@@ -122,6 +122,7 @@ add_library(moonclient_effects STATIC
     effects/effect_named_skill.cpp
     effects/effect_named_sounds.cpp
     effects/effect_paint.cpp
+    effects/effect_shift.cpp
     effects/effect_skill_step.cpp
     effects/effect_skill_view.cpp
     effects/effect_spawn_view.cpp
@@ -1504,6 +1505,7 @@ add_library(moonclient_arena STATIC
     survivors/arena_card_cues.cpp
     survivors/arena_effect_plan.cpp
     survivors/arena_effects.cpp
+    survivors/arena_ground_follow.cpp
     survivors/arena_ground_look.cpp
     survivors/arena_ground_plan.cpp
     survivors/arena_ground_window.cpp

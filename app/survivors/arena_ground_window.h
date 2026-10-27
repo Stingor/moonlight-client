@@ -53,10 +53,11 @@ struct GroundSources {
     const BiomeLook& look, ro::core::LoadProgress* progress = nullptr);
 
 // LA FENÊTRE `origin`, nommée `name`, bâtie sans fichier : plan, GND, GAT, RSW,
-// scène, grille et lumière des acteurs. Le VFS n'est passé qu'à l'assemblage de
-// la scène, qui y trouve tout dans `sources.library`. Le sol se maille en
-// `ground_subdivisions` sous-carreaux par côté de cube : arrondi d'emblée quand
-// le réglage le demande, plutôt qu'à la première image.
+// scène et part pure du téléversement (`PrepareSceneUpload`), grille et lumière
+// des acteurs. Le VFS n'est passé qu'à l'assemblage de la scène, qui y trouve
+// tout dans `sources.library`. Le sol se maille en `ground_subdivisions`
+// sous-carreaux par côté de cube : arrondi d'emblée quand le réglage le
+// demande, plutôt qu'à la première image.
 [[nodiscard]] ro::core::Result<MapStage> BuildGroundWindow(
     ro::vfs::Vfs& vfs, const GroundSources& sources, GroundWindowOrigin origin, std::string name,
     std::int32_t ground_subdivisions = ro::render::kFlatGroundSubdivisions);

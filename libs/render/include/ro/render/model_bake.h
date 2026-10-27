@@ -58,4 +58,9 @@ struct BakedModel {
 [[nodiscard]] BakedModel BakeInstances(const ModelMesh& mesh, std::span<const glm::mat4> transforms,
                                        std::int32_t rsm_version);
 
+// LES POSES FIGÉES DE `model`, CUITES : celles qu'il porte déjà cuites
+// (`ModelInstances::baked`) quand ses poses n'ont pas changé depuis, sinon
+// cuites ici dans `scratch`.
+[[nodiscard]] const BakedModel& BakedPosesOf(const ModelInstances& model, BakedModel& scratch);
+
 }  // namespace ro::render

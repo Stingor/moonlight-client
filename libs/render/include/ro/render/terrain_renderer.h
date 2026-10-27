@@ -3,6 +3,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <memory>
 #include <optional>
 #include <vector>
 
@@ -95,6 +96,21 @@ class TerrainRenderer {
                                           const std::vector<formats::Image>& textures,
                                           const formats::Image& lightmap);
 
+  // LE MÊME TÉLÉVERSEMENT, EN TRANCHES, pour qu'aucune image ne le paie en
+  // entier : `BeginUpload` pose les textures et la lightmap et réserve les
+  // tampons ; chaque `UploadSlice` y copie au plus `most_bytes` des sommets,
+  // puis des indices, et rend vrai quand tout y est. Le compte de
+  // téléversements passe au-delà de `later_than` : un renderer qui en remplace
+  // un autre se dit changé à qui gardait le compte de l'autre.
+  //
+  // ⚠ IL NE SE DESSINE PAS ENTRE LES DEUX, et `mesh` doit vivre jusqu'à la
+  // dernière tranche.
+  [[nodiscard]] core::Result<void> BeginUpload(const TerrainMesh& mesh,
+                                               const std::vector<formats::Image>& textures,
+                                               const formats::Image& lightmap,
+                                               std::uint64_t later_than);
+  [[nodiscard]] bool UploadSlice(std::size_t most_bytes);
+
   // `points` sont les lumières ponctuelles que le sol reçoit, en plus de
   // celles de la carte.
   void Draw(const Camera& camera, const SceneLight& light, float aspect_ratio,
@@ -140,6 +156,11 @@ class TerrainRenderer {
   unsigned int depth_vertex_array_ = 0;
   unsigned int depth_index_buffer_ = 0;
   std::uint64_t uploads_ = 0;
+  // LE TÉLÉVERSEMENT EN TRANCHES en cours : le maillage, ses blocs, et ce qui
+  // en est déjà copié, sommets puis indices puis indices des blocs.
+  const TerrainMesh* staged_mesh_ = nullptr;
+  std::shared_ptr<const TerrainDepthChunks> staged_chunks_;
+  std::size_t staged_bytes_ = 0;
 };
 
 }  // namespace ro::render

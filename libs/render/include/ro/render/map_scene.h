@@ -222,6 +222,11 @@ struct MapSceneOptions {
 [[nodiscard]] core::Result<MapScene> LoadMapScene(vfs::Vfs& vfs, std::string_view map_name,
                                                   const MapSceneOptions& options = {});
 
+// LA PART PURE DU TÉLÉVERSEMENT, faite d'avance : les blocs de profondeur du
+// sol et les poses cuites de chaque modèle. Sans GPU ni fichier ; ce qu'un fil
+// de travail fait d'une scène avant que le fil principal ne la téléverse.
+void PrepareSceneUpload(MapScene& scene);
+
 // LA SCÈNE D'UN SOL ET D'UN DÉCOR DÉJÀ EN MÉMOIRE : tout ce que fait
 // `LoadMapScene` une fois ses deux fichiers lus — retouches, lumière, relief,
 // textures, maillage, eau, modèles, effets, ciel et brouillard. Un sol généré

@@ -1,5 +1,8 @@
 #include "ro/render/model_clock.h"
 
+#include <algorithm>
+#include <utility>
+
 #include "ro/render/model_pose.h"
 #include "ro/render/tick_blend.h"
 
@@ -93,6 +96,46 @@ void ModelClock::Advance(const std::vector<ModelInstances>& models, std::uint32_
     }
   }
   blend_shown_ = blended;
+}
+
+void ModelClock::Rebase(const std::vector<ModelInstances>& from,
+                        const std::vector<ModelInstances>& to) {
+  if (!started_) {
+    return;
+  }
+  std::vector<std::vector<Group>> rebased(to.size());
+  for (std::size_t model = 0; model < to.size(); ++model) {
+    const ModelInstances& instances = to[model];
+    if (instances.rig.empty()) {
+      continue;
+    }
+    const auto same_file = [&instances](const ModelInstances& known) {
+      return known.rsm_file == instances.rsm_file && known.variant_rank == instances.variant_rank;
+    };
+    const auto known = std::find_if(from.begin(), from.end(), same_file);
+    const auto known_index = static_cast<std::size_t>(known - from.begin());
+    for (const ModelPlaybackGroup& playback : instances.animated) {
+      const Group* kept = nullptr;
+      if (known != from.end() && known_index < groups_.size()) {
+        for (std::size_t group = 0;
+             group < known->animated.size() && group < groups_[known_index].size(); ++group) {
+          const ModelPlaybackGroup& played = known->animated[group];
+          if (played.animation_type == playback.animation_type &&
+              played.animation_speed == playback.animation_speed) {
+            kept = &groups_[known_index][group];
+            break;
+          }
+        }
+      }
+      rebased[model].push_back(
+          kept != nullptr ? *kept
+                          : Group{.frame = 0.0F,
+                                  .start_ms = origin_ms_,
+                                  .pose = PoseRig(instances.rig, 0.0F),
+                                  .texture_motions = RigTextureMotions(instances.rig, 0.0F)});
+    }
+  }
+  groups_ = std::move(rebased);
 }
 
 void ModelClock::Hold(const std::vector<ModelInstances>& models, std::size_t model_index,

@@ -95,6 +95,10 @@ class ArenaNumbers {
               std::uint64_t now_ms);
   // Une partie neuve sur l'arène gardée : aucun nombre de la précédente.
   void Restart() noexcept;
+  // LE SOL SE RECENTRE : les nombres composés se déplacent de `world_delta`.
+  // La réserve tient des points de la simulation, que le recentrage ne touche
+  // pas.
+  void Shift(glm::vec3 world_delta) noexcept;
   // Compose les nombres vivants à `now_ms`.
   void Compose(std::uint64_t now_ms, const GroundOf& ground_of);
   void Draw(ro::render::SpriteRenderer& sprites, const ro::render::Camera& camera,

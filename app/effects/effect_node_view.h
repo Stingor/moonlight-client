@@ -116,10 +116,9 @@ class EffectNodesInPlay {
   // ⚠ ET LE PORTEUR, quand l'effet lui est ATTACHÉ : ses semis à venir partent
   // de sa place du moment, voir `FollowActor`. Zéro veut dire « posé là », et
   // c'est le cas de tout ce qui n'est pas un état ou un chapeau.
-  // ⚠ ET LE PARAMÈTRE DE L'INSTANCE : le gestionnaire de coup y pose le nombre
-  // de coups d'un coup multi-coups, et tout autre chemin — le paquet 0x01F3 de
-  // `@effect`, un état, un chapeau — pose UN. Seuls les semis qui le suivent le
-  // lisent.
+  // ⚠ ET LE PARAMÈTRE DE L'INSTANCE : le gestionnaire de coup y pose le nombre de coups d'un
+  // coup multi-coups, et tout autre chemin — le paquet 0x01F3 de `@effect`, un état, un
+  // chapeau — pose UN. Seuls les semis qui le suivent le lisent.
   // ⚠ ET LA VIE MINIMALE, quand l'effet accompagne une action dont la durée est
   // connue : une incantation. Le patron ne connaît que la bouffée ; zéro le
   // laisse décider, ce qui est le cas de tout le reste. Voir
@@ -302,6 +301,9 @@ class EffectNodesInPlay {
   }
 
   [[nodiscard]] std::size_t living() const noexcept { return pool_.size(); }
+  // LE MONDE SE DÉPLACE : voir `EffectNodePool::Shift` et `TracksAlive`.
+  void Shift(glm::vec3 world_delta);
+  [[nodiscard]] bool tracks_alive() const { return pool_.TracksAlive(); }
 
   // CE QUE LE DERNIER `Drawn` A ÉCARTÉ, et pour laquelle des deux raisons.
   // ⚠ DEUX FAÇONS DE SORTIR SANS RIEN RENDRE, et elles accusent des pièces
@@ -324,9 +326,8 @@ class EffectNodesInPlay {
     return pool_.nodes();
   }
 
-  // Combien de quads du monde le dernier `Drawn` a composés. Sert à répondre
-  // « j'ai semé, et voici ce que cela donne » plutôt qu'à laisser l'écran seul
-  // témoin.
+  // Combien de quads du monde le dernier `Drawn` a composés. Sert à répondre « j'ai semé, et
+  // voici ce que cela donne » plutôt qu'à laisser l'écran seul témoin.
   [[nodiscard]] std::size_t world_quad_count() const noexcept {
     std::size_t total = 0;
     for (const std::vector<ro::render::EffectWorldQuad>& lot : ring_quads_) {

@@ -74,4 +74,12 @@ BakedModel BakeInstances(const ModelMesh& mesh, std::span<const glm::mat4> trans
   return baked;
 }
 
+const BakedModel& BakedPosesOf(const ModelInstances& model, BakedModel& scratch) {
+  if (model.baked != nullptr && model.baked_transforms == model.transforms) {
+    return *model.baked;
+  }
+  scratch = BakeInstances(model.mesh, model.transforms, model.rsm_version);
+  return scratch;
+}
+
 }  // namespace ro::render

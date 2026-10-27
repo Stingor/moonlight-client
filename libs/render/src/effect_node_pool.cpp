@@ -137,6 +137,32 @@ bool EffectNodePool::HasAnchored(std::uint32_t anchor_id) const {
          });
 }
 
+void EffectNodePool::Shift(glm::vec3 world_delta) {
+  for (PooledEffectNode& node : nodes_) {
+    node.ground_position += world_delta;
+    if (node.previous_tick.has_value()) {
+      node.previous_tick->ground_position += world_delta;
+    }
+    node.owner_position += world_delta;
+    node.anchor_ground_position += world_delta;
+    node.orbit_anchor += world_delta;
+    node.haunt_center += world_delta;
+    if (node.target_position.has_value()) {
+      *node.target_position += world_delta;
+    }
+    for (EffectTrailStep& step : node.trail) {
+      step.ground_position += world_delta;
+    }
+  }
+  next_anchor_position_ += world_delta;
+}
+
+bool EffectNodePool::TracksAlive() const {
+  return std::ranges::any_of(nodes_, [](const PooledEffectNode& node) {
+    return std::ranges::any_of(node.tracks, &EffectTrack::active);
+  });
+}
+
 bool EffectNodeScheduleSowsAt(const EffectNodeSchedule& schedule, std::int32_t tick) {
   // UN ÂGE QUI REPART À ZÉRO REJOUE L'HORAIRE : le tic se lit dans le cycle.
   if (schedule.cycle_ticks > 0) {

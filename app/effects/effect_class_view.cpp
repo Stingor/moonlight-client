@@ -225,7 +225,7 @@ void EffectClassesInPlay::Advance(const ro::sim::World& world, const MapStage& s
       tick.owner_present = living.owner_id == 0;
       if (const std::optional<glm::vec3> owner =
               PlaceOf(living.owner_id, world, stage, planner, last_tick_ms_)) {
-        tick.owner_position = ro::render::EffectClassToClient(*owner);
+        tick.owner_position = ro::render::EffectClassToClient(*owner - living.frame_shift);
         tick.owner_present = true;
       }
       // CE QUE LE PORTEUR MONTRE, pour les classes qui s'y règlent : la
@@ -260,17 +260,23 @@ void EffectClassesInPlay::Advance(const ro::sim::World& world, const MapStage& s
       tick.bound_position.reset();
       if (const std::optional<glm::vec3> bound =
               PlaceOf(living.bound_id, world, stage, planner, last_tick_ms_)) {
-        tick.bound_position = ro::render::EffectClassToClient(*bound);
+        tick.bound_position = ro::render::EffectClassToClient(*bound - living.frame_shift);
       }
       if (!living.instance->Alive(tick)) {
         return true;
       }
       const glm::vec3 here = ro::render::EffectClassFromClient(
-          tick.owner_position.value_or(living.instance->position()));
+                                 tick.owner_position.value_or(living.instance->position())) +
+                             living.frame_shift;
       tick.culled =
           player.has_value() && glm::length(here - *player) >= ro::render::kEffectClassCullDistance;
       const std::size_t asked_before = events.spawns_on_owner.size();
+      const OutputSizes before = SizesOf(events);
+      const ro::render::EffectClassView seen_from = ViewFrom(view, living.frame_shift);
+      tick.view = &seen_from;
       living.instance->Advance(tick, events);
+      tick.view = &view;
+      ShiftAdded(events, before, living.frame_shift);
       // Ce que ce battement demande sur le porteur reste attaché à lui.
       for (std::size_t rang = asked_before; rang < events.spawns_on_owner.size(); ++rang) {
         owner_spawns_.push_back(OwnerSpawn{events.spawns_on_owner[rang], living.owner_id, here});
@@ -300,7 +306,9 @@ void EffectClassesInPlay::Advance(const ro::sim::World& world, const MapStage& s
   for (const Living& living : living_) {
     if (!living.instance->culled() &&
         draw_gate_.DrawsEffect(living.instance->effect_id(), living.owner_id, living.from_hat)) {
-      living.instance->Draw(view, dessin);
+      const OutputSizes before = SizesOf(dessin);
+      living.instance->Draw(ViewFrom(view, living.frame_shift), dessin);
+      ShiftAdded(dessin, before, living.frame_shift);
     }
   }
   Compose(dessin);
@@ -489,6 +497,49 @@ void EffectClassesInPlay::Compose(const ro::render::EffectClassOutput& output) {
   }
   for (std::size_t rang = 0; rang < screen_quads_.size(); ++rang) {
     screen_quads_[rang].quads = screen_quad_lots_[rang];
+  }
+}
+
+void EffectClassesInPlay::Shift(glm::vec3 world_delta) {
+  for (Living& living : living_) living.frame_shift += world_delta;
+  for (OwnerSpawn& spawn : owner_spawns_) spawn.ground_position += world_delta;
+}
+
+ro::render::EffectClassView EffectClassesInPlay::ViewFrom(const ro::render::EffectClassView& view,
+                                                          glm::vec3 frame_shift) {
+  ro::render::EffectClassView shifted = view;
+  if (frame_shift != glm::vec3(0.0F) && view.project) {
+    shifted.project = [project = view.project, frame_shift](glm::vec3 point) {
+      return project(point + frame_shift);
+    };
+  }
+  return shifted;
+}
+
+EffectClassesInPlay::OutputSizes EffectClassesInPlay::SizesOf(
+    const ro::render::EffectClassOutput& output) {
+  return OutputSizes{.strs = output.strs.size(),
+                     .quads = output.quads.size(),
+                     .sprites = output.sprites.size(),
+                     .sounds = output.sounds.size()};
+}
+
+void EffectClassesInPlay::ShiftAdded(ro::render::EffectClassOutput& output,
+                                     const OutputSizes& before, glm::vec3 frame_shift) {
+  if (frame_shift == glm::vec3(0.0F)) return;
+  for (std::size_t rank = before.strs; rank < output.strs.size(); ++rank) {
+    output.strs[rank].ground_position += frame_shift;
+  }
+  for (std::size_t rank = before.quads; rank < output.quads.size(); ++rank) {
+    ro::render::EffectWorldQuad& quad = output.quads[rank].quad;
+    for (glm::vec3& corner : quad.corners) corner += frame_shift;
+    quad.screen_anchor += frame_shift;
+  }
+  for (std::size_t rank = before.sprites; rank < output.sprites.size(); ++rank) {
+    output.sprites[rank].ground_position += frame_shift;
+  }
+  for (std::size_t rank = before.sounds; rank < output.sounds.size(); ++rank) {
+    output.sounds[rank].position += frame_shift;
   }
 }
 

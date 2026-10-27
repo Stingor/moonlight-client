@@ -18,6 +18,8 @@
 
 namespace ro::render {
 
+struct BakedModel;
+
 // Maillage d'un modèle du décor, aplati en coordonnées locales au modèle.
 //
 // Comme pour le terrain, aucune dépendance à OpenGL : c'est une transformation
@@ -231,6 +233,12 @@ struct ModelInstances {
   std::optional<std::array<std::array<float, 3>, 2>> placement_bounds;
   // Les poses FIGÉES, dessinées d'un seul maillage.
   std::vector<glm::mat4> transforms;
+  // CES POSES DÉJÀ CUITES (`BakeInstances`) hors du fil qui téléverse
+  // (`PrepareSceneUpload`), et les poses pour lesquelles elles l'ont été ;
+  // nulles, `ModelRenderer::Upload` les cuit lui-même. Elles ne servent que si
+  // les poses n'ont pas changé depuis.
+  std::shared_ptr<const BakedModel> baked;
+  std::vector<glm::mat4> baked_transforms;
   // Le rang de chaque pose figée dans le RSW, dans l'ordre de `transforms`.
   std::vector<std::size_t> rsw_ranks;
   // Vide tant que le modèle n'a rien qui bouge.

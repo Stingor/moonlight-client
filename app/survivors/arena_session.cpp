@@ -66,10 +66,29 @@ void ArenaSession::Warm(std::span<const std::uint16_t> species,
               viewport_width, viewport_height, now_ms);
 }
 
+void ArenaSession::FollowGround() {
+  const std::optional<glm::vec2> hero = hero_cell();
+  if (!hero.has_value()) return;
+  const std::optional<GroundRecentre> moved =
+      scene_.FollowHero(*hero, effects_.ShiftsWithoutTrace());
+  if (!moved.has_value()) return;
+  // 🔴 DANS LA MÊME IMAGE QUE L'ÉCHANGE, avant que rien ne se compose : tout
+  // ce que la session tient en coordonnées du monde se déplace d'autant. Les
+  // corps, la lanterne, les halos et l'image ouverte se refont depuis la
+  // nouvelle fenêtre ; les poses et la réserve des chiffres comptent en cases
+  // de la partie, que le recentrage ne touche pas.
+  effects_.Shift(moved->world_delta, glm::ivec2(moved->to.x_cells, moved->to.y_cells));
+  numbers_.Shift(moved->world_delta);
+  camera_.Shift(moved->world_delta);
+  ++recentres_;
+  most_mount_ms_ = std::max(most_mount_ms_, moved->mount_ms);
+}
+
 void ArenaSession::Compose(const ArenaFrameFacts& facts, const GraphicsOptions& graphics,
                            std::uint32_t now_ms) {
   const ro::sim::SurvivorsField& field = *facts.field;
   const std::uint32_t renderer_ms = RendererMs(facts.presentation_ms);
+  FollowGround();
   const auto ground_of = [this](ro::sim::FieldPoint point) { return scene_.GroundAt(point); };
   const auto effects_started = std::chrono::steady_clock::now();
   effects_.Advance(*facts.news, field, facts.orbs, ground_of, renderer_ms);

@@ -104,6 +104,9 @@ class EffectsInPlay {
   // ⚠ LA TROUPE PROCÉDURALE S'OUBLIE PAR SON PROPRE `Forget` : l'appelant fait
   // les deux.
   void Forget();
+  // LE MONDE SE DÉPLACE de `world_delta`, et chaque case du monde de `cell_delta` : voir
+  // `effect_shift.cpp`. ⚠ LA TROUPE PROCÉDURALE SE DÉPLACE PAR SON PROPRE `Shift`.
+  void Shift(glm::vec3 world_delta, glm::ivec2 cell_delta);
 
   // Repère les effets que le monde porte depuis le dernier passage, et lance
   // ceux qu'il sait nommer.

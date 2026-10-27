@@ -62,6 +62,13 @@ class ModelClock {
   void Hold(const std::vector<ModelInstances>& models, std::size_t model_index,
             std::size_t group_index, float frame);
 
+  // LE MÊME DÉCOR SOUS UNE AUTRE LISTE DE MODÈLES : les groupes de `to` qui ont
+  // leur pareil dans `from` — même fichier, même variante, même façon de jouer —
+  // en reprennent l'image et la pose ; les autres naissent au repos. L'origine
+  // et les pas comptés restent : rien ne repart de zéro. Sans effet avant
+  // `Start`.
+  void Rebase(const std::vector<ModelInstances>& from, const std::vector<ModelInstances>& to);
+
   [[nodiscard]] bool started() const noexcept { return started_; }
 
   // L'image courante d'un groupe, ou zéro hors de ce que l'horloge connaît.

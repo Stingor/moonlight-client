@@ -1,7 +1,11 @@
 #include "ro/render/terrain_renderer.h"
 
+#include <algorithm>
+#include <array>
 #include <cstddef>
 #include <cstdint>
+#include <limits>
+#include <memory>
 #include <string_view>
 #include <utility>
 
@@ -197,6 +201,9 @@ TerrainRenderer& TerrainRenderer::operator=(TerrainRenderer&& other) noexcept {
     std::swap(depth_vertex_array_, other.depth_vertex_array_);
     std::swap(depth_index_buffer_, other.depth_index_buffer_);
     std::swap(uploads_, other.uploads_);
+    std::swap(staged_mesh_, other.staged_mesh_);
+    std::swap(staged_chunks_, other.staged_chunks_);
+    std::swap(staged_bytes_, other.staged_bytes_);
   }
   return *this;
 }
@@ -238,7 +245,18 @@ core::Result<TerrainRenderer> TerrainRenderer::Create() {
 core::Result<void> TerrainRenderer::Upload(const TerrainMesh& mesh,
                                            const std::vector<formats::Image>& textures,
                                            const formats::Image& lightmap) {
-  ++uploads_;
+  if (auto begun = BeginUpload(mesh, textures, lightmap, uploads_); !begun) {
+    return begun;
+  }
+  static_cast<void>(UploadSlice(std::numeric_limits<std::size_t>::max()));
+  return {};
+}
+
+core::Result<void> TerrainRenderer::BeginUpload(const TerrainMesh& mesh,
+                                                const std::vector<formats::Image>& textures,
+                                                const formats::Image& lightmap,
+                                                std::uint64_t later_than) {
+  uploads_ = std::max(uploads_, later_than) + 1;
   surfaces_ = mesh.surfaces;
 
   textures_.clear();
@@ -268,21 +286,25 @@ core::Result<void> TerrainRenderer::Upload(const TerrainMesh& mesh,
     glGenBuffers(1, &index_buffer_);
   }
 
+  // LES TAMPONS RÉSERVÉS, remplis par tranches. Les indices restent liés au
+  // tableau de sommets, qui les retient.
   glBindVertexArray(vertex_array_);
   glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_);
   glBufferData(GL_ARRAY_BUFFER,
-               static_cast<GLsizeiptr>(mesh.vertices.size() * sizeof(TerrainVertex)),
-               mesh.vertices.data(), GL_STATIC_DRAW);
-  // Les indices restent liés au tableau de sommets, qui les retient.
+               static_cast<GLsizeiptr>(mesh.vertices.size() * sizeof(TerrainVertex)), nullptr,
+               GL_STATIC_DRAW);
   indexed_ = !mesh.indices.empty();
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer_);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-               static_cast<GLsizeiptr>(mesh.indices.size() * sizeof(std::uint32_t)),
-               mesh.indices.data(), GL_STATIC_DRAW);
+               static_cast<GLsizeiptr>(mesh.indices.size() * sizeof(std::uint32_t)), nullptr,
+               GL_STATIC_DRAW);
   DescribeVertices();
 
-  TerrainDepthChunks chunks = BuildTerrainDepthChunks(mesh);
-  depth_chunks_ = std::move(chunks.chunks);
+  // LES BLOCS BÂTIS D'AVANCE, sinon ici : ils ne dépendent que du maillage.
+  staged_chunks_ = mesh.depth_chunks != nullptr
+                       ? mesh.depth_chunks
+                       : std::make_shared<const TerrainDepthChunks>(BuildTerrainDepthChunks(mesh));
+  depth_chunks_ = staged_chunks_->chunks;
   if (depth_vertex_array_ == 0) {
     glGenVertexArrays(1, &depth_vertex_array_);
     glGenBuffers(1, &depth_index_buffer_);
@@ -291,12 +313,57 @@ core::Result<void> TerrainRenderer::Upload(const TerrainMesh& mesh,
   glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, depth_index_buffer_);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-               static_cast<GLsizeiptr>(chunks.indices.size() * sizeof(std::uint32_t)),
-               chunks.indices.data(), GL_STATIC_DRAW);
+               static_cast<GLsizeiptr>(staged_chunks_->indices.size() * sizeof(std::uint32_t)),
+               nullptr, GL_STATIC_DRAW);
   DescribeVertices();
   glBindVertexArray(0);
-
+  staged_mesh_ = &mesh;
+  staged_bytes_ = 0;
   return {};
+}
+
+bool TerrainRenderer::UploadSlice(std::size_t most_bytes) {
+  if (staged_mesh_ == nullptr) {
+    return true;
+  }
+  // Les trois tampons bout à bout, copiés par la cible de copie : aucune
+  // liaison d'un tableau de sommets n'en est touchée.
+  struct Part {
+    unsigned int buffer = 0;
+    const void* data = nullptr;
+    std::size_t bytes = 0;
+  };
+  const std::array<Part, 3> parts = {{
+      {vertex_buffer_, staged_mesh_->vertices.data(),
+       staged_mesh_->vertices.size() * sizeof(TerrainVertex)},
+      {index_buffer_, staged_mesh_->indices.data(),
+       staged_mesh_->indices.size() * sizeof(std::uint32_t)},
+      {depth_index_buffer_, staged_chunks_->indices.data(),
+       staged_chunks_->indices.size() * sizeof(std::uint32_t)},
+  }};
+  std::size_t left = most_bytes;
+  std::size_t part_start = 0;
+  for (const Part& part : parts) {
+    const std::size_t part_end = part_start + part.bytes;
+    if (left > 0 && staged_bytes_ < part_end) {
+      const std::size_t offset = staged_bytes_ - part_start;
+      const std::size_t copied = std::min(left, part.bytes - offset);
+      glBindBuffer(GL_COPY_WRITE_BUFFER, part.buffer);
+      glBufferSubData(GL_COPY_WRITE_BUFFER, static_cast<GLintptr>(offset),
+                      static_cast<GLsizeiptr>(copied),
+                      static_cast<const std::uint8_t*>(part.data) + offset);
+      staged_bytes_ += copied;
+      left -= copied;
+    }
+    part_start = part_end;
+  }
+  glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
+  if (staged_bytes_ < part_start) {
+    return false;
+  }
+  staged_mesh_ = nullptr;
+  staged_chunks_.reset();
+  return true;
 }
 
 void TerrainRenderer::DescribeVertices() const {

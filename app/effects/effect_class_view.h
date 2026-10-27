@@ -131,13 +131,37 @@ class EffectClassesInPlay {
 
   void Forget();
 
+  // LE MONDE SE DÉPLACE DE `world_delta` (notre repère). Une instance garde le
+  // repère où elle est née : ce qui lui entre — place du porteur, de l'acteur
+  // lié, projection — s'y ramène, et ce qu'elle peint ou fait sonner en sort.
+  // Aucune de ses particules n'a donc à se déplacer.
+  void Shift(glm::vec3 world_delta);
+
  private:
   struct Living {
     std::unique_ptr<ro::render::EffectClassInstance> instance;
     std::uint32_t owner_id = 0;
     std::uint32_t bound_id = 0;
     bool from_hat = false;  // voir `Birth::from_hat`
+    // Ce qu'il faut ajouter à un point du repère de l'instance pour l'avoir
+    // dans le monde d'aujourd'hui.
+    glm::vec3 frame_shift{0.0F, 0.0F, 0.0F};
   };
+  // La vue de l'image, vue depuis le repère d'une instance décalée de
+  // `frame_shift`.
+  [[nodiscard]] static ro::render::EffectClassView ViewFrom(const ro::render::EffectClassView& view,
+                                                            glm::vec3 frame_shift);
+  // Ramène dans le monde ce que l'instance vient d'ajouter à `output` depuis
+  // les tailles `before`.
+  struct OutputSizes {
+    std::size_t strs = 0;
+    std::size_t quads = 0;
+    std::size_t sprites = 0;
+    std::size_t sounds = 0;
+  };
+  [[nodiscard]] static OutputSizes SizesOf(const ro::render::EffectClassOutput& output);
+  static void ShiftAdded(ro::render::EffectClassOutput& output, const OutputSizes& before,
+                         glm::vec3 frame_shift);
 
   [[nodiscard]] std::optional<glm::vec3> PlaceOf(std::uint32_t id, const ro::sim::World& world,
                                                  const MapStage& stage,

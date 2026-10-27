@@ -115,6 +115,10 @@ void ArenaNumbers::Restart() noexcept {
   drawn_.clear();
 }
 
+void ArenaNumbers::Shift(glm::vec3 world_delta) noexcept {
+  for (ro::render::DrawnActor& drawn : drawn_) drawn.ground_position += world_delta;
+}
+
 void ArenaNumbers::Compose(std::uint64_t now_ms, const GroundOf& ground_of) {
   pool_.Expire(now_ms);
   drawn_.clear();

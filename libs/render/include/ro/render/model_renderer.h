@@ -91,9 +91,12 @@ class ModelRenderer {
   // textures à chaque fois. Celles que le nouveau téléversement ne cite plus se
   // rendent au pilote.
   //
-  // `progress`, quand il est donné, compte les modèles envoyés.
+  // `progress`, quand il est donné, compte les modèles envoyés. Le compte de
+  // téléversements passe au-delà de `later_than` : un renderer qui en remplace
+  // un autre se dit changé à qui gardait le compte de l'autre.
   [[nodiscard]] core::Result<void> Upload(const std::vector<ModelInstances>& models,
-                                          core::LoadProgress* progress = nullptr);
+                                          core::LoadProgress* progress = nullptr,
+                                          std::uint64_t later_than = 0);
 
   // Combien de textures le dernier téléversement a dû envoyer au pilote : celles
   // qu'aucun précédent n'avait déjà envoyées.

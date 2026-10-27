@@ -1,5 +1,6 @@
 #include "world/lit_stage.h"
 
+#include <limits>
 #include <string>
 #include <utility>
 #include <vector>
@@ -40,6 +41,8 @@ ro::core::Result<void> LitStage::Open(ro::vfs::Vfs& vfs, MapStage stage,
 ro::core::Result<void> LitStage::Mount(ro::vfs::Vfs& vfs, MapStage stage,
                                        std::string_view sky_map_name,
                                        ro::core::LoadProgress* progress) {
+  // Une carte préparée pour la précédente ne vaut rien pour celle-ci.
+  static_cast<void>(DropPrepared());
   stage_ = std::move(stage);
   background_ = BackgroundOf(*stage_);
 
@@ -82,6 +85,74 @@ ro::core::Result<void> LitStage::Mount(ro::vfs::Vfs& vfs, MapStage stage,
   return {};
 }
 
+ro::core::Result<MapStage> LitStage::Replace(MapStage stage) {
+  if (auto prepared = Prepare(std::move(stage)); !prepared) {
+    return std::unexpected(prepared.error());
+  }
+  return MountPrepared();
+}
+
+ro::core::Result<void> LitStage::Prepare(MapStage stage) {
+  if (!spare_terrain_.has_value()) {
+    auto created = ro::render::TerrainRenderer::Create();
+    if (!created) return std::unexpected(created.error());
+    spare_terrain_ = std::move(*created);
+  }
+  if (!spare_models_.has_value()) {
+    auto created = ro::render::ModelRenderer::Create();
+    if (!created) return std::unexpected(created.error());
+    spare_models_ = std::move(*created);
+  }
+  spare_models_ready_ = false;
+  prepared_ = std::move(stage);
+  // Le compte du sol de réserve passe au-delà de celui du sol montré : qui
+  // garde l'ombre du sol le saura changé à l'échange.
+  return spare_terrain_->BeginUpload(prepared_->scene.terrain, prepared_->scene.terrain_textures,
+                                     prepared_->scene.atlas.image, terrain_.uploads());
+}
+
+bool LitStage::PrepareStep(std::size_t most_bytes) {
+  if (!prepared_.has_value() || spare_models_ready_) return true;
+  if (!spare_terrain_->UploadSlice(most_bytes)) return false;
+  // LE DÉCOR APRÈS LE SOL, à une image à lui : il ne se coupe pas.
+  spare_models_->SetTextureFilter(decor_filter_);
+  if (auto uploaded = spare_models_->Upload(prepared_->scene.models, nullptr, models_.uploads());
+      !uploaded) {
+    ro::core::LogWarning("scène éclairée : décor préparé refusé — {}",
+                         ro::core::Describe(uploaded.error()));
+  }
+  spare_models_ready_ = true;
+  return false;
+}
+
+ro::core::Result<MapStage> LitStage::MountPrepared() {
+  // Le reste du sol, s'il en reste : le renderer de réserve lit encore la carte
+  // préparée tant qu'il n'a pas fini.
+  while (!PrepareStep(std::numeric_limits<std::size_t>::max())) {
+  }
+  MapStage outgoing = std::exchange(*stage_, std::move(*prepared_));
+  prepared_.reset();
+  std::swap(terrain_, *spare_terrain_);
+  std::swap(models_, *spare_models_);
+  spare_models_ready_ = false;
+  background_ = BackgroundOf(*stage_);
+  model_clock_.Rebase(outgoing.scene.models, stage_->scene.models);
+  if (auto uploaded = water_.Upload(stage_->scene.water, stage_->scene.water_animations);
+      !uploaded) {
+    return std::unexpected(uploaded.error());
+  }
+  return outgoing;
+}
+
+std::optional<MapStage> LitStage::DropPrepared() {
+  if (!prepared_.has_value()) return std::nullopt;
+  static_cast<void>(spare_terrain_->UploadSlice(std::numeric_limits<std::size_t>::max()));
+  std::optional<MapStage> dropped = std::move(prepared_);
+  prepared_.reset();
+  spare_models_ready_ = false;
+  return dropped;
+}
+
 LitFrame LitStage::Begin(const GraphicsOptions& graphics, bool fog_shown,
                          std::uint32_t elapsed_ms) {
   // LE SOL ARRONDI comme en partie. Un refus de la carte graphique laisse le sol
@@ -121,7 +192,8 @@ void LitStage::Paint(LitFrame& frame, const ro::render::Camera& camera, float as
   terrain_.Draw(camera, frame.sky.light, aspect_ratio,
                 ClearColorOf(*stage_, background_, frame.fog_shown), frame.stages, frame.fog,
                 frame.sun, frame.points);
-  models_.SetTextureFilter(graphics.decor_filter());
+  decor_filter_ = graphics.decor_filter();
+  models_.SetTextureFilter(decor_filter_);
   // Les faces à texture mêlée attendent la passe translucide, après les corps.
   models_.Draw(camera, frame.sky.light, aspect_ratio,
                ro::render::ModelStages{.blended_apart = true}, &model_clock_, frame.fog, nullptr,

@@ -1,6 +1,7 @@
 #include "survivors/arena_scene.h"
 
 #include <algorithm>
+#include <chrono>
 #include <limits>
 #include <optional>
 #include <string>
@@ -41,6 +42,7 @@ ro::core::Result<void> ArenaScene::Open(ro::vfs::Vfs& vfs, const ro::sim::ArenaR
                                                    ro::core::Describe(opened.error()));
   }
   lit_.set_sky_hour_imposed(true);
+  follow_.reset();
   ground_.reset();
   origin_ = GroundWindowOrigin();
   ro::core::LogInfo("arène : {} montée", lit_.stage().name);
@@ -62,23 +64,122 @@ ro::core::Result<void> ArenaScene::Open(ro::vfs::Vfs& vfs, const ro::sim::Surviv
     return ro::core::Fail(sources.error().code, "arène " + std::string(arena.key) + " : " +
                                                     ro::core::Describe(sources.error()));
   }
-  ground_ = std::make_unique<GroundSources>(std::move(*sources));
-  origin_ = GroundWindowAround(ro::sim::kTerrainStartCell, ro::sim::kTerrainStartCell);
-  auto window = BuildGroundWindow(vfs, *ground_, origin_, std::string(arena.key),
-                                  read.rounded_ground ? ro::render::kRoundedGroundSubdivisions
-                                                      : ro::render::kFlatGroundSubdivisions);
+  return OpenGround(vfs, std::move(*sources),
+                    GroundWindowAround(ro::sim::kTerrainStartCell, ro::sim::kTerrainStartCell),
+                    std::string(arena.key), read);
+}
+
+ro::core::Result<void> ArenaScene::OpenGround(ro::vfs::Vfs& vfs, GroundSources sources,
+                                              GroundWindowOrigin origin, std::string name,
+                                              const MapStageRead& read, GroundBuildThread thread) {
+  follow_.reset();
+  ground_ = std::make_unique<GroundSources>(std::move(sources));
+  vfs_ = &vfs;
+  origin_ = origin;
+  ground_subdivisions_ = read.rounded_ground ? ro::render::kRoundedGroundSubdivisions
+                                             : ro::render::kFlatGroundSubdivisions;
+  auto window = BuildGroundWindow(vfs, *ground_, origin_, name, ground_subdivisions_);
   if (!window) return std::unexpected(window.error());
-  if (auto opened = lit_.Open(vfs, std::move(*window), look->reference_map, read.progress);
+  if (auto opened = lit_.Open(vfs, std::move(*window), ground_->look->reference_map, read.progress);
       !opened) {
     return std::unexpected(opened.error());
   }
   lit_.set_sky_hour_imposed(true);
-  ro::core::LogInfo("arène : {} générée, fenêtre en ({}, {})", arena.key, origin_.x_cells,
+  // 🔴 UN FIL DE TRAVAIL NE LIT AUCUN FICHIER : une fenêtre ne cite que ce que
+  // la bibliothèque a lu (`OpenGroundSources`). Une texture du sol absente de
+  // l'installation se relirait à chaque fenêtre, sur le VFS que le fil
+  // principal emploie : les fenêtres se bâtissent alors sur le fil principal.
+  const GroundBuildThread builds_on =
+      ground_->library.missing_terrain_textures == 0 ? thread : GroundBuildThread::kCaller;
+  follow_ = std::make_unique<GroundFollow<MapStage>>(
+      [this, name](GroundWindowOrigin next) {
+        return BuildGroundWindow(*vfs_, *ground_, next, name, ground_subdivisions_);
+      },
+      builds_on);
+  ro::core::LogInfo("arène : {} générée, fenêtre en ({}, {})", name, origin_.x_cells,
                     origin_.y_cells);
   return {};
 }
 
+std::optional<GroundRecentre> ArenaScene::FollowHero(glm::vec2 hero_cell,
+                                                     bool shifts_without_trace) {
+  if (follow_ == nullptr) return std::nullopt;
+  const bool forced = GroundRecentreForced(origin_, hero_cell);
+  if (!lit_.preparing()) {
+    if (std::optional<GroundFollow<MapStage>::Built> built =
+            follow_->Next(origin_, hero_cell, forced)) {
+      if (auto prepared = lit_.Prepare(std::move(built->window)); !prepared) {
+        ro::core::LogWarning("arène : fenêtre ({}, {}) non préparée — {}", built->origin.x_cells,
+                             built->origin.y_cells, ro::core::Describe(prepared.error()));
+        return std::nullopt;
+      }
+      prepared_origin_ = built->origin;
+      // Les textures et les tampons réservés font l'image de la préparation : la
+      // première tranche attend la suivante, sauf au bord.
+      if (!forced) return std::nullopt;
+    }
+  }
+  if (!lit_.preparing()) return std::nullopt;
+  // UNE TRANCHE DU SOL PAR IMAGE, tout d'un coup quand le bord approche.
+  const bool uploaded =
+      lit_.PrepareStep(forced ? std::numeric_limits<std::size_t>::max() : kGroundUploadSliceBytes);
+  switch (
+      GroundPreparedFateOf(origin_, prepared_origin_, hero_cell, uploaded, shifts_without_trace)) {
+    case GroundPreparedFate::kKeep:
+      return std::nullopt;
+    case GroundPreparedFate::kDrop:
+      if (std::optional<MapStage> dropped = lit_.DropPrepared()) {
+        follow_->Retire(std::move(*dropped));
+      }
+      return std::nullopt;
+    case GroundPreparedFate::kMount:
+      break;
+  }
+  auto mounted = MountPrepared();
+  if (!mounted) {
+    ro::core::LogWarning("arène : fenêtre ({}, {}) non montée — {}", prepared_origin_.x_cells,
+                         prepared_origin_.y_cells, ro::core::Describe(mounted.error()));
+    return std::nullopt;
+  }
+  return *mounted;
+}
+
+ro::core::Result<GroundRecentre> ArenaScene::Recentre(GroundWindowOrigin origin) {
+  if (ground_ == nullptr) {
+    return ro::core::Fail(ro::core::ErrorCode::kInvalidArgument,
+                          "arène : une carte ne se recentre pas");
+  }
+  auto window = BuildGroundWindow(*vfs_, *ground_, origin, std::string(lit_.map_name()),
+                                  ground_subdivisions_);
+  if (!window) return std::unexpected(window.error());
+  if (std::optional<MapStage> dropped = lit_.DropPrepared(); dropped && follow_ != nullptr) {
+    follow_->Retire(std::move(*dropped));
+  }
+  if (auto prepared = lit_.Prepare(std::move(*window)); !prepared) {
+    return std::unexpected(prepared.error());
+  }
+  prepared_origin_ = origin;
+  return MountPrepared();
+}
+
+ro::core::Result<GroundRecentre> ArenaScene::MountPrepared() {
+  const auto started = std::chrono::steady_clock::now();
+  auto outgoing = lit_.MountPrepared();
+  const double mount_ms =
+      std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - started).count();
+  if (!outgoing) return std::unexpected(outgoing.error());
+  if (follow_ != nullptr) follow_->Retire(std::move(*outgoing));
+  const GroundRecentre recentre{.from = origin_,
+                                .to = prepared_origin_,
+                                .world_delta = GroundWorldShift(origin_, prepared_origin_),
+                                .mount_ms = mount_ms};
+  origin_ = prepared_origin_;
+  return recentre;
+}
+
 LitFrame ArenaScene::Begin(const GraphicsOptions& graphics, std::uint64_t presentation_ms) {
+  ground_subdivisions_ = graphics.rounded_ground() ? ro::render::kRoundedGroundSubdivisions
+                                                   : ro::render::kFlatGroundSubdivisions;
   return lit_.Begin(graphics, graphics.fog(), RendererMs(presentation_ms));
 }
 

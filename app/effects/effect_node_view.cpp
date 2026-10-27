@@ -502,4 +502,23 @@ std::int32_t EffectNodesInPlay::ProceduralLifeTicks(std::uint32_t effect_id) {
   return life_ticks;
 }
 
+// LE MONDE QUI SE DÉPLACE : ce que la fenêtre garde d'une image à l'autre suit ; ce qui
+// est refait à chaque image n'a rien à garder.
+void EffectNodesInPlay::Shift(glm::vec3 world_delta) {
+  pool_.Shift(world_delta);
+  for (EffectClock& clock : clocks_) {
+    clock.ground_position += world_delta;
+    clock.bearer_ground_position += world_delta;
+    if (clock.target_position.has_value()) *clock.target_position += world_delta;
+  }
+  for (ScreenNodeInPlay& screen : screen_nodes_) screen.owner_position += world_delta;
+  for (SowingSound& sound : sowing_sounds_) sound.ground_position += world_delta;
+  // Un point du monde seulement : les autres demandes portent un écart à leur
+  // acteur.
+  for (ro::render::EffectSpawnRequest& request : spawn_requests_) {
+    if (request.place == ro::render::EffectSpawnPlace::kAtPoint) request.position += world_delta;
+  }
+  if (local_player_position_.has_value()) *local_player_position_ += world_delta;
+}
+
 }  // namespace moonclient

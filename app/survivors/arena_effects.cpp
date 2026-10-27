@@ -179,6 +179,37 @@ void ArenaEffects::Open(const MapStage& stage, glm::ivec2 origin_cells) {
   Restart();
 }
 
+void ArenaEffects::Shift(glm::vec3 world_delta, glm::ivec2 origin_cells) {
+  // CE QUI S'AJOUTE À CHAQUE CASE du monde privé : elle se compte depuis un
+  // coin plus loin d'autant.
+  const glm::ivec2 cell_delta = origin_cells_ - origin_cells;
+  origin_cells_ = origin_cells;
+  effects_.Shift(world_delta, cell_delta);
+  nodes_.Shift(world_delta);
+  // LES ACTEURS DU MONDE PRIVÉ — héros, orbes, cartes — à leur case nouvelle ;
+  // `Advance` les repose ensuite à chaque image.
+  std::vector<ro::sim::Actor> moved;
+  for (const auto& entry : world_.actors()) {
+    const ro::sim::Actor& actor = entry.second;
+    ro::sim::Actor shifted = actor;
+    shifted.position.x =
+        static_cast<std::uint16_t>(static_cast<std::int32_t>(actor.position.x) + cell_delta.x);
+    shifted.position.y =
+        static_cast<std::uint16_t>(static_cast<std::int32_t>(actor.position.y) + cell_delta.y);
+    moved.push_back(std::move(shifted));
+  }
+  for (ro::sim::Actor& actor : moved) world_.Spawn(std::move(actor));
+  // La carte a changé sous la même adresse : le chemin et la dispersion se
+  // relisent.
+  if (stage_ != nullptr) {
+    planner_.emplace(PlannedMapOf(*stage_));
+    nodes_.NoticeWorld(EffectScatterWorldOf(*stage_));
+  }
+  for (ro::render::GroundQuad& quad : mark_quads_) {
+    for (glm::vec3& corner : quad.corners) corner += world_delta;
+  }
+}
+
 void ArenaEffects::Restart() {
   effects_.Forget();
   nodes_.Forget();

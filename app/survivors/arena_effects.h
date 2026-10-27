@@ -71,6 +71,17 @@ class ArenaEffects {
   // pour une carte, le coin de la fenêtre pour le sol généré.
   void Open(const MapStage& stage, glm::ivec2 origin_cells = {});
 
+  // LE SOL SE RECENTRE (`ArenaScene::FollowHero`) : la carte montée a été
+  // remplacée en place par la fenêtre de coin `origin_cells`, et chaque point du
+  // monde dessiné se déplace de `world_delta`. Les effets en cours suivent :
+  // les fichiers d'effet et les instances de classe sans trace, les nœuds
+  // procéduraux à leur niveau (`EffectNodePool::Shift`) ; le monde privé
+  // recompte ses cases depuis le nouveau coin.
+  void Shift(glm::vec3 world_delta, glm::ivec2 origin_cells);
+  // Vrai quand `Shift` ne laisserait aucune trace : aucun nœud procédural n'a
+  // de piste allumée, dont les points ont le sens que leur figure leur donne.
+  [[nodiscard]] bool ShiftsWithoutTrace() const { return !nodes_.tracks_alive(); }
+
   // UNE PARTIE NEUVE sur l'arène gardée (« Rejouer ») : aucun effet, aucune
   // flamme, aucun tir, aucune annonce ni orbe de la précédente, dont les
   // instants sont lus sur une autre horloge de présentation.

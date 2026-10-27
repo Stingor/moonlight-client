@@ -593,6 +593,18 @@ class EffectNodePool {
 
   [[nodiscard]] bool HasAnchored(std::uint32_t anchor_id) const;
 
+  // LE MONDE ENTIER SE DÉPLACE DE `world_delta` : chaque point que la troupe
+  // tient au niveau du nœud — sa place et celle du tic précédent, son porteur,
+  // son ancre, son orbite, sa hantise, sa cible, sa traînée — et le point du
+  // prochain semis ancré suivent.
+  //
+  // ⚠ LES PISTES NE BOUGENT PAS : chaque figure donne à ses ancres et à ses
+  // cases le sens qu'elle veut — point du monde, écart au nœud, hauteur. Qui
+  // déplace le monde sans trace attend que `TracksAlive` soit faux.
+  void Shift(glm::vec3 world_delta);
+  // Vrai tant qu'un nœud a une piste allumée.
+  [[nodiscard]] bool TracksAlive() const;
+
   // LA CIBLE A BOUGÉ : chaque nœud qui la vise reprend sa place comme point
   // visé. Voir `PooledEffectNode::target_actor_id`.
   void MoveTargeted(std::uint32_t target_actor_id, glm::vec3 ground_position);

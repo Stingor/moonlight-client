@@ -95,6 +95,9 @@ class ArenaCamera {
   void Shake(std::uint32_t until_ms) noexcept { aim_.shake.Request(until_ms); }
   // `/quake` : éteinte, aucune secousse ne se pose.
   void set_quake_enabled(bool enabled) noexcept { aim_.shake.enabled = enabled; }
+  // LE SOL SE RECENTRE : la caméra et son suivi se déplacent de `world_delta`,
+  // et l'image suivante voit la même chose que la précédente.
+  void Shift(glm::vec3 world_delta) noexcept;
 
   // POSE LA CAMÉRA POUR CETTE IMAGE sur le héros, au sol `hero_ground`, à
   // `arrival_ms` de l'arrivée de l'étage, pour une image de `aspect_ratio`.

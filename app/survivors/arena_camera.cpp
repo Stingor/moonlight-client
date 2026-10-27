@@ -134,6 +134,11 @@ ArenaCamera::ArenaCamera(const ro::sim::SpawnFrame& frame) : frame_(frame) {
 
 void ArenaCamera::Enter() noexcept { aim_.tracking.Reset(); }
 
+void ArenaCamera::Shift(glm::vec3 world_delta) noexcept {
+  camera_.look_at += world_delta;
+  aim_.tracking.Shift(world_delta);
+}
+
 void ArenaCamera::Wheel(float notches) noexcept {
   SetDistance(wheel_distance_ - notches * kArenaWheelStepDistance);
 }

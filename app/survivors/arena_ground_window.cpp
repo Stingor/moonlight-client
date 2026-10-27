@@ -231,6 +231,13 @@ Result<GroundSources> OpenGroundSources(ro::vfs::Vfs& vfs, const ro::sim::Terrai
       vfs, look.reference_map, std::move(*ground),
       ro::formats::RswScene::Assemble(SyntheticHeader(), light, std::move(every_model)),
       ro::render::MapSceneOptions{.edit = ro::mapedit::MapEdit(), .progress = progress});
+  // UN MODÈLE ABSENT DE L'INSTALLATION ne se pose pas : une fenêtre ne cite que
+  // ce que la bibliothèque tient, et ne lit donc aucun fichier.
+  std::erase_if(model_files, [&library](const auto& cited) {
+    return std::ranges::none_of(library.models, [&cited](const ro::render::ModelInstances& kept) {
+      return kept.rsm_file == cited.second;
+    });
+  });
   return GroundSources{
       .rule = &rule,
       .run_seed = run_seed,
@@ -256,6 +263,9 @@ Result<MapStage> AssembleGroundWindow(ro::vfs::Vfs& vfs, const GroundSources& so
       ro::render::MapSceneOptions{.ground_subdivisions = ground_subdivisions,
                                   .edit = ro::mapedit::MapEdit(),
                                   .resources = &sources.library});
+  // LA PART PURE DU TÉLÉVERSEMENT avec le reste : le fil qui monte la fenêtre
+  // n'a plus qu'à copier.
+  ro::render::PrepareSceneUpload(scene);
   return AssembleMapStage(std::move(name), std::move(scene), std::move(*gat));
 }
 

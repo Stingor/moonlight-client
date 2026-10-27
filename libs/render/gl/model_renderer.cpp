@@ -363,7 +363,7 @@ ModelRenderer::Batch* ModelRenderer::TakeSameMesh(std::vector<Batch>& previous,
 }
 
 core::Result<void> ModelRenderer::Upload(const std::vector<ModelInstances>& models,
-                                         core::LoadProgress* progress) {
+                                         core::LoadProgress* progress, std::uint64_t later_than) {
   const core::LoadStepScope step(progress, core::LoadStep::kModelUpload, models.size());
   // Les lots précédents qu'un modèle inchangé ne reprend pas se rendent au
   // pilote à la fin : sinon, ils resteraient en mémoire graphique.
@@ -373,7 +373,7 @@ core::Result<void> ModelRenderer::Upload(const std::vector<ModelInstances>& mode
   baked_batches_ = 0;
   batches_.reserve(models.size());
   pose_boxes_.assign(models.size(), ModelPoseBoxes());
-  ++uploads_;
+  uploads_ = std::max(uploads_, later_than) + 1;
   // Les noms que ce téléversement cite : les autres textures se rendront au
   // pilote une fois tous les lots posés.
   std::set<std::string> cited;
@@ -409,7 +409,8 @@ core::Result<void> ModelRenderer::Upload(const std::vector<ModelInstances>& mode
       batch.baked_runs = std::move(kept->baked_runs);
       batch.baked_surfaces = std::move(kept->baked_surfaces);
     } else {
-      const BakedModel baked = BakeInstances(model.mesh, model.transforms, model.rsm_version);
+      BakedModel scratch;
+      const BakedModel& baked = BakedPosesOf(model, scratch);
       if (!baked.vertices.empty()) {
         batch.baked = UploadVertices(baked.vertices, baked.sides);
         batch.baked_runs = baked.runs;

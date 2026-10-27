@@ -123,6 +123,7 @@ add_library(ro_render STATIC
     src/map_emitter.cpp
     src/map_fog.cpp
     src/map_scene.cpp
+    src/map_scene_prepare.cpp
     src/map_smoke.cpp
     src/map_sky.cpp
     src/map_weather.cpp

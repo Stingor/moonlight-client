@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <optional>
 #include <span>
@@ -121,9 +122,16 @@ class ArenaSession {
   [[nodiscard]] const ro::render::Camera& camera() const noexcept { return camera_.camera(); }
   // Ce qu'ont coûté les effets à la dernière composition, en millisecondes.
   [[nodiscard]] double effects_ms() const noexcept { return effects_ms_; }
+  // Les recentrages du sol généré depuis l'ouverture, et le plus cher de leurs
+  // montages, en millisecondes.
+  [[nodiscard]] std::size_t recentres() const noexcept { return recentres_; }
+  [[nodiscard]] double most_mount_ms() const noexcept { return most_mount_ms_; }
 
  private:
   [[nodiscard]] float AspectOf(float width, float height) const noexcept;
+  // LE SOL SUIT LE HÉROS DESSINÉ, et la session avec lui : voir
+  // `ArenaScene::FollowHero`.
+  void FollowGround();
 
   ArenaScene scene_;
   HordeComposer composer_;
@@ -137,6 +145,8 @@ class ArenaSession {
   // Le monde sans personne que la caméra interroge pour la secousse.
   ro::sim::World nobody_;
   double effects_ms_ = 0.0;
+  std::size_t recentres_ = 0;
+  double most_mount_ms_ = 0.0;
 };
 
 }  // namespace moonclient

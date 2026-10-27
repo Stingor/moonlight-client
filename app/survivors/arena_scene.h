@@ -1,9 +1,12 @@
 #pragma once
 
 #include <array>
+#include <atomic>
 #include <cstdint>
 #include <memory>
+#include <optional>
 #include <span>
+#include <string>
 #include <string_view>
 #include <vector>
 
@@ -19,6 +22,7 @@
 
 #include "options/graphics_options.h"
 #include "survivors/arena_effects.h"
+#include "survivors/arena_ground_follow.h"
 #include "survivors/arena_ground_plan.h"
 #include "survivors/arena_ground_window.h"
 #include "survivors/arena_numbers.h"
@@ -35,6 +39,17 @@ struct ArenaOverlays {
   const ArenaNumbers* numbers = nullptr;
   float viewport_width = 0.0F;
   float viewport_height = 0.0F;
+};
+
+// UN RECENTRAGE FAIT : la fenêtre passée de `from` à `to`, ce que devient un
+// point du monde dessiné (`GroundWorldShift`), et ce que son montage a coûté à
+// l'image, en millisecondes — le sol et le décor s'étaient téléversés pendant
+// les images d'avant (`LitStage::Prepare`).
+struct GroundRecentre {
+  GroundWindowOrigin from;
+  GroundWindowOrigin to;
+  glm::vec3 world_delta{0.0F, 0.0F, 0.0F};
+  double mount_ms = 0.0;
 };
 
 // LA SCÈNE DE L'ARÈNE : la vraie carte de l'arène (U8), sœur de l'écran de
@@ -86,6 +101,26 @@ class ArenaScene : private LitLayers {
                                             const ro::sim::ArenaRule& arena, std::uint64_t run_seed,
                                             const MapStageRead& read = {});
 
+  // LE SOL GÉNÉRÉ DE `sources`, sa première fenêtre en `origin`, nommée
+  // `name` : la voie ci-dessus une fois l'aspect trouvé et ses ressources lues.
+  // `thread` dit où se bâtissent les fenêtres suivantes.
+  [[nodiscard]] ro::core::Result<void> OpenGround(
+      ro::vfs::Vfs& vfs, GroundSources sources, GroundWindowOrigin origin, std::string name,
+      const MapStageRead& read = {}, GroundBuildThread thread = GroundBuildThread::kWorker);
+
+  // LE SOL SUIT LE HÉROS (`arena_ground_follow.h`) : à chaque image, avant
+  // `Begin`, il demande la fenêtre qu'il faut au fil de travail, la prépare
+  // tranche par tranche, et la monte. Rend le recentrage fait à cette image —
+  // l'appelant déplace alors de `world_delta` tout ce qu'il tient en
+  // coordonnées du monde, dans la même image —, ou rien ; rien toujours sur une
+  // carte. `shifts_without_trace` : les effets en cours se déplacent sans trace
+  // (`ArenaEffects`).
+  [[nodiscard]] std::optional<GroundRecentre> FollowHero(glm::vec2 hero_cell,
+                                                         bool shifts_without_trace);
+  // UN RECENTRAGE IMMÉDIAT sur `origin`, la fenêtre bâtie sur ce fil : pour les
+  // essais et le banc. Échoue sur une carte.
+  [[nodiscard]] ro::core::Result<GroundRecentre> Recentre(GroundWindowOrigin origin);
+
   // OUVRE UNE IMAGE à `presentation_ms` de l'horloge de présentation. Voir
   // `LitStage::Begin` : les corps se composent après, leur ombre ronde dépend
   // de `LitFrame::sun_shadows`.
@@ -121,6 +156,9 @@ class ArenaScene : private LitLayers {
     return HordeShadows{.sun_shadows = frame.sun_shadows, .horde_sun_shadows = horde_sun_shadows_};
   }
 
+  // Vrai pendant qu'une fenêtre se prépare (`LitStage::Prepare`).
+  [[nodiscard]] bool preparing() const noexcept { return lit_.preparing(); }
+
   // LE COIN SUD-OUEST DE LA FENÊTRE DESSINÉE, en cases de la partie : (0, 0)
   // sur une carte.
   [[nodiscard]] GroundWindowOrigin window_origin() const noexcept { return origin_; }
@@ -142,10 +180,23 @@ class ArenaScene : private LitLayers {
   void DrawOverWater(const ro::render::Camera& camera, float aspect_ratio,
                      const LitFrame& frame) override;
 
+  // Monte la fenêtre préparée, de coin `prepared_origin_`, à la place de la
+  // montrée.
+  [[nodiscard]] ro::core::Result<GroundRecentre> MountPrepared();
+
   LitStage lit_;
   // Le sol généré : ses ressources, lues une fois, et la fenêtre montée.
   std::unique_ptr<GroundSources> ground_;
   GroundWindowOrigin origin_;
+  // Le coin de la fenêtre que `LitStage` prépare, quand il en prépare une.
+  GroundWindowOrigin prepared_origin_;
+  ro::vfs::Vfs* vfs_ = nullptr;
+  // Le maillage du sol des fenêtres à bâtir, celui de la dernière image ; lu
+  // par le fil de travail.
+  std::atomic<std::int32_t> ground_subdivisions_{ro::render::kFlatGroundSubdivisions};
+  // ⚠ APRÈS `ground_` : ses fils lisent les ressources, et le suivi doit être
+  // détruit — ses fils finis — avant elles.
+  std::unique_ptr<GroundFollow<MapStage>> follow_;
   bool horde_sun_shadows_ = false;
   // Les effets de l'image en cours de peinture, le temps de `Paint`.
   ArenaEffects* painting_effects_ = nullptr;

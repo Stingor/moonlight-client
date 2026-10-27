@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <cstddef>
 #include <cstdint>
 #include <optional>
 #include <span>
@@ -124,6 +125,27 @@ class LitStage {
                                             std::string_view sky_map_name,
                                             ro::core::LoadProgress* progress = nullptr);
 
+  // REMPLACE LA CARTE MONTÉE par `stage`, déjà assemblée et de même ciel, en
+  // une fois : la préparation ci-dessous menée d'un trait. Le décor animé garde
+  // son image (`ModelClock::Rebase`), et le reste — sprites, ombre du soleil,
+  // lumières, vide — ne bouge pas. Rend la carte remplacée, que l'appelant
+  // libère où il veut. `stage()` garde son adresse.
+  //
+  // ⚠ SEULEMENT QUAND `ready()`.
+  [[nodiscard]] ro::core::Result<MapStage> Replace(MapStage stage);
+
+  // LE MÊME REMPLACEMENT, PRÉPARÉ SUR PLUSIEURS IMAGES : `Prepare` prend la
+  // carte suivante ; chaque `PrepareStep` téléverse dans des renderers de
+  // réserve au plus `most_bytes` de son sol, ou, le sol entier, tout son décor,
+  // et rend vrai quand tout y est ; `MountPrepared` échange alors les renderers
+  // en une image — l'eau seule s'y téléverse. `DropPrepared` abandonne la carte
+  // préparée et la rend.
+  [[nodiscard]] ro::core::Result<void> Prepare(MapStage stage);
+  [[nodiscard]] bool PrepareStep(std::size_t most_bytes);
+  [[nodiscard]] bool preparing() const noexcept { return prepared_.has_value(); }
+  [[nodiscard]] ro::core::Result<MapStage> MountPrepared();
+  [[nodiscard]] std::optional<MapStage> DropPrepared();
+
   // OUVRE UNE IMAGE : le sol arrondi selon le réglage, le brouillard, les
   // étages du terrain, l'ombre du soleil demandée, et le décor animé posé à
   // `elapsed_ms`.
@@ -202,6 +224,15 @@ class LitStage {
 
   std::optional<MapStage> stage_;
   ro::render::TerrainRenderer terrain_;
+  // LA CARTE EN PRÉPARATION et le sol de réserve où son sol se téléverse, créé
+  // à la première préparation.
+  std::optional<MapStage> prepared_;
+  std::optional<ro::render::TerrainRenderer> spare_terrain_;
+  std::optional<ro::render::ModelRenderer> spare_models_;
+  bool spare_models_ready_ = false;
+  // Le filtrage du décor de la dernière image, que le décor de réserve prend
+  // avant de recevoir ses textures.
+  ro::render::ModelTextureFilter decor_filter_;
   // LA NAPPE D'EAU de la carte : une île en a, et la scène la montre comme la
   // partie.
   ro::render::WaterRenderer water_;

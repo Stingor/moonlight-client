@@ -107,6 +107,10 @@ class CameraTracking {
   // seconde. Voir TeleportUnits, dans camera_chase.h.
   void Reset() noexcept { started_ = false; }
 
+  // LE MONDE SE DÉPLACE DE `world_delta` sous la caméra (une scène dont
+  // l'origine glisse) : le point visé suit, sans rattrapage ni saut.
+  void Shift(glm::vec3 world_delta) noexcept { look_at_ += world_delta; }
+
   // Le suivi RIGIDE, que `/camera` bascule. Faux par défaut, comme le réglage
   // du jeu : la caméra rattrape.
   bool fixed = false;

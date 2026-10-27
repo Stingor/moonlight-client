@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstdint>
+#include <memory>
 #include <span>
 #include <vector>
 
@@ -12,6 +13,8 @@
 #include "ro/render/terrain_relief.h"
 
 namespace ro::render {
+
+struct TerrainDepthChunks;
 
 // Maillage du terrain construit à partir d'un GND.
 //
@@ -63,6 +66,10 @@ struct TerrainMesh {
   std::vector<TerrainSurface> surfaces;
   std::array<float, 3> bounds_min{};
   std::array<float, 3> bounds_max{};
+  // SES BLOCS DE PROFONDEUR, bâtis d'avance hors du fil qui téléverse
+  // (`PrepareSceneUpload`), ou nuls : `TerrainRenderer::Upload` les bâtit alors
+  // lui-même. Un maillage rebâti naît sans eux.
+  std::shared_ptr<const TerrainDepthChunks> depth_chunks;
 
   [[nodiscard]] bool empty() const noexcept { return vertices.empty(); }
   // Centre de l'emprise : point de visée naturel pour cadrer une carte entière.
