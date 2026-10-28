@@ -117,7 +117,8 @@ class PointLightStage {
   }
 
   // Dirige le dessin vers les cartes, les faces peintes reculées contre l'acné.
-  // ⚠ RETIENT la cible et la fenêtre en vigueur, que `EndDepthPass` rétablit.
+  // ⚠ RETIENT les cibles de dessin et de lecture et la fenêtre en vigueur, que
+  // `EndDepthPass` rétablit chacune.
   void BeginDepthPass();
   // Dirige le dessin vers la face `face` de la carte `layer` du palier `tier`,
   // et l'efface : rien n'y ombre plus.
@@ -145,7 +146,8 @@ class PointLightStage {
   // Une carte neuve porte la génération zéro : elle se peint à la première.
   std::uint64_t generation_ = 1;
   std::uint64_t frame_ = 0;
-  int previous_framebuffer_ = 0;
+  int previous_draw_framebuffer_ = 0;
+  int previous_read_framebuffer_ = 0;
   int previous_viewport_[kViewportValues] = {};
 };
 

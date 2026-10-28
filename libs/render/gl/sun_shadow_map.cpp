@@ -116,7 +116,8 @@ core::Result<SunShadowMap> SunShadowMap::Create(int side_texels) {
 }
 
 void SunShadowMap::BeginDepthPass() {
-  glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &previous_framebuffer_);
+  glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &previous_draw_framebuffer_);
+  glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &previous_read_framebuffer_);
   glGetIntegerv(GL_VIEWPORT, previous_viewport_);
   // ⚠ LA CARTE NE DOIT PAS ÊTRE LUE PENDANT QU'ON L'ÉCRIT.
   glActiveTexture(GL_TEXTURE0 + kSunShadowTextureUnit);
@@ -151,7 +152,9 @@ void SunShadowMap::SetCasterOffset(bool on) const {
 
 void SunShadowMap::EndDepthPass() const {
   glDisable(GL_POLYGON_OFFSET_FILL);
-  glBindFramebuffer(GL_FRAMEBUFFER, static_cast<GLuint>(previous_framebuffer_));
+  // LA LECTURE AUSSI : `BeginActorLayer` l'a dirigée vers la couche du monde.
+  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, static_cast<GLuint>(previous_draw_framebuffer_));
+  glBindFramebuffer(GL_READ_FRAMEBUFFER, static_cast<GLuint>(previous_read_framebuffer_));
   glViewport(previous_viewport_[0], previous_viewport_[1], previous_viewport_[2],
              previous_viewport_[3]);
 }

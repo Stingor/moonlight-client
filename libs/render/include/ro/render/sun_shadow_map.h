@@ -56,7 +56,8 @@ class SunShadowMap {
 
   // Dirige le dessin vers la carte, efface sa profondeur et décale celle des
   // faces dessinées, contre l'acné d'une face qui s'ombre elle-même.
-  // ⚠ RETIENT la cible et la fenêtre en vigueur, que `EndDepthPass` rétablit.
+  // ⚠ RETIENT les cibles de dessin et de lecture et la fenêtre en vigueur, que
+  // `EndDepthPass` rétablit chacune.
   // La passe commence sur la couche du monde : sol et décor.
   void BeginDepthPass();
   // Recopie le monde dans la couche des acteurs, et y dirige le dessin : ce qui
@@ -81,7 +82,8 @@ class SunShadowMap {
   std::array<unsigned int, kSunShadowLayerCount> framebuffers_{};
   std::array<unsigned int, kSunShadowLayerCount> depths_{};
   int side_texels_ = 0;
-  int previous_framebuffer_ = 0;
+  int previous_draw_framebuffer_ = 0;
+  int previous_read_framebuffer_ = 0;
   int previous_viewport_[kViewportValues] = {};
 };
 

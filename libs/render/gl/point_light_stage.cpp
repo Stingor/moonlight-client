@@ -102,15 +102,19 @@ core::Result<PointLightStage> PointLightStage::Create() {
   glBindTexture(GL_TEXTURE_BUFFER, 0);
   glBindBuffer(GL_TEXTURE_BUFFER, 0);
 
-  // ⚠ LA CIBLE LIÉE SE RETROUVE APRÈS : l'étage naît à la première lumière, au
-  // milieu d'une image qui peut se peindre hors écran.
-  GLint previous_framebuffer = 0;
-  glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previous_framebuffer);
+  // ⚠ LES CIBLES LIÉES SE RETROUVENT APRÈS, celle de dessin comme celle de
+  // lecture : l'étage naît à la première lumière, au milieu d'une image qui
+  // peut se peindre hors écran.
+  GLint previous_draw_framebuffer = 0;
+  GLint previous_read_framebuffer = 0;
+  glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &previous_draw_framebuffer);
+  glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &previous_read_framebuffer);
   glGenFramebuffers(1, &stage.framebuffer_);
   glBindFramebuffer(GL_FRAMEBUFFER, stage.framebuffer_);
   glDrawBuffer(GL_NONE);
   glReadBuffer(GL_NONE);
-  glBindFramebuffer(GL_FRAMEBUFFER, static_cast<GLuint>(previous_framebuffer));
+  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, static_cast<GLuint>(previous_draw_framebuffer));
+  glBindFramebuffer(GL_READ_FRAMEBUFFER, static_cast<GLuint>(previous_read_framebuffer));
   if (const GLenum error = glGetError(); error != GL_NO_ERROR) {
     return Fail(ErrorCode::kCorruptData, "lumières ponctuelles refusées, erreur OpenGL " +
                                              std::to_string(static_cast<unsigned>(error)));
@@ -169,7 +173,8 @@ void PointLightStage::EnsureLayers() {
 }
 
 void PointLightStage::BeginDepthPass() {
-  glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &previous_framebuffer_);
+  glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &previous_draw_framebuffer_);
+  glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &previous_read_framebuffer_);
   glGetIntegerv(GL_VIEWPORT, previous_viewport_);
   // ⚠ UNE CARTE NE DOIT PAS ÊTRE LUE PENDANT QU'ON L'ÉCRIT.
   for (std::size_t tier = 0; tier < kPointShadowTierCount; ++tier) {
@@ -202,7 +207,8 @@ void PointLightStage::SetCasterOffset(bool on) const {
 
 void PointLightStage::EndDepthPass() const {
   glDisable(GL_POLYGON_OFFSET_FILL);
-  glBindFramebuffer(GL_FRAMEBUFFER, static_cast<GLuint>(previous_framebuffer_));
+  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, static_cast<GLuint>(previous_draw_framebuffer_));
+  glBindFramebuffer(GL_READ_FRAMEBUFFER, static_cast<GLuint>(previous_read_framebuffer_));
   glViewport(previous_viewport_[0], previous_viewport_[1], previous_viewport_[2],
              previous_viewport_[3]);
 }
