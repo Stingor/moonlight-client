@@ -2,7 +2,6 @@
 
 #include <array>
 #include <cstdint>
-#include <optional>
 #include <span>
 #include <vector>
 
@@ -108,23 +107,63 @@ inline constexpr double kGroundAxisSlopeBound =
 static_assert(kGroundAxisSlopeBound <= kGroundAxisSlopeCap,
               "les collines dépasseraient le plafond de pente");
 
-// ── LES TERRASSES : un repère se dresse sur un sol plat. Le sol de sa place et
-// de son site (ou de son emprise, sans place), élargi de `kReliefPadMarginCells`,
-// se tient à la hauteur que les collines ont en son centre. Autour, l'écart
-// des collines à cette hauteur se BRIDE : il reste sous la pente du plafond par
-// axe fois la distance à la terrasse (arrondie sur `kReliefPadRoundCells`, pour
-// que le bord de la terrasse ne fasse pas d'arête), et la bride s'adoucit en
-// un genou dès que l'écart passe `kReliefPadKneeStart` fois la borne, pour que
-// le sol rejoigne les collines sans pli. Une bride ne monte pas plus vite que
-// ce qu'elle bride, ni que sa borne : le plafond par axe tient.
-//
-// Les collines restant à `kGroundReliefMostUnits` de leur niveau moyen, la
-// bride ne touche rien au-delà de `kReliefPadReachCells` de la terrasse.
+// ── LES TERRASSES : un repère se dresse sur un sol plat. Avec des chemins, sa
+// place et tout son site ; sans chemin, son emprise ; élargis de
+// `kReliefPadMarginCells`. Autour, l'écart des collines à la hauteur de la
+// terrasse se BRIDE : il reste sous la pente du plafond par axe fois la
+// distance à la terrasse (arrondie sur `kReliefPadRoundCells`, pour que le bord
+// de la terrasse ne fasse pas d'arête), et la bride s'adoucit en un genou dès
+// que l'écart passe `kReliefPadKneeStart` fois la borne, pour que le sol
+// rejoigne les collines sans pli. Une bride ne monte pas plus vite que ce
+// qu'elle bride, ni que sa borne : le plafond par axe tient.
 inline constexpr double kReliefPadMarginCells = 2.0;
 inline constexpr double kReliefPadRoundCells = 4.0;
 inline constexpr double kReliefPadKneeStart = 0.7;
+
+// LA DISTANCE ARRONDIE, en cases : une parabole sur `kReliefPadRoundCells`,
+// puis la distance moins sa demi-largeur. Elle ne monte jamais plus vite que
+// la distance, et sa pente part de zéro au bord de la terrasse.
+[[nodiscard]] constexpr double ReliefRoundedDistance(double distance_cells) noexcept {
+  return distance_cells < kReliefPadRoundCells
+             ? distance_cells * distance_cells / (2.0 * kReliefPadRoundCells)
+             : distance_cells - kReliefPadRoundCells / 2.0;
+}
+// LA BORNE DE LA BRIDE à `distance_cells` d'une terrasse, en unités de hauteur.
+[[nodiscard]] constexpr double ReliefBridleBoundUnits(double distance_cells) noexcept {
+  return kGroundAxisSlopeCap * ReliefRoundedDistance(distance_cells) * kGroundReliefCellUnits;
+}
+
+// UNE TERRASSE RESTE PLATE, QUELLE QUE SOIT SA VOISINE : à l'intérieur d'une
+// terrasse, la bride d'une autre ne doit rien toucher, donc l'écart de leurs
+// hauteurs rester sous le genou de cette bride. Deux règles le garantissent :
+//  - LA FUSION : deux terrasses à moins de `kReliefPadFuseCells` l'une de
+//    l'autre, de proche en proche, prennent une hauteur COMMUNE — celle des
+//    collines au centre du rectangle qui les englobe toutes ;
+//  - LA BORNE : cette hauteur reste à `kReliefPadMostUnits` au plus du niveau
+//    moyen, si bien que deux terrasses non fusionnées, à `kReliefPadFuseCells`
+//    au moins, ne s'écartent jamais au-delà du genou de leur bride.
+// Une terrasse déborde de son morceau d'au plus `kReliefPadOverhangCells` :
+// deux terrasses plus proches que `kReliefPadFuseCells` sont dans des morceaux
+// voisins, et un groupe fusionné tient dans `kReliefPadFusedSpanChunks` + 1
+// morceaux de côté (voir `GroundReliefPadsAround`).
+inline constexpr double kReliefPadMostUnits = 14.0;
+inline constexpr double kReliefPadOverhangCells =
+    kReliefPadMarginCells - static_cast<double>(ro::sim::kTerrainBorderCells);
+inline constexpr double kReliefPadFuseCells =
+    static_cast<double>(ro::sim::kTerrainChunkCells) - 2.0 * kReliefPadOverhangCells;
+static_assert(2.0 * kReliefPadMostUnits <=
+                  kReliefPadKneeStart * ReliefBridleBoundUnits(kReliefPadFuseCells),
+              "deux terrasses non fusionnées se brideraient l'une l'autre");
+// Le plus court côté de carré de repères où la fusion reste bornée.
+inline constexpr std::int32_t kReliefLeastLandmarkPeriodChunks = 3;
+inline constexpr std::int32_t kReliefPadFusedSpanChunks = 3;
+
+// Une terrasse à `kReliefPadMostUnits` au plus, des collines à
+// `kGroundReliefMostUnits` : la bride ne touche rien au-delà de
+// `kReliefPadReachCells` de la terrasse.
 inline constexpr double kReliefPadReachCells =
-    kGroundReliefSpanUnits / (kReliefPadKneeStart * kGroundAxisSlopeCap * kGroundReliefCellUnits) +
+    (kGroundReliefMostUnits + kReliefPadMostUnits) /
+        (kReliefPadKneeStart * kGroundAxisSlopeCap * kGroundReliefCellUnits) +
     kReliefPadRoundCells / 2.0;
 
 struct GroundReliefPad {
@@ -138,14 +177,17 @@ struct GroundReliefPad {
   [[nodiscard]] bool operator==(const GroundReliefPad&) const = default;
 };
 
-// LA TERRASSE D'UNE PIÈCE posée, ou rien si ce n'est pas un repère.
-[[nodiscard]] std::optional<GroundReliefPad> GroundReliefPadOf(
-    const ro::sim::TerrainRule& rule, std::uint64_t run_seed,
-    const ro::sim::TerrainPieceRule& piece, const ro::sim::PlacedPiece& placed);
-
-// Les terrasses dans l'ordre où elles se brident, d'ouest en est puis du sud au
-// nord : le même pour toute fenêtre qui les lit.
-void SortReliefPads(std::vector<GroundReliefPad>& pads);
+// LES TERRASSES QUI AGISSENT sur le rectangle [west, east] × [south, north] du
+// monde (coins de case) : fusionnées, bornées, puis triées d'ouest en est et
+// du sud au nord, l'ordre où elles se brident. Une fonction de la règle, de la
+// graine et du rectangle : deux rectangles qui se recouvrent lisent, sur leur
+// part commune, les mêmes terrasses aux mêmes hauteurs. Avec des chemins, les
+// repères se lisent sur les places de `sim`, sans générer de morceau ; sans
+// chemin, sur les morceaux générés.
+[[nodiscard]] std::vector<GroundReliefPad> GroundReliefPadsAround(const ro::sim::TerrainRule& rule,
+                                                                  std::uint64_t run_seed,
+                                                                  double west, double south,
+                                                                  double east, double north);
 
 // Les collines seules, au coin de case (east, north) du monde.
 [[nodiscard]] double GroundHillsAt(std::uint64_t run_seed, double world_east,
@@ -153,8 +195,9 @@ void SortReliefPads(std::vector<GroundReliefPad>& pads);
 
 // LA HAUTEUR DU SOL au point (east, north) du monde : les collines, aplanies sur
 // les terrasses `pads`, bridées l'une après l'autre dans l'ordre de
-// `SortReliefPads`. Les terrasses absentes de `pads` n'y comptent pas : il
-// faut toutes celles à moins de `kReliefPadReachCells` du point.
+// `GroundReliefPadsAround`. Une bride qui ne touche rien ne réécrit pas la
+// hauteur : les terrasses absentes de `pads` n'y comptent pas, au bit près,
+// pourvu qu'y soient toutes celles à moins de `kReliefPadReachCells` du point.
 [[nodiscard]] float GroundReliefAt(std::uint64_t run_seed, double world_east, double world_north,
                                    std::span<const GroundReliefPad> pads = {});
 

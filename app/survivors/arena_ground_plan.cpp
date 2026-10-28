@@ -83,14 +83,6 @@ constexpr std::int32_t kCubeCorners = kGroundWindowCubes + 1;
 constexpr std::uint8_t kNoTexture = 0xFF;
 constexpr std::uint8_t kQuarterTurns = ro::sim::kTerrainQuarterTurns;
 constexpr std::uint8_t kHalfTurn = kQuarterTurns / 2;
-// UNE TERRASSE AGIT JUSQU'À kReliefPadReachCells de son bord, qui déborde d'au
-// plus sa marge du morceau de son repère : un tour plus large de morceaux, lus
-// pour leurs seuls repères, les trouve toutes.
-constexpr std::int32_t kPadRingChunks = 2;
-static_assert(kReliefPadReachCells + kReliefPadMarginCells <=
-                  static_cast<double>(kPadRingChunks * kTerrainChunkCells),
-              "une terrasse hors du tour toucherait la fenêtre");
-static_assert(kPadRingChunks >= kRingChunks);
 
 [[nodiscard]] float UnitOf(std::uint32_t draw) noexcept {
   return static_cast<float>(draw) * kUnitFromDraw;
@@ -355,29 +347,17 @@ class Planner {
     return nullptr;
   }
 
-  // Les terrasses des repères du tour, puis les hauteurs de chaque coin de
-  // case, celles des cases et des cubes, lues sur la même grille : le sol
-  // dessiné et le sol foulé se rejoignent à chaque coin de cube. Puis la
-  // lumière que la pente laisse au centre de chaque case.
+  // Les terrasses qui agissent sur la grille des coins, puis les hauteurs de
+  // chaque coin de case, celles des cases et des cubes, lues sur la même
+  // grille : le sol dessiné et le sol foulé se rejoignent à chaque coin de
+  // cube. Puis la lumière que la pente laisse au centre de chaque case.
   void RaiseRelief() {
-    for (const PlannedPiece& piece : ring_pieces_) PadOf(piece.rule, piece.placed);
-    // Le tour des terrasses, au-delà de celui des cases : ses seuls repères.
-    const std::int32_t first_x = ro::sim::TerrainChunkOf(origin_.x_cells);
-    const std::int32_t first_y = ro::sim::TerrainChunkOf(origin_.y_cells);
-    for (std::int32_t row = -kPadRingChunks; row < kWindowChunks + kPadRingChunks; ++row) {
-      for (std::int32_t column = -kPadRingChunks; column < kWindowChunks + kPadRingChunks;
-           ++column) {
-        const bool read = row >= -kRingChunks && column >= -kRingChunks &&
-                          row < kWindowChunks + kRingChunks && column < kWindowChunks + kRingChunks;
-        if (read) continue;
-        const ro::sim::TerrainChunk chunk =
-            ro::sim::GenerateTerrainChunk(rule_, run_seed_, first_x + column, first_y + row);
-        for (const ro::sim::PlacedPiece& placed : chunk.pieces) {
-          PadOf(RuleOf(placed.piece_id), placed);
-        }
-      }
-    }
-    SortReliefPads(plan_.relief_pads);
+    constexpr std::int32_t kLastCorner = kCornerSide - 1 + kCornerMargin;
+    plan_.relief_pads = GroundReliefPadsAround(rule_, run_seed_,
+                                               static_cast<double>(origin_.x_cells - kCornerMargin),
+                                               static_cast<double>(origin_.y_cells - kCornerMargin),
+                                               static_cast<double>(origin_.x_cells + kLastCorner),
+                                               static_cast<double>(origin_.y_cells + kLastCorner));
     // Les coins de la fenêtre et un tour d'un coin : la pente d'un coin du bord
     // s'y lit comme dans la fenêtre voisine.
     corners_.resize(static_cast<std::size_t>(kCornerGridSide) *
@@ -410,14 +390,6 @@ class Planner {
     };
     return GroundNormalOfSlope(
         {(at(x + 1, y) - at(x - 1, y)) / across, (at(x, y + 1) - at(x, y - 1)) / across});
-  }
-
-  // La terrasse d'une pièce, si c'est un repère.
-  void PadOf(const ro::sim::TerrainPieceRule* piece_rule, const ro::sim::PlacedPiece& placed) {
-    if (piece_rule == nullptr) return;
-    const std::optional<GroundReliefPad> pad =
-        GroundReliefPadOf(rule_, run_seed_, *piece_rule, placed);
-    if (pad.has_value()) plan_.relief_pads.push_back(*pad);
   }
 
   // Les hauteurs, sud-ouest, sud-est, nord-ouest, nord-est, d'un carré de

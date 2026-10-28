@@ -40,9 +40,11 @@ inline constexpr std::int32_t kGroundRecentreCells = ro::sim::kTerrainChunkCells
 // pas : il lui reste un demi-morceau à marcher pendant qu'elle se bâtit.
 inline constexpr std::int32_t kGroundAheadCells = kGroundRecentreCells / 2;
 // CE QUE L'IMAGE VOIT DU SOL au plus grand recul du 21:9, vers l'ouest ou
-// l'est (le plus long des quatre côtés, relevé par `survivors render`), et la
-// marge gardée avant le bord.
-inline constexpr std::int32_t kGroundWidestSightCells = 30;
+// l'est (le plus long des quatre côtés), quand le bord de l'image tombe au
+// creux du relief, `kGroundReliefSpanUnits` sous le héros : 35,02 cases
+// (`GroundFootprintOf`, vérifié par l'essai du relief). Puis la marge gardée
+// avant le bord.
+inline constexpr std::int32_t kGroundWidestSightCells = 36;
 inline constexpr std::int32_t kGroundEdgeMarginCells = 6;
 // AU-DELÀ DE CET ÉCART, LE RECENTRAGE N'ATTEND PLUS : ni que les effets se
 // déplacent sans trace, ni que le fil de travail ait fini — la fenêtre se bâtit

@@ -128,8 +128,8 @@ struct GroundPlan {
   std::vector<std::uint16_t> path_blocks;
   // Les hauteurs des coins de chaque case, dans l'ordre du fichier GAT.
   std::vector<std::array<float, 4>> cell_heights;
-  // LES TERRASSES des repères de la fenêtre et de son tour
-  // (`arena_ground_relief.h`).
+  // LES TERRASSES qui agissent sur la fenêtre et sur le tour d'un coin de sa
+  // grille des coins (`GroundReliefPadsAround`).
   std::vector<GroundReliefPad> relief_pads;
   // kGroundWindowCells² cases : la part de lumière que la pente garde en leur
   // centre pour un acteur (`GroundSlopeActorShade`). Celle du sol est cuite
