@@ -49,6 +49,9 @@ class SunShadowMap {
   SunShadowMap& operator=(SunShadowMap&& other) noexcept;
   ~SunShadowMap();
 
+  // ⚠ LAISSE LIÉ CE QU'IL A TROUVÉ LIÉ — cible de dessin, cible de lecture,
+  // texture de l'unité active : la carte naît à la première image qui la
+  // demande, au milieu d'une peinture qui peut viser une cible hors écran.
   [[nodiscard]] static core::Result<SunShadowMap> Create(int side_texels);
 
   // Dirige le dessin vers la carte, efface sa profondeur et décale celle des

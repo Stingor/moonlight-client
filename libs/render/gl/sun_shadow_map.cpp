@@ -29,6 +29,29 @@ constexpr float kBorderDepth[] = {1.0F, 1.0F, 1.0F, 1.0F};
 
 [[nodiscard]] std::size_t RankOf(SunShadowLayer layer) { return static_cast<std::size_t>(layer); }
 
+// LES LIAISONS EN VIGUEUR, relevées à la construction et rétablies à la
+// destruction, quelle que soit la sortie.
+class KeptBindings {
+ public:
+  KeptBindings() {
+    glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &draw_framebuffer_);
+    glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &read_framebuffer_);
+    glGetIntegerv(GL_TEXTURE_BINDING_2D, &texture_);
+  }
+  KeptBindings(const KeptBindings&) = delete;
+  KeptBindings& operator=(const KeptBindings&) = delete;
+  ~KeptBindings() {
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, static_cast<GLuint>(draw_framebuffer_));
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, static_cast<GLuint>(read_framebuffer_));
+    glBindTexture(GL_TEXTURE_2D, static_cast<GLuint>(texture_));
+  }
+
+ private:
+  GLint draw_framebuffer_ = 0;
+  GLint read_framebuffer_ = 0;
+  GLint texture_ = 0;
+};
+
 }  // namespace
 
 SunShadowMap::SunShadowMap(SunShadowMap&& other) noexcept
@@ -61,6 +84,7 @@ core::Result<SunShadowMap> SunShadowMap::Create(int side_texels) {
   SunShadowMap map;
   map.side_texels_ = side_texels;
 
+  const KeptBindings kept;
   glGenTextures(static_cast<GLsizei>(map.depths_.size()), map.depths_.data());
   glGenFramebuffers(static_cast<GLsizei>(map.framebuffers_.size()), map.framebuffers_.data());
   for (std::size_t rank = 0; rank < map.depths_.size(); ++rank) {
@@ -84,14 +108,10 @@ core::Result<SunShadowMap> SunShadowMap::Create(int side_texels) {
     glReadBuffer(GL_NONE);
     const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     if (status != GL_FRAMEBUFFER_COMPLETE) {
-      glBindFramebuffer(GL_FRAMEBUFFER, 0);
-      glBindTexture(GL_TEXTURE_2D, 0);
       return Fail(ErrorCode::kCorruptData, "carte d'ombre incomplète, état " +
                                                std::to_string(static_cast<unsigned>(status)));
     }
   }
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  glBindTexture(GL_TEXTURE_2D, 0);
   return map;
 }
 
