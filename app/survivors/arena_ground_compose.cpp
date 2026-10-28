@@ -11,7 +11,10 @@ constexpr std::size_t kChannels = 4;
 constexpr std::uint8_t kQuarterTurns = 4;
 constexpr std::uint8_t kOpaque = 255;
 constexpr float kFullChannel = 255.0F;
+// L'arrondi au plus proche d'un canal mêlé.
 constexpr float kRounding = 0.5F;
+// Le centre d'un texel, en part de texel depuis son coin sud-ouest.
+constexpr double kTexelCentre = 0.5;
 
 // ── LE MÉLANGE ENTIER du bruit : un pas du finaliseur SplitMix64 par
 // composante, aux constantes publiées.
@@ -34,21 +37,24 @@ struct NoiseOctave {
 };
 constexpr std::array<NoiseOctave, 2> kNoiseOctaves{{{1.0, 0.6F}, {0.35, 0.4F}}};
 // L'amplitude du bruit, de crête à crête, et celle de l'herbe, de part et
-// d'autre de zéro.
+// d'autre de zéro. Le bruit, tiré dans [0, 1), se centre sur sa moyenne.
 constexpr float kNoiseSpan = 0.2F;
+constexpr float kNoiseMean = 0.5F;
 constexpr float kGrassBias = 0.1F;
 constexpr float kGrassLuminanceSpan = 40.0F;
 constexpr float kRedLuminance = 0.299F;
 constexpr float kGreenLuminance = 0.587F;
 constexpr float kBlueLuminance = 0.114F;
-static_assert(kNoiseSpan / 2.0F + kGrassBias < kBlendLowCover,
+// L'écart le plus grand du bruit centré à zéro, d'un côté ou de l'autre.
+constexpr float kNoiseReach = kNoiseSpan * std::max(kNoiseMean, 1.0F - kNoiseMean);
+static_assert(kNoiseReach + kGrassBias < kBlendLowCover,
               "sans chemin dans le bloc, le trouble ne doit jamais donner de terre");
-static_assert(kNoiseSpan / 2.0F + kGrassBias < 1.0F - kBlendHighCover,
+static_assert(kNoiseReach + kGrassBias < 1.0F - kBlendHighCover,
               "tout de chemin, le trouble ne doit jamais donner d'herbe");
 // En deçà, au-delà, la couverture troublée reste sous le seuil bas, sur le
 // seuil haut : l'herbe, la terre, sûrement.
-constexpr float kSurelyGrassCover = kBlendLowCover - kNoiseSpan / 2.0F - kGrassBias;
-constexpr float kSurelyDirtCover = kBlendHighCover + kNoiseSpan / 2.0F + kGrassBias;
+constexpr float kSurelyGrassCover = kBlendLowCover - kNoiseReach - kGrassBias;
+constexpr float kSurelyDirtCover = kBlendHighCover + kNoiseReach + kGrassBias;
 
 // L'écart du vert au rouge entre l'herbe et la terre en deçà duquel elles ne
 // se distinguent pas assez pour lire le masque d'une tache.
@@ -178,8 +184,7 @@ TileAxis AxisOf(std::int32_t world_cube, std::int32_t cube_texels) {
   const double cells_per_texel = static_cast<double>(kCellsPerCube) / cube_texels;
   for (std::int32_t texel = -kComposedBorderTexels; texel < cube_texels + kComposedBorderTexels;
        ++texel) {
-    const double inside =
-        (static_cast<double>(texel) + static_cast<double>(kRounding)) * cells_per_texel;
+    const double inside = (static_cast<double>(texel) + kTexelCentre) * cells_per_texel;
     axis.world_cells.push_back(static_cast<double>(world_cube) * kCellsPerCube + inside);
     axis.source.push_back(static_cast<std::int32_t>(
         FloorMod(static_cast<std::int64_t>(world_cube) * cube_texels + texel, texture_texels)));
@@ -362,6 +367,33 @@ std::int32_t ComposedTileSide(const GroundComposeSources& sources) noexcept {
   return sources.cube_texels + 2 * kComposedBorderTexels;
 }
 
+namespace {
+
+constexpr std::size_t kTilesPerPage =
+    static_cast<std::size_t>(kComposedAtlasColumns) * kComposedAtlasRows;
+
+// Les rangées de tuiles qu'emploie la page `page` quand `kept` tuiles s'y
+// rangent dans l'ordre, page après page.
+[[nodiscard]] std::size_t PageRows(std::size_t page, std::size_t kept) noexcept {
+  const std::size_t first = page * kTilesPerPage;
+  if (first >= kept) return 0;
+  const std::size_t tiles = std::min(kTilesPerPage, kept - first);
+  return (tiles + kComposedAtlasColumns - 1) / kComposedAtlasColumns;
+}
+
+}  // namespace
+
+std::size_t ComposedPagesBytes(const GroundComposeSources& sources, std::size_t cubes) noexcept {
+  const auto side = static_cast<std::size_t>(ComposedTileSide(sources));
+  const std::size_t kept = std::min(cubes, kTilesPerPage * kComposedAtlasPages);
+  std::size_t bytes = 0;
+  for (std::size_t page = 0; page < kComposedAtlasPages; ++page) {
+    bytes += static_cast<std::size_t>(kComposedAtlasColumns) * side * PageRows(page, kept) * side *
+             kChannels;
+  }
+  return bytes;
+}
+
 void ComposeCubeTile(const GroundComposeSources& sources, std::uint64_t run_seed,
                      std::int32_t world_cube_x, std::int32_t world_cube_y, std::uint16_t path_block,
                      std::span<std::uint8_t> tile) {
@@ -413,7 +445,7 @@ void ComposeCubeTile(const GroundComposeSources& sources, std::uint64_t run_seed
       }
       const float grass_bias = std::clamp(
           (Luminance(grass) - sources.grass_mean_luminance) / kGrassLuminanceSpan, -1.0F, 1.0F);
-      const float troubled = cover + kNoiseSpan * (noise - kRounding) + kGrassBias * grass_bias;
+      const float troubled = cover + kNoiseSpan * (noise - kNoiseMean) + kGrassBias * grass_bias;
       const float dirt_share = Smooth(
           std::clamp((troubled - kBlendLowCover) / (kBlendHighCover - kBlendLowCover), 0.0F, 1.0F));
       Mix(grass, dirt, dirt_share, out);
@@ -427,20 +459,16 @@ ComposedGround ComposeGround(const GroundComposeSources& sources, std::uint64_t 
   composed.tiles.resize(plan.cubes.size());
   const std::int32_t side = ComposedTileSide(sources);
   const auto side_size = static_cast<std::size_t>(side);
-  constexpr std::size_t kPerPage =
-      static_cast<std::size_t>(kComposedAtlasColumns) * kComposedAtlasRows;
   std::vector<std::size_t> wanted;
   for (std::size_t rank = 0; rank < plan.cubes.size() && rank < plan.path_blocks.size(); ++rank) {
     if (GroundBlendOf(plan.path_blocks[rank]) == GroundBlend::kComposed) wanted.push_back(rank);
   }
-  const std::size_t kept = std::min(wanted.size(), kPerPage * kComposedAtlasPages);
+  const std::size_t kept = std::min(wanted.size(), kTilesPerPage * kComposedAtlasPages);
   composed.overflow = wanted.size() - kept;
   // Chaque page aussi haute que ses rangées employées.
   for (std::size_t page = 0; page < kComposedAtlasPages; ++page) {
-    const std::size_t first = page * kPerPage;
-    if (first >= kept) break;
-    const std::size_t tiles = std::min(kPerPage, kept - first);
-    const std::size_t rows = (tiles + kComposedAtlasColumns - 1) / kComposedAtlasColumns;
+    const std::size_t rows = PageRows(page, kept);
+    if (rows == 0) break;
     ro::formats::Image& image = composed.pages[page];
     image.width = kComposedAtlasColumns * side;
     image.height = static_cast<std::int32_t>(rows) * side;
@@ -459,8 +487,8 @@ ComposedGround ComposeGround(const GroundComposeSources& sources, std::uint64_t 
     const auto j = static_cast<std::int32_t>(rank / kGroundWindowCubes);
     ComposeCubeTile(sources, run_seed, world_cube_x + i, world_cube_y + j, plan.path_blocks[rank],
                     tile);
-    const std::size_t page = order / kPerPage;
-    const std::size_t slot = order % kPerPage;
+    const std::size_t page = order / kTilesPerPage;
+    const std::size_t slot = order % kTilesPerPage;
     ro::formats::Image& image = composed.pages[page];
     const std::size_t left = (slot % kComposedAtlasColumns) * side_size;
     const std::size_t bottom = (slot / kComposedAtlasColumns) * side_size;

@@ -131,6 +131,11 @@ class TerrainRenderer {
   // seuls les blocs qu'il voit : voir `TerrainDepthChunks`.
   // Combien de fois le sol a été téléversé : ce qui dit qu'il a changé.
   [[nodiscard]] std::uint64_t uploads() const noexcept { return uploads_; }
+  // LA TEXTURE DE RANG `rank` (celui de `textures` au téléversement), ou rien
+  // au-delà : ce qu'on relit pour vérifier une copie par rangées.
+  [[nodiscard]] const GlTexture* texture(std::size_t rank) const noexcept {
+    return rank < textures_.size() ? &textures_[rank] : nullptr;
+  }
 
   void DrawDepth(const glm::mat4& light_view_projection, const ShadowSight* sight = nullptr) const;
 

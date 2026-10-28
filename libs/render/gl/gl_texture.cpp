@@ -91,6 +91,26 @@ void GlTexture::UploadRows(const formats::Image& image, int first_row, int rows)
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+core::Result<formats::Image> GlTexture::ReadPixels() const {
+  constexpr std::size_t kRgbaBytes = 4;
+  if (texture_ == 0) {
+    return Fail(ErrorCode::kCorruptData, "texture absente");
+  }
+  glBindTexture(GL_TEXTURE_2D, texture_);
+  GLint width = 0;
+  GLint height = 0;
+  glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &width);
+  glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &height);
+  formats::Image image{.width = width, .height = height};
+  image.pixels.resize(static_cast<std::size_t>(width) * static_cast<std::size_t>(height) *
+                      kRgbaBytes);
+  if (!image.pixels.empty()) {
+    glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.pixels.data());
+  }
+  glBindTexture(GL_TEXTURE_2D, 0);
+  return image;
+}
+
 core::Result<GlTexture> GlTexture::Placeholder() {
   // Magenta franc : une texture manquante doit se VOIR, pas se fondre dans le
   // décor. Un gris neutre laisserait croire à une carte correctement rendue.

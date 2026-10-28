@@ -77,6 +77,11 @@ class GlTexture {
                                                        Filtering filtering);
   void UploadRows(const formats::Image& image, int first_row, int rows) const;
 
+  // LA TEXTURE RELUE, niveau 0, en RGBA, rangées dans l'ordre du
+  // téléversement : ce qui vérifie qu'une copie par bandes n'a rien perdu.
+  // Un contexte OpenGL doit être courant.
+  [[nodiscard]] core::Result<formats::Image> ReadPixels() const;
+
   // Texture unie d'un seul pixel : sert de remplacement lorsqu'une texture du
   // GND est absente ou illisible, pour que le reste de la carte s'affiche
   // quand même au lieu de disparaître.

@@ -14,9 +14,9 @@
 namespace moonclient {
 
 // LA TERRE COMPOSÉE : le sol généré peint lui-même les cubes que longe un
-// chemin, au lieu de les prendre aux carreaux de bord et de coin des champs,
-// dont la terre a la même couleur mais pas le même dessin d'une texture à
-// l'autre (décision du joueur du 2026-10-28, ADR 0134).
+// chemin, d'une seule herbe et d'une seule terre lues au point du monde : deux
+// cubes de lisière voisins se raccordent sans couture (ADR 0134, « La terre
+// composée »).
 //
 // LA RÈGLE. Un cube se juge sur son BLOC : ses quatre cases et l'anneau d'une
 // case autour, seize cases. Sans case de chemin, il reste l'herbe de fond ;
@@ -87,10 +87,9 @@ void ComposeCubeTile(const GroundComposeSources& sources, std::uint64_t run_seed
                      std::span<std::uint8_t> tile);
 
 // LA TACHE RECOMPOSÉE. Une tache (`GroundTextureRole::kPatch`, `kScatter`)
-// se pose tournée sur un emplacement entier ; son herbe, d'une autre texture
-// que l'herbe de fond, ne prolongeait pas le dessin de ses voisins, et le
-// pourtour de chaque tache traçait un carré sur la prairie. Elle se recompose
-// donc une fois, à l'ouverture, une version par quart de tour : son MASQUE
+// se pose tournée sur un emplacement entier, et son pourtour reprend l'herbe
+// de fond de sa place : il prolonge le dessin de ses voisins. Elle se
+// recompose une fois, à l'ouverture, une version par quart de tour : son MASQUE
 // (la part de terre de chaque texel, lue sur l'écart du vert au rouge, lissée
 // sur kPatchMaskReachTexels, nulle à moins de kPatchRimTexels du bord) mêle
 // l'herbe de fond et la terre pleine lues, comme la composée, au point de
@@ -102,10 +101,10 @@ inline constexpr std::int32_t kPatchRimTexels = 4;
 [[nodiscard]] std::optional<ro::formats::Image> ComposePatchTexture(
     const GroundComposeSources& sources, const ro::formats::Image& patch, std::uint8_t turn);
 
-// LE BORD D'UN MOTIF. Une texture du sol est bornée à ses bords : au raccord
-// de deux périodes d'un motif qui se répète (tous les 4 cubes), le filtrage
-// n'y mêle pas le texel d'en face, et la prairie se quadrillait d'un liseré
-// d'un demi-texel. La texture se lit donc entourée de kMotifBorderTexels : le
+// LE BORD D'UN MOTIF. Une texture du sol est bornée à ses bords ; au raccord
+// de deux périodes d'un motif qui se répète (tous les 4 cubes), le bord fait
+// lire au filtrage la période suivante. La texture se lit entourée de
+// kMotifBorderTexels : le
 // texel que montre, au-delà du bord, l'emplacement voisin — le motif `beyond`
 // à la place où le quart de tour `turn` pose ce texel, la période suivante.
 // L'herbe et la terre s'y bordent d'elles-mêmes ; une tache recomposée, de
@@ -118,7 +117,15 @@ inline constexpr std::int32_t kMotifBorderTexels = 1;
 // LES ATLAS D'UNE FENÊTRE : au plus kComposedAtlasPages pages de
 // kComposedAtlasColumns tuiles de large, chacune aussi haute que ses rangées
 // employées. Une page vide reste vide.
-inline constexpr std::size_t kComposedAtlasPages = 4;
+//
+// LE PLAFOND DES PAGES garde la mémoire vidéo de l'arène sous sa porte : avec
+// les textures de l'installation (64 texels par cube), une page pleine pèse
+// 16 Mio, et le sol montré comme celui de réserve tiennent chacun les leurs ;
+// une troisième page par sol passerait la porte. Deux pages tiennent 1 922
+// cubes ; une fenêtre de la prairie en compose au plus 1 533 (`survivors
+// render --banc`, « terre composée au pire »). Un cube au-delà garde ses
+// carreaux de chemin.
+inline constexpr std::size_t kComposedAtlasPages = 2;
 inline constexpr std::int32_t kComposedAtlasColumns = 31;
 inline constexpr std::int32_t kComposedAtlasRows = 31;
 
@@ -138,6 +145,11 @@ struct ComposedGround {
   // carreaux de chemin.
   std::size_t overflow = 0;
 };
+
+// LES OCTETS DES PAGES qui tiennent `cubes` tuiles composées, au plus ce que
+// les pages tiennent : la mémoire vidéo de la terre composée d'un sol.
+[[nodiscard]] std::size_t ComposedPagesBytes(const GroundComposeSources& sources,
+                                             std::size_t cubes) noexcept;
 
 // Compose chaque cube de la fenêtre que son bloc dit composé.
 [[nodiscard]] ComposedGround ComposeGround(const GroundComposeSources& sources,
