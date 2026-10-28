@@ -220,6 +220,15 @@ std::vector<ro::formats::RswModel> ModelsOf(const GroundSources& sources, const 
   return models;
 }
 
+// LA LUMIÈRE DES ACTEURS SUIT LA PENTE : un acteur prend la part de lumière
+// que la pente garde sous ses pieds, comme le sol la prend dans sa couleur.
+void ShadeGroundLight(ro::render::GroundLight& light, const GroundPlan& plan) {
+  if (light.factors.size() != plan.cell_shades.size()) return;
+  for (std::size_t cell = 0; cell < light.factors.size(); ++cell) {
+    for (float& factor : light.factors[cell]) factor *= plan.cell_shades[cell];
+  }
+}
+
 // LE NOM D'UNE PAGE DE LA TERRE COMPOSÉE : aucun fichier ne le porte.
 std::string ComposedPageName(std::size_t page) {
   return std::string(kComposedPagePrefix) + std::to_string(page);
@@ -283,6 +292,7 @@ Result<GroundSources> OpenGroundSources(ro::vfs::Vfs& vfs, const ro::sim::Terrai
   if (!reference_rsw) return std::unexpected(reference_rsw.error());
 
   const ro::formats::RswLight light = reference_rsw->light();
+  const ro::render::SceneLight scene_light = ro::render::MakeSceneLight(light);
   std::vector<std::string> texture_paths;
   for (const GroundTextureLook& texture : look.textures) {
     auto raw = RawName(texture.texture);
@@ -386,19 +396,20 @@ Result<GroundSources> OpenGroundSources(ro::vfs::Vfs& vfs, const ro::sim::Terrai
       return kept.rsm_file == cited.second;
     });
   });
-  return GroundSources{
-      .rule = &rule,
-      .run_seed = run_seed,
-      .look = &look,
-      .light = light,
-      .plan_light = GroundPlanLight{.toward_sun = ro::render::MakeSceneLight(light).direction},
-      .texture_paths = std::move(texture_paths),
-      .model_files = std::move(model_files),
-      .library = std::move(library),
-      .compose = std::move(compose),
-      .first_composed_page = first_composed_page,
-      .recomposed_patches = std::move(recomposed_patches),
-      .motif_borders = std::move(motif_borders)};
+  return GroundSources{.rule = &rule,
+                       .run_seed = run_seed,
+                       .look = &look,
+                       .light = light,
+                       .plan_light = GroundPlanLight{.toward_sun = scene_light.direction,
+                                                     .ambient = scene_light.ambient,
+                                                     .diffuse = scene_light.diffuse},
+                       .texture_paths = std::move(texture_paths),
+                       .model_files = std::move(model_files),
+                       .library = std::move(library),
+                       .compose = std::move(compose),
+                       .first_composed_page = first_composed_page,
+                       .recomposed_patches = std::move(recomposed_patches),
+                       .motif_borders = std::move(motif_borders)};
 }
 
 Result<MapStage> AssembleGroundWindow(ro::vfs::Vfs& vfs, const GroundSources& sources,
@@ -432,7 +443,11 @@ Result<MapStage> AssembleGroundWindow(ro::vfs::Vfs& vfs, const GroundSources& so
   // LA PART PURE DU TÉLÉVERSEMENT avec le reste : le fil qui monte la fenêtre
   // n'a plus qu'à copier.
   ro::render::PrepareSceneUpload(scene);
-  return AssembleMapStage(std::move(name), std::move(scene), std::move(*gat));
+  auto stage = AssembleMapStage(std::move(name), std::move(scene), std::move(*gat));
+  if (!stage) return stage;
+  ShadeGroundLight(stage->ground_light, plan);
+  ShadeGroundLight(stage->ground_laid_light, plan);
+  return stage;
 }
 
 Result<MapStage> BuildGroundWindow(ro::vfs::Vfs& vfs, const GroundSources& sources,

@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
+#include <optional>
 #include <set>
 #include <span>
 #include <utility>
@@ -16,74 +17,13 @@ namespace {
 
 using ro::sim::kTerrainChunkCells;
 
-// ── LE MÉLANGE ENTIER des graines visuelles : un pas du finaliseur SplitMix64
-// par composante, aux constantes publiées.
-constexpr std::uint64_t kGoldenGamma = 0x9E37'79B9'7F4A'7C15ULL;
-constexpr std::uint64_t kMixFirst = 0xBF58'476D'1CE4'E5B9ULL;
-constexpr std::uint64_t kMixSecond = 0x94D0'49BB'1331'11EBULL;
-constexpr unsigned kMixShiftFirst = 30;
-constexpr unsigned kMixShiftSecond = 27;
-constexpr unsigned kMixShiftLast = 31;
-
 // Les sels visuels, en ASCII : rien de ce qu'ils tirent ne décide une case.
 constexpr std::uint64_t kVisualSalt = 0x5649'5355'414C'0000ULL;  // « VISUAL »
-constexpr std::uint64_t kReliefSalt = 0x5245'4C49'4546'0000ULL;  // « RELIEF »
 constexpr std::uint64_t kTintSalt = 0x5449'4E54'0000'0000ULL;    // « TINT »
 constexpr std::uint64_t kPatchSalt = 0x5041'5443'4800'0000ULL;   // « PATCH »
 constexpr std::uint64_t kVergeSalt = 0x5645'5247'4500'0000ULL;   // « VERGE »
 // Le flux du `Pcg32` visuel d'un morceau.
 constexpr std::uint64_t kVisualStream = 0x0000'0056'4953'4955ULL;
-
-[[nodiscard]] std::uint64_t Finalize(std::uint64_t value) noexcept {
-  value = (value ^ (value >> kMixShiftFirst)) * kMixFirst;
-  value = (value ^ (value >> kMixShiftSecond)) * kMixSecond;
-  return value ^ (value >> kMixShiftLast);
-}
-
-[[nodiscard]] std::uint64_t Mix(std::uint64_t seed, std::uint64_t salt, std::int64_t x,
-                                std::int64_t y) noexcept {
-  std::uint64_t value = Finalize(seed + kGoldenGamma);
-  value = Finalize(value ^ (salt + kGoldenGamma));
-  value = Finalize(value ^ (static_cast<std::uint64_t>(x) + kGoldenGamma));
-  return Finalize(value ^ (static_cast<std::uint64_t>(y) + kGoldenGamma));
-}
-
-// ── LE BRUIT DE VALEUR : un nœud tous les `period` coins de case, interpolé en
-// douceur. Une fonction du coin du monde seul.
-constexpr double kUnitScale = 1.0 / 18446744073709551616.0;  // 2^-64
-
-[[nodiscard]] double Lattice(std::uint64_t seed, std::uint64_t salt, std::int64_t x,
-                             std::int64_t y) noexcept {
-  return static_cast<double>(Mix(seed, salt, x, y)) * kUnitScale;
-}
-
-[[nodiscard]] double Smooth(double t) noexcept { return t * t * (3.0 - 2.0 * t); }
-
-// Dans [0, 1).
-[[nodiscard]] double ValueNoise(std::uint64_t seed, std::uint64_t salt, double east, double north,
-                                double period) noexcept {
-  const double x = east / period;
-  const double y = north / period;
-  const double x0 = std::floor(x);
-  const double y0 = std::floor(y);
-  const auto ix = static_cast<std::int64_t>(x0);
-  const auto iy = static_cast<std::int64_t>(y0);
-  const double tx = Smooth(x - x0);
-  const double ty = Smooth(y - y0);
-  const double south = std::lerp(Lattice(seed, salt, ix, iy), Lattice(seed, salt, ix + 1, iy), tx);
-  const double north_edge =
-      std::lerp(Lattice(seed, salt, ix, iy + 1), Lattice(seed, salt, ix + 1, iy + 1), tx);
-  return std::lerp(south, north_edge, ty);
-}
-
-// ── LE RELIEF (Q3) : deux ondulations, l'une ample et lente, l'autre courte.
-// Un cube fait dix unités ; un dénivelé de quelques unités ne cache rien sous
-// la caméra de l'arène.
-constexpr double kReliefSlowPeriodCells = 28.0;
-constexpr double kReliefSlowUnits = 5.0;
-constexpr double kReliefQuickPeriodCells = 11.0;
-constexpr double kReliefQuickUnits = 1.5;
-constexpr std::uint64_t kQuickReliefSalt = kReliefSalt + 1;
 
 // ── LE SOL PEINT.
 // Le tirage d'un motif : sa chance, son choix et son quart de tour se lisent
@@ -128,6 +68,10 @@ constexpr std::size_t kCellCount =
 constexpr std::size_t kCubeCount =
     static_cast<std::size_t>(kGroundWindowCubes) * static_cast<std::size_t>(kGroundWindowCubes);
 constexpr std::int32_t kCornerSide = kGroundWindowCells + 1;
+// LA GRILLE DES COINS déborde d'un coin de chaque côté : la pente d'un coin se
+// lit sur ses voisins.
+constexpr std::int32_t kCornerMargin = 1;
+constexpr std::int32_t kCornerGridSide = kCornerSide + 2 * kCornerMargin;
 // Les cases lues de la fenêtre et de son tour de morceaux, et le décalage
 // d'une case de la fenêtre dans ce carré.
 constexpr std::int32_t kRingCells = kRingChunks * kTerrainChunkCells;
@@ -139,6 +83,14 @@ constexpr std::int32_t kCubeCorners = kGroundWindowCubes + 1;
 constexpr std::uint8_t kNoTexture = 0xFF;
 constexpr std::uint8_t kQuarterTurns = ro::sim::kTerrainQuarterTurns;
 constexpr std::uint8_t kHalfTurn = kQuarterTurns / 2;
+// UNE TERRASSE AGIT JUSQU'À kReliefPadReachCells de son bord, qui déborde d'au
+// plus sa marge du morceau de son repère : un tour plus large de morceaux, lus
+// pour leurs seuls repères, les trouve toutes.
+constexpr std::int32_t kPadRingChunks = 2;
+static_assert(kReliefPadReachCells + kReliefPadMarginCells <=
+                  static_cast<double>(kPadRingChunks * kTerrainChunkCells),
+              "une terrasse hors du tour toucherait la fenêtre");
+static_assert(kPadRingChunks >= kRingChunks);
 
 [[nodiscard]] float UnitOf(std::uint32_t draw) noexcept {
   return static_cast<float>(draw) * kUnitFromDraw;
@@ -185,7 +137,7 @@ class Planner {
  public:
   Planner(const ro::sim::TerrainRule& rule, std::uint64_t run_seed, const BiomeLook& biome,
           GroundWindowOrigin origin, const GroundPlanLight& light)
-      : rule_(rule), run_seed_(run_seed), biome_(biome), origin_(origin) {
+      : rule_(rule), run_seed_(run_seed), biome_(biome), origin_(origin), light_(light) {
     const glm::vec2 away(-light.toward_sun.x, light.toward_sun.z);
     if (glm::length(away) > kLeastHorizontalSun) shade_direction_ = glm::normalize(away);
     plan_.origin = origin;
@@ -267,8 +219,9 @@ class Planner {
     for (std::int32_t y = 0; y < kGroundWindowCells; ++y) {
       for (std::int32_t x = 0; x < kGroundWindowCells; ++x) {
         if (!AlongPath(x, y)) continue;
-        ro::core::Pcg32 random(Mix(run_seed_, kVergeSalt, origin_.x_cells + x, origin_.y_cells + y),
-                               kVisualStream);
+        ro::core::Pcg32 random(
+            VisualMix(run_seed_, kVergeSalt, origin_.x_cells + x, origin_.y_cells + y),
+            kVisualStream);
         // Toujours quatre tirages : la chance, le modèle, l'angle, la place.
         const bool sown = random.Chance(biome_.verge_per_mille, ro::sim::kTerrainPerMille);
         const SeedLook* seed = Pick(random, biome_.verge_seeds);
@@ -307,7 +260,8 @@ class Planner {
   void PoseChunk(const ro::sim::TerrainChunk& chunk, std::int32_t column, std::int32_t row,
                  bool shown) {
     ro::core::Pcg32 random(
-        Finalize(ro::sim::TerrainChunkSeed(run_seed_, chunk.chunk_x, chunk.chunk_y) ^ kVisualSalt),
+        VisualFinalize(ro::sim::TerrainChunkSeed(run_seed_, chunk.chunk_x, chunk.chunk_y) ^
+                       kVisualSalt),
         kVisualStream);
     for (const ro::sim::PlacedPiece& placed : chunk.pieces) {
       const ro::sim::TerrainPieceRule* piece_rule = RuleOf(placed.piece_id);
@@ -401,24 +355,69 @@ class Planner {
     return nullptr;
   }
 
-  // Les hauteurs de chaque coin de case, puis celles des cases et des cubes,
-  // lues sur la même grille : le sol dessiné et le sol foulé se rejoignent à
-  // chaque coin de cube.
+  // Les terrasses des repères du tour, puis les hauteurs de chaque coin de
+  // case, celles des cases et des cubes, lues sur la même grille : le sol
+  // dessiné et le sol foulé se rejoignent à chaque coin de cube. Puis la
+  // lumière que la pente laisse au centre de chaque case.
   void RaiseRelief() {
-    corners_.resize(static_cast<std::size_t>(kCornerSide) * static_cast<std::size_t>(kCornerSide));
-    for (std::int32_t y = 0; y < kCornerSide; ++y) {
-      for (std::int32_t x = 0; x < kCornerSide; ++x) {
-        corners_[static_cast<std::size_t>(y) * kCornerSide + static_cast<std::size_t>(x)] =
+    for (const PlannedPiece& piece : ring_pieces_) PadOf(piece.rule, piece.placed);
+    // Le tour des terrasses, au-delà de celui des cases : ses seuls repères.
+    const std::int32_t first_x = ro::sim::TerrainChunkOf(origin_.x_cells);
+    const std::int32_t first_y = ro::sim::TerrainChunkOf(origin_.y_cells);
+    for (std::int32_t row = -kPadRingChunks; row < kWindowChunks + kPadRingChunks; ++row) {
+      for (std::int32_t column = -kPadRingChunks; column < kWindowChunks + kPadRingChunks;
+           ++column) {
+        const bool read = row >= -kRingChunks && column >= -kRingChunks &&
+                          row < kWindowChunks + kRingChunks && column < kWindowChunks + kRingChunks;
+        if (read) continue;
+        const ro::sim::TerrainChunk chunk =
+            ro::sim::GenerateTerrainChunk(rule_, run_seed_, first_x + column, first_y + row);
+        for (const ro::sim::PlacedPiece& placed : chunk.pieces) {
+          PadOf(RuleOf(placed.piece_id), placed);
+        }
+      }
+    }
+    SortReliefPads(plan_.relief_pads);
+    // Les coins de la fenêtre et un tour d'un coin : la pente d'un coin du bord
+    // s'y lit comme dans la fenêtre voisine.
+    corners_.resize(static_cast<std::size_t>(kCornerGridSide) *
+                    static_cast<std::size_t>(kCornerGridSide));
+    for (std::int32_t y = -kCornerMargin; y < kCornerSide + kCornerMargin; ++y) {
+      for (std::int32_t x = -kCornerMargin; x < kCornerSide + kCornerMargin; ++x) {
+        corners_[CornerIndex(x, y)] =
             GroundReliefAt(run_seed_, static_cast<double>(origin_.x_cells + x),
-                           static_cast<double>(origin_.y_cells + y));
+                           static_cast<double>(origin_.y_cells + y), plan_.relief_pads);
       }
     }
     plan_.cell_heights.resize(kCellCount);
+    plan_.cell_shades.resize(kCellCount);
     for (std::int32_t y = 0; y < kGroundWindowCells; ++y) {
       for (std::int32_t x = 0; x < kGroundWindowCells; ++x) {
-        plan_.cell_heights[CellIndex(x, y)] = CornersOf(x, y, 1);
+        const std::array<float, 4> heights = CornersOf(x, y, 1);
+        plan_.cell_heights[CellIndex(x, y)] = heights;
+        plan_.cell_shades[CellIndex(x, y)] =
+            GroundSlopeActorShade(GroundCellNormal(heights), light_);
       }
     }
+  }
+
+  // LA NORMALE DU SOL DESSINÉ au coin de case (x, y) de la fenêtre : la
+  // différence centrée des coins voisins, comme le sol arrondi lit sa pente.
+  [[nodiscard]] glm::vec3 CornerNormal(std::int32_t x, std::int32_t y) const {
+    const double across = 2.0 * kGroundReliefCellUnits;
+    const auto at = [this](std::int32_t cx, std::int32_t cy) {
+      return static_cast<double>(corners_[CornerIndex(cx, cy)]);
+    };
+    return GroundNormalOfSlope(
+        {(at(x + 1, y) - at(x - 1, y)) / across, (at(x, y + 1) - at(x, y - 1)) / across});
+  }
+
+  // La terrasse d'une pièce, si c'est un repère.
+  void PadOf(const ro::sim::TerrainPieceRule* piece_rule, const ro::sim::PlacedPiece& placed) {
+    if (piece_rule == nullptr) return;
+    const std::optional<GroundReliefPad> pad =
+        GroundReliefPadOf(rule_, run_seed_, *piece_rule, placed);
+    if (pad.has_value()) plan_.relief_pads.push_back(*pad);
   }
 
   // Les hauteurs, sud-ouest, sud-est, nord-ouest, nord-est, d'un carré de
@@ -426,7 +425,7 @@ class Planner {
   [[nodiscard]] std::array<float, 4> CornersOf(std::int32_t x, std::int32_t y,
                                                std::int32_t span) const {
     const auto at = [this](std::int32_t cx, std::int32_t cy) {
-      return corners_[static_cast<std::size_t>(cy) * kCornerSide + static_cast<std::size_t>(cx)];
+      return corners_[CornerIndex(cx, cy)];
     };
     return {at(x, y), at(x + span, y), at(x, y + span), at(x + span, y + span)};
   }
@@ -465,10 +464,14 @@ class Planner {
         const double east = static_cast<double>(origin_.x_cells + i * kGroundCellsPerCube + 1);
         const double north = static_cast<double>(origin_.y_cells + j * kGroundCellsPerCube + 1);
         const double tint =
-            kTintStrength * ValueNoise(run_seed_, kTintSalt, east, north, kTintPeriodCells);
+            kTintStrength * VisualValueNoise(run_seed_, kTintSalt, east, north, kTintPeriodCells);
+        // LA PENTE SE CUIT DANS LA COULEUR, lue là où le cube la pose : son coin
+        // sud-ouest, que le sol mêle à ceux de ses voisins.
+        const double shade = GroundSlopeShade(
+            CornerNormal(i * kGroundCellsPerCube, j * kGroundCellsPerCube), light_);
         for (std::size_t channel = 0; channel < kTintBgr.size(); ++channel) {
           cube.color[channel] = static_cast<std::uint8_t>(
-              std::lround(std::lerp(kFullChannel, kTintBgr[channel], tint)));
+              std::lround(std::lerp(kFullChannel, kTintBgr[channel], tint) * shade));
         }
         cube.color[kTintBgr.size()] = kOpaque;
       }
@@ -587,7 +590,7 @@ class Planner {
   [[nodiscard]] std::pair<std::uint16_t, std::uint8_t> MotifOf(std::int32_t slot_x,
                                                                std::int32_t slot_y, bool occupied,
                                                                bool pathed) const {
-    const std::uint64_t mixed = Mix(run_seed_, kPatchSalt, slot_x, slot_y);
+    const std::uint64_t mixed = VisualMix(run_seed_, kPatchSalt, slot_x, slot_y);
     const std::uint32_t chance = occupied ? biome_.patch_per_mille : biome_.scatter_per_mille;
     const GroundTextureRole wanted =
         !pathed && mixed % ro::sim::kTerrainPerMille < chance
@@ -716,6 +719,11 @@ class Planner {
 
   [[nodiscard]] glm::ivec2 Origin() const { return {origin_.x_cells, origin_.y_cells}; }
 
+  [[nodiscard]] static std::size_t CornerIndex(std::int32_t x, std::int32_t y) {
+    return static_cast<std::size_t>(y + kCornerMargin) * static_cast<std::size_t>(kCornerGridSide) +
+           static_cast<std::size_t>(x + kCornerMargin);
+  }
+
   [[nodiscard]] static std::size_t CellIndex(std::int32_t x, std::int32_t y) {
     return static_cast<std::size_t>(y) * kGroundWindowCells + static_cast<std::size_t>(x);
   }
@@ -724,6 +732,7 @@ class Planner {
   std::uint64_t run_seed_ = 0;
   const BiomeLook& biome_;
   GroundWindowOrigin origin_;
+  GroundPlanLight light_;
   glm::vec2 shade_direction_{0.0F};
   std::vector<float> corners_;
   std::vector<ShadeDisc> discs_;
@@ -752,16 +761,6 @@ float PieceModelYawDegrees(std::uint8_t quarter, float slot_yaw_degrees) {
                                        kQuarterTurnDegrees,
                 full_turn);
   return turned < 0.0F ? turned + full_turn : turned;
-}
-
-float GroundReliefAt(std::uint64_t run_seed, double world_east, double world_north) {
-  const double slow =
-      ValueNoise(run_seed, kReliefSalt, world_east, world_north, kReliefSlowPeriodCells);
-  const double quick =
-      ValueNoise(run_seed, kQuickReliefSalt, world_east, world_north, kReliefQuickPeriodCells);
-  // Centré sur zéro : une moitié creuse, l'autre bombe.
-  return static_cast<float>(kReliefSlowUnits * (2.0 * slow - 1.0) +
-                            kReliefQuickUnits * (2.0 * quick - 1.0));
 }
 
 GroundPlan PlanGroundWindow(const ro::sim::TerrainRule& rule, std::uint64_t run_seed,

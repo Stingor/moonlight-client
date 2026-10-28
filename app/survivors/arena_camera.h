@@ -61,8 +61,9 @@ inline constexpr float kArenaWidestAspect = 21.0F / 9.0F;
 [[nodiscard]] float ArenaFovDegrees(float aspect_ratio);
 
 // CE QUE LA CAMÉRA VOIT DU SOL, en cases autour du point visé, sur un sol plat
-// à sa hauteur : de combien vers l'ouest, l'est, le nord et le sud. Rien si un
-// coin de l'image regarde au-dessus de l'horizon.
+// à sa hauteur — ou `ground_below_units` plus bas : un sol en creux sous le
+// point visé se voit plus loin. De combien vers l'ouest, l'est, le nord et le
+// sud. Rien si un coin de l'image regarde au-dessus de l'horizon.
 struct GroundFootprint {
   float west_cells = 0.0F;
   float east_cells = 0.0F;
@@ -70,7 +71,15 @@ struct GroundFootprint {
   float south_cells = 0.0F;
 };
 [[nodiscard]] std::optional<GroundFootprint> GroundFootprintOf(const ro::render::Camera& camera,
-                                                               float aspect_ratio);
+                                                               float aspect_ratio,
+                                                               float ground_below_units = 0.0F);
+
+// LA VISÉE LA PLUS RASE de la caméra de l'arène pour une image de ce rapport :
+// la tangente de la plus faible plongée sous l'horizon parmi les rayons de
+// l'image, celle d'un coin du haut. Elle ne dépend ni du recul ni de la
+// descente, seulement de l'élévation et du champ ; un sol dont la pente reste
+// en dessous ne cache jamais le sol plus loin (`kGroundSlopeCap`).
+[[nodiscard]] float ArenaShallowestSightTangent(float aspect_ratio);
 
 // LE RECUL LE PLUS LOINTAIN pour une image de ce rapport : le plus grand, borné
 // à `kArenaFarthestReachDistance`, dont l'emprise au sol tient encore dans le
@@ -83,8 +92,11 @@ struct GroundFootprint {
 // LE PLUS HAUT DÉPART DE LA DESCENTE dont l'emprise au sol reste à
 // `reach_cells` au plus du point visé, de chaque côté, pour une image de ce
 // rapport : un sol qui a un bord proche — la fenêtre du sol généré — ne le
-// montre pas pendant la descente. Jamais moins que `kArenaNearestDistance`.
-[[nodiscard]] float ArenaDescentCeiling(float aspect_ratio, float reach_cells);
+// montre pas pendant la descente. Le sol se lit `ground_below_units` sous le
+// point visé : un relief peut creuser le bord de l'image sous le héros.
+// Jamais moins que `kArenaNearestDistance`.
+[[nodiscard]] float ArenaDescentCeiling(float aspect_ratio, float reach_cells,
+                                        float ground_below_units = 0.0F);
 
 // LA CAMÉRA DE L'ARÈNE : suivi rigide du héros, molette, secousse et descente.
 //
@@ -111,9 +123,9 @@ class ArenaCamera {
   // et l'image suivante voit la même chose que la précédente.
   void Shift(glm::vec3 world_delta) noexcept;
   // LA DESCENTE BORNÉE : son emprise reste à `reach_cells` du héros de chaque
-  // côté (`ArenaDescentCeiling`) ; rien, elle part de `kArenaDescentFromFactor`
-  // fois le recul.
-  void BoundDescent(std::optional<float> reach_cells) noexcept;
+  // côté (`ArenaDescentCeiling`), sur un sol jusqu'à `ground_below_units` sous
+  // lui ; rien, elle part de `kArenaDescentFromFactor` fois le recul.
+  void BoundDescent(std::optional<float> reach_cells, float ground_below_units = 0.0F) noexcept;
 
   // POSE LA CAMÉRA POUR CETTE IMAGE sur le héros, au sol `hero_ground`, à
   // `arrival_ms` de l'arrivée de l'étage, pour une image de `aspect_ratio`.
@@ -138,6 +150,7 @@ class ArenaCamera {
   std::optional<float> farthest_aspect_;
   // La borne de la descente, et son plus haut départ pour `farthest_aspect_`.
   std::optional<float> descent_reach_cells_;
+  float descent_ground_below_units_ = 0.0F;
   float descent_ceiling_ = kArenaDescentUnbounded;
 };
 

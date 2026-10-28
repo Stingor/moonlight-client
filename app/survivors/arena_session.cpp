@@ -12,6 +12,7 @@
 
 #include "survivors/arena_choice.h"
 #include "survivors/arena_ground_follow.h"
+#include "survivors/arena_ground_relief.h"
 
 namespace moonclient {
 namespace {
@@ -48,7 +49,9 @@ ro::core::Result<void> ArenaSession::Open(ro::vfs::Vfs& vfs, const ro::sim::Surv
     ro::core::LogWarning("arène : chiffres absents — {}", ro::core::Describe(digits.error()));
   }
   generated_ = scene_.ground_sources() != nullptr;
-  camera_.BoundDescent(GroundDescentReachOf(generated_));
+  // Le héros peut naître au sommet d'une colline, le bord de l'image au creux.
+  camera_.BoundDescent(GroundDescentReachOf(generated_),
+                       generated_ ? static_cast<float>(kGroundReliefSpanUnits) : 0.0F);
   field_track_ = ArenaFieldTrackOf(rules, *arena);
   arena_id_ = arena->arena_id;
   run_seed_ = start.seed;

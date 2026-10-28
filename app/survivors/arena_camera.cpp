@@ -4,6 +4,7 @@
 #include <array>
 #include <cmath>
 #include <cstdint>
+#include <limits>
 #include <optional>
 
 #include "ro/render/terrain_mesh.h"
@@ -38,13 +39,14 @@ constexpr float kDescentSlackCells = 0.1F;
 // La caméra de l'arène à ce recul, sans descente ni secousse, voit-elle le sol
 // dans `bounds` ? L'emprise ne dépend que du recul, de l'élévation et du champ.
 [[nodiscard]] bool FootprintWithin(float distance, float aspect_ratio,
-                                   const GroundFootprint& bounds) {
+                                   const GroundFootprint& bounds, float ground_below_units = 0.0F) {
   ro::render::Camera camera;
   camera.distance = distance;
   camera.pitch_degrees = kArenaElevationDegrees;
   camera.yaw_degrees = kArenaYawDegrees;
   camera.fov_degrees = ArenaFovDegrees(aspect_ratio);
-  const std::optional<GroundFootprint> seen = GroundFootprintOf(camera, aspect_ratio);
+  const std::optional<GroundFootprint> seen =
+      GroundFootprintOf(camera, aspect_ratio, ground_below_units);
   return seen.has_value() && seen->west_cells <= bounds.west_cells &&
          seen->east_cells <= bounds.east_cells && seen->north_cells <= bounds.north_cells &&
          seen->south_cells <= bounds.south_cells;
@@ -101,7 +103,7 @@ float ArenaFovDegrees(float aspect_ratio) {
 }
 
 std::optional<GroundFootprint> GroundFootprintOf(const ro::render::Camera& camera,
-                                                 float aspect_ratio) {
+                                                 float aspect_ratio, float ground_below_units) {
   const glm::mat4 unproject =
       glm::inverse(camera.ProjectionMatrix(aspect_ratio) * camera.ViewMatrix());
   const auto world_of = [&unproject](glm::vec2 corner, float depth) {
@@ -116,7 +118,7 @@ std::optional<GroundFootprint> GroundFootprintOf(const ro::render::Camera& camer
     if (ray.y >= 0.0F) {
       return std::nullopt;
     }
-    const float along = (camera.look_at.y - near_point.y) / ray.y;
+    const float along = (camera.look_at.y - ground_below_units - near_point.y) / ray.y;
     const glm::vec3 ground = near_point + ray * along;
     // 🔴 LE NORD EST VERS LES Z DÉCROISSANTS : la grille des cases est inversée
     // sur cet axe.
@@ -130,6 +132,26 @@ std::optional<GroundFootprint> GroundFootprintOf(const ro::render::Camera& camer
   return footprint;
 }
 
+float ArenaShallowestSightTangent(float aspect_ratio) {
+  ro::render::Camera camera;
+  camera.distance = kArenaEntryDistance;
+  camera.pitch_degrees = kArenaElevationDegrees;
+  camera.yaw_degrees = kArenaYawDegrees;
+  camera.fov_degrees = ArenaFovDegrees(aspect_ratio);
+  const glm::mat4 unproject =
+      glm::inverse(camera.ProjectionMatrix(aspect_ratio) * camera.ViewMatrix());
+  const auto world_of = [&unproject](glm::vec2 corner, float depth) {
+    const glm::vec4 point = unproject * glm::vec4(corner, depth, 1.0F);
+    return glm::vec3(point) / point.w;
+  };
+  float shallowest = std::numeric_limits<float>::max();
+  for (const glm::vec2 corner : kImageCorners) {
+    const glm::vec3 ray = world_of(corner, kFarDepth) - world_of(corner, kNearDepth);
+    shallowest = std::min(shallowest, -ray.y / std::hypot(ray.x, ray.z));
+  }
+  return shallowest;
+}
+
 float ArenaFarthestDistance(float aspect_ratio, const ro::sim::SpawnFrame& frame) {
   if (FitsSpawnFrame(kArenaFarthestReachDistance, aspect_ratio, frame)) {
     return kArenaFarthestReachDistance;
@@ -141,14 +163,14 @@ float ArenaFarthestDistance(float aspect_ratio, const ro::sim::SpawnFrame& frame
                         });
 }
 
-float ArenaDescentCeiling(float aspect_ratio, float reach_cells) {
+float ArenaDescentCeiling(float aspect_ratio, float reach_cells, float ground_below_units) {
   const float within_cells = reach_cells - kDescentSlackCells;
   const GroundFootprint bounds{.west_cells = within_cells,
                                .east_cells = within_cells,
                                .north_cells = within_cells,
                                .south_cells = within_cells};
-  const auto fitting = [aspect_ratio, &bounds](float distance) {
-    return FootprintWithin(distance, aspect_ratio, bounds);
+  const auto fitting = [aspect_ratio, &bounds, ground_below_units](float distance) {
+    return FootprintWithin(distance, aspect_ratio, bounds, ground_below_units);
   };
   // La descente ne part jamais de plus haut que le plus lointain recul de la
   // molette, multiplié.
@@ -158,9 +180,13 @@ float ArenaDescentCeiling(float aspect_ratio, float reach_cells) {
   return LargestFitting(kArenaNearestDistance, highest, fitting);
 }
 
-void ArenaCamera::BoundDescent(std::optional<float> reach_cells) noexcept {
-  if (descent_reach_cells_ == reach_cells) return;
+void ArenaCamera::BoundDescent(std::optional<float> reach_cells,
+                               float ground_below_units) noexcept {
+  if (descent_reach_cells_ == reach_cells && descent_ground_below_units_ == ground_below_units) {
+    return;
+  }
   descent_reach_cells_ = reach_cells;
+  descent_ground_below_units_ = ground_below_units;
   // Le plafond se recherche à la pose suivante, pour son rapport.
   farthest_aspect_.reset();
 }
@@ -198,9 +224,10 @@ const ro::render::Camera& ArenaCamera::Pose(const glm::vec3& hero_ground, std::u
   if (farthest_aspect_ != aspect_ratio) {
     farthest_aspect_ = aspect_ratio;
     farthest_distance_ = ArenaFarthestDistance(aspect_ratio, frame_);
-    descent_ceiling_ = descent_reach_cells_.has_value()
-                           ? ArenaDescentCeiling(aspect_ratio, *descent_reach_cells_)
-                           : kArenaDescentUnbounded;
+    descent_ceiling_ =
+        descent_reach_cells_.has_value()
+            ? ArenaDescentCeiling(aspect_ratio, *descent_reach_cells_, descent_ground_below_units_)
+            : kArenaDescentUnbounded;
     SetDistance(wheel_distance_);
   }
   aim_.shake.Undo(camera_);

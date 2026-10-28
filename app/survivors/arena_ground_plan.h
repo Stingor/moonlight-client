@@ -10,13 +10,15 @@
 #include "ro/sim/survivors_terrain.h"
 
 #include "survivors/arena_ground_look.h"
+#include "survivors/arena_ground_relief.h"
 
 namespace moonclient {
 
 // LE PLAN D'UNE FENÊTRE DU SOL GÉNÉRÉ : ce que l'arène dessine autour du héros,
 // en données pures, sans GL ni fichier. `sim` décide les cases et les pièces ;
 // le plan en tire tout ce qui ne change pas la partie (ADR 0134, T1) : la
-// texture et la teinte de chaque cube, les ondulations du sol (Q3), une ombre
+// texture et la teinte de chaque cube, les collines du sol et la lumière de
+// leurs pentes (Q3, `arena_ground_relief.h`), une ombre
 // cuite sous chaque pièce, la pose des modèles, un semis qui ne bloque pas, et
 // la terre des chemins, bordée d'un semis le long de ses lisières.
 //
@@ -126,6 +128,13 @@ struct GroundPlan {
   std::vector<std::uint16_t> path_blocks;
   // Les hauteurs des coins de chaque case, dans l'ordre du fichier GAT.
   std::vector<std::array<float, 4>> cell_heights;
+  // LES TERRASSES des repères de la fenêtre et de son tour
+  // (`arena_ground_relief.h`).
+  std::vector<GroundReliefPad> relief_pads;
+  // kGroundWindowCells² cases : la part de lumière que la pente garde en leur
+  // centre pour un acteur (`GroundSlopeActorShade`). Celle du sol est cuite
+  // dans la couleur des cubes (`GroundSlopeShade`).
+  std::vector<float> cell_shades;
   // Les ombres cuites ; la première est le plein jour que partagent les cubes
   // qu'aucune ombre ne touche.
   std::vector<PlannedShade> lightmaps;
@@ -135,12 +144,6 @@ struct GroundPlan {
 
 // L'ombre la plus sombre que pose une pièce, sur 255.
 inline constexpr std::uint8_t kGroundShadeLevel = 128;
-
-// D'où vient la lumière du soleil de référence, dans le repère du monde (x vers
-// l'est, y vers le haut, z vers le sud) : voir `ro::render::SceneLight`.
-struct GroundPlanLight {
-  glm::vec3 toward_sun{0.0F, 1.0F, 0.0F};
-};
 
 // LE PLAN DE LA FENÊTRE `origin` du terrain `rule` sous la graine `run_seed`,
 // dessiné selon `biome`. Une pièce que `biome` ne dessine pas laisse ses cases
@@ -154,9 +157,5 @@ struct GroundPlanLight {
 // quarts dans le sens trigonométrique vu du ciel, l'angle du RSW tourne dans
 // l'autre sens, d'où l'angle de la place `slot_yaw_degrees` moins les quarts.
 [[nodiscard]] float PieceModelYawDegrees(std::uint8_t quarter, float slot_yaw_degrees);
-
-// La hauteur du sol, dans l'unité et le sens du fichier, au coin de case (x, y)
-// du monde : de douces ondulations, les mêmes pour toute fenêtre.
-[[nodiscard]] float GroundReliefAt(std::uint64_t run_seed, double world_east, double world_north);
 
 }  // namespace moonclient
