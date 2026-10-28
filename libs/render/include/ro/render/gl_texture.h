@@ -68,6 +68,15 @@ class GlTexture {
   [[nodiscard]] static core::Result<GlTexture> Upload(const formats::Image& image,
                                                       Filtering filtering = Filtering::kSharp);
 
+  // LE MÊME TÉLÉVERSEMENT, PAR BANDES : `Reserve` pose une texture de la
+  // taille de `image`, vide, et chaque `UploadRows` y copie les rangées
+  // [first_row, first_row + rows). Réservé aux images que le téléversement ne
+  // repeint pas (`FillsTransparentEdges` faux, ou aucun texel transparent) :
+  // une bande ne voit pas les texels de la suivante.
+  [[nodiscard]] static core::Result<GlTexture> Reserve(const formats::Image& image,
+                                                       Filtering filtering);
+  void UploadRows(const formats::Image& image, int first_row, int rows) const;
+
   // Texture unie d'un seul pixel : sert de remplacement lorsqu'une texture du
   // GND est absente ou illisible, pour que le reste de la carte s'affiche
   // quand même au lieu de disparaître.

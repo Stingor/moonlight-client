@@ -1,7 +1,9 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <map>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -13,6 +15,7 @@
 #include "ro/sim/survivors_terrain.h"
 #include "ro/vfs/vfs.h"
 
+#include "survivors/arena_ground_compose.h"
 #include "survivors/arena_ground_look.h"
 #include "survivors/arena_ground_plan.h"
 #include "world/map_stage.h"
@@ -36,12 +39,28 @@ struct GroundSources {
   // La lumière du RSW de la carte de référence.
   ro::formats::RswLight light;
   GroundPlanLight plan_light;
-  // Les chemins des textures, dans l'ordre de `BiomeLook::textures`, et ceux
-  // des modèles, tels que l'installation les écrit (CP949).
+  // Les chemins des textures, dans l'ordre de `BiomeLook::textures`, puis les
+  // pages de la terre composée ; ceux des modèles, tels que l'installation les
+  // écrit (CP949).
   std::vector<std::string> texture_paths;
   std::map<std::string_view, std::string> model_files;
-  // Les textures, les modèles et les tables de la carte de référence.
+  // Les textures, les modèles et les tables de la carte de référence. Les
+  // pages de la terre composée y tiennent leur place d'un texel : une fenêtre
+  // les y trouve sans chercher de fichier, puis y pose les siennes.
   ro::render::MapScene library;
+  // LA TERRE COMPOSÉE (`arena_ground_compose.h`) : l'herbe et la terre du
+  // biome, et le rang de la première page dans `texture_paths`. Rien quand
+  // elles ne se composent pas : les chemins gardent leurs carreaux.
+  std::optional<GroundComposeSources> compose;
+  std::size_t first_composed_page = 0;
+  // LES TACHES RECOMPOSÉES (`ComposePatchTexture`), par rang dans
+  // `BiomeLook::textures` : le rang, dans `texture_paths`, de la version sans
+  // quart de tour, les trois autres à sa suite. Rien : la tache telle quelle.
+  std::vector<std::optional<std::size_t>> recomposed_patches;
+  // LES MOTIFS BORDÉS (`BorderMotif`), par rang dans `texture_paths` : la part
+  // de la texture que prend son bord sur chaque côté, nulle pour une texture
+  // lue telle quelle.
+  std::vector<float> motif_borders;
 };
 
 // LIT LES RESSOURCES DU BIOME `look` dans l'installation, derrière l'écran de

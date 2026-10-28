@@ -1505,6 +1505,7 @@ add_library(moonclient_arena STATIC
     survivors/arena_card_cues.cpp
     survivors/arena_effect_plan.cpp
     survivors/arena_effects.cpp
+    survivors/arena_ground_compose.cpp
     survivors/arena_ground_follow.cpp
     survivors/arena_ground_look.cpp
     survivors/arena_ground_paths.cpp

@@ -15,6 +15,7 @@
 #include "ro/render/point_light_shader.h"
 #include "ro/render/scene_cutout.h"
 #include "ro/render/sun_shadow_map.h"
+#include "ro/render/texture_bleed.h"
 
 namespace ro::render {
 namespace {
@@ -263,8 +264,21 @@ core::Result<void> TerrainRenderer::BeginUpload(const TerrainMesh& mesh,
   textures_.reserve(textures.size());
   alpha_references_.clear();
   alpha_references_.reserve(textures.size());
+  staged_textures_.clear();
+  staged_row_ = 0;
   for (const formats::Image& image : textures) {
     const SceneCutout cutout = SceneCutoutOf(image.file);
+    // UNE GRANDE TEXTURE que le téléversement ne repeint pas se réserve ici et
+    // se copie par rangées, tranche après tranche.
+    if (image.pixels.size() > kSlicedTextureBytes &&
+        (!GlTexture::FillsTransparentEdges(cutout.filtering) || !HasTransparentTexel(image))) {
+      if (auto reserved = GlTexture::Reserve(image, cutout.filtering); reserved) {
+        staged_textures_.push_back(StagedTexture{.rank = textures_.size(), .image = &image});
+        textures_.push_back(std::move(*reserved));
+        alpha_references_.push_back(cutout.alpha_reference);
+        continue;
+      }
+    }
     auto uploaded = GlTexture::Upload(image, cutout.filtering);
     // Une texture illisible ne doit pas emporter la carte entière : on la
     // remplace, et le magenta la signale à l'écran.
@@ -326,6 +340,27 @@ bool TerrainRenderer::UploadSlice(std::size_t most_bytes) {
   if (staged_mesh_ == nullptr) {
     return true;
   }
+  // LES GRANDES TEXTURES D'ABORD, par rangées entières : au moins une par
+  // tranche, pour que la copie avance quel que soit `most_bytes`.
+  constexpr std::size_t kRgbaBytes = 4;
+  std::size_t texture_budget = most_bytes;
+  while (!staged_textures_.empty()) {
+    const StagedTexture& staged = staged_textures_.front();
+    const std::size_t row_bytes = static_cast<std::size_t>(staged.image->width) * kRgbaBytes;
+    const int rows_left = staged.image->height - staged_row_;
+    const auto affordable = static_cast<int>(std::min<std::size_t>(
+        static_cast<std::size_t>(rows_left), std::max<std::size_t>(1, texture_budget / row_bytes)));
+    textures_[staged.rank].UploadRows(*staged.image, staged_row_, affordable);
+    staged_row_ += affordable;
+    const std::size_t spent = static_cast<std::size_t>(affordable) * row_bytes;
+    texture_budget = texture_budget > spent ? texture_budget - spent : 0;
+    if (staged_row_ >= staged.image->height) {
+      staged_textures_.erase(staged_textures_.begin());
+      staged_row_ = 0;
+    }
+    if (texture_budget == 0) return false;
+  }
+  most_bytes = texture_budget;
   // Les trois tampons bout à bout, copiés par la cible de copie : aucune
   // liaison d'un tableau de sommets n'en est touchée.
   struct Part {
@@ -370,6 +405,8 @@ void TerrainRenderer::CancelUpload() noexcept {
   staged_mesh_ = nullptr;
   staged_chunks_.reset();
   staged_bytes_ = 0;
+  staged_textures_.clear();
+  staged_row_ = 0;
 }
 
 void TerrainRenderer::DescribeVertices() const {

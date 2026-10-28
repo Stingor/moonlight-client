@@ -78,6 +78,14 @@ struct PlannedCube {
 // Le retrait d'un cube `inset`, en part de la texture entière.
 inline constexpr float kGroundTileInset = 1.0F / 64.0F;
 
+// LE BLOC D'UN CUBE : 4 × 4 cases, ses quatre cases et l'anneau d'une case
+// autour ; le bit (4 × rangée + colonne), la rangée et la colonne comptées de
+// 0 à 3 depuis la case sud-ouest de l'anneau. Sans case de chemin, le cube est
+// d'herbe ; tout de chemin, de terre pleine ; sinon il se compose (voir
+// `arena_ground_compose.h`).
+inline constexpr std::int32_t kPathBlockSide = 4;
+inline constexpr std::uint16_t kPathBlockFull = 0xFFFFU;
+
 // Le plan d'ombre d'une lightmap, 8 × 8 texels du sud au nord et d'ouest en
 // est : 255 en plein jour, `kGroundShadeLevel` sous une ombre pleine.
 using PlannedShade = std::array<std::uint8_t, kGroundLightmapTexels>;
@@ -111,6 +119,11 @@ struct GroundPlan {
   std::vector<std::uint8_t> passable;
   // kGroundWindowCells² cases : 1 sur un chemin, comme `sim` le dit.
   std::vector<std::uint8_t> path;
+  // LE BLOC DE CHAQUE CUBE, dans l'ordre de `cubes` : ses quatre cases et
+  // l'anneau d'une case autour, lu jusque dans le tour de la fenêtre, un bit
+  // par case de chemin (voir `kPathBlockSide`). Un emplacement dont un cube a
+  // un bloc non nul est celui d'un chemin : il ne porte pas de tache.
+  std::vector<std::uint16_t> path_blocks;
   // Les hauteurs des coins de chaque case, dans l'ordre du fichier GAT.
   std::vector<std::array<float, 4>> cell_heights;
   // Les ombres cuites ; la première est le plein jour que partagent les cubes

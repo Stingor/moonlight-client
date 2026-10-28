@@ -98,13 +98,17 @@ class TerrainRenderer {
 
   // LE MÊME TÉLÉVERSEMENT, EN TRANCHES, pour qu'aucune image ne le paie en
   // entier : `BeginUpload` pose les textures et la lightmap et réserve les
-  // tampons ; chaque `UploadSlice` y copie au plus `most_bytes` des sommets,
+  // tampons ; chaque `UploadSlice` y copie au plus `most_bytes` des grandes
+  // textures (au-delà de kSlicedTextureBytes, par rangées), puis des sommets,
   // puis des indices, et rend vrai quand tout y est. Le compte de
   // téléversements passe au-delà de `later_than` : un renderer qui en remplace
   // un autre se dit changé à qui gardait le compte de l'autre.
   //
-  // ⚠ IL NE SE DESSINE PAS ENTRE LES DEUX, et `mesh` doit vivre jusqu'à la
-  // dernière tranche.
+  // ⚠ IL NE SE DESSINE PAS ENTRE LES DEUX, et `mesh` comme `textures` doivent
+  // vivre jusqu'à la dernière tranche.
+  // Au-delà de 256 Kio, une planche de 256 × 256 texels : les planches du sol
+  // partent entières avec `BeginUpload`.
+  static constexpr std::size_t kSlicedTextureBytes = std::size_t{1} << 18;
   [[nodiscard]] core::Result<void> BeginUpload(const TerrainMesh& mesh,
                                                const std::vector<formats::Image>& textures,
                                                const formats::Image& lightmap,
@@ -165,6 +169,14 @@ class TerrainRenderer {
   const TerrainMesh* staged_mesh_ = nullptr;
   std::shared_ptr<const TerrainDepthChunks> staged_chunks_;
   std::size_t staged_bytes_ = 0;
+  // Les grandes textures réservées dont il reste des rangées à copier : leur
+  // rang dans `textures_` et leur image ; la prochaine rangée de la première.
+  struct StagedTexture {
+    std::size_t rank = 0;
+    const formats::Image* image = nullptr;
+  };
+  std::vector<StagedTexture> staged_textures_;
+  int staged_row_ = 0;
 };
 
 }  // namespace ro::render

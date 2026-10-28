@@ -434,12 +434,13 @@ class Planner {
   void PaintCubes() {
     const std::set<std::pair<std::int32_t, std::int32_t>> occupied = OccupiedSlots();
     const std::vector<std::uint8_t> dirt = DirtCornersOfCubes();
+    ReadPathBlocks();
     // Un emplacement qu'un chemin effleure ne porte pas de tache : leurs
     // lisières ne se raccorderaient pas.
     std::set<std::pair<std::int32_t, std::int32_t>> pathed;
     for (std::int32_t j = 0; j < kGroundWindowCubes; ++j) {
       for (std::int32_t i = 0; i < kGroundWindowCubes; ++i) {
-        if (dirt[CubeIndex(i, j)] == 0) continue;
+        if (plan_.path_blocks[CubeIndex(i, j)] == 0) continue;
         pathed.emplace(FloorDivide(origin_.x_cells / kGroundCellsPerCube + i, kGroundTextureCubes),
                        FloorDivide(origin_.y_cells / kGroundCellsPerCube + j, kGroundTextureCubes));
       }
@@ -470,6 +471,25 @@ class Planner {
               std::lround(std::lerp(kFullChannel, kTintBgr[channel], tint)));
         }
         cube.color[kTintBgr.size()] = kOpaque;
+      }
+    }
+  }
+
+  // LE BLOC DE CHAQUE CUBE, lu dans le tour au bord de la fenêtre.
+  void ReadPathBlocks() {
+    plan_.path_blocks.assign(kCubeCount, 0);
+    for (std::int32_t j = 0; j < kGroundWindowCubes; ++j) {
+      for (std::int32_t i = 0; i < kGroundWindowCubes; ++i) {
+        std::uint16_t block = 0;
+        for (std::int32_t row = 0; row < kPathBlockSide; ++row) {
+          for (std::int32_t column = 0; column < kPathBlockSide; ++column) {
+            if (!PathAt(i * kGroundCellsPerCube - 1 + column, j * kGroundCellsPerCube - 1 + row)) {
+              continue;
+            }
+            block |= static_cast<std::uint16_t>(1U << (row * kPathBlockSide + column));
+          }
+        }
+        plan_.path_blocks[CubeIndex(i, j)] = block;
       }
     }
   }

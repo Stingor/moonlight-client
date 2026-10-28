@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cstddef>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -69,6 +70,25 @@ core::Result<GlTexture> GlTexture::Upload(const formats::Image& image, Filtering
   // opaque avec un texel de couleur clé. Voir texture_bleed.h.
   const formats::Image bled = BleedTransparentEdges(image);
   return GlTexture(CreateRgba(bled.width, bled.height, bled.pixels.data(), filtering));
+}
+
+core::Result<GlTexture> GlTexture::Reserve(const formats::Image& image, Filtering filtering) {
+  if (image.width <= 0 || image.height <= 0 || image.pixels.empty()) {
+    return Fail(ErrorCode::kCorruptData, "image vide");
+  }
+  return GlTexture(CreateRgba(image.width, image.height, nullptr, filtering));
+}
+
+void GlTexture::UploadRows(const formats::Image& image, int first_row, int rows) const {
+  constexpr std::size_t kRgbaBytes = 4;
+  if (texture_ == 0 || rows <= 0 || first_row < 0 || first_row + rows > image.height) {
+    return;
+  }
+  glBindTexture(GL_TEXTURE_2D, texture_);
+  glTexSubImage2D(GL_TEXTURE_2D, 0, 0, first_row, image.width, rows, GL_RGBA, GL_UNSIGNED_BYTE,
+                  image.pixels.data() + static_cast<std::size_t>(first_row) *
+                                            static_cast<std::size_t>(image.width) * kRgbaBytes);
+  glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 core::Result<GlTexture> GlTexture::Placeholder() {

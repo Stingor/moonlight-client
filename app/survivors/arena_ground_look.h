@@ -49,7 +49,9 @@ struct PieceLook {
 // posé, tourné, sur l'emplacement d'une pièce ; une tache ÉPARSE se pose
 // rarement sur un emplacement vide.
 //
-// LES CHEMINS se peignent cube par cube. Chaque coin de cube est de terre
+// LES CHEMINS se composent (`arena_ground_compose.h`) ; les carreaux qui
+// suivent ne servent qu'aux cubes que la composition ne prend pas — herbe et
+// terre qui ne se composent pas, pages pleines. Chaque coin de cube est de terre
 // quand au moins la moitié des quatre cases qui le touchent sont de chemin ;
 // un cube prend le carreau qui raccorde ses quatre coins, tourné : la terre
 // pleine (kPathFull), un bord (kPathEdge), un coin de terre seul
