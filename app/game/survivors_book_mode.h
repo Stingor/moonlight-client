@@ -54,13 +54,18 @@ class SurvivorsBookMode {
                               std::uint16_t first_skill_id) {
     return StartAs(kind_, rules, client_root, seed, first_skill_id);
   }
-  // Le départ d'un tableau donné, quel que soit le choix de l'accueil : une
-  // partie classée sans jeton repart libre, sur l'arène `free_arena_id` quand
-  // elle est donnée — celle qu'elle demandait —, sinon sur celle de l'accueil.
+  // Le départ d'un tableau donné, quel que soit le choix de l'accueil.
   [[nodiscard]] Begun StartAs(SurvivorsBoardKind kind, const ro::sim::SurvivorsRules& rules,
                               const std::filesystem::path& client_root, std::uint64_t seed,
-                              std::uint16_t first_skill_id,
-                              std::optional<std::uint16_t> free_arena_id = std::nullopt);
+                              std::uint16_t first_skill_id);
+  // 🔴 LE RABAT D'UNE PARTIE CLASSÉE, quelle qu'en soit la cause — service
+  // fermé, jeton refusé ou venu trop tard, classement absent : elle part
+  // libre, sur l'arène classée qu'elle demandait (la prairie, que l'onglet
+  // « Partie classée » affiche), jamais sur celle que l'accueil a retenue pour
+  // la partie libre.
+  [[nodiscard]] Begun StartRankedAsFree(const ro::sim::SurvivorsRules& rules,
+                                        const std::filesystem::path& client_root,
+                                        std::uint64_t seed, std::uint16_t first_skill_id);
 
   // Une partie neuve commence : elle sera créditée à son tour.
   void Restart() noexcept;
@@ -82,6 +87,11 @@ class SurvivorsBookMode {
   }
 
  private:
+  // Le départ d'une partie libre sur l'arène `arena_id` (`FreeStartOf`).
+  [[nodiscard]] Begun FreeStart(const ro::sim::SurvivorsRules& rules,
+                                const std::filesystem::path& client_root, std::uint64_t seed,
+                                std::uint16_t first_skill_id, std::uint16_t arena_id);
+
   UtcClock now_utc_;
   SurvivorsSaveFile file_;
   SurvivorsBoardKind kind_ = SurvivorsBoardKind::kFree;

@@ -48,9 +48,7 @@ ro::core::Result<void> ArenaSession::Open(ro::vfs::Vfs& vfs, const ro::sim::Surv
     ro::core::LogWarning("arène : chiffres absents — {}", ro::core::Describe(digits.error()));
   }
   generated_ = scene_.ground_sources() != nullptr;
-  camera_.BoundDescent(generated_
-                           ? std::optional<float>(static_cast<float>(kGroundDescentReachCells))
-                           : std::nullopt);
+  camera_.BoundDescent(GroundDescentReachOf(generated_));
   field_track_ = ArenaFieldTrackOf(rules, *arena);
   arena_id_ = arena->arena_id;
   run_seed_ = start.seed;
@@ -61,8 +59,13 @@ ro::core::Result<void> ArenaSession::Open(ro::vfs::Vfs& vfs, const ro::sim::Surv
 }
 
 bool ArenaSession::Shows(const ro::sim::SurvivorsStart& start) const noexcept {
-  return arena_id_ == start.arena_id &&
-         (!generated_ || (run_seed_ == start.seed && scene_.window_origin() == start_origin_));
+  return arena_id_.has_value() &&
+         MountedArenaServes(MountedArena{.arena_id = *arena_id_,
+                                         .generated = generated_,
+                                         .run_seed = run_seed_,
+                                         .start_origin = start_origin_,
+                                         .shown_origin = scene_.window_origin()},
+                            start.arena_id, start.seed);
 }
 
 void ArenaSession::Restart() {

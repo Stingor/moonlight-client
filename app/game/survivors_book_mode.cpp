@@ -32,8 +32,7 @@ SurvivorsBookMode::Begun SurvivorsBookMode::StartAs(SurvivorsBoardKind kind,
                                                     const ro::sim::SurvivorsRules& rules,
                                                     const std::filesystem::path& client_root,
                                                     std::uint64_t seed,
-                                                    std::uint16_t first_skill_id,
-                                                    std::optional<std::uint16_t> free_arena_id) {
+                                                    std::uint16_t first_skill_id) {
   if (kind == SurvivorsBoardKind::kChallenge) {
     const ro::sim::IsoWeek week = IsoWeekOfUtc(now_utc_());
     return Begun{.start = ChallengeStartOf(rules, week),
@@ -43,14 +42,27 @@ SurvivorsBookMode::Begun SurvivorsBookMode::StartAs(SurvivorsBoardKind kind,
     return Begun{.start = ro::sim::RankedStartOf(rules, seed, first_skill_id),
                  .board = SurvivorsRunBoard{.kind = SurvivorsBoardKind::kRanked}};
   }
+  return FreeStart(rules, client_root, seed, first_skill_id, free_arena_id_);
+}
+
+SurvivorsBookMode::Begun SurvivorsBookMode::StartRankedAsFree(
+    const ro::sim::SurvivorsRules& rules, const std::filesystem::path& client_root,
+    std::uint64_t seed, std::uint16_t first_skill_id) {
+  return FreeStart(rules, client_root, seed, first_skill_id,
+                   ro::sim::RankedStartOf(rules, seed, first_skill_id).arena_id);
+}
+
+SurvivorsBookMode::Begun SurvivorsBookMode::FreeStart(const ro::sim::SurvivorsRules& rules,
+                                                      const std::filesystem::path& client_root,
+                                                      std::uint64_t seed,
+                                                      std::uint16_t first_skill_id,
+                                                      std::uint16_t arena_id) {
   const SurvivorsSaveRead read = file_.Load(client_root);
   if (read.file_unread) {
     ro::core::LogWarning("survivors : carnet illisible, la partie part sans la méta");
   }
   if (read.damaged_copy.has_value()) damaged_copy_ = read.damaged_copy;
-  return Begun{.start = FreeStartOf(rules, read.save, seed, first_skill_id,
-                                    free_arena_id.value_or(free_arena_id_)),
-               .board = {}};
+  return Begun{.start = FreeStartOf(rules, read.save, seed, first_skill_id, arena_id), .board = {}};
 }
 
 void SurvivorsBookMode::Restart() noexcept {

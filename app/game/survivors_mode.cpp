@@ -193,13 +193,13 @@ void SurvivorsMode::Enter(SurvivorsStage& stage, const SurvivorsContext& context
   // UNE PARTIE CLASSÉE OU UN DÉFI DEMANDE SON JETON (Q2, Q3) : l'écran de
   // chargement couvre l'attente, et `Frame` refait le départ qu'elle règle.
   // L'arène vient du départ : la prairie pour le défi et la partie classée,
-  // celle de l'accueil pour la partie libre.
+  // celle de l'accueil pour la partie libre ; une classée sans classement
+  // part libre sur la prairie.
   const SurvivorsBookMode::Begun book_start =
       context.ranking != nullptr
           ? context.ranking->Launch(book_, Rules(), context.client_root, seed, first_skill_id)
       : book_.chosen() == SurvivorsBoardKind::kRanked
-          ? book_.StartAs(SurvivorsBoardKind::kFree, Rules(), context.client_root, seed,
-                          first_skill_id)
+          ? book_.StartRankedAsFree(Rules(), context.client_root, seed, first_skill_id)
           : book_.StartOf(Rules(), context.client_root, seed, first_skill_id);
   TellDamagedCopy(book_.TakeDamagedCopy(), context.say);
   if (auto begun = BeginRun(stage, context, book_start); !begun) {

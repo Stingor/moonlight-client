@@ -175,10 +175,11 @@ SurvivorsBookMode::Begun SurvivorsRankingMode::Launch(SurvivorsBookMode& book,
   // CHAQUE DÉPART OUBLIE LE PRÉCÉDENT : un jeton accordé à un départ qui n'a
   // jamais atteint son bilan ne classe pas la partie suivante.
   session_.ForgetRun();
-  SurvivorsBoardKind kind = book.chosen();
-  // La partie classée n'existe que service ouvert : sans lui, elle part libre.
+  const SurvivorsBoardKind kind = book.chosen();
+  // La partie classée n'existe que service ouvert : sans lui, elle part libre,
+  // sur l'arène qu'elle demandait.
   if (kind == SurvivorsBoardKind::kRanked && !session_.service_open()) {
-    kind = SurvivorsBoardKind::kFree;
+    return book.StartRankedAsFree(rules, client_root, seed, first_skill_id);
   }
   SurvivorsBookMode::Begun begun = book.StartAs(kind, rules, client_root, seed, first_skill_id);
   if (kind == SurvivorsBoardKind::kFree) return begun;
@@ -195,15 +196,13 @@ SurvivorsBookMode::Begun SurvivorsRankingMode::Launch(SurvivorsBookMode& book,
     launch_ = PendingLaunch{.kind = kind,
                             .start_seed = begun.start.seed,
                             .local_seed = seed,
-                            .first_skill_id = first_skill_id,
-                            .arena_id = begun.start.arena_id};
+                            .first_skill_id = first_skill_id};
     return begun;
   }
   // Un défi sans jeton reste un défi local ; une partie classée part libre,
-  // sur l'arène du jeton qu'elle demandait.
+  // sur l'arène qu'elle demandait.
   if (kind == SurvivorsBoardKind::kRanked) {
-    return book.StartAs(SurvivorsBoardKind::kFree, rules, client_root, seed, first_skill_id,
-                        begun.start.arena_id);
+    return book.StartRankedAsFree(rules, client_root, seed, first_skill_id);
   }
   return begun;
 }
@@ -229,8 +228,7 @@ std::optional<SurvivorsBookMode::Begun> SurvivorsRankingMode::Settle(
         .board = SurvivorsRunBoard{.kind = SurvivorsBoardKind::kChallenge, .week = week}};
   }
   if (launch.kind == SurvivorsBoardKind::kRanked) {
-    return book.StartAs(SurvivorsBoardKind::kFree, rules, client_root, launch.local_seed,
-                        launch.first_skill_id, launch.arena_id);
+    return book.StartRankedAsFree(rules, client_root, launch.local_seed, launch.first_skill_id);
   }
   return std::nullopt;
 }

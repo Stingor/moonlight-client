@@ -59,6 +59,28 @@ inline constexpr std::int32_t kGroundDescentReachCells =
     (kGroundWindowCells - ro::sim::kTerrainChunkCells) / 2 - kGroundEdgeMarginCells;
 static_assert(kGroundDescentReachCells > kGroundWidestSightCells);
 
+// LA BORNE DE LA DESCENTE D'ENTRÉE d'une arène montée : `kGroundDescentReachCells`
+// sur le sol généré, aucune sur une carte, que la descente voit entière.
+[[nodiscard]] std::optional<float> GroundDescentReachOf(bool generated) noexcept;
+
+// L'ARÈNE MONTÉE, telle qu'un départ la juge.
+struct MountedArena {
+  std::uint16_t arena_id = 0;
+  bool generated = false;
+  // La graine du sol généré monté.
+  std::uint64_t run_seed = 0;
+  // Le coin de la fenêtre bâtie à l'ouverture, et celui de la fenêtre montée
+  // maintenant, que la partie a pu faire suivre au loin.
+  GroundWindowOrigin start_origin;
+  GroundWindowOrigin shown_origin;
+};
+
+// UN DÉPART GARDE L'ARÈNE MONTÉE quand c'est la même arène et, sur un sol
+// généré, la même graine ET la fenêtre du départ : « Rejouer » une carte la
+// garde ; une graine neuve, ou une fenêtre partie au loin, la remonte.
+[[nodiscard]] bool MountedArenaServes(const MountedArena& mounted, std::uint16_t arena_id,
+                                      std::uint64_t run_seed) noexcept;
+
 // L'écart du héros (cases continues) au centre de la fenêtre `origin`.
 [[nodiscard]] glm::vec2 GroundOffsetFromCentre(GroundWindowOrigin origin, glm::vec2 hero_cell);
 

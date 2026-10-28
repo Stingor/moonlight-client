@@ -103,6 +103,18 @@ GroundPreparedFate GroundPreparedFateOf(GroundWindowOrigin shown, GroundWindowOr
                                                             : GroundPreparedFate::kDrop;
 }
 
+std::optional<float> GroundDescentReachOf(bool generated) noexcept {
+  if (!generated) return std::nullopt;
+  return static_cast<float>(kGroundDescentReachCells);
+}
+
+bool MountedArenaServes(const MountedArena& mounted, std::uint16_t arena_id,
+                        std::uint64_t run_seed) noexcept {
+  if (mounted.arena_id != arena_id) return false;
+  return !mounted.generated ||
+         (mounted.run_seed == run_seed && mounted.shown_origin == mounted.start_origin);
+}
+
 bool GroundAheadStillServes(GroundWindowOrigin shown, GroundWindowOrigin prepared,
                             glm::vec2 hero_cell) {
   if (prepared == shown) return false;
