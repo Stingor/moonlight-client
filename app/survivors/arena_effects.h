@@ -31,13 +31,14 @@
 #include "effects/effect_view.h"
 #include "survivors/arena_card_cues.h"
 #include "survivors/arena_effect_plan.h"
+#include "survivors/arena_zone_grounds.h"
 #include "world/map_stage.h"
 
 namespace moonclient {
 
-// LES EFFETS DE L'ARÈNE : sorts, impacts, montée de niveau, évolution, murs et
-// piliers avec l'effet au sol de leur unité, tirs des monstres, annonces et aires au sol, lueur des
-// cartes.
+// LES EFFETS DE L'ARÈNE : sorts, impacts, montée de niveau, évolution, murs
+// et piliers avec l'effet au sol de leur unité, tirs des monstres, annonces et
+// aires au sol, lueur des cartes.
 //
 // 🔴 LES MÊMES PIÈCES QUE LA PARTIE — catalogue, troupe des nœuds, moteur
 // d'effets, leurs renderers et leurs peintres —, sur un monde PRIVÉ qui ne
@@ -172,12 +173,12 @@ class ArenaEffects {
   void KeepRareGlows(const ro::sim::SurvivorsField& field, const GroundOf& ground_of,
                      std::uint32_t now_ms);
   void ForgetRareGlows();
-  // Allume l'effet au sol d'une zone neuve, le resème quand tout ce qu'il
-  // avait semé est mort, et l'éteint avec l'acteur qui le porte quand la zone
-  // n'est plus. Voir `PlanArenaZoneGrounds`.
+  // Tient les effets au sol des zones par `ArenaZoneGroundKeeper`, sur les
+  // mains de `ArenaZoneGroundHandsOn`. Voir `PlanArenaZoneGrounds`.
   void KeepZoneGrounds(const ro::sim::SurvivorsField& field, const GroundOf& ground_of,
                        std::uint32_t now_ms);
-  void ForgetZoneGrounds();
+  // Les mains qui ne font qu'éteindre : à la bascule et à « Rejouer ».
+  [[nodiscard]] ArenaZoneGroundHands PutOutHands();
   // Combien de temps un effet vit, pour le compte des vivants.
   [[nodiscard]] std::uint32_t LifeMsOf(std::uint32_t effect_id);
   // Pose un acteur du monde privé en cases continues, à la sous-case près.
@@ -209,7 +210,7 @@ class ArenaEffects {
   std::vector<std::uint32_t> glow_actors_;
   std::vector<ArenaZoneGround> zone_ground_plan_;
   // L'effet au sol allumé de chaque zone, avec l'acteur qui le porte.
-  std::vector<ArenaZoneGround> zone_grounds_;
+  ArenaZoneGroundKeeper zone_grounds_;
   std::vector<ZoneFlame> flames_;
   std::vector<ShotSeen> shots_;
   std::vector<WarningMark> warnings_;

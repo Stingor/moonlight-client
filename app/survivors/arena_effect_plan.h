@@ -139,11 +139,17 @@ void PlanArenaLaunches(const ro::sim::SurvivorsNews& news, const ro::sim::Surviv
 void PlanArenaOrbs(std::span<const ro::sim::SurvivorsOrb> orbs, const ArenaSkillLooks& looks,
                    ArenaEffectSwitches switches, std::vector<ArenaOrbLook>& out);
 
+// UN EFFET AU SOL SE MONTRE avec les effets pleins, et toujours s'il est de
+// ceux que le jeu ne coupe jamais (`ro::render::IsForcedVisibleEffect`) : le
+// cercle du pilier en attente marque où le pilier frappera, il reste sous
+// « Effets réduits » comme sans effets.
+[[nodiscard]] bool ArenaZoneGroundShown(std::uint32_t effect_id, ArenaEffectSwitches switches);
+
 // LES EFFETS AU SOL DES ZONES, un par zone vivante dont le skill en a un
 // (`SkillLook::ground_effect_id`), dans l'ordre des zones, au point où elle
 // commence, rangés dans `out` (vidé). Une zone éteinte — expirée, ou au bout
 // de ses coups — n'est plus dans l'état : son effet au sol s'éteint avec elle.
-// Aucun sous « Effets réduits » ni sans effets, comme les flammes.
+// Seuls ceux que `ArenaZoneGroundShown` montre sous `switches`.
 //
 // Hors budget, comme une orbe : l'effet au sol dure autant que sa zone.
 void PlanArenaZoneGrounds(std::span<const ro::sim::SurvivorsZone> zones,
