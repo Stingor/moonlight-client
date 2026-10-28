@@ -1,4 +1,4 @@
-// LE SOLIDE DES MODÈLES DU SOL GÉNÉRÉ, relevé sous 10.0 unités.
+// LE SOLIDE DES MODÈLES DU SOL GÉNÉRÉ, relevé sous 15.0 unités.
 //
 // ENGENDRE par scripts/gen_survivors_piece_solids.py depuis
 // scripts/survivors_piece_solids.json - ne pas modifier a la main.
@@ -21,12 +21,13 @@ constexpr std::array<SolidPoint, 8> kModel0Outline0{{{-12.46F, 18.72F},
                                                      {0.02F, 25.09F}}};
 constexpr std::array<SolidOutline, 1> kModel0Outlines{{{kModel0Outline0}}};
 
-constexpr std::array<SolidPoint, 7> kModel1Outline0{{{-10.11F, 10.92F},
+constexpr std::array<SolidPoint, 8> kModel1Outline0{{{-10.11F, 10.92F},
                                                      {-4.0F, 4.81F},
-                                                     {1.51F, 6.2F},
-                                                     {8.02F, 10.6F},
-                                                     {8.46F, 10.92F},
-                                                     {1.51F, 15.64F},
+                                                     {4.17F, 5.22F},
+                                                     {20.0F, 7.83F},
+                                                     {20.02F, 10.92F},
+                                                     {20.0F, 14.01F},
+                                                     {4.17F, 16.62F},
                                                      {-4.0F, 17.03F}}};
 constexpr std::array<SolidOutline, 1> kModel1Outlines{{{kModel1Outline0}}};
 
@@ -41,11 +42,11 @@ constexpr std::array<SolidPoint, 8> kModel2Outline0{{{-2.69F, 0.06F},
 constexpr std::array<SolidOutline, 1> kModel2Outlines{{{kModel2Outline0}}};
 
 constexpr std::array<SolidPoint, 10> kModel3Outline0{{{-8.7F, 0.24F},
-                                                      {-8.36F, -1.1F},
-                                                      {-8.0F, -2.12F},
-                                                      {-6.34F, -2.62F},
-                                                      {-5.81F, -2.62F},
-                                                      {-4.67F, -2.12F},
+                                                      {-8.19F, -1.77F},
+                                                      {-7.93F, -2.5F},
+                                                      {-6.34F, -2.85F},
+                                                      {-5.55F, -2.85F},
+                                                      {-4.74F, -2.5F},
                                                       {-4.05F, 0.24F},
                                                       {-4.54F, 1.85F},
                                                       {-6.34F, 2.63F},
@@ -91,22 +92,24 @@ constexpr std::array<SolidPoint, 8> kModel7Outline0{{{-11.17F, -4.63F},
                                                      {-11.17F, 4.63F}}};
 constexpr std::array<SolidOutline, 1> kModel7Outlines{{{kModel7Outline0}}};
 
-constexpr std::array<SolidPoint, 6> kModel8Outline0{{{-7.22F, -7.22F},
+constexpr std::array<SolidPoint, 8> kModel8Outline0{{{-7.22F, -7.22F},
                                                      {6.15F, -7.96F},
                                                      {8.74F, -7.29F},
                                                      {8.9F, -4.09F},
-                                                     {7.23F, 7.22F},
+                                                     {8.57F, 7.24F},
+                                                     {7.29F, 7.51F},
+                                                     {2.24F, 8.42F},
                                                      {-7.21F, 7.22F}}};
 constexpr std::array<SolidOutline, 1> kModel8Outlines{{{kModel8Outline0}}};
 
 constexpr std::array<SolidPoint, 8> kModel9Outline0{{{-1.82F, 0.01F},
-                                                     {-1.45F, -0.63F},
+                                                     {-1.26F, -0.95F},
                                                      {-0.89F, -1.6F},
                                                      {0.97F, -1.6F},
                                                      {1.9F, 0.01F},
                                                      {0.97F, 1.62F},
                                                      {-0.89F, 1.62F},
-                                                     {-1.26F, 0.98F}}};
+                                                     {-1.44F, 0.66F}}};
 constexpr std::array<SolidOutline, 1> kModel9Outlines{{{kModel9Outline0}}};
 
 constexpr std::array<SolidPoint, 6> kModel10Outline0{{{-2.25F, 0.01F},
@@ -175,7 +178,7 @@ constexpr std::array<ModelSolid, 11> kSolids{{
      {12.0F, 5.0F, 11.17F},
      kModel7Outlines},
     {"외부소품\\유적02.rsm",
-     1.0F,
+     0.97F,
      0.0F,
      260,
      {-7.22F, -38.3F, -7.96F},
@@ -200,5 +203,7 @@ constexpr std::array<ModelSolid, 11> kSolids{{
 }  // namespace
 
 std::span<const ModelSolid> SurveyedModelSolids() { return kSolids; }
+
+float SurveyedSolidHeightUnits() { return 15.0F; }
 
 }  // namespace moonclient

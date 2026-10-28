@@ -216,7 +216,16 @@ std::vector<SolidFace> SolidFacesOf(const ro::render::ModelMesh& mesh, std::int3
   return faces;
 }
 
-std::vector<std::vector<SolidPoint>> SolidHullsOf(const std::vector<SolidFace>& faces) {
+namespace {
+
+// UN BLOC : des faces qui se touchent, et le plus bas d'entre elles.
+struct SolidBlock {
+  std::vector<std::size_t> faces;
+  float lowest_units = std::numeric_limits<float>::max();
+};
+
+// Les blocs de `faces`, dans l'ordre de leur première face.
+[[nodiscard]] std::vector<SolidBlock> BlocksOf(const std::vector<SolidFace>& faces) {
   std::vector<Box> boxes;
   boxes.reserve(faces.size());
   for (const SolidFace& face : faces) boxes.push_back(BoxOf(face.points));
@@ -229,10 +238,8 @@ std::vector<std::vector<SolidPoint>> SolidHullsOf(const std::vector<SolidFace>& 
       }
     }
   }
-  // Les blocs dans l'ordre de leur première face, et le plus bas de chacun.
   std::vector<std::size_t> block_roots;
-  std::vector<std::vector<SolidPoint>> blocks;
-  std::vector<float> lowest;
+  std::vector<SolidBlock> blocks;
   for (std::size_t face = 0; face < faces.size(); ++face) {
     const std::size_t root = Root(parent, face);
     const auto found = std::find(block_roots.begin(), block_roots.end(), root);
@@ -240,18 +247,48 @@ std::vector<std::vector<SolidPoint>> SolidHullsOf(const std::vector<SolidFace>& 
     if (found == block_roots.end()) {
       block_roots.push_back(root);
       blocks.emplace_back();
-      lowest.push_back(std::numeric_limits<float>::max());
     }
-    blocks[rank].insert(blocks[rank].end(), faces[face].points.begin(), faces[face].points.end());
-    lowest[rank] = std::min(lowest[rank], faces[face].lowest_units);
+    blocks[rank].faces.push_back(face);
+    blocks[rank].lowest_units = std::min(blocks[rank].lowest_units, faces[face].lowest_units);
   }
+  return blocks;
+}
+
+[[nodiscard]] bool Grounded(const SolidBlock& block) noexcept {
+  return block.lowest_units <= kSolidContactUnits;
+}
+
+}  // namespace
+
+std::vector<std::vector<SolidPoint>> SolidHullsOf(const std::vector<SolidFace>& faces) {
   std::vector<std::vector<SolidPoint>> hulls;
-  hulls.reserve(blocks.size());
-  for (std::size_t rank = 0; rank < blocks.size(); ++rank) {
-    if (lowest[rank] > kSolidContactUnits) continue;
-    hulls.push_back(Hull(std::move(blocks[rank])));
+  for (const SolidBlock& block : BlocksOf(faces)) {
+    if (!Grounded(block)) continue;
+    std::vector<SolidPoint> points;
+    for (const std::size_t face : block.faces) {
+      points.insert(points.end(), faces[face].points.begin(), faces[face].points.end());
+    }
+    hulls.push_back(Hull(std::move(points)));
   }
   return hulls;
+}
+
+std::vector<SolidFace> GroundedFacesOf(const std::vector<SolidFace>& faces,
+                                       std::vector<SolidFace>* airborne) {
+  std::vector<std::uint8_t> kept(faces.size(), 0);
+  for (const SolidBlock& block : BlocksOf(faces)) {
+    if (!Grounded(block)) continue;
+    for (const std::size_t face : block.faces) kept[face] = 1;
+  }
+  std::vector<SolidFace> grounded;
+  for (std::size_t face = 0; face < faces.size(); ++face) {
+    if (kept[face] != 0) {
+      grounded.push_back(faces[face]);
+    } else if (airborne != nullptr) {
+      airborne->push_back(faces[face]);
+    }
+  }
+  return grounded;
 }
 
 ro::formats::RswModel PosePlacement(const PlannedPose& pose, float ground_units,
@@ -390,6 +427,7 @@ FootprintAudit AuditFootprint(const SolidGrid& grid, const ro::sim::TerrainPiece
       const bool blocked = ro::sim::FootprintBlocks(rule, quarter, x, y);
       const bool solid = grid.Solid(x, y);
       if (solid && !blocked) ++audit.solid_outside;
+      if (!blocked && grid.SamplesAt(x, y) > 0) ++audit.touched_outside;
       if (solid && blocked) ++audit.matched;
       if (!blocked || grid.SamplesAt(x, y) > 0) continue;
       ++audit.empty_inside;

@@ -10,6 +10,7 @@
 
 #include "ro/formats/rsw.h"
 #include "ro/render/model_mesh.h"
+#include "ro/render/sprite_billboard.h"
 #include "ro/sim/survivors_terrain.h"
 
 #include "survivors/arena_ground_look.h"
@@ -22,11 +23,16 @@ namespace moonclient {
 // que le solide d'une pièce couvre est bloquée par son emprise de `sim`, et
 // que l'emprise ne bloque pas de case loin de tout solide.
 //
-// LA RÈGLE DE HAUTEUR : est solide ce qui passe sous `kSolidHeightUnits`
-// au-dessus de la base du modèle — margelle, murs, pieds de pilier, troncs,
-// pierres. Un feuillage, un toit, une aile de moulin qui passent au-dessus
-// laissent marcher dessous.
-inline constexpr float kSolidHeightUnits = 10.0F;
+// LA RÈGLE DE HAUTEUR : est solide, dans un bloc qui touche le sol, ce qui
+// passe sous la tête d'un héros debout — margelle, murs, piliers, troncs,
+// pierres, le haut d'une pierre penchée compris. Un feuillage, un toit, une
+// aile de moulin, blocs en l'air, laissent marcher dessous.
+//
+// Le héros debout mesure, chapeau compris, `kHeroStandingPixels` pixels de
+// sprite, soit 15 unités du monde.
+inline constexpr float kHeroStandingPixels = 105.0F;
+inline constexpr float kSolidHeightUnits =
+    kHeroStandingPixels / ro::render::kSpritePixelsPerWorldUnit;
 // Un bloc touche le sol quand son point le plus bas en est à moins de ceci.
 inline constexpr float kSolidContactUnits = 1.0F;
 // UNE CASE SE LIT EN 4 × 4 POINTS, un bit chacun, et elle est SOLIDE quand le
@@ -65,6 +71,9 @@ struct ModelSolid {
 // LE RELEVÉ FIGÉ des modèles du catalogue livré (`roc-cli survivors emprises
 // --releve`, table engendrée par `scripts/gen_survivors_piece_solids.py`).
 [[nodiscard]] std::span<const ModelSolid> SurveyedModelSolids();
+// La hauteur de solide sous laquelle le relevé figé a été lu : un relevé lu
+// sous une autre que `kSolidHeightUnits` est périmé.
+[[nodiscard]] float SurveyedSolidHeightUnits();
 
 // Le solide relevé du modèle `choice`, à son échelle et à son enfoncement,
 // dans `solids` ; nullptr s'il n'y est pas.
@@ -91,6 +100,11 @@ struct SolidFace {
 // bout d'une aile de moulin —, ne compte pas : on passe dessous.
 [[nodiscard]] std::vector<std::vector<SolidPoint>> SolidHullsOf(
     const std::vector<SolidFace>& faces);
+// LES FACES DES BLOCS QUI TOUCHENT LE SOL, dans leur ordre : le solide exact,
+// face par face, sous la même règle que `SolidHullsOf`. Les autres, celles des
+// blocs en l'air, vont dans `airborne` s'il est donné.
+[[nodiscard]] std::vector<SolidFace> GroundedFacesOf(const std::vector<SolidFace>& faces,
+                                                     std::vector<SolidFace>* airborne = nullptr);
 
 // LA POSE DU RSW d'un modèle du plan : `ground_units` est l'altitude du monde
 // sous lui, `gnd_width` et `gnd_height` la grille de cubes du sol. C'est la
@@ -142,6 +156,9 @@ void CoverModelSolid(const ModelSolid& solid, const PlannedPose& pose, SolidGrid
 struct FootprintAudit {
   // Les cases solides hors de l'emprise : le héros entre dans le décor.
   std::int32_t solid_outside = 0;
+  // Les cases hors de l'emprise dont un point au moins est couvert : le
+  // solide y déborde de plus d'un demi-pas de point (un huitième de case).
+  std::int32_t touched_outside = 0;
   // Les cases bloquées où aucun point n'est couvert.
   std::int32_t empty_inside = 0;
   // Parmi elles, celles qu'aucune case solide ne touche par un côté : le
@@ -151,8 +168,9 @@ struct FootprintAudit {
   std::int32_t matched = 0;
 };
 
-// LA TOLÉRANCE : une case bloquée vide se tolère au bord du solide (elle en
-// touche une case solide), jamais au-delà.
+// LES TOLÉRANCES : le solide ne déborde nulle part de l'emprise de plus d'un
+// huitième de case (`touched_outside` nul) ; une case bloquée vide se tolère au
+// bord du solide (elle en touche une case solide), jamais au-delà.
 [[nodiscard]] FootprintAudit AuditFootprint(const SolidGrid& grid,
                                             const ro::sim::TerrainPieceRule& rule,
                                             std::uint8_t quarter);

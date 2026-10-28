@@ -27,10 +27,10 @@ constexpr std::array<std::string_view, 4> kRock = {"####", "####", "####", "####
 constexpr std::array<std::string_view, 4> kGrove = {"##..", "##..", "####", "####"};
 // Un massif : deux buissons serrés.
 constexpr std::array<std::string_view, 3> kThicket = {"####", "####", "####"};
-// Les repères, un par grand emplacement élu. Le moulin : le pied de sa tour ;
-// ses ailes passent au-dessus.
+// Les repères, un par grand emplacement élu. Le moulin : le pied de sa tour,
+// ses pointes est et ouest comprises ; ses ailes, en l'air, n'y comptent pas.
 constexpr std::array<std::string_view, 7> kWindmill = {
-    "..####..", ".######.", ".######.", "########", ".######.", ".######.", "..####..",
+    "..####..", ".######.", "########", "########", "########", ".######.", "..####..",
 };
 // Le puits : sa margelle ronde.
 constexpr std::array<std::string_view, 5> kWell = {".###.", "#####", "#####", "#####", ".###."};

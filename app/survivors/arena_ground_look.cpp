@@ -15,18 +15,21 @@ namespace {
 // `arena_piece_solids_test`). Un arbre se pose au milieu du carré de 2 × 2
 // cases que bloque son tronc.
 
+// Le tronc de `나무02` est au sud-est de son pivot.
 constexpr std::array<GroundModelChoice, 2> kTrees{{
     {.model = "나무잡초꽃\\나무01.rsm", .scale = 1.0F, .weight = 5, .shade_cells = 3.0F},
-    {.model = "나무잡초꽃\\나무02.rsm", .scale = 0.9F, .weight = 1, .shade_cells = 3.0F},
+    {.model = "나무잡초꽃\\나무02.rsm",
+     .scale = 0.9F,
+     .weight = 1,
+     .shade_cells = 3.0F,
+     .centre_east_cells = 0.16F,
+     .centre_north_cells = -0.39F},
 }};
-// La pierre penchée de `바위02` a son pied à l'ouest de son pivot.
+// La pierre penchée de `바위02`, jusqu'à la tête du héros, est centrée sur son
+// pivot : son pied à l'ouest, son haut à l'est.
 constexpr std::array<GroundModelChoice, 2> kRocks{{
     {.model = "나무잡초꽃\\바위01.rsm", .scale = 0.6F, .weight = 3, .shade_cells = 1.2F},
-    {.model = "나무잡초꽃\\바위02.rsm",
-     .scale = 0.6F,
-     .weight = 1,
-     .shade_cells = 1.2F,
-     .centre_east_cells = -0.69F},
+    {.model = "나무잡초꽃\\바위02.rsm", .scale = 0.6F, .weight = 1, .shade_cells = 1.2F},
 }};
 constexpr std::array<GroundModelChoice, 2> kBushes{{
     {.model = "나무잡초꽃\\덤불01.rsm", .scale = 0.25F, .weight = 1, .shade_cells = 1.0F},
@@ -48,12 +51,9 @@ constexpr std::array<GroundModelChoice, 1> kWell{{
      .shade_cells = 2.0F,
      .sink_units = 5.0F},
 }};
+// Le pan de mur, jusqu'à la tête du héros, tient dans son carré de 3 × 3.
 constexpr std::array<GroundModelChoice, 1> kRuinedWall{{
-    {.model = "외부소품\\유적02.rsm",
-     .scale = 1.0F,
-     .weight = 1,
-     .shade_cells = 2.0F,
-     .centre_north_cells = -0.12F},
+    {.model = "외부소품\\유적02.rsm", .scale = 0.97F, .weight = 1, .shade_cells = 2.0F},
 }};
 constexpr std::array<GroundModelChoice, 2> kRuinedPillars{{
     {.model = "외부소품\\유적기둥01.rsm", .scale = 1.0F, .weight = 2, .shade_cells = 0.8F},
