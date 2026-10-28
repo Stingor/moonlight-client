@@ -1515,6 +1515,8 @@ add_library(moonclient_arena STATIC
     survivors/arena_ground_window.cpp
     survivors/arena_night_lights.cpp
     survivors/arena_numbers.cpp
+    survivors/arena_piece_solids.cpp
+    survivors/arena_piece_solids_survey.cpp
     survivors/arena_scene.cpp
     survivors/arena_session.cpp
     survivors/arena_zone_grounds.cpp

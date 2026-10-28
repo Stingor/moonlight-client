@@ -22,6 +22,16 @@ struct GroundModelChoice {
   std::uint32_t weight = 1;
   // Le rayon de l'ombre cuite qu'il pose au sol, en cases ; 0 : aucune.
   float shade_cells = 0.0F;
+  // LE MILIEU DE SON SOLIDE (`arena_piece_solids.h`) vu de son pivot, à
+  // l'angle nul et à l'échelle `scale`, en cases vers l'est et le nord : c'est
+  // lui, et non le pivot, qui se pose sur la place. Il se lit au relevé
+  // (`roc-cli survivors emprises`).
+  float centre_east_cells = 0.0F;
+  float centre_north_cells = 0.0F;
+  // L'ENFONCEMENT, en unités à l'échelle 1 : un modèle se pose par son point le
+  // plus bas, sauf celui dont le pied visible est plus haut — le fond d'un
+  // puits sous sa margelle. Il descend d'autant sous le sol, son pied au sol.
+  float sink_units = 0.0F;
 };
 
 // UNE PLACE DE MODÈLE DANS UNE PIÈCE : où il se pose dans l'emprise d'ORIGINE

@@ -10,64 +10,88 @@ namespace {
 // ── LA PRAIRIE DE MIDGARD ───────────────────────────────────────────────────
 // Un catalogue : chaque entrée est courte et se lit seule. Les places des
 // modèles se mesurent sur les emprises de `survivors_rules_terrain.cpp`, le
-// nord en haut ; un arbre se pose au milieu du carré de 2 × 2 cases que bloque
-// son tronc.
+// nord en haut : le solide de chaque modèle, sous tous ses angles, tombe dans
+// l'emprise de sa pièce (`roc-cli survivors emprises`, essai
+// `arena_piece_solids_test`). Un arbre se pose au milieu du carré de 2 × 2
+// cases que bloque son tronc.
 
 constexpr std::array<GroundModelChoice, 2> kTrees{{
     {.model = "나무잡초꽃\\나무01.rsm", .scale = 1.0F, .weight = 5, .shade_cells = 3.0F},
     {.model = "나무잡초꽃\\나무02.rsm", .scale = 0.9F, .weight = 1, .shade_cells = 3.0F},
 }};
+// La pierre penchée de `바위02` a son pied à l'ouest de son pivot.
 constexpr std::array<GroundModelChoice, 2> kRocks{{
-    {.model = "나무잡초꽃\\바위01.rsm", .scale = 0.7F, .weight = 3, .shade_cells = 1.4F},
-    {.model = "나무잡초꽃\\바위02.rsm", .scale = 0.7F, .weight = 1, .shade_cells = 1.4F},
+    {.model = "나무잡초꽃\\바위01.rsm", .scale = 0.6F, .weight = 3, .shade_cells = 1.2F},
+    {.model = "나무잡초꽃\\바위02.rsm",
+     .scale = 0.6F,
+     .weight = 1,
+     .shade_cells = 1.2F,
+     .centre_east_cells = -0.69F},
 }};
 constexpr std::array<GroundModelChoice, 2> kBushes{{
-    {.model = "나무잡초꽃\\덤불01.rsm", .scale = 0.3F, .weight = 1, .shade_cells = 1.2F},
-    {.model = "나무잡초꽃\\덤불02.rsm", .scale = 0.3F, .weight = 1, .shade_cells = 1.2F},
+    {.model = "나무잡초꽃\\덤불01.rsm", .scale = 0.25F, .weight = 1, .shade_cells = 1.0F},
+    {.model = "나무잡초꽃\\덤불02.rsm", .scale = 0.25F, .weight = 1, .shade_cells = 1.0F},
 }};
 constexpr std::array<GroundModelChoice, 1> kWindmill{{
-    {.model = "외부소품\\풍차.rsm", .scale = 0.4F, .weight = 1, .shade_cells = 4.0F},
+    {.model = "외부소품\\풍차.rsm",
+     .scale = 0.4F,
+     .weight = 1,
+     .shade_cells = 4.0F,
+     .centre_east_cells = -0.08F,
+     .centre_north_cells = 0.41F},
 }};
+// Le fond du puits est à 5 unités sous le pied de sa margelle.
 constexpr std::array<GroundModelChoice, 1> kWell{{
-    {.model = "외부소품\\우물.rsm", .scale = 1.0F, .weight = 1, .shade_cells = 2.0F},
+    {.model = "외부소품\\우물.rsm",
+     .scale = 1.0F,
+     .weight = 1,
+     .shade_cells = 2.0F,
+     .sink_units = 5.0F},
 }};
 constexpr std::array<GroundModelChoice, 1> kRuinedWall{{
-    {.model = "외부소품\\유적02.rsm", .scale = 1.0F, .weight = 1, .shade_cells = 2.0F},
+    {.model = "외부소품\\유적02.rsm",
+     .scale = 1.0F,
+     .weight = 1,
+     .shade_cells = 2.0F,
+     .centre_north_cells = -0.12F},
 }};
 constexpr std::array<GroundModelChoice, 2> kRuinedPillars{{
     {.model = "외부소품\\유적기둥01.rsm", .scale = 1.0F, .weight = 2, .shade_cells = 0.8F},
     {.model = "외부소품\\유적기둥03.rsm", .scale = 1.0F, .weight = 1, .shade_cells = 0.8F},
 }};
 
-// Un arbre, un rocher : 2 × 2 cases.
+// Un arbre : 2 × 2 cases ; un rocher : 4 × 4.
 constexpr std::array<PieceModelSlot, 1> kTreeSlots{
     {{.east_cells = 1.0F, .north_cells = 1.0F, .models = kTrees}}};
 constexpr std::array<PieceModelSlot, 1> kRockSlots{
-    {{.east_cells = 1.0F, .north_cells = 1.0F, .models = kRocks}}};
+    {{.east_cells = 2.0F, .north_cells = 2.0F, .models = kRocks}}};
 // Le bosquet en L : un arbre sur chacun de ses trois carrés de 2 × 2.
 constexpr std::array<PieceModelSlot, 3> kGroveSlots{{
     {.east_cells = 1.0F, .north_cells = 3.0F, .models = kTrees},
     {.east_cells = 1.0F, .north_cells = 1.0F, .models = kTrees},
     {.east_cells = 3.0F, .north_cells = 1.0F, .models = kTrees},
 }};
-// Le massif de 3 × 2 : deux buissons.
+// Le massif de 4 × 3 : deux buissons serrés.
 constexpr std::array<PieceModelSlot, 2> kThicketSlots{{
-    {.east_cells = 0.8F, .north_cells = 1.0F, .models = kBushes},
-    {.east_cells = 2.2F, .north_cells = 1.0F, .models = kBushes},
+    {.east_cells = 1.5F, .north_cells = 1.5F, .models = kBushes},
+    {.east_cells = 2.5F, .north_cells = 1.5F, .models = kBushes},
 }};
-// Les repères suivent le quart de tour de leur pièce.
+// Les repères suivent le quart de tour de leur pièce, au milieu de leur
+// emprise : le pied de la tour du moulin, de 8 × 7, la margelle du puits, de
+// 5 × 5.
 constexpr std::array<PieceModelSlot, 1> kWindmillSlots{
-    {{.east_cells = 3.0F, .north_cells = 3.0F, .models = kWindmill, .any_yaw = false}}};
+    {{.east_cells = 4.0F, .north_cells = 3.5F, .models = kWindmill, .any_yaw = false}}};
 constexpr std::array<PieceModelSlot, 1> kWellSlots{
-    {{.east_cells = 1.5F, .north_cells = 1.5F, .models = kWell, .any_yaw = false}}};
-// Les ruines : le mur du nord aux deux coins, des piliers sur les ailes.
+    {{.east_cells = 2.5F, .north_cells = 2.5F, .models = kWell, .any_yaw = false}}};
+// Les ruines de 8 × 5 : un pan de mur à chaque coin du nord, un pilier au
+// milieu d'une case sur chaque aile.
 constexpr std::array<PieceModelSlot, 6> kRuinsSlots{{
     {.east_cells = 1.5F, .north_cells = 3.5F, .models = kRuinedWall, .any_yaw = false},
     {.east_cells = 6.5F, .north_cells = 3.5F, .models = kRuinedWall, .any_yaw = false},
     {.east_cells = 0.5F, .north_cells = 1.5F, .models = kRuinedPillars},
     {.east_cells = 7.5F, .north_cells = 1.5F, .models = kRuinedPillars},
-    {.east_cells = 1.0F, .north_cells = 0.5F, .models = kRuinedPillars},
-    {.east_cells = 7.0F, .north_cells = 0.5F, .models = kRuinedPillars},
+    {.east_cells = 1.5F, .north_cells = 0.5F, .models = kRuinedPillars},
+    {.east_cells = 6.5F, .north_cells = 0.5F, .models = kRuinedPillars},
 }};
 
 constexpr std::array<PieceLook, 7> kPlainsPieces{{

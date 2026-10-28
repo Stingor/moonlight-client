@@ -100,6 +100,9 @@ struct PlannedPose {
   float north = 0.0F;
   float yaw_degrees = 0.0F;
   float scale = 1.0F;
+  // De combien il descend sous le sol, en unités du monde
+  // (`GroundModelChoice::sink_units` à son échelle).
+  float sink_units = 0.0F;
   // Rang de sa pièce dans `GroundPlan::pieces`, ou `kSeedPose` pour un semis.
   std::uint32_t piece = 0;
   [[nodiscard]] bool operator==(const PlannedPose&) const = default;
@@ -157,5 +160,23 @@ inline constexpr std::uint8_t kGroundShadeLevel = 128;
 // quarts dans le sens trigonométrique vu du ciel, l'angle du RSW tourne dans
 // l'autre sens, d'où l'angle de la place `slot_yaw_degrees` moins les quarts.
 [[nodiscard]] float PieceModelYawDegrees(std::uint8_t quarter, float slot_yaw_degrees);
+
+// Un modèle à angle tiré grandit ou rapetisse d'au plus cette part.
+inline constexpr float kPieceScaleJitter = 0.12F;
+
+// LA PLACE D'UN MODÈLE DANS SA PIÈCE : le point `point` de l'emprise d'origine
+// (taille `drawn`), après `quarter` quarts de tour dans le sens
+// trigonométrique, compté depuis le coin sud-ouest de l'emprise tournée.
+[[nodiscard]] glm::vec2 PieceSlotPoint(glm::vec2 point, ro::sim::FootprintSize drawn,
+                                       std::uint8_t quarter) noexcept;
+
+// LA POSE DU MODÈLE `choice` SUR SA PLACE, comptée depuis le coin sud-ouest de
+// l'emprise tournée de `quarter` quarts : à angle tiré, l'angle
+// `drawn_yaw_degrees` et l'échelle multipliée par `jitter` ; sinon l'angle de
+// la place et l'échelle du catalogue. Le milieu du solide du modèle
+// (`GroundModelChoice::centre_east_cells`), tourné avec lui, tombe sur la place.
+[[nodiscard]] PlannedPose PieceSlotPose(const PieceModelSlot& slot, const GroundModelChoice& choice,
+                                        ro::sim::FootprintSize drawn, std::uint8_t quarter,
+                                        float drawn_yaw_degrees, float jitter);
 
 }  // namespace moonclient

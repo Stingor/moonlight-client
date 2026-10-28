@@ -12,29 +12,32 @@ namespace ro::sim::survivors {
 namespace {
 
 // ── LA PRAIRIE DE MIDGARD : les pièces du sol généré et leurs densités ─────
-// Une emprise s'écrit le nord en haut, « # » bloqué. Elle est le CŒUR que le
-// GAT des champs de Prontera bloque sous le modèle, pas sa boîte : un arbre
-// bloque un carré de 2 × 2 cases sous son tronc (`roc-cli survivors pieces`,
-// ADR 0134). Le modèle posé sur chaque pièce est l'affaire d'app.
+// Une emprise s'écrit le nord en haut, « # » bloqué. Elle est le SOLIDE du
+// modèle qu'app y pose (`roc-cli survivors emprises`) : chaque case que sa
+// margelle, son mur, son tronc ou sa pierre couvre au quart, sous tous les
+// angles qu'il peut prendre, et aucune case loin de lui. Un arbre bloque le
+// carré de 2 × 2 cases de son tronc, comme le GAT des champs de Prontera
+// (`roc-cli survivors pieces`, ADR 0134).
 
 // Un arbre seul.
 constexpr std::array<std::string_view, 2> kTree = {"##", "##"};
-// Un rocher.
-constexpr std::array<std::string_view, 2> kRock = {"##", "##"};
+// Un rocher, sous tous ses angles.
+constexpr std::array<std::string_view, 4> kRock = {"####", "####", "####", "####"};
 // Un bosquet : trois arbres en L.
 constexpr std::array<std::string_view, 4> kGrove = {"##..", "##..", "####", "####"};
-// Un massif de buissons.
-constexpr std::array<std::string_view, 2> kThicket = {"###", "###"};
-// Les repères, un par grand emplacement élu.
-constexpr std::array<std::string_view, 6> kWindmill = {
-    "..##..", ".####.", "######", "######", ".####.", "..##..",
+// Un massif : deux buissons serrés.
+constexpr std::array<std::string_view, 3> kThicket = {"####", "####", "####"};
+// Les repères, un par grand emplacement élu. Le moulin : le pied de sa tour ;
+// ses ailes passent au-dessus.
+constexpr std::array<std::string_view, 7> kWindmill = {
+    "..####..", ".######.", ".######.", "########", ".######.", ".######.", "..####..",
 };
-constexpr std::array<std::string_view, 3> kWell = {"###", "###", "###"};
-constexpr std::array<std::string_view, 4> kRuins = {
-    "########",
-    "#......#",
-    "#......#",
-    "##....##",
+// Le puits : sa margelle ronde.
+constexpr std::array<std::string_view, 5> kWell = {".###.", "#####", "#####", "#####", ".###."};
+// Les ruines : deux pans de mur au nord, un passage entre eux, des piliers sur
+// les ailes.
+constexpr std::array<std::string_view, 5> kRuins = {
+    "###..###", "###..###", "###..###", "#......#", ".#....#.",
 };
 
 constexpr std::array<TerrainPieceRule, 7> kPlainsPieces{{

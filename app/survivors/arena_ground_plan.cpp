@@ -50,8 +50,6 @@ constexpr float kLeastHorizontalSun = 1.0e-3F;
 // ── LES POSES.
 constexpr std::uint32_t kFullTurnDegrees = 360;
 constexpr float kQuarterTurnDegrees = 90.0F;
-// Un modèle tiré grandit ou rapetisse d'au plus cette part.
-constexpr float kScaleJitter = 0.12F;
 constexpr float kUnitFromDraw = 1.0F / 4294967296.0F;  // 2^-32
 // Un semis se pose dans sa case, loin de son bord.
 constexpr float kSeedInset = 0.2F;
@@ -86,24 +84,6 @@ constexpr std::uint8_t kHalfTurn = kQuarterTurns / 2;
 
 [[nodiscard]] float UnitOf(std::uint32_t draw) noexcept {
   return static_cast<float>(draw) * kUnitFromDraw;
-}
-
-// Le point (u, v) de l'emprise d'origine, après `quarter` quarts de tour dans
-// le sens trigonométrique, compté depuis le coin sud-ouest de l'emprise tournée.
-[[nodiscard]] glm::vec2 TurnInFootprint(glm::vec2 point, ro::sim::FootprintSize drawn,
-                                        std::uint8_t quarter) noexcept {
-  const auto width = static_cast<float>(drawn.width);
-  const auto height = static_cast<float>(drawn.height);
-  switch (quarter % ro::sim::kTerrainQuarterTurns) {
-    case 1:
-      return {height - point.y, point.x};
-    case 2:
-      return {width - point.x, height - point.y};
-    case 3:
-      return {point.y, width - point.x};
-    default:
-      return point;
-  }
 }
 
 // Un tirage pondéré parmi des choix, par un seul `PickWeighted`.
@@ -273,23 +253,19 @@ class Planner {
         const std::uint32_t yaw_draw = random.Below(kFullTurnDegrees);
         const float scale_draw = UnitOf(random.Next());
         if (choice == nullptr) continue;
-        const glm::vec2 at =
-            corner + TurnInFootprint({slot.east_cells, slot.north_cells}, drawn, placed.quarter);
-        const float yaw = slot.any_yaw ? static_cast<float>(yaw_draw)
-                                       : PieceModelYawDegrees(placed.quarter, slot.yaw_degrees);
-        const float jitter = slot.any_yaw ? 1.0F + kScaleJitter * (2.0F * scale_draw - 1.0F) : 1.0F;
+        const float jitter = 1.0F + kPieceScaleJitter * (2.0F * scale_draw - 1.0F);
         if (shown) {
-          plan_.poses.push_back(PlannedPose{.model = choice->model,
-                                            .east = at.x,
-                                            .north = at.y,
-                                            .yaw_degrees = yaw,
-                                            .scale = choice->scale * jitter,
-                                            .piece = piece_rank});
+          PlannedPose pose = PieceSlotPose(slot, *choice, drawn, placed.quarter,
+                                           static_cast<float>(yaw_draw), jitter);
+          pose.east += corner.x;
+          pose.north += corner.y;
+          pose.piece = piece_rank;
+          plan_.poses.push_back(pose);
         }
         if (choice->shade_cells > 0.0F) {
-          const float radius = choice->shade_cells * jitter;
+          const float radius = choice->shade_cells * (slot.any_yaw ? jitter : 1.0F);
           const glm::vec2 anchor =
-              TurnInFootprint({slot.east_cells, slot.north_cells}, drawn, placed.quarter);
+              PieceSlotPoint({slot.east_cells, slot.north_cells}, drawn, placed.quarter);
           discs_.push_back(ShadeDisc{.corner = {placed.x, placed.y},
                                      .center = anchor + shade_direction_ * (radius * kShadeOffset),
                                      .radius = radius});
@@ -733,6 +709,43 @@ float PieceModelYawDegrees(std::uint8_t quarter, float slot_yaw_degrees) {
                                        kQuarterTurnDegrees,
                 full_turn);
   return turned < 0.0F ? turned + full_turn : turned;
+}
+
+PlannedPose PieceSlotPose(const PieceModelSlot& slot, const GroundModelChoice& choice,
+                          ro::sim::FootprintSize drawn, std::uint8_t quarter,
+                          float drawn_yaw_degrees, float jitter) {
+  const glm::vec2 at = PieceSlotPoint({slot.east_cells, slot.north_cells}, drawn, quarter);
+  const float yaw =
+      slot.any_yaw ? drawn_yaw_degrees : PieceModelYawDegrees(quarter, slot.yaw_degrees);
+  const float grown = slot.any_yaw ? jitter : 1.0F;
+  // L'angle du RSW tourne le modèle dans le sens des aiguilles d'une montre vu
+  // du ciel : (est, nord) → (est cos θ + nord sin θ, nord cos θ − est sin θ).
+  const float radians = glm::radians(yaw);
+  const glm::vec2 centre(choice.centre_east_cells * grown, choice.centre_north_cells * grown);
+  const glm::vec2 turned(centre.x * std::cos(radians) + centre.y * std::sin(radians),
+                         centre.y * std::cos(radians) - centre.x * std::sin(radians));
+  return PlannedPose{.model = choice.model,
+                     .east = at.x - turned.x,
+                     .north = at.y - turned.y,
+                     .yaw_degrees = yaw,
+                     .scale = choice.scale * grown,
+                     .sink_units = choice.sink_units * choice.scale * grown};
+}
+
+glm::vec2 PieceSlotPoint(glm::vec2 point, ro::sim::FootprintSize drawn,
+                         std::uint8_t quarter) noexcept {
+  const auto width = static_cast<float>(drawn.width);
+  const auto height = static_cast<float>(drawn.height);
+  switch (quarter % ro::sim::kTerrainQuarterTurns) {
+    case 1:
+      return {height - point.y, point.x};
+    case 2:
+      return {width - point.x, height - point.y};
+    case 3:
+      return {point.y, width - point.x};
+    default:
+      return point;
+  }
 }
 
 GroundPlan PlanGroundWindow(const ro::sim::TerrainRule& rule, std::uint64_t run_seed,

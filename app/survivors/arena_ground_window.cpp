@@ -16,6 +16,8 @@
 #include "ro/render/terrain_mesh.h"
 #include "ro/vfs/encoding.h"
 
+#include "survivors/arena_piece_solids.h"
+
 namespace moonclient {
 namespace {
 
@@ -196,8 +198,6 @@ float WorldHeightAt(const ro::formats::GndMap& gnd, float east, float north) {
 // la hauteur comptée vers le bas comme dans le fichier.
 std::vector<ro::formats::RswModel> ModelsOf(const GroundSources& sources, const GroundPlan& plan,
                                             const ro::formats::GndMap& gnd) {
-  const float half_width = static_cast<float>(gnd.width()) * ro::render::kWorldUnitsPerCube / 2.0F;
-  const float half_depth = static_cast<float>(gnd.height()) * ro::render::kWorldUnitsPerCube / 2.0F;
   std::vector<ro::formats::RswModel> models;
   models.reserve(plan.poses.size());
   for (const PlannedPose& pose : plan.poses) {
@@ -209,12 +209,8 @@ std::vector<ro::formats::RswModel> ModelsOf(const GroundSources& sources, const 
         lowest = std::min(lowest, WorldHeightAt(gnd, pose.east + dx, pose.north + dy));
       }
     }
-    ro::formats::RswModel model;
+    ro::formats::RswModel model = PosePlacement(pose, lowest, gnd.width(), gnd.height());
     model.model_name = file->second;
-    model.position = {pose.east * kCellUnits - half_width, -lowest,
-                      pose.north * kCellUnits - half_depth};
-    model.rotation = {0.0F, pose.yaw_degrees, 0.0F};
-    model.scale = {pose.scale, pose.scale, pose.scale};
     models.push_back(std::move(model));
   }
   return models;
