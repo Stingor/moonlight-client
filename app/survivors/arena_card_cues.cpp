@@ -4,21 +4,25 @@
 
 namespace moonclient {
 
-void PlanArenaCardGlows(std::span<const ro::sim::SurvivorsPickup> pickups,
-                        ArenaEffectSwitches switches, std::vector<ArenaCardGlow>& out) {
+void PlanArenaRareGlows(std::span<const ro::sim::SurvivorsPickup> pickups,
+                        ArenaEffectSwitches switches, std::vector<ArenaRareGlow>& out) {
   out.clear();
   if (!switches.shown) return;
   for (const ro::sim::SurvivorsPickup& pickup : pickups) {
-    if (out.size() >= kMostArenaCardGlows) return;
-    if (pickup.kind != ro::sim::PickupKind::kCard) continue;
-    out.push_back(ArenaCardGlow{.serial = pickup.serial, .at = pickup.position});
+    if (out.size() >= kMostArenaRareGlows) return;
+    if (pickup.kind == ro::sim::PickupKind::kCard) {
+      out.push_back(ArenaRareGlow{.actor_id = pickup.serial, .at = pickup.position});
+    } else if (pickup.kind == ro::sim::PickupKind::kChest) {
+      out.push_back(
+          ArenaRareGlow{.actor_id = kFirstChestGlowActorId + pickup.serial, .at = pickup.position});
+    }
   }
 }
 
 ArenaCardSounds CardSoundsOf(const ro::sim::SurvivorsNews& news) noexcept {
   ArenaCardSounds sounds;
   if (!news.cards_dropped.empty()) {
-    sounds.drop = ro::render::ItemDropPillarOf(kCardGlowPillar).sound;
+    sounds.drop = ro::render::ItemDropPillarOf(kRareGlowPillar).sound;
   }
   if (!news.cards_found.empty()) sounds.pickup = kCardPickupSound;
   return sounds;

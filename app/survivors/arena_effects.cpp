@@ -220,7 +220,7 @@ void ArenaEffects::Restart() {
   mark_quads_.clear();
   lives_.Clear();
   ForgetOrbs();
-  ForgetCardGlows();
+  ForgetRareGlows();
   budget_ = ArenaEffectBudget();
   launched_total_ = 0;
   step_ = 0;
@@ -253,41 +253,42 @@ void ArenaEffects::set_switches(ArenaEffectSwitches switches) {
     ForgetOrbs();
     flames_.clear();
   }
-  if (!switches.shown) ForgetCardGlows();
+  if (!switches.shown) ForgetRareGlows();
 }
 
-void ArenaEffects::ForgetCardGlows() {
-  for (const std::uint32_t serial : card_glows_) static_cast<void>(world_.Remove(serial));
-  card_glows_.clear();
+void ArenaEffects::ForgetRareGlows() {
+  for (const std::uint32_t actor_id : glow_actors_) static_cast<void>(world_.Remove(actor_id));
+  glow_actors_.clear();
 }
 
-void ArenaEffects::KeepCardGlows(const ro::sim::SurvivorsField& field, const GroundOf& ground_of,
+void ArenaEffects::KeepRareGlows(const ro::sim::SurvivorsField& field, const GroundOf& ground_of,
                                  std::uint32_t now_ms) {
-  PlanArenaCardGlows(field.pickups, switches_, glow_plan_);
-  // UNE CARTE PRISE OU SORTIE DU PLAN éteint sa lueur avec son acteur.
-  std::erase_if(card_glows_, [this](std::uint32_t serial) {
-    if (std::ranges::any_of(
-            glow_plan_, [serial](const ArenaCardGlow& glow) { return glow.serial == serial; })) {
+  PlanArenaRareGlows(field.pickups, switches_, glow_plan_);
+  // UN BUTIN PRIS OU SORTI DU PLAN éteint sa lueur avec son acteur.
+  std::erase_if(glow_actors_, [this](std::uint32_t actor_id) {
+    if (std::ranges::any_of(glow_plan_, [actor_id](const ArenaRareGlow& glow) {
+          return glow.actor_id == actor_id;
+        })) {
       return false;
     }
-    static_cast<void>(world_.Remove(serial));
+    static_cast<void>(world_.Remove(actor_id));
     return true;
   });
-  const ro::render::ItemDropPillar pillar = ro::render::ItemDropPillarOf(kCardGlowPillar);
+  const ro::render::ItemDropPillar pillar = ro::render::ItemDropPillarOf(kRareGlowPillar);
   const std::string folder(ro::render::kEffectFolder);
-  for (const ArenaCardGlow& glow : glow_plan_) {
-    PlaceActor(glow.serial, CellOfField(glm::vec2(static_cast<float>(glow.at.x),
-                                                  static_cast<float>(glow.at.y))));
-    if (std::ranges::find(card_glows_, glow.serial) != card_glows_.end()) continue;
-    card_glows_.push_back(glow.serial);
+  for (const ArenaRareGlow& glow : glow_plan_) {
+    PlaceActor(glow.actor_id, CellOfField(glm::vec2(static_cast<float>(glow.at.x),
+                                                    static_cast<float>(glow.at.y))));
+    if (std::ranges::find(glow_actors_, glow.actor_id) != glow_actors_.end()) continue;
+    glow_actors_.push_back(glow.actor_id);
     // La colonne et sa flaque, posées au sol sans relèvement et derrière les
-    // corps, comme la colonne d'un butin rare : elle montre la carte sans la
-    // noyer. Un fichier absent ne se redemande pas.
+    // corps, comme la colonne d'un butin rare : elle montre la carte ou le
+    // coffre sans le noyer. Un fichier absent ne se redemande pas.
     constexpr float kOnTheGround = 0.0F;
     constexpr bool kBehindActors = true;
     for (const std::string_view file : {pillar.top, pillar.bottom}) {
       static_cast<void>(effects_.PlayLooping(folder + std::string(file), ground_of(glow.at), now_ms,
-                                             kOnTheGround, glow.serial, kBehindActors));
+                                             kOnTheGround, glow.actor_id, kBehindActors));
     }
     ++launched_total_;
   }
@@ -369,7 +370,7 @@ void ArenaEffects::Advance(const ro::sim::SurvivorsNews& news, const ro::sim::Su
   nodes_.FollowActor(kArenaHeroActorId, ground_of(field.hero.position), kArenaBearerFacingDegrees);
   lives_.Expire(now_ms);
   KeepOrbs(orbs, ground_of, now_ms);
-  KeepCardGlows(field, ground_of, now_ms);
+  KeepRareGlows(field, ground_of, now_ms);
   budget_.BeginFrame(living());
   PlanArenaLaunches(news, field, looks_, switches_, budget_, plan_);
   for (const ArenaLaunch& launch : plan_) Launch(launch, ground_of, now_ms);

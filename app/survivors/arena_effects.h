@@ -125,10 +125,10 @@ class ArenaEffects {
   // Les effets que l'arène tient pour vivants : voir `kMostArenaLivingEffects`.
   // Une orbe vit tant qu'elle tourne, une lueur tant que sa carte reste.
   [[nodiscard]] std::size_t living() const noexcept {
-    return lives_.size() + orb_effects_.size() + card_glows_.size();
+    return lives_.size() + orb_effects_.size() + glow_actors_.size();
   }
   // Les cartes au sol qui luisent.
-  [[nodiscard]] std::size_t card_glows() const noexcept { return card_glows_.size(); }
+  [[nodiscard]] std::size_t card_glows() const noexcept { return glow_actors_.size(); }
   [[nodiscard]] std::size_t launched_total() const noexcept { return launched_total_; }
   // Les fichiers que les effets ont fait sonner à la dernière peinture, noms
   // formés : à passer par le budget de voix du mode.
@@ -163,12 +163,12 @@ class ArenaEffects {
   void KeepOrbs(std::span<const ro::sim::SurvivorsOrb> orbs, const GroundOf& ground_of,
                 std::uint32_t now_ms);
   void ForgetOrbs();
-  // Allume la lueur d'une carte tombée, et éteint celle d'une carte partie :
-  // la carte de numéro n luit par l'acteur n du monde privé, et sa boucle
-  // s'éteint avec lui. Voir `PlanArenaCardGlows`.
-  void KeepCardGlows(const ro::sim::SurvivorsField& field, const GroundOf& ground_of,
+  // Allume la lueur d'une carte ou d'un coffre tombé, et éteint celle d'un
+  // butin parti : chaque lueur est portée par un acteur du monde privé, et sa
+  // boucle s'éteint avec lui. Voir `PlanArenaRareGlows`.
+  void KeepRareGlows(const ro::sim::SurvivorsField& field, const GroundOf& ground_of,
                      std::uint32_t now_ms);
-  void ForgetCardGlows();
+  void ForgetRareGlows();
   // Combien de temps un effet vit, pour le compte des vivants.
   [[nodiscard]] std::uint32_t LifeMsOf(std::uint32_t effect_id);
   // Pose un acteur du monde privé en cases continues, à la sous-case près.
@@ -195,9 +195,9 @@ class ArenaEffects {
   std::vector<ArenaOrbLook> orbs_;
   // L'effet que porte l'acteur de chaque orbe allumée, dans l'ordre des orbes.
   std::vector<std::uint32_t> orb_effects_;
-  std::vector<ArenaCardGlow> glow_plan_;
-  // Le numéro de chaque carte dont la lueur est allumée.
-  std::vector<std::uint32_t> card_glows_;
+  std::vector<ArenaRareGlow> glow_plan_;
+  // L'acteur de chaque lueur allumée.
+  std::vector<std::uint32_t> glow_actors_;
   std::vector<ZoneFlame> flames_;
   std::vector<ShotSeen> shots_;
   std::vector<WarningMark> warnings_;

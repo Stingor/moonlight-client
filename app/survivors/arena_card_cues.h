@@ -10,40 +10,50 @@
 #include "ro/render/item_drop.h"
 #include "ro/sim/survivors_geometry.h"
 #include "ro/sim/survivors_news.h"
+#include "ro/sim/survivors_run.h"
 #include "ro/sim/survivors_state.h"
 
 #include "survivors/arena_effect_plan.h"
 
 // CE QU'UNE CARTE TOMBÉE FAIT VOIR ET ENTENDRE DANS L'ARÈNE (Q6), décidé sans
 // GPU ni son : une lueur tant qu'elle est au sol, un son à sa chute, un éclat
-// et un son quand le héros la prend, puis son illustration au HUD.
+// et un son quand le héros la prend, puis son illustration au HUD. Un coffre
+// au sol luit de la même colonne.
 namespace moonclient {
 
-// LA LUEUR D'UNE CARTE AU SOL : la colonne violette d'un butin rare, sa
-// flaque et son son de chute.
-inline constexpr std::uint16_t kCardGlowPillar = ro::render::kItemDropPillarPurple;
+// LA LUEUR D'UNE CARTE OU D'UN COFFRE AU SOL : la colonne violette d'un butin
+// rare, sa flaque et son son de chute.
+inline constexpr std::uint16_t kRareGlowPillar = ro::render::kItemDropPillarPurple;
 
 // LE SON D'UNE CARTE RAMASSÉE : celui de la récompense des mini-jeux.
 inline constexpr std::string_view kCardPickupSound = "_heal_effect.wav";
 
-// LES LUEURS ALLUMÉES au plus, les plus anciennes cartes d'abord : une lueur
-// dure tant que sa carte reste, et compte parmi les effets vivants.
-inline constexpr std::size_t kMostArenaCardGlows = 16;
+// LES LUEURS ALLUMÉES au plus, les plus anciens butins d'abord : une lueur
+// dure tant que son butin reste, et compte parmi les effets vivants.
+inline constexpr std::size_t kMostArenaRareGlows = 16;
 
-// Une carte au sol à faire luire : son numéro, qui nomme aussi l'acteur du
-// monde privé qui porte sa lueur, et sa place.
-struct ArenaCardGlow {
-  std::uint32_t serial = 0;
+// L'ACTEUR DU MONDE PRIVÉ qui porte la lueur d'un coffre : cette base plus le
+// numéro du coffre. Les coffres sont numérotés avec les monstres à partir de
+// 1, comme le héros et les orbes du monde privé : sans base, un coffre
+// prendrait leur acteur. Une carte, numérotée à partir de kFirstCardSerial,
+// porte sa lueur par son propre numéro.
+inline constexpr std::uint32_t kFirstChestGlowActorId = 0x40000000U;
+static_assert(kFirstChestGlowActorId < ro::sim::kFirstCardSerial);
+
+// Un butin rare au sol à faire luire : l'acteur du monde privé qui porte sa
+// lueur, et sa place.
+struct ArenaRareGlow {
+  std::uint32_t actor_id = 0;
   ro::sim::FieldPoint at;
 };
 
-// LES LUEURS DE L'IMAGE, une par carte au sol dans l'ordre de chute, au plus
-// `kMostArenaCardGlows`, rangées dans `out` (vidé). Aucune sans effets.
+// LES LUEURS DE L'IMAGE, une par carte ou coffre au sol dans l'ordre de chute,
+// au plus `kMostArenaRareGlows`, rangées dans `out` (vidé). Aucune sans effets.
 //
 // ⚠ « EFFETS RÉDUITS » LES GARDE : une lueur n'est pas l'éclat d'un coup mais
-// le seul signe qu'une carte attend, et une carte non ramassée est perdue.
-void PlanArenaCardGlows(std::span<const ro::sim::SurvivorsPickup> pickups,
-                        ArenaEffectSwitches switches, std::vector<ArenaCardGlow>& out);
+// le seul signe qu'un butin attend, et un butin non ramassé est perdu.
+void PlanArenaRareGlows(std::span<const ro::sim::SurvivorsPickup> pickups,
+                        ArenaEffectSwitches switches, std::vector<ArenaRareGlow>& out);
 
 // LES SONS DES CARTES d'une image : un son de chute si une carte au moins est
 // tombée, un son de ramassage si une au moins a été prise. Vides sinon.
