@@ -20516,8 +20516,8 @@ tr: Jugar de nuevo
 fr: Survivants de Midgard
 tr: Supervivientes de Midgard
 
-fr: Survivez quinze minutes à la horde de Prontera Field.
-tr: Sobreviva quince minutos a la horda de Prontera Field.
+fr: Survivez quinze minutes à la horde.
+tr: Sobreviva quince minutos a la horda.
 
 fr: Temps : %s
 tr: Tiempo: %s

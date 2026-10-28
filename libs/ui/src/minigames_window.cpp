@@ -79,7 +79,7 @@ void DrawTrophies(const MinigamesView& view) {
   ImGui::PushID(name);
   const bool play = SkinButton(core::Tr("Jouer"), art);
   ImGui::PopID();
-  FaintText(core::Tr("Survivez quinze minutes à la horde de Prontera Field."));
+  FaintText(core::Tr("Survivez quinze minutes à la horde."));
   return play;
 }
 

@@ -272,7 +272,7 @@ SurvivorsPrepareAsk DrawSurvivorsPrepareWindow(SurvivorsPrepareState& state,
     EndSkinnedWindow();
     return asked;
   }
-  FaintText(core::Tr("Survivez quinze minutes à la horde de Prontera Field."));
+  FaintText(core::Tr("Survivez quinze minutes à la horde."));
   if (!view.meta.has_value()) {
     asked.choose_skill_id = DrawBolts(view, art);
   } else {
