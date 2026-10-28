@@ -39,6 +39,7 @@ inline constexpr std::size_t kMostArenaRareGlows = 16;
 // porte sa lueur par son propre numéro.
 inline constexpr std::uint32_t kFirstChestGlowActorId = 0x40000000U;
 static_assert(kFirstChestGlowActorId < ro::sim::kFirstCardSerial);
+static_assert(kFirstZoneGroundActorId < kFirstChestGlowActorId);
 
 // Un butin rare au sol à faire luire : l'acteur du monde privé qui porte sa
 // lueur, et sa place.

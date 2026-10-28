@@ -90,6 +90,22 @@ struct ArenaOrbLook {
   ro::sim::FieldPoint at;
 };
 
+// L'ACTEUR DU MONDE PRIVÉ qui porte l'effet au sol d'une zone : cette base
+// plus le numéro de la zone. Les zones sont numérotées avec les monstres à
+// partir de 1, comme le héros et les orbes : sans base, une zone prendrait
+// leur acteur. La base est sous celle des lueurs de coffre
+// (`kFirstChestGlowActorId`).
+inline constexpr std::uint32_t kFirstZoneGroundActorId = 0x20000000U;
+
+// L'EFFET AU SOL D'UNE ZONE À PEINDRE : le visuel que l'unité du skill
+// entretient dans le jeu — le cercle du pilier de feu qui attend —, porté par
+// un acteur du monde privé posé au point de la zone.
+struct ArenaZoneGround {
+  std::uint32_t actor_id = 0;
+  std::uint32_t effect_id = 0;
+  ro::sim::FieldPoint at;
+};
+
 // L'APPARENCE DE CHAQUE SKILL DES RÈGLES, résolue une fois.
 class ArenaSkillLooks {
  public:
@@ -122,5 +138,16 @@ void PlanArenaLaunches(const ro::sim::SurvivorsNews& news, const ro::sim::Surviv
 // tournerait sans se voir jusqu'à son extinction.
 void PlanArenaOrbs(std::span<const ro::sim::SurvivorsOrb> orbs, const ArenaSkillLooks& looks,
                    ArenaEffectSwitches switches, std::vector<ArenaOrbLook>& out);
+
+// LES EFFETS AU SOL DES ZONES, un par zone vivante dont le skill en a un
+// (`SkillLook::ground_effect_id`), dans l'ordre des zones, au point où elle
+// commence, rangés dans `out` (vidé). Une zone éteinte — expirée, ou au bout
+// de ses coups — n'est plus dans l'état : son effet au sol s'éteint avec elle.
+// Aucun sous « Effets réduits » ni sans effets, comme les flammes.
+//
+// Hors budget, comme une orbe : l'effet au sol dure autant que sa zone.
+void PlanArenaZoneGrounds(std::span<const ro::sim::SurvivorsZone> zones,
+                          const ArenaSkillLooks& looks, ArenaEffectSwitches switches,
+                          std::vector<ArenaZoneGround>& out);
 
 }  // namespace moonclient

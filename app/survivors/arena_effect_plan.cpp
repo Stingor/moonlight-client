@@ -149,4 +149,18 @@ void PlanArenaOrbs(std::span<const ro::sim::SurvivorsOrb> orbs, const ArenaSkill
   }
 }
 
+void PlanArenaZoneGrounds(std::span<const ro::sim::SurvivorsZone> zones,
+                          const ArenaSkillLooks& looks, ArenaEffectSwitches switches,
+                          std::vector<ArenaZoneGround>& out) {
+  out.clear();
+  if (!switches.shown || switches.reduced) return;
+  for (const ro::sim::SurvivorsZone& zone : zones) {
+    const SkillLook* look = looks.Find(zone.skill_id);
+    if (look == nullptr || look->ground_effect_id == 0) continue;
+    out.push_back(ArenaZoneGround{.actor_id = kFirstZoneGroundActorId + zone.serial,
+                                  .effect_id = look->ground_effect_id,
+                                  .at = zone.from});
+  }
+}
+
 }  // namespace moonclient

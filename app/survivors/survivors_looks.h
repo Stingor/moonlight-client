@@ -53,6 +53,12 @@ inline constexpr std::uint32_t kSightFallbackEffect = 22;
 inline constexpr std::uint32_t kNapalmBeatFallbackEffect = 32;
 inline constexpr std::uint32_t kFireWallFallbackEffect = 25;
 
+// L'UNITÉ QU'UN SKILL DE ZONE POSE AU SOL dans le jeu : la zone du mode en
+// montre le visuel entretenu (`SkillLook::ground_effect_id`) tant qu'elle dure.
+// Fire Pillar pose le pilier en attente, dont le cercle rouge marque la case.
+inline constexpr std::uint16_t kFirePillarSkill = 80;
+inline constexpr std::uint32_t kFirePillarWaitingUnit = 135;
+
 // L'EFFET D'UNE ÉVOLUTION : le changement de métier, sur le héros.
 inline constexpr std::uint32_t kJobChangeEffect = 156;
 
@@ -85,6 +91,9 @@ struct SkillLook {
   // L'IMPACT sur un monstre touché : la gerbe ordinaire quand la table n'en
   // nomme pas d'autre. « Effets réduits » le remplace par l'étoile de coup.
   std::uint32_t hit_effect_id = 0;
+  // CE QUE SA ZONE MONTRE AU SOL tant qu'elle dure, sous les flammes : le
+  // visuel entretenu de l'unité que le skill pose dans le jeu, ou zéro.
+  std::uint32_t ground_effect_id = 0;
   // Le skill dont l'icône se montre : le sien.
   std::uint16_t icon_skill_id = 0;
 };
@@ -92,7 +101,8 @@ struct SkillLook {
 // L'apparence d'un skill des règles : l'effet du coup, sinon celui de la table
 // ordinaire, sinon celui de l'annonce, sinon le repli écrit. Où il naît se lit
 // sur l'archétype : une orbite, un projectile qui part du héros et une nova
-// sont portés par lui, tout le reste se pose au sol.
+// sont portés par lui, tout le reste se pose au sol. L'effet au sol d'une zone
+// est celui que la table des unités entretient pour l'unité du skill.
 [[nodiscard]] SkillLook SkillLookOf(const ro::sim::SurvivorsSkillRule& skill);
 
 // LES FICHIERS QU'UN LANCER FAIT ENTENDRE, variantes tirées de `draw` : ceux de

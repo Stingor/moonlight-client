@@ -221,6 +221,7 @@ void ArenaEffects::Restart() {
   lives_.Clear();
   ForgetOrbs();
   ForgetRareGlows();
+  ForgetZoneGrounds();
   budget_ = ArenaEffectBudget();
   launched_total_ = 0;
   step_ = 0;
@@ -251,9 +252,53 @@ void ArenaEffects::set_switches(ArenaEffectSwitches switches) {
   // flammes ne sont plus de ce que l'arène montre.
   if (!switches.shown || switches.reduced) {
     ForgetOrbs();
+    ForgetZoneGrounds();
     flames_.clear();
   }
   if (!switches.shown) ForgetRareGlows();
+}
+
+void ArenaEffects::ForgetZoneGrounds() {
+  for (const ArenaZoneGround& ground : zone_grounds_) {
+    effects_.StopById(ground.effect_id, ground.actor_id);
+    static_cast<void>(world_.Remove(ground.actor_id));
+  }
+  zone_grounds_.clear();
+}
+
+void ArenaEffects::KeepZoneGrounds(const ro::sim::SurvivorsField& field, const GroundOf& ground_of,
+                                   std::uint32_t now_ms) {
+  PlanArenaZoneGrounds(field.zones, looks_, switches_, zone_ground_plan_);
+  // UNE ZONE ÉTEINTE EMPORTE SON EFFET AU SOL, et l'acteur qui le portait.
+  std::erase_if(zone_grounds_, [this](const ArenaZoneGround& lit) {
+    if (std::ranges::any_of(zone_ground_plan_, [&lit](const ArenaZoneGround& planned) {
+          return planned.actor_id == lit.actor_id;
+        })) {
+      return false;
+    }
+    effects_.StopById(lit.effect_id, lit.actor_id);
+    static_cast<void>(world_.Remove(lit.actor_id));
+    return true;
+  });
+  for (const ArenaZoneGround& planned : zone_ground_plan_) {
+    const auto lit = std::ranges::find(zone_grounds_, planned.actor_id, &ArenaZoneGround::actor_id);
+    const bool first = lit == zone_grounds_.end();
+    // UN VISUEL PERMANENT NE SE RELANCE PAS : il ne se resème que quand tout
+    // ce qu'il avait semé est mort de sa propre vie, comme sous une unité.
+    if (!first && effects_.Carries(planned.effect_id, planned.actor_id)) continue;
+    if (first) {
+      PlaceActor(planned.actor_id, CellOfField(glm::vec2(static_cast<float>(planned.at.x),
+                                                         static_cast<float>(planned.at.y))));
+      zone_grounds_.push_back(planned);
+    }
+    // Ni aura ni vie imposée : le patron du visuel décide ; seul le premier
+    // semis s'annonce.
+    constexpr bool kNotEndless = false;
+    constexpr std::int32_t kPatternLife = 0;
+    static_cast<void>(effects_.PlayById(planned.effect_id, ground_of(planned.at), now_ms,
+                                        planned.actor_id, kNotEndless, kPatternLife, first));
+    ++launched_total_;
+  }
 }
 
 void ArenaEffects::ForgetRareGlows() {
@@ -371,6 +416,7 @@ void ArenaEffects::Advance(const ro::sim::SurvivorsNews& news, const ro::sim::Su
   lives_.Expire(now_ms);
   KeepOrbs(orbs, ground_of, now_ms);
   KeepRareGlows(field, ground_of, now_ms);
+  KeepZoneGrounds(field, ground_of, now_ms);
   budget_.BeginFrame(living());
   PlanArenaLaunches(news, field, looks_, switches_, budget_, plan_);
   for (const ArenaLaunch& launch : plan_) Launch(launch, ground_of, now_ms);

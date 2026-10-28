@@ -36,7 +36,8 @@
 namespace moonclient {
 
 // LES EFFETS DE L'ARÈNE : sorts, impacts, montée de niveau, évolution, murs et
-// piliers, tirs des monstres, annonces et aires au sol, lueur des cartes.
+// piliers avec l'effet au sol de leur unité, tirs des monstres, annonces et aires au sol, lueur des
+// cartes.
 //
 // 🔴 LES MÊMES PIÈCES QUE LA PARTIE — catalogue, troupe des nœuds, moteur
 // d'effets, leurs renderers et leurs peintres —, sur un monde PRIVÉ qui ne
@@ -125,8 +126,10 @@ class ArenaEffects {
   // Les effets que l'arène tient pour vivants : voir `kMostArenaLivingEffects`.
   // Une orbe vit tant qu'elle tourne, une lueur tant que sa carte reste.
   [[nodiscard]] std::size_t living() const noexcept {
-    return lives_.size() + orb_effects_.size() + glow_actors_.size();
+    return lives_.size() + orb_effects_.size() + glow_actors_.size() + zone_grounds_.size();
   }
+  // Les zones dont l'effet au sol est allumé.
+  [[nodiscard]] std::size_t zone_grounds() const noexcept { return zone_grounds_.size(); }
   // Les cartes au sol qui luisent.
   [[nodiscard]] std::size_t card_glows() const noexcept { return glow_actors_.size(); }
   [[nodiscard]] std::size_t launched_total() const noexcept { return launched_total_; }
@@ -169,6 +172,12 @@ class ArenaEffects {
   void KeepRareGlows(const ro::sim::SurvivorsField& field, const GroundOf& ground_of,
                      std::uint32_t now_ms);
   void ForgetRareGlows();
+  // Allume l'effet au sol d'une zone neuve, le resème quand tout ce qu'il
+  // avait semé est mort, et l'éteint avec l'acteur qui le porte quand la zone
+  // n'est plus. Voir `PlanArenaZoneGrounds`.
+  void KeepZoneGrounds(const ro::sim::SurvivorsField& field, const GroundOf& ground_of,
+                       std::uint32_t now_ms);
+  void ForgetZoneGrounds();
   // Combien de temps un effet vit, pour le compte des vivants.
   [[nodiscard]] std::uint32_t LifeMsOf(std::uint32_t effect_id);
   // Pose un acteur du monde privé en cases continues, à la sous-case près.
@@ -198,6 +207,9 @@ class ArenaEffects {
   std::vector<ArenaRareGlow> glow_plan_;
   // L'acteur de chaque lueur allumée.
   std::vector<std::uint32_t> glow_actors_;
+  std::vector<ArenaZoneGround> zone_ground_plan_;
+  // L'effet au sol allumé de chaque zone, avec l'acteur qui le porte.
+  std::vector<ArenaZoneGround> zone_grounds_;
   std::vector<ZoneFlame> flames_;
   std::vector<ShotSeen> shots_;
   std::vector<WarningMark> warnings_;

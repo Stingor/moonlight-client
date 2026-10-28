@@ -7,6 +7,7 @@
 #include "ro/render/effect_node_pattern_table.h"
 #include "ro/render/skill_effect_table.h"
 #include "ro/render/skill_hit_effect.h"
+#include "ro/render/skill_unit_table.h"
 
 namespace moonclient {
 namespace {
@@ -35,6 +36,20 @@ namespace {
     default:
       return std::nullopt;
   }
+}
+
+// L'unité que ce skill pose au sol dans le jeu, ou rien.
+[[nodiscard]] std::optional<std::uint32_t> GroundUnitOf(std::uint16_t skill_id) {
+  if (skill_id == kFirePillarSkill) return kFirePillarWaitingUnit;
+  return std::nullopt;
+}
+
+// Le visuel que la table des unités entretient sous ce skill, ou zéro.
+[[nodiscard]] std::uint32_t GroundEffectOf(std::uint16_t skill_id) {
+  const std::optional<std::uint32_t> unit_id = GroundUnitOf(skill_id);
+  if (!unit_id.has_value()) return 0;
+  const ro::render::SkillUnitVisualEntry* visual = ro::render::SkillUnitVisual(*unit_id);
+  return visual != nullptr ? visual->effect_id : 0;
 }
 
 [[nodiscard]] SkillBearer BearerOf(ro::sim::SkillArchetype archetype) {
@@ -109,6 +124,7 @@ SkillLook SkillLookOf(const ro::sim::SurvivorsSkillRule& skill) {
   }
   const std::int32_t hit = ro::render::SkillHitEffect(skill.skill_id, true, true);
   look.hit_effect_id = hit >= 0 ? static_cast<std::uint32_t>(hit) : kPlainHitEffect;
+  look.ground_effect_id = GroundEffectOf(skill.skill_id);
   return look;
 }
 
