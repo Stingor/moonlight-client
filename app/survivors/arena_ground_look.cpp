@@ -2,6 +2,8 @@
 
 #include <array>
 
+#include "ro/core/i18n.h"
+
 namespace moonclient {
 namespace {
 
@@ -133,6 +135,9 @@ constexpr std::array<SeedLook, 6> kPlainsSeeds{{
 constexpr std::array<BiomeLook, 1> kBiomes{{
     {.terrain_key = "midgard_plains",
      .reference_map = "prt_fild08",
+     .display_name = ro::core::TrText("Prairie de Midgard"),
+     .sign_background = "field_s2",
+     .field_track = "bgm\\12.mp3",
      .textures = kPlainsTextures,
      .pieces = kPlainsPieces,
      .seeds = kPlainsSeeds,

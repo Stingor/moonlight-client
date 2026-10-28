@@ -129,6 +129,9 @@ class SurvivorsRankingMode {
     std::uint64_t start_seed = 0;
     std::uint64_t local_seed = 0;
     std::uint16_t first_skill_id = 0;
+    // L'arène du jeton demandé : celle où repart libre une partie classée
+    // sans jeton.
+    std::uint16_t arena_id = 0;
   };
 
   void Write(const std::filesystem::path& client_root);

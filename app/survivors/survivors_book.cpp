@@ -289,12 +289,24 @@ std::vector<std::uint16_t> LockedIdsOf(const ro::sim::SurvivorsRules& rules,
   return locked;
 }
 
+const ro::sim::ArenaRule* DefaultArenaOf(const ro::sim::SurvivorsRules& rules) {
+  return ro::sim::FirstRankedArena(rules);
+}
+
+const ro::sim::ArenaRule* FreeArenaOf(const ro::sim::SurvivorsRules& rules,
+                                      std::uint16_t arena_id) {
+  const ro::sim::ArenaRule* chosen = arena_id != 0 ? ro::sim::FindArena(rules, arena_id) : nullptr;
+  return chosen != nullptr ? chosen : DefaultArenaOf(rules);
+}
+
 ro::sim::SurvivorsStart FreeStartOf(const ro::sim::SurvivorsRules& rules, const SurvivorsSave& save,
-                                    std::uint64_t seed, std::uint16_t first_skill_id) {
+                                    std::uint64_t seed, std::uint16_t first_skill_id,
+                                    std::uint16_t arena_id) {
+  const ro::sim::ArenaRule* arena = FreeArenaOf(rules, arena_id);
   ro::sim::SurvivorsStart start{
       .seed = seed,
       .class_id = rules.classes.empty() ? std::uint16_t{0} : rules.classes.front().class_id,
-      .arena_id = rules.arenas.empty() ? std::uint16_t{0} : rules.arenas.front().arena_id,
+      .arena_id = arena == nullptr ? std::uint16_t{0} : arena->arena_id,
       .first_skill_id = first_skill_id,
       .loadout = {}};
   // Un carnet plus généreux que les règles ne fait pas refuser la partie : la
@@ -337,15 +349,6 @@ ro::sim::SurvivorsStart ChallengeStartOf(const ro::sim::SurvivorsRules& rules,
       .first_skill_id =
           class_rule == nullptr ? std::uint16_t{0} : ChallengeFirstSkill(*class_rule, week),
       .loadout = {}};
-}
-
-SurvivorsBoardKind MountableBoard(const ro::sim::SurvivorsRules& rules,
-                                  SurvivorsBoardKind chosen) noexcept {
-  if (chosen == SurvivorsBoardKind::kFree) return chosen;
-  const ro::sim::ArenaRule* ranked_arena = ro::sim::FirstRankedArena(rules);
-  const bool mounted = ranked_arena != nullptr && !rules.arenas.empty() &&
-                       ranked_arena->arena_id == rules.arenas.front().arena_id;
-  return mounted ? chosen : SurvivorsBoardKind::kFree;
 }
 
 SurvivorsCredit CreditRun(const ro::sim::SurvivorsRules& rules, SurvivorsSave& save,

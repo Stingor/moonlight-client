@@ -70,12 +70,25 @@ struct SurvivorsFeat {
                                                      const ro::sim::ClassRule& class_rule,
                                                      const SurvivorsSave& save);
 
-// LE DÉPART D'UNE PARTIE LIBRE : la classe et l'arène livrées en tête, le
-// loadout et les vies des rangs achetés, la dernière Cursed Water choisie, et
-// les verrous du carnet. La graine se tire par app à chaque partie.
+// L'ARÈNE PAR DÉFAUT : celle que la partie libre joue tant que l'accueil n'en a
+// pas retenu d'autre, la première arène classée — celle du défi et de la
+// partie classée (Q6, Q7). Nulle quand aucune ne l'est.
+[[nodiscard]] const ro::sim::ArenaRule* DefaultArenaOf(const ro::sim::SurvivorsRules& rules);
+
+// L'ARÈNE DE LA PARTIE LIBRE : celle d'Id `arena_id` quand les règles la
+// connaissent, sinon l'arène par défaut. Toute arène du catalogue se joue en
+// partie libre, classée ou non.
+[[nodiscard]] const ro::sim::ArenaRule* FreeArenaOf(const ro::sim::SurvivorsRules& rules,
+                                                    std::uint16_t arena_id);
+
+// LE DÉPART D'UNE PARTIE LIBRE : la classe livrée en tête, l'arène
+// `FreeArenaOf(arena_id)`, le loadout et les vies des rangs achetés, la
+// dernière Cursed Water choisie, et les verrous du carnet. La graine se tire
+// par app à chaque partie.
 [[nodiscard]] ro::sim::SurvivorsStart FreeStartOf(const ro::sim::SurvivorsRules& rules,
                                                   const SurvivorsSave& save, std::uint64_t seed,
-                                                  std::uint16_t first_skill_id);
+                                                  std::uint16_t first_skill_id,
+                                                  std::uint16_t arena_id = 0);
 
 // La semaine ISO d'un instant UTC : le défi change le lundi à 00:00 UTC (Q9).
 [[nodiscard]] ro::sim::IsoWeek IsoWeekOfUtc(std::int64_t utc_s) noexcept;
@@ -90,13 +103,6 @@ struct SurvivorsFeat {
 // graine `SeedOfWeek` et le bolt de la semaine. Le même pour tous les carnets.
 [[nodiscard]] ro::sim::SurvivorsStart ChallengeStartOf(const ro::sim::SurvivorsRules& rules,
                                                        const ro::sim::IsoWeek& week);
-
-// LE TABLEAU QUE LA SALLE PEUT JOUER : elle ne monte que la première arène du
-// catalogue, et la partie classée comme le défi se jouent sur la première arène
-// classée. Quand ce n'est pas la même, le classement se tait : la partie part
-// libre plutôt que d'être soumise sur une arène hors classement.
-[[nodiscard]] SurvivorsBoardKind MountableBoard(const ro::sim::SurvivorsRules& rules,
-                                                SurvivorsBoardKind chosen) noexcept;
 
 // Ce que devient une partie au tableau des records.
 enum class RecordVerdict : std::uint8_t {

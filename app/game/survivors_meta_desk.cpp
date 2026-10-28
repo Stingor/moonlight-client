@@ -43,8 +43,23 @@ constexpr std::size_t kSayTextSize = 256;
   return rules.classes.empty() ? "" : rules.classes.front().key;
 }
 
-[[nodiscard]] const char* ArenaKey(const ro::sim::SurvivorsRules& rules) {
-  return rules.arenas.empty() ? "" : rules.arenas.front().key;
+// La clé de l'arène par défaut, celle du défi et de la partie classée.
+[[nodiscard]] const char* BoardArenaKey(const ro::sim::SurvivorsRules& rules) {
+  const ro::sim::ArenaRule* arena = DefaultArenaOf(rules);
+  return arena != nullptr ? arena->key : "";
+}
+
+// Les lignes des règles en vigueur d'abord, dans l'ordre de leur tableau ; puis
+// celles d'anciennes règles, de toutes arènes, par score décroissant.
+void SortOlderUnder(std::vector<const ro::sim::SurvivorsRecord*>& runs,
+                    const ro::sim::SurvivorsRules& rules) {
+  std::ranges::stable_sort(runs, [&rules](const ro::sim::SurvivorsRecord* first,
+                                          const ro::sim::SurvivorsRecord* second) {
+    const bool first_older = first->ruleset < rules.ruleset_version;
+    const bool second_older = second->ruleset < rules.ruleset_version;
+    if (first_older != second_older) return second_older;
+    return first_older && first->score > second->score;
+  });
 }
 
 [[nodiscard]] ro::ui::SurvivorsRecordRow RecordRowOf(const ro::sim::SurvivorsRecord& record,
@@ -233,7 +248,7 @@ ro::ui::SurvivorsPrepareMeta PrepareMetaOf(const ro::sim::SurvivorsRules& rules,
   meta.challenge_bolt = ro::ui::SurvivorsBoltChoice{
       .skill_id = bolt, .description = bolt_rule != nullptr ? bolt_rule->description : ""};
   if (const SurvivorsBoard* best =
-          FindBoard(save, class_rule.key, ArenaKey(rules), kChallengeBoardKey, week);
+          FindBoard(save, class_rule.key, BoardArenaKey(rules), kChallengeBoardKey, week);
       best != nullptr && !best->runs.empty()) {
     meta.week_best_score = best->runs.front().score;
   }
@@ -278,31 +293,50 @@ void FeatEntriesOf(const SurvivorsSave& save, std::vector<ro::ui::SurvivorsFeatE
 ro::ui::SurvivorsRecordsView RecordsViewOf(const ro::sim::SurvivorsRules& rules,
                                            const SurvivorsSave& save, std::int64_t now_utc_s,
                                            std::optional<std::int64_t> latest_utc_s,
-                                           SurvivorsRecordRowsHeld& held) {
+                                           SurvivorsRecordRowsHeld& held,
+                                           std::uint16_t free_arena_id) {
   held = SurvivorsRecordRowsHeld{};
   const ro::sim::IsoWeek week = IsoWeekOfUtc(now_utc_s);
   const std::string_view class_key = ClassKey(rules);
-  const std::string_view arena_key = ArenaKey(rules);
+  const ro::sim::ArenaRule* free_arena = FreeArenaOf(rules, free_arena_id);
+  const std::string_view free_arena_key = free_arena != nullptr ? free_arena->key : "";
+  const std::string_view board_arena_key = BoardArenaKey(rules);
+  // Une partie d'une autre arène n'entre que jouée sous d'anciennes règles.
+  const auto shown = [&rules](const SurvivorsBoard& board, std::string_view arena_key,
+                              const ro::sim::SurvivorsRecord& run) {
+    return board.arena_key == arena_key || run.ruleset < rules.ruleset_version;
+  };
+  std::vector<const ro::sim::SurvivorsRecord*> free_runs;
+  std::vector<const ro::sim::SurvivorsRecord*> week_runs;
+  std::vector<const ro::sim::SurvivorsRecord*> ranked_runs;
   std::vector<const SurvivorsBoard*> past;
   for (const SurvivorsBoard& board : save.records) {
-    if (board.class_key != class_key || board.arena_key != arena_key) continue;
-    if (board.board_key == kFreeBoardKey) {
+    if (board.class_key != class_key) continue;
+    const bool challenge = board.board_key == kChallengeBoardKey;
+    std::vector<const ro::sim::SurvivorsRecord*>* kept =
+        board.board_key == kFreeBoardKey     ? &free_runs
+        : challenge && board.week == week    ? &week_runs
+        : board.board_key == kRankedBoardKey ? &ranked_runs
+                                             : nullptr;
+    const std::string_view arena_key =
+        board.board_key == kFreeBoardKey ? free_arena_key : board_arena_key;
+    if (kept != nullptr) {
       for (const ro::sim::SurvivorsRecord& run : board.runs) {
-        held.free_runs.push_back(RecordRowOf(run, rules, latest_utc_s));
+        if (shown(board, arena_key, run)) kept->push_back(&run);
       }
-    } else if (board.board_key == kChallengeBoardKey && board.week == week) {
-      for (const ro::sim::SurvivorsRecord& run : board.runs) {
-        held.week_runs.push_back(RecordRowOf(run, rules, latest_utc_s));
-      }
-    } else if (board.board_key == kChallengeBoardKey && !board.runs.empty()) {
+    } else if (challenge && !board.runs.empty() && shown(board, arena_key, board.runs.front())) {
       past.push_back(&board);
-    } else if (board.board_key == kRankedBoardKey) {
-      for (const ro::sim::SurvivorsRecord& run : board.runs) {
-        held.ranked_runs.push_back(RecordRowOf(run, rules, latest_utc_s));
-      }
     }
   }
-  std::ranges::sort(past, [](const SurvivorsBoard* first, const SurvivorsBoard* second) {
+  for (const auto& [runs, rows] :
+       {std::pair{&free_runs, &held.free_runs}, std::pair{&week_runs, &held.week_runs},
+        std::pair{&ranked_runs, &held.ranked_runs}}) {
+    SortOlderUnder(*runs, rules);
+    for (const ro::sim::SurvivorsRecord* run : *runs) {
+      rows->push_back(RecordRowOf(*run, rules, latest_utc_s));
+    }
+  }
+  std::ranges::stable_sort(past, [](const SurvivorsBoard* first, const SurvivorsBoard* second) {
     return ro::sim::IsoWeekOrdinal(first->week) > ro::sim::IsoWeekOrdinal(second->week);
   });
   for (const SurvivorsBoard* board : past) {
@@ -382,6 +416,7 @@ void SurvivorsMetaDesk::FollowPrepare(const ro::ui::SurvivorsPrepareAsk& asked,
                                       const std::filesystem::path& client_root,
                                       const SurvivorsSay& say) {
   if (asked.choose_board.has_value()) book.Choose(BoardKindOf(*asked.choose_board));
+  if (asked.choose_arena_id.has_value()) book.ChooseArena(rules, *asked.choose_arena_id);
   if (asked.choose_cursed_water.has_value()) {
     const int rank = *asked.choose_cursed_water;
     Mutate(

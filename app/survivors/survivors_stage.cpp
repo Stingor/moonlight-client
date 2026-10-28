@@ -40,7 +40,7 @@ void SurvivorsStage::Open() {
 }
 
 ro::core::Result<void> SurvivorsStage::Begin(const ro::sim::SurvivorsRules& rules,
-                                             ro::sim::WalkMap arena,
+                                             std::optional<ro::sim::WalkMap> arena,
                                              const ro::sim::SurvivorsStart& start,
                                              const SurvivorsRunBoard& board) {
   if (screen_ != SurvivorsScreen::kPreparing && screen_ != SurvivorsScreen::kLoading &&
@@ -49,7 +49,8 @@ ro::core::Result<void> SurvivorsStage::Begin(const ro::sim::SurvivorsRules& rule
                           "une partie ne commence que depuis la préparation, le chargement ou le "
                           "bilan");
   }
-  auto run = ro::sim::SurvivorsRun::Start(rules, std::move(arena), start);
+  auto run = arena.has_value() ? ro::sim::SurvivorsRun::Start(rules, std::move(*arena), start)
+                               : ro::sim::SurvivorsRun::Start(rules, start);
   if (!run) return std::unexpected(run.error());
   play_.emplace(std::move(*run));
   board_ = board;

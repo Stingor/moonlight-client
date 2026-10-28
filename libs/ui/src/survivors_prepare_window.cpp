@@ -147,8 +147,32 @@ void DrawCursedWater(const SurvivorsPrepareMeta& meta, SurvivorsPrepareAsk& aske
   FaintText(line.data());
 }
 
+// L'arène nommée, sans choix : celle du défi et de la partie classée.
+void DrawArenaName(const char* name) {
+  if (name == nullptr || *name == '\0') return;
+  ImGui::Text(core::Tr("Arène : %s"), name);
+}
+
+// L'arène de la partie libre : une case par arène proposée, sur une ligne.
+void DrawFreeArena(const SurvivorsPrepareMeta& meta, SurvivorsPrepareAsk& asked,
+                   const SkinArt& art) {
+  if (meta.free_arenas.size() == 1) DrawArenaName(meta.free_arenas.front().name);
+  if (meta.free_arenas.size() < 2) return;
+  ImGui::SeparatorText(core::Tr("Arène"));
+  bool first = true;
+  for (const SurvivorsArenaChoice& arena : meta.free_arenas) {
+    if (!first) ImGui::SameLine();
+    first = false;
+    ImGui::PushID(arena.arena_id);
+    const bool chosen = arena.arena_id == meta.free_arena_id;
+    if (SkinRadio(arena.name, chosen, art) && !chosen) asked.choose_arena_id = arena.arena_id;
+    ImGui::PopID();
+  }
+}
+
 void DrawFreeBoard(const SurvivorsPrepareView& view, const SurvivorsPrepareMeta& meta,
                    SurvivorsPrepareAsk& asked, const SkinArt& art) {
+  DrawFreeArena(meta, asked, art);
   asked.choose_skill_id = DrawBolts(view, art);
   DrawCursedWater(meta, asked, art);
   ImGui::Separator();
@@ -157,6 +181,7 @@ void DrawFreeBoard(const SurvivorsPrepareView& view, const SurvivorsPrepareMeta&
 }
 
 void DrawChallengeBoard(const SurvivorsPrepareMeta& meta) {
+  DrawArenaName(meta.board_arena_name);
   ImGui::TextUnformatted(SurvivorsWeekText(meta.week_year, meta.week_number).data());
   const std::int64_t hours = meta.week_left_s / kSecondsPerHour;
   ImGui::Text(core::Tr("Se termine dans %d j %d h"), static_cast<int>(hours / kHoursPerDay),
@@ -176,8 +201,10 @@ void DrawChallengeBoard(const SurvivorsPrepareMeta& meta) {
 }
 
 // La partie classée : départ neutre, le bolt au choix, la graine du serveur.
-void DrawRankedBoard(const SurvivorsPrepareView& view, const SurvivorsPrepareRanking& ranking,
+void DrawRankedBoard(const SurvivorsPrepareView& view, const SurvivorsPrepareMeta& meta,
                      SurvivorsPrepareAsk& asked, const SkinArt& art) {
+  const SurvivorsPrepareRanking& ranking = *meta.ranking;
+  DrawArenaName(meta.board_arena_name);
   asked.choose_skill_id = DrawBolts(view, art);
   ImGui::Separator();
   FaintText(core::Tr("Départ neutre : sans Bénédictions, sans charges, toutes les cartes."));
@@ -258,7 +285,7 @@ SurvivorsPrepareAsk DrawSurvivorsPrepareWindow(SurvivorsPrepareState& state,
         DrawChallengeBoard(*view.meta);
         break;
       case SurvivorsBoardTab::kRanked:
-        DrawRankedBoard(view, *view.meta->ranking, asked, art);
+        DrawRankedBoard(view, *view.meta, asked, art);
         break;
     }
   }

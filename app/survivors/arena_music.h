@@ -10,8 +10,9 @@
 // à quel volume. `app` la fait jouer par `MapMusic`.
 namespace moonclient {
 
-// La musique de la carte de l'arène, puis celle de Glast Heim qui vient avec
-// la nuit, puis celle de l'antre de Baphomet à minuit, quand il arrive.
+// La musique des champs de l'arène — celle de `prt_fild08` pour une carte,
+// celle de son biome pour un sol généré —, puis celle de Glast Heim qui vient
+// avec la nuit, puis celle de l'antre de Baphomet à minuit, quand il arrive.
 inline constexpr std::string_view kArenaFieldTrack = "bgm\\12.mp3";
 inline constexpr std::string_view kArenaGlastHeimTrack = "bgm\\42.mp3";
 inline constexpr std::string_view kArenaBossTrack = "bgm\\16.mp3";
@@ -22,12 +23,16 @@ inline constexpr std::uint64_t kArenaBossFromMs = kArenaMidnightMs;
 inline constexpr float kArenaPausedMusicShare = 0.5F;
 
 // La piste de l'arène à `presentation_ms` : elle se lit sur l'horloge de la
-// partie, comme la nuit, et gèle avec elle.
-[[nodiscard]] std::string_view ArenaTrackAt(std::uint64_t presentation_ms) noexcept;
+// partie, comme la nuit, et gèle avec elle. `field_track` : la musique des
+// champs de l'arène montée.
+[[nodiscard]] std::string_view ArenaTrackAt(
+    std::uint64_t presentation_ms, std::string_view field_track = kArenaFieldTrack) noexcept;
 
 struct ArenaMusicFacts {
   std::uint64_t presentation_ms = 0;
   bool paused = false;
+  // La musique des champs de l'arène montée : voir `ArenaFieldTrackOf`.
+  std::string_view field_track = kArenaFieldTrack;
   // Le morceau choisi au lecteur de musique du joueur ; vide quand la carte
   // décide.
   std::string_view player_track;

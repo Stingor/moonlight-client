@@ -105,12 +105,20 @@ struct SeedLook {
   std::uint32_t weight = 1;
 };
 
-// UN BIOME : le sol, les pièces, le semis, et la carte dont il prend la lumière,
-// le brouillard, le ciel et la musique.
+// UN BIOME : le sol, les pièces, le semis, la carte dont il prend la lumière,
+// le brouillard et le ciel, et ce que l'arène montre et joue à l'entrée.
 struct BiomeLook {
   // La clé de la règle de terrain de `sim`.
   std::string_view terrain_key;
   std::string_view reference_map;
+  // LE NOM AFFICHÉ, à l'accueil et au bandeau d'entrée : en français, marqué
+  // par `TrText`, traduit à l'affichage.
+  const char* display_name = "";
+  // Le fond du bandeau d'entrée, comme la table des cartes le nomme
+  // (`MapSign::background`).
+  std::string_view sign_background;
+  // La musique des champs, avant que la nuit ne tombe (`ArenaTrackAt`).
+  std::string_view field_track;
   std::span<const GroundTextureLook> textures;
   std::span<const PieceLook> pieces;
   std::span<const SeedLook> seeds;

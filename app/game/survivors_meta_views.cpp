@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <optional>
 #include <span>
+#include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
@@ -20,6 +21,8 @@
 
 #include "game/skin_image_of.h"
 #include "game/survivors_views.h"
+#include "survivors/arena_choice.h"
+#include "survivors/survivors_book.h"
 #include "survivors/survivors_looks.h"
 
 namespace moonclient {
@@ -60,6 +63,25 @@ void SurvivorsViews::ComposeMeta(ro::ui::SurvivorsPrepareView& prepare,
   } else {
     windows.ranking.open = false;
   }
+  // LES ARÈNES (Q6 amendée) : toute arène du catalogue en partie libre, la
+  // prairie par défaut ; le défi et la partie classée nomment la leur.
+  arena_names_.clear();
+  arena_choices_.clear();
+  for (const ro::sim::ArenaRule& arena : rules.arenas) {
+    arena_names_.push_back(ArenaNameOf(rules, arena, tables.map_names));
+  }
+  // Après les noms : une liste qui grandit déplacerait les textes désignés.
+  for (std::size_t rank = 0; rank < rules.arenas.size(); ++rank) {
+    arena_choices_.push_back(ro::ui::SurvivorsArenaChoice{.arena_id = rules.arenas[rank].arena_id,
+                                                          .name = arena_names_[rank].c_str()});
+  }
+  const ro::sim::ArenaRule* free_arena = FreeArenaOf(rules, book.free_arena_id());
+  const ro::sim::ArenaRule* board_arena = DefaultArenaOf(rules);
+  board_arena_name_ =
+      board_arena != nullptr ? ArenaNameOf(rules, *board_arena, tables.map_names) : std::string();
+  meta.free_arenas = arena_choices_;
+  meta.free_arena_id = free_arena != nullptr ? free_arena->arena_id : std::uint16_t{0};
+  meta.board_arena_name = board_arena_name_.c_str();
   prepare.meta = meta;
   if (windows.church.open) ComposeShop(SurvivorsMetaShop::kChurch, windows, save, tables);
   if (windows.kafra.open) ComposeShop(SurvivorsMetaShop::kKafra, windows, save, tables);
@@ -69,7 +91,7 @@ void SurvivorsViews::ComposeMeta(ro::ui::SurvivorsPrepareView& prepare,
     windows.records_view = RecordsViewOf(
         rules, save, now_utc_s,
         credit.has_value() ? std::optional<std::int64_t>(credit->played_at_utc_s) : std::nullopt,
-        record_rows_);
+        record_rows_, book.free_arena_id());
     windows.records_view.ranked_shown = ranking_open;
   }
 }

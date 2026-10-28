@@ -137,8 +137,15 @@ class SurvivorsMode {
 
  private:
   void Enter(SurvivorsStage& stage, const SurvivorsContext& context, std::uint16_t first_skill_id);
-  // Monte l'arène, ou reprend celle gardée pour « Rejouer », et fait arriver
-  // la partie. Faux quand l'arène ne se monte pas : le mode s'est refermé.
+  // Commence sur l'étage la partie du départ `begun`, sur le sol de son arène.
+  [[nodiscard]] ro::core::Result<void> BeginRun(SurvivorsStage& stage,
+                                                const SurvivorsContext& context,
+                                                const SurvivorsBookMode::Begun& begun);
+  // L'arène montée est celle de la partie de l'étage.
+  [[nodiscard]] bool ArenaShown(const SurvivorsStage& stage) const;
+  // Monte l'arène du départ, ou reprend celle gardée pour « Rejouer », et fait
+  // arriver la partie. Faux quand l'arène ne se monte pas : le mode s'est
+  // refermé.
   [[nodiscard]] bool Mount(SurvivorsStage& stage, const SurvivorsContext& context);
   // Refait le départ que le classement vient de régler. Faux quand il ne
   // commence pas : le mode s'est refermé.

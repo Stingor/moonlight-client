@@ -25,6 +25,9 @@ constexpr float kFarthestSearchToleranceDistance = 0.5F;
 // L'emprise reste à ce retrait du cadre : posée sur un héros loin de l'origine,
 // la même caméra rend une emprise qui diffère de quelques dix-millièmes de case.
 constexpr float kFrameSlackCells = 0.01F;
+// Le même retrait pour la descente, trois fois plus haute : l'écart des
+// flottants grandit avec le recul (un centième de case relevé à 1 224 unités).
+constexpr float kDescentSlackCells = 0.1F;
 
 // La part du cadre que l'emprise peut occuper, en cases.
 [[nodiscard]] float CellsOf(std::int32_t units) {
@@ -32,20 +35,39 @@ constexpr float kFrameSlackCells = 0.01F;
          kFrameSlackCells;
 }
 
-// La caméra de l'arène à ce recul, sans descente ni secousse : l'emprise ne
-// dépend que du recul, de l'élévation et du champ.
-[[nodiscard]] bool FitsSpawnFrame(float distance, float aspect_ratio,
-                                  const ro::sim::SpawnFrame& frame) {
+// La caméra de l'arène à ce recul, sans descente ni secousse, voit-elle le sol
+// dans `bounds` ? L'emprise ne dépend que du recul, de l'élévation et du champ.
+[[nodiscard]] bool FootprintWithin(float distance, float aspect_ratio,
+                                   const GroundFootprint& bounds) {
   ro::render::Camera camera;
   camera.distance = distance;
   camera.pitch_degrees = kArenaElevationDegrees;
   camera.yaw_degrees = kArenaYawDegrees;
   camera.fov_degrees = ArenaFovDegrees(aspect_ratio);
   const std::optional<GroundFootprint> seen = GroundFootprintOf(camera, aspect_ratio);
-  return seen.has_value() && seen->west_cells <= CellsOf(frame.half_width_units) &&
-         seen->east_cells <= CellsOf(frame.half_width_units) &&
-         seen->north_cells <= CellsOf(frame.north_units) &&
-         seen->south_cells <= CellsOf(frame.south_units);
+  return seen.has_value() && seen->west_cells <= bounds.west_cells &&
+         seen->east_cells <= bounds.east_cells && seen->north_cells <= bounds.north_cells &&
+         seen->south_cells <= bounds.south_cells;
+}
+
+[[nodiscard]] bool FitsSpawnFrame(float distance, float aspect_ratio,
+                                  const ro::sim::SpawnFrame& frame) {
+  return FootprintWithin(distance, aspect_ratio,
+                         GroundFootprint{.west_cells = CellsOf(frame.half_width_units),
+                                         .east_cells = CellsOf(frame.half_width_units),
+                                         .north_cells = CellsOf(frame.north_units),
+                                         .south_cells = CellsOf(frame.south_units)});
+}
+
+// Le plus grand recul de [fits, overflows] qui tient encore, `fits` tenant et
+// `overflows` débordant : l'emprise grandit avec le recul, on coupe en deux.
+template <typename Fits>
+[[nodiscard]] float LargestFitting(float fits, float overflows, const Fits& fitting) {
+  while (overflows - fits > kFarthestSearchToleranceDistance) {
+    const float middle = (fits + overflows) * 0.5F;
+    (fitting(middle) ? fits : overflows) = middle;
+  }
+  return fits;
 }
 
 // La descente ralentit en cube : vive au départ, posée à l'arrivée.
@@ -56,12 +78,14 @@ constexpr float kFrameSlackCells = 0.01F;
 
 }  // namespace
 
-float ArenaDescentDistance(float rest_distance, std::uint32_t arrival_ms) {
+float ArenaDescentDistance(float rest_distance, std::uint32_t arrival_ms,
+                           float most_from_distance) {
   if (arrival_ms >= kArenaDescentMs) {
     return rest_distance;
   }
   const float progress = static_cast<float>(arrival_ms) / static_cast<float>(kArenaDescentMs);
-  const float from_distance = rest_distance * kArenaDescentFromFactor;
+  const float from_distance = std::max(
+      rest_distance, std::min(rest_distance * kArenaDescentFromFactor, most_from_distance));
   return from_distance + (rest_distance - from_distance) * EaseOutCubic(progress);
 }
 
@@ -111,15 +135,34 @@ float ArenaFarthestDistance(float aspect_ratio, const ro::sim::SpawnFrame& frame
     return kArenaFarthestReachDistance;
   }
   if (!FitsSpawnFrame(kArenaEntryDistance, aspect_ratio, frame)) return kArenaEntryDistance;
-  // L'emprise grandit avec le recul : on coupe en deux l'intervalle entre un
-  // recul qui tient et un recul qui déborde.
-  float fits = kArenaEntryDistance;
-  float overflows = kArenaFarthestReachDistance;
-  while (overflows - fits > kFarthestSearchToleranceDistance) {
-    const float middle = (fits + overflows) * 0.5F;
-    (FitsSpawnFrame(middle, aspect_ratio, frame) ? fits : overflows) = middle;
-  }
-  return fits;
+  return LargestFitting(kArenaEntryDistance, kArenaFarthestReachDistance,
+                        [aspect_ratio, &frame](float distance) {
+                          return FitsSpawnFrame(distance, aspect_ratio, frame);
+                        });
+}
+
+float ArenaDescentCeiling(float aspect_ratio, float reach_cells) {
+  const float within_cells = reach_cells - kDescentSlackCells;
+  const GroundFootprint bounds{.west_cells = within_cells,
+                               .east_cells = within_cells,
+                               .north_cells = within_cells,
+                               .south_cells = within_cells};
+  const auto fitting = [aspect_ratio, &bounds](float distance) {
+    return FootprintWithin(distance, aspect_ratio, bounds);
+  };
+  // La descente ne part jamais de plus haut que le plus lointain recul de la
+  // molette, multiplié.
+  const float highest = kArenaFarthestReachDistance * kArenaDescentFromFactor;
+  if (fitting(highest)) return highest;
+  if (!fitting(kArenaNearestDistance)) return kArenaNearestDistance;
+  return LargestFitting(kArenaNearestDistance, highest, fitting);
+}
+
+void ArenaCamera::BoundDescent(std::optional<float> reach_cells) noexcept {
+  if (descent_reach_cells_ == reach_cells) return;
+  descent_reach_cells_ = reach_cells;
+  // Le plafond se recherche à la pose suivante, pour son rapport.
+  farthest_aspect_.reset();
 }
 
 ArenaCamera::ArenaCamera(const ro::sim::SpawnFrame& frame) : frame_(frame) {
@@ -155,12 +198,15 @@ const ro::render::Camera& ArenaCamera::Pose(const glm::vec3& hero_ground, std::u
   if (farthest_aspect_ != aspect_ratio) {
     farthest_aspect_ = aspect_ratio;
     farthest_distance_ = ArenaFarthestDistance(aspect_ratio, frame_);
+    descent_ceiling_ = descent_reach_cells_.has_value()
+                           ? ArenaDescentCeiling(aspect_ratio, *descent_reach_cells_)
+                           : kArenaDescentUnbounded;
     SetDistance(wheel_distance_);
   }
   aim_.shake.Undo(camera_);
   // Le recul, l'élévation, le lacet et le champ se reposent entiers à chaque
   // image : rien de la précédente n'y survit, et le lacet reste celui du nord.
-  camera_.distance = ArenaDescentDistance(wheel_distance_, arrival_ms);
+  camera_.distance = ArenaDescentDistance(wheel_distance_, arrival_ms, descent_ceiling_);
   camera_.pitch_degrees = kArenaElevationDegrees;
   camera_.yaw_degrees = kArenaYawDegrees;
   camera_.fov_degrees = ArenaFovDegrees(aspect_ratio);

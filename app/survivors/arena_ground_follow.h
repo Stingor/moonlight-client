@@ -50,6 +50,14 @@ inline constexpr std::int32_t kGroundEdgeMarginCells = 6;
 inline constexpr std::int32_t kGroundForceCells =
     kGroundWindowCells / 2 - kGroundWidestSightCells - kGroundEdgeMarginCells;
 static_assert(kGroundForceCells > kGroundRecentreCells);
+// LA DESCENTE D'ENTRÉE VOIT AU PLUS CECI du héros, de chaque côté
+// (`ArenaCamera::BoundDescent`) : la fenêtre du départ (`GroundWindowAround`)
+// laisse deux morceaux entiers entre le morceau du héros et chaque bord, soit
+// au moins la demi-fenêtre moins un demi-morceau ; la marge reste avant le
+// bord. Le héros ne marche pas pendant la descente.
+inline constexpr std::int32_t kGroundDescentReachCells =
+    (kGroundWindowCells - ro::sim::kTerrainChunkCells) / 2 - kGroundEdgeMarginCells;
+static_assert(kGroundDescentReachCells > kGroundWidestSightCells);
 
 // L'écart du héros (cases continues) au centre de la fenêtre `origin`.
 [[nodiscard]] glm::vec2 GroundOffsetFromCentre(GroundWindowOrigin origin, glm::vec2 hero_cell);

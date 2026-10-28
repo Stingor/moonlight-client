@@ -33,6 +33,11 @@ class SurvivorsBookMode {
   // « Rejouer » le garde.
   void Choose(SurvivorsBoardKind kind) noexcept { kind_ = kind; }
   [[nodiscard]] SurvivorsBoardKind chosen() const noexcept { return kind_; }
+  // L'ARÈNE DE LA PARTIE LIBRE, que l'accueil choisit ; « Rejouer » la garde.
+  // Un Id que `rules` ne connaît pas ne se retient pas. 0 : l'arène par défaut
+  // (`FreeArenaOf`). Le défi et la partie classée ne la lisent pas.
+  void ChooseArena(const ro::sim::SurvivorsRules& rules, std::uint16_t arena_id) noexcept;
+  [[nodiscard]] std::uint16_t free_arena_id() const noexcept { return free_arena_id_; }
   // Les secondes UTC du moment, à l'horloge du mode.
   [[nodiscard]] std::int64_t now_utc() const { return now_utc_(); }
 
@@ -50,10 +55,12 @@ class SurvivorsBookMode {
     return StartAs(kind_, rules, client_root, seed, first_skill_id);
   }
   // Le départ d'un tableau donné, quel que soit le choix de l'accueil : une
-  // partie classée sans jeton repart libre.
+  // partie classée sans jeton repart libre, sur l'arène `free_arena_id` quand
+  // elle est donnée — celle qu'elle demandait —, sinon sur celle de l'accueil.
   [[nodiscard]] Begun StartAs(SurvivorsBoardKind kind, const ro::sim::SurvivorsRules& rules,
                               const std::filesystem::path& client_root, std::uint64_t seed,
-                              std::uint16_t first_skill_id);
+                              std::uint16_t first_skill_id,
+                              std::optional<std::uint16_t> free_arena_id = std::nullopt);
 
   // Une partie neuve commence : elle sera créditée à son tour.
   void Restart() noexcept;
@@ -78,6 +85,7 @@ class SurvivorsBookMode {
   UtcClock now_utc_;
   SurvivorsSaveFile file_;
   SurvivorsBoardKind kind_ = SurvivorsBoardKind::kFree;
+  std::uint16_t free_arena_id_ = 0;
   bool credited_ = false;
   std::optional<SurvivorsCredit> credit_;
   std::optional<std::filesystem::path> damaged_copy_;

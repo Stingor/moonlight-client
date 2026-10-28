@@ -20927,9 +20927,6 @@ tr: Free run: the server does not rank a run started here.
 fr: Partie libre : refusée par le serveur.
 tr: Free run: refused by the server.
 
-fr: Partie libre : le défi et la partie classée se jouent sur une autre arène.
-tr: Free run: the challenge and the ranked run are played in another arena.
-
 fr: Parties classées
 tr: Ranked runs
 
@@ -21490,3 +21487,12 @@ tr: %s: %s, %u s
 
 fr: Effets permanents
 tr: Lasting effects
+
+fr: Arène
+tr: Arena
+
+fr: Arène : %s
+tr: Arena: %s
+
+fr: Prairie de Midgard
+tr: Midgard Plains

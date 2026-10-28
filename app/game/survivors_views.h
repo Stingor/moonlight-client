@@ -16,6 +16,7 @@
 #include "ro/sim/survivors_rules.h"
 #include "ro/ui/survivors_prepare_window.h"
 #include "ro/vfs/job_names.h"
+#include "ro/vfs/map_display_names.h"
 #include "ro/vfs/monster_list.h"
 
 #include "game/survivors_book_mode.h"
@@ -51,6 +52,8 @@ struct SurvivorsTables {
   const ro::vfs::MonsterList* monsters = nullptr;
   const ro::vfs::JobNames* jobs = nullptr;
   ro::render::ActorWardrobe* wardrobe = nullptr;
+  // Les noms des cartes : celui d'une arène qui n'est pas générée.
+  const ro::vfs::MapDisplayNames* map_names = nullptr;
 };
 
 // CE QUE L'IMAGE AJOUTE À L'ÉTAGE pour ses fenêtres.
@@ -226,6 +229,10 @@ class SurvivorsViews {
   SurvivorsCreditRowsHeld credit_rows_;
   std::vector<ro::ui::SurvivorsTrophyRow> trophy_rows_;
   SurvivorsRankingRowsHeld ranking_rows_;
+  // LES ARÈNES DE L'ACCUEIL et leurs noms, que les choix désignent.
+  std::vector<std::string> arena_names_;
+  std::vector<ro::ui::SurvivorsArenaChoice> arena_choices_;
+  std::string board_arena_name_;
   // LE CODEX : ses lignes, et le sprite de l'entrée choisie, sur la
   // garde-robe qui l'a vu naître.
   SurvivorsCodexRowsHeld codex_rows_;

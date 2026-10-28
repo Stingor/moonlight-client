@@ -23,11 +23,17 @@ namespace {
 SurvivorsBookMode::SurvivorsBookMode(UtcClock now_utc, SurvivorsSaveFile file)
     : now_utc_(now_utc ? std::move(now_utc) : UtcClock(SystemUtcSeconds)), file_(std::move(file)) {}
 
+void SurvivorsBookMode::ChooseArena(const ro::sim::SurvivorsRules& rules,
+                                    std::uint16_t arena_id) noexcept {
+  if (ro::sim::FindArena(rules, arena_id) != nullptr) free_arena_id_ = arena_id;
+}
+
 SurvivorsBookMode::Begun SurvivorsBookMode::StartAs(SurvivorsBoardKind kind,
                                                     const ro::sim::SurvivorsRules& rules,
                                                     const std::filesystem::path& client_root,
                                                     std::uint64_t seed,
-                                                    std::uint16_t first_skill_id) {
+                                                    std::uint16_t first_skill_id,
+                                                    std::optional<std::uint16_t> free_arena_id) {
   if (kind == SurvivorsBoardKind::kChallenge) {
     const ro::sim::IsoWeek week = IsoWeekOfUtc(now_utc_());
     return Begun{.start = ChallengeStartOf(rules, week),
@@ -42,7 +48,9 @@ SurvivorsBookMode::Begun SurvivorsBookMode::StartAs(SurvivorsBoardKind kind,
     ro::core::LogWarning("survivors : carnet illisible, la partie part sans la méta");
   }
   if (read.damaged_copy.has_value()) damaged_copy_ = read.damaged_copy;
-  return Begun{.start = FreeStartOf(rules, read.save, seed, first_skill_id), .board = {}};
+  return Begun{.start = FreeStartOf(rules, read.save, seed, first_skill_id,
+                                    free_arena_id.value_or(free_arena_id_)),
+               .board = {}};
 }
 
 void SurvivorsBookMode::Restart() noexcept {

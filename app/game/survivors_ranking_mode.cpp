@@ -195,12 +195,15 @@ SurvivorsBookMode::Begun SurvivorsRankingMode::Launch(SurvivorsBookMode& book,
     launch_ = PendingLaunch{.kind = kind,
                             .start_seed = begun.start.seed,
                             .local_seed = seed,
-                            .first_skill_id = first_skill_id};
+                            .first_skill_id = first_skill_id,
+                            .arena_id = begun.start.arena_id};
     return begun;
   }
-  // Un défi sans jeton reste un défi local ; une partie classée part libre.
+  // Un défi sans jeton reste un défi local ; une partie classée part libre,
+  // sur l'arène du jeton qu'elle demandait.
   if (kind == SurvivorsBoardKind::kRanked) {
-    return book.StartAs(SurvivorsBoardKind::kFree, rules, client_root, seed, first_skill_id);
+    return book.StartAs(SurvivorsBoardKind::kFree, rules, client_root, seed, first_skill_id,
+                        begun.start.arena_id);
   }
   return begun;
 }
@@ -227,7 +230,7 @@ std::optional<SurvivorsBookMode::Begun> SurvivorsRankingMode::Settle(
   }
   if (launch.kind == SurvivorsBoardKind::kRanked) {
     return book.StartAs(SurvivorsBoardKind::kFree, rules, client_root, launch.local_seed,
-                        launch.first_skill_id);
+                        launch.first_skill_id, launch.arena_id);
   }
   return std::nullopt;
 }

@@ -10,7 +10,6 @@
 #include "ro/core/build_flavor.h"
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
-#include "ro/formats/gat.h"
 #include "ro/net/action.h"
 #include "ro/render/attack_sound.h"
 #include "ro/render/skill_sound_table.h"
@@ -22,6 +21,7 @@
 #include "game/survivors_ranking_desk.h"
 #include "options/game_option_ids.h"
 #include "survivors/arena_card_cues.h"
+#include "survivors/arena_choice.h"
 #include "survivors/survivors_book.h"
 #include "survivors/survivors_door.h"
 #include "survivors/survivors_file.h"
@@ -79,21 +79,6 @@ constexpr float kArenaSoundPan = 0.0F;
 [[nodiscard]] bool Sitting(const ro::sim::World& world) {
   const ro::sim::Actor* player = world.player();
   return player != nullptr && player->posture == ro::sim::Posture::kSitting;
-}
-
-// Le sol praticable de l'arène, lu dans l'installation sans monter la carte :
-// la partie naît avant l'arène, derrière l'écran de chargement.
-[[nodiscard]] ro::core::Result<ro::sim::WalkMap> ReadArenaWalkMap(ro::vfs::Vfs& vfs) {
-  const ro::sim::SurvivorsRules& rules = Rules();
-  if (rules.arenas.empty()) {
-    return ro::core::Fail(ro::core::ErrorCode::kNotFound, "aucune arène dans les règles");
-  }
-  auto bytes =
-      vfs.Read(vfs.res_names().MapFilePath(std::string(rules.arenas.front().map_name) + ".gat"));
-  if (!bytes) return std::unexpected(bytes.error());
-  auto gat = ro::formats::GatMap::Parse(*bytes);
-  if (!gat) return std::unexpected(gat.error());
-  return ro::sim::WalkMap::FromGat(*gat);
 }
 
 [[nodiscard]] std::optional<ro::sim::SurvivorsAnswer> AnswerOf(
@@ -203,35 +188,21 @@ void SurvivorsMode::Enter(SurvivorsStage& stage, const SurvivorsContext& context
     ro::core::LogWarning("survivors : ni archives ni garde-robe, la partie ne commence pas");
     return;
   }
-  auto walk = arena_.has_value() ? arena_->WalkMapOf() : ReadArenaWalkMap(*context.vfs);
-  if (!walk) {
-    context.say(ro::core::Tr("L'arène des Survivants de Midgard ne peut pas se monter."));
-    ro::core::LogWarning("survivors : sol de l'arène illisible — {}",
-                         ro::core::Describe(walk.error()));
-    return;
-  }
   std::random_device entropy;
   const std::uint64_t seed = (std::uint64_t{entropy()} << 32U) | entropy();
   // UNE PARTIE CLASSÉE OU UN DÉFI DEMANDE SON JETON (Q2, Q3) : l'écran de
   // chargement couvre l'attente, et `Frame` refait le départ qu'elle règle.
-  // Sur une arène hors classement, elle part libre, sans jeton.
-  const bool board_mountable = MountableBoard(Rules(), book_.chosen()) == book_.chosen();
-  if (!board_mountable) {
-    context.say(
-        ro::core::Tr("Partie libre : le défi et la partie classée se jouent sur une autre arène."));
-  }
+  // L'arène vient du départ : la prairie pour le défi et la partie classée,
+  // celle de l'accueil pour la partie libre.
   const SurvivorsBookMode::Begun book_start =
-      !board_mountable ? book_.StartAs(SurvivorsBoardKind::kFree, Rules(), context.client_root,
-                                       seed, first_skill_id)
-      : context.ranking != nullptr
+      context.ranking != nullptr
           ? context.ranking->Launch(book_, Rules(), context.client_root, seed, first_skill_id)
       : book_.chosen() == SurvivorsBoardKind::kRanked
           ? book_.StartAs(SurvivorsBoardKind::kFree, Rules(), context.client_root, seed,
                           first_skill_id)
           : book_.StartOf(Rules(), context.client_root, seed, first_skill_id);
   TellDamagedCopy(book_.TakeDamagedCopy(), context.say);
-  if (auto begun = stage.Begin(Rules(), std::move(*walk), book_start.start, book_start.board);
-      !begun) {
+  if (auto begun = BeginRun(stage, context, book_start); !begun) {
     context.say(ro::core::Tr("L'arène des Survivants de Midgard ne peut pas se monter."));
     ro::core::LogWarning("survivors : la partie refuse de commencer — {}",
                          ro::core::Describe(begun.error()));
@@ -258,11 +229,36 @@ void SurvivorsMode::Enter(SurvivorsStage& stage, const SurvivorsContext& context
   clock_.Follow(false, context.now_ms);
 }
 
+ro::core::Result<void> SurvivorsMode::BeginRun(SurvivorsStage& stage,
+                                               const SurvivorsContext& context,
+                                               const SurvivorsBookMode::Begun& begun) {
+  const ro::sim::ArenaRule* arena = ro::sim::FindArena(Rules(), begun.start.arena_id);
+  if (arena == nullptr) {
+    return ro::core::Fail(ro::core::ErrorCode::kInvalidArgument, "arène du départ inconnue");
+  }
+  // LE SOL DE L'ARÈNE CHOISIE, lu sans monter la scène : la partie naît avant
+  // l'arène, derrière l'écran de chargement — sans installation sur le sol
+  // généré.
+  auto walk = ArenaWalkOf(context.vfs, *arena);
+  if (!walk) return std::unexpected(walk.error());
+  return stage.Begin(Rules(), std::move(*walk), begun.start, begun.board);
+}
+
+bool SurvivorsMode::ArenaShown(const SurvivorsStage& stage) const {
+  return arena_.has_value() && stage.play() != nullptr &&
+         arena_->Shows(stage.play()->run().field().start);
+}
+
 bool SurvivorsMode::Mount(SurvivorsStage& stage, const SurvivorsContext& context) {
   const ro::sim::SurvivorsRules& rules = Rules();
-  if (!arena_.has_value()) {
-    arena_.emplace(*context.vfs, *context.wardrobe, rules);
-    if (auto opened = arena_->Open(*context.vfs, rules.arenas.front()); !opened) {
+  const ro::sim::SurvivorsStart& start = stage.play()->run().field().start;
+  // UNE ARÈNE GARDÉE POUR « REJOUER » repart telle quelle ; une autre arène, ou
+  // le sol généré sous une autre graine, se remonte.
+  if (!ArenaShown(stage)) {
+    if (!arena_.has_value()) arena_.emplace(*context.vfs, *context.wardrobe, rules);
+    const MapStageRead read{.rounded_ground =
+                                context.graphics != nullptr && context.graphics->rounded_ground()};
+    if (auto opened = arena_->Open(*context.vfs, rules, start, read); !opened) {
       ro::core::LogWarning("survivors : {}", ro::core::Describe(opened.error()));
       context.say(ro::core::Tr("L'arène des Survivants de Midgard ne peut pas se monter."));
       arena_.reset();
@@ -289,10 +285,12 @@ bool SurvivorsMode::Mount(SurvivorsStage& stage, const SurvivorsContext& context
                                      static_cast<float>(field.hero.position.y))),
                context.width, context.height, context.now_ms);
   stage.Loaded();
-  sign_.Enter(context.map_names != nullptr
-                  ? context.map_names->SignOf(MapSignFileOf(rules.arenas.front().map_name))
-                  : nullptr,
-              context.sign_mode, context.now_ms);
+  // LE BANDEAU DE L'ARÈNE pendant la descente : son nom, du catalogue du sol
+  // généré ou de la table des cartes.
+  const ro::sim::ArenaRule* arena = ro::sim::FindArena(rules, start.arena_id);
+  const std::optional<ro::vfs::MapSign> sign =
+      arena != nullptr ? ArenaSignOf(rules, *arena, context.map_names) : std::nullopt;
+  sign_.Enter(sign.has_value() ? &*sign : nullptr, context.sign_mode, context.now_ms);
   music_.Reset();
   music_volume_.Forget();
   sounds_.Clear();
@@ -307,10 +305,7 @@ bool SurvivorsMode::Resettle(SurvivorsStage& stage, const SurvivorsContext& cont
   const std::optional<SurvivorsBookMode::Begun> again =
       context.ranking->Settle(book_, Rules(), context.client_root);
   if (!again.has_value()) return true;
-  auto walk = arena_.has_value() ? arena_->WalkMapOf() : ReadArenaWalkMap(*context.vfs);
-  ro::core::Result<void> begun =
-      walk.has_value() ? stage.Begin(Rules(), std::move(*walk), again->start, again->board)
-                       : ro::core::Result<void>(std::unexpected(walk.error()));
+  const ro::core::Result<void> begun = BeginRun(stage, context, *again);
   if (begun) return true;
   ro::core::LogWarning("survivors : le départ réglé par le classement ne commence pas — {}",
                        ro::core::Describe(begun.error()));
@@ -439,7 +434,7 @@ SurvivorsPainted SurvivorsMode::Frame(SurvivorsStage& stage, const SurvivorsCont
     // L'ÉCRAN DE CHARGEMENT D'ABORD, présenté une fois, quand l'arène est à
     // monter : le montage, synchrone, fige l'image suivante derrière lui. Une
     // arène gardée pour « Rejouer » repart sans lui.
-    if (!arena_.has_value() && !loading_shown_) {
+    if (!ArenaShown(stage) && !loading_shown_) {
       loading_shown_ = true;
       loading_now_ = true;
       return SurvivorsPainted{.loading = true};
@@ -696,11 +691,12 @@ void SurvivorsMode::FollowMusic(const SurvivorsStage& stage, const SurvivorsCont
     music_muted_ = false;
     music_.Reset();
   }
-  const ArenaMusicCue cue =
-      music_.Advance(ArenaMusicFacts{.presentation_ms = stage.presentation_ms(),
-                                     .paused = SurvivorsMusicPaused(stage.screen()),
-                                     .player_track = context.music->chosen(),
-                                     .music_volume = music_volume_.player_volume()});
+  const ArenaMusicCue cue = music_.Advance(
+      ArenaMusicFacts{.presentation_ms = stage.presentation_ms(),
+                      .paused = SurvivorsMusicPaused(stage.screen()),
+                      .field_track = arena_.has_value() ? arena_->field_track() : kArenaFieldTrack,
+                      .player_track = context.music->chosen(),
+                      .music_volume = music_volume_.player_volume()});
   if (!cue.start_track.empty()) context.music->PlayForMode(audio, cue.start_track);
   if (const std::optional<float> posed = music_volume_.Pose(cue.volume)) {
     audio.SetMusicVolume(*posed);

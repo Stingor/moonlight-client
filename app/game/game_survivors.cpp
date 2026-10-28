@@ -148,7 +148,9 @@ void Game::FrameSurvivors(std::uint32_t now_ms) {
               .item_icons = pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr,
               .monsters = &pieces_.monster_list,
               .jobs = &pieces_.job_names,
-              .wardrobe = pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr},
+              .wardrobe = pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr,
+              .map_names =
+                  pieces_.map_display_names.has_value() ? &*pieces_.map_display_names : nullptr},
       .map_names = pieces_.map_display_names.has_value() ? &*pieces_.map_display_names : nullptr,
       .images = pieces_.game_images.has_value() ? &*pieces_.game_images : nullptr,
       .sign_mode = settings_->options().pages().map_sign.mode(),

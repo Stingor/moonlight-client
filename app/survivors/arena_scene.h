@@ -93,7 +93,9 @@ class ArenaScene : private LitLayers {
   // LA CARTE OU LE SOL GÉNÉRÉ : quand `arena` nomme un terrain de `rules`, les
   // ressources de son biome se lisent une fois et la fenêtre de 160 × 160 cases
   // se bâtit autour du départ, sous la graine `run_seed` (ADR 0134) ; sinon la
-  // carte de `arena`, comme ci-dessus.
+  // carte de `arena`, comme ci-dessus. LE MÊME TERRAIN SOUS UNE AUTRE GRAINE
+  // (la partie suivante, « Rejouer ») garde les ressources déjà lues : seule la
+  // fenêtre du départ se rebâtit.
   //
   // ⚠ ÉCHOUE EN LE DISANT si le terrain n'a pas d'aspect dans le catalogue
   // d'app, ou si l'installation n'a pas sa carte de référence.
@@ -186,6 +188,11 @@ class ArenaScene : private LitLayers {
   // Monte la fenêtre préparée, de coin `prepared_origin_`, à la place de la
   // montrée.
   [[nodiscard]] ro::core::Result<GroundRecentre> MountPrepared();
+  // Bâtit et monte la première fenêtre du sol de `ground_`, en `origin`, et
+  // arme son suivi.
+  [[nodiscard]] ro::core::Result<void> MountGround(ro::vfs::Vfs& vfs, GroundWindowOrigin origin,
+                                                   std::string name, const MapStageRead& read,
+                                                   GroundBuildThread thread);
 
   LitStage lit_;
   // Le sol généré : ses ressources, lues une fois, et la fenêtre montée.

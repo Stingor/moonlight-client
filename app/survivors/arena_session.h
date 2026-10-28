@@ -5,6 +5,7 @@
 #include <optional>
 #include <span>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include <glm/glm.hpp>
@@ -23,6 +24,7 @@
 #include "options/graphics_options.h"
 #include "survivors/arena_camera.h"
 #include "survivors/arena_effects.h"
+#include "survivors/arena_music.h"
 #include "survivors/arena_numbers.h"
 #include "survivors/arena_scene.h"
 #include "survivors/horde_composer.h"
@@ -69,11 +71,26 @@ class ArenaSession {
   ArenaSession& operator=(ArenaSession&&) = delete;
   ~ArenaSession() = default;
 
-  // Charge la carte de l'arène. Les chiffres qui manquent se disent au journal
-  // et la partie se joue sans eux ; la carte qui manque refuse la partie.
-  [[nodiscard]] ro::core::Result<void> Open(ro::vfs::Vfs& vfs, const ro::sim::ArenaRule& arena);
-  // Le sol praticable de l'arène, pour la simulation.
-  [[nodiscard]] ro::core::Result<ro::sim::WalkMap> WalkMapOf() const;
+  // MONTE L'ARÈNE DU DÉPART `start` : sa carte, ou la fenêtre de son sol généré
+  // autour du départ, sous la graine du départ (`ArenaScene::Open`). Les
+  // chiffres qui manquent se disent au journal et la partie se joue sans eux ;
+  // la carte ou le sol qui ne se montent pas refusent la partie. Une arène
+  // déjà montée se remonte : le même terrain garde ses ressources.
+  //
+  // 🔴 SUR LE SOL GÉNÉRÉ, LA DESCENTE D'ENTRÉE EST BORNÉE à la fenêtre du départ
+  // (`kGroundDescentReachCells`) : son bord n'entre jamais dans l'image.
+  // `read` : le sol arrondi d'emblée quand le réglage le veut, derrière l'écran
+  // de chargement plutôt qu'à la première image.
+  [[nodiscard]] ro::core::Result<void> Open(ro::vfs::Vfs& vfs, const ro::sim::SurvivorsRules& rules,
+                                            const ro::sim::SurvivorsStart& start,
+                                            const MapStageRead& read = {});
+  // Vrai quand l'arène montée est celle du départ `start` : la même arène, et
+  // sur un sol généré la même graine ET la fenêtre du départ, que la partie
+  // précédente a pu faire suivre au loin. « Rejouer » une carte la garde ; une
+  // partie neuve sur le sol généré le remonte, ressources gardées.
+  [[nodiscard]] bool Shows(const ro::sim::SurvivorsStart& start) const noexcept;
+  // La musique des champs de l'arène montée : voir `ArenaFieldTrackOf`.
+  [[nodiscard]] std::string_view field_track() const noexcept { return field_track_; }
 
   // Une partie neuve : rien de vu, aucun effet ni chiffre de la précédente,
   // la caméra repart du héros.
@@ -147,6 +164,13 @@ class ArenaSession {
   double effects_ms_ = 0.0;
   std::size_t recentres_ = 0;
   double most_mount_ms_ = 0.0;
+  // L'arène montée et la graine de son sol ; rien avant la première.
+  std::optional<std::uint16_t> arena_id_;
+  std::uint64_t run_seed_ = 0;
+  bool generated_ = false;
+  // Le coin de la fenêtre montée au départ.
+  GroundWindowOrigin start_origin_;
+  std::string_view field_track_ = kArenaFieldTrack;
 };
 
 }  // namespace moonclient

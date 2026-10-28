@@ -31,6 +31,10 @@ namespace ro::ui {
 // 🔴 Sans `ranking`, AUCUN de ces éléments ne paraît : pas de « hors ligne »
 // pour le joueur d'un serveur qui ne classe pas.
 //
+// L'ARÈNE (Q6, Q7) : la partie libre choisit la sienne parmi celles que `app`
+// propose ; le défi et la partie classée nomment celle où ils se jouent, sans
+// choix. Une seule arène proposée se nomme sans choix elle aussi.
+//
 // Touches, fenêtre au premier plan : Tab change d'onglet, Entrée part.
 
 // Un bolt proposé, déjà résolu par `app`.
@@ -42,6 +46,12 @@ struct SurvivorsBoltChoice {
 };
 
 enum class SurvivorsBoardTab : std::uint8_t { kFree, kChallenge, kRanked };
+
+// Une arène de la partie libre, déjà nommée par `app`.
+struct SurvivorsArenaChoice {
+  std::uint16_t arena_id = 0;
+  const char* name = "";  // ⚠ EN UTF-8, déjà dans la langue du joueur
+};
 // Les lieux de la méta qu'ouvre l'accueil.
 enum class SurvivorsMetaPlace : std::uint8_t { kChurch, kKafra, kCodex, kRecords };
 
@@ -80,6 +90,12 @@ struct SurvivorsPrepareMeta {
   SurvivorsBoltChoice challenge_bolt;
   std::optional<std::uint64_t> week_best_score;
   std::optional<SurvivorsPrepareRanking> ranking;
+  // Les arènes de la partie libre, la retenue, et celle du défi et de la
+  // partie classée (en UTF-8, déjà dans la langue du joueur ; vide, elle ne se
+  // nomme pas).
+  std::span<const SurvivorsArenaChoice> free_arenas;
+  std::uint16_t free_arena_id = 0;
+  const char* board_arena_name = "";
 };
 
 struct SurvivorsPrepareView {
@@ -103,6 +119,8 @@ struct SurvivorsPrepareState {
 struct SurvivorsPrepareAsk {
   std::optional<std::uint16_t> choose_skill_id;
   std::optional<SurvivorsBoardTab> choose_board;
+  // L'arène de la partie libre ; le défi et la partie classée n'en choisissent pas.
+  std::optional<std::uint16_t> choose_arena_id;
   std::optional<int> choose_cursed_water;
   std::optional<SurvivorsMetaPlace> open_place;
   bool open_ranking = false;  // le classement mondial

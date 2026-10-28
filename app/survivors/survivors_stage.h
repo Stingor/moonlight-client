@@ -106,13 +106,16 @@ class SurvivorsStage {
   // départ qui attend son jeton derrière l'écran de chargement s'y refait sur
   // la graine du serveur, ou en partie libre. kInvalidArgument ailleurs ; les
   // refus de SurvivorsRun::Start tels quels, l'étage restant où il était. La
-  // fin de la partie porte son tableau.
+  // fin de la partie porte son tableau. `arena` : la carte de l'arène du
+  // départ, ou rien pour une arène générée, dont le sol naît de son terrain
+  // sous la graine du départ (`ArenaWalkOf`).
   [[nodiscard]] ro::core::Result<void> Begin(const ro::sim::SurvivorsRules& rules,
-                                             ro::sim::WalkMap arena,
+                                             std::optional<ro::sim::WalkMap> arena,
                                              const ro::sim::SurvivorsStart& start,
                                              const SurvivorsRunBoard& board = {});
   // La partie garde l'adresse de ses règles.
-  ro::core::Result<void> Begin(const ro::sim::SurvivorsRules&& rules, ro::sim::WalkMap arena,
+  ro::core::Result<void> Begin(const ro::sim::SurvivorsRules&& rules,
+                               std::optional<ro::sim::WalkMap> arena,
                                const ro::sim::SurvivorsStart& start,
                                const SurvivorsRunBoard& board = {}) = delete;
   // L'arène est montée : kLoading → kArriving.

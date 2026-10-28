@@ -59,14 +59,22 @@ ro::core::Result<void> ArenaScene::Open(ro::vfs::Vfs& vfs, const ro::sim::Surviv
     return ro::core::Fail(ro::core::ErrorCode::kInvalidArgument,
                           "arène " + std::string(arena.key) + " : terrain sans aspect");
   }
+  const GroundWindowOrigin origin =
+      GroundWindowAround(ro::sim::kTerrainStartCell, ro::sim::kTerrainStartCell);
+  // 🔴 LE SUIVI S'ARRÊTE AVANT QUE LA GRAINE NE CHANGE : ses fils lisent les
+  // ressources, et une fenêtre bâtie sous l'ancienne graine ne doit pas se
+  // monter.
+  if (ground_ != nullptr && ground_->rule == rule && ground_->look == look) {
+    follow_.reset();
+    ground_->run_seed = run_seed;
+    return MountGround(vfs, origin, std::string(arena.key), read, GroundBuildThread::kWorker);
+  }
   auto sources = OpenGroundSources(vfs, *rule, run_seed, *look, read.progress);
   if (!sources) {
     return ro::core::Fail(sources.error().code, "arène " + std::string(arena.key) + " : " +
                                                     ro::core::Describe(sources.error()));
   }
-  return OpenGround(vfs, std::move(*sources),
-                    GroundWindowAround(ro::sim::kTerrainStartCell, ro::sim::kTerrainStartCell),
-                    std::string(arena.key), read);
+  return OpenGround(vfs, std::move(*sources), origin, std::string(arena.key), read);
 }
 
 ro::core::Result<void> ArenaScene::OpenGround(ro::vfs::Vfs& vfs, GroundSources sources,
@@ -74,6 +82,12 @@ ro::core::Result<void> ArenaScene::OpenGround(ro::vfs::Vfs& vfs, GroundSources s
                                               const MapStageRead& read, GroundBuildThread thread) {
   follow_.reset();
   ground_ = std::make_unique<GroundSources>(std::move(sources));
+  return MountGround(vfs, origin, std::move(name), read, thread);
+}
+
+ro::core::Result<void> ArenaScene::MountGround(ro::vfs::Vfs& vfs, GroundWindowOrigin origin,
+                                               std::string name, const MapStageRead& read,
+                                               GroundBuildThread thread) {
   vfs_ = &vfs;
   origin_ = origin;
   ground_subdivisions_ = read.rounded_ground ? ro::render::kRoundedGroundSubdivisions

@@ -37,7 +37,7 @@ struct SurvivorsFrameView {
   // L'Église ouverte par-dessus l'écran de fin.
   const ro::ui::SurvivorsShopView* church = nullptr;
   ro::ui::SurvivorsShopState* church_state = nullptr;
-  // Le bandeau « Prontera Field » pendant la descente.
+  // Le bandeau du nom de l'arène pendant la descente.
   const ro::ui::MapSignView* map_sign = nullptr;
   // Le tableau mondial ouvert par-dessus l'écran de fin d'une partie classée.
   const ro::ui::SurvivorsRankingView* ranking = nullptr;

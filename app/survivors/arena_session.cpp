@@ -6,8 +6,12 @@
 #include <cstdint>
 #include <limits>
 #include <optional>
+#include <string>
 
 #include "ro/core/log.h"
+
+#include "survivors/arena_choice.h"
+#include "survivors/arena_ground_follow.h"
 
 namespace moonclient {
 namespace {
@@ -28,20 +32,37 @@ ArenaSession::ArenaSession(ro::vfs::Vfs& vfs, ro::render::ActorWardrobe& wardrob
                            const ro::sim::SurvivorsRules& rules)
     : composer_(wardrobe), effects_(vfs, wardrobe.catalog(), rules), camera_(rules.spawn_frame) {}
 
-ro::core::Result<void> ArenaSession::Open(ro::vfs::Vfs& vfs, const ro::sim::ArenaRule& arena) {
-  if (auto opened = scene_.Open(vfs, arena); !opened) return opened;
-  effects_.Open(scene_.stage());
+ro::core::Result<void> ArenaSession::Open(ro::vfs::Vfs& vfs, const ro::sim::SurvivorsRules& rules,
+                                          const ro::sim::SurvivorsStart& start,
+                                          const MapStageRead& read) {
+  arena_id_.reset();
+  const ro::sim::ArenaRule* arena = ro::sim::FindArena(rules, start.arena_id);
+  if (arena == nullptr) {
+    return ro::core::Fail(ro::core::ErrorCode::kInvalidArgument,
+                          "arène " + std::to_string(start.arena_id) + " inconnue des règles");
+  }
+  if (auto opened = scene_.Open(vfs, rules, *arena, start.seed, read); !opened) return opened;
+  const GroundWindowOrigin origin = scene_.window_origin();
+  effects_.Open(scene_.stage(), glm::ivec2(origin.x_cells, origin.y_cells));
   if (auto digits = numbers_.Open(vfs); !digits) {
     ro::core::LogWarning("arène : chiffres absents — {}", ro::core::Describe(digits.error()));
   }
+  generated_ = scene_.ground_sources() != nullptr;
+  camera_.BoundDescent(generated_
+                           ? std::optional<float>(static_cast<float>(kGroundDescentReachCells))
+                           : std::nullopt);
+  field_track_ = ArenaFieldTrackOf(rules, *arena);
+  arena_id_ = arena->arena_id;
+  run_seed_ = start.seed;
+  start_origin_ = origin;
+  recentres_ = 0;
+  most_mount_ms_ = 0.0;
   return {};
 }
 
-ro::core::Result<ro::sim::WalkMap> ArenaSession::WalkMapOf() const {
-  if (!scene_.ready() || !scene_.stage().gat.has_value()) {
-    return ro::core::Fail(ro::core::ErrorCode::kNotFound, "arène : la carte n'a pas de sol");
-  }
-  return ro::sim::WalkMap::FromGat(*scene_.stage().gat);
+bool ArenaSession::Shows(const ro::sim::SurvivorsStart& start) const noexcept {
+  return arena_id_ == start.arena_id &&
+         (!generated_ || (run_seed_ == start.seed && scene_.window_origin() == start_origin_));
 }
 
 void ArenaSession::Restart() {

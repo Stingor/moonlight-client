@@ -6,14 +6,15 @@
 
 namespace moonclient {
 
-std::string_view ArenaTrackAt(std::uint64_t presentation_ms) noexcept {
+std::string_view ArenaTrackAt(std::uint64_t presentation_ms,
+                              std::string_view field_track) noexcept {
   if (presentation_ms >= kArenaBossFromMs) {
     return kArenaBossTrack;
   }
   if (presentation_ms >= kArenaGlastHeimFromMs) {
     return kArenaGlastHeimTrack;
   }
-  return kArenaFieldTrack;
+  return field_track;
 }
 
 ArenaMusicCue ArenaMusic::Advance(const ArenaMusicFacts& facts) noexcept {
@@ -25,7 +26,7 @@ ArenaMusicCue ArenaMusic::Advance(const ArenaMusicFacts& facts) noexcept {
     cued_ = {};
     return cue;
   }
-  const std::string_view wanted = ArenaTrackAt(facts.presentation_ms);
+  const std::string_view wanted = ArenaTrackAt(facts.presentation_ms, facts.field_track);
   if (wanted != cued_) {
     cued_ = wanted;
     cue.start_track = wanted;
