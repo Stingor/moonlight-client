@@ -224,6 +224,25 @@ struct Push {
   return chosen;
 }
 
+// La plus proche plante visible (dans le cadre d'apparition), la première
+// posée à égalité, quand les plantes naissent au fil des tués : rare et à
+// l'écran, elle se va chercher comme un objet. Posées par blocs, elles
+// abondent, et seules celles à portée de gemme se ramassent en passant.
+[[nodiscard]] const SurvivorsPlant* NearestVisiblePlant(const SurvivorsField& field) {
+  if (field.rules->tuning.plant_kills_per_minute == 0) return nullptr;
+  const SurvivorsPlant* chosen = nullptr;
+  std::int64_t nearest = std::numeric_limits<std::int64_t>::max();
+  for (const SurvivorsPlant& plant : field.plants) {
+    if (!InsideSpawnFrame(field.rules->spawn_frame, field.hero.position, plant.position)) continue;
+    const std::int64_t distance = DistanceSquared(plant.position, field.hero.position);
+    if (distance < nearest) {
+      nearest = distance;
+      chosen = &plant;
+    }
+  }
+  return chosen;
+}
+
 [[nodiscard]] bool BelowPct(const SurvivorsHero& hero, std::int32_t pct) noexcept {
   return std::int64_t{hero.hp} * kPercent < std::int64_t{pct} * hero.max_hp;
 }
@@ -305,8 +324,9 @@ SurvivorsInput SurvivorsBot::Steer(const SurvivorsField& field) {
   sum.y += edge.y;
 
   // LE DÉSIR, sans monstre à portée de panique : le coffre visible, la
-  // Meat sous le seuil, l'objet visible le plus proche, puis la gemme ou la
-  // plante la plus proche à portée dont le segment ne croise aucun monstre.
+  // Meat sous le seuil, l'objet visible le plus proche, la plante visible la
+  // plus proche, puis la gemme ou la plante la plus proche à portée dont le
+  // segment ne croise aucun monstre.
   std::optional<FieldPoint> goal;
   if (!panicked) {
     constexpr PickupKind kChest = PickupKind::kChest;
@@ -316,8 +336,11 @@ SurvivorsInput SurvivorsBot::Steer(const SurvivorsField& field) {
       wanted = NearestPickup(field, &kMeat);
     }
     if (wanted == nullptr) wanted = NearestPickup(field, nullptr);
+    const SurvivorsPlant* plant = wanted == nullptr ? NearestVisiblePlant(field) : nullptr;
     if (wanted != nullptr) {
       goal = wanted->position;
+    } else if (plant != nullptr) {
+      goal = plant->position;
     } else {
       goal = NearestClearGem(field, near_foes_, reach);
     }

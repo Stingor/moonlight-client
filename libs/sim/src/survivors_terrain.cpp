@@ -15,9 +15,8 @@ namespace {
 
 // Les sels des mélanges, en ASCII : « SURVTERR » pour la graine d'un morceau,
 // « SURVDENS » pour les nœuds de densité, « SURVMARK » pour le morceau à
-// repère de chaque carré, « SURVPLNT » pour les plantes d'un morceau.
+// repère de chaque carré.
 constexpr std::uint64_t kTerrainSalt = 0x5355'5256'5445'5252ULL;
-constexpr std::uint64_t kPlantSalt = 0x5355'5256'504C'4E54ULL;
 constexpr std::uint64_t kDensitySalt = 0x5355'5256'4445'4E53ULL;
 constexpr std::uint64_t kLandmarkSalt = 0x5355'5256'4D41'524BULL;
 // « SURVPATH » pour les carrefours, « SURVBEND » pour les coudes des chemins.
@@ -162,7 +161,8 @@ struct Draw {
 }
 
 // Pose une pièce tirée, coin de l'emplacement en coordonnées locales du morceau.
-// Une pièce ordinaire qui toucherait un chemin ne se pose pas.
+// Une pièce ordinaire qui toucherait un chemin ne se pose pas ; une pièce
+// franchissable se pose sans bloquer de case.
 void Place(TerrainChunk& chunk, std::span<const TerrainPieceRule> pieces, const Draw& draw,
            std::int32_t slot_east, std::int32_t slot_north) {
   if (draw.piece_index >= pieces.size() || !draw.corner.fits) return;
@@ -171,9 +171,9 @@ void Place(TerrainChunk& chunk, std::span<const TerrainPieceRule> pieces, const 
   const std::int32_t west = slot_east + draw.corner.east;
   const std::int32_t south = slot_north + draw.corner.north;
   if (!piece.landmark && TouchesPath(chunk, west, south, size)) return;
-  for (std::int32_t north = 0; north < size.height; ++north) {
+  for (std::int32_t north = 0; north < size.height && !piece.walkable; ++north) {
     for (std::int32_t east = 0; east < size.width; ++east) {
-      if (!FootprintBlocks(piece, draw.quarter, east, north)) continue;
+      if (!FootprintCovers(piece, draw.quarter, east, north)) continue;
       const std::size_t cell = LocalCell(west + east, south + north);
       chunk.passable[cell] = 0U;
       chunk.path[cell] = 0U;
@@ -528,7 +528,7 @@ FootprintSize FootprintSizeOf(const TerrainPieceRule& piece, std::uint8_t quarte
   return FootprintSize{.width = width, .height = height};
 }
 
-bool FootprintBlocks(const TerrainPieceRule& piece, std::uint8_t quarter, std::int32_t east,
+bool FootprintCovers(const TerrainPieceRule& piece, std::uint8_t quarter, std::int32_t east,
                      std::int32_t north) noexcept {
   const FootprintSize drawn = FootprintSizeOf(piece, 0);
   // La case du dessin d'origine (colonne, rangée depuis le sud) qui vient en
@@ -564,11 +564,6 @@ std::int32_t TerrainChunkOf(std::int32_t cell) noexcept {
 std::uint64_t TerrainChunkSeed(std::uint64_t run_seed, std::int32_t chunk_x,
                                std::int32_t chunk_y) noexcept {
   return Mix(run_seed, kTerrainSalt, chunk_x, chunk_y);
-}
-
-std::uint64_t TerrainPlantSeed(std::uint64_t run_seed, std::int32_t chunk_x,
-                               std::int32_t chunk_y) noexcept {
-  return Mix(run_seed, kPlantSalt, chunk_x, chunk_y);
 }
 
 std::uint32_t TerrainDensityPerMille(const TerrainRule& rule, std::uint64_t run_seed,

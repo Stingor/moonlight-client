@@ -25,11 +25,10 @@ constexpr std::array<GroundModelChoice, 2> kTrees{{
      .centre_east_cells = 0.16F,
      .centre_north_cells = -0.39F},
 }};
-// La pierre penchée de `바위02`, jusqu'à la tête du héros, est centrée sur son
-// pivot : son pied à l'ouest, son haut à l'est.
-constexpr std::array<GroundModelChoice, 2> kRocks{{
-    {.model = "나무잡초꽃\\바위01.rsm", .scale = 0.6F, .weight = 3, .shade_cells = 1.2F},
-    {.model = "나무잡초꽃\\바위02.rsm", .scale = 0.6F, .weight = 1, .shade_cells = 1.2F},
+// Un rocher : la pierre ronde de `바위01`, seule ; la pierre penchée de
+// `바위02` ne se pose pas sur la prairie.
+constexpr std::array<GroundModelChoice, 1> kRocks{{
+    {.model = "나무잡초꽃\\바위01.rsm", .scale = 0.6F, .weight = 1, .shade_cells = 1.2F},
 }};
 constexpr std::array<GroundModelChoice, 2> kBushes{{
     {.model = "나무잡초꽃\\덤불01.rsm", .scale = 0.25F, .weight = 1, .shade_cells = 1.0F},
@@ -71,7 +70,7 @@ constexpr std::array<PieceModelSlot, 3> kGroveSlots{{
     {.east_cells = 1.0F, .north_cells = 1.0F, .models = kTrees},
     {.east_cells = 3.0F, .north_cells = 1.0F, .models = kTrees},
 }};
-// Le massif de 4 × 3 : deux buissons serrés.
+// Le fourré de 4 × 3 : deux buissons serrés, franchissables.
 constexpr std::array<PieceModelSlot, 2> kThicketSlots{{
     {.east_cells = 1.5F, .north_cells = 1.5F, .models = kBushes},
     {.east_cells = 2.5F, .north_cells = 1.5F, .models = kBushes},

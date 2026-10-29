@@ -245,6 +245,23 @@ struct SurvivorsCaps {
   std::uint16_t most_hazards = kDefaultMostHazards;
   std::uint16_t most_pickups = kDefaultMostPickups;  // les coffres passent hors plafond
 };
+// LES CAPS DES PLANTES DU DÉPART, dans l'ordre de leur pose, en pas d'une
+// case vers l'est et vers le nord : est, ouest, nord, sud, puis nord-est,
+// sud-ouest, nord-ouest, sud-est.
+struct PlantStartHeading {
+  std::int8_t east = 0;
+  std::int8_t north = 0;
+};
+inline constexpr std::array<PlantStartHeading, 8> kPlantStartHeadings{{
+    {.east = 1, .north = 0},
+    {.east = -1, .north = 0},
+    {.east = 0, .north = 1},
+    {.east = 0, .north = -1},
+    {.east = 1, .north = 1},
+    {.east = -1, .north = -1},
+    {.east = -1, .north = 1},
+    {.east = 1, .north = -1},
+}};
 struct SurvivorsTuning {
   std::int32_t foe_walk_scale_pct = 0;
   std::int32_t foe_hp_growth_pct_per_minute = 0;
@@ -271,15 +288,26 @@ struct SurvivorsTuning {
   std::int32_t most_cooldown_pct = 0;
   std::int32_t boss_hp_growth_pct_per_minute = 0;
   std::int32_t boss_walk_scale_pct = 0;
-  std::int32_t knock_units_per_step = 0;    // vitesse d'un recul
+  std::int32_t knock_units_per_step = 0;  // vitesse d'un recul
+  // LES PLANTES SE POSENT D'UNE DE DEUX FAÇONS, exclusives :
+  // - par blocs, au départ, sur toute une carte (`plant_block_cells` et
+  //   `plant_cells_per_plant` non nuls, `plant_kills_per_minute` nul) ;
+  // - au fil des tués (`plant_kills_per_minute` non nul, les deux réglages de
+  //   blocs nuls) : `plant_start_count` plantes autour du départ, puis une
+  //   plante juste hors du cadre d'apparition chaque fois que les tués depuis
+  //   la précédente atteignent `plant_kills_per_minute` × la minute en cours
+  //   (1 de 0:00 à 0:59, 2 de 1:00 à 1:59…), au plus `most_live_plants` en vie.
   std::int32_t plant_block_cells = 0;       // côté d'un bloc qui porte au plus une plante
   std::uint32_t plant_cells_per_plant = 0;  // cases praticables d'un bloc par plante
-  // Sur un sol généré, un morceau S'ÉVEILLE, et pose ses plantes, quand il
-  // touche le carré de ce demi-côté autour du héros ; 0 : aucune plante.
-  std::int32_t plant_wake_cells = 0;
-  // Sur un sol généré, une plante plus loin du héros que cette distance de
-  // Tchebychev SE PERD ; 0 : aucune ne se perd, ce qui n'est permis que sans
-  // éveil (la liste des plantes resterait sans borne).
+  std::uint32_t plant_kills_per_minute = 0;
+  std::uint8_t plant_start_count = 0;
+  // La distance, en cases, entre le héros et les plantes du départ, sur les
+  // caps de kPlantStartHeadings.
+  std::int32_t plant_start_cells = 0;
+  std::uint8_t most_live_plants = 0;
+  // Une plante plus loin du héros que cette distance de Tchebychev SE PERD,
+  // sur tout sol ; 0 : aucune ne se perd, ce qui n'est permis qu'aux plantes
+  // posées par blocs.
   std::int32_t plant_forget_units = 0;
   std::int32_t pickup_radius_units = 0;  // ramassage d'un objet au sol
   std::uint32_t final_overtime_ms = 0;   // au-delà de run_ms, avec un boss final
@@ -389,12 +417,15 @@ struct SurvivorsRules {
 // majoration de PV ; une évolution nomme un Id inconnu, un évolué présent dans
 // une réserve de classe, un skill ou un évolué déjà nommé ; un objet a deux
 // règles ; une plante n'a pas de règle d'objet ; les poids des plantes ont une
-// somme nulle ; des plantes sans bloc ni densité ; des élites sans objet de
+// somme nulle ; des plantes ni par blocs (bloc et densité) ni au fil des tués,
+// ou des deux façons ; des plantes au fil des tués sans plafond, sans oubli,
+// avec un oubli qui atteindrait une plante à sa naissance, plus de plantes au
+// départ que le plafond ou que kPlantStartHeadings, ou des plantes du départ
+// hors de l'écran (leur distance plus l'anneau de recherche au-delà du cadre
+// d'apparition) ; des élites sans objet de
 // coffre ; un coffre promet de 1 à kMostChestGains gains hors de cet ordre ;
 // la partie et son dépassement dépassent 32 bits de ms ; une mesure neuve
-// dépasse la plus grande arène ; un plafond neuf est nul ; l'éveil des plantes
-// sort de [0, kMostArenaSideCells] cases, ou leur oubli, non nul, tombe en
-// deçà de l'éveil plus un morceau.
+// dépasse la plus grande arène ; un plafond neuf est nul.
 // La méta est refusée enfin si : un monstre porte une carte absente du
 // catalogue ; la cote de chute est nulle ; la table de la Cursed Water n'est
 // ni vide ni de kMostCursedWater + 1 rangs, son rang 0 majore quelque chose,

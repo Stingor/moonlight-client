@@ -63,6 +63,63 @@ template <std::size_t kCount>
   return {};
 }
 
+// LES PLANTES se posent par blocs ou au fil des tués, jamais des deux façons.
+// Le cadre d'apparition et l'anneau de recherche sont déjà bornés.
+[[nodiscard]] core::Result<void> CheckPlantSowing(const SurvivorsRules& rules) {
+  const SurvivorsTuning& tuning = rules.tuning;
+  const bool by_blocks = tuning.plant_block_cells != 0 || tuning.plant_cells_per_plant != 0;
+  if (tuning.plant_kills_per_minute == 0) {
+    // Une plante se tire par bloc, avec une chance divisée par la densité.
+    if (!rules.plants.empty() &&
+        (tuning.plant_block_cells == 0 || tuning.plant_cells_per_plant == 0)) {
+      return Refuse("réglages : plantes sans bloc ou sans densité");
+    }
+    if (tuning.plant_start_count != 0 || tuning.plant_start_cells != 0 ||
+        tuning.most_live_plants != 0) {
+      return Refuse(
+          "réglages : plantes du départ ou plafond de plantes sans naissance au fil "
+          "des tués");
+    }
+    return {};
+  }
+  if (by_blocks) return Refuse("réglages : plantes par blocs et au fil des tués");
+  if (rules.plants.empty()) return Refuse("réglages : plantes au fil des tués sans espèce");
+  if (tuning.most_live_plants == 0)
+    return Refuse("réglages : plantes au fil des tués sans plafond");
+  if (tuning.plant_start_count > tuning.most_live_plants ||
+      tuning.plant_start_count > kPlantStartHeadings.size()) {
+    return Refuse("réglages : " + std::to_string(tuning.plant_start_count) +
+                  " plantes au départ, au plus le plafond et " +
+                  std::to_string(kPlantStartHeadings.size()));
+  }
+  const SpawnFrame& frame = rules.spawn_frame;
+  const std::int64_t ring_units = std::int64_t{Cells(tuning.spawn_search_ring)};
+  // Une plante du départ se pose à l'écran : sa case, déplacée de l'anneau de
+  // recherche au plus, reste dans le cadre d'apparition.
+  if (tuning.plant_start_count > 0) {
+    if (tuning.plant_start_cells <= 0 || CellsOutOfBounds(tuning.plant_start_cells)) {
+      return Refuse("réglages : plantes du départ à " + std::to_string(tuning.plant_start_cells) +
+                    " cases, attendu de 1 à " + std::to_string(kMostArenaSideCells));
+    }
+    const std::int64_t nearest_side =
+        std::min({frame.half_width_units, frame.north_units, frame.south_units});
+    if (std::int64_t{Cells(tuning.plant_start_cells)} + ring_units >= nearest_side) {
+      return Refuse("réglages : plantes du départ hors du cadre d'apparition");
+    }
+  }
+  // Une plante naît sur le périmètre du cadre, plus sa marge, puis gagne le
+  // centre d'une case de l'anneau de recherche : l'oubli qui l'atteindrait là
+  // la ferait naître pour rien, et une liste sans oubli croîtrait sans borne.
+  const std::int64_t farthest_birth =
+      std::int64_t{std::max({frame.half_width_units, frame.north_units, frame.south_units})} +
+      frame.margin_units + ring_units + Cells(1);
+  if (tuning.plant_forget_units <= farthest_birth) {
+    return Refuse("réglages : oubli des plantes en deçà de leur naissance, au plus " +
+                  std::to_string(farthest_birth) + " sous-unités du héros");
+  }
+  return {};
+}
+
 [[nodiscard]] bool HasArea(SkillArchetype archetype) noexcept {
   return archetype == SkillArchetype::kClusterBlast || archetype == SkillArchetype::kNova ||
          archetype == SkillArchetype::kRing;
@@ -354,34 +411,12 @@ core::Result<void> CheckContentTuning(const SurvivorsRules& rules) {
     return Refuse("réglages : bloc de plantes hors de [0, " + std::to_string(kMostArenaSideCells) +
                   "] cases");
   }
-  // Une plante se tire par bloc, avec une chance divisée par la densité.
-  if (!rules.plants.empty() &&
-      (tuning.plant_block_cells == 0 || tuning.plant_cells_per_plant == 0)) {
-    return Refuse("réglages : plantes sans bloc ou sans densité");
-  }
-  // L'éveil laisse sous la plus grande mesure la place d'un morceau, que
-  // l'oubli doit tenir au-delà de lui.
-  constexpr std::int32_t kMostPlantWakeCells = kMostArenaSideCells - kTerrainChunkCells;
-  if (tuning.plant_wake_cells < 0 || tuning.plant_wake_cells > kMostPlantWakeCells) {
-    return Refuse("réglages : éveil des plantes hors de [0, " +
-                  std::to_string(kMostPlantWakeCells) + "] cases");
-  }
   if (auto checked =
           CheckMeasures<1>("réglages : ", {{{"oubli des plantes", tuning.plant_forget_units}}});
       !checked) {
     return checked;
   }
-  // Les plantes qui s'éveillent doivent se perdre : sans oubli, leur liste
-  // croîtrait sans borne au fil de la marche.
-  if (tuning.plant_wake_cells > 0 && tuning.plant_forget_units == 0) {
-    return Refuse("réglages : plantes éveillées sans oubli");
-  }
-  // Une plante naît au plus à un morceau au-delà du carré d'éveil : l'oubli
-  // qui l'atteindrait dès sa naissance la ferait naître pour rien.
-  if (tuning.plant_wake_cells > 0 &&
-      tuning.plant_forget_units < Cells(tuning.plant_wake_cells + kTerrainChunkCells)) {
-    return Refuse("réglages : oubli des plantes en deçà de l'éveil plus un morceau");
-  }
+  if (auto checked = CheckPlantSowing(rules); !checked) return checked;
   // Un recul qui ne bouge pas d'une sous-unité par pas ne finit jamais.
   if (tuning.knock_units_per_step == 0) {
     for (const SurvivorsSkillRule& skill : rules.skills) {

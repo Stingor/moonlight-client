@@ -424,12 +424,12 @@ FootprintAudit AuditFootprint(const SolidGrid& grid, const ro::sim::TerrainPiece
   FootprintAudit audit;
   for (std::int32_t y = grid.south; y < grid.south + grid.height; ++y) {
     for (std::int32_t x = grid.west; x < grid.west + grid.width; ++x) {
-      const bool blocked = ro::sim::FootprintBlocks(rule, quarter, x, y);
+      const bool covered = ro::sim::FootprintCovers(rule, quarter, x, y);
       const bool solid = grid.Solid(x, y);
-      if (solid && !blocked) ++audit.solid_outside;
-      if (!blocked && grid.SamplesAt(x, y) > 0) ++audit.touched_outside;
-      if (solid && blocked) ++audit.matched;
-      if (!blocked || grid.SamplesAt(x, y) > 0) continue;
+      if (solid && !covered) ++audit.solid_outside;
+      if (!covered && grid.SamplesAt(x, y) > 0) ++audit.touched_outside;
+      if (solid && covered) ++audit.matched;
+      if (!covered || grid.SamplesAt(x, y) > 0) continue;
       ++audit.empty_inside;
       if (!grid.Solid(x - 1, y) && !grid.Solid(x + 1, y) && !grid.Solid(x, y - 1) &&
           !grid.Solid(x, y + 1)) {

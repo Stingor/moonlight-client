@@ -1,6 +1,7 @@
 #include "survivors/arena_ground_plan.h"
 
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <cstddef>
 #include <optional>
@@ -132,7 +133,7 @@ class Planner {
     plan_.path.assign(kCellCount, 0);
     const auto ring_area =
         static_cast<std::size_t>(kRingSide) * static_cast<std::size_t>(kRingSide);
-    ring_passable_.assign(ring_area, 0);
+    ring_free_.assign(ring_area, 0);
     ring_path_.assign(ring_area, 0);
     const std::int32_t first_x = ro::sim::TerrainChunkOf(origin_.x_cells);
     const std::int32_t first_y = ro::sim::TerrainChunkOf(origin_.y_cells);
@@ -141,23 +142,51 @@ class Planner {
         const ro::sim::TerrainChunk chunk =
             ro::sim::GenerateTerrainChunk(rule_, run_seed_, first_x + column, first_y + row);
         const bool shown = row >= 0 && column >= 0 && row < kWindowChunks && column < kWindowChunks;
-        CopyCells(chunk, column, row, shown);
-        PoseChunk(chunk, column, row, shown);
+        const ChunkCover cover = CoverOf(chunk);
+        CopyCells(chunk, cover, column, row, shown);
+        PoseChunk(chunk, cover, column, row, shown);
       }
     }
   }
 
+  // LES CASES COUVERTES d'un morceau : sous l'emprise d'une de ses pièces,
+  // franchissable ou non. Un semis ne s'y pose pas.
+  using ChunkCover = std::array<std::uint8_t, ro::sim::kTerrainChunkArea>;
+  [[nodiscard]] ChunkCover CoverOf(const ro::sim::TerrainChunk& chunk) const {
+    ChunkCover cover{};
+    for (const ro::sim::PlacedPiece& placed : chunk.pieces) {
+      const ro::sim::TerrainPieceRule* piece_rule = RuleOf(placed.piece_id);
+      if (piece_rule == nullptr) continue;
+      const ro::sim::FootprintSize size = ro::sim::FootprintSizeOf(*piece_rule, placed.quarter);
+      const std::int32_t west = placed.x - chunk.chunk_x * kTerrainChunkCells;
+      const std::int32_t south = placed.y - chunk.chunk_y * kTerrainChunkCells;
+      for (std::int32_t north = 0; north < size.height; ++north) {
+        for (std::int32_t east = 0; east < size.width; ++east) {
+          if (!ro::sim::FootprintCovers(*piece_rule, placed.quarter, east, north)) continue;
+          const std::int32_t x = west + east;
+          const std::int32_t y = south + north;
+          if (x < 0 || y < 0 || x >= kTerrainChunkCells || y >= kTerrainChunkCells) continue;
+          cover[static_cast<std::size_t>(y * kTerrainChunkCells + x)] = 1U;
+        }
+      }
+    }
+    return cover;
+  }
+
   // Les cases du morceau, dans le carré du tour et, s'il se montre, dans la
-  // fenêtre.
-  void CopyCells(const ro::sim::TerrainChunk& chunk, std::int32_t column, std::int32_t row,
-                 bool shown) {
+  // fenêtre. Une case du tour est LIBRE si elle est praticable hors de toute
+  // emprise.
+  void CopyCells(const ro::sim::TerrainChunk& chunk, const ChunkCover& cover, std::int32_t column,
+                 std::int32_t row, bool shown) {
     for (std::int32_t north = 0; north < kTerrainChunkCells; ++north) {
       for (std::int32_t east = 0; east < kTerrainChunkCells; ++east) {
         const std::int32_t x = column * kTerrainChunkCells + east;
         const std::int32_t y = row * kTerrainChunkCells + north;
         const std::uint8_t passable = chunk.Passable(east, north) ? 1U : 0U;
         const std::uint8_t path = chunk.OnPath(east, north) ? 1U : 0U;
-        ring_passable_[RingIndex(x, y)] = passable;
+        const bool covered =
+            cover[static_cast<std::size_t>(north * kTerrainChunkCells + east)] != 0U;
+        ring_free_[RingIndex(x, y)] = covered ? 0U : passable;
         ring_path_[RingIndex(x, y)] = path;
         if (!shown) continue;
         plan_.passable[CellIndex(x, y)] = passable;
@@ -171,8 +200,8 @@ class Planner {
   [[nodiscard]] bool PathAt(std::int32_t x, std::int32_t y) const {
     return InRing(x, y) && ring_path_[RingIndex(x, y)] != 0U;
   }
-  [[nodiscard]] bool PassableInRing(std::int32_t x, std::int32_t y) const {
-    return InRing(x, y) && ring_passable_[RingIndex(x, y)] != 0U;
+  [[nodiscard]] bool FreeInRing(std::int32_t x, std::int32_t y) const {
+    return InRing(x, y) && ring_free_[RingIndex(x, y)] != 0U;
   }
   [[nodiscard]] static bool InRing(std::int32_t x, std::int32_t y) {
     return x >= -kRingCells && y >= -kRingCells && x < kGroundWindowCells + kRingCells &&
@@ -184,7 +213,7 @@ class Planner {
   }
 
   // LE SEMIS DE BORDURE : chaque case libre qui longe un chemin, sans en être
-  // et loin de toute case bloquée, tire d'un `Pcg32` propre à la case du monde
+  // et loin de toute case bloquée ou couverte, tire d'un `Pcg32` propre à la case du monde
   // sa chance, son modèle, son angle et sa place : la même dans toute fenêtre.
   void SowVerges() {
     if (biome_.verge_seeds.empty() || biome_.verge_per_mille == 0) return;
@@ -212,7 +241,7 @@ class Planner {
   }
 
   // Une case libre, hors chemin, qu'un chemin touche par un côté et qu'aucune
-  // case bloquée ne touche.
+  // case bloquée ou couverte ne touche.
   [[nodiscard]] bool AlongPath(std::int32_t x, std::int32_t y) const {
     if (PathAt(x, y)) return false;
     if (!PathAt(x - 1, y) && !PathAt(x + 1, y) && !PathAt(x, y - 1) && !PathAt(x, y + 1)) {
@@ -220,7 +249,7 @@ class Planner {
     }
     for (std::int32_t dy = -1; dy <= 1; ++dy) {
       for (std::int32_t dx = -1; dx <= 1; ++dx) {
-        if (!PassableInRing(x + dx, y + dy)) return false;
+        if (!FreeInRing(x + dx, y + dy)) return false;
       }
     }
     return true;
@@ -229,8 +258,8 @@ class Planner {
   // Les pièces du morceau puis son semis, d'un `Pcg32` propre au morceau : le
   // même quelle que soit la fenêtre qui le montre. Un morceau du tour, qui
   // n'est pas `shown`, ne laisse que l'ombre et la terre de ses pièces.
-  void PoseChunk(const ro::sim::TerrainChunk& chunk, std::int32_t column, std::int32_t row,
-                 bool shown) {
+  void PoseChunk(const ro::sim::TerrainChunk& chunk, const ChunkCover& cover, std::int32_t column,
+                 std::int32_t row, bool shown) {
     ro::core::Pcg32 random(
         VisualFinalize(ro::sim::TerrainChunkSeed(run_seed_, chunk.chunk_x, chunk.chunk_y) ^
                        kVisualSalt),
@@ -272,14 +301,14 @@ class Planner {
         }
       }
     }
-    if (shown) SowChunk(random, chunk, column, row);
+    if (shown) SowChunk(random, chunk, cover, column, row);
   }
 
   // Le semis : toujours `seeds_per_chunk` essais de cinq tirages ; une case
-  // bloquée ou voisine d'une case bloquée, et une case de chemin, n'en
-  // reçoivent pas.
-  void SowChunk(ro::core::Pcg32& random, const ro::sim::TerrainChunk& chunk, std::int32_t column,
-                std::int32_t row) {
+  // bloquée ou couverte, sa voisine, et une case de chemin, n'en reçoivent
+  // pas.
+  void SowChunk(ro::core::Pcg32& random, const ro::sim::TerrainChunk& chunk,
+                const ChunkCover& cover, std::int32_t column, std::int32_t row) {
     const auto side = static_cast<std::uint32_t>(kTerrainChunkCells);
     for (std::uint32_t attempt = 0; attempt < biome_.seeds_per_chunk; ++attempt) {
       const auto east = static_cast<std::int32_t>(random.Below(side));
@@ -287,7 +316,7 @@ class Planner {
       const SeedLook* seed = Pick(random, biome_.seeds);
       const std::uint32_t yaw = random.Below(kFullTurnDegrees);
       const float offset = UnitOf(random.Next());
-      if (seed == nullptr || !ClearAround(chunk, east, north) || chunk.OnPath(east, north)) {
+      if (seed == nullptr || !ClearAround(chunk, cover, east, north) || chunk.OnPath(east, north)) {
         continue;
       }
       plan_.poses.push_back(
@@ -302,8 +331,8 @@ class Planner {
     }
   }
 
-  [[nodiscard]] static bool ClearAround(const ro::sim::TerrainChunk& chunk, std::int32_t east,
-                                        std::int32_t north) {
+  [[nodiscard]] static bool ClearAround(const ro::sim::TerrainChunk& chunk, const ChunkCover& cover,
+                                        std::int32_t east, std::int32_t north) {
     for (std::int32_t dy = -1; dy <= 1; ++dy) {
       for (std::int32_t dx = -1; dx <= 1; ++dx) {
         const std::int32_t x = east + dx;
@@ -311,6 +340,7 @@ class Planner {
         // Hors du morceau : la bordure de l'emplacement voisin, toujours libre.
         if (x < 0 || y < 0 || x >= kTerrainChunkCells || y >= kTerrainChunkCells) continue;
         if (!chunk.Passable(x, y)) return false;
+        if (cover[static_cast<std::size_t>(y * kTerrainChunkCells + x)] != 0U) return false;
       }
     }
     return true;
@@ -566,7 +596,7 @@ class Planner {
     return {std::uint16_t{0}, std::uint8_t{0}};
   }
 
-  // Les emplacements du monde qu'une case bloquée d'une pièce touche.
+  // Les emplacements du monde qu'une case couverte d'une pièce touche.
   [[nodiscard]] std::set<std::pair<std::int32_t, std::int32_t>> OccupiedSlots() const {
     std::set<std::pair<std::int32_t, std::int32_t>> occupied;
     for (const PlannedPiece& piece : ring_pieces_) {
@@ -575,7 +605,7 @@ class Planner {
           ro::sim::FootprintSizeOf(*piece.rule, piece.placed.quarter);
       for (std::int32_t north = 0; north < size.height; ++north) {
         for (std::int32_t east = 0; east < size.width; ++east) {
-          if (!ro::sim::FootprintBlocks(*piece.rule, piece.placed.quarter, east, north)) continue;
+          if (!ro::sim::FootprintCovers(*piece.rule, piece.placed.quarter, east, north)) continue;
           occupied.emplace(FloorDivide(piece.placed.x + east, ro::sim::kTerrainSlotCells),
                            FloorDivide(piece.placed.y + north, ro::sim::kTerrainSlotCells));
         }
@@ -687,8 +717,9 @@ class Planner {
   // Les pièces de la fenêtre et de son tour : leurs emplacements portent des
   // taches.
   std::vector<PlannedPiece> ring_pieces_;
-  // Les cases de la fenêtre et de son tour : praticables, de chemin.
-  std::vector<std::uint8_t> ring_passable_;
+  // Les cases de la fenêtre et de son tour : libres (praticables hors de toute
+  // emprise), de chemin.
+  std::vector<std::uint8_t> ring_free_;
   std::vector<std::uint8_t> ring_path_;
   GroundPlan plan_;
 };

@@ -92,30 +92,37 @@ void GatherGems(SurvivorsField& field);
 void GatherPickups(SurvivorsField& field);
 // survivors_hero.cpp. Les PV par minute, accumulés pas à pas.
 void Regenerate(SurvivorsField& field);
+// survivors_plants.cpp. LA PLANTE DES TUÉS, au plus une par pas : quand les
+// tués depuis la dernière naissance (`tally.kills` − `plant_kills_mark`)
+// atteignent `plant_kills_per_minute` × m, où m = pas ÷ kStepsPerMinute + 1 est
+// la minute en cours au début du pas (prolongation comprise), et que moins de
+// `most_live_plants` plantes vivent, une plante naît hors de l'écran :
+// jusqu'à `spawn_tries_per_foe` essais TryFramePoint du flux décor (deux
+// tirages chacun), puis un PickWeighted de l'espèce. Le compteur repart alors
+// de zéro ; l'excédent se perd. Au plafond, ou sans place, le compteur
+// continue de compter et la naissance attend un pas où elle se fait. Rien
+// pour des plantes posées par blocs.
+void SowPlants(SurvivorsField& field);
 
 // ── Les aides ──────────────────────────────────────────────────────────────
 
-// survivors_loot.cpp. Au départ : par bloc de `plant_block_cells` de côté,
+// survivors_plants.cpp. Au départ : par bloc de `plant_block_cells` de côté,
 // lignes du sud au nord puis colonnes d'ouest en est, un Chance du flux décor
 // de (cases praticables du bloc) sur `plant_cells_per_plant` ; si oui, un
 // Below pour la case, parmi les praticables du bloc dans le même ordre, et un
-// PickWeighted pour l'espèce. Rien sans plantes dans les règles, ni sur un sol
-// généré, qui n'a pas de bord à paver.
+// PickWeighted pour l'espèce. Rien sans plantes posées par blocs, ni sur un
+// sol généré, qui n'a pas de bord à paver.
 void PlantField(SurvivorsField& field);
-// survivors_loot.cpp. Sur un sol généré, au départ puis après chaque marche du
-// héros : chaque morceau du monde qui touche le carré de `plant_wake_cells`
-// autour de la case du héros et n'est pas encore éveillé s'éveille, par clé
-// croissante. Il pose ses plantes comme PlantField pose celles d'une carte,
-// par bloc de `plant_block_cells` compté depuis son coin sud-ouest et rogné à
-// son bord, mais d'un Pcg32 à lui (TerrainPlantSeed, flux décor) : ses plantes
-// ne dépendent ni de l'heure ni des autres morceaux ; seuls leurs numéros de
-// naissance suivent l'ordre des éveils. Rien sur un sol borné, sans plantes,
-// ou si `plant_wake_cells` est nul.
-void WakePlantChunks(SurvivorsField& field);
-// survivors_loot.cpp. Sur un sol généré, retire, dans l'ordre de pose, chaque
-// plante plus loin du héros que `plant_forget_units` en distance de
-// Tchebychev. Son morceau reste éveillé : elle ne repousse jamais. Rien sur un
-// sol borné, ou si `plant_forget_units` est nul.
+// survivors_plants.cpp. LES PLANTES DU DÉPART des plantes au fil des tués :
+// la i-ème sur le cap kPlantStartHeadings[i], à `plant_start_cells` cases de
+// la case du héros sur chaque axe que le cap nomme, ramenée à la case
+// praticable la plus proche dans l'anneau de recherche ; une case introuvable
+// ou déjà plantée ne pose rien et ne tire rien. Un PickWeighted du flux décor
+// par plante posée, pour l'espèce.
+void SowStartPlants(SurvivorsField& field);
+// survivors_plants.cpp. Après la marche du héros, retire, dans l'ordre de
+// pose, chaque plante plus loin de lui que `plant_forget_units` en distance
+// de Tchebychev, sur tout sol. Rien si `plant_forget_units` est nul.
 void ForgetFarPlants(SurvivorsField& field);
 
 // Comment naît un monstre, au-delà de son espèce et de sa place.
@@ -149,11 +156,20 @@ void TrackBoss(SurvivorsField& field, std::uint32_t serial, std::size_t rule_ind
 // du nord au sud, le sud d'est en ouest, l'ouest du sud au nord.
 [[nodiscard]] FieldPoint PerimeterPoint(const SpawnFrame& frame, FieldPoint hero,
                                         std::int64_t along, std::int32_t outward) noexcept;
-// survivors_spawner.cpp. Un point de naissance tiré sur le périmètre du cadre,
-// plus une marge, ramené au centre de la case praticable la plus proche.
-// Chaque essai consomme exactement deux tirages du flux des apparitions ; rien
-// après `spawn_tries_per_foe` essais refusés (aucune case proche, une case qui
-// retombe dans le cadre, ou une impasse que le champ de poursuite connaît).
+// survivors_spawner.cpp. Vrai si le périmètre du cadre se tire en 32 bits et
+// que sa marge n'est pas négative.
+[[nodiscard]] bool FramePerimeterDrawable(const SpawnFrame& frame) noexcept;
+// survivors_spawner.cpp. UN ESSAI DE NAISSANCE HORS DE L'ÉCRAN, d'un cadre
+// tirable : un point du périmètre du cadre (un Below du périmètre), poussé
+// d'une marge (un Below de la marge plus un), ramené au centre de la case
+// praticable la plus proche dans l'anneau de recherche. Exactement deux
+// tirages de `random` ; rien pour une case introuvable, qui retombe dans le
+// cadre, ou une impasse que le champ de poursuite connaît.
+[[nodiscard]] std::optional<FieldPoint> TryFramePoint(const SurvivorsField& field,
+                                                      core::Pcg32& random);
+// survivors_spawner.cpp. Un point de naissance d'un monstre : jusqu'à
+// `spawn_tries_per_foe` essais (TryFramePoint) du flux des apparitions, chaque
+// refus compté.
 [[nodiscard]] std::optional<FieldPoint> DrawSpawnPoint(SurvivorsField& field);
 
 // survivors_progress.cpp. Ce que BuryFoes fait des monstres à PV nuls, pour un

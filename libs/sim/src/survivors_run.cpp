@@ -200,7 +200,7 @@ core::Result<SurvivorsRun> SurvivorsRun::Start(const SurvivorsRules& rules, Surv
   field.banishes_left = start.loadout.banishes;
   field.lives_left = start.lives;
   survivors::PlantField(field);
-  survivors::WakePlantChunks(field);
+  survivors::SowStartPlants(field);
   survivors::RecomputeStats(field);
   RefreshTally(field);
   return SurvivorsRun(std::move(field));
@@ -211,9 +211,7 @@ void SurvivorsRun::Step(SurvivorsInput input) {
   // ⚠ L'ORDRE DU PAS EST LA RÈGLE DU JEU : le changer change chaque partie
   // rejouée, et monte kSurvivorsRulesetVersion.
   survivors::MoveHero(field_, input);
-  // Sur un sol généré, les plantes suivent le héros qui vient de bouger :
-  // l'éveil d'abord, l'oubli ensuite. Rien sur un sol borné.
-  survivors::WakePlantChunks(field_);
+  // Les plantes laissées loin du héros qui vient de bouger se perdent.
   survivors::ForgetFarPlants(field_);
   survivors::RefreshFlow(field_);
   survivors::SpawnFoes(field_);
@@ -238,6 +236,9 @@ void SurvivorsRun::Step(SurvivorsInput input) {
     survivors::GatherGems(field_);
     survivors::GatherPickups(field_);
     survivors::Regenerate(field_);
+    // Les tués de tout le pas comptent, Holy Water comprise ; la plante
+    // naît autour du héros à sa place de fin de pas.
+    survivors::SowPlants(field_);
   }
   CloseStep(field_);
 }

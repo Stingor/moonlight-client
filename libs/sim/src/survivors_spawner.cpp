@@ -111,26 +111,37 @@ FieldPoint PerimeterPoint(const SpawnFrame& frame, FieldPoint hero, std::int64_t
   return {static_cast<std::int32_t>(x), static_cast<std::int32_t>(y)};
 }
 
-std::optional<FieldPoint> DrawSpawnPoint(SurvivorsField& field) {
+bool FramePerimeterDrawable(const SpawnFrame& frame) noexcept {
+  const std::int64_t perimeter =
+      (std::int64_t{frame.half_width_units} * 2 + frame.north_units + frame.south_units) * 2;
+  return perimeter > 0 && perimeter <= std::numeric_limits<std::uint32_t>::max() &&
+         frame.margin_units >= 0;
+}
+
+std::optional<FieldPoint> TryFramePoint(const SurvivorsField& field, core::Pcg32& random) {
   const SurvivorsRules& rules = *field.rules;
   const SpawnFrame& frame = rules.spawn_frame;
   const std::int64_t perimeter =
       (std::int64_t{frame.half_width_units} * 2 + frame.north_units + frame.south_units) * 2;
-  if (perimeter <= 0 || perimeter > std::numeric_limits<std::uint32_t>::max() ||
-      frame.margin_units < 0) {
-    return std::nullopt;
-  }
   const FieldPoint hero = field.hero.position;
+  const std::uint32_t along = random.Below(static_cast<std::uint32_t>(perimeter));
+  const auto outward =
+      static_cast<std::int32_t>(random.Below(static_cast<std::uint32_t>(frame.margin_units) + 1U));
+  const FieldPoint point = PerimeterPoint(frame, hero, along, outward);
+  const std::optional<CellPosition> cell = NearestPassable(
+      field.ground, CellOf(point.x), CellOf(point.y), rules.tuning.spawn_search_ring);
+  if (!cell) return std::nullopt;
+  const FieldPoint landing = CellCenter(cell->x, cell->y);
+  if (InsideSpawnFrame(frame, hero, landing) || Stranded(field.flow, landing)) return std::nullopt;
+  return landing;
+}
+
+std::optional<FieldPoint> DrawSpawnPoint(SurvivorsField& field) {
+  const SurvivorsRules& rules = *field.rules;
+  if (!FramePerimeterDrawable(rules.spawn_frame)) return std::nullopt;
   for (std::uint8_t attempt = 0; attempt < rules.tuning.spawn_tries_per_foe; ++attempt) {
-    const std::uint32_t along = field.spawn_random.Below(static_cast<std::uint32_t>(perimeter));
-    const auto outward = static_cast<std::int32_t>(
-        field.spawn_random.Below(static_cast<std::uint32_t>(frame.margin_units) + 1U));
-    const FieldPoint point = PerimeterPoint(frame, hero, along, outward);
-    const std::optional<CellPosition> cell = NearestPassable(
-        field.ground, CellOf(point.x), CellOf(point.y), rules.tuning.spawn_search_ring);
-    if (cell) {
-      const FieldPoint landing = CellCenter(cell->x, cell->y);
-      if (!InsideSpawnFrame(frame, hero, landing) && !Stranded(field.flow, landing)) return landing;
+    if (const std::optional<FieldPoint> landing = TryFramePoint(field, field.spawn_random)) {
+      return landing;
     }
     ++field.spawn_tries_failed;
   }

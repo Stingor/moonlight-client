@@ -10,7 +10,7 @@
 namespace ro::sim {
 
 // LE TERRAIN GÉNÉRÉ D'UNE ARÈNE SANS BORD : une plaine praticable semée de
-// pièces bloquantes, fonction entière de (règle de terrain, graine de la
+// pièces, bloquantes ou franchissables, fonction entière de (règle de terrain, graine de la
 // partie, coordonnées du morceau). Aucun flottant, aucun état : un morceau
 // regénéré est identique octet pour octet, quel que soit l'ordre dans lequel
 // les morceaux sont demandés, sous MSVC comme sous g++.
@@ -106,11 +106,11 @@ inline constexpr std::int32_t kMostPlazaPathWidthCells =
     2 * (kTerrainChunkCells / 2 - kTerrainSiteOffsetCells - kTerrainLandmarkSiteCells) - 1;
 
 // UNE PIÈCE : une règle de jeu, sans aucun fichier. `app` associe sa clé à des
-// modèles. L'emprise est un dessin de lignes de même largeur, « # » bloque,
-// « . » laisse passer, la PREMIÈRE ligne au nord ; d'au plus
-// kMostPieceSideCells de côté pour une pièce ordinaire, kMostLandmarkSideCells
-// pour un repère (kTerrainLandmarkSiteCells si la règle a des chemins), et
-// sans case libre enclavée.
+// modèles. L'emprise est un dessin de lignes de même largeur, « # » couvert,
+// « . » libre, la PREMIÈRE ligne au nord ; d'au plus kMostPieceSideCells de
+// côté pour une pièce ordinaire, kMostLandmarkSideCells pour un repère
+// (kTerrainLandmarkSiteCells si la règle a des chemins), et sans case libre
+// enclavée. Une case couverte est BLOQUÉE, sauf sous une pièce franchissable.
 struct TerrainPieceRule {
   std::uint16_t piece_id = 0;
   const char* key = "";
@@ -118,6 +118,10 @@ struct TerrainPieceRule {
   std::uint32_t weight = 0;
   // Un repère ne se pose que sur un grand emplacement, jamais ailleurs.
   bool landmark = false;
+  // UNE PIÈCE FRANCHISSABLE (un fourré) ne bloque aucune case : le héros, les
+  // monstres et leurs apparitions la traversent. Son emprise reste la place
+  // où `app` la dessine, qu'aucun chemin ne touche et qu'aucun semis ne prend.
+  bool walkable = false;
 };
 
 struct TerrainRule {
@@ -186,8 +190,9 @@ struct FootprintSize {
 [[nodiscard]] FootprintSize FootprintSizeOf(const TerrainPieceRule& piece,
                                             std::uint8_t quarter) noexcept;
 // Vrai si la case (`east`, `north`) de l'emprise tournée, comptée depuis son
-// coin sud-ouest, est bloquée ; faux hors de l'emprise.
-[[nodiscard]] bool FootprintBlocks(const TerrainPieceRule& piece, std::uint8_t quarter,
+// coin sud-ouest, est couverte (« # ») ; faux hors de l'emprise. Elle est
+// bloquée si la pièce n'est pas franchissable.
+[[nodiscard]] bool FootprintCovers(const TerrainPieceRule& piece, std::uint8_t quarter,
                                    std::int32_t east, std::int32_t north) noexcept;
 
 // Le morceau qui contient une case, par division arrondie vers −∞.
@@ -197,10 +202,6 @@ struct FootprintSize {
 // (graine de la partie, sel du terrain, x, y), en arithmétique non signée. Le
 // rendu en dérive sa graine visuelle.
 [[nodiscard]] std::uint64_t TerrainChunkSeed(std::uint64_t run_seed, std::int32_t chunk_x,
-                                             std::int32_t chunk_y) noexcept;
-// LA GRAINE DES PLANTES D'UN MORCEAU : le même mélange sous un autre sel. Les
-// plantes d'un morceau ne dépendent ni de l'heure ni de l'ordre de son éveil.
-[[nodiscard]] std::uint64_t TerrainPlantSeed(std::uint64_t run_seed, std::int32_t chunk_x,
                                              std::int32_t chunk_y) noexcept;
 
 // La chance, pour mille, qu'un emplacement centré sur la case (x, y) porte une

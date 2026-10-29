@@ -230,7 +230,10 @@ inline void BreakPlantsWithin(SurvivorsField& field, FieldPoint from, FieldPoint
       const PickupRule* pickup =
           rule != rules.plants.end() ? FindPickup(rules, rule->pickup) : nullptr;
       if (pickup == nullptr) continue;
-      if (DropPickup(field, pickup->kind, pickup->item_id, plant.position)) continue;
+      if (DropPickup(field, pickup->kind, pickup->item_id, plant.position)) {
+        if (field.plants_broken < std::numeric_limits<std::uint32_t>::max()) ++field.plants_broken;
+        continue;
+      }
     }
     field.plants[kept++] = plant;
   }

@@ -75,14 +75,6 @@ struct SurvivorsStart {
 // de part et d'autre ; un monstre au-delà tombe dans un seau du bord et reste
 // trouvable.
 inline constexpr std::int32_t kFollowingGridCells = 128;
-// LA CLÉ D'UN MORCEAU DU MONDE : ligne puis colonne, dans [0,
-// kTerrainWorldChunks²). Des clés croissantes vont du sud au nord, puis
-// d'ouest en est.
-[[nodiscard]] constexpr std::uint32_t PlantChunkKey(std::int32_t chunk_x,
-                                                    std::int32_t chunk_y) noexcept {
-  return static_cast<std::uint32_t>(chunk_y) * static_cast<std::uint32_t>(kTerrainWorldChunks) +
-         static_cast<std::uint32_t>(chunk_x);
-}
 // L'entrée d'un pas : le cap du stick, kNoHeading à l'arrêt.
 struct SurvivorsInput {
   std::uint8_t heading = kNoHeading;
@@ -100,8 +92,8 @@ inline constexpr std::uint64_t kOfferStream = 2;
 inline constexpr std::uint64_t kCombatStream = 3;
 // Le butin : l'ouverture des coffres.
 inline constexpr std::uint64_t kLootStream = 4;
-// Le décor : les plantes posées au départ. Sur un sol généré, chaque morceau
-// tire ses plantes dans ce flux, sous sa propre graine (TerrainPlantSeed).
+// Le décor : les plantes, posées par blocs au départ, ou nées au fil des tués
+// (plantes du départ comprises).
 inline constexpr std::uint64_t kFieldStream = 5;
 // La chute des cartes : elle ne décale ni les coffres ni les vagues.
 inline constexpr std::uint64_t kCardStream = 6;
@@ -131,9 +123,9 @@ struct SurvivorsField {
   std::vector<SurvivorsHazard> hazards;     // ordre de pose
   std::vector<SurvivorsGem> gems;           // ordre de naissance
   std::vector<SurvivorsPlant> plants;       // ordre de pose
-  // Sur un sol généré, les morceaux déjà éveillés, par clé strictement
-  // croissante (PlantChunkKey) : un morceau ne pose ses plantes qu'une fois.
-  std::vector<std::uint32_t> woken_chunks;
+  // Au fil des tués : `tally.kills` à la dernière naissance d'une plante (0
+  // au départ). Les tués depuis cette naissance sont le compteur des plantes.
+  std::uint32_t plant_kills_mark = 0;
   std::vector<SurvivorsPickup> pickups;  // ordre de chute
   std::vector<SurvivorsOffer> offers;
   std::vector<std::uint16_t> banished;
@@ -162,6 +154,9 @@ struct SurvivorsField {
   // mesures pour l'outil d'équilibrage ; rien ne les lit pour décider.
   std::uint32_t spawn_tries_failed = 0;
   std::uint32_t spawn_draws_failed = 0;
+  // LES PLANTES CASSÉES depuis le départ, par le héros ou par une aire : une
+  // mesure pour l'outil d'équilibrage, que rien ne lit pour décider.
+  std::uint32_t plants_broken = 0;
   SurvivorsTally tally;
   SurvivorsRecap recap;
   core::Pcg32 spawn_random;
@@ -206,8 +201,8 @@ class SurvivorsRun {
   // terrain, sol généré qui n'est pas celui que le rejeu redérive (la règle
   // de terrain de l'arène dans `rules`, à la même adresse, sous `start.seed`),
   // aucune case praticable à moins de spawn_search_ring × 2 du départ. Le
-  // départ pose les plantes d'un sol borné (flux décor), ou éveille les
-  // morceaux d'un sol généré autour du héros, avant le premier pas. Seule la
+  // départ pose les plantes par blocs d'un sol borné, ou celles du départ des
+  // plantes au fil des tués (flux décor), avant le premier pas. Seule la
   // taille du cache d'un sol généré reste au choix de l'appelant.
   [[nodiscard]] static core::Result<SurvivorsRun> Start(const SurvivorsRules& rules,
                                                         SurvivorsGround ground,

@@ -20,8 +20,9 @@ namespace moonclient {
 
 // LE SOLIDE D'UN MODÈLE DU SOL GÉNÉRÉ : la part de sa géométrie qui arrête la
 // marche, projetée au sol. Le décor ne ment pas (ADR 0131) quand chaque case
-// que le solide d'une pièce couvre est bloquée par son emprise de `sim`, et
-// que l'emprise ne bloque pas de case loin de tout solide.
+// que le solide d'une pièce couvre est sous son emprise de `sim`, et que
+// l'emprise ne couvre pas de case loin de tout solide. Une pièce franchissable
+// (un fourré) garde son dessin dans son emprise, qui ne bloque rien.
 //
 // LA RÈGLE DE HAUTEUR : est solide, dans un bloc qui touche le sol, ce qui
 // passe sous la tête d'un héros debout — margelle, murs, piliers, troncs,
@@ -159,17 +160,17 @@ struct FootprintAudit {
   // Les cases hors de l'emprise dont un point au moins est couvert : le
   // solide y déborde de plus d'un demi-pas de point (un huitième de case).
   std::int32_t touched_outside = 0;
-  // Les cases bloquées où aucun point n'est couvert.
+  // Les cases de l'emprise où aucun point n'est couvert.
   std::int32_t empty_inside = 0;
   // Parmi elles, celles qu'aucune case solide ne touche par un côté : le
   // héros bute sur du vide.
   std::int32_t empty_far = 0;
-  // Les cases bloquées et solides.
+  // Les cases de l'emprise, solides.
   std::int32_t matched = 0;
 };
 
 // LES TOLÉRANCES : le solide ne déborde nulle part de l'emprise de plus d'un
-// huitième de case (`touched_outside` nul) ; une case bloquée vide se tolère au
+// huitième de case (`touched_outside` nul) ; une case d'emprise vide se tolère au
 // bord du solide (elle en touche une case solide), jamais au-delà.
 [[nodiscard]] FootprintAudit AuditFootprint(const SolidGrid& grid,
                                             const ro::sim::TerrainPieceRule& rule,

@@ -119,6 +119,7 @@ add_library(ro_sim STATIC
     src/survivors_meta.cpp
     src/survivors_play.cpp
     src/survivors_openness.cpp
+    src/survivors_plants.cpp
     src/survivors_progress.cpp
     src/survivors_ranked.cpp
     src/survivors_records.cpp

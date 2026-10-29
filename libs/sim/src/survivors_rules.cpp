@@ -61,11 +61,16 @@ constexpr SurvivorsTuning kShippedTuning{
     .boss_hp_growth_pct_per_minute = 0,
     .boss_walk_scale_pct = 100,
     .knock_units_per_step = CellTenths(2),
-    .plant_block_cells = 12,
-    .plant_cells_per_plant = 150,
-    // Sur le sol généré, un morceau pose ses plantes à 48 cases du héros, et
-    // une plante laissée à 96 cases se perd. Sans effet sur une carte.
-    .plant_wake_cells = 48,
+    // LES PLANTES AU FIL DES TUÉS, sur les deux arènes : cinq plantes à
+    // 12 cases du départ, au bord de la clairière et à l'écran ; puis une
+    // plante par 10 × (minute en cours) tués, au plus huit en vie ; une plante
+    // laissée à 96 cases se perd.
+    .plant_block_cells = 0,
+    .plant_cells_per_plant = 0,
+    .plant_kills_per_minute = 10,
+    .plant_start_count = 5,
+    .plant_start_cells = 12,
+    .most_live_plants = 8,
     .plant_forget_units = Cells(96),
     .pickup_radius_units = CellTenths(5),
     // Baphomet jamais tué : la partie finit en survie cinq minutes après lui.
