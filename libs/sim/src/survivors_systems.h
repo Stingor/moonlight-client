@@ -98,7 +98,8 @@ void Regenerate(SurvivorsField& field);
 // la minute en cours au début du pas (prolongation comprise), et que moins de
 // `most_live_plants` plantes vivent, une plante naît hors de l'écran :
 // jusqu'à `spawn_tries_per_foe` essais TryFramePoint du flux décor (deux
-// tirages chacun), puis un PickWeighted de l'espèce. Le compteur repart alors
+// tirages chacun ; une case qui porte déjà une plante vaut un essai manqué),
+// puis un PickWeighted de l'espèce. Le compteur repart alors
 // de zéro ; l'excédent se perd. Au plafond, ou sans place, le compteur
 // continue de compter et la naissance attend un pas où elle se fait. Rien
 // pour des plantes posées par blocs.

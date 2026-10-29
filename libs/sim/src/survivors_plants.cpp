@@ -144,8 +144,10 @@ void SowPlants(SurvivorsField& field) {
   if (counted < needed || field.plants.size() >= tuning.most_live_plants) return;
   if (!FramePerimeterDrawable(rules.spawn_frame)) return;
   for (std::uint8_t attempt = 0; attempt < tuning.spawn_tries_per_foe; ++attempt) {
+    // Une case qui porte déjà une plante vaut un essai manqué : deux plantes
+    // ne se superposent jamais.
     const std::optional<FieldPoint> at = TryFramePoint(field, field.field_random);
-    if (!at) continue;
+    if (!at || PlantedOn(field, *at)) continue;
     const std::size_t before = field.plants.size();
     SowAt(field, PlantWeights(rules), *at);
     if (field.plants.size() != before) field.plant_kills_mark = field.tally.kills;
