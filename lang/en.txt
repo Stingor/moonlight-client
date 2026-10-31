@@ -11269,6 +11269,18 @@ tr: Jump
 fr: Vue à la première personne
 tr: First-person view
 
+fr: Première personne : avancer
+tr: First person: move forward
+
+fr: Première personne : reculer
+tr: First person: move back
+
+fr: Première personne : pas à gauche
+tr: First person: step left
+
+fr: Première personne : pas à droite
+tr: First person: step right
+
 fr: Sinon un clic ne porte qu'un coup, et c'est Ctrl qui fait poursuivre la cible jusqu'à sa chute.
 tr: Otherwise a click lands a single blow, and Ctrl is what chases the target until it falls.
 

@@ -663,6 +663,12 @@ std::optional<std::string> TriggerAction(const KeyPress& to, ActionRef action_re
     case GameAction::kShortcutWheel:
       // Un maintien, que la roue lit elle-même à l'appui et au relâcher.
       break;
+    case GameAction::kStepForward:
+    case GameAction::kStepBack:
+    case GameAction::kStepLeft:
+    case GameAction::kStepRight:
+      // Des maintiens, que la vue à la première personne lit elle-même.
+      break;
     case GameAction::kCameraReset:
       if (Wired(to.rig, "caméra : remise")) {
         ResetCamera(*to.camera, to.rig->limits());

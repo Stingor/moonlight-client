@@ -151,6 +151,11 @@ ActionInput InputOfAction(ActionRef action) {
       return ActionInput::kWorldClick;
     case GameAction::kShortcutWheel:
       return ActionInput::kHold;
+    case GameAction::kStepForward:
+    case GameAction::kStepBack:
+    case GameAction::kStepLeft:
+    case GameAction::kStepRight:
+      return ActionInput::kKeyHold;
     default:
       return ActionInput::kPress;
   }
@@ -177,6 +182,8 @@ bool BindingFits(ActionRef action, Binding binding) {
       // ⚠ UN BOUTON QU'ON TIENT, et seulement celui du milieu : le gauche marche
       // et le droit tourne la caméra, l'un comme l'autre dès l'appui.
       return !gesture.has_value() || gesture == MouseGesture::kMiddleHold;
+    case ActionInput::kKeyHold:
+      return !gesture.has_value();
   }
   return false;
 }

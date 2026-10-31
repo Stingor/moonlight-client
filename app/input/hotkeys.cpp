@@ -97,6 +97,10 @@ constexpr std::array<ActionSavedNames, kNamedActionCount> kActionSavedNames = {{
     {GameAction::kFirstPersonView, "first_person"},
     {GameAction::kSitOrStand, "sit"},
     {GameAction::kJump, "jump"},
+    {GameAction::kStepForward, "step_forward"},
+    {GameAction::kStepBack, "step_back"},
+    {GameAction::kStepLeft, "step_left"},
+    {GameAction::kStepRight, "step_right"},
     {GameAction::kEffectBench, "effect_bench"},
     {GameAction::kCaptureRecord, "capture_video"},
     {GameAction::kCapturePicture, "capture_picture"},
@@ -249,6 +253,10 @@ HotkeyTab TabOfAction(ActionRef action) {
       return HotkeyTab::kInterface;
     case GameAction::kSitOrStand:
     case GameAction::kJump:
+    case GameAction::kStepForward:
+    case GameAction::kStepBack:
+    case GameAction::kStepLeft:
+    case GameAction::kStepRight:
     case GameAction::kTargetNearest:
     case GameAction::kTargetPrevious:
     case GameAction::kTargetNext:
@@ -425,6 +433,14 @@ std::string NameOfAction(ActionRef action) {
       return ro::core::Tr("S'asseoir ou se lever");
     case GameAction::kJump:
       return ro::core::Tr("Sauter");
+    case GameAction::kStepForward:
+      return ro::core::Tr("Première personne : avancer");
+    case GameAction::kStepBack:
+      return ro::core::Tr("Première personne : reculer");
+    case GameAction::kStepLeft:
+      return ro::core::Tr("Première personne : pas à gauche");
+    case GameAction::kStepRight:
+      return ro::core::Tr("Première personne : pas à droite");
     case GameAction::kEffectBench:
       return ro::core::Tr("Banc d'effets");
     case GameAction::kCaptureRecord:
@@ -532,7 +548,10 @@ Hotkeys::Hotkeys() {
   // monde, et la roue ne s'ouvre que si une barre lui est choisie.
   set(GameAction::kShortcutWheel, KeyOfGesture(MouseGesture::kMiddleHold));
   set(GameAction::kSitOrStand, SDLK_INSERT);
-  set(GameAction::kJump, SDLK_SPACE);
+  set(GameAction::kStepForward, SDLK_UP);
+  set(GameAction::kStepBack, SDLK_DOWN);
+  set(GameAction::kStepLeft, SDLK_LEFT);
+  set(GameAction::kStepRight, SDLK_RIGHT);
   bindings_[ActionRef(GameAction::kFirstPersonView).rank()] = Binding{.key = SDLK_F, .shift = true};
   if constexpr (ro::core::kDevTools) {
     set(GameAction::kEffectBench, SDLK_N);

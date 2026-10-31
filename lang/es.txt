@@ -11269,6 +11269,18 @@ tr: Saltar
 fr: Vue à la première personne
 tr: Vista en primera persona
 
+fr: Première personne : avancer
+tr: Primera persona: avanzar
+
+fr: Première personne : reculer
+tr: Primera persona: retroceder
+
+fr: Première personne : pas à gauche
+tr: Primera persona: paso a la izquierda
+
+fr: Première personne : pas à droite
+tr: Primera persona: paso a la derecha
+
 fr: Sinon un clic ne porte qu'un coup, et c'est Ctrl qui fait poursuivre la cible jusqu'à sa chute.
 tr: Si no, un clic da un solo golpe, y es Ctrl lo que hace perseguir al objetivo hasta que caiga.
 

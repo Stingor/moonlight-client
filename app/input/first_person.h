@@ -48,8 +48,8 @@ inline constexpr std::int32_t kFirstPersonStrideCells = 3;
 // en passant d'une vue à l'autre.
 [[nodiscard]] float FirstPersonGazeUnits();
 
-// Les quatre directions de marche, par la PLACE de la touche sur le clavier et
-// non par sa lettre : ZQSD sur un clavier français, WASD sur un anglais.
+// Les quatre directions de marche. Leurs touches sont celles de la table des
+// raccourcis : voir `GameAction::kStepForward`.
 enum class StrideKey : std::uint8_t { kForward, kBack, kLeft, kRight };
 inline constexpr std::size_t kStrideKeyCount = 4;
 using StrideKeys = std::array<bool, kStrideKeyCount>;

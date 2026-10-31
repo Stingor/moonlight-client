@@ -137,9 +137,17 @@ enum class GameAction : std::uint8_t {
   // mégarde, et la vue retourne tout l'écran.
   kFirstPersonView,
   kSitOrStand,
-  // LE SAUT COSMÉTIQUE : voir `ro/sim/jump.h`. ⚠ ESPACE, que rien d'autre ne
-  // prend sur le monde.
+  // LE SAUT COSMÉTIQUE : voir `ro/sim/jump.h`. ⚠ SANS TOUCHE D'USINE : c'est
+  // au joueur de lui donner une place.
   kJump,
+  // LA MARCHE DE LA VUE À LA PREMIÈRE PERSONNE, une action par direction : voir
+  // `input/first_person.h`. ⚠ DES MAINTIENS AU CLAVIER, et les flèches par
+  // défaut : les lettres appartiennent aux barres, et qui veut ZQSD se les
+  // donne.
+  kStepForward,
+  kStepBack,
+  kStepLeft,
+  kStepRight,
   kEffectBench,
   // L'ENREGISTREUR DE ZONE. ⚠ TROIS TOUCHES ET NON UNE, parce qu'elles servent
   // dans l'autre sens : celle qui filme n'ouvre pas le tracé, et une fois la
@@ -359,6 +367,9 @@ enum class ActionInput : std::uint8_t {
   // UN MAINTIEN : l'appui ouvre, le relâcher conclut. Une touche du clavier, ou
   // le bouton du milieu tenu.
   kHold,
+  // UNE TOUCHE DU CLAVIER TENUE, et rien d'autre : la marche s'arrête au
+  // relâcher, et aucun bouton de souris n'est libre sur le monde pour elle.
+  kKeyHold,
 };
 
 [[nodiscard]] ActionInput InputOfAction(ActionRef action);

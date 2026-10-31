@@ -19,21 +19,43 @@
 #include "ro/ui/chat_bar.h"
 
 #include "game/game.h"
+#include "game/game_settings.h"
 #include "input/first_person.h"
+#include "input/hotkeys.h"
 #include "input/key_gate.h"
 #include "world/click_action.h"
 
 namespace moonclient {
 namespace {
 
-// LA PLACE DE CHAQUE TOUCHE DE MARCHE, et non sa lettre : SDL nomme les places
-// d'après un clavier anglais, ce qui fait ZQSD sur un clavier français.
-constexpr std::array<SDL_Scancode, kStrideKeyCount> kStrideScancodes = {
-    SDL_SCANCODE_W, SDL_SCANCODE_S, SDL_SCANCODE_A, SDL_SCANCODE_D};
+// L'ACTION DE LA TABLE QUI PORTE CHAQUE DIRECTION, dans l'ordre de `StrideKey`.
+constexpr std::array<GameAction, kStrideKeyCount> kStrideActions = {
+    GameAction::kStepForward, GameAction::kStepBack, GameAction::kStepLeft, GameAction::kStepRight};
 
-[[nodiscard]] std::optional<StrideKey> StrideKeyOf(SDL_Scancode scancode) {
-  for (std::size_t rank = 0; rank < kStrideScancodes.size(); ++rank) {
-    if (kStrideScancodes[rank] == scancode) {
+// LA DIRECTION QUE PORTE CETTE TOUCHE.
+//
+// ⚠ MAJ NE COMPTE PAS : on marche en la tenant. Ctrl et Alt comptent, eux :
+// Alt+Z ouvre le groupe, même quand Z avance.
+[[nodiscard]] std::optional<StrideKey> StrideKeyOf(const Hotkeys& bindings,
+                                                   const SDL_KeyboardEvent& key) {
+  const bool ctrl = (key.mod & SDL_KMOD_CTRL) != 0;
+  const bool alt = (key.mod & SDL_KMOD_ALT) != 0;
+  for (std::size_t rank = 0; rank < kStrideActions.size(); ++rank) {
+    const Binding binding = bindings.Of(kStrideActions[rank]);
+    if (binding.bound() && binding.key == key.key && binding.ctrl == ctrl && binding.alt == alt) {
+      return static_cast<StrideKey>(rank);
+    }
+  }
+  return std::nullopt;
+}
+
+// La direction que relâche cette touche, quels que soient les modificateurs :
+// un Alt pressé en marchant ne doit pas laisser la marche tenue.
+[[nodiscard]] std::optional<StrideKey> StrideKeyReleasedBy(const Hotkeys& bindings,
+                                                           SDL_Keycode key) {
+  for (std::size_t rank = 0; rank < kStrideActions.size(); ++rank) {
+    const Binding binding = bindings.Of(kStrideActions[rank]);
+    if (binding.bound() && binding.key == key) {
       return static_cast<StrideKey>(rank);
     }
   }
@@ -55,8 +77,8 @@ bool Game::FirstPersonTakes(const SDL_Event& event) {
       }
       return false;
     case SDL_EVENT_KEY_DOWN: {
-      const std::optional<StrideKey> key = StrideKeyOf(event.key.scancode);
-      if (!key.has_value() || (event.key.mod & (SDL_KMOD_CTRL | SDL_KMOD_ALT)) != 0) {
+      const std::optional<StrideKey> key = StrideKeyOf(settings_->bindings(), event.key);
+      if (!key.has_value()) {
         return false;
       }
       // ⚠ UNE LETTRE QUI S'ÉCRIT N'EST PAS UN PAS : la conversation et les champs
@@ -70,13 +92,13 @@ bool Game::FirstPersonTakes(const SDL_Event& event) {
                          event.key.key, event.key.mod)) {
         return false;
       }
-      // 🔴 AVALÉE : sans cela, Z lancerait aussi la case de la troisième barre
-      // qui porte la même touche.
+      // 🔴 AVALÉE : la touche de marche ne déclenche rien d'autre pendant la vue.
       first_person_.Press(*key);
       return true;
     }
     case SDL_EVENT_KEY_UP:
-      if (const std::optional<StrideKey> key = StrideKeyOf(event.key.scancode)) {
+      if (const std::optional<StrideKey> key =
+              StrideKeyReleasedBy(settings_->bindings(), event.key.key)) {
         first_person_.Release(*key);
       }
       return false;
@@ -94,8 +116,9 @@ void Game::FrameFirstPerson(std::uint32_t now_ms) {
   // UNE TOUCHE RELÂCHÉE HORS DE LA FENÊTRE n'envoie aucun événement : l'état
   // réel du clavier la relâche ici.
   const bool* keyboard = SDL_GetKeyboardState(nullptr);
-  for (std::size_t rank = 0; rank < kStrideScancodes.size(); ++rank) {
-    if (!keyboard[kStrideScancodes[rank]]) {
+  for (std::size_t rank = 0; rank < kStrideActions.size(); ++rank) {
+    const Binding binding = settings_->bindings().Of(kStrideActions[rank]);
+    if (!binding.bound() || !keyboard[SDL_GetScancodeFromKey(binding.key, nullptr)]) {
       first_person_.Release(static_cast<StrideKey>(rank));
     }
   }
