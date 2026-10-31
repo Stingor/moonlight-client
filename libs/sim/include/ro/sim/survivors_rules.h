@@ -69,6 +69,8 @@ enum class SkillArchetype : std::uint8_t {
   kNova,          // aire autour du héros
   kRing,          // piliers sur un cercle autour du héros
   kStorm,         // aire posée qui frappe tout son disque, par vagues
+  kCone,          // cône devant le héros, dans son cap
+  kBarrier,       // blocs posés entre le héros et la horde, qu'elle ne traverse pas
 };
 // kHero : une aire centrée sur le héros, et non sur un monstre visé.
 enum class TargetRule : std::uint8_t { kNearest, kRandom, kStrongest, kDensest, kHero };
@@ -122,6 +124,10 @@ struct SkillLevel {
   std::uint8_t freeze_from_wave = 0;
   std::uint32_t blind_ms = 0;  // aveugle : le monstre erre au hasard
   std::uint32_t curse_ms = 0;  // maudit : plus lent, et plus blessé
+  // Cône : sa demi-ouverture de part et d'autre du cap, en caps sur 64.
+  std::uint8_t cone_half_steps = 0;
+  // Barrière : les PV d'un bloc ; `length_units` est sa distance au héros.
+  std::int32_t block_hp = 0;
 };
 
 // La vitesse d'un tir en sous-unités par pas, tronquée vers zéro : celle du

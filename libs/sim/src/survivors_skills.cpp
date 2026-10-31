@@ -353,6 +353,12 @@ void FireSkills(SurvivorsField& field) {
       case SkillArchetype::kTargetStrike:
         fired = FireStrikes(field, *rule, *level);
         break;
+      case SkillArchetype::kCone:
+        fired = FireCone(field, *rule, *level);
+        break;
+      case SkillArchetype::kBarrier:
+        fired = FireBarrier(field, slot, *rule, *level);
+        break;
       case SkillArchetype::kOrbit:  // tournée plus haut
         break;
     }

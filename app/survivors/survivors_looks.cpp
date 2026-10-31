@@ -33,6 +33,8 @@ namespace {
       return kNapalmBeatFallbackEffect;
     case kFireWallSkill:
       return kFireWallFallbackEffect;
+    case kIceWallSkill:
+      return kIceWallFallbackEffect;
     default:
       return std::nullopt;
   }
@@ -41,6 +43,7 @@ namespace {
 // L'unité que ce skill pose au sol dans le jeu, ou rien.
 [[nodiscard]] std::optional<std::uint32_t> GroundUnitOf(std::uint16_t skill_id) {
   if (skill_id == kFirePillarSkill) return kFirePillarWaitingUnit;
+  if (skill_id == kIceWallSkill) return kIceWallUnit;
   return std::nullopt;
 }
 
@@ -58,12 +61,14 @@ namespace {
     case ro::sim::SkillArchetype::kOrbit:
     case ro::sim::SkillArchetype::kLinear:
     case ro::sim::SkillArchetype::kNova:
+    case ro::sim::SkillArchetype::kCone:
       return SkillBearer::kHero;
     case ro::sim::SkillArchetype::kTargetStrike:
     case ro::sim::SkillArchetype::kClusterBlast:
     case ro::sim::SkillArchetype::kWall:
     case ro::sim::SkillArchetype::kRing:
     case ro::sim::SkillArchetype::kStorm:
+    case ro::sim::SkillArchetype::kBarrier:
       return SkillBearer::kGround;
   }
   return SkillBearer::kGround;

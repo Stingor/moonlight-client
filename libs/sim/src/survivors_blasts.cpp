@@ -143,6 +143,52 @@ bool FireNova(SurvivorsField& field, const SurvivorsSkillRule& rule, const Skill
   return true;
 }
 
+// LE CÔNE : devant le héros, dans son cap, long de `reach_units` majoré de
+// l'aire du héros et ouvert de `cone_half_steps` caps de part et d'autre.
+// Chaque monstre vivant dont le centre y tombe (à la portée près de son
+// rayon), par index croissant, prend son coup au pas du lancer, et un recul
+// qui l'écarte du héros. Il casse les plantes le long de son axe. Il attend
+// un monstre dans le cône.
+bool FireCone(SurvivorsField& field, const SurvivorsSkillRule& rule, const SkillLevel& level) {
+  const std::int32_t length = AreaUnits(field, level.reach_units);
+  if (length <= 0 || level.cone_half_steps == 0) return false;
+  const FieldPoint hero = field.hero.position;
+  const std::uint8_t facing = field.hero.facing;
+  GatherNearby(field, hero, QueryUnits(field, length));
+  std::erase_if(field.nearby, [&](std::uint32_t index) {
+    const SurvivorsFoe& foe = field.foes[index];
+    if (foe.hp <= 0 || !Overlaps(field, foe, hero, length)) return true;
+    const auto turn = static_cast<std::uint32_t>(
+        (std::uint32_t{HeadingOf(foe.position - hero, facing)} + kHeadingSteps - facing) %
+        kHeadingSteps);
+    return std::min(turn, kHeadingSteps - turn) > level.cone_half_steps;
+  });
+  if (field.nearby.empty()) return false;
+  const FieldPoint tip = hero + TurnVector(facing, length);
+  // Les plantes : celles de l'axe, à la demi-largeur du cône à mi-longueur.
+  const std::int32_t half_width =
+      ClampedUnits(IntegerSqrt(static_cast<std::uint64_t>(DistanceSquared(
+          TurnVector(facing, length / 2),
+          TurnVector(static_cast<std::uint8_t>((facing + level.cone_half_steps) % kHeadingSteps),
+                     length / 2)))));
+  BreakPlantsWithin(field, hero, tip, half_width);
+  for (const std::uint32_t index : field.nearby) {
+    SurvivorsFoe& foe = field.foes[index];
+    const SurvivorsStatus status{.freeze_ms = level.freeze_ms,
+                                 .knockback_units = level.knockback_units,
+                                 .knock_heading = HeadingAway(hero, foe, facing)};
+    HurtFoe(field, foe, DamageAgainst(field, level.damage, rule.element, foe), rule.skill_id,
+            status);
+  }
+  PublishCast(field.news, SurvivorsCast{.skill_id = rule.skill_id,
+                                        .kind = CastKind::kConeOn,
+                                        .from = hero,
+                                        .to = tip,
+                                        .target_serial = 0,
+                                        .land_step = 0});
+  return true;
+}
+
 void LandBlasts(SurvivorsField& field) {
   if (field.rules == nullptr) return;
   // Par index, dans l'ordre d'émission : une chute n'ajoute aucun éclat.

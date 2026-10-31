@@ -440,6 +440,15 @@ tr: Púas de tierra brotan bajo monstruos al azar.
 fr: Un orage s'abat sur le monstre le plus proche et frappe en rafale.
 tr: Una tormenta cae sobre el monstruo más cercano y golpea en ráfagas.
 
+fr: Un cône de feu jaillit devant vous, là où vous marchez.
+tr: Un cono de fuego brota delante de ti, hacia donde caminas.
+
+fr: Une rafale de boules d'eau s'abat sur le monstre le plus robuste.
+tr: Una ráfaga de bolas de agua cae sobre el monstruo más resistente.
+
+fr: Des blocs de glace barrent la route à la horde ; qui les frappe gèle.
+tr: Bloques de hielo cierran el paso a la horda; quien los golpea se congela.
+
 fr: Des météores s'abattent là où les monstres se pressent.
 tr: Caen meteoros donde se agolpan los monstruos.
 
@@ -469,6 +478,12 @@ tr: Púas de tierra brotan a tu alrededor.
 
 fr: Des esprits explosifs poursuivent les monstres et les maudissent.
 tr: Espíritus explosivos persiguen a los monstruos y los maldicen.
+
+fr: Un météore écrase la foule la plus dense et la repousse.
+tr: Un meteoro aplasta a la multitud más densa y la hace retroceder.
+
+fr: Une onde glacée part de vous et gèle tout ce qu'elle touche.
+tr: Una onda helada parte de ti y congela todo lo que toca.
 
 fr: Récupération de PV au fil du temps.
 tr: Recuperación de PV con el tiempo.
@@ -20702,20 +20717,50 @@ tr: Obtén Napalm Vulcan, la unión de Soul Strike y Napalm Beat.
 fr: Grand sorcier
 tr: Gran hechicero
 
-fr: Obtenir chacun des neuf skills évolués, au fil des parties.
-tr: Obtén cada una de las nueve habilidades evolucionadas, a lo largo de las partidas.
-
 fr: Hiver éternel
 tr: Invierno eterno
 
-fr: Geler 100 monstres dans une partie de Survivants de Midgard.
-tr: Congela 100 monstruos en una partida de Supervivientes de Midgard.
+fr: Geler 1 000 monstres dans une partie de Survivants de Midgard.
+tr: Congela 1000 monstruos en una partida de Supervivientes de Midgard.
 
 fr: À l'aveugle
 tr: A ciegas
 
 fr: Vaincre Baphomet dans une partie lancée sans minimap.
 tr: Derrota a Baphomet en una partida iniciada sin minimapa.
+
+fr: Souffle ardent
+tr: Aliento ardiente
+
+fr: Porter Fire Ball au niveau maximum dans une partie.
+tr: Lleva Fire Ball al nivel máximo en una partida.
+
+fr: Déluge
+tr: Diluvio
+
+fr: Porter Water Ball au niveau maximum dans une partie.
+tr: Lleva Water Ball al nivel máximo en una partida.
+
+fr: Rempart de glace
+tr: Muralla de hielo
+
+fr: Porter Ice Wall au niveau maximum dans une partie.
+tr: Lleva Ice Wall al nivel máximo en una partida.
+
+fr: Roche pourpre
+tr: Roca carmesí
+
+fr: Obtenir Crimson Rock dans une partie de Survivants de Midgard.
+tr: Obtén Crimson Rock en una partida de Supervivientes de Midgard.
+
+fr: Givre
+tr: Escarcha
+
+fr: Obtenir Jack Frost, l'union de Water Ball et de Cold Bolt.
+tr: Obtén Jack Frost, la unión de Water Ball y Cold Bolt.
+
+fr: Obtenir chacun des skills évolués, au fil des parties.
+tr: Obtén cada una de las habilidades evolucionadas, a lo largo de las partidas.
 
 fr: Recharge de tous les skills raccourcie.
 tr: Recarga más corta para todas las habilidades.
@@ -20809,6 +20854,9 @@ tr: Congelaciones con Cold Bolt, en total
 
 fr: Monstres Wind vaincus, au cumul
 tr: Monstruos Wind derrotados, en total
+
+fr: Monstres Fire vaincus, au cumul
+tr: Monstruos Fire derrotados, en total
 
 fr: Niveau atteint en une seule partie
 tr: Nivel alcanzado en una sola partida

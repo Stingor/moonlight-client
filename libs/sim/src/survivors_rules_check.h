@@ -64,7 +64,8 @@ template <typename Rule, typename IdOf>
 // trouve jamais personne.
 [[nodiscard]] constexpr bool ArchetypeAims(SkillArchetype archetype) noexcept {
   return archetype == SkillArchetype::kTargetStrike || archetype == SkillArchetype::kHoming ||
-         archetype == SkillArchetype::kClusterBlast || archetype == SkillArchetype::kLinear;
+         archetype == SkillArchetype::kClusterBlast || archetype == SkillArchetype::kLinear ||
+         archetype == SkillArchetype::kCone || archetype == SkillArchetype::kBarrier;
 }
 
 // survivors_rules_check_content.cpp : les contrôles du contenu d'une arène

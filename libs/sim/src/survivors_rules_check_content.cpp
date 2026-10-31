@@ -124,17 +124,20 @@ template <std::size_t kCount>
          archetype == SkillArchetype::kRing || archetype == SkillArchetype::kStorm;
 }
 
-// Un mur et un cercle de piliers sont des zones : sans vie, elles meurent nées.
+// Un mur, un cercle de piliers et une barrière sont des zones : sans vie,
+// elles meurent nées.
 [[nodiscard]] bool IsZone(SkillArchetype archetype) noexcept {
-  return archetype == SkillArchetype::kWall || archetype == SkillArchetype::kRing;
+  return archetype == SkillArchetype::kWall || archetype == SkillArchetype::kRing ||
+         archetype == SkillArchetype::kBarrier;
 }
 
 [[nodiscard]] core::Result<void> CheckLevelContent(const SurvivorsSkillRule& skill,
                                                    const SkillLevel& level, const std::string& at) {
-  if (auto checked = CheckMeasures<4>(at, {{{"aire", level.area_radius_units},
+  if (auto checked = CheckMeasures<5>(at, {{{"aire", level.area_radius_units},
                                             {"longueur", level.length_units},
                                             {"recul", level.knockback_units},
-                                            {"portée de rebond", level.bounce_reach_units}}});
+                                            {"portée de rebond", level.bounce_reach_units},
+                                            {"PV de bloc", level.block_hp}}});
       !checked) {
     return checked;
   }
@@ -163,6 +166,17 @@ template <std::size_t kCount>
   if (std::size_t{level.bounces} + 1 > kMostShotHits) {
     return Refuse(at + std::to_string(level.bounces) + " rebonds, au plus " +
                   std::to_string(kMostShotHits - 1));
+  }
+  // Un cône s'ouvre de part et d'autre du cap, au plus d'un demi-tour.
+  if (skill.archetype == SkillArchetype::kCone &&
+      (level.cone_half_steps == 0 || level.cone_half_steps > kHeadingSteps / 2)) {
+    return Refuse(at + "de cône ouvert de " + std::to_string(level.cone_half_steps) +
+                  " caps, de 1 à " + std::to_string(kHeadingSteps / 2));
+  }
+  // Un bloc de barrière a des PV, un rayon, et se pose à une distance.
+  if (skill.archetype == SkillArchetype::kBarrier &&
+      (level.block_hp <= 0 || level.hit_radius_units <= 0 || level.length_units <= 0)) {
+    return Refuse(at + "de barrière sans PV, sans rayon de bloc ou sans distance");
   }
   if (skill.archetype == SkillArchetype::kStorm) {
     // Plusieurs vagues se suivent à un intervalle ; un orage posé sur un
@@ -217,8 +231,10 @@ core::Result<void> CheckSkillContent(const SurvivorsRules& rules) {
     // d'un éclat.
     if (skill.target == TargetRule::kDensest && skill.archetype != SkillArchetype::kTargetStrike &&
         skill.archetype != SkillArchetype::kClusterBlast &&
-        skill.archetype != SkillArchetype::kStorm) {
-      return Refuse(named + "ciblage du plus dense hors d'une frappe, d'un éclat ou d'un orage");
+        skill.archetype != SkillArchetype::kStorm && skill.archetype != SkillArchetype::kBarrier) {
+      return Refuse(named +
+                    "ciblage du plus dense hors d'une frappe, d'un éclat, d'un orage ou "
+                    "d'une barrière");
     }
     // Seule une frappe tire sa cible au hasard : aucun tirage n'est prévu pour
     // un éclat ni pour un orage.

@@ -219,6 +219,7 @@ void SurvivorsRun::Step(SurvivorsInput input) {
   survivors::RunBossScripts(field_);
   survivors::SteerFoes(field_);
   survivors::MoveHorde(field_);
+  survivors::HoldBarriers(field_);
   survivors::RebuildGrid(field_);
   survivors::FireSkills(field_);
   survivors::LandStrikes(field_);

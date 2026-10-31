@@ -260,6 +260,8 @@ struct SurvivorsZone {
   std::uint8_t freeze_from_wave = 0;
   std::uint32_t blind_ms = 0;
   std::uint32_t curse_ms = 0;
+  // Barrière : les PV qui restent au bloc ; à zéro, il éclate.
+  std::int32_t block_hp = 0;
 };
 struct SurvivorsGem {
   FieldPoint position;

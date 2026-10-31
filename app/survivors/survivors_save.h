@@ -101,6 +101,7 @@ struct SurvivorsAlbumCard {
 struct SurvivorsAlbumCounters {
   std::uint64_t chills = 0;      // monstres ralentis par un glaçage
   std::uint64_t wind_kills = 0;  // monstres Wind vaincus
+  std::uint64_t fire_kills = 0;  // monstres Fire vaincus
   std::uint16_t best_level = 0;
   std::uint32_t best_survived_ms = 0;
   std::uint32_t runs = 0;

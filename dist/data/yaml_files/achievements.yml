@@ -6030,7 +6030,7 @@ achievements:
     dependents: []
     window:
       summary: "Survivants de Midgard"
-      details: "Obtenir chacun des neuf skills évolués, au fil des parties."
+      details: "Obtenir chacun des skills évolués, au fil des parties."
       gauge: bullets
       group: "ADVENTURE"
       major: 6
@@ -6045,13 +6045,13 @@ achievements:
     dependents: []
     window:
       summary: "Survivants de Midgard"
-      details: "Geler 100 monstres dans une partie de Survivants de Midgard."
+      details: "Geler 1 000 monstres dans une partie de Survivants de Midgard."
       gauge: bullets
       group: "ADVENTURE"
       major: 6
       minor: 1
       objectives:
-        - {text: "100 monstres gelés"}
+        - {text: "1 000 monstres gelés"}
   910024:
     name: "A l'aveugle"
     score: 30
@@ -6067,3 +6067,78 @@ achievements:
       minor: 1
       objectives:
         - {text: "Sans minimap"}
+  910025:
+    name: "Souffle ardent"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Porter Fire Ball au niveau maximum dans une partie."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Fire Ball niveau 8"}
+  910026:
+    name: "Deluge"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Porter Water Ball au niveau maximum dans une partie."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Water Ball niveau 8"}
+  910027:
+    name: "Rempart de glace"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Porter Ice Wall au niveau maximum dans une partie."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Ice Wall niveau 8"}
+  910028:
+    name: "Roche pourpre"
+    score: 30
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir Crimson Rock dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Crimson Rock"}
+  910029:
+    name: "Givre"
+    score: 30
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir Jack Frost, l'union de Water Ball et de Cold Bolt."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Jack Frost"}

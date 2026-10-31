@@ -440,6 +440,15 @@ tr: Spikes of earth burst up beneath random monsters.
 fr: Un orage s'abat sur le monstre le plus proche et frappe en rafale.
 tr: A storm crashes down on the nearest monster and strikes in bursts.
 
+fr: Un cône de feu jaillit devant vous, là où vous marchez.
+tr: A cone of fire bursts out in front of you, where you walk.
+
+fr: Une rafale de boules d'eau s'abat sur le monstre le plus robuste.
+tr: A volley of water balls crashes onto the sturdiest monster.
+
+fr: Des blocs de glace barrent la route à la horde ; qui les frappe gèle.
+tr: Blocks of ice bar the horde's way; whoever strikes them freezes.
+
 fr: Des météores s'abattent là où les monstres se pressent.
 tr: Meteors crash down where monsters crowd together.
 
@@ -469,6 +478,12 @@ tr: Spikes of earth burst up all around you.
 
 fr: Des esprits explosifs poursuivent les monstres et les maudissent.
 tr: Explosive spirits chase the monsters and curse them.
+
+fr: Un météore écrase la foule la plus dense et la repousse.
+tr: A meteor crushes the densest crowd and drives it back.
+
+fr: Une onde glacée part de vous et gèle tout ce qu'elle touche.
+tr: An icy wave spreads from you and freezes everything it touches.
 
 fr: Récupération de PV au fil du temps.
 tr: HP recovery over time.
@@ -20702,20 +20717,50 @@ tr: Obtain Napalm Vulcan, the union of Soul Strike and Napalm Beat.
 fr: Grand sorcier
 tr: Archwizard
 
-fr: Obtenir chacun des neuf skills évolués, au fil des parties.
-tr: Obtain each of the nine evolved skills, across runs.
-
 fr: Hiver éternel
 tr: Eternal Winter
 
-fr: Geler 100 monstres dans une partie de Survivants de Midgard.
-tr: Freeze 100 monsters in a Midgard Survivors run.
+fr: Geler 1 000 monstres dans une partie de Survivants de Midgard.
+tr: Freeze 1,000 monsters in a Midgard Survivors run.
 
 fr: À l'aveugle
 tr: Blindfolded
 
 fr: Vaincre Baphomet dans une partie lancée sans minimap.
 tr: Defeat Baphomet in a run started without the minimap.
+
+fr: Souffle ardent
+tr: Searing Breath
+
+fr: Porter Fire Ball au niveau maximum dans une partie.
+tr: Raise Fire Ball to its maximum level in a run.
+
+fr: Déluge
+tr: Deluge
+
+fr: Porter Water Ball au niveau maximum dans une partie.
+tr: Raise Water Ball to its maximum level in a run.
+
+fr: Rempart de glace
+tr: Rampart of Ice
+
+fr: Porter Ice Wall au niveau maximum dans une partie.
+tr: Raise Ice Wall to its maximum level in a run.
+
+fr: Roche pourpre
+tr: Crimson Stone
+
+fr: Obtenir Crimson Rock dans une partie de Survivants de Midgard.
+tr: Obtain Crimson Rock in a Midgard Survivors run.
+
+fr: Givre
+tr: Hoarfrost
+
+fr: Obtenir Jack Frost, l'union de Water Ball et de Cold Bolt.
+tr: Obtain Jack Frost, the union of Water Ball and Cold Bolt.
+
+fr: Obtenir chacun des skills évolués, au fil des parties.
+tr: Obtain each of the evolved skills, across runs.
 
 fr: Recharge de tous les skills raccourcie.
 tr: Shorter cooldown for every skill.
@@ -20809,6 +20854,9 @@ tr: Chills by Cold Bolt, in total
 
 fr: Monstres Wind vaincus, au cumul
 tr: Wind monsters defeated, in total
+
+fr: Monstres Fire vaincus, au cumul
+tr: Fire monsters defeated, in total
 
 fr: Niveau atteint en une seule partie
 tr: Level reached in a single run

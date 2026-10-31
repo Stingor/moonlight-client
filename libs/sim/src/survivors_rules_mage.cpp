@@ -22,7 +22,7 @@ constexpr std::uint16_t kMageClassId = 1;
 constexpr std::uint16_t kMageJobId = 2;
 constexpr std::uint16_t kWizardJobId = 9;          // l'apparence après une évolution
 constexpr std::uint16_t kMageWeaponItemId = 1601;  // Rod
-constexpr std::int32_t kMageMaxHp = 300;
+constexpr std::int32_t kMageMaxHp = 340;
 constexpr std::uint32_t kMageWalkMsPerCell = 150;
 constexpr std::int32_t kMageMagnetCells = 3;
 constexpr std::int32_t kMageDamagePctPerLevel = 1;
@@ -73,6 +73,18 @@ constexpr std::int32_t kDiverHitRadiusTenths = 4;
 // frappe tout son disque toutes les 300 ms.
 constexpr std::int32_t kThunderstormReachCells = 9;
 constexpr std::uint32_t kThunderstormWaveMs = 300;
+
+// Fire Ball : un cône de feu devant le héros, qui écarte d'une demi-case.
+constexpr std::int32_t kFireBallKnockbackTenths = 5;
+
+// Ice Wall : des blocs d'une demi-case de rayon, posés à trois cases du héros
+// face à la foule la plus dense qu'il cherche à dix cases, et qui tiennent
+// six secondes.
+constexpr std::int32_t kIceWallSearchCells = 10;
+constexpr std::int32_t kIceWallDensityCells = 2;
+constexpr std::int32_t kIceWallAheadCells = 3;
+constexpr std::int32_t kIceWallBlockTenths = 5;
+constexpr std::uint32_t kIceWallLifeMs = 6000;
 
 // Un niveau d'éclair : `amount` frappes de `damage`, une salve par
 // `cooldown_ms`, et un glaçage de `chill_ms` (0 : aucun).
@@ -184,6 +196,34 @@ constexpr std::uint32_t kThunderstormWaveMs = 300;
                     .interval_ms = kThunderstormWaveMs,
                     .reach_units = Cells(kThunderstormReachCells),
                     .area_radius_units = CellTenths(radius_tenths)};
+}
+
+// Un niveau de Fire Ball : un cône de `damage`, long de `length_tenths`
+// dixièmes de case et ouvert de `half_steps` caps de chaque côté.
+[[nodiscard]] constexpr SkillLevel Cone(std::int32_t damage, std::uint32_t cooldown_ms,
+                                        std::int32_t length_tenths,
+                                        std::uint8_t half_steps) noexcept {
+  return SkillLevel{.damage = damage,
+                    .cooldown_ms = cooldown_ms,
+                    .reach_units = CellTenths(length_tenths),
+                    .knockback_units = CellTenths(kFireBallKnockbackTenths),
+                    .cone_half_steps = half_steps};
+}
+
+// Un niveau d'Ice Wall : `blocks` blocs de `block_hp` PV, qui gèlent
+// `freeze_ms` le monstre qui les frappe.
+[[nodiscard]] constexpr SkillLevel IceWall(std::uint8_t blocks, std::int32_t block_hp,
+                                           std::uint32_t freeze_ms,
+                                           std::uint32_t cooldown_ms) noexcept {
+  return SkillLevel{.cooldown_ms = cooldown_ms,
+                    .amount = blocks,
+                    .reach_units = Cells(kIceWallSearchCells),
+                    .hit_radius_units = CellTenths(kIceWallBlockTenths),
+                    .life_ms = kIceWallLifeMs,
+                    .area_radius_units = Cells(kIceWallDensityCells),
+                    .length_units = Cells(kIceWallAheadCells),
+                    .freeze_ms = freeze_ms,
+                    .block_hp = block_hp};
 }
 
 // Bolt(frappes, dégâts, recharge en ms).
@@ -304,7 +344,42 @@ constexpr std::array<SkillLevel, kMostSkillLevels> kThunderstormLevels{{
     Storm(7, 36, 2400, 25),
 }};
 
-constexpr std::array<SurvivorsSkillRule, 10> kPoolSkills{{
+// Cone(dégâts, recharge en ms, longueur en dixièmes de case, demi-ouverture
+// en caps).
+constexpr std::array<SkillLevel, kMostSkillLevels> kFireBallLevels{{
+    Cone(33, 1500, 35, 5),
+    Cone(39, 1500, 35, 5),
+    Cone(39, 1400, 40, 6),
+    Cone(47, 1400, 40, 6),
+    Cone(47, 1300, 45, 7),
+    Cone(56, 1300, 45, 7),
+    Cone(56, 1200, 50, 8),
+    Cone(67, 1100, 50, 8),
+}};
+// Bolt(frappes, dégâts, recharge en ms) : la rafale de Water Ball.
+constexpr std::array<SkillLevel, kMostSkillLevels> kWaterBallLevels{{
+    Bolt(3, 28, 2600),
+    Bolt(3, 33, 2600),
+    Bolt(4, 33, 2600),
+    Bolt(4, 39, 2400),
+    Bolt(5, 39, 2400),
+    Bolt(5, 44, 2200),
+    Bolt(6, 44, 2200),
+    Bolt(7, 50, 2000),
+}};
+// IceWall(blocs, PV d'un bloc, gel en ms, recharge en ms).
+constexpr std::array<SkillLevel, kMostSkillLevels> kIceWallLevels{{
+    IceWall(5, 80, 800, 9000),
+    IceWall(5, 100, 800, 9000),
+    IceWall(6, 100, 1000, 8500),
+    IceWall(6, 130, 1000, 8500),
+    IceWall(7, 130, 1200, 8000),
+    IceWall(7, 160, 1200, 7500),
+    IceWall(8, 160, 1500, 7500),
+    IceWall(9, 200, 1500, 7000),
+}};
+
+constexpr std::array<SurvivorsSkillRule, 13> kPoolSkills{{
     {.skill_id = kFireBoltId,
      .key = "fire_bolt",
      .description = core::TrText("Des éclairs de feu frappent le monstre le plus proche."),
@@ -376,6 +451,29 @@ constexpr std::array<SurvivorsSkillRule, 10> kPoolSkills{{
      .target = TargetRule::kNearest,
      .element = SurvivorsElement::kWind,
      .levels = kThunderstormLevels},
+    {.skill_id = kFireBallId,
+     .key = "fire_ball",
+     .description = core::TrText("Un cône de feu jaillit devant vous, là où vous marchez."),
+     .archetype = SkillArchetype::kCone,
+     .target = TargetRule::kNearest,
+     .element = SurvivorsElement::kFire,
+     .levels = kFireBallLevels},
+    {.skill_id = kWaterBallId,
+     .key = "water_ball",
+     .description =
+         core::TrText("Une rafale de boules d'eau s'abat sur le monstre le plus robuste."),
+     .archetype = SkillArchetype::kTargetStrike,
+     .target = TargetRule::kStrongest,
+     .element = SurvivorsElement::kWater,
+     .levels = kWaterBallLevels},
+    {.skill_id = kIceWallId,
+     .key = "ice_wall",
+     .description =
+         core::TrText("Des blocs de glace barrent la route à la horde ; qui les frappe gèle."),
+     .archetype = SkillArchetype::kBarrier,
+     .target = TargetRule::kDensest,
+     .element = SurvivorsElement::kWater,
+     .levels = kIceWallLevels},
 }};
 
 // Le gain de chaque carte, du niveau 1 au niveau 5.
@@ -459,9 +557,10 @@ constexpr std::array<CardRule, 12> kCards{{
 
 constexpr std::array<std::uint16_t, 3> kMageStarterSkills{kFireBoltId, kColdBoltId,
                                                           kLightningBoltId};
-constexpr std::array<std::uint16_t, 10> kMageSkillPool{
-    kFireBoltId,   kColdBoltId, kLightningBoltId, kSoulStrikeId, kSightId,
-    kNapalmBeatId, kFireWallId, kFrostDiverId,    kEarthSpikeId, kThunderstormId};
+constexpr std::array<std::uint16_t, 13> kMageSkillPool{
+    kFireBoltId,   kColdBoltId,  kLightningBoltId, kSoulStrikeId, kSightId,
+    kNapalmBeatId, kFireWallId,  kFrostDiverId,    kEarthSpikeId, kThunderstormId,
+    kFireBallId,   kWaterBallId, kIceWallId};
 // Les douze cartes, celles des boss comprises : la réserve livrée est
 // entière, celle du départ neutre ; une partie libre en retire par ses Id
 // verrouillés ce que le carnet n'a pas débloqué.

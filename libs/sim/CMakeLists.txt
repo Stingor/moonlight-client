@@ -105,6 +105,7 @@ add_library(ro_sim STATIC
     src/style_code.cpp
     src/summon_master.cpp
     src/survivors_behaviours.cpp
+    src/survivors_barriers.cpp
     src/survivors_blasts.cpp
     src/survivors_bosses.cpp
     src/survivors_bot.cpp

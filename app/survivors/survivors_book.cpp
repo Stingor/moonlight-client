@@ -29,8 +29,12 @@ constexpr std::uint64_t kFrostDiverChills = 500;
 constexpr std::uint64_t kEarthSpikeWindKills = 300;
 // Thunderstorm se débloque par le niveau 25 atteint en une partie.
 constexpr std::uint64_t kThunderstormLevel = 25;
+// Water Ball se débloque par 500 monstres Fire vaincus au cumul.
+constexpr std::uint64_t kWaterBallFireKills = 500;
+// Ice Wall se débloque par une partie survécue dix minutes.
+constexpr std::uint64_t kIceWallSurvivedMs = 10ULL * 60 * 1000;
 
-constexpr std::array<SurvivorsUnlock, 10> kUnlocks{{
+constexpr std::array<SurvivorsUnlock, 12> kUnlocks{{
     {.key = "golem_card", .condition = UnlockCondition::kCardFound},
     {.key = "mastering_card", .condition = UnlockCondition::kCardFound},
     {.key = "eclipse_card", .condition = UnlockCondition::kCardFound},
@@ -41,13 +45,17 @@ constexpr std::array<SurvivorsUnlock, 10> kUnlocks{{
     {.key = "frost_diver", .condition = UnlockCondition::kFeat},
     {.key = "earth_spike", .condition = UnlockCondition::kFeat},
     {.key = "thunderstorm", .condition = UnlockCondition::kFeat},
+    {.key = "water_ball", .condition = UnlockCondition::kFeat},
+    {.key = "ice_wall", .condition = UnlockCondition::kFeat},
 }};
 
-constexpr std::array<SurvivorsFeat, 4> kFeats{{
+constexpr std::array<SurvivorsFeat, 6> kFeats{{
     {.key = "sight", .counter = FeatCounter::kBestSurvivedMs, .threshold = kSightSurvivedMs},
     {.key = "frost_diver", .counter = FeatCounter::kChills, .threshold = kFrostDiverChills},
     {.key = "earth_spike", .counter = FeatCounter::kWindKills, .threshold = kEarthSpikeWindKills},
     {.key = "thunderstorm", .counter = FeatCounter::kBestLevel, .threshold = kThunderstormLevel},
+    {.key = "water_ball", .counter = FeatCounter::kFireKills, .threshold = kWaterBallFireKills},
+    {.key = "ice_wall", .counter = FeatCounter::kBestSurvivedMs, .threshold = kIceWallSurvivedMs},
 }};
 
 [[nodiscard]] std::uint64_t SaturatedAdd(std::uint64_t total, std::uint64_t amount) noexcept {
@@ -104,6 +112,8 @@ constexpr std::array<SurvivorsFeat, 4> kFeats{{
       return counters.wind_kills;
     case FeatCounter::kBestLevel:
       return counters.best_level;
+    case FeatCounter::kFireKills:
+      return counters.fire_kills;
   }
   return 0;
 }
@@ -141,6 +151,9 @@ void CountRun(const ro::sim::SurvivorsRules& rules, SurvivorsAlbumCounters& coun
     const ro::sim::FoeRule* foe = ro::sim::FindFoe(rules, kills.id);
     if (foe != nullptr && foe->element == ro::sim::SurvivorsElement::kWind) {
       counters.wind_kills = SaturatedAdd(counters.wind_kills, kills.value);
+    }
+    if (foe != nullptr && foe->element == ro::sim::SurvivorsElement::kFire) {
+      counters.fire_kills = SaturatedAdd(counters.fire_kills, kills.value);
     }
   }
   counters.best_level = std::max(counters.best_level, ending.tally.level);

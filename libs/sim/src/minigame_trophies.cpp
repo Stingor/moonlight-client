@@ -67,11 +67,21 @@ constexpr std::array<MinigameTrophyText, kMinigameTrophyCount> kTrophies = {{
     {MinigameTrophy::kSurvivorsNapalmVulcan, "survivors_napalm_vulcan", core::TrText("Union"),
      core::TrText("Obtenir Napalm Vulcan, l'union de Soul Strike et de Napalm Beat.")},
     {MinigameTrophy::kSurvivorsGrandWizard, "survivors_grand_wizard", core::TrText("Grand sorcier"),
-     core::TrText("Obtenir chacun des neuf skills évolués, au fil des parties.")},
+     core::TrText("Obtenir chacun des skills évolués, au fil des parties.")},
     {MinigameTrophy::kSurvivorsDeepFreeze, "survivors_deep_freeze", core::TrText("Hiver éternel"),
-     core::TrText("Geler 100 monstres dans une partie de Survivants de Midgard.")},
+     core::TrText("Geler 1 000 monstres dans une partie de Survivants de Midgard.")},
     {MinigameTrophy::kSurvivorsBlindVictory, "survivors_blind_victory", core::TrText("À l'aveugle"),
      core::TrText("Vaincre Baphomet dans une partie lancée sans minimap.")},
+    {MinigameTrophy::kSurvivorsFireBall, "survivors_fire_ball", core::TrText("Souffle ardent"),
+     core::TrText("Porter Fire Ball au niveau maximum dans une partie.")},
+    {MinigameTrophy::kSurvivorsWaterBall, "survivors_water_ball", core::TrText("Déluge"),
+     core::TrText("Porter Water Ball au niveau maximum dans une partie.")},
+    {MinigameTrophy::kSurvivorsIceWall, "survivors_ice_wall", core::TrText("Rempart de glace"),
+     core::TrText("Porter Ice Wall au niveau maximum dans une partie.")},
+    {MinigameTrophy::kSurvivorsCrimsonRock, "survivors_crimson_rock", core::TrText("Roche pourpre"),
+     core::TrText("Obtenir Crimson Rock dans une partie de Survivants de Midgard.")},
+    {MinigameTrophy::kSurvivorsJackFrost, "survivors_jack_frost", core::TrText("Givre"),
+     core::TrText("Obtenir Jack Frost, l'union de Water Ball et de Cold Bolt.")},
 }};
 
 }  // namespace

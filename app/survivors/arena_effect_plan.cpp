@@ -20,6 +20,10 @@ namespace {
                                                                      : hero_class.job_id;
 }
 
+// LE CÔNE se montre par autant d'éclats de son effet, au sol, également
+// espacés sur son axe jusqu'à sa pointe.
+inline constexpr std::int64_t kConeBursts = 3;
+
 // L'effet qu'un lancer de skill fait naître, d'après sa sorte.
 void PlanCast(const ro::sim::SurvivorsCast& cast, const SkillLook& look,
               std::vector<ArenaLaunch>& out) {
@@ -38,6 +42,17 @@ void PlanCast(const ro::sim::SurvivorsCast& cast, const SkillLook& look,
                                 .at = look.bearer == SkillBearer::kHero ? cast.from : cast.to,
                                 .target = cast.to});
       return;
+    case ro::sim::CastKind::kConeOn:
+      for (std::int64_t burst = 1; burst <= kConeBursts; ++burst) {
+        const ro::sim::FieldPoint at{
+            static_cast<std::int32_t>(cast.from.x + (std::int64_t{cast.to.x} - cast.from.x) *
+                                                        burst / kConeBursts),
+            static_cast<std::int32_t>(cast.from.y + (std::int64_t{cast.to.y} - cast.from.y) *
+                                                        burst / kConeBursts)};
+        out.push_back(
+            ArenaLaunch{.effect_id = look.effect_id, .kind = ArenaLaunchKind::kOnGround, .at = at});
+      }
+      return;
     // Orbites et zones se lisent sur l'état : voir `PlanArenaOrbs`.
     case ro::sim::CastKind::kOrbitOn:
     case ro::sim::CastKind::kOrbitOff:
@@ -45,6 +60,7 @@ void PlanCast(const ro::sim::SurvivorsCast& cast, const SkillLook& look,
     case ro::sim::CastKind::kRingOn:
     case ro::sim::CastKind::kStormOn:
     case ro::sim::CastKind::kZoneOff:
+    case ro::sim::CastKind::kBlockOn:
       return;
   }
 }

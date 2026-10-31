@@ -58,6 +58,10 @@ void SteerFoes(SurvivorsField& field);
 // au-dessus de la horde), poussée du héros ; un monstre gelé y compte comme
 // immobile.
 void MoveHorde(SurvivorsField& field);
+// survivors_barriers.cpp. LES BLOCS RETIENNENT LA HORDE, après sa marche : un
+// monstre qui chevauche un bloc en est repoussé le long de son bord ; s'il
+// peut frapper, il frappe le bloc et gèle. Un boss ou un mini-boss le brise.
+void HoldBarriers(SurvivorsField& field);
 // survivors_horde.cpp. `foe_points` et `foe_grid` reflètent `foes`.
 void RebuildGrid(SurvivorsField& field);
 // survivors_skills.cpp. Les salves dues, aiguillées par archétype : frappes
@@ -237,6 +241,12 @@ void HurtFoe(SurvivorsField& field, SurvivorsFoe& foe, SurvivorsDamage damage,
 // survivors_blasts.cpp : l'éclat visé et la nova.
 [[nodiscard]] bool FireClusterBlast(SurvivorsField& field, const SurvivorsSkillRule& rule,
                                     const SkillLevel& level);
+// survivors_blasts.cpp : le cône devant le héros.
+[[nodiscard]] bool FireCone(SurvivorsField& field, const SurvivorsSkillRule& rule,
+                            const SkillLevel& level);
+// survivors_barriers.cpp : la barrière.
+[[nodiscard]] bool FireBarrier(SurvivorsField& field, std::uint8_t slot,
+                               const SurvivorsSkillRule& rule, const SkillLevel& level);
 [[nodiscard]] bool FireNova(SurvivorsField& field, const SurvivorsSkillRule& rule,
                             const SkillLevel& level);
 // survivors_zones.cpp : le mur et le cercle de piliers.

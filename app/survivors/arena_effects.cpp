@@ -463,6 +463,8 @@ void ArenaEffects::KeepZones(const ro::sim::SurvivorsField& field, std::uint32_t
   }
   std::vector<ro::sim::FieldPoint> points;
   for (const ro::sim::SurvivorsZone& zone : field.zones) {
+    // Un bloc de barrière n'a pas de flamme : son unité au sol le montre.
+    if (zone.archetype == ro::sim::SkillArchetype::kBarrier) continue;
     const SkillLook* look = looks_.Find(zone.skill_id);
     if (look == nullptr) continue;
     ZonePoints(zone, points);

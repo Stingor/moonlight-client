@@ -35,8 +35,11 @@ class SurvivorsRun;
 //   Heaven's Drive, Napalm Vulcan possédé à la fin de la partie.
 // - « Grand sorcier » : chacun des skills évolués des règles obtenu au moins
 //   une fois, au fil des parties (`MinigameRecord::survivors_evolved`).
-// - « Hiver éternel » : 100 monstres gelés dans la partie.
+// - « Hiver éternel » : 1 000 monstres gelés dans la partie.
 // - « À l'aveugle » : la victoire dans une partie lancée sans minimap.
+// - « Souffle ardent », « Déluge », « Rempart de glace » : Fire Ball, Water
+//   Ball, Ice Wall possédé à son plus haut niveau à la fin de la partie.
+// - « Roche pourpre », « Givre » : Crimson Rock, Jack Frost possédé à la fin.
 
 // CE QUE LA PARTIE NE SAIT PAS D'ELLE-MÊME, et qu'`app` dit : la minimap est
 // un affichage, que la simulation ignore.

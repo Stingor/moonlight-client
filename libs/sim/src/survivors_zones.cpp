@@ -66,8 +66,10 @@ void PublishZone(SurvivorsNews& news, const SurvivorsZone& zone, CastKind kind) 
   return zone.limited && zone.hits_left == 0;
 }
 
+// Un bloc de barrière éclate à zéro PV.
 [[nodiscard]] bool Over(const SurvivorsField& field, const SurvivorsZone& zone) noexcept {
-  return field.step >= zone.expires_step || Spent(zone);
+  return field.step >= zone.expires_step || Spent(zone) ||
+         (zone.archetype == SkillArchetype::kBarrier && zone.block_hp <= 0);
 }
 
 // Un mur : chaque monstre vivant qu'il chevauche, par index croissant, prend
@@ -262,7 +264,8 @@ void AdvanceZones(SurvivorsField& field) {
   // Par index, dans l'ordre de pose : une zone n'en pose aucune autre.
   for (std::size_t index = 0; index < field.zones.size(); ++index) {
     SurvivorsZone& zone = field.zones[index];
-    if (Over(field, zone)) continue;
+    // Un bloc ne frappe rien : HoldBarriers retient la horde.
+    if (Over(field, zone) || zone.archetype == SkillArchetype::kBarrier) continue;
     // Une zone vivante casse les plantes de son aire à chaque pas, monstres
     // ou non ; un pilier dès qu'il est armé, un orage à chaque vague.
     const bool waits =

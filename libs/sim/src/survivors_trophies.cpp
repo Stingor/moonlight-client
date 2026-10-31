@@ -19,7 +19,7 @@ namespace {
 constexpr std::uint32_t kHoldOutMs = 300000;
 constexpr std::uint32_t kManyKills = 1000;
 constexpr std::uint16_t kSeasonedLevel = 40;
-constexpr std::uint64_t kManyFreezes = 100;
+constexpr std::uint64_t kManyFreezes = 1000;
 
 // Les trophées d'un skill évolué possédé, chacun le sien.
 struct EvolvedTrophy {
@@ -33,11 +33,33 @@ constexpr std::array<EvolvedTrophy, 5> kEvolvedTrophies{{
     {survivors::kHeavensDriveId, MinigameTrophy::kSurvivorsHeavensDrive},
     {survivors::kNapalmVulcanId, MinigameTrophy::kSurvivorsNapalmVulcan},
 }};
+// Ceux des évolués du Warlock, au rang qui suit les skills de niveau maximum.
+constexpr std::array<EvolvedTrophy, 2> kWarlockTrophies{{
+    {survivors::kCrimsonRockId, MinigameTrophy::kSurvivorsCrimsonRock},
+    {survivors::kJackFrostId, MinigameTrophy::kSurvivorsJackFrost},
+}};
+
+// Les trophées d'un skill de base porté à son plus haut niveau.
+constexpr std::array<EvolvedTrophy, 3> kTopLevelTrophies{{
+    {survivors::kFireBallId, MinigameTrophy::kSurvivorsFireBall},
+    {survivors::kWaterBallId, MinigameTrophy::kSurvivorsWaterBall},
+    {survivors::kIceWallId, MinigameTrophy::kSurvivorsIceWall},
+}};
 
 [[nodiscard]] bool Owns(const SurvivorsField& field, std::uint16_t skill_id) {
   return std::ranges::any_of(field.hero.skills, [skill_id](const OwnedSkill& owned) {
     return owned.skill_id == skill_id;
   });
+}
+
+// Vrai si la partie possède `skill_id` à son plus haut niveau.
+[[nodiscard]] bool OwnsAtTop(const SurvivorsField& field, std::uint16_t skill_id) {
+  if (field.rules == nullptr) return false;
+  const SurvivorsSkillRule* rule = FindSkill(*field.rules, skill_id);
+  return rule != nullptr && !rule->levels.empty() &&
+         std::ranges::any_of(field.hero.skills, [&](const OwnedSkill& owned) {
+           return owned.skill_id == skill_id && std::size_t{owned.level} == rule->levels.size();
+         });
 }
 
 // Ajoute au record les évolués que la partie possède, et dit si le record les
@@ -98,6 +120,12 @@ std::vector<MinigameTrophy> RecordSurvivors(MinigameRecord& record, const Surviv
                      field.recap.freezes >= kManyFreezes, fresh);
   EarnMinigameTrophy(record, MinigameTrophy::kSurvivorsBlindVictory,
                      victory && facts.without_minimap, fresh);
+  for (const EvolvedTrophy& top : kTopLevelTrophies) {
+    EarnMinigameTrophy(record, top.trophy, OwnsAtTop(field, top.skill_id), fresh);
+  }
+  for (const EvolvedTrophy& evolved : kWarlockTrophies) {
+    EarnMinigameTrophy(record, evolved.trophy, Owns(field, evolved.skill_id), fresh);
+  }
   return fresh;
 }
 

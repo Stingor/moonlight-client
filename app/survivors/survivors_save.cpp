@@ -51,6 +51,7 @@ constexpr const char* kFeatsField = "feats";
 constexpr const char* kCountersField = "counters";
 constexpr const char* kChillsField = "chills";
 constexpr const char* kWindKillsField = "wind_kills";
+constexpr const char* kFireKillsField = "fire_kills";
 constexpr const char* kBestLevelField = "best_level";
 constexpr const char* kBestSurvivedField = "best_survived_ms";
 constexpr const char* kRunsCountField = "runs";
@@ -342,6 +343,7 @@ void ReadAlbum(const YAML::Node& section, SurvivorsAlbum& album) {
   const YAML::Node counters = MapIn(section, kCountersField);
   album.counters.chills = CountIn<std::uint64_t>(counters, kChillsField, 0);
   album.counters.wind_kills = CountIn<std::uint64_t>(counters, kWindKillsField, 0);
+  album.counters.fire_kills = CountIn<std::uint64_t>(counters, kFireKillsField, 0);
   album.counters.best_level = CountIn<std::uint16_t>(counters, kBestLevelField, 0);
   album.counters.best_survived_ms = CountIn<std::uint32_t>(counters, kBestSurvivedField, 0);
   album.counters.runs = CountIn<std::uint32_t>(counters, kRunsCountField, 0);
@@ -524,6 +526,7 @@ void WriteAlbum(YAML::Emitter& out, const SurvivorsAlbum& album) {
   out << YAML::Key << kCountersField << YAML::Value << YAML::BeginMap;
   out << YAML::Key << kChillsField << YAML::Value << counters.chills;
   out << YAML::Key << kWindKillsField << YAML::Value << counters.wind_kills;
+  out << YAML::Key << kFireKillsField << YAML::Value << counters.fire_kills;
   out << YAML::Key << kBestLevelField << YAML::Value << counters.best_level;
   out << YAML::Key << kBestSurvivedField << YAML::Value << counters.best_survived_ms;
   out << YAML::Key << kRunsCountField << YAML::Value << counters.runs;

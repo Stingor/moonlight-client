@@ -64,6 +64,12 @@ inline constexpr std::uint16_t kSoulStrikeSkill = 13;
 // Fire Pillar pose le pilier en attente, dont le cercle rouge marque la case.
 inline constexpr std::uint16_t kFirePillarSkill = 80;
 inline constexpr std::uint32_t kFirePillarWaitingUnit = 135;
+// Ice Wall : chaque bloc est l'unité du mur de glace du jeu, un bloc permanent
+// tant que sa zone dure.
+inline constexpr std::uint16_t kIceWallSkill = 87;
+inline constexpr std::uint32_t kIceWallUnit = 141;
+// Son lancer n'a pas d'effet au tableau : il se montre par le bloc lui-même.
+inline constexpr std::uint32_t kIceWallFallbackEffect = 74;
 
 // L'EFFET D'UNE ÉVOLUTION : le changement de métier, sur le héros.
 inline constexpr std::uint32_t kJobChangeEffect = 156;

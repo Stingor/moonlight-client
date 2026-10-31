@@ -55,11 +55,16 @@ enum class MinigameTrophy : std::uint8_t {
   kSurvivorsGrandWizard,
   kSurvivorsDeepFreeze,
   kSurvivorsBlindVictory,
+  kSurvivorsFireBall,
+  kSurvivorsWaterBall,
+  kSurvivorsIceWall,
+  kSurvivorsCrimsonRock,
+  kSurvivorsJackFrost,
 };
 
-inline constexpr std::size_t kMinigameTrophyCount = 24;
+inline constexpr std::size_t kMinigameTrophyCount = 29;
 static_assert(kMinigameTrophyCount ==
-                  static_cast<std::size_t>(MinigameTrophy::kSurvivorsBlindVictory) + 1,
+                  static_cast<std::size_t>(MinigameTrophy::kSurvivorsJackFrost) + 1,
               "le compte suit le dernier trophée de l'énumération");
 
 struct MinigameTrophyText {

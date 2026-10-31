@@ -124,6 +124,30 @@ constexpr std::array<SkillLevel, 1> kNapalmVulcanLevels{{
      .curse_ms = 3000},
 }};
 
+// Crimson Rock : un météore sur la foule la plus dense, plein dans tout
+// l'éclat, qui repousse loin.
+constexpr std::array<SkillLevel, 1> kCrimsonRockLevels{{
+    {.damage = 90,
+     .cooldown_ms = 2500,
+     .amount = 1,
+     .reach_units = Cells(10),
+     .area_radius_units = CellTenths(35),
+     .splash_pct = 100,
+     .knockback_units = Cells(2)},
+}};
+
+// Jack Frost : une onde glacée autour du héros, quatre vagues qui gèlent dès
+// la première.
+constexpr std::array<SkillLevel, 1> kJackFrostLevels{{
+    {.damage = 40,
+     .cooldown_ms = 4500,
+     .amount = 4,
+     .interval_ms = 300,
+     .area_radius_units = Cells(6),
+     .freeze_ms = 2000,
+     .freeze_from_wave = 1},
+}};
+
 constexpr std::array<SurvivorsSkillRule, kShippedEvolvedSkillCount> kEvolvedSkills{{
     {.skill_id = kMeteorStormId,
      .key = "meteor_storm",
@@ -189,6 +213,20 @@ constexpr std::array<SurvivorsSkillRule, kShippedEvolvedSkillCount> kEvolvedSkil
      .target = TargetRule::kNearest,
      .element = SurvivorsElement::kGhost,
      .levels = kNapalmVulcanLevels},
+    {.skill_id = kCrimsonRockId,
+     .key = "crimson_rock",
+     .description = core::TrText("Un météore écrase la foule la plus dense et la repousse."),
+     .archetype = SkillArchetype::kClusterBlast,
+     .target = TargetRule::kDensest,
+     .element = SurvivorsElement::kFire,
+     .levels = kCrimsonRockLevels},
+    {.skill_id = kJackFrostId,
+     .key = "jack_frost",
+     .description = core::TrText("Une onde glacée part de vous et gèle tout ce qu'elle touche."),
+     .archetype = SkillArchetype::kStorm,
+     .target = TargetRule::kHero,
+     .element = SurvivorsElement::kWater,
+     .levels = kJackFrostLevels},
 }};
 
 constexpr std::array<EvolutionRule, kShippedEvolvedSkillCount> kEvolutions{{
@@ -209,6 +247,13 @@ constexpr std::array<EvolutionRule, kShippedEvolvedSkillCount> kEvolutions{{
      .card_item_id = 0,
      .evolved_skill_id = kNapalmVulcanId,
      .partner_skill_id = kNapalmBeatId},
+    {.skill_id = kFireBallId, .card_item_id = kSporeCardId, .evolved_skill_id = kCrimsonRockId},
+    // L'UNION : Water Ball et Cold Bolt — que Storm Gust consomme aussi : la
+    // première des deux évolutions prend Cold Bolt.
+    {.skill_id = kWaterBallId,
+     .card_item_id = 0,
+     .evolved_skill_id = kJackFrostId,
+     .partner_skill_id = kColdBoltId},
 }};
 
 }  // namespace
