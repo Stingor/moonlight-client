@@ -51,6 +51,7 @@ constexpr std::array<float, 4> kNoArenaClearColor = {0.0F, 0.0F, 0.0F, 1.0F};
                                                      : SurvivorsEventKind::kKeyUp;
       routed.scancode = static_cast<std::uint32_t>(event.key.scancode);
       routed.repeat = event.key.repeat;
+      routed.ctrl = (event.key.mod & SDL_KMOD_CTRL) != 0;
       break;
     case SDL_EVENT_MOUSE_BUTTON_DOWN:
     case SDL_EVENT_MOUSE_BUTTON_UP:

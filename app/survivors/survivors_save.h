@@ -85,6 +85,8 @@ struct SurvivorsSaveMeta {
   std::vector<SurvivorsForeignEntry> foreign_church_ranks;
   std::vector<SurvivorsForeignEntry> foreign_kafra_ranks;
   std::uint8_t cursed_water = 0;  // le dernier rang choisi, 0 à kMostCursedWater
+  // La partie libre part sans minimap : voir `kWithoutMinimapZenyPct`.
+  bool without_minimap = false;
   [[nodiscard]] bool operator==(const SurvivorsSaveMeta&) const = default;
 };
 

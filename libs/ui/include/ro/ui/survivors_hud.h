@@ -9,6 +9,7 @@
 #include <imgui.h>
 
 #include "ro/ui/survivors_effects.h"
+#include "ro/ui/survivors_minimap.h"
 
 namespace ro::ui {
 
@@ -19,8 +20,9 @@ namespace ro::ui {
 //   - le minuteur centré dessous, puis la barre du boss quand il vit ;
 //   - en haut à gauche les skills, puis les cartes (icône et niveau) ;
 //   - en haut à droite les tués, les Zeny et le compteur discret des messages
-//     privés reçus pendant la partie (U5), puis les charges et les vies, puis
-//     la colonne des effets en cours ;
+//     privés reçus pendant la partie (U5), puis les charges et les vies, la
+//     minimap quand elle se montre (`survivors_minimap.h`), puis la colonne
+//     des effets en cours ;
 //   - sous le minuteur, la marque « Classée », « Défi » ou « Cursed Water n » ;
 //   - en bas à droite, l'illustration de la carte ramassée, qui glisse ;
 //   - des flèches au bord de l'écran vers le boss et les Old Blue Box hors du
@@ -94,6 +96,8 @@ struct SurvivorsHudView {
   // du héros, les avis des objets ramassés (`survivors_effects.h`).
   std::span<const SurvivorsHudEffect> effects;
   std::span<const SurvivorsHudNotice> notices;
+  // Sous les charges et les vies, au-dessus des effets.
+  SurvivorsMinimapView minimap;
 };
 
 void DrawSurvivorsHud(const SurvivorsHudView& view);

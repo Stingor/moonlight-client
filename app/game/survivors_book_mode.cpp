@@ -62,7 +62,8 @@ SurvivorsBookMode::Begun SurvivorsBookMode::FreeStart(const ro::sim::SurvivorsRu
     ro::core::LogWarning("survivors : carnet illisible, la partie part sans la méta");
   }
   if (read.damaged_copy.has_value()) damaged_copy_ = read.damaged_copy;
-  return Begun{.start = FreeStartOf(rules, read.save, seed, first_skill_id, arena_id), .board = {}};
+  return Begun{.start = FreeStartOf(rules, read.save, seed, first_skill_id, arena_id),
+               .board = SurvivorsRunBoard{.without_minimap = read.save.meta.without_minimap}};
 }
 
 void SurvivorsBookMode::Restart() noexcept {

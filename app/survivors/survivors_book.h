@@ -136,8 +136,14 @@ struct SurvivorsCredit {
   [[nodiscard]] bool operator==(const SurvivorsCredit&) const = default;
 };
 
+// PARTIR SANS MINIMAP (cahier « lisibilité », Q4) majore les Zeny de la
+// partie libre d'autant, après la Cursed Water.
+inline constexpr std::uint64_t kWithoutMinimapZenyPct = 15;
+[[nodiscard]] std::uint64_t WithoutMinimapZeny(std::uint64_t zeny, bool without_minimap) noexcept;
+
 // CRÉDITE LE CARNET D'UNE PARTIE FINIE, ou interrompue. Toute partie verse ses
-// Zeny (`RunZeny`, majorés par la Cursed Water du départ) et ses cartes
+// Zeny (`RunZeny`, majorés par la Cursed Water du départ, puis par une
+// partie sans minimap) et ses cartes
 // ramassées, défi, abandon et liaison perdue compris (Q10) ; ses compteurs
 // s'ajoutent, et les exploits qu'ils atteignent s'inscrivent. Seule une partie
 // qui n'est pas abandonnée entre aux records, au tableau de `ending.board` ; au

@@ -232,6 +232,8 @@ ro::ui::SurvivorsPrepareMeta PrepareMetaOf(const ro::sim::SurvivorsRules& rules,
   meta.cursed_water = std::min<int>(save.meta.cursed_water, meta.most_cursed_water);
   meta.cursed_water_bonus_pct =
       Clamped(ro::sim::kCursedWaterZenyPctPerRank * static_cast<std::uint64_t>(meta.cursed_water));
+  meta.without_minimap = save.meta.without_minimap;
+  meta.without_minimap_bonus_pct = Clamped(kWithoutMinimapZenyPct);
   for (const std::uint8_t rank : save.meta.ranks.church) meta.blessing_ranks += rank;
   const ro::sim::IsoWeek week = IsoWeekOfUtc(now_utc_s);
   meta.week_year = week.year;
@@ -422,6 +424,17 @@ void SurvivorsMetaDesk::FollowPrepare(const ro::ui::SurvivorsPrepareAsk& asked,
     Mutate(
         client_root,
         [&rules, rank](SurvivorsSave& save) { return ChooseCursedWater(save, rules, rank); }, say);
+  }
+  if (asked.choose_without_minimap.has_value()) {
+    const bool without = *asked.choose_without_minimap;
+    Mutate(
+        client_root,
+        [without](SurvivorsSave& save) {
+          if (save.meta.without_minimap == without) return false;
+          save.meta.without_minimap = without;
+          return true;
+        },
+        say);
   }
   if (!asked.open_place.has_value()) return;
   switch (*asked.open_place) {

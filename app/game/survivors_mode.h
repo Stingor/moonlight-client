@@ -207,6 +207,8 @@ class SurvivorsMode {
   // L'apparence du héros posée, et si elle était celle de l'évolution.
   std::optional<bool> hero_evolved_;
   int pressed_card_key_ = 0;
+  // Ctrl+Tab a masqué la minimap ; elle le reste d'une partie à l'autre.
+  bool minimap_hidden_ = false;
   std::array<std::string, 4> key_labels_;
 };
 

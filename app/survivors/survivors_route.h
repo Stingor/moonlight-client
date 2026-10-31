@@ -28,6 +28,8 @@ inline constexpr std::uint32_t kScancodeDigit4 = 33;
 inline constexpr std::uint32_t kScancodeReturn = 40;
 inline constexpr std::uint32_t kScancodeSpace = 44;
 inline constexpr std::uint32_t kScancodeKeypadEnter = 88;
+// Ctrl+Tab montre ou masque la minimap, comme en partie.
+inline constexpr std::uint32_t kScancodeTab = 43;
 
 // Le bouton gauche, par son numéro SDL.
 inline constexpr std::uint8_t kLeftMouseButton = 1;
@@ -51,6 +53,8 @@ struct SurvivorsEvent {
   std::uint32_t scancode = 0;
   // Une touche tenue que le système répète : la pause ne bascule pas deux fois.
   bool repeat = false;
+  // Ctrl tenu avec la touche.
+  bool ctrl = false;
   std::uint8_t button = 0;
   // La souris, en points de la fenêtre.
   float x = 0.0F;
@@ -71,6 +75,8 @@ struct SurvivorsGestures {
   int pressed_card_key = 0;
   // Entrée ou Espace : le bouton « Continuer » du coffre.
   bool confirm = false;
+  // Ctrl+Tab : la minimap se montre ou se masque.
+  bool toggle_minimap = false;
 };
 
 [[nodiscard]] bool IsConfirmKey(std::uint32_t scancode) noexcept;

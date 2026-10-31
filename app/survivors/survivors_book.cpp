@@ -367,13 +367,25 @@ ro::sim::SurvivorsStart ChallengeStartOf(const ro::sim::SurvivorsRules& rules,
       .loadout = {}};
 }
 
+std::uint64_t WithoutMinimapZeny(std::uint64_t zeny, bool without_minimap) noexcept {
+  if (!without_minimap) return zeny;
+  constexpr std::uint64_t kPercent = 100;
+  const std::uint64_t bonus = zeny / kPercent * kWithoutMinimapZenyPct +
+                              zeny % kPercent * kWithoutMinimapZenyPct / kPercent;
+  return zeny > std::numeric_limits<std::uint64_t>::max() - bonus
+             ? std::numeric_limits<std::uint64_t>::max()
+             : zeny + bonus;
+}
+
 SurvivorsCredit CreditRun(const ro::sim::SurvivorsRules& rules, SurvivorsSave& save,
                           const SurvivorsEnding& ending, const ro::sim::SurvivorsStart& start,
                           std::int64_t now_utc_s) {
   const ro::sim::SurvivorsTally& tally = ending.tally;
   SurvivorsCredit credit;
-  credit.zeny = ro::sim::CursedWaterZeny(ro::sim::RunZeny(tally, ending.zeny, tally.outcome),
-                                         start.cursed_water);
+  credit.zeny = WithoutMinimapZeny(
+      ro::sim::CursedWaterZeny(ro::sim::RunZeny(tally, ending.zeny, tally.outcome),
+                               start.cursed_water),
+      ending.board.without_minimap && ending.board.kind == SurvivorsBoardKind::kFree);
   save.meta.zeny = SaturatedAdd(save.meta.zeny, credit.zeny);
   save.meta.zeny_earned = SaturatedAdd(save.meta.zeny_earned, credit.zeny);
   credit.zeny_balance = save.meta.zeny;

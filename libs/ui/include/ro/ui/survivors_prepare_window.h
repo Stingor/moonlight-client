@@ -77,10 +77,12 @@ struct SurvivorsPrepareMeta {
   SurvivorsBoardTab board = SurvivorsBoardTab::kFree;
   std::uint64_t zeny = 0;  // le solde
   // Partie libre.
-  int cursed_water = 0;            // le rang choisi
-  int most_cursed_water = 0;       // 0 : aucune fiole
-  int cursed_water_bonus_pct = 0;  // le score et les Zeny majorés au rang choisi
-  int blessing_ranks = 0;          // les rangs bénis, toutes Bénédictions confondues
+  int cursed_water = 0;               // le rang choisi
+  int most_cursed_water = 0;          // 0 : aucune fiole
+  int cursed_water_bonus_pct = 0;     // le score et les Zeny majorés au rang choisi
+  bool without_minimap = false;       // partir sans minimap
+  int without_minimap_bonus_pct = 0;  // les Zeny majorés sans elle
+  int blessing_ranks = 0;             // les rangs bénis, toutes Bénédictions confondues
   int lives = 0;
   int charges = 0;  // les charges Kafra par partie, tous services confondus
   // Défi de la semaine.
@@ -122,6 +124,7 @@ struct SurvivorsPrepareAsk {
   // L'arène de la partie libre ; le défi et la partie classée n'en choisissent pas.
   std::optional<std::uint16_t> choose_arena_id;
   std::optional<int> choose_cursed_water;
+  std::optional<bool> choose_without_minimap;
   std::optional<SurvivorsMetaPlace> open_place;
   bool open_ranking = false;  // le classement mondial
   bool start = false;

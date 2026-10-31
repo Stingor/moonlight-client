@@ -771,7 +771,8 @@ add_library(moonclient_minigames STATIC
     game/survivors_meta_desk.cpp
     game/survivors_ranking_desk.cpp
     game/survivors_ranking_mode.cpp
-    game/survivors_trophy_count.cpp)
+    game/survivors_trophy_count.cpp
+    survivors/survivors_minimap_marks.cpp)
 
 target_link_libraries(moonclient_minigames
     PUBLIC ro_audio ro_net ro_render ro_sim ro_ui ro_vfs moonclient_monstersheet moonclient_survivors

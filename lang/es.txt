@@ -20594,6 +20594,9 @@ tr: p95 (ms)
 fr: Échap : pause
 tr: Esc: pausa
 
+fr: Ctrl+Tab : afficher ou masquer la minimap
+tr: Ctrl+Tab: mostrar u ocultar el minimapa
+
 fr: Évolution
 tr: Evolución
 
@@ -20830,6 +20833,9 @@ tr: ¿Devolver %s Zeny?
 
 fr: Score et Zeny +%d %%, monstres plus durs
 tr: Puntuación y Zeny +%d %%, monstruos más duros
+
+fr: Partir sans minimap : Zeny +%d %%
+tr: Salir sin minimapa: Zeny +%d %%
 
 fr: Score à battre : %s
 tr: Puntuación a batir: %s

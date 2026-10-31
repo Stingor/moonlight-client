@@ -453,6 +453,7 @@ SurvivorsPainted SurvivorsMode::Frame(SurvivorsStage& stage, const SurvivorsCont
 
   SurvivorsGestures gestures = route_.TakeGestures();
   pressed_card_key_ = gestures.pressed_card_key;
+  if (gestures.toggle_minimap) minimap_hidden_ = !minimap_hidden_;
   // LE CODEX PAR-DESSUS LA PAUSE prend Échap et la molette avant les options :
   // ouvert, il est le dernier venu, la pause qui les ouvre étant cachée sous lui.
   (void)FollowCodexOverPause(stage.screen(), ask_.pause.open_codex, gestures,
@@ -727,6 +728,7 @@ SurvivorsFrameView SurvivorsMode::View(const SurvivorsStage& stage,
                          .pressed_card_key = pressed_card_key_,
                          .banner = banner_,
                          .unread_whispers = whispers_.received(),
+                         .minimap_shown = !minimap_hidden_ && !stage.board().without_minimap,
                          .options = options_,
                          .measures = &measures_,
                          .busy_voices = sounds_.busy(context.now_ms),

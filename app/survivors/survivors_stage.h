@@ -79,6 +79,10 @@ enum class SurvivorsBoardKind : std::uint8_t { kFree, kChallenge, kRanked };
 struct SurvivorsRunBoard {
   SurvivorsBoardKind kind = SurvivorsBoardKind::kFree;
   ro::sim::IsoWeek week;  // la semaine du défi ; {0, 0} hors du défi
+  // UNE PARTIE LIBRE PARTIE SANS MINIMAP : rien ne la montre, et ses Zeny se
+  // majorent au crédit. Jamais au défi ni en partie classée, où le serveur ne
+  // pourrait pas vérifier qu'elle était éteinte.
+  bool without_minimap = false;
   [[nodiscard]] bool operator==(const SurvivorsRunBoard&) const = default;
 };
 

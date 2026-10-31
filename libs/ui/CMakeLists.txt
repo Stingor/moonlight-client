@@ -207,6 +207,7 @@ add_library(ro_ui STATIC
     src/survivors_hud.cpp
     src/survivors_kafra_window.cpp
     src/survivors_meta_text.cpp
+    src/survivors_minimap.cpp
     src/survivors_offer_window.cpp
     src/survivors_pause_window.cpp
     src/survivors_prepare_window.cpp

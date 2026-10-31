@@ -262,7 +262,12 @@ void DrawSurvivorsHud(const SurvivorsHudView& view) {
   const float below_counters = DrawCounters(draw, view, far.x - kMargin, below_bar);
   const float below_charges =
       DrawChargesAndLives(draw, view, far.x - kMargin, below_counters + kSlotGap);
-  DrawSurvivorsHudEffects(draw, view.effects, far.x - kMargin, below_charges + kSlotGap);
+  const float below_minimap =
+      view.minimap.shown
+          ? DrawSurvivorsMinimap(draw, ImVec2(far.x - kMargin, below_charges + kSlotGap),
+                                 view.minimap, view.clock_ms)
+          : below_charges;
+  DrawSurvivorsHudEffects(draw, view.effects, far.x - kMargin, below_minimap + kSlotGap);
 
   for (const SurvivorsEdgeTarget& target : view.edge_targets) {
     if (const std::optional<EdgeArrowPlace> place =

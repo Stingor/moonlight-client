@@ -69,6 +69,9 @@ struct SurvivorsViewFacts {
   // L'alerte qui a mis en pause, quand c'est le monde réel.
   std::optional<RealWorldAlert> banner;
   std::uint32_t unread_whispers = 0;
+  // LA MINIMAP SE MONTRE : la touche ne l'a pas masquée, et la partie n'est
+  // pas partie sans elle.
+  bool minimap_shown = false;
   SurvivorsOptions options;
   const ArenaMeasures* measures = nullptr;
   // Les voix du mode occupées, pour les comptes de la pause.
@@ -196,6 +199,7 @@ class SurvivorsViews {
   std::vector<ro::ui::SurvivorsHudSlot> skill_slots_;
   std::vector<ro::ui::SurvivorsHudSlot> card_slots_;
   std::vector<ro::ui::SurvivorsEdgeTarget> edge_targets_;
+  std::vector<ro::ui::SurvivorsMinimapDot> minimap_dots_;
   std::vector<ro::ui::SurvivorsOfferCard> offer_cards_;
   std::vector<ro::ui::SurvivorsChestGainRow> chest_gains_;
   std::vector<ImTextureID> roulette_icons_;

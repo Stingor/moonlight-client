@@ -11,7 +11,7 @@ bool IsConfirmKey(std::uint32_t scancode) noexcept {
 
 bool SurvivorsReadsKey(std::uint32_t scancode) noexcept {
   return IsMoveKey(scancode) || scancode == kScancodeEscape || IsConfirmKey(scancode) ||
-         (scancode >= kScancodeDigit1 && scancode <= kScancodeDigit4);
+         scancode == kScancodeTab || (scancode >= kScancodeDigit1 && scancode <= kScancodeDigit4);
 }
 
 bool SurvivorsRoute::Take(const SurvivorsEvent& event) {
@@ -25,6 +25,8 @@ bool SurvivorsRoute::Take(const SurvivorsEvent& event) {
         gestures_.pressed_card_key = static_cast<int>(event.scancode - kScancodeDigit1) + 1;
       } else if (IsConfirmKey(event.scancode)) {
         gestures_.confirm = true;
+      } else if (event.scancode == kScancodeTab && event.ctrl) {
+        gestures_.toggle_minimap = true;
       }
       return true;
     case SurvivorsEventKind::kKeyUp:

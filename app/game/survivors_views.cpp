@@ -11,6 +11,7 @@
 #include "ro/sim/survivors_geometry.h"
 
 #include "game/skin_image_of.h"
+#include "survivors/survivors_minimap_marks.h"
 
 namespace moonclient {
 namespace {
@@ -34,6 +35,24 @@ constexpr const char* kRankedOutEffectsLabel = ro::core::TrText("dont par priori
 constexpr const char* kUnseenEffectsLabel = ro::core::TrText("Effets hors champ");
 
 [[nodiscard]] std::string NumberedName(std::uint16_t id) { return "#" + std::to_string(id); }
+
+// LE CADRE DE L'ÉCRAN SUR LA MINIMAP : ses quatre coins visés au sol du héros,
+// dans l'ordre du tour, en écarts au héros. Faux quand un coin ne tombe pas au
+// sol.
+[[nodiscard]] bool ScreenCornersOf(const ArenaSession& arena, ro::sim::FieldPoint hero, float width,
+                                   float height, std::array<ImVec2, 4>& corners) {
+  const std::array<glm::vec2, 4> screen{glm::vec2(0.0F, 0.0F), glm::vec2(width, 0.0F),
+                                        glm::vec2(width, height), glm::vec2(0.0F, height)};
+  const auto per_cell = static_cast<float>(ro::sim::kSubunitsPerCell);
+  for (std::size_t corner = 0; corner < screen.size(); ++corner) {
+    const std::optional<ro::sim::FieldPoint> ground =
+        arena.FieldPointUnder(screen[corner], hero, width, height);
+    if (!ground.has_value()) return false;
+    corners[corner] = ImVec2(static_cast<float>(ground->x - hero.x) / per_cell,
+                             static_cast<float>(ground->y - hero.y) / per_cell);
+  }
+  return true;
+}
 
 [[nodiscard]] float Fill(std::int64_t part, std::int64_t whole) noexcept {
   if (whole <= 0) return 0.0F;
@@ -260,6 +279,15 @@ void SurvivorsViews::ComposeHud(const SurvivorsField& field, const ro::sim::Surv
     }
   }
   hud_.edge_targets = edge_targets_;
+  hud_.minimap.shown = facts.minimap_shown;
+  if (facts.minimap_shown) {
+    SurvivorsMinimapDotsOf(field, rules, minimap_dots_);
+    hud_.minimap.dots = minimap_dots_;
+    hud_.minimap.hero_facing = field.hero.facing;
+    hud_.minimap.screen_known =
+        facts.arena != nullptr && ScreenCornersOf(*facts.arena, field.hero.position, facts.width,
+                                                  facts.height, hud_.minimap.screen_corners_cells);
+  }
   if (facts.arena != nullptr) {
     if (const std::optional<glm::vec2> hero_cell = facts.arena->hero_cell()) {
       if (const std::optional<glm::vec2> feet = facts.arena->ScreenOf(

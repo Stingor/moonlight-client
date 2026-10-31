@@ -68,6 +68,7 @@ void DrawControls(const SurvivorsPrepareView& view) {
   ImGui::TextUnformatted(core::Tr("Les sorts partent seuls."));
   ImGui::TextUnformatted(core::Tr("1 à 4 : choisir une carte au niveau supérieur"));
   ImGui::TextUnformatted(core::Tr("Échap : pause"));
+  ImGui::TextUnformatted(core::Tr("Ctrl+Tab : afficher ou masquer la minimap"));
 }
 
 // L'onglet classé s'offre-t-il ? Le classement ouvert, et rien qui le grise.
@@ -147,6 +148,16 @@ void DrawCursedWater(const SurvivorsPrepareMeta& meta, SurvivorsPrepareAsk& aske
   FaintText(line.data());
 }
 
+// PARTIR SANS MINIMAP, en partie libre seulement : ses Zeny se majorent.
+void DrawWithoutMinimap(const SurvivorsPrepareMeta& meta, SurvivorsPrepareAsk& asked,
+                        const SkinArt& art) {
+  std::array<char, kLineSize> line = {};
+  std::snprintf(line.data(), line.size(), core::Tr("Partir sans minimap : Zeny +%d %%"),
+                meta.without_minimap_bonus_pct);
+  bool ticked = meta.without_minimap;
+  if (SkinCheckBox(line.data(), &ticked, art)) asked.choose_without_minimap = ticked;
+}
+
 // L'arène nommée, sans choix : celle du défi et de la partie classée.
 void DrawArenaName(const char* name) {
   if (name == nullptr || *name == '\0') return;
@@ -175,6 +186,7 @@ void DrawFreeBoard(const SurvivorsPrepareView& view, const SurvivorsPrepareMeta&
   DrawFreeArena(meta, asked, art);
   asked.choose_skill_id = DrawBolts(view, art);
   DrawCursedWater(meta, asked, art);
+  DrawWithoutMinimap(meta, asked, art);
   ImGui::Separator();
   ImGui::Text(core::Tr("Bénédictions : %d rang(s), %d vie(s), %d charge(s)"), meta.blessing_ranks,
               meta.lives, meta.charges);
