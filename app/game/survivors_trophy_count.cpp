@@ -20,7 +20,11 @@ bool SurvivorsTrophyCount::Freeze(SurvivorsStage& stage, MinigameStage* minigame
 void SurvivorsTrophyCount::Count(const SurvivorsStage& stage, MinigameStage* minigames,
                                  const std::filesystem::path& client_root) {
   if (counted_ || minigames == nullptr || stage.play() == nullptr) return;
-  won_ = minigames->RecordSurvivorsRun(stage.play()->run(), client_root);
+  won_ = minigames->RecordSurvivorsRun(
+      stage.play()->run(), client_root,
+      ro::sim::SurvivorsTrophyFacts{.without_minimap =
+                                        stage.board().without_minimap &&
+                                        stage.board().kind == SurvivorsBoardKind::kFree});
   counted_ = true;
 }
 

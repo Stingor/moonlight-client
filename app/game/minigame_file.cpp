@@ -1,6 +1,8 @@
 #include "game/minigame_file.h"
 
 #include <algorithm>
+#include <cstdint>
+#include <limits>
 #include <optional>
 #include <string_view>
 
@@ -21,6 +23,7 @@ namespace {
 constexpr const char* kRojeweledBestField = "rojeweled_best";
 constexpr const char* kRoggleBestField = "roggle_best";
 constexpr const char* kTrophiesField = "trophies";
+constexpr const char* kSurvivorsEvolvedField = "survivors_evolved";
 
 constexpr const char* kFileHeader =
     "# Les meilleurs scores et les trophees des mini-jeux de moonclient.\n"
@@ -73,6 +76,22 @@ ro::core::Result<ro::sim::MinigameRecord> ReadMinigameRecord(std::string_view te
         }
       }
     }
+    // LES ÉVOLUÉS OBTENUS : un Id hors de 1 à 65 535 ou illisible se saute ;
+    // la liste se range croissante, sans doublon.
+    const YAML::Node evolved = whole[kSurvivorsEvolvedField];
+    if (evolved && evolved.IsSequence()) {
+      for (const YAML::Node& id : evolved) {
+        std::uint32_t skill_id = 0;
+        if (!id.IsScalar() || !YAML::convert<std::uint32_t>::decode(id, skill_id) ||
+            skill_id == 0 || skill_id > std::numeric_limits<std::uint16_t>::max()) {
+          continue;
+        }
+        record.survivors_evolved.push_back(static_cast<std::uint16_t>(skill_id));
+      }
+      std::ranges::sort(record.survivors_evolved);
+      const auto repeated = std::ranges::unique(record.survivors_evolved);
+      record.survivors_evolved.erase(repeated.begin(), repeated.end());
+    }
   } catch (const YAML::Exception& broken) {
     return ro::core::Fail(ro::core::ErrorCode::kCorruptData, broken.what());
   }
@@ -93,7 +112,13 @@ std::string WriteMinigameRecord(const ro::sim::MinigameRecord& record) {
   for (const std::string& key : record.foreign_trophy_keys) {
     out << key;
   }
-  out << YAML::EndSeq << YAML::EndMap;
+  out << YAML::EndSeq;
+  if (!record.survivors_evolved.empty()) {
+    out << YAML::Key << kSurvivorsEvolvedField << YAML::Value << YAML::Flow << YAML::BeginSeq;
+    for (const std::uint16_t skill_id : record.survivors_evolved) out << skill_id;
+    out << YAML::EndSeq;
+  }
+  out << YAML::EndMap;
   return std::string(kFileHeader) + out.c_str() + "\n";
 }
 

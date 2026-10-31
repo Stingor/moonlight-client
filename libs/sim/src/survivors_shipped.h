@@ -29,6 +29,16 @@ inline constexpr std::uint16_t kSoulStrikeId = 13;
 inline constexpr std::uint16_t kNapalmBeatId = 11;
 inline constexpr std::uint16_t kEarthSpikeId = 90;
 inline constexpr std::uint16_t kThunderstormId = 21;
+// Les évolués.
+inline constexpr std::uint16_t kMeteorStormId = 83;
+inline constexpr std::uint16_t kSightrasherId = 81;
+inline constexpr std::uint16_t kFirePillarId = 80;
+inline constexpr std::uint16_t kFrostNovaId = 88;
+inline constexpr std::uint16_t kStormGustId = 89;
+inline constexpr std::uint16_t kJupitelThunderId = 84;
+inline constexpr std::uint16_t kLordOfVermilionId = 85;
+inline constexpr std::uint16_t kHeavensDriveId = 91;
+inline constexpr std::uint16_t kNapalmVulcanId = 400;
 
 inline constexpr std::uint16_t kHornetCardId = 4019;
 inline constexpr std::uint16_t kChonchonCardId = 4009;

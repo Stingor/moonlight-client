@@ -305,6 +305,9 @@ struct SurvivorsRecap {
   std::vector<SurvivorsCount> damage_by_skill;
   std::vector<std::uint16_t> cards_found;
   std::uint64_t chills = 0;
+  // Les monstres vivants passés de non gelés à gelés : un gel qui en prolonge
+  // un autre ne recompte pas.
+  std::uint64_t freezes = 0;
   [[nodiscard]] bool operator==(const SurvivorsRecap&) const = default;
 };
 // Ajoute `amount` à l'entrée `id`, posée en fin de liste à sa première

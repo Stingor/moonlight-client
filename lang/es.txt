@@ -20663,6 +20663,54 @@ tr: Mente pura
 fr: Vaincre Baphomet sans aucune carte.
 tr: Vencer a Baphomet sin ninguna carta.
 
+fr: Blizzard
+tr: Ventisca
+
+fr: Obtenir Storm Gust dans une partie de Survivants de Midgard.
+tr: Obtén Storm Gust en una partida de Supervivientes de Midgard.
+
+fr: Foudre de Jupiter
+tr: Rayo de Júpiter
+
+fr: Obtenir Jupitel Thunder dans une partie de Survivants de Midgard.
+tr: Obtén Jupitel Thunder en una partida de Supervivientes de Midgard.
+
+fr: Seigneur du tonnerre
+tr: Señor del trueno
+
+fr: Obtenir Lord of Vermilion dans une partie de Survivants de Midgard.
+tr: Obtén Lord of Vermilion en una partida de Supervivientes de Midgard.
+
+fr: Ciel en feu
+tr: Cielo en llamas
+
+fr: Obtenir Heaven's Drive dans une partie de Survivants de Midgard.
+tr: Obtén Heaven's Drive en una partida de Supervivientes de Midgard.
+
+fr: Union
+tr: Unión
+
+fr: Obtenir Napalm Vulcan, l'union de Soul Strike et de Napalm Beat.
+tr: Obtén Napalm Vulcan, la unión de Soul Strike y Napalm Beat.
+
+fr: Grand sorcier
+tr: Gran hechicero
+
+fr: Obtenir chacun des neuf skills évolués, au fil des parties.
+tr: Obtén cada una de las nueve habilidades evolucionadas, a lo largo de las partidas.
+
+fr: Hiver éternel
+tr: Invierno eterno
+
+fr: Geler 100 monstres dans une partie de Survivants de Midgard.
+tr: Congela 100 monstruos en una partida de Supervivientes de Midgard.
+
+fr: À l'aveugle
+tr: A ciegas
+
+fr: Vaincre Baphomet dans une partie lancée sans minimap.
+tr: Derrota a Baphomet en una partida iniciada sin minimapa.
+
 fr: Recharge de tous les skills raccourcie.
 tr: Recarga más corta para todas las habilidades.
 

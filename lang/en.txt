@@ -20663,6 +20663,54 @@ tr: Pure Mind
 fr: Vaincre Baphomet sans aucune carte.
 tr: Defeat Baphomet without any card.
 
+fr: Blizzard
+tr: Blizzard
+
+fr: Obtenir Storm Gust dans une partie de Survivants de Midgard.
+tr: Obtain Storm Gust in a Midgard Survivors run.
+
+fr: Foudre de Jupiter
+tr: Jupiter's Lightning
+
+fr: Obtenir Jupitel Thunder dans une partie de Survivants de Midgard.
+tr: Obtain Jupitel Thunder in a Midgard Survivors run.
+
+fr: Seigneur du tonnerre
+tr: Lord of Thunder
+
+fr: Obtenir Lord of Vermilion dans une partie de Survivants de Midgard.
+tr: Obtain Lord of Vermilion in a Midgard Survivors run.
+
+fr: Ciel en feu
+tr: Sky Ablaze
+
+fr: Obtenir Heaven's Drive dans une partie de Survivants de Midgard.
+tr: Obtain Heaven's Drive in a Midgard Survivors run.
+
+fr: Union
+tr: Union
+
+fr: Obtenir Napalm Vulcan, l'union de Soul Strike et de Napalm Beat.
+tr: Obtain Napalm Vulcan, the union of Soul Strike and Napalm Beat.
+
+fr: Grand sorcier
+tr: Archwizard
+
+fr: Obtenir chacun des neuf skills évolués, au fil des parties.
+tr: Obtain each of the nine evolved skills, across runs.
+
+fr: Hiver éternel
+tr: Eternal Winter
+
+fr: Geler 100 monstres dans une partie de Survivants de Midgard.
+tr: Freeze 100 monsters in a Midgard Survivors run.
+
+fr: À l'aveugle
+tr: Blindfolded
+
+fr: Vaincre Baphomet dans une partie lancée sans minimap.
+tr: Defeat Baphomet in a run started without the minimap.
+
 fr: Recharge de tous les skills raccourcie.
 tr: Shorter cooldown for every skill.
 

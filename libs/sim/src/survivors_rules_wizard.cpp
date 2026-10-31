@@ -18,16 +18,6 @@ namespace {
 // la sixième minute, laissent place à l'évolué. Un évolué n'a qu'un niveau, et
 // n'entre dans aucune réserve : seul un coffre le donne.
 
-constexpr std::uint16_t kMeteorStormId = 83;
-constexpr std::uint16_t kSightrasherId = 81;
-constexpr std::uint16_t kFirePillarId = 80;
-constexpr std::uint16_t kFrostNovaId = 88;
-constexpr std::uint16_t kStormGustId = 89;
-constexpr std::uint16_t kJupitelThunderId = 84;
-constexpr std::uint16_t kLordOfVermilionId = 85;
-constexpr std::uint16_t kHeavensDriveId = 91;
-constexpr std::uint16_t kNapalmVulcanId = 400;
-
 // Meteor Storm : cinq météores sur les plus denses, pleins dans tout l'éclat.
 constexpr std::array<SkillLevel, 1> kMeteorStormLevels{{
     {.damage = 32,

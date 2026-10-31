@@ -178,6 +178,10 @@ inline void ExtendStatus(const SurvivorsField& field, std::uint32_t ms,
   if (rule == nullptr || rule->rank != FoeRank::kCommon) return applied;
   const std::uint8_t traits = rule->behaviour.traits;
   if (status.freeze_ms > 0 && (traits & kFoeFreezeImmune) == 0) {
+    if (foe.freeze_until_step <= field.step &&
+        field.recap.freezes < std::numeric_limits<std::uint64_t>::max()) {
+      ++field.recap.freezes;
+    }
     ExtendStatus(field, status.freeze_ms, foe.freeze_until_step);
     applied.froze = true;
   }

@@ -13,6 +13,7 @@
 #include "ro/sim/minigame_trophies.h"
 #include "ro/sim/peg_game.h"
 #include "ro/sim/survivors_run.h"
+#include "ro/sim/survivors_trophies.h"
 #include "ro/ui/escape_stack.h"
 #include "ro/ui/minigames_window.h"
 #include "ro/ui/roggle_window.h"
@@ -130,7 +131,8 @@ class MinigameStage {
   // est une ligne de l'écran de fin du mode (Q13), jamais la file des avis des
   // autres jeux. `Announce` les dit au serveur. Voir `ro::sim::RecordSurvivors`.
   [[nodiscard]] std::vector<ro::sim::MinigameTrophy> RecordSurvivorsRun(
-      const ro::sim::SurvivorsRun& run, const std::filesystem::path& client_root);
+      const ro::sim::SurvivorsRun& run, const std::filesystem::path& client_root,
+      const ro::sim::SurvivorsTrophyFacts& facts = {});
 
   // LES SONS À JOUER. Consommés.
   [[nodiscard]] std::vector<InterfaceSoundFile> TakeSounds();

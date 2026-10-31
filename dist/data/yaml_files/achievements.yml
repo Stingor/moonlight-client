@@ -5946,3 +5946,123 @@ achievements:
       minor: 1
       objectives:
         - {text: "Aucune carte"}
+  910017:
+    name: "Blizzard"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir Storm Gust dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Storm Gust"}
+  910018:
+    name: "Foudre de Jupiter"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir Jupitel Thunder dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Jupitel Thunder"}
+  910019:
+    name: "Seigneur du tonnerre"
+    score: 30
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir Lord of Vermilion dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Lord of Vermilion"}
+  910020:
+    name: "Ciel en feu"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir Heaven's Drive dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Heaven's Drive"}
+  910021:
+    name: "Union"
+    score: 30
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir Napalm Vulcan, l'union de Soul Strike et de Napalm Beat."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Napalm Vulcan"}
+  910022:
+    name: "Grand sorcier"
+    score: 50
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir chacun des neuf skills évolués, au fil des parties."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Les neuf évolués"}
+  910023:
+    name: "Hiver eternel"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Geler 100 monstres dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "100 monstres gelés"}
+  910024:
+    name: "A l'aveugle"
+    score: 30
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Vaincre Baphomet dans une partie lancée sans minimap."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Sans minimap"}

@@ -181,9 +181,13 @@ void MinigameStage::Leave(const std::filesystem::path& client_root) {
 }
 
 std::vector<ro::sim::MinigameTrophy> MinigameStage::RecordSurvivorsRun(
-    const ro::sim::SurvivorsRun& run, const std::filesystem::path& client_root) {
-  std::vector<ro::sim::MinigameTrophy> fresh = ro::sim::RecordSurvivors(Record(client_root), run);
-  if (!fresh.empty()) {
+    const ro::sim::SurvivorsRun& run, const std::filesystem::path& client_root,
+    const ro::sim::SurvivorsTrophyFacts& facts) {
+  ro::sim::MinigameRecord& record = Record(client_root);
+  // Un évolué neuf change le record sans gagner de trophée : il s'écrit aussi.
+  const std::size_t evolved_before = record.survivors_evolved.size();
+  std::vector<ro::sim::MinigameTrophy> fresh = ro::sim::RecordSurvivors(record, run, facts);
+  if (!fresh.empty() || record.survivors_evolved.size() != evolved_before) {
     Save(client_root);
   }
   return fresh;

@@ -30,10 +30,25 @@ class SurvivorsRun;
 //   l'élément Fire.
 // - « Esprit pur » : la victoire sans aucune carte possédée (une carte
 //   ramassée au sol ne se porte pas).
+// - « Blizzard », « Foudre de Jupiter », « Seigneur du tonnerre », « Ciel en
+//   feu », « Union » : Storm Gust, Jupitel Thunder, Lord of Vermilion,
+//   Heaven's Drive, Napalm Vulcan possédé à la fin de la partie.
+// - « Grand sorcier » : chacun des skills évolués des règles obtenu au moins
+//   une fois, au fil des parties (`MinigameRecord::survivors_evolved`).
+// - « Hiver éternel » : 100 monstres gelés dans la partie.
+// - « À l'aveugle » : la victoire dans une partie lancée sans minimap.
 
-// LES TROPHÉES QUE CETTE PARTIE GAGNE. Rend ceux gagnés à l'instant, dans
-// l'ordre du catalogue ; vide quand rien ne change.
+// CE QUE LA PARTIE NE SAIT PAS D'ELLE-MÊME, et qu'`app` dit : la minimap est
+// un affichage, que la simulation ignore.
+struct SurvivorsTrophyFacts {
+  bool without_minimap = false;
+};
+
+// LES TROPHÉES QUE CETTE PARTIE GAGNE, et les évolués qu'elle ajoute au
+// record. Rend les trophées gagnés à l'instant, dans l'ordre du catalogue ;
+// vide quand rien ne change.
 [[nodiscard]] std::vector<MinigameTrophy> RecordSurvivors(MinigameRecord& record,
-                                                          const SurvivorsRun& run);
+                                                          const SurvivorsRun& run,
+                                                          const SurvivorsTrophyFacts& facts = {});
 
 }  // namespace ro::sim
