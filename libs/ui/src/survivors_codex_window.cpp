@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <array>
 #include <cstdio>
+#include <span>
+#include <string_view>
 
 #include <imgui.h>
 
@@ -338,8 +340,10 @@ void DrawPlantSheet(const SurvivorsCodexEntry& entry) {
 }
 
 // Une entrée non vue : « ??? » en titre, sa silhouette, « ??? », et pour un
-// sort verrouillé le but de l'exploit qui l'ouvre. Rien d'autre.
-void DrawUnseenSheet(SurvivorsCodexState& state, const SurvivorsCodexEntry& entry) {
+// sort verrouillé le but de l'exploit qui l'ouvre, puis la barre de l'Album :
+// où en est le joueur, sur quel seuil. Rien d'autre.
+void DrawUnseenSheet(SurvivorsCodexState& state, const SurvivorsCodexEntry& entry,
+                     std::span<const SurvivorsFeatEntry> feats) {
   ColoredText(kHeadingColor, kCodexUnknown);
   DrawPortrait(state, entry);
   FaintText(kCodexUnknown);
@@ -348,14 +352,23 @@ void DrawUnseenSheet(SurvivorsCodexState& state, const SurvivorsCodexEntry& entr
   Line line = {};
   std::snprintf(line.data(), line.size(), core::Tr("Se débloque : %s"), goal);
   ImGui::TextWrapped("%s", line.data());
+  const auto feat = std::ranges::find_if(feats, [&entry](const SurvivorsFeatEntry& candidate) {
+    return std::string_view(candidate.key) == entry.unlock_feat;
+  });
+  if (feat == feats.end() || feat->threshold == 0) return;
+  const float share = static_cast<float>(static_cast<double>(feat->progress) /
+                                         static_cast<double>(feat->threshold));
+  ImGui::ProgressBar(std::min(share, 1.0F), ImVec2(-1.0F, 0.0F),
+                     SurvivorsFeatProgressText(*feat).data());
 }
 
 // LA FICHE commence par le nom de l'entrée, puis son image quand elle en a une.
-void DrawSheet(SurvivorsCodexState& state, const SurvivorsCodexEntry& entry, const SkinArt& art) {
+void DrawSheet(SurvivorsCodexState& state, const SurvivorsCodexEntry& entry,
+               std::span<const SurvivorsFeatEntry> feats, const SkinArt& art) {
   ImGui::BeginChild("##codex_sheet", ImVec2(0.0F, 0.0F), ImGuiChildFlags_Borders);
   ImGui::PushTextWrapPos(0.0F);
   if (!entry.seen) {
-    DrawUnseenSheet(state, entry);
+    DrawUnseenSheet(state, entry, feats);
   } else {
     ColoredText(kHeadingColor, CodexEntryName(entry).data());
     DrawPortrait(state, entry);
@@ -465,7 +478,7 @@ SurvivorsCodexAsk DrawSurvivorsCodexWindow(SurvivorsCodexState& state,
   DrawList(state, entries, moved, art);
   if (!entries.empty()) {
     ImGui::SameLine();
-    DrawSheet(state, entries[selected], art);
+    DrawSheet(state, entries[selected], album_view.feats, art);
   }
   EndSkinnedWindow();
   return ask;
