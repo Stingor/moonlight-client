@@ -6,16 +6,17 @@
 # ─────────────────────────────────────────────────────────────────────────────
 #  Les succès que le serveur connaît, et ce que la fenêtre en montre
 #
-#  La liste des succès et tout sauf `window` sont exportés de l'achievement_db
-#  du serveur Moonlight (mode Prerenewal). Les champs de `window` sont tirés de
+#  La liste des succès et tout sauf `window` ont été exportés de l'achievement_db
+#  du serveur Moonlight (mode Prerenewal), et les champs de `window` de
 #  SystemEN\achievements.lub de l'installation : les textes de Gravity
 #  traduits par ROenglishRE, et ceux des succès que le serveur Moonlight a
 #  ajoutés. Ce dépôt ne revendique pas ces textes comme siens.
 #
-#  Fichier produit par scripts/yaml_tables/achievements.py. Ne pas éditer à la
-#  main :
-#      python scripts/yaml_tables/achievements.py --serveur <dépôt moonlight> \
-#          --client <dossier client> --sortie dist/data/yaml_files/achievements.yml
+#  🔴 LA TABLE VIT SA PROPRE VIE (décision du joueur, le 2026-10-31) : elle
+#  s'édite ici, à la main, et plus rien ne la régénère ; le .lub n'est plus lu.
+#  Un succès neuf s'écrit à deux endroits, aux mêmes points : son entrée à
+#  db/import/achievement_db.yml du serveur (Id, groupe, nom, points,
+#  récompenses), puis la sienne ici, avec sa `window`.
 #
 #  achievements : identifiant du succès -> name (son nom), score (les points
 #    qu'il rapporte), targets (chaque objectif : [numéro, compte qui
