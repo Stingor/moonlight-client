@@ -158,6 +158,10 @@ class ArenaSession {
   ArenaCamera camera_;
   // Les poses de l'image, retouchées pour l'effacement de la victoire.
   std::vector<HordePose> faded_;
+  // Les règles de la partie, et ce que le décor ne doit pas cacher à cette
+  // image (`ArenaVeilTargets`).
+  const ro::sim::SurvivorsRules& rules_;
+  std::vector<glm::vec3> veil_targets_;
   LitFrame frame_;
   // Le monde sans personne que la caméra interroge pour la secousse.
   ro::sim::World nobody_;

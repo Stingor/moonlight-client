@@ -21,6 +21,7 @@
 #include "ro/vfs/vfs.h"
 
 #include "options/graphics_options.h"
+#include "survivors/arena_decor_veil.h"
 #include "survivors/arena_effects.h"
 #include "survivors/arena_ground_follow.h"
 #include "survivors/arena_ground_plan.h"
@@ -33,12 +34,14 @@
 namespace moonclient {
 
 // LES CALQUES DE L'ARÈNE : ses effets et ses chiffres, que l'appelant possède.
-// Nuls, rien ne s'y peint.
+// Nuls, rien ne s'y peint. `veil_targets` : ce que le décor ne doit pas cacher
+// (`ArenaVeilTargets`) ; vide, le feuillage reste plein.
 struct ArenaOverlays {
   ArenaEffects* effects = nullptr;
   const ArenaNumbers* numbers = nullptr;
   float viewport_width = 0.0F;
   float viewport_height = 0.0F;
+  std::span<const glm::vec3> veil_targets;
 };
 
 // UN RECENTRAGE FAIT : la fenêtre passée de `from` à `to`, ce que devient un
@@ -158,6 +161,9 @@ class ArenaScene : private LitLayers {
     return HordeShadows{.sun_shadows = frame.sun_shadows, .horde_sun_shadows = horde_sun_shadows_};
   }
 
+  // Le feuillage redevient plein : une partie neuve.
+  void ForgetVeil() { veil_.Forget(); }
+
   // Vrai pendant qu'une fenêtre se prépare (`LitStage::Prepare`).
   [[nodiscard]] bool preparing() const noexcept { return lit_.preparing(); }
   // Libère les renderers de réserve du sol (`LitStage::ReleaseSpares`) et la
@@ -208,6 +214,10 @@ class ArenaScene : private LitLayers {
   // détruit — ses fils finis — avant elles.
   std::unique_ptr<GroundFollow<MapStage>> follow_;
   bool horde_sun_shadows_ = false;
+  // LE FONDU DU FEUILLAGE, et le compte des montages de carte ou de fenêtre :
+  // un compte neuf refait ses boîtes.
+  ArenaDecorVeil veil_;
+  std::uint32_t mounts_ = 0;
   // Les effets de l'image en cours de peinture, le temps de `Paint`.
   ArenaEffects* painting_effects_ = nullptr;
   // LA LANTERNE ET LA LUEUR DES OBJETS de l'image, refaites à chaque `Paint`

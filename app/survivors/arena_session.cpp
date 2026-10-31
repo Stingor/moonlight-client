@@ -31,7 +31,10 @@ constexpr float kFlatDeterminant = 1e-6F;
 
 ArenaSession::ArenaSession(ro::vfs::Vfs& vfs, ro::render::ActorWardrobe& wardrobe,
                            const ro::sim::SurvivorsRules& rules)
-    : composer_(wardrobe), effects_(vfs, wardrobe.catalog(), rules), camera_(rules.spawn_frame) {}
+    : composer_(wardrobe),
+      effects_(vfs, wardrobe.catalog(), rules),
+      camera_(rules.spawn_frame),
+      rules_(rules) {}
 
 ro::core::Result<void> ArenaSession::Open(ro::vfs::Vfs& vfs, const ro::sim::SurvivorsRules& rules,
                                           const ro::sim::SurvivorsStart& start,
@@ -77,6 +80,8 @@ void ArenaSession::Restart() {
   effects_.Restart();
   numbers_.Restart();
   faded_.clear();
+  veil_targets_.clear();
+  scene_.ForgetVeil();
 }
 
 float ArenaSession::AspectOf(float width, float height) const noexcept {
@@ -148,6 +153,8 @@ void ArenaSession::Compose(const ArenaFrameFacts& facts, const GraphicsOptions& 
   composer_.Compose(
       shown, [this](const HordePose& pose) { return scene_.GroundAtCell(pose.cell); },
       scene_.ShadowsOf(frame_));
+  ArenaVeilTargets(
+      shown, rules_, [this](glm::vec2 cell) { return scene_.GroundAtCell(cell); }, veil_targets_);
   if (!poses_.poses().empty() && poses_.poses().front().kind == HordeBodyKind::kHero) {
     effects_.FollowHero(poses_.poses().front().cell);
   }
@@ -166,7 +173,8 @@ void ArenaSession::Paint(const ArenaFrameFacts& facts, const GraphicsOptions& gr
                ArenaOverlays{.effects = &effects_,
                              .numbers = &numbers_,
                              .viewport_width = facts.viewport_width,
-                             .viewport_height = facts.viewport_height});
+                             .viewport_height = facts.viewport_height,
+                             .veil_targets = veil_targets_});
 }
 
 std::optional<glm::vec2> ArenaSession::ScreenOf(glm::vec3 world, float viewport_width,

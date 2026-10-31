@@ -51,6 +51,15 @@ struct LitActors {
   std::span<const ro::render::PointLight> carried_lights;
 };
 
+// LE VOILE DU DÉCOR D'UNE IMAGE : les opacités que la passe opaque applique,
+// et les poses voilées que la passe translucide peint. Vide, tout est plein.
+//
+// ⚠ DES VUES : elles doivent vivre jusqu'à la fin de `LitStage::Paint`.
+struct LitDecorVeil {
+  const ro::render::ModelOpacities* opacities = nullptr;
+  std::span<const ro::render::VeiledPose> veiled;
+};
+
 // L'IMAGE EN COURS : ce que la page « Graphics » en a décidé à son ouverture,
 // puis sa lumière une fois le ciel lu et les ombres peintes.
 struct LitFrame {
@@ -169,11 +178,12 @@ class LitStage {
   // `elapsed_ms` anime l'eau ; `now_ms` les lumières de la carte.
   //
   // Au retour, `frame` porte la lumière de l'image : les effets qui se peignent
-  // après la séquence la lisent.
+  // après la séquence la lisent. `veil` efface le décor qui cache ce qu'il faut
+  // voir ; vide, tout le décor est plein.
   void Paint(LitFrame& frame, const ro::render::Camera& camera, float aspect_ratio,
              const GraphicsOptions& graphics, std::optional<float> sky_hour,
              std::uint32_t elapsed_ms, std::uint32_t now_ms, const LitActors& actors,
-             LitLayers& layers);
+             LitLayers& layers, const LitDecorVeil& veil = {});
 
   // L'HEURE IMPOSÉE : vrai, `Paint` lit `sky_hour` même quand le joueur n'a pas
   // le cycle jour/nuit. C'est l'heure d'une mise en scène, pas celle du

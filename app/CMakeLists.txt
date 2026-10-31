@@ -1504,6 +1504,7 @@ add_library(moonclient_arena STATIC
     survivors/arena_camera.cpp
     survivors/arena_card_cues.cpp
     survivors/arena_choice.cpp
+    survivors/arena_decor_veil.cpp
     survivors/arena_effect_plan.cpp
     survivors/arena_effects.cpp
     survivors/arena_ground_compose.cpp

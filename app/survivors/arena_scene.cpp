@@ -42,6 +42,7 @@ ro::core::Result<void> ArenaScene::Open(ro::vfs::Vfs& vfs, const ro::sim::ArenaR
                                                    ro::core::Describe(opened.error()));
   }
   lit_.set_sky_hour_imposed(true);
+  ++mounts_;
   follow_.reset();
   ground_.reset();
   origin_ = GroundWindowOrigin();
@@ -99,6 +100,7 @@ ro::core::Result<void> ArenaScene::MountGround(ro::vfs::Vfs& vfs, GroundWindowOr
     return std::unexpected(opened.error());
   }
   lit_.set_sky_hour_imposed(true);
+  ++mounts_;
   // 🔴 UN FIL DE TRAVAIL NE LIT AUCUN FICHIER : une fenêtre ne cite que ce que
   // la bibliothèque a lu (`OpenGroundSources`). Une texture du sol absente de
   // l'installation se relirait à chaque fenêtre, sur le VFS que le fil
@@ -197,6 +199,7 @@ ro::core::Result<GroundRecentre> ArenaScene::MountPrepared() {
   const double mount_ms =
       std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - started).count();
   if (!outgoing) return std::unexpected(outgoing.error());
+  ++mounts_;
   if (follow_ != nullptr) follow_->Retire(std::move(*outgoing));
   const GroundRecentre recentre{.from = origin_,
                                 .to = prepared_origin_,
@@ -230,9 +233,17 @@ void ArenaScene::Paint(LitFrame& frame, const ro::render::Camera& camera, float 
                          .halos = item_halos_,
                          .sun_casters = horde.sun_casters(),
                          .carried_lights = carried_lights_};
+  veil_.Advance(ArenaVeilFrame{.stage = &lit_.stage(),
+                               .mount = mounts_,
+                               .camera = &camera,
+                               .aspect_ratio = aspect_ratio,
+                               .width = static_cast<std::int32_t>(overlays.viewport_width),
+                               .height = static_cast<std::int32_t>(overlays.viewport_height),
+                               .targets = overlays.veil_targets,
+                               .now_ms = now_ms});
   painting_effects_ = overlays.effects;
   lit_.Paint(frame, camera, aspect_ratio, graphics, ArenaSkyHour(presentation_ms),
-             RendererMs(presentation_ms), now_ms, actors, *this);
+             RendererMs(presentation_ms), now_ms, actors, *this, veil_.decor());
   painting_effects_ = nullptr;
   if (overlays.effects != nullptr) {
     overlays.effects->DrawAfterBodies(lit_.sprites(), camera, aspect_ratio, overlays.viewport_width,

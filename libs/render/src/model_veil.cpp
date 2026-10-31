@@ -63,6 +63,15 @@ void ModelVeils::Clear() {
 
 void ModelVeils::Advance(float elapsed_ms, const std::optional<SightSegment>& segment,
                          const SightFrustum& frustum) {
+  if (segment.has_value()) {
+    Advance(elapsed_ms, std::span<const SightSegment>(&*segment, 1), frustum);
+  } else {
+    Advance(elapsed_ms, std::span<const SightSegment>(), frustum);
+  }
+}
+
+void ModelVeils::Advance(float elapsed_ms, std::span<const SightSegment> segments,
+                         const SightFrustum& frustum) {
   pending_ms_ += std::max(elapsed_ms, 0.0F);
   auto frames = static_cast<std::size_t>(std::floor(pending_ms_ / kVeilFrameMs));
   if (frames > kMostFramesPerAdvance) {
@@ -77,13 +86,13 @@ void ModelVeils::Advance(float elapsed_ms, const std::optional<SightSegment>& se
     sides_[rank] = BoxAgainstFrustum(frustum, boxes_[rank]);
   }
   for (std::size_t frame = 0; frame < frames; ++frame) {
-    // LE SEGMENT MARQUE D'ABORD, puis chaque pose dessinée avance d'un cran :
-    // c'est l'ordre du client dans son image.
-    if (segment.has_value()) {
+    // LES SEGMENTS MARQUENT D'ABORD, puis chaque pose dessinée avance d'un
+    // cran : c'est l'ordre du client dans son image.
+    for (const SightSegment& segment : segments) {
       crossed_.clear();
-      tree_.CollectAlong(segment->origin, segment->direction, crossed_);
+      tree_.CollectAlong(segment.origin, segment.direction, crossed_);
       for (const std::uint32_t item : crossed_) {
-        if (SegmentMeetsBox(*segment, boxes_[item])) {
+        if (SegmentMeetsBox(segment, boxes_[item])) {
           veils_[item].marked = true;
         }
       }

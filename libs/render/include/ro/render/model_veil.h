@@ -76,6 +76,11 @@ class ModelVeils {
   // autres restent où elles en sont.
   void Advance(float elapsed_ms, const std::optional<SightSegment>& segment,
                const SightFrustum& frustum);
+  // PLUSIEURS REGARDS : à chaque image, chacun marque ce qu'il traverse, puis
+  // chaque pose avance d'un cran — une pose que deux segments traversent n'en
+  // descend pas plus vite.
+  void Advance(float elapsed_ms, std::span<const SightSegment> segments,
+               const SightFrustum& frustum);
 
   [[nodiscard]] const ModelOpacities& opacities() const noexcept { return opacities_; }
   // Les poses voilées que la vue montre, pour la passe translucide.

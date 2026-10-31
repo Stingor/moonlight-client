@@ -188,7 +188,7 @@ LitFrame LitStage::Begin(const GraphicsOptions& graphics, bool fog_shown,
 void LitStage::Paint(LitFrame& frame, const ro::render::Camera& camera, float aspect_ratio,
                      const GraphicsOptions& graphics, std::optional<float> sky_hour,
                      std::uint32_t elapsed_ms, std::uint32_t now_ms, const LitActors& actors,
-                     LitLayers& layers) {
+                     LitLayers& layers, const LitDecorVeil& veil) {
   frame.sky = SkyOf(graphics, sky_hour);
   frame.sun = DrawSunShadow(frame.sun_shadows, camera, aspect_ratio, frame.sky,
                             actors.sun_casters.value_or(actors.bodies));
@@ -206,8 +206,8 @@ void LitStage::Paint(LitFrame& frame, const ro::render::Camera& camera, float as
   models_.SetTextureFilter(decor_filter_);
   // Les faces à texture mêlée attendent la passe translucide, après les corps.
   models_.Draw(camera, frame.sky.light, aspect_ratio,
-               ro::render::ModelStages{.blended_apart = true}, &model_clock_, frame.fog, nullptr,
-               frame.sun, frame.points);
+               ro::render::ModelStages{.blended_apart = true}, &model_clock_, frame.fog,
+               veil.opacities, frame.sun, frame.points);
   layers.DrawBehindBodies(camera, aspect_ratio, frame);
 
   using ro::render::SpriteRenderer;
@@ -232,9 +232,9 @@ void LitStage::Paint(LitFrame& frame, const ro::render::Camera& camera, float as
                 SpriteRenderer::DepthWrite::kOff, SpriteRenderer::DepthTest::kOn, frame.fog);
   // LE VIDE SOUS LA CARTE prend l'heure du ciel, avant les faces mêlées.
   ShadeVoid(frame.sky, camera, aspect_ratio);
-  // LA PASSE TRANSLUCIDE DU DÉCOR, sans pose voilée : ses faces mêlées.
-  models_.DrawVeiled(camera, frame.sky.light, aspect_ratio, stage_->scene.models, {}, &model_clock_,
-                     frame.fog, frame.points);
+  // LA PASSE TRANSLUCIDE DU DÉCOR : ses faces mêlées et ses poses voilées.
+  models_.DrawVeiled(camera, frame.sky.light, aspect_ratio, stage_->scene.models, veil.veiled,
+                     &model_clock_, frame.fog, frame.points);
 }
 
 ro::render::SkyLight LitStage::SkyOf(const GraphicsOptions& graphics,
