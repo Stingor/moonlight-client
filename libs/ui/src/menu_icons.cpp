@@ -61,6 +61,9 @@ constexpr std::array<MenuIconEntry, kMenuCommandCount> kCatalogue = {{
     {kRankingBoard, "ranking", true, false},
     {kMarket, "market", true, false},
     {kDatabase, "database", true, false},
+    {kRojeweled, "rojeweled", true, false},
+    {kRoggle, "roggle", true, false},
+    {kSurvivors, "survivors", true, false},
     {kCashShopButton, "NC_CashShop", true, false, true},
 }};
 
@@ -425,6 +428,12 @@ const char* MenuIconLabel(MenuCommand command) {
       return core::Tr("Marché");
     case kDatabase:
       return core::Tr("Base de données");
+    case kRojeweled:
+      return core::Tr("Rojeweled");
+    case kRoggle:
+      return core::Tr("Roggle");
+    case kSurvivors:
+      return core::Tr("Survivants de Midgard");
     case kCashShopButton:
       return core::Tr("Bouton du Vote Shop");
   }

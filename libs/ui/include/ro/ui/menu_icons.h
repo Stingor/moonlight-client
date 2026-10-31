@@ -80,7 +80,7 @@ enum class MenuCommand : std::uint8_t {
   kMvpTracker,
   // LA FICHE DU PET, que le jeu n'ouvre que par le menu du pet.
   //
-  // ⚠ LES QUATRE SUIVANTES N'ONT AUCUN BITMAP DU JEU : leur art est le nôtre,
+  // ⚠ TOUTES LES SUIVANTES N'ONT AUCUN BITMAP DU JEU : leur art est le nôtre,
   // livré avec le client — voir `OurMenuIconPath`.
   kPetWindow,
   // LE TABLEAU DES CLASSEMENTS, que le jeu n'a pas.
@@ -89,6 +89,14 @@ enum class MenuCommand : std::uint8_t {
   kMarket,
   // LA BASE DE DONNÉES des objets et des monstres.
   kDatabase,
+  // LES MINI-JEUX, un par jeu, que la salle du menu d'Échap ouvre aussi.
+  //
+  // 🔴 MASQUÉES À L'USINE : le joueur les allume une à une dans les options.
+  // Un jeu n'est pas une fenêtre qu'on cherche en arrivant, et trois cases de
+  // plus repousseraient la grille d'une rangée.
+  kRojeweled,
+  kRoggle,
+  kSurvivors,
   // ── HORS DE LA GRILLE ─────────────────────────────────────────────────────
   //
   // LE BOUTON DU VOTE SHOP, posé à part. C'est une icône du jeu,

@@ -61,6 +61,9 @@ MenuIconFacts MenuIconFactsOf(const ro::sim::World& world, const UiStage::Window
   open_when(MenuCommand::kRankingBoard, windows.ranking_board.window.open);
   open_when(MenuCommand::kMarket, windows.trade.market.state.open);
   open_when(MenuCommand::kDatabase, windows.monster_sheet.database.state.open);
+  open_when(MenuCommand::kRojeweled, windows.minigames.rojeweled.open);
+  open_when(MenuCommand::kRoggle, windows.minigames.roggle.open);
+  open_when(MenuCommand::kSurvivors, windows.minigames.survivors_prepare.open);
   open_when(MenuCommand::kBooking, windows.party_booking.window.open);
   open_when(MenuCommand::kCashShop, windows.cash_shop.state.open);
   open_when(MenuCommand::kMail, windows.mail.box.open);
@@ -146,6 +149,26 @@ void ApplyMenuCommand(MenuCommand command, const MenuIconTargets& to) {
     case MenuCommand::kDatabase:
       to.windows->monster_sheet.database.toggle_asked = true;
       break;
+    // LES MINI-JEUX : ouverts, ils se ferment ; fermés, ils se demandent par le
+    // chemin de la salle, qui ferme celle-ci quand l'accueil de Survivants s'ouvre.
+    case MenuCommand::kRojeweled: {
+      MinigameWindows& minigames = to.windows->minigames;
+      minigames.icon_answer.open_rojeweled = !minigames.rojeweled.open;
+      minigames.rojeweled.open = false;
+      break;
+    }
+    case MenuCommand::kRoggle: {
+      MinigameWindows& minigames = to.windows->minigames;
+      minigames.icon_answer.open_roggle = !minigames.roggle.open;
+      minigames.roggle.open = false;
+      break;
+    }
+    case MenuCommand::kSurvivors: {
+      MinigameWindows& minigames = to.windows->minigames;
+      minigames.icon_answer.open_survivors = !minigames.survivors_prepare.open;
+      minigames.survivors_prepare.open = false;
+      break;
+    }
     default:
       // ⚠ UN CAS PAR DÉFAUT, à rebours du dépôt : les icônes sans fenêtre ne
       // remontent jamais jusqu'ici — la grille ouvre pour elles la fenêtre

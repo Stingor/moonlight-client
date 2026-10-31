@@ -55,6 +55,9 @@ struct FactoryIconPlace {
   float x = 0.0F;
   float y = 0.0F;
   ro::ui::AnchorSide across = ro::ui::AnchorSide::kStart;
+  // Masquée à l'usine : sa case des options la montre. Elle a tout de même sa
+  // place, pour ne pas tomber sur le portrait le jour où on l'allume.
+  bool hidden = false;
 };
 
 // ⚠ PAR NOM DE BITMAP ET NON PAR RANG : le nom est celui du fichier du jeu, et
@@ -84,6 +87,9 @@ constexpr std::array kFactoryIconPlaces = {
     FactoryIconPlace{.stem = "pet", .x = 36.0F, .y = 271.0F},
     FactoryIconPlace{.stem = "market", .x = 68.0F, .y = 271.0F},
     FactoryIconPlace{.stem = "database", .x = 100.0F, .y = 271.0F},
+    FactoryIconPlace{.stem = "rojeweled", .x = 132.0F, .y = 271.0F, .hidden = true},
+    FactoryIconPlace{.stem = "roggle", .x = 4.0F, .y = 305.0F, .hidden = true},
+    FactoryIconPlace{.stem = "survivors", .x = 36.0F, .y = 305.0F, .hidden = true},
     FactoryIconPlace{
         .stem = "NC_CashShop", .x = 254.0F, .y = 14.0F, .across = ro::ui::AnchorSide::kEnd},
 };
@@ -174,6 +180,7 @@ ro::ui::MenuIconsLook FactoryMenuIcons() {
     place.x = found->x;
     place.y = found->y;
     place.across = static_cast<int>(found->across);
+    place.hidden = found->hidden;
   }
   return look;
 }

@@ -99,6 +99,9 @@ std::optional<GameAction> ActionOfMenuCommand(MenuCommand command) {
     case MenuCommand::kRankingBoard:
     case MenuCommand::kMarket:
     case MenuCommand::kDatabase:
+    case MenuCommand::kRojeweled:
+    case MenuCommand::kRoggle:
+    case MenuCommand::kSurvivors:
       break;
     case MenuCommand::kCardAlbum:
       return GameAction::kOpenCardAlbum;
@@ -136,10 +139,14 @@ bool MenuCommandPorted(MenuCommand command) {
   // groupe.
   // LE MARCHÉ NON PLUS : sa touche passe par son étage, que l'icône n'atteint
   // pas ; elle dépose sa bascule dans ses fenêtres.
+  // LES MINI-JEUX NON PLUS : ils s'ouvrent par la salle, et leurs icônes
+  // déposent leur demande à côté de la sienne.
   return ActionOfMenuCommand(command).has_value() || command == MenuCommand::kOption ||
          command == MenuCommand::kShortcut || command == MenuCommand::kBattleground ||
          command == MenuCommand::kRankingBoard || command == MenuCommand::kBooking ||
-         command == MenuCommand::kMarket || command == MenuCommand::kDatabase;
+         command == MenuCommand::kMarket || command == MenuCommand::kDatabase ||
+         command == MenuCommand::kRojeweled || command == MenuCommand::kRoggle ||
+         command == MenuCommand::kSurvivors;
 }
 
 void ComposeMenuIcons(std::vector<ro::ui::MenuIconView>& into, ro::render::GameImages* images,
