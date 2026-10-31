@@ -136,6 +136,9 @@ enum class GameAction : std::uint8_t {
   // ⚠ MAJ+F : F seule n'est à aucune barre, mais une touche nue se presse par
   // mégarde, et la vue retourne tout l'écran.
   kFirstPersonView,
+  // LE VOL LIBRE DE L'ADMINISTRATEUR, une bascule : voir `input/free_flight.h`.
+  // ⚠ SANS TOUCHE D'USINE, et sans effet pour qui n'est pas administrateur.
+  kFreeFlight,
   kSitOrStand,
   // LE SAUT COSMÉTIQUE : voir `ro/sim/jump.h`. ⚠ SANS TOUCHE D'USINE : c'est
   // au joueur de lui donner une place.
@@ -148,6 +151,10 @@ enum class GameAction : std::uint8_t {
   kStepBack,
   kStepLeft,
   kStepRight,
+  // MONTER ET DESCENDRE PENDANT LE VOL LIBRE, des maintiens comme la marche.
+  // ⚠ ESPACE ET CTRL GAUCHE : le sol arrête la descente.
+  kFlyUp,
+  kFlyDown,
   kEffectBench,
   // L'ENREGISTREUR DE ZONE. ⚠ TROIS TOUCHES ET NON UNE, parce qu'elles servent
   // dans l'autre sens : celle qui filme n'ouvre pas le tracé, et une fois la

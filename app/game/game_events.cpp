@@ -29,9 +29,9 @@ void Game::PumpEvents(std::uint32_t now_ms) {
     if (survivors_.owns_screen() && SurvivorsTakes(event, now_ms)) {
       continue;
     }
-    // LA VUE À LA PREMIÈRE PERSONNE prend ses touches de marche avant les barres
-    // de raccourcis : voir `game_first_person.cpp`.
-    if (first_person_.active() && FirstPersonTakes(event)) {
+    // LA VUE À LA PREMIÈRE PERSONNE ET LE VOL LIBRE prennent leurs touches avant
+    // les barres de raccourcis : voir `game_first_person.cpp`.
+    if (FirstPersonTakes(event)) {
       continue;
     }
     RouteEvent({.gl = &*gl_,

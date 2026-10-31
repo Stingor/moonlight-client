@@ -95,12 +95,15 @@ constexpr std::array<ActionSavedNames, kNamedActionCount> kActionSavedNames = {{
     {GameAction::kReportBug, "bug_report"},
     {GameAction::kFrameWholeMap, "whole_map"},
     {GameAction::kFirstPersonView, "first_person"},
+    {GameAction::kFreeFlight, "free_flight"},
     {GameAction::kSitOrStand, "sit"},
     {GameAction::kJump, "jump"},
     {GameAction::kStepForward, "step_forward"},
     {GameAction::kStepBack, "step_back"},
     {GameAction::kStepLeft, "step_left"},
     {GameAction::kStepRight, "step_right"},
+    {GameAction::kFlyUp, "fly_up"},
+    {GameAction::kFlyDown, "fly_down"},
     {GameAction::kEffectBench, "effect_bench"},
     {GameAction::kCaptureRecord, "capture_video"},
     {GameAction::kCapturePicture, "capture_picture"},
@@ -257,6 +260,8 @@ HotkeyTab TabOfAction(ActionRef action) {
     case GameAction::kStepBack:
     case GameAction::kStepLeft:
     case GameAction::kStepRight:
+    case GameAction::kFlyUp:
+    case GameAction::kFlyDown:
     case GameAction::kTargetNearest:
     case GameAction::kTargetPrevious:
     case GameAction::kTargetNext:
@@ -269,6 +274,7 @@ HotkeyTab TabOfAction(ActionRef action) {
       return HotkeyTab::kPlay;
     case GameAction::kFrameWholeMap:
     case GameAction::kFirstPersonView:
+    case GameAction::kFreeFlight:
     case GameAction::kCameraReset:
     case GameAction::kCameraResetYaw:
     case GameAction::kCameraResetTilt:
@@ -407,6 +413,8 @@ std::string NameOfAction(ActionRef action) {
       return ro::core::Tr("Voir la carte entière");
     case GameAction::kFirstPersonView:
       return ro::core::Tr("Vue à la première personne");
+    case GameAction::kFreeFlight:
+      return ro::core::Tr("Vol libre (administrateur)");
     case GameAction::kCameraReset:
       return ro::core::Tr("Remettre la caméra");
     case GameAction::kCameraResetYaw:
@@ -441,6 +449,10 @@ std::string NameOfAction(ActionRef action) {
       return ro::core::Tr("Première personne : pas à gauche");
     case GameAction::kStepRight:
       return ro::core::Tr("Première personne : pas à droite");
+    case GameAction::kFlyUp:
+      return ro::core::Tr("Vol libre : monter");
+    case GameAction::kFlyDown:
+      return ro::core::Tr("Vol libre : descendre");
     case GameAction::kEffectBench:
       return ro::core::Tr("Banc d'effets");
     case GameAction::kCaptureRecord:
@@ -552,6 +564,8 @@ Hotkeys::Hotkeys() {
   set(GameAction::kStepBack, SDLK_DOWN);
   set(GameAction::kStepLeft, SDLK_LEFT);
   set(GameAction::kStepRight, SDLK_RIGHT);
+  set(GameAction::kFlyUp, SDLK_SPACE);
+  set(GameAction::kFlyDown, SDLK_LCTRL);
   bindings_[ActionRef(GameAction::kFirstPersonView).rank()] = Binding{.key = SDLK_F, .shift = true};
   if constexpr (ro::core::kDevTools) {
     set(GameAction::kEffectBench, SDLK_N);

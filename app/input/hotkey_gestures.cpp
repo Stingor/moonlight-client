@@ -155,6 +155,8 @@ ActionInput InputOfAction(ActionRef action) {
     case GameAction::kStepBack:
     case GameAction::kStepLeft:
     case GameAction::kStepRight:
+    case GameAction::kFlyUp:
+    case GameAction::kFlyDown:
       return ActionInput::kKeyHold;
     default:
       return ActionInput::kPress;

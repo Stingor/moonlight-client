@@ -667,7 +667,12 @@ std::optional<std::string> TriggerAction(const KeyPress& to, ActionRef action_re
     case GameAction::kStepBack:
     case GameAction::kStepLeft:
     case GameAction::kStepRight:
+    case GameAction::kFlyUp:
+    case GameAction::kFlyDown:
       // Des maintiens, que la vue à la première personne lit elle-même.
+      break;
+    case GameAction::kFreeFlight:
+      // Lue par la vue à la première personne, qui vérifie le rang du joueur.
       break;
     case GameAction::kCameraReset:
       if (Wired(to.rig, "caméra : remise")) {

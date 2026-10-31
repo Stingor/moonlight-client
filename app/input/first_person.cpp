@@ -12,9 +12,6 @@
 namespace moonclient {
 namespace {
 
-// En deçà, deux touches opposées se sont annulées : aucune direction.
-constexpr float kNoDirection = 1e-3F;
-
 [[nodiscard]] float Held(const StrideKeys& held, StrideKey key) {
   return held[static_cast<std::size_t>(key)] ? 1.0F : 0.0F;
 }
@@ -96,13 +93,14 @@ void FirstPersonView::Toggle(ro::render::Camera& camera) {
   active_ = true;
 }
 
+void TurnGaze(float& yaw_degrees, float& pitch_degrees, float dx_px, float dy_px) {
+  yaw_degrees -= dx_px * kFirstPersonDegreesPerPixel;
+  pitch_degrees = std::clamp(pitch_degrees + dy_px * kFirstPersonDegreesPerPixel,
+                             -kFirstPersonMaxPitchDegrees, kFirstPersonMaxPitchDegrees);
+}
+
 void FirstPersonView::Look(float dx_px, float dy_px) {
-  // ⚠ LE LACET DE LA CAMÉRA CROÎT VERS LA GAUCHE : tirer vers la droite le fait
-  // donc décroître. Tirer vers le bas incline vers le sol, comme la caméra du
-  // jeu.
-  yaw_degrees_ -= dx_px * kFirstPersonDegreesPerPixel;
-  pitch_degrees_ = std::clamp(pitch_degrees_ + dy_px * kFirstPersonDegreesPerPixel,
-                              -kFirstPersonMaxPitchDegrees, kFirstPersonMaxPitchDegrees);
+  TurnGaze(yaw_degrees_, pitch_degrees_, dx_px, dy_px);
 }
 
 bool FirstPersonView::StrideDue(std::uint32_t now_ms, std::uint32_t repeat_ms) {

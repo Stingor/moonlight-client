@@ -87,6 +87,7 @@ target_include_directories(moonclient_effect_nodes PUBLIC ${CMAKE_CURRENT_SOURCE
 add_library(moonclient_stage STATIC
     input/camera_aim.cpp
     input/first_person.cpp
+    input/free_flight.cpp
     world/decor_veil_view.cpp
     world/night_light_view.cpp
     world/map_stage.cpp

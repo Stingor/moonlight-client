@@ -68,6 +68,7 @@
 #include "input/camera_aim.h"
 #include "input/camera_rig.h"
 #include "input/first_person.h"
+#include "input/free_flight.h"
 #include "items/bank_view.h"
 #include "items/card_album_view.h"
 #include "items/card_insert_view.h"
@@ -120,9 +121,8 @@ namespace moonclient {
 //
 // ⚠ L'ORDRE DES MEMBRES EST L'ORDRE DE DESTRUCTION, À L'ENVERS, et le VFS vit
 // avant tout ce qui en garde une référence — effets, musique, bruits, unités au
-// sol, icônes de compétence. ⚠ IL APPARTIENT MAINTENANT À LA COQUILLE, donc il
-// survit à la partie : la contrainte est tenue par construction, et c'est
-// `ClientShell` qui la porte désormais.
+// sol, icônes de compétence. ⚠ IL APPARTIENT À LA COQUILLE, `ClientShell`, et
+// survit donc à la partie : la contrainte est tenue par construction.
 //
 // ⚠ ELLE NE SE DÉPLACE NI NE SE COPIE : elle garde l'adresse de ce que la
 // coquille contient, et se construit là où elle vivra.
@@ -507,7 +507,6 @@ class Game : public Screen,
   [[nodiscard]] bool FirstPersonTakes(const SDL_Event& event);
 
   // ── L'ÉCRAN DE VEILLE, dans `game_afk.cpp` ─────────────────────────────────
-  //
   // ⚠ MÊME CLASSE, AUTRE UNITÉ DE TRADUCTION : la veille est un sujet entier —
   // la décision, la caméra, l'annonce au serveur et deux lignes d'horloge.
 
@@ -563,6 +562,7 @@ class Game : public Screen,
   CameraAim aim_;
   CameraRig camera_rig_;
   FirstPersonView first_person_;
+  FreeFlight free_flight_;
   // L'image précédente, pour l'heure du ciel qui tourne : voir `SkyOfFrame`.
   std::optional<std::uint32_t> last_sky_ms_;
   // Le fuseau du serveur s'est révélé inconnu : dit une fois au journal.

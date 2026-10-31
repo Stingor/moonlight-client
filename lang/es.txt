@@ -11281,6 +11281,15 @@ tr: Primera persona: paso a la izquierda
 fr: Première personne : pas à droite
 tr: Primera persona: paso a la derecha
 
+fr: Vol libre (administrateur)
+tr: Vuelo libre (administrador)
+
+fr: Vol libre : monter
+tr: Vuelo libre: subir
+
+fr: Vol libre : descendre
+tr: Vuelo libre: bajar
+
 fr: Sinon un clic ne porte qu'un coup, et c'est Ctrl qui fait poursuivre la cible jusqu'à sa chute.
 tr: Si no, un clic da un solo golpe, y es Ctrl lo que hace perseguir al objetivo hasta que caiga.
 

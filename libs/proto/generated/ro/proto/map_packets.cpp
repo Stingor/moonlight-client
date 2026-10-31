@@ -12700,6 +12700,31 @@ std::vector<std::uint8_t> Encode(const ZcMoonlightSurvivorsService& packet) {
   return out;
 }
 
+bool Decode(std::span<const std::uint8_t> frame, CzMoonlightFreeFlight& packet) {
+  if (frame.size() != CzMoonlightFreeFlight::kWireSize) {
+    return false;
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != CzMoonlightFreeFlight::kOpcode) {
+    return false;
+  }
+  packet.packetLength = static_cast<std::int16_t>(reader.I16());
+  packet.x = static_cast<std::int16_t>(reader.I16());
+  packet.y = static_cast<std::int16_t>(reader.I16());
+  return reader.ok();
+}
+
+std::vector<std::uint8_t> Encode(const CzMoonlightFreeFlight& packet) {
+  std::vector<std::uint8_t> out;
+  out.reserve(CzMoonlightFreeFlight::kWireSize);
+  ByteWriter writer(out);
+  writer.U16(CzMoonlightFreeFlight::kOpcode);
+  writer.I16(static_cast<std::int16_t>(packet.packetLength));
+  writer.I16(static_cast<std::int16_t>(packet.x));
+  writer.I16(static_cast<std::int16_t>(packet.y));
+  return out;
+}
+
 bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightCardAlbum& packet) {
   if (frame.size() < ZcMoonlightCardAlbum::kWireSize) {
     return false;

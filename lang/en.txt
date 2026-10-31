@@ -11281,6 +11281,15 @@ tr: First person: step left
 fr: Première personne : pas à droite
 tr: First person: step right
 
+fr: Vol libre (administrateur)
+tr: Free flight (administrator)
+
+fr: Vol libre : monter
+tr: Free flight: up
+
+fr: Vol libre : descendre
+tr: Free flight: down
+
 fr: Sinon un clic ne porte qu'un coup, et c'est Ctrl qui fait poursuivre la cible jusqu'à sa chute.
 tr: Otherwise a click lands a single blow, and Ctrl is what chases the target until it falls.
 

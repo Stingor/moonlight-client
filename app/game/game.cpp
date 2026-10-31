@@ -204,10 +204,10 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
       .height = static_cast<std::int32_t>(shell_.height()),
       .now_ms = now_ms});
   pieces_.night_light.Advance(*stage_, world_, now_ms);
-  // Pas pendant la veille, une secousse ni la vue à la première personne : la
-  // caméra ne porte pas alors la vue du joueur.
+  // Pas pendant la veille, une secousse, la vue à la première personne ni le
+  // vol libre : la caméra ne porte pas alors la vue du joueur.
   if (link_.is_open() && !afk_screen_.active() && !aim_.shake.shaking() &&
-      !first_person_.active()) {
+      !first_person_.active() && !free_flight_.active()) {
     if (const std::optional<CameraMemory> now = camera_rig_.MemoryNow(camera_); now.has_value()) {
       settings_->NoteCameraMemory(*now);
     }

@@ -38,6 +38,14 @@ inline constexpr float kFirstPersonDegreesPerPixel = 0.25F;
 // pour que la marche ne s'arrête pas entre deux demandes, assez près pour qu'un
 // relâchement l'arrête vite.
 inline constexpr std::int32_t kFirstPersonStrideCells = 3;
+// En deçà, deux touches opposées se sont annulées : aucune direction.
+inline constexpr float kNoDirection = 1e-3F;
+
+// TOURNE UN REGARD d'un glisser de la souris, en pixels.
+//
+// ⚠ LE LACET DE LA CAMÉRA CROÎT VERS LA GAUCHE : tirer vers la droite le fait
+// donc décroître. Tirer vers le bas incline vers le sol, comme la caméra du jeu.
+void TurnGaze(float& yaw_degrees, float& pitch_degrees, float dx_px, float dy_px);
 
 // LA DISTANCE DU POINT VISÉ DEVANT L'ŒIL, en unités du monde.
 //
