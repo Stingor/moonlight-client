@@ -126,8 +126,7 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
   // LES MINI-JEUX, et leurs sons d'interface.
   pieces_.minigames.Advance(
       windows_.minigames,
-      MinigamePieces::Of(pieces_.wardrobe, pieces_.item_icons, Rights().staff_tools), client_root_,
-      now_ms);
+      MinigamePieces::Of(pieces_.wardrobe, pieces_.item_icons), client_root_, now_ms);
   play_sounds(pieces_.minigames.TakeSounds(), "d'un mini-jeu");
   if (link_.is_open()) {
     const bool verified = handshake_.state() == ro::net::MoonclientHandshakeState::kVerified;
