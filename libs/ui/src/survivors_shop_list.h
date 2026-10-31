@@ -20,6 +20,8 @@ struct SurvivorsShopLook {
   float first_height = 0.0F;
   SurvivorsEffectText (*effect)(const SurvivorsShopRow& row, int total) = nullptr;
   const char* (*describe)(const SurvivorsShopRow& row) = nullptr;
+  // Une note sous le solde, déjà traduite ; nulle : aucune.
+  const char* note = nullptr;
 };
 
 [[nodiscard]] SurvivorsShopAsk DrawSurvivorsShop(SurvivorsShopState& state,

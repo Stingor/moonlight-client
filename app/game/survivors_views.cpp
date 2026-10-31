@@ -153,7 +153,8 @@ SurvivorsFrameView SurvivorsViews::Compose(const SurvivorsStage& stage,
   switch (screen) {
     case SurvivorsScreen::kChoosing:
       if (field == nullptr) break;
-      ComposeOffer(*field, rules, stage.accepts_input(), facts.pressed_card_key, tables);
+      ComposeOffer(*field, rules, stage.accepts_input(), facts.pressed_card_key,
+                   stage.board().kind != SurvivorsBoardKind::kFree, tables);
       view.offer = &offer_;
       view.offer_state = &offer_state_;
       break;
@@ -270,7 +271,7 @@ void SurvivorsViews::ComposeHud(const SurvivorsField& field, const ro::sim::Surv
 }
 
 void SurvivorsViews::ComposeOffer(const SurvivorsField& field, const ro::sim::SurvivorsRules& rules,
-                                  bool accepts_input, int pressed_card_key,
+                                  bool accepts_input, int pressed_card_key, bool charges_withheld,
                                   const SurvivorsTables& tables) {
   offer_cards_.clear();
   for (const ro::sim::SurvivorsOffer& offer : field.offers) {
@@ -314,7 +315,8 @@ void SurvivorsViews::ComposeOffer(const SurvivorsField& field, const ro::sim::Su
                                       .pressed_card_key = pressed_card_key,
                                       .rerolls = field.rerolls_left,
                                       .skips = field.skips_left,
-                                      .banishes = field.banishes_left};
+                                      .banishes = field.banishes_left,
+                                      .charges_withheld = charges_withheld};
 }
 
 void SurvivorsViews::ComposeChest(const SurvivorsStage& stage, const SurvivorsTables& tables) {

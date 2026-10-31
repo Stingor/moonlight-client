@@ -41,6 +41,9 @@ struct SurvivorsOfferView {
   int rerolls = 0;
   int skips = 0;
   int banishes = 0;
+  // Vrai au défi et en partie classée, qui partent sans charges Kafra : la
+  // fenêtre le dit, pour qu'aucun joueur ne les cherche.
+  bool charges_withheld = false;
 };
 
 // Le bannissement armé tient d'une image à l'autre : la fenêtre le garde ici.

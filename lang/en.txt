@@ -20417,6 +20417,15 @@ tr: The shop has closed or is out of sight: the walk stops.
 fr: %d — Prendre
 tr: %d — Take
 
+fr: %d — Bannir
+tr: %d — Banish
+
+fr: Charges Kafra : en partie libre seulement.
+tr: Kafra charges: free play only.
+
+fr: Les charges servent en partie libre : le défi et la partie classée partent sans elles.
+tr: Charges work in free play: the challenge and ranked runs start without them.
+
 fr: %s %s %s %s ou les flèches : se déplacer
 tr: %s %s %s %s or the arrow keys: move
 

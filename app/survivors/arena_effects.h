@@ -213,8 +213,10 @@ class ArenaEffects {
   std::optional<ro::sim::WalkPlanner> planner_;
   std::vector<ArenaLaunch> plan_;
   std::vector<ArenaOrbLook> orbs_;
-  // L'effet que porte l'acteur de chaque orbe allumée, dans l'ordre des orbes.
+  // L'effet que porte l'acteur de chaque orbe allumée, dans l'ordre des orbes,
+  // et l'heure avant laquelle un semis refusé ne se retente pas.
   std::vector<std::uint32_t> orb_effects_;
+  std::vector<std::uint32_t> orb_retry_ms_;
   std::vector<ArenaRareGlow> glow_plan_;
   // L'acteur de chaque lueur allumée.
   std::vector<std::uint32_t> glow_actors_;

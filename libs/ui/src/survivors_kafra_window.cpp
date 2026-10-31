@@ -38,7 +38,9 @@ SurvivorsShopAsk DrawSurvivorsKafraWindow(SurvivorsShopState& state, const Survi
                                .first_width = kFirstWidth,
                                .first_height = kFirstHeight,
                                .effect = KafraEffect,
-                               .describe = KafraDescription};
+                               .describe = KafraDescription,
+                               .note = core::Tr("Les charges servent en partie libre : le défi "
+                                                "et la partie classée partent sans elles.")};
   return DrawSurvivorsShop(state, view, look, art);
 }
 

@@ -52,7 +52,10 @@ constexpr std::array<ImGuiKey, kMostOfferCards> kPadKeys = {ImGuiKey_Keypad1, Im
 }
 
 // Une carte ; vrai quand elle est cliquée.
-[[nodiscard]] bool DrawCard(const SurvivorsOfferCard& card, std::size_t index, const SkinArt& art) {
+// Le bouton dit ce que le clic fera : prendre la carte, ou la bannir quand le
+// bannissement est armé.
+[[nodiscard]] bool DrawCard(const SurvivorsOfferCard& card, std::size_t index, bool banishing,
+                            const SkinArt& art) {
   std::array<char, kLineSize> line = {};
   ImGui::PushID(static_cast<int>(index));
   ImGui::BeginChild("##card", ImVec2(kCardWidth, kCardHeight), ImGuiChildFlags_Borders);
@@ -78,7 +81,9 @@ constexpr std::array<ImGuiKey, kMostOfferCards> kPadKeys = {ImGuiKey_Keypad1, Im
   ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
   ImGui::TextWrapped("%s", SurvivorsText(card.description));
   ImGui::PopStyleColor();
-  std::snprintf(line.data(), line.size(), core::Tr("%d — Prendre"), static_cast<int>(index + 1));
+  std::snprintf(line.data(), line.size(),
+                banishing ? core::Tr("%d — Bannir") : core::Tr("%d — Prendre"),
+                static_cast<int>(index + 1));
   ImGui::SetCursorPosY(kCardHeight - SkinButtonHeight(art) - ImGui::GetStyle().WindowPadding.y);
   const bool taken = SkinButton(line.data(), art, ImVec2(-1.0F, 0.0F));
   // Une description trop longue fait défiler la carte : l'ascenseur se voit.
@@ -128,6 +133,9 @@ constexpr std::array<ImGuiKey, kMostOfferCards> kPadKeys = {ImGuiKey_Keypad1, Im
   if (state.banishing) {
     FaintText(core::Tr("Choisissez la carte à bannir."));
   }
+  if (view.charges_withheld) {
+    FaintText(core::Tr("Charges Kafra : en partie libre seulement."));
+  }
   return asked;
 }
 
@@ -152,7 +160,7 @@ std::optional<SurvivorsOfferAsk> DrawSurvivorsOfferWindow(SurvivorsOfferState& s
   const std::size_t shown = std::min(view.cards.size(), static_cast<std::size_t>(kMostOfferCards));
   for (std::size_t index = 0; index < shown; ++index) {
     if (index > 0) ImGui::SameLine();
-    if (DrawCard(view.cards[index], index, art)) {
+    if (DrawCard(view.cards[index], index, state.banishing, art)) {
       clicked = static_cast<std::uint8_t>(index);
     }
   }

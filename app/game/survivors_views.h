@@ -142,7 +142,8 @@ class SurvivorsViews {
                   std::uint64_t clock_ms, const SurvivorsViewFacts& facts,
                   const SurvivorsTables& tables);
   void ComposeOffer(const ro::sim::SurvivorsField& field, const ro::sim::SurvivorsRules& rules,
-                    bool accepts_input, int pressed_card_key, const SurvivorsTables& tables);
+                    bool accepts_input, int pressed_card_key, bool charges_withheld,
+                    const SurvivorsTables& tables);
   void ComposeChest(const SurvivorsStage& stage, const SurvivorsTables& tables);
   void ComposePause(const SurvivorsStage& stage, const ro::sim::SurvivorsField* field,
                     const SurvivorsViewFacts& facts);

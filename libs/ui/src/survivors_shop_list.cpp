@@ -170,6 +170,7 @@ SurvivorsShopAsk DrawSurvivorsShop(SurvivorsShopState& state, const SurvivorsSho
   std::snprintf(balance.data(), balance.size(), core::Tr("Solde : %s Zeny"),
                 SurvivorsZeny(view.zeny).data());
   ImGui::TextUnformatted(balance.data());
+  if (look.note != nullptr) FaintText(look.note);
   ImGui::Separator();
   const float footer = SkinButtonHeight(art) + ImGui::GetFrameHeightWithSpacing();
   ImGui::BeginChild("##rows", ImVec2(0.0F, -footer));

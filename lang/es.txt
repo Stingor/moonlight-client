@@ -20417,6 +20417,15 @@ tr: La tienda ha cerrado o ya no está a la vista: la marcha se detiene.
 fr: %d — Prendre
 tr: %d — Tomar
 
+fr: %d — Bannir
+tr: %d — Desterrar
+
+fr: Charges Kafra : en partie libre seulement.
+tr: Cargas Kafra: solo en partida libre.
+
+fr: Les charges servent en partie libre : le défi et la partie classée partent sans elles.
+tr: Las cargas sirven en partida libre: el desafío y la partida clasificada empiezan sin ellas.
+
 fr: %s %s %s %s ou les flèches : se déplacer
 tr: %s %s %s %s o las flechas: moverse
 

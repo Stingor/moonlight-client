@@ -327,6 +327,7 @@ void ArenaEffects::ForgetOrbs() {
     static_cast<void>(world_.Remove(OrbActorId(index)));
   }
   orb_effects_.clear();
+  orb_retry_ms_.clear();
 }
 
 void ArenaEffects::KeepOrbs(std::span<const ro::sim::SurvivorsOrb> orbs, const GroundOf& ground_of,
@@ -339,6 +340,7 @@ void ArenaEffects::KeepOrbs(std::span<const ro::sim::SurvivorsOrb> orbs, const G
     static_cast<void>(world_.Remove(OrbActorId(index)));
   }
   orb_effects_.resize(std::min(orb_effects_.size(), orbs_.size()));
+  orb_retry_ms_.resize(orb_effects_.size());
   for (std::size_t index = 0; index < orbs_.size(); ++index) {
     const ArenaOrbLook& orb = orbs_[index];
     const std::uint32_t actor_id = OrbActorId(index);
@@ -348,14 +350,27 @@ void ArenaEffects::KeepOrbs(std::span<const ro::sim::SurvivorsOrb> orbs, const G
     // resteraient là où elle a été allumée, et l'orbite ne tournerait plus.
     nodes_.FollowActor(actor_id, ground_of(orb.at), kArenaBearerFacingDegrees);
     if (index < orb_effects_.size()) {
-      if (orb_effects_[index] == orb.effect_id) continue;
-      effects_.StopById(orb_effects_[index], actor_id);
-      orb_effects_[index] = orb.effect_id;
+      // UNE ORBE DONT L'EFFET EST MORT SE RESÈME : un semis refusé par la troupe
+      // pleine, ou un effet éteint au bout de sa vie, la laisserait invisible
+      // alors qu'elle tourne et frappe encore. Le semis refusé ne se retente
+      // qu'après `kZoneGroundRetryMs`.
+      if (orb_effects_[index] == orb.effect_id &&
+          (effects_.Carries(orb.effect_id, actor_id) || now_ms < orb_retry_ms_[index])) {
+        continue;
+      }
+      if (orb_effects_[index] != orb.effect_id) {
+        effects_.StopById(orb_effects_[index], actor_id);
+        orb_effects_[index] = orb.effect_id;
+      }
     } else {
       orb_effects_.push_back(orb.effect_id);
+      orb_retry_ms_.push_back(0);
     }
-    static_cast<void>(effects_.PlayById(orb.effect_id, ground_of(orb.at), now_ms, actor_id, true));
-    ++launched_total_;
+    if (effects_.PlayById(orb.effect_id, ground_of(orb.at), now_ms, actor_id, true)) {
+      ++launched_total_;
+    } else {
+      orb_retry_ms_[index] = now_ms + kZoneGroundRetryMs;
+    }
   }
 }
 
