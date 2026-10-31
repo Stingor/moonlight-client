@@ -20165,6 +20165,15 @@ tr: Sonido del mapa seleccionado
 fr: Sons
 tr: Sonidos
 
+fr: Effets sautés
+tr: Efectos omitidos
+
+fr: dont par priorité
+tr: por prioridad
+
+fr: Effets hors champ
+tr: Efectos fuera de pantalla
+
 fr: Sons ajoutés
 tr: Sonidos añadidos
 

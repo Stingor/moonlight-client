@@ -1,9 +1,13 @@
 #include "survivors/arena_effect_plan.h"
 
 #include <algorithm>
+#include <cmath>
+#include <functional>
 
 #include "ro/render/effect_visibility.h"
 #include "ro/sim/level_up_effect.h"
+
+#include "survivors/arena_camera.h"
 
 namespace moonclient {
 namespace {
@@ -16,31 +20,23 @@ namespace {
                                                                      : hero_class.job_id;
 }
 
-// Ajoute un lancer si le budget lui fait place.
-void Admit(ArenaEffectBudget& budget, const ArenaLaunch& launch, std::vector<ArenaLaunch>& out) {
-  if (budget.Admit()) out.push_back(launch);
-}
-
 // L'effet qu'un lancer de skill fait naître, d'après sa sorte.
-void PlanCast(const ro::sim::SurvivorsCast& cast, const SkillLook& look, ArenaEffectBudget& budget,
+void PlanCast(const ro::sim::SurvivorsCast& cast, const SkillLook& look,
               std::vector<ArenaLaunch>& out) {
   switch (cast.kind) {
     case ro::sim::CastKind::kStrike:
     case ro::sim::CastKind::kBlast:
-      Admit(budget,
-            ArenaLaunch{
-                .effect_id = look.effect_id, .kind = ArenaLaunchKind::kOnGround, .at = cast.to},
-            out);
+      out.push_back(ArenaLaunch{
+          .effect_id = look.effect_id, .kind = ArenaLaunchKind::kOnGround, .at = cast.to});
       return;
     case ro::sim::CastKind::kShot:
     case ro::sim::CastKind::kNova:
-      Admit(budget,
-            ArenaLaunch{.effect_id = look.effect_id,
-                        .kind = look.bearer == SkillBearer::kHero ? ArenaLaunchKind::kOnHero
-                                                                  : ArenaLaunchKind::kOnGround,
-                        .at = look.bearer == SkillBearer::kHero ? cast.from : cast.to,
-                        .target = cast.to},
-            out);
+      out.push_back(ArenaLaunch{.effect_id = look.effect_id,
+                                .kind = look.bearer == SkillBearer::kHero
+                                            ? ArenaLaunchKind::kOnHero
+                                            : ArenaLaunchKind::kOnGround,
+                                .at = look.bearer == SkillBearer::kHero ? cast.from : cast.to,
+                                .target = cast.to});
       return;
     // Orbites et zones se lisent sur l'état : voir `PlanArenaOrbs`.
     case ro::sim::CastKind::kOrbitOn:
@@ -52,36 +48,109 @@ void PlanCast(const ro::sim::SurvivorsCast& cast, const SkillLook& look, ArenaEf
   }
 }
 
+[[nodiscard]] std::int64_t Squared(std::int64_t value) { return value * value; }
+
+// Le rang d'un impact : répété sur un monstre déjà touché dans l'image, proche
+// du héros, ou plus loin. Un impact sans monstre nommé n'est jamais répété.
+[[nodiscard]] ArenaEffectRank HitRank(const ro::sim::SurvivorsHit& hit, ro::sim::FieldPoint hero,
+                                      std::vector<std::uint32_t>& struck_serials) {
+  if (hit.foe_serial != 0) {
+    if (std::ranges::find(struck_serials, hit.foe_serial) != struck_serials.end()) {
+      return ArenaEffectRank::kLoose;
+    }
+    struck_serials.push_back(hit.foe_serial);
+  }
+  const std::int64_t reach = std::int64_t{kArenaNearHitCells} * ro::sim::kSubunitsPerCell;
+  const bool near =
+      Squared(std::int64_t{hit.at.x} - hero.x) + Squared(std::int64_t{hit.at.y} - hero.y) <=
+      Squared(reach);
+  return near ? ArenaEffectRank::kNearHit : ArenaEffectRank::kHit;
+}
+
+// Une case de la simulation en sous-unités, comptée depuis une emprise en cases
+// flottantes, arrondie au-dessus : le cadre ne rétrécit jamais.
+[[nodiscard]] std::int32_t UnitsOfCells(float cells) {
+  return static_cast<std::int32_t>(
+             std::ceil(cells * static_cast<float>(ro::sim::kSubunitsPerCell))) +
+         kArenaSightMarginCells * ro::sim::kSubunitsPerCell;
+}
+
 }  // namespace
 
-void ArenaEffectBudget::BeginFrame(std::size_t living) noexcept {
-  living_ = living;
+ArenaSight ArenaSightOf(const ro::render::Camera& camera, float aspect_ratio,
+                        ro::sim::FieldPoint hero) {
+  const std::optional<GroundFootprint> footprint = GroundFootprintOf(camera, aspect_ratio);
+  if (!footprint.has_value()) return ArenaSight{};
+  return ArenaSight{.bounded = true,
+                    .west_x = hero.x - UnitsOfCells(footprint->west_cells),
+                    .east_x = hero.x + UnitsOfCells(footprint->east_cells),
+                    .south_y = hero.y - UnitsOfCells(footprint->south_cells),
+                    .north_y = hero.y + UnitsOfCells(footprint->north_cells)};
+}
+
+void ArenaEffectBudget::BeginFrame(std::size_t living_seen, std::size_t living_anywhere) noexcept {
+  living_seen_ = living_seen;
+  living_anywhere_ = living_anywhere;
   launched_ = 0;
   skipped_ = 0;
 }
 
-void ArenaEffectLives::Add(std::uint32_t ends_ms) { ends_ms_.push_back(ends_ms); }
-
-void ArenaEffectLives::Expire(std::uint32_t now_ms) {
-  if (now_ms < last_now_ms_) ends_ms_.clear();
-  last_now_ms_ = now_ms;
-  std::erase_if(ends_ms_, [now_ms](std::uint32_t ends_ms) { return ends_ms <= now_ms; });
+std::size_t ArenaEffectBudget::LivingCeiling(ArenaEffectRank rank) const noexcept {
+  if (!reserves_held_) return caps_.living;
+  std::size_t reserved = 0;
+  switch (rank) {
+    case ArenaEffectRank::kHero:
+      break;
+    case ArenaEffectRank::kNearHit:
+    case ArenaEffectRank::kHit:
+      reserved = kArenaHeroLivingReserve;
+      break;
+    case ArenaEffectRank::kLoose:
+      reserved = kArenaHeroLivingReserve + kArenaHitLivingReserve;
+      break;
+  }
+  return caps_.living > reserved ? caps_.living - reserved : 0;
 }
 
-void ArenaEffectLives::Clear() noexcept {
-  ends_ms_.clear();
-  last_now_ms_ = 0;
-}
-
-bool ArenaEffectBudget::Admit() noexcept {
-  if (launched_ >= kMostArenaLaunchesPerFrame || living_ >= kMostArenaLivingEffects) {
+bool ArenaEffectBudget::Admit(ArenaEffectRank rank) noexcept {
+  const bool over_caps = launched_ >= caps_.launches_per_frame || living_seen_ >= caps_.living ||
+                         living_anywhere_ >= caps_.living * kArenaLivingAnywhereFactor;
+  const bool over_ceiling = living_seen_ >= LivingCeiling(rank);
+  if (over_caps || over_ceiling) {
     ++skipped_;
     ++skipped_total_;
+    if (!over_caps) ++ranked_out_total_;
     return false;
   }
   ++launched_;
-  ++living_;
+  ++living_seen_;
+  ++living_anywhere_;
   return true;
+}
+
+void ArenaEffectLives::Add(std::uint32_t ends_ms, std::optional<ro::sim::FieldPoint> at) {
+  lives_.push_back(Life{.ends_ms = ends_ms, .at = at});
+}
+
+void ArenaEffectLives::Expire(std::uint32_t now_ms) {
+  if (now_ms < last_now_ms_) lives_.clear();
+  last_now_ms_ = now_ms;
+  std::erase_if(lives_, [now_ms](const Life& life) { return life.ends_ms <= now_ms; });
+}
+
+void ArenaEffectLives::Clear() noexcept {
+  lives_.clear();
+  last_now_ms_ = 0;
+}
+
+std::size_t ArenaEffectLives::CountSeen(const ArenaSight& sight) const noexcept {
+  return static_cast<std::size_t>(std::ranges::count_if(
+      lives_, [&sight](const Life& life) { return !life.at.has_value() || sight.Sees(*life.at); }));
+}
+
+bool ArenaLaunchSeen(const ArenaLaunch& launch, const ArenaSight& sight) noexcept {
+  return launch.kind == ArenaLaunchKind::kOnHero || sight.Sees(launch.at) ||
+         (launch.target.has_value() && sight.Sees(*launch.target));
 }
 
 ArenaSkillLooks::ArenaSkillLooks(const ro::sim::SurvivorsRules& rules) {
@@ -96,47 +165,61 @@ const SkillLook* ArenaSkillLooks::Find(std::uint16_t skill_id) const noexcept {
   return found != looks_.end() ? &*found : nullptr;
 }
 
-void PlanArenaLaunches(const ro::sim::SurvivorsNews& news, const ro::sim::SurvivorsField& field,
-                       const ArenaSkillLooks& looks, ArenaEffectSwitches switches,
-                       ArenaEffectBudget& budget, std::vector<ArenaLaunch>& out) {
+void CollectArenaLaunches(const ro::sim::SurvivorsNews& news, const ro::sim::SurvivorsField& field,
+                          const ArenaSkillLooks& looks, ArenaEffectSwitches switches,
+                          std::vector<ArenaLaunch>& out) {
   out.clear();
   if (!switches.shown) return;
   if (!switches.reduced) {
     if (news.level_ups > 0) {
-      Admit(budget,
-            ArenaLaunch{.effect_id = ro::sim::BaseLevelUpEffectId(HeroJobOf(field)),
-                        .kind = ArenaLaunchKind::kOnHero,
-                        .at = field.hero.position},
-            out);
+      out.push_back(ArenaLaunch{.effect_id = ro::sim::BaseLevelUpEffectId(HeroJobOf(field)),
+                                .kind = ArenaLaunchKind::kOnHero,
+                                .at = field.hero.position});
     }
     if (!news.evolutions.empty()) {
-      Admit(budget,
-            ArenaLaunch{.effect_id = kJobChangeEffect,
-                        .kind = ArenaLaunchKind::kOnHero,
-                        .at = field.hero.position},
-            out);
+      out.push_back(ArenaLaunch{.effect_id = kJobChangeEffect,
+                                .kind = ArenaLaunchKind::kOnHero,
+                                .at = field.hero.position});
     }
     // UNE CARTE PRISE BRILLE SUR LE HÉROS, une fois par image.
     if (!news.cards_found.empty()) {
-      Admit(budget,
-            ArenaLaunch{.effect_id = kCardPickupEffect,
-                        .kind = ArenaLaunchKind::kOnHero,
-                        .at = field.hero.position},
-            out);
+      out.push_back(ArenaLaunch{.effect_id = kCardPickupEffect,
+                                .kind = ArenaLaunchKind::kOnHero,
+                                .at = field.hero.position});
     }
     for (const ro::sim::SurvivorsCast& cast : news.casts) {
-      if (const SkillLook* look = looks.Find(cast.skill_id)) PlanCast(cast, *look, budget, out);
+      if (const SkillLook* look = looks.Find(cast.skill_id)) PlanCast(cast, *look, out);
     }
   }
+  std::vector<std::uint32_t> struck_serials;
   for (const ro::sim::SurvivorsHit& hit : news.hits) {
     const SkillLook* look = looks.Find(hit.skill_id);
     if (look == nullptr) continue;
-    Admit(budget,
-          ArenaLaunch{.effect_id = switches.reduced ? kPlainHitEffect : look->hit_effect_id,
-                      .kind = ArenaLaunchKind::kOnGround,
-                      .at = hit.at},
-          out);
+    out.push_back(ArenaLaunch{.effect_id = switches.reduced ? kPlainHitEffect : look->hit_effect_id,
+                              .kind = ArenaLaunchKind::kOnGround,
+                              .at = hit.at,
+                              .rank = HitRank(hit, field.hero.position, struck_serials)});
   }
+}
+
+void AdmitArenaLaunches(const ArenaSight& sight, ArenaEffectBudget& budget,
+                        std::vector<ArenaLaunch>& launches) {
+  std::ranges::stable_sort(launches, std::less<>(), &ArenaLaunch::rank);
+  std::erase_if(launches, [&sight, &budget](const ArenaLaunch& launch) {
+    if (!ArenaLaunchSeen(launch, sight)) {
+      budget.NoteUnseen();
+      return true;
+    }
+    return !budget.Admit(launch.rank);
+  });
+}
+
+void PlanArenaLaunches(const ro::sim::SurvivorsNews& news, const ro::sim::SurvivorsField& field,
+                       const ArenaSkillLooks& looks, ArenaEffectSwitches switches,
+                       const ArenaSight& sight, ArenaEffectBudget& budget,
+                       std::vector<ArenaLaunch>& out) {
+  CollectArenaLaunches(news, field, looks, switches, out);
+  AdmitArenaLaunches(sight, budget, out);
 }
 
 void PlanArenaOrbs(std::span<const ro::sim::SurvivorsOrb> orbs, const ArenaSkillLooks& looks,

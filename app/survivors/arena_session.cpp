@@ -118,7 +118,11 @@ void ArenaSession::Compose(const ArenaFrameFacts& facts, const GraphicsOptions& 
   FollowGround();
   const auto ground_of = [this](ro::sim::FieldPoint point) { return scene_.GroundAt(point); };
   const auto effects_started = std::chrono::steady_clock::now();
-  effects_.Advance(*facts.news, field, facts.orbs, ground_of, renderer_ms);
+  // LE CADRE VU EST CELUI DE LA CAMÉRA POSÉE à l'image précédente : la marge
+  // du cadre couvre le pas qu'elle fera à celle-ci.
+  const ArenaSight sight = ArenaSightOf(
+      camera_.camera(), AspectOf(facts.viewport_width, facts.viewport_height), field.hero.position);
+  effects_.Advance(*facts.news, field, facts.orbs, ground_of, renderer_ms, sight);
   effects_ms_ =
       std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - effects_started)
           .count();

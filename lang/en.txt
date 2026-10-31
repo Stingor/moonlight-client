@@ -20165,6 +20165,15 @@ tr: Selected map sound
 fr: Sons
 tr: Sounds
 
+fr: Effets sautés
+tr: Skipped effects
+
+fr: dont par priorité
+tr: by priority
+
+fr: Effets hors champ
+tr: Off-screen effects
+
 fr: Sons ajoutés
 tr: Added sounds
 

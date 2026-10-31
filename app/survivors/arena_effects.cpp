@@ -222,7 +222,8 @@ void ArenaEffects::Restart() {
   ForgetOrbs();
   ForgetRareGlows();
   zone_grounds_.Forget(PutOutHands());
-  budget_ = ArenaEffectBudget();
+  // Les compteurs repartent de zéro, les plafonds restent.
+  budget_ = ArenaEffectBudget(budget_.caps());
   launched_total_ = 0;
   step_ = 0;
   // Ni la chauffe ni la partie d'avant ne font entendre leurs bruits.
@@ -382,13 +383,26 @@ void ArenaEffects::Launch(const ArenaLaunch& launch, const GroundOf& ground_of,
   static_cast<void>(effects_.PlayById(launch.effect_id, ground_of(launch.at), now_ms,
                                       on_hero ? kArenaHeroActorId : 0, false, 0, true, 0, 0.0F,
                                       0.0F, target));
-  lives_.Add(now_ms + LifeMsOf(launch.effect_id));
+  lives_.Add(now_ms + LifeMsOf(launch.effect_id),
+             on_hero ? std::nullopt : std::optional<ro::sim::FieldPoint>(launch.at));
   ++launched_total_;
 }
 
+std::size_t ArenaEffects::LivingSeen(const ArenaSight& sight) const {
+  const auto seen = [&sight](ro::sim::FieldPoint at) { return sight.Sees(at); };
+  std::size_t count = lives_.CountSeen(sight);
+  count += static_cast<std::size_t>(std::ranges::count_if(orbs_, seen, &ArenaOrbLook::at));
+  count += static_cast<std::size_t>(std::ranges::count_if(glow_plan_, seen, &ArenaRareGlow::at));
+  count += static_cast<std::size_t>(
+      std::ranges::count_if(zone_ground_plan_, seen, &ArenaZoneGround::at));
+  return count;
+}
+
+void ArenaEffects::set_caps(ArenaEffectCaps caps) { budget_ = ArenaEffectBudget(caps); }
+
 void ArenaEffects::Advance(const ro::sim::SurvivorsNews& news, const ro::sim::SurvivorsField& field,
                            std::span<const ro::sim::SurvivorsOrb> orbs, const GroundOf& ground_of,
-                           std::uint32_t now_ms) {
+                           std::uint32_t now_ms, const ArenaSight& sight) {
   step_ = field.step;
   PlaceActor(kArenaHeroActorId, CellOfField(glm::vec2(static_cast<float>(field.hero.position.x),
                                                       static_cast<float>(field.hero.position.y))));
@@ -398,22 +412,31 @@ void ArenaEffects::Advance(const ro::sim::SurvivorsNews& news, const ro::sim::Su
   KeepOrbs(orbs, ground_of, now_ms);
   KeepRareGlows(field, ground_of, now_ms);
   KeepZoneGrounds(field, ground_of, now_ms);
-  budget_.BeginFrame(living());
-  PlanArenaLaunches(news, field, looks_, switches_, budget_, plan_);
-  for (const ArenaLaunch& launch : plan_) Launch(launch, ground_of, now_ms);
+  budget_.set_reserves_held(switches_.shown && !switches_.reduced);
+  budget_.BeginFrame(LivingSeen(sight), living());
+  // LES SORTS ET LES FLAMMES DES MURS AU RANG DU HÉROS, devant les impacts : le
+  // budget tranche sur tous les candidats de l'image à la fois.
+  CollectArenaLaunches(news, field, looks_, switches_, plan_);
+  KeepZones(field, now_ms);
+  AdmitArenaLaunches(sight, budget_, plan_);
+  for (const ArenaLaunch& launch : plan_) {
+    Launch(launch, ground_of, now_ms);
+    if (launch.caller_index.has_value()) {
+      ZoneFlame& flame = flames_[*launch.caller_index];
+      flame.relaunch_ms = now_ms + LifeMsOf(flame.effect_id);
+    }
+  }
   for (const ro::sim::SurvivorsWarning& warning : news.warnings) {
     warnings_.push_back(WarningMark{.warning = warning, .announced_step = field.step});
   }
   std::erase_if(warnings_, [&field](const WarningMark& mark) {
     return field.step >= mark.warning.strike_step;
   });
-  KeepZones(field, ground_of, now_ms);
-  ShootFoeShots(field, ground_of);
+  ShootFoeShots(field, ground_of, sight);
   LayGroundMarks(field);
 }
 
-void ArenaEffects::KeepZones(const ro::sim::SurvivorsField& field, const GroundOf& ground_of,
-                             std::uint32_t now_ms) {
+void ArenaEffects::KeepZones(const ro::sim::SurvivorsField& field, std::uint32_t now_ms) {
   std::erase_if(flames_, [&field](const ZoneFlame& flame) {
     return std::ranges::none_of(field.zones, [&flame](const ro::sim::SurvivorsZone& zone) {
       return zone.serial == flame.zone_serial;
@@ -440,19 +463,22 @@ void ArenaEffects::KeepZones(const ro::sim::SurvivorsField& field, const GroundO
       }
     }
   }
-  // UNE FLAMME ÉTEINTE SE RALLUME tant que sa zone dure ; sans place au
-  // budget, elle réessaie à l'image suivante.
-  for (ZoneFlame& flame : flames_) {
-    if (now_ms < flame.relaunch_ms || !budget_.Admit()) continue;
-    Launch(
-        ArenaLaunch{
-            .effect_id = flame.effect_id, .kind = ArenaLaunchKind::kOnGround, .at = flame.at},
-        ground_of, now_ms);
-    flame.relaunch_ms = now_ms + LifeMsOf(flame.effect_id);
+  // UNE FLAMME ÉTEINTE SE RALLUME tant que sa zone dure, candidate au rang du
+  // héros ; sans place au budget, ou hors champ, elle réessaie à l'image
+  // suivante.
+  for (std::size_t index = 0; index < flames_.size(); ++index) {
+    const ZoneFlame& flame = flames_[index];
+    if (now_ms < flame.relaunch_ms) continue;
+    plan_.push_back(ArenaLaunch{.effect_id = flame.effect_id,
+                                .kind = ArenaLaunchKind::kOnGround,
+                                .at = flame.at,
+                                .rank = ArenaEffectRank::kHero,
+                                .caller_index = index});
   }
 }
 
-void ArenaEffects::ShootFoeShots(const ro::sim::SurvivorsField& field, const GroundOf& ground_of) {
+void ArenaEffects::ShootFoeShots(const ro::sim::SurvivorsField& field, const GroundOf& ground_of,
+                                 const ArenaSight& sight) {
   std::erase_if(shots_, [&field](const ShotSeen& seen) {
     return std::ranges::none_of(field.foe_shots, [&seen](const ro::sim::SurvivorsFoeShot& shot) {
       return shot.from_serial == seen.from_serial && shot.expires_step == seen.expires_step;
@@ -471,16 +497,23 @@ void ArenaEffects::ShootFoeShots(const ro::sim::SurvivorsField& field, const Gro
     if (shooter == field.foes.end()) continue;
     const ro::render::ActorLook look = FoeLook(shooter->foe_id);
     const std::string_view sprite = ro::render::ArrowSpriteOf(*sprites_, look, false);
-    if (sprite.empty() || !budget_.Admit()) continue;
+    if (sprite.empty()) continue;
     const std::uint32_t steps = shot.expires_step > field.step ? shot.expires_step - field.step : 0;
+    const ro::sim::FieldPoint lands = Along(shot.position, shot.velocity, steps);
+    // UNE FLÈCHE EST UN EFFET SECONDAIRE : la dernière servie, et hors champ
+    // tout son vol, elle ne part pas.
+    if (!sight.Sees(shot.position) && !sight.Sees(lands)) {
+      budget_.NoteUnseen();
+      continue;
+    }
+    if (!budget_.Admit(ArenaEffectRank::kLoose)) continue;
     const std::uint32_t flight_ms = steps * ro::sim::kSurvivorsStepMs;
     const glm::vec3 lift{0.0F, ro::render::kArrowFlightHeight, 0.0F};
     const auto life_ticks = static_cast<std::int32_t>(std::max<std::uint32_t>(
         flight_ms / static_cast<std::uint32_t>(ro::render::kEffectTickMs), 1));
-    static_cast<void>(
-        nodes_.ShootSprite(sprite, ground_of(shot.position) + lift,
-                           ground_of(Along(shot.position, shot.velocity, steps)) + lift, life_ticks,
-                           ro::render::ProjectileFlightOf(*sprites_, look)));
+    static_cast<void>(nodes_.ShootSprite(sprite, ground_of(shot.position) + lift,
+                                         ground_of(lands) + lift, life_ticks,
+                                         ro::render::ProjectileFlightOf(*sprites_, look)));
     ++launched_total_;
   }
 }

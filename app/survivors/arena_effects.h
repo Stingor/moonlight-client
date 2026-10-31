@@ -97,9 +97,14 @@ class ArenaEffects {
   // font naître, entretient murs, piliers et orbes (`SurvivorsRun::Orbs`)
   // d'après l'état, tire les flèches des monstres et pose les annonces au sol.
   // `now_ms` est l'horloge de présentation, ramenée à celle des renderers.
+  // `sight` : le cadre que la caméra voit (`ArenaSightOf`) ; ce qui naîtrait
+  // dehors ne part pas, et ce qui y vit ne compte pas au plafond.
   void Advance(const ro::sim::SurvivorsNews& news, const ro::sim::SurvivorsField& field,
                std::span<const ro::sim::SurvivorsOrb> orbs, const GroundOf& ground_of,
-               std::uint32_t now_ms);
+               std::uint32_t now_ms, const ArenaSight& sight = {});
+
+  // LES PLAFONDS DU BUDGET, que seul le banc change pour les essayer.
+  void set_caps(ArenaEffectCaps caps);
 
   // LE HÉROS À SA PLACE DESSINÉE, en cases continues (`HordePose::cell`) : les
   // effets qu'il porte le suivent entre deux pas au lieu de sauter de case en
@@ -129,6 +134,10 @@ class ArenaEffects {
   [[nodiscard]] std::size_t living() const noexcept {
     return lives_.size() + orb_effects_.size() + glow_actors_.size() + zone_grounds_.size();
   }
+  // Ceux d'entre eux qui vivent dans le cadre vu : ce que le plafond compte.
+  [[nodiscard]] std::size_t LivingSeen(const ArenaSight& sight) const;
+  // Les nœuds procéduraux vivants de la troupe.
+  [[nodiscard]] std::size_t nodes_living() const noexcept { return nodes_.living(); }
   // Les zones dont l'effet au sol est allumé.
   [[nodiscard]] std::size_t zone_grounds() const noexcept { return zone_grounds_.size(); }
   // Les cartes au sol qui luisent.
@@ -159,9 +168,10 @@ class ArenaEffects {
   };
 
   void Launch(const ArenaLaunch& launch, const GroundOf& ground_of, std::uint32_t now_ms);
-  void KeepZones(const ro::sim::SurvivorsField& field, const GroundOf& ground_of,
-                 std::uint32_t now_ms);
-  void ShootFoeShots(const ro::sim::SurvivorsField& field, const GroundOf& ground_of);
+  // Tient les flammes des zones, et range dans `plan_` celles à rallumer.
+  void KeepZones(const ro::sim::SurvivorsField& field, std::uint32_t now_ms);
+  void ShootFoeShots(const ro::sim::SurvivorsField& field, const GroundOf& ground_of,
+                     const ArenaSight& sight);
   void LayGroundMarks(const ro::sim::SurvivorsField& field);
   // Allume, repose et éteint les orbes, un acteur du monde privé chacune.
   void KeepOrbs(std::span<const ro::sim::SurvivorsOrb> orbs, const GroundOf& ground_of,

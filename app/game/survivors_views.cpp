@@ -26,6 +26,12 @@ constexpr const char* kFoesCountLabel = ro::core::TrText("Monstres");
 constexpr const char* kBodiesCountLabel = ro::core::TrText("Corps");
 constexpr const char* kEffectsCountLabel = ro::core::TrText("Effets");
 constexpr const char* kVoicesCountLabel = ro::core::TrText("Sons");
+// LE BUDGET DES EFFETS DE LA PARTIE : les lancers refusés au plafond, ceux
+// qu'une réserve tenue pour plus prioritaire a seule refusés, et ceux qui
+// seraient nés hors du cadre vu — ni lancés ni sautés.
+constexpr const char* kSkippedEffectsLabel = ro::core::TrText("Effets sautés");
+constexpr const char* kRankedOutEffectsLabel = ro::core::TrText("dont par priorité");
+constexpr const char* kUnseenEffectsLabel = ro::core::TrText("Effets hors champ");
 
 [[nodiscard]] std::string NumberedName(std::uint16_t id) { return "#" + std::to_string(id); }
 
@@ -371,6 +377,13 @@ void SurvivorsViews::ComposePause(const SurvivorsStage& stage, const SurvivorsFi
            .value = static_cast<long long>(facts.arena->composer().drawn().size())});
       count_rows_.push_back({.label = kEffectsCountLabel,
                              .value = static_cast<long long>(facts.arena->effects().living())});
+      const ArenaEffectBudget& budget = facts.arena->effects().budget();
+      count_rows_.push_back(
+          {.label = kSkippedEffectsLabel, .value = static_cast<long long>(budget.skipped_total())});
+      count_rows_.push_back({.label = kRankedOutEffectsLabel,
+                             .value = static_cast<long long>(budget.ranked_out_total())});
+      count_rows_.push_back(
+          {.label = kUnseenEffectsLabel, .value = static_cast<long long>(budget.unseen_total())});
     }
     count_rows_.push_back(
         {.label = kVoicesCountLabel, .value = static_cast<long long>(facts.busy_voices)});
