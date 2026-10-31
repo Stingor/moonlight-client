@@ -23,6 +23,7 @@
 #include "ro/render/sprite_billboard.h"
 #include "ro/render/terrain_mesh.h"
 #include "ro/render/vanish_fade.h"
+#include "ro/sim/jump.h"
 #include "ro/sim/movement.h"
 #include "ro/sim/status_effects.h"
 #include "ro/sim/world.h"
@@ -415,6 +416,10 @@ SceneCensus ComposeScene(ro::render::ActorWardrobe* wardrobe, const ro::sim::Wor
     // l'état de ce qu'il fait, et une marche retenue le reste avec lui.
     if (id == world.player_id()) {
       scene.player_gesture = PlayerGesture{played.motion, played.action_state};
+      if (scene.player_unseen && scene_id != 0) {
+        ++census.hidden;
+        return;
+      }
     }
     // Le joueur dissimulé garde sa place, sans corps : voir `KeepConcealedSelf`.
     if (concealment != Concealment::kVisible) {
@@ -545,8 +550,10 @@ SceneCensus ComposeScene(ro::render::ActorWardrobe* wardrobe, const ro::sim::Wor
     // CORPS, à l'endroit où ce corps est VU.
     drops.NoteBody(id, ground, body_pixels);
     const float lifted = pose.lift_fraction * body_pixels;
-    const float height =
-        ground[1] + (pose.up_pixels + lifted) / ro::render::kSpritePixelsPerWorldUnit;
+    // LE SAUT MONTE LE CORPS, pas son ombre : elle reste sur `standing`.
+    const float height = ground[1] +
+                         (pose.up_pixels + lifted) / ro::render::kSpritePixelsPerWorldUnit +
+                         ro::sim::JumpLiftAt(actor, now_ms);
     const float scale = ro::render::BodyScaleAfterEffects(played_effects);
     const glm::vec3 feet(ground[0], height, ground[2]);
     // LA PLANTE DE L'HALLUCINATION, posée où l'acteur se tient.

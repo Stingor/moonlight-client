@@ -132,7 +132,14 @@ enum class GameAction : std::uint8_t {
   // ouverte.
   kReportBug,
   kFrameWholeMap,
+  // LA VUE À LA PREMIÈRE PERSONNE, une bascule : voir `input/first_person.h`.
+  // ⚠ MAJ+F : F seule n'est à aucune barre, mais une touche nue se presse par
+  // mégarde, et la vue retourne tout l'écran.
+  kFirstPersonView,
   kSitOrStand,
+  // LE SAUT COSMÉTIQUE : voir `ro/sim/jump.h`. ⚠ ESPACE, que rien d'autre ne
+  // prend sur le monde.
+  kJump,
   kEffectBench,
   // L'ENREGISTREUR DE ZONE. ⚠ TROIS TOUCHES ET NON UNE, parce qu'elles servent
   // dans l'autre sens : celle qui filme n'ouvre pas le tracé, et une fois la

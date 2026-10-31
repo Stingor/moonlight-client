@@ -7,6 +7,7 @@
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
 #include "ro/net/action.h"
+#include "ro/net/jump.h"
 #include "ro/render/actor_sprite.h"
 #include "ro/sim/store_approach.h"
 #include "ro/sim/world.h"
@@ -612,6 +613,16 @@ std::optional<std::string> TriggerAction(const KeyPress& to, ActionRef action_re
       break;
     case GameAction::kFrameWholeMap:
       *to.camera = framed_map;
+      break;
+    case GameAction::kFirstPersonView:
+      if (Wired(to.first_person, "vue à la première personne")) {
+        to.first_person->Toggle(*to.camera);
+      }
+      break;
+    case GameAction::kJump:
+      if (to.link->is_open()) {
+        ReportRefusal(ro::net::JumpPlayer(*to.link, *to.world, to.now_ms));
+      }
       break;
     // Le mode éteint, ces quatre-là ne font rien : c'est le prix d'un
     // interrupteur maître honnête.

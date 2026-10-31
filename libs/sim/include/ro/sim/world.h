@@ -386,6 +386,11 @@ class World : public WorldHoldings, public WorldNpcDialog {
   // redite repart de zéro : on la répète, et elle rejoue. Faux pour un inconnu.
   bool RecordEmotion(std::uint32_t id, Emotion emotion, std::uint32_t since_ms);
 
+  // Fait sauter un acteur à partir de cet instant : voir `ro/sim/jump.h`. Un
+  // saut en cours ne repart pas, il finit son arc. Faux pour un inconnu, et
+  // pour un acteur encore en l'air.
+  bool RecordJump(std::uint32_t id, std::uint32_t since_ms);
+
   // BLADE STOP : le moine `caster_id` saisit la lame de `target_id`, ou la
   // relâche. Une prise ne se pose que si les deux sont connus ; un relâchement
   // libère chacun de ceux qui le sont. Rend faux si aucun ne l'est.

@@ -17,6 +17,7 @@
 #include "ro/net/flag_graffiti.h"
 #include "ro/net/gm_outfit.h"
 #include "ro/net/inventory.h"
+#include "ro/net/jump.h"
 #include "ro/net/map_mode.h"
 #include "ro/net/player_bonuses.h"
 #include "ro/net/player_settings.h"
@@ -238,6 +239,11 @@ FrameOutcome RelayFrame(const Frame& frame, sim::World& world, std::uint32_t now
   }
   // LE BOND DE BODY RELOCATION — voir ro/net/snap.h.
   if (const FrameOutcome outcome = ApplySnapFrame(frame, world, now_ms);
+      outcome != FrameOutcome::kUnhandled) {
+    return outcome;
+  }
+  // LE SAUT D'UN JOUEUR EN VUE — voir ro/net/jump.h.
+  if (const FrameOutcome outcome = ApplyJumpFrame(frame, world, now_ms);
       outcome != FrameOutcome::kUnhandled) {
     return outcome;
   }

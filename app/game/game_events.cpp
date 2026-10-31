@@ -29,6 +29,11 @@ void Game::PumpEvents(std::uint32_t now_ms) {
     if (survivors_.owns_screen() && SurvivorsTakes(event, now_ms)) {
       continue;
     }
+    // LA VUE À LA PREMIÈRE PERSONNE prend ses touches de marche avant les barres
+    // de raccourcis : voir `game_first_person.cpp`.
+    if (first_person_.active() && FirstPersonTakes(event)) {
+      continue;
+    }
     RouteEvent({.gl = &*gl_,
                 .interface = &*interface_,
                 .link = &link_,
@@ -38,6 +43,7 @@ void Game::PumpEvents(std::uint32_t now_ms) {
                 .effects = &*effects_,
                 .effect_nodes = &*effect_nodes_,
                 .camera = &camera_,
+                .first_person = &first_person_,
                 .rig = &camera_rig_,
                 .chat = &windows_.chat.main,
                 .grimoire = &grimoire_,

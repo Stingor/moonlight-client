@@ -118,6 +118,7 @@ void World::Spawn(Actor actor) {
     }
     actor.emotion = found->second.emotion;
     actor.emotion_since_ms = found->second.emotion_since_ms;
+    actor.jump_since_ms = found->second.jump_since_ms;
     actor.effects = std::move(found->second.effects);
     actor.skill_scale = found->second.skill_scale;
     actor.chat_text = std::move(found->second.chat_text);

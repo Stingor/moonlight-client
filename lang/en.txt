@@ -11248,6 +11248,12 @@ tr: Restore the original keys
 fr: S'asseoir ou se lever
 tr: Sit or stand
 
+fr: Sauter
+tr: Jump
+
+fr: Vue à la première personne
+tr: First-person view
+
 fr: Sinon un clic ne porte qu'un coup, et c'est Ctrl qui fait poursuivre la cible jusqu'à sa chute.
 tr: Otherwise a click lands a single blow, and Ctrl is what chases the target until it falls.
 

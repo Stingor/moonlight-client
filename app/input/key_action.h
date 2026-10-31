@@ -35,6 +35,7 @@
 #include "chat/chat_view.h"
 #include "effects/effect_bench_view.h"
 #include "input/camera_rig.h"
+#include "input/first_person.h"
 #include "input/hotkeys.h"
 #include "items/bank_view.h"
 #include "items/card_album_view.h"
@@ -171,6 +172,8 @@ struct KeyPress {
   ShortcutBarView* shortcuts = nullptr;
   EffectBenchPanel* bench = nullptr;
   ro::render::Camera* camera = nullptr;
+  // LA VUE À LA PREMIÈRE PERSONNE, que sa touche bascule sur `camera`.
+  FirstPersonView* first_person = nullptr;
   const CameraRig* rig = nullptr;
   ro::net::Connection* link = nullptr;
   ro::sim::World* world = nullptr;

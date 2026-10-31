@@ -94,7 +94,9 @@ constexpr std::array<ActionSavedNames, kNamedActionCount> kActionSavedNames = {{
     {GameAction::kOpenDatabase, "database"},
     {GameAction::kReportBug, "bug_report"},
     {GameAction::kFrameWholeMap, "whole_map"},
+    {GameAction::kFirstPersonView, "first_person"},
     {GameAction::kSitOrStand, "sit"},
+    {GameAction::kJump, "jump"},
     {GameAction::kEffectBench, "effect_bench"},
     {GameAction::kCaptureRecord, "capture_video"},
     {GameAction::kCapturePicture, "capture_picture"},
@@ -246,6 +248,7 @@ HotkeyTab TabOfAction(ActionRef action) {
     case GameAction::kAfkScreen:
       return HotkeyTab::kInterface;
     case GameAction::kSitOrStand:
+    case GameAction::kJump:
     case GameAction::kTargetNearest:
     case GameAction::kTargetPrevious:
     case GameAction::kTargetNext:
@@ -257,6 +260,7 @@ HotkeyTab TabOfAction(ActionRef action) {
     case GameAction::kShortcutWheel:
       return HotkeyTab::kPlay;
     case GameAction::kFrameWholeMap:
+    case GameAction::kFirstPersonView:
     case GameAction::kCameraReset:
     case GameAction::kCameraResetYaw:
     case GameAction::kCameraResetTilt:
@@ -393,6 +397,8 @@ std::string NameOfAction(ActionRef action) {
       return ro::core::Tr("Signaler un bug");
     case GameAction::kFrameWholeMap:
       return ro::core::Tr("Voir la carte entière");
+    case GameAction::kFirstPersonView:
+      return ro::core::Tr("Vue à la première personne");
     case GameAction::kCameraReset:
       return ro::core::Tr("Remettre la caméra");
     case GameAction::kCameraResetYaw:
@@ -417,6 +423,8 @@ std::string NameOfAction(ActionRef action) {
       return ro::core::Tr("Incliner à la molette");
     case GameAction::kSitOrStand:
       return ro::core::Tr("S'asseoir ou se lever");
+    case GameAction::kJump:
+      return ro::core::Tr("Sauter");
     case GameAction::kEffectBench:
       return ro::core::Tr("Banc d'effets");
     case GameAction::kCaptureRecord:
@@ -524,6 +532,8 @@ Hotkeys::Hotkeys() {
   // monde, et la roue ne s'ouvre que si une barre lui est choisie.
   set(GameAction::kShortcutWheel, KeyOfGesture(MouseGesture::kMiddleHold));
   set(GameAction::kSitOrStand, SDLK_INSERT);
+  set(GameAction::kJump, SDLK_SPACE);
+  bindings_[ActionRef(GameAction::kFirstPersonView).rank()] = Binding{.key = SDLK_F, .shift = true};
   if constexpr (ro::core::kDevTools) {
     set(GameAction::kEffectBench, SDLK_N);
   }

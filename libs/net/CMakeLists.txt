@@ -58,6 +58,7 @@ add_library(ro_net STATIC
     src/inventory.cpp
     src/item_news.cpp
     src/inventory_request.cpp
+    src/jump.cpp
     src/item_facts.cpp
     src/monster_sheet.cpp
     src/movement.cpp

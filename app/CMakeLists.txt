@@ -86,6 +86,7 @@ target_include_directories(moonclient_effect_nodes PUBLIC ${CMAKE_CURRENT_SOURCE
 # Les ranger ici ferait une bibliothèque qui ne se lie qu'avec lui.
 add_library(moonclient_stage STATIC
     input/camera_aim.cpp
+    input/first_person.cpp
     world/decor_veil_view.cpp
     world/night_light_view.cpp
     world/map_stage.cpp
@@ -1848,6 +1849,7 @@ add_executable(moonclient
     game/game.cpp
     game/game_events.cpp
     game/game_afk.cpp
+    game/game_first_person.cpp
     game/game_survivors.cpp
     game/survivors_mode.cpp
     game/survivors_views.cpp

@@ -455,6 +455,9 @@ struct Actor {
   // animation ; rien ne l'efface, et le serveur ne dit jamais qu'elle a fini.
   std::optional<Emotion> emotion;
   std::uint32_t emotion_since_ms = 0;
+  // LE DERNIER SAUT, dans l'horloge de l'APPELANT : voir `ro/sim/jump.h`. Rien
+  // pour qui n'a jamais sauté.
+  std::optional<std::uint32_t> jump_since_ms;
   // L'enseigne qu'il porte, s'il en tient une.
   std::optional<Signboard> signboard;
   // CE QU'IL EST EN TANT QU'OBJET AU SOL. Vide pour tout le reste : un

@@ -32,6 +32,7 @@
 #include "effects/effect_view.h"
 #include "game/ui_stage.h"
 #include "input/camera_rig.h"
+#include "input/first_person.h"
 #include "input/hotkeys.h"
 #include "items/bank_view.h"
 #include "items/card_album_view.h"
@@ -85,6 +86,7 @@ struct EventRouting {
   EffectsInPlay* effects = nullptr;
   EffectNodesInPlay* effect_nodes = nullptr;
   ro::render::Camera* camera = nullptr;
+  FirstPersonView* first_person = nullptr;
   CameraRig* rig = nullptr;
   // L'ÉTAT DE LA CHATBOX : Entrée lui donne le clavier, et rien d'autre ne passe
   // plus par ici — le champ de l'interface fait la saisie.

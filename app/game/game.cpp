@@ -175,6 +175,9 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
   // écrit la pose de la caméra, et elle doit écraser le cadrage du personnage,
   // pas être écrasée par lui.
   AdvanceAfk(now_ms);
+  // LA VUE À LA PREMIÈRE PERSONNE remplace le cadrage du personnage, et cède
+  // devant la veille.
+  FrameFirstPerson(now_ms);
   // LE RELIEF D'ABORD : la caméra, le voile et le dessin le lisent tous.
   if (auto followed = FollowMapRelief(); !followed) {
     return followed;
@@ -201,9 +204,10 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
       .height = static_cast<std::int32_t>(shell_.height()),
       .now_ms = now_ms});
   pieces_.night_light.Advance(*stage_, world_, now_ms);
-  // Pas pendant la veille ni une secousse : la caméra ne porte pas alors la vue
-  // du joueur.
-  if (link_.is_open() && !afk_screen_.active() && !aim_.shake.shaking()) {
+  // Pas pendant la veille, une secousse ni la vue à la première personne : la
+  // caméra ne porte pas alors la vue du joueur.
+  if (link_.is_open() && !afk_screen_.active() && !aim_.shake.shaking() &&
+      !first_person_.active()) {
     if (const std::optional<CameraMemory> now = camera_rig_.MemoryNow(camera_); now.has_value()) {
       settings_->NoteCameraMemory(*now);
     }

@@ -67,6 +67,7 @@
 #include "guild/guild_panel.h"
 #include "input/camera_aim.h"
 #include "input/camera_rig.h"
+#include "input/first_person.h"
 #include "items/bank_view.h"
 #include "items/card_album_view.h"
 #include "items/card_insert_view.h"
@@ -502,6 +503,8 @@ class Game : public Screen,
   // ── LE MODE SURVIVORS : voir `game_survivors.cpp`.
   void FrameSurvivors(std::uint32_t now_ms);
   [[nodiscard]] bool SurvivorsTakes(const SDL_Event& event, std::uint32_t now_ms);
+  void FrameFirstPerson(std::uint32_t now_ms);
+  [[nodiscard]] bool FirstPersonTakes(const SDL_Event& event);
 
   // ── L'ÉCRAN DE VEILLE, dans `game_afk.cpp` ─────────────────────────────────
   //
@@ -559,6 +562,7 @@ class Game : public Screen,
   ro::render::Camera camera_;
   CameraAim aim_;
   CameraRig camera_rig_;
+  FirstPersonView first_person_;
   // L'image précédente, pour l'heure du ciel qui tourne : voir `SkyOfFrame`.
   std::optional<std::uint32_t> last_sky_ms_;
   // Le fuseau du serveur s'est révélé inconnu : dit une fois au journal.

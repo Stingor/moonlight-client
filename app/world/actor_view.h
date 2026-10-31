@@ -610,6 +610,10 @@ struct ComposedScene {
   std::map<std::uint32_t, float> hover_pixels;
   // LA LÉVITATION DE CHACUN, d'une image à l'autre. `Clear` n'y touche pas.
   UnionHovers union_hovers;
+  // LE PERSONNAGE DU JOUEUR NE SE DESSINE PAS : la caméra est dans sa tête, et
+  // son panneau couvrirait l'écran. Son geste se note quand même. `Clear` n'y
+  // touche pas.
+  bool player_unseen = false;
 
   void Clear() {
     drawn.clear();
