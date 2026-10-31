@@ -74,9 +74,13 @@ void SurvivorsViews::NameCodexEntry(ro::ui::SurvivorsCodexEntry& entry,
     case SurvivorsCodexSheet::kSkill:
       entry.name = SkillName(entry.ro_id, tables);
       entry.icon = SkillIconImage(entry.ro_id, tables);
-      NameCodexLink(entry.evolution.card, CodexLinkKind::kItem, tables);
+      NameCodexLink(entry.evolution.card,
+                    entry.evolution.union_of_two ? CodexLinkKind::kSkill : CodexLinkKind::kItem,
+                    tables);
       NameCodexLink(entry.evolution.result, CodexLinkKind::kSkill, tables);
-      NameCodexLink(entry.evolved_from.card, CodexLinkKind::kItem, tables);
+      NameCodexLink(entry.evolved_from.card,
+                    entry.evolved_from.union_of_two ? CodexLinkKind::kSkill : CodexLinkKind::kItem,
+                    tables);
       NameCodexLink(entry.evolved_from.result, CodexLinkKind::kSkill, tables);
       return;
     case SurvivorsCodexSheet::kItem:

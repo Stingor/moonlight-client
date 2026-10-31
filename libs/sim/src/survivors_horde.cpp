@@ -150,6 +150,14 @@ void Recall(SurvivorsField& field, SurvivorsFoe& foe) {
   const SurvivorsTuning& tuning = field.rules->tuning;
   const FieldPoint hero = field.hero.position;
   const std::int32_t speed = PaceOf(field, foe);
+  // UN AVEUGLÉ ERRE à son cap du moment, et glisse le long des murs.
+  if (Blinded(field, foe)) {
+    const std::uint8_t heading = BlindHeading(field, foe);
+    const FieldPoint delta = TurnVector(heading, speed);
+    foe.position = Slide(field.ground, foe.position, delta);
+    foe.facing = heading;
+    return false;
+  }
   if ((TraitsOf(*field.rules, foe) & kFoePassesWalls) != 0) {
     const FieldPoint delta = StepToward(foe.position, hero, speed);
     foe.position = Glide(field.ground, foe.position, delta);

@@ -23,6 +23,12 @@ inline constexpr std::uint16_t kFireBoltId = 19;
 inline constexpr std::uint16_t kSightId = 10;
 inline constexpr std::uint16_t kFireWallId = 18;
 inline constexpr std::uint16_t kFrostDiverId = 15;
+inline constexpr std::uint16_t kColdBoltId = 14;
+inline constexpr std::uint16_t kLightningBoltId = 20;
+inline constexpr std::uint16_t kSoulStrikeId = 13;
+inline constexpr std::uint16_t kNapalmBeatId = 11;
+inline constexpr std::uint16_t kEarthSpikeId = 90;
+inline constexpr std::uint16_t kThunderstormId = 21;
 
 inline constexpr std::uint16_t kHornetCardId = 4019;
 inline constexpr std::uint16_t kChonchonCardId = 4009;
@@ -32,6 +38,10 @@ inline constexpr std::uint16_t kPupaCardId = 4003;
 inline constexpr std::uint16_t kPoringCardId = 4001;
 inline constexpr std::uint16_t kSporeCardId = 4022;
 inline constexpr std::uint16_t kThiefBugCardId = 4016;
+inline constexpr std::uint16_t kEclipseCardId = 4266;
+inline constexpr std::uint16_t kDragonFlyCardId = 4179;
+inline constexpr std::uint16_t kVagabondWolfCardId = 4183;
+inline constexpr std::uint16_t kBaphometCardId = 4147;
 
 inline constexpr std::uint16_t kLunaticId = 1063;
 inline constexpr std::uint16_t kPoringId = 1002;
@@ -65,7 +75,7 @@ inline constexpr std::uint16_t kPlainsTerrainId = 1;
 
 // survivors_rules_wizard.cpp : les skills évolués, que seul un coffre donne,
 // et les évolutions qui les nomment.
-inline constexpr std::size_t kShippedEvolvedSkillCount = 4;
+inline constexpr std::size_t kShippedEvolvedSkillCount = 9;
 [[nodiscard]] std::span<const SurvivorsSkillRule> ShippedEvolvedSkills();
 [[nodiscard]] std::span<const EvolutionRule> ShippedEvolutions();
 

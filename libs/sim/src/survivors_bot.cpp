@@ -443,9 +443,10 @@ SurvivorsAnswer SurvivorsBot::Choose(const SurvivorsField& field) const {
 
 const SurvivorsBotProfile& MageBotProfile() {
   // Les skills et les cartes dans l'ordre de préférence du Magicien (robot).
-  static constexpr std::array<std::uint16_t, 8> kSkillOrder{19, 13, 10, 11, 18, 15, 14, 20};
-  static constexpr std::array<std::uint16_t, 8> kCardOrder{4019, 4072, 4003, 4197,
-                                                           4009, 4022, 4016, 4001};
+  static constexpr std::array<std::uint16_t, 10> kSkillOrder{19, 13, 10, 11, 18,
+                                                             15, 14, 20, 90, 21};
+  static constexpr std::array<std::uint16_t, 12> kCardOrder{4019, 4072, 4003, 4197, 4009, 4022,
+                                                            4266, 4179, 4183, 4147, 4016, 4001};
   static const SurvivorsBotProfile kProfile{.skill_order = kSkillOrder,
                                             .card_order = kCardOrder,
                                             .threat_radius_units = Cells(8),

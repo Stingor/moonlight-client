@@ -273,13 +273,40 @@ enum class FoeAct : std::uint8_t { kNone, kShoot, kCharge, kBlink, kHide };
   const std::int32_t speed = field.step < foe.boost_until_step
                                  ? ScaledUnits(foe.units_per_step, foe.boost_pct)
                                  : foe.units_per_step;
-  if (foe.chill_until_step <= field.step) return speed;
-  std::int64_t slow_pct = std::clamp<std::int64_t>(tuning.chill_slow_pct, 0, kPercent);
-  if (IsBoss(*field.rules, foe)) {
-    slow_pct =
-        slow_pct * std::clamp<std::int64_t>(tuning.boss_chill_share_pct, 0, kPercent) / kPercent;
+  std::int32_t pace = speed;
+  if (foe.chill_until_step > field.step) {
+    std::int64_t slow_pct = std::clamp<std::int64_t>(tuning.chill_slow_pct, 0, kPercent);
+    if (IsBoss(*field.rules, foe)) {
+      slow_pct =
+          slow_pct * std::clamp<std::int64_t>(tuning.boss_chill_share_pct, 0, kPercent) / kPercent;
+    }
+    pace = static_cast<std::int32_t>(std::int64_t{pace} * (kPercent - slow_pct) / kPercent);
   }
-  return static_cast<std::int32_t>(std::int64_t{speed} * (kPercent - slow_pct) / kPercent);
+  // Le maudit perd sa part après le glaçage, qui se cumule avec elle.
+  if (foe.curse_until_step > field.step) {
+    const std::int64_t slow_pct = std::clamp<std::int64_t>(tuning.curse_slow_pct, 0, kPercent);
+    pace = static_cast<std::int32_t>(std::int64_t{pace} * (kPercent - slow_pct) / kPercent);
+  }
+  return pace;
+}
+
+[[nodiscard]] inline bool Blinded(const SurvivorsField& field, const SurvivorsFoe& foe) noexcept {
+  return field.step < foe.blind_until_step;
+}
+
+// LE CAP D'UN AVEUGLÉ : tiré du numéro du monstre et de la période de
+// `blind_turn_ms` en cours, par un mélange entier sans tirage ; il change à
+// chaque période, et deux aveuglés voisins errent chacun de leur côté.
+[[nodiscard]] inline std::uint8_t BlindHeading(const SurvivorsField& field,
+                                               const SurvivorsFoe& foe) noexcept {
+  const std::uint32_t period_steps =
+      std::max<std::uint32_t>(StepsOf(field.rules->tuning.blind_turn_ms), 1);
+  constexpr std::uint64_t kGolden = 0x9E3779B97F4A7C15ULL;
+  constexpr std::uint64_t kSpread = 0xBF58476D1CE4E5B9ULL;
+  constexpr unsigned kHighBits = 32;
+  const std::uint64_t mixed =
+      std::uint64_t{foe.serial} * kGolden + std::uint64_t{field.step / period_steps} * kSpread;
+  return static_cast<std::uint8_t>((mixed >> kHighBits) % kHeadingSteps);
 }
 
 // Le pas de `from` vers `goal`, de `speed` au plus : Toward dépasserait un but

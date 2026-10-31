@@ -22,16 +22,11 @@ constexpr std::uint16_t kMageClassId = 1;
 constexpr std::uint16_t kMageJobId = 2;
 constexpr std::uint16_t kWizardJobId = 9;          // l'apparence après une évolution
 constexpr std::uint16_t kMageWeaponItemId = 1601;  // Rod
-constexpr std::int32_t kMageMaxHp = 280;
+constexpr std::int32_t kMageMaxHp = 300;
 constexpr std::uint32_t kMageWalkMsPerCell = 150;
 constexpr std::int32_t kMageMagnetCells = 3;
 constexpr std::int32_t kMageDamagePctPerLevel = 1;
 constexpr std::int32_t kMageDamagePctCap = 25;
-
-constexpr std::uint16_t kColdBoltId = 14;
-constexpr std::uint16_t kLightningBoltId = 20;
-constexpr std::uint16_t kSoulStrikeId = 13;
-constexpr std::uint16_t kNapalmBeatId = 11;
 
 // Les trois éclairs frappent à la même portée, une frappe toutes les 120 ms.
 constexpr std::int32_t kBoltReachCells = 9;
@@ -73,6 +68,11 @@ constexpr std::uint32_t kWallLifeMs = 4000;
 constexpr std::int32_t kDiverReachCells = 9;
 constexpr std::int32_t kDiverSpeedCellsPerSecond = 12;
 constexpr std::int32_t kDiverHitRadiusTenths = 4;
+
+// Thunderstorm : un orage posé sur le monstre le plus proche, à 9 cases, qui
+// frappe tout son disque toutes les 300 ms.
+constexpr std::int32_t kThunderstormReachCells = 9;
+constexpr std::uint32_t kThunderstormWaveMs = 300;
 
 // Un niveau d'éclair : `amount` frappes de `damage`, une salve par
 // `cooldown_ms`, et un glaçage de `chill_ms` (0 : aucun).
@@ -173,6 +173,19 @@ constexpr std::int32_t kDiverHitRadiusTenths = 4;
                     .freeze_ms = freeze_ms};
 }
 
+// Un niveau de Thunderstorm : `waves` vagues de `damage`, sur un disque de
+// `radius_tenths` dixièmes de case.
+[[nodiscard]] constexpr SkillLevel Storm(std::uint8_t waves, std::int32_t damage,
+                                         std::uint32_t cooldown_ms,
+                                         std::int32_t radius_tenths) noexcept {
+  return SkillLevel{.damage = damage,
+                    .cooldown_ms = cooldown_ms,
+                    .amount = waves,
+                    .interval_ms = kThunderstormWaveMs,
+                    .reach_units = Cells(kThunderstormReachCells),
+                    .area_radius_units = CellTenths(radius_tenths)};
+}
+
 // Bolt(frappes, dégâts, recharge en ms).
 constexpr std::array<SkillLevel, kMostSkillLevels> kFireBoltLevels{{
     Bolt(2, 12, 1100),
@@ -268,8 +281,30 @@ constexpr std::array<SkillLevel, kMostSkillLevels> kFrostDiverLevels{{
     Diver(3, 36, 1400, 2000, 2),
     Diver(4, 40, 1400, 2500, 3),
 }};
+// Bolt(frappes, dégâts, recharge en ms) : les pointes d'Earth Spike.
+constexpr std::array<SkillLevel, kMostSkillLevels> kEarthSpikeLevels{{
+    Bolt(2, 22, 1400),
+    Bolt(3, 22, 1400),
+    Bolt(3, 27, 1400),
+    Bolt(4, 27, 1400),
+    Bolt(4, 27, 1200),
+    Bolt(5, 31, 1200),
+    Bolt(6, 31, 1200),
+    Bolt(8, 36, 1200),
+}};
+// Storm(vagues, dégâts, recharge en ms, rayon en dixièmes de case).
+constexpr std::array<SkillLevel, kMostSkillLevels> kThunderstormLevels{{
+    Storm(4, 18, 3200, 20),
+    Storm(4, 22, 3200, 20),
+    Storm(5, 22, 3200, 20),
+    Storm(5, 22, 2800, 22),
+    Storm(5, 28, 2800, 22),
+    Storm(6, 28, 2800, 25),
+    Storm(6, 28, 2400, 25),
+    Storm(7, 36, 2400, 25),
+}};
 
-constexpr std::array<SurvivorsSkillRule, 8> kPoolSkills{{
+constexpr std::array<SurvivorsSkillRule, 10> kPoolSkills{{
     {.skill_id = kFireBoltId,
      .key = "fire_bolt",
      .description = core::TrText("Des éclairs de feu frappent le monstre le plus proche."),
@@ -326,6 +361,21 @@ constexpr std::array<SurvivorsSkillRule, 8> kPoolSkills{{
      .target = TargetRule::kNearest,
      .element = SurvivorsElement::kWater,
      .levels = kFrostDiverLevels},
+    {.skill_id = kEarthSpikeId,
+     .key = "earth_spike",
+     .description = core::TrText("Des pointes de terre jaillissent sous des monstres au hasard."),
+     .archetype = SkillArchetype::kTargetStrike,
+     .target = TargetRule::kRandom,
+     .element = SurvivorsElement::kEarth,
+     .levels = kEarthSpikeLevels},
+    {.skill_id = kThunderstormId,
+     .key = "thunderstorm",
+     .description =
+         core::TrText("Un orage s'abat sur le monstre le plus proche et frappe en rafale."),
+     .archetype = SkillArchetype::kStorm,
+     .target = TargetRule::kNearest,
+     .element = SurvivorsElement::kWind,
+     .levels = kThunderstormLevels},
 }};
 
 // Le gain de chaque carte, du niveau 1 au niveau 5.
@@ -338,8 +388,13 @@ constexpr std::array<std::int32_t, kMostCardLevels> kThiefBugLevels{40, 80, 120,
 constexpr std::array<std::int32_t, kMostCardLevels> kGolemLevels{1, 2, 3, 4, 5};
 // Mastering Card n'a que deux niveaux : un projectile de plus par niveau.
 constexpr std::array<std::int32_t, 2> kMasteringLevels{1, 2};
+// Les cartes des mini-boss et de Baphomet : recharge, aire, durée, expérience.
+constexpr std::array<std::int32_t, kMostCardLevels> kEclipseLevels{4, 8, 12, 16, 20};
+constexpr std::array<std::int32_t, kMostCardLevels> kDragonFlyLevels{8, 16, 24, 32, 40};
+constexpr std::array<std::int32_t, kMostCardLevels> kVagabondWolfLevels{10, 20, 30, 40, 50};
+constexpr std::array<std::int32_t, kMostCardLevels> kBaphometLevels{8, 16, 24, 32, 40};
 
-constexpr std::array<CardRule, 8> kCards{{
+constexpr std::array<CardRule, 12> kCards{{
     {.card_item_id = kHornetCardId,
      .key = "hornet_card",
      .description = core::TrText("Dégâts de tous les skills augmentés."),
@@ -380,19 +435,40 @@ constexpr std::array<CardRule, 8> kCards{{
      .description = core::TrText("Un projectile de plus pour chaque skill."),
      .stat = SurvivorsStat::kAmount,
      .per_level = kMasteringLevels},
+    {.card_item_id = kEclipseCardId,
+     .key = "eclipse_card",
+     .description = core::TrText("Recharge de tous les skills raccourcie."),
+     .stat = SurvivorsStat::kCooldownPct,
+     .per_level = kEclipseLevels},
+    {.card_item_id = kDragonFlyCardId,
+     .key = "dragon_fly_card",
+     .description = core::TrText("Aire de tous les skills élargie."),
+     .stat = SurvivorsStat::kAreaPct,
+     .per_level = kDragonFlyLevels},
+    {.card_item_id = kVagabondWolfCardId,
+     .key = "vagabond_wolf_card",
+     .description = core::TrText("Durée des zones, des gels et des statuts allongée."),
+     .stat = SurvivorsStat::kDurationPct,
+     .per_level = kVagabondWolfLevels},
+    {.card_item_id = kBaphometCardId,
+     .key = "baphomet_card",
+     .description = core::TrText("Expérience gagnée augmentée."),
+     .stat = SurvivorsStat::kExpPct,
+     .per_level = kBaphometLevels},
 }};
 
 constexpr std::array<std::uint16_t, 3> kMageStarterSkills{kFireBoltId, kColdBoltId,
                                                           kLightningBoltId};
-constexpr std::array<std::uint16_t, 8> kMageSkillPool{kFireBoltId,   kColdBoltId,  kLightningBoltId,
-                                                      kSoulStrikeId, kSightId,     kNapalmBeatId,
-                                                      kFireWallId,   kFrostDiverId};
-// Les huit cartes, Golem et Mastering comprises : la réserve livrée est
+constexpr std::array<std::uint16_t, 10> kMageSkillPool{
+    kFireBoltId,   kColdBoltId, kLightningBoltId, kSoulStrikeId, kSightId,
+    kNapalmBeatId, kFireWallId, kFrostDiverId,    kEarthSpikeId, kThunderstormId};
+// Les douze cartes, celles des boss comprises : la réserve livrée est
 // entière, celle du départ neutre ; une partie libre en retire par ses Id
 // verrouillés ce que le carnet n'a pas débloqué.
-constexpr std::array<std::uint16_t, 8> kMageCardPool{
-    kHornetCardId, kPupaCardId,     kChonchonCardId, kPoringCardId,
-    kSporeCardId,  kThiefBugCardId, kGolemCardId,    kMasteringCardId};
+constexpr std::array<std::uint16_t, 12> kMageCardPool{
+    kHornetCardId,  kPupaCardId,      kChonchonCardId,     kPoringCardId,
+    kSporeCardId,   kThiefBugCardId,  kGolemCardId,        kMasteringCardId,
+    kEclipseCardId, kDragonFlyCardId, kVagabondWolfCardId, kBaphometCardId};
 
 constexpr std::array<ClassRule, 1> kClasses{{
     {.class_id = kMageClassId,

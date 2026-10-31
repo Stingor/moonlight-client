@@ -68,8 +68,10 @@ enum class SkillArchetype : std::uint8_t {
   kWall,          // mur perpendiculaire au cap du héros
   kNova,          // aire autour du héros
   kRing,          // piliers sur un cercle autour du héros
+  kStorm,         // aire posée qui frappe tout son disque, par vagues
 };
-enum class TargetRule : std::uint8_t { kNearest, kRandom, kStrongest, kDensest };
+// kHero : une aire centrée sur le héros, et non sur un monstre visé.
+enum class TargetRule : std::uint8_t { kNearest, kRandom, kStrongest, kDensest, kHero };
 enum class SurvivorsStat : std::uint8_t {
   kDamagePct,
   kMaxHp,
@@ -115,6 +117,11 @@ struct SkillLevel {
   std::uint8_t bounces = 0;
   std::int32_t bounce_pct = 0;
   std::int32_t bounce_reach_units = 0;
+  // Orage : ses vagues gèlent à partir de celle-ci (1 : dès la première) ;
+  // 0 avec un gel : toutes.
+  std::uint8_t freeze_from_wave = 0;
+  std::uint32_t blind_ms = 0;  // aveugle : le monstre erre au hasard
+  std::uint32_t curse_ms = 0;  // maudit : plus lent, et plus blessé
 };
 
 // La vitesse d'un tir en sous-unités par pas, tronquée vers zéro : celle du
@@ -296,7 +303,8 @@ struct SurvivorsTuning {
   //   blocs nuls) : `plant_start_count` plantes autour du départ, puis une
   //   plante juste hors du cadre d'apparition chaque fois que les tués depuis
   //   la précédente atteignent `plant_kills_per_minute` × la minute en cours
-  //   (1 de 0:00 à 0:59, 2 de 1:00 à 1:59…), au plus `most_live_plants` en vie.
+  //   (1 de 0:00 à 0:59, 2 de 1:00 à 1:59…), au plus `most_live_plants` en vie
+  //   (0 : sans plafond ; le rythme et la perte bornent alors la liste).
   std::int32_t plant_block_cells = 0;       // côté d'un bloc qui porte au plus une plante
   std::uint32_t plant_cells_per_plant = 0;  // cases praticables d'un bloc par plante
   std::uint32_t plant_kills_per_minute = 0;
@@ -311,6 +319,13 @@ struct SurvivorsTuning {
   std::int32_t plant_forget_units = 0;
   std::int32_t pickup_radius_units = 0;  // ramassage d'un objet au sol
   std::uint32_t final_overtime_ms = 0;   // au-delà de run_ms, avec un boss final
+  // LES STATUTS D'AVEUGLEMENT ET DE MALÉDICTION, que seuls les communs
+  // subissent. Un maudit marche `curse_slow_pct` % moins vite et prend
+  // `curse_hurt_pct` % de dégâts de plus ; un aveuglé erre au hasard, et change
+  // de cap tous les `blind_turn_ms`.
+  std::int32_t curse_slow_pct = 0;
+  std::int32_t curse_hurt_pct = 0;
+  std::uint32_t blind_turn_ms = 0;
 };
 
 // LA CHUTE DES CARTES. Un tué qui porte une carte la lâche une fois sur

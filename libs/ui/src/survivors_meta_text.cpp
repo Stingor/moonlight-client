@@ -69,6 +69,8 @@ const char* SurvivorsKafraDescription(std::string_view service_key) {
 const char* SurvivorsFeatGoal(std::string_view feat_key) {
   if (feat_key == "sight") return core::Tr("Survivre en une seule partie");
   if (feat_key == "frost_diver") return core::Tr("Glaçages par Cold Bolt, au cumul");
+  if (feat_key == "earth_spike") return core::Tr("Monstres Wind vaincus, au cumul");
+  if (feat_key == "thunderstorm") return core::Tr("Niveau atteint en une seule partie");
   return "";
 }
 

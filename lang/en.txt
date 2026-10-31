@@ -434,6 +434,12 @@ tr: A wall of fire in front of you burns and pushes back monsters.
 fr: Un trait de glace file droit, transperce et gèle.
 tr: A bolt of ice flies straight, pierces and freezes.
 
+fr: Des pointes de terre jaillissent sous des monstres au hasard.
+tr: Spikes of earth burst up beneath random monsters.
+
+fr: Un orage s'abat sur le monstre le plus proche et frappe en rafale.
+tr: A storm crashes down on the nearest monster and strikes in bursts.
+
 fr: Des météores s'abattent là où les monstres se pressent.
 tr: Meteors crash down where monsters crowd together.
 
@@ -449,6 +455,21 @@ tr: A trade is open.
 fr: Une onde de glace gèle les monstres autour de vous.
 tr: A wave of ice freezes the monsters around you.
 
+fr: Un blizzard tourbillonne sur la foule et finit par la geler.
+tr: A blizzard swirls over the crowd and ends up freezing it.
+
+fr: Des boules de foudre filent droit et repoussent tout loin.
+tr: Balls of lightning fly straight and hurl everything far back.
+
+fr: La foudre s'abat autour de vous en vagues et aveugle.
+tr: Lightning crashes down around you in waves and blinds.
+
+fr: Des pointes de terre jaillissent tout autour de vous.
+tr: Spikes of earth burst up all around you.
+
+fr: Des esprits explosifs poursuivent les monstres et les maudissent.
+tr: Explosive spirits chase the monsters and curse them.
+
 fr: Récupération de PV au fil du temps.
 tr: HP recovery over time.
 
@@ -460,6 +481,12 @@ tr: Armor: every hit taken is reduced.
 
 fr: Un projectile de plus pour chaque skill.
 tr: One more projectile for every skill.
+
+fr: Aire de tous les skills élargie.
+tr: Area of every skill widened.
+
+fr: Durée des zones, des gels et des statuts allongée.
+tr: Duration of zones, freezes and statuses extended.
 
 fr: Des esprits poursuivent les monstres et les transpercent.
 tr: Spirits chase monsters and pierce through them.
@@ -20723,6 +20750,12 @@ tr: Experience +%d %%
 fr: Glaçages par Cold Bolt, au cumul
 tr: Chills by Cold Bolt, in total
 
+fr: Monstres Wind vaincus, au cumul
+tr: Wind monsters defeated, in total
+
+fr: Niveau atteint en une seule partie
+tr: Level reached in a single run
+
 fr: Hors des records du défi : départ non neutre ou autre semaine.
 tr: Not on the challenge records: start not neutral, or another week.
 
@@ -21016,6 +21049,9 @@ tr: %s — from %d%% to %d%% HP
 
 fr: + niveau %d donne
 tr: + level %d gives
+
+fr: + les deux au niveau %d donnent
+tr: + both at level %d give
 
 fr: 1 chance sur %u
 tr: 1 chance in %u

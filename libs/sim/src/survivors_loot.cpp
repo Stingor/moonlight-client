@@ -2,6 +2,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <limits>
+#include <optional>
 #include <vector>
 
 #include "ro/sim/survivors_content.h"
@@ -60,29 +61,61 @@ void CountOne(Counter& counter) noexcept {
 
 // ── Les coffres ────────────────────────────────────────────────────────────
 
+// Vrai si le héros possède `skill_id` à son plus haut niveau.
+[[nodiscard]] bool OwnsAtTop(const SurvivorsField& field, std::uint16_t skill_id) {
+  const SurvivorsSkillRule* rule = FindSkill(*field.rules, skill_id);
+  const auto owned = std::ranges::find(field.hero.skills, skill_id, &OwnedSkill::skill_id);
+  return rule != nullptr && owned != field.hero.skills.end() && !rule->levels.empty() &&
+         std::size_t{owned->level} == rule->levels.size();
+}
+
 // L'évolution que le skill de l'emplacement `slot` peut prendre : skill au
-// plus haut niveau, carte possédée à tout niveau, évolué pas encore possédé.
-// nullptr sinon.
+// plus haut niveau, carte possédée à tout niveau — ou, pour une union, second
+// skill lui aussi au plus haut niveau —, évolué pas encore possédé. nullptr
+// sinon.
 [[nodiscard]] const EvolutionRule* DueEvolution(const SurvivorsField& field, std::size_t slot) {
   const SurvivorsRules& rules = *field.rules;
   const OwnedSkill& owned = field.hero.skills[slot];
-  const SurvivorsSkillRule* rule = FindSkill(rules, owned.skill_id);
   const EvolutionRule* evolution = FindEvolutionOf(rules, owned.skill_id);
-  if (rule == nullptr || evolution == nullptr || rule->levels.empty() ||
-      std::size_t{owned.level} != rule->levels.size()) {
-    return nullptr;
-  }
-  if (!OwnsCard(field.hero, evolution->card_item_id) ||
-      OwnsSkill(field.hero, evolution->evolved_skill_id) ||
+  if (evolution == nullptr || !OwnsAtTop(field, owned.skill_id)) return nullptr;
+  const bool completed = evolution->partner_skill_id != 0
+                             ? OwnsAtTop(field, evolution->partner_skill_id)
+                             : OwnsCard(field.hero, evolution->card_item_id);
+  if (!completed || OwnsSkill(field.hero, evolution->evolved_skill_id) ||
       FindSkill(rules, evolution->evolved_skill_id) == nullptr) {
     return nullptr;
   }
   return evolution;
 }
 
+// LIBÈRE L'EMPLACEMENT `slot` : les suivants reculent d'un rang, et ce qui
+// nomme un emplacement les suit — tirs et zones, retouches des monstres. Un
+// tir ou une zone du skill retiré n'a plus d'emplacement (kMostSkillSlots) :
+// il finit sa vie sans se rattacher à un autre skill.
+void FreeSkillSlot(SurvivorsField& field, std::size_t slot) {
+  field.hero.skills.erase(field.hero.skills.begin() + static_cast<std::ptrdiff_t>(slot));
+  const auto follow = [slot](std::uint8_t& named) {
+    if (named == slot) {
+      named = static_cast<std::uint8_t>(kMostSkillSlots);
+    } else if (named > slot && named < kMostSkillSlots) {
+      --named;
+    }
+  };
+  for (SurvivorsShot& shot : field.shots) follow(shot.skill_slot);
+  for (SurvivorsZone& zone : field.zones) follow(zone.skill_slot);
+  for (SurvivorsFoe& foe : field.foes) {
+    std::shift_left(foe.rehit_ready_step.begin() + static_cast<std::ptrdiff_t>(slot),
+                    foe.rehit_ready_step.end(), 1);
+    foe.rehit_ready_step.back() = 0;
+  }
+}
+
 // L'ÉVOLUTION : l'emplacement garde son index et prend l'évolué au niveau 1,
-// prêt à tirer dès ce pas, une orbite au début de sa phase.
-void Evolve(SurvivorsField& field, std::size_t slot, const EvolutionRule& evolution) {
+// prêt à tirer dès ce pas, une orbite au début de sa phase ; une union libère
+// en plus l'emplacement de son second skill. Rend l'index de l'emplacement
+// libéré, ou rien.
+std::optional<std::size_t> Evolve(SurvivorsField& field, std::size_t slot,
+                                  const EvolutionRule& evolution) {
   OwnedSkill& owned = field.hero.skills[slot];
   const std::uint16_t from_skill_id = owned.skill_id;
   owned = OwnedSkill{.skill_id = evolution.evolved_skill_id,
@@ -98,6 +131,13 @@ void Evolve(SurvivorsField& field, std::size_t slot, const EvolutionRule& evolut
   } else {
     ++field.news.dropped;
   }
+  if (evolution.partner_skill_id == 0) return std::nullopt;
+  const auto partner =
+      std::ranges::find(field.hero.skills, evolution.partner_skill_id, &OwnedSkill::skill_id);
+  if (partner == field.hero.skills.end()) return std::nullopt;
+  const auto freed = static_cast<std::size_t>(partner - field.hero.skills.begin());
+  FreeSkillSlot(field, freed);
+  return freed;
 }
 
 // Une montée possible par un coffre : un skill (par son emplacement) ou une
@@ -184,8 +224,10 @@ void OpenChest(SurvivorsField& field, FieldPoint at) {
     for (std::size_t slot = 0; slot < field.hero.skills.size() && news.gain_count < gains; ++slot) {
       const EvolutionRule* evolution = DueEvolution(field, slot);
       if (evolution == nullptr) continue;
-      Evolve(field, slot, *evolution);
+      const std::optional<std::size_t> freed = Evolve(field, slot, *evolution);
       push({.kind = ChestGainKind::kEvolution, .id = evolution->evolved_skill_id, .level = 1});
+      // Un emplacement libéré avant celui-ci le fait reculer d'un rang.
+      if (freed.has_value() && *freed < slot) --slot;
     }
   }
   std::vector<Growth> candidates;

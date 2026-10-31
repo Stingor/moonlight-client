@@ -40,6 +40,8 @@ struct SurvivorsUnlock {
 enum class FeatCounter : std::uint8_t {
   kBestSurvivedMs,  // la plus longue partie survécue
   kChills,          // les glaçages au cumul
+  kWindKills,       // les monstres Wind vaincus au cumul
+  kBestLevel,       // le plus haut niveau atteint en une partie
 };
 struct SurvivorsFeat {
   const char* key = "";
@@ -47,8 +49,11 @@ struct SurvivorsFeat {
   std::uint64_t threshold = 0;
 };
 
-// Les tables livrées : Golem et Mastering Card jusqu'à leur première chute,
-// Sight jusqu'à une partie survécue 5:00, Frost Diver jusqu'à 500 glaçages.
+// Les tables livrées : Golem et Mastering Card, et les cartes d'Eclipse, de
+// Dragon Fly, de Vagabond Wolf et de Baphomet, jusqu'à leur première chute,
+// Sight jusqu'à une partie survécue 5:00, Frost Diver jusqu'à 500 glaçages,
+// Earth Spike jusqu'à 300 monstres Wind vaincus, Thunderstorm jusqu'au
+// niveau 25 dans une partie.
 [[nodiscard]] std::span<const SurvivorsUnlock> ShippedSurvivorsUnlocks();
 [[nodiscard]] std::span<const SurvivorsFeat> ShippedSurvivorsFeats();
 

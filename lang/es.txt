@@ -434,6 +434,12 @@ tr: Un muro de fuego delante de ti quema y repele a los monstruos.
 fr: Un trait de glace file droit, transperce et gèle.
 tr: Un rayo de hielo vuela recto, atraviesa y congela.
 
+fr: Des pointes de terre jaillissent sous des monstres au hasard.
+tr: Púas de tierra brotan bajo monstruos al azar.
+
+fr: Un orage s'abat sur le monstre le plus proche et frappe en rafale.
+tr: Una tormenta cae sobre el monstruo más cercano y golpea en ráfagas.
+
 fr: Des météores s'abattent là où les monstres se pressent.
 tr: Caen meteoros donde se agolpan los monstruos.
 
@@ -449,6 +455,21 @@ tr: Hay un intercambio abierto.
 fr: Une onde de glace gèle les monstres autour de vous.
 tr: Una onda de hielo congela a los monstruos a tu alrededor.
 
+fr: Un blizzard tourbillonne sur la foule et finit par la geler.
+tr: Una ventisca gira sobre la multitud y acaba congelándola.
+
+fr: Des boules de foudre filent droit et repoussent tout loin.
+tr: Bolas de rayo vuelan rectas y lo repelen todo lejos.
+
+fr: La foudre s'abat autour de vous en vagues et aveugle.
+tr: El rayo cae a tu alrededor en oleadas y ciega.
+
+fr: Des pointes de terre jaillissent tout autour de vous.
+tr: Púas de tierra brotan a tu alrededor.
+
+fr: Des esprits explosifs poursuivent les monstres et les maudissent.
+tr: Espíritus explosivos persiguen a los monstruos y los maldicen.
+
 fr: Récupération de PV au fil du temps.
 tr: Recuperación de PV con el tiempo.
 
@@ -460,6 +481,12 @@ tr: Armadura: cada golpe recibido se reduce.
 
 fr: Un projectile de plus pour chaque skill.
 tr: Un proyectil más para cada habilidad.
+
+fr: Aire de tous les skills élargie.
+tr: Área de todas las habilidades ampliada.
+
+fr: Durée des zones, des gels et des statuts allongée.
+tr: Duración de zonas, congelaciones y estados prolongada.
 
 fr: Des esprits poursuivent les monstres et les transpercent.
 tr: Espíritus persiguen a los monstruos y los atraviesan.
@@ -20723,6 +20750,12 @@ tr: Experiencia +%d %%
 fr: Glaçages par Cold Bolt, au cumul
 tr: Congelaciones con Cold Bolt, en total
 
+fr: Monstres Wind vaincus, au cumul
+tr: Monstruos Wind derrotados, en total
+
+fr: Niveau atteint en une seule partie
+tr: Nivel alcanzado en una sola partida
+
 fr: Hors des records du défi : départ non neutre ou autre semaine.
 tr: Fuera de los récords del desafío: salida no neutra u otra semana.
 
@@ -21016,6 +21049,9 @@ tr: %s — del %d %% al %d %% de PV
 
 fr: + niveau %d donne
 tr: + nivel %d da
+
+fr: + les deux au niveau %d donnent
+tr: + ambos al nivel %d dan
 
 fr: 1 chance sur %u
 tr: 1 posibilidad entre %u

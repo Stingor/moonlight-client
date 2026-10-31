@@ -109,10 +109,15 @@ struct EliteRule {
 };
 
 // Un skill au plus haut niveau, et sa carte possédée, donnent l'évolué.
+// UNE ÉVOLUTION : le skill au plus haut niveau et sa carte possédée donnent
+// l'évolué. UNE UNION nomme à la place de la carte un second skill, lui aussi
+// au plus haut niveau : l'évolué prend la place du premier, et la place du
+// second se libère.
 struct EvolutionRule {
   std::uint16_t skill_id = 0;
-  std::uint16_t card_item_id = 0;
+  std::uint16_t card_item_id = 0;  // 0 pour une union
   std::uint16_t evolved_skill_id = 0;
+  std::uint16_t partner_skill_id = 0;  // le second skill d'une union ; 0 sinon
 };
 
 enum class PickupKind : std::uint8_t {

@@ -63,18 +63,22 @@ constexpr SurvivorsTuning kShippedTuning{
     .knock_units_per_step = CellTenths(2),
     // LES PLANTES AU FIL DES TUÉS, sur les deux arènes : cinq plantes à
     // 12 cases du départ, au bord de la clairière et à l'écran ; puis une
-    // plante par 10 × (minute en cours) tués, au plus huit en vie ; une plante
-    // laissée à 96 cases se perd.
+    // plante par 10 × (minute en cours) tués, sans plafond ; une plante
+    // laissée à 48 cases, juste au-delà de l'écran, se perd : celles qu'on
+    // laisse derrière soi ne retiennent rien.
     .plant_block_cells = 0,
     .plant_cells_per_plant = 0,
     .plant_kills_per_minute = 10,
     .plant_start_count = 5,
     .plant_start_cells = 12,
-    .most_live_plants = 8,
-    .plant_forget_units = Cells(96),
+    .most_live_plants = 0,
+    .plant_forget_units = Cells(48),
     .pickup_radius_units = CellTenths(5),
     // Baphomet jamais tué : la partie finit en survie cinq minutes après lui.
     .final_overtime_ms = 300000,
+    .curse_slow_pct = 25,
+    .curse_hurt_pct = 20,
+    .blind_turn_ms = 600,
 };
 
 // LA CURSED WATER : par rang, PV de naissance des monstres +20 % et contact

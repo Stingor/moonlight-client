@@ -97,19 +97,22 @@ struct OfferCandidate {
 // Les offres possibles, skills puis cartes, dans l'ordre des réserves : un
 // possédé sous son niveau maximal, un nouveau tant qu'un emplacement est libre.
 // Un Id banni ou verrouillé n'y entre pas, ni un skill dont le héros possède
-// l'évolué.
+// l'évolué, qu'il en soit le premier skill ou le second d'une union.
 [[nodiscard]] std::vector<OfferCandidate> OfferCandidates(SurvivorsField& field) {
   const SurvivorsRules& rules = *field.rules;
   const ClassRule& hero_class = *field.hero_class;
   SurvivorsHero& hero = field.hero;
   std::vector<OfferCandidate> candidates;
+  const auto spent = [&](std::uint16_t skill_id) {
+    return std::ranges::any_of(rules.evolutions, [&](const EvolutionRule& evolution) {
+      return (evolution.skill_id == skill_id || evolution.partner_skill_id == skill_id) &&
+             OwnedSkillOf(hero, evolution.evolved_skill_id) != nullptr;
+    });
+  };
   for (const std::uint16_t skill_id : hero_class.skill_pool) {
     const SurvivorsSkillRule* rule = FindSkill(rules, skill_id);
     if (rule == nullptr || Banished(field, skill_id) || Locked(field, skill_id)) continue;
-    if (const EvolutionRule* evolution = FindEvolutionOf(rules, skill_id);
-        evolution != nullptr && OwnedSkillOf(hero, evolution->evolved_skill_id) != nullptr) {
-      continue;
-    }
+    if (spent(skill_id)) continue;
     if (const OwnedSkill* owned = OwnedSkillOf(hero, skill_id); owned != nullptr) {
       if (std::size_t{owned->level} < rule->levels.size()) {
         candidates.push_back(

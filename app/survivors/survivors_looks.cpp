@@ -63,6 +63,7 @@ namespace {
     case ro::sim::SkillArchetype::kClusterBlast:
     case ro::sim::SkillArchetype::kWall:
     case ro::sim::SkillArchetype::kRing:
+    case ro::sim::SkillArchetype::kStorm:
       return SkillBearer::kGround;
   }
   return SkillBearer::kGround;
@@ -116,13 +117,16 @@ SkillLook SkillLookOf(const ro::sim::SurvivorsSkillRule& skill) {
   SkillLook look{.skill_id = skill.skill_id,
                  .bearer = BearerOf(skill.archetype),
                  .icon_skill_id = skill.skill_id};
-  if (const std::optional<std::uint32_t> tabled = TabledEffectOf(skill.skill_id)) {
+  const std::uint16_t shown =
+      skill.skill_id == kNapalmVulcanSkill ? kSoulStrikeSkill : skill.skill_id;
+  look.effect_skill_id = shown;
+  if (const std::optional<std::uint32_t> tabled = TabledEffectOf(shown)) {
     look.effect_id = *tabled;
-  } else if (const std::optional<std::uint32_t> fallback = FallbackEffectOf(skill.skill_id)) {
+  } else if (const std::optional<std::uint32_t> fallback = FallbackEffectOf(shown)) {
     look.effect_id = *fallback;
     look.fallback = true;
   }
-  const std::int32_t hit = ro::render::SkillHitEffect(skill.skill_id, true, true);
+  const std::int32_t hit = ro::render::SkillHitEffect(shown, true, true);
   look.hit_effect_id = hit >= 0 ? static_cast<std::uint32_t>(hit) : kPlainHitEffect;
   look.ground_effect_id = GroundEffectOf(skill.skill_id);
   return look;

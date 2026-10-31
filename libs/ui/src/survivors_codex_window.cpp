@@ -228,7 +228,9 @@ void DrawEvolution(const SurvivorsCodexEntry& entry) {
     ImGui::SameLine();
     DrawLink(evolution.card);
     ImGui::SameLine();
-    std::snprintf(line.data(), line.size(), core::Tr("+ niveau %d donne"),
+    std::snprintf(line.data(), line.size(),
+                  evolution.union_of_two ? core::Tr("+ les deux au niveau %d donnent")
+                                         : core::Tr("+ niveau %d donne"),
                   static_cast<int>(evolution.max_level));
     ImGui::TextUnformatted(line.data());
     ImGui::SameLine();

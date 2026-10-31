@@ -96,7 +96,8 @@ void Regenerate(SurvivorsField& field);
 // tués depuis la dernière naissance (`tally.kills` − `plant_kills_mark`)
 // atteignent `plant_kills_per_minute` × m, où m = pas ÷ kStepsPerMinute + 1 est
 // la minute en cours au début du pas (prolongation comprise), et que moins de
-// `most_live_plants` plantes vivent, une plante naît hors de l'écran :
+// `most_live_plants` plantes vivent (0 : sans plafond), une plante naît hors de
+// l'écran :
 // jusqu'à `spawn_tries_per_foe` essais TryFramePoint du flux décor (deux
 // tirages chacun ; une case qui porte déjà une plante vaut un essai manqué),
 // puis un PickWeighted de l'espèce. Le compteur repart alors
@@ -210,15 +211,18 @@ struct SurvivorsDamage {
 };
 // survivors_skills.cpp. `base` majoré des bonus de dégâts du héros (cartes et
 // niveau, plafonné), puis de l'élément contre l'élément de défense de `foe`
-// (Water s'il est gelé) ; au moins 1 si l'élément ne l'annule pas.
+// (Water s'il est gelé), puis de la part de plus d'un maudit ; au moins 1 si
+// l'élément ne l'annule pas.
 [[nodiscard]] SurvivorsDamage DamageAgainst(const SurvivorsField& field, std::int32_t base,
                                             SurvivorsElement attack, const SurvivorsFoe& foe);
-// Ce qu'un coup inflige en plus des dégâts : un gel, et un recul au cap
-// `knock_heading`.
+// Ce qu'un coup inflige en plus des dégâts : un gel, un recul au cap
+// `knock_heading`, un aveuglement et une malédiction.
 struct SurvivorsStatus {
   std::uint32_t freeze_ms = 0;
   std::int32_t knockback_units = 0;
   std::uint8_t knock_heading = 0;
+  std::uint32_t blind_ms = 0;
+  std::uint32_t curse_ms = 0;
 };
 // survivors_skills.cpp. Retire les PV, pose `hurt_step`, ajoute `damage_dealt`,
 // applique `status` à un monstre qui survit (ApplyStatus), publie un
@@ -240,6 +244,9 @@ void HurtFoe(SurvivorsField& field, SurvivorsFoe& foe, SurvivorsDamage damage,
                             const SurvivorsSkillRule& rule, const SkillLevel& level);
 [[nodiscard]] bool FireRing(SurvivorsField& field, std::uint8_t slot,
                             const SurvivorsSkillRule& rule, const SkillLevel& level);
+// survivors_zones.cpp : l'orage.
+[[nodiscard]] bool FireStorm(SurvivorsField& field, std::uint8_t slot,
+                             const SurvivorsSkillRule& rule, const SkillLevel& level);
 // survivors_skills.cpp. Les orbes du DERNIER pas exécuté (`field.step − 1`, ou
 // le pas 0 avant le premier), par le même calcul que FireSkills : celles qui
 // ont touché, alignées sur la position des monstres. Une orbite dont la phase

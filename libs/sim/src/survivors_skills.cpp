@@ -140,6 +140,7 @@ namespace {
                                         .hit_count = 0,
                                         .freeze_ms = level.freeze_ms,
                                         .knockback_units = level.knockback_units,
+                                        .curse_ms = level.curse_ms,
                                         .straight = false});
     PublishCast(field.news, SurvivorsCast{.skill_id = rule.skill_id,
                                           .kind = CastKind::kShot,
@@ -346,6 +347,9 @@ void FireSkills(SurvivorsField& field) {
       case SkillArchetype::kRing:
         fired = FireRing(field, slot, *rule, *level);
         break;
+      case SkillArchetype::kStorm:
+        fired = FireStorm(field, slot, *rule, *level);
+        break;
       case SkillArchetype::kTargetStrike:
         fired = FireStrikes(field, *rule, *level);
         break;
@@ -393,6 +397,10 @@ SurvivorsDamage DamageAgainst(const SurvivorsField& field, std::int32_t base,
   // Ramené à l'int32 avant l'élément : le produit reste loin des 64 bits.
   std::int64_t amount =
       std::int64_t{ScaledUnits(std::max(base, 0), bonus_pct)} * efficiency_pct / kPercent;
+  // Un maudit prend sa part de plus, après l'élément.
+  if (foe.curse_until_step > field.step) {
+    amount = amount * (kPercent + std::max(field.rules->tuning.curse_hurt_pct, 0)) / kPercent;
+  }
   if (efficiency_pct > 0) amount = std::max<std::int64_t>(amount, 1);
   return SurvivorsDamage{.amount = ClampedUnits(amount), .efficiency_pct = efficiency_pct};
 }

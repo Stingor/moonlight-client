@@ -2,6 +2,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <limits>
 #include <vector>
 
 #include "ro/sim/survivors_geometry.h"
@@ -20,7 +21,8 @@ namespace ro::sim::survivors {
 // qu'elles vivent. Un mur touche chaque monstre qui le chevauche, une fois par
 // `rehit_ms` et par emplacement de skill ; un pilier se déclenche dès qu'un
 // monstre entre dans son aire, frappe toute l'aire, puis se réarme. Une zone à
-// coups comptés s'éteint à son dernier coup, toute zone à la fin de sa vie.
+// coups comptés s'éteint à son dernier coup, toute zone à la fin de sa vie. Un
+// orage frappe tout son disque à chaque vague.
 
 namespace {
 
@@ -112,6 +114,30 @@ void TriggerPillar(SurvivorsField& field, SurvivorsZone& zone) {
   if (zone.limited) --zone.hits_left;
 }
 
+// Une vague d'orage, à son pas : chaque monstre vivant du disque, par index
+// croissant, prend son coup, avec l'aveuglement et la malédiction de l'orage ;
+// à partir de `freeze_from_wave`, il gèle. Le recul l'écarte du centre. Une
+// vague compte pour un coup, même sans monstre dans le disque.
+void StrikeStorm(SurvivorsField& field, SurvivorsZone& zone) {
+  if (field.step < zone.armed_step) return;
+  ++zone.waves_done;
+  const bool freezes = zone.freeze_ms > 0 && zone.waves_done >= zone.freeze_from_wave;
+  GatherAround(field, zone);
+  for (const std::uint32_t index : field.nearby) {
+    SurvivorsFoe& foe = field.foes[index];
+    if (foe.hp <= 0 || !Touches(field, zone, foe)) continue;
+    const SurvivorsStatus status{.freeze_ms = freezes ? zone.freeze_ms : 0,
+                                 .knockback_units = zone.knockback_units,
+                                 .knock_heading = HeadingAway(zone.from, foe, zone.push_heading),
+                                 .blind_ms = zone.blind_ms,
+                                 .curse_ms = zone.curse_ms};
+    HurtFoe(field, foe, DamageAgainst(field, zone.damage, zone.element, foe), zone.skill_id,
+            status);
+  }
+  zone.armed_step = field.step + zone.rehit_steps;
+  if (zone.limited && zone.hits_left > 0) --zone.hits_left;
+}
+
 // Une zone neuve d'un niveau, sans sa forme.
 [[nodiscard]] SurvivorsZone ZoneOf(SurvivorsField& field, std::uint8_t slot,
                                    const SurvivorsSkillRule& rule, const SkillLevel& level) {
@@ -190,6 +216,47 @@ bool FireRing(SurvivorsField& field, std::uint8_t slot, const SurvivorsSkillRule
   return true;
 }
 
+// L'ORAGE : une aire de `area_radius_units`, majorée de l'aire du héros, posée
+// sur le monstre que la règle du skill vise à `reach_units`, ou sur le héros
+// (kHero). Sa première vague tombe au pas qui suit, puis une tous les
+// `interval_ms`, `amount` vagues en tout (majorées de la quantité du héros).
+// Elle attend un monstre à portée — dans son aire, centrée sur le héros — et
+// sa place sous le plafond des zones.
+bool FireStorm(SurvivorsField& field, std::uint8_t slot, const SurvivorsSkillRule& rule,
+               const SkillLevel& level) {
+  if (RoomUnder(field.zones.size(), field.rules->caps.most_zones) == 0) return false;
+  const std::int32_t radius = AreaUnits(field, level.area_radius_units);
+  const std::uint32_t waves =
+      std::min<std::uint32_t>(AmountOf(field, level), std::numeric_limits<std::uint8_t>::max());
+  if (radius <= 0 || waves == 0) return false;
+  FieldPoint center = field.hero.position;
+  if (rule.target == TargetRule::kHero) {
+    GatherNearby(field, center, radius);
+    if (field.nearby.empty()) return false;
+  } else {
+    GatherNearby(field, field.hero.position, level.reach_units);
+    if (field.nearby.empty()) return false;
+    OrderTargets(field, rule.target, radius);
+    center = field.foes[field.nearby.front()].position;
+  }
+  SurvivorsZone zone = ZoneOf(field, slot, rule, level);
+  zone.from = center;
+  zone.to = center;
+  zone.radius_units = radius;
+  zone.rehit_steps = std::max<std::uint32_t>(StepsOf(level.interval_ms), 1);
+  zone.armed_step = field.step + 1;
+  zone.hits_left = static_cast<std::uint8_t>(waves);
+  zone.limited = true;
+  // La vie couvre toutes les vagues : la dernière l'éteint.
+  zone.expires_step = zone.armed_step + waves * zone.rehit_steps;
+  zone.freeze_from_wave = level.freeze_from_wave;
+  zone.blind_ms = level.blind_ms;
+  zone.curse_ms = level.curse_ms;
+  field.zones.push_back(zone);
+  PublishZone(field.news, zone, CastKind::kStormOn);
+  return true;
+}
+
 void AdvanceZones(SurvivorsField& field) {
   if (field.rules == nullptr) return;
   // Par index, dans l'ordre de pose : une zone n'en pose aucune autre.
@@ -197,12 +264,15 @@ void AdvanceZones(SurvivorsField& field) {
     SurvivorsZone& zone = field.zones[index];
     if (Over(field, zone)) continue;
     // Une zone vivante casse les plantes de son aire à chaque pas, monstres
-    // ou non ; un pilier dès qu'il est armé.
-    if (zone.archetype != SkillArchetype::kRing || field.step >= zone.armed_step) {
-      BreakPlantsWithin(field, zone.from, zone.to, zone.radius_units);
-    }
+    // ou non ; un pilier dès qu'il est armé, un orage à chaque vague.
+    const bool waits =
+        (zone.archetype == SkillArchetype::kRing || zone.archetype == SkillArchetype::kStorm) &&
+        field.step < zone.armed_step;
+    if (!waits) BreakPlantsWithin(field, zone.from, zone.to, zone.radius_units);
     if (zone.archetype == SkillArchetype::kRing) {
       TriggerPillar(field, zone);
+    } else if (zone.archetype == SkillArchetype::kStorm) {
+      StrikeStorm(field, zone);
     } else {
       SweepWall(field, zone);
     }

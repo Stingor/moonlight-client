@@ -84,9 +84,8 @@ template <std::size_t kCount>
   }
   if (by_blocks) return Refuse("réglages : plantes par blocs et au fil des tués");
   if (rules.plants.empty()) return Refuse("réglages : plantes au fil des tués sans espèce");
-  if (tuning.most_live_plants == 0)
-    return Refuse("réglages : plantes au fil des tués sans plafond");
-  if (tuning.plant_start_count > tuning.most_live_plants ||
+  // Un plafond, quand il y en a un, laisse naître les plantes du départ.
+  if ((tuning.most_live_plants != 0 && tuning.plant_start_count > tuning.most_live_plants) ||
       tuning.plant_start_count > kPlantStartHeadings.size()) {
     return Refuse("réglages : " + std::to_string(tuning.plant_start_count) +
                   " plantes au départ, au plus le plafond et " +
@@ -122,7 +121,7 @@ template <std::size_t kCount>
 
 [[nodiscard]] bool HasArea(SkillArchetype archetype) noexcept {
   return archetype == SkillArchetype::kClusterBlast || archetype == SkillArchetype::kNova ||
-         archetype == SkillArchetype::kRing;
+         archetype == SkillArchetype::kRing || archetype == SkillArchetype::kStorm;
 }
 
 // Un mur et un cercle de piliers sont des zones : sans vie, elles meurent nées.
@@ -165,6 +164,23 @@ template <std::size_t kCount>
     return Refuse(at + std::to_string(level.bounces) + " rebonds, au plus " +
                   std::to_string(kMostShotHits - 1));
   }
+  if (skill.archetype == SkillArchetype::kStorm) {
+    // Plusieurs vagues se suivent à un intervalle ; un orage posé sur un
+    // monstre le cherche à une portée.
+    if (level.amount > 1 && level.interval_ms == 0) {
+      return Refuse(at + "d'orage à plusieurs vagues sans intervalle");
+    }
+    if (skill.target != TargetRule::kHero && level.reach_units == 0) {
+      return Refuse(at + "d'orage visé sans portée");
+    }
+  }
+  // Le gel à partir d'une vague : un gel, et une vague qui tombe.
+  if (level.freeze_from_wave > 0 &&
+      (skill.archetype != SkillArchetype::kStorm || level.freeze_ms == 0 ||
+       level.freeze_from_wave > level.amount)) {
+    return Refuse(at + "gel dès la vague " + std::to_string(level.freeze_from_wave) +
+                  " hors d'un orage qui gèle et la fait tomber");
+  }
   return {};
 }
 
@@ -200,13 +216,19 @@ core::Result<void> CheckSkillContent(const SurvivorsRules& rules) {
     // Le plus dense se cherche autour d'un point visé : celui d'une frappe ou
     // d'un éclat.
     if (skill.target == TargetRule::kDensest && skill.archetype != SkillArchetype::kTargetStrike &&
-        skill.archetype != SkillArchetype::kClusterBlast) {
-      return Refuse(named + "ciblage du plus dense hors d'une frappe ou d'un éclat");
+        skill.archetype != SkillArchetype::kClusterBlast &&
+        skill.archetype != SkillArchetype::kStorm) {
+      return Refuse(named + "ciblage du plus dense hors d'une frappe, d'un éclat ou d'un orage");
     }
     // Seule une frappe tire sa cible au hasard : aucun tirage n'est prévu pour
-    // un éclat.
-    if (skill.target == TargetRule::kRandom && skill.archetype == SkillArchetype::kClusterBlast) {
-      return Refuse(named + "ciblage au hasard d'un éclat");
+    // un éclat ni pour un orage.
+    if (skill.target == TargetRule::kRandom && (skill.archetype == SkillArchetype::kClusterBlast ||
+                                                skill.archetype == SkillArchetype::kStorm)) {
+      return Refuse(named + "ciblage au hasard d'un éclat ou d'un orage");
+    }
+    // Seul un orage se pose sur le héros.
+    if (skill.target == TargetRule::kHero && skill.archetype != SkillArchetype::kStorm) {
+      return Refuse(named + "ciblage du héros hors d'un orage");
     }
     for (std::size_t index = 0; index < skill.levels.size(); ++index) {
       const std::string at = named + "niveau " + std::to_string(index + 1) + " ";
@@ -335,10 +357,17 @@ core::Result<void> CheckEvolutions(const SurvivorsRules& rules) {
   }
   for (const EvolutionRule& evolution : rules.evolutions) {
     const std::string named = "évolution de " + std::to_string(evolution.skill_id) + " : ";
-    if (FindSkill(rules, evolution.skill_id) == nullptr ||
-        FindCard(rules, evolution.card_item_id) == nullptr ||
+    // Une union nomme un second skill, distinct, et aucune carte ; une
+    // évolution simple, une carte et aucun second skill.
+    const bool union_of_two = evolution.partner_skill_id != 0;
+    const bool completed = union_of_two
+                               ? evolution.card_item_id == 0 &&
+                                     evolution.partner_skill_id != evolution.skill_id &&
+                                     FindSkill(rules, evolution.partner_skill_id) != nullptr
+                               : FindCard(rules, evolution.card_item_id) != nullptr;
+    if (FindSkill(rules, evolution.skill_id) == nullptr || !completed ||
         FindSkill(rules, evolution.evolved_skill_id) == nullptr) {
-      return Refuse(named + "skill, carte ou évolué inconnu");
+      return Refuse(named + "skill, carte, second skill ou évolué inconnu");
     }
     // Un évolué ne s'offre pas : seul un coffre le donne.
     for (const ClassRule& hero_class : rules.classes) {

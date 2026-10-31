@@ -53,6 +53,12 @@ inline constexpr std::uint32_t kSightFallbackEffect = 22;
 inline constexpr std::uint32_t kNapalmBeatFallbackEffect = 32;
 inline constexpr std::uint32_t kFireWallFallbackEffect = 25;
 
+// L'EFFET EMPRUNTÉ : Napalm Vulcan naît, dans le jeu, sur sa cible, que la horde
+// du mode n'est pas ; ses esprits qui poursuivent se montrent par l'effet de
+// Soul Strike, porté par le héros. Son icône reste la sienne.
+inline constexpr std::uint16_t kNapalmVulcanSkill = 400;
+inline constexpr std::uint16_t kSoulStrikeSkill = 13;
+
 // L'UNITÉ QU'UN SKILL DE ZONE POSE AU SOL dans le jeu : la zone du mode en
 // montre le visuel entretenu (`SkillLook::ground_effect_id`) tant qu'elle dure.
 // Fire Pillar pose le pilier en attente, dont le cercle rouge marque la case.
@@ -83,6 +89,8 @@ enum class SkillBearer : std::uint8_t {
 
 struct SkillLook {
   std::uint16_t skill_id = 0;
+  // Le skill dont les tables donnent l'effet : le sien, sauf un effet emprunté.
+  std::uint16_t effect_skill_id = 0;
   // L'effet du sort, toujours connu pour un skill des règles livrées.
   std::uint32_t effect_id = 0;
   SkillBearer bearer = SkillBearer::kGround;

@@ -89,6 +89,10 @@ struct SurvivorsFoe {
   // Gelé tant que `step < freeze_until_step` : immobile, sans contact, et
   // d'élément de défense Water.
   std::uint32_t freeze_until_step = 0;
+  // Aveuglé tant que `step < blind_until_step` : il erre au lieu de
+  // poursuivre. Maudit tant que `step < curse_until_step`.
+  std::uint32_t blind_until_step = 0;
+  std::uint32_t curse_until_step = 0;
   // Un recul en cours : le monstre glisse au cap `knock_heading` tant qu'il
   // lui reste des sous-unités, à la place de sa marche.
   std::uint8_t knock_heading = 0;
@@ -191,6 +195,7 @@ struct SurvivorsShot {
   // Ce que chaque coup inflige en plus des dégâts ; le recul suit le vol.
   std::uint32_t freeze_ms = 0;
   std::int32_t knockback_units = 0;
+  std::uint32_t curse_ms = 0;
   // Un projectile droit : il garde sa vitesse de départ, sans se tourner vers
   // un monstre.
   bool straight = false;
@@ -249,6 +254,12 @@ struct SurvivorsZone {
   bool limited = false;
   std::uint8_t push_heading = 0;  // le cap d'un recul
   SurvivorsElement element = SurvivorsElement::kNeutral;
+  // Orage : les vagues déjà tombées, et celle à partir de laquelle elles
+  // gèlent (0 : toutes) ; l'aveuglement et la malédiction de chaque coup.
+  std::uint8_t waves_done = 0;
+  std::uint8_t freeze_from_wave = 0;
+  std::uint32_t blind_ms = 0;
+  std::uint32_t curse_ms = 0;
 };
 struct SurvivorsGem {
   FieldPoint position;

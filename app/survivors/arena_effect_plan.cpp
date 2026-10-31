@@ -43,6 +43,7 @@ void PlanCast(const ro::sim::SurvivorsCast& cast, const SkillLook& look,
     case ro::sim::CastKind::kOrbitOff:
     case ro::sim::CastKind::kWallOn:
     case ro::sim::CastKind::kRingOn:
+    case ro::sim::CastKind::kStormOn:
     case ro::sim::CastKind::kZoneOff:
       return;
   }

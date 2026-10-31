@@ -141,7 +141,9 @@ void SowPlants(SurvivorsField& field) {
   const std::uint64_t minute = std::uint64_t{field.step} / kStepsPerMinute + 1;
   const std::uint64_t needed = std::uint64_t{tuning.plant_kills_per_minute} * minute;
   const std::uint64_t counted = std::uint64_t{field.tally.kills} - field.plant_kills_mark;
-  if (counted < needed || field.plants.size() >= tuning.most_live_plants) return;
+  const bool capped =
+      tuning.most_live_plants != 0 && field.plants.size() >= tuning.most_live_plants;
+  if (counted < needed || capped) return;
   if (!FramePerimeterDrawable(rules.spawn_frame)) return;
   for (std::uint8_t attempt = 0; attempt < tuning.spawn_tries_per_foe; ++attempt) {
     // Une case qui porte déjà une plante vaut un essai manqué : deux plantes

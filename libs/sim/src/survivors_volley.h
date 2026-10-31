@@ -152,26 +152,37 @@ struct StatusApplied {
   bool knocked = false;
 };
 
-// Le gel et le recul d'un coup sur un monstre vivant. Le gel le tient jusqu'à
-// `step + StepsOf(freeze × (100 + durée) / 100)`, sans jamais raccourcir un
-// gel en cours ; le recul remplace celui en cours. Ni l'un ni l'autre sur un
-// boss, ni sur un monstre qui y est insensible par ses traits.
+// Prolonge `until_step` jusqu'à `step + StepsOf(ms × (100 + durée) / 100)`,
+// sans jamais le raccourcir.
+inline void ExtendStatus(const SurvivorsField& field, std::uint32_t ms,
+                         std::uint32_t& until_step) noexcept {
+  const std::uint32_t steps = ScaledSteps(ms, field.hero.stats.Of(SurvivorsStat::kDurationPct));
+  const std::uint64_t until = std::uint64_t{field.step} + steps;
+  until_step = std::max(until_step, static_cast<std::uint32_t>(std::min<std::uint64_t>(
+                                        until, std::numeric_limits<std::uint32_t>::max())));
+}
+
+// Le gel, le recul, l'aveuglement et la malédiction d'un coup sur un monstre
+// vivant. Gel, aveuglement et malédiction durent `ms × (100 + durée) / 100`,
+// sans jamais raccourcir ceux en cours ; le recul remplace celui en cours.
+// Aucun sur un boss ; ni gel ni recul sur un monstre qui y est insensible par
+// ses traits.
 [[nodiscard]] inline StatusApplied ApplyStatus(SurvivorsField& field, SurvivorsFoe& foe,
                                                const SurvivorsStatus& status) {
   StatusApplied applied;
-  if (foe.hp <= 0 || (status.freeze_ms == 0 && status.knockback_units <= 0)) return applied;
+  if (foe.hp <= 0 || (status.freeze_ms == 0 && status.knockback_units <= 0 &&
+                      status.blind_ms == 0 && status.curse_ms == 0)) {
+    return applied;
+  }
   const FoeRule* rule = FindFoe(*field.rules, foe.foe_id);
   if (rule == nullptr || rule->rank != FoeRank::kCommon) return applied;
   const std::uint8_t traits = rule->behaviour.traits;
   if (status.freeze_ms > 0 && (traits & kFoeFreezeImmune) == 0) {
-    const std::uint32_t steps =
-        ScaledSteps(status.freeze_ms, field.hero.stats.Of(SurvivorsStat::kDurationPct));
-    const std::uint64_t until = std::uint64_t{field.step} + steps;
-    foe.freeze_until_step =
-        std::max(foe.freeze_until_step, static_cast<std::uint32_t>(std::min<std::uint64_t>(
-                                            until, std::numeric_limits<std::uint32_t>::max())));
+    ExtendStatus(field, status.freeze_ms, foe.freeze_until_step);
     applied.froze = true;
   }
+  if (status.blind_ms > 0) ExtendStatus(field, status.blind_ms, foe.blind_until_step);
+  if (status.curse_ms > 0) ExtendStatus(field, status.curse_ms, foe.curse_until_step);
   if (status.knockback_units > 0 && (traits & kFoeKnockbackImmune) == 0) {
     foe.knock_heading = static_cast<std::uint8_t>(status.knock_heading % kHeadingSteps);
     foe.knock_left_units = status.knockback_units;

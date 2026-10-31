@@ -124,10 +124,13 @@ struct SurvivorsCodexLink {
 };
 
 // L'évolution d'un sort de base : sa carte, au niveau maximal, donne l'évolué.
+// Une union nomme à la place de la carte un second sort (`card` désigne
+// alors une compétence), lui aussi au niveau maximal.
 struct SurvivorsCodexEvolution {
   SurvivorsCodexLink card;
   SurvivorsCodexLink result;
   std::uint8_t max_level = 0;
+  bool union_of_two = false;
 };
 
 // D'où vient un monstre, et à quelle heure au plus tôt.

@@ -25,17 +25,29 @@ namespace {
 constexpr std::uint64_t kSightSurvivedMs = 5ULL * 60 * 1000;
 // Frost Diver se débloque par 500 glaçages au cumul.
 constexpr std::uint64_t kFrostDiverChills = 500;
+// Earth Spike se débloque par 300 monstres Wind vaincus au cumul.
+constexpr std::uint64_t kEarthSpikeWindKills = 300;
+// Thunderstorm se débloque par le niveau 25 atteint en une partie.
+constexpr std::uint64_t kThunderstormLevel = 25;
 
-constexpr std::array<SurvivorsUnlock, 4> kUnlocks{{
+constexpr std::array<SurvivorsUnlock, 10> kUnlocks{{
     {.key = "golem_card", .condition = UnlockCondition::kCardFound},
     {.key = "mastering_card", .condition = UnlockCondition::kCardFound},
+    {.key = "eclipse_card", .condition = UnlockCondition::kCardFound},
+    {.key = "dragon_fly_card", .condition = UnlockCondition::kCardFound},
+    {.key = "vagabond_wolf_card", .condition = UnlockCondition::kCardFound},
+    {.key = "baphomet_card", .condition = UnlockCondition::kCardFound},
     {.key = "sight", .condition = UnlockCondition::kFeat},
     {.key = "frost_diver", .condition = UnlockCondition::kFeat},
+    {.key = "earth_spike", .condition = UnlockCondition::kFeat},
+    {.key = "thunderstorm", .condition = UnlockCondition::kFeat},
 }};
 
-constexpr std::array<SurvivorsFeat, 2> kFeats{{
+constexpr std::array<SurvivorsFeat, 4> kFeats{{
     {.key = "sight", .counter = FeatCounter::kBestSurvivedMs, .threshold = kSightSurvivedMs},
     {.key = "frost_diver", .counter = FeatCounter::kChills, .threshold = kFrostDiverChills},
+    {.key = "earth_spike", .counter = FeatCounter::kWindKills, .threshold = kEarthSpikeWindKills},
+    {.key = "thunderstorm", .counter = FeatCounter::kBestLevel, .threshold = kThunderstormLevel},
 }};
 
 [[nodiscard]] std::uint64_t SaturatedAdd(std::uint64_t total, std::uint64_t amount) noexcept {
@@ -88,6 +100,10 @@ constexpr std::array<SurvivorsFeat, 2> kFeats{{
       return counters.best_survived_ms;
     case FeatCounter::kChills:
       return counters.chills;
+    case FeatCounter::kWindKills:
+      return counters.wind_kills;
+    case FeatCounter::kBestLevel:
+      return counters.best_level;
   }
   return 0;
 }

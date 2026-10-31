@@ -129,7 +129,8 @@ namespace {
   const SurvivorsElement element = rule != nullptr ? rule->element : SurvivorsElement::kNeutral;
   const SurvivorsStatus status{.freeze_ms = shot.freeze_ms,
                                .knockback_units = shot.knockback_units,
-                               .knock_heading = HeadingOf(shot.velocity, field.hero.facing)};
+                               .knock_heading = HeadingOf(shot.velocity, field.hero.facing),
+                               .curse_ms = shot.curse_ms};
   HurtFoe(field, *touched, DamageAgainst(field, shot.damage, element, *touched), shot.skill_id,
           status);
   // Un tir dont la mémoire est pleine s'éteint, perçage restant ou non : il ne
@@ -192,6 +193,7 @@ bool FireLinear(SurvivorsField& field, std::uint8_t slot, const SurvivorsSkillRu
                                         .hit_count = 0,
                                         .freeze_ms = level.freeze_ms,
                                         .knockback_units = level.knockback_units,
+                                        .curse_ms = level.curse_ms,
                                         .straight = true});
     PublishCast(field.news, SurvivorsCast{.skill_id = rule.skill_id,
                                           .kind = CastKind::kShot,

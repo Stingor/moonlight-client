@@ -186,10 +186,17 @@ constexpr std::array<FoeRule, 45> kFoes{{
     // Les mini-boss et le boss final : PV fixes, marche de leur BossRule.
     WithCard(Boss(FoeRank::kMiniBoss, kMasteringId, 2, kMedium, kWater, 600, 300, 12, 1072, 20),
              kMasteringCardId),
-    Boss(FoeRank::kMiniBoss, kEclipseId, 6, kMedium, kNeutral, 900, 200, 11, 1456, 30),
-    Boss(FoeRank::kMiniBoss, kDragonFlyId, 8, kSmall, kWind, 1200, 100, 12, 1076, 40, kFlyer),
-    Boss(FoeRank::kMiniBoss, kVagabondWolfId, 24, kMedium, kEarth, 2400, 150, 11, 1048, 60),
-    Boss(FoeRank::kBoss, kBaphometId, 81, kLarge, kDark, 11000, 100, 35, 768, 0, kBossImmunities),
+    WithCard(Boss(FoeRank::kMiniBoss, kEclipseId, 6, kMedium, kNeutral, 900, 200, 11, 1456, 30),
+             kEclipseCardId),
+    WithCard(
+        Boss(FoeRank::kMiniBoss, kDragonFlyId, 8, kSmall, kWind, 1200, 100, 12, 1076, 40, kFlyer),
+        kDragonFlyCardId),
+    WithCard(
+        Boss(FoeRank::kMiniBoss, kVagabondWolfId, 24, kMedium, kEarth, 2400, 150, 11, 1048, 60),
+        kVagabondWolfCardId),
+    WithCard(Boss(FoeRank::kBoss, kBaphometId, 81, kLarge, kDark, 11000, 100, 35, 768, 0,
+                  kBossImmunities),
+             kBaphometCardId),
 }};
 
 // ── Les vagues ─────────────────────────────────────────────────────────────

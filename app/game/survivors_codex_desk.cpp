@@ -100,10 +100,13 @@ constexpr std::array<SkillRow, 14> kSkillRows{{
 
 [[nodiscard]] ro::ui::SurvivorsCodexEvolution EvolutionOf(const ro::sim::SurvivorsRules& rules,
                                                           const ro::sim::EvolutionRule& rule) {
+  const bool union_of_two = rule.partner_skill_id != 0;
   return ro::ui::SurvivorsCodexEvolution{
-      .card = ro::ui::SurvivorsCodexLink{.ro_id = rule.card_item_id},
+      .card = union_of_two ? SkillLink(rule.partner_skill_id)
+                           : ro::ui::SurvivorsCodexLink{.ro_id = rule.card_item_id},
       .result = SkillLink(rule.evolved_skill_id),
-      .max_level = MostLevelOf(rules, rule.skill_id)};
+      .max_level = MostLevelOf(rules, rule.skill_id),
+      .union_of_two = union_of_two};
 }
 
 // Ce qu'un objet au sol dit de lui : son effet selon sa sorte, sa durée, sa
@@ -174,7 +177,8 @@ struct LinkSight {
 };
 
 void MarkEvolution(ro::ui::SurvivorsCodexEvolution& evolution, const LinkSight& sight) {
-  evolution.card.seen = sight.Card(evolution.card.ro_id);
+  evolution.card.seen =
+      evolution.union_of_two ? sight.Skill(evolution.card.ro_id) : sight.Card(evolution.card.ro_id);
   evolution.result.seen = sight.Skill(evolution.result.ro_id);
 }
 
