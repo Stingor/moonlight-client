@@ -638,7 +638,11 @@ std::optional<std::string> DrawChatInput(ChatInputState& state, const ChatLinePr
     }
   }
   ImGui::PopStyleColor(1 + field_colors);
-  DrawCommandsOverField(state, preview.commands, active, field_corner, field_extent.x, art);
+  // ⚠ LA LISTE SE MONTRE AUSSI À L'IMAGE OÙ LE CHAMP VIENT DE PERDRE LE CLAVIER :
+  // le clic sur une rangée le désactive avant qu'elle soit dessinée, et c'est
+  // cette image-là qui doit le recevoir.
+  DrawCommandsOverField(state, preview.commands, active || state.was_active, field_corner,
+                        field_extent.x, art);
 
   // La place restante, dès que le champ a une deuxième rangée — c'est aussi le
   // moment où l'étiquette laisse, sous elle, la place de l'écrire.
