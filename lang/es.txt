@@ -11065,6 +11065,12 @@ tr: Requiere %.*s nivel %u
 fr: Requiert %u niveau %u (autre onglet)
 tr: Requiere %u nivel %u (otra pestaña)
 
+fr: Vient après %.*s niveau %u (non exigé)
+tr: Sigue a %.*s nivel %u (no obligatorio)
+
+fr: Vient après %u niveau %u (autre onglet, non exigé)
+tr: Sigue a %u nivel %u (otra pestaña, no obligatorio)
+
 fr: Requiert : %s
 tr: Requiere: %s
 

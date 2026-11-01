@@ -102,11 +102,15 @@ void SkillView::Rebuild(const ro::sim::SkillTree& tree, const ro::sim::Grimoire&
   };
   std::vector<Bounds> bounds;
 
-  // Les prérequis que le serveur vérifie pour le métier du personnage.
+  // Les prérequis que la base du serveur déclare pour le métier du personnage.
+  // ⚠ TOUS, MÊME SOUS `player_skillfree` : ils dessinent l'arbre, et seule
+  // l'infobulle dit s'ils verrouillent.
+  const bool enforced = tree.prerequisites_enforced();
   const auto add_needs = [&](std::uint16_t skill_id) -> std::pair<std::size_t, std::size_t> {
     const std::size_t at = needs_.size();
-    for (const ro::sim::SkillRequirement& need : tree.NeedsOf(job, skill_id)) {
-      needs_.push_back(ro::ui::SkillNeedView{.skill_id = need.skill_id, .level = need.level});
+    for (const ro::sim::SkillRequirement& need : tree.DeclaredNeedsOf(job, skill_id)) {
+      needs_.push_back(ro::ui::SkillNeedView{
+          .skill_id = need.skill_id, .level = need.level, .enforced = enforced});
     }
     return {at, needs_.size() - at};
   };

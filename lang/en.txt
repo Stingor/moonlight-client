@@ -11065,6 +11065,12 @@ tr: Requires %.*s level %u
 fr: Requiert %u niveau %u (autre onglet)
 tr: Requires %u level %u (other tab)
 
+fr: Vient après %.*s niveau %u (non exigé)
+tr: Follows %.*s level %u (not required)
+
+fr: Vient après %u niveau %u (autre onglet, non exigé)
+tr: Follows %u level %u (other tab, not required)
+
 fr: Requiert : %s
 tr: Requires: %s
 

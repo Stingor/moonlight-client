@@ -29,6 +29,9 @@ namespace ro::ui {
 struct SkillNeedView {
   std::uint16_t skill_id = 0;
   std::uint16_t level = 0;
+  // Le serveur le vérifie-t-il ? Faux sous `player_skillfree` : la flèche se
+  // trace quand même, mais l'infobulle ne promet aucun verrou.
+  bool enforced = true;
 };
 
 // Une case de la grille.

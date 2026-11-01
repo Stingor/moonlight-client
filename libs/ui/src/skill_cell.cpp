@@ -196,12 +196,18 @@ void ShowSkillTooltip(const SkillCellView& cell, std::span<const SkillCellView> 
       // Un prérequis peut vivre dans un AUTRE onglet — une troisième classe en
       // réclame souvent une de deuxième. Aucune flèche ne peut alors le désigner,
       // autant le dire.
+      //
+      // ⚠ « REQUIERT » SEULEMENT POUR UN VERROU QUE LE SERVEUR TIENT : sous
+      // `player_skillfree`, la branche se lit toujours, mais rien ne bloque.
       if (found == siblings.end()) {
-        ImGui::Text(core::Tr("Requiert %u niveau %u (autre onglet)"), need.skill_id, need.level);
+        ImGui::Text(need.enforced ? core::Tr("Requiert %u niveau %u (autre onglet)")
+                                  : core::Tr("Vient après %u niveau %u (autre onglet, non exigé)"),
+                    need.skill_id, need.level);
         continue;
       }
-      ImGui::Text(core::Tr("Requiert %.*s niveau %u"), static_cast<int>(found->name.size()),
-                  found->name.data(), need.level);
+      ImGui::Text(need.enforced ? core::Tr("Requiert %.*s niveau %u")
+                                : core::Tr("Vient après %.*s niveau %u (non exigé)"),
+                  static_cast<int>(found->name.size()), found->name.data(), need.level);
     }
 
     // ── CE QU'ON PEUT FAIRE DE CETTE CASE-LÀ ──────────────────────────────────

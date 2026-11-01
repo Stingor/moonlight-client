@@ -251,9 +251,15 @@ class SkillTree {
   // Le rang maximal, 0 quand le serveur ne la lui donne pas.
   [[nodiscard]] std::uint16_t MaxLevelOf(std::uint32_t job, std::uint16_t skill_id) const;
   // Les prérequis que le serveur VÉRIFIE : aucun sous `player_skillfree`, même
-  // quand sa base en déclare. Les montrer promettrait un verrou qui n'existe pas.
+  // quand sa base en déclare. Les payer d'office dépenserait des points pour un
+  // verrou qui n'existe pas.
   [[nodiscard]] std::span<const SkillRequirement> NeedsOf(std::uint32_t job,
                                                           std::uint16_t skill_id) const;
+  // Les prérequis que la base du serveur DÉCLARE, vérifiés ou non : la forme de
+  // l'arbre, que le grimoire trace même sous `player_skillfree`. La flèche dit
+  // d'où vient une compétence ; c'est `NeedsOf` qui dit si elle verrouille.
+  [[nodiscard]] std::span<const SkillRequirement> DeclaredNeedsOf(std::uint32_t job,
+                                                                  std::uint16_t skill_id) const;
   // L'arbre de la guilde, par compétence croissante. `player_skillfree` ne le
   // touche pas : le serveur y vérifie toujours les prérequis.
   [[nodiscard]] std::span<const SkillRule> GuildRules() const noexcept { return rules_.guild; }

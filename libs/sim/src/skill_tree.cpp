@@ -221,6 +221,15 @@ std::span<const SkillRequirement> SkillTree::NeedsOf(std::uint32_t job,
   return rule->needs;
 }
 
+std::span<const SkillRequirement> SkillTree::DeclaredNeedsOf(std::uint32_t job,
+                                                             std::uint16_t skill_id) const {
+  const SkillRule* rule = RuleOf(job, skill_id);
+  if (rule == nullptr) {
+    return {};
+  }
+  return rule->needs;
+}
+
 SkillTree SkillTree::FromTables(std::vector<SkillNode> nodes, SkillTreeLayout layout) {
   SkillTree tree;
   tree.nodes_ = std::move(nodes);
