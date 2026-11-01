@@ -8,6 +8,7 @@
 #include <glm/glm.hpp>
 
 #include "ro/render/camera.h"
+#include "ro/render/sprite_billboard.h"
 #include "ro/sim/packed_position.h"
 #include "ro/sim/walk_map.h"
 
@@ -24,9 +25,12 @@
 // l'œil, à la distance qui laisse l'œil exactement où il doit être.
 namespace moonclient {
 
-// La hauteur de l'œil au-dessus des pieds, en unités du monde. Un corps d'une
-// soixantaine de pixels de sprite en mesure à peu près neuf.
-inline constexpr float kFirstPersonEyeUnits = 8.0F;
+// La hauteur des yeux d'un personnage debout, en pixels de sprite au-dessus des
+// pieds : quatre cinquièmes des cent cinq pixels qu'il mesure chapeau compris.
+inline constexpr float kFirstPersonEyePixels = 84.0F;
+// La même, en unités du monde : douze.
+inline constexpr float kFirstPersonEyeUnits =
+    kFirstPersonEyePixels / ro::render::kSpritePixelsPerWorldUnit;
 // Le champ vertical, en degrés : celui d'un jeu de tir, et non le champ étroit
 // qui donne à la vue du jeu son aspect presque orthographique.
 inline constexpr float kFirstPersonFovDegrees = 75.0F;
