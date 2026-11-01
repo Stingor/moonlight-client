@@ -28,6 +28,7 @@
 #include "game/game_settings.h"
 #include "game/interface_sound.h"
 #include "game/ui_stage.h"
+#include "voice/voice_mode.h"
 #include "world/entity_menu.h"
 #include "world/native_marker.h"
 #include "world/navi_session.h"
@@ -142,6 +143,9 @@ class GameFoundation {
   // LA CAPTURE D'ÉCRAN ENTIÈRE, rangée sous `ScreenShot/`. ⚠ SA PRISE SUIT LE
   // DESSIN DES FENÊTRES, comme celle de l'enregistreur de zone.
   ScreenShooter screenshot_;
+  // LA VOIX EN JEU : le serveur voix, ouvert et fermé avec la partie. Voir
+  // `VoiceMode`.
+  VoiceMode voice_;
   // ── LES SONS D'INTERFACE ───────────────────────────────────────────────────
   // CEUX DONT L'ÉCHEC EST DÉJÀ AU JOURNAL : un son qui manque ne s'y dit qu'une
   // fois par partie. Voir `PlayInterfaceSounds`.

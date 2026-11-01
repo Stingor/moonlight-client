@@ -284,6 +284,9 @@ tr: Reach 20,000 points in a game of Roggle.
 fr: Atteindre 5 000 points dans une partie de Rojeweled.
 tr: Reach 5,000 points in a game of Rojeweled.
 
+fr: Au-delà de 100 %, le micro est amplifié.
+tr: Above 100 %, the microphone is amplified.
+
 fr: Aucune partie finie
 tr: No finished game
 
@@ -316,6 +319,9 @@ tr: Blocks this player's whispers; alone, lists the blocked ones.
 
 fr: Bloque les chuchotements de tout le monde.
 tr: Blocks everyone's whispers.
+
+fr: Canal de la voix
+tr: Voice channel
 
 fr: Cascade ×%d
 tr: Cascade ×%d
@@ -401,6 +407,9 @@ tr: Fireballs circle around you.
 fr: Des éclats d'esprit frappent là où les monstres se pressent.
 tr: Spirit bursts strike where monsters crowd together.
 
+fr: Entendre les autres joueurs, et leur parler en tenant la touche « Parler (voix) » des raccourcis. Seulement sur un serveur qui ouvre la voix.
+tr: Hear the other players, and talk to them by holding the "Talk (voice)" shortcut key. Only on a server that opens voice.
+
 fr: Il faut être en ville ou dans un intérieur.
 tr: You must be in a town or indoors.
 
@@ -415,6 +424,15 @@ tr: The connection to the server is lost.
 
 fr: On vous propose un échange.
 tr: Someone is offering you a trade.
+
+fr: Où l'on parle et qui l'on entend : les joueurs proches, le groupe ou la guilde. Dans un salon de discussion, la voix est celle du salon.
+tr: Where you talk and whom you hear: nearby players, the party or the guild. In a chat room, the voice is the room's.
+
+fr: Parler (voix)
+tr: Talk (voice)
+
+fr: Proximité
+tr: Nearby
 
 fr: Un PNJ vous parle.
 tr: An NPC is talking to you.
@@ -1580,6 +1598,39 @@ tr: Increased walk speed.
 fr: Vitesse du temps
 tr: Speed of time
 
+fr: Voix
+tr: Voice
+
+fr: Voix : aucun appareil de son ne s'ouvre.
+tr: Voice: no sound device opens.
+
+fr: Voix : choisissez la touche « Parler (voix) » dans les raccourcis.
+tr: Voice: choose the "Talk (voice)" key in the shortcuts.
+
+fr: Voix : coupée par un MJ.
+tr: Voice: muted by a GM.
+
+fr: Voix : coupée quelques minutes, trop de paquets.
+tr: Voice: cut for a few minutes, too many packets.
+
+fr: Voix : la proximité se tait pendant la guerre de guilde.
+tr: Voice: nearby voice is silent during the guild war.
+
+fr: Voix : réservée aux comptes qui l'ont.
+tr: Voice: reserved for accounts that have it.
+
+fr: Voix : serveur injoignable, nouvel essai…
+tr: Voice: server unreachable, retrying…
+
+fr: Voix en jeu
+tr: In-game voice
+
+fr: Volume des voix
+tr: Voice volume
+
+fr: Volume du micro
+tr: Microphone volume
+
 fr: Votre personnage a changé de carte.
 tr: Your character changed maps.
 
@@ -1591,6 +1642,9 @@ tr: Your character died in the game.
 
 fr: Vous avez reçu une invitation.
 tr: You received an invitation.
+
+fr: Vous parlez
+tr: You are talking
 
 fr: aucun morceau
 tr: no track

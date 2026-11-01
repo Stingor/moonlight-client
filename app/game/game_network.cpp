@@ -261,11 +261,11 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
   // LA POIGNÉE DE MAIN D'INTÉGRITÉ, aussitôt la liaison ouverte, et ce qu'elle
   // débloque : voir `PumpHandshake`.
   if (link_.is_open()) {
-    // Le bit du classement survivors n'y entre que si la table des longueurs
-    // connaît ses ZC.
+    // Les bits du classement survivors et de la voix n'y entrent que si la
+    // table des longueurs connaît leurs ZC.
     PumpHandshake(link_, handshake_, reported_handshake_, pieces_,
                   settings_->options().pages().mvp_tracker.settings().enabled,
-                  survivors_ranking_.caps(), now_ms);
+                  survivors_ranking_.caps() | voice_.caps(), now_ms);
   }
 
   // L'ANNEAU DES DIX PREMIERS S'ACCORDE AU RANG DE CHACUN, à chaque battement.

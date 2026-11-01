@@ -284,6 +284,9 @@ tr: Alcanza 20 000 puntos en una partida de Roggle.
 fr: Atteindre 5 000 points dans une partie de Rojeweled.
 tr: Alcanza 5000 puntos en una partida de Rojeweled.
 
+fr: Au-delà de 100 %, le micro est amplifié.
+tr: Por encima del 100 %, el micrófono se amplifica.
+
 fr: Aucune partie finie
 tr: Ninguna partida terminada
 
@@ -316,6 +319,9 @@ tr: Bloquea los susurros de este jugador; sola, lista los bloqueados.
 
 fr: Bloque les chuchotements de tout le monde.
 tr: Bloquea los susurros de todo el mundo.
+
+fr: Canal de la voix
+tr: Canal de voz
 
 fr: Cascade ×%d
 tr: Cascada ×%d
@@ -401,6 +407,9 @@ tr: Bolas de fuego giran a tu alrededor.
 fr: Des éclats d'esprit frappent là où les monstres se pressent.
 tr: Estallidos de espíritu golpean donde se agolpan los monstruos.
 
+fr: Entendre les autres joueurs, et leur parler en tenant la touche « Parler (voix) » des raccourcis. Seulement sur un serveur qui ouvre la voix.
+tr: Oír a los demás jugadores, y hablarles manteniendo pulsada la tecla «Hablar (voz)» de los atajos. Solo en un servidor que abre la voz.
+
 fr: Il faut être en ville ou dans un intérieur.
 tr: Debes estar en una ciudad o en un interior.
 
@@ -415,6 +424,15 @@ tr: Se perdió la conexión con el servidor.
 
 fr: On vous propose un échange.
 tr: Alguien te propone un intercambio.
+
+fr: Où l'on parle et qui l'on entend : les joueurs proches, le groupe ou la guilde. Dans un salon de discussion, la voix est celle du salon.
+tr: Dónde se habla y a quién se oye: los jugadores cercanos, el grupo o el gremio. En una sala de chat, la voz es la de la sala.
+
+fr: Parler (voix)
+tr: Hablar (voz)
+
+fr: Proximité
+tr: Cercanía
 
 fr: Un PNJ vous parle.
 tr: Un PNJ te está hablando.
@@ -1580,6 +1598,39 @@ tr: Velocidad de marcha aumentada.
 fr: Vitesse du temps
 tr: Velocidad del tiempo
 
+fr: Voix
+tr: Voz
+
+fr: Voix : aucun appareil de son ne s'ouvre.
+tr: Voz: no se abre ningún dispositivo de sonido.
+
+fr: Voix : choisissez la touche « Parler (voix) » dans les raccourcis.
+tr: Voz: elija la tecla «Hablar (voz)» en los atajos.
+
+fr: Voix : coupée par un MJ.
+tr: Voz: silenciada por un GM.
+
+fr: Voix : coupée quelques minutes, trop de paquets.
+tr: Voz: cortada unos minutos, demasiados paquetes.
+
+fr: Voix : la proximité se tait pendant la guerre de guilde.
+tr: Voz: la voz cercana calla durante la guerra de gremios.
+
+fr: Voix : réservée aux comptes qui l'ont.
+tr: Voz: reservada a las cuentas que la tienen.
+
+fr: Voix : serveur injoignable, nouvel essai…
+tr: Voz: servidor inaccesible, reintentando…
+
+fr: Voix en jeu
+tr: Voz en el juego
+
+fr: Volume des voix
+tr: Volumen de las voces
+
+fr: Volume du micro
+tr: Volumen del micrófono
+
 fr: Votre personnage a changé de carte.
 tr: Tu personaje ha cambiado de mapa.
 
@@ -1591,6 +1642,9 @@ tr: Tu personaje ha muerto en el juego.
 
 fr: Vous avez reçu une invitation.
 tr: Has recibido una invitación.
+
+fr: Vous parlez
+tr: Está hablando
 
 fr: aucun morceau
 tr: ninguna pista

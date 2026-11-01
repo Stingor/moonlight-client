@@ -153,6 +153,7 @@ add_subdirectory(libs/mapedit)
 add_subdirectory(libs/proto)
 add_subdirectory(libs/sim)
 add_subdirectory(libs/net)
+add_subdirectory(libs/voice)
 add_subdirectory(libs/render)
 # `ui` porte DEUX cibles, et seule la seconde touche à la plateforme : les
 # fenêtres elles-mêmes se bâtissent et se testent ici comme sur le runner sans

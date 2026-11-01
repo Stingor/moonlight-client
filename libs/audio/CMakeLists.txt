@@ -16,7 +16,8 @@ add_library(ro_audio STATIC
     src/peak_limiter.cpp
     src/sound_channel.cpp
     src/sound_onset.cpp
-    src/sound_placement.cpp)
+    src/sound_placement.cpp
+    src/voice_devices.cpp)
 add_library(ro::audio ALIAS ro_audio)
 
 target_include_directories(ro_audio PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

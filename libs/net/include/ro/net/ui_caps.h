@@ -83,6 +83,11 @@ inline constexpr std::uint32_t kUiCapAttackElement = 0x00040000;
 // chaque annonce qui porte le bit. ⚠ ELLE N'ENTRE DANS LE MASQUE QUE SI LA TABLE DES LONGUEURS
 // CONNAÎT CES QUATRE ZC : un ZC inconnu de la table arrête la liaison.
 inline constexpr std::uint32_t kUiCapSurvivors = 0x00080000;
+// 🔴 UNE CAPACITÉ DE LECTURE : ce client parle au serveur voix, et sait lire
+// où le joindre (`ZC 0x0F55`, voir `voice_service.h`). Même règle que pour
+// survivors : elle n'entre dans le masque que si la table des longueurs
+// connaît ce ZC.
+inline constexpr std::uint32_t kUiCapVoice = 0x00100000;
 
 [[nodiscard]] core::Result<void> AnnounceUiCaps(Connection& link, std::uint32_t caps);
 

@@ -110,6 +110,18 @@ target_link_libraries(moonclient_map_sign
 target_include_directories(moonclient_map_sign PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # La capture d'écran entière : la relecture, l'encodage PNG et le nom du fichier.
+# LA VOIX EN JEU, en bibliothèque : le mode qui ouvre et ferme la liaison au
+# serveur voix, branche ses appareils de son et compose son témoin. Le fil,
+# Opus et le protocole vivent dans `ro_voice` (ADR 0135).
+add_library(moonclient_voice STATIC
+    voice/voice_mode.cpp)
+
+target_link_libraries(moonclient_voice
+    PUBLIC ro_net ro_ui
+    PRIVATE ro_audio ro_core ro_proto ro_voice SDL3::SDL3 ro_warnings)
+
+target_include_directories(moonclient_voice PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
 add_library(moonclient_screenshot STATIC
     capture/screenshot.cpp)
 
@@ -1977,6 +1989,7 @@ add_executable(moonclient
     options/option_pages.cpp
     options/deal_refusal_options.cpp
     options/pet_options.cpp
+    options/voice_options.cpp
     options/bug_report_options.cpp
     options/menu_icons_options.cpp
     options/map_sign_options.cpp
@@ -2045,7 +2058,7 @@ add_executable(moonclient
     game/window_events.cpp)
 
 target_link_libraries(moonclient
-    PRIVATE moonclient_chatlinks moonclient_chatcommands moonclient_skillrefusal moonclient_skillrules moonclient_songmusic moonclient_music moonclient_ranknotices moonclient_chatpreview moonclient_cursor moonclient_targeting moonclient_quickcast moonclient_skillfacts moonclient_calloptions moonclient_spritesounds moonclient_debug moonclient_versus moonclient_damage moonclient_display moonclient_entitybars moonclient_names moonclient_equip moonclient_effect_nodes moonclient_effects moonclient_stage moonclient_map_sign moonclient_screenshot moonclient_itemdrop moonclient_items moonclient_itemtoast moonclient_balloons moonclient_statuses moonclient_titles
+    PRIVATE moonclient_chatlinks moonclient_chatcommands moonclient_skillrefusal moonclient_skillrules moonclient_songmusic moonclient_music moonclient_ranknotices moonclient_chatpreview moonclient_cursor moonclient_targeting moonclient_quickcast moonclient_skillfacts moonclient_calloptions moonclient_spritesounds moonclient_debug moonclient_versus moonclient_damage moonclient_display moonclient_entitybars moonclient_names moonclient_equip moonclient_effect_nodes moonclient_effects moonclient_stage moonclient_map_sign moonclient_screenshot moonclient_voice moonclient_itemdrop moonclient_items moonclient_itemtoast moonclient_balloons moonclient_statuses moonclient_titles
             moonclient_visibility moonclient_afk moonclient_backdrop moonclient_lit_stage moonclient_graphics moonclient_settingtoggles moonclient_camera_rules moonclient_cardalbum moonclient_mvptracker moonclient_battleground moonclient_memorial moonclient_minigames moonclient_survivors moonclient_arena moonclient_monstertalk moonclient_battlefield moonclient_craft moonclient_itemfacts moonclient_bugreport moonclient_books moonclient_barter moonclient_buyingstore moonclient_storesearch moonclient_market moonclient_database moonclient_vending moonclient_chatroom moonclient_whispers moonclient_mail moonclient_achievements moonclient_profiles moonclient_entitymenu moonclient_party moonclient_hotkeys moonclient_shortcutwheel moonclient_menuicons moonclient_companionai moonclient_keys moonclient_lobby moonclient_entry moonclient_monstersheet moonclient_navigation moonclient_quests
             moonclient_loading moonclient_config moonclient_patcher_net moonclient_skins moonclient_skinlook moonclient_postures moonclient_presets moonclient_styles moonclient_web_http
             moonclient_chatweboptions moonclient_chatweb_net

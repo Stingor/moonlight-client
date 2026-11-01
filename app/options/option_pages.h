@@ -50,6 +50,7 @@
 #include "options/talk_filter_options.h"
 #include "options/target_options.h"
 #include "options/view_equip_memory.h"
+#include "options/voice_options.h"
 #include "options/weapon_refine_options.h"
 #include "options/whisper_options.h"
 #include "options/window_title_options.h"
@@ -132,6 +133,8 @@ struct OptionPages {
   MvpTrackerOptions mvp_tracker;
   BattlegroundOptions battleground;
   PetOptions pet;
+  // La voix en jeu, dans la page Son.
+  VoiceOptions voice;
   QuestTrackerOptions quest_tracker;
   // ⚠ SANS DÉCLARATION AU FICHIER : c'est le serveur qui tient ce réglage.
   CallOptions call;

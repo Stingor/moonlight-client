@@ -110,6 +110,7 @@ constexpr std::array<ActionSavedNames, kNamedActionCount> kActionSavedNames = {{
     {GameAction::kCaptureZone, "capture_zone"},
     {GameAction::kScreenshot, "screenshot"},
     {GameAction::kAfkScreen, "afk_screen"},
+    {GameAction::kVoiceTalk, "voice_talk"},
     {GameAction::kTargetNearest, "target_nearest"},
     {GameAction::kTargetPrevious, "target_previous"},
     {GameAction::kTargetNext, "target_next"},
@@ -293,6 +294,7 @@ HotkeyTab TabOfAction(ActionRef action) {
     case GameAction::kOpenMarket:
     case GameAction::kOpenDatabase:
     case GameAction::kReportBug:
+    case GameAction::kVoiceTalk:
     case GameAction::kAfkScreen:
       return HotkeyTab::kInterface;
     case GameAction::kSitOrStand:
@@ -507,6 +509,8 @@ std::string NameOfAction(ActionRef action) {
       return ro::core::Tr("Capture d'écran");
     case GameAction::kAfkScreen:
       return ro::core::Tr("Écran de veille");
+    case GameAction::kVoiceTalk:
+      return ro::core::Tr("Parler (voix)");
     case GameAction::kTargetNearest:
       return ro::core::Tr("Cible la plus proche");
     case GameAction::kTargetPrevious:

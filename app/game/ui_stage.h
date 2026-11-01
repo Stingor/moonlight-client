@@ -82,6 +82,7 @@
 #include "ro/ui/talkbox_window.h"
 #include "ro/ui/ui_context.h"
 #include "ro/ui/view_equip_window.h"
+#include "ro/ui/voice_overlay.h"
 #include "ro/ui/warp_list_window.h"
 #include "ro/ui/weapon_refine_window.h"
 #include "ro/ui/zone_capture.h"
@@ -182,7 +183,8 @@ class UiStage {
     ro::ui::ShortcutWheelView shortcut_wheel;     // la roue d'utilisation, composée par `app`
     // La liaison au serveur : bandeau et boîte de perte, composés par `app`.
     ro::ui::LinkNoticeState link_notice;
-    BalloonBoards balloons;  // les bulles d'annonce, composées à chaque image
+    ro::ui::VoiceOverlayState voice;  // le témoin de la voix, composé par `app`
+    BalloonBoards balloons;           // les bulles d'annonce, composées à chaque image
     ro::ui::PacketWindowState packets;
     ro::ui::LogWindowState log;
     ro::ui::ChatWindows chat;

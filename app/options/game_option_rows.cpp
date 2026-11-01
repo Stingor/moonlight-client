@@ -90,6 +90,7 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar, bool searching) {
              Tr("Un bruit s'entend du côté d'où il vient. Le client d'origine ne le dit pas : "
                 "il n'atténue qu'avec la distance, et celle-ci reste dans les deux cas."),
              "", sound_options_.spatial_sound));
+  pages_.voice.ComposeInto(sound_rows_);
 
   display_rows_.clear();
   language_names_.clear();

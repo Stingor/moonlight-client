@@ -104,6 +104,10 @@ bool SetNonBlocking(NativeSocket handle) {
 // Windows signale « connexion en cours » par un code qui lui est propre.
 bool ConnectInProgress(int code) { return code == WSAEWOULDBLOCK; }
 
+// Le pair d'un socket UDP n'écoute pas : un envoi précédent a reçu un refus
+// du réseau, que le système rend à la lecture suivante.
+bool PeerRefused(int code) { return code == WSAECONNRESET || code == WSAECONNREFUSED; }
+
 #else
 
 void EnsureSubsystem() {}
@@ -129,6 +133,8 @@ bool SetNonBlocking(NativeSocket handle) {
 }
 
 bool ConnectInProgress(int code) { return code == EINPROGRESS; }
+
+bool PeerRefused(int code) { return code == ECONNREFUSED; }
 
 #endif
 
@@ -428,6 +434,126 @@ Result<std::size_t> TcpSocket::Send(std::span<const std::uint8_t> bytes) {
     return std::size_t{0};
   }
   return Fail(ErrorCode::kIoFailure, "écriture : " + DescribeError(code));
+}
+
+UdpSocket::~UdpSocket() { Close(); }
+
+UdpSocket::UdpSocket(UdpSocket&& other) noexcept : handle_(other.handle_) {
+  other.handle_ = kInvalidSocket;
+}
+
+UdpSocket& UdpSocket::operator=(UdpSocket&& other) noexcept {
+  if (this != &other) {
+    Close();
+    handle_ = other.handle_;
+    other.handle_ = kInvalidSocket;
+  }
+  return *this;
+}
+
+void UdpSocket::Close() noexcept {
+  if (handle_ != kInvalidSocket) {
+    CloseNative(handle_);
+    handle_ = kInvalidSocket;
+  }
+}
+
+Result<UdpSocket> UdpSocket::Connect(std::string_view host, std::uint16_t port) {
+  EnsureSubsystem();
+
+  const std::string host_text(host);
+  std::array<char, kPortTextSize> port_text = {};
+  std::snprintf(port_text.data(), port_text.size(), "%u", static_cast<unsigned>(port));
+
+  addrinfo hints = addrinfo();
+  hints.ai_family = AF_UNSPEC;
+  hints.ai_socktype = SOCK_DGRAM;
+  hints.ai_protocol = IPPROTO_UDP;
+
+  addrinfo* candidates = nullptr;
+  const int resolved = getaddrinfo(host_text.c_str(), port_text.data(), &hints, &candidates);
+  if (resolved != 0 || candidates == nullptr) {
+    return Fail(ErrorCode::kIoFailure, "hôte introuvable : " + host_text);
+  }
+
+  Error last = Error{ErrorCode::kIoFailure, "aucune adresse pour " + host_text};
+  for (addrinfo* candidate = candidates; candidate != nullptr; candidate = candidate->ai_next) {
+    const NativeSocket handle = static_cast<NativeSocket>(
+        socket(candidate->ai_family, candidate->ai_socktype, candidate->ai_protocol));
+    if (handle == kInvalidSocket) {
+      last = Error{ErrorCode::kIoFailure, "création du socket : " + DescribeError(LastError())};
+      continue;
+    }
+    UdpSocket attempt;
+    attempt.handle_ = handle;
+    if (!SetNonBlocking(handle)) {
+      last = Error{ErrorCode::kIoFailure, "socket non bloquant : " + DescribeError(LastError())};
+      continue;
+    }
+#if defined(_WIN32)
+    const int fixed = ::connect(static_cast<SOCKET>(handle), candidate->ai_addr,
+                                static_cast<int>(candidate->ai_addrlen));
+#else
+    const int fixed = ::connect(handle, candidate->ai_addr, candidate->ai_addrlen);
+#endif
+    if (fixed != 0) {
+      last = Error{ErrorCode::kIoFailure, "pair UDP : " + DescribeError(LastError())};
+      continue;
+    }
+    freeaddrinfo(candidates);
+    return attempt;
+  }
+
+  freeaddrinfo(candidates);
+  return std::unexpected(last);
+}
+
+Result<bool> UdpSocket::Send(std::span<const std::uint8_t> datagram) {
+  if (!is_open()) {
+    return Fail(ErrorCode::kIoFailure, "envoi sur un socket UDP fermé");
+  }
+#if defined(_WIN32)
+  const int written =
+      send(static_cast<SOCKET>(handle_), reinterpret_cast<const char*>(datagram.data()),
+           static_cast<int>(datagram.size()), 0);
+#else
+  const auto written = ::send(handle_, datagram.data(), datagram.size(), MSG_NOSIGNAL);
+#endif
+  if (written >= 0) {
+    return static_cast<std::size_t>(written) == datagram.size();
+  }
+  const int code = LastError();
+  if (WouldBlock(code) || PeerRefused(code)) {
+    return false;
+  }
+  return Fail(ErrorCode::kIoFailure, "envoi UDP : " + DescribeError(code));
+}
+
+Result<std::optional<std::size_t>> UdpSocket::Receive(std::span<std::uint8_t> into) {
+  if (!is_open()) {
+    return Fail(ErrorCode::kIoFailure, "lecture sur un socket UDP fermé");
+  }
+#if defined(_WIN32)
+  const int read = recv(static_cast<SOCKET>(handle_), reinterpret_cast<char*>(into.data()),
+                        static_cast<int>(into.size()), 0);
+#else
+  const auto read = ::recv(handle_, into.data(), into.size(), 0);
+#endif
+  if (read >= 0) {
+    return std::optional<std::size_t>(static_cast<std::size_t>(read));
+  }
+  const int code = LastError();
+#if defined(_WIN32)
+  // Windows rend un datagramme trop long pour `into` en erreur, après l'avoir
+  // tronqué : ce qui tenait est là.
+  if (code == WSAEMSGSIZE) {
+    return std::optional<std::size_t>(into.size());
+  }
+#endif
+  if (WouldBlock(code) || PeerRefused(code)) {
+    return std::optional<std::size_t>();
+  }
+  return Fail(ErrorCode::kIoFailure, "lecture UDP : " + DescribeError(code));
 }
 
 }  // namespace ro::net

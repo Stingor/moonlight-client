@@ -341,6 +341,11 @@ ro::net::FrameOutcome Game::ApplyFrameBeyondWorld(const ro::net::Frame& received
       outcome == ro::net::FrameOutcome::kUnhandled) {
     outcome = survivors_read;
   }
+  // ET OÙ JOINDRE LE SERVEUR VOIX.
+  if (const ro::net::FrameOutcome voiced = voice_.ApplyFrame(received);
+      outcome == ro::net::FrameOutcome::kUnhandled) {
+    outcome = voiced;
+  }
   // ET CE QU'AUCUNE FENÊTRE NE MONTRE ENCORE : réputation, packs d'émotions,
   // jeu d'équipement de rechange.
   if (const ro::net::FrameOutcome recorded = ro::net::ApplyLedgerFrame(received, ledger_);

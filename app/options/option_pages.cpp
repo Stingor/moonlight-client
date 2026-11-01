@@ -107,6 +107,8 @@ void OptionPages::Declare(SettingsFile& into) {
   DeclareOn(into, OptionSection::kGameplay, battleground);
   into.Section("La fiche du pet");
   DeclareOn(into, OptionSection::kInterface, pet);
+  into.Section("La voix en jeu");
+  DeclareOn(into, OptionSection::kSound, voice);
   into.Section("Le portrait de statut");
   DeclareOn(into, OptionSection::kStatBars, portrait);
 }
@@ -162,7 +164,8 @@ bool OptionPages::ChangeSetting(const ro::ui::OptionsWindowAction& asked) {
          grey_world.Change(asked) || sprite_sounds.Change(asked) || mvp_tracker.Change(asked) ||
          battleground.Change(asked) || pet.Change(asked) || quest_tracker.Change(asked) ||
          chat_web.Change(asked) || talk_filter.Change(asked) || portrait.Change(asked) ||
-         balloons.Change(asked) || signboards.Change(asked) || deal_refusal.Change(asked);
+         balloons.Change(asked) || signboards.Change(asked) || deal_refusal.Change(asked) ||
+         voice.Change(asked);
 }
 
 void OptionPages::ComposeChatExtras(std::vector<ro::ui::OptionRowView>& rows) {

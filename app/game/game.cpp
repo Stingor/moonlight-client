@@ -42,6 +42,7 @@
 #include "game/survivors_mode.h"
 #include "game/warp_list_stage.h"
 #include "guild/sample_emblem.h"
+#include "input/hotkeys.h"
 #include "items/inventory_view.h"
 #include "options/damage_page_names.h"
 #include "options/entity_page_tabs.h"
@@ -145,6 +146,21 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
           .now = SurvivorsRankingNow{.steady_ms = now_ms,
                                      .utc_s = static_cast<std::int64_t>(std::time(nullptr))}},
       client_root_);
+  // LA VOIX : ouverte ou fermée selon le réglage et le serveur, et la touche
+  // « Parler » relue sur l'état du clavier.
+  {
+    const Binding talk = settings_->bindings().Of(GameAction::kVoiceTalk);
+    voice_.Pump(
+        VoiceFacts{.verified = handshake_.state() == ro::net::MoonclientHandshakeState::kVerified,
+                   .account_id = ticket_.account.account_id,
+                   .character_id = ticket_.character_id,
+                   .login_id1 = ticket_.account.login_id1,
+                   .settings = settings_->options().pages().voice.settings(),
+                   .spatial = settings_->options().spatial_sound(),
+                   .talk_key = talk.bound() ? talk.key : 0U,
+                   .now_ms = now_ms});
+    windows_.voice = voice_.overlay();
+  }
   // LES CLASSEMENTS attendent leurs noms ; les avis d'étoile ont leur son.
   pieces_.rank_notices.Advance(world_, now_ms);
   // Le tableau montre le dernier classement, et demande celui d'un onglet.

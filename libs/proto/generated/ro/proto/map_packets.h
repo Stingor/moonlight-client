@@ -5406,6 +5406,16 @@ struct CzMoonlightFreeFlight {
   std::int16_t y = 0;
 };
 
+// PACKET_ZC_MOONLIGHT_VOICE_SERVICE
+struct ZcMoonlightVoiceService {
+  static constexpr std::uint16_t kOpcode = 0x0f55;
+  // Taille sur le fil, en octets.
+  static constexpr std::size_t kWireSize = 70;
+
+  std::uint16_t port = 0;
+  std::string host;
+};
+
 // PACKET_ZC_MOONLIGHT_CARD_ALBUM
 struct ZcMoonlightCardAlbum {
   static constexpr std::uint16_t kOpcode = 0x0f33;
@@ -8570,6 +8580,7 @@ struct CzMoveItemToPersonal {
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzMoonlightSurvivorsJournal& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightSurvivorsService& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzMoonlightFreeFlight& packet);
+[[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightVoiceService& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightCardAlbum& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzMoonlightCardAlbumCmd& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzMoonlightReqStatusList& packet);
@@ -9189,6 +9200,7 @@ struct CzMoveItemToPersonal {
 [[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonlightSurvivorsJournal& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightSurvivorsService& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonlightFreeFlight& packet);
+[[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightVoiceService& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightCardAlbum& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonlightCardAlbumCmd& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonlightReqStatusList& packet);

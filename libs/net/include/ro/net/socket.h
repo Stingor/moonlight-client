@@ -99,6 +99,45 @@ class TcpSocket {
   NativeSocket handle_ = kInvalidSocket;
 };
 
+// UN SOCKET UDP TOURNÉ VERS UN SEUL PAIR, fermé à la destruction.
+//
+// Non bloquant, comme le socket TCP. Le pair est fixé à l'ouverture : chaque
+// envoi part vers lui, et le système écarte tout datagramme venu d'ailleurs.
+//
+// ⚠ UN DATAGRAMME SE PERD SANS UN MOT, et c'est son contrat : un envoi réussi
+// ne dit pas qu'il est arrivé. Ce qui doit arriver passe par le TCP.
+class UdpSocket {
+ public:
+  UdpSocket() = default;
+  ~UdpSocket();
+
+  UdpSocket(const UdpSocket&) = delete;
+  UdpSocket& operator=(const UdpSocket&) = delete;
+  UdpSocket(UdpSocket&& other) noexcept;
+  UdpSocket& operator=(UdpSocket&& other) noexcept;
+
+  // Résout l'hôte et fixe le pair. Rien ne part sur le fil : l'UDP n'a pas
+  // de poignée de main.
+  [[nodiscard]] static core::Result<UdpSocket> Connect(std::string_view host, std::uint16_t port);
+
+  // Envoie un datagramme ENTIER, ou rien : rend vrai quand le système l'a pris,
+  // faux quand son tampon est plein.
+  [[nodiscard]] core::Result<bool> Send(std::span<const std::uint8_t> datagram);
+
+  // Le datagramme suivant, dont la taille est rendue, ou rien — sans attendre.
+  // Un datagramme plus long que `into` est tronqué par le système.
+  //
+  // ⚠ UN PAIR QUI N'ÉCOUTE PAS N'EST PAS UNE PANNE : le refus que le système
+  // remonte (« port injoignable ») se lit comme « rien pour l'instant ».
+  [[nodiscard]] core::Result<std::optional<std::size_t>> Receive(std::span<std::uint8_t> into);
+
+  void Close() noexcept;
+  [[nodiscard]] bool is_open() const noexcept { return handle_ != kInvalidSocket; }
+
+ private:
+  NativeSocket handle_ = kInvalidSocket;
+};
+
 // UNE ÉCOUTE TCP SUR LA BOUCLE LOCALE, fermée à la destruction.
 //
 // 🔴 127.0.0.1 ET RIEN D'AUTRE : elle sert la console de mise au point, qu'un

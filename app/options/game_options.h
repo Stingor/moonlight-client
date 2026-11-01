@@ -216,6 +216,7 @@ class GameOptions {
   [[nodiscard]] const ShopOptions& shops() const noexcept { return pages_.shops; }
   bool ToggleShopSetting(ShopRow row, const OptionTargets& to);
   [[nodiscard]] OptionPages& pages() noexcept { return pages_; }
+  [[nodiscard]] bool spatial_sound() const noexcept { return sound_options_.spatial_sound; }
 
   // Ce qu'un sort qui attend sa cible montre : le rang au curseur, l'étiquette.
   [[nodiscard]] const ro::render::ArmedSkillLook& armed_skill() const noexcept {

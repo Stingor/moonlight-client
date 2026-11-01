@@ -12725,6 +12725,37 @@ std::vector<std::uint8_t> Encode(const CzMoonlightFreeFlight& packet) {
   return out;
 }
 
+bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightVoiceService& packet) {
+  if (frame.size() < ZcMoonlightVoiceService::kWireSize) {
+    return false;
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != ZcMoonlightVoiceService::kOpcode) {
+    return false;
+  }
+  // La longueur est déjà connue : c'est celle de la trame.
+  reader.Skip(2);
+  packet.port = static_cast<std::uint16_t>(reader.U16());
+  packet.host = reader.FixedString(64);
+  return reader.ok();
+}
+
+std::vector<std::uint8_t> Encode(const ZcMoonlightVoiceService& packet) {
+  std::vector<std::uint8_t> out;
+  out.reserve(ZcMoonlightVoiceService::kWireSize);
+  ByteWriter writer(out);
+  writer.U16(ZcMoonlightVoiceService::kOpcode);
+  // Réservée : la longueur ne sera connue qu'une fois la queue écrite.
+  writer.U16(0);
+  writer.U16(static_cast<std::uint16_t>(packet.port));
+  writer.FixedString(packet.host, 64);
+  if (writer.size() > kMaxFrameSize ||
+      !writer.PatchU16(kLengthOffset, static_cast<std::uint16_t>(writer.size()))) {
+    return {};
+  }
+  return out;
+}
+
 bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightCardAlbum& packet) {
   if (frame.size() < ZcMoonlightCardAlbum::kWireSize) {
     return false;

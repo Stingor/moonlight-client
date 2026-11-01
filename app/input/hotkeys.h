@@ -174,6 +174,10 @@ enum class GameAction : std::uint8_t {
   // tout le monde pour cela reviendrait à la retirer à ceux qui ne s'en servent
   // jamais.
   kAfkScreen,
+  // PARLER, LA TOUCHE TENUE : la voix part tant qu'elle l'est. ⚠ SANS TOUCHE
+  // D'USINE : les lettres libres servent à écrire, et le joueur la choisit ;
+  // le témoin de la voix le lui rappelle tant qu'elle manque.
+  kVoiceTalk,
   // LE CIBLAGE AU CLAVIER, sans touche d'usine : celle qui vient à l'esprit,
   // Tab, sert au chat, et Échap a son propre réglage dans le mode Ciblage.
   kTargetNearest,
