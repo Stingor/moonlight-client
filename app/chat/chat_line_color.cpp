@@ -22,7 +22,9 @@ ImU32 ColorOfChatKind(ChatKind kind) {
     case ChatKind::kPublic:
       return 0;  // la couleur ordinaire
     case ChatKind::kSelf:
-      return IM_COL32(255, 255, 255, 255);
+      // LE VERT VIF DU CLIENT D'ORIGINE : sa propre parole se repère d'un coup
+      // d'œil dans le fil. Plus franc que le vert pâle de la guilde.
+      return IM_COL32(0, 255, 0, 255);
     case ChatKind::kServer:
       return IM_COL32(180, 220, 255, 255);
     case ChatKind::kAnnouncement:
