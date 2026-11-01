@@ -239,6 +239,7 @@ add_library(ro_render STATIC
     src/effect_track_ribbon_wave.cpp
     src/effect_white_burst_seed.cpp
     src/effect_particle_quad.cpp
+    src/effect_panel_depth.cpp
     src/effect_quad_depth.cpp
     src/effect_quad_rotation.cpp
     src/effect_node_sprite.cpp

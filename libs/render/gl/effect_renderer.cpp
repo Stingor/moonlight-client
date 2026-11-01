@@ -11,6 +11,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "ro/render/effect_laid.h"
+#include "ro/render/effect_panel_depth.h"
 #include "ro/render/effect_quad_depth.h"
 #include "ro/render/effect_render_word.h"
 #include "ro/render/effect_scene.h"
@@ -194,42 +195,18 @@ void EffectRenderer::PaintQuads(const glm::mat4& view_projection, DepthTest dept
   glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(vertices_.size() * sizeof(EffectVertex)),
                vertices_.data(), GL_STREAM_DRAW);
 
-  // ⚠ SANS ÉPREUVE DE PROFONDEUR, et c'est une décision, pas un oubli.
+  // ⚠ UN PANNEAU D'EFFET ÉPROUVE LA PROFONDEUR, et le client non : il le peint
+  // par-dessus le décor, qui ne le cache donc jamais. C'est un défaut du jeu
+  // que l'on ne reproduit pas — une aura se voyait à travers l'arbre ou la
+  // statue qui cachait son porteur.
   //
-  // Un effet est un panneau face à l'écran, à la profondeur de son ancre. La
-  // caméra du jeu PLONGE : tout ce que l'écran montre sous cette ancre est du
-  // terrain PLUS PROCHE que le panneau, et le terrain gagne. La moitié basse
-  // d'un effet disparaît donc dans le sol, et l'on ne voit l'effet entier qu'à
-  // la verticale, quand le panneau devient parallèle au sol. C'est
-  // géométriquement inévitable tant qu'on éprouve la profondeur, quelle que
-  // soit la profondeur qu'on donne aux coins.
+  // Le panneau ne se coupe pas pour autant dans le sol, alors que sa moitié
+  // basse recouvre à l'écran du terrain plus proche que son ancre : il prend
+  // la profondeur de ce terrain. Voir `EffectPanelDepthCorners`.
   //
-  // Un ACTEUR y échappe parce que son origine est à ses PIEDS : rien de lui ne
-  // pend sous le sol, et ce qui pend s'y couche (BillboardDepthCorners).
-  // L'ancre d'un effet est en l'air, au centre d'un écran de 640 sur 480, et la
-  // moitié de son contenu est authored sous elle.
-  //
-  // Le client ne rencontre pas le problème parce qu'il n'empile pas des
-  // triangles du monde : il pose des quads en coordonnées d'écran dans une file
-  // triée, une profondeur par PRIMITIVE, et les mélangés passent en dernier.
-  // Un effet y est donc entier
-  // ou absent, jamais coupé. On obtient le même résultat en le peignant
-  // par-dessus : les effets sont déjà dessinés après le terrain, le décor et
-  // les acteurs.
-  //
-  // Ce qu'on y perd : un effet derrière un mur se voit à travers. Le jeu le
-  // laisse aussi.
-  //
-  // ⚠ UN QUAD DU MONDE ÉPROUVE LA PROFONDEUR, un panneau non. Le raisonnement
-  // ci-dessus vaut pour les PANNEAUX : leur ancre est en l'air et leur moitié
-  // basse se couperait dans le sol. La géométrie d'un quad du monde, elle, est
-  // réelle — et sans l'épreuve, les vingt-cinq pointes de terre recouvraient
-  // entièrement le personnage, là où le client le montre ENTRE elles.
-  //
-  // ⚠ CE QUE CELA ROUVRE, et c'est dit : un anneau et le fichier qui
-  // l'accompagne appartiennent au même effet, et ne sont plus éprouvés
-  // pareil. S'ils se croisent, ils se tranchent. Le défaut mesuré l'emporte
-  // sur le défaut redouté.
+  // Un QUAD DU MONDE éprouve la profondeur de ses vrais coins : sans l'épreuve,
+  // les vingt-cinq pointes de terre recouvraient entièrement le personnage, là
+  // où le client le montre ENTRE elles.
   //
   // L'écriture reste COUPÉE : ces quads sont mélangés, et deux d'entre eux qui
   // se croisent doivent se voir l'un l'autre. C'est le tri par profondeur qui
@@ -460,13 +437,10 @@ void EffectRenderer::Draw(const Camera& camera, std::span<const DrawnEffect> eff
       // l'angle de vue, et le terrain vient en manger des morceaux — des
       // coupures droites qui balaient l'effet quand la caméra tourne.
       //
-      // Les quatre coins d'un panneau face à l'écran sont de toute façon à la
-      // même distance ; une marge les fait passer devant le sol qu'ils touchent,
-      // comme pour un sprite.
-      std::array<glm::vec3, 4> depth_corners = corners;
-      for (glm::vec3& corner : depth_corners) {
-        corner -= basis.forward * kSpriteGroundClearance;
-      }
+      // Il prend la profondeur du terrain qu'il recouvre : voir
+      // `EffectPanelDepthCorners`.
+      const std::array<glm::vec3, 4> depth_corners =
+          EffectPanelDepthCorners(corners, drawn->ground_position, eye, basis.forward);
       const std::array<glm::vec2, 4> texture_uv = {
           glm::vec2{quad.uv_min.x, quad.uv_min.y}, glm::vec2{quad.uv_max.x, quad.uv_min.y},
           glm::vec2{quad.uv_max.x, quad.uv_max.y}, glm::vec2{quad.uv_min.x, quad.uv_max.y}};
@@ -484,7 +458,7 @@ void EffectRenderer::Draw(const Camera& camera, std::span<const DrawnEffect> eff
       }
     }
   }
-  PaintQuads(camera.ProjectionMatrix(aspect_ratio) * camera.ViewMatrix(), DepthTest::kOff,
+  PaintQuads(camera.ProjectionMatrix(aspect_ratio) * camera.ViewMatrix(), DepthTest::kOn,
              SceneFog());
 }
 
