@@ -60,8 +60,8 @@ struct MonsterLink {
 
 // LA PAGE DU MONSTRE DANS LE BESTIAIRE DU SITE. ⚠ L'ADRESSE EST CELLE DE CE
 // SERVEUR-LÀ, comme celle de la base d'objets (`ro/vfs/item_table.h`).
-inline constexpr std::string_view kBestiaryPageUrl =
-    "https://moonlight-destiny.fr/index.php?page=bestiary&mobid=";
+// Celle du nouveau site (/monstres/<id>), comme la fiche d'objet.
+inline constexpr std::string_view kBestiaryPageUrl = "https://site.moonlight-destiny.fr/monstres/";
 
 [[nodiscard]] std::string MonsterBestiaryUrl(std::uint32_t monster_id);
 

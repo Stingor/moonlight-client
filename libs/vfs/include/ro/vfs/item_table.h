@@ -120,11 +120,13 @@ inline constexpr std::string_view kItemInfoPath = "data\\yaml_files\\item_info.y
 // ⚠ L'ADRESSE EST CELLE DE CE SERVEUR-LÀ. Elle vit dans son dossier de jeu, et
 // c'est lui qui la choisit ; la recopier ici est un emprunt assumé, pas une
 // dépendance que le client irait chercher ailleurs.
+//
+// ⚠ C'EST LA FICHE DU NOUVEAU SITE (/objets/<id>) : l'ancienne page du forum
+// disparaît avec sa migration, et le site y redirigera les anciens liens.
 inline constexpr std::string_view kDatabaseLinkPrefix = "<URL>ItemID : ";
 // Le balisage qui entoure l'adresse dans une ligne de description.
 inline constexpr std::string_view kDatabaseLinkInfo = "<INFO>";
-inline constexpr std::string_view kDatabasePageUrl =
-    "https://moonlight-destiny.fr/index.php?page=itemdb&itemid=";
+inline constexpr std::string_view kDatabasePageUrl = "https://site.moonlight-destiny.fr/objets/";
 inline constexpr std::string_view kDatabaseLinkSuffix = "</INFO></URL>";
 // ⚠ UNE ESPACE, PAS UNE LIGNE VIDE : c'est ce que le script écrit, et une ligne
 // vide ne se replierait pas de la même façon.
