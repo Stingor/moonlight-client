@@ -31,6 +31,7 @@ add_library(ro_formats STATIC
     src/gr2_section_codec.cpp
     src/jpeg.cpp
     src/png.cpp
+    src/png_write.cpp
     src/lua_source.cpp
     src/lua_table.cpp
     src/lua_calls.cpp

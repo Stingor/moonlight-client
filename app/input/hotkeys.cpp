@@ -108,6 +108,7 @@ constexpr std::array<ActionSavedNames, kNamedActionCount> kActionSavedNames = {{
     {GameAction::kCaptureRecord, "capture_video"},
     {GameAction::kCapturePicture, "capture_picture"},
     {GameAction::kCaptureZone, "capture_zone"},
+    {GameAction::kScreenshot, "screenshot"},
     {GameAction::kAfkScreen, "afk_screen"},
     {GameAction::kTargetNearest, "target_nearest"},
     {GameAction::kTargetPrevious, "target_previous"},
@@ -331,6 +332,7 @@ HotkeyTab TabOfAction(ActionRef action) {
     case GameAction::kCaptureRecord:
     case GameAction::kCapturePicture:
     case GameAction::kCaptureZone:
+    case GameAction::kScreenshot:
       return HotkeyTab::kTools;
   }
   return HotkeyTab::kInterface;
@@ -501,6 +503,8 @@ std::string NameOfAction(ActionRef action) {
       return ro::core::Tr("Capturer une image de la zone");
     case GameAction::kCaptureZone:
       return ro::core::Tr("Retracer la zone de capture");
+    case GameAction::kScreenshot:
+      return ro::core::Tr("Capture d'écran");
     case GameAction::kAfkScreen:
       return ro::core::Tr("Écran de veille");
     case GameAction::kTargetNearest:
@@ -606,6 +610,7 @@ Hotkeys::Hotkeys() {
   set(GameAction::kStepRight, SDLK_RIGHT);
   set(GameAction::kFlyUp, SDLK_SPACE);
   set(GameAction::kFlyDown, SDLK_LCTRL);
+  set(GameAction::kScreenshot, SDLK_PRINTSCREEN);
   bindings_[ActionRef(GameAction::kFirstPersonView).rank()] = Binding{.key = SDLK_F, .shift = true};
   if constexpr (ro::core::kDevTools) {
     set(GameAction::kEffectBench, SDLK_N);

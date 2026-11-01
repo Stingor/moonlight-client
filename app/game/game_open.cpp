@@ -47,7 +47,8 @@ GameFoundation::GameFoundation(ClientShell& shell, ro::net::Connection link, ro:
       world_(std::move(world)),
       ticket_(ticket),
       targeting_(shell.settings().options().targeting().settings()),
-      quick_cast_(shell.settings().options().quick_cast().look()) {}
+      quick_cast_(shell.settings().options().quick_cast().look()),
+      screenshot_(shell.client_root()) {}
 
 Game::Game(ClientShell& shell, ro::net::Connection link, ro::sim::World world,
            const ro::net::ZoneTicket& ticket)

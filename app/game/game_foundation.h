@@ -21,6 +21,7 @@
 #include "ro/ui/entity_menu.h"
 #include "ro/vfs/vfs.h"
 
+#include "capture/screenshot.h"
 #include "character/staff_view.h"
 #include "game/client_shell.h"
 #include "game/game_pieces.h"
@@ -138,6 +139,9 @@ class GameFoundation {
   // composée une fois, et ce qu'on sait avoir basculé chez le serveur. ⚠ À LA
   // PARTIE ET NON À LA FENÊTRE : le serveur oublie ses bascules à la déconnexion.
   StaffSession staff_;
+  // LA CAPTURE D'ÉCRAN ENTIÈRE, rangée sous `ScreenShot/`. ⚠ SA PRISE SUIT LE
+  // DESSIN DES FENÊTRES, comme celle de l'enregistreur de zone.
+  ScreenShooter screenshot_;
   // ── LES SONS D'INTERFACE ───────────────────────────────────────────────────
   // CEUX DONT L'ÉCHEC EST DÉJÀ AU JOURNAL : un son qui manque ne s'y dit qu'une
   // fois par partie. Voir `PlayInterfaceSounds`.

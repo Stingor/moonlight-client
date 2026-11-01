@@ -8632,6 +8632,18 @@ tr: Bala de cañón
 fr: Capture d'écran
 tr: Captura de pantalla
 
+fr: Capture d'écran enregistrée : {}
+tr: Captura de pantalla guardada: {}
+
+fr: Capture d'écran impossible.
+tr: No se pudo hacer la captura de pantalla.
+
+fr: Capture d'écran impossible : le fichier n'a pas pu s'écrire.
+tr: No se pudo hacer la captura de pantalla: el archivo no pudo escribirse.
+
+fr: Capture d'écran refusée : la précédente s'enregistre encore.
+tr: Captura de pantalla rechazada: la anterior aún se está guardando.
+
 fr: Capturer une image
 tr: Capturar una imagen
 

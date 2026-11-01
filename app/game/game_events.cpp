@@ -81,6 +81,7 @@ void Game::PumpEvents(std::uint32_t now_ms) {
                 .database_toggle = &windows_.monster_sheet.database.toggle_asked,
                 .bug_report = &windows_.bug_report,
                 .recorder = &recorder_,
+                .screenshot = &screenshot_,
                 .hotkeys = &windows_.hotkeys,
                 .bindings = &settings_->bindings(),
                 .presets = &*presets_,

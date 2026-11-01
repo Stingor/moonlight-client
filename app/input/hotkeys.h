@@ -166,6 +166,9 @@ enum class GameAction : std::uint8_t {
   kCaptureRecord,
   kCapturePicture,
   kCaptureZone,
+  // LA CAPTURE DE L'ÉCRAN ENTIER, rangée sous `ScreenShot/`. ⚠ IMPR. ÉCRAN PAR
+  // DÉFAUT : la touche du jeu, celle que le joueur cherche d'instinct.
+  kScreenshot,
   // L'ÉCRAN DE VEILLE, À LA DEMANDE. ⚠ SANS TOUCHE D'USINE : le geste est celui
   // de quelqu'un qui se lève de sa chaise, et prendre une touche du clavier de
   // tout le monde pour cela reviendrait à la retirer à ceux qui ne s'en servent

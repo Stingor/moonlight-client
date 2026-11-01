@@ -169,6 +169,7 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
                                      .point_width = points.width,
                                      .point_height = points.height},
                         now_ms);
+    screenshot_.GrabIfDue(drawable.width, drawable.height);
     return {};
   }
   // ⚠ APRÈS LE RÉSEAU, DONC APRÈS `AimCamera`, ET AVANT LE DESSIN : la veille
@@ -233,6 +234,7 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
                                    .point_width = points.width,
                                    .point_height = points.height},
                       now_ms);
+  screenshot_.GrabIfDue(drawable.width, drawable.height);
   return {};
 }
 
@@ -361,6 +363,11 @@ void Game::DrawInterface(std::uint32_t now_ms) {
   // presse-papier, et le témoin doit dire « copié » à l'image où ça arrive.
   recorder_.Follow(settings_->options().capture());
   recorder_.Tick(now_ms);
+  // ⚠ LE COMPTE RENDU DE LA CAPTURE D'ÉCRAN VA AU CHAT, et non à l'écran : un
+  // mot flottant figurerait dans la capture suivante.
+  if (std::optional<std::string> said = screenshot_.TakeReport()) {
+    world_.RecordChat(ro::sim::ChatKind::kServer, 0, std::move(*said), now_ms);
+  }
   // LES FAMILLES DE FENÊTRES COMPOSENT LEURS VUES — voir `game.h`.
   StageChat(now_ms);
   StageDescriptions(now_ms);

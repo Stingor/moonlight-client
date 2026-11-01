@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <span>
+#include <vector>
 
 #include "ro/core/error.h"
 #include "ro/formats/image.h"
@@ -21,5 +22,9 @@ namespace ro::formats {
 //
 // ⚠ IL S'APPUIE SUR `stb_image`, déjà compilé pour le JPEG et les emblèmes.
 [[nodiscard]] core::Result<Image> DecodePng(std::span<const std::uint8_t> data);
+
+// ENCODE UNE IMAGE RGBA8 EN PNG, rangée zéro en haut, alpha compris : sans perte,
+// pour les captures d'écran que le joueur garde.
+[[nodiscard]] core::Result<std::vector<std::uint8_t>> EncodePng(const Image& image);
 
 }  // namespace ro::formats

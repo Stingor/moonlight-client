@@ -28,6 +28,7 @@
 #include "ro/ui/status_window.h"
 #include "ro/ui/world_map_window.h"
 
+#include "capture/screenshot.h"
 #include "capture/zone_recorder.h"
 #include "character/preset_view.h"
 #include "character/shortcut_view.h"
@@ -144,6 +145,7 @@ struct KeyPress {
   // ses gestes sont des ordres à une machine, pas un interrupteur d'affichage,
   // et c'est pourquoi il descend ici en entier plutôt que par un drapeau.
   ZoneRecorder* recorder = nullptr;
+  ScreenShooter* screenshot = nullptr;  // la capture d'écran entière, de même
   // ⚠ LA TABLE DES RACCOURCIS EST LA SEULE SOURCE : c'est elle qui dit ce qu'une
   // touche déclenche, et c'est elle que la configuration écrit.
   Hotkeys* bindings = nullptr;

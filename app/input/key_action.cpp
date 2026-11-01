@@ -602,6 +602,11 @@ std::optional<std::string> TriggerAction(const KeyPress& to, ActionRef action_re
         to.recorder->AskZone();
       }
       break;
+    case GameAction::kScreenshot:
+      if (Wired(to.screenshot, "capture d'écran")) {
+        to.screenshot->Ask();
+      }
+      break;
     case GameAction::kAfkScreen:
       // ⚠ ELLE N'A PAS À BASCULER : la moindre entrée met fin à la veille, et
       // la touche qui la lancerait en même temps qu'elle la termine ne ferait

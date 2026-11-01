@@ -109,6 +109,10 @@ bool Game::SurvivorsTakes(const SDL_Event& event, std::uint32_t now_ms) {
       recorder_.AskPicture();
       return true;
     }
+    if (action == ActionRef(GameAction::kScreenshot)) {
+      screenshot_.Ask();
+      return true;
+    }
   }
   // La souris au-dessus d'une fenêtre, telle que l'interface l'a vue avant la
   // route : la molette y fait défiler la fenêtre, pas reculer la caméra.

@@ -21,6 +21,7 @@
 #include "ro/ui/skill_window.h"
 #include "ro/ui/status_window.h"
 
+#include "capture/screenshot.h"
 #include "capture/zone_recorder.h"
 #include "character/grimoire_keys.h"
 #include "character/preset_view.h"
@@ -156,6 +157,7 @@ struct EventRouting {
   // N'EST PAS UNE FENÊTRE — pas de drapeau d'ouverture à basculer, un ordre à
   // une machine.
   ZoneRecorder* recorder = nullptr;
+  ScreenShooter* screenshot = nullptr;  // la capture d'écran entière, de même
   ro::ui::HotkeyWindowState* hotkeys = nullptr;
   Hotkeys* bindings = nullptr;
   // Les presets d'équipement : leurs touches, et celle qu'attend leur onglet.

@@ -8632,6 +8632,18 @@ tr: Cannonball
 fr: Capture d'écran
 tr: Screen capture
 
+fr: Capture d'écran enregistrée : {}
+tr: Screenshot saved: {}
+
+fr: Capture d'écran impossible.
+tr: Screenshot failed.
+
+fr: Capture d'écran impossible : le fichier n'a pas pu s'écrire.
+tr: Screenshot failed: the file could not be written.
+
+fr: Capture d'écran refusée : la précédente s'enregistre encore.
+tr: Screenshot refused: the previous one is still being saved.
+
 fr: Capturer une image
 tr: Capture a picture
 
