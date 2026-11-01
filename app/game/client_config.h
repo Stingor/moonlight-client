@@ -27,7 +27,7 @@ namespace moonclient {
 //     - name: Moonlight-Destiny
 //       address: moonlight-destiny.fr
 //       port: 16900
-//       web_login: https://moonlight-destiny.fr
+//       web_login: https://site.moonlight-destiny.fr
 //   web: moonlight-destiny.fr:8888
 //   server_time_zone: Europe/Paris
 //   test_server: 127.0.0.1:6900

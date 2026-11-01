@@ -12,17 +12,20 @@ namespace moonclient::web {
 // LE CHEMIN DE L'API SUR LE SITE, et l'origine par défaut.
 //
 // ⚠ L'ORIGINE EST CELLE DE LA PRODUCTION, et elle se règle. ⚠ EN HTTPS, ET
-// L'API L'IMPOSE elle-même — identifiant du forum, mot de passe et OTP de jeu y
+// L'API L'IMPOSE elle-même — identifiant du site, mot de passe et OTP de jeu y
 // circulent, et les trois valent un compte.
-inline constexpr std::string_view kWebLoginOrigin = "https://moonlight-destiny.fr";
+//
+// ⚠ C'EST LE NOUVEAU SITE, PAS LE FORUM : l'API y a été reprise avec le même
+// contrat, et l'ancienne disparaît avec la migration du forum.
+inline constexpr std::string_view kWebLoginOrigin = "https://site.moonlight-destiny.fr";
 inline constexpr std::string_view kWebLoginPath = "/api/game_login.php";
 
 // LA PAGE QUI REGROUPE PLUSIEURS COMPTES DU SITE EN UN SEUL.
 //
-// ⚠ ELLE N'EST PAS DE L'API : c'est une page du panneau de contrôle du forum,
-// que l'on ouvre dans le NAVIGATEUR. Le client n'en lit rien et n'y envoie
-// rien — il n'a ni la session du forum ni de raison de l'avoir.
-inline constexpr std::string_view kMergePagePath = "/ucp.php?i=moonlight&mode=merge";
+// ⚠ ELLE N'EST PAS DE L'API : c'est une page du site, que l'on ouvre dans le
+// NAVIGATEUR. Le client n'en lit rien et n'y envoie rien — il n'a ni la
+// session du site ni de raison de l'avoir.
+inline constexpr std::string_view kMergePagePath = "/compte/rapatriement";
 
 // COMBIEN DE TEMPS LE JETON DU SITE VIT, en millisecondes.
 //
