@@ -30,6 +30,7 @@
 #include "ro/net/item_news.h"
 #include "ro/net/manner_points.h"
 #include "ro/net/map_guidance.h"
+#include "ro/net/marriage.h"
 #include "ro/net/member_statuses.h"
 #include "ro/net/monster_sheet.h"
 #include "ro/net/movement.h"
@@ -82,7 +83,7 @@ ro::net::FrameOutcome Game::ApplyFrameBeyondWorld(const ro::net::Frame& received
   // LES AMIS ; CE QU'UN SCRIPT MONTRE SUR LA CARTE (repères, navigation à
   // prendre), le boss d'un Convex Mirror, les nouvelles d'objets (ramassage
   // d'un membre, pièce abîmée), l'issue d'une alliance ou d'une hostilité,
-  // l'adoption, les fiches du staff, l'accusé d'un signalement, les points de
+  // l'adoption, le mariage, les fiches du staff, l'accusé d'un signalement, les points de
   // manière, la ligne d'un état, l'équipement montré par un autre joueur,
   // avec son refus, le jeu d'équipement de rechange, la pièce posée ou
   // retirée — son nom, puis ce qu'elle apporte —, et les éditions de carte que
@@ -95,6 +96,7 @@ ro::net::FrameOutcome Game::ApplyFrameBeyondWorld(const ro::net::Frame& received
         ro::net::ApplyItemNewsFrame(received, pieces_.item_news, now_ms),
         ro::net::ApplyGuildRelationAnswerFrame(received, world_, now_ms),
         ro::net::ApplyAdoptionFrame(received, pieces_.adoption.desk()),
+        ro::net::ApplyMarriageFrame(received, world_, now_ms),
         pieces_.entity_inspector.ApplyFrame(received), pieces_.chat_block_log.ApplyFrame(received),
         PlayerReportDesk::ApplyFrame(received, world_, now_ms),
         ro::net::ApplyMannerPointFrame(received, world_, now_ms),

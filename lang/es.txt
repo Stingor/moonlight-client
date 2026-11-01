@@ -628,6 +628,9 @@ tr: %s está fuera de vista: seguimiento detenido.
 fr: %s est porté : ôtez-le d'abord.
 tr: %s está equipado: quítalo primero.
 
+fr: %s et %s ont divorcé.
+tr: %s y %s se han divorciado.
+
 fr: %s figure deux fois dans le panier.
 tr: %s está dos veces en el carrito.
 

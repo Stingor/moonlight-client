@@ -628,6 +628,9 @@ tr: %s is out of sight: no longer following.
 fr: %s est porté : ôtez-le d'abord.
 tr: %s is equipped: unequip it first.
 
+fr: %s et %s ont divorcé.
+tr: %s and %s have divorced.
+
 fr: %s figure deux fois dans le panier.
 tr: %s is in the cart twice.
 

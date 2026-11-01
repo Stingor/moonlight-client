@@ -111,6 +111,7 @@ add_library(ro_net STATIC
     src/memorial_dungeon.cpp
     src/friends.cpp
     src/adoption.cpp
+    src/marriage.cpp
     src/social_text.cpp
     src/session.cpp
     src/npc_dialog.cpp
