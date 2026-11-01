@@ -16,10 +16,13 @@
 #include "ro/net/free_flight.h"
 #include "ro/net/movement.h"
 #include "ro/render/terrain_mesh.h"
+#include "ro/sim/actor.h"
 #include "ro/sim/jump.h"
 #include "ro/sim/movement.h"
+#include "ro/ui/character_staff.h"
 #include "ro/ui/chat_bar.h"
 
+#include "character/staff_view.h"
 #include "game/game.h"
 #include "game/game_settings.h"
 #include "input/first_person.h"
@@ -101,6 +104,13 @@ bool Game::FirstPersonTakes(const SDL_Event& event) {
       free_flight_.Leave(camera_);
     } else {
       free_flight_.Enter(camera_);
+      // 🔴 L'ADMINISTRATEUR VOLE INVISIBLE : son corps suit l'œil à travers la
+      // carte, et les joueurs le verraient glisser d'un bout à l'autre. `@hide`
+      // est une bascule : elle ne part que vers qui ne l'est pas déjà.
+      const ro::sim::Actor* self = world_.player();
+      if (self != nullptr && (self->option & ro::sim::kOptionInvisible) == 0) {
+        SendStaffOrder({.order = ro::ui::StaffOrder::kToggleHide}, link_, world_);
+      }
     }
     return true;
   }
@@ -128,7 +138,9 @@ bool Game::FirstPersonTakes(const SDL_Event& event) {
       const std::optional<std::size_t> rank =
           free_flight_.active() ? MoveKeyReleasedBy(settings_->bindings(), event.key.key)
                                 : MoveKeyOf(settings_->bindings(), event.key);
-      if (!rank.has_value() || !goes_to_game()) {
+      // ⚠ HORS DU VOL, SES TOUCHES PASSENT : Espace, qui y monte, saute à pied.
+      if (!rank.has_value() || (!free_flight_.active() && *rank >= kStrideKeyCount) ||
+          !goes_to_game()) {
         return false;
       }
       // 🔴 AVALÉE : la touche de marche ne déclenche rien d'autre pendant la vue.

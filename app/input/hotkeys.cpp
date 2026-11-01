@@ -141,6 +141,46 @@ constexpr std::array<ActionSavedNames, kNamedActionCount> kActionSavedNames = {{
 }
 static_assert(ActionSavedNamesInOrder(), "la table des noms gravés suit l'énumération");
 
+// MONTER ET DESCENDRE NE SE LISENT QU'EN VOL, où la vue avale leurs touches
+// avant toute autre route (`game_first_person.cpp`).
+[[nodiscard]] bool FlightOnly(ActionRef action) {
+  return action == ActionRef(GameAction::kFlyUp) || action == ActionRef(GameAction::kFlyDown);
+}
+
+// CE QUE LA VUE LIT ENCORE EN VOL : la bascule, la marche et les deux hauteurs.
+[[nodiscard]] bool ReadInFlight(ActionRef action) {
+  const std::optional<GameAction> named = action.named();
+  if (!named.has_value()) {
+    return false;
+  }
+  switch (*named) {
+    case GameAction::kFreeFlight:
+    case GameAction::kStepForward:
+    case GameAction::kStepBack:
+    case GameAction::kStepLeft:
+    case GameAction::kStepRight:
+    case GameAction::kFlyUp:
+    case GameAction::kFlyDown:
+      return true;
+    default:
+      return false;
+  }
+}
+
+// 🔴 UNE TOUCHE DU VOL SE PARTAGE AVEC UNE ACTION DU SOL : Espace monte en vol
+// et saute à pied. Hors du vol, la vue la laisse passer ; en vol, elle la prend
+// avant que le saut ne la voie. Deux actions lues en vol se disputent la touche
+// comme les autres.
+[[nodiscard]] bool ContendForKey(ActionRef first, ActionRef second) {
+  if (FlightOnly(first)) {
+    return ReadInFlight(second);
+  }
+  if (FlightOnly(second)) {
+    return ReadInFlight(first);
+  }
+  return true;
+}
+
 }  // namespace
 
 bool ActionInThisBuild(ActionRef action) {
@@ -618,7 +658,9 @@ std::optional<ActionRef> Hotkeys::ActionFor(std::uint32_t key, bool ctrl, bool s
   }
   const Binding wanted{.key = key, .ctrl = ctrl, .shift = shift, .alt = alt};
   for (const ActionRef action : AllBindableActions()) {
-    if (bindings_[action.rank()] == wanted && ActionInThisBuild(action)) {
+    // ⚠ SANS LES TOUCHES DU VOL : la vue les lit elle-même, et la touche
+    // qu'elles partagent revient à l'action du sol.
+    if (bindings_[action.rank()] == wanted && ActionInThisBuild(action) && !FlightOnly(action)) {
       return action;
     }
   }
@@ -659,7 +701,7 @@ std::optional<ActionRef> Hotkeys::Bind(ActionRef action, Binding binding) {
     // ⚠ SE REPOSER SA PROPRE TOUCHE NE DÉPOSSÈDE PERSONNE : sans ce test, la
     // fenêtre annoncerait qu'on vient de se voler à soi-même.
     for (const ActionRef other : AllBindableActions()) {
-      if (other != action && bindings_[other.rank()] == binding) {
+      if (other != action && bindings_[other.rank()] == binding && ContendForKey(other, action)) {
         bindings_[other.rank()] = Binding{};
         // Une action absente de cette construction perd sa touche sans qu'on
         // l'annonce : le joueur ne la voit nulle part.

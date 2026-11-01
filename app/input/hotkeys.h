@@ -152,7 +152,8 @@ enum class GameAction : std::uint8_t {
   kStepLeft,
   kStepRight,
   // MONTER ET DESCENDRE PENDANT LE VOL LIBRE, des maintiens comme la marche.
-  // ⚠ ESPACE ET CTRL GAUCHE : le sol arrête la descente.
+  // ⚠ ESPACE ET CTRL GAUCHE : le sol arrête la descente. Leurs touches se
+  // partagent avec une action du sol, le saut sur Espace : voir `Bind`.
   kFlyUp,
   kFlyDown,
   kEffectBench,
@@ -496,6 +497,9 @@ class Hotkeys {
   // 🔴 ET ON REND LA VICTIME, PARCE QUE LA TABLE COMPTE PLUS DE CENT LIGNES :
   // l'action dépossédée est ailleurs dans la liste, et le joueur ne verrait
   // jamais ce qu'il vient de perdre. Rien de repris = rien rendu.
+  //
+  // ⚠ MONTER ET DESCENDRE NE PRENNENT RIEN AUX ACTIONS DU SOL, ni elles à eux :
+  // la vue ne les lit qu'en vol, avant toute autre route. `ActionFor` les tait.
   std::optional<ActionRef> Bind(ActionRef action, Binding binding);
 
   // Rétablit les raccourcis d'origine, tous à la fois.
