@@ -82,11 +82,10 @@ bool ItemBelongsToTab(const InventoryItem& item, const ItemCellsAsk& ask) {
   // 🔴 L'APPARAT N'EST PAS UN TYPE, C'EST UN EMPLACEMENT. Une coiffe d'apparat
   // arrive sur le fil sous le type « armure » ; seul son masque la distingue.
   //
-  // ⚠ ET IL N'EST PAS DIT POUR CE QU'ON VIENT DE DÉPOSER : le paquet de dépôt ne
-  // porte pas l'emplacement, à la différence de la liste d'ouverture. Un costume
-  // déposé pendant la session se montre donc sous « Armures » jusqu'à la
-  // réouverture du coffre : le fil ne donne rien de mieux.
-  const bool costume = ro::sim::IsCostumeLocation(item.wearable_at);
+  // ⚠ ET LE PAQUET DE DÉPÔT NE LE PORTE PAS, à la différence de la liste
+  // d'ouverture : pour un objet qu'on vient de déposer, ce sont les faits du
+  // coffre (`ZC 0x0F0F`, poussé juste derrière) qui le disent.
+  const bool costume = ro::sim::IsCostumeLocation(ask.WearableAtOf(item));
   // ⚠ L'APPARAT QUITTE TOUS LES AUTRES ONGLETS, comme un favori : son onglet est
   // un DÉPLACEMENT, pas un filtre de plus. « Tout » le montre quand même, et les
   // favoris aussi — ils sont tranchés au-dessus.

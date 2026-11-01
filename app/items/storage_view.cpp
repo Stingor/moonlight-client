@@ -114,6 +114,7 @@ void StorageView::ComposeCells(const ro::sim::World& world, ro::ui::ItemTab tab,
                               .favorites_tab = true,
                               .fine_tabs = true,
                               .client_favorites = favorites_,
+                              .storage_facts = &world.storage_facts(),
                               .creators = creators_,
                               .creators_pending = &creators_pending_},
                  items_, words_, icons_, names_, cells_);

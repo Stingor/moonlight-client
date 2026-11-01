@@ -11,6 +11,7 @@
 #include "ro/net/connection.h"
 #include "ro/render/item_icons.h"
 #include "ro/sim/inventory.h"
+#include "ro/sim/storage_facts.h"
 #include "ro/sim/world_fwd.h"
 #include "ro/ui/inventory_window.h"
 #include "ro/vfs/item_link.h"
@@ -171,6 +172,22 @@ struct ItemCellsAsk {
   // structure n'a pas le champ —, alors qu'il retient ceux du SAC. Nul pour les
   // deux autres contenants, dont le drapeau vient du fil.
   const StorageFavorites* client_favorites = nullptr;
+  // CE QUE LE SERVEUR DIT DES OBJETS DU COFFRE, quand c'est le coffre.
+  //
+  // 🔴 C'EST LUI QUI DIT L'EMPLACEMENT D'UN OBJET DÉPOSÉ. Le paquet de dépôt ne
+  // le porte pas, mais le serveur pousse `ZC 0x0F0F` juste derrière : sans lui,
+  // une coiffe d'apparat déposée resterait sous « Armures » jusqu'à la
+  // réouverture du coffre. Nul pour les deux autres contenants.
+  const ro::sim::StorageFacts* storage_facts = nullptr;
+
+  // OÙ CET OBJET PEUT SE PORTER : le fil d'abord, les faits du coffre sinon.
+  [[nodiscard]] std::uint32_t WearableAtOf(const ro::sim::InventoryItem& item) const {
+    if (item.wearable_at != 0 || storage_facts == nullptr) {
+      return item.wearable_at;
+    }
+    const ro::sim::StorageItemFacts* const facts = storage_facts->Of(item.item_id);
+    return facts == nullptr ? 0 : facts->equip_mask;
+  }
 
   // Cet objet-là est-il favori, tout compte fait ?
   [[nodiscard]] bool FavoriteOf(std::uint32_t item_id, bool told_by_server) const {
