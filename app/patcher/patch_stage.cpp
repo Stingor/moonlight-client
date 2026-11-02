@@ -232,7 +232,7 @@ ro::core::Result<PatchStageEnd> UpdateInstall(ClientShell& shell, const PatcherC
   // même fichier, et deux processus qui y écrivent ensemble s'écrasent l'un
   // l'autre.
   ro::core::EndLogFile("l'exécutable a changé, le client se relance");
-  if (auto relaunched = RelaunchSelf(); !relaunched) {
+  if (auto relaunched = RelaunchSelf(settings.running_executable); !relaunched) {
     return std::unexpected(relaunched.error());
   }
   return ended;

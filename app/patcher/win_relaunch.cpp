@@ -35,19 +35,15 @@ ro::core::Result<std::filesystem::path> RunningExecutablePath() {
                             std::to_string(GetLastError()) + ")");
 }
 
-ro::core::Result<void> RelaunchSelf() {
-  auto executable = RunningExecutablePath();
-  if (!executable) {
-    return std::unexpected(executable.error());
-  }
+ro::core::Result<void> RelaunchSelf(const std::filesystem::path& executable) {
   // ⚠ LA LIGNE DE COMMANDE D'ORIGINE, telle quelle : la relance retombe sur
   // la forme de lancement qui a appliqué la mise à jour.
   std::wstring command_line = GetCommandLineW();
-  const std::wstring working_directory = executable->parent_path().wstring();
+  const std::wstring working_directory = executable.parent_path().wstring();
   STARTUPINFOW startup = {};
   startup.cb = sizeof(startup);
   PROCESS_INFORMATION started = {};
-  if (CreateProcessW(executable->c_str(), command_line.data(), nullptr, nullptr, FALSE, 0, nullptr,
+  if (CreateProcessW(executable.c_str(), command_line.data(), nullptr, nullptr, FALSE, 0, nullptr,
                      working_directory.c_str(), &startup, &started) == FALSE) {
     return ro::core::Fail(
         ro::core::ErrorCode::kIoFailure,

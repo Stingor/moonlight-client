@@ -32,11 +32,7 @@ ro::core::Result<std::filesystem::path> RunningExecutablePath() {
   return executable;
 }
 
-ro::core::Result<void> RelaunchSelf() {
-  auto executable = RunningExecutablePath();
-  if (!executable) {
-    return std::unexpected(executable.error());
-  }
+ro::core::Result<void> RelaunchSelf(const std::filesystem::path& executable) {
   // ⚠ LA LIGNE DE COMMANDE D'ORIGINE, telle quelle : la relance retombe sur
   // la forme de lancement qui a appliqué la mise à jour. Le noyau la garde en
   // arguments séparés par des octets nuls.
@@ -54,7 +50,7 @@ ro::core::Result<void> RelaunchSelf() {
     }
   }
   if (arguments.empty()) {
-    arguments.push_back(executable->string());
+    arguments.push_back(executable.string());
   }
   // 🔴 TOUT SE PRÉPARE AVANT `fork` : dans l'enfant d'un programme à plusieurs
   // fils, seuls des appels sûrs en signal sont permis — `chdir` et `execv` en
@@ -65,8 +61,8 @@ ro::core::Result<void> RelaunchSelf() {
     argv.push_back(argument.data());
   }
   argv.push_back(nullptr);
-  const std::string program = executable->string();
-  const std::string working_directory = executable->parent_path().string();
+  const std::string program = executable.string();
+  const std::string working_directory = executable.parent_path().string();
 
   const pid_t child = fork();
   if (child < 0) {

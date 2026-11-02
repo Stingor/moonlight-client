@@ -27,6 +27,12 @@ namespace moonclient::patcher {
 [[nodiscard]] ro::core::Result<std::filesystem::path> SetRunningExecutableAside(
     const std::filesystem::path& running_executable);
 
+// LE NOUVEL EXÉCUTABLE REPREND LES DROITS DE L'ANCIEN, écarté sous `aside`.
+// Un fichier reçu du réseau naît sans le droit d'exécution : sous Linux, le
+// client remplacé ne pourrait plus se relancer.
+void KeepExecutablePermissions(const std::filesystem::path& aside,
+                               const std::filesystem::path& running_executable);
+
 // L'empreinte SHA-256 d'un fichier, en hexadécimal minuscule, lue par morceaux.
 [[nodiscard]] ro::core::Result<std::string> Sha256OfFile(const std::filesystem::path& path);
 

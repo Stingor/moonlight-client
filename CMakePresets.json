@@ -77,6 +77,21 @@
         "VCPKG_MANIFEST_NO_DEFAULT_FEATURES": "ON",
         "VCPKG_MANIFEST_FEATURES": "tests;ui"
       }
+    },
+    {
+      "name": "linux-release",
+      "displayName": "Linux / g++-14 Release, a livrer",
+      "description": "Le client que scripts/package_linux.py empaquette. Triplet x64-linux-release : les bibliotheques de vcpkg sont liees en statique, et seules celles de la distribution (libcurl, OpenSSL, libsecret, glib) restent dynamiques. Sans essais. VCPKG_ROOT doit etre pose.",
+      "inherits": "linux-gcc",
+      "binaryDir": "${sourceDir}/build/linux-release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "MOONCLIENT_BUILD_TESTS": "OFF",
+        "VCPKG_TARGET_TRIPLET": "x64-linux-release",
+        "VCPKG_HOST_TRIPLET": "x64-linux-release",
+        "VCPKG_MANIFEST_NO_DEFAULT_FEATURES": "ON",
+        "VCPKG_MANIFEST_FEATURES": "render;audio;ui;ui-gl"
+      }
     }
   ],
   "buildPresets": [
@@ -134,6 +149,11 @@
     {
       "name": "linux-gcc-asan",
       "configurePreset": "linux-gcc-asan",
+      "jobs": 0
+    },
+    {
+      "name": "linux-release",
+      "configurePreset": "linux-release",
       "jobs": 0
     }
   ],

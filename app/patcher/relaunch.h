@@ -17,6 +17,10 @@ namespace moonclient::patcher {
 // PENDANT QUE L'ANCIEN S'ARRÊTE : il ne doit pas attendre de lui qu'il ait
 // libéré quoi que ce soit — le verrou d'installation est déjà rendu, et
 // l'ancien exécutable porte un autre nom.
-[[nodiscard]] ro::core::Result<void> RelaunchSelf();
+//
+// ⚠ `executable` EST LE CHEMIN LU AU LANCEMENT, et non celui que le système
+// donne à l'instant : sous Linux, `/proc/self/exe` suit le fichier écarté, et
+// relancerait l'ancien client.
+[[nodiscard]] ro::core::Result<void> RelaunchSelf(const std::filesystem::path& executable);
 
 }  // namespace moonclient::patcher

@@ -119,6 +119,9 @@ using ro::core::Result;
       }
       return std::unexpected(written.error());
     }
+    if (set_aside.has_value()) {
+      KeepExecutablePermissions(*set_aside, target.running_executable);
+    }
     applied.executable_replaced = applied.executable_replaced || replaces_running;
   }
   return applied;

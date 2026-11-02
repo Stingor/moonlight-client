@@ -131,6 +131,7 @@ constexpr std::string_view kMirrorDownloadName = "mirror.download";
       return Fail(ErrorCode::kIoFailure,
                   "impossible de poser le nouvel exécutable : " + failed.message());
     }
+    KeepExecutablePermissions(*aside, running_executable);
     return true;
   }
   failed.clear();

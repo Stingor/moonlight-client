@@ -61,6 +61,15 @@ Result<std::filesystem::path> SetRunningExecutableAside(
   return aside;
 }
 
+void KeepExecutablePermissions(const std::filesystem::path& aside,
+                               const std::filesystem::path& running_executable) {
+  std::error_code ignored;
+  const std::filesystem::file_status previous = std::filesystem::status(aside, ignored);
+  if (!ignored) {
+    std::filesystem::permissions(running_executable, previous.permissions(), ignored);
+  }
+}
+
 Result<std::string> Sha256OfFile(const std::filesystem::path& path) {
   std::ifstream file(path, std::ios::binary);
   if (!file) {
