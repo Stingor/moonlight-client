@@ -21922,3 +21922,6 @@ tr: Nivel del micrófono:
 
 fr: voix fermée
 tr: voz cerrada
+
+fr: Pause pendant la saisie
+tr: Pausa al escribir

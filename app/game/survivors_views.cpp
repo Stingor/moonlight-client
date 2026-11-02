@@ -67,6 +67,8 @@ constexpr const char* kUnseenEffectsLabel = ro::core::TrText("Effets hors champ"
       return ro::ui::SurvivorsPauseReason::kFocusLost;
     case PauseCause::kWorldAlert:
       return ro::ui::SurvivorsPauseReason::kWorldAlert;
+    case PauseCause::kTyping:
+      return ro::ui::SurvivorsPauseReason::kPlayer;
   }
   return ro::ui::SurvivorsPauseReason::kPlayer;
 }
@@ -183,6 +185,9 @@ SurvivorsFrameView SurvivorsViews::Compose(const SurvivorsStage& stage,
       view.chest = &chest_;
       break;
     case SurvivorsScreen::kPaused:
+      // LA PAUSE DE LA SAISIE N'A PAS DE FENÊTRE : elle couvrirait la
+      // conversation qu'on est en train d'écrire.
+      if (stage.pause_cause() == PauseCause::kTyping) break;
       ComposePause(stage, field, facts);
       if (field != nullptr) ComposePauseEffects(*field, rules, tables);
       view.pause = &pause_;
@@ -426,6 +431,7 @@ void SurvivorsViews::ComposePause(const SurvivorsStage& stage, const SurvivorsFi
       .measures_offered = ro::core::kDevTools,
       .show_measures = measures_shown,
       .horde_sun_shadows = facts.options.horde_sun_shadows,
+      .pause_while_typing = facts.options.pause_while_typing,
       .measures = measure_rows_,
       .counts = count_rows_};
 }

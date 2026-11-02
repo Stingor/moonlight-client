@@ -49,8 +49,10 @@ enum class SurvivorsScreen : std::uint8_t {
   kWon,
   kSummary,
 };
-// Ce qui a mis la partie en pause : le bandeau de la pause le dit.
-enum class PauseCause : std::uint8_t { kPlayer, kFocusLost, kWorldAlert };
+// Ce qui a mis la partie en pause : le bandeau de la pause le dit. La saisie
+// d'une ligne de conversation n'ouvre pas la fenêtre de pause, et la partie
+// reprend d'elle-même quand la saisie se referme.
+enum class PauseCause : std::uint8_t { kPlayer, kFocusLost, kWorldAlert, kTyping };
 
 // L'arrivée, que la descente de la caméra suit (`arrival_ms`), la roulette
 // d'un coffre, le voile de la mort (U15) et le bandeau « Victoire ! » (Q7), en
@@ -67,6 +69,7 @@ struct SurvivorsIntent {
   bool resume = false;                         // le bouton « Reprendre »
   bool focus_lost = false;                     // pause automatique (U6)
   bool world_alert = false;                    // pause automatique (U5)
+  bool typing = false;   // une saisie est ouverte, et le réglage met alors en pause
   bool proceed = false;  // un clic qui passe la roulette, le voile, le bandeau
   bool abandon = false;  // confirmé dans la pause
   std::optional<ro::sim::SurvivorsAnswer> answer;  // touche 1 à 4, R, P ou B

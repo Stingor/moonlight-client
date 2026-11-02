@@ -88,6 +88,9 @@ struct SurvivorsContext {
   float height = 0.0F;
   // `/quake` : la caméra de l'arène se secoue.
   bool quake = true;
+  // Une ligne de conversation s'écrit : la partie se met en pause si le
+  // réglage le veut.
+  bool typing = false;
   // Une ligne au joueur, dans la conversation.
   std::function<void(std::string)> say;
   std::uint32_t now_ms = 0;

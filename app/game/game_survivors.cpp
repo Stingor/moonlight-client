@@ -229,6 +229,12 @@ void Game::FrameSurvivors(std::uint32_t now_ms) {
       .width = static_cast<float>(shell_.width()),
       .height = static_cast<float>(shell_.height()),
       .quake = settings_->options().graphics().screen_quake(),
+      // UNE SAISIE OUVERTE : un champ qui écrit, ou la barre dépliée du battle
+      // mode qui réclame les frappes.
+      .typing = interface_->gate().text_to_ui ||
+                ro::ui::ChatBarTakesTyping(windows_.chat.main.input.battle_mode,
+                                           windows_.chat.main.input.unfolded,
+                                           interface_->gate().text_to_ui),
       .say =
           [this, now_ms](std::string text) {
             world_.RecordChat(ro::sim::ChatKind::kServer, 0, std::move(text), now_ms);

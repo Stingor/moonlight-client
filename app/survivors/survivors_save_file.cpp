@@ -151,6 +151,9 @@ ro::core::Result<SurvivorsSaveRead> SaveSurvivorsOptions(const std::filesystem::
     if (after.horde_sun_shadows != before.horde_sun_shadows) {
       kept.horde_sun_shadows = after.horde_sun_shadows;
     }
+    if (after.pause_while_typing != before.pause_while_typing) {
+      kept.pause_while_typing = after.pause_while_typing;
+    }
     if (after.first_skill_id != before.first_skill_id) {
       kept.first_skill_id = after.first_skill_id;
     }

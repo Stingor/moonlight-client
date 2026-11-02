@@ -46,6 +46,7 @@ struct SurvivorsPauseView {
   bool measures_offered = false;
   bool show_measures = false;
   bool horde_sun_shadows = false;
+  bool pause_while_typing = false;
   std::span<const SurvivorsMeasureRow> measures;
   std::span<const SurvivorsCountRow> counts;
   // Les effets permanents de la partie, sous les fenêtres qu'on ouvre.
@@ -67,6 +68,7 @@ struct SurvivorsPauseAsk {
   std::optional<bool> reduced_effects;
   std::optional<bool> show_measures;
   std::optional<bool> horde_sun_shadows;
+  std::optional<bool> pause_while_typing;
 };
 
 [[nodiscard]] SurvivorsPauseAsk DrawSurvivorsPauseWindow(SurvivorsPauseState& state,

@@ -17,11 +17,12 @@ using ro::sim::SurvivorsPhase;
 [[nodiscard]] PauseCause CauseOf(const SurvivorsIntent& intent) noexcept {
   if (intent.world_alert) return PauseCause::kWorldAlert;
   if (intent.focus_lost) return PauseCause::kFocusLost;
+  if (intent.typing && !intent.escape) return PauseCause::kTyping;
   return PauseCause::kPlayer;
 }
 
 [[nodiscard]] bool AsksPause(const SurvivorsIntent& intent) noexcept {
-  return intent.escape || intent.focus_lost || intent.world_alert;
+  return intent.escape || intent.focus_lost || intent.world_alert || intent.typing;
 }
 
 }  // namespace
@@ -202,7 +203,10 @@ void SurvivorsStage::AdvancePaused(const SurvivorsIntent& intent) {
   }
   // Une alerte arrivée pendant la pause du joueur prend le bandeau.
   if (intent.world_alert) pause_cause_ = PauseCause::kWorldAlert;
-  if ((intent.escape || intent.resume) && guard_.Accepts(clock_ms_)) {
+  // LA PAUSE DE LA SAISIE se lève avec elle, sans garde : aucun clic n'y
+  // risque de relancer la horde par mégarde.
+  const bool typing_done = pause_cause_ == PauseCause::kTyping && !intent.typing;
+  if (typing_done || ((intent.escape || intent.resume) && guard_.Accepts(clock_ms_))) {
     Enter(arrival_ms_ < kArrivalMs ? SurvivorsScreen::kArriving : SurvivorsScreen::kPlaying);
   }
 }

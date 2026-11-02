@@ -51,12 +51,15 @@ namespace moonclient {
 inline constexpr std::string_view kSurvivorsSaveFileName = "survivors.yml";
 
 // Les réglages du mode : « Effets réduits », « Afficher les mesures »,
-// « Ombres du soleil de la horde » et le dernier premier bolt choisi. Ils
+// « Ombres du soleil de la horde », « Pause pendant la saisie » et le
+// dernier premier bolt choisi. Ils
 // restent hors des réglages du client.
 struct SurvivorsOptions {
   bool reduced_effects = false;
   bool show_measures = false;
   bool horde_sun_shadows = false;
+  // Une ligne de conversation qu'on écrit met la partie en pause.
+  bool pause_while_typing = true;
   std::uint16_t first_skill_id = 0;  // 0 : aucun choix encore, Fire Bolt se présélectionne
   [[nodiscard]] bool operator==(const SurvivorsOptions&) const = default;
 };

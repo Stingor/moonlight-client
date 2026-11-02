@@ -21922,3 +21922,6 @@ tr: Microphone level:
 
 fr: voix fermée
 tr: voice off
+
+fr: Pause pendant la saisie
+tr: Pause while typing

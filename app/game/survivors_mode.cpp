@@ -375,6 +375,7 @@ SurvivorsIntent SurvivorsMode::IntentOf(const SurvivorsStage& stage,
   intent.escape = gestures.escape;
   intent.focus_lost = gestures.focus_lost;
   intent.world_alert = report.pauses();
+  intent.typing = context.typing && options_.pause_while_typing;
   intent.resume = ask_.pause.resume;
   intent.abandon = ask_.pause.abandon;
   // Entrée et Espace valent « Continuer » sur le coffre seul : ailleurs,
@@ -394,6 +395,9 @@ void SurvivorsMode::ApplyOptions(const ro::ui::SurvivorsPauseAsk& asked,
     options_.show_measures = *asked.show_measures;
   }
   if (asked.horde_sun_shadows.has_value()) options_.horde_sun_shadows = *asked.horde_sun_shadows;
+  if (asked.pause_while_typing.has_value()) {
+    options_.pause_while_typing = *asked.pause_while_typing;
+  }
   if (options_ == before) return;
   if (arena_.has_value()) {
     arena_->SetSwitches(SwitchesOf(options_));
