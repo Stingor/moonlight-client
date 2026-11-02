@@ -4,6 +4,7 @@
 #include <functional>
 #include <memory>
 #include <optional>
+#include <string>
 
 #include "ro/net/connection.h"
 #include "ro/net/voice_service.h"
@@ -83,6 +84,10 @@ class VoiceMode {
   // Les appareils n'ont pas pu s'ouvrir : on ne réessaie qu'au prochain
   // changement de réglage, pour ne pas écrire l'échec à chaque image.
   bool devices_failed_ = false;
+  // LES APPAREILS DEMANDÉS à la dernière pompe : un autre choix rouvre la
+  // liaison sur les nouveaux.
+  std::string microphone_;
+  std::string speakers_;
   std::uint32_t online_since_ms_ = 0;
   bool was_online_ = false;
   ro::ui::VoiceOverlayState overlay_;

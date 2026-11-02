@@ -2,6 +2,8 @@
 
 #include <array>
 #include <cstddef>
+#include <functional>
+#include <string>
 #include <vector>
 
 #include "ro/ui/options_window.h"
@@ -13,7 +15,7 @@ namespace moonclient {
 // ── LA VOIX EN JEU, DANS LA PAGE « SON » ────────────────────────────────────
 //
 // L'interrupteur, le canal où l'on parle et où l'on écoute, le volume des voix
-// et celui du micro. Le côté d'où vient une voix suit « Son spatialisé ».
+// et celui du micro, et les deux appareils. Le côté d'où vient une voix suit « Son spatialisé ».
 // Voir l'ADR 0135.
 inline constexpr int kVoiceRowBase = 9400;
 
@@ -22,6 +24,8 @@ enum class VoiceRow : int {
   kChannel,
   kOutputVolume,
   kInputVolume,
+  kMicrophone,
+  kSpeakers,
   kCount,
 };
 
@@ -42,12 +46,29 @@ struct VoiceSettings {
   int channel = 0;  // 0 proximité, 1 groupe, 2 guilde
   float output_volume = 1.0F;
   float input_gain = 1.0F;
+  // LE NOM DE L'APPAREIL, vide pour celui du système.
+  std::string microphone;
+  std::string speakers;
+};
+
+// UN CHOIX D'APPAREIL tel que la ligne le montre : « celui du système » en
+// tête, puis ceux que le système connaît, puis celui qu'on avait gardé s'il
+// est débranché, pour que la ligne dise vrai.
+struct VoiceDeviceChoice {
+  std::vector<std::string> names;   // ce que la ligne choisie garde
+  std::vector<std::string> labels;  // ce qu'elle montre
+  std::vector<const char*> shown;   // les mêmes, pour la ligne
+  int chosen = 0;
 };
 
 class VoiceOptions {
  public:
   // ⚠ AVANT LA LECTURE DU FICHIER : la valeur présente ici est le défaut.
   void Declare(SettingsFile& into);
+  // Les noms des appareils que le système connaît, demandés à chaque
+  // `ComposeInto` : un casque se branche pendant que la page est ouverte.
+  using DeviceLister = std::function<std::vector<std::string>()>;
+  void ListDevicesWith(DeviceLister microphones, DeviceLister speakers);
   // Ajoute ses lignes à celles de la page Son, à chaque image où elle est
   // ouverte.
   void ComposeInto(std::vector<ro::ui::OptionRowView>& rows);
@@ -59,6 +80,10 @@ class VoiceOptions {
  private:
   VoiceSettings settings_;
   std::array<const char*, kVoiceChosenChannelCount> channel_names_{};
+  DeviceLister list_microphones_;
+  DeviceLister list_speakers_;
+  VoiceDeviceChoice microphone_choice_;
+  VoiceDeviceChoice speakers_choice_;
 };
 
 }  // namespace moonclient

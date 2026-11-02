@@ -19,9 +19,52 @@ constexpr int kCaptureChannels = 1;
 constexpr int kPlaybackChannels = 2;
 constexpr std::size_t kSampleBytes = sizeof(std::int16_t);
 
+// Les appareils du genre demandé ; à rendre par `SDL_free`.
+[[nodiscard]] SDL_AudioDeviceID* ListDevices(VoiceDeviceKind kind, int& count) {
+  return kind == VoiceDeviceKind::kMicrophone ? SDL_GetAudioRecordingDevices(&count)
+                                              : SDL_GetAudioPlaybackDevices(&count);
+}
+
+[[nodiscard]] SDL_AudioDeviceID FindDevice(VoiceDeviceKind kind, std::string_view name) {
+  const SDL_AudioDeviceID fallback = kind == VoiceDeviceKind::kMicrophone
+                                         ? SDL_AUDIO_DEVICE_DEFAULT_RECORDING
+                                         : SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK;
+  if (name.empty()) return fallback;
+  int count = 0;
+  SDL_AudioDeviceID* devices = ListDevices(kind, count);
+  SDL_AudioDeviceID found = fallback;
+  for (int at = 0; devices != nullptr && at < count; ++at) {
+    const char* device_name = SDL_GetAudioDeviceName(devices[at]);
+    if (device_name != nullptr && name == device_name) {
+      found = devices[at];
+      break;
+    }
+  }
+  SDL_free(devices);
+  if (found == fallback) {
+    core::LogWarning("voix : « {} » est absent, l'appareil par défaut le remplace", name);
+  }
+  return found;
+}
+
 }  // namespace
 
-core::Result<VoiceDevices> VoiceDevices::Open() {
+std::vector<std::string> VoiceDevices::DeviceNames(VoiceDeviceKind kind) {
+  std::vector<std::string> names;
+  if (SDL_WasInit(SDL_INIT_AUDIO) == 0) return names;
+  int count = 0;
+  SDL_AudioDeviceID* devices = ListDevices(kind, count);
+  for (int at = 0; devices != nullptr && at < count; ++at) {
+    if (const char* name = SDL_GetAudioDeviceName(devices[at]); name != nullptr) {
+      names.emplace_back(name);
+    }
+  }
+  SDL_free(devices);
+  return names;
+}
+
+core::Result<VoiceDevices> VoiceDevices::Open(std::string_view microphone,
+                                              std::string_view speakers) {
   VoiceDevices devices;
   // ⚠ COMPTÉ PAR SDL : la musique a déjà ouvert le son, et chacun le referme
   // pour son compte.
@@ -32,8 +75,8 @@ core::Result<VoiceDevices> VoiceDevices::Open() {
 
   const SDL_AudioSpec playback{
       .format = SDL_AUDIO_S16, .channels = kPlaybackChannels, .freq = kVoiceRate};
-  devices.playback_ =
-      SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &playback, nullptr, nullptr);
+  devices.playback_ = SDL_OpenAudioDeviceStream(FindDevice(VoiceDeviceKind::kSpeakers, speakers),
+                                                &playback, nullptr, nullptr);
   if (devices.playback_ == nullptr) {
     return Fail(ErrorCode::kIoFailure, std::string("sortie de la voix : ") + SDL_GetError());
   }
@@ -41,8 +84,8 @@ core::Result<VoiceDevices> VoiceDevices::Open() {
 
   const SDL_AudioSpec capture{
       .format = SDL_AUDIO_S16, .channels = kCaptureChannels, .freq = kVoiceRate};
-  devices.capture_ =
-      SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_RECORDING, &capture, nullptr, nullptr);
+  devices.capture_ = SDL_OpenAudioDeviceStream(FindDevice(VoiceDeviceKind::kMicrophone, microphone),
+                                               &capture, nullptr, nullptr);
   if (devices.capture_ == nullptr) {
     core::LogWarning("voix : pas de micro ({})", SDL_GetError());
   } else {

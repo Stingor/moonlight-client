@@ -80,7 +80,8 @@ ro::net::FrameOutcome VoiceMode::ApplyFrame(const ro::net::Frame& frame) {
 }
 
 void VoiceMode::Start(const VoiceFacts& facts) {
-  ro::core::Result<ro::audio::VoiceDevices> opened = ro::audio::VoiceDevices::Open();
+  ro::core::Result<ro::audio::VoiceDevices> opened =
+      ro::audio::VoiceDevices::Open(microphone_, speakers_);
   if (!opened.has_value()) {
     devices_failed_ = true;
     ro::core::LogWarning("voix : {}", ro::core::Describe(opened.error()));
@@ -111,6 +112,12 @@ void VoiceMode::Stop() noexcept {
 void VoiceMode::Pump(const VoiceFacts& facts) {
   if (!facts.settings.enabled) {
     devices_failed_ = false;
+  }
+  if (facts.settings.microphone != microphone_ || facts.settings.speakers != speakers_) {
+    microphone_ = facts.settings.microphone;
+    speakers_ = facts.settings.speakers;
+    devices_failed_ = false;
+    Stop();
   }
   const bool wanted = facts.settings.enabled && facts.verified && service_.has_value() &&
                       facts.account_id != 0 && facts.character_id != 0;

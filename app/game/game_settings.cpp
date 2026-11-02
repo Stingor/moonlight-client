@@ -2,6 +2,7 @@
 
 #include <utility>
 
+#include "ro/audio/voice_devices.h"
 #include "ro/core/i18n.h"
 
 #include "game/hotkey_bug_report.h"
@@ -27,6 +28,9 @@ GameSettings::GameSettings(std::filesystem::path client_root)
   // ⚠ DÉCLARER PUIS LIRE, DANS CET ORDRE : la valeur présente au moment de la
   // déclaration est ce qui sert de défaut.
   options_.Declare(file_);
+  options_.pages().voice.ListDevicesWith(
+      [] { return ro::audio::VoiceDevices::DeviceNames(ro::audio::VoiceDeviceKind::kMicrophone); },
+      [] { return ro::audio::VoiceDevices::DeviceNames(ro::audio::VoiceDeviceKind::kSpeakers); });
   LoadBlockedNpcs(client_root_, options_.context_menu().blocked());
   file_.Section("La caméra du joueur");
   file_.Declare("camera_outside_distance", &camera_memory_.outdoor.zoom);

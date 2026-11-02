@@ -21754,3 +21754,21 @@ tr: Arena: %s
 
 fr: Prairie de Midgard
 tr: Midgard Plains
+
+fr: Celui du système
+tr: System default
+
+fr: (débranché)
+tr: (unplugged)
+
+fr: Micro de la voix
+tr: Voice microphone
+
+fr: Le micro où l'on parle. Un casque débranché laisse la place à celui du système, jusqu'à son retour.
+tr: The microphone you speak into. An unplugged headset gives way to the system default until it comes back.
+
+fr: Sortie des voix
+tr: Voice output
+
+fr: Où l'on entend les autres joueurs.
+tr: Where you hear the other players.

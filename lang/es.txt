@@ -21754,3 +21754,21 @@ tr: Arena: %s
 
 fr: Prairie de Midgard
 tr: Pradera de Midgard
+
+fr: Celui du système
+tr: El del sistema
+
+fr: (débranché)
+tr: (desconectado)
+
+fr: Micro de la voix
+tr: Micrófono de voz
+
+fr: Le micro où l'on parle. Un casque débranché laisse la place à celui du système, jusqu'à son retour.
+tr: El micrófono por el que se habla. Un auricular desconectado deja paso al del sistema hasta que vuelva.
+
+fr: Sortie des voix
+tr: Salida de las voces
+
+fr: Où l'on entend les autres joueurs.
+tr: Donde se oye a los demás jugadores.
