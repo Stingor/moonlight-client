@@ -21925,3 +21925,66 @@ tr: voice off
 
 fr: Pause pendant la saisie
 tr: Pause while typing
+
+fr: Aucun joueur bloqué ne porte ce nom.
+tr: No blocked player has that name.
+
+fr: Bloque ses chuchotements, et sa voix s'il est à portée de voix. La casse compte : « bob » n'est pas « Bob ».
+tr: Blocks their whispers, and their voice if they are within voice range. Case matters: “bob” is not “Bob”.
+
+fr: Bloquer
+tr: Block
+
+fr: Bloquer tous les chuchotements
+tr: Block all whispers
+
+fr: Ceux dont vous ne recevez plus les chuchotements ou la voix : on les y débloque, on en bloque d'autres.
+tr: Players whose whispers or voice you no longer receive: unblock them there, or block others.
+
+fr: Ceux dont vous ne recevez plus les chuchotements ou la voix, et le moyen de les débloquer.
+tr: Players whose whispers or voice you no longer receive, and a way to unblock them.
+
+fr: Ceux que vous n'entendez plus, ou dont vous ne recevez plus les chuchotements : on les y débloque, on en bloque d'autres.
+tr: Players you no longer hear, or whose whispers you no longer receive: unblock them there, or block others.
+
+fr: Chuchotements
+tr: Whispers
+
+fr: Hors de portée de voix : sa voix se coupe quand vous l'entendez.
+tr: Out of voice range: their voice can be muted once you hear them.
+
+fr: Hors ligne : le serveur n'écoute pas.
+tr: Offline: the server is not listening.
+
+fr: Joueurs bloqués
+tr: Blocked players
+
+fr: Joueurs bloqués…
+tr: Blocked players…
+
+fr: La voix est fermée : ses blocages ne se montrent pas.
+tr: Voice is off: its blocks cannot be shown.
+
+fr: La voix est fermée.
+tr: Voice is off.
+
+fr: Le service web ne garde pas la liste des chuchotements : elle s'oubliera à la déconnexion.
+tr: The web service is not keeping the whisper list: it will be forgotten when you log out.
+
+fr: Nom du personnage à bloquer
+tr: Name of the character to block
+
+fr: Ouvre la liste des joueurs bloqués : chuchotements et voix.
+tr: Opens the list of blocked players: whispers and voice.
+
+fr: Personne ne peut plus vous chuchoter, liste ou non. Décochée, la liste reprend : ceux qui y sont restent bloqués.
+tr: No one can whisper to you anymore, listed or not. Unticked, the list applies again: those on it stay blocked.
+
+fr: Un joueur bloqué ne peut plus vous chuchoter ; bloqué à la voix, vous ne l'entendez plus. Il n'en est pas averti.
+tr: A blocked player can no longer whisper to you; blocked by voice, you no longer hear them. They are not told.
+
+fr: Un joueur bloqué à la voix ne paraît ici que s'il est en ligne.
+tr: A player blocked by voice only shows here while online.
+
+fr: Vous n'avez bloqué personne.
+tr: You have not blocked anyone.

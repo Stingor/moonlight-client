@@ -21925,3 +21925,66 @@ tr: voz cerrada
 
 fr: Pause pendant la saisie
 tr: Pausa al escribir
+
+fr: Aucun joueur bloqué ne porte ce nom.
+tr: Ningún jugador bloqueado tiene ese nombre.
+
+fr: Bloque ses chuchotements, et sa voix s'il est à portée de voix. La casse compte : « bob » n'est pas « Bob ».
+tr: Bloquea sus susurros, y su voz si está al alcance de la voz. Las mayúsculas cuentan: «bob» no es «Bob».
+
+fr: Bloquer
+tr: Bloquear
+
+fr: Bloquer tous les chuchotements
+tr: Bloquear todos los susurros
+
+fr: Ceux dont vous ne recevez plus les chuchotements ou la voix : on les y débloque, on en bloque d'autres.
+tr: Jugadores cuyos susurros o voz ya no recibe: desbloquéelos allí, o bloquee a otros.
+
+fr: Ceux dont vous ne recevez plus les chuchotements ou la voix, et le moyen de les débloquer.
+tr: Jugadores cuyos susurros o voz ya no recibe, y cómo desbloquearlos.
+
+fr: Ceux que vous n'entendez plus, ou dont vous ne recevez plus les chuchotements : on les y débloque, on en bloque d'autres.
+tr: Jugadores que ya no oye, o cuyos susurros ya no recibe: desbloquéelos allí, o bloquee a otros.
+
+fr: Chuchotements
+tr: Susurros
+
+fr: Hors de portée de voix : sa voix se coupe quand vous l'entendez.
+tr: Fuera del alcance de la voz: su voz se puede silenciar cuando lo oiga.
+
+fr: Hors ligne : le serveur n'écoute pas.
+tr: Desconectado: el servidor no escucha.
+
+fr: Joueurs bloqués
+tr: Jugadores bloqueados
+
+fr: Joueurs bloqués…
+tr: Jugadores bloqueados…
+
+fr: La voix est fermée : ses blocages ne se montrent pas.
+tr: La voz está cerrada: sus bloqueos no se muestran.
+
+fr: La voix est fermée.
+tr: La voz está cerrada.
+
+fr: Le service web ne garde pas la liste des chuchotements : elle s'oubliera à la déconnexion.
+tr: El servicio web no guarda la lista de susurros: se olvidará al desconectarse.
+
+fr: Nom du personnage à bloquer
+tr: Nombre del personaje a bloquear
+
+fr: Ouvre la liste des joueurs bloqués : chuchotements et voix.
+tr: Abre la lista de jugadores bloqueados: susurros y voz.
+
+fr: Personne ne peut plus vous chuchoter, liste ou non. Décochée, la liste reprend : ceux qui y sont restent bloqués.
+tr: Nadie puede susurrarle, esté en la lista o no. Desmarcada, la lista vuelve a aplicarse: quienes están en ella siguen bloqueados.
+
+fr: Un joueur bloqué ne peut plus vous chuchoter ; bloqué à la voix, vous ne l'entendez plus. Il n'en est pas averti.
+tr: Un jugador bloqueado ya no puede susurrarle; bloqueado por voz, ya no lo oye. No se le avisa.
+
+fr: Un joueur bloqué à la voix ne paraît ici que s'il est en ligne.
+tr: Un jugador bloqueado por voz solo aparece aquí si está conectado.
+
+fr: Vous n'avez bloqué personne.
+tr: No ha bloqueado a nadie.

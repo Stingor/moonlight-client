@@ -208,6 +208,15 @@ VoiceMode::Peer VoiceMode::PeerOf(std::string_view name) const {
   return Peer::kUnknown;
 }
 
+std::vector<std::string> VoiceMode::BlockedNames() const {
+  std::vector<std::string> names;
+  names.reserve(blocked_.size());
+  for (const rv::NearbyPlayer& player : blocked_) {
+    names.push_back(player.name);
+  }
+  return names;
+}
+
 void VoiceMode::Block(std::string_view name, bool blocked) {
   if (engine_ == nullptr) return;
   const auto named = [name](const rv::NearbyPlayer& player) { return player.name == name; };

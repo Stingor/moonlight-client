@@ -753,6 +753,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
       .ranking_board_asked = &windows_.ranking_board.open_asked,
       .market = &pieces_.trade.market(),
       .database = &database_,
+      .block_list = &windows_.whispers.blocks,
       .navi = &navi_,
       .navigation = &windows_.navigation.state,
       .map_names = pieces_.map_display_names.has_value() ? &*pieces_.map_display_names : nullptr,

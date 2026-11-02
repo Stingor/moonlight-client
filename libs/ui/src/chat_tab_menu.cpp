@@ -338,6 +338,15 @@ void DrawChatTabMenu(ChatWindowState& state, const ChatAppearance& look,
                         core::Tr("Ces réglages-là valent pour toutes les fenêtres de "
                                  "conversation."));
     }
+    if (ImGui::Selectable(core::Tr("Joueurs bloqués…"))) {
+      asked->blocks_asked = true;
+      ImGui::CloseCurrentPopup();
+    }
+    if (ImGui::IsItemHovered()) {
+      SkinTooltip(
+          core::Tr("Ceux dont vous ne recevez plus les chuchotements ou la voix, et le "
+                   "moyen de les débloquer."));
+    }
   }
 
   EndSkinPopup();

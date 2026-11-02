@@ -1,5 +1,6 @@
-// LES CONVERSATIONS 1:1, dans la trame de l'interface : leur dessin. À part de
-// `ui_stage.cpp`, qui n'a plus la place de les porter.
+// LES CONVERSATIONS 1:1, dans la trame de l'interface : leur dessin, et celui
+// des joueurs bloqués. À part de `ui_stage.cpp`, qui n'a plus la place de les
+// porter.
 
 #include <string>
 #include <utility>
@@ -66,6 +67,8 @@ void UiStage::DrawWhisperWindows(WhisperWindows& whispers, const ChatTabsView& t
     }
     whispers.answers.emplace_back(std::string(view.peer), std::move(asked));
   }
+  whispers.blocks_answer =
+      ro::ui::DrawBlockListWindow(whispers.blocks, whispers.blocks_view, skin_);
 }
 
 void UiStage::RegisterWhisperEscapes(WhisperWindows& whispers) {
@@ -77,6 +80,7 @@ void UiStage::RegisterWhisperEscapes(WhisperWindows& whispers) {
     whispers.escape_ids.push_back(ro::ui::WhisperWindowId(peer));
     escape_.Register(whispers.escape_ids.back().c_str(), &state.open);
   }
+  escape_.Register(ro::ui::kBlockListWindowId, &whispers.blocks.open);
 }
 
 }  // namespace moonclient

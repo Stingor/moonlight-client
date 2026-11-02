@@ -39,6 +39,8 @@ enum class VoiceRow : int {
   kRelease,
   kActivation,
   kInputLevel,
+  // Ouvre la fenêtre des joueurs bloqués : un bouton, pas un réglage.
+  kBlocks,
   kCount,
 };
 

@@ -97,6 +97,9 @@ void Game::ApplyPartyAnswers(std::uint32_t now_ms) {
   if (asked.booking_asked) {
     windows_.party_booking.open_asked = true;
   }
+  if (asked.blocks_asked) {
+    ro::ui::RaiseBlockListWindow(windows_.whispers.blocks);
+  }
   // ⚠ LE RAPPORT AVANT L'AVANCÉE, qui consomme la réponse et refait la vue :
   // il décrit celle que le joueur a vue.
   if (windows_.party_booking.answer.report_bug && windows_.party_booking.view != nullptr) {

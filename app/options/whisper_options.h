@@ -13,7 +13,8 @@ namespace moonclient {
 // ── LE RÉGLAGE DES AMIS DU CLIENT, dans la section Conversation ─────────────
 //
 // Ses trois cases : ouvrir une conversation 1:1 quand un AMI chuchote, quand un
-// INCONNU chuchote, et sonner à l'ouverture. Ils se montrent dans les réglages
+// INCONNU chuchote, et sonner à l'ouverture. Puis le bouton des joueurs
+// bloqués. Ils se montrent dans les réglages
 // de la conversation : la fenêtre du client qui les portait n'existe pas ici,
 // et une conversation qui ne s'ouvre jamais sans qu'on sache pourquoi est
 // pire qu'un réglage de plus.
@@ -29,6 +30,8 @@ enum class WhisperRow : int {
   kOpenFromFriend = 0,
   kOpenFromStranger,
   kAlarm,
+  // Ouvre la fenêtre des joueurs bloqués : un bouton, pas un réglage.
+  kBlocks,
   kCount,
 };
 
@@ -47,6 +50,11 @@ class WhisperOptions {
 
   // Rend vrai quand la ligne était la sienne.
   [[nodiscard]] bool Change(const ro::ui::OptionsWindowAction& asked);
+
+  // L'identifiant d'une ligne, celui que rend la fenêtre.
+  [[nodiscard]] static int IdOf(WhisperRow row) noexcept {
+    return kWhisperRowBase + static_cast<int>(row);
+  }
 
  private:
   FriendSetup setup_;

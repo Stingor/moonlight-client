@@ -646,8 +646,9 @@ void SubmitChat(const ChatDispatch& to, const std::string& line, std::uint32_t s
     }
     return;
   }
-  // LE MARCHÉ ET LA BASE DE DONNÉES. Même règle : la ligne se prend sans eux.
-  if (FollowOpeningCommand(line, to.market, to.database)) {
+  // LE MARCHÉ, LA BASE DE DONNÉES ET LES JOUEURS BLOQUÉS. Même règle : la
+  // ligne se prend sans eux.
+  if (FollowOpeningCommand(line, to.market, to.database, to.block_list)) {
     return;
   }
   // LES CLASSEMENTS : la réponse s'écrit quand elle arrive, ses noms avec —

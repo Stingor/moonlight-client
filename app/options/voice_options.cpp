@@ -224,6 +224,13 @@ void VoiceOptions::ComposeInto(std::vector<OptionRowView>& rows) {
       .chosen = sane.speaking_icon,
       .choices = icon_names_,
       .disabled = !sane.enabled});
+  rows.push_back(
+      OptionRowView{.id = VoiceRowId(VoiceRow::kBlocks),
+                    .label = Tr("Joueurs bloqués…"),
+                    .help = Tr("Ceux que vous n'entendez plus, ou dont vous ne recevez plus les "
+                               "chuchotements : on les y débloque, on en bloque d'autres."),
+                    .command = "/blocage",
+                    .kind = OptionKind::kAction});
 }
 
 bool VoiceOptions::Change(const ro::ui::OptionsWindowAction& asked) {
@@ -265,6 +272,7 @@ bool VoiceOptions::Change(const ro::ui::OptionsWindowAction& asked) {
       settings_.activation_percent = asked.value;
       break;
     case VoiceRow::kInputLevel:
+    case VoiceRow::kBlocks:
     case VoiceRow::kCount:
       break;
   }

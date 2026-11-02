@@ -166,6 +166,11 @@ void Game::ApplyCaptureGesture(const UiStage::Answers& answers, std::uint32_t no
   // sur le premier onglet des étiquettes (numéro 4000) déclenchait ainsi
   // l'enregistrement d'un film, et la ligne d'à côté prenait une capture.
   // LE BOUTON « OUVRIR L'ALBUM » de sa page : il ouvre, il ne referme pas.
+  // « JOUEURS BLOQUÉS… », des pages Conversation et Son.
+  if (answers.options.changed == WhisperOptions::IdOf(WhisperRow::kBlocks) ||
+      answers.options.changed == VoiceRowId(VoiceRow::kBlocks)) {
+    ro::ui::RaiseBlockListWindow(windows_.whispers.blocks);
+  }
   if (answers.options.changed == CardAlbumRowId(CardAlbumRow::kOpen) && !windows_.card_album.open) {
     card_album_.Toggle(windows_.card_album, link_, now_ms);
   }

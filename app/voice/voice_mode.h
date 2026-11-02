@@ -84,6 +84,11 @@ class VoiceMode {
     kBlocked,  // ce compte ne l'entend plus
   };
   [[nodiscard]] Peer PeerOf(std::string_view name) const;
+  // Les joueurs que ce compte n'entend plus et qui sont en ligne : le serveur
+  // voix ne nomme pas les autres. Vide quand la liaison est fermée.
+  [[nodiscard]] std::vector<std::string> BlockedNames() const;
+  // La liaison était ouverte à la dernière pompe.
+  [[nodiscard]] bool online() const noexcept { return was_online_; }
   // Ne plus entendre ce joueur, ou l'entendre de nouveau. Sans effet sur un
   // joueur que la voix ne connaît pas.
   void Block(std::string_view name, bool blocked);

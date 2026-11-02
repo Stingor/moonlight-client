@@ -30,6 +30,7 @@
 #include "ro/ui/chat_whisper_list.h"
 #include "ro/ui/chat_window.h"
 
+#include "chat/block_list_route.h"
 #include "chat/chat_image_cache.h"
 #include "chat/chat_item_link.h"
 #include "chat/chat_line_preview.h"
@@ -116,6 +117,12 @@ void Game::StageChat(std::uint32_t now_ms) {
                                               }}) > 0;
   if (whisper_rang && vfs_ != nullptr) {
     PlayWhisperAlarm(audio_, *vfs_, client_root_, whisper_page.setup().alarm);
+  }
+  // LES JOUEURS BLOQUÉS : le geste rendu à l'image précédente, puis la vue.
+  FollowBlockListAnswer(std::exchange(windows_.whispers.blocks_answer, {}), link_, pieces_.whispers,
+                        voice_);
+  if (windows_.whispers.blocks.open) {
+    windows_.whispers.blocks_view = ComposeBlockList(pieces_.whispers, voice_, link_.is_open());
   }
   // QUI VIENT DE NOUS CHUCHOTER entre dans les récents de la box « Pseudo » :
   // c'est souvent à lui qu'on veut répondre.
@@ -374,6 +381,9 @@ void Game::ApplyChatAnswers(const UiStage::Answers& answers, std::uint32_t now_m
     // n'a pas de barre de titre où en poser une.
     if (ask.asked.settings_asked) {
       GameSettings::OpenOptionsAt(windows_, OptionSection::kChat);
+    }
+    if (ask.asked.blocks_asked) {
+      ro::ui::RaiseBlockListWindow(windows_.whispers.blocks);
     }
     // ⚠ CE QUE LE SÉLECTEUR REND EST UN RANG, ET UN RANG NE DIT PAS UN CANAL :
     // tous partagent le même genre. C'est la liste de l'image en cours qui

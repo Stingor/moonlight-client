@@ -94,6 +94,8 @@ struct ChatDispatch {
   MarketStage* market = nullptr;
   // LA BASE DE DONNÉES, que `/db` ouvre. Nulle : la commande se tait.
   DatabaseStage* database = nullptr;
+  // LES JOUEURS BLOQUÉS, que `/blocage` ouvre. Nulle : la commande se tait.
+  ro::ui::BlockListWindowState* block_list = nullptr;
   // LA NAVIGATION, que `/navi` et `/navigation` ouvrent ou lancent : le guidage
   // et les tables de recherche, la fenêtre, et les noms affichés des cartes.
   NaviSession* navi = nullptr;

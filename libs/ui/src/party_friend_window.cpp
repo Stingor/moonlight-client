@@ -245,16 +245,20 @@ void DrawFriendTab(PartyFriendWindowState& state, const PartyFriendView& view,
 
   if (view.friends.empty()) {
     ImGui::TextDisabled("%s", core::Tr("Votre liste d'amis est vide."));
-    return;
+  } else {
+    for (std::size_t rank = 0; rank < view.friends.size(); ++rank) {
+      ImGui::PushID(static_cast<int>(rank));
+      DrawFriendRow(state, view, view.friends[rank], look, action);
+      ImGui::PopID();
+    }
+    ImGui::Separator();
+    ImGui::TextDisabled("%s %d/%d", core::Tr("Amis :"), static_cast<int>(view.friends.size()),
+                        kFriendsMost);
   }
-  for (std::size_t rank = 0; rank < view.friends.size(); ++rank) {
-    ImGui::PushID(static_cast<int>(rank));
-    DrawFriendRow(state, view, view.friends[rank], look, action);
-    ImGui::PopID();
+  // LA LISTE INVERSE, à côté de celle des amis : on la cherche ici.
+  if (SkinSmallButton(core::Tr("Joueurs bloqués…"), art)) {
+    action.blocks_asked = true;
   }
-  ImGui::Separator();
-  ImGui::TextDisabled("%s %d/%d", core::Tr("Amis :"), static_cast<int>(view.friends.size()),
-                      kFriendsMost);
 }
 
 void DrawBody(PartyFriendWindowState& state, const PartyFriendView& view,

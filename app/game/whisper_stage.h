@@ -24,6 +24,7 @@
 #include "ro/sim/whisper.h"
 #include "ro/sim/whisper_blocks.h"
 #include "ro/sim/world.h"
+#include "ro/ui/block_list_window.h"
 #include "ro/ui/chat_input.h"
 #include "ro/ui/chat_link.h"
 #include "ro/ui/whisper_window.h"
@@ -50,6 +51,11 @@ struct WhisperWindows {
   std::vector<std::pair<std::string, ro::ui::WhisperWindowAction>> answers;
   // Les identités des fenêtres, déclarées à la pile d'Échap.
   std::vector<std::string> escape_ids;
+  // LES JOUEURS BLOQUÉS, chuchotements et voix : la vue descend à chaque image,
+  // le geste remonte à la suivante. Voir `chat/block_list_view.h`.
+  ro::ui::BlockListWindowState blocks;
+  ro::ui::BlockListView blocks_view;
+  ro::ui::BlockListAnswer blocks_answer;
 };
 
 // CE QUE L'ÉTAPE LIT AILLEURS, à chaque image.
@@ -83,6 +89,11 @@ class WhisperStage {
   [[nodiscard]] const WhisperDesk& desk() const noexcept { return desk_; }
   // QUI NE PEUT PLUS NOUS CHUCHOTER, tel que le serveur l'a dit.
   [[nodiscard]] ro::sim::WhisperBlockList& blocks() noexcept { return blocks_; }
+  [[nodiscard]] const ro::sim::WhisperBlockList& blocks() const noexcept { return blocks_; }
+  // LA LISTE RANGÉE AU SERVICE WEB, ou nulle sans service.
+  [[nodiscard]] const WhisperBlockMemory* block_memory() const noexcept {
+    return block_memory_.has_value() ? &*block_memory_ : nullptr;
+  }
 
   // LA LISTE DE BLOCAGE RANGÉE AU SERVICE WEB : relue dès maintenant, rejouée
   // après la première carte, sauvegardée à chaque changement — voir

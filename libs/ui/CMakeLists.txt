@@ -166,6 +166,7 @@ add_library(ro_ui STATIC
     src/link_notice.cpp
     src/voice_overlay.cpp
     src/chat_block_log_window.cpp
+    src/block_list_window.cpp
     src/player_report_window.cpp
     src/entity_inspector_window.cpp
     src/monster_sheet_preview.cpp

@@ -296,6 +296,8 @@ struct PartyFriendAction {
   bool settings_asked = false;
   // La fenêtre de recherche de groupe est demandée.
   bool booking_asked = false;
+  // La fenêtre des joueurs bloqués est demandée, depuis l'onglet des amis.
+  bool blocks_asked = false;
   bool grid_toggled = false;
   bool grid_enabled = false;
   bool closed = false;

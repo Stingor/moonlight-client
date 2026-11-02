@@ -329,6 +329,8 @@ struct ChatWindowAction {
   // aucune valeur, il demande l'ouverture du panneau Options sur la section qui
   // parle de la conversation.
   bool settings_asked = false;
+  // UNE AUTRE PORTE : la fenêtre des joueurs bloqués.
+  bool blocks_asked = false;
   // Le joueur a cliqué le mot qui remplace la barre prêtée : la salle du
   // salon doit passer devant.
   bool lent_input_asked = false;

@@ -6,6 +6,8 @@
 #include <string>
 #include <utility>
 
+#include "ro/ui/block_list_window.h"
+
 #include "game/database_compose.h"
 #include "game/database_stage.h"
 #include "game/market_route.h"
@@ -13,7 +15,14 @@
 
 namespace moonclient {
 
-bool FollowOpeningCommand(std::string_view line, MarketStage* market, DatabaseStage* database) {
+bool FollowOpeningCommand(std::string_view line, MarketStage* market, DatabaseStage* database,
+                          ro::ui::BlockListWindowState* block_list) {
+  if (IsBlockListCommand(line)) {
+    if (block_list != nullptr) {
+      ro::ui::RaiseBlockListWindow(*block_list);
+    }
+    return true;
+  }
   if (IsMarketCommand(line)) {
     if (market != nullptr) {
       market->AskOpen();

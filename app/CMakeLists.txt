@@ -635,7 +635,8 @@ add_library(moonclient_whispers STATIC
     chat/player_link_judge.cpp
     chat/whisper_desk.cpp
     chat/whisper_block_memory.cpp
-    chat/whisper_lines.cpp)
+    chat/whisper_lines.cpp
+    chat/block_list_view.cpp)
 
 target_link_libraries(moonclient_whispers
     PUBLIC ro_core ro_sim ro_vfs ro_ui moonclient_web
@@ -1805,6 +1806,7 @@ add_executable(moonclient
     chat/chat_view.cpp
     chat/player_command_run.cpp
     chat/opening_commands.cpp
+    chat/block_list_route.cpp
     chat/talk_filter_command.cpp
     chat/dev_commands.cpp
     items/description_view.cpp

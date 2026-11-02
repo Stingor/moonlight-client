@@ -118,6 +118,8 @@ constexpr auto kSlashCommands = std::to_array<SlashCommand>({
            TrText("Ouvre la navigation, guide vers une case ou cherche.")),
     Plain("marche", "", TrText("Ouvre le marché.")),
     Taking("db", "", "[<recherche>]", TrText("Ouvre la base de données, sur cette recherche.")),
+    Plain("blocage", "blocages blocklist",
+          TrText("Ouvre la liste des joueurs bloqués : chuchotements et voix.")),
     Plain("ranking", "", TrText("Ouvre le tableau des classements.")),
     Plain("blacksmith", "", TrText("Demande le classement des forgerons.")),
     Plain("alchemist", "", TrText("Demande le classement des alchimistes.")),

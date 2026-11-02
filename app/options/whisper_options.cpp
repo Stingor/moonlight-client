@@ -13,8 +13,6 @@ constexpr const char* kOpenFromFriendKey = "chat_1_1_friends";
 constexpr const char* kOpenFromStrangerKey = "chat_1_1_unknown";
 constexpr const char* kAlarmKey = "chat_1_1_alarm";
 
-[[nodiscard]] int IdOf(WhisperRow row) { return kWhisperRowBase + static_cast<int>(row); }
-
 }  // namespace
 
 void WhisperOptions::Declare(SettingsFile& into) {
@@ -46,6 +44,13 @@ void WhisperOptions::ComposeInto(std::vector<ro::ui::OptionRowView>& rows) const
                  "chuchotement — pas à chaque ligne."),
       .kind = ro::ui::OptionKind::kToggle,
       .on = setup_.alarm});
+  rows.push_back(ro::ui::OptionRowView{
+      .id = IdOf(WhisperRow::kBlocks),
+      .label = Tr("Joueurs bloqués…"),
+      .help = Tr("Ceux dont vous ne recevez plus les chuchotements ou la voix : on les y "
+                 "débloque, on en bloque d'autres."),
+      .command = "/blocage",
+      .kind = ro::ui::OptionKind::kAction});
 }
 
 bool WhisperOptions::Change(const ro::ui::OptionsWindowAction& asked) {
@@ -63,6 +68,7 @@ bool WhisperOptions::Change(const ro::ui::OptionsWindowAction& asked) {
     case WhisperRow::kAlarm:
       setup_.alarm = asked.on;
       break;
+    case WhisperRow::kBlocks:
     case WhisperRow::kCount:
       break;
   }
