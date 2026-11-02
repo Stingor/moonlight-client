@@ -14,6 +14,8 @@
 #include "ro/proto/packet_lengths.h"
 #include "ro/voice/voice_engine.h"
 
+#include "options/percent.h"
+
 namespace moonclient {
 namespace {
 
@@ -50,7 +52,8 @@ constexpr std::uint32_t kTalkKeyReminderMs = 15'000;
   if (status.war && !status.in_room && facts.settings.channel == 0) {
     return Tr("Voix : la proximité se tait pendant la guerre de guilde.");
   }
-  if (facts.talk_key == 0 && facts.now_ms - online_since_ms < kTalkKeyReminderMs) {
+  if (facts.talk_key == 0 && facts.settings.talk_mode != static_cast<int>(VoiceTalkMode::kVoice) &&
+      facts.now_ms - online_since_ms < kTalkKeyReminderMs) {
     return Tr("Voix : choisissez la touche « Parler (voix) » dans les raccourcis.");
   }
   return {};
@@ -153,20 +156,24 @@ void VoiceMode::Pump(const VoiceFacts& facts) {
   }
   const bool talking = engine_ != nullptr && TalkKeyHeld(facts.talk_key);
   if (engine_ != nullptr) {
-    engine_->Steer(
-        rv::VoiceControls{.talking = talking,
-                          .channel = static_cast<rv::VoiceChannel>(facts.settings.channel),
-                          .output_gain = facts.settings.output_volume,
-                          .input_gain = facts.settings.input_gain,
-                          .spatial = facts.spatial});
+    engine_->Steer(rv::VoiceControls{
+        .talking = talking,
+        .voice_activated = facts.settings.talk_mode == static_cast<int>(VoiceTalkMode::kVoice),
+        .activation_level = facts.settings.activation_percent / kPercent * kVoiceLevelAtFullScale,
+        .release_ms = static_cast<std::uint32_t>(facts.settings.release_ms),
+        .channel = static_cast<rv::VoiceChannel>(facts.settings.channel),
+        .output_gain = facts.settings.output_volume,
+        .input_gain = facts.settings.input_gain,
+        .spatial = facts.spatial});
   }
-  Compose(facts, talking);
+  Compose(facts);
 }
 
-void VoiceMode::Compose(const VoiceFacts& facts, bool talking) {
+void VoiceMode::Compose(const VoiceFacts& facts) {
   overlay_ = ro::ui::VoiceOverlayState();
   heard_.clear();
   blocked_.clear();
+  input_percent_.reset();
   if (engine_ == nullptr) {
     if (devices_failed_ && facts.settings.enabled && service_.has_value()) {
       overlay_.notice = Tr("Voix : aucun appareil de son ne s'ouvre.");
@@ -180,9 +187,12 @@ void VoiceMode::Compose(const VoiceFacts& facts, bool talking) {
   }
   was_online_ = online;
   overlay_.notice = NoticeOf(status, facts, online_since_ms_);
-  if (status.transmitting && talking) {
+  // ⚠ CE QUI PART, ET NON LA TOUCHE : la voix et le délai au relâchement
+  // font parler sans elle.
+  if (status.transmitting) {
     overlay_.self_talking = Tr("Vous parlez");
   }
+  input_percent_ = status.input_level / kVoiceLevelAtFullScale * kPercent;
   heard_ = std::move(status.nearby);
   blocked_ = std::move(status.blocked);
   for (rv::SpeakingVoice& voice : status.speaking) {

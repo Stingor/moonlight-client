@@ -21892,3 +21892,33 @@ tr: Teclado num. Intro
 
 fr: Pavé num.
 tr: Teclado num.
+
+fr: En tenant la touche
+tr: Mantener la tecla
+
+fr: À la voix
+tr: Activación por voz
+
+fr: Mode de parole
+tr: Modo de voz
+
+fr: En tenant la touche, rien ne part sans elle. À la voix, le micro part dès qu'il vous entend plus fort que le seuil ; la touche marche aussi.
+tr: Manteniendo la tecla, nada se envía sin ella. Con activación por voz, el micrófono envía en cuanto te oye por encima del umbral; la tecla también funciona.
+
+fr: Délai au relâchement
+tr: Retardo al soltar
+
+fr: Combien la parole tient encore après la touche lâchée, ou après votre dernier mot à la voix : une fin de phrase ne se coupe pas.
+tr: Cuánto dura aún la voz después de soltar la tecla, o tras tu última palabra con activación por voz: el final de una frase no se corta.
+
+fr: Seuil de la voix
+tr: Umbral de voz
+
+fr: Le micro part quand son niveau dépasse ce seuil. Réglez-le au-dessus du niveau de votre pièce en silence, et sous celui de votre voix.
+tr: El micrófono envía cuando su nivel supera este umbral. Ajústalo por encima del nivel de tu habitación en silencio y por debajo del de tu voz.
+
+fr: Niveau du micro :
+tr: Nivel del micrófono:
+
+fr: voix fermée
+tr: voz cerrada

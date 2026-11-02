@@ -72,6 +72,9 @@ class VoiceMode {
 
   // Le témoin à dessiner, composé à la dernière pompe.
   [[nodiscard]] const ro::ui::VoiceOverlayState& overlay() const noexcept { return overlay_; }
+  // Le niveau du micro à la dernière pompe, en pour cent de
+  // `kVoiceLevelAtFullScale` ; vide quand la liaison est fermée.
+  [[nodiscard]] std::optional<float> input_percent() const noexcept { return input_percent_; }
 
   // CE QUE LA VOIX SAIT D'UN JOUEUR, par son nom : le nom est le seul lien
   // entre le personnage à l'écran et celui du serveur voix.
@@ -98,7 +101,7 @@ class VoiceMode {
   void Stop() noexcept;
   // Ferme une liaison ouverte, et dit pourquoi au journal.
   void StopFor(std::string_view why);
-  void Compose(const VoiceFacts& facts, bool talking);
+  void Compose(const VoiceFacts& facts);
 
   std::uint32_t caps_ = 0;
   std::optional<ro::net::VoiceService> service_;
@@ -117,6 +120,7 @@ class VoiceMode {
   std::uint32_t online_since_ms_ = 0;
   bool was_online_ = false;
   ro::ui::VoiceOverlayState overlay_;
+  std::optional<float> input_percent_;
   // Relevés à la dernière pompe, vides quand la liaison est fermée.
   std::vector<ro::voice::NearbyPlayer> heard_;
   std::vector<ro::voice::NearbyPlayer> blocked_;

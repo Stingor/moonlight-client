@@ -21892,3 +21892,33 @@ tr: Keypad Enter
 
 fr: Pavé num.
 tr: Keypad
+
+fr: En tenant la touche
+tr: Push to talk
+
+fr: À la voix
+tr: Voice activation
+
+fr: Mode de parole
+tr: Speaking mode
+
+fr: En tenant la touche, rien ne part sans elle. À la voix, le micro part dès qu'il vous entend plus fort que le seuil ; la touche marche aussi.
+tr: With push to talk, nothing is sent without the key. With voice activation, the microphone sends as soon as it hears you louder than the threshold; the key works too.
+
+fr: Délai au relâchement
+tr: Release delay
+
+fr: Combien la parole tient encore après la touche lâchée, ou après votre dernier mot à la voix : une fin de phrase ne se coupe pas.
+tr: How long speaking lasts after you let go of the key, or after your last word with voice activation: the end of a sentence is not cut off.
+
+fr: Seuil de la voix
+tr: Voice threshold
+
+fr: Le micro part quand son niveau dépasse ce seuil. Réglez-le au-dessus du niveau de votre pièce en silence, et sous celui de votre voix.
+tr: The microphone sends when its level rises above this threshold. Set it above the level of your silent room, and below that of your voice.
+
+fr: Niveau du micro :
+tr: Microphone level:
+
+fr: voix fermée
+tr: voice off

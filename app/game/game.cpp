@@ -154,9 +154,10 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
     // raccourcis : elle attend son geste même fenêtre des raccourcis fermée.
     const int talk_rank = static_cast<int>(ActionRef(GameAction::kVoiceTalk).rank());
     VoiceOptions& voice_options = settings_->options().pages().voice;
-    voice_options.ShowTalkKey(
-        VoiceTalkKeyView{.label = talk.bound() ? LabelOfBinding(talk) : std::string(),
-                         .capturing = windows_.hotkeys.capturing == talk_rank});
+    voice_options.ShowLive(
+        VoiceLiveView{.talk_key = talk.bound() ? LabelOfBinding(talk) : std::string(),
+                      .capturing = windows_.hotkeys.capturing == talk_rank,
+                      .input_percent = voice_.input_percent()});
     if (voice_options.TakeTalkKeyRequest()) {
       windows_.hotkeys.capturing = talk_rank;
       windows_.hotkeys.robbed[0] = '\0';

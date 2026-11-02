@@ -4,6 +4,8 @@
 
 #include <algorithm>
 #include <array>
+#include <cmath>
+#include <string>
 #include <string_view>
 #include <utility>
 
@@ -27,6 +29,9 @@ constexpr const char* kInputGainKey = "voice_input_gain";
 constexpr const char* kMicrophoneKey = "voice_microphone";
 constexpr const char* kSpeakersKey = "voice_speakers";
 constexpr const char* kSpeakingIconKey = "voice_speaking_icon";
+constexpr const char* kTalkModeKey = "voice_talk_mode";
+constexpr const char* kReleaseKey = "voice_release_ms";
+constexpr const char* kActivationKey = "voice_activation_percent";
 
 // Les images, rangées comme `SpeakingIcon`.
 constexpr std::array<std::string_view, static_cast<std::size_t>(SpeakingIcon::kCount)>
@@ -75,6 +80,9 @@ void VoiceOptions::Declare(SettingsFile& into) {
   into.Declare(kMicrophoneKey, &settings_.microphone);
   into.Declare(kSpeakersKey, &settings_.speakers);
   into.Declare(kSpeakingIconKey, &settings_.speaking_icon);
+  into.Declare(kTalkModeKey, &settings_.talk_mode);
+  into.Declare(kReleaseKey, &settings_.release_ms);
+  into.Declare(kActivationKey, &settings_.activation_percent);
 }
 
 void VoiceOptions::ListDevicesWith(DeviceLister microphones, DeviceLister speakers) {
@@ -89,6 +97,9 @@ VoiceSettings VoiceOptions::settings() const noexcept {
   sane.input_gain = std::clamp(sane.input_gain, 0.0F, kVoiceMostInputGain);
   sane.speaking_icon =
       std::clamp(sane.speaking_icon, 0, static_cast<int>(SpeakingIcon::kCount) - 1);
+  sane.talk_mode = std::clamp(sane.talk_mode, 0, static_cast<int>(VoiceTalkMode::kCount) - 1);
+  sane.release_ms = std::clamp(sane.release_ms, 0, kVoiceMostReleaseMs);
+  sane.activation_percent = std::clamp(sane.activation_percent, 0.0F, kPercent);
   return sane;
 }
 
@@ -104,11 +115,22 @@ void VoiceOptions::ComposeInto(std::vector<OptionRowView>& rows) {
       .kind = OptionKind::kToggle,
       .on = sane.enabled});
   rows.back().heading = Tr("Voix");
-  if (talk_key_.capturing) {
+  const bool by_voice = sane.talk_mode == static_cast<int>(VoiceTalkMode::kVoice);
+  mode_names_ = {Tr("En tenant la touche"), Tr("À la voix")};
+  rows.push_back(OptionRowView{
+      .id = VoiceRowId(VoiceRow::kTalkMode),
+      .label = Tr("Mode de parole"),
+      .help = Tr("En tenant la touche, rien ne part sans elle. À la voix, le micro part dès qu'il "
+                 "vous entend plus fort que le seuil ; la touche marche aussi."),
+      .kind = OptionKind::kChoice,
+      .chosen = sane.talk_mode,
+      .choices = mode_names_,
+      .disabled = !sane.enabled});
+  if (live_.capturing) {
     talk_key_text_ = Tr("Appuyez sur une touche - Échap annule, Suppr retire le raccourci.");
   } else {
     talk_key_text_ = std::string(Tr("Touche pour parler :")) + " " +
-                     (talk_key_.label.empty() ? std::string(Tr("aucune")) : talk_key_.label);
+                     (live_.talk_key.empty() ? std::string(Tr("aucune")) : live_.talk_key);
   }
   rows.push_back(OptionRowView{
       .id = VoiceRowId(VoiceRow::kTalkKey),
@@ -117,6 +139,35 @@ void VoiceOptions::ComposeInto(std::vector<OptionRowView>& rows) {
                  "raccourcis clavier."),
       .kind = OptionKind::kAction,
       .disabled = !sane.enabled});
+  rows.push_back(OptionRowView{
+      .id = VoiceRowId(VoiceRow::kRelease),
+      .label = Tr("Délai au relâchement"),
+      .help = Tr("Combien la parole tient encore après la touche lâchée, ou après votre dernier "
+                 "mot à la voix : une fin de phrase ne se coupe pas."),
+      .kind = OptionKind::kSlider,
+      .value = static_cast<float>(sane.release_ms),
+      .lowest = 0.0F,
+      .highest = static_cast<float>(kVoiceMostReleaseMs),
+      .format = "%.0f ms",
+      .disabled = !sane.enabled});
+  rows.push_back(OptionRowView{
+      .id = VoiceRowId(VoiceRow::kActivation),
+      .label = Tr("Seuil de la voix"),
+      .help = Tr("Le micro part quand son niveau dépasse ce seuil. Réglez-le au-dessus du niveau "
+                 "de votre pièce en silence, et sous celui de votre voix."),
+      .kind = OptionKind::kSlider,
+      .value = sane.activation_percent,
+      .lowest = 0.0F,
+      .highest = kPercent,
+      .format = "%.0f %%",
+      .disabled = !sane.enabled || !by_voice});
+  level_text_ =
+      std::string(Tr("Niveau du micro :")) + " " +
+      (live_.input_percent.has_value() ? std::to_string(std::lround(*live_.input_percent)) + " %"
+                                       : std::string(Tr("voix fermée")));
+  rows.push_back(OptionRowView{.id = VoiceRowId(VoiceRow::kInputLevel),
+                               .label = level_text_.c_str(),
+                               .kind = OptionKind::kNote});
   rows.push_back(OptionRowView{
       .id = VoiceRowId(VoiceRow::kChannel),
       .label = Tr("Canal de la voix"),
@@ -204,6 +255,16 @@ bool VoiceOptions::Change(const ro::ui::OptionsWindowAction& asked) {
     case VoiceRow::kSpeakingIcon:
       settings_.speaking_icon = asked.chosen;
       break;
+    case VoiceRow::kTalkMode:
+      settings_.talk_mode = asked.chosen;
+      break;
+    case VoiceRow::kRelease:
+      settings_.release_ms = static_cast<int>(std::lround(asked.value));
+      break;
+    case VoiceRow::kActivation:
+      settings_.activation_percent = asked.value;
+      break;
+    case VoiceRow::kInputLevel:
     case VoiceRow::kCount:
       break;
   }

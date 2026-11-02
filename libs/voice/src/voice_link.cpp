@@ -34,6 +34,17 @@ constexpr float kSampleCeiling = static_cast<float>(std::numeric_limits<std::int
   return drawn;
 }
 
+// La moyenne quadratique d'une trame, de 0 à 1.
+[[nodiscard]] float LevelOf(std::span<const std::int16_t> frame) {
+  if (frame.empty()) return 0.0F;
+  double sum = 0.0;
+  for (const std::int16_t sample : frame) {
+    const double scaled = static_cast<double>(sample) / static_cast<double>(kSampleCeiling);
+    sum += scaled * scaled;
+  }
+  return static_cast<float>(std::sqrt(sum / static_cast<double>(frame.size())));
+}
+
 [[nodiscard]] std::span<const std::uint8_t> BytesOf(const std::string& text) {
   return {reinterpret_cast<const std::uint8_t*>(text.data()), text.size()};
 }
@@ -52,7 +63,7 @@ VoiceLink::VoiceLink(VoiceTarget target, VoiceDevices devices)
 void VoiceLink::Step(std::uint32_t now_ms) {
   if (!tcp_.is_open()) {
     if (state_ == VoiceLinkState::kLost && now_ms < retry_at_ms_) {
-      Capture();
+      Capture(now_ms);
       Play(now_ms);
       return;
     }
@@ -70,7 +81,7 @@ void VoiceLink::Step(std::uint32_t now_ms) {
       SendText(PingMessage(now_ms));
     }
   }
-  Capture();
+  Capture(now_ms);
   Play(now_ms);
   Flush(now_ms);
 }
@@ -243,7 +254,18 @@ void VoiceLink::FollowControls() {
     told_channel_ = controls_.channel;
     SendText(SetChannelMessage(controls_.channel));
   }
-  const bool talking = controls_.talking && encoder_.has_value();
+}
+
+void VoiceLink::FollowTalking(std::uint32_t now_ms) {
+  if (state_ != VoiceLinkState::kOnline) return;
+  if (controls_.talking) {
+    last_spoke_ms_ = now_ms;
+  }
+  const std::uint32_t hold_ms = controls_.voice_activated
+                                    ? std::max(controls_.release_ms, kVoiceActivationLeastHoldMs)
+                                    : controls_.release_ms;
+  const bool held = last_spoke_ms_.has_value() && now_ms - *last_spoke_ms_ < hold_ms;
+  const bool talking = encoder_.has_value() && (controls_.talking || held);
   if (told_talking_ != talking) {
     told_talking_ = talking;
     SendText(TalkMessage(talking, session_id_));
@@ -257,7 +279,7 @@ void VoiceLink::Greet(std::uint32_t now_ms) {
   next_hello_ms_ = now_ms + (udp_ready_ ? kVoiceHelloKeepMs : kVoiceHelloRetryMs);
 }
 
-void VoiceLink::Capture() {
+void VoiceLink::Capture(std::uint32_t now_ms) {
   if (devices_.read_capture) {
     const std::size_t before = captured_.size();
     captured_.resize(before + kVoiceFrameSamples * kMostCaptureFramesPerStep);
@@ -265,26 +287,33 @@ void VoiceLink::Capture() {
         devices_.read_capture(std::span<std::int16_t>(captured_).subspan(before));
     captured_.resize(before + std::min(read, captured_.size() - before));
   }
-  const bool transmitting = state_ == VoiceLinkState::kOnline && told_talking_ == true;
   std::size_t used = 0;
   while (captured_.size() - used >= kVoiceFrameSamples) {
     const std::span<std::int16_t> frame(captured_.data() + used, kVoiceFrameSamples);
     used += kVoiceFrameSamples;
     // ⚠ LE MICRO SE LIT MÊME QUAND ON SE TAIT : sans quoi, la touche enfoncée,
-    // partiraient d'abord les secondes entendues avant.
-    if (!transmitting) continue;
+    // partiraient d'abord les secondes entendues avant. Et c'est à le lire
+    // qu'on sait si la voix dépasse le seuil.
     if (controls_.input_gain != 1.0F) {
       for (std::int16_t& sample : frame) {
         sample = static_cast<std::int16_t>(std::lround(std::clamp(
             static_cast<float>(sample) * controls_.input_gain, -kSampleCeiling, kSampleCeiling)));
       }
     }
+    input_level_ = LevelOf(frame);
+    if (controls_.voice_activated && input_level_ >= controls_.activation_level) {
+      last_spoke_ms_ = now_ms;
+    }
+    FollowTalking(now_ms);
+    if (state_ != VoiceLinkState::kOnline || told_talking_ != true) continue;
     core::Result<std::vector<std::uint8_t>> packet = encoder_->Encode(frame);
     if (packet.has_value()) {
       SendVoice(*packet);
     }
   }
   captured_.erase(captured_.begin(), captured_.begin() + static_cast<std::ptrdiff_t>(used));
+  // SANS MICRO, OU ENTRE DEUX TRAMES : la touche et le délai se suivent aussi.
+  FollowTalking(now_ms);
 }
 
 void VoiceLink::Play(std::uint32_t now_ms) {
@@ -337,6 +366,7 @@ VoiceStatus VoiceLink::status(std::uint32_t now_ms) const {
                      .refusal = refusal_,
                      .udp = udp_ready_,
                      .transmitting = state_ == VoiceLinkState::kOnline && told_talking_ == true,
+                     .input_level = input_level_,
                      .war = war_,
                      .in_room = in_room_,
                      .speaking = mixer_.speaking(now_ms),

@@ -41,6 +41,15 @@ inline constexpr std::size_t kVoicePlaybackLeadFrames = 3;
 // Au-delà, le TCP n'avance plus : l'audio qui suivrait s'y entasserait.
 inline constexpr std::size_t kVoiceMostOutboundBytes = 64 * 1024;
 
+// LE NIVEAU DU MICRO : la moyenne quadratique d'une trame, gain compris, sur
+// une échelle où 1 est le plus fort possible. Une voix ordinaire tient entre
+// 0,02 et 0,2 ; un silence de pièce, sous 0,01.
+inline constexpr float kVoiceDefaultActivationLevel = 0.03F;
+inline constexpr std::uint32_t kVoiceDefaultReleaseMs = 300;
+// LA PAROLE À LA VOIX TIENT AU MOINS CECI : les blancs entre deux mots ne
+// coupent pas la phrase, même délai de relâchement à zéro.
+inline constexpr std::uint32_t kVoiceActivationLeastHoldMs = 200;
+
 // LES APPAREILS DE SON, vus de la voix : des fonctions, que `app` branche sur
 // ceux de la couche de son. Un micro absent est une lecture vide.
 struct VoiceDevices {
@@ -64,6 +73,13 @@ struct VoiceTarget {
 // CE QUE LE JOUEUR DEMANDE, redit à chaque pas.
 struct VoiceControls {
   bool talking = false;  // la touche « Parler » est tenue
+  // PARLER À LA VOIX : le micro part dès qu'il entend plus fort que le seuil,
+  // touche ou non. Le seuil se compare à `VoiceStatus::input_level`.
+  bool voice_activated = false;
+  float activation_level = kVoiceDefaultActivationLevel;
+  // CE QUE LA PAROLE TIENT ENCORE après la touche lâchée, ou après le dernier
+  // son au-dessus du seuil : une fin de phrase ne se coupe pas.
+  std::uint32_t release_ms = kVoiceDefaultReleaseMs;
   VoiceChannel channel = VoiceChannel::kNearby;
   float output_gain = 1.0F;
   float input_gain = 1.0F;
@@ -86,8 +102,11 @@ struct VoiceStatus {
   std::optional<RefusalKind> refusal;
   bool udp = false;           // l'audio passe par l'UDP
   bool transmitting = false;  // le micro part vers le serveur
-  bool war = false;           // la proximité est coupée par la guerre de guilde
-  bool in_room = false;       // la voix est celle du salon de discussion
+  // Le niveau de la dernière trame du micro, gain compris. Voir
+  // `kVoiceDefaultActivationLevel`.
+  float input_level = 0.0F;
+  bool war = false;      // la proximité est coupée par la guerre de guilde
+  bool in_room = false;  // la voix est celle du salon de discussion
   std::vector<SpeakingVoice> speaking;
   std::vector<NearbyPlayer> nearby;
   // Les joueurs en ligne que ce compte n'entend plus.
@@ -113,8 +132,11 @@ class VoiceLink {
   void ReadUdp(std::uint32_t now_ms);
   void Apply(const ServerMessage& message, std::uint32_t now_ms);
   void FollowControls();
+  // Dit au serveur qu'on parle, ou qu'on s'est tu, d'après la touche, la voix
+  // et le délai de relâchement.
+  void FollowTalking(std::uint32_t now_ms);
   void Greet(std::uint32_t now_ms);
-  void Capture();
+  void Capture(std::uint32_t now_ms);
   void Play(std::uint32_t now_ms);
   void SendText(const std::string& json);
   void SendVoice(std::span<const std::uint8_t> opus);
@@ -155,6 +177,10 @@ class VoiceLink {
   std::optional<OpusVoiceEncoder> encoder_;
   std::vector<std::int16_t> captured_;
   std::uint16_t sequence_ = 0;
+  float input_level_ = 0.0F;
+  // Le dernier instant où l'on parlait — touche tenue ou voix au-dessus du
+  // seuil —, vide tant que ce n'est jamais arrivé.
+  std::optional<std::uint32_t> last_spoke_ms_;
   VoiceMixer mixer_;
   std::vector<std::int16_t> mixed_ = std::vector<std::int16_t>(kVoiceOutputFrameSamples);
 };
