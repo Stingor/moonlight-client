@@ -478,15 +478,7 @@ void Game::DrawInterface(std::uint32_t now_ms) {
   // Même règle : rien n'est fermé ni déplacé, et tout ce qui précède a tourné.
   // L'image de l'écran de chargement n'a pas d'autre interface.
   if (survivors_.owns_screen()) {
-    if (!survivors_mode_->loading_shown_now()) {
-      ComposeOptionSamples(now_ms);
-      const SurvivorsAsk asked = interface_->DrawSurvivorsOnly(
-          survivors_mode_->View(survivors_, survivors_mode_->context()));
-      // LES OPTIONS DU JEU OUVERTES SUR LA PAUSE agissent tout de suite.
-      settings_->ApplyOptionsAside(asked.options, windows_.options, OptionsTargets(), now_ms);
-      survivors_mode_->NoteAsk(asked);
-      PaintCursor();
-    }
+    if (!survivors_mode_->loading_shown_now()) DrawSurvivorsInterface(now_ms);
     settings_->Tick(now_ms);
     return;
   }

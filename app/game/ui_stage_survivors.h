@@ -3,6 +3,8 @@
 #include <optional>
 #include <span>
 
+#include "ro/ui/chat_window.h"
+#include "ro/ui/damage_meter_window.h"
 #include "ro/ui/map_sign_banner.h"
 #include "ro/ui/options_window.h"
 #include "ro/ui/survivors_album_window.h"
@@ -15,12 +17,32 @@
 #include "ro/ui/survivors_records_window.h"
 #include "ro/ui/survivors_shop.h"
 #include "ro/ui/survivors_summary_window.h"
+#include "ro/ui/voice_overlay.h"
+
+#include "chat/chat_tab_view.h"
 
 namespace moonclient {
 
+// LA CONVERSATION ET LA VOIX PAR-DESSUS L'ARÈNE : la fenêtre principale — son
+// fil et sa saisie — et le témoin de qui parle. La partie ne coupe pas le
+// joueur des autres. Les fenêtres flottantes, les salons et les 1:1 attendent
+// le retour au jeu.
+struct SurvivorsTalkView {
+  ro::ui::ChatWindows* chat = nullptr;
+  const ro::ui::ChatLinePreview* preview = nullptr;
+  const ChatTabsView* tabs = nullptr;
+  std::span<const ro::ui::ChatInputLink> links;
+  std::span<const ro::ui::ChatEmotion> emotions;
+  std::span<const ro::ui::ChatEmojiGroup> emojis;
+  // Le compteur de dégâts, quand l'onglet montré est le sien.
+  const ro::ui::DamageMeterView* meter = nullptr;
+  const ro::ui::VoiceOverlayState* voice = nullptr;
+};
+
 // UNE IMAGE D'INTERFACE PENDANT UNE PARTIE DE SURVIVORS : le HUD, la fenêtre
-// de l'écran en cours et le bandeau du nom de l'arène, rien d'autre. Les
-// fenêtres du jeu ne se dessinent pas — elles ne sont ni fermées ni
+// de l'écran en cours, le bandeau du nom de l'arène, la conversation et le
+// témoin de la voix (`SurvivorsTalkView`). Les autres fenêtres du jeu ne se
+// dessinent pas — elles ne sont ni fermées ni
 // déplacées, et l'image qui suit la partie les redessine telles qu'avant.
 //
 // ⚠ LES VUES POINTENT DANS CE QU'APP A COMPOSÉ POUR L'IMAGE, et les états des
@@ -52,6 +74,8 @@ struct SurvivorsFrameView {
   ro::ui::SurvivorsCodexState* codex_state = nullptr;
   const ro::ui::SurvivorsAlbumView* album = nullptr;
   ro::ui::SurvivorsAlbumState* album_state = nullptr;
+  // Posée par app après la vue du mode, qui ne la connaît pas.
+  SurvivorsTalkView talk;
 };
 
 // CE QUE LES FENÊTRES DE L'IMAGE ONT DEMANDÉ : app en fait l'intention de
@@ -67,6 +91,8 @@ struct SurvivorsAsk {
   ro::ui::SurvivorsShopAsk church;
   ro::ui::SurvivorsRankingAsk ranking;
   ro::ui::SurvivorsCodexAsk codex;
+  // Ce que la fenêtre de conversation a demandé, appliqué comme en jeu.
+  std::optional<ro::ui::ChatWindowAction> chat;
 };
 
 // LES FENÊTRES DE LA MÉTA (Q1) : l'Église, la Kafra, le Codex et les records,

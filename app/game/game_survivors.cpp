@@ -20,6 +20,7 @@
 
 #include "ro/render/screen_tint.h"
 #include "ro/sim/deal.h"
+#include "ro/ui/chat_bar.h"
 
 #include "game/game.h"
 #include "game/survivors_mode.h"
@@ -116,7 +117,71 @@ bool Game::SurvivorsTakes(const SDL_Event& event, std::uint32_t now_ms) {
   }
   // La souris au-dessus d'une fenêtre, telle que l'interface l'a vue avant la
   // route : la molette y fait défiler la fenêtre, pas reculer la caméra.
-  return survivors_mode_->Take(SurvivorsEventOf(event, interface_->gate().mouse_to_ui));
+  const ro::ui::InputGate gate = interface_->gate();
+  const SurvivorsEvent routed = SurvivorsEventOf(event, gate.mouse_to_ui);
+  // 🔴 LE CLAVIER SE PARTAGE AVEC LA CONVERSATION ET LA VOIX. L'interface a
+  // déjà vu la frappe ; reste à dire si l'arène la voit aussi.
+  ro::ui::ChatInputState& input = windows_.chat.main.input;
+  const Binding talk = settings_->bindings().Of(GameAction::kVoiceTalk);
+  const bool key_event = event.type == SDL_EVENT_KEY_DOWN || event.type == SDL_EVENT_KEY_UP;
+  const SurvivorsKeyFacts facts{
+      .typing = gate.typing_to_ui,
+      .chat_claims = ro::ui::ChatBarTakesTyping(input.battle_mode, input.unfolded, gate.text_to_ui),
+      .chest_shown = survivors_.screen() == SurvivorsScreen::kChest,
+      .chat_folds_on_escape = ro::ui::ChatBarFoldsOnEscape(input.battle_mode, input.unfolded),
+      .talk_key = key_event && talk.bound() && event.key.key == talk.key};
+  switch (SurvivorsKeyTurnOf(routed, facts)) {
+    case SurvivorsKeyTurn::kArena:
+      return survivors_mode_->Take(routed);
+    case SurvivorsKeyTurn::kTyping:
+      survivors_mode_->ReleaseHeld();
+      return true;
+    case SurvivorsKeyTurn::kVoice:
+      return true;
+    case SurvivorsKeyTurn::kOpenChat:
+      // Le même dépôt qu'Entrée en jeu : la barre tranche en tête d'image.
+      windows_.chat.main.open = true;
+      input.enter_pending = true;
+      return true;
+    case SurvivorsKeyTurn::kFoldChat:
+      input.escape_pending = true;
+      return true;
+  }
+  return true;
+}
+
+void Game::DrawSurvivorsInterface(std::uint32_t now_ms) {
+  ComposeOptionSamples(now_ms);
+  SurvivorsFrameView view = survivors_mode_->View(survivors_, survivors_mode_->context());
+  view.talk = SurvivorsTalkView{
+      .chat = &windows_.chat,
+      .preview = &chat_preview_.preview(),
+      .tabs = &*chat_tabs_,
+      .links = input_links_,
+      .emotions = emotions_,
+      .emojis = emojis_,
+      .meter = windows_.damage_meter_view.look.shown ? &windows_.damage_meter_view : nullptr,
+      .voice = &windows_.voice};
+  SurvivorsAsk asked = interface_->DrawSurvivorsOnly(view);
+  // LES OPTIONS DU JEU OUVERTES SUR LA PAUSE agissent tout de suite.
+  settings_->ApplyOptionsAside(asked.options, windows_.options, OptionsTargets(), now_ms);
+  // LA CONVERSATION PAR LE MÊME CHEMIN QU'EN JEU : la ligne part, puis les
+  // gestes de la fenêtre s'appliquent.
+  if (asked.chat.has_value()) {
+    UiStage::Answers answers;
+    answers.chat.push_back(UiStage::ChatWindowAsk{.asked = std::move(*asked.chat)});
+    asked.chat.reset();
+    SendTypedChat(answers, now_ms);
+    ApplyChatAnswers(answers, now_ms);
+    // 🔴 DANS L'ARÈNE, UNE LIGNE ENVOYÉE REND LE CLAVIER À LA PARTIE. En jeu
+    // la barre le garde pour la phrase suivante ; ici le héros est sous les
+    // coups, et il doit pouvoir marcher dès la ligne partie.
+    if (answers.chat.front().asked.said.has_value()) {
+      windows_.chat.main.input.wants_focus = false;
+    }
+  }
+  survivors_mode_->NoteAsk(asked);
+  PaintCursor();
 }
 
 void Game::FrameSurvivors(std::uint32_t now_ms) {

@@ -118,6 +118,8 @@ class SurvivorsMode {
   void FollowDoor(SurvivorsStage& stage, const SurvivorsContext& context);
   // Un événement pendant que la partie tient l'écran : vrai quand il est pris.
   [[nodiscard]] bool Take(const SurvivorsEvent& event) { return route_.Take(event); }
+  // Le clavier part à un champ de texte : voir `SurvivorsRoute::ReleaseHeld`.
+  void ReleaseHeld() noexcept { route_.ReleaseHeld(); }
   // UNE IMAGE DE PARTIE : relevé, intention, étage, arène, sons, musique.
   // L'arène se peint dans la cible liée par l'appelant.
   [[nodiscard]] SurvivorsPainted Frame(SurvivorsStage& stage, const SurvivorsContext& context);

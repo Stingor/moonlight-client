@@ -2,6 +2,8 @@
 // veille, l'écran de chargement, celui de mise à jour ou une partie de
 // survivors.
 
+#include <cstdint>
+
 #include "ro/ui/loading_screen.h"
 #include "ro/ui/survivors_church_window.h"
 #include "ro/ui/survivors_ranking_window.h"
@@ -40,6 +42,20 @@ SurvivorsAsk UiStage::DrawSurvivorsOnly(const SurvivorsFrameView& view) {
   // LE HUD SOUS TOUT : il peint sur la liste de fond et n'ouvre aucune fenêtre.
   if (view.hud != nullptr) ro::ui::DrawSurvivorsHud(*view.hud);
   if (view.map_sign != nullptr) ro::ui::DrawMapSign(*view.map_sign, ui_->MapSignFont());
+  // LA CONVERSATION SOUS LES FENÊTRES DE LA PARTIE : un choix de carte ou la
+  // pause passent devant elle. Les polices du texte riche sont celles que la
+  // dernière image du jeu a posées dans `rich`.
+  const SurvivorsTalkView& talk = view.talk;
+  if (talk.chat != nullptr && talk.preview != nullptr && talk.tabs != nullptr) {
+    constexpr std::uint32_t kMainGroup = 0;
+    const ChatTabsView& tabs = *talk.tabs;
+    talk.chat->board.strips.clear();
+    ask.chat = ro::ui::DrawChatWindow(
+        talk.chat->main, tabs.look(kMainGroup), *talk.preview, tabs.lines(kMainGroup),
+        tabs.layout(kMainGroup), tabs.tabs(kMainGroup), tabs.count(), tabs.types(kMainGroup),
+        tabs.tuned_look(kMainGroup), talk.emotions, talk.emojis, talk.chat->board, skin_,
+        talk.links, talk.chat->link_facts, talk.meter);
+  }
   if (view.offer != nullptr && view.offer_state != nullptr) {
     ask.offer = ro::ui::DrawSurvivorsOfferWindow(*view.offer_state, *view.offer, skin_);
   }
@@ -72,6 +88,8 @@ SurvivorsAsk UiStage::DrawSurvivorsOnly(const SurvivorsFrameView& view) {
   if (view.ranking != nullptr && view.ranking_state != nullptr) {
     ask.ranking = ro::ui::DrawSurvivorsRankingWindow(*view.ranking_state, *view.ranking, skin_);
   }
+  // QUI PARLE, par-dessus tout, comme dans le jeu.
+  if (talk.voice != nullptr) ro::ui::DrawVoiceOverlay(*talk.voice);
   ui_->EndFrame();
   backend_.Draw();
   return ask;

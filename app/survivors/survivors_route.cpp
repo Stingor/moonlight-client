@@ -14,6 +14,29 @@ bool SurvivorsReadsKey(std::uint32_t scancode) noexcept {
          scancode == kScancodeTab || (scancode >= kScancodeDigit1 && scancode <= kScancodeDigit4);
 }
 
+SurvivorsKeyTurn SurvivorsKeyTurnOf(const SurvivorsEvent& event,
+                                    const SurvivorsKeyFacts& facts) noexcept {
+  const bool keyboard = event.kind == SurvivorsEventKind::kKeyDown ||
+                        event.kind == SurvivorsEventKind::kKeyUp ||
+                        event.kind == SurvivorsEventKind::kText;
+  if (!keyboard) return SurvivorsKeyTurn::kArena;
+  if (facts.typing) return SurvivorsKeyTurn::kTyping;
+  const SurvivorsKeyTurn otherwise =
+      facts.chat_claims ? SurvivorsKeyTurn::kTyping : SurvivorsKeyTurn::kArena;
+  if (event.kind == SurvivorsEventKind::kText) return otherwise;
+  if (facts.talk_key) return SurvivorsKeyTurn::kVoice;
+  // Entrée et Échap gardent leur sens même quand la barre réclame les
+  // frappes : ce sont elles qui l'ouvrent, l'envoient et la replient.
+  if (event.kind == SurvivorsEventKind::kKeyDown && !event.repeat) {
+    const bool enter = event.scancode == kScancodeReturn || event.scancode == kScancodeKeypadEnter;
+    if (enter && !facts.chest_shown) return SurvivorsKeyTurn::kOpenChat;
+    if (event.scancode == kScancodeEscape && facts.chat_folds_on_escape) {
+      return SurvivorsKeyTurn::kFoldChat;
+    }
+  }
+  return otherwise;
+}
+
 bool SurvivorsRoute::Take(const SurvivorsEvent& event) {
   switch (event.kind) {
     case SurvivorsEventKind::kKeyDown:
@@ -36,7 +59,10 @@ bool SurvivorsRoute::Take(const SurvivorsEvent& event) {
     case SurvivorsEventKind::kMouseUp:
       mouse_x_ = event.x;
       mouse_y_ = event.y;
-      if (event.button == kLeftMouseButton) {
+      // Un appui sur une fenêtre — la conversation — ne vise pas ; le
+      // relâchement, lui, lâche toujours.
+      if (event.button == kLeftMouseButton &&
+          !(event.kind == SurvivorsEventKind::kMouseDown && event.over_interface)) {
         mouse_held_ = event.kind == SurvivorsEventKind::kMouseDown;
       }
       return true;
@@ -67,5 +93,10 @@ bool SurvivorsRoute::Take(const SurvivorsEvent& event) {
 SurvivorsGestures SurvivorsRoute::TakeGestures() noexcept { return std::exchange(gestures_, {}); }
 
 void SurvivorsRoute::Reset() noexcept { *this = SurvivorsRoute(); }
+
+void SurvivorsRoute::ReleaseHeld() noexcept {
+  keys_.ReleaseAll();
+  mouse_held_ = false;
+}
 
 }  // namespace moonclient

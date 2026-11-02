@@ -86,6 +86,42 @@ struct SurvivorsGestures {
 // garder une action du jeu qui ne touche pas au personnage (l'enregistreur).
 [[nodiscard]] bool SurvivorsReadsKey(std::uint32_t scancode) noexcept;
 
+// À QUI VA UNE FRAPPE PENDANT LA PARTIE, maintenant que la conversation et la
+// voix restent par-dessus l'arène.
+enum class SurvivorsKeyTurn : std::uint8_t {
+  // À la route de l'arène, comme avant.
+  kArena,
+  // Un champ de texte écrit : la frappe est à lui, et le héros lâche les
+  // touches qu'il tenait — leur relâchement ira au champ.
+  kTyping,
+  // La touche « Parler (voix) » : la voix la lit sur l'état du clavier, et
+  // l'arène ne la voit pas.
+  kVoice,
+  // Entrée hors du coffre : la conversation s'ouvre.
+  kOpenChat,
+  // Échap sur la barre que le battle mode a dépliée : elle se replie, et la
+  // partie ne se met pas en pause.
+  kFoldChat,
+};
+
+// Ce que l'interface et l'écran disent au moment de la frappe.
+struct SurvivorsKeyFacts {
+  // Un champ de texte a le clavier : toute frappe est à lui.
+  bool typing = false;
+  // La barre que le battle mode a dépliée réclame les frappes sans avoir le
+  // clavier : tout lui va, sauf Entrée et Échap.
+  bool chat_claims = false;
+  // Le coffre est à l'écran : Entrée y vaut « Continuer ».
+  bool chest_shown = false;
+  // La barre de conversation se replie sur Échap.
+  bool chat_folds_on_escape = false;
+  // La frappe est celle de la touche « Parler (voix) ».
+  bool talk_key = false;
+};
+
+[[nodiscard]] SurvivorsKeyTurn SurvivorsKeyTurnOf(const SurvivorsEvent& event,
+                                                  const SurvivorsKeyFacts& facts) noexcept;
+
 class SurvivorsRoute {
  public:
   // Vrai quand l'événement est pris.
@@ -94,6 +130,9 @@ class SurvivorsRoute {
   [[nodiscard]] SurvivorsGestures TakeGestures() noexcept;
   // Une partie neuve, ou le retour au jeu : rien n'est tenu.
   void Reset() noexcept;
+  // Le clavier part à un champ de texte : les touches et le bouton tenus se
+  // lâchent, sans toucher aux gestes de l'image.
+  void ReleaseHeld() noexcept;
 
   [[nodiscard]] const MoveKeys& keys() const noexcept { return keys_; }
   [[nodiscard]] bool mouse_held() const noexcept { return mouse_held_; }

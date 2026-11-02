@@ -491,7 +491,6 @@ class Game : public Screen,
   void ComposeCursor(const ro::sim::Actor* designated,
                      const std::optional<ro::sim::CellPosition>& hovered_cell,
                      std::uint32_t now_ms);
-
   // REPEINT L'IMAGE DU MONDE À TRAVERS LA TEINTE DE LA VEILLE. ⚠ ENTRE LE MONDE
   // ET L'INTERFACE, et hors du dessin du monde, qui a une sortie anticipée.
   void TintForAfk(std::uint32_t now_ms);
@@ -503,6 +502,7 @@ class Game : public Screen,
   // ── LE MODE SURVIVORS : voir `game_survivors.cpp`.
   void FrameSurvivors(std::uint32_t now_ms);
   [[nodiscard]] bool SurvivorsTakes(const SDL_Event& event, std::uint32_t now_ms);
+  void DrawSurvivorsInterface(std::uint32_t now_ms);
   void FrameFirstPerson(std::uint32_t now_ms);
   [[nodiscard]] bool FirstPersonTakes(const SDL_Event& event);
 
