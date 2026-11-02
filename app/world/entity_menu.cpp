@@ -192,6 +192,18 @@ void AddCompanionConduct(Composer& menu, const CompanionConductFacts& conduct, b
   menu.LeaveSubmenu();
 }
 
+// UNE BASCULE, comme celle des chuchotements : couper une voix qu'on n'entend
+// pas ne ferait rien.
+void AddVoiceToggle(Composer& menu, const EntityMenuFacts& facts) {
+  const char* voice_tip =
+      Tr("Sa voix ne vous parvient plus. Le blocage suit son compte, d'une connexion à l'autre.");
+  if (facts.voice_blocked) {
+    menu.Add(Tr("Rétablir sa voix"), EntityVerb::kVoiceAllow, voice_tip);
+  } else if (facts.voice_heard) {
+    menu.Add(Tr("Couper sa voix"), EntityVerb::kVoiceBlock, voice_tip);
+  }
+}
+
 void AddPlayer(Composer& menu, const EntityMenuFacts& facts) {
   AddTarget(menu, facts);
   menu.Add(Tr("Voir l'équipement"), EntityVerb::kViewEquip);
@@ -297,13 +309,7 @@ void AddPlayer(Composer& menu, const EntityMenuFacts& facts) {
   } else {
     menu.Add(Tr("Bloquer les chuchotements"), EntityVerb::kWhisperBlock, whisper_tip);
   }
-  const char* voice_tip =
-      Tr("Sa voix ne vous parvient plus. Le blocage suit son compte, d'une connexion à l'autre.");
-  if (facts.voice_blocked) {
-    menu.Add(Tr("Rétablir sa voix"), EntityVerb::kVoiceAllow, voice_tip);
-  } else if (facts.voice_heard) {
-    menu.Add(Tr("Couper sa voix"), EntityVerb::kVoiceBlock, voice_tip);
-  }
+  AddVoiceToggle(menu, facts);
   menu.Add(Tr("Signaler ce joueur"), EntityVerb::kReportPlayer,
            Tr("Le signalement est enregistré pour l'équipe, qui le consulte."));
   menu.Group();
@@ -383,6 +389,8 @@ void AddNpc(Composer& menu, const EntityMenuFacts& facts, const EntityMenuSettin
     menu.Add(Tr("Linker ce NPC"), EntityVerb::kNpcLink);
   }
   menu.Add(Tr("Copier le nom"), EntityVerb::kCopyName);
+  // Un PNJ qui parle — le bot du chat — se coupe comme un joueur.
+  AddVoiceToggle(menu, facts);
   // LA CASE, seulement sur un PNJ épinglé : les autres changent d'identifiant à
   // chaque démarrage du serveur, et une case cochée sur eux désignerait
   // n'importe qui le lendemain.

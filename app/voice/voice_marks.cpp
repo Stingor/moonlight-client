@@ -25,7 +25,12 @@ std::vector<ro::ui::VoiceMarkView> VoiceMarksOnScreen(const ro::render::Camera& 
   }
   for (std::size_t index = 0; index < drawn.size() && index < ids.size(); ++index) {
     const ro::sim::Actor* actor = world.Find(ids[index]);
-    if (actor == nullptr || actor->kind != ro::sim::ActorKind::kPlayer) {
+    // Un PNJ parle aussi : le serveur voix fait dire au bot du chat ses
+    // répliques, sous le nom du PNJ.
+    const bool may_speak = actor != nullptr && (actor->kind == ro::sim::ActorKind::kPlayer ||
+                                                (actor->kind == ro::sim::ActorKind::kNonPlayer &&
+                                                 actor->familiar == ro::sim::Familiar::kNone));
+    if (!may_speak) {
       continue;
     }
     const bool speaking =
