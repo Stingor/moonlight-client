@@ -128,8 +128,8 @@ add_library(moonclient_voice STATIC
     voice/voice_mode.cpp)
 
 target_link_libraries(moonclient_voice
-    PUBLIC ro_net ro_ui
-    PRIVATE ro_audio ro_core ro_proto ro_voice SDL3::SDL3 ro_warnings)
+    PUBLIC ro_net ro_ui ro_voice
+    PRIVATE ro_audio ro_core ro_proto SDL3::SDL3 ro_warnings)
 
 target_include_directories(moonclient_voice PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -1877,6 +1877,7 @@ add_executable(moonclient
     game/zone_stream_capture.cpp
     character/skill_book_view.cpp
     world/screen_overlays.cpp
+    voice/voice_marks.cpp
     world/selection_marker.cpp
     world/target_hud_view.cpp
     world/status_portrait_view.cpp

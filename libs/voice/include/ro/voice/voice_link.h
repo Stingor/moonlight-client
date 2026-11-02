@@ -90,6 +90,8 @@ struct VoiceStatus {
   bool in_room = false;       // la voix est celle du salon de discussion
   std::vector<SpeakingVoice> speaking;
   std::vector<NearbyPlayer> nearby;
+  // Les joueurs en ligne que ce compte n'entend plus.
+  std::vector<NearbyPlayer> blocked;
 };
 
 class VoiceLink {
@@ -97,6 +99,9 @@ class VoiceLink {
   VoiceLink(VoiceTarget target, VoiceDevices devices);
 
   void Steer(const VoiceControls& controls) { controls_ = controls; }
+  // Ne plus entendre ce personnage, ou l'entendre de nouveau. Perdu quand la
+  // liaison n'est pas en ligne : le serveur seul tient la liste.
+  void Block(std::uint32_t character_id, bool blocked);
   // Un pas : la liaison, l'écoute, le micro et la sortie.
   void Step(std::uint32_t now_ms);
   [[nodiscard]] VoiceStatus status(std::uint32_t now_ms) const;
@@ -139,6 +144,7 @@ class VoiceLink {
   bool war_ = false;
   bool in_room_ = false;
   std::vector<NearbyPlayer> nearby_;
+  std::vector<NearbyPlayer> blocked_;
   std::optional<std::int32_t> own_x_;
 
   // CE QUE LE SERVEUR SAIT DE NOUS : ce qui a été dit, pour ne redire qu'un

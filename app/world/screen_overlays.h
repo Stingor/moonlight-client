@@ -19,6 +19,7 @@
 #include "ro/ui/entity_bars.h"
 #include "ro/ui/pick_boxes.h"
 #include "ro/ui/pvp_hud_frames.h"
+#include "ro/ui/voice_overlay.h"
 
 #include "character/skill_book_view.h"
 #include "chat/chat_item_link.h"
@@ -28,6 +29,7 @@
 #include "guild/emblem_plates.h"
 #include "options/battleground_options.h"
 #include "options/setting_links.h"
+#include "options/voice_options.h"
 #include "world/actor_view.h"
 #include "world/ground_unit_pick.h"
 #include "world/signboard_style.h"
@@ -138,6 +140,10 @@ struct ScreenOverlays {
   // ici. ⚠ DÉPOSÉ, il se peint par-dessus le voile de ténèbres, qui cache tout
   // ce qui appartient au monde : voir `OverWorldLayer`.
   std::vector<ro::render::ScreenQuad>* game_hud = nullptr;
+  // LA VOIX : les têtes de qui parle s'y déposent, avec l'icône choisie. Nul :
+  // aucune.
+  ro::ui::VoiceOverlayState* voice = nullptr;
+  SpeakingIcon speaking_icon = SpeakingIcon::kMicrophone;
 };
 
 [[nodiscard]] HoveredActor DrawScreenOverlays(const ScreenOverlays& what, float aspect_ratio,

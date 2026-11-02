@@ -20,6 +20,11 @@ void VoiceEngine::Steer(const VoiceControls& controls) {
   controls_ = controls;
 }
 
+void VoiceEngine::Block(std::uint32_t character_id, bool blocked) {
+  const std::lock_guard<std::mutex> lock(guard_);
+  block_orders_.push_back(BlockOrder{.character_id = character_id, .blocked = blocked});
+}
+
 VoiceStatus VoiceEngine::status() const {
   const std::lock_guard<std::mutex> lock(guard_);
   return status_;
@@ -32,11 +37,16 @@ void VoiceEngine::Run() {
     const auto now_ms = static_cast<std::uint32_t>(
         std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - started).count());
     VoiceControls controls;
+    std::vector<BlockOrder> orders;
     {
       const std::lock_guard<std::mutex> lock(guard_);
       controls = controls_;
+      orders.swap(block_orders_);
     }
     link_.Steer(controls);
+    for (const BlockOrder& order : orders) {
+      link_.Block(order.character_id, order.blocked);
+    }
     link_.Step(now_ms);
     VoiceStatus status = link_.status(now_ms);
     {

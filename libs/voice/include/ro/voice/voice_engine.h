@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <mutex>
 #include <thread>
+#include <vector>
 
 #include "ro/voice/voice_link.h"
 
@@ -31,14 +32,22 @@ class VoiceEngine {
   VoiceEngine& operator=(const VoiceEngine&) = delete;
 
   void Steer(const VoiceControls& controls);
+  // Un ORDRE, et non un état : il part une fois, au pas suivant du fil.
+  void Block(std::uint32_t character_id, bool blocked);
   [[nodiscard]] VoiceStatus status() const;
 
  private:
+  struct BlockOrder {
+    std::uint32_t character_id = 0;
+    bool blocked = false;
+  };
+
   void Run();
 
   VoiceLink link_;
   mutable std::mutex guard_;
   VoiceControls controls_;
+  std::vector<BlockOrder> block_orders_;
   VoiceStatus status_;
   std::atomic<bool> stopping_ = false;
   std::thread worker_;

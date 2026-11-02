@@ -1,5 +1,6 @@
 #include "voice/voice_mode.h"
 
+#include <algorithm>
 #include <span>
 #include <string>
 #include <utility>
@@ -72,7 +73,7 @@ ro::net::FrameOutcome VoiceMode::ApplyFrame(const ro::net::Frame& frame) {
   // UN AUTRE SERVEUR VOIX : la liaison en cours ne mène plus au bon.
   if (service_.has_value() &&
       (service_->host != service->host || service_->port != service->port)) {
-    Stop();
+    StopFor("autre serveur voix");
   }
   ro::core::LogInfo("voix : le serveur la sert sur {}:{}", service->host, service->port);
   service_ = std::move(service);
@@ -88,6 +89,9 @@ void VoiceMode::Start(const VoiceFacts& facts) {
     return;
   }
   devices_ = std::make_unique<ro::audio::VoiceDevices>(std::move(*opened));
+  started_as_ = VoiceIdentity{.account_id = facts.account_id,
+                              .character_id = facts.character_id,
+                              .login_id1 = facts.login_id1};
   ro::audio::VoiceDevices* devices = devices_.get();
   rv::VoiceDevices hooks{
       .read_capture =
@@ -109,6 +113,15 @@ void VoiceMode::Stop() noexcept {
   devices_.reset();
 }
 
+void VoiceMode::StopFor(std::string_view why) {
+  // 🔴 UNE VOIX QUI SE TAIT DIT POURQUOI : sans cette ligne, une liaison fermée
+  // par la partie ne se distingue pas d'un micro muet.
+  if (engine_ != nullptr) {
+    ro::core::LogInfo("voix : liaison fermée ({})", why);
+  }
+  Stop();
+}
+
 void VoiceMode::Pump(const VoiceFacts& facts) {
   if (!facts.settings.enabled) {
     devices_failed_ = false;
@@ -117,12 +130,24 @@ void VoiceMode::Pump(const VoiceFacts& facts) {
     microphone_ = facts.settings.microphone;
     speakers_ = facts.settings.speakers;
     devices_failed_ = false;
-    Stop();
+    StopFor("autres appareils");
   }
-  const bool wanted = facts.settings.enabled && facts.verified && service_.has_value() &&
-                      facts.account_id != 0 && facts.character_id != 0;
-  if (!wanted) {
-    Stop();
+  // UN AUTRE PERSONNAGE, OU UNE AUTRE SESSION, n'est pas celui que la liaison
+  // a présenté au serveur voix : elle se rouvre sous la nouvelle identité.
+  const VoiceIdentity identity{.account_id = facts.account_id,
+                               .character_id = facts.character_id,
+                               .login_id1 = facts.login_id1};
+  if (identity != started_as_) {
+    StopFor("autre personnage");
+  }
+  if (!facts.settings.enabled) {
+    StopFor("voix éteinte");
+  } else if (!facts.verified) {
+    StopFor("poignée de main non reconnue");
+  } else if (!service_.has_value()) {
+    StopFor("serveur voix inconnu");
+  } else if (facts.account_id == 0 || facts.character_id == 0) {
+    StopFor("hors de la partie");
   } else if (engine_ == nullptr && !devices_failed_) {
     Start(facts);
   }
@@ -140,6 +165,8 @@ void VoiceMode::Pump(const VoiceFacts& facts) {
 
 void VoiceMode::Compose(const VoiceFacts& facts, bool talking) {
   overlay_ = ro::ui::VoiceOverlayState();
+  heard_.clear();
+  blocked_.clear();
   if (engine_ == nullptr) {
     if (devices_failed_ && facts.settings.enabled && service_.has_value()) {
       overlay_.notice = Tr("Voix : aucun appareil de son ne s'ouvre.");
@@ -156,9 +183,28 @@ void VoiceMode::Compose(const VoiceFacts& facts, bool talking) {
   if (status.transmitting && talking) {
     overlay_.self_talking = Tr("Vous parlez");
   }
+  heard_ = std::move(status.nearby);
+  blocked_ = std::move(status.blocked);
   for (rv::SpeakingVoice& voice : status.speaking) {
+    heard_.push_back(rv::NearbyPlayer{.character_id = voice.speaker_id, .name = voice.name});
     overlay_.speaking.push_back(std::move(voice.name));
   }
+}
+
+VoiceMode::Peer VoiceMode::PeerOf(std::string_view name) const {
+  const auto named = [name](const rv::NearbyPlayer& player) { return player.name == name; };
+  if (std::ranges::any_of(blocked_, named)) return Peer::kBlocked;
+  if (std::ranges::any_of(heard_, named)) return Peer::kHeard;
+  return Peer::kUnknown;
+}
+
+void VoiceMode::Block(std::string_view name, bool blocked) {
+  if (engine_ == nullptr) return;
+  const auto named = [name](const rv::NearbyPlayer& player) { return player.name == name; };
+  const std::vector<rv::NearbyPlayer>& known = blocked ? heard_ : blocked_;
+  const auto found = std::ranges::find_if(known, named);
+  if (found == known.end()) return;
+  engine_->Block(found->character_id, blocked);
 }
 
 }  // namespace moonclient

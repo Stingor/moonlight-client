@@ -2,7 +2,10 @@
 
 #include <algorithm>
 #include <bit>
+#include <string_view>
 #include <utility>
+
+#include "ro/core/text.h"
 
 namespace ro::voice {
 namespace {
@@ -119,7 +122,10 @@ std::optional<HeardVoice> DecodeHeardVoice(std::span<const std::uint8_t> bytes) 
   heard.y = static_cast<std::int32_t>(ReadU32(bytes, kHeardYAt));
   const auto name = bytes.subspan(kHeardNameAt, kHeardNameBytes);
   const auto end = std::find(name.begin(), name.end(), std::uint8_t{0});
-  heard.name.assign(name.begin(), end);
+  // LE NOM SE COMPARE À CELUI DU PERSONNAGE À L'ÉCRAN : même décodage que le
+  // serveur de jeu, quel que soit l'encodage que la base lui a donné.
+  heard.name = core::Utf8FromWire(std::string_view(reinterpret_cast<const char*>(name.data()),
+                                                   static_cast<std::size_t>(end - name.begin())));
   heard.sequence = ReadU16(bytes, kHeardSequenceAt);
   const auto opus = bytes.subspan(kHeardHeaderBytes);
   heard.opus.assign(opus.begin(), opus.end());

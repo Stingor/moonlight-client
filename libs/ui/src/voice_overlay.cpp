@@ -1,6 +1,7 @@
 #include "ro/ui/voice_overlay.h"
 
 #include <cmath>
+#include <span>
 
 #include <imgui.h>
 
@@ -61,6 +62,21 @@ void DrawVoiceOverlay(const VoiceOverlayState& state) {
   }
   for (const std::string& name : state.speaking) {
     y = DrawLine(into, y, name, kLineText, kSpeakingDot);
+  }
+}
+
+void DrawVoiceMarks(std::span<const VoiceMarkView> marks, const SkinImage& icon) {
+  if (marks.empty() || !icon.usable()) {
+    return;
+  }
+  const float scale = Scale();
+  const float side = std::round(kVoiceMarkPixels * scale);
+  const float lift = kVoiceMarkLiftPixels * scale;
+  ImDrawList* into = ImGui::GetBackgroundDrawList();
+  for (const VoiceMarkView& mark : marks) {
+    // Arrondie au pixel : une icône à cheval sur deux pixels se brouille.
+    const ImVec2 min(std::round(mark.head.x - side * 0.5F), std::round(mark.head.y - lift - side));
+    into->AddImage(icon.id, min, ImVec2(min.x + side, min.y + side));
   }
 }
 

@@ -21772,3 +21772,39 @@ tr: Salida de las voces
 
 fr: Où l'on entend les autres joueurs.
 tr: Donde se oye a los demás jugadores.
+
+fr: Rétablir sa voix
+tr: Volver a oír su voz
+
+fr: Couper sa voix
+tr: Silenciar su voz
+
+fr: Sa voix ne vous parvient plus. Le blocage suit son compte, d'une connexion à l'autre.
+tr: Su voz ya no te llega. El bloqueo sigue a su cuenta, de una conexión a otra.
+
+fr: Touche pour parler :
+tr: Tecla para hablar:
+
+fr: On parle en tenant cette touche. C'est la même que « Parler (voix) » dans les raccourcis clavier.
+tr: Se habla manteniendo esta tecla. Es la misma que «Hablar (voz)» en los atajos de teclado.
+
+fr: Micro
+tr: Micrófono
+
+fr: Tête qui parle
+tr: Cabeza que habla
+
+fr: Bulle
+tr: Bocadillo
+
+fr: Haut-parleur
+tr: Altavoz
+
+fr: Note de musique
+tr: Nota musical
+
+fr: Icône de parole
+tr: Icono de voz
+
+fr: Ce qui s'affiche au-dessus de qui parle, vous compris. Seul votre écran change.
+tr: Lo que aparece sobre quien habla, tú incluido. Solo cambia tu pantalla.

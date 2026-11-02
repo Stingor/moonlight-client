@@ -14,6 +14,7 @@
 #include "ro/net/npc_dialog.h"
 #include "ro/net/player_bonuses.h"
 #include "ro/net/skill.h"
+#include "ro/net/voice_service.h"
 #include "ro/net/world_notice.h"
 #include "ro/net/world_skill.h"
 #include "ro/proto/manual_packets.h"
@@ -645,6 +646,7 @@ FrameOutcome ApplyFrame(const Frame& frame, sim::World& world, std::uint32_t now
       return Decoded<proto::ZcEquipmentEffect>(frame, [&world](const auto& packet) {
         bool known = false;
         for (const std::uint16_t effect : packet.effects) {
+          if (effect == kVoiceSpeakingHatEffect) continue;
           known = world.SetHatEffect(packet.aid, static_cast<sim::HatEffectId>(effect),
                                      packet.status != 0) ||
                   known;

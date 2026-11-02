@@ -334,6 +334,8 @@ void Game::OpenEntityMenu(const ro::sim::Actor& actor, EntityFamily family, std:
   facts.target_is_friend = befriended != nullptr && befriended->account_id == actor.id;
   facts.friends_full = friends_.full();
   facts.whisper_blocked = pieces_.whispers.blocks().Blocks(actor.name);
+  facts.voice_heard = voice_.PeerOf(actor.name) == VoiceMode::Peer::kHeard;
+  facts.voice_blocked = voice_.PeerOf(actor.name) == VoiceMode::Peer::kBlocked;
   facts.dealing = pieces_.trade.deal().deal().phase() != ro::sim::DealPhase::kNone;
   facts.followed = world_mouse_.follow.followed_id == actor.id;
   facts.store_open =
@@ -471,6 +473,10 @@ void Game::PlayEntityVerb(EntityVerb verb, std::uint32_t id, int points, std::ui
                                                  verb == EntityVerb::kWhisperBlock
                                                      ? ro::sim::WhisperBlockWay::kBlock
                                                      : ro::sim::WhisperBlockWay::kAllow));
+      return;
+    case EntityVerb::kVoiceBlock:
+    case EntityVerb::kVoiceAllow:
+      voice_.Block(name, verb == EntityVerb::kVoiceBlock);
       return;
     case EntityVerb::kMailSend:
       // ⚠ JAMAIS POUR SOI : le menu de soi n'a pas l'entrée, et le clic le

@@ -3,6 +3,8 @@
 #include "options/voice_options.h"
 
 #include <algorithm>
+#include <array>
+#include <string_view>
 #include <utility>
 
 #include "ro/core/i18n.h"
@@ -24,6 +26,14 @@ constexpr const char* kOutputVolumeKey = "voice_output_volume";
 constexpr const char* kInputGainKey = "voice_input_gain";
 constexpr const char* kMicrophoneKey = "voice_microphone";
 constexpr const char* kSpeakersKey = "voice_speakers";
+constexpr const char* kSpeakingIconKey = "voice_speaking_icon";
+
+// Les images, rangées comme `SpeakingIcon`.
+constexpr std::array<std::string_view, static_cast<std::size_t>(SpeakingIcon::kCount)>
+    kSpeakingIconPaths = {
+        "data\\ui_icons\\voice_microphone.png",     "data\\ui_icons\\voice_speaking_head.png",
+        "data\\ui_icons\\voice_speech_balloon.png", "data\\ui_icons\\voice_speaker.png",
+        "data\\ui_icons\\voice_musical_note.png",   ""};
 
 void ComposeChoice(const std::vector<std::string>& known, const std::string& kept,
                    VoiceDeviceChoice& into) {
@@ -52,6 +62,11 @@ void Choose(const VoiceDeviceChoice& choice, int chosen, std::string& into) {
 
 }  // namespace
 
+std::string_view SpeakingIconPath(SpeakingIcon icon) {
+  const auto rank = static_cast<std::size_t>(icon);
+  return rank < kSpeakingIconPaths.size() ? kSpeakingIconPaths[rank] : std::string_view();
+}
+
 void VoiceOptions::Declare(SettingsFile& into) {
   into.Declare(kEnabledKey, &settings_.enabled);
   into.Declare(kChannelKey, &settings_.channel);
@@ -59,6 +74,7 @@ void VoiceOptions::Declare(SettingsFile& into) {
   into.Declare(kInputGainKey, &settings_.input_gain);
   into.Declare(kMicrophoneKey, &settings_.microphone);
   into.Declare(kSpeakersKey, &settings_.speakers);
+  into.Declare(kSpeakingIconKey, &settings_.speaking_icon);
 }
 
 void VoiceOptions::ListDevicesWith(DeviceLister microphones, DeviceLister speakers) {
@@ -71,6 +87,8 @@ VoiceSettings VoiceOptions::settings() const noexcept {
   sane.channel = std::clamp(sane.channel, 0, static_cast<int>(kVoiceChosenChannelCount) - 1);
   sane.output_volume = std::clamp(sane.output_volume, 0.0F, 1.0F);
   sane.input_gain = std::clamp(sane.input_gain, 0.0F, kVoiceMostInputGain);
+  sane.speaking_icon =
+      std::clamp(sane.speaking_icon, 0, static_cast<int>(SpeakingIcon::kCount) - 1);
   return sane;
 }
 
@@ -86,6 +104,19 @@ void VoiceOptions::ComposeInto(std::vector<OptionRowView>& rows) {
       .kind = OptionKind::kToggle,
       .on = sane.enabled});
   rows.back().heading = Tr("Voix");
+  if (talk_key_.capturing) {
+    talk_key_text_ = Tr("Appuyez sur une touche - Échap annule, Suppr retire le raccourci.");
+  } else {
+    talk_key_text_ = std::string(Tr("Touche pour parler :")) + " " +
+                     (talk_key_.label.empty() ? std::string(Tr("aucune")) : talk_key_.label);
+  }
+  rows.push_back(OptionRowView{
+      .id = VoiceRowId(VoiceRow::kTalkKey),
+      .label = talk_key_text_.c_str(),
+      .help = Tr("On parle en tenant cette touche. C'est la même que « Parler (voix) » dans les "
+                 "raccourcis clavier."),
+      .kind = OptionKind::kAction,
+      .disabled = !sane.enabled});
   rows.push_back(OptionRowView{
       .id = VoiceRowId(VoiceRow::kChannel),
       .label = Tr("Canal de la voix"),
@@ -132,6 +163,16 @@ void VoiceOptions::ComposeInto(std::vector<OptionRowView>& rows) {
                                .chosen = speakers_choice_.chosen,
                                .choices = speakers_choice_.shown,
                                .disabled = !sane.enabled});
+  icon_names_ = {Tr("Micro"),        Tr("Tête qui parle"),  Tr("Bulle"),
+                 Tr("Haut-parleur"), Tr("Note de musique"), Tr("Aucune")};
+  rows.push_back(OptionRowView{
+      .id = VoiceRowId(VoiceRow::kSpeakingIcon),
+      .label = Tr("Icône de parole"),
+      .help = Tr("Ce qui s'affiche au-dessus de qui parle, vous compris. Seul votre écran change."),
+      .kind = OptionKind::kChoice,
+      .chosen = sane.speaking_icon,
+      .choices = icon_names_,
+      .disabled = !sane.enabled});
 }
 
 bool VoiceOptions::Change(const ro::ui::OptionsWindowAction& asked) {
@@ -156,6 +197,12 @@ bool VoiceOptions::Change(const ro::ui::OptionsWindowAction& asked) {
       break;
     case VoiceRow::kSpeakers:
       Choose(speakers_choice_, asked.chosen, settings_.speakers);
+      break;
+    case VoiceRow::kTalkKey:
+      talk_key_asked_ = true;
+      break;
+    case VoiceRow::kSpeakingIcon:
+      settings_.speaking_icon = asked.chosen;
       break;
     case VoiceRow::kCount:
       break;

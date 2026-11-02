@@ -21,6 +21,11 @@ namespace ro::net {
 inline constexpr std::uint16_t kVoiceServiceOpcode = 0x0F55;
 inline constexpr std::size_t kVoiceServiceSize = 70;
 
+// L'EFFET DE CHAPEAU que le serveur pose sur qui parle, pour les clients qui ne
+// savent pas qui parle. Ce client le sait par la voix et dessine son icône : il
+// ignore cet effet, que sa table des effets de chapeau attribue à un costume.
+inline constexpr std::uint16_t kVoiceSpeakingHatEffect = 267;
+
 struct VoiceService {
   std::string host;
   std::uint16_t port = 0;

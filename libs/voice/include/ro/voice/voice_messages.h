@@ -35,6 +35,10 @@ struct VoiceLogin {
 // Ne plus être entendu, ou ne plus rien entendre (et ne plus être entendu).
 [[nodiscard]] std::string MuteMessage(bool muted, std::uint64_t session_id);
 [[nodiscard]] std::string DeafenMessage(bool deafened, std::uint64_t session_id);
+// Ne plus entendre un joueur, ou l'entendre de nouveau. 🔴 LE SERVEUR GARDE LE
+// BLOCAGE POUR SON COMPTE, d'une session à l'autre, mais ne le pose que sur un
+// joueur en ligne : c'est par lui qu'il retrouve le compte.
+[[nodiscard]] std::string BlockMessage(std::uint32_t character_id, bool blocked);
 
 // CE QUE LE SERVEUR DIT.
 struct AuthAccepted {
@@ -78,13 +82,25 @@ struct Refusal {
   RefusalKind kind = RefusalKind::kError;
   std::string message;  // le texte du serveur, en anglais, pour le journal
 };
-// Ce que ce client ne lit pas encore : les appels privés, les blocages.
+// LES JOUEURS BLOQUÉS QUI SONT EN LIGNE, dits après l'authentification.
+// ⚠ TUS QUAND IL N'Y EN A AUCUN : la liste se vide à l'authentification.
+struct BlockedPlayers {
+  std::vector<NearbyPlayer> players;
+};
+// Un blocage posé ou levé, confirmé par le serveur.
+struct BlockChanged {
+  std::uint32_t character_id = 0;
+  std::string name;  // vide quand le blocage est levé
+  bool blocked = false;
+};
+// Ce que ce client ne lit pas encore : les appels privés.
 struct Unread {
   std::string type;
 };
 
-using ServerMessage = std::variant<AuthAccepted, OwnPlace, NearbyPlayers, ChannelAccepted, WarState,
-                                   RoomJoined, RoomLeft, Pong, Refusal, Unread>;
+using ServerMessage =
+    std::variant<AuthAccepted, OwnPlace, NearbyPlayers, ChannelAccepted, WarState, RoomJoined,
+                 RoomLeft, Pong, Refusal, BlockedPlayers, BlockChanged, Unread>;
 
 // Ce que dit un texte du serveur, ou une erreur s'il n'est pas un objet JSON
 // muni d'un `type`.

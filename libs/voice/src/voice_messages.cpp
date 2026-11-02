@@ -5,6 +5,8 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include "ro/core/text.h"
+
 namespace ro::voice {
 namespace {
 
@@ -32,20 +34,20 @@ template <typename T>
   }
 }
 
-[[nodiscard]] ServerMessage ReadNearby(const YAML::Node& object) {
-  NearbyPlayers nearby;
-  const YAML::Node players = object["players"];
-  if (!players || !players.IsSequence()) return nearby;
+// Une liste de joueurs, chacun nommé par la clé `id_key`.
+[[nodiscard]] std::vector<NearbyPlayer> ReadPlayers(const YAML::Node& players, const char* id_key) {
+  std::vector<NearbyPlayer> read;
+  if (!players || !players.IsSequence()) return read;
   for (const YAML::Node& player : players) {
     if (!player.IsMap()) continue;
     NearbyPlayer entry;
-    entry.character_id = ValueOr<std::uint32_t>(player, "id", 0);
-    entry.name = ValueOr<std::string>(player, "name", "");
+    entry.character_id = ValueOr<std::uint32_t>(player, id_key, 0);
+    entry.name = core::Utf8FromWire(ValueOr<std::string>(player, "name", ""));
     if (entry.character_id != 0) {
-      nearby.players.push_back(std::move(entry));
+      read.push_back(std::move(entry));
     }
   }
-  return nearby;
+  return read;
 }
 
 [[nodiscard]] ServerMessage ReadChannel(const YAML::Node& object) {
@@ -84,6 +86,11 @@ std::string DeafenMessage(bool deafened, std::uint64_t session_id) {
   return Toggle("deafen", deafened, session_id);
 }
 
+std::string BlockMessage(std::uint32_t character_id, bool blocked) {
+  return std::string("{\"type\":\"") + (blocked ? "block_add" : "block_remove") +
+         "\",\"target_char_id\":" + std::to_string(character_id) + "}";
+}
+
 core::Result<ServerMessage> ParseServerMessage(std::string_view json) {
   // Le JSON est un sous-ensemble du YAML que le lecteur du client sait déjà
   // lire. ⚠ SES EXCEPTIONS S'ARRÊTENT ICI : un texte du serveur ne se croit pas.
@@ -109,7 +116,16 @@ core::Result<ServerMessage> ParseServerMessage(std::string_view json) {
                     .x = ValueOr<std::int32_t>(object, "x", 0),
                     .y = ValueOr<std::int32_t>(object, "y", 0)};
   }
-  if (type == "nearby_players") return ReadNearby(object);
+  if (type == "nearby_players")
+    return NearbyPlayers{.players = ReadPlayers(object["players"], "id")};
+  if (type == "your_blocks") {
+    return BlockedPlayers{.players = ReadPlayers(object["blocked"], "char_id")};
+  }
+  if (type == "block_added" || type == "block_removed") {
+    return BlockChanged{.character_id = ValueOr<std::uint32_t>(object, "target_char_id", 0),
+                        .name = core::Utf8FromWire(ValueOr<std::string>(object, "target_name", "")),
+                        .blocked = type == "block_added"};
+  }
   if (type == "channel_ack") return ReadChannel(object);
   if (type == "war_state") {
     return WarState{.active = ValueOr<bool>(object, "active", false),

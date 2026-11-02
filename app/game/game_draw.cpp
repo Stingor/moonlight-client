@@ -601,7 +601,10 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
       .connected = link_.is_open(),
       .talkbox_speakers =
           ground_units_.has_value() ? ground_units_->speakers() : std::span<const GroundUnitPick>(),
-      .game_hud = &pieces_.over_world.game_hud()};
+      .game_hud = &pieces_.over_world.game_hud(),
+      .voice = &windows_.voice,
+      .speaking_icon =
+          static_cast<SpeakingIcon>(settings_->options().pages().voice.settings().speaking_icon)};
   // 🔴 ET LA VEILLE LES EFFACE AUSSI, pas seulement les fenêtres. Chez le client
   // d'origine, les étiquettes de nom et les bulles sortent du MÊME appel que
   // les fenêtres. Ici ce sont deux chemins, et n'en couper qu'un laisserait les

@@ -189,6 +189,7 @@ void VoiceLink::Apply(const ServerMessage& message, std::uint32_t now_ms) {
         using Said = std::decay_t<decltype(said)>;
         if constexpr (std::is_same_v<Said, AuthAccepted>) {
           state_ = VoiceLinkState::kOnline;
+          blocked_.clear();
           udp_identity_ = UdpIdentity{.session_id = session_id_,
                                       .character_id = target_.character_id,
                                       .token = said.udp_token};
@@ -214,6 +215,15 @@ void VoiceLink::Apply(const ServerMessage& message, std::uint32_t now_ms) {
           in_room_ = true;
         } else if constexpr (std::is_same_v<Said, RoomLeft>) {
           in_room_ = false;
+        } else if constexpr (std::is_same_v<Said, BlockedPlayers>) {
+          blocked_ = said.players;
+        } else if constexpr (std::is_same_v<Said, BlockChanged>) {
+          std::erase_if(blocked_, [&](const NearbyPlayer& player) {
+            return player.character_id == said.character_id;
+          });
+          if (said.blocked) {
+            blocked_.push_back(NearbyPlayer{.character_id = said.character_id, .name = said.name});
+          }
         } else if constexpr (std::is_same_v<Said, Refusal>) {
           refusal_ = said.kind;
           detail_ = said.message;
@@ -221,6 +231,11 @@ void VoiceLink::Apply(const ServerMessage& message, std::uint32_t now_ms) {
         }
       },
       message);
+}
+
+void VoiceLink::Block(std::uint32_t character_id, bool blocked) {
+  if (state_ != VoiceLinkState::kOnline || character_id == 0) return;
+  SendText(BlockMessage(character_id, blocked));
 }
 
 void VoiceLink::FollowControls() {
@@ -325,7 +340,8 @@ VoiceStatus VoiceLink::status(std::uint32_t now_ms) const {
                      .war = war_,
                      .in_room = in_room_,
                      .speaking = mixer_.speaking(now_ms),
-                     .nearby = nearby_};
+                     .nearby = nearby_,
+                     .blocked = blocked_};
 }
 
 }  // namespace ro::voice

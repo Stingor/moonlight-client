@@ -84,6 +84,8 @@ UiStage::Answers UiStage::Draw(
   ro::ui::DrawEntityBars(entity_bars, entity_bar_look);
   // LES INCANTATIONS AVEC ELLES, et sous les bulles pour la même raison.
   ro::ui::DrawCastBars(cast_bars, cast_bar_look);
+  // L'ICÔNE DE QUI PARLE, sous les bulles : une phrase passe par-dessus.
+  ro::ui::DrawVoiceMarks(windows.voice.marks, windows.voice.mark_icon);
   // Les bulles juste apres la grille, sur la MEME liste de fond : elles la
   // recouvrent, et c est l ordre qu on veut -- un quadrillage d alignement n a
   // pas a barrer ce que quelqu un vient de dire.

@@ -21772,3 +21772,39 @@ tr: Voice output
 
 fr: Où l'on entend les autres joueurs.
 tr: Where you hear the other players.
+
+fr: Rétablir sa voix
+tr: Unmute their voice
+
+fr: Couper sa voix
+tr: Mute their voice
+
+fr: Sa voix ne vous parvient plus. Le blocage suit son compte, d'une connexion à l'autre.
+tr: Their voice no longer reaches you. The block follows their account, from one login to the next.
+
+fr: Touche pour parler :
+tr: Push-to-talk key:
+
+fr: On parle en tenant cette touche. C'est la même que « Parler (voix) » dans les raccourcis clavier.
+tr: Hold this key to speak. It is the same as "Talk (voice)" in the keyboard shortcuts.
+
+fr: Micro
+tr: Microphone
+
+fr: Tête qui parle
+tr: Speaking head
+
+fr: Bulle
+tr: Speech balloon
+
+fr: Haut-parleur
+tr: Speaker
+
+fr: Note de musique
+tr: Musical note
+
+fr: Icône de parole
+tr: Speaking icon
+
+fr: Ce qui s'affiche au-dessus de qui parle, vous compris. Seul votre écran change.
+tr: What appears above whoever is speaking, yourself included. Only your screen changes.

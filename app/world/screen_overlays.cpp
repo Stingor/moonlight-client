@@ -14,6 +14,7 @@
 
 #include "chat/chat_view.h"
 #include "guild/plate_emblem.h"
+#include "voice/voice_marks.h"
 #include "world/armed_cursor.h"
 #include "world/battlefield_view.h"
 #include "world/cast_bar_view.h"
@@ -239,6 +240,13 @@ HoveredActor DrawScreenOverlays(const ScreenOverlays& what, float aspect_ratio, 
         TalkboxBubblesOnScreen(camera, aspect_ratio, what.talkbox_speakers, world, now_ms,
                                viewport_width, viewport_height, what.bubbles);
     what.bubbles_on_screen->insert(what.bubbles_on_screen->end(), talkbox.begin(), talkbox.end());
+  }
+  // L'ICÔNE AU-DESSUS DE QUI PARLE : récoltée ici, peinte sous les bulles.
+  if (what.connected && !actors.drawn.empty() && what.voice != nullptr) {
+    what.voice->marks = VoiceMarksOnScreen(camera, aspect_ratio, actors.drawn, actors.ids, world,
+                                           *what.voice, viewport_width, viewport_height);
+    what.voice->mark_icon = SpeakingIconImage(
+        pieces.game_images.has_value() ? &*pieces.game_images : nullptr, what.speaking_icon);
   }
   // LES INCANTATIONS : RÉCOLTÉES ICI, PEINTES PAR L'ÉTAGE D'INTERFACE.
   //

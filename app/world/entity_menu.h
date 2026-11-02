@@ -268,6 +268,10 @@ enum class EntityVerb : int {
   // « QUEL CLIENT ? », à l'administrateur, sur un joueur : le client qu'il
   // emploie, que le serveur écrit dans la conversation.
   kClientInfo,
+  // NE PLUS ENTENDRE SA VOIX, ou l'entendre de nouveau. Distinct de
+  // `kMute`, qui est la sanction de chat du staff.
+  kVoiceBlock,
+  kVoiceAllow,
 };
 
 // ── LE SOUS-MENU « TACTIQUE DU COMPAGNON » ──────────────────────────────────
@@ -289,7 +293,7 @@ inline constexpr int kTacticVerbBase = 1000;
 inline constexpr int kTacticVerbsPerCompanion = 16;
 // 🔴 `EntityVerb` grandit à chaque geste ajouté : s'il atteignait la base, un
 // verbe du menu se lirait comme une tactique. Son DERNIER verbe est ici.
-static_assert(static_cast<int>(EntityVerb::kClientInfo) < kTacticVerbBase);
+static_assert(static_cast<int>(EntityVerb::kVoiceAllow) < kTacticVerbBase);
 static_assert(static_cast<int>(TacticMenuChoice::kTriggerFirst) ==
               static_cast<int>(ro::sim::kTacticRankCount));
 static_assert(static_cast<int>(TacticMenuChoice::kRemove) ==
@@ -378,6 +382,10 @@ struct EntityMenuFacts {
   // Ses chuchotements sont bloqués, nommément : la ligne propose alors de les
   // autoriser.
   bool whisper_blocked = false;
+  // Ce que la voix sait de lui : à portée de voix, ou bloqué. Ni l'un ni
+  // l'autre : la ligne n'apparaît pas, le serveur ne saurait pas qui viser.
+  bool voice_heard = false;
+  bool voice_blocked = false;
   // Un échange est ouvert, ou une proposition attend : on n'en propose pas un
   // second.
   bool dealing = false;

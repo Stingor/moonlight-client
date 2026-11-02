@@ -5,11 +5,14 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <string_view>
+#include <vector>
 
 #include "ro/net/connection.h"
 #include "ro/net/voice_service.h"
 #include "ro/net/world_update.h"
 #include "ro/ui/voice_overlay.h"
+#include "ro/voice/voice_messages.h"
 
 #include "options/voice_options.h"
 
@@ -70,9 +73,31 @@ class VoiceMode {
   // Le témoin à dessiner, composé à la dernière pompe.
   [[nodiscard]] const ro::ui::VoiceOverlayState& overlay() const noexcept { return overlay_; }
 
+  // CE QUE LA VOIX SAIT D'UN JOUEUR, par son nom : le nom est le seul lien
+  // entre le personnage à l'écran et celui du serveur voix.
+  enum class Peer : std::uint8_t {
+    kUnknown,  // hors de portée de voix, ou sans voix
+    kHeard,    // à portée, ou entendu à l'instant
+    kBlocked,  // ce compte ne l'entend plus
+  };
+  [[nodiscard]] Peer PeerOf(std::string_view name) const;
+  // Ne plus entendre ce joueur, ou l'entendre de nouveau. Sans effet sur un
+  // joueur que la voix ne connaît pas.
+  void Block(std::string_view name, bool blocked);
+
  private:
+  // QUI LA LIAISON A PRÉSENTÉ au serveur voix.
+  struct VoiceIdentity {
+    std::uint32_t account_id = 0;
+    std::uint32_t character_id = 0;
+    std::uint32_t login_id1 = 0;
+    bool operator==(const VoiceIdentity&) const = default;
+  };
+
   void Start(const VoiceFacts& facts);
   void Stop() noexcept;
+  // Ferme une liaison ouverte, et dit pourquoi au journal.
+  void StopFor(std::string_view why);
   void Compose(const VoiceFacts& facts, bool talking);
 
   std::uint32_t caps_ = 0;
@@ -88,9 +113,13 @@ class VoiceMode {
   // liaison sur les nouveaux.
   std::string microphone_;
   std::string speakers_;
+  VoiceIdentity started_as_;
   std::uint32_t online_since_ms_ = 0;
   bool was_online_ = false;
   ro::ui::VoiceOverlayState overlay_;
+  // Relevés à la dernière pompe, vides quand la liaison est fermée.
+  std::vector<ro::voice::NearbyPlayer> heard_;
+  std::vector<ro::voice::NearbyPlayer> blocked_;
 };
 
 }  // namespace moonclient

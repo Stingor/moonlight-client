@@ -297,6 +297,13 @@ void AddPlayer(Composer& menu, const EntityMenuFacts& facts) {
   } else {
     menu.Add(Tr("Bloquer les chuchotements"), EntityVerb::kWhisperBlock, whisper_tip);
   }
+  const char* voice_tip =
+      Tr("Sa voix ne vous parvient plus. Le blocage suit son compte, d'une connexion à l'autre.");
+  if (facts.voice_blocked) {
+    menu.Add(Tr("Rétablir sa voix"), EntityVerb::kVoiceAllow, voice_tip);
+  } else if (facts.voice_heard) {
+    menu.Add(Tr("Couper sa voix"), EntityVerb::kVoiceBlock, voice_tip);
+  }
   menu.Add(Tr("Signaler ce joueur"), EntityVerb::kReportPlayer,
            Tr("Le signalement est enregistré pour l'équipe, qui le consulte."));
   menu.Group();

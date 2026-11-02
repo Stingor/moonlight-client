@@ -2,8 +2,11 @@
 
 #include <array>
 #include <cstddef>
+#include <cstdint>
 #include <functional>
 #include <string>
+#include <string_view>
+#include <utility>
 #include <vector>
 
 #include "ro/ui/options_window.h"
@@ -14,8 +17,9 @@ namespace moonclient {
 
 // ── LA VOIX EN JEU, DANS LA PAGE « SON » ────────────────────────────────────
 //
-// L'interrupteur, le canal où l'on parle et où l'on écoute, le volume des voix
-// et celui du micro, et les deux appareils. Le côté d'où vient une voix suit « Son spatialisé ».
+// L'interrupteur, la touche « Parler », le canal où l'on parle et où l'on
+// écoute, le volume des voix et celui du micro, les deux appareils et l'icône
+// au-dessus de qui parle. Le côté d'où vient une voix suit « Son spatialisé ».
 // Voir l'ADR 0135.
 inline constexpr int kVoiceRowBase = 9400;
 
@@ -26,7 +30,30 @@ enum class VoiceRow : int {
   kInputVolume,
   kMicrophone,
   kSpeakers,
+  kTalkKey,
+  kSpeakingIcon,
   kCount,
+};
+
+// L'ICÔNE AU-DESSUS DE QUI PARLE, au choix du joueur : elle ne change que ce
+// qu'il voit. ⚠ LE RANG EST GARDÉ DANS LE FICHIER : on ajoute à la fin.
+enum class SpeakingIcon : std::uint8_t {
+  kMicrophone,
+  kSpeakingHead,
+  kSpeechBalloon,
+  kSpeaker,
+  kMusicalNote,
+  kNone,
+  kCount,
+};
+
+// L'image d'une icône, sous le dossier de nos icônes, ou vide pour « aucune ».
+[[nodiscard]] std::string_view SpeakingIconPath(SpeakingIcon icon);
+
+// La touche « Parler » telle que la ligne la montre.
+struct VoiceTalkKeyView {
+  std::string label;       // vide quand aucune touche n'est posée
+  bool capturing = false;  // la capture attend son geste
 };
 
 [[nodiscard]] constexpr int VoiceRowId(VoiceRow row) {
@@ -49,6 +76,7 @@ struct VoiceSettings {
   // LE NOM DE L'APPAREIL, vide pour celui du système.
   std::string microphone;
   std::string speakers;
+  int speaking_icon = 0;  // une `SpeakingIcon`
 };
 
 // UN CHOIX D'APPAREIL tel que la ligne le montre : « celui du système » en
@@ -69,6 +97,10 @@ class VoiceOptions {
   // `ComposeInto` : un casque se branche pendant que la page est ouverte.
   using DeviceLister = std::function<std::vector<std::string>()>;
   void ListDevicesWith(DeviceLister microphones, DeviceLister speakers);
+  // LA TOUCHE « PARLER », que la boucle seule sait nommer et capturer : elle la
+  // redit à chaque image, et reprend la demande de capture que la ligne arme.
+  void ShowTalkKey(VoiceTalkKeyView talk_key) { talk_key_ = std::move(talk_key); }
+  [[nodiscard]] bool TakeTalkKeyRequest() noexcept { return std::exchange(talk_key_asked_, false); }
   // Ajoute ses lignes à celles de la page Son, à chaque image où elle est
   // ouverte.
   void ComposeInto(std::vector<ro::ui::OptionRowView>& rows);
@@ -84,6 +116,10 @@ class VoiceOptions {
   DeviceLister list_speakers_;
   VoiceDeviceChoice microphone_choice_;
   VoiceDeviceChoice speakers_choice_;
+  std::array<const char*, static_cast<std::size_t>(SpeakingIcon::kCount)> icon_names_{};
+  VoiceTalkKeyView talk_key_;
+  std::string talk_key_text_;
+  bool talk_key_asked_ = false;
 };
 
 }  // namespace moonclient

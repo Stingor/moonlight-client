@@ -150,6 +150,17 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
   // « Parler » relue sur l'état du clavier.
   {
     const Binding talk = settings_->bindings().Of(GameAction::kVoiceTalk);
+    // LA TOUCHE SE CHOISIT AUSSI DANS LA PAGE SON, par la capture des
+    // raccourcis : elle attend son geste même fenêtre des raccourcis fermée.
+    const int talk_rank = static_cast<int>(ActionRef(GameAction::kVoiceTalk).rank());
+    VoiceOptions& voice_options = settings_->options().pages().voice;
+    voice_options.ShowTalkKey(
+        VoiceTalkKeyView{.label = talk.bound() ? LabelOfBinding(talk) : std::string(),
+                         .capturing = windows_.hotkeys.capturing == talk_rank});
+    if (voice_options.TakeTalkKeyRequest()) {
+      windows_.hotkeys.capturing = talk_rank;
+      windows_.hotkeys.robbed[0] = '\0';
+    }
     voice_.Pump(
         VoiceFacts{.verified = handshake_.state() == ro::net::MoonclientHandshakeState::kVerified,
                    .account_id = ticket_.account.account_id,
