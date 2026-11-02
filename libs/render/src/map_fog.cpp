@@ -44,8 +44,9 @@ std::uint8_t ByteAt(std::uint32_t color, unsigned shift) {
 }
 
 core::Error Refused(std::string detail) {
-  return core::Error{core::ErrorCode::kCorruptData,
-                     std::string(kFogTablePath) + " : " + std::move(detail)};
+  std::string message(kFogTablePath);
+  message.append(" : ").append(detail);
+  return core::Error{core::ErrorCode::kCorruptData, std::move(message)};
 }
 
 // UNE FRACTION, lue en double puis ramenée à un float : le client lisait le

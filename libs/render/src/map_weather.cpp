@@ -17,8 +17,9 @@ constexpr int kSupportedVersion = 1;
 constexpr std::string_view kMapFileSuffix = ".rsw";
 
 core::Error Refused(std::string detail) {
-  return core::Error{core::ErrorCode::kCorruptData,
-                     std::string(kMapWeatherPath) + " : " + std::move(detail)};
+  std::string message(kMapWeatherPath);
+  message.append(" : ").append(detail);
+  return core::Error{core::ErrorCode::kCorruptData, std::move(message)};
 }
 
 // Un champ texte d'une ligne, en CP949, ou une exception.

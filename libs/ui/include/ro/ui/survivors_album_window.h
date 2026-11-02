@@ -8,6 +8,8 @@
 
 #include <imgui.h>
 
+#include "ro/ui/survivors_hud.h"
+
 namespace ro::ui {
 
 // L'ALBUM DES SURVIVANTS (Q12) : une grille des cartes de l'arène — trouvée,
@@ -72,8 +74,11 @@ struct SurvivorsAlbumState {
 // courante : l'onglet Cartes du Codex le dessine.
 void DrawSurvivorsAlbumBody(SurvivorsAlbumState& state, const SurvivorsAlbumView& view);
 
-// LA PROGRESSION D'UN EXPLOIT, « 312 / 500 » ou « 03:12 / 05:00 ».
-inline constexpr std::size_t kSurvivorsFeatProgressTextSize = 48;
+// LA PROGRESSION D'UN EXPLOIT, « 312 / 500 » ou « 03:12 / 05:00 ». Le tampon
+// tient deux minuteurs et leur séparateur.
+inline constexpr std::size_t kSurvivorsFeatSeparatorBytes = sizeof(" / ") - 1;
+inline constexpr std::size_t kSurvivorsFeatProgressTextSize =
+    kSurvivorsClockTextSize + kSurvivorsFeatSeparatorBytes + kSurvivorsClockTextSize;
 [[nodiscard]] std::array<char, kSurvivorsFeatProgressTextSize> SurvivorsFeatProgressText(
     const SurvivorsFeatEntry& feat);
 

@@ -45,7 +45,9 @@ constexpr ImU32 kSilhouetteTint = IM_COL32(0, 0, 0, 255);
 constexpr ImU32 kSpriteBoxBack = IM_COL32(0, 0, 0, 40);
 // Les titres de la fiche, en or sombre : le corps est clair.
 constexpr ImU32 kHeadingColor = kSkinGoldTextColor;
-constexpr std::size_t kLineSize = 224;
+// Une ligne tient le pire cas : une heure, deux espaces, puis un nom.
+constexpr std::size_t kTimedLineGapBytes = sizeof("  ") - 1;
+constexpr std::size_t kLineSize = kSurvivorsClockTextSize + kTimedLineGapBytes + kCodexTextSize;
 using Line = std::array<char, kLineSize>;
 constexpr ImGuiTableFlags kLevelTableFlags =
     ImGuiTableFlags_SizingStretchSame | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersInnerH;

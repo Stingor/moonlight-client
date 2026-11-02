@@ -8,6 +8,7 @@
 
 #include <imgui.h>
 
+#include "ro/core/decimal_text.h"
 #include "ro/ui/survivors_effects.h"
 #include "ro/ui/survivors_minimap.h"
 
@@ -107,8 +108,10 @@ void DrawSurvivorsHud(const SurvivorsHudView& view);
 // premier dixième, reste, et repart pendant le dernier.
 [[nodiscard]] float SurvivorsCardSlide(float fraction) noexcept;
 
-// LE MINUTEUR, « mm:ss » ; au-delà d'une heure, les minutes continuent.
-inline constexpr std::size_t kSurvivorsClockTextSize = 16;
+// LE MINUTEUR, « mm:ss » ; au-delà d'une heure, les minutes continuent. Le
+// tampon tient le pire cas : deux nombres de 64 bits.
+inline constexpr std::size_t kSurvivorsClockTextSize =
+    core::kDecimalTextBytes<std::uint64_t> + core::kDecimalTextBytes<std::uint64_t>;
 [[nodiscard]] std::array<char, kSurvivorsClockTextSize> SurvivorsClockText(std::uint64_t clock_ms);
 
 // LA PLACE D'UNE FLÈCHE DE BORD : sur le bord du cadre rentré de `inset_px`,

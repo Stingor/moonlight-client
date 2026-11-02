@@ -42,7 +42,9 @@ inline constexpr std::int64_t kMostSpeedUnitsPerSecond =
 }
 
 [[nodiscard]] inline std::unexpected<core::Error> Refuse(std::string detail) {
-  return core::Fail(core::ErrorCode::kInvalidArgument, "règles survivors : " + std::move(detail));
+  std::string message("règles survivors : ");
+  message.append(detail);
+  return core::Fail(core::ErrorCode::kInvalidArgument, std::move(message));
 }
 
 [[nodiscard]] inline bool Contains(std::span<const std::uint16_t> ids, std::uint16_t id) {

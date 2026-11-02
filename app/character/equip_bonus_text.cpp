@@ -18,6 +18,7 @@
 #include <vector>
 
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 #include "ro/sim/player_bonuses.h"
 #include "ro/ui/character_window.h"
 
@@ -35,9 +36,8 @@ using ro::sim::ItemBonusKind;
 using ro::sim::PlayerBonuses;
 using ro::sim::SkillBonusKind;
 
-// La place d'une valeur écrite, et celle d'un libellé composé.
+// La place d'une valeur écrite.
 constexpr std::size_t kValueRoom = 32;
-constexpr std::size_t kLabelRoom = 160;
 // Ce que vaut un bonus « tout ou rien » rangé parmi les pour cent : la fiche
 // replie de même le masque d'« ignore DEF ».
 constexpr std::int32_t kWholePercent = 100;
@@ -178,24 +178,11 @@ template <typename Set>
   return std::string(verb) + " " + target;
 }
 
-// Un libellé composé autour d'un nombre ou d'un nom.
-[[nodiscard]] std::string Composed(const char* format, std::int32_t number) {
-  char label[kLabelRoom] = {};
-  std::snprintf(label, sizeof(label), format, number);
-  return label;
-}
-
-[[nodiscard]] std::string Composed(const char* format, const std::string& name) {
-  char label[kLabelRoom] = {};
-  std::snprintf(label, sizeof(label), format, name.c_str());
-  return label;
-}
-
 // Le numéro d'un type que ce client ne sait pas dire, avec sa dernière valeur.
 [[nodiscard]] std::string Unknown(const ro::sim::EquipBonus& bonus) {
   const std::int32_t last = bonus.level == 0 ? bonus.values[0] : bonus.values[bonus.level - 1];
-  return Valued(Composed(ro::core::Tr("Bonus #%d"), static_cast<std::int32_t>(bonus.type)), last,
-                Unit::kFlat);
+  return Valued(ro::core::Printed(ro::core::Tr("Bonus #%d"), static_cast<std::int32_t>(bonus.type)),
+                last, Unit::kFlat);
 }
 
 // L'apport propre de la pièce, hors script.
@@ -599,23 +586,29 @@ template <typename Set>
     case Type::kSpDrainValueClass:
       return Valued(Against(ro::core::Tr("SP par coup vs"), ClassOf(target)), n, Unit::kFlat);
     case Type::kAddDamageClass:
-      return Valued(Composed(ro::core::Tr("Dégâts vs monstre #%d"), target), n, Unit::kPercent);
+      return Valued(ro::core::Printed(ro::core::Tr("Dégâts vs monstre #%d"), target), n,
+                    Unit::kPercent);
     case Type::kAddMagicDamageClass:
-      return Valued(Composed(ro::core::Tr("Dég. mag. vs monstre #%d"), target), n, Unit::kPercent);
+      return Valued(ro::core::Printed(ro::core::Tr("Dég. mag. vs monstre #%d"), target), n,
+                    Unit::kPercent);
     case Type::kAddDefMonster:
-      return Valued(Composed(ro::core::Tr("Réduc. vs monstre #%d"), target), n, Unit::kPercent);
+      return Valued(ro::core::Printed(ro::core::Tr("Réduc. vs monstre #%d"), target), n,
+                    Unit::kPercent);
     case Type::kAddMdefMonster:
-      return Valued(Composed(ro::core::Tr("Réduc. mag. vs monstre #%d"), target), n,
+      return Valued(ro::core::Printed(ro::core::Tr("Réduc. mag. vs monstre #%d"), target), n,
                     Unit::kPercent);
     case Type::kAddItemHealRate:
     case Type::kAddItemSpHealRate:
-      return Valued(Composed(ro::core::Tr("Soin de %s"),
-                             names.item_of ? names.item_of(static_cast<std::uint32_t>(target))
-                                           : std::string()),
-                    n, Unit::kPercent);
+      return Valued(
+          ro::core::Printed(
+              ro::core::Tr("Soin de %s"),
+              (names.item_of ? names.item_of(static_cast<std::uint32_t>(target)) : std::string())
+                  .c_str()),
+          n, Unit::kPercent);
     case Type::kAddItemGroupHealRate:
     case Type::kAddItemGroupSpHealRate:
-      return Valued(Composed(ro::core::Tr("Soin du groupe #%d"), target), n, Unit::kPercent);
+      return Valued(ro::core::Printed(ro::core::Tr("Soin du groupe #%d"), target), n,
+                    Unit::kPercent);
     case Type::kResEff:
       return Skill(names, ro::sim::SkillBonus{
                               .code = static_cast<std::uint16_t>(SkillBonusKind::kResistEffect),
@@ -632,8 +625,9 @@ template <typename Set>
                               .skill_id = static_cast<std::uint16_t>(target),
                               .value = n});
     case Type::kAddEff2:
-      return Valued(Composed(ro::core::Tr("Statut sur soi : %s"), StatusName(names, target)), n,
-                    Unit::kCentiPercent);
+      return Valued(
+          ro::core::Printed(ro::core::Tr("Statut sur soi : %s"), StatusName(names, target).c_str()),
+          n, Unit::kCentiPercent);
     case Type::kSkillAtk:
       return SkillOf(names, SkillBonusKind::kSkillAttack, target, n);
     case Type::kSubSkill:
@@ -688,8 +682,9 @@ template <typename Set>
     case Type::kAutoSpellOnSkill:
       return AutoSpell(names, SkillBonusKind::kAutoSpellOnSkill, v[1], v[2], v[3], v[0]);
     case Type::kAddEffOnSkill:
-      return Valued(Composed(ro::core::Tr("Inflige %s"), StatusName(names, v[1])) + " " +
-                        Composed(ro::core::Tr("par %s"), SkillName(names, v[0])),
+      return Valued(ro::core::Printed(ro::core::Tr("Inflige %s"), StatusName(names, v[1]).c_str()) +
+                        " " +
+                        ro::core::Printed(ro::core::Tr("par %s"), SkillName(names, v[0]).c_str()),
                     v[2], Unit::kCentiPercent);
     case Type::kHpDrainRate:
       return Sheet([&v](PlayerBonuses& one) { one.hp_drain_pct = v[1]; });
@@ -712,14 +707,18 @@ template <typename Set>
       return Valued(ro::core::Tr("Vanish SP"), v[1], Unit::kPercent);
     case Type::kHpRegenRate:
     case Type::kRegenPercentHp:
-      return Valued(Composed(ro::core::Tr("Régén. PV toutes les %d ms"), v[1]), v[0], Unit::kFlat);
+      return Valued(ro::core::Printed(ro::core::Tr("Régén. PV toutes les %d ms"), v[1]), v[0],
+                    Unit::kFlat);
     case Type::kSpRegenRate:
     case Type::kRegenPercentSp:
-      return Valued(Composed(ro::core::Tr("Régén. SP toutes les %d ms"), v[1]), v[0], Unit::kFlat);
+      return Valued(ro::core::Printed(ro::core::Tr("Régén. SP toutes les %d ms"), v[1]), v[0],
+                    Unit::kFlat);
     case Type::kHpLossRate:
-      return Valued(Composed(ro::core::Tr("Perte PV toutes les %d ms"), v[1]), v[0], Unit::kFlat);
+      return Valued(ro::core::Printed(ro::core::Tr("Perte PV toutes les %d ms"), v[1]), v[0],
+                    Unit::kFlat);
     case Type::kSpLossRate:
-      return Valued(Composed(ro::core::Tr("Perte SP toutes les %d ms"), v[1]), v[0], Unit::kFlat);
+      return Valued(ro::core::Printed(ro::core::Tr("Perte SP toutes les %d ms"), v[1]), v[0],
+                    Unit::kFlat);
     case Type::kAbsorbDmgMaxHp:
     case Type::kAbsorbDmgMaxHp2:
       return Valued(ro::core::Tr("Dégâts plafonnés en PV max"), v[0], Unit::kPercent);

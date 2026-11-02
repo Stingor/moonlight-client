@@ -52,8 +52,9 @@ constexpr float kByteScale = 255.0F;
 constexpr int kLargestStyle = 255;
 
 core::Error Refused(std::string detail) {
-  return core::Error{core::ErrorCode::kCorruptData,
-                     std::string(kMapSkyPath) + " : " + std::move(detail)};
+  std::string message(kMapSkyPath);
+  message.append(" : ").append(detail);
+  return core::Error{core::ErrorCode::kCorruptData, std::move(message)};
 }
 
 // La couleur, ramenée à l'unité. Une couleur à deux composantes n'est pas une

@@ -4,7 +4,9 @@
 #include <cstdlib>
 #include <cstring>
 
+#include "ro/core/decimal_text.h"
 #include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 #include "ro/ui/database_window.h"
 #include "ro/ui/survivors_hud.h"
 
@@ -19,8 +21,14 @@ constexpr std::int64_t kHundredthsPerPct = 100;
 // Une décimale de plus ne dirait rien au joueur.
 constexpr int kMostDecimals = 2;
 constexpr std::int64_t kDecimalBase = 10;
-constexpr std::size_t kNumberSize = 32;
-using NumberText = std::array<char, kNumberSize>;
+// Les tampons tiennent le pire cas : les décimales, puis la partie entière
+// suivie d'elles, puis le tout précédé de son signe.
+using DigitsText = std::array<char, core::kDecimalTextBytes<long long>>;
+constexpr std::size_t kUnsignedNumberSize =
+    core::kDecimalTextBytes<long long> + core::kDecimalTextBytes<long long>;
+using UnsignedNumberText = std::array<char, kUnsignedNumberSize>;
+constexpr std::size_t kSignBytes = 1;
+using NumberText = std::array<char, kUnsignedNumberSize + kSignBytes>;
 
 // `value / scale`, arrondi à deux décimales au plus, les décimales nulles
 // tues ; `scale` est une puissance de dix.
@@ -45,9 +53,9 @@ using NumberText = std::array<char, kNumberSize>;
     std::snprintf(text.data(), text.size(), "%s%lld", sign, static_cast<long long>(whole));
     return text;
   }
-  NumberText digits = {};
+  DigitsText digits = {};
   std::snprintf(digits.data(), digits.size(), "%0*lld", decimals, static_cast<long long>(fraction));
-  NumberText number = {};
+  UnsignedNumberText number = {};
   // La partie entière et les décimales, séparées comme la langue le veut.
   std::snprintf(number.data(), number.size(), core::Tr("%lld,%s"), static_cast<long long>(whole),
                 digits.data());
@@ -281,10 +289,10 @@ CodexText CodexSourceText(const SurvivorsCodexSource& source) {
 CodexText CodexAffinitiesText(std::span<const SurvivorsCodexAffinity> affinities) {
   CodexText text = {};
   for (const SurvivorsCodexAffinity& affinity : affinities) {
-    CodexText piece = {};
-    std::snprintf(piece.data(), piece.size(), "%s %s", CodexElementName(affinity.element),
-                  CodexValueText(SurvivorsCodexUnit::kPercent, affinity.pct).data());
-    Append(text, piece.data());
+    const std::string piece =
+        core::Printed("%s %s", CodexElementName(affinity.element),
+                      CodexValueText(SurvivorsCodexUnit::kPercent, affinity.pct).data());
+    Append(text, piece.c_str());
   }
   return text;
 }
