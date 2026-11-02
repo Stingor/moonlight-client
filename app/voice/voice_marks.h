@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+#include <cstddef>
 #include <cstdint>
 #include <span>
 #include <vector>
@@ -34,5 +36,8 @@ namespace moonclient {
 // ou quand l'installation ne la porte pas.
 [[nodiscard]] ro::ui::SkinImage SpeakingIconImage(ro::render::GameImages* images,
                                                   SpeakingIcon icon);
+// Toutes, au rang de `SpeakingIcon` : ce que la page Son montre au choix.
+[[nodiscard]] std::array<ro::ui::SkinImage, static_cast<std::size_t>(SpeakingIcon::kCount)>
+SpeakingIconImages(ro::render::GameImages* images);
 
 }  // namespace moonclient

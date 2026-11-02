@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <span>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -220,9 +221,13 @@ void VoiceOptions::ComposeInto(std::vector<OptionRowView>& rows) {
       .id = VoiceRowId(VoiceRow::kSpeakingIcon),
       .label = Tr("Icône de parole"),
       .help = Tr("Ce qui s'affiche au-dessus de qui parle, vous compris. Seul votre écran change."),
-      .kind = OptionKind::kChoice,
+      .kind = OptionKind::kPicture,
       .chosen = sane.speaking_icon,
       .choices = icon_names_,
+      // ⚠ PAS UNE IMAGE, PAS DE CASES : six cercles barrés ne disent rien.
+      .pictures = std::ranges::any_of(live_.icons, &ro::ui::SkinImage::usable)
+                      ? std::span<const ro::ui::SkinImage>(live_.icons)
+                      : std::span<const ro::ui::SkinImage>(),
       .disabled = !sane.enabled});
   rows.push_back(
       OptionRowView{.id = VoiceRowId(VoiceRow::kBlocks),

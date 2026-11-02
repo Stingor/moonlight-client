@@ -31,6 +31,7 @@ constexpr std::size_t kValuesBytes = 480;
     case OptionKind::kSlider:
       return std::isfinite(row.value) ? std::format("{:g}", row.value) : std::string("null");
     case OptionKind::kChoice:
+    case OptionKind::kPicture:
       return std::to_string(row.chosen);
     case OptionKind::kColor:
       return std::format(R"("{:08X}")", static_cast<unsigned>(row.color));

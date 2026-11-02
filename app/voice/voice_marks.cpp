@@ -53,4 +53,13 @@ ro::ui::SkinImage SpeakingIconImage(ro::render::GameImages* images, SpeakingIcon
   return ro::ui::AtOurDensity(SkinImageOf(images->GetOursIfShipped(path)));
 }
 
+std::array<ro::ui::SkinImage, static_cast<std::size_t>(SpeakingIcon::kCount)> SpeakingIconImages(
+    ro::render::GameImages* images) {
+  std::array<ro::ui::SkinImage, static_cast<std::size_t>(SpeakingIcon::kCount)> all{};
+  for (std::size_t rank = 0; rank < all.size(); ++rank) {
+    all[rank] = SpeakingIconImage(images, static_cast<SpeakingIcon>(rank));
+  }
+  return all;
+}
+
 }  // namespace moonclient

@@ -46,6 +46,7 @@
 #include "items/inventory_view.h"
 #include "options/damage_page_names.h"
 #include "options/entity_page_tabs.h"
+#include "voice/voice_marks.h"
 #include "world/cast_bar_view.h"
 #include "world/click_action.h"
 #include "world/damage_path_sample.h"
@@ -154,10 +155,12 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
     // raccourcis : elle attend son geste même fenêtre des raccourcis fermée.
     const int talk_rank = static_cast<int>(ActionRef(GameAction::kVoiceTalk).rank());
     VoiceOptions& voice_options = settings_->options().pages().voice;
-    voice_options.ShowLive(
-        VoiceLiveView{.talk_key = talk.bound() ? LabelOfBinding(talk) : std::string(),
-                      .capturing = windows_.hotkeys.capturing == talk_rank,
-                      .input_percent = voice_.input_percent()});
+    voice_options.ShowLive(VoiceLiveView{
+        .talk_key = talk.bound() ? LabelOfBinding(talk) : std::string(),
+        .capturing = windows_.hotkeys.capturing == talk_rank,
+        .input_percent = voice_.input_percent(),
+        .icons =
+            SpeakingIconImages(pieces_.game_images.has_value() ? &*pieces_.game_images : nullptr)});
     if (voice_options.TakeTalkKeyRequest()) {
       windows_.hotkeys.capturing = talk_rank;
       windows_.hotkeys.robbed[0] = '\0';

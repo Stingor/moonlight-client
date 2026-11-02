@@ -4,6 +4,8 @@
 
 #include <algorithm>
 #include <array>
+#include <cstddef>
+#include <numbers>
 #include <optional>
 #include <string_view>
 
@@ -40,6 +42,20 @@ constexpr float kControlWidthPixels = 190.0F;
 constexpr const char* kActionBoxId = "##confirmer";
 // Celle du bouton invisible d'un cadre qu'on manipule, sous la même pile.
 constexpr const char* kCanvasId = "##cadre";
+// Celle de chaque case d'un choix par images, sous le rang de la case.
+constexpr const char* kPictureId = "##image";
+
+// LES CASES D'UN CHOIX PAR IMAGES tiennent ensemble la largeur d'un contrôle,
+// sans dépasser ce côté : trois icônes ne s'étirent pas en vignettes.
+constexpr float kPictureMostPixels = 32.0F;
+// Le jour entre l'image et le bord de sa case, et le trait du cadre de celle
+// qui est choisie.
+constexpr float kPicturePadPixels = 4.0F;
+constexpr float kPictureFramePixels = 2.0F;
+// Le cercle barré d'une case sans image : un trait fin, et la barre à 45°,
+// d'un bord du cercle à l'autre.
+constexpr float kAbsenceStrokePixels = 1.5F;
+constexpr float kHalfDiagonal = std::numbers::sqrt2_v<float> / 2.0F;
 
 // LE BANDEAU D'UN BLOC REPLIABLE, aux couleurs de la peau : un gris léger au
 // repos, le gris des champs sous la souris. ⚠ LES COULEURS D'IMGUI SONT CELLES
@@ -162,6 +178,76 @@ void DrawRowTail(const OptionRowView& row, float command_column, float* widest, 
   DrawRevert(row, command_column, used, widest, art, asked);
 }
 
+// Une case d'un choix par images : l'image ajustée à la case, ou le cercle
+// barré quand elle n'en a pas.
+void PaintPicture(const SkinImage& picture, ImVec2 min, ImVec2 max, const SkinLook& look) {
+  ImDrawList* into = ImGui::GetWindowDrawList();
+  const float pad = Px(kPicturePadPixels);
+  const ImVec2 room(max.x - min.x - 2.0F * pad, max.y - min.y - 2.0F * pad);
+  const ImVec2 center((min.x + max.x) * 0.5F, (min.y + max.y) * 0.5F);
+  if (!picture.usable()) {
+    const float radius = std::min(room.x, room.y) * 0.5F;
+    const ImU32 ink = ImGui::GetColorU32(look.faint_text);
+    into->AddCircle(center, radius, ink, 0, Px(kAbsenceStrokePixels));
+    const float reach = radius * kHalfDiagonal;
+    into->AddLine(ImVec2(center.x - reach, center.y + reach),
+                  ImVec2(center.x + reach, center.y - reach), ink, Px(kAbsenceStrokePixels));
+    return;
+  }
+  // ⚠ AJUSTÉE SANS DÉFORMER : le sens le plus serré fixe l'échelle des deux.
+  const float fit = std::min(room.x / picture.width, room.y / picture.height);
+  const ImVec2 half(picture.width * fit * 0.5F, picture.height * fit * 0.5F);
+  // ⚠ LA TEINTE PORTE LE GRISÉ : `GetColorU32` y applique l'opacité d'une
+  // rangée éteinte, qu'une liste de dessin n'applique pas d'elle-même.
+  into->AddImage(picture.id, ImVec2(center.x - half.x, center.y - half.y),
+                 ImVec2(center.x + half.x, center.y + half.y), ImVec2(0.0F, 0.0F),
+                 ImVec2(1.0F, 1.0F), ImGui::GetColorU32(IM_COL32_WHITE));
+}
+
+// UN CHOIX PAR IMAGES : une case par entrée, la choisie surlignée et cadrée,
+// son nom en bulle. Rend vrai quand on en clique une autre.
+[[nodiscard]] bool DrawPictureChoice(const OptionRowView& row, const SkinArt& art, int* chosen) {
+  const SkinLook& look = art.look();
+  const float gap = ImGui::GetStyle().ItemInnerSpacing.x;
+  const auto count = static_cast<float>(row.choices.size());
+  const float side =
+      std::min(Px(kPictureMostPixels), (Px(kControlWidthPixels) - gap * (count - 1.0F)) / count);
+  const float rounding = look.rounding * Scale();
+  bool changed = false;
+  ImGui::BeginGroup();
+  for (std::size_t rank = 0; rank < row.choices.size(); ++rank) {
+    if (rank != 0) {
+      ImGui::SameLine(0.0F, gap);
+    }
+    ImGui::PushID(static_cast<int>(rank));
+    const bool pressed = ImGui::InvisibleButton(kPictureId, ImVec2(side, side));
+    ImGui::PopID();
+    const bool hovered = ImGui::IsItemHovered();
+    const ImVec2 min = ImGui::GetItemRectMin();
+    const ImVec2 max = ImGui::GetItemRectMax();
+    const bool picked = static_cast<int>(rank) == *chosen;
+    ImDrawList* into = ImGui::GetWindowDrawList();
+    into->AddRectFilled(min, max, ImGui::GetColorU32(picked ? look.selection : look.input),
+                        rounding);
+    PaintPicture(row.pictures[rank], min, max, look);
+    if (picked || hovered) {
+      into->AddRect(min, max, ImGui::GetColorU32(picked ? look.active_tab : look.border), rounding,
+                    0, Px(kPictureFramePixels));
+    }
+    if (hovered && row.choices[rank] != nullptr) {
+      SkinTooltip(row.choices[rank]);
+    }
+    if (pressed && !picked) {
+      *chosen = static_cast<int>(rank);
+      changed = true;
+    }
+  }
+  ImGui::EndGroup();
+  ImGui::SameLine();
+  ImGui::TextUnformatted(row.label);
+  return changed;
+}
+
 // Le contrôle d'une ligne. Rend vrai si le joueur l'a bougé, et remplit la
 // demande. ⚠ IL TRAVAILLE SUR UNE COPIE : la fenêtre ne possède aucun réglage,
 // elle ne fait que dire ce qui a été demandé.
@@ -194,9 +280,13 @@ void DrawRowTail(const OptionRowView& row, float command_column, float* widest, 
       }
       return false;
     }
-    case OptionKind::kChoice: {
+    case OptionKind::kChoice:
+    case OptionKind::kPicture: {
       int chosen = row.chosen;
-      if (SkinCombo(row.label, &chosen, row.choices, art)) {
+      const bool pictured = row.kind == OptionKind::kPicture && !row.choices.empty() &&
+                            row.pictures.size() == row.choices.size();
+      if (pictured ? DrawPictureChoice(row, art, &chosen)
+                   : SkinCombo(row.label, &chosen, row.choices, art)) {
         asked->changed = row.id;
         asked->chosen = chosen;
         return true;

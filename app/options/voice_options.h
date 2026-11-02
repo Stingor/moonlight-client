@@ -74,13 +74,15 @@ enum class SpeakingIcon : std::uint8_t {
 // L'image d'une icône, sous le dossier de nos icônes, ou vide pour « aucune ».
 [[nodiscard]] std::string_view SpeakingIconPath(SpeakingIcon icon);
 
-// CE QUE LA PAGE MONTRE ET QUE LA BOUCLE SEULE SAIT : la touche « Parler », et
-// le niveau du micro à l'instant.
+// CE QUE LA PAGE MONTRE ET QUE LA BOUCLE SEULE SAIT : la touche « Parler », le
+// niveau du micro à l'instant, et l'image de chaque icône de parole.
 struct VoiceLiveView {
   std::string talk_key;    // vide quand aucune touche n'est posée
   bool capturing = false;  // la capture de la touche attend son geste
   // En pour cent de `kVoiceLevelAtFullScale` ; vide quand la voix est fermée.
   std::optional<float> input_percent;
+  // Au rang de `SpeakingIcon`. Sans elles, l'icône se choisit dans une liste.
+  std::array<ro::ui::SkinImage, static_cast<std::size_t>(SpeakingIcon::kCount)> icons{};
 };
 
 [[nodiscard]] constexpr int VoiceRowId(VoiceRow row) {

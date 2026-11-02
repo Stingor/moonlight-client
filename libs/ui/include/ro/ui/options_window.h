@@ -66,6 +66,11 @@ enum class OptionKind : std::uint8_t {
   // ⚠ CE QU'IL RÈGLE N'EST PAS À LA FENÊTRE : le panneau écrit lui-même dans
   // ce qu'il a reçu. La demande ne porte que l'identifiant de la ligne.
   kPanel,
+  // UN CHOIX QUI SE VOIT : une case par entrée, son image dedans, son nom en
+  // bulle. Pour ce qu'on choisit sur sa mine — une icône —, qu'un nom dans une
+  // liste déroulante ne montre pas. Sans une image par entrée, la ligne
+  // redevient une liste déroulante.
+  kPicture,
 };
 
 // LA PLUS LONGUE LIGNE QU'UN CHAMP `kText` ACCEPTE, terminateur compris.
@@ -125,6 +130,9 @@ struct OptionRowView {
   const char* format = "%.2f";
   int chosen = 0;
   std::span<const char* const> choices;
+  // L'image de chaque entrée d'un `kPicture`, au rang de `choices`. Une image
+  // vide se peint comme l'absence : un cercle barré.
+  std::span<const SkinImage> pictures;
   // Ce que porte un champ `kText`. Au-delà de `kOptionTextBytes`, coupé à une
   // frontière de caractère UTF-8.
   const char* text = "";
@@ -407,6 +415,7 @@ struct OptionsWindowState {
 //   kToggle   ->  on
 //   kSlider   ->  value
 //   kChoice   ->  chosen      ⚠ PAS `value`
+//   kPicture  ->  chosen
 //   kColor    ->  color
 //   kAction   ->  rien, `changed` suffit
 //   kCanvas   ->  dragged et point, ou copy_to ; `changed` est l'ANCRE
