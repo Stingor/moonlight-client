@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <optional>
 #include <string>
+#include <string_view>
 
 #include <SDL3/SDL_keyboard.h>
 #include <SDL3/SDL_keycode.h>
@@ -82,6 +83,93 @@ constexpr std::uint32_t kAsciiCaseGap = 'a' - 'A';
       return ro::core::Tr("Clic milieu maintenu");
   }
   return "?";
+}
+
+// Le nom affiché d'une touche qui n'est pas un caractère, dans la langue de
+// l'interface. Nul quand SDL nomme déjà la touche comme on l'écrirait (F1, Tab,
+// Pause…). Le fichier garde le nom anglais de SDL, que seul l'affichage traduit.
+[[nodiscard]] const char* TranslatedKeyName(SDL_Keycode key) {
+  switch (key) {
+    case SDLK_RETURN:
+      return ro::core::Tr("Entrée");
+    case SDLK_ESCAPE:
+      return ro::core::Tr("Échap");
+    case SDLK_BACKSPACE:
+      return ro::core::Tr("Retour arrière");
+    case SDLK_SPACE:
+      return ro::core::Tr("Espace");
+    case SDLK_DELETE:
+      return ro::core::Tr("Suppr");
+    case SDLK_INSERT:
+      return ro::core::Tr("Inser");
+    case SDLK_HOME:
+      return ro::core::Tr("Début");
+    case SDLK_END:
+      return ro::core::Tr("Fin");
+    case SDLK_PAGEUP:
+      return ro::core::Tr("Page préc.");
+    case SDLK_PAGEDOWN:
+      return ro::core::Tr("Page suiv.");
+    case SDLK_LEFT:
+      return ro::core::Tr("Flèche gauche");
+    case SDLK_RIGHT:
+      return ro::core::Tr("Flèche droite");
+    case SDLK_UP:
+      return ro::core::Tr("Flèche haut");
+    case SDLK_DOWN:
+      return ro::core::Tr("Flèche bas");
+    case SDLK_PRINTSCREEN:
+      return ro::core::Tr("Impr Écran");
+    case SDLK_SCROLLLOCK:
+      return ro::core::Tr("Arrêt défil.");
+    case SDLK_CAPSLOCK:
+      return ro::core::Tr("Verr. maj.");
+    case SDLK_NUMLOCKCLEAR:
+      return ro::core::Tr("Verr. num.");
+    case SDLK_APPLICATION:
+      return ro::core::Tr("Menu");
+    case SDLK_LCTRL:
+      return ro::core::Tr("Ctrl gauche");
+    case SDLK_RCTRL:
+      return ro::core::Tr("Ctrl droit");
+    case SDLK_LSHIFT:
+      return ro::core::Tr("Maj gauche");
+    case SDLK_RSHIFT:
+      return ro::core::Tr("Maj droite");
+    case SDLK_LALT:
+      return ro::core::Tr("Alt gauche");
+    case SDLK_RALT:
+      return ro::core::Tr("Alt Gr");
+    case SDLK_LGUI:
+      return ro::core::Tr("Windows gauche");
+    case SDLK_RGUI:
+      return ro::core::Tr("Windows droite");
+    case SDLK_KP_ENTER:
+      return ro::core::Tr("Pavé num. Entrée");
+    default:
+      return nullptr;
+  }
+}
+
+// Le préfixe que SDL donne aux touches du pavé numérique : « Keypad 1 ».
+constexpr std::string_view kKeypadPrefix = "Keypad ";
+
+[[nodiscard]] std::string DisplayedKeyName(SDL_Keycode key) {
+  if (const char* translated = TranslatedKeyName(key); translated != nullptr) {
+    return translated;
+  }
+  const char* name = SDL_GetKeyName(key);
+  if (name == nullptr || *name == '\0') {
+    return "?";
+  }
+  const std::string_view sdl_name(name);
+  if (sdl_name.starts_with(kKeypadPrefix)) {
+    std::string label = ro::core::Tr("Pavé num.");
+    label += ' ';
+    label += sdl_name.substr(kKeypadPrefix.size());
+    return label;
+  }
+  return std::string(sdl_name);
 }
 
 }  // namespace
@@ -262,8 +350,7 @@ std::string LabelOfBinding(Binding binding) {
     label += LabelOfGesture(*gesture);
     return label;
   }
-  const char* name = SDL_GetKeyName(static_cast<SDL_Keycode>(binding.key));
-  label += name != nullptr ? name : "?";
+  label += DisplayedKeyName(static_cast<SDL_Keycode>(binding.key));
   return label;
 }
 

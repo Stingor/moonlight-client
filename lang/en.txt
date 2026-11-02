@@ -21808,3 +21808,87 @@ tr: Speaking icon
 
 fr: Ce qui s'affiche au-dessus de qui parle, vous compris. Seul votre écran change.
 tr: What appears above whoever is speaking, yourself included. Only your screen changes.
+
+fr: Entrée
+tr: Enter
+
+fr: Échap
+tr: Esc
+
+fr: Retour arrière
+tr: Backspace
+
+fr: Espace
+tr: Space
+
+fr: Inser
+tr: Insert
+
+fr: Début
+tr: Home
+
+fr: Fin
+tr: End
+
+fr: Page préc.
+tr: Page Up
+
+fr: Page suiv.
+tr: Page Down
+
+fr: Flèche gauche
+tr: Left Arrow
+
+fr: Flèche droite
+tr: Right Arrow
+
+fr: Flèche haut
+tr: Up Arrow
+
+fr: Flèche bas
+tr: Down Arrow
+
+fr: Impr Écran
+tr: Print Screen
+
+fr: Arrêt défil.
+tr: Scroll Lock
+
+fr: Verr. maj.
+tr: Caps Lock
+
+fr: Verr. num.
+tr: Num Lock
+
+fr: Menu
+tr: Menu
+
+fr: Ctrl gauche
+tr: Left Ctrl
+
+fr: Ctrl droit
+tr: Right Ctrl
+
+fr: Maj gauche
+tr: Left Shift
+
+fr: Maj droite
+tr: Right Shift
+
+fr: Alt gauche
+tr: Left Alt
+
+fr: Alt Gr
+tr: Alt Gr
+
+fr: Windows gauche
+tr: Left Windows
+
+fr: Windows droite
+tr: Right Windows
+
+fr: Pavé num. Entrée
+tr: Keypad Enter
+
+fr: Pavé num.
+tr: Keypad

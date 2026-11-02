@@ -21808,3 +21808,87 @@ tr: Icono de voz
 
 fr: Ce qui s'affiche au-dessus de qui parle, vous compris. Seul votre écran change.
 tr: Lo que aparece sobre quien habla, tú incluido. Solo cambia tu pantalla.
+
+fr: Entrée
+tr: Intro
+
+fr: Échap
+tr: Esc
+
+fr: Retour arrière
+tr: Retroceso
+
+fr: Espace
+tr: Espacio
+
+fr: Inser
+tr: Insert
+
+fr: Début
+tr: Inicio
+
+fr: Fin
+tr: Fin
+
+fr: Page préc.
+tr: Re Pág
+
+fr: Page suiv.
+tr: Av Pág
+
+fr: Flèche gauche
+tr: Flecha izquierda
+
+fr: Flèche droite
+tr: Flecha derecha
+
+fr: Flèche haut
+tr: Flecha arriba
+
+fr: Flèche bas
+tr: Flecha abajo
+
+fr: Impr Écran
+tr: Impr Pant
+
+fr: Arrêt défil.
+tr: Bloq Despl
+
+fr: Verr. maj.
+tr: Bloq Mayús
+
+fr: Verr. num.
+tr: Bloq Num
+
+fr: Menu
+tr: Menú
+
+fr: Ctrl gauche
+tr: Ctrl izq.
+
+fr: Ctrl droit
+tr: Ctrl der.
+
+fr: Maj gauche
+tr: Mayús izq.
+
+fr: Maj droite
+tr: Mayús der.
+
+fr: Alt gauche
+tr: Alt izq.
+
+fr: Alt Gr
+tr: Alt Gr
+
+fr: Windows gauche
+tr: Windows izq.
+
+fr: Windows droite
+tr: Windows der.
+
+fr: Pavé num. Entrée
+tr: Teclado num. Intro
+
+fr: Pavé num.
+tr: Teclado num.
