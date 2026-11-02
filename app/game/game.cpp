@@ -46,6 +46,7 @@
 #include "items/inventory_view.h"
 #include "options/damage_page_names.h"
 #include "options/entity_page_tabs.h"
+#include "voice/voice_keys.h"
 #include "voice/voice_marks.h"
 #include "world/cast_bar_view.h"
 #include "world/click_action.h"
@@ -150,19 +151,23 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
   // LA VOIX : ouverte ou fermée selon le réglage et le serveur, et la touche
   // « Parler » relue sur l'état du clavier.
   {
-    const Binding talk = settings_->bindings().Of(GameAction::kVoiceTalk);
-    // LA TOUCHE SE CHOISIT AUSSI DANS LA PAGE SON, par la capture des
+    const VoiceKeys talk = ReadVoiceKeys(settings_->bindings());
+    // UN CLIC SUR LA BARRE, à l'image d'avant : un réglage de la page Son.
+    if (const auto asked = VoiceBarAction(windows_.voice.bar_answer,
+                                          settings_->options().pages().voice.settings())) {
+      settings_->ApplyOptionsAside(*asked, windows_.options, OptionsTargets(), now_ms);
+    }
+    const auto icons =
+        SpeakingIconImages(pieces_.game_images.has_value() ? &*pieces_.game_images : nullptr);
+    // LES TOUCHES SE CHOISISSENT AUSSI DANS LA PAGE SON, par la capture des
     // raccourcis : elle attend son geste même fenêtre des raccourcis fermée.
-    const int talk_rank = static_cast<int>(ActionRef(GameAction::kVoiceTalk).rank());
     VoiceOptions& voice_options = settings_->options().pages().voice;
-    voice_options.ShowLive(VoiceLiveView{
-        .talk_key = talk.bound() ? LabelOfBinding(talk) : std::string(),
-        .capturing = windows_.hotkeys.capturing == talk_rank,
-        .input_percent = voice_.input_percent(),
-        .icons =
-            SpeakingIconImages(pieces_.game_images.has_value() ? &*pieces_.game_images : nullptr)});
-    if (voice_options.TakeTalkKeyRequest()) {
-      windows_.hotkeys.capturing = talk_rank;
+    voice_options.ShowLive(VoiceLiveView{.talk_keys = talk.labels,
+                                         .capturing = VoiceKeyCapturing(windows_.hotkeys.capturing),
+                                         .input_percent = voice_.input_percent(),
+                                         .icons = icons});
+    if (const std::optional<VoiceTalkKey> asked = voice_options.TakeTalkKeyRequest()) {
+      windows_.hotkeys.capturing = VoiceKeyCaptureRank(*asked);
       windows_.hotkeys.robbed[0] = '\0';
     }
     voice_.Pump(
@@ -172,9 +177,11 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
                    .login_id1 = ticket_.account.login_id1,
                    .settings = settings_->options().pages().voice.settings(),
                    .spatial = settings_->options().spatial_sound(),
-                   .talk_key = talk.bound() ? talk.key : 0U,
+                   .talk_keys = talk.codes,
                    .now_ms = now_ms});
     windows_.voice = voice_.overlay();
+    windows_.voice.bar.mic_icon = icons[static_cast<std::size_t>(SpeakingIcon::kMicrophone)];
+    windows_.voice.bar.speaker_icon = icons[static_cast<std::size_t>(SpeakingIcon::kSpeaker)];
   }
   // LES CLASSEMENTS attendent leurs noms ; les avis d'étoile ont leur son.
   pieces_.rank_notices.Advance(world_, now_ms);

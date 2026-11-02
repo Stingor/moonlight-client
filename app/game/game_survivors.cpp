@@ -26,6 +26,7 @@
 #include "game/survivors_mode.h"
 #include "input/hotkeys.h"
 #include "survivors/survivors_route.h"
+#include "voice/voice_keys.h"
 
 namespace moonclient {
 namespace {
@@ -122,14 +123,13 @@ bool Game::SurvivorsTakes(const SDL_Event& event, std::uint32_t now_ms) {
   // 🔴 LE CLAVIER SE PARTAGE AVEC LA CONVERSATION ET LA VOIX. L'interface a
   // déjà vu la frappe ; reste à dire si l'arène la voit aussi.
   ro::ui::ChatInputState& input = windows_.chat.main.input;
-  const Binding talk = settings_->bindings().Of(GameAction::kVoiceTalk);
   const bool key_event = event.type == SDL_EVENT_KEY_DOWN || event.type == SDL_EVENT_KEY_UP;
   const SurvivorsKeyFacts facts{
       .typing = gate.typing_to_ui,
       .chat_claims = ro::ui::ChatBarTakesTyping(input.battle_mode, input.unfolded, gate.text_to_ui),
       .chest_shown = survivors_.screen() == SurvivorsScreen::kChest,
       .chat_folds_on_escape = ro::ui::ChatBarFoldsOnEscape(input.battle_mode, input.unfolded),
-      .talk_key = key_event && talk.bound() && event.key.key == talk.key};
+      .talk_key = key_event && IsVoiceTalkKey(settings_->bindings(), event.key.key)};
   switch (SurvivorsKeyTurnOf(routed, facts)) {
     case SurvivorsKeyTurn::kArena:
       return survivors_mode_->Take(routed);

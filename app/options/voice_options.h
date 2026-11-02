@@ -11,8 +11,10 @@
 #include <vector>
 
 #include "ro/ui/options_window.h"
+#include "ro/ui/voice_overlay.h"
 
 #include "game/settings_file.h"
+#include "options/percent.h"
 
 namespace moonclient {
 
@@ -41,8 +43,34 @@ enum class VoiceRow : int {
   kInputLevel,
   // Ouvre la fenêtre des joueurs bloqués : un bouton, pas un réglage.
   kBlocks,
+  kSelfMuted,
+  kDeafened,
+  kListenNearby,
+  kListenParty,
+  kListenGuild,
+  kTalkNearbyKey,
+  kTalkPartyKey,
+  kTalkGuildKey,
+  kBarShown,
+  kBarLocked,
+  kBarScale,
+  kBarOpacity,
+  kBarVertical,
+  kBarSpeakers,
+  kBarFade,
   kCount,
 };
+
+// LES TOUCHES DE LA VOIX : « Parler », sur le canal par défaut, puis celle de
+// chaque canal, au rang du canal plus un.
+enum class VoiceTalkKey : std::uint8_t {
+  kDefault,
+  kNearby,
+  kParty,
+  kGuild,
+  kCount,
+};
+inline constexpr std::size_t kVoiceTalkKeyCount = static_cast<std::size_t>(VoiceTalkKey::kCount);
 
 // COMMENT LE MICRO PART. ⚠ LE RANG EST GARDÉ DANS LE FICHIER.
 enum class VoiceTalkMode : std::uint8_t {
@@ -58,6 +86,10 @@ inline constexpr float kVoiceLevelAtFullScale = 0.2F;
 inline constexpr float kVoiceDefaultActivationPercent = 15.0F;
 inline constexpr int kVoiceDefaultReleaseMs = 300;
 inline constexpr int kVoiceMostReleaseMs = 1000;
+// LA BARRE DE LA VOIX : sa taille et son opacité, en pour cent.
+inline constexpr float kVoiceBarLeastScalePercent = 60.0F;
+inline constexpr float kVoiceBarMostScalePercent = 200.0F;
+inline constexpr float kVoiceBarLeastOpacityPercent = 20.0F;
 
 // L'ICÔNE AU-DESSUS DE QUI PARLE, au choix du joueur : elle ne change que ce
 // qu'il voit. ⚠ LE RANG EST GARDÉ DANS LE FICHIER : on ajoute à la fin.
@@ -74,11 +106,13 @@ enum class SpeakingIcon : std::uint8_t {
 // L'image d'une icône, sous le dossier de nos icônes, ou vide pour « aucune ».
 [[nodiscard]] std::string_view SpeakingIconPath(SpeakingIcon icon);
 
-// CE QUE LA PAGE MONTRE ET QUE LA BOUCLE SEULE SAIT : la touche « Parler », le
-// niveau du micro à l'instant, et l'image de chaque icône de parole.
+// CE QUE LA PAGE MONTRE ET QUE LA BOUCLE SEULE SAIT : les touches de la voix,
+// le niveau du micro à l'instant, et l'image de chaque icône de parole.
 struct VoiceLiveView {
-  std::string talk_key;    // vide quand aucune touche n'est posée
-  bool capturing = false;  // la capture de la touche attend son geste
+  // Au rang de `VoiceTalkKey` ; vide quand aucune touche n'est posée.
+  std::array<std::string, kVoiceTalkKeyCount> talk_keys;
+  // La touche dont la capture attend son geste, ou aucune.
+  std::optional<VoiceTalkKey> capturing;
   // En pour cent de `kVoiceLevelAtFullScale` ; vide quand la voix est fermée.
   std::optional<float> input_percent;
   // Au rang de `SpeakingIcon`. Sans elles, l'icône se choisit dans une liste.
@@ -89,8 +123,19 @@ struct VoiceLiveView {
   return kVoiceRowBase + static_cast<int>(row);
 }
 
+struct VoiceSettings;
+
+// UN CLIC SUR LA BARRE DE LA VOIX, tel que la page Son l'aurait demandé : il
+// passe par le même chemin qu'un réglage de la page, et s'enregistre de même.
+// Vide quand il ne change rien.
+[[nodiscard]] std::optional<ro::ui::OptionsWindowAction> VoiceBarAction(
+    const ro::ui::VoiceBarAnswer& answer, const VoiceSettings& now);
+
 // LES CANAUX QU'ON CHOISIT, au rang du fil : le salon s'impose de lui-même.
 inline constexpr std::size_t kVoiceChosenChannelCount = 3;
+inline constexpr int kVoiceListenEvery = (1 << kVoiceChosenChannelCount) - 1;
+// Le bit d'un canal dans `VoiceSettings::listened`.
+[[nodiscard]] constexpr int VoiceListenBit(int channel) { return 1 << channel; }
 // Le micro peut monter au double : un micro discret se rattrape sans réglage
 // du système.
 inline constexpr float kVoiceMostInputGain = 2.0F;
@@ -99,7 +144,23 @@ struct VoiceSettings {
   // ALLUMÉE par défaut : rien ne part sans la touche « Parler », et entendre
   // les autres est ce qu'on attend d'un serveur qui ouvre la voix.
   bool enabled = true;
-  int channel = 0;  // 0 proximité, 1 groupe, 2 guilde
+  // LE CANAL PAR DÉFAUT, où part « Parler » et la voix : 0 proximité,
+  // 1 groupe, 2 guilde.
+  int channel = 0;
+  // LES CANAUX ÉCOUTÉS, un bit par canal au rang de `channel`. ⚠ TOUS PAR
+  // DÉFAUT : un joueur ne parle au groupe ou à la guilde que pour y être
+  // entendu.
+  int listened = kVoiceListenEvery;
+  bool self_muted = false;
+  bool deafened = false;
+  // LA BARRE DE LA VOIX : voir `ro::ui::VoiceBarView`.
+  bool bar_shown = true;
+  bool bar_locked = false;
+  float bar_scale_percent = kPercent;
+  float bar_opacity_percent = kPercent;
+  bool bar_vertical = false;
+  bool bar_speakers = true;
+  bool bar_fade = false;
   float output_volume = 1.0F;
   float input_gain = 1.0F;
   // LE NOM DE L'APPAREIL, vide pour celui du système.
@@ -129,11 +190,13 @@ class VoiceOptions {
   // `ComposeInto` : un casque se branche pendant que la page est ouverte.
   using DeviceLister = std::function<std::vector<std::string>()>;
   void ListDevicesWith(DeviceLister microphones, DeviceLister speakers);
-  // LA TOUCHE « PARLER » ET LE NIVEAU DU MICRO, que la boucle seule sait : elle
-  // les redit à chaque image, et reprend la demande de capture que la ligne
-  // de la touche arme.
+  // LES TOUCHES ET LE NIVEAU DU MICRO, que la boucle seule sait : elle les
+  // redit à chaque image, et reprend la demande de capture qu'une ligne de
+  // touche arme.
   void ShowLive(VoiceLiveView live) { live_ = std::move(live); }
-  [[nodiscard]] bool TakeTalkKeyRequest() noexcept { return std::exchange(talk_key_asked_, false); }
+  [[nodiscard]] std::optional<VoiceTalkKey> TakeTalkKeyRequest() noexcept {
+    return std::exchange(talk_key_asked_, std::nullopt);
+  }
   // Ajoute ses lignes à celles de la page Son, à chaque image où elle est
   // ouverte.
   void ComposeInto(std::vector<ro::ui::OptionRowView>& rows);
@@ -143,6 +206,11 @@ class VoiceOptions {
   [[nodiscard]] VoiceSettings settings() const noexcept;
 
  private:
+  // Le canal par défaut, les canaux écoutés et la touche de chaque canal.
+  void ComposeChannelsInto(std::vector<ro::ui::OptionRowView>& rows, const VoiceSettings& sane);
+  // L'apparence de la barre de la voix.
+  static void ComposeBarInto(std::vector<ro::ui::OptionRowView>& rows, const VoiceSettings& sane);
+
   VoiceSettings settings_;
   std::array<const char*, kVoiceChosenChannelCount> channel_names_{};
   DeviceLister list_microphones_;
@@ -152,9 +220,9 @@ class VoiceOptions {
   std::array<const char*, static_cast<std::size_t>(SpeakingIcon::kCount)> icon_names_{};
   std::array<const char*, static_cast<std::size_t>(VoiceTalkMode::kCount)> mode_names_{};
   VoiceLiveView live_;
-  std::string talk_key_text_;
+  std::array<std::string, kVoiceTalkKeyCount> talk_key_texts_;
   std::string level_text_;
-  bool talk_key_asked_ = false;
+  std::optional<VoiceTalkKey> talk_key_asked_;
 };
 
 }  // namespace moonclient

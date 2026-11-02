@@ -320,9 +320,6 @@ tr: Bloquea los susurros de este jugador; sola, lista los bloqueados.
 fr: Bloque les chuchotements de tout le monde.
 tr: Bloquea los susurros de todo el mundo.
 
-fr: Canal de la voix
-tr: Canal de voz
-
 fr: Cascade ×%d
 tr: Cascada ×%d
 
@@ -424,9 +421,6 @@ tr: Se perdió la conexión con el servidor.
 
 fr: On vous propose un échange.
 tr: Alguien te propone un intercambio.
-
-fr: Où l'on parle et qui l'on entend : les joueurs proches, le groupe ou la guilde. Dans un salon de discussion, la voix est celle du salon.
-tr: Dónde se habla y a quién se oye: los jugadores cercanos, el grupo o el gremio. En una sala de chat, la voz es la de la sala.
 
 fr: Parler (voix)
 tr: Hablar (voz)
@@ -21785,9 +21779,6 @@ tr: Su voz ya no te llega. El bloqueo sigue a su cuenta, de una conexión a otra
 fr: Touche pour parler :
 tr: Tecla para hablar:
 
-fr: On parle en tenant cette touche. C'est la même que « Parler (voix) » dans les raccourcis clavier.
-tr: Se habla manteniendo esta tecla. Es la misma que «Hablar (voz)» en los atajos de teclado.
-
 fr: Micro
 tr: Micrófono
 
@@ -21988,3 +21979,111 @@ tr: Un jugador bloqueado por voz solo aparece aquí si está conectado.
 
 fr: Vous n'avez bloqué personne.
 tr: No ha bloqueado a nadie.
+
+fr: Barre de la voix
+tr: Barra de voz
+
+fr: Canal par défaut
+tr: Canal predeterminado
+
+fr: Canaux
+tr: Canales
+
+fr: Canaux écoutés
+tr: Canales que escucha
+
+fr: Clic : couper le micro.
+tr: Clic: silenciar el micrófono.
+
+fr: Clic : l'écouter ou non. Clic droit : en faire le canal par défaut.
+tr: Clic: escucharlo o no. Clic derecho: hacerlo el canal predeterminado.
+
+fr: Clic : n'entendre plus personne.
+tr: Clic: dejar de oír a todos.
+
+fr: Elle ne se déplace plus à la souris.
+tr: Ya no se mueve con el ratón.
+
+fr: En colonne
+tr: En columna
+
+fr: Estompée au repos
+tr: Atenuada en reposo
+
+fr: Les canaux dont vous entendez les voix, plusieurs à la fois. Un joueur ne vous entend que s'il écoute le canal où vous parlez.
+tr: Los canales cuyas voces oye, varios a la vez. Un jugador solo le oye si escucha el canal en el que habla.
+
+fr: Micro coupé
+tr: Micrófono silenciado
+
+fr: Micro coupé. Clic : le rétablir.
+tr: Micrófono silenciado. Clic: reactivarlo.
+
+fr: On parle sur ce canal en tenant sa touche, quel que soit le canal par défaut, et on l'écoute pendant ce temps. Ce sont aussi des raccourcis clavier.
+tr: Mantenga su tecla para hablar en este canal, sea cual sea el canal predeterminado, y lo escucha mientras tanto. También son atajos de teclado.
+
+fr: On parle sur le canal par défaut en tenant cette touche. C'est la même que « Parler (voix) » dans les raccourcis clavier.
+tr: Mantenga esta tecla para hablar en el canal predeterminado. Es la misma que «Hablar (voz)» en los atajos de teclado.
+
+fr: Opacité de la barre
+tr: Opacidad de la barra
+
+fr: Où part la voix avec la touche « Parler (voix) », et à la voix. Vous l'écoutez toujours. Dans un salon de discussion, la voix est celle du salon.
+tr: Adónde va su voz con la tecla «Hablar (voz)» y con la activación por voz. Siempre lo escucha. En una sala de chat, la voz es la de la sala.
+
+fr: Parler au groupe (voix)
+tr: Hablar a la party (voz)
+
+fr: Parler au groupe :
+tr: Hablar a la party:
+
+fr: Parler en proximité (voix)
+tr: Hablar en cercanía (voz)
+
+fr: Parler en proximité :
+tr: Hablar en cercanía:
+
+fr: Parler à la guilde (voix)
+tr: Hablar a la guild (voz)
+
+fr: Parler à la guilde :
+tr: Hablar a la guild:
+
+fr: Presque transparente quand personne ne parle et que la souris est ailleurs.
+tr: Casi transparente cuando nadie habla y el ratón está en otra parte.
+
+fr: Qui parle, dessous
+tr: Quién habla, debajo
+
+fr: Rien ne part, ni à la touche ni à la voix.
+tr: No se envía nada, ni con la tecla ni por voz.
+
+fr: Sourdine
+tr: Ensordecer
+
+fr: Sourdine : vous n'entendez personne. Clic : la lever.
+tr: Ensordecido: no oye a nadie. Clic: dejar de ensordecer.
+
+fr: Taille de la barre
+tr: Tamaño de la barra
+
+fr: Touche de chaque canal
+tr: Tecla de cada canal
+
+fr: Une petite barre à placer où l'on veut : le micro, la sourdine, et une pastille par canal. Un clic écoute un canal ou ne l'écoute plus, un clic droit en fait le canal par défaut. Sans elle, qui parle s'affiche sur le bord gauche.
+tr: Una pequeña barra que se coloca donde se quiera: el micrófono, ensordecer y una pastilla por canal. Un clic escucha un canal o deja de escucharlo, un clic derecho lo hace canal predeterminado. Sin ella, quién habla se muestra en el borde izquierdo.
+
+fr: Verrouillée
+tr: Bloqueada
+
+fr: Vous n'entendez plus personne, et rien ne part.
+tr: No oye a nadie y no se envía nada.
+
+fr: canal par défaut, toujours écouté
+tr: canal predeterminado, siempre escuchado
+
+fr: pas écouté
+tr: no escuchado
+
+fr: écouté
+tr: escuchado

@@ -99,7 +99,9 @@ void VoiceLink::Open(std::uint32_t now_ms) {
   outbound_.clear();
   session_id_ = DrawSessionId();
   told_channel_.reset();
+  told_listened_.reset();
   told_talking_.reset();
+  listens_many_ = false;
   refusal_.reset();
   detail_.clear();
   state_ = VoiceLinkState::kAuthenticating;
@@ -226,6 +228,8 @@ void VoiceLink::Apply(const ServerMessage& message, std::uint32_t now_ms) {
           in_room_ = true;
         } else if constexpr (std::is_same_v<Said, RoomLeft>) {
           in_room_ = false;
+        } else if constexpr (std::is_same_v<Said, ListenAccepted>) {
+          listens_many_ = true;
         } else if constexpr (std::is_same_v<Said, BlockedPlayers>) {
           blocked_ = said.players;
         } else if constexpr (std::is_same_v<Said, BlockChanged>) {
@@ -250,7 +254,15 @@ void VoiceLink::Block(std::uint32_t character_id, bool blocked) {
 }
 
 void VoiceLink::FollowControls() {
-  if (told_channel_ != controls_.channel) {
+  // ⚠ LES CANAUX ÉCOUTÉS D'ABORD : un serveur qui les connaît ne laisse plus
+  // le canal unique qui suit les défaire.
+  const auto listened = static_cast<std::uint8_t>(
+      (controls_.listened | ListenBit(controls_.channel)) & kVoiceListenAll);
+  if (told_listened_ != listened) {
+    told_listened_ = listened;
+    SendText(SetListenMessage(listened));
+  }
+  if (!listens_many_ && told_channel_ != controls_.channel) {
     told_channel_ = controls_.channel;
     SendText(SetChannelMessage(controls_.channel));
   }
@@ -265,7 +277,8 @@ void VoiceLink::FollowTalking(std::uint32_t now_ms) {
                                     ? std::max(controls_.release_ms, kVoiceActivationLeastHoldMs)
                                     : controls_.release_ms;
   const bool held = last_spoke_ms_.has_value() && now_ms - *last_spoke_ms_ < hold_ms;
-  const bool talking = encoder_.has_value() && (controls_.talking || held);
+  const bool silenced = controls_.self_muted || controls_.deafened;
+  const bool talking = encoder_.has_value() && !silenced && (controls_.talking || held);
   if (told_talking_ != talking) {
     told_talking_ = talking;
     SendText(TalkMessage(talking, session_id_));
@@ -318,7 +331,7 @@ void VoiceLink::Capture(std::uint32_t now_ms) {
 
 void VoiceLink::Play(std::uint32_t now_ms) {
   if (!devices_.write_playback || !devices_.queued_playback) return;
-  const MixSettings settings{.output_gain = controls_.output_gain,
+  const MixSettings settings{.output_gain = controls_.deafened ? 0.0F : controls_.output_gain,
                              .spatial = controls_.spatial,
                              .listener_x = own_x_,
                              .muted = controls_.muted};

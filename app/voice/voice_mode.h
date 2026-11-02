@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <cstdint>
 #include <functional>
 #include <memory>
@@ -47,9 +48,10 @@ struct VoiceFacts {
   std::uint32_t login_id1 = 0;
   VoiceSettings settings;
   bool spatial = true;
-  // LA TOUCHE « PARLER », ou 0 quand elle n'est liée à rien. ⚠ LUE TENUE sur
-  // l'état du clavier, sans ses modificateurs : on parle en tenant Maj aussi.
-  std::uint32_t talk_key = 0;
+  // LES TOUCHES DE LA VOIX, au rang de `VoiceTalkKey`, ou 0 pour une touche
+  // liée à rien. ⚠ LUES TENUES sur l'état du clavier, sans leurs
+  // modificateurs : on parle en tenant Maj aussi.
+  std::array<std::uint32_t, kVoiceTalkKeyCount> talk_keys{};
   std::uint32_t now_ms = 0;
 };
 
@@ -107,6 +109,8 @@ class VoiceMode {
   // Ferme une liaison ouverte, et dit pourquoi au journal.
   void StopFor(std::string_view why);
   void Compose(const VoiceFacts& facts);
+  // La barre de la voix : ses pastilles, ses boutons, son apparence.
+  void ComposeBar(const VoiceFacts& facts, bool transmitting);
 
   std::uint32_t caps_ = 0;
   std::optional<ro::net::VoiceService> service_;
@@ -124,6 +128,11 @@ class VoiceMode {
   VoiceIdentity started_as_;
   std::uint32_t online_since_ms_ = 0;
   bool was_online_ = false;
+  // LE CANAL OÙ L'ON PARLE : celui de la touche tenue, gardé tant que la
+  // parole tient le délai au relâchement — une fin de phrase ne change pas de
+  // canal. Le canal par défaut quand rien ne part.
+  std::optional<int> talk_channel_;
+  bool transmitting_ = false;
   ro::ui::VoiceOverlayState overlay_;
   std::optional<float> input_percent_;
   // Relevés à la dernière pompe, vides quand la liaison est fermée.

@@ -80,7 +80,16 @@ struct VoiceControls {
   // CE QUE LA PAROLE TIENT ENCORE après la touche lâchée, ou après le dernier
   // son au-dessus du seuil : une fin de phrase ne se coupe pas.
   std::uint32_t release_ms = kVoiceDefaultReleaseMs;
+  // LE CANAL OÙ L'ON PARLE, celui de la touche tenue ou le canal par défaut.
   VoiceChannel channel = VoiceChannel::kNearby;
+  // LES CANAUX QU'ON ÉCOUTE, un bit par canal (`ListenBit`). ⚠ CELUI OÙ L'ON
+  // PARLE EN FAIT TOUJOURS PARTIE : le serveur ne relaie que de qui écoute le
+  // canal où il parle.
+  std::uint8_t listened = ListenBit(VoiceChannel::kNearby);
+  // Le micro coupé : rien ne part, touche ou voix. La sourdine : rien ne
+  // s'entend, et rien ne part non plus.
+  bool self_muted = false;
+  bool deafened = false;
   float output_gain = 1.0F;
   float input_gain = 1.0F;
   bool spatial = true;
@@ -172,7 +181,12 @@ class VoiceLink {
   // CE QUE LE SERVEUR SAIT DE NOUS : ce qui a été dit, pour ne redire qu'un
   // changement. Vide tant que rien n'est dit.
   std::optional<VoiceChannel> told_channel_;
+  std::optional<std::uint8_t> told_listened_;
   std::optional<bool> told_talking_;
+  // LE SERVEUR ÉCOUTE PLUSIEURS CANAUX : il l'a confirmé. Dès lors, changer
+  // de canal pour parler ne lui est plus dit — il ne relaie que d'après les
+  // canaux écoutés.
+  bool listens_many_ = false;
 
   std::optional<OpusVoiceEncoder> encoder_;
   std::vector<std::int16_t> captured_;

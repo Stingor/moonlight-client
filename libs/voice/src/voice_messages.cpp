@@ -74,6 +74,11 @@ std::string SetChannelMessage(VoiceChannel channel) {
          "}";
 }
 
+std::string SetListenMessage(std::uint8_t listened) {
+  return "{\"type\":\"set_listen\",\"mask\":" +
+         std::to_string(static_cast<unsigned>(listened & kVoiceListenAll)) + "}";
+}
+
 std::string TalkMessage(bool talking, std::uint64_t session_id) {
   return Toggle("ptt", talking, session_id);
 }
@@ -127,6 +132,10 @@ core::Result<ServerMessage> ParseServerMessage(std::string_view json) {
                         .blocked = type == "block_added"};
   }
   if (type == "channel_ack") return ReadChannel(object);
+  if (type == "listen_ack") {
+    return ListenAccepted{.listened = static_cast<std::uint8_t>(
+                              ValueOr<std::uint32_t>(object, "mask", 0) & kVoiceListenAll)};
+  }
   if (type == "war_state") {
     return WarState{.active = ValueOr<bool>(object, "active", false),
                     .recommended_channel = ValueOr<std::int32_t>(object, "recommended_channel", 0)};

@@ -111,6 +111,9 @@ constexpr std::array<ActionSavedNames, kNamedActionCount> kActionSavedNames = {{
     {GameAction::kScreenshot, "screenshot"},
     {GameAction::kAfkScreen, "afk_screen"},
     {GameAction::kVoiceTalk, "voice_talk"},
+    {GameAction::kVoiceTalkNearby, "voice_talk_nearby"},
+    {GameAction::kVoiceTalkParty, "voice_talk_party"},
+    {GameAction::kVoiceTalkGuild, "voice_talk_guild"},
     {GameAction::kTargetNearest, "target_nearest"},
     {GameAction::kTargetPrevious, "target_previous"},
     {GameAction::kTargetNext, "target_next"},
@@ -295,6 +298,9 @@ HotkeyTab TabOfAction(ActionRef action) {
     case GameAction::kOpenDatabase:
     case GameAction::kReportBug:
     case GameAction::kVoiceTalk:
+    case GameAction::kVoiceTalkNearby:
+    case GameAction::kVoiceTalkParty:
+    case GameAction::kVoiceTalkGuild:
     case GameAction::kAfkScreen:
       return HotkeyTab::kInterface;
     case GameAction::kSitOrStand:
@@ -511,6 +517,12 @@ std::string NameOfAction(ActionRef action) {
       return ro::core::Tr("Écran de veille");
     case GameAction::kVoiceTalk:
       return ro::core::Tr("Parler (voix)");
+    case GameAction::kVoiceTalkNearby:
+      return ro::core::Tr("Parler en proximité (voix)");
+    case GameAction::kVoiceTalkParty:
+      return ro::core::Tr("Parler au groupe (voix)");
+    case GameAction::kVoiceTalkGuild:
+      return ro::core::Tr("Parler à la guilde (voix)");
     case GameAction::kTargetNearest:
       return ro::core::Tr("Cible la plus proche");
     case GameAction::kTargetPrevious:

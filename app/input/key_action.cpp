@@ -677,6 +677,9 @@ std::optional<std::string> TriggerAction(const KeyPress& to, ActionRef action_re
       // Des maintiens, que la vue à la première personne lit elle-même.
       break;
     case GameAction::kVoiceTalk:
+    case GameAction::kVoiceTalkNearby:
+    case GameAction::kVoiceTalkParty:
+    case GameAction::kVoiceTalkGuild:
       // Un maintien, que la voix lit à chaque image sur l'état du clavier.
       break;
     case GameAction::kFreeFlight:

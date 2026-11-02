@@ -36,7 +36,7 @@ struct SurvivorsTalkView {
   std::span<const ro::ui::ChatEmojiGroup> emojis;
   // Le compteur de dégâts, quand l'onglet montré est le sien.
   const ro::ui::DamageMeterView* meter = nullptr;
-  const ro::ui::VoiceOverlayState* voice = nullptr;
+  ro::ui::VoiceOverlayState* voice = nullptr;
 };
 
 // UNE IMAGE D'INTERFACE PENDANT UNE PARTIE DE SURVIVORS : le HUD, la fenêtre

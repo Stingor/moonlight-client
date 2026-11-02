@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <optional>
 #include <span>
 #include <string>
 #include <string_view>
@@ -33,6 +34,22 @@ constexpr const char* kSpeakingIconKey = "voice_speaking_icon";
 constexpr const char* kTalkModeKey = "voice_talk_mode";
 constexpr const char* kReleaseKey = "voice_release_ms";
 constexpr const char* kActivationKey = "voice_activation_percent";
+constexpr const char* kListenedKey = "voice_listened";
+constexpr const char* kSelfMutedKey = "voice_self_muted";
+constexpr const char* kDeafenedKey = "voice_deafened";
+constexpr const char* kBarShownKey = "voice_bar_shown";
+constexpr const char* kBarLockedKey = "voice_bar_locked";
+constexpr const char* kBarScaleKey = "voice_bar_scale";
+constexpr const char* kBarOpacityKey = "voice_bar_opacity";
+constexpr const char* kBarVerticalKey = "voice_bar_vertical";
+constexpr const char* kBarSpeakersKey = "voice_bar_speakers";
+constexpr const char* kBarFadeKey = "voice_bar_fade";
+
+// La ligne de la touche d'un canal, au rang du canal.
+constexpr std::array<VoiceRow, kVoiceChosenChannelCount> kTalkKeyRows = {
+    VoiceRow::kTalkNearbyKey, VoiceRow::kTalkPartyKey, VoiceRow::kTalkGuildKey};
+constexpr std::array<VoiceRow, kVoiceChosenChannelCount> kListenRows = {
+    VoiceRow::kListenNearby, VoiceRow::kListenParty, VoiceRow::kListenGuild};
 
 // Les images, rangées comme `SpeakingIcon`.
 constexpr std::array<std::string_view, static_cast<std::size_t>(SpeakingIcon::kCount)>
@@ -66,6 +83,16 @@ void Choose(const VoiceDeviceChoice& choice, int chosen, std::string& into) {
   }
 }
 
+// Ce que dit la ligne d'une touche : la touche posée, ou l'attente du geste.
+[[nodiscard]] std::string TalkKeyText(const VoiceLiveView& live, VoiceTalkKey key,
+                                      const char* named) {
+  if (live.capturing == key) {
+    return Tr("Appuyez sur une touche - Échap annule, Suppr retire le raccourci.");
+  }
+  const std::string& bound = live.talk_keys[static_cast<std::size_t>(key)];
+  return std::string(named) + " " + (bound.empty() ? std::string(Tr("aucune")) : bound);
+}
+
 }  // namespace
 
 std::string_view SpeakingIconPath(SpeakingIcon icon) {
@@ -84,6 +111,41 @@ void VoiceOptions::Declare(SettingsFile& into) {
   into.Declare(kTalkModeKey, &settings_.talk_mode);
   into.Declare(kReleaseKey, &settings_.release_ms);
   into.Declare(kActivationKey, &settings_.activation_percent);
+  into.Declare(kListenedKey, &settings_.listened);
+  into.Declare(kSelfMutedKey, &settings_.self_muted);
+  into.Declare(kDeafenedKey, &settings_.deafened);
+  into.Declare(kBarShownKey, &settings_.bar_shown);
+  into.Declare(kBarLockedKey, &settings_.bar_locked);
+  into.Declare(kBarScaleKey, &settings_.bar_scale_percent);
+  into.Declare(kBarOpacityKey, &settings_.bar_opacity_percent);
+  into.Declare(kBarVerticalKey, &settings_.bar_vertical);
+  into.Declare(kBarSpeakersKey, &settings_.bar_speakers);
+  into.Declare(kBarFadeKey, &settings_.bar_fade);
+}
+
+std::optional<ro::ui::OptionsWindowAction> VoiceBarAction(const ro::ui::VoiceBarAnswer& answer,
+                                                          const VoiceSettings& now) {
+  ro::ui::OptionsWindowAction asked;
+  const auto channels = static_cast<int>(kVoiceChosenChannelCount);
+  if (answer.toggle_mute) {
+    asked.changed = VoiceRowId(VoiceRow::kSelfMuted);
+    asked.on = !now.self_muted;
+  } else if (answer.toggle_deafen) {
+    asked.changed = VoiceRowId(VoiceRow::kDeafened);
+    asked.on = !now.deafened;
+  } else if (answer.make_default >= 0 && answer.make_default < channels &&
+             answer.make_default != now.channel) {
+    asked.changed = VoiceRowId(VoiceRow::kChannel);
+    asked.chosen = answer.make_default;
+  } else if (answer.toggle_listen >= 0 && answer.toggle_listen < channels &&
+             answer.toggle_listen != now.channel) {
+    // ⚠ LE CANAL PAR DÉFAUT S'ÉCOUTE TOUJOURS : sa pastille ne l'éteint pas.
+    asked.changed = VoiceRowId(kListenRows[static_cast<std::size_t>(answer.toggle_listen)]);
+    asked.on = (now.listened & VoiceListenBit(answer.toggle_listen)) == 0;
+  } else {
+    return std::nullopt;
+  }
+  return asked;
 }
 
 void VoiceOptions::ListDevicesWith(DeviceLister microphones, DeviceLister speakers) {
@@ -94,6 +156,11 @@ void VoiceOptions::ListDevicesWith(DeviceLister microphones, DeviceLister speake
 VoiceSettings VoiceOptions::settings() const noexcept {
   VoiceSettings sane = settings_;
   sane.channel = std::clamp(sane.channel, 0, static_cast<int>(kVoiceChosenChannelCount) - 1);
+  sane.listened &= kVoiceListenEvery;
+  sane.bar_scale_percent =
+      std::clamp(sane.bar_scale_percent, kVoiceBarLeastScalePercent, kVoiceBarMostScalePercent);
+  sane.bar_opacity_percent =
+      std::clamp(sane.bar_opacity_percent, kVoiceBarLeastOpacityPercent, kPercent);
   sane.output_volume = std::clamp(sane.output_volume, 0.0F, 1.0F);
   sane.input_gain = std::clamp(sane.input_gain, 0.0F, kVoiceMostInputGain);
   sane.speaking_icon =
@@ -116,6 +183,20 @@ void VoiceOptions::ComposeInto(std::vector<OptionRowView>& rows) {
       .kind = OptionKind::kToggle,
       .on = sane.enabled});
   rows.back().heading = Tr("Voix");
+  rows.push_back(OptionRowView{.id = VoiceRowId(VoiceRow::kSelfMuted),
+                               .label = Tr("Micro coupé"),
+                               .help = Tr("Rien ne part, ni à la touche ni à la voix."),
+                               .kind = OptionKind::kToggle,
+                               .on = sane.self_muted,
+                               .indented = true,
+                               .disabled = !sane.enabled});
+  rows.push_back(OptionRowView{.id = VoiceRowId(VoiceRow::kDeafened),
+                               .label = Tr("Sourdine"),
+                               .help = Tr("Vous n'entendez plus personne, et rien ne part."),
+                               .kind = OptionKind::kToggle,
+                               .on = sane.deafened,
+                               .same_line = true,
+                               .disabled = !sane.enabled});
   const bool by_voice = sane.talk_mode == static_cast<int>(VoiceTalkMode::kVoice);
   mode_names_ = {Tr("En tenant la touche"), Tr("À la voix")};
   rows.push_back(OptionRowView{
@@ -127,17 +208,13 @@ void VoiceOptions::ComposeInto(std::vector<OptionRowView>& rows) {
       .chosen = sane.talk_mode,
       .choices = mode_names_,
       .disabled = !sane.enabled});
-  if (live_.capturing) {
-    talk_key_text_ = Tr("Appuyez sur une touche - Échap annule, Suppr retire le raccourci.");
-  } else {
-    talk_key_text_ = std::string(Tr("Touche pour parler :")) + " " +
-                     (live_.talk_key.empty() ? std::string(Tr("aucune")) : live_.talk_key);
-  }
+  talk_key_texts_[static_cast<std::size_t>(VoiceTalkKey::kDefault)] =
+      TalkKeyText(live_, VoiceTalkKey::kDefault, Tr("Touche pour parler :"));
   rows.push_back(OptionRowView{
       .id = VoiceRowId(VoiceRow::kTalkKey),
-      .label = talk_key_text_.c_str(),
-      .help = Tr("On parle en tenant cette touche. C'est la même que « Parler (voix) » dans les "
-                 "raccourcis clavier."),
+      .label = talk_key_texts_[static_cast<std::size_t>(VoiceTalkKey::kDefault)].c_str(),
+      .help = Tr("On parle sur le canal par défaut en tenant cette touche. C'est la même que "
+                 "« Parler (voix) » dans les raccourcis clavier."),
       .kind = OptionKind::kAction,
       .disabled = !sane.enabled});
   rows.push_back(OptionRowView{
@@ -169,15 +246,6 @@ void VoiceOptions::ComposeInto(std::vector<OptionRowView>& rows) {
   rows.push_back(OptionRowView{.id = VoiceRowId(VoiceRow::kInputLevel),
                                .label = level_text_.c_str(),
                                .kind = OptionKind::kNote});
-  rows.push_back(OptionRowView{
-      .id = VoiceRowId(VoiceRow::kChannel),
-      .label = Tr("Canal de la voix"),
-      .help = Tr("Où l'on parle et qui l'on entend : les joueurs proches, le groupe ou la guilde. "
-                 "Dans un salon de discussion, la voix est celle du salon."),
-      .kind = OptionKind::kChoice,
-      .chosen = sane.channel,
-      .choices = channel_names_,
-      .disabled = !sane.enabled});
   rows.push_back(OptionRowView{.id = VoiceRowId(VoiceRow::kOutputVolume),
                                .label = Tr("Volume des voix"),
                                .kind = OptionKind::kSlider,
@@ -236,6 +304,110 @@ void VoiceOptions::ComposeInto(std::vector<OptionRowView>& rows) {
                                "chuchotements : on les y débloque, on en bloque d'autres."),
                     .command = "/blocage",
                     .kind = OptionKind::kAction});
+  ComposeChannelsInto(rows, sane);
+  ComposeBarInto(rows, sane);
+}
+
+void VoiceOptions::ComposeBarInto(std::vector<OptionRowView>& rows, const VoiceSettings& sane) {
+  const bool off = !sane.enabled || !sane.bar_shown;
+  rows.push_back(OptionRowView{
+      .id = VoiceRowId(VoiceRow::kBarShown),
+      .label = Tr("Barre de la voix"),
+      .help = Tr("Une petite barre à placer où l'on veut : le micro, la sourdine, et une pastille "
+                 "par canal. Un clic écoute un canal ou ne l'écoute plus, un clic droit en fait le "
+                 "canal par défaut. Sans elle, qui parle s'affiche sur le bord gauche."),
+      .kind = OptionKind::kToggle,
+      .on = sane.bar_shown,
+      .disabled = !sane.enabled});
+  rows.back().heading = Tr("Barre de la voix");
+  rows.push_back(OptionRowView{.id = VoiceRowId(VoiceRow::kBarLocked),
+                               .label = Tr("Verrouillée"),
+                               .help = Tr("Elle ne se déplace plus à la souris."),
+                               .kind = OptionKind::kToggle,
+                               .on = sane.bar_locked,
+                               .indented = true,
+                               .disabled = off});
+  rows.push_back(OptionRowView{.id = VoiceRowId(VoiceRow::kBarVertical),
+                               .label = Tr("En colonne"),
+                               .kind = OptionKind::kToggle,
+                               .on = sane.bar_vertical,
+                               .same_line = true,
+                               .disabled = off});
+  rows.push_back(OptionRowView{.id = VoiceRowId(VoiceRow::kBarSpeakers),
+                               .label = Tr("Qui parle, dessous"),
+                               .kind = OptionKind::kToggle,
+                               .on = sane.bar_speakers,
+                               .indented = true,
+                               .disabled = off});
+  rows.push_back(OptionRowView{
+      .id = VoiceRowId(VoiceRow::kBarFade),
+      .label = Tr("Estompée au repos"),
+      .help = Tr("Presque transparente quand personne ne parle et que la souris est ailleurs."),
+      .kind = OptionKind::kToggle,
+      .on = sane.bar_fade,
+      .same_line = true,
+      .disabled = off});
+  rows.push_back(OptionRowView{.id = VoiceRowId(VoiceRow::kBarScale),
+                               .label = Tr("Taille de la barre"),
+                               .kind = OptionKind::kSlider,
+                               .value = sane.bar_scale_percent,
+                               .lowest = kVoiceBarLeastScalePercent,
+                               .highest = kVoiceBarMostScalePercent,
+                               .format = "%.0f %%",
+                               .indented = true,
+                               .disabled = off});
+  rows.push_back(OptionRowView{.id = VoiceRowId(VoiceRow::kBarOpacity),
+                               .label = Tr("Opacité de la barre"),
+                               .kind = OptionKind::kSlider,
+                               .value = sane.bar_opacity_percent,
+                               .lowest = kVoiceBarLeastOpacityPercent,
+                               .highest = kPercent,
+                               .format = "%.0f %%",
+                               .indented = true,
+                               .disabled = off});
+}
+
+void VoiceOptions::ComposeChannelsInto(std::vector<OptionRowView>& rows,
+                                       const VoiceSettings& sane) {
+  rows.push_back(OptionRowView{
+      .id = VoiceRowId(VoiceRow::kChannel),
+      .label = Tr("Canal par défaut"),
+      .help = Tr("Où part la voix avec la touche « Parler (voix) », et à la voix. Vous l'écoutez "
+                 "toujours. Dans un salon de discussion, la voix est celle du salon."),
+      .kind = OptionKind::kChoice,
+      .chosen = sane.channel,
+      .choices = channel_names_,
+      .disabled = !sane.enabled});
+  rows.back().heading = Tr("Canaux");
+  for (std::size_t channel = 0; channel < kVoiceChosenChannelCount; ++channel) {
+    const bool shown = (sane.listened & VoiceListenBit(static_cast<int>(channel))) != 0;
+    rows.push_back(OptionRowView{
+        .id = VoiceRowId(kListenRows[channel]),
+        .label = channel_names_[channel],
+        .help = Tr("Les canaux dont vous entendez les voix, plusieurs à la fois. Un joueur ne "
+                   "vous entend que s'il écoute le canal où vous parlez."),
+        .kind = OptionKind::kToggle,
+        // ⚠ LE CANAL PAR DÉFAUT S'ÉCOUTE TOUJOURS : sa case le dit, cochée.
+        .on = shown || static_cast<int>(channel) == sane.channel,
+        .same_line = channel != 0,
+        .disabled = !sane.enabled || static_cast<int>(channel) == sane.channel});
+  }
+  rows[rows.size() - kVoiceChosenChannelCount].heading = Tr("Canaux écoutés");
+  const std::array<const char*, kVoiceChosenChannelCount> named = {
+      Tr("Parler en proximité :"), Tr("Parler au groupe :"), Tr("Parler à la guilde :")};
+  for (std::size_t channel = 0; channel < kVoiceChosenChannelCount; ++channel) {
+    const auto key = static_cast<VoiceTalkKey>(channel + 1);
+    talk_key_texts_[channel + 1] = TalkKeyText(live_, key, named[channel]);
+    rows.push_back(OptionRowView{
+        .id = VoiceRowId(kTalkKeyRows[channel]),
+        .label = talk_key_texts_[channel + 1].c_str(),
+        .help = Tr("On parle sur ce canal en tenant sa touche, quel que soit le canal par "
+                   "défaut, et on l'écoute pendant ce temps. Ce sont aussi des raccourcis "
+                   "clavier."),
+        .kind = OptionKind::kAction,
+        .disabled = !sane.enabled});
+  }
+  rows[rows.size() - kVoiceChosenChannelCount].heading = Tr("Touche de chaque canal");
 }
 
 bool VoiceOptions::Change(const ro::ui::OptionsWindowAction& asked) {
@@ -262,8 +434,51 @@ bool VoiceOptions::Change(const ro::ui::OptionsWindowAction& asked) {
       Choose(speakers_choice_, asked.chosen, settings_.speakers);
       break;
     case VoiceRow::kTalkKey:
-      talk_key_asked_ = true;
+      talk_key_asked_ = VoiceTalkKey::kDefault;
       break;
+    case VoiceRow::kTalkNearbyKey:
+      talk_key_asked_ = VoiceTalkKey::kNearby;
+      break;
+    case VoiceRow::kTalkPartyKey:
+      talk_key_asked_ = VoiceTalkKey::kParty;
+      break;
+    case VoiceRow::kTalkGuildKey:
+      talk_key_asked_ = VoiceTalkKey::kGuild;
+      break;
+    case VoiceRow::kSelfMuted:
+      settings_.self_muted = asked.on;
+      break;
+    case VoiceRow::kBarShown:
+      settings_.bar_shown = asked.on;
+      break;
+    case VoiceRow::kBarLocked:
+      settings_.bar_locked = asked.on;
+      break;
+    case VoiceRow::kBarVertical:
+      settings_.bar_vertical = asked.on;
+      break;
+    case VoiceRow::kBarSpeakers:
+      settings_.bar_speakers = asked.on;
+      break;
+    case VoiceRow::kBarFade:
+      settings_.bar_fade = asked.on;
+      break;
+    case VoiceRow::kBarScale:
+      settings_.bar_scale_percent = asked.value;
+      break;
+    case VoiceRow::kBarOpacity:
+      settings_.bar_opacity_percent = asked.value;
+      break;
+    case VoiceRow::kDeafened:
+      settings_.deafened = asked.on;
+      break;
+    case VoiceRow::kListenNearby:
+    case VoiceRow::kListenParty:
+    case VoiceRow::kListenGuild: {
+      const int bit = VoiceListenBit(asked.changed - VoiceRowId(VoiceRow::kListenNearby));
+      settings_.listened = asked.on ? (settings().listened | bit) : (settings().listened & ~bit);
+      break;
+    }
     case VoiceRow::kSpeakingIcon:
       settings_.speaking_icon = asked.chosen;
       break;

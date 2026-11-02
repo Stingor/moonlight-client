@@ -246,6 +246,9 @@ ActionInput InputOfAction(ActionRef action) {
     case GameAction::kFlyUp:
     case GameAction::kFlyDown:
     case GameAction::kVoiceTalk:
+    case GameAction::kVoiceTalkNearby:
+    case GameAction::kVoiceTalkParty:
+    case GameAction::kVoiceTalkGuild:
       return ActionInput::kKeyHold;
     default:
       return ActionInput::kPress;

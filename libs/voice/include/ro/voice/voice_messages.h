@@ -30,6 +30,10 @@ struct VoiceLogin {
 // Le canal ÉCOUTÉ, qui doit être aussi celui où l'on parle : le serveur ne
 // relaie la proximité, le groupe et la guilde qu'entre deux joueurs accordés.
 [[nodiscard]] std::string SetChannelMessage(VoiceChannel channel);
+// LES CANAUX ÉCOUTÉS, plusieurs à la fois : un bit par canal, de la proximité
+// à la guilde. Un serveur qui ne le connaît pas l'ignore et s'en tient au
+// canal de `SetChannelMessage` ; celui qui le connaît le confirme.
+[[nodiscard]] std::string SetListenMessage(std::uint8_t listened);
 // 🔴 LE SERVEUR JETTE L'AUDIO de qui n'a pas dit qu'il parle.
 [[nodiscard]] std::string TalkMessage(bool talking, std::uint64_t session_id);
 // Ne plus être entendu, ou ne plus rien entendre (et ne plus être entendu).
@@ -62,6 +66,10 @@ struct NearbyPlayers {
 };
 struct ChannelAccepted {
   VoiceChannel channel = VoiceChannel::kNearby;
+};
+// Les canaux écoutés, confirmés : le serveur en écoute plusieurs à la fois.
+struct ListenAccepted {
+  std::uint8_t listened = 0;
 };
 // LA GUERRE DE GUILDE sur la carte : proximité et salon s'y taisent, et le
 // serveur recommande le canal où se replier, s'il y en a un.
@@ -99,8 +107,8 @@ struct Unread {
 };
 
 using ServerMessage =
-    std::variant<AuthAccepted, OwnPlace, NearbyPlayers, ChannelAccepted, WarState, RoomJoined,
-                 RoomLeft, Pong, Refusal, BlockedPlayers, BlockChanged, Unread>;
+    std::variant<AuthAccepted, OwnPlace, NearbyPlayers, ChannelAccepted, ListenAccepted, WarState,
+                 RoomJoined, RoomLeft, Pong, Refusal, BlockedPlayers, BlockChanged, Unread>;
 
 // Ce que dit un texte du serveur, ou une erreur s'il n'est pas un objet JSON
 // muni d'un `type`.

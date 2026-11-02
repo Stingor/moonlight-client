@@ -320,9 +320,6 @@ tr: Blocks this player's whispers; alone, lists the blocked ones.
 fr: Bloque les chuchotements de tout le monde.
 tr: Blocks everyone's whispers.
 
-fr: Canal de la voix
-tr: Voice channel
-
 fr: Cascade ×%d
 tr: Cascade ×%d
 
@@ -424,9 +421,6 @@ tr: The connection to the server is lost.
 
 fr: On vous propose un échange.
 tr: Someone is offering you a trade.
-
-fr: Où l'on parle et qui l'on entend : les joueurs proches, le groupe ou la guilde. Dans un salon de discussion, la voix est celle du salon.
-tr: Where you talk and whom you hear: nearby players, the party or the guild. In a chat room, the voice is the room's.
 
 fr: Parler (voix)
 tr: Talk (voice)
@@ -21785,9 +21779,6 @@ tr: Their voice no longer reaches you. The block follows their account, from one
 fr: Touche pour parler :
 tr: Push-to-talk key:
 
-fr: On parle en tenant cette touche. C'est la même que « Parler (voix) » dans les raccourcis clavier.
-tr: Hold this key to speak. It is the same as "Talk (voice)" in the keyboard shortcuts.
-
 fr: Micro
 tr: Microphone
 
@@ -21988,3 +21979,111 @@ tr: A player blocked by voice only shows here while online.
 
 fr: Vous n'avez bloqué personne.
 tr: You have not blocked anyone.
+
+fr: Barre de la voix
+tr: Voice bar
+
+fr: Canal par défaut
+tr: Default channel
+
+fr: Canaux
+tr: Channels
+
+fr: Canaux écoutés
+tr: Channels you listen to
+
+fr: Clic : couper le micro.
+tr: Click: mute the microphone.
+
+fr: Clic : l'écouter ou non. Clic droit : en faire le canal par défaut.
+tr: Click: listen to it or not. Right-click: make it the default channel.
+
+fr: Clic : n'entendre plus personne.
+tr: Click: stop hearing everyone.
+
+fr: Elle ne se déplace plus à la souris.
+tr: It can no longer be moved with the mouse.
+
+fr: En colonne
+tr: Vertical
+
+fr: Estompée au repos
+tr: Faded when idle
+
+fr: Les canaux dont vous entendez les voix, plusieurs à la fois. Un joueur ne vous entend que s'il écoute le canal où vous parlez.
+tr: The channels whose voices you hear, several at once. A player only hears you if they listen to the channel you speak on.
+
+fr: Micro coupé
+tr: Microphone muted
+
+fr: Micro coupé. Clic : le rétablir.
+tr: Microphone muted. Click: unmute it.
+
+fr: On parle sur ce canal en tenant sa touche, quel que soit le canal par défaut, et on l'écoute pendant ce temps. Ce sont aussi des raccourcis clavier.
+tr: Hold its key to speak on this channel, whatever the default channel, and you hear it meanwhile. These are also keyboard shortcuts.
+
+fr: On parle sur le canal par défaut en tenant cette touche. C'est la même que « Parler (voix) » dans les raccourcis clavier.
+tr: Hold this key to speak on the default channel. It is the same as "Talk (voice)" in the keyboard shortcuts.
+
+fr: Opacité de la barre
+tr: Bar opacity
+
+fr: Où part la voix avec la touche « Parler (voix) », et à la voix. Vous l'écoutez toujours. Dans un salon de discussion, la voix est celle du salon.
+tr: Where your voice goes with the "Talk (voice)" key, and with voice activation. You always listen to it. In a chat room, the voice is the room's.
+
+fr: Parler au groupe (voix)
+tr: Talk to party (voice)
+
+fr: Parler au groupe :
+tr: Talk to party:
+
+fr: Parler en proximité (voix)
+tr: Talk nearby (voice)
+
+fr: Parler en proximité :
+tr: Talk nearby:
+
+fr: Parler à la guilde (voix)
+tr: Talk to guild (voice)
+
+fr: Parler à la guilde :
+tr: Talk to guild:
+
+fr: Presque transparente quand personne ne parle et que la souris est ailleurs.
+tr: Almost transparent when nobody is speaking and the mouse is elsewhere.
+
+fr: Qui parle, dessous
+tr: Who is speaking, below
+
+fr: Rien ne part, ni à la touche ni à la voix.
+tr: Nothing is sent, neither by key nor by voice.
+
+fr: Sourdine
+tr: Deafen
+
+fr: Sourdine : vous n'entendez personne. Clic : la lever.
+tr: Deafened: you hear nobody. Click: undeafen.
+
+fr: Taille de la barre
+tr: Bar size
+
+fr: Touche de chaque canal
+tr: Key for each channel
+
+fr: Une petite barre à placer où l'on veut : le micro, la sourdine, et une pastille par canal. Un clic écoute un canal ou ne l'écoute plus, un clic droit en fait le canal par défaut. Sans elle, qui parle s'affiche sur le bord gauche.
+tr: A small bar you can place anywhere: the microphone, deafen, and a pill per channel. A click listens to a channel or stops listening, a right-click makes it the default channel. Without it, who is speaking shows on the left edge.
+
+fr: Verrouillée
+tr: Locked
+
+fr: Vous n'entendez plus personne, et rien ne part.
+tr: You hear nobody, and nothing is sent.
+
+fr: canal par défaut, toujours écouté
+tr: default channel, always heard
+
+fr: pas écouté
+tr: not listened to
+
+fr: écouté
+tr: listened to

@@ -178,6 +178,11 @@ enum class GameAction : std::uint8_t {
   // D'USINE : les lettres libres servent à écrire, et le joueur la choisit ;
   // le témoin de la voix le lui rappelle tant qu'elle manque.
   kVoiceTalk,
+  // PARLER SUR UN CANAL, la touche tenue, quel que soit le canal par défaut.
+  // Sans touche d'usine, comme « Parler ».
+  kVoiceTalkNearby,
+  kVoiceTalkParty,
+  kVoiceTalkGuild,
   // LE CIBLAGE AU CLAVIER, sans touche d'usine : celle qui vient à l'esprit,
   // Tab, sert au chat, et Échap a son propre réglage dans le mode Ciblage.
   kTargetNearest,

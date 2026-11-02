@@ -1880,6 +1880,7 @@ add_executable(moonclient
     character/skill_book_view.cpp
     world/screen_overlays.cpp
     voice/voice_marks.cpp
+    voice/voice_keys.cpp
     world/selection_marker.cpp
     world/target_hud_view.cpp
     world/status_portrait_view.cpp

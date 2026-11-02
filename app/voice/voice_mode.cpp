@@ -1,6 +1,7 @@
 #include "voice/voice_mode.h"
 
 #include <algorithm>
+#include <array>
 #include <span>
 #include <string>
 #include <utility>
@@ -52,7 +53,9 @@ constexpr std::uint32_t kTalkKeyReminderMs = 15'000;
   if (status.war && !status.in_room && facts.settings.channel == 0) {
     return Tr("Voix : la proximité se tait pendant la guerre de guilde.");
   }
-  if (facts.talk_key == 0 && facts.settings.talk_mode != static_cast<int>(VoiceTalkMode::kVoice) &&
+  const bool no_key =
+      std::ranges::all_of(facts.talk_keys, [](std::uint32_t key) { return key == 0; });
+  if (no_key && facts.settings.talk_mode != static_cast<int>(VoiceTalkMode::kVoice) &&
       facts.now_ms - online_since_ms < kTalkKeyReminderMs) {
     return Tr("Voix : choisissez la touche « Parler (voix) » dans les raccourcis.");
   }
@@ -154,14 +157,34 @@ void VoiceMode::Pump(const VoiceFacts& facts) {
   } else if (engine_ == nullptr && !devices_failed_) {
     Start(facts);
   }
-  const bool talking = engine_ != nullptr && TalkKeyHeld(facts.talk_key);
+  // UNE TOUCHE DE CANAL TENUE passe avant « Parler » et la voix, qui parlent
+  // sur le canal par défaut.
+  std::optional<int> held_channel;
+  for (std::size_t rank = 1; rank < kVoiceTalkKeyCount && engine_ != nullptr; ++rank) {
+    if (TalkKeyHeld(facts.talk_keys[rank])) {
+      held_channel = static_cast<int>(rank) - 1;
+      break;
+    }
+  }
+  const bool talking =
+      engine_ != nullptr &&
+      (held_channel.has_value() ||
+       TalkKeyHeld(facts.talk_keys[static_cast<std::size_t>(VoiceTalkKey::kDefault)]));
+  if (talking) {
+    talk_channel_ = held_channel.value_or(facts.settings.channel);
+  } else if (!transmitting_) {
+    talk_channel_.reset();
+  }
   if (engine_ != nullptr) {
     engine_->Steer(rv::VoiceControls{
         .talking = talking,
         .voice_activated = facts.settings.talk_mode == static_cast<int>(VoiceTalkMode::kVoice),
         .activation_level = facts.settings.activation_percent / kPercent * kVoiceLevelAtFullScale,
         .release_ms = static_cast<std::uint32_t>(facts.settings.release_ms),
-        .channel = static_cast<rv::VoiceChannel>(facts.settings.channel),
+        .channel = static_cast<rv::VoiceChannel>(talk_channel_.value_or(facts.settings.channel)),
+        .listened = static_cast<std::uint8_t>(facts.settings.listened),
+        .self_muted = facts.settings.self_muted,
+        .deafened = facts.settings.deafened,
         .output_gain = facts.settings.output_volume,
         .input_gain = facts.settings.input_gain,
         .spatial = facts.spatial});
@@ -171,6 +194,7 @@ void VoiceMode::Pump(const VoiceFacts& facts) {
 
 void VoiceMode::Compose(const VoiceFacts& facts) {
   overlay_ = ro::ui::VoiceOverlayState();
+  transmitting_ = false;
   heard_.clear();
   blocked_.clear();
   input_percent_.reset();
@@ -181,6 +205,7 @@ void VoiceMode::Compose(const VoiceFacts& facts) {
     return;
   }
   rv::VoiceStatus status = engine_->status();
+  transmitting_ = status.transmitting;
   const bool online = status.state == rv::VoiceLinkState::kOnline;
   if (online && !was_online_) {
     online_since_ms_ = facts.now_ms;
@@ -192,12 +217,47 @@ void VoiceMode::Compose(const VoiceFacts& facts) {
   if (status.transmitting) {
     overlay_.self_talking = Tr("Vous parlez");
   }
+  ComposeBar(facts, status.transmitting);
   input_percent_ = status.input_level / kVoiceLevelAtFullScale * kPercent;
   heard_ = std::move(status.nearby);
   blocked_ = std::move(status.blocked);
   for (rv::SpeakingVoice& voice : status.speaking) {
     heard_.push_back(rv::NearbyPlayer{.character_id = voice.speaker_id, .name = voice.name});
     overlay_.speaking.push_back(std::move(voice.name));
+  }
+}
+
+void VoiceMode::ComposeBar(const VoiceFacts& facts, bool transmitting) {
+  const VoiceSettings& settings = facts.settings;
+  ro::ui::VoiceBarView& bar = overlay_.bar;
+  bar.shown = settings.bar_shown;
+  bar.self_muted = settings.self_muted;
+  bar.deafened = settings.deafened;
+  bar.mute_tip =
+      settings.self_muted ? Tr("Micro coupé. Clic : le rétablir.") : Tr("Clic : couper le micro.");
+  bar.deafen_tip = settings.deafened ? Tr("Sourdine : vous n'entendez personne. Clic : la lever.")
+                                     : Tr("Clic : n'entendre plus personne.");
+  bar.scale = settings.bar_scale_percent / kPercent;
+  bar.opacity = settings.bar_opacity_percent / kPercent;
+  bar.vertical = settings.bar_vertical;
+  bar.locked = settings.bar_locked;
+  bar.speakers = settings.bar_speakers;
+  bar.fade_idle = settings.bar_fade;
+  const std::array<const char*, ro::ui::kVoiceBarChannelCount> names = {Tr("Proximité"),
+                                                                        Tr("Groupe"), Tr("Guilde")};
+  const int spoken = talk_channel_.value_or(settings.channel);
+  for (std::size_t rank = 0; rank < bar.channels.size(); ++rank) {
+    const auto channel = static_cast<int>(rank);
+    ro::ui::VoiceBarChannel& pill = bar.channels[rank];
+    pill.name = names[rank];
+    pill.is_default = channel == settings.channel;
+    pill.listened = pill.is_default || (settings.listened & VoiceListenBit(channel)) != 0;
+    pill.talking = transmitting && channel == spoken;
+    const char* state = pill.is_default ? Tr("canal par défaut, toujours écouté")
+                        : pill.listened ? Tr("écouté")
+                                        : Tr("pas écouté");
+    pill.tip = pill.name + " : " + state + "\n" +
+               Tr("Clic : l'écouter ou non. Clic droit : en faire le canal par défaut.");
   }
 }
 

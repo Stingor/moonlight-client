@@ -29,6 +29,16 @@ enum class VoiceChannel : std::uint8_t {
 };
 inline constexpr std::uint8_t kVoiceChannelCount = 5;
 
+// LES CANAUX QU'ON ÉCOUTE, un bit par canal : la proximité, le groupe et la
+// guilde. Le salon et l'appel privé s'entendent sans s'écouter.
+inline constexpr std::uint8_t kVoiceListenedChannelCount = 3;
+inline constexpr std::uint8_t kVoiceListenAll = (1U << kVoiceListenedChannelCount) - 1U;
+[[nodiscard]] constexpr std::uint8_t ListenBit(VoiceChannel channel) {
+  return static_cast<std::uint8_t>(channel) < kVoiceListenedChannelCount
+             ? static_cast<std::uint8_t>(1U << static_cast<std::uint8_t>(channel))
+             : std::uint8_t{0};
+}
+
 // ── LES TRAMES TCP : [56 54][version][genre][longueur:4] puis le contenu ────
 inline constexpr std::size_t kFrameHeaderBytes = 8;
 inline constexpr std::uint8_t kFrameVersion = 1;
