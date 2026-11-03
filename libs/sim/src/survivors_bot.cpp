@@ -458,6 +458,27 @@ const SurvivorsBotProfile& MageBotProfile() {
   return kProfile;
 }
 
+const SurvivorsBotProfile& KnightBotProfile() {
+  // Les coups qui portent quand il fuit d'abord ; les cônes, qui ne frappent
+  // que devant lui, à la fin.
+  static constexpr std::array<std::uint16_t, 7> kSkillOrder{5, 7, 62, 56, 59, 57, 58};
+  static constexpr std::array<std::uint16_t, 12> kCardOrder{4072, 4019, 4003, 4022, 4266, 4197,
+                                                            4009, 4179, 4183, 4147, 4016, 4001};
+  static const SurvivorsBotProfile kProfile{.skill_order = kSkillOrder,
+                                            .card_order = kCardOrder,
+                                            .threat_radius_units = Cells(3),
+                                            .panic_radius_units = CellTenths(15),
+                                            .gem_reach_units = Cells(10),
+                                            .edge_margin_units = Cells(20),
+                                            .heal_below_pct = 50,
+                                            .steady_steps = 5};
+  return kProfile;
+}
+
+const SurvivorsBotProfile& BotProfileOf(std::string_view class_key) {
+  return class_key == "knight" ? KnightBotProfile() : MageBotProfile();
+}
+
 std::uint32_t PlayBot(SurvivorsPlay& play, SurvivorsBot& bot, std::uint32_t most_steps,
                       const std::function<void(const SurvivorsRun&)>& on_step) {
   std::uint32_t played = 0;

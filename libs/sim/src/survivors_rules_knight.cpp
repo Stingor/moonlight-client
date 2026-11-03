@@ -21,14 +21,14 @@ constexpr std::uint16_t kKnightClassId = 2;
 constexpr std::uint16_t kKnightJobId = 7;
 constexpr std::uint16_t kLordKnightJobId = 4008;     // l'apparence après une évolution
 constexpr std::uint16_t kKnightWeaponItemId = 1401;  // Javelin
-constexpr std::int32_t kKnightMaxHp = 520;
+constexpr std::int32_t kKnightMaxHp = 600;
 constexpr std::uint32_t kKnightWalkMsPerCell = 165;
 constexpr std::int32_t kKnightMagnetTenths = 24;
 constexpr std::int32_t kKnightDamagePctPerLevel = 1;
 constexpr std::int32_t kKnightDamagePctCap = 25;
 
 // Bash : le coup de lance, sur ce qui est à portée de bras.
-constexpr std::int32_t kBashReachTenths = 22;
+constexpr std::int32_t kBashReachTenths = 32;
 constexpr std::uint32_t kBashIntervalMs = 100;
 constexpr std::int32_t kBashKnockbackTenths = 5;
 
@@ -128,26 +128,26 @@ constexpr std::int32_t kBowlingBashKnockbackCells = 2;
 
 // Bash(coups, dégâts, recharge en ms).
 constexpr std::array<SkillLevel, kMostSkillLevels> kBashLevels{{
-    Bash(1, 30, 900),
-    Bash(2, 30, 900),
-    Bash(2, 36, 900),
-    Bash(3, 36, 850),
-    Bash(3, 42, 850),
-    Bash(4, 42, 800),
-    Bash(4, 50, 800),
-    Bash(5, 58, 750),
+    Bash(1, 24, 900),
+    Bash(2, 24, 900),
+    Bash(2, 29, 900),
+    Bash(3, 29, 850),
+    Bash(3, 34, 850),
+    Bash(4, 34, 800),
+    Bash(4, 40, 800),
+    Bash(5, 46, 750),
 }};
 
 // Magnum(dégâts, recharge en ms, rayon en dixièmes de case).
 constexpr std::array<SkillLevel, kMostSkillLevels> kMagnumBreakLevels{{
-    Magnum(26, 2600, 20),
-    Magnum(32, 2600, 20),
-    Magnum(32, 2400, 22),
-    Magnum(38, 2400, 22),
-    Magnum(38, 2200, 25),
-    Magnum(46, 2200, 25),
-    Magnum(46, 2000, 28),
-    Magnum(56, 1800, 30),
+    Magnum(26, 2000, 30),
+    Magnum(32, 2000, 30),
+    Magnum(32, 1900, 33),
+    Magnum(38, 1900, 33),
+    Magnum(38, 1800, 36),
+    Magnum(46, 1800, 36),
+    Magnum(46, 1700, 40),
+    Magnum(56, 1500, 42),
 }};
 
 // Pierce(coups, dégâts, recharge en ms, perçage).
@@ -201,21 +201,21 @@ constexpr std::array<SkillLevel, kMostSkillLevels> kSpearBoomerangLevels{{
 
 // Bowling(coups, dégâts, recharge en ms, rayon en dixièmes de case).
 constexpr std::array<SkillLevel, kMostSkillLevels> kBowlingBashLevels{{
+    Bowling(1, 29, 2000, 12),
     Bowling(1, 34, 2000, 12),
-    Bowling(1, 40, 2000, 12),
-    Bowling(2, 40, 2000, 12),
-    Bowling(2, 40, 1800, 15),
-    Bowling(2, 48, 1800, 15),
-    Bowling(3, 48, 1800, 15),
-    Bowling(3, 48, 1600, 18),
-    Bowling(4, 58, 1500, 18),
+    Bowling(2, 34, 2000, 12),
+    Bowling(2, 34, 1800, 15),
+    Bowling(2, 41, 1800, 15),
+    Bowling(3, 41, 1800, 15),
+    Bowling(3, 41, 1600, 18),
+    Bowling(4, 49, 1500, 18),
 }};
 
 // ── Les évolués : un niveau chacun, que seul un coffre donne ──────────────
 
 // Head Crush : trois coups écrasants sur ce qui est à portée de bras.
 constexpr std::array<SkillLevel, 1> kHeadCrushLevels{{
-    {.damage = 110,
+    {.damage = 55,
      .cooldown_ms = 800,
      .amount = 3,
      .interval_ms = 120,
@@ -225,7 +225,7 @@ constexpr std::array<SkillLevel, 1> kHeadCrushLevels{{
 
 // Spiral Pierce : quatre lances qui traversent toute la file.
 constexpr std::array<SkillLevel, 1> kSpiralPierceLevels{{
-    {.damage = 85,
+    {.damage = 50,
      .cooldown_ms = 900,
      .amount = 4,
      .reach_units = Cells(8),
@@ -236,7 +236,7 @@ constexpr std::array<SkillLevel, 1> kSpiralPierceLevels{{
 
 // Joint Beat : un large coup devant le héros, qui brise les jambes et fige.
 constexpr std::array<SkillLevel, 1> kJointBeatLevels{{
-    {.damage = 70,
+    {.damage = 55,
      .cooldown_ms = 1300,
      .reach_units = CellTenths(45),
      .knockback_units = CellTenths(5),

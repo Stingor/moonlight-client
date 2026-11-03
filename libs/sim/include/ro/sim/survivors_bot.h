@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <functional>
 #include <span>
+#include <string_view>
 #include <vector>
 
 #include "ro/sim/survivors_geometry.h"
@@ -56,6 +57,12 @@ class SurvivorsBot {
 
 // Le profil du Magicien, réglé par l'outil d'équilibrage.
 [[nodiscard]] const SurvivorsBotProfile& MageBotProfile();
+// Le profil du Chevalier : il tient plus près de la horde, que ses coups
+// courts doivent atteindre.
+[[nodiscard]] const SurvivorsBotProfile& KnightBotProfile();
+// Le profil de la classe `class_key` : celui du Chevalier pour « knight »,
+// celui du Magicien sinon.
+[[nodiscard]] const SurvivorsBotProfile& BotProfileOf(std::string_view class_key);
 
 // Joue jusqu'à la fin de la partie, `most_steps` pas, ou une réponse refusée :
 // `Answer(Choose)` à chaque choix, sinon `Advance(20 ms, Steer)`, en rappelant
