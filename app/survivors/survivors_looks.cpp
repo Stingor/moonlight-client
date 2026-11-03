@@ -149,6 +149,7 @@ SkillLook SkillLookOf(const ro::sim::SurvivorsSkillRule& skill) {
   const std::int32_t hit = ro::render::SkillHitEffect(shown, true, true);
   look.hit_effect_id = hit >= 0 ? static_cast<std::uint32_t>(hit) : kPlainHitEffect;
   look.ground_effect_id = GroundEffectOf(skill.skill_id);
+  look.storm_sown = skill.skill_id == kHeavensDriveSkill;
   return look;
 }
 

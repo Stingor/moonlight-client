@@ -485,8 +485,8 @@ tr: Bolas de rayo vuelan rectas y lo repelen todo lejos.
 fr: La foudre s'abat autour de vous en vagues et aveugle.
 tr: El rayo cae a tu alrededor en oleadas y ciega.
 
-fr: Des pointes de terre jaillissent tout autour de vous.
-tr: Púas de tierra brotan a tu alrededor.
+fr: Des pointes de terre jaillissent sous la horde et blessent qui les traverse.
+tr: Púas de tierra brotan bajo la horda e hieren a quien las cruza.
 
 fr: Des esprits explosifs poursuivent les monstres et les maudissent.
 tr: Espíritus explosivos persiguen a los monstruos y los maldicen.

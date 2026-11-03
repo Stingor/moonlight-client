@@ -102,13 +102,17 @@ constexpr std::array<SkillLevel, 1> kLordOfVermilionLevels{{
      .blind_ms = 3000},
 }};
 
-// Heaven's Drive : trois salves de pointes de terre autour du héros.
+// Heaven's Drive : un champ de pointes de terre jaillit sous un monstre tiré
+// au hasard à mi-distance, et blesse à chaque vague ce qui s'y tient ou le
+// traverse. Deux champs se chevauchent : le suivant naît avant que le
+// premier ne s'éteigne.
 constexpr std::array<SkillLevel, 1> kHeavensDriveLevels{{
-    {.damage = 60,
-     .cooldown_ms = 3000,
-     .amount = 3,
-     .interval_ms = 250,
-     .area_radius_units = Cells(5)},
+    {.damage = 26,
+     .cooldown_ms = 2500,
+     .amount = 10,
+     .interval_ms = 400,
+     .reach_units = Cells(10),
+     .area_radius_units = Cells(3)},
 }};
 
 // Napalm Vulcan : six esprits explosifs qui poursuivent, traversent un
@@ -201,9 +205,10 @@ constexpr std::array<SurvivorsSkillRule, kShippedEvolvedSkillCount> kEvolvedSkil
      .levels = kLordOfVermilionLevels},
     {.skill_id = kHeavensDriveId,
      .key = "heavens_drive",
-     .description = core::TrText("Des pointes de terre jaillissent tout autour de vous."),
-     .archetype = SkillArchetype::kNova,
-     .target = TargetRule::kNearest,
+     .description = core::TrText(
+         "Des pointes de terre jaillissent sous la horde et blessent qui les traverse."),
+     .archetype = SkillArchetype::kStorm,
+     .target = TargetRule::kRandom,
      .element = SurvivorsElement::kEarth,
      .levels = kHeavensDriveLevels},
     {.skill_id = kNapalmVulcanId,

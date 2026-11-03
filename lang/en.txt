@@ -485,8 +485,8 @@ tr: Balls of lightning fly straight and hurl everything far back.
 fr: La foudre s'abat autour de vous en vagues et aveugle.
 tr: Lightning crashes down around you in waves and blinds.
 
-fr: Des pointes de terre jaillissent tout autour de vous.
-tr: Spikes of earth burst up all around you.
+fr: Des pointes de terre jaillissent sous la horde et blessent qui les traverse.
+tr: Spikes of earth burst up under the horde and wound whatever crosses them.
 
 fr: Des esprits explosifs poursuivent les monstres et les maudissent.
 tr: Explosive spirits chase the monsters and curse them.

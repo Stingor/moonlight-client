@@ -65,12 +65,17 @@ void PlanCast(const ro::sim::SurvivorsCast& cast, const SkillLook& look,
     case ro::sim::CastKind::kConeOn:
       PlanCone(cast, look, out);
       return;
+    case ro::sim::CastKind::kStormOn:
+      if (look.storm_sown) {
+        out.push_back(ArenaLaunch{
+            .effect_id = look.effect_id, .kind = ArenaLaunchKind::kOnGround, .at = cast.to});
+      }
+      return;
     // Orbites et zones se lisent sur l'état : voir `PlanArenaOrbs`.
     case ro::sim::CastKind::kOrbitOn:
     case ro::sim::CastKind::kOrbitOff:
     case ro::sim::CastKind::kWallOn:
     case ro::sim::CastKind::kRingOn:
-    case ro::sim::CastKind::kStormOn:
     case ro::sim::CastKind::kZoneOff:
     case ro::sim::CastKind::kBlockOn:
       return;

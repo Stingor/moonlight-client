@@ -36,6 +36,28 @@ inline constexpr std::array<std::uint8_t, 4> kWallTurns = {0, 2 * kQuarterTurn, 
   return static_cast<std::uint8_t>((std::uint32_t{heading} + turns) % kHeadingSteps);
 }
 
+// UN MONSTRE AU HASARD À MI-DISTANCE, parmi `field.nearby` : tiré parmi ceux
+// au-delà de la moitié de `reach_units`, et parmi tous quand aucun n'y est.
+// Un orage posé là laisse la horde venir à lui au lieu de tomber sur le héros.
+[[nodiscard]] std::uint32_t RandomAtMidReach(SurvivorsField& field, std::int32_t reach_units) {
+  const std::int64_t half = std::int64_t{reach_units} / 2;
+  const auto far = [&](std::uint32_t index) {
+    const FieldPoint offset = field.foes[index].position - field.hero.position;
+    return std::int64_t{offset.x} * offset.x + std::int64_t{offset.y} * offset.y >= half * half;
+  };
+  const auto beyond = static_cast<std::uint32_t>(std::ranges::count_if(field.nearby, far));
+  if (beyond == 0) {
+    return field.nearby[field.combat_random.Below(static_cast<std::uint32_t>(field.nearby.size()))];
+  }
+  std::uint32_t skipped = field.combat_random.Below(beyond);
+  for (const std::uint32_t index : field.nearby) {
+    if (!far(index)) continue;
+    if (skipped == 0) return index;
+    --skipped;
+  }
+  return field.nearby.front();
+}
+
 [[nodiscard]] bool Touches(const SurvivorsField& field, const SurvivorsZone& zone,
                            const SurvivorsFoe& foe) noexcept {
   const std::int64_t reach = std::int64_t{zone.radius_units} + FoeRadius(*field.rules, foe);
@@ -235,6 +257,10 @@ bool FireStorm(SurvivorsField& field, std::uint8_t slot, const SurvivorsSkillRul
   if (rule.target == TargetRule::kHero) {
     GatherNearby(field, center, radius);
     if (field.nearby.empty()) return false;
+  } else if (rule.target == TargetRule::kRandom) {
+    GatherNearby(field, field.hero.position, level.reach_units);
+    if (field.nearby.empty()) return false;
+    center = field.foes[RandomAtMidReach(field, level.reach_units)].position;
   } else {
     GatherNearby(field, field.hero.position, level.reach_units);
     if (field.nearby.empty()) return false;

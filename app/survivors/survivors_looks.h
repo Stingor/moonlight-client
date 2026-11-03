@@ -83,6 +83,10 @@ inline constexpr std::uint32_t kIceWallUnit = 141;
 // Son lancer n'a pas d'effet au tableau : il se montre par le bloc lui-même.
 inline constexpr std::uint32_t kIceWallFallbackEffect = 74;
 
+// HEAVEN'S DRIVE pose un orage sans unité au sol : son champ de pointes se joue
+// à sa naissance, au point de l'orage, pour que la horde voie où il blesse.
+inline constexpr std::uint16_t kHeavensDriveSkill = 91;
+
 // L'EFFET D'UNE ÉVOLUTION : le changement de métier, sur le héros.
 inline constexpr std::uint32_t kJobChangeEffect = 156;
 
@@ -120,6 +124,8 @@ struct SkillLook {
   // CE QUE SA ZONE MONTRE AU SOL tant qu'elle dure, sous les flammes : le
   // visuel entretenu de l'unité que le skill pose dans le jeu, ou zéro.
   std::uint32_t ground_effect_id = 0;
+  // Son orage joue l'effet du sort à sa naissance, au point où il se pose.
+  bool storm_sown = false;
   // Le skill dont l'icône se montre : le sien.
   std::uint16_t icon_skill_id = 0;
 };

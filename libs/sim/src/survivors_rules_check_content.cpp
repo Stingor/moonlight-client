@@ -236,11 +236,10 @@ core::Result<void> CheckSkillContent(const SurvivorsRules& rules) {
                     "ciblage du plus dense hors d'une frappe, d'un éclat, d'un orage ou "
                     "d'une barrière");
     }
-    // Seule une frappe tire sa cible au hasard : aucun tirage n'est prévu pour
-    // un éclat ni pour un orage.
-    if (skill.target == TargetRule::kRandom && (skill.archetype == SkillArchetype::kClusterBlast ||
-                                                skill.archetype == SkillArchetype::kStorm)) {
-      return Refuse(named + "ciblage au hasard d'un éclat ou d'un orage");
+    // Une frappe et un orage tirent leur cible au hasard ; aucun tirage n'est
+    // prévu pour un éclat.
+    if (skill.target == TargetRule::kRandom && skill.archetype == SkillArchetype::kClusterBlast) {
+      return Refuse(named + "ciblage au hasard d'un éclat");
     }
     // Seul un orage se pose sur le héros.
     if (skill.target == TargetRule::kHero && skill.archetype != SkillArchetype::kStorm) {
