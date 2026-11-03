@@ -21773,6 +21773,9 @@ tr: Efectos permanentes
 fr: Arène
 tr: Arena
 
+fr: %s : une partie tenue %u:00 le débloque.
+tr: %s: una partida aguantada %u:00 lo desbloquea.
+
 fr: Arène : %s
 tr: Arena: %s
 

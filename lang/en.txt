@@ -21773,6 +21773,9 @@ tr: Lasting effects
 fr: Arène
 tr: Arena
 
+fr: %s : une partie tenue %u:00 le débloque.
+tr: %s: a run held for %u:00 unlocks it.
+
 fr: Arène : %s
 tr: Arena: %s
 

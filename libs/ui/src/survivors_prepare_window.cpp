@@ -181,8 +181,33 @@ void DrawFreeArena(const SurvivorsPrepareMeta& meta, SurvivorsPrepareAsk& asked,
   }
 }
 
+// La classe de la partie libre : une case par classe, sur une ligne ; une
+// classe verrouillée est grisée, et ce qui la débloque se lit dessous.
+void DrawFreeClass(const SurvivorsPrepareMeta& meta, SurvivorsPrepareAsk& asked,
+                   const SkinArt& art) {
+  if (meta.free_classes.size() < 2) return;
+  ImGui::SeparatorText(core::Tr("Classe"));
+  bool first = true;
+  for (const SurvivorsClassChoice& choice : meta.free_classes) {
+    if (!first) ImGui::SameLine();
+    first = false;
+    ImGui::PushID(choice.class_id);
+    ImGui::BeginDisabled(choice.locked);
+    const bool chosen = choice.class_id == meta.free_class_id;
+    if (SkinRadio(choice.name, chosen, art) && !chosen && !choice.locked) {
+      asked.choose_class_id = choice.class_id;
+    }
+    ImGui::EndDisabled();
+    ImGui::PopID();
+  }
+  for (const SurvivorsClassChoice& choice : meta.free_classes) {
+    if (choice.locked && *choice.unlock_hint != '\0') FaintText(choice.unlock_hint);
+  }
+}
+
 void DrawFreeBoard(const SurvivorsPrepareView& view, const SurvivorsPrepareMeta& meta,
                    SurvivorsPrepareAsk& asked, const SkinArt& art) {
+  DrawFreeClass(meta, asked, art);
   DrawFreeArena(meta, asked, art);
   asked.choose_skill_id = DrawBolts(view, art);
   DrawCursedWater(meta, asked, art);

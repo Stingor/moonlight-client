@@ -175,6 +175,9 @@ class SurvivorsMode {
   // `Freeze`, les trophées comptés si `minigames` n'est pas nul.
   void FreezeRun(SurvivorsStage& stage, MinigameStage* minigames,
                  const std::filesystem::path& client_root);
+  // La classe que jouera la prochaine partie : celle de l'accueil en partie
+  // libre, la première pour le défi et la partie classée. Nulle sans classe.
+  [[nodiscard]] const ro::sim::ClassRule* PlayingClass() const;
   [[nodiscard]] std::uint16_t ChosenBolt() const;
 
   SurvivorsContext context_;

@@ -58,6 +58,16 @@ constexpr std::array<SurvivorsFeat, 6> kFeats{{
     {.key = "ice_wall", .counter = FeatCounter::kBestSurvivedMs, .threshold = kIceWallSurvivedMs},
 }};
 
+// LES CLASSES QUI SE DÉBLOQUENT, chacune par un exploit du carnet. Le
+// Chevalier partage celui d'Ice Wall.
+struct ClassUnlock {
+  std::string_view class_key;
+  std::string_view feat_key;
+};
+constexpr std::array<ClassUnlock, 1> kClassUnlocks{{
+    {.class_key = "knight", .feat_key = "ice_wall"},
+}};
+
 [[nodiscard]] std::uint64_t SaturatedAdd(std::uint64_t total, std::uint64_t amount) noexcept {
   constexpr std::uint64_t kMost = std::numeric_limits<std::uint64_t>::max();
   return amount > kMost - total ? kMost : total + amount;
@@ -328,15 +338,44 @@ const ro::sim::ArenaRule* FreeArenaOf(const ro::sim::SurvivorsRules& rules,
   return chosen != nullptr ? chosen : DefaultArenaOf(rules);
 }
 
+std::string_view ClassUnlockFeat(const ro::sim::ClassRule& class_rule) {
+  const auto found =
+      std::ranges::find(kClassUnlocks, std::string_view(class_rule.key), &ClassUnlock::class_key);
+  return found != kClassUnlocks.end() ? found->feat_key : std::string_view();
+}
+
+bool ClassUnlocked(const ro::sim::SurvivorsRules& rules, const ro::sim::ClassRule& class_rule,
+                   const SurvivorsSave& save) {
+  if (!rules.classes.empty() && rules.classes.front().class_id == class_rule.class_id) return true;
+  const std::string_view feat = ClassUnlockFeat(class_rule);
+  return feat.empty() || HasFeat(save, feat);
+}
+
+const ro::sim::ClassRule* FreeClassOf(const ro::sim::SurvivorsRules& rules,
+                                      const SurvivorsSave& save, std::uint16_t class_id) {
+  if (rules.classes.empty()) return nullptr;
+  const ro::sim::ClassRule* chosen = class_id != 0 ? ro::sim::FindClass(rules, class_id) : nullptr;
+  if (chosen != nullptr && ClassUnlocked(rules, *chosen, save)) return chosen;
+  return &rules.classes.front();
+}
+
+std::uint16_t FirstSkillOf(const ro::sim::ClassRule& class_rule, std::uint16_t first_skill_id) {
+  const std::span<const std::uint16_t> starters = class_rule.starter_skills;
+  if (std::ranges::find(starters, first_skill_id) != starters.end()) return first_skill_id;
+  return starters.empty() ? std::uint16_t{0} : starters.front();
+}
+
 ro::sim::SurvivorsStart FreeStartOf(const ro::sim::SurvivorsRules& rules, const SurvivorsSave& save,
                                     std::uint64_t seed, std::uint16_t first_skill_id,
-                                    std::uint16_t arena_id) {
+                                    std::uint16_t arena_id, std::uint16_t class_id) {
   const ro::sim::ArenaRule* arena = FreeArenaOf(rules, arena_id);
+  const ro::sim::ClassRule* chosen_class = FreeClassOf(rules, save, class_id);
   ro::sim::SurvivorsStart start{
       .seed = seed,
-      .class_id = rules.classes.empty() ? std::uint16_t{0} : rules.classes.front().class_id,
+      .class_id = chosen_class == nullptr ? std::uint16_t{0} : chosen_class->class_id,
       .arena_id = arena == nullptr ? std::uint16_t{0} : arena->arena_id,
-      .first_skill_id = first_skill_id,
+      .first_skill_id =
+          chosen_class == nullptr ? first_skill_id : FirstSkillOf(*chosen_class, first_skill_id),
       .loadout = {}};
   // Un carnet plus généreux que les règles ne fait pas refuser la partie : la
   // Cursed Water se ramène au plus haut rang que les règles connaissent.
@@ -344,8 +383,8 @@ ro::sim::SurvivorsStart FreeStartOf(const ro::sim::SurvivorsRules& rules, const 
       rules.cursed_water.empty() ? 0 : rules.cursed_water.size() - 1;
   start.cursed_water =
       static_cast<std::uint8_t>(std::min<std::size_t>(save.meta.cursed_water, most_cursed_water));
-  if (rules.classes.empty()) return start;
-  const ro::sim::ClassRule& class_rule = rules.classes.front();
+  if (chosen_class == nullptr) return start;
+  const ro::sim::ClassRule& class_rule = *chosen_class;
   const ro::sim::SurvivorsMetaStart meta =
       ro::sim::LoadoutOf(ro::sim::ShippedSurvivorsMeta(), save.meta.ranks, class_rule);
   start.loadout = meta.loadout;

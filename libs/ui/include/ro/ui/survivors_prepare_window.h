@@ -52,6 +52,14 @@ struct SurvivorsArenaChoice {
   std::uint16_t arena_id = 0;
   const char* name = "";  // ⚠ EN UTF-8, déjà dans la langue du joueur
 };
+// Une classe de la partie libre. Verrouillée, elle se montre grisée, avec ce
+// qui la débloque.
+struct SurvivorsClassChoice {
+  std::uint16_t class_id = 0;
+  const char* name = "";  // ⚠ EN UTF-8, déjà dans la langue du joueur
+  bool locked = false;
+  const char* unlock_hint = "";  // ⚠ EN UTF-8, déjà dans la langue du joueur
+};
 // Les lieux de la méta qu'ouvre l'accueil.
 enum class SurvivorsMetaPlace : std::uint8_t { kChurch, kKafra, kCodex, kRecords };
 
@@ -97,6 +105,10 @@ struct SurvivorsPrepareMeta {
   // nomme pas).
   std::span<const SurvivorsArenaChoice> free_arenas;
   std::uint16_t free_arena_id = 0;
+  // Les classes de la partie libre et la retenue ; le défi et la partie
+  // classée jouent la première.
+  std::span<const SurvivorsClassChoice> free_classes;
+  std::uint16_t free_class_id = 0;
   const char* board_arena_name = "";
 };
 
@@ -123,6 +135,8 @@ struct SurvivorsPrepareAsk {
   std::optional<SurvivorsBoardTab> choose_board;
   // L'arène de la partie libre ; le défi et la partie classée n'en choisissent pas.
   std::optional<std::uint16_t> choose_arena_id;
+  // La classe de la partie libre, jamais une classe verrouillée.
+  std::optional<std::uint16_t> choose_class_id;
   std::optional<int> choose_cursed_water;
   std::optional<bool> choose_without_minimap;
   std::optional<SurvivorsMetaPlace> open_place;

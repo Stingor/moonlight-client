@@ -134,12 +134,13 @@ const char* SurvivorsViews::JobName(std::uint16_t job_id, const SurvivorsTables&
 
 void SurvivorsViews::ComposePrepare(ro::ui::SurvivorsPrepareView& view,
                                     const ro::sim::SurvivorsRules& rules,
+                                    const ro::sim::ClassRule* playing_class,
                                     std::uint16_t chosen_skill_id, const char* refusal,
                                     const std::array<std::string, 4>& key_labels,
                                     const SurvivorsTables& tables) {
   bolts_.clear();
-  if (!rules.classes.empty()) {
-    for (const std::uint16_t skill_id : rules.classes.front().starter_skills) {
+  if (playing_class != nullptr) {
+    for (const std::uint16_t skill_id : playing_class->starter_skills) {
       const ro::sim::SurvivorsSkillRule* rule = ro::sim::FindSkill(rules, skill_id);
       bolts_.push_back(
           ro::ui::SurvivorsBoltChoice{.skill_id = skill_id,

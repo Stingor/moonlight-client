@@ -419,6 +419,7 @@ void SurvivorsMetaDesk::FollowPrepare(const ro::ui::SurvivorsPrepareAsk& asked,
                                       const SurvivorsSay& say) {
   if (asked.choose_board.has_value()) book.Choose(BoardKindOf(*asked.choose_board));
   if (asked.choose_arena_id.has_value()) book.ChooseArena(rules, *asked.choose_arena_id);
+  if (asked.choose_class_id.has_value()) book.ChooseClass(rules, *asked.choose_class_id);
   if (asked.choose_cursed_water.has_value()) {
     const int rank = *asked.choose_cursed_water;
     Mutate(

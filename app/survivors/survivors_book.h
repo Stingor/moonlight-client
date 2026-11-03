@@ -88,14 +88,35 @@ struct SurvivorsFeat {
 [[nodiscard]] const ro::sim::ArenaRule* FreeArenaOf(const ro::sim::SurvivorsRules& rules,
                                                     std::uint16_t arena_id);
 
-// LE DÉPART D'UNE PARTIE LIBRE : la classe livrée en tête, l'arène
-// `FreeArenaOf(arena_id)`, le loadout et les vies des rangs achetés, la
-// dernière Cursed Water choisie, et les verrous du carnet. La graine se tire
-// par app à chaque partie.
+// UNE CLASSE DÉBLOQUÉE (Q6 du lot 12) : la première l'est toujours ; le
+// Chevalier, par le même exploit qu'Ice Wall, une partie tenue 10:00.
+[[nodiscard]] bool ClassUnlocked(const ro::sim::SurvivorsRules& rules,
+                                 const ro::sim::ClassRule& class_rule, const SurvivorsSave& save);
+// La clé de l'exploit qui débloque `class_rule`, vide pour une classe ouverte
+// d'emblée.
+[[nodiscard]] std::string_view ClassUnlockFeat(const ro::sim::ClassRule& class_rule);
+
+// LA CLASSE DE LA PARTIE LIBRE : celle d'Id `class_id` quand les règles la
+// connaissent et que le carnet l'a débloquée, sinon la première. Nulle sans
+// classe. Le défi et la partie classée jouent la première.
+[[nodiscard]] const ro::sim::ClassRule* FreeClassOf(const ro::sim::SurvivorsRules& rules,
+                                                    const SurvivorsSave& save,
+                                                    std::uint16_t class_id);
+
+// Le premier skill d'une partie de `class_rule` : `first_skill_id` quand il
+// est l'un de ses skills de départ, sinon le premier d'entre eux.
+[[nodiscard]] std::uint16_t FirstSkillOf(const ro::sim::ClassRule& class_rule,
+                                         std::uint16_t first_skill_id);
+
+// LE DÉPART D'UNE PARTIE LIBRE : la classe `FreeClassOf(class_id)`, l'arène
+// `FreeArenaOf(arena_id)`, son premier skill `FirstSkillOf`, le loadout et les
+// vies des rangs achetés, la dernière Cursed Water choisie, et les verrous du
+// carnet. La graine se tire par app à chaque partie.
 [[nodiscard]] ro::sim::SurvivorsStart FreeStartOf(const ro::sim::SurvivorsRules& rules,
                                                   const SurvivorsSave& save, std::uint64_t seed,
                                                   std::uint16_t first_skill_id,
-                                                  std::uint16_t arena_id = 0);
+                                                  std::uint16_t arena_id = 0,
+                                                  std::uint16_t class_id = 0);
 
 // La semaine ISO d'un instant UTC : le défi change le lundi à 00:00 UTC (Q9).
 [[nodiscard]] ro::sim::IsoWeek IsoWeekOfUtc(std::int64_t utc_s) noexcept;

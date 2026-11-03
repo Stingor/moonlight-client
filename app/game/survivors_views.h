@@ -103,11 +103,13 @@ enum class CodexLinkKind : std::uint8_t { kSkill, kItem, kFoe };
 class SurvivorsViews {
  public:
   // LA PRÉPARATION, dans la fenêtre de la salle : les bolts de départ de la
-  // classe, celui qui est choisi, la raison du refus d'entrée (nulle quand la
-  // partie peut commencer) et les lettres du clavier du joueur.
+  // classe qui jouera (`playing_class`, nulle : aucun), celui qui est choisi,
+  // la raison du refus d'entrée (nulle quand la partie peut commencer) et les
+  // lettres du clavier du joueur.
   void ComposePrepare(ro::ui::SurvivorsPrepareView& view, const ro::sim::SurvivorsRules& rules,
-                      std::uint16_t chosen_skill_id, const char* refusal,
-                      const std::array<std::string, 4>& key_labels, const SurvivorsTables& tables);
+                      const ro::sim::ClassRule* playing_class, std::uint16_t chosen_skill_id,
+                      const char* refusal, const std::array<std::string, 4>& key_labels,
+                      const SurvivorsTables& tables);
 
   // L'ACCUEIL ET SES FENÊTRES DE MÉTA (Q1), depuis le carnet relu : la méta de
   // la préparation, puis l'Église, la Kafra, le Codex et les records ouverts ;
@@ -141,6 +143,10 @@ class SurvivorsViews {
   [[nodiscard]] const char* CardName(std::uint16_t card_item_id, const SurvivorsTables& tables);
   [[nodiscard]] const char* FoeName(std::uint16_t foe_id, const SurvivorsTables& tables);
   [[nodiscard]] const char* JobName(std::uint16_t job_id, const SurvivorsTables& tables);
+  // Les classes de la partie libre, la retenue, et ce qui débloque les autres.
+  void ComposeClassChoices(const ro::sim::SurvivorsRules& rules, const SurvivorsSave& save,
+                           const SurvivorsTables& tables, std::uint16_t free_class_id,
+                           ro::ui::SurvivorsPrepareMeta& meta);
   void ComposeHud(const ro::sim::SurvivorsField& field, const ro::sim::SurvivorsRules& rules,
                   std::uint64_t clock_ms, const SurvivorsViewFacts& facts,
                   const SurvivorsTables& tables);
@@ -238,6 +244,9 @@ class SurvivorsViews {
   std::vector<std::string> arena_names_;
   std::vector<ro::ui::SurvivorsArenaChoice> arena_choices_;
   std::string board_arena_name_;
+  // LES CLASSES DE L'ACCUEIL et ce qui débloque chacune, que les choix désignent.
+  std::vector<std::string> class_hints_;
+  std::vector<ro::ui::SurvivorsClassChoice> class_choices_;
   // LE CODEX : ses lignes, et le sprite de l'entrée choisie, sur la
   // garde-robe qui l'a vu naître.
   SurvivorsCodexRowsHeld codex_rows_;

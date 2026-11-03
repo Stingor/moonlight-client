@@ -17,6 +17,8 @@
 #include <utility>
 #include <vector>
 
+#include "ro/core/i18n.h"
+#include "ro/core/printed.h"
 #include "ro/sim/survivors_meta.h"
 
 #include "game/skin_image_of.h"
@@ -39,7 +41,47 @@ constexpr std::uint16_t kTrophyIconItem = 714;
   return tables.skill_tree != nullptr ? tables.skill_tree->FindByName(idname) : nullptr;
 }
 
+// La durée de partie que demande l'exploit `feat_key`, en minutes ; 0 pour un
+// exploit qui ne se compte pas en durée.
+[[nodiscard]] std::uint64_t FeatMinutes(std::string_view feat_key) {
+  constexpr std::uint64_t kMsPerMinute = 60ULL * 1000;
+  for (const SurvivorsFeat& feat : ShippedSurvivorsFeats()) {
+    if (feat.key == feat_key && feat.counter == FeatCounter::kBestSurvivedMs) {
+      return feat.threshold / kMsPerMinute;
+    }
+  }
+  return 0;
+}
+
 }  // namespace
+
+void SurvivorsViews::ComposeClassChoices(const ro::sim::SurvivorsRules& rules,
+                                         const SurvivorsSave& save, const SurvivorsTables& tables,
+                                         std::uint16_t free_class_id,
+                                         ro::ui::SurvivorsPrepareMeta& meta) {
+  class_hints_.clear();
+  class_choices_.clear();
+  // Les textes d'abord : une liste qui grandit déplacerait les textes désignés.
+  for (const ro::sim::ClassRule& class_rule : rules.classes) {
+    const std::uint64_t minutes = FeatMinutes(ClassUnlockFeat(class_rule));
+    class_hints_.push_back(
+        minutes == 0 ? std::string()
+                     : ro::core::Printed(ro::core::Tr("%s : une partie tenue %u:00 le débloque."),
+                                         JobName(class_rule.job_id, tables),
+                                         static_cast<unsigned>(minutes)));
+  }
+  for (std::size_t rank = 0; rank < rules.classes.size(); ++rank) {
+    const ro::sim::ClassRule& class_rule = rules.classes[rank];
+    class_choices_.push_back(
+        ro::ui::SurvivorsClassChoice{.class_id = class_rule.class_id,
+                                     .name = JobName(class_rule.job_id, tables),
+                                     .locked = !ClassUnlocked(rules, class_rule, save),
+                                     .unlock_hint = class_hints_[rank].c_str()});
+  }
+  const ro::sim::ClassRule* free_class = FreeClassOf(rules, save, free_class_id);
+  meta.free_classes = class_choices_;
+  meta.free_class_id = free_class != nullptr ? free_class->class_id : std::uint16_t{0};
+}
 
 void SurvivorsViews::ComposeMeta(ro::ui::SurvivorsPrepareView& prepare,
                                  SurvivorsMetaWindows& windows, const SurvivorsMetaDesk& desk,
@@ -81,6 +123,7 @@ void SurvivorsViews::ComposeMeta(ro::ui::SurvivorsPrepareView& prepare,
       board_arena != nullptr ? ArenaNameOf(rules, *board_arena, tables.map_names) : std::string();
   meta.free_arenas = arena_choices_;
   meta.free_arena_id = free_arena != nullptr ? free_arena->arena_id : std::uint16_t{0};
+  ComposeClassChoices(rules, save, tables, book.free_class_id(), meta);
   meta.board_arena_name = board_arena_name_.c_str();
   prepare.meta = meta;
   if (windows.church.open) ComposeShop(SurvivorsMetaShop::kChurch, windows, save, tables);

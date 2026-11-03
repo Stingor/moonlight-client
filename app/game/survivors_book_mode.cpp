@@ -28,6 +28,11 @@ void SurvivorsBookMode::ChooseArena(const ro::sim::SurvivorsRules& rules,
   if (ro::sim::FindArena(rules, arena_id) != nullptr) free_arena_id_ = arena_id;
 }
 
+void SurvivorsBookMode::ChooseClass(const ro::sim::SurvivorsRules& rules,
+                                    std::uint16_t class_id) noexcept {
+  if (ro::sim::FindClass(rules, class_id) != nullptr) free_class_id_ = class_id;
+}
+
 SurvivorsBookMode::Begun SurvivorsBookMode::StartAs(SurvivorsBoardKind kind,
                                                     const ro::sim::SurvivorsRules& rules,
                                                     const std::filesystem::path& client_root,
@@ -42,27 +47,28 @@ SurvivorsBookMode::Begun SurvivorsBookMode::StartAs(SurvivorsBoardKind kind,
     return Begun{.start = ro::sim::RankedStartOf(rules, seed, first_skill_id),
                  .board = SurvivorsRunBoard{.kind = SurvivorsBoardKind::kRanked}};
   }
-  return FreeStart(rules, client_root, seed, first_skill_id, free_arena_id_);
+  return FreeStart(rules, client_root, seed, first_skill_id, free_arena_id_, free_class_id_);
 }
 
 SurvivorsBookMode::Begun SurvivorsBookMode::StartRankedAsFree(
     const ro::sim::SurvivorsRules& rules, const std::filesystem::path& client_root,
     std::uint64_t seed, std::uint16_t first_skill_id) {
-  return FreeStart(rules, client_root, seed, first_skill_id,
-                   ro::sim::RankedStartOf(rules, seed, first_skill_id).arena_id);
+  const ro::sim::SurvivorsStart ranked = ro::sim::RankedStartOf(rules, seed, first_skill_id);
+  return FreeStart(rules, client_root, seed, first_skill_id, ranked.arena_id, ranked.class_id);
 }
 
 SurvivorsBookMode::Begun SurvivorsBookMode::FreeStart(const ro::sim::SurvivorsRules& rules,
                                                       const std::filesystem::path& client_root,
                                                       std::uint64_t seed,
                                                       std::uint16_t first_skill_id,
-                                                      std::uint16_t arena_id) {
+                                                      std::uint16_t arena_id,
+                                                      std::uint16_t class_id) {
   const SurvivorsSaveRead read = file_.Load(client_root);
   if (read.file_unread) {
     ro::core::LogWarning("survivors : carnet illisible, la partie part sans la méta");
   }
   if (read.damaged_copy.has_value()) damaged_copy_ = read.damaged_copy;
-  return Begun{.start = FreeStartOf(rules, read.save, seed, first_skill_id, arena_id),
+  return Begun{.start = FreeStartOf(rules, read.save, seed, first_skill_id, arena_id, class_id),
                .board = SurvivorsRunBoard{.without_minimap = read.save.meta.without_minimap}};
 }
 

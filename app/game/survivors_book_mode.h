@@ -38,6 +38,10 @@ class SurvivorsBookMode {
   // (`FreeArenaOf`). Le défi et la partie classée ne la lisent pas.
   void ChooseArena(const ro::sim::SurvivorsRules& rules, std::uint16_t arena_id) noexcept;
   [[nodiscard]] std::uint16_t free_arena_id() const noexcept { return free_arena_id_; }
+  // LA CLASSE DE LA PARTIE LIBRE, de même ; une classe que le carnet n'a pas
+  // débloquée part comme la première (`FreeClassOf`).
+  void ChooseClass(const ro::sim::SurvivorsRules& rules, std::uint16_t class_id) noexcept;
+  [[nodiscard]] std::uint16_t free_class_id() const noexcept { return free_class_id_; }
   // Les secondes UTC du moment, à l'horloge du mode.
   [[nodiscard]] std::int64_t now_utc() const { return now_utc_(); }
 
@@ -87,15 +91,18 @@ class SurvivorsBookMode {
   }
 
  private:
-  // Le départ d'une partie libre sur l'arène `arena_id` (`FreeStartOf`).
+  // Le départ d'une partie libre de la classe `class_id` sur l'arène
+  // `arena_id` (`FreeStartOf`).
   [[nodiscard]] Begun FreeStart(const ro::sim::SurvivorsRules& rules,
                                 const std::filesystem::path& client_root, std::uint64_t seed,
-                                std::uint16_t first_skill_id, std::uint16_t arena_id);
+                                std::uint16_t first_skill_id, std::uint16_t arena_id,
+                                std::uint16_t class_id);
 
   UtcClock now_utc_;
   SurvivorsSaveFile file_;
   SurvivorsBoardKind kind_ = SurvivorsBoardKind::kFree;
   std::uint16_t free_arena_id_ = 0;
+  std::uint16_t free_class_id_ = 0;
   bool credited_ = false;
   std::optional<SurvivorsCredit> credit_;
   std::optional<std::filesystem::path> damaged_copy_;

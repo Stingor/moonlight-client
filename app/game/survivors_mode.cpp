@@ -115,10 +115,18 @@ SurvivorsModeSlot::SurvivorsModeSlot() : mode_(std::make_unique<SurvivorsMode>()
 
 SurvivorsModeSlot::~SurvivorsModeSlot() = default;
 
-std::uint16_t SurvivorsMode::ChosenBolt() const {
+const ro::sim::ClassRule* SurvivorsMode::PlayingClass() const {
   const ro::sim::SurvivorsRules& rules = Rules();
-  if (rules.classes.empty() || rules.classes.front().starter_skills.empty()) return 0;
-  const std::span<const std::uint16_t> bolts = rules.classes.front().starter_skills;
+  if (book_.chosen() == SurvivorsBoardKind::kFree) {
+    return FreeClassOf(rules, desk_.save(), book_.free_class_id());
+  }
+  return rules.classes.empty() ? nullptr : &rules.classes.front();
+}
+
+std::uint16_t SurvivorsMode::ChosenBolt() const {
+  const ro::sim::ClassRule* playing = PlayingClass();
+  if (playing == nullptr || playing->starter_skills.empty()) return 0;
+  const std::span<const std::uint16_t> bolts = playing->starter_skills;
   if (std::ranges::find(bolts, options_.first_skill_id) != bolts.end()) {
     return options_.first_skill_id;
   }
@@ -173,7 +181,7 @@ void SurvivorsMode::FollowDoor(SurvivorsStage& stage, const SurvivorsContext& co
   const std::optional<EntryRefusal> refusal = Judge(EntryFactsOf(*context.world, context.aside));
   const MoveKeyLabels labels = LabelsOf(context.key_namer);
   key_labels_ = {labels.north, labels.west, labels.south, labels.east};
-  views_.ComposePrepare(windows.survivors_prepare_view, Rules(), ChosenBolt(),
+  views_.ComposePrepare(windows.survivors_prepare_view, Rules(), PlayingClass(), ChosenBolt(),
                         refusal.has_value() ? RefusalText(*refusal) : nullptr, key_labels_,
                         context.tables);
   views_.ComposeMeta(windows.survivors_prepare_view, windows.survivors_meta, desk_, book_, Rules(),
@@ -275,8 +283,8 @@ bool SurvivorsMode::Mount(SurvivorsStage& stage, const SurvivorsContext& context
   // LA CHAUFFE : chaque espèce de la première vague, et les bolts de départ.
   const ro::sim::SurvivorsField& field = stage.play()->run().field();
   std::vector<std::uint16_t> skills;
-  if (!rules.classes.empty()) {
-    const std::span<const std::uint16_t> starters = rules.classes.front().starter_skills;
+  if (const ro::sim::ClassRule* hero_class = ro::sim::FindClass(rules, start.class_id)) {
+    const std::span<const std::uint16_t> starters = hero_class->starter_skills;
     skills.assign(starters.begin(), starters.end());
   }
   const std::span<const std::uint16_t> species =
