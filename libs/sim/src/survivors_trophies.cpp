@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <array>
 #include <cstdint>
+#include <span>
 #include <vector>
 
 #include "ro/sim/survivors_rules.h"
@@ -62,20 +63,34 @@ constexpr std::array<EvolvedTrophy, 3> kTopLevelTrophies{{
          });
 }
 
-// Ajoute au record les évolués que la partie possède, et dit si le record les
-// tient tous : chacun des évolués des règles, au moins un.
+// Vrai si l'évolution part d'un skill de la réserve de la première classe, le
+// Magicien : « Grand sorcier » ne demande que les siennes.
+[[nodiscard]] bool OfFirstClass(const SurvivorsRules& rules, const EvolutionRule& evolution) {
+  if (rules.classes.empty()) return false;
+  const std::span<const std::uint16_t> pool = rules.classes.front().skill_pool;
+  return std::ranges::find(pool, evolution.skill_id) != pool.end();
+}
+
+// Ajoute au record les évolués que la partie possède, et dit si le record
+// tient tous ceux de la première classe, qui en a au moins un.
 [[nodiscard]] bool RememberEvolved(MinigameRecord& record, const SurvivorsField& field) {
-  if (field.rules == nullptr || field.rules->evolutions.empty()) return false;
+  if (field.rules == nullptr) return false;
+  const SurvivorsRules& rules = *field.rules;
   std::vector<std::uint16_t>& kept = record.survivors_evolved;
-  for (const EvolutionRule& evolution : field.rules->evolutions) {
+  for (const EvolutionRule& evolution : rules.evolutions) {
     if (Owns(field, evolution.evolved_skill_id) &&
         !std::ranges::binary_search(kept, evolution.evolved_skill_id)) {
       kept.insert(std::ranges::upper_bound(kept, evolution.evolved_skill_id),
                   evolution.evolved_skill_id);
     }
   }
-  return std::ranges::all_of(field.rules->evolutions, [&kept](const EvolutionRule& evolution) {
-    return std::ranges::binary_search(kept, evolution.evolved_skill_id);
+  const auto of_first_class = [&rules](const EvolutionRule& evolution) {
+    return OfFirstClass(rules, evolution);
+  };
+  if (std::ranges::none_of(rules.evolutions, of_first_class)) return false;
+  return std::ranges::all_of(rules.evolutions, [&](const EvolutionRule& evolution) {
+    return !of_first_class(evolution) ||
+           std::ranges::binary_search(kept, evolution.evolved_skill_id);
   });
 }
 

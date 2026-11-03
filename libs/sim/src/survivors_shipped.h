@@ -44,6 +44,17 @@ inline constexpr std::uint16_t kHeavensDriveId = 91;
 inline constexpr std::uint16_t kNapalmVulcanId = 400;
 inline constexpr std::uint16_t kCrimsonRockId = 2211;
 inline constexpr std::uint16_t kJackFrostId = 2204;
+// Le Chevalier, puis ses évolués.
+inline constexpr std::uint16_t kBashId = 5;
+inline constexpr std::uint16_t kMagnumBreakId = 7;
+inline constexpr std::uint16_t kPierceId = 56;
+inline constexpr std::uint16_t kBrandishSpearId = 57;
+inline constexpr std::uint16_t kSpearStabId = 58;
+inline constexpr std::uint16_t kSpearBoomerangId = 59;
+inline constexpr std::uint16_t kBowlingBashId = 62;
+inline constexpr std::uint16_t kSpiralPierceId = 397;
+inline constexpr std::uint16_t kHeadCrushId = 398;
+inline constexpr std::uint16_t kJointBeatId = 399;
 
 inline constexpr std::uint16_t kHornetCardId = 4019;
 inline constexpr std::uint16_t kChonchonCardId = 4009;
@@ -81,9 +92,10 @@ inline constexpr std::uint32_t kMinuteMs = 60000;
 // La règle de terrain de la prairie, que nomme l'arène générée.
 inline constexpr std::uint16_t kPlainsTerrainId = 1;
 
-// survivors_rules_mage.cpp : la classe, ses skills et ses cartes. Les skills
-// sont ceux de la réserve, puis les évolués de ShippedEvolvedSkills : une
-// seule table, que FindSkill parcourt.
+// survivors_rules_mage.cpp : les classes, les skills et les cartes. Les skills
+// sont ceux de la réserve du Magicien, puis les évolués de
+// ShippedEvolvedSkills, puis ceux du Chevalier : une seule table, que
+// FindSkill parcourt.
 [[nodiscard]] std::span<const ClassRule> ShippedClasses();
 [[nodiscard]] std::span<const SurvivorsSkillRule> ShippedSkills();
 [[nodiscard]] std::span<const CardRule> ShippedCards();
@@ -93,6 +105,15 @@ inline constexpr std::uint16_t kPlainsTerrainId = 1;
 inline constexpr std::size_t kShippedEvolvedSkillCount = 11;
 [[nodiscard]] std::span<const SurvivorsSkillRule> ShippedEvolvedSkills();
 [[nodiscard]] std::span<const EvolutionRule> ShippedEvolutions();
+
+// survivors_rules_knight.cpp : le Chevalier, ses skills — la réserve, puis les
+// évolués — et ses évolutions. ShippedClasses, ShippedSkills et
+// ShippedEvolutions les mettent après ceux du Magicien.
+inline constexpr std::size_t kKnightPoolSkillCount = 7;
+inline constexpr std::size_t kKnightEvolvedSkillCount = 3;
+[[nodiscard]] const ClassRule& KnightClass();
+[[nodiscard]] std::span<const SurvivorsSkillRule> KnightSkills();
+[[nodiscard]] std::span<const EvolutionRule> KnightEvolutions();
 
 // survivors_rules_foes.cpp : les monstres, leurs vagues, les arènes, la courbe
 // d'XP et la table des éléments.

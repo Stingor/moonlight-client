@@ -35,8 +35,24 @@ namespace {
       return kFireWallFallbackEffect;
     case kIceWallSkill:
       return kIceWallFallbackEffect;
+    case kBashSkill:
+      return kBashFallbackEffect;
     default:
       return std::nullopt;
+  }
+}
+
+// Le skill dont ce skill emprunte l'effet, ou lui-même.
+[[nodiscard]] std::uint16_t ShownSkillOf(std::uint16_t skill_id) {
+  switch (skill_id) {
+    case kNapalmVulcanSkill:
+      return kSoulStrikeSkill;
+    case kBrandishSpearSkill:
+      return kSpearStabSkill;
+    case kSpiralPierceSkill:
+      return kPierceSkill;
+    default:
+      return skill_id;
   }
 }
 
@@ -122,8 +138,7 @@ SkillLook SkillLookOf(const ro::sim::SurvivorsSkillRule& skill) {
   SkillLook look{.skill_id = skill.skill_id,
                  .bearer = BearerOf(skill.archetype),
                  .icon_skill_id = skill.skill_id};
-  const std::uint16_t shown =
-      skill.skill_id == kNapalmVulcanSkill ? kSoulStrikeSkill : skill.skill_id;
+  const std::uint16_t shown = ShownSkillOf(skill.skill_id);
   look.effect_skill_id = shown;
   if (const std::optional<std::uint32_t> tabled = TabledEffectOf(shown)) {
     look.effect_id = *tabled;

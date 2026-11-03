@@ -497,6 +497,36 @@ tr: Un meteoro aplasta a la multitud más densa y la hace retroceder.
 fr: Une onde glacée part de vous et gèle tout ce qu'elle touche.
 tr: Una onda helada parte de ti y congela todo lo que toca.
 
+fr: Des coups de lance frappent le monstre à portée de bras.
+tr: Golpes de lanza alcanzan al monstruo al alcance de tu brazo.
+
+fr: Une onde de feu jaillit de vous et repousse la horde.
+tr: Una onda de fuego brota de ti y hace retroceder a la horda.
+
+fr: Un coup de lance droit traverse la file des monstres.
+tr: Una estocada recta atraviesa la fila de monstruos.
+
+fr: Une longue pique devant vous repousse les monstres au loin.
+tr: Una larga estocada delante de ti aleja a los monstruos.
+
+fr: La lance balaie largement devant vous, là où vous marchez.
+tr: La lanza barre a lo ancho delante de ti, hacia donde caminas.
+
+fr: Une lance lancée au loin frappe le monstre le plus proche.
+tr: Una lanza arrojada a lo lejos golpea al monstruo más cercano.
+
+fr: Un coup furieux disperse la foule la plus dense à portée.
+tr: Un golpe furioso dispersa la multitud más densa a tu alcance.
+
+fr: Des coups écrasants s'abattent sur ce qui vous touche.
+tr: Golpes demoledores caen sobre lo que te toca.
+
+fr: Des lances en spirale transpercent toute la file.
+tr: Lanzas en espiral atraviesan toda la fila.
+
+fr: Un coup large brise les jambes des monstres et les fige.
+tr: Un golpe amplio rompe las piernas de los monstruos y los inmoviliza.
+
 fr: Récupération de PV au fil du temps.
 tr: Recuperación de PV con el tiempo.
 

@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <array>
 #include <cstdint>
 #include <span>
@@ -260,6 +261,17 @@ constexpr std::array<EvolutionRule, kShippedEvolvedSkillCount> kEvolutions{{
 
 std::span<const SurvivorsSkillRule> ShippedEvolvedSkills() { return kEvolvedSkills; }
 
-std::span<const EvolutionRule> ShippedEvolutions() { return kEvolutions; }
+std::span<const EvolutionRule> ShippedEvolutions() {
+  // Celles du Magicien, puis celles du Chevalier, assemblées au premier appel.
+  static const std::array<EvolutionRule, kShippedEvolvedSkillCount + kKnightEvolvedSkillCount>
+      kAll = [] {
+        std::array<EvolutionRule, kShippedEvolvedSkillCount + kKnightEvolvedSkillCount> all{};
+        const std::span<const EvolutionRule> knight = KnightEvolutions();
+        auto out = std::copy(kEvolutions.begin(), kEvolutions.end(), all.begin());
+        std::copy_n(knight.begin(), std::min(knight.size(), kKnightEvolvedSkillCount), out);
+        return all;
+      }();
+  return kAll;
+}
 
 }  // namespace ro::sim::survivors

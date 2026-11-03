@@ -58,6 +58,18 @@ inline constexpr std::uint32_t kFireWallFallbackEffect = 25;
 // Soul Strike, porté par le héros. Son icône reste la sienne.
 inline constexpr std::uint16_t kNapalmVulcanSkill = 400;
 inline constexpr std::uint16_t kSoulStrikeSkill = 13;
+// De même, Brandish Spear et Spiral Pierce naissent sur leur cible : le
+// balayage se montre par l'effet de Spear Stab, les lances par celui de Pierce,
+// tous deux portés par le héros.
+inline constexpr std::uint16_t kBrandishSpearSkill = 57;
+inline constexpr std::uint16_t kSpearStabSkill = 58;
+inline constexpr std::uint16_t kSpiralPierceSkill = 397;
+inline constexpr std::uint16_t kPierceSkill = 56;
+
+// Bash n'a pas d'effet de lancer dans le jeu, seulement l'étincelle de son
+// coup : le mode la pose sur le monstre frappé.
+inline constexpr std::uint16_t kBashSkill = 5;
+inline constexpr std::uint32_t kBashFallbackEffect = 1;
 
 // L'UNITÉ QU'UN SKILL DE ZONE POSE AU SOL dans le jeu : la zone du mode en
 // montre le visuel entretenu (`SkillLook::ground_effect_id`) tant qu'elle dure.

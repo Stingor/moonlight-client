@@ -497,6 +497,36 @@ tr: A meteor crushes the densest crowd and drives it back.
 fr: Une onde glacée part de vous et gèle tout ce qu'elle touche.
 tr: An icy wave spreads from you and freezes everything it touches.
 
+fr: Des coups de lance frappent le monstre à portée de bras.
+tr: Spear blows strike the monster within arm's reach.
+
+fr: Une onde de feu jaillit de vous et repousse la horde.
+tr: A wave of fire bursts from you and pushes back the horde.
+
+fr: Un coup de lance droit traverse la file des monstres.
+tr: A straight spear thrust pierces the line of monsters.
+
+fr: Une longue pique devant vous repousse les monstres au loin.
+tr: A long thrust in front of you drives monsters far back.
+
+fr: La lance balaie largement devant vous, là où vous marchez.
+tr: Your spear sweeps wide in front of you, where you walk.
+
+fr: Une lance lancée au loin frappe le monstre le plus proche.
+tr: A spear thrown far strikes the nearest monster.
+
+fr: Un coup furieux disperse la foule la plus dense à portée.
+tr: A furious blow scatters the densest crowd within reach.
+
+fr: Des coups écrasants s'abattent sur ce qui vous touche.
+tr: Crushing blows rain down on whatever touches you.
+
+fr: Des lances en spirale transpercent toute la file.
+tr: Spiralling spears pierce the whole line.
+
+fr: Un coup large brise les jambes des monstres et les fige.
+tr: A wide blow breaks the monsters' legs and holds them still.
+
 fr: Récupération de PV au fil du temps.
 tr: HP recovery over time.
 

@@ -569,37 +569,43 @@ constexpr std::array<std::uint16_t, 12> kMageCardPool{
     kSporeCardId,   kThiefBugCardId,  kGolemCardId,        kMasteringCardId,
     kEclipseCardId, kDragonFlyCardId, kVagabondWolfCardId, kBaphometCardId};
 
-constexpr std::array<ClassRule, 1> kClasses{{
-    {.class_id = kMageClassId,
-     .key = "mage",
-     .job_id = kMageJobId,
-     .weapon_item_id = kMageWeaponItemId,
-     .max_hp = kMageMaxHp,
-     .walk_ms_per_cell = kMageWalkMsPerCell,
-     .magnet_units = Cells(kMageMagnetCells),
-     .damage_pct_per_level = kMageDamagePctPerLevel,
-     .damage_pct_cap = kMageDamagePctCap,
-     .starter_skills = kMageStarterSkills,
-     .skill_pool = kMageSkillPool,
-     .card_pool = kMageCardPool,
-     .evolved_job_id = kWizardJobId},
-}};
+constexpr ClassRule kMage{.class_id = kMageClassId,
+                          .key = "mage",
+                          .job_id = kMageJobId,
+                          .weapon_item_id = kMageWeaponItemId,
+                          .max_hp = kMageMaxHp,
+                          .walk_ms_per_cell = kMageWalkMsPerCell,
+                          .magnet_units = Cells(kMageMagnetCells),
+                          .damage_pct_per_level = kMageDamagePctPerLevel,
+                          .damage_pct_cap = kMageDamagePctCap,
+                          .starter_skills = kMageStarterSkills,
+                          .skill_pool = kMageSkillPool,
+                          .card_pool = kMageCardPool,
+                          .evolved_job_id = kWizardJobId};
 
-constexpr std::size_t kSkillCount = kPoolSkills.size() + kShippedEvolvedSkillCount;
+constexpr std::size_t kKnightSkillCount = kKnightPoolSkillCount + kKnightEvolvedSkillCount;
+constexpr std::size_t kSkillCount =
+    kPoolSkills.size() + kShippedEvolvedSkillCount + kKnightSkillCount;
 
 }  // namespace
 
-std::span<const ClassRule> ShippedClasses() { return kClasses; }
+std::span<const ClassRule> ShippedClasses() {
+  // Le Magicien en tête : la partie classée et le défi prennent la première
+  // classe.
+  static const std::array<ClassRule, 2> kClasses{kMage, KnightClass()};
+  return kClasses;
+}
 
 std::span<const SurvivorsSkillRule> ShippedSkills() {
-  // Une table IMMUABLE, assemblée au premier appel : les skills de la réserve,
-  // puis les évolués, dans cet ordre.
+  // Une table IMMUABLE, assemblée au premier appel : la réserve du Magicien,
+  // ses évolués, puis les skills du Chevalier, dans cet ordre.
   static const std::array<SurvivorsSkillRule, kSkillCount> kSkills = [] {
     std::array<SurvivorsSkillRule, kSkillCount> skills{};
     const std::span<const SurvivorsSkillRule> evolved = ShippedEvolvedSkills();
-    std::copy(kPoolSkills.begin(), kPoolSkills.end(), skills.begin());
-    std::copy_n(evolved.begin(), std::min(evolved.size(), kShippedEvolvedSkillCount),
-                skills.begin() + static_cast<std::ptrdiff_t>(kPoolSkills.size()));
+    const std::span<const SurvivorsSkillRule> knight = KnightSkills();
+    auto out = std::copy(kPoolSkills.begin(), kPoolSkills.end(), skills.begin());
+    out = std::copy_n(evolved.begin(), std::min(evolved.size(), kShippedEvolvedSkillCount), out);
+    std::copy_n(knight.begin(), std::min(knight.size(), kKnightSkillCount), out);
     return skills;
   }();
   return kSkills;
