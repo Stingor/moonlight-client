@@ -65,6 +65,9 @@ struct SurvivorsContext {
   MapMusic* music = nullptr;
   ro::net::Connection* link = nullptr;
   const ro::sim::World* world = nullptr;
+  // Le compteur de dégâts : les coups de l'arène s'y comptent. Nul, ils n'y
+  // vont pas.
+  ro::sim::DamageMeter* damage_meter = nullptr;
   MinigameWindows* minigames = nullptr;
   // Les trophées : une partie finie y inscrit les siens.
   MinigameStage* minigame_stage = nullptr;

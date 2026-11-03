@@ -22,6 +22,7 @@
 #include "options/game_option_ids.h"
 #include "survivors/arena_card_cues.h"
 #include "survivors/arena_choice.h"
+#include "survivors/arena_meter.h"
 #include "survivors/survivors_book.h"
 #include "survivors/survivors_door.h"
 #include "survivors/survivors_file.h"
@@ -531,6 +532,17 @@ SurvivorsPainted SurvivorsMode::Frame(SurvivorsStage& stage, const SurvivorsCont
   }
   if (stage.owns_screen()) {
     views_.NoticeFinds(stage.news(), stage.presentation_ms());
+    if (stage.play() != nullptr && context.damage_meter != nullptr) {
+      const ro::vfs::MonsterList* monsters = context.tables.monsters;
+      RecordArenaBlows(
+          stage.news(), stage.play()->run().field(),
+          [monsters](std::uint16_t foe_id) {
+            const ro::vfs::MonsterListEntry* entry =
+                monsters != nullptr ? monsters->Find(foe_id) : nullptr;
+            return entry != nullptr ? entry->name : "#" + std::to_string(foe_id);
+          },
+          *context.damage_meter, context.now_ms);
+    }
     PlaySounds(stage.news(), context);
     FollowMusic(stage, context);
   }

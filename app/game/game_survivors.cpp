@@ -194,6 +194,7 @@ void Game::FrameSurvivors(std::uint32_t now_ms) {
       .music = &music_,
       .link = &link_,
       .world = &world_,
+      .damage_meter = &world_.damage_meter(),
       .minigames = &windows_.minigames,
       .minigame_stage = &pieces_.minigames,
       .ranking = &survivors_ranking_,
