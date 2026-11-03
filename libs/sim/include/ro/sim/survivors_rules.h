@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <optional>
 #include <span>
+#include <vector>
 
 #include "ro/core/error.h"
 #include "ro/sim/packed_position.h"
@@ -170,7 +171,13 @@ struct FoeRule {
   std::uint32_t exp = 0;
   FoeBehaviour behaviour;
   std::uint16_t card_item_id = 0;  // la carte qu'il peut lâcher ; 0 : aucune
+  // SON ARMURE : la part, en %, des dégâts reçus qu'il retranche, après
+  // l'élément. 0 : aucune.
+  std::int32_t armor_pct = 0;
 };
+// L'armure la plus forte qu'un monstre puisse porter : au-delà, un coup ne
+// le toucherait presque plus.
+inline constexpr std::int32_t kMostFoeArmorPct = 80;
 
 // En vigueur de from_ms jusqu'à la vague suivante.
 struct WaveRule {
@@ -203,6 +210,19 @@ struct ArenaRule {
   // classement ne se joue qu'en partie libre ; les règles en classent une au
   // moins.
   bool ranked = false;
+  // SON CONTENU PROPRE : ses vagues, et avec elles ses boss et ses
+  // événements. Sans vagues, l'arène joue ceux des règles, et ses boss et
+  // événements ne se lisent pas.
+  std::span<const WaveRule> waves;
+  std::span<const BossRule> bosses;
+  std::span<const EventRule> events;
+};
+// LE CONTENU QU'UNE PARTIE JOUE : les vagues, les boss et les événements de
+// son arène, ou ceux des règles.
+struct ArenaContent {
+  std::span<const WaveRule> waves;
+  std::span<const BossRule> bosses;
+  std::span<const EventRule> events;
 };
 struct ClassRule {
   std::uint16_t class_id = 0;
@@ -482,6 +502,13 @@ struct SurvivorsRules {
 [[nodiscard]] const PickupRule* FindPickup(const SurvivorsRules& rules, PickupKind kind);
 // Vrai si un boss est marqué final : sa chute clôt la partie en victoire.
 [[nodiscard]] bool HasFinalBoss(const SurvivorsRules& rules);
+[[nodiscard]] bool HasFinalBoss(std::span<const BossRule> bosses);
+// Le contenu que joue l'arène `arena` : le sien quand elle a des vagues,
+// sinon celui des règles.
+[[nodiscard]] ArenaContent ContentOf(const SurvivorsRules& rules, const ArenaRule& arena);
+// Le contenu des règles, puis celui de chaque arène qui a le sien : de quoi
+// parcourir toutes les espèces que les règles font naître.
+[[nodiscard]] std::vector<ArenaContent> AllContents(const SurvivorsRules& rules);
 // L'XP qui mène du niveau `level` au suivant, dans [1, 0xFFFFFFFF] : jamais 0,
 // pour qu'une boucle de montées finisse toujours. Sans segment applicable
 // (courbe vide, niveau 0), 0xFFFFFFFF : aucune montée.

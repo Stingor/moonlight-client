@@ -177,6 +177,7 @@ std::uint32_t HatchFoe(SurvivorsField& field, const FoeRule& rule, FieldPoint at
   foe.born_step = field.step;
   foe.touch_ready_step = field.step;
   foe.facing = HeadingOf(field.hero.position - at, 0);
+  foe.armor_pct = rule.armor_pct;
   foe.drift_heading = options.drift_heading;
   foe.elite = options.elite;
   field.foes.push_back(foe);
@@ -185,15 +186,17 @@ std::uint32_t HatchFoe(SurvivorsField& field, const FoeRule& rule, FieldPoint at
 
 void SpawnFoes(SurvivorsField& field) {
   const SurvivorsRules& rules = *field.rules;
+  const std::span<const WaveRule> waves = field.content.waves;
+  const std::span<const BossRule> bosses = field.content.bosses;
   const std::uint64_t elapsed_ms = std::uint64_t{field.step} * kSurvivorsStepMs;
 
-  if (!rules.waves.empty()) {
-    while (field.wave_index + 1 < rules.waves.size() &&
-           rules.waves[field.wave_index + 1].from_ms <= elapsed_ms) {
+  if (!waves.empty()) {
+    while (field.wave_index + 1 < waves.size() &&
+           waves[field.wave_index + 1].from_ms <= elapsed_ms) {
       ++field.wave_index;
     }
-    field.wave_index = std::min(field.wave_index, rules.waves.size() - 1);
-    const WaveRule& wave = rules.waves[field.wave_index];
+    field.wave_index = std::min(field.wave_index, waves.size() - 1);
+    const WaveRule& wave = waves[field.wave_index];
     const std::size_t most_foes = rules.caps.most_foes;
     bool hatching = true;
     // Le lot de la vague, à chaque intervalle, dans la limite du plafond. Un lot
@@ -228,9 +231,8 @@ void SpawnFoes(SurvivorsField& field) {
 
   // Un boss naît à son heure, hors plafond ; sans place ce pas, il réessaie au
   // suivant.
-  while (field.next_boss < rules.bosses.size() &&
-         rules.bosses[field.next_boss].at_ms <= elapsed_ms) {
-    const BossRule& boss = rules.bosses[field.next_boss];
+  while (field.next_boss < bosses.size() && bosses[field.next_boss].at_ms <= elapsed_ms) {
+    const BossRule& boss = bosses[field.next_boss];
     const FoeRule* rule = FindFoe(rules, boss.foe_id);
     if (rule == nullptr) {
       ++field.next_boss;

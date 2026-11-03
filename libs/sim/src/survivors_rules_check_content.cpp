@@ -301,16 +301,20 @@ core::Result<void> CheckFoeBehaviours(const SurvivorsRules& rules) {
   return {};
 }
 
-core::Result<void> CheckBossScripts(const SurvivorsRules& rules) {
-  const auto finals = std::count_if(rules.bosses.begin(), rules.bosses.end(),
-                                    [](const BossRule& boss) { return boss.final; });
+namespace {
+
+// Les scripts des boss d'un contenu.
+[[nodiscard]] core::Result<void> CheckContentBosses(const SurvivorsRules& rules,
+                                                    std::span<const BossRule> bosses) {
+  const auto finals =
+      std::count_if(bosses.begin(), bosses.end(), [](const BossRule& boss) { return boss.final; });
   if (finals > 1) return Refuse(std::to_string(finals) + " boss finals, au plus un");
-  for (std::size_t index = 0; index < rules.bosses.size(); ++index) {
-    const BossRule& boss = rules.bosses[index];
+  for (std::size_t index = 0; index < bosses.size(); ++index) {
+    const BossRule& boss = bosses[index];
     const std::string named =
         "boss " + std::to_string(boss.foe_id) + " à " + std::to_string(boss.at_ms) + " ms : ";
     // Sa chute clôt la partie : aucun boss ne vient après lui.
-    if (boss.final && index + 1 != rules.bosses.size()) {
+    if (boss.final && index + 1 != bosses.size()) {
       return Refuse(named + "boss final qui n'est pas le dernier");
     }
     if (boss.escort_count > 0 && FindFoe(rules, boss.escort_foe_id) == nullptr) {
@@ -334,11 +338,13 @@ core::Result<void> CheckBossScripts(const SurvivorsRules& rules) {
   return {};
 }
 
-core::Result<void> CheckEventsAndElites(const SurvivorsRules& rules) {
-  for (std::size_t index = 0; index < rules.events.size(); ++index) {
-    const EventRule& event = rules.events[index];
+// Les événements d'un contenu.
+[[nodiscard]] core::Result<void> CheckContentEvents(const SurvivorsRules& rules,
+                                                    std::span<const EventRule> events) {
+  for (std::size_t index = 0; index < events.size(); ++index) {
+    const EventRule& event = events[index];
     const std::string named = "événement à " + std::to_string(event.at_ms) + " ms : ";
-    if (index > 0 && event.at_ms < rules.events[index - 1].at_ms) {
+    if (index > 0 && event.at_ms < events[index - 1].at_ms) {
       return Refuse(named + "événements non triés");
     }
     if (FindFoe(rules, event.foe_id) == nullptr) {
@@ -351,6 +357,22 @@ core::Result<void> CheckEventsAndElites(const SurvivorsRules& rules) {
     if (auto checked = CheckMeasures<1>(named, {{{"rayon", event.radius_units}}}); !checked) {
       return checked;
     }
+  }
+  return {};
+}
+
+}  // namespace
+
+core::Result<void> CheckBossScripts(const SurvivorsRules& rules) {
+  for (const ArenaContent& content : AllContents(rules)) {
+    if (auto checked = CheckContentBosses(rules, content.bosses); !checked) return checked;
+  }
+  return {};
+}
+
+core::Result<void> CheckEventsAndElites(const SurvivorsRules& rules) {
+  for (const ArenaContent& content : AllContents(rules)) {
+    if (auto checked = CheckContentEvents(rules, content.events); !checked) return checked;
   }
   const EliteRule& elites = rules.elites;
   if (elites.interval_ms != 0 && elites.hp_pct == 0) {

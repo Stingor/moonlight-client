@@ -193,6 +193,13 @@ template <typename Rule, typename IdOf>
 
 [[nodiscard]] core::Result<void> CheckFoes(const SurvivorsRules& rules) {
   for (const FoeRule& foe : rules.foes) {
+    if (foe.armor_pct < 0 || foe.armor_pct > kMostFoeArmorPct) {
+      return Refuse("monstre " + std::to_string(foe.foe_id) + " : armure de " +
+                    std::to_string(foe.armor_pct) + " %, de 0 à " +
+                    std::to_string(kMostFoeArmorPct));
+    }
+  }
+  for (const FoeRule& foe : rules.foes) {
     const std::string named = "monstre " + std::to_string(foe.foe_id) + " : ";
     if (foe.hp <= 0) return Refuse(named + "PV " + std::to_string(foe.hp));
     if (foe.touch_damage != 0 && foe.touch_interval_ms == 0) {
@@ -202,15 +209,18 @@ template <typename Rule, typename IdOf>
   return {};
 }
 
-// Les vagues, leurs tirages pondérés, et les boss.
-[[nodiscard]] core::Result<void> CheckWaves(const SurvivorsRules& rules) {
-  if (rules.waves.empty() || rules.waves.front().from_ms != 0) {
+// Les vagues d'un contenu, leurs tirages pondérés, et ses boss.
+[[nodiscard]] core::Result<void> CheckContentWaves(const SurvivorsRules& rules,
+                                                   const ArenaContent& content) {
+  const std::span<const WaveRule> waves = content.waves;
+  const std::span<const BossRule> bosses = content.bosses;
+  if (waves.empty() || waves.front().from_ms != 0) {
     return Refuse("aucune vague en vigueur dès 0 ms");
   }
-  for (std::size_t index = 0; index < rules.waves.size(); ++index) {
-    const WaveRule& wave = rules.waves[index];
+  for (std::size_t index = 0; index < waves.size(); ++index) {
+    const WaveRule& wave = waves[index];
     const std::string named = "vague de " + std::to_string(wave.from_ms) + " ms : ";
-    if (index > 0 && wave.from_ms < rules.waves[index - 1].from_ms) {
+    if (index > 0 && wave.from_ms < waves[index - 1].from_ms) {
       return Refuse(named + "vagues non triées");
     }
     // Sans intervalle, un lot naîtrait à chaque pas.
@@ -233,14 +243,29 @@ template <typename Rule, typename IdOf>
       }
     }
   }
-  for (std::size_t index = 0; index < rules.bosses.size(); ++index) {
-    const BossRule& boss = rules.bosses[index];
-    if (index > 0 && boss.at_ms < rules.bosses[index - 1].at_ms) {
+  for (std::size_t index = 0; index < bosses.size(); ++index) {
+    const BossRule& boss = bosses[index];
+    if (index > 0 && boss.at_ms < bosses[index - 1].at_ms) {
       return Refuse("boss non triés à " + std::to_string(boss.at_ms) + " ms");
     }
     if (FindFoe(rules, boss.foe_id) == nullptr) {
       return Refuse("boss inconnu " + std::to_string(boss.foe_id));
     }
+  }
+  return {};
+}
+
+// Les vagues des règles et celles de chaque arène qui a les siennes ; une
+// arène sans vagues ne nomme ni boss ni événement, qui ne se liraient pas.
+[[nodiscard]] core::Result<void> CheckWaves(const SurvivorsRules& rules) {
+  for (const ArenaRule& arena : rules.arenas) {
+    if (arena.waves.empty() && (!arena.bosses.empty() || !arena.events.empty())) {
+      return Refuse("arène " + std::to_string(arena.arena_id) +
+                    " : des boss ou des événements sans vagues");
+    }
+  }
+  for (const ArenaContent& content : AllContents(rules)) {
+    if (core::Result<void> checked = CheckContentWaves(rules, content); !checked) return checked;
   }
   return {};
 }

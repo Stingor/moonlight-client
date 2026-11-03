@@ -130,6 +130,7 @@ add_library(ro_sim STATIC
     src/survivors_rules_bosses.cpp
     src/survivors_rules_check_content.cpp
     src/survivors_rules_check_terrain.cpp
+    src/survivors_rules_desert.cpp
     src/survivors_rules_events.cpp
     src/survivors_rules_foes.cpp
     src/survivors_rules_knight.cpp

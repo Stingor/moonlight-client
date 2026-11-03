@@ -305,9 +305,9 @@ void Hold(SurvivorsField& field, SurvivorsFoe& foe, SurvivorsBossTrack& track, s
 // que sur un boss touché depuis le passage précédent. Faux pour un boss parti
 // (mort, ou règle disparue) : son suivi s'efface.
 [[nodiscard]] bool RunBoss(SurvivorsField& field, SurvivorsBossTrack& track) {
-  const SurvivorsRules& rules = *field.rules;
-  if (track.rule_index >= rules.bosses.size()) return false;
-  const BossRule& boss = rules.bosses[track.rule_index];
+  const std::span<const BossRule> bosses = field.content.bosses;
+  if (track.rule_index >= bosses.size()) return false;
+  const BossRule& boss = bosses[track.rule_index];
   SurvivorsFoe* foe = FoeBySerial(field, track.serial);
   if (foe == nullptr) return false;
   foe->previous_position = foe->position;
@@ -340,9 +340,9 @@ void Hold(SurvivorsField& field, SurvivorsFoe& foe, SurvivorsBossTrack& track, s
 }  // namespace
 
 void TrackBoss(SurvivorsField& field, std::uint32_t serial, std::size_t rule_index) {
-  const SurvivorsRules& rules = *field.rules;
+  const std::span<const BossRule> bosses = field.content.bosses;
   const SurvivorsFoe* foe = FoeBySerial(field, serial);
-  if (foe == nullptr || rule_index >= rules.bosses.size() ||
+  if (foe == nullptr || rule_index >= bosses.size() ||
       rule_index > std::numeric_limits<std::uint16_t>::max()) {
     return;
   }
@@ -352,7 +352,7 @@ void TrackBoss(SurvivorsField& field, std::uint32_t serial, std::size_t rule_ind
                            .seen_hp = foe->hp,
                            .held_move = kNoBossMove,
                            .escorted = false};
-  const auto& moves = rules.bosses[rule_index].moves;
+  const auto& moves = bosses[rule_index].moves;
   for (std::size_t index = 0; index < std::min(moves.size(), kMostBossMoves); ++index) {
     track.ready_step[index] = Later(field.step, StepsOf(moves[index].first_ms));
   }
@@ -360,7 +360,7 @@ void TrackBoss(SurvivorsField& field, std::uint32_t serial, std::size_t rule_ind
 }
 
 bool IsFinalBoss(const SurvivorsField& field, std::uint32_t serial) {
-  const auto& bosses = field.rules->bosses;
+  const std::span<const BossRule> bosses = field.content.bosses;
   for (const SurvivorsBossTrack& track : field.boss_tracks) {
     if (track.serial == serial) {
       return track.rule_index < bosses.size() && bosses[track.rule_index].final;

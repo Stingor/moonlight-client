@@ -86,11 +86,18 @@ inline constexpr std::uint16_t kEclipseId = 1093;
 inline constexpr std::uint16_t kDragonFlyId = 1091;
 inline constexpr std::uint16_t kVagabondWolfId = 1092;
 inline constexpr std::uint16_t kBaphometId = 1039;
+// Ceux de la prairie que le désert fait naître aussi.
+inline constexpr std::uint16_t kDropsId = 1113;
+inline constexpr std::uint16_t kCondorId = 1009;
+inline constexpr std::uint16_t kGolemId = 1040;
+inline constexpr std::uint16_t kMummyId = 1041;
 
 inline constexpr std::uint32_t kMinuteMs = 60000;
 
-// La règle de terrain de la prairie, que nomme l'arène générée.
+// Les règles de terrain de la prairie et du désert, que nomment les arènes
+// générées.
 inline constexpr std::uint16_t kPlainsTerrainId = 1;
+inline constexpr std::uint16_t kDesertTerrainId = 2;
 
 // survivors_rules_mage.cpp : les classes, les skills et les cartes. Les skills
 // sont ceux de la réserve du Magicien, puis les évolués de
@@ -122,6 +129,13 @@ inline constexpr std::size_t kKnightEvolvedSkillCount = 3;
 [[nodiscard]] std::span<const ArenaRule> ShippedArenas();
 [[nodiscard]] std::span<const ExpSegment> ShippedExpCurve();
 [[nodiscard]] std::span<const ElementRow> ShippedElements();
+
+// survivors_rules_desert.cpp : les monstres propres au désert de Morroc, et
+// ses vagues, ses boss et ses événements. ShippedFoes les met après ceux de
+// la prairie ; l'arène du désert porte le contenu.
+inline constexpr std::size_t kDesertFoeCount = 23;
+[[nodiscard]] std::span<const FoeRule> DesertFoes();
+[[nodiscard]] ArenaContent DesertContent();
 
 // survivors_rules_bosses.cpp : les mini-boss, le boss final et leurs coups.
 [[nodiscard]] std::span<const BossRule> ShippedBosses();

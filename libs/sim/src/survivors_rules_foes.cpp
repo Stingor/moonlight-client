@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <array>
 #include <cstdint>
 #include <optional>
@@ -23,10 +24,8 @@ using enum SurvivorsElement;
 // ses PV, ses dégâts et son XP sont ceux du mode, pas ceux de RO.
 
 constexpr std::uint16_t kFabreId = 1007;
-constexpr std::uint16_t kDropsId = 1113;
 constexpr std::uint16_t kWillowId = 1010;
 constexpr std::uint16_t kRockerId = 1052;
-constexpr std::uint16_t kCondorId = 1009;
 constexpr std::uint16_t kSavageBabeId = 1167;
 constexpr std::uint16_t kPoporingId = 1031;
 constexpr std::uint16_t kSmokieId = 1056;
@@ -40,10 +39,8 @@ constexpr std::uint16_t kMantisId = 1139;
 constexpr std::uint16_t kOrcSkeletonId = 1152;
 constexpr std::uint16_t kArcherSkeletonId = 1016;
 constexpr std::uint16_t kMunakId = 1026;
-constexpr std::uint16_t kGolemId = 1040;
 constexpr std::uint16_t kBigfootId = 1060;
 constexpr std::uint16_t kHunterFlyId = 1035;
-constexpr std::uint16_t kMummyId = 1041;
 constexpr std::uint16_t kBathoryId = 1102;
 constexpr std::uint16_t kSoheeId = 1170;
 constexpr std::uint16_t kWhisperId = 1179;
@@ -133,9 +130,11 @@ constexpr FoeBehaviour kBossImmunities{
   return rule;
 }
 
+constexpr std::size_t kPlainsFoeCount = 45;
+
 // Common(Id, niveau, taille, élément, PV, ms par case, contact, ms, XP[, comportement]).
 // WithCard(…, carte) : un porteur de carte.
-constexpr std::array<FoeRule, 45> kFoes{{
+constexpr std::array<FoeRule, kPlainsFoeCount> kFoes{{
     Common(kLunaticId, 3, kSmall, kNeutral, 11, 200, 3, 1456, 1),
     Common(kFabreId, 2, kSmall, kEarth, 22, 400, 4, 1672, 1),
     WithCard(Common(kPoringId, 1, kMedium, kWater, 15, 400, 4, 1872, 1), kPoringCardId),
@@ -277,25 +276,6 @@ constexpr std::array<WaveRule, 18> kWaves{{
     Wave(kSilenceMs, kWave14Foes, kWave14Weights, 0, 1000, 0),
 }};
 
-// prt_fild08 : le départ est le centre de la carte, la case (200, 200),
-// praticable, dont la fenêtre de 40 × 40 l'est à 99 % (`roc-cli survivors
-// arena-openness`, ADR 0133) ; partie libre seulement, hors classement et sans
-// équilibrage propre (Q6). midgard_plains : le sol généré de la prairie, sans
-// bord, né au centre du monde, l'arène classée et celle du défi (ADR 0134).
-constexpr std::array<ArenaRule, 2> kArenas{{
-    {.arena_id = 1,
-     .key = "prt_fild08",
-     .map_name = "prt_fild08",
-     .start = std::nullopt,
-     .ranked = false},
-    {.arena_id = 2,
-     .key = "midgard_plains",
-     .map_name = "",
-     .start = std::nullopt,
-     .terrain_id = kPlainsTerrainId,
-     .ranked = true},
-}};
-
 constexpr std::array<ExpSegment, 3> kExpCurve{{
     {.from_level = 1, .base = 5, .per_level = 10},
     {.from_level = 20, .base = 220, .per_level = 40},
@@ -322,11 +302,55 @@ constexpr std::array<ElementRow, kSurvivorsElementCount> kElements{{
 
 }  // namespace
 
-std::span<const FoeRule> ShippedFoes() { return kFoes; }
+std::span<const FoeRule> ShippedFoes() {
+  // Une table IMMUABLE, assemblée au premier appel : la prairie, puis le désert.
+  static const std::array<FoeRule, kPlainsFoeCount + kDesertFoeCount> kAll = [] {
+    std::array<FoeRule, kPlainsFoeCount + kDesertFoeCount> all{};
+    const std::span<const FoeRule> desert = DesertFoes();
+    auto out = std::copy(kFoes.begin(), kFoes.end(), all.begin());
+    std::copy_n(desert.begin(), std::min(desert.size(), kDesertFoeCount), out);
+    return all;
+  }();
+  return kAll;
+}
 
 std::span<const WaveRule> ShippedWaves() { return kWaves; }
 
-std::span<const ArenaRule> ShippedArenas() { return kArenas; }
+// prt_fild08 : le départ est le centre de la carte, la case (200, 200),
+// praticable, dont la fenêtre de 40 × 40 l'est à 99 % (`roc-cli survivors
+// arena-openness`, ADR 0133) ; partie libre seulement, hors classement et sans
+// équilibrage propre (Q6). midgard_plains : le sol généré de la prairie, sans
+// bord, né au centre du monde, l'arène classée et celle du défi (ADR 0134).
+// morroc_desert : le sol généré du désert, avec son bestiaire, ses boss et ses
+// événements ; partie libre seulement (lot 12, Q2).
+std::span<const ArenaRule> ShippedArenas() {
+  static const std::array<ArenaRule, 3> kArenas = [] {
+    const ArenaContent desert = DesertContent();
+    return std::array<ArenaRule, 3>{{
+        {.arena_id = 1,
+         .key = "prt_fild08",
+         .map_name = "prt_fild08",
+         .start = std::nullopt,
+         .ranked = false},
+        {.arena_id = 2,
+         .key = "midgard_plains",
+         .map_name = "",
+         .start = std::nullopt,
+         .terrain_id = kPlainsTerrainId,
+         .ranked = true},
+        {.arena_id = 3,
+         .key = "morroc_desert",
+         .map_name = "",
+         .start = std::nullopt,
+         .terrain_id = kDesertTerrainId,
+         .ranked = false,
+         .waves = desert.waves,
+         .bosses = desert.bosses,
+         .events = desert.events},
+    }};
+  }();
+  return kArenas;
+}
 
 std::span<const ExpSegment> ShippedExpCurve() { return kExpCurve; }
 

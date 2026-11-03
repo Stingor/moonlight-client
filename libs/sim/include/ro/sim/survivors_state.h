@@ -86,6 +86,7 @@ struct SurvivorsFoe {
   // Par emplacement de skill : le pas où ce skill peut retoucher ce monstre.
   std::array<std::uint32_t, kMostSkillSlots> rehit_ready_step = {};
   std::uint8_t facing = 0;
+  std::int32_t armor_pct = 0;  // celle de sa règle, posée à sa naissance
   // Gelé tant que `step < freeze_until_step` : immobile, sans contact, et
   // d'élément de défense Water.
   std::uint32_t freeze_until_step = 0;

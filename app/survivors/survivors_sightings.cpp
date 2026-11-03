@@ -84,10 +84,10 @@ void NoteGround(SurvivorsCodexSeen& seen, const ro::sim::SurvivorsField& field,
 
 void NoteEvents(SurvivorsCodexSeen& seen, const ro::sim::SurvivorsField& field,
                 std::uint64_t presentation_ms) {
-  const ro::sim::SurvivorsRules& rules = *field.rules;
-  const std::size_t passed = std::min(field.next_event, rules.events.size());
+  const std::span<const ro::sim::EventRule> events = field.content.events;
+  const std::size_t passed = std::min(field.next_event, events.size());
   for (std::size_t index = 0; index < passed; ++index) {
-    seen.Add(CodexCategory::kEvents, CodexEventKey(rules.events[index]));
+    seen.Add(CodexCategory::kEvents, CodexEventKey(events[index]));
   }
   if (presentation_ms >= kArenaNightFallsMs) seen.Add(CodexCategory::kEvents, kCodexNightKey);
 }

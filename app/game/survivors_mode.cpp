@@ -287,8 +287,9 @@ bool SurvivorsMode::Mount(SurvivorsStage& stage, const SurvivorsContext& context
     const std::span<const std::uint16_t> starters = hero_class->starter_skills;
     skills.assign(starters.begin(), starters.end());
   }
+  const std::span<const ro::sim::WaveRule> waves = field.content.waves;
   const std::span<const std::uint16_t> species =
-      rules.waves.empty() ? std::span<const std::uint16_t>() : rules.waves.front().foe_ids;
+      waves.empty() ? std::span<const std::uint16_t>() : waves.front().foe_ids;
   arena_->Warm(species, skills,
                CellOfField(glm::vec2(static_cast<float>(field.hero.position.x),
                                      static_cast<float>(field.hero.position.y))),

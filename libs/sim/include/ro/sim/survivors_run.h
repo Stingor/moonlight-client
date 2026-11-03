@@ -109,6 +109,9 @@ inline constexpr std::uint32_t kFirstCardSerial = 0x80000000U;
 struct SurvivorsField {
   const SurvivorsRules* rules = nullptr;
   const ClassRule* hero_class = nullptr;
+  // Les vagues, les boss et les événements de l'arène (`ContentOf`), dans les
+  // règles eux aussi : `wave_index`, `next_boss` et `next_event` y comptent.
+  ArenaContent content;
   SurvivorsGround ground;
   SurvivorsStart start;
   std::uint32_t step = 0;

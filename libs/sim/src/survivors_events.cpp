@@ -166,8 +166,9 @@ struct SideLine {
 // espèce à tirer) ; faux sans place, et elle réessaie au pas suivant.
 [[nodiscard]] bool SpawnElite(SurvivorsField& field) {
   const SurvivorsRules& rules = *field.rules;
-  if (rules.waves.empty()) return true;
-  const WaveRule& wave = rules.waves[std::min(field.wave_index, rules.waves.size() - 1)];
+  const std::span<const WaveRule> waves = field.content.waves;
+  if (waves.empty()) return true;
+  const WaveRule& wave = waves[std::min(field.wave_index, waves.size() - 1)];
   if (wave.weights.size() != wave.foe_ids.size()) return true;
   const std::size_t pick = field.spawn_random.PickWeighted(wave.weights);
   if (pick >= wave.foe_ids.size()) return true;
@@ -195,9 +196,9 @@ void SpawnEvents(SurvivorsField& field) {
   if (field.rules == nullptr) return;
   const SurvivorsRules& rules = *field.rules;
   const std::uint64_t elapsed_ms = std::uint64_t{field.step} * kSurvivorsStepMs;
-  while (field.next_event < rules.events.size() &&
-         rules.events[field.next_event].at_ms <= elapsed_ms) {
-    const EventRule& event = rules.events[field.next_event];
+  const std::span<const EventRule> events = field.content.events;
+  while (field.next_event < events.size() && events[field.next_event].at_ms <= elapsed_ms) {
+    const EventRule& event = events[field.next_event];
     const std::size_t next_member = SpawnEvent(field, event, field.event_members_placed);
     if (next_member < event.count) {
       // next_member < count <= 255 : le compte tient dans l'octet.

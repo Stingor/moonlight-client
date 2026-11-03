@@ -189,9 +189,26 @@ const PickupRule* FindPickup(const SurvivorsRules& rules, PickupKind kind) {
   return found == rules.pickups.end() ? nullptr : &*found;
 }
 
-bool HasFinalBoss(const SurvivorsRules& rules) {
-  return std::any_of(rules.bosses.begin(), rules.bosses.end(),
-                     [](const BossRule& boss) { return boss.final; });
+bool HasFinalBoss(const SurvivorsRules& rules) { return HasFinalBoss(rules.bosses); }
+
+bool HasFinalBoss(std::span<const BossRule> bosses) {
+  return std::any_of(bosses.begin(), bosses.end(), [](const BossRule& boss) { return boss.final; });
+}
+
+ArenaContent ContentOf(const SurvivorsRules& rules, const ArenaRule& arena) {
+  if (!arena.waves.empty()) {
+    return ArenaContent{.waves = arena.waves, .bosses = arena.bosses, .events = arena.events};
+  }
+  return ArenaContent{.waves = rules.waves, .bosses = rules.bosses, .events = rules.events};
+}
+
+std::vector<ArenaContent> AllContents(const SurvivorsRules& rules) {
+  std::vector<ArenaContent> contents{
+      ArenaContent{.waves = rules.waves, .bosses = rules.bosses, .events = rules.events}};
+  for (const ArenaRule& arena : rules.arenas) {
+    if (!arena.waves.empty()) contents.push_back(ContentOf(rules, arena));
+  }
+  return contents;
 }
 
 std::uint32_t ExpToNext(const SurvivorsRules& rules, std::uint16_t level) {

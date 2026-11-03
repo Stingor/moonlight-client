@@ -19,7 +19,7 @@ namespace {
 
 using core::TrText;
 
-constexpr std::array<SurvivorsCodexPhraseRow, 73> kPhrases{{
+constexpr std::array<SurvivorsCodexPhraseRow, 103> kPhrases{{
     // ── Les monstres communs ──
     {"1063", TrText("Le premier venu : petit, rapide et fragile.")},                 // Lunatic
     {"1007", TrText("Une larve lente, qui vient en nombre dès le départ.")},         // Fabre
@@ -67,6 +67,28 @@ constexpr std::array<SurvivorsCodexPhraseRow, 73> kPhrases{{
     {"1192", TrText("Un spectre lourd parmi les derniers venus.")},                // Wraith
     {"1117", TrText("Un druide maudit, le plus robuste des communs.")},            // Evil Druid
     {"1101", TrText("Ne naît que des invocations de Baphomet.")},                  // Baphomet Jr.
+    // ── Les monstres du désert ──
+    {"1049", TrText("Un poussin du désert, le premier venu du sable.")},  // Picky
+    {"1107", TrText("Un louveteau du désert, rapide et fragile.")},       // Baby Desert Wolf
+    {"1047",
+     TrText("Un œuf qui ne bouge ni ne frappe : un mur vivant, posé en anneau.")},  // Peco Peco Egg
+    {"1097", TrText("Un œuf de fourmi, immobile, posé en anneau autour du héros.")},  // Ant Egg
+    {"1019", TrText("Un grand oiseau coureur, solide pour son rang.")},               // Peco Peco
+    {"1055", TrText("Un cactus en marche, lent mais coriace.")},                      // Muka
+    {"1127", TrText("S'enterre par moments : ni visé, ni touché, ni touchant.")},     // Hode
+    {"1001", TrText("Un scorpion vif qui arrive en essaim.")},                        // Scorpion
+    {"1106", TrText("Chasse en meute : quand l'un vient, les autres suivent.")},      // Desert Wolf
+    {"1095", TrText("Une fourmi ouvrière, que la reine appelle en nombre.")},         // Andre
+    {"1160", TrText("Une fourmi soldat, plus vive que l'ouvrière.")},                 // Piere
+    {"1105", TrText("La plus rapide des fourmis, qui vient en raid.")},               // Deniro
+    {"1165", TrText("Un homme de sable, solide au cœur du désert.")},                 // Sandman
+    {"1119", TrText("Un lézard à collerette, aux coups secs.")},                      // Frilldora
+    {"1140", TrText("Un prêtre du feu que rien ne repousse.")},                       // Marduk
+    {"1029", TrText("Une serpente des ruines ; le Pharaon l'appelle à la fin.")},     // Isis
+    {"1032", TrText("Un chien mort-vivant, qui annonce la nuit de la pyramide.")},    // Verit
+    {"1146", TrText("Chasse en meute dans le noir, et mord vite.")},                  // Matyr
+    {"1164", TrText("Un mort lent qui frappe dur.")},                                 // Requiem
+    {"1154", TrText("Un guerrier de feu, le plus robuste des communs du désert.")},   // Pasana
     // ── Les mini-boss et le boss ──
     {"1090", TrText("Le premier mini-boss : il appelle des Porings à la rescousse.")},  // Mastering
     {"1093", TrText("Un lapin qui bondit vers le héros, escorté de Lunatics.")},        // Eclipse
@@ -74,6 +96,12 @@ constexpr std::array<SurvivorsCodexPhraseRow, 73> kPhrases{{
     {"1092", TrText("Son hurlement presse le pas de ses loups.")},         // Vagabond Wolf
     {"1039", TrText("Le seigneur de l'arène : charge, invoque, fait trembler le sol. Sa chute est "
                     "la victoire.")},  // Baphomet
+    // ── Les mini-boss et le boss du désert ──
+    {"1159", TrText("Un poisson des sables qui charge après une annonce.")},       // Phreeoni
+    {"1147", TrText("La reine de la fourmilière : elle appelle ses ouvrières.")},  // Maya
+    {"1157",
+     TrText("Le seigneur du désert : charge, invoque, fait trembler le sable, et une armure "
+            "absorbe une part de chaque coup. Sa chute est la victoire.")},  // Pharaoh
     // ── Les plantes ──
     {"1078", TrText("Une plante qui lâche de la viande, pour reprendre des forces.")},  // Red Plant
     {"1081", TrText("Une plante qui lâche de l'or.")},                // Yellow Plant
@@ -109,6 +137,14 @@ constexpr std::array<SurvivorsCodexPhraseRow, 73> kPhrases{{
     {"swarm_1005", TrText("Une nuée de Familiars traverse la horde.")},
     {"raid_1122", TrText("Un raid de Goblins charge le héros.")},
     {"ring_1036", TrText("Des Ghouls referment un anneau autour du héros.")},
+    // ── Les événements du désert ──
+    {"swarm_1107", TrText("Une meute de louveteaux traverse le sable.")},
+    {"ring_1047", TrText("Des œufs de Peco Peco se posent en anneau et enferment le héros.")},
+    {"swarm_1001", TrText("Un essaim de Scorpions arrive d'un même côté.")},
+    {"ring_1097", TrText("Des œufs de fourmi se posent en anneau autour du héros.")},
+    {"raid_1105", TrText("Un raid de Deniros charge le héros.")},
+    {"raid_1106", TrText("Une meute de loups du désert charge le héros.")},
+    {"ring_1041", TrText("Des momies referment un anneau autour du héros.")},
     {"elites", TrText("Un monstre de la vague, bien plus robuste, qui lâche une Old Blue Box.")},
     {"night", TrText("Le ciel s'assombrit jusqu'à minuit, et les morts-vivants se lèvent.")},
 }};

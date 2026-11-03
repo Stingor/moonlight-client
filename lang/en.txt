@@ -21413,6 +21413,93 @@ tr: Leaves a harmful poison puddle when it dies.
 fr: Le ciel s'assombrit jusqu'à minuit, et les morts-vivants se lèvent.
 tr: The sky darkens until midnight, and the undead rise.
 
+fr: Un poussin du désert, le premier venu du sable.
+tr: A desert chick, the first to come out of the sand.
+
+fr: Un louveteau du désert, rapide et fragile.
+tr: A desert wolf cub, quick and frail.
+
+fr: Un œuf qui ne bouge ni ne frappe : un mur vivant, posé en anneau.
+tr: An egg that neither moves nor strikes: a living wall, set in a ring.
+
+fr: Un œuf de fourmi, immobile, posé en anneau autour du héros.
+tr: An ant egg, motionless, set in a ring around the hero.
+
+fr: Un grand oiseau coureur, solide pour son rang.
+tr: A large running bird, sturdy for its rank.
+
+fr: Un cactus en marche, lent mais coriace.
+tr: A walking cactus, slow but tough.
+
+fr: S'enterre par moments : ni visé, ni touché, ni touchant.
+tr: Burrows now and then: neither targeted, nor hit, nor hitting.
+
+fr: Un scorpion vif qui arrive en essaim.
+tr: A quick scorpion that comes in swarms.
+
+fr: Une fourmi ouvrière, que la reine appelle en nombre.
+tr: A worker ant, which the queen calls in numbers.
+
+fr: Une fourmi soldat, plus vive que l'ouvrière.
+tr: A soldier ant, quicker than the worker.
+
+fr: La plus rapide des fourmis, qui vient en raid.
+tr: The fastest of the ants, which comes in raids.
+
+fr: Un homme de sable, solide au cœur du désert.
+tr: A man of sand, sturdy in the heart of the desert.
+
+fr: Un lézard à collerette, aux coups secs.
+tr: A frilled lizard that strikes sharply.
+
+fr: Un prêtre du feu que rien ne repousse.
+tr: A fire priest that nothing pushes back.
+
+fr: Une serpente des ruines ; le Pharaon l'appelle à la fin.
+tr: A serpent of the ruins; the Pharaoh calls her at the end.
+
+fr: Un chien mort-vivant, qui annonce la nuit de la pyramide.
+tr: An undead dog, heralding the night of the pyramid.
+
+fr: Chasse en meute dans le noir, et mord vite.
+tr: Hunts in packs in the dark, and bites fast.
+
+fr: Un mort lent qui frappe dur.
+tr: A slow dead man who strikes hard.
+
+fr: Un guerrier de feu, le plus robuste des communs du désert.
+tr: A fire warrior, the sturdiest of the desert's commons.
+
+fr: Un poisson des sables qui charge après une annonce.
+tr: A sand fish that charges after a warning.
+
+fr: La reine de la fourmilière : elle appelle ses ouvrières.
+tr: The queen of the anthill: she calls her workers.
+
+fr: Le seigneur du désert : charge, invoque, fait trembler le sable, et une armure absorbe une part de chaque coup. Sa chute est la victoire.
+tr: The lord of the desert: he charges, summons, shakes the sand, and armour absorbs part of every blow. His fall is victory.
+
+fr: Une meute de louveteaux traverse le sable.
+tr: A pack of wolf cubs crosses the sand.
+
+fr: Des œufs de Peco Peco se posent en anneau et enferment le héros.
+tr: Peco Peco eggs settle in a ring and close in on the hero.
+
+fr: Un essaim de Scorpions arrive d'un même côté.
+tr: A swarm of Scorpions arrives from one side.
+
+fr: Des œufs de fourmi se posent en anneau autour du héros.
+tr: Ant eggs settle in a ring around the hero.
+
+fr: Un raid de Deniros charge le héros.
+tr: A raid of Deniros charges the hero.
+
+fr: Une meute de loups du désert charge le héros.
+tr: A pack of desert wolves charges the hero.
+
+fr: Des momies referment un anneau autour du héros.
+tr: Mummies close a ring around the hero.
+
 fr: Le héros marche plus vite un moment.
 tr: The hero walks faster for a while.
 
@@ -21781,6 +21868,9 @@ tr: Arena: %s
 
 fr: Prairie de Midgard
 tr: Midgard Plains
+
+fr: Désert de Sograt
+tr: Sograt Desert
 
 fr: Celui du système
 tr: System default

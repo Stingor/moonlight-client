@@ -190,22 +190,20 @@ struct TimedEntry {
   SurvivorsCodexEntry entry;
 };
 
-}  // namespace
-
-FoeArrival FoeArrivalOf(const ro::sim::SurvivorsRules& rules, std::uint16_t foe_id) {
-  FoeArrival arrival;
+// Les sources d'un contenu qui font naître `foe_id`.
+void NoteArrivals(const ro::sim::ArenaContent& content, std::uint16_t foe_id, FoeArrival& arrival) {
   constexpr std::uint16_t kNoBringer = 0;
-  for (const ro::sim::WaveRule& wave : rules.waves) {
+  for (const ro::sim::WaveRule& wave : content.waves) {
     if (WaveBrings(wave, foe_id)) {
       NoteSource(arrival.sources, SurvivorsCodexSourceKind::kWave, wave.from_ms, kNoBringer);
     }
   }
-  for (const ro::sim::EventRule& event : rules.events) {
+  for (const ro::sim::EventRule& event : content.events) {
     if (event.foe_id == foe_id && event.count != 0) {
       NoteSource(arrival.sources, SurvivorsCodexSourceKind::kEvent, event.at_ms, kNoBringer);
     }
   }
-  for (const ro::sim::BossRule& boss : rules.bosses) {
+  for (const ro::sim::BossRule& boss : content.bosses) {
     if (boss.escort_foe_id == foe_id && boss.escort_count != 0) {
       NoteSource(arrival.sources, SurvivorsCodexSourceKind::kEscort, boss.at_ms, boss.foe_id);
     }
@@ -215,6 +213,16 @@ FoeArrival FoeArrivalOf(const ro::sim::SurvivorsRules& rules, std::uint16_t foe_
                    boss.foe_id);
       }
     }
+  }
+}
+
+}  // namespace
+
+FoeArrival FoeArrivalOf(const ro::sim::SurvivorsRules& rules, std::uint16_t foe_id) {
+  FoeArrival arrival;
+  // Les arènes qui ont leur contenu font naître leurs espèces à elles.
+  for (const ro::sim::ArenaContent& content : ro::sim::AllContents(rules)) {
+    NoteArrivals(content, foe_id, arrival);
   }
   std::ranges::stable_sort(arrival.sources, {}, &SurvivorsCodexSource::at_ms);
   if (!arrival.sources.empty()) arrival.arrives_ms = arrival.sources.front().at_ms;
@@ -262,29 +270,32 @@ void CodexFoesOf(const ro::sim::SurvivorsRules& rules, const SurvivorsCodexSeen&
 void CodexBossesOf(const ro::sim::SurvivorsRules& rules, const SurvivorsCodexSeen& seen,
                    SurvivorsCodexRowsHeld& held) {
   std::vector<TimedEntry> rows;
-  for (const ro::sim::BossRule& boss : rules.bosses) {
-    const ro::sim::FoeRule* foe = ro::sim::FindFoe(rules, boss.foe_id);
-    if (foe == nullptr) continue;
-    SurvivorsCodexEntry entry = FoeEntryOf(rules, seen, *foe, &boss, held);
-    entry.arrives = true;
-    entry.arrives_ms = boss.at_ms;
-    entry.at_ms = boss.at_ms;
-    entry.final = boss.final;
-    entry.escort = FoeLink(boss.escort_foe_id);
-    entry.escort_count = boss.escort_count;
-    entry.moves = held.Hold(MovesOf(boss));
-    rows.push_back(TimedEntry{.at_ms = boss.at_ms, .entry = entry});
-  }
-  for (const ro::sim::EventRule& event : rules.events) {
-    const std::string key = CodexEventKey(event);
-    SurvivorsCodexEntry entry{.sheet = SurvivorsCodexSheet::kEvent,
-                              .seen = seen.Has(CodexCategory::kEvents, key),
-                              .key = held.HoldKey(key)};
-    entry.at_ms = event.at_ms;
-    entry.event_kind = static_cast<ro::ui::SurvivorsCodexEventKind>(event.kind);
-    entry.event_foe = FoeLink(event.foe_id);
-    entry.event_count = event.count;
-    rows.push_back(TimedEntry{.at_ms = event.at_ms, .entry = entry});
+  // Les boss et les événements de chaque contenu, celui des règles d'abord.
+  for (const ro::sim::ArenaContent& content : ro::sim::AllContents(rules)) {
+    for (const ro::sim::BossRule& boss : content.bosses) {
+      const ro::sim::FoeRule* foe = ro::sim::FindFoe(rules, boss.foe_id);
+      if (foe == nullptr) continue;
+      SurvivorsCodexEntry entry = FoeEntryOf(rules, seen, *foe, &boss, held);
+      entry.arrives = true;
+      entry.arrives_ms = boss.at_ms;
+      entry.at_ms = boss.at_ms;
+      entry.final = boss.final;
+      entry.escort = FoeLink(boss.escort_foe_id);
+      entry.escort_count = boss.escort_count;
+      entry.moves = held.Hold(MovesOf(boss));
+      rows.push_back(TimedEntry{.at_ms = boss.at_ms, .entry = entry});
+    }
+    for (const ro::sim::EventRule& event : content.events) {
+      const std::string key = CodexEventKey(event);
+      SurvivorsCodexEntry entry{.sheet = SurvivorsCodexSheet::kEvent,
+                                .seen = seen.Has(CodexCategory::kEvents, key),
+                                .key = held.HoldKey(key)};
+      entry.at_ms = event.at_ms;
+      entry.event_kind = static_cast<ro::ui::SurvivorsCodexEventKind>(event.kind);
+      entry.event_foe = FoeLink(event.foe_id);
+      entry.event_count = event.count;
+      rows.push_back(TimedEntry{.at_ms = event.at_ms, .entry = entry});
+    }
   }
   const ro::sim::EliteRule& elites = rules.elites;
   if (elites.interval_ms != 0) {

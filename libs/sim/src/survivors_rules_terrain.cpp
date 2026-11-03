@@ -59,7 +59,37 @@ constexpr std::array<TerrainPieceRule, 7> kPlainsPieces{{
 // Une clairière de 12 cases autour du départ, un repère par carré de 5 × 5
 // morceaux. Un carrefour tous les trois morceaux, des chemins de quatre cases
 // de large qui s'écartent de sept cases au plus de leur droite.
-constexpr std::array<TerrainRule, 1> kTerrains{{
+// ── LE DÉSERT DE MORROC : ses pièces ───────────────────────────────────────
+
+// Un palmier seul : son tronc bloque un carré de 2 × 2 cases.
+constexpr std::array<std::string_view, 2> kPalm = {"##", "##"};
+// Un bouquet : trois palmiers en L.
+constexpr std::array<std::string_view, 4> kPalmGrove = {"##..", "##..", "####", "####"};
+// Un cactus : son disque de cinq cases, sous tous ses angles.
+constexpr std::array<std::string_view, 5> kCactus = {".###.", "#####", "#####", "#####", ".###."};
+// Des ossements, franchissables : leur case, et celles qu'ils effleurent.
+constexpr std::array<std::string_view, 3> kBones = {".#.", "###", ".#."};
+// Un pilier de ruine du désert, à 0,6 de sa taille : son fût de quatre cases,
+// et celles qu'il effleure.
+constexpr std::array<std::string_view, 6> kRuinPillar = {"..##..", ".####.", "######",
+                                                         "######", ".####.", "..##.."};
+// Un pan des ruines du désert, le repère : un carré de quatre cases.
+constexpr std::array<std::string_view, 4> kDesertRuins = {"####", "####", "####", "####"};
+
+constexpr std::array<TerrainPieceRule, 6> kDesertPieces{{
+    {.piece_id = 1, .key = "palm", .footprint = kPalm, .weight = 8},
+    {.piece_id = 2, .key = "palm_grove", .footprint = kPalmGrove, .weight = 5},
+    {.piece_id = 3, .key = "cactus", .footprint = kCactus, .weight = 6},
+    {.piece_id = 4, .key = "bones", .footprint = kBones, .weight = 8, .walkable = true},
+    {.piece_id = 5, .key = "ruin_pillar", .footprint = kRuinPillar, .weight = 3},
+    {.piece_id = 6,
+     .key = "desert_ruins",
+     .footprint = kDesertRuins,
+     .weight = 1,
+     .landmark = true},
+}};
+
+constexpr std::array<TerrainRule, 2> kTerrains{{
     {.terrain_id = kPlainsTerrainId,
      .key = "midgard_plains",
      .pieces = kPlainsPieces,
@@ -71,6 +101,16 @@ constexpr std::array<TerrainRule, 1> kTerrains{{
      .path_period_chunks = 3,
      .path_width_cells = 4,
      .path_wiggle_cells = 7},
+    // Le désert est clairsemé : de 120 à 350 ‰, une clairière de 12 cases, un
+    // repère par carré de 6 × 6 morceaux, et aucun chemin.
+    {.terrain_id = kDesertTerrainId,
+     .key = "morroc_desert",
+     .pieces = kDesertPieces,
+     .density_min_per_mille = 120,
+     .density_max_per_mille = 350,
+     .density_period_chunks = 3,
+     .clearing_cells = 12,
+     .landmark_period_chunks = 6},
 }};
 
 }  // namespace

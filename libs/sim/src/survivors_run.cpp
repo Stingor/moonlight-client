@@ -74,11 +74,11 @@ void CloseStep(SurvivorsField& field) {
   field.tally.survived_steps = field.step;
   RefreshTally(field);
   if (field.phase != SurvivorsPhase::kRunning) return;
-  // Sans boss final dans les règles, la partie se gagne en tenant run_ms.
+  // Sans boss final dans son contenu, la partie se gagne en tenant run_ms.
   // Avec, elle continue jusqu'à sa chute (kVictory), et finit au plus tard en
   // kSurvived après le dépassement.
   std::uint64_t end_ms = field.rules->run_ms;
-  if (HasFinalBoss(*field.rules)) end_ms += field.rules->tuning.final_overtime_ms;
+  if (HasFinalBoss(field.content.bosses)) end_ms += field.rules->tuning.final_overtime_ms;
   if (std::uint64_t{field.step} * kSurvivorsStepMs >= end_ms) {
     field.phase = SurvivorsPhase::kOver;
     field.tally.outcome = SurvivorsOutcome::kSurvived;
@@ -178,6 +178,7 @@ core::Result<SurvivorsRun> SurvivorsRun::Start(const SurvivorsRules& rules, Surv
   SurvivorsField field;
   field.rules = &rules;
   field.hero_class = hero_class;
+  field.content = ContentOf(rules, *arena_rule);
   field.start = start;
   if (ground.bounded()) {
     field.foe_grid.Reset(ground.width(), ground.height());

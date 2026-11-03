@@ -155,7 +155,84 @@ constexpr std::array<SeedLook, 6> kPlainsSeeds{{
     {.model = "나무잡초꽃\\덤불06.rsm", .scale = 0.8F, .weight = 4},
 }};
 
-constexpr std::array<BiomeLook, 1> kBiomes{{
+// ── LE DÉSERT DE MORROC ─────────────────────────────────────────────────────
+// Les modèles des champs de Sograt (moc_fild01) : palmiers, cactus,
+// ossements, piliers et pans de ruines du désert. Les emprises sont celles de
+// `survivors_rules_terrain.cpp` ; un palmier se pose au milieu du carré de
+// 2 × 2 cases que bloque son tronc, comme un arbre de la prairie.
+constexpr std::array<GroundModelChoice, 2> kPalms{{
+    {.model = "나무잡초꽃\\야자수01.rsm", .scale = 1.0F, .weight = 1, .shade_cells = 3.0F},
+    {.model = "나무잡초꽃\\야자수02.rsm", .scale = 1.0F, .weight = 1, .shade_cells = 3.0F},
+}};
+constexpr std::array<GroundModelChoice, 3> kCacti{{
+    {.model = "나무잡초꽃\\선인장01.rsm", .scale = 1.0F, .weight = 1, .shade_cells = 0.8F},
+    {.model = "나무잡초꽃\\선인장02.rsm", .scale = 1.0F, .weight = 1, .shade_cells = 0.8F},
+    {.model = "나무잡초꽃\\선인장03.rsm", .scale = 1.0F, .weight = 1, .shade_cells = 0.8F},
+}};
+constexpr std::array<GroundModelChoice, 1> kBonesModel{{
+    {.model = "외부소품\\뼈다구04.rsm", .scale = 1.0F, .weight = 1, .shade_cells = 1.0F},
+}};
+constexpr std::array<GroundModelChoice, 3> kDesertPillars{{
+    {.model = "외부소품\\사막유적기둥01.rsm", .scale = 0.6F, .weight = 2, .shade_cells = 0.8F},
+    {.model = "외부소품\\사막유적기둥03.rsm", .scale = 0.6F, .weight = 1, .shade_cells = 0.8F},
+    {.model = "외부소품\\사막유적기둥04.rsm", .scale = 0.6F, .weight = 1, .shade_cells = 0.8F},
+}};
+constexpr std::array<GroundModelChoice, 1> kDesertWall{{
+    {.model = "외부소품\\사막유적02.rsm", .scale = 1.0F, .weight = 1, .shade_cells = 2.0F},
+}};
+
+constexpr std::array<PieceModelSlot, 1> kPalmSlots{
+    {{.east_cells = 1.0F, .north_cells = 1.0F, .models = kPalms}}};
+// Le bouquet en L : un palmier sur chacun de ses trois carrés de 2 × 2.
+constexpr std::array<PieceModelSlot, 3> kPalmGroveSlots{{
+    {.east_cells = 1.0F, .north_cells = 3.0F, .models = kPalms},
+    {.east_cells = 1.0F, .north_cells = 1.0F, .models = kPalms},
+    {.east_cells = 3.0F, .north_cells = 1.0F, .models = kPalms},
+}};
+constexpr std::array<PieceModelSlot, 1> kCactusSlots{
+    {{.east_cells = 2.5F, .north_cells = 2.5F, .models = kCacti}}};
+constexpr std::array<PieceModelSlot, 1> kBonesSlots{
+    {{.east_cells = 1.5F, .north_cells = 1.5F, .models = kBonesModel}}};
+constexpr std::array<PieceModelSlot, 1> kRuinPillarSlots{
+    {{.east_cells = 3.0F, .north_cells = 3.0F, .models = kDesertPillars}}};
+// Le repère : un pan des ruines du désert, au milieu de son carré de 4 × 4.
+constexpr std::array<PieceModelSlot, 1> kDesertRuinsSlots{
+    {{.east_cells = 2.0F, .north_cells = 2.0F, .models = kDesertWall, .any_yaw = false}}};
+
+constexpr std::array<PieceLook, 6> kDesertPieces{{
+    {.key = "palm", .slots = kPalmSlots},
+    {.key = "palm_grove", .slots = kPalmGroveSlots},
+    {.key = "cactus", .slots = kCactusSlots},
+    {.key = "bones", .slots = kBonesSlots},
+    {.key = "ruin_pillar", .slots = kRuinPillarSlots},
+    {.key = "desert_ruins", .slots = kDesertRuinsSlots},
+}};
+
+// Le sable plein de Sograt, `moc_맨땅08`, le seul de la série qui se raccorde à
+// lui-même : les autres sont des bords de rocher ou de sable clair, dessinés
+// pour leurs voisins, et quadrillent le sol posés seuls ; la tache claire de
+// `moc_맨땅06` y paraît en carré, son sable n'ayant pas la teinte de `08`.
+// Éparses, un rocher et les deux fossiles, tous trois sur le même sable. Le
+// désert n'a ni taches sous ses pièces ni chemins : leurs carreaux sont le
+// sable lui-même.
+constexpr std::array<GroundTextureLook, 7> kDesertTextures{{
+    {.texture = "필드바닥\\moc_맨땅08.bmp"},
+    {.texture = "필드바닥\\moc_맨땅04.bmp", .role = GroundTextureRole::kScatter},
+    {.texture = "필드바닥\\moc_화석01.bmp", .role = GroundTextureRole::kScatter, .weight = 2},
+    {.texture = "필드바닥\\moc_화석02.bmp", .role = GroundTextureRole::kScatter},
+    {.texture = "필드바닥\\moc_맨땅08.bmp", .role = GroundTextureRole::kPathFull},
+    {.texture = "필드바닥\\moc_맨땅08.bmp", .role = GroundTextureRole::kPathEdge},
+    {.texture = "필드바닥\\moc_맨땅08.bmp", .role = GroundTextureRole::kPathOuter},
+}};
+
+// Le semis : de petits cactus et quelques os épars.
+constexpr float kSmallCactusScale = 0.5F;
+constexpr std::array<SeedLook, 2> kDesertSeeds{{
+    {.model = "나무잡초꽃\\선인장03.rsm", .scale = kSmallCactusScale, .weight = 3},
+    {.model = "외부소품\\뼈다구04.rsm", .scale = kSmallCactusScale, .weight = 1},
+}};
+
+constexpr std::array<BiomeLook, 2> kBiomes{{
     {.terrain_key = "midgard_plains",
      .reference_map = "prt_fild08",
      .display_name = ro::core::TrText("Prairie de Midgard"),
@@ -169,6 +246,17 @@ constexpr std::array<BiomeLook, 1> kBiomes{{
      .verge_per_mille = 120,
      .patch_per_mille = 800,
      .scatter_per_mille = 40},
+    {.terrain_key = "morroc_desert",
+     .reference_map = "moc_fild01",
+     .display_name = ro::core::TrText("Désert de Sograt"),
+     .sign_background = "field_s2",
+     .field_track = "bgm\\24.mp3",
+     .textures = kDesertTextures,
+     .pieces = kDesertPieces,
+     .seeds = kDesertSeeds,
+     .seeds_per_chunk = 6,
+     .patch_per_mille = 0,
+     .scatter_per_mille = 20},
 }};
 
 }  // namespace

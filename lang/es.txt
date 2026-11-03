@@ -21413,6 +21413,93 @@ tr: Al morir deja un charco de veneno que hiere.
 fr: Le ciel s'assombrit jusqu'à minuit, et les morts-vivants se lèvent.
 tr: El cielo se oscurece hasta medianoche, y los no muertos se alzan.
 
+fr: Un poussin du désert, le premier venu du sable.
+tr: Un polluelo del desierto, el primero en salir de la arena.
+
+fr: Un louveteau du désert, rapide et fragile.
+tr: Un lobezno del desierto, rápido y frágil.
+
+fr: Un œuf qui ne bouge ni ne frappe : un mur vivant, posé en anneau.
+tr: Un huevo que ni se mueve ni golpea: un muro vivo, puesto en anillo.
+
+fr: Un œuf de fourmi, immobile, posé en anneau autour du héros.
+tr: Un huevo de hormiga, inmóvil, puesto en anillo alrededor del héroe.
+
+fr: Un grand oiseau coureur, solide pour son rang.
+tr: Una gran ave corredora, robusta para su rango.
+
+fr: Un cactus en marche, lent mais coriace.
+tr: Un cactus andante, lento pero duro.
+
+fr: S'enterre par moments : ni visé, ni touché, ni touchant.
+tr: Se entierra a ratos: ni apuntado, ni golpeado, ni golpea.
+
+fr: Un scorpion vif qui arrive en essaim.
+tr: Un escorpión veloz que llega en enjambre.
+
+fr: Une fourmi ouvrière, que la reine appelle en nombre.
+tr: Una hormiga obrera, que la reina llama en número.
+
+fr: Une fourmi soldat, plus vive que l'ouvrière.
+tr: Una hormiga soldado, más viva que la obrera.
+
+fr: La plus rapide des fourmis, qui vient en raid.
+tr: La más rápida de las hormigas, que llega en incursión.
+
+fr: Un homme de sable, solide au cœur du désert.
+tr: Un hombre de arena, robusto en el corazón del desierto.
+
+fr: Un lézard à collerette, aux coups secs.
+tr: Un lagarto de gorguera, de golpes secos.
+
+fr: Un prêtre du feu que rien ne repousse.
+tr: Un sacerdote del fuego al que nada hace retroceder.
+
+fr: Une serpente des ruines ; le Pharaon l'appelle à la fin.
+tr: Una serpiente de las ruinas; el Faraón la llama al final.
+
+fr: Un chien mort-vivant, qui annonce la nuit de la pyramide.
+tr: Un perro no muerto, que anuncia la noche de la pirámide.
+
+fr: Chasse en meute dans le noir, et mord vite.
+tr: Caza en manada en la oscuridad, y muerde rápido.
+
+fr: Un mort lent qui frappe dur.
+tr: Un muerto lento que golpea fuerte.
+
+fr: Un guerrier de feu, le plus robuste des communs du désert.
+tr: Un guerrero de fuego, el más robusto de los comunes del desierto.
+
+fr: Un poisson des sables qui charge après une annonce.
+tr: Un pez de las arenas que embiste tras un aviso.
+
+fr: La reine de la fourmilière : elle appelle ses ouvrières.
+tr: La reina del hormiguero: llama a sus obreras.
+
+fr: Le seigneur du désert : charge, invoque, fait trembler le sable, et une armure absorbe une part de chaque coup. Sa chute est la victoire.
+tr: El señor del desierto: embiste, invoca, hace temblar la arena, y una armadura absorbe parte de cada golpe. Su caída es la victoria.
+
+fr: Une meute de louveteaux traverse le sable.
+tr: Una manada de lobeznos cruza la arena.
+
+fr: Des œufs de Peco Peco se posent en anneau et enferment le héros.
+tr: Huevos de Peco Peco se posan en anillo y encierran al héroe.
+
+fr: Un essaim de Scorpions arrive d'un même côté.
+tr: Un enjambre de Escorpiones llega por un mismo lado.
+
+fr: Des œufs de fourmi se posent en anneau autour du héros.
+tr: Huevos de hormiga se posan en anillo alrededor del héroe.
+
+fr: Un raid de Deniros charge le héros.
+tr: Una incursión de Deniros embiste al héroe.
+
+fr: Une meute de loups du désert charge le héros.
+tr: Una manada de lobos del desierto embiste al héroe.
+
+fr: Des momies referment un anneau autour du héros.
+tr: Momias cierran un anillo alrededor del héroe.
+
 fr: Le héros marche plus vite un moment.
 tr: El héroe camina más rápido durante un rato.
 
@@ -21781,6 +21868,9 @@ tr: Arena: %s
 
 fr: Prairie de Midgard
 tr: Pradera de Midgard
+
+fr: Désert de Sograt
+tr: Desierto de Sograt
 
 fr: Celui du système
 tr: El del sistema

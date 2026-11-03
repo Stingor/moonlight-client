@@ -403,9 +403,13 @@ SurvivorsDamage DamageAgainst(const SurvivorsField& field, std::int32_t base,
   // Ramené à l'int32 avant l'élément : le produit reste loin des 64 bits.
   std::int64_t amount =
       std::int64_t{ScaledUnits(std::max(base, 0), bonus_pct)} * efficiency_pct / kPercent;
-  // Un maudit prend sa part de plus, après l'élément.
+  // Un maudit prend sa part de plus, après l'élément ; une armure retranche
+  // la sienne ensuite.
   if (foe.curse_until_step > field.step) {
     amount = amount * (kPercent + std::max(field.rules->tuning.curse_hurt_pct, 0)) / kPercent;
+  }
+  if (foe.armor_pct > 0) {
+    amount = amount * (kPercent - std::min(foe.armor_pct, kMostFoeArmorPct)) / kPercent;
   }
   if (efficiency_pct > 0) amount = std::max<std::int64_t>(amount, 1);
   return SurvivorsDamage{.amount = ClampedUnits(amount), .efficiency_pct = efficiency_pct};
