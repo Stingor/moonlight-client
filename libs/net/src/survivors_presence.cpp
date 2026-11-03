@@ -5,9 +5,17 @@
 
 #include "ro/core/byte_reader.h"
 #include "ro/core/byte_writer.h"
+#include "ro/proto/map_packets.h"
 
 namespace ro::net {
 namespace {
+
+// Le contrat de l'en-tête est celui des structures que `packetgen` engendre des
+// en-têtes du serveur : un écart arrête la bâtisse.
+static_assert(kSurvivorsPresenceAskOpcode == proto::CzMoonlightSurvivorsPresence::kOpcode);
+static_assert(kSurvivorsPresenceOpcode == proto::ZcMoonlightSurvivorsPresence::kOpcode);
+static_assert(kSurvivorsPresenceAskSize == proto::CzMoonlightSurvivorsPresence::kWireSize);
+static_assert(kSurvivorsPresenceSize == proto::ZcMoonlightSurvivorsPresence::kWireSize);
 
 [[nodiscard]] SurvivorsPresenceState StateOf(std::uint8_t wire) {
   switch (wire) {
