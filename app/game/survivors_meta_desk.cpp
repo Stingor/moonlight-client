@@ -296,10 +296,15 @@ ro::ui::SurvivorsRecordsView RecordsViewOf(const ro::sim::SurvivorsRules& rules,
                                            const SurvivorsSave& save, std::int64_t now_utc_s,
                                            std::optional<std::int64_t> latest_utc_s,
                                            SurvivorsRecordRowsHeld& held,
-                                           std::uint16_t free_arena_id) {
+                                           std::uint16_t free_arena_id,
+                                           std::uint16_t free_class_id) {
   held = SurvivorsRecordRowsHeld{};
   const ro::sim::IsoWeek week = IsoWeekOfUtc(now_utc_s);
+  // Le défi et la partie classée sont ceux de la première classe ; la partie
+  // libre, celle de la classe retenue à l'accueil.
   const std::string_view class_key = ClassKey(rules);
+  const ro::sim::ClassRule* free_class = FreeClassOf(rules, save, free_class_id);
+  const std::string_view free_class_key = free_class != nullptr ? free_class->key : class_key;
   const ro::sim::ArenaRule* free_arena = FreeArenaOf(rules, free_arena_id);
   const std::string_view free_arena_key = free_arena != nullptr ? free_arena->key : "";
   const std::string_view board_arena_key = BoardArenaKey(rules);
@@ -313,7 +318,8 @@ ro::ui::SurvivorsRecordsView RecordsViewOf(const ro::sim::SurvivorsRules& rules,
   std::vector<const ro::sim::SurvivorsRecord*> ranked_runs;
   std::vector<const SurvivorsBoard*> past;
   for (const SurvivorsBoard& board : save.records) {
-    if (board.class_key != class_key) continue;
+    const bool free = board.board_key == kFreeBoardKey;
+    if (board.class_key != (free ? free_class_key : class_key)) continue;
     const bool challenge = board.board_key == kChallengeBoardKey;
     std::vector<const ro::sim::SurvivorsRecord*>* kept =
         board.board_key == kFreeBoardKey     ? &free_runs

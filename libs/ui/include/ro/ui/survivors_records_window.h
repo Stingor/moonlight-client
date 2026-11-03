@@ -46,6 +46,9 @@ enum class SurvivorsRecordsTab : std::uint8_t { kFree, kChallenge, kRanked };
 
 struct SurvivorsRecordsView {
   std::span<const SurvivorsRecordRow> free_runs;  // rangées, dix au plus
+  // La classe des parties libres montrées, celle de l'accueil (en UTF-8, déjà
+  // dans la langue du joueur) ; vide, elle ne se nomme pas.
+  const char* free_class_name = "";
   std::span<const SurvivorsRecordRow> week_runs;  // la semaine en cours, rangées
   // L'onglet des parties classées : montré seulement si `ranked_shown`.
   bool ranked_shown = false;

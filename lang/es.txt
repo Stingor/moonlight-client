@@ -21866,6 +21866,9 @@ tr: %s: una partida aguantada %u:00 lo desbloquea.
 fr: Arène : %s
 tr: Arena: %s
 
+fr: Classe : %s
+tr: Clase: %s
+
 fr: Prairie de Midgard
 tr: Pradera de Midgard
 

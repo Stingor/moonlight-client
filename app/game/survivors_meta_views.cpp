@@ -134,8 +134,13 @@ void SurvivorsViews::ComposeMeta(ro::ui::SurvivorsPrepareView& prepare,
     windows.records_view = RecordsViewOf(
         rules, save, now_utc_s,
         credit.has_value() ? std::optional<std::int64_t>(credit->played_at_utc_s) : std::nullopt,
-        record_rows_, book.free_arena_id());
+        record_rows_, book.free_arena_id(), book.free_class_id());
     windows.records_view.ranked_shown = ranking_open;
+    const ro::sim::ClassRule* free_class = FreeClassOf(rules, save, book.free_class_id());
+    // Une seule classe : rien à distinguer, la classe ne se nomme pas.
+    windows.records_view.free_class_name = free_class != nullptr && rules.classes.size() > 1
+                                               ? JobName(free_class->job_id, tables)
+                                               : "";
   }
 }
 

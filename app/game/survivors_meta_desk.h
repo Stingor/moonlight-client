@@ -91,9 +91,10 @@ void FeatEntriesOf(const SurvivorsSave& save, std::vector<ro::ui::SurvivorsFeatE
 // règles, marquées, sous celles des règles en vigueur, dans leur ordre de
 // score, et leur numéro continue celui des lignes qui les précèdent.
 //
-// LES TABLEAUX SONT CEUX D'UNE ARÈNE : les parties libres, de l'arène de la
-// partie libre (`FreeArenaOf(free_arena_id)`) ; le défi et les parties
-// classées, de l'arène par défaut, la prairie. LES RECORDS D'ANCIENNES RÈGLES
+// LES TABLEAUX SONT CEUX D'UNE ARÈNE ET D'UNE CLASSE : les parties libres, de
+// l'arène et de la classe de la partie libre (`FreeArenaOf(free_arena_id)`,
+// `FreeClassOf(free_class_id)`) ; le défi et les parties classées, de l'arène
+// par défaut, la prairie, et de la première classe. LES RECORDS D'ANCIENNES RÈGLES
 // D'UNE AUTRE ARÈNE (Q10 A) — ceux du ruleset 3, tous joués sur `prt_fild08` —
 // se rangent sous eux, marqués, du même tableau ; ceux des règles en vigueur
 // d'une autre arène restent aux tableaux de leur arène.
@@ -103,12 +104,10 @@ struct SurvivorsRecordRowsHeld {
   std::vector<ro::ui::SurvivorsRecordRow> past_weeks;
   std::vector<ro::ui::SurvivorsRecordRow> ranked_runs;
 };
-[[nodiscard]] ro::ui::SurvivorsRecordsView RecordsViewOf(const ro::sim::SurvivorsRules& rules,
-                                                         const SurvivorsSave& save,
-                                                         std::int64_t now_utc_s,
-                                                         std::optional<std::int64_t> latest_utc_s,
-                                                         SurvivorsRecordRowsHeld& held,
-                                                         std::uint16_t free_arena_id = 0);
+[[nodiscard]] ro::ui::SurvivorsRecordsView RecordsViewOf(
+    const ro::sim::SurvivorsRules& rules, const SurvivorsSave& save, std::int64_t now_utc_s,
+    std::optional<std::int64_t> latest_utc_s, SurvivorsRecordRowsHeld& held,
+    std::uint16_t free_arena_id = 0, std::uint16_t free_class_id = 0);
 
 // L'ÉCRAN DE FIN, depuis le crédit : Zeny versés et solde du carnet relu
 // `save` (un achat fait à l'Église depuis l'écran de fin s'y voit), tableau,

@@ -21866,6 +21866,9 @@ tr: %s: a run held for %u:00 unlocks it.
 fr: Arène : %s
 tr: Arena: %s
 
+fr: Classe : %s
+tr: Class: %s
+
 fr: Prairie de Midgard
 tr: Midgard Plains
 
