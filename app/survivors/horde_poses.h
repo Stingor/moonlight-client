@@ -36,9 +36,8 @@ struct HordePose {
   ro::render::Motion motion = ro::render::Motion::kIdle;
   // Depuis le début de la motion, à l'horloge de présentation.
   float motion_ms = 0.0F;
-  // L'image tenue au lieu de celle que donne motion_ms. Le héros au repos tient
-  // le regard droit devant : les trois images de l'attente d'un personnage sont
-  // les trois orientations de sa tête, pas une animation.
+  // L'image tenue au lieu de celle que donne motion_ms : le héros qui incante
+  // tient la première de son rang.
   std::optional<std::size_t> held_frame;
   std::size_t direction = 0;
   // La position interpolée, en cases continues : le centre de la case (x, y)
@@ -80,6 +79,13 @@ inline constexpr std::uint32_t kHordeBirthFadeMs = 333;
 // calque, sans la transparence de son porteur. Un corps encore transparent —
 // qui naît, ressurgit ou s'efface — n'en pose donc aucune, et un mort non plus.
 [[nodiscard]] bool CastsRoundShadow(const HordePose& pose) noexcept;
+// LE HÉROS LANCE DE TEMPS À AUTRE : un lancer qui le trouve immobile lui fait
+// jouer son geste — l'attaque pour une classe de mêlée, l'incantation sinon —
+// mais pas plus d'une fois par cette durée, comptée depuis le geste précédent.
+// Ses skills partent bien plus souvent, et un geste à chacun le ferait trembler.
+inline constexpr std::uint32_t kHeroGestureEveryMs = 2000;
+// L'incantation tient sa première image pendant cette durée.
+inline constexpr std::uint32_t kHeroCastHoldMs = 600;
 // Un mort, sa chute jouée, s'efface pendant cette durée.
 inline constexpr std::uint32_t kFallFadeMs = 1000;
 // Au plus autant de morts s'effacent à la fois ; le plus ancien cède.
@@ -109,6 +115,10 @@ class HordePoses {
   // ⚠ AVANT `Pose` : leur direction et leur rang d'élite se lisent dans le
   // souvenir de l'image précédente, que `Pose` remplace.
   void NoticeFalls(std::span<const ro::sim::SurvivorsFall> falls, std::uint64_t presentation_ms);
+  // LES LANCERS DES DERNIERS PAS peuvent commencer un geste du héros à
+  // `presentation_ms` (voir `kHeroGestureEveryMs`).
+  void NoticeCasts(std::span<const ro::sim::SurvivorsCast> casts,
+                   const ro::sim::SurvivorsField& field, std::uint64_t presentation_ms);
 
   // POSE TOUS LES CORPS à `presentation_ms` : le héros d'abord, puis les
   // monstres, les morts, les plantes, les objets et les gemmes. Les positions
@@ -158,6 +168,8 @@ class HordePoses {
   std::vector<FoeMemory> next_memory_;
   std::vector<FallingBody> falling_;
   std::vector<HordePose> poses_;
+  // Le début du dernier geste du héros, s'il en a fait un.
+  std::optional<std::uint64_t> gesture_started_ms_;
 };
 
 }  // namespace moonclient

@@ -346,7 +346,8 @@ constexpr ClassRule kKnight{.class_id = kKnightClassId,
                             .starter_skills = kKnightStarterSkills,
                             .skill_pool = kKnightSkillPool,
                             .card_pool = kKnightCardPool,
-                            .evolved_job_id = kLordKnightJobId};
+                            .evolved_job_id = kLordKnightJobId,
+                            .melee = true};
 
 }  // namespace
 

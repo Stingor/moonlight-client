@@ -5,7 +5,6 @@
 #include <cstdint>
 
 #include "ro/render/ailment_sprites.h"
-#include "ro/sim/movement.h"
 #include "ro/sim/survivors_content.h"
 #include "ro/sim/survivors_rules.h"
 
@@ -129,21 +128,53 @@ void HordePoses::Reset() {
   next_memory_.clear();
   falling_.clear();
   poses_.clear();
+  gesture_started_ms_.reset();
+}
+
+void HordePoses::NoticeCasts(std::span<const ro::sim::SurvivorsCast> casts,
+                             const ro::sim::SurvivorsField& field, std::uint64_t presentation_ms) {
+  const ro::sim::SurvivorsHero& hero = field.hero;
+  if (hero.position != hero.previous_position) return;
+  if (field.tally.outcome == ro::sim::SurvivorsOutcome::kFell) return;
+  if (gesture_started_ms_.has_value() &&
+      presentation_ms < *gesture_started_ms_ + kHeroGestureEveryMs) {
+    return;
+  }
+  // Une orbite qui se replie et une zone qui s'éteint ne sont pas des lancers.
+  const bool launched = std::ranges::any_of(casts, [](const ro::sim::SurvivorsCast& cast) {
+    return cast.kind != ro::sim::CastKind::kOrbitOff && cast.kind != ro::sim::CastKind::kZoneOff;
+  });
+  if (launched) gesture_started_ms_ = presentation_ms;
 }
 
 void HordePoses::PoseHero(const ro::sim::SurvivorsField& field, std::uint64_t presentation_ms,
-                          std::uint32_t blend_per_mille, const HordeTimesOf& /*times_of*/) {
+                          std::uint32_t blend_per_mille, const HordeTimesOf& times_of) {
   const ro::sim::SurvivorsHero& hero = field.hero;
   HordePose pose{.kind = HordeBodyKind::kHero,
                  .cell = Interpolated(hero.previous_position, hero.position, blend_per_mille)};
   if (field.tally.outcome == ro::sim::SurvivorsOutcome::kFell) {
     pose.motion = Motion::kDie;
     pose.motion_ms = ElapsedSince(presentation_ms, MsOfStep(field.step));
-  } else {
-    const bool moving = hero.position != hero.previous_position;
-    pose.motion = moving ? Motion::kWalk : Motion::kIdle;
+  } else if (hero.position != hero.previous_position) {
+    pose.motion = Motion::kWalk;
     pose.motion_ms = static_cast<float>(presentation_ms);
-    if (!moving) pose.held_frame = ro::sim::kGazeAhead;
+  } else {
+    // Immobile, il se tient en garde, et la garde d'un personnage s'anime.
+    pose.motion = Motion::kReady;
+    pose.motion_ms = static_cast<float>(presentation_ms);
+    if (gesture_started_ms_.has_value()) {
+      const bool melee = field.hero_class != nullptr && field.hero_class->melee;
+      const float gesture_ms = ElapsedSince(presentation_ms, *gesture_started_ms_);
+      const float attack_ms = times_of(HordeBodyKind::kHero, 0).attack_ms;
+      if (melee && gesture_ms < attack_ms) {
+        pose.motion = Motion::kAttack;
+        pose.motion_ms = gesture_ms;
+      } else if (!melee && gesture_ms < static_cast<float>(kHeroCastHoldMs)) {
+        pose.motion = Motion::kCast;
+        pose.motion_ms = gesture_ms;
+        pose.held_frame = 0;
+      }
+    }
   }
   pose.direction = DirectionOf(hero.facing, pose.motion != Motion::kDie);
   poses_.push_back(pose);

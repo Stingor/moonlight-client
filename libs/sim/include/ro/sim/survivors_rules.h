@@ -238,6 +238,7 @@ struct ClassRule {
   std::span<const std::uint16_t> skill_pool;
   std::span<const std::uint16_t> card_pool;
   std::uint16_t evolved_job_id = 0;  // apparence après une évolution, côté app
+  bool melee = false;  // lance d'un geste d'attaque plutôt que d'incantation, côté app
 };
 // XP du niveau L au niveau L + 1 : base + per_level × (L − from_level), pour le
 // dernier segment dont from_level <= L.
