@@ -88,6 +88,10 @@ inline constexpr std::uint32_t kUiCapSurvivors = 0x00080000;
 // survivors : elle n'entre dans le masque que si la table des longueurs
 // connaît ce ZC.
 inline constexpr std::uint32_t kUiCapVoice = 0x00100000;
+// 🔴 UNE CAPACITÉ DE LECTURE : ce client sait lire la présence en arène des
+// autres (`ZC 0x0F57`, voir `survivors_presence.h`). Même règle : elle n'entre
+// dans le masque que si la table des longueurs connaît ce ZC.
+inline constexpr std::uint32_t kUiCapSurvivorsPresence = 0x00200000;
 
 [[nodiscard]] core::Result<void> AnnounceUiCaps(Connection& link, std::uint32_t caps);
 

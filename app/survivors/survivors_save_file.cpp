@@ -154,6 +154,9 @@ ro::core::Result<SurvivorsSaveRead> SaveSurvivorsOptions(const std::filesystem::
     if (after.pause_while_typing != before.pause_while_typing) {
       kept.pause_while_typing = after.pause_while_typing;
     }
+    if (after.presence_shown != before.presence_shown) {
+      kept.presence_shown = after.presence_shown;
+    }
     if (after.first_skill_id != before.first_skill_id) {
       kept.first_skill_id = after.first_skill_id;
     }

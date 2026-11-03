@@ -36,6 +36,9 @@
 
 namespace moonclient {
 
+// La table des joueurs en arène : voir `game/survivors_presence_labels.h`.
+class SurvivorsPresenceLabels;
+
 // CE QUI SE PEINT EN COORDONNÉES D'ÉCRAN, PAR-DESSUS LE MONDE.
 //
 // Les jauges de vie et les incantations, le nom de ce que la souris désigne, les
@@ -114,6 +117,9 @@ struct ScreenOverlays {
   // version, le magasin tient les images — et note celles qui manquent.
   const ro::sim::GuildBook* guild = nullptr;
   EmblemPlates* emblems = nullptr;
+  // LA LIGNE D'UN JOUEUR DANS L'ARÈNE DE SURVIVORS, par compte, déjà
+  // traduite ; vide, ou sans fonction, personne n'y est.
+  const SurvivorsPresenceLabels* arena_status = nullptr;
   // OÙ LE JOUEUR A POSÉ LES DEUX PIÈCES DU CLASSEMENT PVP. ⚠ REÇU et non gardé,
   // comme les bulles et les barres : c'est un réglage, il vit dans les options.
   // Voir `ro/ui/pvp_hud_frames.h` — le cadre porte la taille autant que la place.

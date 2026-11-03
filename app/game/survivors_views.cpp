@@ -433,6 +433,7 @@ void SurvivorsViews::ComposePause(const SurvivorsStage& stage, const SurvivorsFi
       .show_measures = measures_shown,
       .horde_sun_shadows = facts.options.horde_sun_shadows,
       .pause_while_typing = facts.options.pause_while_typing,
+      .presence_shown = facts.options.presence_shown,
       .measures = measure_rows_,
       .counts = count_rows_};
 }

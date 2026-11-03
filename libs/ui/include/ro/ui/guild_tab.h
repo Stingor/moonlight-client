@@ -54,6 +54,9 @@ struct GuildMemberView {
   // « Inviter dans mon carnet MVP » : la raison, déjà traduite, qui grise
   // l'entrée du menu ; nulle, elle est offerte.
   const char* mvp_refusal = nullptr;
+  // « En arène : Désert de Sograt, 07:42 », déjà traduit ; vide hors de
+  // l'arène de survivors.
+  std::string_view arena_status;
 };
 
 struct GuildPositionView {

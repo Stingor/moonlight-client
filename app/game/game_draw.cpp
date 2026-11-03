@@ -29,6 +29,7 @@
 #include "effects/effect_layers.h"
 #include "game/game.h"
 #include "game/setting_destination_open.h"
+#include "game/survivors_presence_mode.h"
 #include "world/armed_cursor.h"
 #include "world/click_action.h"
 #include "world/ground_unit_view.h"
@@ -589,6 +590,7 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
       .entity_names = settings_->options().entity_names(),
       .guild = &guild_book_,
       .emblems = guild_emblems_.has_value() ? &guild_emblems_->plates() : nullptr,
+      .arena_status = &survivors_presence_->labels,
       .pvp_hud = settings_->options().pvp_hud(),
       .battleground = settings_->options().pages().battleground.settings(),
       // L'ADMINISTRATEUR comme le menu d'entité le reconnaît : le niveau de

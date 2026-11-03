@@ -408,6 +408,7 @@ void SurvivorsMode::ApplyOptions(const ro::ui::SurvivorsPauseAsk& asked,
   if (asked.pause_while_typing.has_value()) {
     options_.pause_while_typing = *asked.pause_while_typing;
   }
+  if (asked.presence_shown.has_value()) options_.presence_shown = *asked.presence_shown;
   if (options_ == before) return;
   if (arena_.has_value()) {
     arena_->SetSwitches(SwitchesOf(options_));

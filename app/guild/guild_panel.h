@@ -30,6 +30,9 @@
 
 namespace moonclient {
 
+// La table des joueurs en arène : voir `game/survivors_presence_labels.h`.
+class SurvivorsPresenceLabels;
+
 // L'ONGLET GUILDE, VU DE LA PARTIE : ce qu'il montre, et ce qu'on fait de ce
 // qu'il demande.
 //
@@ -97,6 +100,8 @@ class GuildPanel {
   void JudgesMvpInvites(MvpInviteJudge judge) { mvp_judge_ = std::move(judge); }
   // Posé de même : carnet éteint, l'entrée n'est dans le menu d'aucun membre.
   void WithdrawsMvpInvites(bool withdrawn) noexcept { mvp_withdrawn_ = withdrawn; }
+  // Posé de même : la table des joueurs en arène, ou nulle pour personne.
+  void ShowsArenaStatus(const SurvivorsPresenceLabels* labels) noexcept { arena_status_ = labels; }
 
   // 🔴 LA FENÊTRE SE REDEMANDE À L'OUVERTURE DE L'ONGLET, PUIS TOUTES LES
   // TRENTE SECONDES tant qu'il est à l'écran : le serveur ne pousse ni les
@@ -145,6 +150,7 @@ class GuildPanel {
   GuildPanelPieces pieces_;
   MvpInviteJudge mvp_judge_;
   bool mvp_withdrawn_ = false;
+  const SurvivorsPresenceLabels* arena_status_ = nullptr;
   ro::ui::GuildView view_;
   std::optional<ro::render::ActorThumbnails> thumbnails_;
 

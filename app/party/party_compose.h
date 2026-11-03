@@ -100,6 +100,9 @@ class PartyLens {
   // personnage de mon compte. Par défaut, rien ne s'y oppose.
   [[nodiscard]] virtual const char* MvpInviteRefusal(std::string_view name,
                                                      bool same_account) const;
+  // Ce compte est dans l'arène de survivors : sa ligne, déjà traduite. Par
+  // défaut, personne n'y est.
+  [[nodiscard]] virtual std::string_view ArenaStatus(std::uint32_t account_id) const;
 };
 
 // ── LES FAUX MEMBRES DU MODE RÉGLAGE ─────────────────────────────────────

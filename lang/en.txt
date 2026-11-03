@@ -22213,3 +22213,21 @@ tr: not listened to
 
 fr: écouté
 tr: listened to
+
+fr: Montrer ma partie aux autres
+tr: Show my run to others
+
+fr: Arène inconnue
+tr: Unknown arena
+
+fr: En arène : %s, %s
+tr: In the arena: %s, %s
+
+fr: En pause dans l'arène : %s, %s
+tr: Paused in the arena: %s, %s
+
+fr: ARÈNE
+tr: ARENA
+
+fr: En arène
+tr: In the arena

@@ -29,6 +29,9 @@
 
 namespace moonclient {
 
+// La table des joueurs en arène : voir `game/survivors_presence_labels.h`.
+class SurvivorsPresenceLabels;
+
 // LA FENÊTRE GROUPE / AMIS ET LA GRILLE DE GROUPE, VUES DE LA PARTIE : ce
 // qu'elles montrent, le PS qu'on demande pour elles, et ce que le serveur dit
 // en retour dans la conversation.
@@ -93,6 +96,8 @@ class PartyPanel final : private PartyLens {
   void JudgesMvpInvites(PartyMvpJudge judge) { mvp_judge_ = std::move(judge); }
   // Posé de même : carnet éteint, l'entrée n'est dans le menu d'aucune ligne.
   void WithdrawsMvpInvites(bool withdrawn) noexcept { mvp_withdrawn_ = withdrawn; }
+  // Posé de même : la table des joueurs en arène, ou nulle pour personne.
+  void ShowsArenaStatus(const SurvivorsPresenceLabels* labels) noexcept { arena_status_ = labels; }
   [[nodiscard]] std::uint32_t cast_account_id() const noexcept { return cast_account_id_; }
 
  private:
@@ -107,6 +112,7 @@ class PartyPanel final : private PartyLens {
   [[nodiscard]] PartyStatuses Statuses(std::uint32_t account_id, bool is_me) override;
   [[nodiscard]] const char* MvpInviteRefusal(std::string_view name,
                                              bool same_account) const override;
+  [[nodiscard]] std::string_view ArenaStatus(std::uint32_t account_id) const override;
 
   [[nodiscard]] ro::ui::SkinImage ImageAt(std::string_view path);
   // Oublie les états des comptes qui ne sont plus ni dans le groupe ni moi.
@@ -135,6 +141,7 @@ class PartyPanel final : private PartyLens {
   std::uint32_t cast_account_id_ = 0;
   PartyMvpJudge mvp_judge_;
   bool mvp_withdrawn_ = false;
+  const SurvivorsPresenceLabels* arena_status_ = nullptr;
 };
 
 // CE QUE LE SERVEUR A RÉPONDU au groupe et aux amis, écrit dans la conversation.

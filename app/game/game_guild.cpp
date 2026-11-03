@@ -15,6 +15,7 @@
 #include "chat/player_link_judge.h"
 #include "game/game.h"
 #include "game/save_folder.h"
+#include "game/survivors_presence_mode.h"
 #include "game/whisper_stage.h"
 
 namespace moonclient {
@@ -65,6 +66,7 @@ void Game::RefreshGuild(std::uint32_t now_ms) {
   // « INVITER DANS MON CARNET MVP » : le carnet seul sait qui peut y entrer ;
   // éteint, l'entrée disparaît.
   guild_panel_->WithdrawsMvpInvites(!settings_->options().pages().mvp_tracker.settings().enabled);
+  guild_panel_->ShowsArenaStatus(&survivors_presence_->labels);
   guild_panel_->JudgesMvpInvites([this](std::string_view name, bool same_account) {
     return JudgeMvpInvite(
         name,

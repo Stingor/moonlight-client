@@ -150,6 +150,8 @@ SurvivorsPauseAsk DrawSurvivorsPauseWindow(SurvivorsPauseState& state,
       Setting(core::Tr("Ombres du soleil de la horde"), view.horde_sun_shadows, art);
   asked.pause_while_typing =
       Setting(core::Tr("Pause pendant la saisie"), view.pause_while_typing, art);
+  asked.presence_shown =
+      Setting(core::Tr("Montrer ma partie aux autres"), view.presence_shown, art);
   if (view.measures_offered && view.show_measures) {
     DrawMeasures(view);
   }

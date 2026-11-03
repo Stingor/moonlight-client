@@ -12,6 +12,7 @@
 #include "ro/core/text.h"
 #include "ro/ui/chat_link.h"
 #include "ro/ui/skin_popup.h"
+#include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 
 #include "guild_panes.h"
@@ -231,7 +232,14 @@ void DrawMemberRow(GuildTabState& state, const GuildView& view, const GuildMembe
   ImGui::TableSetColumnIndex(Rank(MemberColumn::kContribution));
   ColoredText(kGuildBlackColor, std::to_string(member.contribution).c_str());
   ImGui::TableSetColumnIndex(Rank(MemberColumn::kLogin));
-  if (member.online) {
+  if (member.online && !member.arena_status.empty()) {
+    // En arène : où et depuis quand, dans la bulle.
+    ColoredText(kGuildArenaColor, core::Tr("En arène"));
+    if (ImGui::IsItemHovered()) {
+      const std::string status(member.arena_status);
+      SkinTooltipFormat("%s", status.c_str());
+    }
+  } else if (member.online) {
     ColoredText(kGuildGreenColor, core::Tr("En ligne"));
   } else {
     const std::string seen = member.last_seen.empty() ? "—" : std::string(member.last_seen);

@@ -15,6 +15,7 @@
 #include "chat/player_link_judge.h"
 #include "game/game.h"
 #include "game/party_booking_bug_report.h"
+#include "game/survivors_presence_mode.h"
 #include "game/whisper_stage.h"
 #include "options/option_sections.h"
 #include "world/click_action.h"
@@ -46,6 +47,7 @@ void Game::RefreshParty(std::uint32_t now_ms) {
   // « INVITER DANS MON CARNET MVP » : le carnet seul sait qui peut y entrer ;
   // éteint, l'entrée disparaît.
   party_panel_->WithdrawsMvpInvites(!settings_->options().pages().mvp_tracker.settings().enabled);
+  party_panel_->ShowsArenaStatus(&survivors_presence_->labels);
   party_panel_->JudgesMvpInvites([this](std::string_view name, bool same_account) {
     return JudgeMvpInvite(
         name,

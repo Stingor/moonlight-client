@@ -54,6 +54,7 @@ constexpr ImU32 kGaugeShadow = IM_COL32(0, 0, 0, 180);
 constexpr ImU32 kBadgeOffline = IM_COL32(105, 105, 105, 255);
 constexpr ImU32 kBadgeMe = IM_COL32(58, 110, 190, 255);
 constexpr ImU32 kBadgeOnline = IM_COL32(54, 138, 64, 255);
+constexpr ImU32 kBadgeArena = IM_COL32(176, 92, 40, 255);
 constexpr ImU32 kShareMark = IM_COL32(184, 112, 36, 255);
 constexpr ImU32 kOfflineTint = IM_COL32(140, 140, 140, 220);
 constexpr ImU32 kRowRule = IM_COL32(0, 0, 0, 40);
@@ -484,8 +485,15 @@ void DrawFriendRow(PartyFriendWindowState& state, const PartyFriendView& view,
   if (head_here) {
     DrawHead(row.head, ImVec2(origin.x, origin.y - Px(kHeadDropPixels)), head_box);
   }
-  DrawStatusBadge(row.online ? "ON" : "OFF", row.online ? kBadgeOnline : kBadgeOffline,
-                  row.online ? core::Tr("En ligne") : core::Tr("Hors ligne"));
+  // EN ARÈNE, la pastille le dit à la place de « en ligne », et sa bulle dit
+  // où et depuis quand.
+  if (row.online && !row.arena_status.empty()) {
+    const std::string status(row.arena_status);
+    DrawStatusBadge(core::Tr("ARÈNE"), kBadgeArena, status.c_str());
+  } else {
+    DrawStatusBadge(row.online ? "ON" : "OFF", row.online ? kBadgeOnline : kBadgeOffline,
+                    row.online ? core::Tr("En ligne") : core::Tr("Hors ligne"));
+  }
 
   const float bottom = ImGui::GetCursorScreenPos().y;
   const bool row_hovered = ImGui::IsWindowHovered() &&

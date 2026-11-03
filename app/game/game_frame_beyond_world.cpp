@@ -50,6 +50,7 @@
 #include "ro/vfs/warp_memo_words.h"
 
 #include "game/game.h"
+#include "game/survivors_presence_mode.h"
 #include "items/warp_memo_report.h"
 #include "world/player_report.h"
 
@@ -340,6 +341,11 @@ ro::net::FrameOutcome Game::ApplyFrameBeyondWorld(const ro::net::Frame& received
   if (const ro::net::FrameOutcome survivors_read = survivors_ranking_.ApplyFrame(received, now_ms);
       outcome == ro::net::FrameOutcome::kUnhandled) {
     outcome = survivors_read;
+  }
+  // ET LA PRÉSENCE EN ARÈNE DES AUTRES.
+  if (const ro::net::FrameOutcome present = survivors_presence_->mode.ApplyFrame(received, now_ms);
+      outcome == ro::net::FrameOutcome::kUnhandled) {
+    outcome = present;
   }
   // ET OÙ JOINDRE LE SERVEUR VOIX.
   if (const ro::net::FrameOutcome voiced = voice_.ApplyFrame(received);

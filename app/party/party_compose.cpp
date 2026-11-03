@@ -71,6 +71,8 @@ const char* PartyLens::MvpInviteRefusal(std::string_view /*name*/, bool /*same_a
   return nullptr;
 }
 
+std::string_view PartyLens::ArenaStatus(std::uint32_t /*account_id*/) const { return {}; }
+
 ro::ui::PartyMemberView PartyViews::MemberRow(const ro::sim::PartyMember& member,
                                               const PartyComposeInput& input, PartyLens& lens,
                                               PartyStatuses& statuses) const {
@@ -189,6 +191,7 @@ void PartyViews::ComposeFriends(const PartyComposeInput& input, PartyLens& lens)
     const ro::sim::PartyMember* member = input.party->Find(chum.account_id);
     row.in_my_party = member != nullptr && member->char_id == chum.char_id;
     row.mvp_refusal = lens.MvpInviteRefusal(chum.name, chum.account_id == self_.account_id);
+    if (chum.online) row.arena_status = lens.ArenaStatus(chum.account_id);
     friends_.push_back(row);
   }
 }

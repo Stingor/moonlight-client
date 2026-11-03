@@ -4,6 +4,7 @@
 
 #include "afk/afk_screen.h"
 #include "game/survivors_mode_slot.h"
+#include "game/survivors_presence_slot.h"
 #include "game/survivors_ranking_mode.h"
 #include "survivors/survivors_stage.h"
 
@@ -46,6 +47,10 @@ class GameModes {
   // fin des parties classées. ⚠ AVANT LE MODE, qui le désigne jusqu'à sa
   // destruction. Voir `SurvivorsRankingMode`.
   SurvivorsRankingMode survivors_ranking_;
+  // LA PRÉSENCE EN ARÈNE : ce que le joueur fait du mode, dit au serveur, ce
+  // que le serveur dit des autres, et ce que l'étiquette, les amis et la
+  // guilde en écrivent. Voir `SurvivorsPresence`.
+  SurvivorsPresenceSlot survivors_presence_;
   SurvivorsModeSlot survivors_mode_;
 };
 

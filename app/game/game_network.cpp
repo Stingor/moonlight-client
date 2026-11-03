@@ -40,6 +40,7 @@
 #include "game/handshake_pump.h"
 #include "game/interface_sound.h"
 #include "game/level_up_cue.h"
+#include "game/survivors_presence_mode.h"
 #include "input/camera_aim.h"
 #include "loading/loading_plans.h"
 #include "loading/loading_presenter.h"
@@ -265,7 +266,8 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
     // table des longueurs connaît leurs ZC.
     PumpHandshake(link_, handshake_, reported_handshake_, pieces_,
                   settings_->options().pages().mvp_tracker.settings().enabled,
-                  survivors_ranking_.caps() | voice_.caps(), now_ms);
+                  survivors_ranking_.caps() | survivors_presence_->mode.caps() | voice_.caps(),
+                  now_ms);
   }
 
   // L'ANNEAU DES DIX PREMIERS S'ACCORDE AU RANG DE CHACUN, à chaque battement.

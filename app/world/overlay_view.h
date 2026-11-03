@@ -142,6 +142,9 @@ inline constexpr int kNameFontPixels = 12;
 // ⚠ ELLE NE DÉCIDE PAS SI L'ÉTIQUETTE PARAÎT : c'est `ShowsEntityName` qui le
 // dit, chez l'appelant, parce que lui seul sait ce que la souris désigne et ce
 // qui est visé. Ici, `names` ne sert qu'à décider de ce que l'étiquette MONTRE.
+//
+// `arena_status` : la ligne d'un joueur dans l'arène de survivors, écrite
+// sous les autres ; vide, l'étiquette n'en a pas.
 [[nodiscard]] std::vector<ro::render::ScreenQuad> DrawnName(
     const ro::render::FontAtlas& font, const ro::render::Camera& camera, float aspect_ratio,
     const ro::render::DrawnActor& drawn, const ro::sim::Actor& actor,
@@ -149,7 +152,8 @@ inline constexpr int kNameFontPixels = 12;
     const std::optional<ro::ui::ScreenBand>& bars_under_feet,
     const ro::render::EntityNamesLook& names, const ro::render::BossBadges& badges,
     const ro::formats::Image* emblem, float viewport_width, float viewport_height,
-    const ro::sim::BannedWords* banned, std::string_view name = {});
+    const ro::sim::BannedWords* banned, std::string_view name = {},
+    std::string_view arena_status = {});
 
 // Les enseignes des acteurs dessinés : l'échoppe qu'ils tiennent, le salon
 // qu'ils ont ouvert. Chacune au-dessus du sien, dans la surface que `surfaces`

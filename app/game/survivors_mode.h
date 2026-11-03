@@ -143,6 +143,9 @@ class SurvivorsMode {
   // habille, que la partie possède et détruit avant ses modes.
   void Forget() noexcept { arena_.reset(); }
 
+  // Les réglages du mode, relus du carnet à l'ouverture de la salle.
+  [[nodiscard]] const SurvivorsOptions& options() const noexcept { return options_; }
+
  private:
   void Enter(SurvivorsStage& stage, const SurvivorsContext& context, std::uint16_t first_skill_id);
   // Commence sur l'étage la partie du départ `begun`, sur le sol de son arène.

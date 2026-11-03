@@ -247,7 +247,7 @@ std::vector<ro::render::ScreenQuad> DrawnName(
     const std::optional<ro::ui::ScreenBand>& bars_under_feet,
     const ro::render::EntityNamesLook& names, const ro::render::BossBadges& badges,
     const ro::formats::Image* emblem, float viewport_width, float viewport_height,
-    const ro::sim::BannedWords* banned, std::string_view name) {
+    const ro::sim::BannedWords* banned, std::string_view name, std::string_view arena_status) {
   const ro::render::EntityNameLook& how =
       names.kinds[static_cast<std::size_t>(NamePlateKindOf(actor, world))];
 
@@ -306,9 +306,14 @@ std::vector<ro::render::ScreenQuad> DrawnName(
   // déclare : les deux lignes prennent la parenthèse et une espace finale. Voir
   // `NamePlateLook`.
   constexpr ro::render::NamePlateLook kComposition = {.korean_service = true};
-  const std::vector<std::string> lines = ro::render::ComposeNamePlateLines(what, kComposition);
+  std::vector<std::string> lines = ro::render::ComposeNamePlateLines(what, kComposition);
   if (lines.empty()) {
     return {};
+  }
+  // EN ARÈNE, une ligne de plus sous les autres : le joueur ne répond pas, et
+  // l'étiquette dit pourquoi.
+  if (!arena_status.empty() && actor.kind == ro::sim::ActorKind::kPlayer) {
+    lines.emplace_back(arena_status);
   }
   // Aux PIEDS, et non au-dessus de la tête : c'est là que le client pose ses
   // noms, et cela ne dépend donc pas de la taille du sprite.

@@ -17,6 +17,7 @@
 #include "ro/sim/world.h"
 
 #include "game/skin_image_of.h"
+#include "game/survivors_presence_labels.h"
 #include "world/actor_styles.h"
 
 namespace moonclient {
@@ -122,6 +123,9 @@ void GuildPanel::RefreshMembers(const ro::sim::GuildBook& book, const ro::sim::S
     view.position_label = book.PositionLabel(member.position);
     view.contribution = member.contribution;
     view.online = member.online;
+    if (member.online && arena_status_ != nullptr) {
+      view.arena_status = arena_status_->Of(member.account_id);
+    }
     view.last_seen = member_seen_[index];
     view.last_login = member.last_login;
     view.self = member.char_id == player.char_id;

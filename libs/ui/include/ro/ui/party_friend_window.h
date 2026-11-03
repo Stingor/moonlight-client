@@ -180,6 +180,9 @@ struct FriendView {
   bool in_my_party = false;
   // Comme pour un membre du groupe : la raison du grisage, ou nul.
   const char* mvp_refusal = nullptr;
+  // « En arène : Désert de Sograt, 07:42 », déjà traduit ; vide hors de
+  // l'arène de survivors.
+  std::string_view arena_status;
 };
 
 // LA DEMANDE REÇUE, une seule à la fois : une nouvelle remplace l'ancienne.

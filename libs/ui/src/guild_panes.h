@@ -27,6 +27,8 @@ inline constexpr ImU32 kGuildBlackColor = IM_COL32(0, 0, 0, 255);
 inline constexpr ImU32 kGuildBlueColor = IM_COL32(38, 64, 153, 255);
 // Ce qui va bien : en ligne, alliés, guilde créée.
 inline constexpr ImU32 kGuildGreenColor = IM_COL32(26, 128, 38, 255);
+// En ligne, mais dans l'arène de survivors.
+inline constexpr ImU32 kGuildArenaColor = IM_COL32(150, 74, 26, 255);
 // Ce qui refuse ou détruit.
 inline constexpr ImU32 kGuildRedColor = IM_COL32(153, 31, 31, 255);
 // Le fond d'une ligne de membre CONNECTÉ, comme le client la teinte.

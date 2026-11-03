@@ -13,6 +13,7 @@
 #include "ro/sim/world.h"
 
 #include "chat/chat_view.h"
+#include "game/survivors_presence_labels.h"
 #include "guild/plate_emblem.h"
 #include "voice/voice_marks.h"
 #include "world/armed_cursor.h"
@@ -214,10 +215,11 @@ HoveredActor DrawScreenOverlays(const ScreenOverlays& what, float aspect_ratio, 
                                 : nullptr;
       // ⚠ LES INSIGNES ET LES EMBLÈMES SE PASSENT PAR RÉFÉRENCE, sans copie : la
       // couche d'écran retient leur ADRESSE pour ne les téléverser qu'une fois.
-      const std::vector<ro::render::ScreenQuad> one =
-          DrawnName(*name_font, camera, aspect_ratio, actors.drawn[rank], *actor, titles, world,
-                    BarsUnderFeetOf(what, actor->id), what.entity_names, pieces.boss_badges, emblem,
-                    viewport_width, viewport_height, &pieces.banned_words, item_name);
+      const std::vector<ro::render::ScreenQuad> one = DrawnName(
+          *name_font, camera, aspect_ratio, actors.drawn[rank], *actor, titles, world,
+          BarsUnderFeetOf(what, actor->id), what.entity_names, pieces.boss_badges, emblem,
+          viewport_width, viewport_height, &pieces.banned_words, item_name,
+          what.arena_status != nullptr ? what.arena_status->Of(actor->id) : std::string_view());
       names.insert(names.end(), one.begin(), one.end());
     }
     pieces.overlay.Draw(names, viewport_width, viewport_height);

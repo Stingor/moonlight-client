@@ -17,6 +17,7 @@
 #include "ro/sim/world.h"
 
 #include "game/skin_image_of.h"
+#include "game/survivors_presence_labels.h"
 #include "world/actor_styles.h"
 #include "world/actor_view.h"
 #include "world/click_action.h"
@@ -274,6 +275,10 @@ ro::ui::SkinImage PartyPanel::Crown() { return ImageAt(kCrownPath); }
 
 const char* PartyPanel::MvpInviteRefusal(std::string_view name, bool same_account) const {
   return mvp_judge_ ? mvp_judge_(name, same_account) : nullptr;
+}
+
+std::string_view PartyPanel::ArenaStatus(std::uint32_t account_id) const {
+  return arena_status_ != nullptr ? arena_status_->Of(account_id) : std::string_view();
 }
 
 PartyStatuses PartyPanel::Statuses(std::uint32_t account_id, bool is_me) {

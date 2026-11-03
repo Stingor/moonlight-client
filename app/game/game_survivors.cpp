@@ -20,11 +20,14 @@
 
 #include "ro/render/screen_tint.h"
 #include "ro/sim/deal.h"
+#include "ro/sim/survivors_rules.h"
 #include "ro/ui/chat_bar.h"
 
 #include "game/game.h"
 #include "game/survivors_mode.h"
+#include "game/survivors_presence_mode.h"
 #include "input/hotkeys.h"
+#include "survivors/arena_choice.h"
 #include "survivors/survivors_route.h"
 #include "voice/voice_keys.h"
 
@@ -243,6 +246,25 @@ void Game::FrameSurvivors(std::uint32_t now_ms) {
       .now_ms = now_ms});
   const SurvivorsContext& context = survivors_mode_->context();
   survivors_mode_->FollowDoor(survivors_, context);
+  // LA PRÉSENCE EN ARÈNE, à chaque image, muette tant que le serveur ne l'a pas
+  // annoncée : elle dit aussi la sortie, une fois la salle refermée.
+  survivors_presence_->mode.Pump(
+      link_, SurvivorsPresenceFacts{
+                 .link_open = link_.is_open(),
+                 .verified = handshake_.state() == ro::net::MoonclientHandshakeState::kVerified,
+                 .shown = survivors_mode_->options().presence_shown,
+                 .own = PresenceOfStage(survivors_),
+                 .now_ms = now_ms});
+  const ro::vfs::MapDisplayNames* map_names =
+      pieces_.map_display_names.has_value() ? &*pieces_.map_display_names : nullptr;
+  survivors_presence_->labels.Compose(
+      survivors_presence_->mode.seen(),
+      [map_names](std::uint16_t arena_id) {
+        const ro::sim::SurvivorsRules& rules = ro::sim::ShippedSurvivorsRules();
+        const ro::sim::ArenaRule* arena = ro::sim::FindArena(rules, arena_id);
+        return arena != nullptr ? ArenaNameOf(rules, *arena, map_names) : std::string();
+      },
+      now_ms);
   if (!survivors_.owns_screen()) return;
 
   // LA FLÈCHE DU CURSEUR, sans rien du monde à désigner.
