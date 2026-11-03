@@ -56,8 +56,9 @@ enum class CastKind : std::uint8_t {
 // chute ; un mur (kWallOn) ses deux bouts, un pilier (kRingOn) son centre dans
 // `from` et `to`, un orage (kStormOn) aussi, et chaque zone publie kZoneOff,
 // aux mêmes points, quand elle s'éteint. Un cône (kConeOn) porte le héros dans
-// `from` et la pointe de son axe dans `to` ; un bloc de barrière (kBlockOn),
-// une zone, sa case dans `from` et `to`.
+// `from`, la pointe de son axe dans `to` et sa demi-ouverture en caps dans
+// `spread_steps` ; un bloc de barrière (kBlockOn), une zone, sa case dans
+// `from` et `to`.
 struct SurvivorsCast {
   std::uint16_t skill_id = 0;
   CastKind kind = CastKind::kStrike;
@@ -65,6 +66,7 @@ struct SurvivorsCast {
   FieldPoint to;
   std::uint32_t target_serial = 0;
   std::uint32_t land_step = 0;
+  std::uint8_t spread_steps = 0;
 };
 inline constexpr std::size_t kMostNewsWarnings = 128;
 // Un ajout se fait en FIN d'énumération.

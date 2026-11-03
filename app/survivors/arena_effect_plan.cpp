@@ -20,9 +20,29 @@ namespace {
                                                                      : hero_class.job_id;
 }
 
-// LE CÔNE se montre par autant d'éclats de son effet, au sol, également
-// espacés sur son axe jusqu'à sa pointe.
+// LE CÔNE se montre par autant de projectiles de son effet, tirés du héros en
+// éventail sur toute son ouverture, chacun visant la longueur du cône. L'effet
+// s'oriente sur sa cible : posé au sol sans elle, il resterait droit.
 inline constexpr std::int64_t kConeBursts = 3;
+
+// Les lancers d'un cône : du bord gauche au bord droit, l'axe au milieu.
+void PlanCone(const ro::sim::SurvivorsCast& cast, const SkillLook& look,
+              std::vector<ArenaLaunch>& out) {
+  const ro::sim::FieldPoint axis = cast.to - cast.from;
+  const std::uint8_t facing = ro::sim::HeadingOf(axis, 0);
+  const auto length = static_cast<std::int32_t>(ro::sim::IntegerSqrt(
+      static_cast<std::uint64_t>(ro::sim::DistanceSquared(cast.from, cast.to))));
+  for (std::int64_t burst = 0; burst < kConeBursts; ++burst) {
+    const std::int64_t turn =
+        std::int64_t{cast.spread_steps} * (2 * burst - (kConeBursts - 1)) / (kConeBursts - 1);
+    const auto heading = static_cast<std::uint8_t>(
+        (std::int64_t{facing} + turn + ro::sim::kHeadingSteps) % ro::sim::kHeadingSteps);
+    out.push_back(ArenaLaunch{.effect_id = look.effect_id,
+                              .kind = ArenaLaunchKind::kOnHero,
+                              .at = cast.from,
+                              .target = cast.from + ro::sim::TurnVector(heading, length)});
+  }
+}
 
 // L'effet qu'un lancer de skill fait naître, d'après sa sorte.
 void PlanCast(const ro::sim::SurvivorsCast& cast, const SkillLook& look,
@@ -43,15 +63,7 @@ void PlanCast(const ro::sim::SurvivorsCast& cast, const SkillLook& look,
                                 .target = cast.to});
       return;
     case ro::sim::CastKind::kConeOn:
-      for (std::int64_t burst = 1; burst <= kConeBursts; ++burst) {
-        const ro::sim::FieldPoint at{
-            static_cast<std::int32_t>(cast.from.x + (std::int64_t{cast.to.x} - cast.from.x) *
-                                                        burst / kConeBursts),
-            static_cast<std::int32_t>(cast.from.y + (std::int64_t{cast.to.y} - cast.from.y) *
-                                                        burst / kConeBursts)};
-        out.push_back(
-            ArenaLaunch{.effect_id = look.effect_id, .kind = ArenaLaunchKind::kOnGround, .at = at});
-      }
+      PlanCone(cast, look, out);
       return;
     // Orbites et zones se lisent sur l'état : voir `PlanArenaOrbs`.
     case ro::sim::CastKind::kOrbitOn:

@@ -185,7 +185,8 @@ bool FireCone(SurvivorsField& field, const SurvivorsSkillRule& rule, const Skill
                                         .from = hero,
                                         .to = tip,
                                         .target_serial = 0,
-                                        .land_step = 0});
+                                        .land_step = 0,
+                                        .spread_steps = level.cone_half_steps});
   return true;
 }
 
