@@ -48,6 +48,9 @@
 // renderer prend.
 namespace moonclient {
 
+// La table des joueurs en arène : voir `game/survivors_presence_labels.h`.
+class SurvivorsPresenceLabels;
+
 // Ce que le SOL sous la souris permet.
 enum class GroundHover : std::uint8_t {
   // Une case où l'on peut aller.
@@ -170,6 +173,9 @@ inline constexpr int kNameFontPixels = 12;
 //
 // `hits`, s'il est donné, reçoit le cadre de chaque enseigne peinte, dans
 // l'ordre de la peinture : c'est ce qu'un clic vise. Voir `SignboardHit`.
+//
+// Le salon de présence d'un joueur dont `arena_status` tient la ligne ne se
+// peint pas : voir `IsPresenceRoom`. Nul, tous se peignent.
 [[nodiscard]] std::vector<ro::render::ScreenQuad> DrawnSignboards(
     const ro::render::Camera& camera, float aspect_ratio,
     std::span<const ro::render::DrawnActor> drawn, std::span<const std::uint32_t> ids,
@@ -177,7 +183,8 @@ inline constexpr int kNameFontPixels = 12;
     const ro::render::FontAtlas& font, const ro::render::SignboardSurfaces& surfaces,
     const ro::ui::EntityBarsLook& bars, const ro::render::SignboardLook& look,
     std::uint32_t spotlit_owner_id, float viewport_width, float viewport_height,
-    const ro::sim::BannedWords* banned, std::vector<SignboardHit>* hits = nullptr);
+    const ro::sim::BannedWords* banned, const SurvivorsPresenceLabels* arena_status,
+    std::vector<SignboardHit>* hits = nullptr);
 
 // ⚠ LES JAUGES DE VIE NE SONT PLUS ICI. Elles se règlent espèce par espèce et
 // écrivent parfois leurs nombres : elles sont donc passées en ImGui, où vit la

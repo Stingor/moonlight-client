@@ -51,6 +51,11 @@ void SurvivorsPresenceLabels::Compose(std::span<const SurvivorsPresenceSeen> see
   }
 }
 
+bool IsPresenceRoom(const ro::sim::Signboard& board, std::string_view arena_status) noexcept {
+  return !arena_status.empty() && board.kind == ro::sim::SignboardKind::kChatRoom &&
+         board.limit == kPresenceRoomLimit;
+}
+
 std::string_view SurvivorsPresenceLabels::Of(std::uint32_t account_id) const noexcept {
   const auto at = std::ranges::lower_bound(lines_, account_id, {},
                                            &std::pair<std::uint32_t, std::string>::first);

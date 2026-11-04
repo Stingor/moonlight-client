@@ -122,11 +122,11 @@ HoveredActor DrawScreenOverlays(const ScreenOverlays& what, float aspect_ratio, 
       ForgetShopSignboards(pieces);
       ro::render::RecolorShopSurfaces(pieces.signboards, what.signboards.look.shop);
     }
-    const std::vector<ro::render::ScreenQuad> boards =
-        DrawnSignboards(camera, aspect_ratio, actors.drawn, actors.ids, world, party, *board_font,
-                        pieces.signboards, what.entity_bars, what.signboards.look,
-                        pieces.trade.store_search().spotlit_owner_aid(), viewport_width,
-                        viewport_height, &pieces.banned_words, &pieces.trade.signboards());
+    const std::vector<ro::render::ScreenQuad> boards = DrawnSignboards(
+        camera, aspect_ratio, actors.drawn, actors.ids, world, party, *board_font,
+        pieces.signboards, what.entity_bars, what.signboards.look,
+        pieces.trade.store_search().spotlit_owner_aid(), viewport_width, viewport_height,
+        &pieces.banned_words, what.arena_status, &pieces.trade.signboards());
     pieces.overlay.Draw(boards, viewport_width, viewport_height);
   }
 

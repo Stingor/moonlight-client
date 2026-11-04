@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "ro/net/survivors_presence.h"
+#include "ro/sim/signboard.h"
 
 namespace moonclient {
 
@@ -40,6 +41,16 @@ using PresenceArenaNamer = std::function<std::string(std::uint16_t arena_id)>;
 // La ligne d'un joueur à `now_ms`, déjà traduite.
 [[nodiscard]] std::string PresenceLabel(const SurvivorsPresenceSeen& seen,
                                         std::string_view arena_name, std::int64_t now_ms);
+
+// LE SALON QUE LE SERVEUR OUVRE pour le client natif, qui n'écrit pas la ligne
+// sous le nom : une place, celle du joueur. moonclient écrit cette ligne, et la
+// bulle ne ferait que la redire, en couvrant ce qui se tient derrière.
+inline constexpr std::uint16_t kPresenceRoomLimit = 1;
+
+// Vrai pour l'enseigne de ce salon : celle d'un joueur dont `arena_status` est
+// la ligne de présence, non vide.
+[[nodiscard]] bool IsPresenceRoom(const ro::sim::Signboard& board,
+                                  std::string_view arena_status) noexcept;
 
 // LES LIGNES DE TOUS LES JOUEURS EN ARÈNE, refaites à chaque image.
 class SurvivorsPresenceLabels {

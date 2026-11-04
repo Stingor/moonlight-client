@@ -12,6 +12,7 @@
 #include "ro/sim/world.h"
 #include "ro/ui/system_fonts.h"
 
+#include "game/survivors_presence_labels.h"
 #include "world/entity_bar_view.h"
 #include "world/item_dropper.h"
 #include "world/name_plate_view.h"
@@ -394,7 +395,8 @@ std::vector<ro::render::ScreenQuad> DrawnSignboards(
     const ro::render::FontAtlas& font, const ro::render::SignboardSurfaces& surfaces,
     const ro::ui::EntityBarsLook& bars, const ro::render::SignboardLook& look,
     std::uint32_t spotlit_owner_id, float viewport_width, float viewport_height,
-    const ro::sim::BannedWords* banned, std::vector<SignboardHit>* hits) {
+    const ro::sim::BannedWords* banned, const SurvivorsPresenceLabels* arena_status,
+    std::vector<SignboardHit>* hits) {
   std::vector<ro::render::ScreenQuad> quads;
   if (hits != nullptr) {
     hits->clear();
@@ -407,6 +409,9 @@ std::vector<ro::render::ScreenQuad> DrawnSignboards(
     const ro::sim::Actor* actor = world.Find(ids[index]);
     if (actor == nullptr || !actor->signboard.has_value() ||
         !SignboardShown(*actor->signboard, look)) {
+      continue;
+    }
+    if (arena_status != nullptr && IsPresenceRoom(*actor->signboard, arena_status->Of(actor->id))) {
       continue;
     }
     const std::optional<glm::vec2> feet = ro::render::ProjectToScreen(
