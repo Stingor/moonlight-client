@@ -147,6 +147,9 @@ class SurvivorsMode {
   [[nodiscard]] const SurvivorsOptions& options() const noexcept { return options_; }
 
  private:
+  [[nodiscard]] static const ro::sim::SurvivorsRules& Rules();
+  // Pose sur l'arène montée les réglages qui la regardent.
+  void PoseArenaOptions();
   void Enter(SurvivorsStage& stage, const SurvivorsContext& context, std::uint16_t first_skill_id);
   // Commence sur l'étage la partie du départ `begun`, sur le sol de son arène.
   [[nodiscard]] ro::core::Result<void> BeginRun(SurvivorsStage& stage,

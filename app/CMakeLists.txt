@@ -1915,6 +1915,8 @@ add_executable(moonclient
     game/game_first_person.cpp
     game/game_survivors.cpp
     game/survivors_mode.cpp
+    game/survivors_mode_door.cpp
+    game/survivors_mode_sound.cpp
     game/survivors_views.cpp
     game/survivors_meta_views.cpp
     game/survivors_codex_views.cpp
