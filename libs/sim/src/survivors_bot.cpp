@@ -403,6 +403,9 @@ SurvivorsAnswer SurvivorsBot::Choose(const SurvivorsField& field) const {
   OfferRank best;
   for (std::size_t index = 0; index < field.offers.size(); ++index) {
     const SurvivorsOffer& offer = field.offers[index];
+    // Un robot juge pour le héros qu'il voit en scène : l'offre d'un autre passe
+    // après.
+    if (offer.hero_index != field.stage) continue;
     OfferRank rank;
     switch (offer.kind) {
       case OfferKind::kNewCard:

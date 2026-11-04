@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <optional>
@@ -95,11 +96,19 @@ inline constexpr std::int32_t kFollowingGridCells = 128;
 struct SurvivorsInput {
   std::uint8_t heading = kNoHeading;
 };
-enum class AnswerKind : std::uint8_t { kPick, kReroll, kSkip, kBanish };
+// kRaise : en coop, relever le héros `offer_index`. Une feuille part, et la
+// montée de niveau avec elle : personne ne reçoit rien à ce niveau.
+enum class AnswerKind : std::uint8_t { kPick, kReroll, kSkip, kBanish, kRaise };
 struct SurvivorsAnswer {
   AnswerKind kind = AnswerKind::kPick;
   std::uint8_t offer_index = 0;
   [[nodiscard]] bool operator==(const SurvivorsAnswer&) const = default;
+};
+// CE QU'UN JOUEUR DIT À UN TIC : son cap, et son bulletin s'il en dépose un.
+struct SurvivorsTeamInput {
+  std::uint8_t heading = kNoHeading;
+  std::optional<SurvivorsAnswer> ballot;
+  [[nodiscard]] bool operator==(const SurvivorsTeamInput&) const = default;
 };
 // Les flux d'aléa, dérivés de la graine : un flux par usage, pour qu'un tirage
 // de plus dans l'un ne décale pas les autres.
@@ -125,6 +134,23 @@ inline constexpr std::int32_t kTeamLeashCells = 30;
 // Une réserve commune ne dépasse pas ce nombre de charges de chaque sorte :
 // le double de ce qu'un solo apporte au rang maximal d'un service Kafra.
 inline constexpr std::uint8_t kMostTeamCharges = 6;
+// LE VOTE D'UNE MONTÉE DE NIVEAU se clôt à ce nombre de tics au plus : 10 s.
+inline constexpr std::uint32_t kVoteTicks = 500;
+// La pause commune d'un coffre ouvert en coop, en tics : 2 s.
+inline constexpr std::uint32_t kChestHoldTicks = 100;
+// L'ÉCHELLE D'UNE ÉQUIPE, en pour cent de la partie solo : l'EXP qu'un niveau
+// demande, les PV de la horde, et ses lots et son plancher.
+struct SurvivorsTeamScale {
+  std::int32_t exp_needed_pct = 100;
+  std::int32_t foe_hp_pct = 100;
+  std::int32_t batch_pct = 100;
+};
+inline constexpr std::array<SurvivorsTeamScale, kMostHeroes> kTeamScales{{
+    {.exp_needed_pct = 100, .foe_hp_pct = 100, .batch_pct = 100},
+    {.exp_needed_pct = 60, .foe_hp_pct = 85, .batch_pct = 110},
+    {.exp_needed_pct = 47, .foe_hp_pct = 78, .batch_pct = 110},
+    {.exp_needed_pct = 40, .foe_hp_pct = 72, .batch_pct = 118},
+}};
 // CE QU'UN HÉROS POSSÈDE EN PROPRE, hors de la scène : voir `PutOnStage`.
 struct SurvivorsKit {
   SurvivorsHero hero;
@@ -159,8 +185,16 @@ struct SurvivorsField {
   SurvivorsPhase phase = SurvivorsPhase::kRunning;
   SurvivorsHero hero;
   std::vector<SurvivorsKit> allies;
-  std::uint8_t stage = 0;                   // l'index du héros en scène
-  std::uint8_t leaves_left = 0;             // les feuilles d'Yggdrasil de l'équipe
+  std::uint8_t stage = 0;        // l'index du héros en scène
+  std::uint8_t leaves_left = 0;  // les feuilles d'Yggdrasil de l'équipe
+  // Les tics écoulés : ils avancent aussi pendant un vote ou une pause de coffre.
+  std::uint32_t ticks = 0;
+  // Le vote ouvert : le bulletin de chaque héros, et les tics qu'il lui reste ;
+  // 0 : il s'ouvrira au prochain tic.
+  std::array<std::optional<SurvivorsAnswer>, kMostHeroes> ballots;
+  std::uint32_t vote_ticks_left = 0;
+  // Les tics de la pause d'un coffre : la partie n'avance pas tant qu'il en reste.
+  std::uint32_t hold_ticks_left = 0;
   std::vector<SurvivorsFoe> foes;           // ordre de naissance
   std::vector<SurvivorsShot> shots;         // ordre de naissance
   std::vector<SurvivorsStrike> strikes;     // ordre d'émission
@@ -231,6 +265,12 @@ struct SurvivorsField {
 [[nodiscard]] inline std::size_t HeroCount(const SurvivorsField& field) noexcept {
   return field.allies.size() + 1;
 }
+// L'échelle de cette équipe.
+[[nodiscard]] inline const SurvivorsTeamScale& TeamScaleOf(const SurvivorsField& field) noexcept {
+  return kTeamScales[field.allies.size()];
+}
+// L'EXP que demande le niveau suivant de l'équipe.
+[[nodiscard]] std::uint32_t TeamExpToNext(const SurvivorsField& field);
 // Le héros `hero_index`, où qu'il soit. Son niveau et son EXP sont à jour entre
 // deux pas.
 [[nodiscard]] const SurvivorsHero& HeroAt(const SurvivorsField& field, std::size_t hero_index);
@@ -293,8 +333,16 @@ class SurvivorsRun {
   // UN PAS À PLUSIEURS : le cap de chaque héros, dans l'ordre de leur index ; un
   // héros sans cap reste à l'arrêt. Sans effet hors kRunning.
   void StepTeam(std::span<const SurvivorsInput> inputs);
+  // UN TIC DE PARTIE COOP, un jeu d'entrées par héros dans l'ordre de leur index :
+  // un pas, le tic d'un vote, ou celui d'une pause de coffre. Un bulletin que
+  // `BallotValid` refuse est ignoré. Sans effet sur une partie finie.
+  void Tick(std::span<const SurvivorsTeamInput> inputs);
+  // Le vote ouvert accepte ce bulletin : une offre présente, une charge ou une
+  // feuille en réserve, un héros à terre pour une relève.
+  [[nodiscard]] bool BallotValid(SurvivorsAnswer ballot) const;
   // Faux hors kChoosing, pour un index hors des offres, une charge épuisée, ou
-  // un bannissement de kHeal ou kZeny.
+  // un bannissement de kHeal ou kZeny. Une relève : faux sans feuille, ou pour
+  // un héros debout ou inconnu.
   [[nodiscard]] bool Answer(SurvivorsAnswer answer);
   // La partie s'arrête en kAbandoned, aussi pendant un choix, et son bilan
   // reflète l'état du moment (PV, niveau, monstres vivants), sans compter de

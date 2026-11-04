@@ -1,6 +1,7 @@
 #include "ro/sim/survivors_run.h"
 
 #include <algorithm>
+#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <limits>
@@ -176,6 +177,15 @@ void HoldLeash(SurvivorsField& field, FieldPoint from) {
 }
 
 }  // namespace
+
+std::uint32_t TeamExpToNext(const SurvivorsField& field) {
+  const std::uint32_t needed = ExpToNext(*field.rules, field.hero.level);
+  if (field.allies.empty()) return needed;
+  const std::uint64_t scaled = std::uint64_t{needed} *
+                               static_cast<std::uint64_t>(TeamScaleOf(field).exp_needed_pct) /
+                               static_cast<std::uint64_t>(survivors::kPercent);
+  return static_cast<std::uint32_t>(std::max<std::uint64_t>(scaled, 1));
+}
 
 const SurvivorsHero& HeroAt(const SurvivorsField& field, std::size_t hero_index) {
   return hero_index == field.stage ? field.hero : KitAt(field, hero_index).hero;
@@ -439,6 +449,28 @@ void SurvivorsRun::StepTeam(std::span<const SurvivorsInput> inputs) {
   PutOnStage(field_, 0);
   if (!field_.allies.empty()) SyncTeam(field_);
   CloseStep(field_);
+}
+
+void SurvivorsRun::Tick(std::span<const SurvivorsTeamInput> inputs) {
+  if (field_.phase == SurvivorsPhase::kOver) return;
+  ++field_.ticks;
+  if (field_.phase == SurvivorsPhase::kChoosing) {
+    survivors::AdvanceVote(field_, inputs);
+    return;
+  }
+  if (field_.hold_ticks_left > 0) {
+    --field_.hold_ticks_left;
+    return;
+  }
+  std::array<SurvivorsInput, kMostHeroes> headings{};
+  for (std::size_t index = 0; index < std::min(inputs.size(), kMostHeroes); ++index) {
+    headings[index].heading = inputs[index].heading;
+  }
+  StepTeam(headings);
+}
+
+bool SurvivorsRun::BallotValid(SurvivorsAnswer ballot) const {
+  return survivors::BallotAccepted(field_, ballot);
 }
 
 bool SurvivorsRun::Answer(SurvivorsAnswer answer) {

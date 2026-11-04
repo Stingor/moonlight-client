@@ -121,6 +121,7 @@ add_library(ro_sim STATIC
     src/survivors_loot.cpp
     src/survivors_meta.cpp
     src/survivors_play.cpp
+    src/survivors_team_play.cpp
     src/survivors_openness.cpp
     src/survivors_plants.cpp
     src/survivors_progress.cpp

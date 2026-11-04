@@ -59,6 +59,14 @@ void CountOne(Counter& counter) noexcept {
                      [&](const OwnedCard& owned) { return owned.card_item_id == card_item_id; });
 }
 
+// Une carte vaut pour toute l'équipe : celle d'un allié complète une évolution.
+[[nodiscard]] bool TeamOwnsCard(const SurvivorsField& field, std::uint16_t card_item_id) {
+  for (std::size_t index = 0; index < HeroCount(field); ++index) {
+    if (OwnsCard(HeroAt(field, index), card_item_id)) return true;
+  }
+  return false;
+}
+
 // ── Les coffres ────────────────────────────────────────────────────────────
 
 // Vrai si le héros possède `skill_id` à son plus haut niveau.
@@ -80,7 +88,7 @@ void CountOne(Counter& counter) noexcept {
   if (evolution == nullptr || !OwnsAtTop(field, owned.skill_id)) return nullptr;
   const bool completed = evolution->partner_skill_id != 0
                              ? OwnsAtTop(field, evolution->partner_skill_id)
-                             : OwnsCard(field.hero, evolution->card_item_id);
+                             : TeamOwnsCard(field, evolution->card_item_id);
   if (!completed || OwnsSkill(field.hero, evolution->evolved_skill_id) ||
       FindSkill(rules, evolution->evolved_skill_id) == nullptr) {
     return nullptr;
@@ -256,6 +264,7 @@ void OpenChest(SurvivorsField& field, FieldPoint at) {
     ForEachHero(field, [&field] { RecomputeStats(field); });
   }
   CountOne(field.tally.chests_opened);
+  if (!field.allies.empty()) field.hold_ticks_left = kChestHoldTicks;
   if (field.news.chests.size() < kMostNewsChests) {
     field.news.chests.push_back(news);
   } else {

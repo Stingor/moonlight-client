@@ -35,6 +35,9 @@ class Pcg32 {
   // si la somme est nulle ou dépasse 0xFFFFFFFF.
   [[nodiscard]] std::size_t PickWeighted(std::span<const std::uint32_t> weights) noexcept;
 
+  // L'état interne : ce que l'empreinte d'une partie compare d'une machine à l'autre.
+  [[nodiscard]] std::uint64_t state() const noexcept { return state_; }
+
   [[nodiscard]] bool operator==(const Pcg32&) const = default;
 
  private:

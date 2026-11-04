@@ -68,6 +68,8 @@ using Figure = ro::ui::SurvivorsEffectFigure;
       return Figure::kSkipsLeft;
     case ro::sim::KafraCharge::kBanish:
       return Figure::kBanishesLeft;
+    case ro::sim::KafraCharge::kRaise:
+      return Figure::kLeavesLeft;
   }
   return Figure::kRerollsLeft;
 }
@@ -82,6 +84,8 @@ using Figure = ro::ui::SurvivorsEffectFigure;
       return {field.start.loadout.skips, field.skips_left};
     case ro::sim::KafraCharge::kBanish:
       return {field.start.loadout.banishes, field.banishes_left};
+    case ro::sim::KafraCharge::kRaise:
+      return {field.start.leaves, field.leaves_left};
   }
   return {std::uint8_t{0}, std::uint8_t{0}};
 }

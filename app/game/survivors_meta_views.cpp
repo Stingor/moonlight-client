@@ -261,7 +261,8 @@ void SurvivorsViews::ComposeHudMeta(const SurvivorsStage& stage,
   const std::array<std::pair<ro::sim::KafraService, std::uint8_t>, ro::sim::kKafraServiceCount>
       charges{{{ro::sim::KafraService::kMagnifier, field.rerolls_left},
                {ro::sim::KafraService::kFlyWing, field.skips_left},
-               {ro::sim::KafraService::kButterflyWing, field.banishes_left}}};
+               {ro::sim::KafraService::kButterflyWing, field.banishes_left},
+               {ro::sim::KafraService::kYggdrasilLeaf, field.leaves_left}}};
   for (const auto& [service, count] : charges) {
     if (count == 0) continue;
     const ro::sim::KafraRule* rule = ro::sim::FindKafra(Meta(), service);

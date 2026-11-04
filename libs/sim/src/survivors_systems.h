@@ -17,6 +17,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include "ro/sim/survivors_geometry.h"
@@ -205,6 +206,17 @@ void BuildOffers(SurvivorsField& field);
 // Un skill acquis prend `ready_step = step` ; une orbite acquise ou montée de
 // niveau prend aussi `phase_step = step`, et repart au début de sa phase active.
 [[nodiscard]] bool ApplyAnswer(SurvivorsField& field, SurvivorsAnswer answer);
+
+// survivors_progress.cpp. Le bulletin est recevable : voir SurvivorsRun::BallotValid.
+[[nodiscard]] bool BallotAccepted(const SurvivorsField& field, SurvivorsAnswer ballot);
+// survivors_progress.cpp. UN TIC DE VOTE : les bulletins reçus, puis la
+// clôture à la majorité absolue, quand tous ont voté, ou à la fin des tics.
+// L'option la plus votée gagne ; à égalité, ou faute de bulletin parmi les
+// offres, un tirage du flux des offres.
+void AdvanceVote(SurvivorsField& field, std::span<const SurvivorsTeamInput> inputs);
+// survivors_hero.cpp. Le héros en scène se relève : PV, invulnérabilité et onde
+// de ReviveRule.
+void RaiseHero(SurvivorsField& field);
 
 // survivors_hero.cpp. `damage` moins l'armure du héros, au moins 1, retiré de
 // ses PV et compté dans `hero_hurt` ; rien pendant l'invulnérabilité d'une

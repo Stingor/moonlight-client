@@ -461,8 +461,14 @@ tr: Revela 25 objetos distintos en Roggle.
 fr: Dévoiler un item dans Roggle.
 tr: Revela un objeto en Roggle.
 
+fr: En coop, relever un allié à terre, au prix d'une montée de niveau.
+tr: En cooperativo, levanta a un aliado caído, a costa de una subida de nivel.
+
 fr: Entendre les autres joueurs, et leur parler en tenant la touche « Parler (voix) » des raccourcis. Seulement sur un serveur qui ouvre la voix.
 tr: Oír a los demás jugadores, y hablarles manteniendo pulsada la tecla «Hablar (voz)» de los atajos. Solo en un servidor que abre la voz.
+
+fr: Feuilles restantes : %d
+tr: Hojas restantes: %d
 
 fr: Gagner le défi du jour de Roggle.
 tr: Gana el reto del día de Roggle.

@@ -243,16 +243,15 @@ void SurvivorsViews::ComposeHud(const SurvivorsField& field, const ro::sim::Surv
     card_slots_.push_back(
         {.icon = SurvivorsItemIcon(card.card_item_id, tables), .level = card.level});
   }
-  hud_ = ro::ui::SurvivorsHudView{
-      .level = field.hero.level,
-      .exp_fill = Fill(field.hero.exp, ro::sim::ExpToNext(rules, field.hero.level)),
-      .clock_ms = clock_ms,
-      .kills = field.tally.kills,
-      .zeny = field.hero.zeny,
-      .skills = skill_slots_,
-      .cards = card_slots_,
-      .unread_whispers = static_cast<int>(facts.unread_whispers),
-      .hero_fill = Fill(field.hero.hp, field.hero.max_hp)};
+  hud_ = ro::ui::SurvivorsHudView{.level = field.hero.level,
+                                  .exp_fill = Fill(field.hero.exp, ro::sim::TeamExpToNext(field)),
+                                  .clock_ms = clock_ms,
+                                  .kills = field.tally.kills,
+                                  .zeny = field.hero.zeny,
+                                  .skills = skill_slots_,
+                                  .cards = card_slots_,
+                                  .unread_whispers = static_cast<int>(facts.unread_whispers),
+                                  .hero_fill = Fill(field.hero.hp, field.hero.max_hp)};
   if (const std::optional<CardVignetteShown> card = card_vignettes_.ShownAt(clock_ms)) {
     const ro::ui::SkinImage art = SurvivorsCardIllustration(card->card_item_id, tables);
     if (art.usable()) {

@@ -50,10 +50,9 @@ namespace {
 // LA RELÈVE : PV à `hp_pct` % des PV max (un au moins), invulnérable dès ce
 // pas et pendant `invulnerable_ms`, et l'onde qui écarte du héros, jusqu'à
 // `push_units`, chaque monstre tangible plus proche qu'un recul peut déplacer.
-void Revive(SurvivorsField& field) {
+void Rise(SurvivorsField& field) {
   const ReviveRule& revive = field.rules->revive;
   SurvivorsHero& hero = field.hero;
-  --field.lives_left;
   hero.hp = static_cast<std::int32_t>(std::clamp<std::int64_t>(
       std::int64_t{hero.max_hp} * std::clamp<std::int64_t>(revive.hp_pct, 0, kPercent) / kPercent,
       1, hero.max_hp));
@@ -77,7 +76,17 @@ void Revive(SurvivorsField& field) {
       SurvivorsReviveNews{.at = hero.position, .lives_left = field.lives_left});
 }
 
+void Revive(SurvivorsField& field) {
+  --field.lives_left;
+  Rise(field);
+}
+
 }  // namespace
+
+void RaiseHero(SurvivorsField& field) {
+  field.hero.down = false;
+  Rise(field);
+}
 
 void MoveHero(SurvivorsField& field, SurvivorsInput input) {
   SurvivorsHero& hero = field.hero;

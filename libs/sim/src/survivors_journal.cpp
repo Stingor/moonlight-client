@@ -120,7 +120,7 @@ std::uint8_t PackAnswer(SurvivorsAnswer answer) noexcept {
 
 std::optional<SurvivorsAnswer> UnpackAnswer(std::uint8_t value) noexcept {
   const auto kind = static_cast<std::uint8_t>(value >> kAnswerKindShift);
-  if (kind > static_cast<std::uint8_t>(AnswerKind::kBanish)) return std::nullopt;
+  if (kind > static_cast<std::uint8_t>(AnswerKind::kRaise)) return std::nullopt;
   return SurvivorsAnswer{.kind = static_cast<AnswerKind>(kind),
                          .offer_index = static_cast<std::uint8_t>(value & kAnswerIndexMask)};
 }

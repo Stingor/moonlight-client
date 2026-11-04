@@ -42,9 +42,9 @@ enum class Blessing : std::uint8_t {
 inline constexpr std::size_t kBlessingCount = 11;
 static_assert(static_cast<std::size_t>(Blessing::kResurrection) + 1 == kBlessingCount);
 
-enum class KafraService : std::uint8_t { kMagnifier, kFlyWing, kButterflyWing };
-inline constexpr std::size_t kKafraServiceCount = 3;
-static_assert(static_cast<std::size_t>(KafraService::kButterflyWing) + 1 == kKafraServiceCount);
+enum class KafraService : std::uint8_t { kMagnifier, kFlyWing, kButterflyWing, kYggdrasilLeaf };
+inline constexpr std::size_t kKafraServiceCount = 4;
+static_assert(static_cast<std::size_t>(KafraService::kYggdrasilLeaf) + 1 == kKafraServiceCount);
 
 // Ce qu'une Bénédiction change au départ.
 enum class BlessingEffect : std::uint8_t {
@@ -53,7 +53,8 @@ enum class BlessingEffect : std::uint8_t {
   kLife,      // `totals` vies
 };
 // La charge qu'un service Kafra donne à chaque partie : un rang, une charge.
-enum class KafraCharge : std::uint8_t { kReroll, kSkip, kBanish };
+// kRaise : une feuille, qui relève un allié à terre ; sans effet en solo.
+enum class KafraCharge : std::uint8_t { kReroll, kSkip, kBanish, kRaise };
 
 struct BlessingRule {
   Blessing blessing = Blessing::kBlessing;
@@ -156,6 +157,7 @@ std::uint64_t RefundKafra(SurvivorsMetaRanks& ranks, std::uint64_t& zeny) noexce
 struct SurvivorsMetaStart {
   SurvivorsLoadout loadout;
   std::uint8_t lives = 0;
+  std::uint8_t leaves = 0;  // sans effet en solo : une partie coop seule les prend
   [[nodiscard]] bool operator==(const SurvivorsMetaStart&) const = default;
 };
 [[nodiscard]] SurvivorsMetaStart LoadoutOf(const SurvivorsMeta& meta,

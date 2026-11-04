@@ -68,6 +68,7 @@ constexpr std::array<std::uint64_t, kKafraRanks> kKafraRankPrices{300, 600, 1200
 constexpr std::uint16_t kMagnifierItemId = 611;
 constexpr std::uint16_t kFlyWingItemId = 601;
 constexpr std::uint16_t kButterflyWingItemId = 602;
+constexpr std::uint16_t kYggdrasilLeafItemId = 610;
 
 constexpr std::array<BlessingRule, kBlessingCount> kBlessings{{
     {.blessing = Blessing::kBlessing,
@@ -175,6 +176,11 @@ constexpr std::array<KafraRule, kKafraServiceCount> kKafraServices{{
      .key = "butterfly_wing",
      .item_id = kButterflyWingItemId,
      .charge = KafraCharge::kBanish,
+     .rank_prices = kKafraRankPrices},
+    {.service = KafraService::kYggdrasilLeaf,
+     .key = "yggdrasil_leaf",
+     .item_id = kYggdrasilLeafItemId,
+     .charge = KafraCharge::kRaise,
      .rank_prices = kKafraRankPrices},
 }};
 
@@ -380,6 +386,9 @@ SurvivorsMetaStart LoadoutOf(const SurvivorsMeta& meta, const SurvivorsMetaRanks
         break;
       case KafraCharge::kBanish:
         start.loadout.banishes = charges;
+        break;
+      case KafraCharge::kRaise:
+        start.leaves = charges;
         break;
     }
   }

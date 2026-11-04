@@ -148,6 +148,9 @@ SurvivorsFigureText SurvivorsEffectFigureText(SurvivorsEffectFigure figure, std:
     case SurvivorsEffectFigure::kLivesLeft:
       std::snprintf(out, size, core::Tr("Vies restantes : %d"), shown);
       break;
+    case SurvivorsEffectFigure::kLeavesLeft:
+      std::snprintf(out, size, core::Tr("Feuilles restantes : %d"), shown);
+      break;
   }
   return text;
 }

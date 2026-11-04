@@ -63,6 +63,9 @@ const char* SurvivorsKafraDescription(std::string_view service_key) {
   if (service_key == "butterfly_wing") {
     return core::Tr("Bannir : retirer une carte des offres de la partie.");
   }
+  if (service_key == "yggdrasil_leaf") {
+    return core::Tr("En coop, relever un allié à terre, au prix d'une montée de niveau.");
+  }
   return "";
 }
 

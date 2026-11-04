@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <limits>
@@ -82,7 +83,7 @@ void GainExp(SurvivorsField& field, std::uint32_t exp) {
   hero.exp = SaturatedSum(hero.exp, gained);
   field.tally.exp_total = SaturatedSum(field.tally.exp_total, gained);
   while (hero.level < std::numeric_limits<std::uint16_t>::max()) {
-    const std::uint32_t needed = ExpToNext(*field.rules, hero.level);
+    const std::uint32_t needed = TeamExpToNext(field);
     if (hero.exp < needed) break;
     hero.exp -= needed;
     ++hero.level;
@@ -477,8 +478,94 @@ void BuildOffers(SurvivorsField& field) {
   }
 }
 
+bool BallotAccepted(const SurvivorsField& field, SurvivorsAnswer ballot) {
+  if (field.phase != SurvivorsPhase::kChoosing) return false;
+  if (ballot.kind == AnswerKind::kRaise) {
+    return field.leaves_left > 0 && std::size_t{ballot.offer_index} < HeroCount(field) &&
+           HeroAt(field, ballot.offer_index).down;
+  }
+  if (std::size_t{ballot.offer_index} >= field.offers.size()) return false;
+  const SurvivorsOffer& offer = field.offers[ballot.offer_index];
+  switch (ballot.kind) {
+    case AnswerKind::kPick:
+      return true;
+    case AnswerKind::kReroll:
+      return field.rerolls_left > 0;
+    case AnswerKind::kSkip:
+      return field.skips_left > 0;
+    case AnswerKind::kBanish:
+      return field.banishes_left > 0 && offer.kind != OfferKind::kHeal &&
+             offer.kind != OfferKind::kZeny;
+    case AnswerKind::kRaise:
+      break;
+  }
+  return false;
+}
+
+void AdvanceVote(SurvivorsField& field, std::span<const SurvivorsTeamInput> inputs) {
+  if (field.vote_ticks_left == 0) field.vote_ticks_left = kVoteTicks;
+  const std::size_t voters = HeroCount(field);
+  for (std::size_t voter = 0; voter < std::min(voters, inputs.size()); ++voter) {
+    if (inputs[voter].ballot.has_value() && BallotAccepted(field, *inputs[voter].ballot)) {
+      field.ballots[voter] = inputs[voter].ballot;
+    }
+  }
+  --field.vote_ticks_left;
+  // Les options votées, dans l'ordre de leur premier bulletin, et leurs voix.
+  std::array<SurvivorsAnswer, kMostHeroes> options{};
+  std::array<std::uint32_t, kMostHeroes> votes{};
+  std::size_t option_count = 0;
+  std::size_t cast = 0;
+  std::uint32_t best = 0;
+  for (std::size_t voter = 0; voter < voters; ++voter) {
+    if (!field.ballots[voter].has_value()) continue;
+    ++cast;
+    std::size_t option = 0;
+    while (option < option_count && !(options[option] == *field.ballots[voter])) ++option;
+    if (option == option_count) options[option_count++] = *field.ballots[voter];
+    best = std::max(best, ++votes[option]);
+  }
+  const bool majority = std::size_t{best} * 2 > voters;
+  if (!majority && cast < voters && field.vote_ticks_left > 0) return;
+  // L'option retenue : la plus votée, ou le tirage parmi les ex æquo ; sans
+  // aucun bulletin, le tirage parmi les offres.
+  SurvivorsAnswer chosen{};
+  if (cast == 0) {
+    chosen.kind = AnswerKind::kPick;
+    chosen.offer_index = static_cast<std::uint8_t>(
+        field.offer_random.Below(static_cast<std::uint32_t>(field.offers.size())));
+  } else {
+    std::uint32_t tied = 0;
+    for (std::size_t option = 0; option < option_count; ++option) {
+      if (votes[option] == best) ++tied;
+    }
+    std::uint32_t draw = tied > 1 ? field.offer_random.Below(tied) : 0;
+    for (std::size_t option = 0; option < option_count; ++option) {
+      if (votes[option] != best) continue;
+      if (draw == 0) {
+        chosen = options[option];
+        break;
+      }
+      --draw;
+    }
+  }
+  field.ballots = {};
+  field.vote_ticks_left = 0;
+  // Une offre qui ne s'applique plus laisse passer le niveau, sans charge.
+  if (!ApplyAnswer(field, chosen)) Settle(field);
+}
+
 bool ApplyAnswer(SurvivorsField& field, SurvivorsAnswer answer) {
   if (field.rules == nullptr || field.phase != SurvivorsPhase::kChoosing) return false;
+  if (answer.kind == AnswerKind::kRaise) {
+    if (!BallotAccepted(field, answer)) return false;
+    --field.leaves_left;
+    PutOnStage(field, answer.offer_index);
+    RaiseHero(field);
+    PutOnStage(field, 0);
+    Settle(field);
+    return true;
+  }
   // Toute réponse, même sans offre à désigner, porte un index pris dans les
   // offres : un choix n'a qu'un encodage, et un journal porteur d'un index
   // absurde ne se rejoue pas.
@@ -519,6 +606,8 @@ bool ApplyAnswer(SurvivorsField& field, SurvivorsAnswer answer) {
       BuildOffers(field);
       return true;
     }
+    case AnswerKind::kRaise:  // jugée plus haut
+      break;
   }
   return false;
 }

@@ -159,6 +159,7 @@ std::uint32_t HatchFoe(SurvivorsField& field, const FoeRule& rule, FieldPoint at
                                       : tuning.foe_hp_growth_pct_per_minute;
   std::int32_t hp = PercentOfHp(rule.hp, kPercent + std::int64_t{growth_pct} * minutes);
   if (options.elite) hp = PercentOfHp(hp, rules.elites.hp_pct);
+  if (!field.allies.empty()) hp = PercentOfHp(hp, TeamScaleOf(field).foe_hp_pct);
   // La Cursed Water du départ majore les PV après la croissance et l'élite ;
   // le rang 0 n'y touche pas.
   if (const std::uint8_t cursed = field.start.cursed_water;
@@ -184,6 +185,19 @@ std::uint32_t HatchFoe(SurvivorsField& field, const FoeRule& rule, FieldPoint at
   return foe.serial;
 }
 
+namespace {
+
+// Un lot ou un plancher de vague, à l'échelle de l'équipe. `wave_batch_born`
+// compte dans un octet : un lot n'en sort pas.
+[[nodiscard]] std::size_t ScaledCrowd(const SurvivorsField& field, std::size_t crowd) noexcept {
+  constexpr std::size_t kMostCrowd = 255;
+  if (field.allies.empty()) return crowd;
+  const auto pct = static_cast<std::size_t>(TeamScaleOf(field).batch_pct);
+  return std::min(crowd * pct / static_cast<std::size_t>(kPercent), kMostCrowd);
+}
+
+}  // namespace
+
 void SpawnFoes(SurvivorsField& field) {
   const SurvivorsRules& rules = *field.rules;
   const std::span<const WaveRule> waves = field.content.waves;
@@ -204,8 +218,8 @@ void SpawnFoes(SurvivorsField& field) {
     // reprend au pas suivant pour son SEUL reste, compté quelle que soit la
     // vague en vigueur. Un lot que le plafond réduit est accompli.
     if (field.step - field.wave_spawn_step >= StepsOf(wave.interval_ms)) {
-      const std::size_t owed =
-          wave.batch - std::min<std::size_t>(wave.batch, field.wave_batch_born);
+      const std::size_t batch = ScaledCrowd(field, wave.batch);
+      const std::size_t owed = batch - std::min<std::size_t>(batch, field.wave_batch_born);
       const std::size_t room = most_foes - std::min(most_foes, field.foes.size());
       const std::size_t wanted = std::min(owed, room);
       const WaveHatch hatch = HatchFromWave(field, wave, wanted, room);
@@ -220,9 +234,10 @@ void SpawnFoes(SurvivorsField& field) {
     }
     // Sous le plancher, des naissances de plus, bornées par pas.
     const std::size_t alive = field.foes.size();
-    if (hatching && alive < wave.floor) {
+    const std::size_t floor = ScaledCrowd(field, wave.floor);
+    if (hatching && alive < floor) {
       const std::size_t room = most_foes - std::min(most_foes, alive);
-      const std::size_t missing = std::min<std::size_t>(wave.floor - alive, room);
+      const std::size_t missing = std::min<std::size_t>(floor - alive, room);
       (void)HatchFromWave(field, wave,
                           std::min<std::size_t>(missing, rules.tuning.most_floor_spawns_per_step),
                           room);
