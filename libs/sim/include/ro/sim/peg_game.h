@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <array>
 #include <cstdint>
 #include <random>
@@ -37,7 +38,15 @@ inline constexpr float kPegCannonY = 34.0F;
 inline constexpr float kPegBucketWidth = 82.0F;
 inline constexpr float kPegBucketHeight = 16.0F;
 inline constexpr float kPegBucketY = kPegBoardHeight - 22.0F;
-inline constexpr int kPegStartBalls = 10;
+
+// LES BILLES D'UNE PARTIE suivent le plateau : une par dizaine de plots, arrondi
+// au-dessus, sans descendre sous le plancher qui laisse une chance à un petit
+// plateau.
+inline constexpr int kPegsPerStartBall = 10;
+inline constexpr int kPegFewestStartBalls = 4;
+[[nodiscard]] constexpr int PegStartBalls(int peg_count) noexcept {
+  return std::max(kPegFewestStartBalls, (peg_count + kPegsPerStartBall - 1) / kPegsPerStartBall);
+}
 
 // Le pas de la physique, en secondes.
 inline constexpr float kPegStepS = 1.0F / 240.0F;
@@ -292,6 +301,7 @@ class PegGame {
   // Pose ses propres plots et repart d'une partie neuve, sans violet tournant.
   void SetPegs(std::vector<Peg> pegs);
   void PlaceBall(PegPoint at, PegPoint velocity);
+  void SetBallsLeft(int balls_left) noexcept { balls_left_ = balls_left; }
 
  private:
   void StartBoard(PegLayout layout, bool daily, std::uint32_t day);
@@ -328,7 +338,7 @@ class PegGame {
   std::uint32_t item_id_ = 0;
   PegFrame picture_frame_;
   bool purple_rotates_ = false;
-  int balls_left_ = kPegStartBalls;
+  int balls_left_ = kPegFewestStartBalls;
   int score_ = 0;
   int orange_total_ = 0;
   int orange_left_ = 0;

@@ -158,7 +158,7 @@ void PegGame::Restart() {
   orange_total_ = static_cast<int>(
       std::ranges::count_if(pegs_, [](const Peg& peg) { return peg.kind == PegKind::kOrange; }));
   orange_left_ = orange_total_;
-  balls_left_ = kPegStartBalls;
+  balls_left_ = PegStartBalls(static_cast<int>(pegs_.size()));
   score_ = 0;
   catches_ = 0;
   powers_used_ = 0;
