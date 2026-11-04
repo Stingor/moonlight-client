@@ -799,6 +799,7 @@ target_include_directories(moonclient_memorial PUBLIC ${CMAKE_CURRENT_SOURCE_DIR
 add_library(moonclient_minigames STATIC
     game/minigame_file.cpp
     game/minigame_stage.cpp
+    game/minigame_stage_roggle.cpp
     game/minigame_trophy_announcer.cpp
     game/survivors_book_mode.cpp
     game/survivors_codex_desk.cpp
@@ -2118,6 +2119,12 @@ set_target_properties(moonclient PROPERTIES OUTPUT_NAME "MoonClient")
 if(MSVC)
     target_link_options(moonclient PRIVATE
         "$<$<NOT:$<CONFIG:Debug>>:/SUBSYSTEM:WINDOWS;/ENTRY:mainCRTStartup>")
+endif()
+
+# LA COQUILLE DU CLIENT INCLUT TOUTES LES ÉTAPES : son objet dépasse le nombre
+# de sections qu'un objet MSVC ordinaire admet (C1128).
+if(MSVC)
+    set_source_files_properties(game/client_shell.cpp PROPERTIES COMPILE_OPTIONS /bigobj)
 endif()
 
 # 🔴 LE RUNTIME C++ VOYAGE AVEC L'EXÉCUTABLE, à côté de lui.

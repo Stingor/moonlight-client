@@ -17,6 +17,8 @@ constexpr int kRojeweledLongCombo = 4;
 constexpr int kRoggleCatches = 3;
 constexpr int kRoggleSpareBalls = 5;
 constexpr int kRoggleHighScore = 20000;
+constexpr int kRogglePowers = 3;
+constexpr int kRoggleBigShot = 10000;
 
 constexpr std::array<MinigameTrophyText, kMinigameTrophyCount> kTrophies = {{
     {MinigameTrophy::kRojeweledFinished, "rojeweled_finished", core::TrText("Jusqu'au bout"),
@@ -82,6 +84,14 @@ constexpr std::array<MinigameTrophyText, kMinigameTrophyCount> kTrophies = {{
      core::TrText("Obtenir Crimson Rock dans une partie de Survivants de Midgard.")},
     {MinigameTrophy::kSurvivorsJackFrost, "survivors_jack_frost", core::TrText("Givre"),
      core::TrText("Obtenir Jack Frost, l'union de Water Ball et de Cold Bolt.")},
+    {MinigameTrophy::kRoggleThreePowers, "roggle_three_powers", core::TrText("Arsenal"),
+     core::TrText("Déclencher trois pouvoirs dans une partie de Roggle.")},
+    {MinigameTrophy::kRoggleDailyWon, "roggle_daily_won", core::TrText("Défi relevé"),
+     core::TrText("Gagner le défi du jour de Roggle.")},
+    {MinigameTrophy::kRoggleBigShot, "roggle_big_shot", core::TrText("Coup d'éclat"),
+     core::TrText("Marquer 10 000 points en un seul tir de Roggle.")},
+    {MinigameTrophy::kRoggleFreeBall, "roggle_free_ball", core::TrText("Bille offerte"),
+     core::TrText("Gagner une bille par un tir de Roggle.")},
 }};
 
 }  // namespace
@@ -117,6 +127,14 @@ std::vector<MinigameTrophy> RecordRoggle(MinigameRecord& record, const PegGame& 
   if (over && game.score() > record.roggle_best) {
     record.roggle_best = game.score();
   }
+  // LE MEILLEUR DU JOUR repart de zéro avec un jour neuf.
+  if (over && game.daily()) {
+    if (game.day() != record.roggle_daily_day) {
+      record.roggle_daily_day = game.day();
+      record.roggle_daily_best = 0;
+    }
+    record.roggle_daily_best = std::max(record.roggle_daily_best, game.score());
+  }
   EarnMinigameTrophy(record, MinigameTrophy::kRoggleWon, won, fresh);
   EarnMinigameTrophy(record, MinigameTrophy::kRoggleFlawless,
                      won && game.balls_left() >= kRoggleSpareBalls, fresh);
@@ -124,12 +142,25 @@ std::vector<MinigameTrophy> RecordRoggle(MinigameRecord& record, const PegGame& 
                      fresh);
   EarnMinigameTrophy(record, MinigameTrophy::kRoggleScore20000, game.score() >= kRoggleHighScore,
                      fresh);
+  EarnMinigameTrophy(record, MinigameTrophy::kRoggleThreePowers,
+                     game.powers_used() >= kRogglePowers, fresh);
+  EarnMinigameTrophy(record, MinigameTrophy::kRoggleDailyWon, won && game.daily(), fresh);
+  EarnMinigameTrophy(record, MinigameTrophy::kRoggleBigShot, game.best_shot() >= kRoggleBigShot,
+                     fresh);
+  EarnMinigameTrophy(record, MinigameTrophy::kRoggleFreeBall, game.free_balls() > 0, fresh);
   return fresh;
 }
 
 void MergeMinigameRecord(MinigameRecord& into, const MinigameRecord& from) {
   into.rojeweled_best = std::max(into.rojeweled_best, from.rojeweled_best);
   into.roggle_best = std::max(into.roggle_best, from.roggle_best);
+  // Le meilleur du jour le plus récent l'emporte ; à jour égal, le plus haut.
+  if (from.roggle_daily_day > into.roggle_daily_day) {
+    into.roggle_daily_day = from.roggle_daily_day;
+    into.roggle_daily_best = from.roggle_daily_best;
+  } else if (from.roggle_daily_day == into.roggle_daily_day) {
+    into.roggle_daily_best = std::max(into.roggle_daily_best, from.roggle_daily_best);
+  }
   for (std::size_t trophy = 0; trophy < kMinigameTrophyCount; ++trophy) {
     into.unlocked[trophy] = into.unlocked[trophy] || from.unlocked[trophy];
   }

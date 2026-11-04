@@ -32,8 +32,6 @@ struct OwnedSkill {
   // Origine de la phase d'une orbite : le pas de son acquisition, puis de
   // chaque montée de niveau, pour qu'elle reparte au début de sa phase active.
   std::uint32_t phase_step = 0;
-  // Une posture dure tant que `step < stance_until_step` ; 0 : éteinte.
-  std::uint32_t stance_until_step = 0;
 };
 struct OwnedCard {
   std::uint16_t card_item_id = 0;
@@ -72,26 +70,6 @@ struct SurvivorsHero {
   // Relevé, il ne prend aucun coup tant que `step < invulnerable_until_step`.
   std::uint32_t invulnerable_until_step = 0;
 };
-
-// LE MÉTIER QUE LE HÉROS MONTRE : celui de sa classe, de son évolution dès la
-// première, et monté tant qu'il tient la carte de sa monture.
-[[nodiscard]] inline std::uint16_t HeroJobOf(const ClassRule& hero_class,
-                                             const SurvivorsHero& hero) noexcept {
-  const bool evolved = hero.evolutions > 0 && hero_class.evolved_job_id != 0;
-  bool mounted = false;
-  if (hero_class.mount_card_item_id != 0) {
-    for (const OwnedCard& card : hero.cards) {
-      mounted = mounted || card.card_item_id == hero_class.mount_card_item_id;
-    }
-  }
-  if (mounted) {
-    const std::uint16_t ridden =
-        evolved ? hero_class.mounted_evolved_job_id : hero_class.mounted_job_id;
-    if (ridden != 0) return ridden;
-  }
-  return evolved ? hero_class.evolved_job_id : hero_class.job_id;
-}
-
 struct SurvivorsFoe {
   std::uint32_t serial = 0;  // numéro de naissance, unique dans la partie
   std::uint16_t foe_id = 0;

@@ -263,6 +263,9 @@ tr: Line up three monsters of the same colour, in thirty moves.
 fr: Allège ou rétablit les effets.
 tr: Lightens or restores the effects.
 
+fr: Anneaux
+tr: Rings
+
 fr: Annonce sur la carte, sans ton nom.
 tr: Announces on the map, without your name.
 
@@ -274,6 +277,9 @@ tr: Announces to the whole server, without your name.
 
 fr: Annonce à tout le serveur, ton nom en tête.
 tr: Announces to the whole server, your name first.
+
+fr: Arsenal
+tr: Arsenal
 
 fr: Atteindre 15 000 points dans une partie de Rojeweled.
 tr: Reach 15,000 points in a game of Rojeweled.
@@ -299,6 +305,9 @@ tr: Allows all whispers again.
 fr: Balayage (°)
 tr: Sweep (°)
 
+fr: Bande ! +%d
+tr: Bank shot! +%d
+
 fr: Bascule le battle mode : la barre de saisie se replie.
 tr: Toggles battle mode: the input bar folds away.
 
@@ -310,6 +319,12 @@ tr: Base Lv. %d
 
 fr: Basic Info : replier ou déplier
 tr: Basic Info: collapse or expand
+
+fr: Bille offerte
+tr: Free ball
+
+fr: Bille offerte !
+tr: Free ball!
 
 fr: Billes : %d
 tr: Balls: %d
@@ -347,6 +362,9 @@ tr: Sky
 fr: Cliquez deux monstres voisins pour les échanger.
 tr: Click two neighbouring monsters to swap them.
 
+fr: Cliquez sur la fenêtre pour reprendre.
+tr: Click the window to resume.
+
 fr: Colle la caméra au personnage, ou la laisse rattraper.
 tr: Sticks the camera to the character, or lets it catch up.
 
@@ -361,6 +379,9 @@ tr: Sunset (h)
 
 fr: Couleur du titre
 tr: Title color
+
+fr: Coup d'éclat
+tr: Masterstroke
 
 fr: Coupe ou rétablit la musique.
 tr: Mutes or restores the music.
@@ -398,14 +419,38 @@ tr: Asks for the blacksmith ranking.
 fr: Demande le classement des taekwons.
 tr: Asks for the taekwon ranking.
 
+fr: Dernier orange !
+tr: Last orange!
+
 fr: Des boules de feu tournent autour de vous.
 tr: Fireballs circle around you.
 
 fr: Des éclats d'esprit frappent là où les monstres se pressent.
 tr: Spirit bursts strike where monsters crowd together.
 
+fr: Déclencher trois pouvoirs dans une partie de Roggle.
+tr: Trigger three powers in a game of Roggle.
+
+fr: Défi du jour
+tr: Daily challenge
+
+fr: Défi du jour :
+tr: Daily challenge:
+
+fr: Défi relevé
+tr: Challenge met
+
 fr: Entendre les autres joueurs, et leur parler en tenant la touche « Parler (voix) » des raccourcis. Seulement sur un serveur qui ouvre la voix.
 tr: Hear the other players, and talk to them by holding the "Talk (voice)" shortcut key. Only on a server that opens voice.
+
+fr: Gagner le défi du jour de Roggle.
+tr: Win the Roggle daily challenge.
+
+fr: Gagner une bille par un tir de Roggle.
+tr: Earn a ball from a single Roggle shot.
+
+fr: Grille éparse
+tr: Scattered grid
 
 fr: Il faut être en ville ou dans un intérieur.
 tr: You must be in a town or indoors.
@@ -419,14 +464,32 @@ tr: The storage is open.
 fr: La liaison avec le serveur est perdue.
 tr: The connection to the server is lost.
 
+fr: Marquer 10 000 points en un seul tir de Roggle.
+tr: Score 10,000 points in a single Roggle shot.
+
+fr: Meilleur du jour :
+tr: Today's best:
+
 fr: On vous propose un échange.
 tr: Someone is offering you a trade.
 
 fr: Parler (voix)
 tr: Talk (voice)
 
+fr: Plateau :
+tr: Board:
+
 fr: Proximité
 tr: Nearby
+
+fr: Pyramide
+tr: Pyramid
+
+fr: Rafale ! +%d
+tr: Volley! +%d
+
+fr: Tir lointain ! +%d
+tr: Long shot! +%d
 
 fr: Un PNJ vous parle.
 tr: An NPC is talking to you.
@@ -517,12 +580,6 @@ tr: A spear thrown far strikes the nearest monster.
 
 fr: Un coup furieux disperse la foule la plus dense à portée.
 tr: A furious blow scatters the densest crowd within reach.
-
-fr: Par moments, vous encaissez : votre armure augmente.
-tr: At times you brace yourself: your armor rises.
-
-fr: Par moments, vos coups s'enchaînent : toutes les recharges raccourcissent.
-tr: At times your blows come in a rush: every cooldown shortens.
 
 fr: Des coups écrasants s'abattent sur ce qui vous touche.
 tr: Crushing blows rain down on whatever touches you.
@@ -1616,17 +1673,17 @@ tr: A window you drag sticks to the edge of another window or of the screen, the
 fr: Une vente est ouverte.
 tr: A shop is open.
 
+fr: Vagues
+tr: Waves
+
 fr: Vaut pour l'heure forcée ci-dessus comme pour le « Cycle jour/nuit » de Graphics. Seul ce client le voit.
 tr: Applies to the forced hour above as well as to the “Day/night cycle” in Graphics. Only this client sees it.
 
-fr: Visez à la souris, cliquez pour tirer.
-tr: Aim with the mouse, click to shoot.
+fr: Visez à la souris, affinez à la molette, cliquez pour tirer.
+tr: Aim with the mouse, fine-tune with the wheel, click to shoot.
 
 fr: Vitesse de marche augmentée.
 tr: Increased walk speed.
-
-fr: Vous montez votre Peco Peco : vitesse de marche augmentée.
-tr: You ride your Peco Peco: increased walk speed.
 
 fr: Vitesse du temps
 tr: Speed of time

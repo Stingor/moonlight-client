@@ -6142,3 +6142,63 @@ achievements:
       minor: 1
       objectives:
         - {text: "Jack Frost"}
+  910030:
+    name: "Arsenal"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Roggle"
+      details: "Déclencher trois pouvoirs dans une partie de Roggle."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Trois pouvoirs"}
+  910031:
+    name: "Defi releve"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Roggle"
+      details: "Gagner le défi du jour de Roggle."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Défi du jour gagné"}
+  910032:
+    name: "Coup d'eclat"
+    score: 30
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Roggle"
+      details: "Marquer 10 000 points en un seul tir de Roggle."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "10 000 points en un tir"}
+  910033:
+    name: "Bille offerte"
+    score: 10
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Roggle"
+      details: "Gagner une bille par un tir de Roggle."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Une bille gagnée"}

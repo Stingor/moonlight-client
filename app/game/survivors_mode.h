@@ -219,7 +219,7 @@ class SurvivorsMode {
   // Le carnet de l'accueil et les intentions de ses fenêtres de méta.
   SurvivorsMetaDesk desk_;
   // L'apparence du héros posée, et si elle était celle de l'évolution.
-  std::optional<std::uint16_t> hero_job_;
+  std::optional<bool> hero_evolved_;
   int pressed_card_key_ = 0;
   // Ctrl+Tab a masqué la minimap ; elle le reste d'une partie à l'autre.
   bool minimap_hidden_ = false;

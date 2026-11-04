@@ -22,6 +22,8 @@ namespace {
 // écrits chez le joueur.
 constexpr const char* kRojeweledBestField = "rojeweled_best";
 constexpr const char* kRoggleBestField = "roggle_best";
+constexpr const char* kRoggleDailyDayField = "roggle_daily_day";
+constexpr const char* kRoggleDailyBestField = "roggle_daily_best";
 constexpr const char* kTrophiesField = "trophies";
 constexpr const char* kSurvivorsEvolvedField = "survivors_evolved";
 
@@ -58,6 +60,13 @@ ro::core::Result<ro::sim::MinigameRecord> ReadMinigameRecord(std::string_view te
     }
     record.rojeweled_best = BestIn(whole, kRojeweledBestField);
     record.roggle_best = BestIn(whole, kRoggleBestField);
+    // Un jour illisible efface le meilleur du jour avec lui.
+    const YAML::Node daily_day = whole[kRoggleDailyDayField];
+    if (daily_day && daily_day.IsScalar()) {
+      record.roggle_daily_day = daily_day.as<std::uint32_t>(0);
+      record.roggle_daily_best =
+          record.roggle_daily_day == 0 ? 0 : BestIn(whole, kRoggleDailyBestField);
+    }
     const YAML::Node trophies = whole[kTrophiesField];
     if (trophies && trophies.IsSequence()) {
       const auto catalog = ro::sim::MinigameTrophies();
@@ -103,6 +112,10 @@ std::string WriteMinigameRecord(const ro::sim::MinigameRecord& record) {
   out << YAML::BeginMap;
   out << YAML::Key << kRojeweledBestField << YAML::Value << record.rojeweled_best;
   out << YAML::Key << kRoggleBestField << YAML::Value << record.roggle_best;
+  if (record.roggle_daily_day != 0) {
+    out << YAML::Key << kRoggleDailyDayField << YAML::Value << record.roggle_daily_day;
+    out << YAML::Key << kRoggleDailyBestField << YAML::Value << record.roggle_daily_best;
+  }
   out << YAML::Key << kTrophiesField << YAML::Value << YAML::BeginSeq;
   for (const ro::sim::MinigameTrophyText& text : ro::sim::MinigameTrophies()) {
     if (record.Has(text.trophy)) {

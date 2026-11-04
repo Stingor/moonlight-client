@@ -187,6 +187,26 @@ class MinigameStage {
   std::vector<ro::ui::RojeweledBlast> blasts_;
   std::vector<ro::ui::RogglePeg> pegs_;
   std::vector<ro::ui::RogglePoint> guide_;
+
+  // ── ROGGLE : voir `minigame_stage_roggle.cpp` ─────────────────────────────
+  void ApplyRoggleAnswer(MinigameWindows& windows);
+  // LES AVIS ET LES ÉCLATS, datés à l'horloge de la partie : ils se figent
+  // avec elle.
+  struct RoggleCalloutBorn {
+    ro::sim::PegCallout callout;
+    std::uint32_t born_ms = 0;
+  };
+  struct RoggleBurstBorn {
+    ro::sim::PegCleared cleared;
+    std::uint32_t born_ms = 0;
+  };
+  std::deque<RoggleCalloutBorn> roggle_callouts_;
+  std::deque<RoggleBurstBorn> roggle_bursts_;
+  std::vector<ro::ui::RoggleCallout> roggle_callout_views_;
+  std::vector<ro::ui::RoggleBurst> roggle_burst_views_;
+  std::vector<ro::ui::RogglePoint> roggle_balls_;
+  // La fenêtre de Roggle était dépliée et avait le focus à l'image précédente.
+  bool roggle_watching_ = false;
 };
 
 }  // namespace moonclient

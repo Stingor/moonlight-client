@@ -78,7 +78,6 @@ namespace {
     case ro::sim::SkillArchetype::kLinear:
     case ro::sim::SkillArchetype::kNova:
     case ro::sim::SkillArchetype::kCone:
-    case ro::sim::SkillArchetype::kStance:
       return SkillBearer::kHero;
     case ro::sim::SkillArchetype::kTargetStrike:
     case ro::sim::SkillArchetype::kClusterBlast:
@@ -117,10 +116,11 @@ std::uint16_t PickupLookOf(const ro::sim::SurvivorsPickup& pickup) noexcept {
 }
 
 ro::render::ActorLook HeroLook(const ro::render::ActorLook& player,
-                               const ro::sim::ClassRule& hero_class, std::uint16_t job) noexcept {
+                               const ro::sim::ClassRule& hero_class, bool evolved) noexcept {
   ro::render::ActorLook look;
   look.player = true;
-  look.job = job != 0 ? job : hero_class.job_id;
+  look.job =
+      evolved && hero_class.evolved_job_id != 0 ? hero_class.evolved_job_id : hero_class.job_id;
   look.sex = player.sex;
   look.hair = player.hair;
   look.headgears = player.headgears;

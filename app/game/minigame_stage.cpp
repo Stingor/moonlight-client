@@ -24,17 +24,10 @@ constexpr std::array<std::uint32_t, ro::ui::kRojeweledKinds> kGemClasses = {1002
 // L'étoile de Rojeweled est un Angeling, rangé après la bille de Roggle.
 constexpr std::uint32_t kStarClass = 1096;
 constexpr std::size_t kStarSlot = ro::ui::kRojeweledKinds + 1;
-// La bille de Roggle est un Poring.
-constexpr std::uint32_t kBallClass = 1002;
-constexpr std::size_t kBallSlot = ro::ui::kRojeweledKinds;
-// Les gemmes des plots : Red Gemstone à effacer, Blue Gemstone en bonus.
-constexpr std::uint32_t kOrangePegItem = 716;
-constexpr std::uint32_t kBluePegItem = 717;
 
 // Le côté du cadre où se compose un monstre, en pixels : une case de grille
-// moins ses marges, la bille un peu plus grande que son contact.
+// moins ses marges.
 constexpr int kGemBoxPx = 36;
-constexpr int kBallBoxPx = 26;
 
 // L'avis d'un trophée : plein, puis il s'efface.
 constexpr std::uint32_t kToastShownMs = 2500;
@@ -42,8 +35,6 @@ constexpr std::uint32_t kToastFadeMs = 500;
 
 // Les sons, sous le dossier des sons du jeu.
 constexpr const char* kBurstSound = "_stone_explosion.wav";
-constexpr const char* kOrangeHitSound = "effect\\EF_hit2.wav";
-constexpr const char* kBlueHitSound = "effect\\EF_hit4.wav";
 constexpr const char* kRewardSound = "_heal_effect.wav";
 // Rojeweled : un échange refusé claque comme un bouton, un remélange sonne
 // comme un début de sort.
@@ -74,20 +65,6 @@ constexpr const char* kStarBlastSound = "effect\\EF_ThunderStorm.wav";
       return ro::ui::RojeweledSpecial::kStar;
   }
   return ro::ui::RojeweledSpecial::kNone;
-}
-
-[[nodiscard]] ro::ui::RogglePhase PhaseOf(ro::sim::PegPhase phase) {
-  switch (phase) {
-    case ro::sim::PegPhase::kAiming:
-      return ro::ui::RogglePhase::kAiming;
-    case ro::sim::PegPhase::kFlying:
-      return ro::ui::RogglePhase::kFlying;
-    case ro::sim::PegPhase::kWon:
-      return ro::ui::RogglePhase::kWon;
-    case ro::sim::PegPhase::kLost:
-      return ro::ui::RogglePhase::kLost;
-  }
-  return ro::ui::RogglePhase::kAiming;
 }
 
 // LES FENÊTRES DE LA MÉTA, par-dessus l'accueil, chacune déclarée à Échap.
@@ -175,7 +152,9 @@ void MinigameStage::Advance(MinigameWindows& windows, const MinigamePieces& piec
   // ⚠ LES RÉPONSES AVANT LES HORLOGES : un clic date de l'image qui l'a reçu.
   ApplyAnswers(windows);
   rojeweled_clock_.Follow(windows.rojeweled.open, now_ms);
-  const std::uint32_t roggle_step_ms = roggle_clock_.Follow(windows.roggle.open, now_ms);
+  // Roggle attend, fenêtre repliée ou sans le focus.
+  const std::uint32_t roggle_step_ms =
+      roggle_clock_.Follow(windows.roggle.open && roggle_watching_, now_ms);
 
   const bool was_composed = windows.composed;
   windows.composed = windows.hub.open || windows.rojeweled.open || windows.roggle.open;
@@ -249,16 +228,7 @@ void MinigameStage::ApplyAnswers(MinigameWindows& windows) {
     rojeweled_.Click({jewels.clicked->row, jewels.clicked->column}, rojeweled_clock_.watched_ms());
   }
 
-  const ro::ui::RoggleAsk pegs = std::exchange(windows.roggle_answer, {});
-  if (pegs.new_game) {
-    roggle_.NewGame();
-  }
-  if (pegs.aim.has_value()) {
-    roggle_.Aim({pegs.aim->x, pegs.aim->y});
-  }
-  if (pegs.launch) {
-    roggle_.Launch();
-  }
+  ApplyRoggleAnswer(windows);
 }
 
 void MinigameStage::PlayRojeweled() {
@@ -296,24 +266,6 @@ void MinigameStage::PlayRojeweled() {
     // celui d'avant cette partie.
     rojeweled_new_record_ =
         rojeweled_.score() > 0 && rojeweled_.score() > record_->record.rojeweled_best;
-  }
-}
-
-void MinigameStage::PlayRoggle(std::uint32_t step_ms) {
-  if (!roggle_.started()) {
-    roggle_.NewGame();
-  }
-  constexpr float kMsPerSecond = 1000.0F;
-  roggle_.Advance(static_cast<float>(step_ms) / kMsPerSecond);
-  const ro::sim::PegNews news = roggle_.TakeNews();
-  if (news.orange_hits > 0) {
-    sounds_.push_back(SoundOf(kOrangeHitSound));
-  }
-  if (news.blue_hits > 0) {
-    sounds_.push_back(SoundOf(kBlueHitSound));
-  }
-  if (news.caught || (news.finished && roggle_.phase() == ro::sim::PegPhase::kWon)) {
-    sounds_.push_back(SoundOf(kRewardSound));
   }
 }
 
@@ -460,49 +412,6 @@ void MinigameStage::ComposeRojeweled(MinigameWindows& windows, const MinigamePie
   }
   view.star_art = SpriteOf(kStarSlot, kStarClass, kGemBoxPx, pieces.wardrobe, now_ms);
   view.toast = Toast(now_ms, view.toast_alpha);
-}
-
-void MinigameStage::ComposeRoggle(MinigameWindows& windows, const MinigamePieces& pieces,
-                                  std::uint32_t now_ms) {
-  if (!windows.roggle.open) {
-    return;
-  }
-  ro::ui::RoggleView& view = windows.roggle_view;
-  view.board = ro::ui::RoggleBoard{.width = ro::sim::kPegBoardWidth,
-                                   .height = ro::sim::kPegBoardHeight,
-                                   .ball_radius = ro::sim::kPegBallRadius,
-                                   .peg_radius = ro::sim::kPegRadius,
-                                   .cannon = {ro::sim::kPegCannonX, ro::sim::kPegCannonY},
-                                   .bucket_width = ro::sim::kPegBucketWidth,
-                                   .bucket_height = ro::sim::kPegBucketHeight,
-                                   .bucket_y = ro::sim::kPegBucketY};
-  pegs_.clear();
-  for (const ro::sim::Peg& peg : roggle_.pegs()) {
-    if (!peg.removed) {
-      pegs_.push_back(
-          ro::ui::RogglePeg{.at = {peg.x, peg.y}, .orange = peg.orange, .lit = peg.lit});
-    }
-  }
-  view.pegs = pegs_;
-  guide_.clear();
-  for (const ro::sim::PegPoint point : roggle_.AimGuide()) {
-    guide_.push_back({point.x, point.y});
-  }
-  view.guide = guide_;
-  view.phase = PhaseOf(roggle_.phase());
-  view.ball = {roggle_.ball().x, roggle_.ball().y};
-  view.bucket_x = roggle_.bucket_x();
-  view.aim = {roggle_.aim().x, roggle_.aim().y};
-  view.balls_left = roggle_.balls_left();
-  view.score = roggle_.score();
-  view.orange_left = roggle_.orange_left();
-  view.multiplier = roggle_.multiplier();
-  view.best_score = record_->record.roggle_best;
-  view.orange_art = ItemIconImage(pieces.item_icons, kOrangePegItem);
-  view.blue_art = ItemIconImage(pieces.item_icons, kBluePegItem);
-  view.ball_art = SpriteOf(kBallSlot, kBallClass, kBallBoxPx, pieces.wardrobe, now_ms);
-  // ⚠ L'AVIS N'EST MONTRÉ QUE PAR UN JEU : Rojeweled le prend s'il est ouvert.
-  view.toast = windows.rojeweled.open ? nullptr : Toast(now_ms, view.toast_alpha);
 }
 
 }  // namespace moonclient
