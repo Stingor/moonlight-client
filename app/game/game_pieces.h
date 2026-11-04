@@ -80,6 +80,7 @@
 #include "game/tracker_stage.h"
 #include "game/trade_stages.h"
 #include "game/whisper_stage.h"
+#include "guard/cheat_guard.h"
 #include "items/doll_effects.h"
 #include "mvp/mvp_tracker_stage.h"
 #include "options/commands_page.h"
@@ -554,6 +555,8 @@ struct GamePieces {
   GmOutfitAnnouncer gm_outfit;
   // LES ÉDITIONS DE CARTE QUE LE SERVEUR TIENT : voir `MapEditSync`.
   MapEditSync map_edit_sync;
+  // LE GARDE, qui signale au serveur les outils de triche : voir `CheatGuard`.
+  CheatGuard guard;
 };
 
 // Charge les accessoires DANS la structure, plutôt que d'en rendre une.

@@ -117,6 +117,9 @@ ro::core::Result<void> ClientShell::OpenWindow(int width, int height) {
   }
   gl_ = std::move(*context);
   ReportStage("fenêtre");
+  // LE GARDE observe dès que la fenêtre existe : son crochet lit les messages
+  // qu'elle reçoit.
+  pieces_.guard.Start();
 
   // L'INTERFACE, aussitôt après : elle est ce qui décide, à chaque événement,
   // si le geste revient au jeu ou à une fenêtre.

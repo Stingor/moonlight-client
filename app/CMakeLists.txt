@@ -1784,6 +1784,26 @@ target_link_libraries(moonclient_chatweb_net
 
 target_include_directories(moonclient_chatweb_net PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
+# LE GARDE : les sondes de la machine et le signalement au serveur. Ses règles
+# (`guard_rules`) sont pures et s'essaient sans système ; ses sondes ne parlent
+# qu'à Windows et à SDL, pour le crochet des messages de la fenêtre.
+add_library(moonclient_guard STATIC
+    guard/cheat_guard.cpp
+    guard/guard_rules.cpp)
+
+target_link_libraries(moonclient_guard
+    PUBLIC ro_core ro_net
+    PRIVATE SDL3::SDL3 ro_warnings)
+
+target_include_directories(moonclient_guard PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+# 🔴 LA TABLE DES NOMS RESTE HORS DU DÉPÔT : `guard_signatures.local.inc`, que
+# git ignore, n'entre dans la bâtisse que s'il existe. Sans lui, la table est
+# vide. Voir `guard_signatures.example.inc`.
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/guard/guard_signatures.local.inc)
+  target_compile_definitions(moonclient_guard PRIVATE MOONCLIENT_GUARD_SIGNATURES)
+endif()
+
 add_executable(moonclient
     world/actor_carts.cpp
     world/actor_census.cpp
@@ -2080,7 +2100,7 @@ target_link_libraries(moonclient
     PRIVATE moonclient_chatlinks moonclient_chatcommands moonclient_skillrefusal moonclient_skillrules moonclient_songmusic moonclient_music moonclient_ranknotices moonclient_chatpreview moonclient_cursor moonclient_targeting moonclient_quickcast moonclient_skillfacts moonclient_calloptions moonclient_spritesounds moonclient_debug moonclient_versus moonclient_damage moonclient_display moonclient_entitybars moonclient_names moonclient_equip moonclient_effect_nodes moonclient_effects moonclient_stage moonclient_map_sign moonclient_screenshot moonclient_voice moonclient_voiceoptions moonclient_itemdrop moonclient_items moonclient_itemtoast moonclient_balloons moonclient_statuses moonclient_titles
             moonclient_visibility moonclient_afk moonclient_backdrop moonclient_lit_stage moonclient_graphics moonclient_settingtoggles moonclient_camera_rules moonclient_cardalbum moonclient_mvptracker moonclient_battleground moonclient_memorial moonclient_minigames moonclient_survivors moonclient_arena moonclient_monstertalk moonclient_battlefield moonclient_craft moonclient_itemfacts moonclient_bugreport moonclient_books moonclient_barter moonclient_buyingstore moonclient_storesearch moonclient_market moonclient_database moonclient_vending moonclient_chatroom moonclient_whispers moonclient_mail moonclient_achievements moonclient_profiles moonclient_entitymenu moonclient_party moonclient_hotkeys moonclient_shortcutwheel moonclient_menuicons moonclient_companionai moonclient_keys moonclient_lobby moonclient_entry moonclient_monstersheet moonclient_navigation moonclient_quests
             moonclient_loading moonclient_config moonclient_patcher_net moonclient_skins moonclient_skinlook moonclient_postures moonclient_presets moonclient_styles moonclient_web_http
-            moonclient_chatweboptions moonclient_chatweb_net
+            moonclient_chatweboptions moonclient_chatweb_net moonclient_guard
             moonclient_portraitoptions moonclient_bubbleoptions moonclient_factorylayout
             moonclient_seatlayout moonclient_settings moonclient_settinglinks ro_audio ro_core ro_formats
             ro_net ro_sim ro_vfs

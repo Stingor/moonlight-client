@@ -13,6 +13,7 @@ add_library(ro_net STATIC
     src/achievement.cpp
     src/action.cpp
     src/character_select_return.cpp
+    src/cheat_report.cpp
     src/actor_guild.cpp
     src/actor_name.cpp
     src/attack_reach.cpp

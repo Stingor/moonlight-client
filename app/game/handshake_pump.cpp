@@ -37,6 +37,10 @@ void PumpHandshake(ro::net::Connection& link, ro::net::MoonclientHandshake& hand
   // sort avec son interrupteur.
   pieces.surfaces.Pump(link, handshake.state() == ro::net::MoonclientHandshakeState::kVerified,
                        ShownSurfaces(mvp_tracker_enabled) | reading_caps);
+  // LE GARDE ne parle qu'à une session reconnue : le serveur ignore ses
+  // signalements avant.
+  pieces.guard.Pump(link, handshake.state() == ro::net::MoonclientHandshakeState::kVerified,
+                    now_ms);
 }
 
 }  // namespace moonclient
