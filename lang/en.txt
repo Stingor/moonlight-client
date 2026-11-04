@@ -20816,6 +20816,18 @@ tr: Ctrl+Tab: show or hide the minimap
 fr: Évolution
 tr: Evolution
 
+fr: Votre objectif
+tr: Your objective
+
+fr: Au choix de niveau, ce qui y mène porte la mention « Objectif ».
+tr: On level-up, whatever leads to it is marked « Objective ».
+
+fr: Retirer l'objectif
+tr: Remove the objective
+
+fr: Épingler en objectif
+tr: Pin as objective
+
 fr: Évolution : %s
 tr: Evolution: %s
 

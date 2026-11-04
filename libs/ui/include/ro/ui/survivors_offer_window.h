@@ -27,7 +27,8 @@ struct SurvivorsOfferCard {
   const char* description = "";  // ⚠ EN FRANÇAIS, marqué par `TrText` : traduit ici
   int owned_level = 0;           // 0 : « NEW! »
   int next_level = 1;
-  bool evolves = false;  // la prendre ouvre une évolution
+  bool evolves = false;    // la prendre ouvre une évolution
+  bool objective = false;  // elle mène au sort épinglé en objectif au Codex
 };
 
 struct SurvivorsOfferView {

@@ -81,10 +81,10 @@ void DrawSurvivorsMetaWindows(SurvivorsMetaWindows& meta, const ro::ui::SkinArt&
   if (meta.kafra.open) {
     meta.kafra_answer = ro::ui::DrawSurvivorsKafraWindow(meta.kafra, meta.kafra_view, art);
   }
-  // Le Codex se lit seulement : sa croix ferme sa case, rien d'autre à router.
+  // Le Codex se lit, et épingle un objectif, que le mode route.
   if (meta.codex.open) {
-    (void)ro::ui::DrawSurvivorsCodexWindow(meta.codex, meta.codex_view, meta.album, meta.album_view,
-                                           art);
+    meta.codex_answer = ro::ui::DrawSurvivorsCodexWindow(meta.codex, meta.codex_view, meta.album,
+                                                         meta.album_view, art);
   }
   if (meta.records.open) ro::ui::DrawSurvivorsRecordsWindow(meta.records, meta.records_view, art);
   if (meta.ranking.open) {

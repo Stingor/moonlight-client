@@ -11,6 +11,7 @@
 #include "ro/sim/survivors_geometry.h"
 
 #include "game/skin_image_of.h"
+#include "game/survivors_objective.h"
 #include "survivors/survivors_minimap_marks.h"
 
 namespace moonclient {
@@ -176,7 +177,8 @@ SurvivorsFrameView SurvivorsViews::Compose(const SurvivorsStage& stage,
     case SurvivorsScreen::kChoosing:
       if (field == nullptr) break;
       ComposeOffer(*field, rules, stage.accepts_input(), facts.pressed_card_key,
-                   stage.board().kind != SurvivorsBoardKind::kFree, tables);
+                   stage.board().kind != SurvivorsBoardKind::kFree,
+                   facts.options.objective_skill_id, tables);
       view.offer = &offer_;
       view.offer_state = &offer_state_;
       break;
@@ -306,8 +308,9 @@ void SurvivorsViews::ComposeHud(const SurvivorsField& field, const ro::sim::Surv
 
 void SurvivorsViews::ComposeOffer(const SurvivorsField& field, const ro::sim::SurvivorsRules& rules,
                                   bool accepts_input, int pressed_card_key, bool charges_withheld,
-                                  const SurvivorsTables& tables) {
+                                  std::uint16_t objective_skill_id, const SurvivorsTables& tables) {
   offer_cards_.clear();
+  const SurvivorsObjectivePath objective = SurvivorsObjectivePathOf(rules, objective_skill_id);
   for (const ro::sim::SurvivorsOffer& offer : field.offers) {
     ro::ui::SurvivorsOfferCard card;
     card.next_level = offer.next_level;
@@ -342,6 +345,7 @@ void SurvivorsViews::ComposeOffer(const SurvivorsField& field, const ro::sim::Su
     const bool levels_up = offer.kind == ro::sim::OfferKind::kSkillLevel ||
                            offer.kind == ro::sim::OfferKind::kCardLevel;
     card.owned_level = levels_up ? std::max(0, offer.next_level - 1) : 0;
+    card.objective = OfferServesObjective(objective, offer);
     offer_cards_.push_back(card);
   }
   offer_ = ro::ui::SurvivorsOfferView{.cards = offer_cards_,

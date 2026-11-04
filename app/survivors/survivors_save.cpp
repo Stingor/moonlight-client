@@ -34,6 +34,7 @@ constexpr const char* kHordeSunShadowsField = "horde_sun_shadows";
 constexpr const char* kPauseWhileTypingField = "pause_while_typing";
 constexpr const char* kPresenceShownField = "presence_shown";
 constexpr const char* kFirstSkillIdField = "first_skill_id";
+constexpr const char* kObjectiveSkillIdField = "objective_skill_id";
 
 constexpr const char* kMetaSection = "meta";
 constexpr const char* kZenyField = "zeny";
@@ -98,7 +99,8 @@ constexpr const char* kFileHeader =
     "# Le carnet du mode Survivants de Midgard de moonclient.\n"
     "#\n"
     "# options : effets reduits, mesures affichees, ombres du soleil de la horde,\n"
-    "# et l'identifiant de competence du dernier premier sort choisi.\n"
+    "# l'identifiant de competence du dernier premier sort choisi, et celui du\n"
+    "# sort epingle en objectif au Codex.\n"
     "# meta : les Zeny du mode, les rangs de l'Eglise et de la Kafra.\n"
     "# album : les cartes trouvees, les exploits, les compteurs.\n"
     "# records : les dix meilleures parties de chaque tableau.\n"
@@ -260,6 +262,7 @@ void ReadOptions(const YAML::Node& section, SurvivorsOptions& options) {
   options.pause_while_typing = FlagIn(section, kPauseWhileTypingField, options.pause_while_typing);
   options.presence_shown = FlagIn(section, kPresenceShownField, options.presence_shown);
   options.first_skill_id = SkillIdIn(section, kFirstSkillIdField);
+  options.objective_skill_id = SkillIdIn(section, kObjectiveSkillIdField);
 }
 
 // Où se range une clé du catalogue : sa place dans les rangs, et son rang
@@ -467,6 +470,7 @@ void WriteOptions(YAML::Emitter& out, const SurvivorsOptions& options) {
   out << YAML::Key << kPauseWhileTypingField << YAML::Value << options.pause_while_typing;
   out << YAML::Key << kPresenceShownField << YAML::Value << options.presence_shown;
   out << YAML::Key << kFirstSkillIdField << YAML::Value << options.first_skill_id;
+  out << YAML::Key << kObjectiveSkillIdField << YAML::Value << options.objective_skill_id;
   out << YAML::EndMap;
 }
 

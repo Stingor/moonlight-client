@@ -364,9 +364,32 @@ void DrawUnseenSheet(SurvivorsCodexState& state, const SurvivorsCodexEntry& entr
                      SurvivorsFeatProgressText(*feat).data());
 }
 
+// L'OBJECTIF au pied de la fiche d'un sort, vu ou non : épinglé, ce qui y
+// mène — le sort, ses sorts de base, sa carte — se signale au choix de niveau.
+// Rend l'objectif voulu au clic.
+[[nodiscard]] std::optional<std::uint16_t> DrawObjective(const SurvivorsCodexEntry& entry,
+                                                         std::uint16_t objective_skill_id,
+                                                         const SkinArt& art) {
+  ImGui::Separator();
+  const bool pinned = entry.ro_id == objective_skill_id;
+  if (pinned) {
+    ColoredText(kHeadingColor, core::Tr("Votre objectif"));
+    FaintText(core::Tr("Au choix de niveau, ce qui y mène porte la mention « Objectif »."));
+  }
+  if (!SkinButton(pinned ? core::Tr("Retirer l'objectif") : core::Tr("Épingler en objectif"),
+                  art)) {
+    return std::nullopt;
+  }
+  return pinned ? std::uint16_t{0} : entry.ro_id;
+}
+
 // LA FICHE commence par le nom de l'entrée, puis son image quand elle en a une.
-void DrawSheet(SurvivorsCodexState& state, const SurvivorsCodexEntry& entry,
-               std::span<const SurvivorsFeatEntry> feats, const SkinArt& art) {
+// Celle d'un sort finit par son objectif.
+[[nodiscard]] std::optional<std::uint16_t> DrawSheet(SurvivorsCodexState& state,
+                                                     const SurvivorsCodexEntry& entry,
+                                                     std::span<const SurvivorsFeatEntry> feats,
+                                                     std::uint16_t objective_skill_id,
+                                                     const SkinArt& art) {
   ImGui::BeginChild("##codex_sheet", ImVec2(0.0F, 0.0F), ImGuiChildFlags_Borders);
   ImGui::PushTextWrapPos(0.0F);
   if (!entry.seen) {
@@ -413,9 +436,14 @@ void DrawSheet(SurvivorsCodexState& state, const SurvivorsCodexEntry& entry,
         break;
     }
   }
+  std::optional<std::uint16_t> objective;
+  if (entry.sheet == SurvivorsCodexSheet::kSkill && entry.ro_id != 0) {
+    objective = DrawObjective(entry, objective_skill_id, art);
+  }
   ImGui::PopTextWrapPos();
   PaintWindowScrollbar(art);
   ImGui::EndChild();
+  return objective;
 }
 
 // ── LES ONGLETS ─────────────────────────────────────────────────────────────
@@ -480,7 +508,8 @@ SurvivorsCodexAsk DrawSurvivorsCodexWindow(SurvivorsCodexState& state,
   DrawList(state, entries, moved, art);
   if (!entries.empty()) {
     ImGui::SameLine();
-    DrawSheet(state, entries[selected], album_view.feats, art);
+    ask.objective_skill_id =
+        DrawSheet(state, entries[selected], album_view.feats, view.objective_skill_id, art);
   }
   EndSkinnedWindow();
   return ask;

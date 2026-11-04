@@ -169,6 +169,9 @@ class SurvivorsMode {
   void ApplyOptions(const ro::ui::SurvivorsPauseAsk& asked, const SurvivorsContext& context);
   // Écrit les réglages qui diffèrent de `before`.
   void SaveOptions(const SurvivorsOptions& before, const SurvivorsContext& context);
+  // L'objectif que le Codex veut (rien : inchangé), gardé aux réglages, puis
+  // reposé dans les fenêtres de la méta.
+  void FollowObjective(std::optional<std::uint16_t> wanted, const SurvivorsContext& context);
   void FollowEntered(SurvivorsStage& stage, const SurvivorsContext& context);
   void PaintArena(const SurvivorsStage& stage, const SurvivorsContext& context);
   void PlaySounds(const ro::sim::SurvivorsNews& news, const SurvivorsContext& context);

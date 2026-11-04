@@ -112,6 +112,10 @@ struct SurvivorsMetaWindows {
   ro::ui::SurvivorsShopAsk kafra_answer;
   ro::ui::SurvivorsCodexState codex;
   ro::ui::SurvivorsCodexView codex_view;
+  ro::ui::SurvivorsCodexAsk codex_answer;
+  // Le sort épinglé en objectif, celui des réglages, que le mode pose à chaque
+  // image : le Codex le montre, à l'accueil comme sur la pause.
+  std::uint16_t objective_skill_id = 0;
   // L'Album, onglet Cartes du Codex : son curseur et son détail tiennent
   // d'une ouverture à l'autre.
   ro::ui::SurvivorsAlbumState album;

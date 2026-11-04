@@ -256,6 +256,8 @@ struct SurvivorsCodexEntry {
 // reste vide : il dessine `SurvivorsAlbumView`.
 struct SurvivorsCodexView {
   std::array<std::span<const SurvivorsCodexEntry>, kSurvivorsCodexTabCount> entries;
+  // Le sort épinglé en objectif ; 0 : aucun.
+  std::uint16_t objective_skill_id = 0;
 };
 
 struct SurvivorsCodexState {
@@ -271,10 +273,12 @@ struct SurvivorsCodexState {
   std::optional<SurvivorsCodexTab> tab_wanted;
 };
 
-// CE QUE LA FENÊTRE REND : `closed` à l'image où sa croix la ferme. Elle se
-// lit seulement ; aucune autre intention n'en sort.
+// CE QUE LA FENÊTRE REND : `closed` à l'image où sa croix la ferme, et
+// l'objectif voulu à celle où la fiche d'un sort l'épingle (son Id) ou le
+// retire (0). Rien d'autre : le Codex se lit.
 struct SurvivorsCodexAsk {
   bool closed = false;
+  std::optional<std::uint16_t> objective_skill_id;
 };
 
 inline constexpr const char* kSurvivorsCodexId = "survivors_codex";

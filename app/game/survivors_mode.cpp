@@ -141,6 +141,8 @@ void SurvivorsMode::FollowDoor(SurvivorsStage& stage, const SurvivorsContext& co
     options_ = desk_.save().options;
     options_loaded_ = true;
   }
+  FollowObjective(std::exchange(windows.survivors_meta.codex_answer, {}).objective_skill_id,
+                  context);
   // CE QUE LE CLASSEMENT A À DIRE AU JOUEUR (Q3, Q5, Q6), partie ou non.
   if (context.ranking != nullptr) SayRankingNotices(*context.ranking, stage, context.say);
   if (std::optional<SurvivorsEnding> ending =
@@ -417,6 +419,16 @@ void SurvivorsMode::ApplyOptions(const ro::ui::SurvivorsPauseAsk& asked,
   SaveOptions(before, context);
 }
 
+void SurvivorsMode::FollowObjective(std::optional<std::uint16_t> wanted,
+                                    const SurvivorsContext& context) {
+  if (wanted.has_value() && *wanted != options_.objective_skill_id) {
+    const SurvivorsOptions before = options_;
+    options_.objective_skill_id = *wanted;
+    SaveOptions(before, context);
+  }
+  context.minigames->survivors_meta.objective_skill_id = options_.objective_skill_id;
+}
+
 void SurvivorsMode::SaveOptions(const SurvivorsOptions& before, const SurvivorsContext& context) {
   const ro::core::Result<SurvivorsSaveRead> saved =
       SaveSurvivorsOptions(context.client_root, before, options_);
@@ -473,6 +485,7 @@ SurvivorsPainted SurvivorsMode::Frame(SurvivorsStage& stage, const SurvivorsCont
   // ouvert, il est le dernier venu, la pause qui les ouvre étant cachée sous lui.
   (void)FollowCodexOverPause(stage.screen(), ask_.pause.open_codex, gestures,
                              context.minigames->survivors_meta.codex);
+  FollowObjective(ask_.codex.objective_skill_id, context);
   // LES OPTIONS DU JEU PAR-DESSUS LA PAUSE prennent Échap d'abord, et la
   // molette, qui fait défiler leurs pages et non reculer la caméra.
   bool* options_open = context.options_window != nullptr ? &context.options_window->open : nullptr;

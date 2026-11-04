@@ -160,6 +160,9 @@ ro::core::Result<SurvivorsSaveRead> SaveSurvivorsOptions(const std::filesystem::
     if (after.first_skill_id != before.first_skill_id) {
       kept.first_skill_id = after.first_skill_id;
     }
+    if (after.objective_skill_id != before.objective_skill_id) {
+      kept.objective_skill_id = after.objective_skill_id;
+    }
     return kept != read;
   });
 }

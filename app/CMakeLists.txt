@@ -810,6 +810,7 @@ add_library(moonclient_minigames STATIC
     game/survivors_ranking_mode.cpp
     game/survivors_presence_mode.cpp
     game/survivors_presence_labels.cpp
+    game/survivors_objective.cpp
     game/survivors_trophy_count.cpp
     survivors/survivors_minimap_marks.cpp)
 

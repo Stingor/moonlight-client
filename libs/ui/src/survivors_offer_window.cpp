@@ -26,6 +26,7 @@ constexpr float kIconSide = 64.0F;
 // La carte est posée sur le corps clair : « NEW! » s'y écrit en or sombre.
 constexpr ImU32 kNewColor = kSkinGoldTextColor;
 constexpr ImU32 kEvolveColor = kSkinEvolveTextColor;
+constexpr ImU32 kObjectiveColor = kSkinGoldTextColor;
 constexpr std::size_t kLineSize = 64;
 constexpr ImGuiWindowFlags kModalFlags =
     ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse |
@@ -77,6 +78,10 @@ constexpr std::array<ImGuiKey, kMostOfferCards> kPadKeys = {ImGuiKey_Keypad1, Im
   if (card.evolves) {
     ImGui::SameLine();
     ColoredText(kEvolveColor, core::Tr("Évolution"));
+  }
+  if (card.objective) {
+    ImGui::SameLine();
+    ColoredText(kObjectiveColor, core::Tr("Objectif"));
   }
   ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
   ImGui::TextWrapped("%s", SurvivorsText(card.description));

@@ -150,9 +150,10 @@ class SurvivorsViews {
   void ComposeHud(const ro::sim::SurvivorsField& field, const ro::sim::SurvivorsRules& rules,
                   std::uint64_t clock_ms, const SurvivorsViewFacts& facts,
                   const SurvivorsTables& tables);
+  // Une offre qui mène au sort `objective_skill_id` (0 : aucun) le dit.
   void ComposeOffer(const ro::sim::SurvivorsField& field, const ro::sim::SurvivorsRules& rules,
                     bool accepts_input, int pressed_card_key, bool charges_withheld,
-                    const SurvivorsTables& tables);
+                    std::uint16_t objective_skill_id, const SurvivorsTables& tables);
   void ComposeChest(const SurvivorsStage& stage, const SurvivorsTables& tables);
   void ComposePause(const SurvivorsStage& stage, const ro::sim::SurvivorsField* field,
                     const SurvivorsViewFacts& facts);

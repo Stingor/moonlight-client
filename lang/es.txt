@@ -20816,6 +20816,18 @@ tr: Ctrl+Tab: mostrar u ocultar el minimapa
 fr: Évolution
 tr: Evolución
 
+fr: Votre objectif
+tr: Tu objetivo
+
+fr: Au choix de niveau, ce qui y mène porte la mention « Objectif ».
+tr: Al subir de nivel, lo que lleva a él lleva la mención « Objetivo ».
+
+fr: Retirer l'objectif
+tr: Quitar el objetivo
+
+fr: Épingler en objectif
+tr: Fijar como objetivo
+
 fr: Évolution : %s
 tr: Evolución: %s
 
