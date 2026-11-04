@@ -72,9 +72,11 @@ void CountOne(Counter& counter) noexcept {
 }
 
 // De l'expérience gagnée : majorée, puis chaque niveau atteint ouvre un
-// choix. ExpToNext ne rend jamais 0 : la boucle finit.
+// choix. ExpToNext ne rend jamais 0 : la boucle finit. Le niveau qui fait
+// renaître le héros le dit, et majore ses dégâts dès ce pas.
 void GainExp(SurvivorsField& field, std::uint32_t exp) {
   SurvivorsHero& hero = field.hero;
+  const bool was_reborn = field.hero_class != nullptr && Reborn(*field.hero_class, hero.level);
   const auto gained = static_cast<std::uint64_t>(Scaled(exp, ExpBonusPct(field)));
   hero.exp = SaturatedSum(hero.exp, gained);
   field.tally.exp_total = SaturatedSum(field.tally.exp_total, gained);
@@ -85,6 +87,10 @@ void GainExp(SurvivorsField& field, std::uint32_t exp) {
     ++hero.level;
     CountOne(field.pending_level_ups);
     CountOne(field.news.level_ups);
+  }
+  if (!was_reborn && field.hero_class != nullptr && Reborn(*field.hero_class, hero.level)) {
+    field.news.reborn = true;
+    RecomputeStats(field);
   }
 }
 
@@ -258,6 +264,11 @@ void RecomputeStats(SurvivorsField& field) {
     }
     std::int32_t& value = stats.values[static_cast<std::size_t>(card->stat)];
     value = SaturatedAdd(value, card->per_level[owned.level - 1U]);
+  }
+  // La renaissance, une fois atteinte.
+  if (Reborn(*field.hero_class, hero.level)) {
+    std::int32_t& damage = stats.values[static_cast<std::size_t>(SurvivorsStat::kDamagePct)];
+    damage = SaturatedAdd(damage, field.hero_class->reborn_damage_pct);
   }
   // Puis chaque posture en cours, à son niveau.
   for (const OwnedSkill& owned : hero.skills) {

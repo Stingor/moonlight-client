@@ -88,9 +88,17 @@ template <typename Rule, typename IdOf>
                     " sous-unités");
     }
     if (PercentOutOfBounds(hero_class.damage_pct_per_level) ||
-        PercentOutOfBounds(hero_class.damage_pct_cap)) {
+        PercentOutOfBounds(hero_class.damage_pct_cap) ||
+        PercentOutOfBounds(hero_class.reborn_damage_pct)) {
       return Refuse(named + "majoration de dégâts hors de [0, " + std::to_string(kMostStatBonus) +
                     "]");
+    }
+    // Une renaissance a un corps ; sans niveau, ni corps ni bonus.
+    if ((hero_class.reborn_level != 0) != (hero_class.reborn_job_id != 0) ||
+        (hero_class.reborn_level == 0 &&
+         (hero_class.reborn_damage_pct != 0 || hero_class.reborn_mounted_job_id != 0))) {
+      return Refuse(named + "renaissance au niveau " + std::to_string(hero_class.reborn_level) +
+                    " vers le métier " + std::to_string(hero_class.reborn_job_id));
     }
     if (auto checked = CheckListUnique(hero_class.skill_pool, named, "la réserve de skills");
         !checked) {

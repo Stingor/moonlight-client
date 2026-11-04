@@ -74,9 +74,11 @@ struct SurvivorsHero {
 };
 
 // LE MÉTIER QUE LE HÉROS MONTRE : celui de sa classe, de son évolution dès la
-// première, et monté tant qu'il tient la carte de sa monture.
+// première, de sa classe transcendante une fois rené, et monté tant qu'il
+// tient la carte de sa monture.
 [[nodiscard]] inline std::uint16_t HeroJobOf(const ClassRule& hero_class,
                                              const SurvivorsHero& hero) noexcept {
+  const bool reborn = Reborn(hero_class, hero.level) && hero_class.reborn_job_id != 0;
   const bool evolved = hero.evolutions > 0 && hero_class.evolved_job_id != 0;
   bool mounted = false;
   if (hero_class.mount_card_item_id != 0) {
@@ -86,9 +88,10 @@ struct SurvivorsHero {
   }
   if (mounted) {
     const std::uint16_t ridden =
-        evolved ? hero_class.mounted_evolved_job_id : hero_class.mounted_job_id;
+        reborn ? hero_class.reborn_mounted_job_id : hero_class.mounted_job_id;
     if (ridden != 0) return ridden;
   }
+  if (reborn) return hero_class.reborn_job_id;
   return evolved ? hero_class.evolved_job_id : hero_class.job_id;
 }
 

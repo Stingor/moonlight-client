@@ -15,19 +15,23 @@ namespace {
 // ── LE CHEVALIER : sa classe, ses sept skills et ses évolutions ────────────
 // Il tient la ligne : plus de PV que le Magicien, une marche plus lente, un
 // aimant plus court, et des coups courts qui repoussent. Ses évolutions sont
-// les skills de Lord Knight, dont il prend le corps à la première.
+// les skills de Lord Knight. Épéiste au départ, il devient Chevalier à sa
+// première évolution, et Lord Knight à sa renaissance.
 
 constexpr std::uint16_t kKnightClassId = 2;
-constexpr std::uint16_t kKnightJobId = 7;
-constexpr std::uint16_t kLordKnightJobId = 4008;      // l'apparence après une évolution
+constexpr std::uint16_t kSwordmanJobId = 1;           // l'apparence du départ
+constexpr std::uint16_t kKnightJobId = 7;             // après une évolution
+constexpr std::uint16_t kLordKnightJobId = 4008;      // rené
 constexpr std::uint16_t kKnightPecoJobId = 13;        // monté sur son Peco Peco
-constexpr std::uint16_t kLordKnightPecoJobId = 4014;  // monté, après une évolution
+constexpr std::uint16_t kLordKnightPecoJobId = 4014;  // monté, rené
 constexpr std::uint16_t kKnightWeaponItemId = 1401;   // Javelin
 constexpr std::int32_t kKnightMaxHp = 600;
 constexpr std::uint32_t kKnightWalkMsPerCell = 165;
 constexpr std::int32_t kKnightMagnetTenths = 24;
 constexpr std::int32_t kKnightDamagePctPerLevel = 1;
 constexpr std::int32_t kKnightDamagePctCap = 25;
+constexpr std::uint16_t kKnightRebornLevel = 50;
+constexpr std::int32_t kKnightRebornDamagePct = 5;
 
 // Bash : le coup de lance, sur ce qui est à portée de bras.
 constexpr std::int32_t kBashReachTenths = 32;
@@ -399,7 +403,7 @@ constexpr std::array<std::uint16_t, 12> kKnightCardPool{
 
 constexpr ClassRule kKnight{.class_id = kKnightClassId,
                             .key = "knight",
-                            .job_id = kKnightJobId,
+                            .job_id = kSwordmanJobId,
                             .weapon_item_id = kKnightWeaponItemId,
                             .max_hp = kKnightMaxHp,
                             .walk_ms_per_cell = kKnightWalkMsPerCell,
@@ -409,11 +413,14 @@ constexpr ClassRule kKnight{.class_id = kKnightClassId,
                             .starter_skills = kKnightStarterSkills,
                             .skill_pool = kKnightSkillPool,
                             .card_pool = kKnightCardPool,
-                            .evolved_job_id = kLordKnightJobId,
+                            .evolved_job_id = kKnightJobId,
                             .melee = true,
                             .mount_card_item_id = kPecoPecoCardId,
                             .mounted_job_id = kKnightPecoJobId,
-                            .mounted_evolved_job_id = kLordKnightPecoJobId};
+                            .reborn_level = kKnightRebornLevel,
+                            .reborn_job_id = kLordKnightJobId,
+                            .reborn_mounted_job_id = kLordKnightPecoJobId,
+                            .reborn_damage_pct = kKnightRebornDamagePct};
 
 }  // namespace
 

@@ -147,6 +147,7 @@ struct SurvivorsNews {
   std::vector<std::uint32_t> boss_arrivals;  // serials
   std::vector<SurvivorsBossMoveNews> boss_moves;
   std::uint16_t level_ups = 0;
+  bool reborn = false;  // le héros vient de renaître (ClassRule::reborn_level)
   std::uint32_t gems_gathered = 0;
   std::int32_t hero_hurt = 0;  // somme des dégâts encaissés
   std::uint32_t dropped = 0;   // nouvelles écartées par les plafonds

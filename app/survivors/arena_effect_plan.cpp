@@ -210,7 +210,9 @@ void CollectArenaLaunches(const ro::sim::SurvivorsNews& news, const ro::sim::Sur
                                 .kind = ArenaLaunchKind::kOnHero,
                                 .at = field.hero.position});
     }
-    if (!news.evolutions.empty()) {
+    // UNE ÉVOLUTION ET LA RENAISSANCE changent le corps : l'effet du
+    // changement de métier.
+    if (!news.evolutions.empty() || news.reborn) {
       out.push_back(ArenaLaunch{.effect_id = kJobChangeEffect,
                                 .kind = ArenaLaunchKind::kOnHero,
                                 .at = field.hero.position});

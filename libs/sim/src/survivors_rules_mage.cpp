@@ -20,7 +20,10 @@ namespace {
 
 constexpr std::uint16_t kMageClassId = 1;
 constexpr std::uint16_t kMageJobId = 2;
-constexpr std::uint16_t kWizardJobId = 9;          // l'apparence après une évolution
+constexpr std::uint16_t kWizardJobId = 9;         // l'apparence après une évolution
+constexpr std::uint16_t kHighWizardJobId = 4010;  // rené
+constexpr std::uint16_t kMageRebornLevel = 50;
+constexpr std::int32_t kMageRebornDamagePct = 5;
 constexpr std::uint16_t kMageWeaponItemId = 1601;  // Rod
 constexpr std::int32_t kMageMaxHp = 340;
 constexpr std::uint32_t kMageWalkMsPerCell = 150;
@@ -581,7 +584,10 @@ constexpr ClassRule kMage{.class_id = kMageClassId,
                           .starter_skills = kMageStarterSkills,
                           .skill_pool = kMageSkillPool,
                           .card_pool = kMageCardPool,
-                          .evolved_job_id = kWizardJobId};
+                          .evolved_job_id = kWizardJobId,
+                          .reborn_level = kMageRebornLevel,
+                          .reborn_job_id = kHighWizardJobId,
+                          .reborn_damage_pct = kMageRebornDamagePct};
 
 constexpr std::size_t kKnightSkillCount = kKnightPoolSkillCount + kKnightEvolvedSkillCount;
 constexpr std::size_t kSkillCount =

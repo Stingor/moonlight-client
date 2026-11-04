@@ -466,10 +466,15 @@ void SurvivorsViews::ComposeSummary(const SurvivorsStage& stage,
   const auto hero_class =
       std::ranges::find(rules.classes, ending->class_id, &ro::sim::ClassRule::class_id);
   if (hero_class != rules.classes.end()) {
-    summary_.job_name = JobName(ending->tally.evolutions > 0 && hero_class->evolved_job_id != 0
-                                    ? hero_class->evolved_job_id
-                                    : hero_class->job_id,
-                                tables);
+    // Le corps de la fin : rené, évolué, ou celui du départ.
+    std::uint16_t job = hero_class->job_id;
+    if (ending->tally.evolutions > 0 && hero_class->evolved_job_id != 0) {
+      job = hero_class->evolved_job_id;
+    }
+    if (ro::sim::Reborn(*hero_class, ending->tally.level) && hero_class->reborn_job_id != 0) {
+      job = hero_class->reborn_job_id;
+    }
+    summary_.job_name = JobName(job, tables);
   }
   foe_rows_.clear();
   for (const ro::sim::SurvivorsCount& count : ending->recap.kills_by_foe) {

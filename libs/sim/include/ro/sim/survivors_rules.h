@@ -247,12 +247,23 @@ struct ClassRule {
   std::uint16_t evolved_job_id = 0;  // apparence après une évolution, côté app
   bool melee = false;  // lance d'un geste d'attaque plutôt que d'incantation, côté app
   // LA MONTURE : le héros qui tient cette carte monte, et montre
-  // `mounted_job_id`, puis `mounted_evolved_job_id` après une évolution. 0 :
-  // aucune monture.
+  // `mounted_job_id`, puis `reborn_mounted_job_id` une fois rené. 0 : aucune
+  // monture.
   std::uint16_t mount_card_item_id = 0;
   std::uint16_t mounted_job_id = 0;
-  std::uint16_t mounted_evolved_job_id = 0;
+  // LA RENAISSANCE : au niveau `reborn_level`, le héros prend le corps de sa
+  // classe transcendante, `reborn_job_id`, et ses skills `reborn_damage_pct` %
+  // de dégâts en plus. 0 : aucune renaissance.
+  std::uint16_t reborn_level = 0;
+  std::uint16_t reborn_job_id = 0;
+  std::uint16_t reborn_mounted_job_id = 0;
+  std::int32_t reborn_damage_pct = 0;
 };
+
+// Vrai quand un héros de ce niveau est rené.
+[[nodiscard]] constexpr bool Reborn(const ClassRule& hero_class, std::uint16_t level) noexcept {
+  return hero_class.reborn_level != 0 && level >= hero_class.reborn_level;
+}
 // XP du niveau L au niveau L + 1 : base + per_level × (L − from_level), pour le
 // dernier segment dont from_level <= L.
 struct ExpSegment {
