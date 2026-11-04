@@ -461,9 +461,9 @@ const SurvivorsBotProfile& MageBotProfile() {
 const SurvivorsBotProfile& KnightBotProfile() {
   // Les coups qui portent quand il fuit d'abord ; les cônes, qui ne frappent
   // que devant lui, à la fin.
-  static constexpr std::array<std::uint16_t, 7> kSkillOrder{5, 7, 62, 56, 59, 57, 58};
+  static constexpr std::array<std::uint16_t, 9> kSkillOrder{5, 7, 62, 56, 8, 60, 59, 57, 58};
   static constexpr std::array<std::uint16_t, 12> kCardOrder{4072, 4019, 4003, 4022, 4266, 4197,
-                                                            4009, 4179, 4183, 4147, 4016, 4001};
+                                                            4031, 4179, 4183, 4147, 4016, 4001};
   static const SurvivorsBotProfile kProfile{.skill_order = kSkillOrder,
                                             .card_order = kCardOrder,
                                             .threat_radius_units = Cells(3),

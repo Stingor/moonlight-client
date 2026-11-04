@@ -32,14 +32,15 @@ inline constexpr std::uint16_t kGroundCardItem = 4001;
 [[nodiscard]] std::uint16_t PickupLookOf(const ro::sim::SurvivorsPickup& pickup) noexcept;
 
 // LE HÉROS (U7) : la tête, la coiffure, les coiffes, la cape et les couleurs
-// du personnage (`player`), sur le corps de la classe du mode et son arme ; le
-// corps passe à celui de l'évolution dès la première (`evolved`).
+// du personnage (`player`), sur le corps du métier `job` que le héros montre
+// (ro::sim::HeroJobOf : évolué, monté) et l'arme de sa classe. `job` nul : le
+// métier de la classe.
 //
 // ⚠ CE QUI CHANGERAIT LE CORPS EST RETIRÉ : costume, monture, habit de GM,
 // combinaison, tête d'orc et bouclier sont ceux du personnage, pas du mode.
 [[nodiscard]] ro::render::ActorLook HeroLook(const ro::render::ActorLook& player,
                                              const ro::sim::ClassRule& hero_class,
-                                             bool evolved) noexcept;
+                                             std::uint16_t job) noexcept;
 
 // ── LA TABLE D'APPARENCE DES SKILLS ─────────────────────────────────────────
 

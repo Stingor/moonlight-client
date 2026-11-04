@@ -12,12 +12,11 @@
 namespace moonclient {
 namespace {
 
-// L'apparence que le héros montre : celle de l'évolution dès la première.
+// L'apparence que le héros montre : évolué dès la première évolution, et
+// monté sur sa monture.
 [[nodiscard]] std::uint16_t HeroJobOf(const ro::sim::SurvivorsField& field) {
   if (field.hero_class == nullptr) return 0;
-  const ro::sim::ClassRule& hero_class = *field.hero_class;
-  return field.hero.evolutions > 0 && hero_class.evolved_job_id != 0 ? hero_class.evolved_job_id
-                                                                     : hero_class.job_id;
+  return ro::sim::HeroJobOf(*field.hero_class, field.hero);
 }
 
 // LE CÔNE se montre par autant de projectiles de son effet, tirés du héros en
@@ -55,6 +54,7 @@ void PlanCast(const ro::sim::SurvivorsCast& cast, const SkillLook& look,
       return;
     case ro::sim::CastKind::kShot:
     case ro::sim::CastKind::kNova:
+    case ro::sim::CastKind::kStanceOn:
       out.push_back(ArenaLaunch{.effect_id = look.effect_id,
                                 .kind = look.bearer == SkillBearer::kHero
                                             ? ArenaLaunchKind::kOnHero

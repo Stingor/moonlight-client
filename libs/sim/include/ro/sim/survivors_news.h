@@ -47,6 +47,7 @@ enum class CastKind : std::uint8_t {
   kStormOn,
   kConeOn,
   kBlockOn,
+  kStanceOn,
 };
 // Un lancer : UNE nouvelle par frappe (kStrike, rebond compris) et par tir
 // (kShot), pas une par salve, avec le monstre visé et, pour une frappe, le pas
@@ -58,7 +59,8 @@ enum class CastKind : std::uint8_t {
 // aux mêmes points, quand elle s'éteint. Un cône (kConeOn) porte le héros dans
 // `from`, la pointe de son axe dans `to` et sa demi-ouverture en caps dans
 // `spread_steps` ; un bloc de barrière (kBlockOn), une zone, sa case dans
-// `from` et `to`.
+// `from` et `to`. Une posture (kStanceOn) porte le héros dans `from` et `to`,
+// au pas où elle prend.
 struct SurvivorsCast {
   std::uint16_t skill_id = 0;
   CastKind kind = CastKind::kStrike;

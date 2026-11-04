@@ -518,6 +518,12 @@ tr: Una lanza arrojada a lo lejos golpea al monstruo más cercano.
 fr: Un coup furieux disperse la foule la plus dense à portée.
 tr: Un golpe furioso dispersa la multitud más densa a tu alcance.
 
+fr: Par moments, vous encaissez : votre armure augmente.
+tr: A ratos aguantas el golpe: tu armadura aumenta.
+
+fr: Par moments, vos coups s'enchaînent : toutes les recharges raccourcissent.
+tr: A ratos tus golpes se encadenan: todas las recargas se acortan.
+
 fr: Des coups écrasants s'abattent sur ce qui vous touche.
 tr: Golpes demoledores caen sobre lo que te toca.
 
@@ -1618,6 +1624,9 @@ tr: Apunta con el ratón y haz clic para disparar.
 
 fr: Vitesse de marche augmentée.
 tr: Velocidad de marcha aumentada.
+
+fr: Vous montez votre Peco Peco : vitesse de marche augmentée.
+tr: Montas tu Peco Peco: velocidad de marcha aumentada.
 
 fr: Vitesse du temps
 tr: Velocidad del tiempo

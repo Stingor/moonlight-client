@@ -611,6 +611,17 @@ std::span<const SurvivorsSkillRule> ShippedSkills() {
   return kSkills;
 }
 
-std::span<const CardRule> ShippedCards() { return kCards; }
+std::span<const CardRule> ShippedCards() {
+  // Une table IMMUABLE, assemblée au premier appel : les cartes du Magicien,
+  // puis celles du Chevalier.
+  static const std::array<CardRule, kCards.size() + kKnightCardCount> kAllCards = [] {
+    std::array<CardRule, kCards.size() + kKnightCardCount> cards{};
+    const std::span<const CardRule> knight = KnightCards();
+    auto out = std::copy(kCards.begin(), kCards.end(), cards.begin());
+    std::copy_n(knight.begin(), std::min(knight.size(), kKnightCardCount), out);
+    return cards;
+  }();
+  return kAllCards;
+}
 
 }  // namespace ro::sim::survivors

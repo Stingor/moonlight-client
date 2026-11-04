@@ -19,8 +19,10 @@ namespace {
 
 constexpr std::uint16_t kKnightClassId = 2;
 constexpr std::uint16_t kKnightJobId = 7;
-constexpr std::uint16_t kLordKnightJobId = 4008;     // l'apparence après une évolution
-constexpr std::uint16_t kKnightWeaponItemId = 1401;  // Javelin
+constexpr std::uint16_t kLordKnightJobId = 4008;      // l'apparence après une évolution
+constexpr std::uint16_t kKnightPecoJobId = 13;        // monté sur son Peco Peco
+constexpr std::uint16_t kLordKnightPecoJobId = 4014;  // monté, après une évolution
+constexpr std::uint16_t kKnightWeaponItemId = 1401;   // Javelin
 constexpr std::int32_t kKnightMaxHp = 600;
 constexpr std::uint32_t kKnightWalkMsPerCell = 165;
 constexpr std::int32_t kKnightMagnetTenths = 24;
@@ -50,6 +52,13 @@ constexpr std::int32_t kBowlingBashReachCells = 3;
 constexpr std::uint32_t kBowlingBashIntervalMs = 150;
 constexpr std::int32_t kBowlingBashSplashPct = 70;
 constexpr std::int32_t kBowlingBashKnockbackCells = 2;
+
+// Un niveau de posture : `bonus` à sa statistique pendant `life_ms`, toutes
+// les `cooldown_ms`.
+[[nodiscard]] constexpr SkillLevel Stance(std::uint32_t life_ms, std::uint32_t cooldown_ms,
+                                          std::int32_t bonus) noexcept {
+  return SkillLevel{.cooldown_ms = cooldown_ms, .life_ms = life_ms, .stance_bonus = bonus};
+}
 
 // Un niveau de Bash : `amount` coups de `damage`.
 [[nodiscard]] constexpr SkillLevel Bash(std::uint8_t amount, std::int32_t damage,
@@ -211,6 +220,31 @@ constexpr std::array<SkillLevel, kMostSkillLevels> kBowlingBashLevels{{
     Bowling(4, 49, 1500, 18),
 }};
 
+// Endure(durée en ms, recharge en ms, armure) : le Chevalier encaisse.
+constexpr std::array<SkillLevel, kMostSkillLevels> kEndureLevels{{
+    Stance(5000, 16000, 2),
+    Stance(5500, 15500, 2),
+    Stance(6000, 15000, 3),
+    Stance(6500, 14500, 3),
+    Stance(7000, 14000, 4),
+    Stance(7500, 13500, 4),
+    Stance(8000, 13000, 5),
+    Stance(8000, 12000, 6),
+}};
+
+// Two-Hand Quicken(durée en ms, recharge en ms, recharges raccourcies en %) :
+// tous ses coups reviennent plus vite.
+constexpr std::array<SkillLevel, kMostSkillLevels> kTwoHandQuickenLevels{{
+    Stance(5000, 15000, 15),
+    Stance(5500, 14500, 18),
+    Stance(6000, 14000, 20),
+    Stance(6500, 13500, 23),
+    Stance(7000, 13000, 25),
+    Stance(7500, 12500, 28),
+    Stance(8000, 12000, 30),
+    Stance(8000, 11000, 35),
+}};
+
 // ── Les évolués : un niveau chacun, que seul un coffre donne ──────────────
 
 // Head Crush : trois coups écrasants sur ce qui est à portée de bras.
@@ -295,6 +329,23 @@ constexpr std::array<SurvivorsSkillRule, kKnightPoolSkillCount + kKnightEvolvedS
          .target = TargetRule::kDensest,
          .element = SurvivorsElement::kNeutral,
          .levels = kBowlingBashLevels},
+        {.skill_id = kEndureId,
+         .key = "endure",
+         .description = core::TrText("Par moments, vous encaissez : votre armure augmente."),
+         .archetype = SkillArchetype::kStance,
+         .target = TargetRule::kNearest,
+         .element = SurvivorsElement::kNeutral,
+         .levels = kEndureLevels,
+         .stance_stat = SurvivorsStat::kArmor},
+        {.skill_id = kTwoHandQuickenId,
+         .key = "two_hand_quicken",
+         .description = core::TrText(
+             "Par moments, vos coups s'enchaînent : toutes les recharges raccourcissent."),
+         .archetype = SkillArchetype::kStance,
+         .target = TargetRule::kNearest,
+         .element = SurvivorsElement::kNeutral,
+         .levels = kTwoHandQuickenLevels,
+         .stance_stat = SurvivorsStat::kCooldownPct},
         {.skill_id = kHeadCrushId,
          .key = "head_crush",
          .description = core::TrText("Des coups écrasants s'abattent sur ce qui vous touche."),
@@ -326,11 +377,23 @@ constexpr std::array<EvolutionRule, kKnightEvolvedSkillCount> kKnightEvolutions{
 
 constexpr std::array<std::uint16_t, 3> kKnightStarterSkills{kBashId, kPierceId, kMagnumBreakId};
 constexpr std::array<std::uint16_t, kKnightPoolSkillCount> kKnightSkillPool{
-    kBashId,          kMagnumBreakId,    kPierceId,     kSpearStabId,
-    kBrandishSpearId, kSpearBoomerangId, kBowlingBashId};
-// Les cartes sont des passifs communs : la réserve est celle du Magicien.
+    kBashId,           kMagnumBreakId, kPierceId, kSpearStabId,     kBrandishSpearId,
+    kSpearBoomerangId, kBowlingBashId, kEndureId, kTwoHandQuickenId};
+
+// La carte Peco Peco : le Chevalier monte son oiseau, et sa marche bondit.
+constexpr std::array<std::int32_t, kMostCardLevels> kPecoPecoLevels{10, 20, 30, 40, 50};
+constexpr std::array<CardRule, kKnightCardCount> kKnightCards{{
+    {.card_item_id = kPecoPecoCardId,
+     .key = "peco_peco_card",
+     .description = core::TrText("Vous montez votre Peco Peco : vitesse de marche augmentée."),
+     .stat = SurvivorsStat::kWalkPct,
+     .per_level = kPecoPecoLevels},
+}};
+
+// Les cartes sont les passifs du Magicien, sauf la marche : le Peco Peco
+// tient la place de Chonchon.
 constexpr std::array<std::uint16_t, 12> kKnightCardPool{
-    kHornetCardId,  kPupaCardId,      kChonchonCardId,     kPoringCardId,
+    kHornetCardId,  kPupaCardId,      kPecoPecoCardId,     kPoringCardId,
     kSporeCardId,   kThiefBugCardId,  kGolemCardId,        kMasteringCardId,
     kEclipseCardId, kDragonFlyCardId, kVagabondWolfCardId, kBaphometCardId};
 
@@ -347,13 +410,18 @@ constexpr ClassRule kKnight{.class_id = kKnightClassId,
                             .skill_pool = kKnightSkillPool,
                             .card_pool = kKnightCardPool,
                             .evolved_job_id = kLordKnightJobId,
-                            .melee = true};
+                            .melee = true,
+                            .mount_card_item_id = kPecoPecoCardId,
+                            .mounted_job_id = kKnightPecoJobId,
+                            .mounted_evolved_job_id = kLordKnightPecoJobId};
 
 }  // namespace
 
 const ClassRule& KnightClass() { return kKnight; }
 
 std::span<const SurvivorsSkillRule> KnightSkills() { return kKnightSkills; }
+
+std::span<const CardRule> KnightCards() { return kKnightCards; }
 
 std::span<const EvolutionRule> KnightEvolutions() { return kKnightEvolutions; }
 

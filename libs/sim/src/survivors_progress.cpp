@@ -259,6 +259,19 @@ void RecomputeStats(SurvivorsField& field) {
     std::int32_t& value = stats.values[static_cast<std::size_t>(card->stat)];
     value = SaturatedAdd(value, card->per_level[owned.level - 1U]);
   }
+  // Puis chaque posture en cours, à son niveau.
+  for (const OwnedSkill& owned : hero.skills) {
+    if (field.step >= owned.stance_until_step) continue;
+    const SurvivorsSkillRule* skill = FindSkill(*field.rules, owned.skill_id);
+    if (skill == nullptr || skill->archetype != SkillArchetype::kStance ||
+        skill->stance_stat == SurvivorsStat::kMaxHp) {
+      continue;
+    }
+    const SkillLevel* level = LevelOf(*skill, owned);
+    if (level == nullptr) continue;
+    std::int32_t& value = stats.values[static_cast<std::size_t>(skill->stance_stat)];
+    value = SaturatedAdd(value, level->stance_bonus);
+  }
   hero.stats = stats;
 
   // Un gain de PV max s'ajoute aux PV courants ; une perte les plafonne. Un
