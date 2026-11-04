@@ -2,6 +2,8 @@
 
 #include <cstdint>
 #include <optional>
+#include <span>
+#include <vector>
 
 #include "ro/sim/packed_position.h"
 #include "ro/sim/survivors_ground.h"
@@ -21,6 +23,11 @@ class HordeFlow {
   // sur chaque axe, bornée au sol.
   void Refresh(const SurvivorsGround& ground, CellPosition hero_cell, std::uint32_t step,
                std::int32_t radius_cells, std::uint32_t refresh_steps);
+  // LE MÊME CHAMP VERS PLUSIEURS HÉROS : chaque monstre marche vers le plus
+  // proche. La fenêtre part du milieu de leur boîte englobante, et s'élargit
+  // de la moitié de sa taille. Il se refait dès qu'un héros change de case.
+  void Refresh(const SurvivorsGround& ground, std::span<const CellPosition> hero_cells,
+               std::uint32_t step, std::int32_t radius_cells, std::uint32_t refresh_steps);
   // La case de l'arène vers laquelle marcher depuis (x, y) ; rien hors
   // fenêtre, sur la source ou si injoignable. Son `direction` est la direction
   // serveur du pas.
@@ -33,7 +40,11 @@ class HordeFlow {
   // la première inondation.
   [[nodiscard]] bool Covers(std::int32_t x, std::int32_t y) const noexcept;
   // La case d'où le champ est parti : celle du héros à la dernière inondation.
-  [[nodiscard]] std::optional<CellPosition> source() const noexcept { return flooded_from_; }
+  [[nodiscard]] std::optional<CellPosition> source() const noexcept {
+    return flooded_from_.empty() ? std::nullopt : std::optional(flooded_from_.front());
+  }
+  // Les cases d'où le champ est parti, dans l'ordre reçu.
+  [[nodiscard]] std::span<const CellPosition> sources() const noexcept { return flooded_from_; }
   // Le nombre d'inondations faites : ce que le banc et les essais mesurent.
   [[nodiscard]] std::uint32_t floods() const noexcept { return floods_; }
 
@@ -41,7 +52,7 @@ class HordeFlow {
   WalkField field_;
   std::int32_t origin_x_ = 0;
   std::int32_t origin_y_ = 0;
-  std::optional<CellPosition> flooded_from_;
+  std::vector<CellPosition> flooded_from_;
   bool sourced_ = false;  // la source était praticable : le champ mène quelque part
   std::uint32_t flooded_step_ = 0;
   std::uint32_t floods_ = 0;

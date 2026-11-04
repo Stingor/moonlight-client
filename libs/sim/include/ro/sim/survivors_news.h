@@ -153,6 +153,8 @@ struct SurvivorsNews {
   std::uint32_t dropped = 0;   // nouvelles écartées par les plafonds
   std::vector<SurvivorsCardNews> cards_found;
   std::vector<SurvivorsReviveNews> revives;
+  // Les héros tombés à terre à ce pas, en coop.
+  std::vector<std::uint8_t> heroes_down;
   // Les cartes tombées au sol, sous le plafond des cartes ramassées.
   std::vector<SurvivorsCardNews> cards_dropped;
 };

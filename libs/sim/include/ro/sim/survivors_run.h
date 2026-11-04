@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include "ro/core/error.h"
@@ -40,6 +41,17 @@ struct SurvivorsLoadout {
 // Les Id qu'un départ peut verrouiller : une borne du journal, au-delà de la
 // taille de toute réserve de classe.
 inline constexpr std::size_t kMostLockedIds = 64;
+// CE QU'UN ALLIÉ APPORTE À UNE PARTIE COOP : tout ce qu'un départ fixe pour
+// un joueur. La graine, l'arène et la Cursed Water sont celles de l'équipe.
+struct SurvivorsAllyStart {
+  std::uint16_t class_id = 0;
+  std::uint16_t first_skill_id = 0;
+  SurvivorsLoadout loadout;
+  std::uint8_t lives = 0;
+  std::uint8_t leaves = 0;
+  std::vector<std::uint16_t> locked_ids;
+  [[nodiscard]] bool operator==(const SurvivorsAllyStart&) const = default;
+};
 struct SurvivorsStart {
   std::uint64_t seed = 0;
   std::uint16_t class_id = 0;
@@ -51,6 +63,10 @@ struct SurvivorsStart {
   // Les skills et les cartes retirés des réserves de la classe, par Id
   // strictement croissant : jamais offerts dans cette partie.
   std::vector<std::uint16_t> locked_ids;
+  // LES FEUILLES D'YGGDRASIL de ce joueur : sans effet en solo.
+  std::uint8_t leaves = 0;
+  // Les autres joueurs d'une partie coop, au plus kMostHeroes − 1 ; vide en solo.
+  std::vector<SurvivorsAllyStart> allies;
   [[nodiscard]] bool operator==(const SurvivorsStart&) const = default;
 };
 // LE DÉPART NEUTRE, celui du défi et de la partie classée : aucun bonus,
@@ -58,7 +74,7 @@ struct SurvivorsStart {
 // monde y joue la même partie.
 [[nodiscard]] inline bool IsNeutralStart(const SurvivorsStart& start) noexcept {
   return start.loadout == SurvivorsLoadout{} && start.lives == 0 && start.cursed_water == 0 &&
-         start.locked_ids.empty();
+         start.locked_ids.empty() && start.allies.empty();
 }
 // LA CASE DE DÉPART d'une arène : celle que la règle d'arène nomme, sinon le
 // centre de la carte, ramenée à la case praticable la plus proche à deux
@@ -102,10 +118,35 @@ inline constexpr std::uint64_t kCardStream = 6;
 // objets qui naissent après elle.
 inline constexpr std::uint32_t kFirstCardSerial = 0x80000000U;
 
+// LA DISTANCE MAXIMALE entre deux héros debout : un héros ne s'éloigne pas
+// davantage d'un autre. Elle garde la horde et ses apparitions sur un seul
+// théâtre.
+inline constexpr std::int32_t kTeamLeashCells = 30;
+// Une réserve commune ne dépasse pas ce nombre de charges de chaque sorte :
+// le double de ce qu'un solo apporte au rang maximal d'un service Kafra.
+inline constexpr std::uint8_t kMostTeamCharges = 6;
+// CE QU'UN HÉROS POSSÈDE EN PROPRE, hors de la scène : voir `PutOnStage`.
+struct SurvivorsKit {
+  SurvivorsHero hero;
+  const ClassRule* hero_class = nullptr;
+  std::uint8_t lives_left = 0;
+  std::vector<SurvivorsShot> shots;
+  std::vector<SurvivorsStrike> strikes;
+  std::vector<SurvivorsBlast> blasts;
+  std::vector<SurvivorsZone> zones;
+  SurvivorsAllyStart start;
+};
+
 // TOUT L'ÉTAT D'UNE PARTIE. Lu par app et par les essais ; écrit par les
 // systèmes de src/survivors_systems.h, dans l'ordre de SurvivorsRun::Step.
 // `rules` et `hero_class` pointent dans les règles passées à Start, qui doivent
 // survivre à la partie.
+//
+// À PLUSIEURS, UN SEUL HÉROS EST EN SCÈNE : `hero`, `hero_class`, `lives_left`,
+// ses coups et la part joueur de `start`. Chaque système agit sur lui, et
+// `allies` garde les autres. Entre deux pas, le héros 0 est en scène. Le niveau,
+// l'EXP, le Battle Manual et les zenys sont ceux de l'équipe : ils restent dans
+// `hero`, et `SyncTeam` les recopie aux autres.
 struct SurvivorsField {
   const SurvivorsRules* rules = nullptr;
   const ClassRule* hero_class = nullptr;
@@ -117,6 +158,9 @@ struct SurvivorsField {
   std::uint32_t step = 0;
   SurvivorsPhase phase = SurvivorsPhase::kRunning;
   SurvivorsHero hero;
+  std::vector<SurvivorsKit> allies;
+  std::uint8_t stage = 0;                   // l'index du héros en scène
+  std::uint8_t leaves_left = 0;             // les feuilles d'Yggdrasil de l'équipe
   std::vector<SurvivorsFoe> foes;           // ordre de naissance
   std::vector<SurvivorsShot> shots;         // ordre de naissance
   std::vector<SurvivorsStrike> strikes;     // ordre d'émission
@@ -183,6 +227,24 @@ struct SurvivorsField {
   SurvivorsNews news;
 };
 
+// Le nombre de héros de la partie.
+[[nodiscard]] inline std::size_t HeroCount(const SurvivorsField& field) noexcept {
+  return field.allies.size() + 1;
+}
+// Le héros `hero_index`, où qu'il soit. Son niveau et son EXP sont à jour entre
+// deux pas.
+[[nodiscard]] const SurvivorsHero& HeroAt(const SurvivorsField& field, std::size_t hero_index);
+// La classe du héros `hero_index`.
+[[nodiscard]] const ClassRule* ClassAt(const SurvivorsField& field, std::size_t hero_index);
+// Les coups du héros `hero_index`, pour le dessin.
+[[nodiscard]] const std::vector<SurvivorsZone>& ZonesAt(const SurvivorsField& field,
+                                                        std::size_t hero_index);
+// MET EN SCÈNE le héros `hero_index` : il échange sa place avec celui qui y est.
+// L'échange ne touche ni le niveau, ni l'EXP, ni les zenys de l'équipe.
+void PutOnStage(SurvivorsField& field, std::size_t hero_index);
+// Recopie aux alliés le niveau, l'EXP et les zenys du héros en scène.
+void SyncTeam(SurvivorsField& field);
+
 // Une orbe en vie, pour le dessin.
 struct SurvivorsOrb {
   std::uint16_t skill_id = 0;
@@ -228,6 +290,9 @@ class SurvivorsRun {
                                           const SurvivorsStart& start) = delete;
   // Un pas de 20 ms. Sans effet hors kRunning.
   void Step(SurvivorsInput input);
+  // UN PAS À PLUSIEURS : le cap de chaque héros, dans l'ordre de leur index ; un
+  // héros sans cap reste à l'arrêt. Sans effet hors kRunning.
+  void StepTeam(std::span<const SurvivorsInput> inputs);
   // Faux hors kChoosing, pour un index hors des offres, une charge épuisée, ou
   // un bannissement de kHeal ou kZeny.
   [[nodiscard]] bool Answer(SurvivorsAnswer answer);
@@ -252,6 +317,10 @@ class SurvivorsRun {
   // fait avancer la partie. Le jeu ne s'en sert pas ; une partie retouchée ainsi
   // ne se rejoue plus depuis son journal.
   [[nodiscard]] SurvivorsField& field_for_tests() noexcept { return field_; }
+
+  // Le robot d'un héros lit le héros en scène : son appelant le met en scène,
+  // lit, puis y remet le héros 0.
+  void PutHeroOnStage(std::size_t hero_index) { PutOnStage(field_, hero_index); }
 
  private:
   explicit SurvivorsRun(SurvivorsField field);

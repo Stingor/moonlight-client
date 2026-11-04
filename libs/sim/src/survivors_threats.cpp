@@ -34,12 +34,17 @@ namespace {
       !field.ground.Passable(CellOf(shot.position.x), CellOf(shot.position.y))) {
     return false;
   }
-  if (!HeroWithin(field, shot.position, shot.radius_units)) return true;
-  // Un héros déjà tombé ce pas n'est plus blessé ; le tir s'éteint quand même.
-  if (field.phase == SurvivorsPhase::kRunning && shot.damage > 0) {
-    (void)HurtHero(field, shot.damage);
-  }
-  return false;
+  // Un tir touche un seul héros, le premier qu'il chevauche.
+  bool hit = false;
+  ForEachStanding(field, [&] {
+    if (hit || !HeroWithin(field, shot.position, shot.radius_units)) return;
+    hit = true;
+    // Un héros déjà tombé ce pas n'est plus blessé ; le tir s'éteint quand même.
+    if (field.phase == SurvivorsPhase::kRunning && shot.damage > 0) {
+      (void)HurtHero(field, shot.damage);
+    }
+  });
+  return !hit;
 }
 
 // Une menace au sol à ce pas : armée, elle blesse le héros qui la chevauche,
@@ -49,8 +54,17 @@ namespace {
   if (field.step >= hazard.until_step) return false;
   if (field.step < hazard.armed_step || field.step < hazard.next_hurt_step) return true;
   if (field.phase != SurvivorsPhase::kRunning || hazard.damage <= 0) return true;
-  if (!HeroWithin(field, hazard.center, hazard.radius_units)) return true;
-  (void)HurtHero(field, hazard.damage);
+  // Une menace au sol blesse tous ceux qu'elle chevauche.
+  bool hit = false;
+  ForEachStanding(field, [&] {
+    if (field.phase != SurvivorsPhase::kRunning ||
+        !HeroWithin(field, hazard.center, hazard.radius_units)) {
+      return;
+    }
+    hit = true;
+    (void)HurtHero(field, hazard.damage);
+  });
+  if (!hit) return true;
   hazard.next_hurt_step = hazard.period_steps > 0
                               ? static_cast<std::uint32_t>(std::min<std::uint64_t>(
                                     std::uint64_t{field.step} + hazard.period_steps,

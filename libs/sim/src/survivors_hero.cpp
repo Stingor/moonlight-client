@@ -90,7 +90,7 @@ void MoveHero(SurvivorsField& field, SurvivorsInput input) {
 
 bool HurtHero(SurvivorsField& field, std::int32_t damage) {
   SurvivorsHero& hero = field.hero;
-  if (field.step < hero.invulnerable_until_step) return false;
+  if (hero.down || field.step < hero.invulnerable_until_step) return false;
   const std::int32_t armor = hero.stats.Of(SurvivorsStat::kArmor);
   // En 64 bits : une armure négative ne fait pas déborder la soustraction.
   const std::int32_t taken = static_cast<std::int32_t>(std::clamp<std::int64_t>(
@@ -105,6 +105,16 @@ bool HurtHero(SurvivorsField& field, std::int32_t damage) {
     return false;
   }
   hero.hp = 0;
+  // En coop, le héros reste à terre ; la partie ne finit qu'avec le dernier.
+  if (!field.allies.empty()) {
+    hero.down = true;
+    field.news.heroes_down.push_back(static_cast<std::uint8_t>(field.stage));
+    bool someone_stands = false;
+    for (std::size_t index = 0; index < HeroCount(field); ++index) {
+      someone_stands = someone_stands || !HeroAt(field, index).down;
+    }
+    if (someone_stands) return false;
+  }
   field.phase = SurvivorsPhase::kOver;
   field.tally.outcome = SurvivorsOutcome::kFell;
   return true;
@@ -128,7 +138,7 @@ void TouchHero(SurvivorsField& field) {
                                FoeRadius(rules, foe) + rules.tuning.touch_reach_units;
     if (DistanceSquared(foe.position, hero.position) >= reach * reach) continue;
     foe.touch_ready_step = field.step + StepsOf(rule->touch_interval_ms);
-    if (HurtHero(field, TouchDamageOf(field, foe, *rule))) return;
+    if (HurtHero(field, TouchDamageOf(field, foe, *rule)) || field.hero.down) return;
   }
 }
 

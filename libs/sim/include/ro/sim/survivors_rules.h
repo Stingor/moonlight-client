@@ -22,6 +22,8 @@ inline constexpr std::uint16_t kSurvivorsRulesetVersion = 4;
 inline constexpr std::size_t kMostSkillLevels = 8;
 inline constexpr std::size_t kMostCardLevels = 5;
 inline constexpr std::uint8_t kMostOffers = 4;
+// Les héros d'une partie : un en solo, quatre au plus en coop.
+inline constexpr std::size_t kMostHeroes = 4;
 inline constexpr std::int32_t kMostArenaSideCells = 512;
 // Les emplacements de skill qu'un monstre suit un à un (`rehit_ready_step`) :
 // CheckSurvivorsRules refuse un `caps.skill_slots` plus grand.

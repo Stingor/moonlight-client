@@ -112,9 +112,10 @@ constexpr std::array<std::uint8_t, kFrameSideCount> kRecallSideTurns = {0, 2, 1,
 void Recall(SurvivorsField& field, SurvivorsFoe& foe) {
   const SurvivorsRules& rules = *field.rules;
   const SpawnFrame& frame = rules.spawn_frame;
-  const FieldPoint hero = field.hero.position;
+  const SurvivorsHero& nearest = NearestStanding(field, foe.position);
+  const FieldPoint hero = nearest.position;
   const FieldPoint offset = foe.position - hero;
-  const auto faced = static_cast<std::uint8_t>(FacedSide(field.hero.facing));
+  const auto faced = static_cast<std::uint8_t>(FacedSide(nearest.facing));
   for (const std::uint8_t turns : kRecallSideTurns) {
     const auto side = static_cast<FrameSide>((faced + turns) % kFrameSideCount);
     const FieldPoint target = RecallTarget(frame, hero, offset, side);
@@ -122,7 +123,7 @@ void Recall(SurvivorsField& field, SurvivorsFoe& foe) {
         field.ground, CellOf(target.x), CellOf(target.y), rules.tuning.spawn_search_ring);
     if (!cell) continue;
     const FieldPoint landing = CellCenter(cell->x, cell->y);
-    if (InsideSpawnFrame(frame, hero, landing) || Stranded(field.flow, landing)) continue;
+    if (InsideAnySpawnFrame(field, landing) || Stranded(field.flow, landing)) continue;
     foe.position = landing;
     foe.previous_position = landing;
     return;
@@ -132,9 +133,11 @@ void Recall(SurvivorsField& field, SurvivorsFoe& foe) {
 // Vrai si le champ mène de la case (x, y) à sa source sans détour : son coût
 // vaut la marche octile, aucun mur ne s'interpose sur le plus court chemin.
 [[nodiscard]] bool OpenGround(const HordeFlow& flow, std::int32_t cell_x, std::int32_t cell_y) {
-  const std::optional<CellPosition> source = flow.source();
   const std::optional<std::uint32_t> cost = flow.CostFrom(cell_x, cell_y);
-  return source && cost && *cost == OctileCost(cell_x, cell_y, source->x, source->y);
+  if (!cost) return false;
+  return std::ranges::any_of(flow.sources(), [&](const CellPosition& source) {
+    return *cost == OctileCost(cell_x, cell_y, source.x, source.y);
+  });
 }
 
 // LA POURSUITE d'un monstre. Le champ le mène de case en case, vers le centre
@@ -148,7 +151,7 @@ void Recall(SurvivorsField& field, SurvivorsFoe& foe) {
 [[nodiscard]] bool Chase(SurvivorsField& field, SurvivorsFoe& foe) {
   if (!Walks(field, foe)) return false;
   const SurvivorsTuning& tuning = field.rules->tuning;
-  const FieldPoint hero = field.hero.position;
+  const FieldPoint hero = NearestStanding(field, foe.position).position;
   const std::int32_t speed = PaceOf(field, foe);
   // UN AVEUGLÉ ERRE à son cap du moment, et glisse le long des murs.
   if (Blinded(field, foe)) {
@@ -308,19 +311,24 @@ void ShoveHero(SurvivorsField& field) {
 }  // namespace
 
 void RefreshFlow(SurvivorsField& field) {
-  const std::int32_t cell_x = CellOf(field.hero.position.x);
-  const std::int32_t cell_y = CellOf(field.hero.position.y);
-  // Le héros ne quitte pas l'arène, que ses murs bornent ; une case hors de
-  // l'arène laisse le champ tel quel.
-  if (cell_x < 0 || cell_y < 0 || cell_x >= field.ground.width() ||
-      cell_y >= field.ground.height()) {
-    return;
+  // Un héros ne quitte pas l'arène, que ses murs bornent ; une case hors de
+  // l'arène ne compte pas, et sans aucune case le champ reste tel quel.
+  std::array<CellPosition, kMostHeroes> cells;
+  std::size_t cell_count = 0;
+  for (std::size_t index = 0; index < HeroCount(field); ++index) {
+    const SurvivorsHero& hero = HeroAt(field, index);
+    const std::int32_t cell_x = CellOf(hero.position.x);
+    const std::int32_t cell_y = CellOf(hero.position.y);
+    if (hero.down || cell_x < 0 || cell_y < 0 || cell_x >= field.ground.width() ||
+        cell_y >= field.ground.height()) {
+      continue;
+    }
+    cells[cell_count++] =
+        CellPosition{static_cast<std::uint16_t>(cell_x), static_cast<std::uint16_t>(cell_y), 0};
   }
   const SurvivorsTuning& tuning = field.rules->tuning;
-  field.flow.Refresh(
-      field.ground,
-      CellPosition{static_cast<std::uint16_t>(cell_x), static_cast<std::uint16_t>(cell_y), 0},
-      field.step, tuning.flow_radius_cells, tuning.flow_refresh_steps);
+  field.flow.Refresh(field.ground, std::span<const CellPosition>(cells.data(), cell_count),
+                     field.step, tuning.flow_radius_cells, tuning.flow_refresh_steps);
 }
 
 void MoveHorde(SurvivorsField& field) {
@@ -336,9 +344,11 @@ void MoveHorde(SurvivorsField& field) {
     if (foe.drift_heading != kNoHeading) continue;
     // Trop loin du héros, ou dans une impasse que ses murs lui imposent : le
     // monstre est rappelé, puis poursuit dans le même pas.
-    if (recall > 0 && (DistanceSquared(foe.position, field.hero.position) > recall * recall ||
-                       (Stranded(field.flow, foe.position) &&
-                        (TraitsOf(*field.rules, foe) & kFoePassesWalls) == 0))) {
+    if (recall > 0 &&
+        (DistanceSquared(foe.position, NearestStanding(field, foe.position).position) >
+             recall * recall ||
+         (Stranded(field.flow, foe.position) &&
+          (TraitsOf(*field.rules, foe) & kFoePassesWalls) == 0))) {
       Recall(field, foe);
     }
     // Le comportement a mené son pas : aucune poursuite.
@@ -347,7 +357,7 @@ void MoveHorde(SurvivorsField& field) {
     if (Chase(field, foe) && recall > 0) Recall(field, foe);
   }
   Separate(field);
-  ShoveHero(field);
+  ForEachStanding(field, [&field] { ShoveHero(field); });
 }
 
 void RebuildGrid(SurvivorsField& field) { FillFoeGrid(field); }

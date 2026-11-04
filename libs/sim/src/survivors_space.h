@@ -132,6 +132,49 @@ inline constexpr std::int64_t kMostScaledBonusPct = std::int64_t{1} << 30;
   return std::nullopt;
 }
 
+// CHAQUE HÉROS DEBOUT PASSE EN SCÈNE, dans l'ordre de leur index, puis le héros
+// qui y était y revient. En solo, un simple appel.
+template <typename Action>
+void ForEachStanding(SurvivorsField& field, Action&& action) {
+  if (field.allies.empty()) {
+    action();
+    return;
+  }
+  const std::size_t back_on_stage = field.stage;
+  for (std::size_t index = 0; index < HeroCount(field); ++index) {
+    PutOnStage(field, index);
+    if (!field.hero.down) action();
+  }
+  PutOnStage(field, back_on_stage);
+}
+// Chaque héros, debout ou à terre, passe en scène.
+template <typename Action>
+void ForEachHero(SurvivorsField& field, Action&& action) {
+  const std::size_t back_on_stage = field.stage;
+  for (std::size_t index = 0; index < HeroCount(field); ++index) {
+    PutOnStage(field, index);
+    action();
+  }
+  PutOnStage(field, back_on_stage);
+}
+// Le héros debout le plus proche de `from`, le plus petit index à égalité : la
+// cible de la horde. Celui qui est en scène s'il n'y en a aucun.
+[[nodiscard]] inline const SurvivorsHero& NearestStanding(const SurvivorsField& field,
+                                                          FieldPoint from) {
+  if (field.allies.empty()) return field.hero;
+  const SurvivorsHero* nearest = nullptr;
+  std::int64_t nearest_squared = 0;
+  for (std::size_t index = 0; index < HeroCount(field); ++index) {
+    const SurvivorsHero& hero = HeroAt(field, index);
+    if (hero.down) continue;
+    const std::int64_t squared = DistanceSquared(hero.position, from);
+    if (nearest == nullptr || squared < nearest_squared) {
+      nearest = &hero;
+      nearest_squared = squared;
+    }
+  }
+  return nearest != nullptr ? *nearest : field.hero;
+}
 // Strictement dans le cadre d'apparition centré sur `hero` ; son périmètre
 // n'en fait pas partie.
 [[nodiscard]] inline bool InsideSpawnFrame(const SpawnFrame& frame, FieldPoint hero,
@@ -140,6 +183,17 @@ inline constexpr std::int64_t kMostScaledBonusPct = std::int64_t{1} << 30;
   const std::int64_t dy = std::int64_t{point.y} - hero.y;
   return dx > -frame.half_width_units && dx < frame.half_width_units && dy > -frame.south_units &&
          dy < frame.north_units;
+}
+// Vrai si `point` tombe dans le cadre d'apparition d'un héros debout : ce qui y
+// naît naîtrait sous ses yeux.
+[[nodiscard]] inline bool InsideAnySpawnFrame(const SurvivorsField& field, FieldPoint point) {
+  const SpawnFrame& frame = field.rules->spawn_frame;
+  if (field.allies.empty()) return InsideSpawnFrame(frame, field.hero.position, point);
+  for (std::size_t index = 0; index < HeroCount(field); ++index) {
+    const SurvivorsHero& hero = HeroAt(field, index);
+    if (!hero.down && InsideSpawnFrame(frame, hero.position, point)) return true;
+  }
+  return false;
 }
 
 // UNE IMPASSE : une case que le champ de poursuite couvre, mais d'où aucun

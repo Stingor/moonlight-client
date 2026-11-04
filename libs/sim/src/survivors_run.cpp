@@ -63,7 +63,12 @@ void RefreshTally(SurvivorsField& field) {
   field.tally.foes_alive = static_cast<std::uint16_t>(
       std::min<std::size_t>(field.foes.size(), std::numeric_limits<std::uint16_t>::max()));
   field.tally.level = field.hero.level;
-  field.tally.hp_left = field.hero.hp;
+  std::int64_t hp_left = 0;
+  for (std::size_t index = 0; index < HeroCount(field); ++index) {
+    hp_left += HeroAt(field, index).hp;
+  }
+  field.tally.hp_left = static_cast<std::int32_t>(
+      std::min<std::int64_t>(hp_left, std::numeric_limits<std::int32_t>::max()));
 }
 
 // La fin d'un pas : le compte des pas, le bilan, puis la fin de partie ou le
@@ -90,7 +95,115 @@ void CloseStep(SurvivorsField& field) {
   }
 }
 
+// LE DÉPART D'UN ALLIÉ, vu comme un départ à lui seul : ce qui se juge pour un
+// joueur se juge de la même façon pour chacun.
+[[nodiscard]] SurvivorsStart StartOfAlly(const SurvivorsStart& team,
+                                         const SurvivorsAllyStart& ally) {
+  SurvivorsStart start;
+  start.seed = team.seed;
+  start.class_id = ally.class_id;
+  start.arena_id = team.arena_id;
+  start.first_skill_id = ally.first_skill_id;
+  start.loadout = ally.loadout;
+  start.lives = ally.lives;
+  start.locked_ids = ally.locked_ids;
+  return start;
+}
+
+// Vrai si la case est celle d'un héros déjà placé.
+[[nodiscard]] bool HeroStandsOn(const SurvivorsField& field, FieldPoint at) {
+  for (std::size_t index = 0; index < HeroCount(field); ++index) {
+    if (HeroAt(field, index).position == at) return true;
+  }
+  return false;
+}
+
+// Échange la scène et l'équipement `kit`, sauf ce qui appartient à l'équipe.
+void Exchange(SurvivorsField& field, SurvivorsKit& kit) {
+  std::swap(field.hero, kit.hero);
+  std::swap(field.hero.level, kit.hero.level);
+  std::swap(field.hero.exp, kit.hero.exp);
+  std::swap(field.hero.exp_boost_until_step, kit.hero.exp_boost_until_step);
+  std::swap(field.hero.zeny, kit.hero.zeny);
+  std::swap(field.hero_class, kit.hero_class);
+  std::swap(field.lives_left, kit.lives_left);
+  std::swap(field.shots, kit.shots);
+  std::swap(field.strikes, kit.strikes);
+  std::swap(field.blasts, kit.blasts);
+  std::swap(field.zones, kit.zones);
+  std::swap(field.start.class_id, kit.start.class_id);
+  std::swap(field.start.first_skill_id, kit.start.first_skill_id);
+  std::swap(field.start.loadout, kit.start.loadout);
+  std::swap(field.start.lives, kit.start.lives);
+  std::swap(field.start.leaves, kit.start.leaves);
+  std::swap(field.start.locked_ids, kit.start.locked_ids);
+}
+
+// L'équipement du héros `hero_index`, quand il n'est pas en scène.
+[[nodiscard]] const SurvivorsKit& KitAt(const SurvivorsField& field, std::size_t hero_index) {
+  return field.allies[(hero_index == 0 ? field.stage : hero_index) - 1U];
+}
+
+// Met en scène le premier héros debout dont c'est le tour : le théâtre des
+// apparitions passe de l'un à l'autre, un pas sur deux à deux.
+void PutAnchorOnStage(SurvivorsField& field) {
+  if (field.allies.empty()) return;
+  const std::size_t count = HeroCount(field);
+  for (std::size_t turn = 0; turn < count; ++turn) {
+    const std::size_t index = (field.step + turn) % count;
+    if (!HeroAt(field, index).down) {
+      PutOnStage(field, index);
+      return;
+    }
+  }
+}
+
+// LA LAISSE : un pas qui éloigne un héros d'un autre au-delà de la distance
+// maximale est annulé, mais le héros garde son cap.
+void HoldLeash(SurvivorsField& field, FieldPoint from) {
+  const std::int64_t leash = Cells(kTeamLeashCells);
+  SurvivorsHero& hero = field.hero;
+  for (std::size_t index = 0; index < HeroCount(field); ++index) {
+    if (index == field.stage) continue;
+    const SurvivorsHero& other = HeroAt(field, index);
+    if (other.down) continue;
+    const std::int64_t after = DistanceSquared(hero.position, other.position);
+    if (after > leash * leash && after > DistanceSquared(from, other.position)) {
+      hero.position = from;
+      return;
+    }
+  }
+}
+
 }  // namespace
+
+const SurvivorsHero& HeroAt(const SurvivorsField& field, std::size_t hero_index) {
+  return hero_index == field.stage ? field.hero : KitAt(field, hero_index).hero;
+}
+
+const ClassRule* ClassAt(const SurvivorsField& field, std::size_t hero_index) {
+  return hero_index == field.stage ? field.hero_class : KitAt(field, hero_index).hero_class;
+}
+
+const std::vector<SurvivorsZone>& ZonesAt(const SurvivorsField& field, std::size_t hero_index) {
+  return hero_index == field.stage ? field.zones : KitAt(field, hero_index).zones;
+}
+
+void PutOnStage(SurvivorsField& field, std::size_t hero_index) {
+  if (hero_index == field.stage) return;
+  if (field.stage != 0) Exchange(field, field.allies[field.stage - 1U]);
+  if (hero_index != 0) Exchange(field, field.allies[hero_index - 1U]);
+  field.stage = static_cast<std::uint8_t>(hero_index);
+}
+
+void SyncTeam(SurvivorsField& field) {
+  for (SurvivorsKit& kit : field.allies) {
+    kit.hero.level = field.hero.level;
+    kit.hero.exp = field.hero.exp;
+    kit.hero.exp_boost_until_step = field.hero.exp_boost_until_step;
+    kit.hero.zeny = field.hero.zeny;
+  }
+}
 
 std::optional<CellPosition> SurvivorsStartCell(const SurvivorsRules& rules,
                                                const ArenaRule& arena_rule,
@@ -152,6 +265,27 @@ core::Result<SurvivorsRun> SurvivorsRun::Start(const SurvivorsRules& rules, Surv
   if (core::Result<void> locked = CheckLockedIds(*hero_class, start); !locked) {
     return std::unexpected(std::move(locked.error()));
   }
+  if (start.allies.size() + 1 > kMostHeroes) {
+    return Refuse(std::to_string(start.allies.size() + 1) + " héros, au plus " +
+                  std::to_string(kMostHeroes));
+  }
+  for (const SurvivorsAllyStart& ally : start.allies) {
+    const ClassRule* ally_class = FindClass(rules, ally.class_id);
+    if (ally_class == nullptr) return Refuse("classe inconnue " + std::to_string(ally.class_id));
+    if (std::find(ally_class->starter_skills.begin(), ally_class->starter_skills.end(),
+                  ally.first_skill_id) == ally_class->starter_skills.end() ||
+        FindSkill(rules, ally.first_skill_id) == nullptr) {
+      return Refuse("premier skill hors des skills de départ " +
+                    std::to_string(ally.first_skill_id));
+    }
+    if (!LoadoutWithinBounds(ally.loadout)) {
+      return Refuse("bonus de loadout au-delà de ±" + std::to_string(kMostStatBonus));
+    }
+    if (core::Result<void> locked = CheckLockedIds(*ally_class, StartOfAlly(start, ally));
+        !locked) {
+      return std::unexpected(std::move(locked.error()));
+    }
+  }
   if (ground.bounded() &&
       (ground.width() <= 0 || ground.height() <= 0 || ground.width() > kMostArenaSideCells ||
        ground.height() > kMostArenaSideCells)) {
@@ -200,18 +334,71 @@ core::Result<SurvivorsRun> SurvivorsRun::Start(const SurvivorsRules& rules, Surv
   field.skips_left = start.loadout.skips;
   field.banishes_left = start.loadout.banishes;
   field.lives_left = start.lives;
+  // LES ALLIÉS naissent autour du premier, chacun sur sa case ; les charges et les
+  // feuilles de tous forment la réserve de l'équipe.
+  if (!start.allies.empty()) {
+    std::uint32_t rerolls = start.loadout.rerolls;
+    std::uint32_t skips = start.loadout.skips;
+    std::uint32_t banishes = start.loadout.banishes;
+    std::uint32_t leaves = start.leaves;
+    for (const SurvivorsAllyStart& ally : start.allies) {
+      SurvivorsKit kit;
+      kit.hero_class = FindClass(rules, ally.class_id);
+      kit.lives_left = ally.lives;
+      kit.start = ally;
+      kit.hero.skills.push_back(OwnedSkill{.skill_id = ally.first_skill_id, .level = 1});
+      std::optional<CellPosition> cell;
+      for (std::int32_t ring = 1; ring <= kStartSearchRings * rules.tuning.spawn_search_ring;
+           ++ring) {
+        const auto around =
+            static_cast<std::uint8_t>(field.allies.size() * kHeadingSteps / (kMostHeroes - 1));
+        const FieldPoint wanted = field.hero.position + TurnVector(around, Cells(ring));
+        cell = survivors::NearestPassable(field.ground, CellOf(wanted.x), CellOf(wanted.y),
+                                          rules.tuning.spawn_search_ring);
+        if (cell && !HeroStandsOn(field, CellCenter(cell->x, cell->y))) break;
+        cell.reset();
+      }
+      if (!cell) cell = start_cell;
+      kit.hero.position = CellCenter(cell->x, cell->y);
+      kit.hero.previous_position = kit.hero.position;
+      field.allies.push_back(std::move(kit));
+      rerolls += ally.loadout.rerolls;
+      skips += ally.loadout.skips;
+      banishes += ally.loadout.banishes;
+      leaves += ally.leaves;
+    }
+    field.rerolls_left =
+        static_cast<std::uint8_t>(std::min<std::uint32_t>(rerolls, kMostTeamCharges));
+    field.skips_left = static_cast<std::uint8_t>(std::min<std::uint32_t>(skips, kMostTeamCharges));
+    field.banishes_left =
+        static_cast<std::uint8_t>(std::min<std::uint32_t>(banishes, kMostTeamCharges));
+    field.leaves_left = static_cast<std::uint8_t>(std::min<std::uint32_t>(leaves, 255U));
+  }
   survivors::PlantField(field);
   survivors::SowStartPlants(field);
-  survivors::RecomputeStats(field);
+  survivors::ForEachHero(field, [&field] { survivors::RecomputeStats(field); });
   RefreshTally(field);
   return SurvivorsRun(std::move(field));
 }
 
 void SurvivorsRun::Step(SurvivorsInput input) {
+  StepTeam(std::span<const SurvivorsInput>(&input, 1));
+}
+
+void SurvivorsRun::StepTeam(std::span<const SurvivorsInput> inputs) {
   if (field_.phase != SurvivorsPhase::kRunning) return;
   // ⚠ L'ORDRE DU PAS EST LA RÈGLE DU JEU : le changer change chaque partie
   // rejouée, et monte kSurvivorsRulesetVersion.
-  survivors::MoveHero(field_, input);
+  survivors::ForEachStanding(field_, [&] {
+    const SurvivorsInput input =
+        field_.stage < inputs.size() ? inputs[field_.stage] : SurvivorsInput{};
+    const FieldPoint from = field_.hero.position;
+    survivors::MoveHero(field_, input);
+    if (!field_.allies.empty()) HoldLeash(field_, from);
+  });
+  // Un héros en scène sert de théâtre à ce qui ne dépend pas d'un héros : le
+  // cadre d'apparition, la grille, les plantes qui naissent.
+  PutAnchorOnStage(field_);
   // Les plantes laissées loin du héros qui vient de bouger se perdent.
   survivors::ForgetFarPlants(field_);
   survivors::RefreshFlow(field_);
@@ -220,28 +407,37 @@ void SurvivorsRun::Step(SurvivorsInput input) {
   survivors::RunBossScripts(field_);
   survivors::SteerFoes(field_);
   survivors::MoveHorde(field_);
-  survivors::HoldBarriers(field_);
+  survivors::ForEachStanding(field_, [this] { survivors::HoldBarriers(field_); });
   survivors::RebuildGrid(field_);
-  survivors::FireSkills(field_);
-  survivors::LandStrikes(field_);
-  survivors::LandBlasts(field_);
-  survivors::AdvanceShots(field_);
-  survivors::AdvanceZones(field_);
+  // Un héros tombé laisse ses coups en vol finir leur course.
+  survivors::ForEachHero(field_, [this] {
+    if (!field_.hero.down) survivors::FireSkills(field_);
+    survivors::LandStrikes(field_);
+    survivors::LandBlasts(field_);
+    survivors::AdvanceShots(field_);
+    survivors::AdvanceZones(field_);
+  });
   survivors::BuryFoes(field_);
   // La chute du boss final clôt la partie dans BuryFoes : ni menace ni contact
   // ne blessent plus le héros, et une victoire l'emporte sur une chute du même
   // pas. Un héros tombé sous une menace ne prend plus de contact, ne ramasse
   // plus rien et ne se soigne plus.
   if (field_.phase == SurvivorsPhase::kRunning) survivors::AdvanceThreats(field_);
-  if (field_.phase == SurvivorsPhase::kRunning) survivors::TouchHero(field_);
   if (field_.phase == SurvivorsPhase::kRunning) {
-    survivors::GatherGems(field_);
-    survivors::GatherPickups(field_);
-    survivors::Regenerate(field_);
+    survivors::ForEachStanding(field_, [this] { survivors::TouchHero(field_); });
+  }
+  if (field_.phase == SurvivorsPhase::kRunning) {
+    survivors::ForEachStanding(field_, [this] {
+      survivors::GatherGems(field_);
+      survivors::GatherPickups(field_);
+      survivors::Regenerate(field_);
+    });
     // Les tués de tout le pas comptent, Holy Water comprise ; la plante
     // naît autour du héros à sa place de fin de pas.
     survivors::SowPlants(field_);
   }
+  PutOnStage(field_, 0);
+  if (!field_.allies.empty()) SyncTeam(field_);
   CloseStep(field_);
 }
 
@@ -264,6 +460,15 @@ SurvivorsNews SurvivorsRun::TakeNews() { return std::exchange(field_.news, Survi
 void SurvivorsRun::Orbs(std::vector<SurvivorsOrb>& out) const {
   out.clear();
   survivors::CollectOrbs(field_, out);
+  // Les orbes des alliés : chacun passe en scène le temps de les lire, et le
+  // héros 0 y revient avant de rendre la main.
+  if (field_.allies.empty()) return;
+  auto& staged = const_cast<SurvivorsField&>(field_);
+  for (std::size_t index = 1; index < HeroCount(field_); ++index) {
+    PutOnStage(staged, index);
+    if (!staged.hero.down) survivors::CollectOrbs(staged, out);
+  }
+  PutOnStage(staged, 0);
 }
 
 }  // namespace ro::sim

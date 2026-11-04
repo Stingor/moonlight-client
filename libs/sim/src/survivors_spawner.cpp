@@ -132,7 +132,7 @@ std::optional<FieldPoint> TryFramePoint(const SurvivorsField& field, core::Pcg32
       field.ground, CellOf(point.x), CellOf(point.y), rules.tuning.spawn_search_ring);
   if (!cell) return std::nullopt;
   const FieldPoint landing = CellCenter(cell->x, cell->y);
-  if (InsideSpawnFrame(frame, hero, landing) || Stranded(field.flow, landing)) return std::nullopt;
+  if (InsideAnySpawnFrame(field, landing) || Stranded(field.flow, landing)) return std::nullopt;
   return landing;
 }
 
@@ -176,7 +176,7 @@ std::uint32_t HatchFoe(SurvivorsField& field, const FoeRule& rule, FieldPoint at
   foe.units_per_step = UnitsPerStep(WalkMsOf(tuning, rule, options));
   foe.born_step = field.step;
   foe.touch_ready_step = field.step;
-  foe.facing = HeadingOf(field.hero.position - at, 0);
+  foe.facing = HeadingOf(NearestStanding(field, at).position - at, 0);
   foe.armor_pct = rule.armor_pct;
   foe.drift_heading = options.drift_heading;
   foe.elite = options.elite;

@@ -103,14 +103,17 @@ void SweepWall(SurvivorsField& field, SurvivorsZone& zone) {
   for (const std::uint32_t index : field.nearby) {
     if (Spent(zone)) return;
     SurvivorsFoe& foe = field.foes[index];
-    if (foe.hp <= 0 || foe.rehit_ready_step[zone.skill_slot] > field.step) continue;
+    if (foe.hp <= 0 ||
+        foe.rehit_ready_step[RehitIndex(field.stage, zone.skill_slot)] > field.step) {
+      continue;
+    }
     if (!Touches(field, zone, foe)) continue;
     const SurvivorsStatus status{.freeze_ms = zone.freeze_ms,
                                  .knockback_units = zone.knockback_units,
                                  .knock_heading = zone.push_heading};
     HurtFoe(field, foe, DamageAgainst(field, zone.damage, zone.element, foe), zone.skill_id,
             status);
-    foe.rehit_ready_step[zone.skill_slot] = field.step + zone.rehit_steps;
+    foe.rehit_ready_step[RehitIndex(field.stage, zone.skill_slot)] = field.step + zone.rehit_steps;
     if (zone.limited) --zone.hits_left;
   }
 }

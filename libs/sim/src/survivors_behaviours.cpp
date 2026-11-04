@@ -105,7 +105,8 @@ void Stride(SurvivorsField& field, SurvivorsFoe& foe, std::uint8_t traits, Field
 // longueur ; une cachette toujours.
 [[nodiscard]] bool ActHolds(const SurvivorsField& field, const SurvivorsFoe& foe,
                             const FoeBehaviour& behaviour, FoeAct act) noexcept {
-  const std::int64_t distance = Distance(foe.position, field.hero.position);
+  const std::int64_t distance =
+      Distance(foe.position, NearestStanding(field, foe.position).position);
   const std::int64_t reach = behaviour.reach_units;
   switch (act) {
     case FoeAct::kShoot:
@@ -128,7 +129,7 @@ void Stride(SurvivorsField& field, SurvivorsFoe& foe, std::uint8_t traits, Field
 // sans point de chute.
 [[nodiscard]] bool Announce(SurvivorsField& field, SurvivorsFoe& foe, const FoeBehaviour& behaviour,
                             FoeAct act, std::uint32_t strike_step) {
-  const FieldPoint hero = field.hero.position;
+  const FieldPoint hero = NearestStanding(field, foe.position).position;
   SurvivorsWarning warning{.kind = WarningKind::kShot,
                            .source_serial = foe.serial,
                            .from = foe.position,
@@ -154,8 +155,8 @@ void Stride(SurvivorsField& field, SurvivorsFoe& foe, std::uint8_t traits, Field
       break;
     }
     case FoeAct::kBlink: {
-      const std::optional<FieldPoint> landing = LeapLanding(
-          field.ground, foe.position, field.hero.position, foe.facing, behaviour.reach_units);
+      const std::optional<FieldPoint> landing =
+          LeapLanding(field.ground, foe.position, hero, foe.facing, behaviour.reach_units);
       if (!landing) return false;
       foe.act_target = *landing;
       warning.kind = WarningKind::kLeap;
@@ -263,7 +264,7 @@ void Loose(SurvivorsField& field, SurvivorsFoe& foe, const FoeBehaviour& behavio
 // de son serial ; jamais au-delà du héros. Vrai quand ce vol le mène ; un mur
 // qui coupe sa ligne ou arrête son pas le rend à la poursuite (faux).
 [[nodiscard]] bool Fly(SurvivorsField& field, SurvivorsFoe& foe, std::uint8_t traits) {
-  const FieldPoint hero = field.hero.position;
+  const FieldPoint hero = NearestStanding(field, foe.position).position;
   const std::int64_t distance = Distance(foe.position, hero);
   if (distance == 0) return true;
   const std::uint64_t sway_phase =
@@ -313,7 +314,7 @@ void Loose(SurvivorsField& field, SurvivorsFoe& foe, const FoeBehaviour& behavio
 // se tient.
 [[nodiscard]] bool KeepRange(SurvivorsField& field, SurvivorsFoe& foe,
                              const FoeBehaviour& behaviour) {
-  const FieldPoint hero = field.hero.position;
+  const FieldPoint hero = NearestStanding(field, foe.position).position;
   const std::int64_t distance = Distance(foe.position, hero);
   const std::int64_t reach = behaviour.reach_units;
   if (distance > reach + kRangedSlackUnits) return false;
@@ -388,9 +389,10 @@ void SteerFoes(SurvivorsField& field) {
   // gemme ; un rappel nul est éteint.
   const std::int64_t recall = field.rules->tuning.recall_units;
   if (recall <= 0) return;
-  const FieldPoint hero = field.hero.position;
   std::erase_if(field.foes, [&](const SurvivorsFoe& foe) {
-    return foe.drift_heading != kNoHeading && DistanceSquared(foe.position, hero) > recall * recall;
+    return foe.drift_heading != kNoHeading &&
+           DistanceSquared(foe.position, NearestStanding(field, foe.position).position) >
+               recall * recall;
   });
 }
 

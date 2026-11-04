@@ -106,7 +106,7 @@ void Escort(SurvivorsField& field, const BossRule& boss, FieldPoint at) {
 // ont lieu même au plafond des menaces, qui écarte le cercle et son annonce.
 void Quake(SurvivorsField& field, const SurvivorsFoe& foe, const BossMoveRule& move) {
   const std::uint32_t strike_step = Later(field.step, StepsOf(move.telegraph_ms));
-  const FieldPoint hero = field.hero.position;
+  const FieldPoint hero = NearestStanding(field, foe.position).position;
   const std::int32_t reach = std::max(move.reach_units, 0);
   for (std::size_t circle = 0; circle < move.count; ++circle) {
     FieldPoint center = hero;
@@ -161,7 +161,7 @@ void Dash(SurvivorsField& field, SurvivorsFoe& foe, const BossMoveRule& move) {
 // cap s'ils se confondent).
 void Retreat(SurvivorsField& field, SurvivorsFoe& foe) {
   const std::int32_t pace = PaceOf(field, foe);
-  FieldPoint away = Toward(field.hero.position, foe.position, pace);
+  FieldPoint away = Toward(NearestStanding(field, foe.position).position, foe.position, pace);
   if (away == FieldPoint{}) {
     away = TurnVector(static_cast<std::uint8_t>((foe.facing + kHalfTurn) % kHeadingSteps), pace);
   }
@@ -237,7 +237,8 @@ void Hold(SurvivorsField& field, SurvivorsFoe& foe, SurvivorsBossTrack& track, s
 [[nodiscard]] bool StartLeap(SurvivorsField& field, SurvivorsFoe& foe, SurvivorsBossTrack& track,
                              std::size_t index, const BossMoveRule& move) {
   const std::optional<FieldPoint> landing =
-      LeapLanding(field.ground, foe.position, field.hero.position, foe.facing, move.reach_units);
+      LeapLanding(field.ground, foe.position, NearestStanding(field, foe.position).position,
+                  foe.facing, move.reach_units);
   if (!landing) return false;
   const std::uint32_t strike_step = Later(field.step, StepsOf(move.telegraph_ms));
   foe.act_target = *landing;
@@ -260,7 +261,8 @@ void Hold(SurvivorsField& field, SurvivorsFoe& foe, SurvivorsBossTrack& track, s
   if (per_step <= 0) return false;
   const std::uint32_t strike_step = Later(field.step, StepsOf(move.telegraph_ms));
   const std::int64_t length = std::int64_t{per_step} * EffectSteps(move);
-  foe.act_heading = HeadingOf(field.hero.position - foe.position, foe.facing);
+  foe.act_heading =
+      HeadingOf(NearestStanding(field, foe.position).position - foe.position, foe.facing);
   foe.act_target =
       foe.position + TurnVector(foe.act_heading, static_cast<std::int32_t>(std::min<std::int64_t>(
                                                      length, Cells(kMostArenaSideCells))));

@@ -104,9 +104,11 @@ void FreeSkillSlot(SurvivorsField& field, std::size_t slot) {
   for (SurvivorsShot& shot : field.shots) follow(shot.skill_slot);
   for (SurvivorsZone& zone : field.zones) follow(zone.skill_slot);
   for (SurvivorsFoe& foe : field.foes) {
-    std::shift_left(foe.rehit_ready_step.begin() + static_cast<std::ptrdiff_t>(slot),
-                    foe.rehit_ready_step.end(), 1);
-    foe.rehit_ready_step.back() = 0;
+    const auto heros_slots =
+        foe.rehit_ready_step.begin() + static_cast<std::ptrdiff_t>(RehitIndex(field.stage, 0));
+    const auto heros_end = heros_slots + static_cast<std::ptrdiff_t>(kMostSkillSlots);
+    std::shift_left(heros_slots + static_cast<std::ptrdiff_t>(slot), heros_end, 1);
+    *(heros_end - 1) = 0;
   }
 }
 
@@ -221,20 +223,38 @@ void OpenChest(SurvivorsField& field, FieldPoint at) {
   SurvivorsChestNews news{.at = at};
   const auto push = [&](const SurvivorsChestGain& gain) { news.gains[news.gain_count++] = gain; };
   if (std::uint64_t{field.step} * kSurvivorsStepMs >= chest.evolution_from_ms) {
-    for (std::size_t slot = 0; slot < field.hero.skills.size() && news.gain_count < gains; ++slot) {
-      const EvolutionRule* evolution = DueEvolution(field, slot);
-      if (evolution == nullptr) continue;
-      const std::optional<std::size_t> freed = Evolve(field, slot, *evolution);
-      push({.kind = ChestGainKind::kEvolution, .id = evolution->evolved_skill_id, .level = 1});
-      // Un emplacement libéré avant celui-ci le fait reculer d'un rang.
-      if (freed.has_value() && *freed < slot) --slot;
-    }
+    ForEachStanding(field, [&] {
+      for (std::size_t slot = 0; slot < field.hero.skills.size() && news.gain_count < gains;
+           ++slot) {
+        const EvolutionRule* evolution = DueEvolution(field, slot);
+        if (evolution == nullptr) continue;
+        const std::optional<std::size_t> freed = Evolve(field, slot, *evolution);
+        push({.kind = ChestGainKind::kEvolution, .id = evolution->evolved_skill_id, .level = 1});
+        // Un emplacement libéré avant celui-ci le fait reculer d'un rang.
+        if (freed.has_value() && *freed < slot) --slot;
+      }
+    });
   }
   std::vector<Growth> candidates;
   std::vector<std::uint32_t> weights;
-  while (news.gain_count < gains) push(Grow(field, candidates, weights));
+  // En coop, le contenu va à l'équipe : celui qui ouvre d'abord, puis chacun à
+  // son tour, à partir de lui.
+  const std::size_t opener = field.stage;
+  std::size_t turn = 0;
+  while (news.gain_count < gains) {
+    const std::size_t receiver = (opener + turn++) % HeroCount(field);
+    PutOnStage(field, receiver);
+    if (receiver != opener && field.hero.down) continue;
+    push(Grow(field, candidates, weights));
+  }
+  PutOnStage(field, opener);
 
-  RecomputeStats(field);
+  if (field.allies.empty()) {
+    RecomputeStats(field);
+  } else {
+    SyncTeam(field);
+    ForEachHero(field, [&field] { RecomputeStats(field); });
+  }
   CountOne(field.tally.chests_opened);
   if (field.news.chests.size() < kMostNewsChests) {
     field.news.chests.push_back(news);

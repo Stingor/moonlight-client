@@ -218,7 +218,9 @@ void SpinOrbit(SurvivorsField& field, std::uint8_t slot, const SurvivorsSkillRul
     GatherNearby(field, center, query_units);
     for (const std::uint32_t index : field.nearby) {
       SurvivorsFoe& foe = field.foes[index];
-      if (foe.hp <= 0 || foe.rehit_ready_step[slot] > field.step) continue;
+      if (foe.hp <= 0 || foe.rehit_ready_step[RehitIndex(field.stage, slot)] > field.step) {
+        continue;
+      }
       const std::int64_t reach =
           std::int64_t{level.hit_radius_units} + FoeRadius(*field.rules, foe);
       if (DistanceSquared(center, foe.position) >= reach * reach) continue;
@@ -228,7 +230,7 @@ void SpinOrbit(SurvivorsField& field, std::uint8_t slot, const SurvivorsSkillRul
           .knock_heading = HeadingAway(field.hero.position, foe, field.hero.facing)};
       HurtFoe(field, foe, DamageAgainst(field, level.damage, rule.element, foe), rule.skill_id,
               status);
-      foe.rehit_ready_step[slot] = field.step + rehit_steps;
+      foe.rehit_ready_step[RehitIndex(field.stage, slot)] = field.step + rehit_steps;
     }
   }
 }

@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <optional>
+#include <span>
 #include <utility>
 #include <vector>
 
@@ -12,15 +13,38 @@ namespace ro::sim {
 
 void HordeFlow::Refresh(const SurvivorsGround& ground, CellPosition hero_cell, std::uint32_t step,
                         std::int32_t radius_cells, std::uint32_t refresh_steps) {
-  if (flooded_from_) {
-    const bool moved = flooded_from_->x != hero_cell.x || flooded_from_->y != hero_cell.y;
+  const std::array<CellPosition, 1> hero_cells{hero_cell};
+  Refresh(ground, hero_cells, step, radius_cells, refresh_steps);
+}
+
+void HordeFlow::Refresh(const SurvivorsGround& ground, std::span<const CellPosition> hero_cells,
+                        std::uint32_t step, std::int32_t radius_cells,
+                        std::uint32_t refresh_steps) {
+  if (hero_cells.empty()) return;
+  if (!flooded_from_.empty()) {
+    const bool moved = !std::ranges::equal(
+        flooded_from_, hero_cells,
+        [](const CellPosition& a, const CellPosition& b) { return a.x == b.x && a.y == b.y; });
     if (!moved || step - flooded_step_ < refresh_steps) return;
   }
-  const std::int32_t radius = std::max(radius_cells, 0);
-  const std::int32_t first_x = std::max<std::int32_t>(hero_cell.x - radius, 0);
-  const std::int32_t first_y = std::max<std::int32_t>(hero_cell.y - radius, 0);
-  const std::int32_t last_x = std::min<std::int32_t>(hero_cell.x + radius, ground.width() - 1);
-  const std::int32_t last_y = std::min<std::int32_t>(hero_cell.y + radius, ground.height() - 1);
+  std::int32_t least_x = hero_cells.front().x;
+  std::int32_t least_y = hero_cells.front().y;
+  std::int32_t most_x = least_x;
+  std::int32_t most_y = least_y;
+  for (const CellPosition& cell : hero_cells) {
+    least_x = std::min<std::int32_t>(least_x, cell.x);
+    least_y = std::min<std::int32_t>(least_y, cell.y);
+    most_x = std::max<std::int32_t>(most_x, cell.x);
+    most_y = std::max<std::int32_t>(most_y, cell.y);
+  }
+  const std::int32_t middle_x = least_x + (most_x - least_x) / 2;
+  const std::int32_t middle_y = least_y + (most_y - least_y) / 2;
+  const std::int32_t radius =
+      std::max(radius_cells, 0) + std::max(most_x - middle_x, most_y - middle_y);
+  const std::int32_t first_x = std::max<std::int32_t>(middle_x - radius, 0);
+  const std::int32_t first_y = std::max<std::int32_t>(middle_y - radius, 0);
+  const std::int32_t last_x = std::min<std::int32_t>(middle_x + radius, ground.width() - 1);
+  const std::int32_t last_y = std::min<std::int32_t>(middle_y + radius, ground.height() - 1);
   const std::int32_t width = std::max(last_x - first_x + 1, 0);
   const std::int32_t height = std::max(last_y - first_y + 1, 0);
 
@@ -34,17 +58,22 @@ void HordeFlow::Refresh(const SurvivorsGround& ground, CellPosition hero_cell, s
     }
   }
   const WalkMap window(width, height, std::move(passable));
-  const std::array<CellPosition, 1> source{
-      CellPosition{static_cast<std::uint16_t>(hero_cell.x - first_x),
-                   static_cast<std::uint16_t>(hero_cell.y - first_y), 0}};
+  std::vector<CellPosition> sources;
+  sources.reserve(hero_cells.size());
+  for (const CellPosition& cell : hero_cells) {
+    sources.push_back(CellPosition{static_cast<std::uint16_t>(cell.x - first_x),
+                                   static_cast<std::uint16_t>(cell.y - first_y), 0});
+  }
   // Un héros hors de la fenêtre (arène vide, case hors carte) ou sur une case
   // bloquée donne un champ sans source : tout y est injoignable, la horde
   // marche droit sur lui, et le champ ne couvre rien.
-  field_ = WalkField::Flood(window, source);
+  field_ = WalkField::Flood(window, sources);
   origin_x_ = first_x;
   origin_y_ = first_y;
-  flooded_from_ = hero_cell;
-  sourced_ = field_.CostFrom(source[0].x, source[0].y).has_value();
+  flooded_from_.assign(hero_cells.begin(), hero_cells.end());
+  sourced_ = std::ranges::any_of(sources, [this](const CellPosition& source) {
+    return field_.CostFrom(source.x, source.y).has_value();
+  });
   flooded_step_ = step;
   ++floods_;
 }

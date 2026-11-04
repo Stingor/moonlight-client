@@ -77,6 +77,7 @@ void CountOne(Counter& counter) noexcept {
 void GainExp(SurvivorsField& field, std::uint32_t exp) {
   SurvivorsHero& hero = field.hero;
   const bool was_reborn = field.hero_class != nullptr && Reborn(*field.hero_class, hero.level);
+  const std::uint16_t level_before = hero.level;
   const auto gained = static_cast<std::uint64_t>(Scaled(exp, ExpBonusPct(field)));
   hero.exp = SaturatedSum(hero.exp, gained);
   field.tally.exp_total = SaturatedSum(field.tally.exp_total, gained);
@@ -91,6 +92,11 @@ void GainExp(SurvivorsField& field, std::uint32_t exp) {
   if (!was_reborn && field.hero_class != nullptr && Reborn(*field.hero_class, hero.level)) {
     field.news.reborn = true;
     RecomputeStats(field);
+  }
+  // Le niveau de l'équipe vaut pour tous, et fait renaître les autres classes.
+  if (!field.allies.empty() && hero.level != level_before) {
+    SyncTeam(field);
+    ForEachHero(field, [&field] { RecomputeStats(field); });
   }
 }
 
@@ -146,6 +152,45 @@ struct OfferCandidate {
   return candidates;
 }
 
+// Ce qu'un héros a déjà reçu : la somme des niveaux de ses skills.
+[[nodiscard]] std::uint32_t SkillLevelsOf(const SurvivorsHero& hero) noexcept {
+  std::uint32_t levels = 0;
+  for (const OwnedSkill& owned : hero.skills) levels += owned.level;
+  return levels;
+}
+
+// LES OFFRES D'UNE ÉQUIPE : celles de chaque héros, dans l'ordre de leur index.
+// Une carte vaut pour tous : celle qu'un héros tient n'est plus offerte
+// neuve à un autre, ni deux fois. Le poids d'une offre croît avec le retard de
+// son héros sur le mieux servi, pour que personne ne reste oublié.
+[[nodiscard]] std::vector<OfferCandidate> TeamOfferCandidates(SurvivorsField& field) {
+  std::uint32_t most_levels = 0;
+  for (std::size_t index = 0; index < HeroCount(field); ++index) {
+    most_levels = std::max(most_levels, SkillLevelsOf(HeroAt(field, index)));
+  }
+  std::vector<OfferCandidate> team;
+  const auto card_taken = [&](std::uint16_t card_item_id) {
+    for (std::size_t index = 0; index < HeroCount(field); ++index) {
+      for (const OwnedCard& owned : HeroAt(field, index).cards) {
+        if (owned.card_item_id == card_item_id) return true;
+      }
+    }
+    return std::ranges::any_of(team, [&](const OfferCandidate& candidate) {
+      return candidate.offer.kind == OfferKind::kNewCard && candidate.offer.id == card_item_id;
+    });
+  };
+  ForEachHero(field, [&] {
+    const std::uint32_t behind = most_levels - SkillLevelsOf(field.hero);
+    for (OfferCandidate& candidate : OfferCandidates(field)) {
+      if (candidate.offer.kind == OfferKind::kNewCard && card_taken(candidate.offer.id)) continue;
+      candidate.offer.hero_index = field.stage;
+      candidate.weight += candidate.weight * behind;
+      team.push_back(candidate);
+    }
+  });
+  return team;
+}
+
 // Applique une offre choisie. Faux, sans rien changer, pour une offre qui ne
 // s'applique plus à l'état du héros.
 [[nodiscard]] bool Grant(SurvivorsField& field, const SurvivorsOffer& offer) {
@@ -195,8 +240,12 @@ struct OfferCandidate {
       return true;
     }
     case OfferKind::kHeal:
-      hero.hp = static_cast<std::int32_t>(std::min<std::int64_t>(
-          std::int64_t{hero.hp} + std::max(rules.tuning.heal_offer_hp, 0), hero.max_hp));
+      // Le soin va à tous les héros debout.
+      ForEachStanding(field, [&] {
+        field.hero.hp = static_cast<std::int32_t>(std::min<std::int64_t>(
+            std::int64_t{field.hero.hp} + std::max(rules.tuning.heal_offer_hp, 0),
+            field.hero.max_hp));
+      });
       return true;
     case OfferKind::kZeny:
       hero.zeny = SaturatedSum(hero.zeny, rules.tuning.zeny_offer);
@@ -257,13 +306,22 @@ void RecomputeStats(SurvivorsField& field) {
   // Les statistiques : le bonus du loadout, plus chaque carte à son niveau,
   // cumulés en saturant dans l'int32.
   SurvivorsStats stats = field.start.loadout.bonus;
-  for (const OwnedCard& owned : hero.cards) {
-    const CardRule* card = FindCard(*field.rules, owned.card_item_id);
-    if (card == nullptr || owned.level == 0 || std::size_t{owned.level} > card->per_level.size()) {
-      continue;
+  // Les cartes valent pour toute l'équipe, sauf la monture de celui qui la tient.
+  for (std::size_t index = 0; index < HeroCount(field); ++index) {
+    const ClassRule* holder_class = ClassAt(field, index);
+    for (const OwnedCard& owned : HeroAt(field, index).cards) {
+      const CardRule* card = FindCard(*field.rules, owned.card_item_id);
+      if (card == nullptr || owned.level == 0 ||
+          std::size_t{owned.level} > card->per_level.size()) {
+        continue;
+      }
+      if (index != field.stage && holder_class != nullptr &&
+          owned.card_item_id == holder_class->mount_card_item_id) {
+        continue;
+      }
+      std::int32_t& value = stats.values[static_cast<std::size_t>(card->stat)];
+      value = SaturatedAdd(value, card->per_level[owned.level - 1U]);
     }
-    std::int32_t& value = stats.values[static_cast<std::size_t>(card->stat)];
-    value = SaturatedAdd(value, card->per_level[owned.level - 1U]);
   }
   // La renaissance, une fois atteinte.
   if (Reborn(*field.hero_class, hero.level)) {
@@ -290,7 +348,7 @@ void RecomputeStats(SurvivorsField& field) {
   const ClassRule& hero_class = *field.hero_class;
   const std::int32_t max_hp =
       std::max(SaturatedAdd(hero_class.max_hp, stats.Of(SurvivorsStat::kMaxHp)), 1);
-  if (max_hp > hero.max_hp) {
+  if (!hero.down && max_hp > hero.max_hp) {
     hero.hp = SaturatedAdd(hero.hp, std::int64_t{max_hp} - hero.max_hp);
   }
   hero.max_hp = max_hp;
@@ -391,7 +449,8 @@ void GatherGems(SurvivorsField& field) {
 
 void BuildOffers(SurvivorsField& field) {
   if (field.rules == nullptr || field.hero_class == nullptr) return;
-  std::vector<OfferCandidate> candidates = OfferCandidates(field);
+  std::vector<OfferCandidate> candidates =
+      field.allies.empty() ? OfferCandidates(field) : TeamOfferCandidates(field);
   // Le tirage de la chance a lieu dans tous les cas : le flux des offres ne
   // dépend pas du nombre de candidats.
   const auto luck_pct = static_cast<std::uint32_t>(
@@ -425,11 +484,22 @@ bool ApplyAnswer(SurvivorsField& field, SurvivorsAnswer answer) {
   // absurde ne se rejoue pas.
   if (std::size_t{answer.offer_index} >= field.offers.size()) return false;
   switch (answer.kind) {
-    case AnswerKind::kPick:
-      if (!Grant(field, field.offers[answer.offer_index])) return false;
-      RecomputeStats(field);
+    case AnswerKind::kPick: {
+      // L'offre va à son héros ; ses cartes valent pour tous.
+      const SurvivorsOffer offer = field.offers[answer.offer_index];
+      PutOnStage(field, offer.hero_index);
+      const bool granted = Grant(field, offer);
+      PutOnStage(field, 0);
+      if (!granted) return false;
+      if (field.allies.empty()) {
+        RecomputeStats(field);
+      } else {
+        SyncTeam(field);
+        ForEachHero(field, [&field] { RecomputeStats(field); });
+      }
       Settle(field);
       return true;
+    }
     case AnswerKind::kSkip:
       if (field.skips_left == 0) return false;
       --field.skips_left;

@@ -125,8 +125,8 @@ void ForgetFarPlants(SurvivorsField& field) {
   if (field.rules == nullptr) return;
   const std::int64_t forget = field.rules->tuning.plant_forget_units;
   if (forget <= 0) return;
-  const FieldPoint hero = field.hero.position;
   std::erase_if(field.plants, [&](const SurvivorsPlant& plant) {
+    const FieldPoint hero = NearestStanding(field, plant.position).position;
     const std::int64_t dx = std::int64_t{plant.position.x} - hero.x;
     const std::int64_t dy = std::int64_t{plant.position.y} - hero.y;
     return std::max(dx < 0 ? -dx : dx, dy < 0 ? -dy : dy) > forget;

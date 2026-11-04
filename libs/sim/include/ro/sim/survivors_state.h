@@ -23,6 +23,7 @@ struct SurvivorsOffer {
   OfferKind kind = OfferKind::kHeal;
   std::uint16_t id = 0;  // skill_id ou card_item_id ; 0 pour kHeal et kZeny
   std::uint8_t next_level = 0;
+  std::uint8_t hero_index = 0;  // le héros qui la reçoit ; 0 en solo
   [[nodiscard]] bool operator==(const SurvivorsOffer&) const = default;
 };
 struct OwnedSkill {
@@ -71,6 +72,9 @@ struct SurvivorsHero {
   std::uint8_t evolutions = 0;  // skills évolués par un coffre
   // Relevé, il ne prend aucun coup tant que `step < invulnerable_until_step`.
   std::uint32_t invulnerable_until_step = 0;
+  // En coop : tombé sans vie de réserve. Il ne bouge, ne tire ni ne ramasse
+  // plus, et la horde l'ignore. Jamais vrai en solo.
+  bool down = false;
 };
 
 // LE MÉTIER QUE LE HÉROS MONTRE : celui de sa classe, de son évolution dès la
@@ -108,8 +112,9 @@ struct SurvivorsFoe {
   std::uint32_t touch_ready_step = 0;
   std::uint32_t chill_until_step = 0;
   std::uint32_t hurt_step = 0;  // dernier coup reçu, pour l'animation
-  // Par emplacement de skill : le pas où ce skill peut retoucher ce monstre.
-  std::array<std::uint32_t, kMostSkillSlots> rehit_ready_step = {};
+  // Par héros puis par emplacement de skill : le pas où ce skill peut retoucher
+  // ce monstre. Voir `RehitIndex`.
+  std::array<std::uint32_t, kMostHeroes * kMostSkillSlots> rehit_ready_step = {};
   std::uint8_t facing = 0;
   std::int32_t armor_pct = 0;  // celle de sa règle, posée à sa naissance
   // Gelé tant que `step < freeze_until_step` : immobile, sans contact, et
@@ -149,6 +154,11 @@ struct SurvivorsFoe {
   // RunBossScripts le déplace, ni SteerFoes ni la poursuite ne le font.
   bool scripted = false;
 };
+// La place, dans `rehit_ready_step`, de l'emplacement `slot` du héros
+// `hero_index`.
+[[nodiscard]] constexpr std::size_t RehitIndex(std::size_t hero_index, std::size_t slot) noexcept {
+  return hero_index * kMostSkillSlots + slot;
+}
 // Aucun coup de boss ne tient le corps du boss.
 inline constexpr std::uint8_t kNoBossMove = 0xFF;
 // LE SUIVI D'UN BOSS EN VIE : la règle qui l'a fait naître, et le pas où
