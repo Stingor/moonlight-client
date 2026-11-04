@@ -311,8 +311,11 @@ void BuryFallen(SurvivorsField& field) {
     field.tally.kill_points = SaturatedSum(field.tally.kill_points, KillPoints(*rule, foe.elite));
     if (rank != FoeRank::kCommon) CountOne(field.tally.boss_kills);
     if (foe.elite) CountOne(field.tally.elite_kills);
-    // La chute du boss final est la victoire : la partie s'arrête à ce pas.
-    if (field.phase == SurvivorsPhase::kRunning && IsFinalBoss(field, foe.serial)) {
+    // La chute du boss final est la victoire : la partie s'arrête à ce pas, et
+    // sa carte va droit au héros, qui n'aurait plus le temps de la ramasser.
+    const bool final_fall =
+        field.phase == SurvivorsPhase::kRunning && IsFinalBoss(field, foe.serial);
+    if (final_fall) {
       field.phase = SurvivorsPhase::kOver;
       field.tally.outcome = SurvivorsOutcome::kVictory;
     }
@@ -327,7 +330,7 @@ void BuryFallen(SurvivorsField& field) {
     DropGem(field, foe.position, exp);
     DropGem(field, foe.position, foe.carried_exp);
     LeavePuddle(field, rule->behaviour, foe.position);
-    DropCard(field, foe, *rule);
+    DropCard(field, foe, *rule, final_fall ? CardLanding::kHand : CardLanding::kGround);
     // Une élite ou un mini-boss lâche un coffre, même au plafond des objets ;
     // un objet de coffre nul n'en fait lâcher aucun.
     if ((foe.elite || rank == FoeRank::kMiniBoss) && rules.chests.item_id != 0) {

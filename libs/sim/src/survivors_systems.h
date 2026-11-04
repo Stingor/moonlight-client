@@ -185,8 +185,12 @@ void BuryFallen(SurvivorsField& field);
 // tombant : à coup sûr pour le premier tué de son espèce de mini-boss ou de
 // boss, sinon par un Chance(1, common_odds) du flux des cartes, tiré pour
 // chaque tué qui porte une carte et pour lui seul. Posée au sol hors plafond,
-// sous un numéro de carte.
-void DropCard(SurvivorsField& field, const SurvivorsFoe& foe, const FoeRule& rule);
+// sous un numéro de carte. `kHand` : elle va droit au héros, ramassée à ce pas
+// — celle du boss final, dont la chute arrête la partie avant qu'il ne
+// l'atteigne.
+enum class CardLanding : std::uint8_t { kGround, kHand };
+void DropCard(SurvivorsField& field, const SurvivorsFoe& foe, const FoeRule& rule,
+              CardLanding landing);
 
 // survivors_progress.cpp. `hero.stats` (loadout + cartes), `max_hp` (un gain
 // s'ajoute aux PV courants), `units_per_step` et `magnet_units` du héros.

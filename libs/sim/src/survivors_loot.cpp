@@ -316,7 +316,8 @@ void TakeCard(SurvivorsField& field, const SurvivorsPickup& card) {
 
 }  // namespace
 
-void DropCard(SurvivorsField& field, const SurvivorsFoe& foe, const FoeRule& rule) {
+void DropCard(SurvivorsField& field, const SurvivorsFoe& foe, const FoeRule& rule,
+              CardLanding landing) {
   if (rule.card_item_id == 0) return;
   bool dropped = false;
   if (rule.rank != FoeRank::kCommon &&
@@ -328,10 +329,10 @@ void DropCard(SurvivorsField& field, const SurvivorsFoe& foe, const FoeRule& rul
     dropped = field.card_random.Chance(1, field.rules->card_drops.common_odds);
   }
   if (!dropped) return;
-  field.pickups.push_back(SurvivorsPickup{.serial = field.next_card_serial,
-                                          .kind = PickupKind::kCard,
-                                          .item_id = rule.card_item_id,
-                                          .position = foe.position});
+  const SurvivorsPickup card{.serial = field.next_card_serial,
+                             .kind = PickupKind::kCard,
+                             .item_id = rule.card_item_id,
+                             .position = foe.position};
   if (field.next_card_serial < std::numeric_limits<std::uint32_t>::max()) {
     ++field.next_card_serial;
   }
@@ -340,6 +341,14 @@ void DropCard(SurvivorsField& field, const SurvivorsFoe& foe, const FoeRule& rul
         SurvivorsCardNews{.card_item_id = rule.card_item_id, .at = foe.position});
   } else {
     ++field.news.dropped;
+  }
+  switch (landing) {
+    case CardLanding::kGround:
+      field.pickups.push_back(card);
+      return;
+    case CardLanding::kHand:
+      TakeCard(field, card);
+      return;
   }
 }
 
