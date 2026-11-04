@@ -22240,3 +22240,6 @@ tr: New record!
 
 fr: Plus aucun échange : on remélange !
 tr: No moves left: reshuffling!
+
+fr: 4 : une ligne · L ou T : une bombe · 5 : un Angeling
+tr: 4: a line · L or T: a bomb · 5: an Angeling

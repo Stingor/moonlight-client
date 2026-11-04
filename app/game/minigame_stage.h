@@ -177,12 +177,14 @@ class MinigameStage {
   // Les trophées à annoncer, le premier à l'écran depuis `toast_started_ms_`.
   std::deque<ro::sim::MinigameTrophy> toasts_;
   std::optional<std::uint32_t> toast_started_ms_;
-  // Un monstre par espèce de gemme, puis le Poring de la bille.
-  std::array<std::optional<MonsterSprite>, ro::ui::kRojeweledKinds + 1> sprites_;
+  // Un monstre par espèce de gemme, puis le Poring de la bille, puis
+  // l'Angeling de l'étoile.
+  std::array<std::optional<MonsterSprite>, ro::ui::kRojeweledKinds + 2> sprites_;
   // LA COMPOSITION : ce que les vues désignent.
   std::vector<ro::ui::MinigameTrophyRow> trophy_rows_;
   std::vector<ro::ui::RojeweledBurst> bursts_;
   std::vector<ro::ui::RojeweledGain> gains_;
+  std::vector<ro::ui::RojeweledBlast> blasts_;
   std::vector<ro::ui::RogglePeg> pegs_;
   std::vector<ro::ui::RogglePoint> guide_;
 };

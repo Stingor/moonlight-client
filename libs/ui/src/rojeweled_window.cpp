@@ -5,6 +5,7 @@
 #include <cmath>
 #include <cstdio>
 #include <numbers>
+#include <utility>
 
 #include <imgui.h>
 
@@ -25,7 +26,7 @@ constexpr float kPad = 6.0F;
 constexpr float kBoard = kRojeweledSide * kCell + kPad * 2.0F;
 // La place que prennent le bandeau du haut et les marges de la fenêtre.
 constexpr float kChromeWidth = 16.0F;
-constexpr float kChromeHeight = 96.0F;
+constexpr float kChromeHeight = 116.0F;
 
 // Le monstre, en retrait de sa case ; la pastille, un peu moins.
 constexpr float kGemInset = 4.0F;
@@ -86,6 +87,33 @@ constexpr float kGlowAlpha = 0.6F;
 constexpr float kCoreAlpha = 0.85F;
 constexpr float kRingAlpha = 0.8F;
 
+// LES MARQUES DES GEMMES SPÉCIALES. La ligne : une barre blanche dans son sens,
+// épaisse de cette part de la case, et une flèche à chaque bout.
+constexpr float kLineBarShare = 0.16F;
+constexpr float kLineArrowShare = 0.14F;
+constexpr ImU32 kMarkColor = IM_COL32(255, 255, 255, 255);
+constexpr float kLineBarAlpha = 0.75F;
+// La bombe : un anneau blanc qui bat, au bord de sa pastille.
+constexpr float kBombPulsePerS = 7.0F;
+constexpr float kBombRingThickness = 3.0F;
+// L'étoile : un anneau aux six couleurs, autour d'une pastille claire.
+constexpr float kStarRingThickness = 4.0F;
+constexpr float kStarPadAlpha = 0.3F;
+constexpr int kStarArcSegments = 8;
+// Le tour de l'anneau de l'étoile tourne, en radians par seconde.
+constexpr float kStarSpinPerS = 1.5F;
+
+// LES SOUFFLES. Une ligne : une bande de lumière sur toute la rangée ou la
+// colonne, qui s'amincit. Une bombe : une onde jusqu'au carré qu'elle souffle.
+// Une étoile : une onde blanche qui court sur toute la grille, et des rayons.
+constexpr float kBeamAlpha = 0.7F;
+constexpr float kBeamCoreShare = 0.35F;
+constexpr float kBombWaveCells = 1.6F;
+constexpr float kBombWaveAlpha = 0.45F;
+constexpr float kStarWaveCells = 5.0F;
+constexpr int kStarRays = 12;
+constexpr float kStarRayThickness = 3.0F;
+
 [[nodiscard]] ImVec2 CellCorner(ImVec2 origin, RojeweledCell cell) {
   return ImVec2(origin.x + kPad + static_cast<float>(cell.column) * kCell,
                 origin.y + kPad + static_cast<float>(cell.row) * kCell);
@@ -105,35 +133,164 @@ void DrawFitted(ImDrawList* draw, const SkinImage& image, ImVec2 low, ImVec2 hig
   draw->AddImage(image.id, corner, ImVec2(corner.x + size.x, corner.y + size.y));
 }
 
+[[nodiscard]] float Seconds() { return static_cast<float>(ImGui::GetTime()); }
+
+// La couleur d'une espèce ; blanche pour une étoile.
+[[nodiscard]] ImU32 ColorOf(int kind) {
+  return kind >= 0 && kind < kRojeweledKinds ? kKindColors[static_cast<std::size_t>(kind)]
+                                             : IM_COL32_WHITE;
+}
+
+// La flèche d'une gemme de ligne, pointe en `tip`, tournée vers `outward`.
+void DrawArrow(ImDrawList* draw, ImVec2 tip, ImVec2 outward, float size, ImU32 color) {
+  const ImVec2 back(tip.x - outward.x * size, tip.y - outward.y * size);
+  const ImVec2 side(-outward.y * size * 0.6F, outward.x * size * 0.6F);
+  draw->AddTriangleFilled(tip, ImVec2(back.x + side.x, back.y + side.y),
+                          ImVec2(back.x - side.x, back.y - side.y), color);
+}
+
+// LA MARQUE D'UNE GEMME SPÉCIALE, par-dessus son monstre.
+void DrawSpecialMark(ImDrawList* draw, RojeweledSpecial special, ImU32 color, ImVec2 center,
+                     float pad_half) {
+  switch (special) {
+    case RojeweledSpecial::kNone:
+    case RojeweledSpecial::kStar:
+      return;
+    case RojeweledSpecial::kRowBlast:
+    case RojeweledSpecial::kColumnBlast: {
+      const bool row = special == RojeweledSpecial::kRowBlast;
+      const ImVec2 along = row ? ImVec2(1.0F, 0.0F) : ImVec2(0.0F, 1.0F);
+      const float bar_half = pad_half * kLineBarShare;
+      const ImVec2 bar(row ? pad_half : bar_half, row ? bar_half : pad_half);
+      draw->AddRectFilled(ImVec2(center.x - bar.x, center.y - bar.y),
+                          ImVec2(center.x + bar.x, center.y + bar.y),
+                          WithAlpha(kMarkColor, kLineBarAlpha));
+      const float arrow = pad_half * 2.0F * kLineArrowShare;
+      DrawArrow(draw, ImVec2(center.x + along.x * pad_half, center.y + along.y * pad_half), along,
+                arrow, kMarkColor);
+      DrawArrow(draw, ImVec2(center.x - along.x * pad_half, center.y - along.y * pad_half),
+                ImVec2(-along.x, -along.y), arrow, kMarkColor);
+      return;
+    }
+    case RojeweledSpecial::kBomb: {
+      const float pulse = 0.5F + 0.5F * std::sin(Seconds() * kBombPulsePerS);
+      draw->AddCircle(center, pad_half, WithAlpha(kMarkColor, 0.4F + 0.6F * pulse), 0,
+                      kBombRingThickness);
+      draw->AddCircle(center, pad_half * (0.8F + 0.1F * pulse), WithAlpha(color, 1.0F), 0,
+                      kBombRingThickness * 0.5F);
+      return;
+    }
+  }
+}
+
+// L'ÉTOILE : une pastille claire, un anneau aux six couleurs qui tourne, et
+// l'Angeling, ou un disque blanc sans lui.
+void DrawStar(ImDrawList* draw, const RojeweledView& view, ImVec2 center, float pad_half,
+              float gem_half) {
+  draw->AddRectFilled(ImVec2(center.x - pad_half, center.y - pad_half),
+                      ImVec2(center.x + pad_half, center.y + pad_half),
+                      WithAlpha(kMarkColor, kStarPadAlpha), kRounding);
+  const float turn = 2.0F * std::numbers::pi_v<float>;
+  const float spin = Seconds() * kStarSpinPerS;
+  for (int kind = 0; kind < kRojeweledKinds; ++kind) {
+    const float from = spin + turn * static_cast<float>(kind) / kRojeweledKinds;
+    draw->PathArcTo(center, pad_half, from, from + turn / kRojeweledKinds, kStarArcSegments);
+    draw->PathStroke(kKindColors[static_cast<std::size_t>(kind)], 0, kStarRingThickness);
+  }
+  if (view.star_art.usable()) {
+    DrawFitted(draw, view.star_art, ImVec2(center.x - gem_half, center.y - gem_half),
+               ImVec2(center.x + gem_half, center.y + gem_half));
+    return;
+  }
+  draw->AddCircleFilled(center, gem_half * 2.0F * kFallbackRadius, kMarkColor);
+}
+
 // LA GEMME, à la taille `scale` de sa case, autour du milieu de la case.
-void DrawGem(ImDrawList* draw, const RojeweledView& view, int kind, ImVec2 corner, float scale) {
+void DrawGem(ImDrawList* draw, const RojeweledView& view, const RojeweledGem& gem, ImVec2 corner,
+             float scale) {
   if (scale <= 0.0F) {
     return;
   }
-  const ImU32 color = kKindColors[static_cast<std::size_t>(kind)];
   const ImVec2 center(corner.x + kCell * 0.5F, corner.y + kCell * 0.5F);
   const float pad_half = (kCell * 0.5F - kPadInset) * scale;
+  const float gem_half = (kCell * 0.5F - kGemInset) * scale;
+  if (gem.special == RojeweledSpecial::kStar) {
+    DrawStar(draw, view, center, pad_half, gem_half);
+    return;
+  }
+  const ImU32 color = kKindColors[static_cast<std::size_t>(gem.kind)];
   const ImVec2 pad_low(center.x - pad_half, center.y - pad_half);
   const ImVec2 pad_high(center.x + pad_half, center.y + pad_half);
   draw->AddRectFilled(pad_low, pad_high, WithAlpha(color, kPadAlpha), kRounding * scale);
   draw->AddRect(pad_low, pad_high, color, kRounding * scale, 0, kRingThickness);
-  const float gem_half = (kCell * 0.5F - kGemInset) * scale;
   const ImVec2 low(center.x - gem_half, center.y - gem_half);
   const ImVec2 high(center.x + gem_half, center.y + gem_half);
-  const SkinImage& image = view.art[static_cast<std::size_t>(kind)];
+  const SkinImage& image = view.art[static_cast<std::size_t>(gem.kind)];
   if (image.usable()) {
     DrawFitted(draw, image, low, high);
-    return;
+  } else {
+    draw->AddCircleFilled(center, (high.x - low.x) * kFallbackRadius, color);
   }
-  const ImVec2 middle((low.x + high.x) * 0.5F, (low.y + high.y) * 0.5F);
-  draw->AddCircleFilled(middle, (high.x - low.x) * kFallbackRadius, color);
+  DrawSpecialMark(draw, gem.special, color, center, pad_half);
+}
+
+// LE SOUFFLE D'UNE GEMME SPÉCIALE, sur tout ce qu'il efface.
+void DrawBlast(ImDrawList* draw, ImVec2 origin, const RojeweledBlast& blast) {
+  const ImU32 color = ColorOf(blast.kind);
+  const float done = blast.progress;
+  const float left = 1.0F - done;
+  const ImVec2 corner = CellCorner(origin, blast.cell);
+  const ImVec2 middle(corner.x + kCell * 0.5F, corner.y + kCell * 0.5F);
+  const float board_low_x = origin.x + kPad;
+  const float board_high_x = origin.x + kBoard - kPad;
+  const float board_low_y = origin.y + kPad;
+  const float board_high_y = origin.y + kBoard - kPad;
+  switch (blast.special) {
+    case RojeweledSpecial::kNone:
+      return;
+    case RojeweledSpecial::kRowBlast:
+    case RojeweledSpecial::kColumnBlast: {
+      const bool row = blast.special == RojeweledSpecial::kRowBlast;
+      const float half = kCell * 0.5F * left;
+      for (const auto& [share, tint] :
+           {std::pair{1.0F, color}, std::pair{kBeamCoreShare, kMarkColor}}) {
+        const float thick = half * share;
+        const ImVec2 low =
+            row ? ImVec2(board_low_x, middle.y - thick) : ImVec2(middle.x - thick, board_low_y);
+        const ImVec2 high =
+            row ? ImVec2(board_high_x, middle.y + thick) : ImVec2(middle.x + thick, board_high_y);
+        draw->AddRectFilled(low, high, WithAlpha(tint, left * kBeamAlpha));
+      }
+      return;
+    }
+    case RojeweledSpecial::kBomb: {
+      const float radius = kCell * kBombWaveCells * done;
+      draw->AddCircleFilled(middle, radius, WithAlpha(color, left * kBombWaveAlpha));
+      draw->AddCircle(middle, radius, WithAlpha(kMarkColor, left), 0, kBombRingThickness);
+      return;
+    }
+    case RojeweledSpecial::kStar: {
+      const float radius = kCell * kStarWaveCells * done;
+      draw->AddCircle(middle, radius, WithAlpha(kMarkColor, left), 0, kBombRingThickness);
+      const float turn = 2.0F * std::numbers::pi_v<float>;
+      for (int ray = 0; ray < kStarRays; ++ray) {
+        const float angle = turn * static_cast<float>(ray) / kStarRays;
+        const ImU32 tint = kKindColors[static_cast<std::size_t>(ray % kRojeweledKinds)];
+        draw->AddLine(
+            middle,
+            ImVec2(middle.x + std::cos(angle) * radius, middle.y + std::sin(angle) * radius),
+            WithAlpha(tint, left), kStarRayThickness * left);
+      }
+      return;
+    }
+  }
 }
 
 void DrawBurst(ImDrawList* draw, ImVec2 origin, const RojeweledBurst& burst) {
-  if (burst.kind < 0 || burst.kind >= kRojeweledKinds) {
+  if (burst.kind < 0 || burst.kind > kRojeweledStarKind) {
     return;
   }
-  const ImU32 color = kKindColors[static_cast<std::size_t>(burst.kind)];
+  const ImU32 color = ColorOf(burst.kind);
   const float done = burst.progress;
   const float left = 1.0F - done;
   const ImVec2 corner = CellCorner(origin, burst.cell);
@@ -176,6 +333,7 @@ void DrawHeader(const RojeweledView& view, RojeweledAsk& asked, const SkinArt& a
     asked.new_game = true;
   }
   FaintText(core::Tr("Cliquez deux monstres voisins pour les échanger."));
+  FaintText(core::Tr("4 : une ligne · L ou T : une bombe · 5 : un Angeling"));
 }
 
 // Une ligne centrée sur le plateau, à la hauteur `top`.
@@ -313,21 +471,25 @@ RojeweledAsk DrawRojeweledWindow(RojeweledState& state, const RojeweledView& vie
   }
   for (int index = 0; index < kRojeweledCells; ++index) {
     const RojeweledGem& gem = view.gems[static_cast<std::size_t>(index)];
-    if (gem.kind < 0 || gem.kind >= kRojeweledKinds) {
+    const bool star = gem.special == RojeweledSpecial::kStar;
+    if (!star && (gem.kind < 0 || gem.kind >= kRojeweledKinds)) {
       continue;
     }
     const RojeweledCell cell{index / kRojeweledSide, index % kRojeweledSide};
     const ImVec2 corner = CellCorner(origin, cell);
     float scale = gem.scale;
     if (view.selected == cell) {
-      scale *= 1.0F + kBreathScale * std::sin(static_cast<float>(ImGui::GetTime()) * kBreathPerS);
+      scale *= 1.0F + kBreathScale * std::sin(Seconds() * kBreathPerS);
     }
-    DrawGem(draw, view, gem.kind,
+    DrawGem(draw, view, gem,
             ImVec2(corner.x + gem.offset_columns * kCell, corner.y + gem.offset_rows * kCell),
             scale);
   }
   for (const RojeweledBurst& burst : view.bursts) {
     DrawBurst(draw, origin, burst);
+  }
+  for (const RojeweledBlast& blast : view.blasts) {
+    DrawBlast(draw, origin, blast);
   }
   for (const RojeweledGain& gain : view.gains) {
     DrawGain(draw, origin, gain);

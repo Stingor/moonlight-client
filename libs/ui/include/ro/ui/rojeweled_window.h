@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <cstdint>
 #include <optional>
 #include <span>
 
@@ -16,6 +17,10 @@ namespace ro::ui {
 // ⚠ CHAQUE ESPÈCE A SA COULEUR, en pastille sous le monstre : plusieurs
 // monstres de la famille se ressemblent à s'y tromper, et c'est la couleur
 // qu'on aligne. Sans sprite, la pastille reste seule.
+//
+// ⚠ UNE GEMME SPÉCIALE SE RECONNAÎT SANS LE SPRITE : une ligne porte une barre
+// dans son sens, une bombe un anneau qui bat, une étoile une pastille aux six
+// couleurs. L'étoile montre un Angeling quand il est là.
 
 inline constexpr const char* kRojeweledTitle = core::TrText("Rojeweled");
 inline constexpr const char* kRojeweledId = "rojeweled";
@@ -23,6 +28,8 @@ inline constexpr const char* kRojeweledId = "rojeweled";
 inline constexpr int kRojeweledSide = 8;
 inline constexpr int kRojeweledKinds = 6;
 inline constexpr int kRojeweledCells = kRojeweledSide * kRojeweledSide;
+// L'espèce d'une étoile, hors des espèces qui s'alignent.
+inline constexpr int kRojeweledStarKind = kRojeweledKinds;
 
 struct RojeweledCell {
   int row = 0;
@@ -31,10 +38,20 @@ struct RojeweledCell {
   [[nodiscard]] bool operator==(const RojeweledCell&) const = default;
 };
 
+enum class RojeweledSpecial : std::uint8_t {
+  kNone,
+  kRowBlast,
+  kColumnBlast,
+  kBomb,
+  kStar,
+};
+
 // Une gemme, telle qu'elle se dessine.
 struct RojeweledGem {
-  // L'espèce, ou un nombre négatif pour une case vide.
+  // L'espèce, `kRojeweledStarKind` pour une étoile, ou un nombre négatif pour
+  // une case vide.
   int kind = 0;
+  RojeweledSpecial special = RojeweledSpecial::kNone;
   // Où la dessiner, en cases, par rapport à sa place.
   float offset_rows = 0.0F;
   float offset_columns = 0.0F;
@@ -47,6 +64,16 @@ struct RojeweledBurst {
   RojeweledCell cell;
   int kind = 0;
   // De 0, l'effacement, à 1, la fin de l'éclat.
+  float progress = 0.0F;
+};
+
+// Une gemme spéciale qui souffle encore.
+struct RojeweledBlast {
+  RojeweledCell cell;
+  RojeweledSpecial special = RojeweledSpecial::kNone;
+  // L'espèce de la gemme qui a soufflé, `kRojeweledStarKind` pour une étoile.
+  int kind = 0;
+  // De 0, le souffle, à 1, sa fin.
   float progress = 0.0F;
 };
 
@@ -66,6 +93,7 @@ struct RojeweledView {
   std::array<RojeweledGem, kRojeweledCells> gems = {};
   std::span<const RojeweledBurst> bursts;
   std::span<const RojeweledGain> gains;
+  std::span<const RojeweledBlast> blasts;
   std::optional<RojeweledCell> selected;
   // L'échange à suggérer.
   std::optional<std::array<RojeweledCell, 2>> hint;
@@ -83,6 +111,8 @@ struct RojeweledView {
   bool new_record = false;
   // Le monstre de chaque espèce ; inutilisable, la pastille reste seule.
   std::array<SkinImage, kRojeweledKinds> art = {};
+  // Le monstre d'une étoile ; inutilisable, la pastille reste seule.
+  SkinImage star_art;
   // Le trophée qui vient d'être gagné, en français ; nul sans avis.
   const char* toast = nullptr;
   float toast_alpha = 0.0F;

@@ -22240,3 +22240,6 @@ tr: ¡Nuevo récord!
 
 fr: Plus aucun échange : on remélange !
 tr: No quedan intercambios: ¡a barajar!
+
+fr: 4 : une ligne · L ou T : une bombe · 5 : un Angeling
+tr: 4: una línea · L o T: una bomba · 5: un Angeling

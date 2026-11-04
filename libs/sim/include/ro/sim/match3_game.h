@@ -26,12 +26,40 @@ namespace ro::sim {
 // ⚠ AUCUNE GRILLE N'EST JAMAIS BLOQUÉE : une grille sans échange possible est
 // remélangée. Le remélange est une phase à part, que la fenêtre annonce, et
 // pendant laquelle les gemmes neuves apparaissent.
+//
+// ── LES GEMMES SPÉCIALES ──────────────────────────────────────────────────────
+//
+// Un alignement plus riche que trois laisse une gemme spéciale à la place
+// d'une des gemmes effacées : celle que le joueur a déplacée si elle en est,
+// sinon celle du milieu, ou le croisement pour un L ou un T.
+//
+//   - QUATRE en ligne : une gemme de LIGNE, de l'espèce alignée. Effacée, elle
+//     souffle toute sa rangée si l'alignement était horizontal, toute sa
+//     colonne s'il était vertical.
+//   - Un L ou un T (deux alignements de la même espèce qui se croisent) : une
+//     BOMBE, de l'espèce alignée. Effacée, elle souffle le carré de trois sur
+//     trois autour d'elle.
+//   - CINQ en ligne ou plus : une ÉTOILE, sans espèce. Elle ne s'aligne avec
+//     rien ; échangée avec une voisine, elle efface toutes les gemmes de
+//     l'espèce de cette voisine, et deux étoiles échangées vident la grille.
+//     Soufflée par une autre, elle efface l'espèce la plus nombreuse.
+//
+// ⚠ UN SOUFFLE EN ENTRAÎNE D'AUTRES : une spéciale prise dans un souffle
+// souffle à son tour, dans le même pas de cascade.
+// ⚠ UN ÉCHANGE AVEC UNE ÉTOILE TIENT TOUJOURS, et coûte un coup.
 
 inline constexpr int kMatch3Side = 8;
 inline constexpr int kMatch3Kinds = 6;
 inline constexpr int kMatch3Cells = kMatch3Side * kMatch3Side;
+// L'espèce d'une étoile, hors des espèces qui s'alignent.
+inline constexpr int kMatch3StarKind = kMatch3Kinds;
 // Le plus petit alignement qui s'efface.
 inline constexpr int kMatch3ShortestRun = 3;
+// L'alignement qui laisse une gemme de ligne, et celui qui laisse une étoile.
+inline constexpr int kMatch3LineRun = 4;
+inline constexpr int kMatch3StarRun = 5;
+// Ce que rapporte chaque souffle, avant le multiplicateur de cascade.
+inline constexpr int kMatch3BlastPoints = 250;
 // Une case vide, le temps d'une chute.
 inline constexpr int kMatch3Empty = -1;
 // Les coups d'une partie.
@@ -59,6 +87,20 @@ inline constexpr std::uint32_t kMatch3ComboLingerMs = 900;
 inline constexpr std::uint32_t kMatch3GainMs = 900;
 // Le silence après lequel un échange possible se montre.
 inline constexpr std::uint32_t kMatch3HintAfterMs = 3500;
+// Le temps qu'un souffle reste à l'écran.
+inline constexpr std::uint32_t kMatch3BlastMs = 450;
+
+enum class Match3Special : std::uint8_t {
+  kNone,
+  // Souffle sa rangée.
+  kRowBlast,
+  // Souffle sa colonne.
+  kColumnBlast,
+  // Souffle le carré de trois sur trois autour d'elle.
+  kBomb,
+  // Efface une espèce entière.
+  kStar,
+};
 
 struct Match3Cell {
   int row = 0;
@@ -70,6 +112,15 @@ struct Match3Cell {
 // Une gemme qui vient de s'effacer, et qui éclate encore un instant.
 struct Match3Burst {
   Match3Cell cell;
+  int kind = 0;
+  std::uint32_t started_ms = 0;
+};
+
+// Une gemme spéciale qui vient de souffler.
+struct Match3Blast {
+  Match3Cell cell;
+  Match3Special special = Match3Special::kNone;
+  // L'espèce de la gemme qui a soufflé ; `kMatch3StarKind` pour une étoile.
   int kind = 0;
   std::uint32_t started_ms = 0;
 };
@@ -107,6 +158,12 @@ struct Match3News {
   int refused_swaps = 0;
   // La grille vient d'être remélangée.
   bool reshuffled = false;
+  // Des gemmes spéciales nées d'un alignement riche.
+  int specials_made = 0;
+  // Les souffles, par sorte de gemme spéciale.
+  int line_blasts = 0;
+  int bomb_blasts = 0;
+  int star_blasts = 0;
   // La partie vient de finir.
   bool finished = false;
 };
@@ -126,7 +183,10 @@ class Match3Game {
 
   [[nodiscard]] Match3News TakeNews() noexcept;
 
+  // L'espèce d'une case : `kMatch3StarKind` pour une étoile, `kMatch3Empty`
+  // hors de la grille.
   [[nodiscard]] int KindAt(Match3Cell cell) const;
+  [[nodiscard]] Match3Special SpecialAt(Match3Cell cell) const;
   [[nodiscard]] bool started() const noexcept { return started_; }
   [[nodiscard]] Match3Phase phase() const noexcept { return phase_; }
   [[nodiscard]] int score() const noexcept { return score_; }
@@ -138,6 +198,7 @@ class Match3Game {
   [[nodiscard]] std::optional<Match3Cell> selected() const noexcept { return selected_; }
   [[nodiscard]] const std::vector<Match3Burst>& bursts() const noexcept { return bursts_; }
   [[nodiscard]] const std::vector<Match3Gain>& gains() const noexcept { return gains_; }
+  [[nodiscard]] const std::vector<Match3Blast>& blasts() const noexcept { return blasts_; }
 
   // LA CASCADE À DIRE : celle en cours, ou la dernière pendant
   // `kMatch3ComboLingerMs` après le retour au repos.
@@ -161,8 +222,11 @@ class Match3Game {
   [[nodiscard]] std::optional<std::array<Match3Cell, 2>> Hint(std::uint32_t now_ms) const;
 
   // ── POUR LES ESSAIS ────────────────────────────────────────────────────────
-  // Pose une grille entière, rangée par rangée. Aucun remélange.
+  // Pose une grille entière, rangée par rangée, sans gemme spéciale. Aucun
+  // remélange.
   void SetCells(const std::array<int, kMatch3Cells>& kinds, std::uint32_t now_ms);
+  // Fait d'une case une gemme spéciale ; une étoile y perd son espèce.
+  void SetSpecial(Match3Cell cell, Match3Special special);
   // Un échange possible, ou aucun : la grille est bloquée.
   [[nodiscard]] std::optional<std::array<Match3Cell, 2>> FindMove() const;
   // Tous les échanges possibles.
@@ -174,7 +238,15 @@ class Match3Game {
  private:
   using Marks = std::array<bool, kMatch3Cells>;
 
+  // Une gemme spéciale à poser à la place d'une gemme effacée.
+  struct Creation {
+    Match3Cell cell;
+    Match3Special special = Match3Special::kNone;
+    int kind = 0;
+  };
+
   [[nodiscard]] int& At(Match3Cell cell);
+  [[nodiscard]] Match3Special& SpecialRef(Match3Cell cell);
   [[nodiscard]] int RandomKind();
   // Marque les alignements ; rend le nombre de gemmes marquées et, dans
   // `long_bonus`, les gemmes au-delà de trois.
@@ -183,6 +255,17 @@ class Match3Game {
   // Efface ce qui est aligné, fait tomber, remplit : un pas de cascade. Faux
   // quand rien n'était aligné.
   bool ClearStep(std::uint32_t now_ms);
+  // L'échange d'une étoile : efface l'espèce de sa voisine, puis fait tomber.
+  void StarStep(std::uint32_t now_ms);
+  // Fait souffler les gemmes spéciales marquées, de proche en proche ; celles
+  // de `fired` ont déjà soufflé. Rend le nombre de souffles.
+  int Detonate(Marks& marks, Marks& fired, std::uint32_t now_ms);
+  // L'espèce la plus nombreuse de la grille.
+  [[nodiscard]] int MostCommonKind() const;
+  // Compte, efface ce qui est marqué, pose les gemmes spéciales nées du pas,
+  // fait tomber et remplit.
+  void Resolve(const Marks& marks, int long_bonus, int blasts,
+               const std::vector<Creation>& creations, std::uint32_t now_ms);
   // Tire une grille entière sans alignement. Elle peut n'offrir aucun échange.
   void FillWithoutMatches();
   void Settle(std::uint32_t now_ms);
@@ -195,6 +278,10 @@ class Match3Game {
   // petite graine est si petit qu'il désigne toujours le premier échange.
   std::mt19937 hint_random_;
   std::array<int, kMatch3Cells> cells_ = {};
+  std::array<Match3Special, kMatch3Cells> specials_ = {};
+  // Le pas de cascade en cours est le premier d'un échange : une gemme
+  // spéciale naît de préférence sur une des deux cases échangées.
+  bool swap_step_ = false;
   // Les rangées qu'une gemme vient de tomber, pour l'animation de chute.
   std::array<int, kMatch3Cells> fallen_rows_ = {};
   // La plus longue chute du pas de cascade en cours.
@@ -216,6 +303,7 @@ class Match3Game {
   std::uint32_t last_action_ms_ = 0;
   std::vector<Match3Burst> bursts_;
   std::vector<Match3Gain> gains_;
+  std::vector<Match3Blast> blasts_;
   Match3News news_;
 };
 

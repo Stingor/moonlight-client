@@ -21,6 +21,9 @@ namespace {
 // fenêtre : Poring, Drops, Metaling, Poporing, Marin, Deviling.
 constexpr std::array<std::uint32_t, ro::ui::kRojeweledKinds> kGemClasses = {1002, 1113, 1613,
                                                                             1031, 1242, 1582};
+// L'étoile de Rojeweled est un Angeling, rangé après la bille de Roggle.
+constexpr std::uint32_t kStarClass = 1096;
+constexpr std::size_t kStarSlot = ro::ui::kRojeweledKinds + 1;
 // La bille de Roggle est un Poring.
 constexpr std::uint32_t kBallClass = 1002;
 constexpr std::size_t kBallSlot = ro::ui::kRojeweledKinds;
@@ -46,9 +49,31 @@ constexpr const char* kRewardSound = "_heal_effect.wav";
 // comme un début de sort.
 constexpr const char* kRefusedSwapSound = "버튼소리.wav";
 constexpr const char* kReshuffleSound = "effect\\EF_BeginSpell.wav";
+// Une gemme spéciale naît sur un Angelus ; une ligne souffle en éclair, une
+// bombe en Magnum Break, une étoile en Thunderstorm.
+constexpr const char* kSpecialMadeSound = "effect\\EF_Angelus.wav";
+constexpr const char* kLineBlastSound = "effect\\EF_LightBolt1.wav";
+constexpr const char* kBombBlastSound = "effect\\EF_MagnumBreak.wav";
+constexpr const char* kStarBlastSound = "effect\\EF_ThunderStorm.wav";
 
 [[nodiscard]] InterfaceSoundFile SoundOf(const char* path) {
   return InterfaceSoundFile{.place = InterfaceSoundPlace::kSoundArchive, .path = path};
+}
+
+[[nodiscard]] ro::ui::RojeweledSpecial SpecialOf(ro::sim::Match3Special special) {
+  switch (special) {
+    case ro::sim::Match3Special::kNone:
+      return ro::ui::RojeweledSpecial::kNone;
+    case ro::sim::Match3Special::kRowBlast:
+      return ro::ui::RojeweledSpecial::kRowBlast;
+    case ro::sim::Match3Special::kColumnBlast:
+      return ro::ui::RojeweledSpecial::kColumnBlast;
+    case ro::sim::Match3Special::kBomb:
+      return ro::ui::RojeweledSpecial::kBomb;
+    case ro::sim::Match3Special::kStar:
+      return ro::ui::RojeweledSpecial::kStar;
+  }
+  return ro::ui::RojeweledSpecial::kNone;
 }
 
 [[nodiscard]] ro::ui::RogglePhase PhaseOf(ro::sim::PegPhase phase) {
@@ -126,6 +151,7 @@ bool SurvivorsClaimsEnter(const MinigameWindows& windows) {
 
 static_assert(ro::ui::kRojeweledSide == ro::sim::kMatch3Side);
 static_assert(ro::ui::kRojeweledKinds == ro::sim::kMatch3Kinds);
+static_assert(ro::ui::kRojeweledStarKind == ro::sim::kMatch3StarKind);
 
 std::uint32_t WatchedClock::Follow(bool watched, std::uint32_t now_ms) {
   if (!watched) {
@@ -250,6 +276,20 @@ void MinigameStage::PlayRojeweled() {
   if (news.reshuffled) {
     sounds_.push_back(SoundOf(kReshuffleSound));
   }
+  // ⚠ UN SON PAR SORTE, pas par souffle : une chaîne de dix lignes ne doit pas
+  // jouer dix éclairs en même temps.
+  if (news.specials_made > 0) {
+    sounds_.push_back(SoundOf(kSpecialMadeSound));
+  }
+  if (news.line_blasts > 0) {
+    sounds_.push_back(SoundOf(kLineBlastSound));
+  }
+  if (news.bomb_blasts > 0) {
+    sounds_.push_back(SoundOf(kBombBlastSound));
+  }
+  if (news.star_blasts > 0) {
+    sounds_.push_back(SoundOf(kStarBlastSound));
+  }
   if (news.finished) {
     sounds_.push_back(SoundOf(kRewardSound));
     // ⚠ LU AVANT QUE LE RECORD NE SE RANGE : le meilleur score est encore
@@ -362,6 +402,7 @@ void MinigameStage::ComposeRojeweled(MinigameWindows& windows, const MinigamePie
     const ro::sim::Match3Game::Offset offset = rojeweled_.OffsetAt(cell, watched_ms);
     view.gems[static_cast<std::size_t>(index)] =
         ro::ui::RojeweledGem{.kind = rojeweled_.KindAt(cell),
+                             .special = SpecialOf(rojeweled_.SpecialAt(cell)),
                              .offset_rows = offset.rows,
                              .offset_columns = offset.columns,
                              .scale = gem_scale};
@@ -386,6 +427,16 @@ void MinigameStage::ComposeRojeweled(MinigameWindows& windows, const MinigamePie
                                        static_cast<float>(ro::sim::kMatch3GainMs))});
   }
   view.gains = gains_;
+  blasts_.clear();
+  for (const ro::sim::Match3Blast& blast : rojeweled_.blasts()) {
+    blasts_.push_back(ro::ui::RojeweledBlast{
+        .cell = {blast.cell.row, blast.cell.column},
+        .special = SpecialOf(blast.special),
+        .kind = blast.kind,
+        .progress = std::min(1.0F, static_cast<float>(watched_ms - blast.started_ms) /
+                                       static_cast<float>(ro::sim::kMatch3BlastMs))});
+  }
+  view.blasts = blasts_;
   view.selected.reset();
   if (const std::optional<ro::sim::Match3Cell> selected = rojeweled_.selected()) {
     view.selected = ro::ui::RojeweledCell{selected->row, selected->column};
@@ -407,6 +458,7 @@ void MinigameStage::ComposeRojeweled(MinigameWindows& windows, const MinigamePie
   for (std::size_t kind = 0; kind < kGemClasses.size(); ++kind) {
     view.art[kind] = SpriteOf(kind, kGemClasses[kind], kGemBoxPx, pieces.wardrobe, now_ms);
   }
+  view.star_art = SpriteOf(kStarSlot, kStarClass, kGemBoxPx, pieces.wardrobe, now_ms);
   view.toast = Toast(now_ms, view.toast_alpha);
 }
 
