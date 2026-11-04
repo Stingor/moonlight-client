@@ -116,7 +116,11 @@ constexpr std::array<SkillLevel, 1> kHeavensDriveLevels{{
 }};
 
 // Napalm Vulcan : six esprits explosifs qui poursuivent, traversent un
-// monstre de plus, et maudissent.
+// monstre de plus, et maudissent. Chaque coup éclate comme Napalm Beat à son
+// plus haut niveau, qu'il remplace avec Soul Strike : l'union garde l'aire
+// des deux.
+constexpr std::int32_t kNapalmVulcanSplashTenths = 22;
+constexpr std::int32_t kNapalmVulcanSplashPct = 60;
 constexpr std::array<SkillLevel, 1> kNapalmVulcanLevels{{
     {.damage = 36,
      .cooldown_ms = 1000,
@@ -126,6 +130,8 @@ constexpr std::array<SkillLevel, 1> kNapalmVulcanLevels{{
      .hit_radius_units = CellTenths(5),
      .life_ms = 2500,
      .pierce = 1,
+     .area_radius_units = CellTenths(kNapalmVulcanSplashTenths),
+     .splash_pct = kNapalmVulcanSplashPct,
      .curse_ms = 3000},
 }};
 

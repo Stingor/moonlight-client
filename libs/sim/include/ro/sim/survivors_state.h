@@ -197,6 +197,11 @@ struct SurvivorsShot {
   std::uint32_t freeze_ms = 0;
   std::int32_t knockback_units = 0;
   std::uint32_t curse_ms = 0;
+  // L'éclat de chaque coup : les AUTRES monstres que ce disque, autour du
+  // monstre touché, chevauche prennent `splash_pct` % des dégâts. Rayon nul :
+  // aucun éclat.
+  std::int32_t splash_radius_units = 0;
+  std::int32_t splash_pct = 0;
   // Un projectile droit : il garde sa vitesse de départ, sans se tourner vers
   // un monstre.
   bool straight = false;

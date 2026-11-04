@@ -241,6 +241,20 @@ void HurtFoe(SurvivorsField& field, SurvivorsFoe& foe, SurvivorsDamage damage,
 // survivors_blasts.cpp : l'éclat visé et la nova.
 [[nodiscard]] bool FireClusterBlast(SurvivorsField& field, const SurvivorsSkillRule& rule,
                                     const SkillLevel& level);
+// L'ÉCLAT D'UN COUP : chaque monstre vivant que le disque de `radius_units`
+// autour de `center` chevauche, sauf `spared_serial` qui a déjà pris le coup,
+// prend `damage × splash_pct / 100` avant bonus et élément, sans gel ni recul.
+struct SurvivorsSplash {
+  FieldPoint center;
+  std::uint32_t spared_serial = 0;
+  std::int32_t damage = 0;
+  std::int32_t radius_units = 0;
+  std::int32_t splash_pct = 0;
+  std::uint16_t skill_id = 0;
+  SurvivorsElement element = SurvivorsElement::kNeutral;
+};
+// survivors_blasts.cpp.
+void SplashAround(SurvivorsField& field, const SurvivorsSplash& splash);
 // survivors_blasts.cpp : le cône devant le héros.
 [[nodiscard]] bool FireCone(SurvivorsField& field, const SurvivorsSkillRule& rule,
                             const SkillLevel& level);

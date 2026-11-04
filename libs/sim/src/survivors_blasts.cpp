@@ -190,6 +190,24 @@ bool FireCone(SurvivorsField& field, const SurvivorsSkillRule& rule, const Skill
   return true;
 }
 
+void SplashAround(SurvivorsField& field, const SurvivorsSplash& splash) {
+  if (splash.radius_units <= 0) return;
+  const std::int64_t pct = std::clamp(splash.splash_pct, 0, kMostStatBonus);
+  if (pct == 0) return;
+  const auto base = static_cast<std::int32_t>(
+      std::min<std::int64_t>(std::int64_t{std::max(splash.damage, 0)} * pct / kPercent,
+                             std::numeric_limits<std::int32_t>::max()));
+  GatherNearby(field, splash.center, QueryUnits(field, splash.radius_units));
+  for (const std::uint32_t index : field.nearby) {
+    SurvivorsFoe& foe = field.foes[index];
+    if (foe.hp <= 0 || foe.serial == splash.spared_serial ||
+        !Overlaps(field, foe, splash.center, splash.radius_units)) {
+      continue;
+    }
+    HurtFoe(field, foe, DamageAgainst(field, base, splash.element, foe), splash.skill_id);
+  }
+}
+
 void LandBlasts(SurvivorsField& field) {
   if (field.rules == nullptr) return;
   // Par index, dans l'ordre d'émission : une chute n'ajoute aucun éclat.

@@ -131,8 +131,19 @@ namespace {
                                .knockback_units = shot.knockback_units,
                                .knock_heading = HeadingOf(shot.velocity, field.hero.facing),
                                .curse_ms = shot.curse_ms};
+  // L'éclat part d'où le monstre ÉTAIT touché : le recul du coup ne le déplace pas.
+  const FieldPoint struck_at = touched->position;
   HurtFoe(field, *touched, DamageAgainst(field, shot.damage, element, *touched), shot.skill_id,
           status);
+  if (shot.splash_radius_units > 0 && shot.splash_pct > 0) {
+    SplashAround(field, SurvivorsSplash{.center = struck_at,
+                                        .spared_serial = touched->serial,
+                                        .damage = shot.damage,
+                                        .radius_units = shot.splash_radius_units,
+                                        .splash_pct = shot.splash_pct,
+                                        .skill_id = shot.skill_id,
+                                        .element = element});
+  }
   // Un tir dont la mémoire est pleine s'éteint, perçage restant ou non : il ne
   // touche jamais deux fois le même monstre. CheckSurvivorsRules borne le
   // perçage pour que la mémoire suffise.
@@ -178,23 +189,26 @@ bool FireLinear(SurvivorsField& field, std::uint8_t slot, const SurvivorsSkillRu
     FieldPoint velocity = Toward(hero, target.position, speed_per_step);
     // Un monstre sur le héros : le projectile part droit devant.
     if (velocity == FieldPoint{}) velocity = TurnVector(field.hero.facing, speed_per_step);
-    field.shots.push_back(SurvivorsShot{.serial = field.next_serial++,
-                                        .skill_slot = slot,
-                                        .skill_id = rule.skill_id,
-                                        .position = hero,
-                                        .previous_position = hero,
-                                        .velocity = velocity,
-                                        .damage = level.damage,
-                                        .hit_radius_units = level.hit_radius_units,
-                                        .expires_step = field.step + life_steps,
-                                        .pierce_left = level.pierce,
-                                        .target_serial = target.serial,
-                                        .hit_serials = {},
-                                        .hit_count = 0,
-                                        .freeze_ms = level.freeze_ms,
-                                        .knockback_units = level.knockback_units,
-                                        .curse_ms = level.curse_ms,
-                                        .straight = true});
+    field.shots.push_back(
+        SurvivorsShot{.serial = field.next_serial++,
+                      .skill_slot = slot,
+                      .skill_id = rule.skill_id,
+                      .position = hero,
+                      .previous_position = hero,
+                      .velocity = velocity,
+                      .damage = level.damage,
+                      .hit_radius_units = level.hit_radius_units,
+                      .expires_step = field.step + life_steps,
+                      .pierce_left = level.pierce,
+                      .target_serial = target.serial,
+                      .hit_serials = {},
+                      .hit_count = 0,
+                      .freeze_ms = level.freeze_ms,
+                      .knockback_units = level.knockback_units,
+                      .curse_ms = level.curse_ms,
+                      .splash_radius_units = AreaUnits(field, level.area_radius_units),
+                      .splash_pct = level.splash_pct,
+                      .straight = true});
     PublishCast(field.news, SurvivorsCast{.skill_id = rule.skill_id,
                                           .kind = CastKind::kShot,
                                           .from = hero,
