@@ -5443,6 +5443,74 @@ struct ZcMoonlightSurvivorsPresence {
   std::uint32_t elapsed_s = 0;
 };
 
+// PACKET_CZ_MOONLIGHT_SURVIVORS_COOP_LOBBY
+struct CzMoonlightSurvivorsCoopLobby {
+  static constexpr std::uint16_t kOpcode = 0x0f58;
+  // Taille sur le fil, en octets.
+  static constexpr std::size_t kWireSize = 5;
+
+  std::uint8_t action = 0;
+};
+
+// PACKET_ZC_MOONLIGHT_SURVIVORS_COOP_LOBBY_entry
+struct ZcMoonlightSurvivorsCoopLobbyEntry {
+  // Taille sur le fil, en octets.
+  static constexpr std::size_t kWireSize = 29;
+
+  std::uint32_t char_id = 0;
+  std::uint8_t ready = 0;
+  std::string name;
+};
+
+// PACKET_ZC_MOONLIGHT_SURVIVORS_COOP_LOBBY
+struct ZcMoonlightSurvivorsCoopLobby {
+  static constexpr std::uint16_t kOpcode = 0x0f59;
+  // Taille sur le fil SANS la queue variable, qui la porte elle-même.
+  static constexpr std::size_t kWireSize = 10;
+
+  std::uint8_t state = 0;
+  std::uint32_t refusals = 0;
+  std::uint8_t count = 0;
+  std::vector<ZcMoonlightSurvivorsCoopLobbyEntry> entries;
+};
+
+// PACKET_ZC_MOONLIGHT_SURVIVORS_COOP_START
+struct ZcMoonlightSurvivorsCoopStart {
+  static constexpr std::uint16_t kOpcode = 0x0f5a;
+  // Taille sur le fil, en octets.
+  static constexpr std::size_t kWireSize = 14;
+
+  std::uint64_t seed = 0;
+  std::uint8_t input_delay_ticks = 0;
+  std::uint8_t count = 0;
+};
+
+// PACKET_CZ_MOONLIGHT_SURVIVORS_COOP_FRAME
+struct CzMoonlightSurvivorsCoopFrame {
+  static constexpr std::uint16_t kOpcode = 0x0f5b;
+  // Taille sur le fil, en octets.
+  static constexpr std::size_t kWireSize = 4;
+};
+
+// PACKET_ZC_MOONLIGHT_SURVIVORS_COOP_FRAME
+struct ZcMoonlightSurvivorsCoopFrame {
+  static constexpr std::uint16_t kOpcode = 0x0f5c;
+  // Taille sur le fil, en octets.
+  static constexpr std::size_t kWireSize = 8;
+
+  std::uint32_t char_id = 0;
+};
+
+// PACKET_ZC_MOONLIGHT_SURVIVORS_COOP_LEFT
+struct ZcMoonlightSurvivorsCoopLeft {
+  static constexpr std::uint16_t kOpcode = 0x0f5d;
+  // Taille sur le fil, en octets.
+  static constexpr std::size_t kWireSize = 12;
+
+  std::uint32_t char_id = 0;
+  std::uint32_t through_tick = 0;
+};
+
 // PACKET_ZC_MOONLIGHT_CARD_ALBUM
 struct ZcMoonlightCardAlbum {
   static constexpr std::uint16_t kOpcode = 0x0f33;
@@ -8612,6 +8680,18 @@ struct CzMoveItemToPersonal {
                           CzMoonlightSurvivorsPresence& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame,
                           ZcMoonlightSurvivorsPresence& packet);
+[[nodiscard]] bool Decode(std::span<const std::uint8_t> frame,
+                          CzMoonlightSurvivorsCoopLobby& packet);
+[[nodiscard]] bool Decode(std::span<const std::uint8_t> frame,
+                          ZcMoonlightSurvivorsCoopLobby& packet);
+[[nodiscard]] bool Decode(std::span<const std::uint8_t> frame,
+                          ZcMoonlightSurvivorsCoopStart& packet);
+[[nodiscard]] bool Decode(std::span<const std::uint8_t> frame,
+                          CzMoonlightSurvivorsCoopFrame& packet);
+[[nodiscard]] bool Decode(std::span<const std::uint8_t> frame,
+                          ZcMoonlightSurvivorsCoopFrame& packet);
+[[nodiscard]] bool Decode(std::span<const std::uint8_t> frame,
+                          ZcMoonlightSurvivorsCoopLeft& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightCardAlbum& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzMoonlightCardAlbumCmd& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzMoonlightReqStatusList& packet);
@@ -9234,6 +9314,12 @@ struct CzMoveItemToPersonal {
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightVoiceService& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonlightSurvivorsPresence& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightSurvivorsPresence& packet);
+[[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonlightSurvivorsCoopLobby& packet);
+[[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightSurvivorsCoopLobby& packet);
+[[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightSurvivorsCoopStart& packet);
+[[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonlightSurvivorsCoopFrame& packet);
+[[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightSurvivorsCoopFrame& packet);
+[[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightSurvivorsCoopLeft& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightCardAlbum& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonlightCardAlbumCmd& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonlightReqStatusList& packet);

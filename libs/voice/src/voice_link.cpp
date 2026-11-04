@@ -192,6 +192,8 @@ void VoiceLink::ReadUdp(std::uint32_t now_ms) {
       udp_ready_ = true;
     } else if (received->heard.has_value()) {
       mixer_.Hear(*received->heard, now_ms);
+    } else if (received->coop.has_value() && coop_received_.size() < kVoiceMostCoopHeld) {
+      coop_received_.push_back(*received->coop);
     }
   }
 }
@@ -344,6 +346,16 @@ void VoiceLink::Play(std::uint32_t now_ms) {
 void VoiceLink::SendText(const std::string& json) {
   const std::vector<std::uint8_t> frame = EncodeFrame(FrameKind::kText, BytesOf(json));
   outbound_.insert(outbound_.end(), frame.begin(), frame.end());
+}
+
+void VoiceLink::SendCoop(std::span<const std::uint8_t> payload) {
+  if (!udp_.is_open() || !udp_ready_) return;
+  // Un envoi refusé est une trame perdue : la suivante la redit.
+  (void)udp_.Send(EncodeUdpCoop(udp_identity_, payload));
+}
+
+std::vector<CoopRelayed> VoiceLink::TakeCoop() {
+  return std::exchange(coop_received_, std::vector<CoopRelayed>{});
 }
 
 void VoiceLink::SendVoice(std::span<const std::uint8_t> opus) {

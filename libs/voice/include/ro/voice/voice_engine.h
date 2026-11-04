@@ -35,6 +35,9 @@ class VoiceEngine {
   // Un ORDRE, et non un état : il part une fois, au pas suivant du fil.
   void Block(std::uint32_t character_id, bool blocked);
   [[nodiscard]] VoiceStatus status() const;
+  // LA COOP SURVIVORS, par le même fil : une trame à envoyer, et celles reçues.
+  void PostCoop(std::vector<std::uint8_t> payload);
+  [[nodiscard]] std::vector<CoopRelayed> TakeCoop();
 
  private:
   struct BlockOrder {
@@ -48,6 +51,8 @@ class VoiceEngine {
   mutable std::mutex guard_;
   VoiceControls controls_;
   std::vector<BlockOrder> block_orders_;
+  std::vector<std::vector<std::uint8_t>> coop_to_send_;
+  std::vector<CoopRelayed> coop_received_;
   VoiceStatus status_;
   std::atomic<bool> stopping_ = false;
   std::thread worker_;

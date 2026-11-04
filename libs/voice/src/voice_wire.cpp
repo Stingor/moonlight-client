@@ -170,6 +170,16 @@ std::vector<std::uint8_t> EncodeUdpVoice(const UdpIdentity& identity, VoiceChann
   return out;
 }
 
+std::vector<std::uint8_t> EncodeUdpCoop(const UdpIdentity& identity,
+                                        std::span<const std::uint8_t> payload) {
+  std::vector<std::uint8_t> out;
+  out.reserve(kUdpHelloBytes + payload.size());
+  PutUdpPrefix(out, UdpKind::kCoop);
+  PutUdpIdentity(out, identity);
+  out.insert(out.end(), payload.begin(), payload.end());
+  return out;
+}
+
 std::optional<UdpReceived> DecodeUdp(std::span<const std::uint8_t> bytes) {
   if (bytes.size() < kUdpPrefixBytes || ReadU32(bytes, 0) != kUdpMagic || bytes[4] != kUdpVersion) {
     return std::nullopt;
@@ -181,6 +191,20 @@ std::optional<UdpReceived> DecodeUdp(std::span<const std::uint8_t> bytes) {
       std::optional<HeardVoice> heard = DecodeHeardVoice(bytes.subspan(kUdpPrefixBytes));
       if (!heard.has_value()) return std::nullopt;
       return UdpReceived{.kind = UdpKind::kHeard, .heard = std::move(heard)};
+    }
+    case static_cast<std::uint8_t>(UdpKind::kCoopRelayed): {
+      constexpr std::size_t kSenderBytes = 4;
+      const std::span<const std::uint8_t> body = bytes.subspan(kUdpPrefixBytes);
+      if (body.size() < kSenderBytes) return std::nullopt;
+      std::uint32_t sender = 0;
+      for (std::size_t index = 0; index < kSenderBytes; ++index) {
+        sender = (sender << 8U) | body[index];
+      }
+      const std::span<const std::uint8_t> payload = body.subspan(kSenderBytes);
+      return UdpReceived{.kind = UdpKind::kCoopRelayed,
+                         .coop = CoopRelayed{
+                             .sender_id = sender,
+                             .payload = std::vector<std::uint8_t>(payload.begin(), payload.end())}};
     }
     default:
       return std::nullopt;

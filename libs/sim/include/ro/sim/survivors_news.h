@@ -159,4 +159,8 @@ struct SurvivorsNews {
   std::vector<SurvivorsCardNews> cards_dropped;
 };
 
+// Ajoute à `into` les nouvelles de `more`, plus récentes : une image peut couvrir
+// plusieurs tics.
+void AppendSurvivorsNews(SurvivorsNews& into, SurvivorsNews&& more);
+
 }  // namespace ro::sim

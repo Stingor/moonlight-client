@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "ro/sim/survivors_geometry.h"
+#include "ro/sim/survivors_match.h"
 
 namespace ro::sim {
 
@@ -64,6 +65,7 @@ class Reader {
   explicit Reader(std::span<const std::uint8_t> bytes) : bytes_(bytes) {}
   [[nodiscard]] bool ok() const noexcept { return ok_; }
   [[nodiscard]] bool done() const noexcept { return at_ == bytes_.size(); }
+  [[nodiscard]] std::size_t left() const noexcept { return bytes_.size() - at_; }
   [[nodiscard]] std::uint8_t U8() noexcept {
     if (at_ >= bytes_.size()) {
       ok_ = false;
@@ -177,6 +179,91 @@ class Digest {
 };
 
 }  // namespace
+
+std::uint64_t SurvivorsRulesDigest(const SurvivorsRules& rules) {
+  Digest digest;
+  digest.Add(rules.ruleset_version);
+  digest.Add(rules.run_ms);
+  digest.Add(rules.classes.size());
+  for (const ClassRule& rule : rules.classes) {
+    digest.Add(rule.class_id);
+    digest.AddSigned(rule.max_hp);
+    digest.Add(rule.walk_ms_per_cell);
+    digest.Add(rule.skill_pool.size());
+    digest.Add(rule.card_pool.size());
+  }
+  digest.Add(rules.skills.size());
+  for (const SurvivorsSkillRule& rule : rules.skills) {
+    digest.Add(rule.skill_id);
+    digest.Add(rule.levels.size());
+  }
+  digest.Add(rules.foes.size());
+  for (const FoeRule& rule : rules.foes) {
+    digest.Add(rule.foe_id);
+    digest.AddSigned(rule.hp);
+    digest.AddSigned(rule.touch_damage);
+    digest.Add(rule.exp);
+  }
+  digest.Add(rules.arenas.size());
+  for (const SurvivorsTeamScale& scale : kTeamScales) {
+    digest.AddSigned(scale.exp_needed_pct);
+    digest.AddSigned(scale.foe_hp_pct);
+    digest.AddSigned(scale.batch_pct);
+  }
+  return digest.value();
+}
+
+std::vector<std::uint8_t> EncodeSurvivorsCoopPart(const SurvivorsCoopPart& part) {
+  Writer out;
+  out.U16(part.ruleset_version);
+  out.U64(part.rules_digest);
+  out.U16(part.arena_id);
+  out.U8(part.cursed_water);
+  WritePlayer(out, part.player.class_id, part.player.first_skill_id, part.player.loadout,
+              part.player.lives, part.player.leaves, part.player.locked_ids);
+  return out.Take();
+}
+
+std::optional<SurvivorsCoopPart> DecodeSurvivorsCoopPart(std::span<const std::uint8_t> bytes,
+                                                         std::size_t* trailing_bytes) {
+  Reader in(bytes);
+  SurvivorsCoopPart part;
+  part.ruleset_version = in.U16();
+  part.rules_digest = in.U64();
+  part.arena_id = in.U16();
+  part.cursed_water = in.U8();
+  std::optional<SurvivorsAllyStart> player = ReadPlayer(in);
+  if (!in.ok() || !player.has_value()) return std::nullopt;
+  part.player = std::move(*player);
+  if (trailing_bytes != nullptr) *trailing_bytes = in.left();
+  return part;
+}
+
+std::optional<SurvivorsStart> TeamStartOf(std::uint64_t seed, const SurvivorsRules& rules,
+                                          std::span<const SurvivorsCoopPart> parts) {
+  if (parts.size() < 2 || parts.size() > kMostHeroes) return std::nullopt;
+  const std::uint64_t rules_digest = SurvivorsRulesDigest(rules);
+  SurvivorsStart start;
+  start.seed = seed;
+  start.arena_id = parts.front().arena_id;
+  start.cursed_water = parts.front().cursed_water;
+  for (std::size_t index = 0; index < parts.size(); ++index) {
+    const SurvivorsCoopPart& part = parts[index];
+    if (part.ruleset_version != rules.ruleset_version || part.rules_digest != rules_digest) {
+      return std::nullopt;
+    }
+    start.cursed_water = std::min(start.cursed_water, part.cursed_water);
+    if (index > 0) start.allies.push_back(part.player);
+  }
+  const SurvivorsAllyStart& first = parts.front().player;
+  start.class_id = first.class_id;
+  start.first_skill_id = first.first_skill_id;
+  start.loadout = first.loadout;
+  start.lives = first.lives;
+  start.leaves = first.leaves;
+  start.locked_ids = first.locked_ids;
+  return start;
+}
 
 std::vector<std::uint8_t> EncodeSurvivorsTeamJournal(const SurvivorsTeamJournal& journal) {
   Writer out;

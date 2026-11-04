@@ -40,6 +40,8 @@ inline constexpr std::uint32_t kVoiceHelloKeepMs = 10'000;
 inline constexpr std::size_t kVoicePlaybackLeadFrames = 3;
 // Au-delà, le TCP n'avance plus : l'audio qui suivrait s'y entasserait.
 inline constexpr std::size_t kVoiceMostOutboundBytes = 64 * 1024;
+// Les trames de la coop gardées entre deux lectures : assez pour un chargement.
+inline constexpr std::size_t kVoiceMostCoopHeld = 512;
 
 // LE NIVEAU DU MICRO : la moyenne quadratique d'une trame, gain compris, sur
 // une échelle où 1 est le plus fort possible. Une voix ordinaire tient entre
@@ -130,6 +132,11 @@ class VoiceLink {
   // Ne plus entendre ce personnage, ou l'entendre de nouveau. Perdu quand la
   // liaison n'est pas en ligne : le serveur seul tient la liste.
   void Block(std::uint32_t character_id, bool blocked);
+  // UNE TRAME DE LA COOP SURVIVORS, par l'UDP s'il est ouvert. Perdue sinon : le
+  // serveur de carte en porte toujours une copie.
+  void SendCoop(std::span<const std::uint8_t> payload);
+  // Les trames de la coop reçues depuis le dernier appel.
+  [[nodiscard]] std::vector<CoopRelayed> TakeCoop();
   // Un pas : la liaison, l'écoute, le micro et la sortie.
   void Step(std::uint32_t now_ms);
   [[nodiscard]] VoiceStatus status(std::uint32_t now_ms) const;
@@ -165,6 +172,7 @@ class VoiceLink {
   std::uint64_t session_id_ = 0;
   UdpIdentity udp_identity_;
   bool udp_ready_ = false;
+  std::vector<CoopRelayed> coop_received_;
   std::uint32_t next_hello_ms_ = 0;
   std::uint32_t last_ping_ms_ = 0;
   std::uint32_t retry_at_ms_ = 0;

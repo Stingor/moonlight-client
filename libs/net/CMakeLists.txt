@@ -80,6 +80,7 @@ add_library(ro_net STATIC
     src/status_chat_texts.cpp
     src/survivors_ranking.cpp
     src/survivors_presence.cpp
+    src/survivors_coop.cpp
     src/talkbox.cpp
     src/flag_graffiti.cpp
     src/target_info.cpp

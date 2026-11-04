@@ -92,6 +92,9 @@ inline constexpr std::uint32_t kUiCapVoice = 0x00100000;
 // autres (`ZC 0x0F57`, voir `survivors_presence.h`). Même règle : elle n'entre
 // dans le masque que si la table des longueurs connaît ce ZC.
 inline constexpr std::uint32_t kUiCapSurvivorsPresence = 0x00200000;
+// CE CLIENT SAIT LIRE LA COOP DU MODE SURVIVORS (`survivors_coop.h`). Même règle :
+// elle n'entre dans le masque que si la table des longueurs connaît ses ZC.
+inline constexpr std::uint32_t kUiCapSurvivorsCoop = 0x00400000;
 
 [[nodiscard]] core::Result<void> AnnounceUiCaps(Connection& link, std::uint32_t caps);
 

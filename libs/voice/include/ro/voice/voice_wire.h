@@ -105,9 +105,11 @@ inline constexpr std::size_t kUdpHelloBytes = 26;
 inline constexpr std::size_t kUdpVoiceHeaderBytes = 33;
 
 enum class UdpKind : std::uint8_t {
-  kHello = 1,  // le client se fait connaître ; le serveur répond du même
-  kVoice = 2,  // l'audio du client
-  kHeard = 3,  // l'audio d'un autre, relayé par le serveur
+  kHello = 1,        // le client se fait connaître ; le serveur répond du même
+  kVoice = 2,        // l'audio du client
+  kHeard = 3,        // l'audio d'un autre, relayé par le serveur
+  kCoop = 4,         // une trame d'entrées de la coop survivors
+  kCoopRelayed = 5,  // la trame d'un autre membre du groupe
 };
 
 // CE QUI LIE UN DATAGRAMME À SA SESSION TCP : le serveur rejette tout
@@ -123,9 +125,20 @@ struct UdpIdentity {
                                                        VoiceChannel channel, std::uint16_t sequence,
                                                        std::span<const std::uint8_t> opus);
 
+// UNE TRAME DE LA COOP : l'identité comme pour l'audio, puis la trame opaque.
+[[nodiscard]] std::vector<std::uint8_t> EncodeUdpCoop(const UdpIdentity& identity,
+                                                      std::span<const std::uint8_t> payload);
+
+// La trame de la coop d'un autre membre du groupe.
+struct CoopRelayed {
+  std::uint32_t sender_id = 0;
+  std::vector<std::uint8_t> payload;
+};
+
 struct UdpReceived {
   UdpKind kind = UdpKind::kHello;
   std::optional<HeardVoice> heard;  // pour `kHeard` seulement
+  std::optional<CoopRelayed> coop;  // pour `kCoopRelayed` seulement
 };
 
 // Ce que dit un datagramme du serveur, ou rien s'il n'est pas du serveur voix.
