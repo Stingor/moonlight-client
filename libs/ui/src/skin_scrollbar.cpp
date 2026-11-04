@@ -205,7 +205,10 @@ void DriveScrollbar(ImGuiWindow* window, const ScrollRail& rail, float track_top
   const ImGuiWindow* const hovered =
       context->HoveredWindow != nullptr ? context->HoveredWindow->RootWindow : nullptr;
   const bool mouse_on_us = hovered != nullptr && hovered == window->RootWindow;
-  const bool may_take = !imgui_holds_mouse && mouse_on_us;
+  // ⚠ Et sur la part VISIBLE de l'ascenseur : celle qu'un parent a rognée ne se
+  // clique pas, sinon un clic sur sa barre de titre ferait défiler l'enfant.
+  const bool may_take =
+      !imgui_holds_mouse && mouse_on_us && window->OuterRectClipped.Contains(io.MousePos);
 
   // 🔴 ET IMGUI DOIT LÂCHER LE BOUTON GAUCHE SUR CE RAIL. Sa barre est toujours
   // là sous la nôtre — c'est elle qui réserve la place et que nous rendons
@@ -350,8 +353,10 @@ void PaintWindowScrollbar(const SkinArt& art) {
   ImDrawList* into = window->DrawList;
   // ⚠ LA PISTE DÉBORDE DE LA ZONE DE CONTENU : sans élargir le découpage, elle
   // serait rognée, comme le cadre l'était.
-  into->PushClipRect(window->Pos,
-                     ImVec2(window->Pos.x + window->Size.x, window->Pos.y + window->Size.y), false);
+  // 🔴 MAIS PAS AU-DELÀ DE CE QUE LE PARENT LAISSE VOIR : une liste enfant que la
+  // fenêtre fait défiler hors de sa vue peindrait son ascenseur par-dessus la
+  // barre de titre, voire hors de la fenêtre.
+  into->PushClipRect(window->OuterRectClipped.Min, window->OuterRectClipped.Max, false);
   // ⚠ LA PISTE MORD SUR LES FLÈCHES de deux pixels, qui la recouvrent ensuite :
   // sans ce recouvrement, la jointure laisse un trait clair visible à toutes les
   // échelles. Même règle que la piste du curseur de réglage.
