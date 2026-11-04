@@ -19,6 +19,8 @@ namespace ro::ui {
 
 inline constexpr const char* kRoggleTitle = core::TrText("Roggle");
 inline constexpr const char* kRoggleId = "roggle";
+inline constexpr const char* kRoggleNotebookTitle = core::TrText("Carnet de Roggle");
+inline constexpr const char* kRoggleNotebookId = "roggle_notebook";
 
 // Un point du plateau, en pixels du plateau.
 struct RogglePoint {
@@ -67,6 +69,26 @@ struct RoggleBurst {
 
 enum class RogglePhase : std::uint8_t { kAiming, kFlying, kWon, kLost };
 
+// L'IMAGE D'UN PLATEAU D'OBJET, posée sous les plots : à peine visible, puis
+// dévoilée disque par disque là où un plot s'est effacé, et en entier à la
+// victoire.
+struct RogglePicture {
+  SkinImage art;
+  RogglePoint origin;
+  float width = 0.0F;
+  float height = 0.0F;
+  // Le centre des disques dévoilés.
+  std::span<const RogglePoint> revealed;
+
+  [[nodiscard]] bool usable() const noexcept { return art.usable() && width > 0.0F; }
+};
+
+// UN OBJET DU CARNET : son icône et son nom.
+struct RoggleNotebookEntry {
+  SkinImage icon;
+  const char* name = "";
+};
+
 // LA GÉOMÉTRIE DU PLATEAU, recopiée des règles par `app` : la fenêtre ne
 // connaît pas `sim`.
 struct RoggleBoard {
@@ -105,8 +127,13 @@ struct RoggleView {
   int orange_left = 0;
   int multiplier = 1;
   int best_score = 0;
-  // LE NOM DU PLATEAU, déjà traduit, et le défi du jour.
+  // LE NOM DU PLATEAU, déjà traduit — celui de l'objet pour un plateau
+  // d'objet —, et le défi du jour.
   const char* layout_name = "";
+  RogglePicture picture;
+  // LE CARNET : les objets dévoilés, et combien l'installation en propose.
+  std::span<const RoggleNotebookEntry> notebook;
+  int notebook_total = 0;
   bool daily = false;
   // Le meilleur score du défi d'aujourd'hui ; nul sans défi fini ce jour.
   int daily_best = 0;
@@ -124,6 +151,8 @@ struct RoggleView {
 
 struct RoggleState {
   bool open = false;
+  // Le carnet ne s'ouvre qu'avec la fenêtre du jeu, et se ferme avec elle.
+  bool notebook_open = false;
 };
 
 struct RoggleAsk {

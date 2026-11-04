@@ -19,6 +19,8 @@ constexpr int kRoggleSpareBalls = 5;
 constexpr int kRoggleHighScore = 20000;
 constexpr int kRogglePowers = 3;
 constexpr int kRoggleBigShot = 10000;
+constexpr std::size_t kRoggleManyItems = 10;
+constexpr std::size_t kRoggleMostItems = 25;
 
 constexpr std::array<MinigameTrophyText, kMinigameTrophyCount> kTrophies = {{
     {MinigameTrophy::kRojeweledFinished, "rojeweled_finished", core::TrText("Jusqu'au bout"),
@@ -92,7 +94,21 @@ constexpr std::array<MinigameTrophyText, kMinigameTrophyCount> kTrophies = {{
      core::TrText("Marquer 10 000 points en un seul tir de Roggle.")},
     {MinigameTrophy::kRoggleFreeBall, "roggle_free_ball", core::TrText("Bille offerte"),
      core::TrText("Gagner une bille par un tir de Roggle.")},
+    {MinigameTrophy::kRoggleFirstItem, "roggle_first_item", core::TrText("Première pièce"),
+     core::TrText("Dévoiler un item dans Roggle.")},
+    {MinigameTrophy::kRoggleTenItems, "roggle_ten_items", core::TrText("Collectionneur"),
+     core::TrText("Dévoiler 10 items différents dans Roggle.")},
+    {MinigameTrophy::kRoggleTwentyFiveItems, "roggle_twenty_five_items",
+     core::TrText("Conservateur"), core::TrText("Dévoiler 25 items différents dans Roggle.")},
 }};
+
+// Range un objet dans le carnet, croissant et sans doublon.
+void Reveal(std::vector<std::uint32_t>& revealed, std::uint32_t item_id) {
+  const auto at = std::ranges::lower_bound(revealed, item_id);
+  if (at == revealed.end() || *at != item_id) {
+    revealed.insert(at, item_id);
+  }
+}
 
 }  // namespace
 
@@ -135,6 +151,9 @@ std::vector<MinigameTrophy> RecordRoggle(MinigameRecord& record, const PegGame& 
     }
     record.roggle_daily_best = std::max(record.roggle_daily_best, game.score());
   }
+  if (won && game.layout() == PegLayout::kItem && game.item_id() != 0) {
+    Reveal(record.roggle_revealed, game.item_id());
+  }
   EarnMinigameTrophy(record, MinigameTrophy::kRoggleWon, won, fresh);
   EarnMinigameTrophy(record, MinigameTrophy::kRoggleFlawless,
                      won && game.balls_left() >= kRoggleSpareBalls, fresh);
@@ -148,6 +167,11 @@ std::vector<MinigameTrophy> RecordRoggle(MinigameRecord& record, const PegGame& 
   EarnMinigameTrophy(record, MinigameTrophy::kRoggleBigShot, game.best_shot() >= kRoggleBigShot,
                      fresh);
   EarnMinigameTrophy(record, MinigameTrophy::kRoggleFreeBall, game.free_balls() > 0, fresh);
+  const std::size_t revealed = record.roggle_revealed.size();
+  EarnMinigameTrophy(record, MinigameTrophy::kRoggleFirstItem, revealed > 0, fresh);
+  EarnMinigameTrophy(record, MinigameTrophy::kRoggleTenItems, revealed >= kRoggleManyItems, fresh);
+  EarnMinigameTrophy(record, MinigameTrophy::kRoggleTwentyFiveItems, revealed >= kRoggleMostItems,
+                     fresh);
   return fresh;
 }
 
@@ -160,6 +184,9 @@ void MergeMinigameRecord(MinigameRecord& into, const MinigameRecord& from) {
     into.roggle_daily_best = from.roggle_daily_best;
   } else if (from.roggle_daily_day == into.roggle_daily_day) {
     into.roggle_daily_best = std::max(into.roggle_daily_best, from.roggle_daily_best);
+  }
+  for (const std::uint32_t item_id : from.roggle_revealed) {
+    Reveal(into.roggle_revealed, item_id);
   }
   for (std::size_t trophy = 0; trophy < kMinigameTrophyCount; ++trophy) {
     into.unlocked[trophy] = into.unlocked[trophy] || from.unlocked[trophy];

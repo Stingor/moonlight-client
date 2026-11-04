@@ -6202,3 +6202,48 @@ achievements:
       minor: 1
       objectives:
         - {text: "Une bille gagnée"}
+  910034:
+    name: "Premiere piece"
+    score: 10
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Roggle"
+      details: "Dévoiler un item dans Roggle."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Un item dévoilé"}
+  910035:
+    name: "Collectionneur"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Roggle"
+      details: "Dévoiler 10 items différents dans Roggle."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "10 items dévoilés"}
+  910036:
+    name: "Conservateur"
+    score: 30
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Roggle"
+      details: "Dévoiler 25 items différents dans Roggle."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "25 items dévoilés"}

@@ -123,6 +123,32 @@ void PegGame::StartBoard(PegLayout layout, bool daily, std::uint32_t day) {
   ChoosePurple();
 }
 
+bool PegGame::NewItemGame(const PegPicture& picture) {
+  random_.seed(seeds_());
+  return StartItemBoard(picture, false, 0);
+}
+
+bool PegGame::NewDailyItemGame(std::uint32_t day, const PegPicture& picture) {
+  random_.seed(day);
+  return StartItemBoard(picture, true, day);
+}
+
+bool PegGame::StartItemBoard(const PegPicture& picture, bool daily, std::uint32_t day) {
+  std::vector<Peg> pegs = BuildItemPegLayout(picture, random_);
+  if (pegs.empty()) {
+    return false;
+  }
+  SetPegs(std::move(pegs));
+  layout_ = PegLayout::kItem;
+  daily_ = daily;
+  day_ = day;
+  item_id_ = picture.item_id;
+  picture_frame_ = PegPictureFrame(picture);
+  purple_rotates_ = true;
+  ChoosePurple();
+  return true;
+}
+
 void PegGame::SetPegs(std::vector<Peg> pegs) {
   pegs_ = std::move(pegs);
   Restart();
@@ -146,6 +172,8 @@ void PegGame::Restart() {
   layout_ = PegLayout::kScattered;
   daily_ = false;
   day_ = 0;
+  item_id_ = 0;
+  picture_frame_ = PegFrame();
   purple_rotates_ = false;
   bucket_x_ = kPegBoardWidth * 0.5F;
   bucket_direction_ = 1.0F;

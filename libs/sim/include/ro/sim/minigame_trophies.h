@@ -64,10 +64,14 @@ enum class MinigameTrophy : std::uint8_t {
   kRoggleDailyWon,
   kRoggleBigShot,
   kRoggleFreeBall,
+  kRoggleFirstItem,
+  kRoggleTenItems,
+  kRoggleTwentyFiveItems,
 };
 
-inline constexpr std::size_t kMinigameTrophyCount = 33;
-static_assert(kMinigameTrophyCount == static_cast<std::size_t>(MinigameTrophy::kRoggleFreeBall) + 1,
+inline constexpr std::size_t kMinigameTrophyCount = 36;
+static_assert(kMinigameTrophyCount ==
+                  static_cast<std::size_t>(MinigameTrophy::kRoggleTwentyFiveItems) + 1,
               "le compte suit le dernier trophée de l'énumération");
 
 struct MinigameTrophyText {
@@ -89,6 +93,9 @@ struct MinigameRecord {
   // l'époque Unix ; nul tant qu'aucun défi n'est fini.
   std::uint32_t roggle_daily_day = 0;
   int roggle_daily_best = 0;
+  // LE CARNET DE ROGGLE : les objets dont le plateau a été vidé de son orange,
+  // croissants et sans doublon.
+  std::vector<std::uint32_t> roggle_revealed;
   std::array<bool, kMinigameTrophyCount> unlocked = {};
   // LES CLÉS DE TROPHÉE QUE CE CATALOGUE NE CONNAÎT PAS, telles que lues : un
   // client plus récent les a gagnées, et elles se réécrivent avec le reste.

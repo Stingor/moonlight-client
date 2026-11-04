@@ -1,6 +1,10 @@
+#include <algorithm>
+#include <cstdint>
 #include <string>
 #include <string_view>
+#include <unordered_set>
 #include <utility>
+#include <vector>
 
 #include "ro/render/item_icons.h"
 #include "ro/render/skin_pieces.h"
@@ -70,6 +74,27 @@ std::string ItemIconPath(const vfs::ItemTable& items, std::uint32_t item_id) {
   path += resource;
   path += kIconSuffix;
   return path;
+}
+
+std::vector<std::uint32_t> ItemsWithCollection(const vfs::Vfs& vfs, const vfs::ItemTable& items) {
+  std::vector<std::uint32_t> ids;
+  ids.reserve(items.size());
+  for (const auto& [item_id, entry] : items.entries()) {
+    ids.push_back(item_id);
+  }
+  std::ranges::sort(ids);
+  std::unordered_set<std::string_view> resources;
+  std::vector<std::uint32_t> owned;
+  for (const std::uint32_t item_id : ids) {
+    const std::string path = ItemCollectionPath(items, item_id);
+    if (path.empty() || !vfs.ContainsRaw(path)) {
+      continue;
+    }
+    if (resources.insert(items.ResourceOf(item_id)).second) {
+      owned.push_back(item_id);
+    }
+  }
+  return owned;
 }
 
 }  // namespace ro::render

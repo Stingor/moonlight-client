@@ -1,8 +1,10 @@
 // LES PLATEAUX DE ROGGLE : où se posent les plots, et lesquels sont orange,
-// verts ou bleus. Voir l'ADR 0139.
+// verts ou bleus, et le plateau que trace l'image d'un objet. Voir les ADR 0139
+// et 0140.
 
 #include <algorithm>
 #include <cmath>
+#include <cstddef>
 #include <numbers>
 #include <utility>
 
@@ -165,7 +167,167 @@ void AssignKinds(std::vector<Peg>& pegs, std::mt19937& random) {
   }
 }
 
+// ── LE PLATEAU D'OBJET ──────────────────────────────────────────────────────
+
+// LA ZONE DES PLOTS où l'image se pose : sous le canon, au-dessus du seau.
+constexpr float kItemZoneMarginX = 40.0F;
+constexpr float kItemZoneTop = 110.0F;
+constexpr float kItemZoneBottomMargin = 140.0F;
+constexpr float kItemZoneWidth = kPegBoardWidth - 2.0F * kItemZoneMarginX;
+constexpr float kItemZoneHeight = kPegBoardHeight - kItemZoneTop - kItemZoneBottomMargin;
+
+// LA MAILLE, en quinconce comme la grille éparse : on part de la plus large, et
+// l'on resserre jusqu'à tracer assez de plots. La plus serrée laisse encore
+// passer la bille entre deux plots voisins ; la plus large ne pose pas plus
+// d'environ soixante-dix plots, même sur un objet qui remplit son cadre.
+constexpr float kItemWidestSpacingX = 52.0F;
+constexpr float kItemNarrowestSpacingX = 2.0F * (kPegRadius + kPegBallRadius);
+constexpr float kItemSpacingStep = 2.0F;
+constexpr float kItemRowRatio = kGridSpacingY / kGridSpacingX;
+constexpr std::size_t kItemTargetPegs = 60;
+// La part de sa case que l'image doit couvrir pour y poser un plot.
+constexpr float kItemCoveredShare = 0.45F;
+constexpr float kChannelMax = 255.0F;
+
+// Une case de la maille, et ce que l'image y montre.
+struct ItemCell {
+  PegPoint at;
+  float vividness = 0.0F;
+};
+
+// LA MOYENNE de l'opacité et de la vivacité sous un rectangle du plateau.
+struct CellCover {
+  float opacity = 0.0F;
+  float vividness = 0.0F;
+};
+
+[[nodiscard]] CellCover CoverUnder(const PegPicture& picture, const PegFrame& frame, PegPoint at,
+                                   float half_width, float half_height) {
+  const float scale = frame.width / static_cast<float>(picture.width);
+  const auto pixel_x = [&](float board_x) {
+    return std::clamp(static_cast<int>(std::floor((board_x - frame.origin.x) / scale)), 0,
+                      picture.width);
+  };
+  const auto pixel_y = [&](float board_y) {
+    return std::clamp(static_cast<int>(std::floor((board_y - frame.origin.y) / scale)), 0,
+                      picture.height);
+  };
+  const int left = pixel_x(at.x - half_width);
+  const int right = std::max(left + 1, pixel_x(at.x + half_width));
+  const int top = pixel_y(at.y - half_height);
+  const int bottom = std::max(top + 1, pixel_y(at.y + half_height));
+  float opacity = 0.0F;
+  float vividness = 0.0F;
+  int counted = 0;
+  for (int y = top; y < bottom && y < picture.height; ++y) {
+    for (int x = left; x < right && x < picture.width; ++x) {
+      const auto index = static_cast<std::size_t>(y) * static_cast<std::size_t>(picture.width) +
+                         static_cast<std::size_t>(x);
+      opacity += static_cast<float>(picture.opacity[index]);
+      vividness += static_cast<float>(picture.vividness[index]);
+      ++counted;
+    }
+  }
+  if (counted == 0) {
+    return {};
+  }
+  const float area = static_cast<float>(counted) * kChannelMax;
+  return CellCover{.opacity = opacity / area, .vividness = vividness / area};
+}
+
+// LES CASES QUE L'IMAGE COUVRE, à cette maille.
+[[nodiscard]] std::vector<ItemCell> CoveredCells(const PegPicture& picture, const PegFrame& frame,
+                                                 float spacing_x) {
+  const float spacing_y = spacing_x * kItemRowRatio;
+  const float right = frame.origin.x + frame.width;
+  const float bottom = frame.origin.y + frame.height;
+  std::vector<ItemCell> cells;
+  int row = 0;
+  for (float y = frame.origin.y + spacing_y * 0.5F; y < bottom; y += spacing_y, ++row) {
+    const float shift = (row % 2 == 1) ? spacing_x * 0.5F : 0.0F;
+    for (float x = frame.origin.x + shift; x < right; x += spacing_x) {
+      const PegPoint at{.x = x, .y = y};
+      const CellCover cover = CoverUnder(picture, frame, at, spacing_x * 0.5F, spacing_y * 0.5F);
+      if (cover.opacity >= kItemCoveredShare) {
+        cells.push_back(ItemCell{.at = at, .vividness = cover.vividness});
+      }
+    }
+  }
+  return cells;
+}
+
+// LES SORTES D'UN PLATEAU D'OBJET : l'orange sur les cases les plus vives, le
+// hasard départageant les égales ; deux verts au hasard parmi le reste.
+std::vector<Peg> KindsOfCells(const std::vector<ItemCell>& cells, std::mt19937& random) {
+  std::vector<std::size_t> order(cells.size());
+  for (std::size_t index = 0; index < order.size(); ++index) {
+    order[index] = index;
+  }
+  std::shuffle(order.begin(), order.end(), random);
+  std::ranges::stable_sort(order, [&](std::size_t left, std::size_t right) {
+    return cells[left].vividness > cells[right].vividness;
+  });
+  const std::size_t oranges = std::max<std::size_t>(1, cells.size() / kOrangeShare);
+  std::shuffle(order.begin() + static_cast<std::ptrdiff_t>(oranges), order.end(), random);
+  const std::size_t greens = std::min(kGreenPegs, cells.size() - std::min(cells.size(), oranges));
+  std::uniform_int_distribution<int> power(1, kPegPowerCount);
+  std::vector<Peg> pegs(cells.size());
+  for (std::size_t rank = 0; rank < order.size(); ++rank) {
+    const ItemCell& cell = cells[order[rank]];
+    Peg& peg = pegs[order[rank]];
+    peg.x = cell.at.x;
+    peg.y = cell.at.y;
+    if (rank < oranges) {
+      peg.kind = PegKind::kOrange;
+    } else if (rank < oranges + greens) {
+      peg.kind = PegKind::kGreen;
+      peg.power = static_cast<PegPower>(power(random));
+    }
+  }
+  return pegs;
+}
+
+[[nodiscard]] bool Readable(const PegPicture& picture) noexcept {
+  const auto pixels =
+      static_cast<std::size_t>(picture.width) * static_cast<std::size_t>(picture.height);
+  return picture.width > 0 && picture.height > 0 && picture.opacity.size() == pixels &&
+         picture.vividness.size() == pixels;
+}
+
 }  // namespace
+
+PegFrame PegPictureFrame(const PegPicture& picture) noexcept {
+  if (!Readable(picture)) {
+    return {};
+  }
+  const float scale = std::min(kItemZoneWidth / static_cast<float>(picture.width),
+                               kItemZoneHeight / static_cast<float>(picture.height));
+  const float width = static_cast<float>(picture.width) * scale;
+  const float height = static_cast<float>(picture.height) * scale;
+  return PegFrame{.origin = {.x = kItemZoneMarginX + (kItemZoneWidth - width) * 0.5F,
+                             .y = kItemZoneTop + (kItemZoneHeight - height) * 0.5F},
+                  .width = width,
+                  .height = height};
+}
+
+std::vector<Peg> BuildItemPegLayout(const PegPicture& picture, std::mt19937& random) {
+  if (!Readable(picture)) {
+    return {};
+  }
+  const PegFrame frame = PegPictureFrame(picture);
+  std::vector<ItemCell> cells;
+  for (float spacing_x = kItemWidestSpacingX; spacing_x >= kItemNarrowestSpacingX;
+       spacing_x -= kItemSpacingStep) {
+    cells = CoveredCells(picture, frame, spacing_x);
+    if (cells.size() >= kItemTargetPegs) {
+      break;
+    }
+  }
+  if (cells.size() < static_cast<std::size_t>(kPegItemMinPegs)) {
+    return {};
+  }
+  return KindsOfCells(cells, random);
+}
 
 std::vector<Peg> BuildPegLayout(PegLayout layout, std::mt19937& random) {
   std::vector<Peg> pegs;
@@ -185,6 +347,9 @@ std::vector<Peg> BuildPegLayout(PegLayout layout, std::mt19937& random) {
     case PegLayout::kWaves:
       Waves(pegs);
       break;
+    case PegLayout::kItem:
+      // Tracé par une image : voir `BuildItemPegLayout`.
+      return pegs;
   }
   AssignKinds(pegs, random);
   return pegs;

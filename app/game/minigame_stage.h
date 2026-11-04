@@ -5,6 +5,7 @@
 #include <deque>
 #include <filesystem>
 #include <optional>
+#include <random>
 #include <vector>
 
 #include "ro/render/actor_wardrobe.h"
@@ -150,9 +151,9 @@ class MinigameStage {
  private:
   [[nodiscard]] ro::sim::MinigameRecord& Record(const std::filesystem::path& client_root);
   void Save(const std::filesystem::path& client_root);
-  void ApplyAnswers(MinigameWindows& windows);
+  void ApplyAnswers(MinigameWindows& windows, const MinigamePieces& pieces);
   void PlayRojeweled();
-  void PlayRoggle(std::uint32_t step_ms);
+  void PlayRoggle(std::uint32_t step_ms, const MinigamePieces& pieces);
   void ComposeHub(MinigameWindows& windows);
   void ComposeRojeweled(MinigameWindows& windows, const MinigamePieces& pieces,
                         std::uint32_t now_ms);
@@ -189,7 +190,12 @@ class MinigameStage {
   std::vector<ro::ui::RogglePoint> guide_;
 
   // ── ROGGLE : voir `minigame_stage_roggle.cpp` ─────────────────────────────
-  void ApplyRoggleAnswer(MinigameWindows& windows);
+  void ApplyRoggleAnswer(MinigameWindows& windows, const MinigamePieces& pieces);
+  // UNE PARTIE NEUVE, libre ou du jour : un plateau d'objet quand
+  // l'installation en offre un, sinon un plateau dessiné.
+  void StartRoggle(const MinigamePieces& pieces, bool daily);
+  // Tire les plateaux des parties libres.
+  std::mt19937 roggle_boards_;
   // LES AVIS ET LES ÉCLATS, datés à l'horloge de la partie : ils se figent
   // avec elle.
   struct RoggleCalloutBorn {
@@ -205,6 +211,8 @@ class MinigameStage {
   std::vector<ro::ui::RoggleCallout> roggle_callout_views_;
   std::vector<ro::ui::RoggleBurst> roggle_burst_views_;
   std::vector<ro::ui::RogglePoint> roggle_balls_;
+  std::vector<ro::ui::RogglePoint> roggle_revealed_;
+  std::vector<ro::ui::RoggleNotebookEntry> roggle_notebook_;
   // La fenêtre de Roggle était dépliée et avait le focus à l'image précédente.
   bool roggle_watching_ = false;
 };

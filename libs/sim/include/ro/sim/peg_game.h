@@ -92,13 +92,16 @@ enum class PegPower : std::uint8_t {
 };
 inline constexpr int kPegPowerCount = 3;
 
+// Les plateaux DESSINÉS, puis celui que trace l'image d'un objet.
 enum class PegLayout : std::uint8_t {
   kScattered,
   kPyramid,
   kRings,
   kPoring,
   kWaves,
+  kItem,
 };
+// Les plateaux dessinés seuls : ceux que le hasard et le défi tirent d'eux-mêmes.
 inline constexpr int kPegLayoutCount = 5;
 
 // Un point du plateau.
@@ -106,6 +109,33 @@ struct PegPoint {
   float x = 0.0F;
   float y = 0.0F;
 };
+
+// ── LE PLATEAU D'OBJET ──────────────────────────────────────────────────────
+//
+// L'illustration de collection d'un objet, déjà détourée, trace ses plots : un
+// plot partout où l'image couvre sa case, l'orange sur ses couleurs les plus
+// vives. Effacer tous les oranges dévoile l'objet. Voir l'ADR 0140.
+
+// L'IMAGE RELEVÉE, en pixels de l'image, rangée par rangée depuis le haut :
+// l'opacité et la vivacité (l'écart entre la plus forte et la plus faible
+// composante, pondéré par l'opacité), de 0 à 255.
+struct PegPicture {
+  std::uint32_t item_id = 0;
+  int width = 0;
+  int height = 0;
+  std::vector<std::uint8_t> opacity;
+  std::vector<std::uint8_t> vividness;
+};
+
+// Où l'image se pose sur le plateau, en pixels du plateau.
+struct PegFrame {
+  PegPoint origin;
+  float width = 0.0F;
+  float height = 0.0F;
+};
+
+// Une image qui trace moins de plots ne fait pas un plateau.
+inline constexpr int kPegItemMinPegs = 30;
 
 // UN PLOT QUI TOURNE autour d'un centre ; immobile sous un rayon nul.
 struct PegOrbit {
@@ -206,6 +236,10 @@ class PegGame {
   // LE DÉFI DU JOUR : le plateau et tout le hasard de la partie se tirent du
   // numéro du jour, compté depuis l'époque Unix ; la même partie pour tous.
   void NewDailyGame(std::uint32_t day);
+  // UN PLATEAU D'OBJET, libre ou du jour. Rend faux, sans toucher à la partie,
+  // quand l'image trace trop peu de plots.
+  bool NewItemGame(const PegPicture& picture);
+  bool NewDailyItemGame(std::uint32_t day, const PegPicture& picture);
 
   // Vise vers ce point du plateau.
   void Aim(PegPoint target) noexcept;
@@ -242,6 +276,9 @@ class PegGame {
   [[nodiscard]] PegLayout layout() const noexcept { return layout_; }
   [[nodiscard]] bool daily() const noexcept { return daily_; }
   [[nodiscard]] std::uint32_t day() const noexcept { return day_; }
+  // L'objet du plateau, et où son image se pose ; nul hors plateau d'objet.
+  [[nodiscard]] std::uint32_t item_id() const noexcept { return item_id_; }
+  [[nodiscard]] PegFrame picture_frame() const noexcept { return picture_frame_; }
   // Le dernier orange est touché : le seau a laissé place aux cases.
   [[nodiscard]] bool finale() const noexcept { return finale_; }
   // Une bille frôle le dernier orange : le temps ralentit.
@@ -258,6 +295,7 @@ class PegGame {
 
  private:
   void StartBoard(PegLayout layout, bool daily, std::uint32_t day);
+  bool StartItemBoard(const PegPicture& picture, bool daily, std::uint32_t day);
   void Restart();
   void Step(float step_s);
   void MoveBucket(float step_s);
@@ -287,6 +325,8 @@ class PegGame {
   PegLayout layout_ = PegLayout::kScattered;
   bool daily_ = false;
   std::uint32_t day_ = 0;
+  std::uint32_t item_id_ = 0;
+  PegFrame picture_frame_;
   bool purple_rotates_ = false;
   int balls_left_ = kPegStartBalls;
   int score_ = 0;
@@ -319,5 +359,14 @@ bool BouncePegOnWalls(PegPoint& at, PegPoint& velocity) noexcept;
 // LES PLOTS D'UN PLATEAU, sortes et pouvoirs tirés : un quart d'orange, deux
 // verts, le reste en bleu. Voir `peg_layouts.cpp`.
 [[nodiscard]] std::vector<Peg> BuildPegLayout(PegLayout layout, std::mt19937& random);
+
+// LE CADRE DE L'IMAGE : agrandie autant que la zone des plots le permet, sans
+// déformation, centrée.
+[[nodiscard]] PegFrame PegPictureFrame(const PegPicture& picture) noexcept;
+
+// LES PLOTS QUE TRACE UNE IMAGE, sortes et pouvoirs tirés ; vide quand elle en
+// trace moins de `kPegItemMinPegs`. La maille se resserre pour un objet mince.
+// Voir `peg_layouts.cpp`.
+[[nodiscard]] std::vector<Peg> BuildItemPegLayout(const PegPicture& picture, std::mt19937& random);
 
 }  // namespace ro::sim

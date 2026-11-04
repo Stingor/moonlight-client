@@ -1,9 +1,14 @@
 // ROGGLE DANS L'ÉTAGE DES MINI-JEUX : ce que la fenêtre demande, la partie qui
-// avance et ce qu'elle fait entendre, la vue composée. Voir l'ADR 0139.
+// avance et ce qu'elle fait entendre, la vue composée. Voir les ADR 0139 et
+// 0140.
 
 #include <algorithm>
 #include <chrono>
+#include <cstddef>
+#include <optional>
+#include <random>
 #include <utility>
+#include <vector>
 
 #include "game/minigame_stage.h"
 #include "game/skin_image_of.h"
@@ -36,6 +41,38 @@ constexpr const char* kFreeBallSound = "levelup.wav";
 constexpr const char* kRewardSound = "_heal_effect.wav";
 
 constexpr float kMsPerSecond = 1000.0F;
+
+// UNE PARTIE LIBRE se joue sur un plateau d'objet deux fois sur trois.
+constexpr double kItemBoardShare = 2.0 / 3.0;
+// Les objets essayés à la suite avant de se rabattre sur un plateau dessiné :
+// une image peut manquer ou tracer trop peu de plots.
+constexpr int kItemAttempts = 12;
+constexpr int kChannels = 4;
+constexpr int kAlphaChannel = 3;
+constexpr int kOpaque = 255;
+
+// L'IMAGE DE COLLECTION RELEVÉE pour les règles, ou rien quand elle manque.
+[[nodiscard]] std::optional<ro::sim::PegPicture> PictureOf(ro::render::ItemIcons& icons,
+                                                           std::uint32_t item_id) {
+  const std::optional<ro::formats::Image> image = icons.ReadCollection(item_id);
+  if (!image.has_value() || image->empty()) {
+    return std::nullopt;
+  }
+  ro::sim::PegPicture picture{.item_id = item_id, .width = image->width, .height = image->height};
+  const auto pixels =
+      static_cast<std::size_t>(image->width) * static_cast<std::size_t>(image->height);
+  picture.opacity.resize(pixels);
+  picture.vividness.resize(pixels);
+  for (std::size_t index = 0; index < pixels; ++index) {
+    const std::uint8_t* rgba = &image->pixels[index * kChannels];
+    const int alpha = rgba[kAlphaChannel];
+    const int strongest = std::max({rgba[0], rgba[1], rgba[2]});
+    const int weakest = std::min({rgba[0], rgba[1], rgba[2]});
+    picture.opacity[index] = static_cast<std::uint8_t>(alpha);
+    picture.vividness[index] = static_cast<std::uint8_t>((strongest - weakest) * alpha / kOpaque);
+  }
+  return picture;
+}
 
 [[nodiscard]] InterfaceSoundFile SoundOf(const char* path) {
   return InterfaceSoundFile{.place = InterfaceSoundPlace::kSoundArchive, .path = path};
@@ -85,8 +122,16 @@ static_assert(static_cast<int>(ro::ui::RoggleCalloutKind::kBin) ==
       return "Poring";
     case ro::sim::PegLayout::kWaves:
       return ro::core::Tr("Vagues");
+    case ro::sim::PegLayout::kItem:
+      break;
   }
   return "";
+}
+
+// Le nom d'un objet de la table, ou vide.
+[[nodiscard]] const char* ItemName(const ro::render::ItemIcons& icons, std::uint32_t item_id) {
+  const ro::vfs::ItemEntry* entry = icons.items().Find(item_id);
+  return entry != nullptr ? entry->name.c_str() : "";
 }
 
 [[nodiscard]] float Progress(std::uint32_t age_ms, std::uint32_t life_ms) {
@@ -95,14 +140,43 @@ static_assert(static_cast<int>(ro::ui::RoggleCalloutKind::kBin) ==
 
 }  // namespace
 
-void MinigameStage::ApplyRoggleAnswer(MinigameWindows& windows) {
+void MinigameStage::StartRoggle(const MinigamePieces& pieces, bool daily) {
+  const std::uint32_t today = TodayUtc();
+  ro::render::ItemIcons* icons = pieces.item_icons;
+  const bool item_board =
+      icons != nullptr && (daily || std::bernoulli_distribution(kItemBoardShare)(roggle_boards_));
+  const std::vector<std::uint32_t> none;
+  const std::vector<std::uint32_t>& items = item_board ? icons->CollectionItems() : none;
+  if (!items.empty()) {
+    // ⚠ L'OBJET DU JOUR se tire de la sortie brute du générateur, que la norme
+    // fixe : une distribution, elle, change d'une bibliothèque à l'autre.
+    std::mt19937 daily_draw(today);
+    std::size_t at = (daily ? daily_draw() : roggle_boards_()) % items.size();
+    for (int attempt = 0; attempt < kItemAttempts; ++attempt, at = (at + 1) % items.size()) {
+      const std::optional<ro::sim::PegPicture> picture = PictureOf(*icons, items[at]);
+      if (!picture.has_value()) {
+        continue;
+      }
+      if (daily ? roggle_.NewDailyItemGame(today, *picture) : roggle_.NewItemGame(*picture)) {
+        return;
+      }
+    }
+  }
+  if (daily) {
+    roggle_.NewDailyGame(today);
+  } else {
+    roggle_.NewGame();
+  }
+}
+
+void MinigameStage::ApplyRoggleAnswer(MinigameWindows& windows, const MinigamePieces& pieces) {
   const ro::ui::RoggleAsk pegs = std::exchange(windows.roggle_answer, {});
   roggle_watching_ = pegs.watching;
   if (pegs.new_game) {
-    roggle_.NewGame();
+    StartRoggle(pieces, false);
   }
   if (pegs.daily_game) {
-    roggle_.NewDailyGame(TodayUtc());
+    StartRoggle(pieces, true);
   }
   if (pegs.new_game || pegs.daily_game) {
     roggle_callouts_.clear();
@@ -119,9 +193,9 @@ void MinigameStage::ApplyRoggleAnswer(MinigameWindows& windows) {
   }
 }
 
-void MinigameStage::PlayRoggle(std::uint32_t step_ms) {
+void MinigameStage::PlayRoggle(std::uint32_t step_ms, const MinigamePieces& pieces) {
   if (!roggle_.started()) {
-    roggle_.NewGame();
+    StartRoggle(pieces, false);
   }
   roggle_.Advance(static_cast<float>(step_ms) / kMsPerSecond);
   ro::sim::PegNews news = roggle_.TakeNews();
@@ -227,6 +301,34 @@ void MinigameStage::ComposeRoggle(MinigameWindows& windows, const MinigamePieces
   view.multiplier = roggle_.multiplier();
   view.best_score = record_->record.roggle_best;
   view.layout_name = LayoutName(roggle_.layout());
+  view.picture = {};
+  roggle_revealed_.clear();
+  roggle_notebook_.clear();
+  view.notebook_total = 0;
+  if (pieces.item_icons != nullptr) {
+    ro::render::ItemIcons& icons = *pieces.item_icons;
+    if (roggle_.layout() == ro::sim::PegLayout::kItem) {
+      for (const ro::sim::Peg& peg : roggle_.pegs()) {
+        if (peg.removed) {
+          roggle_revealed_.push_back({peg.x, peg.y});
+        }
+      }
+      const ro::sim::PegFrame frame = roggle_.picture_frame();
+      view.picture =
+          ro::ui::RogglePicture{.art = SizedSkinImageOf(icons.GetCollection(roggle_.item_id())),
+                                .origin = {frame.origin.x, frame.origin.y},
+                                .width = frame.width,
+                                .height = frame.height,
+                                .revealed = roggle_revealed_};
+      view.layout_name = ItemName(icons, roggle_.item_id());
+    }
+    for (const std::uint32_t item_id : record_->record.roggle_revealed) {
+      roggle_notebook_.push_back(ro::ui::RoggleNotebookEntry{.icon = ItemIconImage(&icons, item_id),
+                                                             .name = ItemName(icons, item_id)});
+    }
+    view.notebook_total = static_cast<int>(icons.CollectionItems().size());
+  }
+  view.notebook = roggle_notebook_;
   view.daily = roggle_.daily();
   view.daily_best = roggle_.daily() && record_->record.roggle_daily_day == roggle_.day()
                         ? record_->record.roggle_daily_best

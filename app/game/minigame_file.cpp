@@ -24,6 +24,7 @@ constexpr const char* kRojeweledBestField = "rojeweled_best";
 constexpr const char* kRoggleBestField = "roggle_best";
 constexpr const char* kRoggleDailyDayField = "roggle_daily_day";
 constexpr const char* kRoggleDailyBestField = "roggle_daily_best";
+constexpr const char* kRoggleRevealedField = "roggle_revealed";
 constexpr const char* kTrophiesField = "trophies";
 constexpr const char* kSurvivorsEvolvedField = "survivors_evolved";
 
@@ -101,6 +102,21 @@ ro::core::Result<ro::sim::MinigameRecord> ReadMinigameRecord(std::string_view te
       const auto repeated = std::ranges::unique(record.survivors_evolved);
       record.survivors_evolved.erase(repeated.begin(), repeated.end());
     }
+    // LE CARNET DE ROGGLE : un numéro nul ou illisible se saute ; la liste se
+    // range croissante, sans doublon.
+    const YAML::Node revealed = whole[kRoggleRevealedField];
+    if (revealed && revealed.IsSequence()) {
+      for (const YAML::Node& id : revealed) {
+        std::uint32_t item_id = 0;
+        if (!id.IsScalar() || !YAML::convert<std::uint32_t>::decode(id, item_id) || item_id == 0) {
+          continue;
+        }
+        record.roggle_revealed.push_back(item_id);
+      }
+      std::ranges::sort(record.roggle_revealed);
+      const auto repeated = std::ranges::unique(record.roggle_revealed);
+      record.roggle_revealed.erase(repeated.begin(), repeated.end());
+    }
   } catch (const YAML::Exception& broken) {
     return ro::core::Fail(ro::core::ErrorCode::kCorruptData, broken.what());
   }
@@ -115,6 +131,11 @@ std::string WriteMinigameRecord(const ro::sim::MinigameRecord& record) {
   if (record.roggle_daily_day != 0) {
     out << YAML::Key << kRoggleDailyDayField << YAML::Value << record.roggle_daily_day;
     out << YAML::Key << kRoggleDailyBestField << YAML::Value << record.roggle_daily_best;
+  }
+  if (!record.roggle_revealed.empty()) {
+    out << YAML::Key << kRoggleRevealedField << YAML::Value << YAML::Flow << YAML::BeginSeq;
+    for (const std::uint32_t item_id : record.roggle_revealed) out << item_id;
+    out << YAML::EndSeq;
   }
   out << YAML::Key << kTrophiesField << YAML::Value << YAML::BeginSeq;
   for (const ro::sim::MinigameTrophyText& text : ro::sim::MinigameTrophies()) {

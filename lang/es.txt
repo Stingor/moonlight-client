@@ -335,6 +335,12 @@ tr: Bloquea los susurros de este jugador; sola, lista los bloqueados.
 fr: Bloque les chuchotements de tout le monde.
 tr: Bloquea los susurros de todo el mundo.
 
+fr: Carnet (%d)
+tr: Cuaderno (%d)
+
+fr: Carnet de Roggle
+tr: Cuaderno de Roggle
+
 fr: Cascade ×%d
 tr: Cascada ×%d
 
@@ -368,11 +374,17 @@ tr: Haz clic en la ventana para reanudar.
 fr: Colle la caméra au personnage, ou la laisse rattraper.
 tr: Pega la cámara al personaje, o la deja alcanzarlo.
 
+fr: Collectionneur
+tr: Coleccionista
+
 fr: Commandes du client
 tr: Comandos del cliente
 
 fr: Compte les joueurs connectés.
 tr: Cuenta los jugadores conectados.
+
+fr: Conservateur
+tr: Conservador
 
 fr: Coucher (h)
 tr: Ocaso (h)
@@ -440,6 +452,15 @@ tr: Reto del día:
 fr: Défi relevé
 tr: Reto superado
 
+fr: Dévoiler 10 items différents dans Roggle.
+tr: Revela 10 objetos distintos en Roggle.
+
+fr: Dévoiler 25 items différents dans Roggle.
+tr: Revela 25 objetos distintos en Roggle.
+
+fr: Dévoiler un item dans Roggle.
+tr: Revela un objeto en Roggle.
+
 fr: Entendre les autres joueurs, et leur parler en tenant la touche « Parler (voix) » des raccourcis. Seulement sur un serveur qui ouvre la voix.
 tr: Oír a los demás jugadores, y hablarles manteniendo pulsada la tecla «Hablar (voz)» de los atajos. Solo en un servidor que abre la voz.
 
@@ -454,6 +475,15 @@ tr: Rejilla dispersa
 
 fr: Il faut être en ville ou dans un intérieur.
 tr: Debes estar en una ciudad o en un interior.
+
+fr: Il rejoint le carnet.
+tr: Pasa al cuaderno.
+
+fr: Item dévoilé !
+tr: ¡Objeto revelado!
+
+fr: Items dévoilés : %d sur %d
+tr: Objetos revelados: %d de %d
 
 fr: Le personnage est mort.
 tr: Tu personaje está muerto.
@@ -478,6 +508,9 @@ tr: Hablar (voz)
 
 fr: Plateau :
 tr: Tablero:
+
+fr: Première pièce
+tr: Primera pieza
 
 fr: Proximité
 tr: Cercanía
@@ -1684,6 +1717,9 @@ tr: Olas
 
 fr: Vaut pour l'heure forcée ci-dessus comme pour le « Cycle jour/nuit » de Graphics. Seul ce client le voit.
 tr: Vale para la hora forzada de arriba y para el «Ciclo día/noche» de Graphics. Solo este cliente lo ve.
+
+fr: Videz un plateau d'item de son orange pour l'y ranger.
+tr: Vacía de naranja un tablero de objeto para guardarlo aquí.
 
 fr: Visez à la souris, affinez à la molette, cliquez pour tirer.
 tr: Apunta con el ratón, afina con la rueda y haz clic para disparar.

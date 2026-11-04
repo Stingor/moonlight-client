@@ -8,6 +8,7 @@
 #include <imgui.h>
 
 #include "ro/ui/minigames_window.h"
+#include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 #include "ro/ui/window_bounds.h"
@@ -47,6 +48,20 @@ constexpr float kBurstGrowth = 1.2F;
 constexpr float kBinTextInsetPx = 4.0F;
 // Le cadre du ralenti.
 constexpr float kSlowFrameWidth = 4.0F;
+
+// L'IMAGE D'UN PLATEAU D'OBJET : à peine visible sous les plots, et dévoilée
+// en disques de ce rayon, assez grands pour se toucher à la maille la plus
+// large.
+constexpr float kPictureFaintShare = 0.14F;
+constexpr float kRevealRadius = 30.0F;
+// Les mots de la victoire, sous l'objet dévoilé.
+constexpr float kWonTextBelowPx = 18.0F;
+
+// LE CARNET : des cases d'icône, tant par rangée.
+constexpr float kNotebookCellPx = 36.0F;
+constexpr float kNotebookIconHalf = 14.0F;
+constexpr int kNotebookColumns = 9;
+constexpr float kNotebookHeight = 260.0F;
 
 constexpr ImU32 kBoardColor = IM_COL32(18, 20, 34, 255);
 constexpr ImU32 kBoardEdge = IM_COL32(80, 90, 140, 255);
@@ -205,7 +220,7 @@ void DrawPeg(ImDrawList* draw, const RoggleView& view, const RogglePeg& peg, ImV
   }
 }
 
-void DrawHeader(const RoggleView& view, RoggleAsk& asked, const SkinArt& art) {
+void DrawHeader(RoggleState& state, const RoggleView& view, RoggleAsk& asked, const SkinArt& art) {
   const float gap = ImGui::GetFontSize();
   ImGui::Text(core::Tr("Score : %d"), view.score);
   ImGui::SameLine(0.0F, gap);
@@ -223,6 +238,13 @@ void DrawHeader(const RoggleView& view, RoggleAsk& asked, const SkinArt& art) {
   ImGui::SameLine();
   if (SkinSmallButton(core::Tr("Défi du jour"), art)) {
     asked.daily_game = true;
+  }
+  ImGui::SameLine();
+  char notebook[64];
+  std::snprintf(notebook, sizeof(notebook), core::Tr("Carnet (%d)"),
+                static_cast<int>(view.notebook.size()));
+  if (SkinSmallButton(notebook, art)) {
+    state.notebook_open = !state.notebook_open;
   }
 
   FaintText(view.daily ? core::Tr("Défi du jour :") : core::Tr("Plateau :"));
@@ -346,30 +368,83 @@ void DrawBursts(ImDrawList* draw, ImVec2 origin, const RoggleView& view) {
   }
 }
 
+// L'image d'un rectangle du plateau, clippée au cadre de l'image : `low` et
+// `high` en pixels du plateau.
+void DrawPicturePart(ImDrawList* draw, ImVec2 origin, const RogglePicture& picture, ImVec2 low,
+                     ImVec2 high, ImU32 tint, float rounding) {
+  const float left = std::max(low.x, picture.origin.x);
+  const float top = std::max(low.y, picture.origin.y);
+  const float right = std::min(high.x, picture.origin.x + picture.width);
+  const float bottom = std::min(high.y, picture.origin.y + picture.height);
+  if (right <= left || bottom <= top) {
+    return;
+  }
+  const ImVec2 uv_low((left - picture.origin.x) / picture.width,
+                      (top - picture.origin.y) / picture.height);
+  const ImVec2 uv_high((right - picture.origin.x) / picture.width,
+                       (bottom - picture.origin.y) / picture.height);
+  draw->AddImageRounded(picture.art.id, ImVec2(origin.x + left, origin.y + top),
+                        ImVec2(origin.x + right, origin.y + bottom), uv_low, uv_high, tint,
+                        rounding);
+}
+
+void DrawWholePicture(ImDrawList* draw, ImVec2 origin, const RogglePicture& picture, ImU32 tint) {
+  DrawPicturePart(draw, origin, picture, ImVec2(picture.origin.x, picture.origin.y),
+                  ImVec2(picture.origin.x + picture.width, picture.origin.y + picture.height), tint,
+                  0.0F);
+}
+
+// L'OBJET SOUS LES PLOTS : son ombre, et les disques déjà dévoilés.
+void DrawPicture(ImDrawList* draw, ImVec2 origin, const RoggleView& view) {
+  const RogglePicture& picture = view.picture;
+  if (!picture.usable()) {
+    return;
+  }
+  DrawWholePicture(draw, origin, picture, Faded(IM_COL32_WHITE, kPictureFaintShare));
+  for (const RogglePoint at : picture.revealed) {
+    DrawPicturePart(draw, origin, picture, ImVec2(at.x - kRevealRadius, at.y - kRevealRadius),
+                    ImVec2(at.x + kRevealRadius, at.y + kRevealRadius), IM_COL32_WHITE,
+                    kRevealRadius);
+  }
+}
+
+// Le voile, puis deux lignes centrées dont la première finit à `text_y`, en
+// pixels du plateau.
 void DrawVeil(ImDrawList* draw, ImVec2 origin, const RoggleView& view, ImU32 color,
-              const char* title, const char* hint) {
+              const char* title, const char* hint, float text_y) {
   const float width = view.board.width;
   const float height = view.board.height;
   draw->AddRectFilled(origin, ImVec2(origin.x + width, origin.y + height), kVeilColor, kRounding);
   const ImVec2 size = ImGui::CalcTextSize(title);
-  draw->AddText(ImVec2(origin.x + (width - size.x) * 0.5F, origin.y + height * 0.5F - size.y),
-                color, title);
+  draw->AddText(ImVec2(origin.x + (width - size.x) * 0.5F, origin.y + text_y - size.y), color,
+                title);
   const ImVec2 hint_size = ImGui::CalcTextSize(hint);
-  draw->AddText(ImVec2(origin.x + (width - hint_size.x) * 0.5F, origin.y + height * 0.5F),
-                IM_COL32_WHITE, hint);
+  draw->AddText(ImVec2(origin.x + (width - hint_size.x) * 0.5F, origin.y + text_y), IM_COL32_WHITE,
+                hint);
 }
 
 void DrawOutcome(ImDrawList* draw, ImVec2 origin, const RoggleView& view) {
+  const float middle_y = view.board.height * 0.5F;
+  if (view.phase == RogglePhase::kWon && view.picture.usable()) {
+    // L'OBJET DÉVOILÉ en entier, par-dessus le voile, et les mots dessous.
+    const RogglePicture& picture = view.picture;
+    const float below =
+        picture.origin.y + picture.height + kWonTextBelowPx + ImGui::GetTextLineHeight();
+    DrawVeil(draw, origin, view, kWonColor, core::Tr("Item dévoilé !"),
+             core::Tr("Il rejoint le carnet."), below);
+    DrawWholePicture(draw, origin, picture, IM_COL32_WHITE);
+    return;
+  }
   if (view.phase == RogglePhase::kWon || view.phase == RogglePhase::kLost) {
     const bool won = view.phase == RogglePhase::kWon;
     DrawVeil(draw, origin, view, won ? kWonColor : kLostColor,
              won ? core::Tr("Gagné !") : core::Tr("Perdu…"),
-             core::Tr("« Nouvelle partie » pour rejouer."));
+             core::Tr("« Nouvelle partie » pour rejouer."), middle_y);
     return;
   }
   if (view.paused) {
     DrawVeil(draw, origin, view, IM_COL32_WHITE, core::Tr("Pause"),
-             core::Tr("Cliquez sur la fenêtre pour reprendre."));
+             core::Tr("Cliquez sur la fenêtre pour reprendre."), middle_y);
   }
 }
 
@@ -408,11 +483,51 @@ void ReadBoardInput(const RoggleView& view, ImVec2 origin, bool clicked, RoggleA
   asked.launch = clicked && !view.paused;
 }
 
+// LE CARNET : une case par objet dévoilé, son nom au survol.
+void DrawNotebook(RoggleState& state, const RoggleView& view, const SkinArt& art) {
+  static WindowName name(kRoggleNotebookTitle, kRoggleNotebookId);
+  const float width = kNotebookCellPx * static_cast<float>(kNotebookColumns) + kChromeWidth;
+  ImGui::SetNextWindowSize(ImVec2(width, kNotebookHeight), ImGuiCond_FirstUseEver);
+  ConstrainNextWindowToScreen(name.Get());
+  if (!BeginSkinnedWindow(name.Get(), &state.notebook_open, art, SkinnedTitle::kBar)) {
+    EndSkinnedWindow();
+    return;
+  }
+  ImGui::Text(core::Tr("Items dévoilés : %d sur %d"), static_cast<int>(view.notebook.size()),
+              view.notebook_total);
+  if (view.notebook.empty()) {
+    FaintText(core::Tr("Videz un plateau d'item de son orange pour l'y ranger."));
+  }
+  ImDrawList* draw = ImGui::GetWindowDrawList();
+  for (std::size_t index = 0; index < view.notebook.size(); ++index) {
+    const RoggleNotebookEntry& entry = view.notebook[index];
+    if (index % static_cast<std::size_t>(kNotebookColumns) != 0) {
+      ImGui::SameLine(0.0F, 0.0F);
+    }
+    ImGui::PushID(static_cast<int>(index));
+    const ImVec2 low = ImGui::GetCursorScreenPos();
+    static_cast<void>(ImGui::InvisibleButton("##objet", ImVec2(kNotebookCellPx, kNotebookCellPx)));
+    const ImVec2 middle(low.x + kNotebookCellPx * 0.5F, low.y + kNotebookCellPx * 0.5F);
+    if (entry.icon.usable()) {
+      DrawFitted(draw, entry.icon, middle, kNotebookIconHalf);
+    } else {
+      draw->AddCircleFilled(middle, kNotebookIconHalf * 0.5F, kOrangeColor);
+    }
+    if (ImGui::IsItemHovered() && BeginSkinTooltip()) {
+      ImGui::TextUnformatted(entry.name);
+      EndSkinTooltip();
+    }
+    ImGui::PopID();
+  }
+  EndSkinnedWindow();
+}
+
 }  // namespace
 
 RoggleAsk DrawRoggleWindow(RoggleState& state, const RoggleView& view, const SkinArt& art) {
   RoggleAsk asked;
   if (!state.open) {
+    state.notebook_open = false;
     return asked;
   }
   const RoggleBoard& board = view.board;
@@ -426,7 +541,7 @@ RoggleAsk DrawRoggleWindow(RoggleState& state, const RoggleView& view, const Ski
     return asked;
   }
   asked.watching = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
-  DrawHeader(view, asked, art);
+  DrawHeader(state, view, asked, art);
 
   const ImVec2 origin = ImGui::GetCursorScreenPos();
   const bool clicked =
@@ -438,6 +553,7 @@ RoggleAsk DrawRoggleWindow(RoggleState& state, const RoggleView& view, const Ski
   draw->AddRectFilled(origin, far_corner, kBoardColor, kRounding);
   draw->AddRect(origin, far_corner, view.slowed ? kSlowColor : kBoardEdge, kRounding, 0,
                 view.slowed ? kSlowFrameWidth : 1.0F);
+  DrawPicture(draw, origin, view);
   for (const RogglePoint point : view.guide) {
     draw->AddCircleFilled(ImVec2(origin.x + point.x, origin.y + point.y), kGuideDotRadius,
                           kGuideColor);
@@ -468,6 +584,10 @@ RoggleAsk DrawRoggleWindow(RoggleState& state, const RoggleView& view, const Ski
   DrawTrophyToast(view.toast, view.toast_alpha, origin, board.width);
 
   EndSkinnedWindow();
+  // ⚠ APRÈS LE JEU : une fenêtre ne s'ouvre pas dans une autre.
+  if (state.notebook_open) {
+    DrawNotebook(state, view, art);
+  }
   return asked;
 }
 

@@ -2,9 +2,12 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <optional>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
+#include "ro/formats/image.h"
 #include "ro/render/icon_texture.h"
 #include "ro/vfs/card_illustrations.h"
 #include "ro/vfs/item_table.h"
@@ -86,6 +89,15 @@ class ItemIcons {
   };
   [[nodiscard]] DescriptionPicture GetDescriptionPicture(std::uint32_t item_id);
 
+  // L'ILLUSTRATION DE COLLECTION EN PIXELS, détourée comme sa texture, pour qui
+  // veut la lire et non la montrer ; vide quand l'installation ne l'a pas.
+  [[nodiscard]] std::optional<formats::Image> ReadCollection(std::uint32_t item_id);
+
+  // `ItemsWithCollection`, relevé à la première demande.
+  [[nodiscard]] const std::vector<std::uint32_t>& CollectionItems();
+
+  [[nodiscard]] const vfs::ItemTable& items() const noexcept { return *items_; }
+
   [[nodiscard]] std::size_t loaded_count() const noexcept { return loaded_.size(); }
 
   // OUBLIE TOUT : le skin a changé. Voir `GameImages::Clear`.
@@ -99,12 +111,19 @@ class ItemIcons {
   std::unordered_map<std::uint32_t, IconTexture> loaded_;
   std::unordered_map<std::uint32_t, IconTexture> collections_;
   std::unordered_map<std::uint32_t, IconTexture> illustrations_;
+  std::optional<std::vector<std::uint32_t>> collection_items_;
   std::uint64_t generation_ = 0;
 };
 
 // LE CHEMIN D'ARCHIVE de l'illustration de collection d'un objet, en CP949.
 // Vide aux mêmes conditions que celui de l'icône.
 [[nodiscard]] std::string ItemCollectionPath(const vfs::ItemTable& items, std::uint32_t item_id);
+
+// LES OBJETS DONT L'INSTALLATION PORTE L'ILLUSTRATION DE COLLECTION,
+// croissants, un seul par ressource : les cartes partagent toutes le dos de
+// carte générique, qui ne compte qu'une fois, sous son plus petit numéro.
+[[nodiscard]] std::vector<std::uint32_t> ItemsWithCollection(const vfs::Vfs& vfs,
+                                                             const vfs::ItemTable& items);
 
 // LE CHEMIN D'ARCHIVE de l'illustration d'une carte, en CP949. Vide pour tout ce
 // que la table des illustrations ignore — c'est-à-dire pour tout ce qui n'est

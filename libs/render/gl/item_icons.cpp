@@ -1,7 +1,9 @@
 #include "ro/render/item_icons.h"
 
+#include <optional>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "ro/formats/bmp.h"
 #include "ro/formats/image.h"
@@ -14,26 +16,35 @@ ItemIcons::ItemIcons(vfs::Vfs& vfs, const vfs::ItemTable& items,
 
 namespace {
 
-// Charge un bitmap du jeu dans une texture, ou laisse la case vide.
+// Lit un bitmap du jeu, transparence posée ; vide quand il manque.
 // `on_paper` : une illustration de collection, peinte sur du papier blanc ; son
 // fond se détoure, pour qu'elle se pose sur n'importe quel panneau.
-void LoadInto(vfs::Vfs& vfs, const std::string& path, IconTexture& into, bool on_paper = false) {
+std::optional<formats::Image> ReadImage(vfs::Vfs& vfs, const std::string& path, bool on_paper) {
   if (path.empty()) {
-    return;
+    return std::nullopt;
   }
   auto bytes = vfs.ReadRaw(path);
   if (!bytes) {
-    return;
+    return std::nullopt;
   }
   auto image = formats::DecodeBmp(*bytes);
   if (!image) {
-    return;
+    return std::nullopt;
   }
   // Les bitmaps du client n'ont aucun canal alpha : le magenta pur EST leur
   // transparence, et c'est antérieur à l'alpha.
   formats::ApplyMagentaColorKey(*image);
   if (on_paper) {
     formats::MattePaperBackground(*image);
+  }
+  return std::move(*image);
+}
+
+// Charge un bitmap du jeu dans une texture, ou laisse la case vide.
+void LoadInto(vfs::Vfs& vfs, const std::string& path, IconTexture& into, bool on_paper = false) {
+  auto image = ReadImage(vfs, path, on_paper);
+  if (!image) {
+    return;
   }
   // ⚠ AU PLUS PROCHE, comme le client : le bitmap fait vingt-quatre pixels dans
   // une case de trente-deux. Interpolée, l'icône se ramollit visiblement.
@@ -82,6 +93,22 @@ ItemIcons::DescriptionPicture ItemIcons::GetDescriptionPicture(std::uint32_t ite
   const IconTexture& art = GetCollection(item_id);
   const IconTexture& shown = art.usable() ? art : Get(item_id);
   return DescriptionPicture{.texture = shown.usable() ? &shown : nullptr, .card = false};
+}
+
+std::optional<formats::Image> ItemIcons::ReadCollection(std::uint32_t item_id) {
+  if (vfs_ == nullptr || items_ == nullptr) {
+    return std::nullopt;
+  }
+  return ReadImage(*vfs_, ItemCollectionPath(*items_, item_id), /*on_paper=*/true);
+}
+
+const std::vector<std::uint32_t>& ItemIcons::CollectionItems() {
+  if (!collection_items_.has_value()) {
+    collection_items_ = (vfs_ == nullptr || items_ == nullptr)
+                            ? std::vector<std::uint32_t>()
+                            : ItemsWithCollection(*vfs_, *items_);
+  }
+  return *collection_items_;
 }
 
 void ItemIcons::Clear() {

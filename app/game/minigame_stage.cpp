@@ -108,6 +108,7 @@ void DrawMinigameWindows(MinigameWindows& windows, const ro::ui::SkinArt& art,
   escape.Register(ro::ui::kMinigamesId, &windows.hub.open);
   escape.Register(ro::ui::kRojeweledId, &windows.rojeweled.open);
   escape.Register(ro::ui::kRoggleId, &windows.roggle.open);
+  escape.Register(ro::ui::kRoggleNotebookId, &windows.roggle.notebook_open);
   windows.hub_answer = ro::ui::DrawMinigamesWindow(windows.hub, windows.hub_view, art);
   windows.rojeweled_answer =
       ro::ui::DrawRojeweledWindow(windows.rojeweled, windows.rojeweled_view, art);
@@ -147,10 +148,11 @@ void MinigameStage::Advance(MinigameWindows& windows, const MinigamePieces& piec
     std::random_device entropy;
     rojeweled_ = ro::sim::Match3Game(entropy());
     roggle_ = ro::sim::PegGame(entropy());
+    roggle_boards_.seed(entropy());
     seeded_ = true;
   }
   // ⚠ LES RÉPONSES AVANT LES HORLOGES : un clic date de l'image qui l'a reçu.
-  ApplyAnswers(windows);
+  ApplyAnswers(windows, pieces);
   rojeweled_clock_.Follow(windows.rojeweled.open, now_ms);
   // Roggle attend, fenêtre repliée ou sans le focus.
   const std::uint32_t roggle_step_ms =
@@ -171,7 +173,7 @@ void MinigameStage::Advance(MinigameWindows& windows, const MinigamePieces& piec
     toasts_.insert(toasts_.end(), fresh.begin(), fresh.end());
   }
   if (windows.roggle.open) {
-    PlayRoggle(roggle_step_ms);
+    PlayRoggle(roggle_step_ms, pieces);
     const std::vector<ro::sim::MinigameTrophy> fresh = RecordRoggle(record_->record, roggle_);
     toasts_.insert(toasts_.end(), fresh.begin(), fresh.end());
   }
@@ -206,7 +208,7 @@ void MinigameStage::Save(const std::filesystem::path& client_root) {
   record_unsaved_ = !SaveMinigameRecord(client_root, *record_);
 }
 
-void MinigameStage::ApplyAnswers(MinigameWindows& windows) {
+void MinigameStage::ApplyAnswers(MinigameWindows& windows, const MinigamePieces& pieces) {
   ro::ui::MinigamesAsk hub = std::exchange(windows.hub_answer, {});
   const ro::ui::MinigamesAsk icons = std::exchange(windows.icon_answer, {});
   hub.open_rojeweled = hub.open_rojeweled || icons.open_rojeweled;
@@ -228,7 +230,7 @@ void MinigameStage::ApplyAnswers(MinigameWindows& windows) {
     rojeweled_.Click({jewels.clicked->row, jewels.clicked->column}, rojeweled_clock_.watched_ms());
   }
 
-  ApplyRoggleAnswer(windows);
+  ApplyRoggleAnswer(windows, pieces);
 }
 
 void MinigameStage::PlayRojeweled() {

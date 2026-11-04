@@ -335,6 +335,12 @@ tr: Blocks this player's whispers; alone, lists the blocked ones.
 fr: Bloque les chuchotements de tout le monde.
 tr: Blocks everyone's whispers.
 
+fr: Carnet (%d)
+tr: Notebook (%d)
+
+fr: Carnet de Roggle
+tr: Roggle notebook
+
 fr: Cascade ×%d
 tr: Cascade ×%d
 
@@ -368,11 +374,17 @@ tr: Click the window to resume.
 fr: Colle la caméra au personnage, ou la laisse rattraper.
 tr: Sticks the camera to the character, or lets it catch up.
 
+fr: Collectionneur
+tr: Collector
+
 fr: Commandes du client
 tr: Client commands
 
 fr: Compte les joueurs connectés.
 tr: Counts the players online.
+
+fr: Conservateur
+tr: Curator
 
 fr: Coucher (h)
 tr: Sunset (h)
@@ -440,6 +452,15 @@ tr: Daily challenge:
 fr: Défi relevé
 tr: Challenge met
 
+fr: Dévoiler 10 items différents dans Roggle.
+tr: Reveal 10 different items in Roggle.
+
+fr: Dévoiler 25 items différents dans Roggle.
+tr: Reveal 25 different items in Roggle.
+
+fr: Dévoiler un item dans Roggle.
+tr: Reveal an item in Roggle.
+
 fr: Entendre les autres joueurs, et leur parler en tenant la touche « Parler (voix) » des raccourcis. Seulement sur un serveur qui ouvre la voix.
 tr: Hear the other players, and talk to them by holding the "Talk (voice)" shortcut key. Only on a server that opens voice.
 
@@ -454,6 +475,15 @@ tr: Scattered grid
 
 fr: Il faut être en ville ou dans un intérieur.
 tr: You must be in a town or indoors.
+
+fr: Il rejoint le carnet.
+tr: It joins the notebook.
+
+fr: Item dévoilé !
+tr: Item revealed!
+
+fr: Items dévoilés : %d sur %d
+tr: Items revealed: %d of %d
 
 fr: Le personnage est mort.
 tr: Your character is dead.
@@ -478,6 +508,9 @@ tr: Talk (voice)
 
 fr: Plateau :
 tr: Board:
+
+fr: Première pièce
+tr: First piece
 
 fr: Proximité
 tr: Nearby
@@ -1684,6 +1717,9 @@ tr: Waves
 
 fr: Vaut pour l'heure forcée ci-dessus comme pour le « Cycle jour/nuit » de Graphics. Seul ce client le voit.
 tr: Applies to the forced hour above as well as to the “Day/night cycle” in Graphics. Only this client sees it.
+
+fr: Videz un plateau d'item de son orange pour l'y ranger.
+tr: Clear an item board of its orange to file the item here.
 
 fr: Visez à la souris, affinez à la molette, cliquez pour tirer.
 tr: Aim with the mouse, fine-tune with the wheel, click to shoot.
