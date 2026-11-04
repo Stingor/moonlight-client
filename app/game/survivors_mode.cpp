@@ -279,7 +279,7 @@ bool SurvivorsMode::Mount(SurvivorsStage& stage, const SurvivorsContext& context
   arena_->SetSwitches(SwitchesOf(options_));
   arena_->SetHordeSunShadows(options_.horde_sun_shadows);
   arena_->SetQuake(context.quake);
-  hero_evolved_.reset();
+  hero_job_.reset();
   // LA CHAUFFE : chaque espèce de la première vague, et les bolts de départ.
   const ro::sim::SurvivorsField& field = stage.play()->run().field();
   std::vector<std::uint16_t> skills;
@@ -609,17 +609,18 @@ void SurvivorsMode::FollowEntered(SurvivorsStage& stage, const SurvivorsContext&
 void SurvivorsMode::PaintArena(const SurvivorsStage& stage, const SurvivorsContext& context) {
   const ro::sim::SurvivorsPlay& play = *stage.play();
   const ro::sim::SurvivorsField& field = play.run().field();
-  // LE HÉROS PORTE LE VISAGE DU PERSONNAGE (U7), et le corps de l'évolution
-  // dès la première.
-  const bool evolved = field.hero.evolutions > 0;
-  if (hero_evolved_ != evolved && field.hero_class != nullptr) {
+  // LE HÉROS PORTE LE VISAGE DU PERSONNAGE (U7), et le corps de son métier :
+  // évolué dès la première évolution, monté sur sa monture.
+  const std::uint16_t hero_job =
+      field.hero_class != nullptr ? ro::sim::HeroJobOf(*field.hero_class, field.hero) : 0;
+  if (hero_job_ != hero_job && field.hero_class != nullptr) {
     const ro::sim::Actor* player = context.world->player();
     const ro::render::ActorLook face =
         player != nullptr ? LookOf(*player)
                           : ro::render::ActorLook{
                                 .player = true, .sex = kFallbackHeroSex, .hair = kFallbackHeroHair};
-    arena_->SetHeroLook(HeroLook(face, *field.hero_class, evolved));
-    hero_evolved_ = evolved;
+    arena_->SetHeroLook(HeroLook(face, *field.hero_class, hero_job));
+    hero_job_ = hero_job;
   }
   play.run().Orbs(orbs_);
   const ArenaFrameFacts facts{

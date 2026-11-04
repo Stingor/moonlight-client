@@ -52,6 +52,8 @@ inline constexpr std::uint16_t kBrandishSpearId = 57;
 inline constexpr std::uint16_t kSpearStabId = 58;
 inline constexpr std::uint16_t kSpearBoomerangId = 59;
 inline constexpr std::uint16_t kBowlingBashId = 62;
+inline constexpr std::uint16_t kEndureId = 8;
+inline constexpr std::uint16_t kTwoHandQuickenId = 60;
 inline constexpr std::uint16_t kSpiralPierceId = 397;
 inline constexpr std::uint16_t kHeadCrushId = 398;
 inline constexpr std::uint16_t kJointBeatId = 399;
@@ -68,6 +70,7 @@ inline constexpr std::uint16_t kEclipseCardId = 4266;
 inline constexpr std::uint16_t kDragonFlyCardId = 4179;
 inline constexpr std::uint16_t kVagabondWolfCardId = 4183;
 inline constexpr std::uint16_t kBaphometCardId = 4147;
+inline constexpr std::uint16_t kPecoPecoCardId = 4031;
 
 inline constexpr std::uint16_t kLunaticId = 1063;
 inline constexpr std::uint16_t kPoringId = 1002;
@@ -116,9 +119,12 @@ inline constexpr std::size_t kShippedEvolvedSkillCount = 11;
 // survivors_rules_knight.cpp : le Chevalier, ses skills — la réserve, puis les
 // évolués — et ses évolutions. ShippedClasses, ShippedSkills et
 // ShippedEvolutions les mettent après ceux du Magicien.
-inline constexpr std::size_t kKnightPoolSkillCount = 7;
+inline constexpr std::size_t kKnightPoolSkillCount = 9;
 inline constexpr std::size_t kKnightEvolvedSkillCount = 3;
+// Ses cartes propres, que ShippedCards met après celles du Magicien.
+inline constexpr std::size_t kKnightCardCount = 1;
 [[nodiscard]] const ClassRule& KnightClass();
+[[nodiscard]] std::span<const CardRule> KnightCards();
 [[nodiscard]] std::span<const SurvivorsSkillRule> KnightSkills();
 [[nodiscard]] std::span<const EvolutionRule> KnightEvolutions();
 

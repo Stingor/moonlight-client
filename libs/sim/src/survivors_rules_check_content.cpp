@@ -178,6 +178,15 @@ template <std::size_t kCount>
       (level.block_hp <= 0 || level.hit_radius_units <= 0 || level.length_units <= 0)) {
     return Refuse(at + "de barrière sans PV, sans rayon de bloc ou sans distance");
   }
+  // Une posture majore une statistique, autre que les PV max, moins longtemps
+  // que sa recharge.
+  if (skill.archetype == SkillArchetype::kStance &&
+      (level.stance_bonus == 0 || level.life_ms == 0 || level.cooldown_ms <= level.life_ms ||
+       skill.stance_stat == SurvivorsStat::kMaxHp)) {
+    return Refuse(at +
+                  "de posture sans bonus, sans durée, plus longue que sa recharge, ou sur "
+                  "les PV max");
+  }
   if (skill.archetype == SkillArchetype::kStorm) {
     // Plusieurs vagues se suivent à un intervalle ; un orage posé sur un
     // monstre le cherche à une portée.

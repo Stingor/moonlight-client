@@ -72,6 +72,7 @@ enum class SkillArchetype : std::uint8_t {
   kStorm,         // aire posée qui frappe tout son disque, par vagues
   kCone,          // cône devant le héros, dans son cap
   kBarrier,       // blocs posés entre le héros et la horde, qu'elle ne traverse pas
+  kStance,        // posture : un état sur le héros, `life_ms` toutes les `cooldown_ms`
 };
 // kHero : une aire centrée sur le héros, et non sur un monstre visé.
 enum class TargetRule : std::uint8_t { kNearest, kRandom, kStrongest, kDensest, kHero };
@@ -129,6 +130,9 @@ struct SkillLevel {
   std::uint8_t cone_half_steps = 0;
   // Barrière : les PV d'un bloc ; `length_units` est sa distance au héros.
   std::int32_t block_hp = 0;
+  // Posture : ce qu'elle ajoute à la statistique `stance_stat` du skill, tant
+  // qu'elle dure.
+  std::int32_t stance_bonus = 0;
 };
 
 // La vitesse d'un tir en sous-unités par pas, tronquée vers zéro : celle du
@@ -148,6 +152,9 @@ struct SurvivorsSkillRule {
   TargetRule target = TargetRule::kNearest;
   SurvivorsElement element = SurvivorsElement::kNeutral;
   std::span<const SkillLevel> levels;  // niveau 1 en tête
+  // Posture : la statistique que `stance_bonus` majore. Jamais les PV max :
+  // la fin de la posture les retirerait au héros.
+  SurvivorsStat stance_stat = SurvivorsStat::kArmor;
 };
 
 struct CardRule {
@@ -239,6 +246,12 @@ struct ClassRule {
   std::span<const std::uint16_t> card_pool;
   std::uint16_t evolved_job_id = 0;  // apparence après une évolution, côté app
   bool melee = false;  // lance d'un geste d'attaque plutôt que d'incantation, côté app
+  // LA MONTURE : le héros qui tient cette carte monte, et montre
+  // `mounted_job_id`, puis `mounted_evolved_job_id` après une évolution. 0 :
+  // aucune monture.
+  std::uint16_t mount_card_item_id = 0;
+  std::uint16_t mounted_job_id = 0;
+  std::uint16_t mounted_evolved_job_id = 0;
 };
 // XP du niveau L au niveau L + 1 : base + per_level × (L − from_level), pour le
 // dernier segment dont from_level <= L.

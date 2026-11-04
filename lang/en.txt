@@ -581,6 +581,12 @@ tr: A spear thrown far strikes the nearest monster.
 fr: Un coup furieux disperse la foule la plus dense à portée.
 tr: A furious blow scatters the densest crowd within reach.
 
+fr: Par moments, vous encaissez : votre armure augmente.
+tr: At times you brace yourself: your armor rises.
+
+fr: Par moments, vos coups s'enchaînent : toutes les recharges raccourcissent.
+tr: At times your blows come in a rush: every cooldown shortens.
+
 fr: Des coups écrasants s'abattent sur ce qui vous touche.
 tr: Crushing blows rain down on whatever touches you.
 
@@ -1684,6 +1690,9 @@ tr: Aim with the mouse, fine-tune with the wheel, click to shoot.
 
 fr: Vitesse de marche augmentée.
 tr: Increased walk speed.
+
+fr: Vous montez votre Peco Peco : vitesse de marche augmentée.
+tr: You ride your Peco Peco: increased walk speed.
 
 fr: Vitesse du temps
 tr: Speed of time
