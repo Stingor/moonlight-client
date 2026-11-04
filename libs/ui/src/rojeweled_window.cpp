@@ -1,6 +1,7 @@
 #include "ro/ui/rojeweled_window.h"
 
 #include <algorithm>
+#include <cfloat>
 #include <cmath>
 #include <cstdio>
 #include <numbers>
@@ -56,6 +57,27 @@ constexpr std::size_t kComboTextSize = 48;
 // Le pouls de l'indice, en radians par seconde, et son alpha le plus bas.
 constexpr float kHintPulsePerS = 6.0F;
 constexpr float kHintLowestAlpha = 0.4F;
+// La gemme choisie respire : son pouls, en radians par seconde, et l'écart de
+// taille au plus fort.
+constexpr float kBreathPerS = 5.0F;
+constexpr float kBreathScale = 0.07F;
+// À partir de ce compte, les coups restants se disent en rouge.
+constexpr int kFewMovesLeft = 5;
+constexpr ImVec4 kFewMovesColor(1.0F, 0.42F, 0.38F, 1.0F);
+// LES POINTS GAGNÉS montrent de presque une case en s'effaçant, un peu plus
+// gros que le texte ; ceux d'une cascade sont dorés. Une ombre les détache des
+// gemmes.
+constexpr float kGainRiseCells = 0.9F;
+constexpr float kGainFontScale = 1.3F;
+constexpr ImU32 kGainColor = IM_COL32(255, 255, 255, 255);
+constexpr ImU32 kShadowColor = IM_COL32(0, 0, 0, 255);
+constexpr float kShadowOffset = 1.5F;
+// Ce que porte « +123456 », zéro final compris.
+constexpr std::size_t kGainTextSize = 16;
+// Le bandeau qui annonce un remélange.
+constexpr ImU32 kBandColor = IM_COL32(0, 0, 0, 170);
+// Ce que porte une ligne du bilan, zéro final compris.
+constexpr std::size_t kOutcomeTextSize = 96;
 
 // L'ÉCLAT D'UNE GEMME EFFACÉE : une lueur de sa couleur, un cœur blanc qui
 // s'éteint vite, une onde qui s'élargit, et des étincelles qui fusent.
@@ -83,14 +105,21 @@ void DrawFitted(ImDrawList* draw, const SkinImage& image, ImVec2 low, ImVec2 hig
   draw->AddImage(image.id, corner, ImVec2(corner.x + size.x, corner.y + size.y));
 }
 
-void DrawGem(ImDrawList* draw, const RojeweledView& view, int kind, ImVec2 corner) {
+// LA GEMME, à la taille `scale` de sa case, autour du milieu de la case.
+void DrawGem(ImDrawList* draw, const RojeweledView& view, int kind, ImVec2 corner, float scale) {
+  if (scale <= 0.0F) {
+    return;
+  }
   const ImU32 color = kKindColors[static_cast<std::size_t>(kind)];
-  const ImVec2 pad_low(corner.x + kPadInset, corner.y + kPadInset);
-  const ImVec2 pad_high(corner.x + kCell - kPadInset, corner.y + kCell - kPadInset);
-  draw->AddRectFilled(pad_low, pad_high, WithAlpha(color, kPadAlpha), kRounding);
-  draw->AddRect(pad_low, pad_high, color, kRounding, 0, kRingThickness);
-  const ImVec2 low(corner.x + kGemInset, corner.y + kGemInset);
-  const ImVec2 high(corner.x + kCell - kGemInset, corner.y + kCell - kGemInset);
+  const ImVec2 center(corner.x + kCell * 0.5F, corner.y + kCell * 0.5F);
+  const float pad_half = (kCell * 0.5F - kPadInset) * scale;
+  const ImVec2 pad_low(center.x - pad_half, center.y - pad_half);
+  const ImVec2 pad_high(center.x + pad_half, center.y + pad_half);
+  draw->AddRectFilled(pad_low, pad_high, WithAlpha(color, kPadAlpha), kRounding * scale);
+  draw->AddRect(pad_low, pad_high, color, kRounding * scale, 0, kRingThickness);
+  const float gem_half = (kCell * 0.5F - kGemInset) * scale;
+  const ImVec2 low(center.x - gem_half, center.y - gem_half);
+  const ImVec2 high(center.x + gem_half, center.y + gem_half);
   const SkinImage& image = view.art[static_cast<std::size_t>(kind)];
   if (image.usable()) {
     DrawFitted(draw, image, low, high);
@@ -131,7 +160,11 @@ void DrawBurst(ImDrawList* draw, ImVec2 origin, const RojeweledBurst& burst) {
 void DrawHeader(const RojeweledView& view, RojeweledAsk& asked, const SkinArt& art) {
   ImGui::Text(core::Tr("Score : %d"), view.score);
   ImGui::SameLine(0.0F, ImGui::GetFontSize());
-  ImGui::Text(core::Tr("Coups : %d"), view.moves_left);
+  if (!view.over && view.moves_left <= kFewMovesLeft) {
+    ImGui::TextColored(kFewMovesColor, core::Tr("Coups : %d"), view.moves_left);
+  } else {
+    ImGui::Text(core::Tr("Coups : %d"), view.moves_left);
+  }
   ImGui::SameLine(0.0F, ImGui::GetFontSize());
   if (view.best_score > 0) {
     FaintText(core::Tr("Meilleur :"));
@@ -145,19 +178,81 @@ void DrawHeader(const RojeweledView& view, RojeweledAsk& asked, const SkinArt& a
   FaintText(core::Tr("Cliquez deux monstres voisins pour les échanger."));
 }
 
+// Une ligne centrée sur le plateau, à la hauteur `top`.
+void CenteredLine(ImDrawList* draw, ImVec2 origin, float top, ImU32 color, const char* text) {
+  const ImVec2 size = ImGui::CalcTextSize(text);
+  draw->AddText(ImVec2(origin.x + (kBoard - size.x) * 0.5F, top), color, text);
+}
+
+// LE BILAN : titre, score, meilleure cascade, record, et comment rejouer,
+// centrés ensemble sur le plateau voilé.
+void DrawSummary(ImDrawList* draw, ImVec2 origin, const RojeweledView& view) {
+  const ImVec2 far(origin.x + kBoard, origin.y + kBoard);
+  draw->AddRectFilled(origin, far, kVeilColor, kRounding);
+  std::array<char, kOutcomeTextSize> score = {};
+  std::snprintf(score.data(), score.size(), core::Tr("Score : %d"), view.score);
+  std::array<char, kOutcomeTextSize> combo = {};
+  if (view.best_combo >= 2) {
+    std::snprintf(combo.data(), combo.size(), core::Tr("Meilleure cascade : ×%d"), view.best_combo);
+  }
+  struct Line {
+    const char* text;
+    ImU32 color;
+  };
+  std::array<Line, 5> lines = {};
+  std::size_t count = 0;
+  lines[count++] = {core::Tr("Partie finie !"), kSelectedColor};
+  if (view.new_record) {
+    lines[count++] = {core::Tr("Nouveau record !"), kComboColor};
+  }
+  lines[count++] = {score.data(), IM_COL32_WHITE};
+  if (combo[0] != '\0') {
+    lines[count++] = {combo.data(), IM_COL32_WHITE};
+  }
+  lines[count++] = {core::Tr("« Nouvelle partie » pour rejouer."), IM_COL32_WHITE};
+  const float line_height = ImGui::GetTextLineHeightWithSpacing();
+  float top = origin.y + (kBoard - line_height * static_cast<float>(count)) * 0.5F;
+  for (std::size_t index = 0; index < count; ++index) {
+    CenteredLine(draw, origin, top, lines[index].color, lines[index].text);
+    top += line_height;
+  }
+}
+
+// L'ANNONCE D'UN REMÉLANGE, sur un bandeau au milieu du plateau.
+void DrawReshuffleNotice(ImDrawList* draw, ImVec2 origin) {
+  const char* text = core::Tr("Plus aucun échange : on remélange !");
+  const float line_height = ImGui::GetTextLineHeightWithSpacing();
+  const float top = origin.y + (kBoard - line_height) * 0.5F;
+  draw->AddRectFilled(ImVec2(origin.x, top - kPad),
+                      ImVec2(origin.x + kBoard, top + line_height + kPad), kBandColor);
+  CenteredLine(draw, origin, top, kComboColor, text);
+}
+
+// LES POINTS GAGNÉS, qui montent depuis le centre de ce qui s'est effacé.
+void DrawGain(ImDrawList* draw, ImVec2 origin, const RojeweledGain& gain) {
+  std::array<char, kGainTextSize> text = {};
+  std::snprintf(text.data(), text.size(), "+%d", gain.points);
+  ImFont* font = ImGui::GetFont();
+  const float font_size = ImGui::GetFontSize() * kGainFontScale;
+  const ImVec2 size = font->CalcTextSizeA(font_size, FLT_MAX, 0.0F, text.data());
+  const float left = 1.0F - gain.progress;
+  const ImVec2 middle(origin.x + kPad + (gain.column + 0.5F) * kCell,
+                      origin.y + kPad + (gain.row + 0.5F - gain.progress * kGainRiseCells) * kCell);
+  const ImVec2 corner(middle.x - size.x * 0.5F, middle.y - size.y * 0.5F);
+  const ImU32 color = gain.combo >= 2 ? kComboColor : kGainColor;
+  draw->AddText(font, font_size, ImVec2(corner.x + kShadowOffset, corner.y + kShadowOffset),
+                WithAlpha(kShadowColor, left), text.data());
+  draw->AddText(font, font_size, corner, WithAlpha(color, left), text.data());
+}
+
 void DrawOutcome(ImDrawList* draw, ImVec2 origin, const RojeweledView& view) {
   const ImVec2 far(origin.x + kBoard, origin.y + kBoard);
   if (view.over) {
-    draw->AddRectFilled(origin, far, kVeilColor, kRounding);
-    const char* title = core::Tr("Partie finie !");
-    const ImVec2 size = ImGui::CalcTextSize(title);
-    draw->AddText(ImVec2(origin.x + (kBoard - size.x) * 0.5F, origin.y + kBoard * 0.5F - size.y),
-                  kSelectedColor, title);
-    const char* hint = core::Tr("« Nouvelle partie » pour rejouer.");
-    const ImVec2 hint_size = ImGui::CalcTextSize(hint);
-    draw->AddText(ImVec2(origin.x + (kBoard - hint_size.x) * 0.5F, origin.y + kBoard * 0.5F),
-                  IM_COL32_WHITE, hint);
+    DrawSummary(draw, origin, view);
     return;
+  }
+  if (view.reshuffling) {
+    DrawReshuffleNotice(draw, origin);
   }
   if (view.combo >= 2) {
     std::array<char, kComboTextSize> text = {};
@@ -221,12 +316,21 @@ RojeweledAsk DrawRojeweledWindow(RojeweledState& state, const RojeweledView& vie
     if (gem.kind < 0 || gem.kind >= kRojeweledKinds) {
       continue;
     }
-    const ImVec2 corner = CellCorner(origin, {index / kRojeweledSide, index % kRojeweledSide});
+    const RojeweledCell cell{index / kRojeweledSide, index % kRojeweledSide};
+    const ImVec2 corner = CellCorner(origin, cell);
+    float scale = gem.scale;
+    if (view.selected == cell) {
+      scale *= 1.0F + kBreathScale * std::sin(static_cast<float>(ImGui::GetTime()) * kBreathPerS);
+    }
     DrawGem(draw, view, gem.kind,
-            ImVec2(corner.x + gem.offset_columns * kCell, corner.y + gem.offset_rows * kCell));
+            ImVec2(corner.x + gem.offset_columns * kCell, corner.y + gem.offset_rows * kCell),
+            scale);
   }
   for (const RojeweledBurst& burst : view.bursts) {
     DrawBurst(draw, origin, burst);
+  }
+  for (const RojeweledGain& gain : view.gains) {
+    DrawGain(draw, origin, gain);
   }
   draw->PopClipRect();
 

@@ -22231,3 +22231,12 @@ tr: ARENA
 
 fr: En arène
 tr: In the arena
+
+fr: Meilleure cascade : ×%d
+tr: Best cascade: ×%d
+
+fr: Nouveau record !
+tr: New record!
+
+fr: Plus aucun échange : on remélange !
+tr: No moves left: reshuffling!

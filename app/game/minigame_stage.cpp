@@ -42,6 +42,10 @@ constexpr const char* kBurstSound = "_stone_explosion.wav";
 constexpr const char* kOrangeHitSound = "effect\\EF_hit2.wav";
 constexpr const char* kBlueHitSound = "effect\\EF_hit4.wav";
 constexpr const char* kRewardSound = "_heal_effect.wav";
+// Rojeweled : un échange refusé claque comme un bouton, un remélange sonne
+// comme un début de sort.
+constexpr const char* kRefusedSwapSound = "버튼소리.wav";
+constexpr const char* kReshuffleSound = "effect\\EF_BeginSpell.wav";
 
 [[nodiscard]] InterfaceSoundFile SoundOf(const char* path) {
   return InterfaceSoundFile{.place = InterfaceSoundPlace::kSoundArchive, .path = path};
@@ -213,6 +217,7 @@ void MinigameStage::ApplyAnswers(MinigameWindows& windows) {
   const ro::ui::RojeweledAsk jewels = std::exchange(windows.rojeweled_answer, {});
   if (jewels.new_game) {
     rojeweled_.NewGame(rojeweled_clock_.watched_ms());
+    rojeweled_new_record_ = false;
   }
   if (jewels.clicked.has_value()) {
     rojeweled_.Click({jewels.clicked->row, jewels.clicked->column}, rojeweled_clock_.watched_ms());
@@ -239,8 +244,18 @@ void MinigameStage::PlayRojeweled() {
   for (int burst = 0; burst < news.bursts; ++burst) {
     sounds_.push_back(SoundOf(kBurstSound));
   }
+  if (news.refused_swaps > 0) {
+    sounds_.push_back(SoundOf(kRefusedSwapSound));
+  }
+  if (news.reshuffled) {
+    sounds_.push_back(SoundOf(kReshuffleSound));
+  }
   if (news.finished) {
     sounds_.push_back(SoundOf(kRewardSound));
+    // ⚠ LU AVANT QUE LE RECORD NE SE RANGE : le meilleur score est encore
+    // celui d'avant cette partie.
+    rojeweled_new_record_ =
+        rojeweled_.score() > 0 && rojeweled_.score() > record_->record.rojeweled_best;
   }
 }
 
@@ -341,13 +356,15 @@ void MinigameStage::ComposeRojeweled(MinigameWindows& windows, const MinigamePie
   }
   ro::ui::RojeweledView& view = windows.rojeweled_view;
   const std::uint32_t watched_ms = rojeweled_clock_.watched_ms();
+  const float gem_scale = rojeweled_.GemScale(watched_ms);
   for (int index = 0; index < ro::ui::kRojeweledCells; ++index) {
     const ro::sim::Match3Cell cell{index / ro::ui::kRojeweledSide, index % ro::ui::kRojeweledSide};
     const ro::sim::Match3Game::Offset offset = rojeweled_.OffsetAt(cell, watched_ms);
     view.gems[static_cast<std::size_t>(index)] =
         ro::ui::RojeweledGem{.kind = rojeweled_.KindAt(cell),
                              .offset_rows = offset.rows,
-                             .offset_columns = offset.columns};
+                             .offset_columns = offset.columns,
+                             .scale = gem_scale};
   }
   bursts_.clear();
   for (const ro::sim::Match3Burst& burst : rojeweled_.bursts()) {
@@ -358,6 +375,17 @@ void MinigameStage::ComposeRojeweled(MinigameWindows& windows, const MinigamePie
                                        static_cast<float>(ro::sim::kMatch3BurstMs))});
   }
   view.bursts = bursts_;
+  gains_.clear();
+  for (const ro::sim::Match3Gain& gain : rojeweled_.gains()) {
+    gains_.push_back(ro::ui::RojeweledGain{
+        .row = gain.row,
+        .column = gain.column,
+        .points = gain.points,
+        .combo = gain.combo,
+        .progress = std::min(1.0F, static_cast<float>(watched_ms - gain.started_ms) /
+                                       static_cast<float>(ro::sim::kMatch3GainMs))});
+  }
+  view.gains = gains_;
   view.selected.reset();
   if (const std::optional<ro::sim::Match3Cell> selected = rojeweled_.selected()) {
     view.selected = ro::ui::RojeweledCell{selected->row, selected->column};
@@ -370,9 +398,12 @@ void MinigameStage::ComposeRojeweled(MinigameWindows& windows, const MinigamePie
   }
   view.score = rojeweled_.score();
   view.moves_left = rojeweled_.moves_left();
-  view.combo = rojeweled_.combo();
+  view.combo = rojeweled_.ShownCombo(watched_ms);
+  view.best_combo = rojeweled_.best_combo();
   view.best_score = record_->record.rojeweled_best;
+  view.reshuffling = rojeweled_.phase() == ro::sim::Match3Phase::kReshuffling;
   view.over = rojeweled_.phase() == ro::sim::Match3Phase::kOver;
+  view.new_record = view.over && rojeweled_new_record_;
   for (std::size_t kind = 0; kind < kGemClasses.size(); ++kind) {
     view.art[kind] = SpriteOf(kind, kGemClasses[kind], kGemBoxPx, pieces.wardrobe, now_ms);
   }

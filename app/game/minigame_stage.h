@@ -167,6 +167,8 @@ class MinigameStage {
   bool record_unsaved_ = false;
   MinigameTrophyAnnouncer announcer_;
   ro::sim::Match3Game rojeweled_{0};
+  // La partie de Rojeweled finie a battu le meilleur score d'avant.
+  bool rojeweled_new_record_ = false;
   ro::sim::PegGame roggle_{0};
   bool seeded_ = false;
   WatchedClock rojeweled_clock_;
@@ -180,6 +182,7 @@ class MinigameStage {
   // LA COMPOSITION : ce que les vues désignent.
   std::vector<ro::ui::MinigameTrophyRow> trophy_rows_;
   std::vector<ro::ui::RojeweledBurst> bursts_;
+  std::vector<ro::ui::RojeweledGain> gains_;
   std::vector<ro::ui::RogglePeg> pegs_;
   std::vector<ro::ui::RogglePoint> guide_;
 };

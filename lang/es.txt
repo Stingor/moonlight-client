@@ -22231,3 +22231,12 @@ tr: ARENA
 
 fr: En arène
 tr: En la arena
+
+fr: Meilleure cascade : ×%d
+tr: Mejor cascada: ×%d
+
+fr: Nouveau record !
+tr: ¡Nuevo récord!
+
+fr: Plus aucun échange : on remélange !
+tr: No quedan intercambios: ¡a barajar!
