@@ -374,10 +374,8 @@ class Inventory {
   // ⚠ ELLE DOIT COUVRIR TOUS LES BITS DEMANDÉS, et non un seul : demander les
   // deux mains ne doit pas rendre la première épée d'un port à deux armes.
   //
-  // 🔴 ET LE BOUCLIER DEMANDE UN TRI DE PLUS, qui n'est pas ici : une arme à
-  // deux mains porte AUSSI son bit, donc elle répond. C'est `IsTwoHanded` qui
-  // l'écarte, à l'endroit qui dessine — une case d'ombre autour de cette
-  // fonction lui ferait mentir sur tous les autres emplacements.
+  // 🔴 UNE ARME À DEUX MAINS PORTE AUSSI LE BIT DU BOUCLIER, donc elle répond à
+  // cet emplacement. Qui veut l'en distinguer demande `IsTwoHanded`.
   [[nodiscard]] const InventoryItem* WornAt(std::uint32_t location) const;
 
   // Range ou sort un objet de l'onglet des favoris. Faux si la case est vide.

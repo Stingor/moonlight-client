@@ -57,8 +57,7 @@ inline constexpr std::uint32_t kEquipShadowMask = 0x3F4000;
 // LES DEUX MAINS ENSEMBLE — `EQP_ARMS`, `src/map/pc.hpp`.
 //
 // 🔴 UNE ARME À DEUX MAINS PORTE CE MASQUE ENTIER, donc elle répond aussi à la
-// case du bouclier. Sans ce nom, le mannequin dessinerait la même arme deux
-// fois, et un vrai port à deux armes serait indiscernable d'une claymore.
+// case du bouclier, où le mannequin la montre comme à celle de l'arme.
 inline constexpr std::uint32_t kEquipBothHands = kEquipWeapon | kEquipShield;
 
 [[nodiscard]] constexpr bool IsShadowLocation(std::uint32_t location) noexcept {

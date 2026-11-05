@@ -43,8 +43,8 @@ namespace moonclient {
 //
 // ⚠ LE RANGEMENT PAR EMPLACEMENT EST ICI, PAS DANS LA FENÊTRE. Savoir qu'un
 // chapeau d'apparat ne répond pas au bit d'un chapeau ordinaire, et qu'une arme
-// à deux mains ne doit pas se montrer dans la case du bouclier, demande de
-// connaître les drapeaux du serveur.
+// à deux mains se montre aussi dans la case du bouclier, demande de connaître
+// les drapeaux du serveur.
 class CharacterView {
  public:
   // LES NOMS DES FORGERONS, confiés une fois la description ouverte.

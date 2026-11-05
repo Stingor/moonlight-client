@@ -195,13 +195,9 @@ void CharacterView::Refresh(bool open, const ro::sim::World& world, bool costume
     if (piece == nullptr) {
       continue;
     }
-    // 🔴 LA CASE DU BOUCLIER SE VIDE DEVANT UNE ARME À DEUX MAINS. Le serveur
-    // lui donne les DEUX bits — c'est `EQP_ARMS` —, donc elle répond ici ; sans
-    // ce tri, le mannequin dessinerait la même arme deux fois et un vrai port à
-    // deux armes serait indiscernable d'une claymore.
-    if (slot == EquipSlot::kShield && ro::sim::IsTwoHanded(piece->worn_at)) {
-      continue;
-    }
+    // 🔴 UNE ARME À DEUX MAINS REMPLIT AUSSI LA CASE DU BOUCLIER : elle porte les
+    // deux bits (`EQP_ARMS`), et une case vide laisserait croire la main libre.
+    // Les deux cases désignent la même pièce, par sa `client_slot`.
 
     std::string name;
     if (items_ != nullptr && words_ != nullptr) {
