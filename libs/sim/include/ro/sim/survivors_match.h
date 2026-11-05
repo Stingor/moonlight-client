@@ -23,11 +23,15 @@ namespace ro::sim {
 //
 // UNE TRAME : [through_tick:4][count:1] puis `count` entrées des tics
 // (through_tick − count + 1 … through_tick), chacune [cap:1][bulletin:1], et
-// éventuellement [digest_tick:4][digest:8]. Tout est petit-boutiste. Chaque trame
-// redit les dernières entrées : la perte d'un datagramme est couverte par le
-// suivant, sans attendre de retransmission.
+// éventuellement [digest_tick:4][digest:8]. Tout est petit-boutiste.
+//
+// DEUX CHEMINS, DEUX RÔLES. Seul le chemin fiable, qui livre à tous les mêmes trames
+// dans le même ordre, fait avancer la partie confirmée : `Receive`. Le chemin rapide
+// peut perdre, doubler ou devancer : il ne sert qu'à mieux prédire le présent, `Hear`.
+// Deux clients ne peuvent donc pas confirmer des entrées différentes.
 
-// Les tics qu'une trame redit.
+// Les tics déjà envoyés qu'une trame redit, pour le chemin rapide. Une trame porte
+// en plus tous les tics que nulle autre n'a portés, si nombreux soient-ils.
 inline constexpr std::size_t kLockstepRedundantTicks = 10;
 // Un bulletin absent, sur le fil.
 inline constexpr std::uint8_t kLockstepNoBallot = 0xFF;
@@ -38,6 +42,9 @@ inline constexpr std::uint32_t kLockstepDigestEveryTicks = 50;
 // Le client ne se donne pas plus de cette avance sur le dernier tic confirmé :
 // au-delà, il attend les autres.
 inline constexpr std::uint32_t kLockstepMostLeadTicks = 25;
+// Les entrées d'un autre joueur gardées en attente de leur tic : le double de ce
+// que son avance permet à un client honnête. Au-delà, elles s'ignorent.
+inline constexpr std::size_t kLockstepMostPendingTicks = std::size_t{kLockstepMostLeadTicks} * 8U;
 // Une trame ne dépasse pas ces octets : le contrat du serveur.
 inline constexpr std::size_t kLockstepMostFrameBytes = 256;
 
@@ -74,13 +81,6 @@ struct SurvivorsCoopPart {
                                                         const SurvivorsRules& rules,
                                                         std::span<const SurvivorsCoopPart> parts);
 
-// UN JOUEUR QUI PART : à partir du tic qui suit `through_tick`, son héros passe au
-// robot, sur chaque client au même tic.
-struct LockstepLeave {
-  std::size_t player = 0;
-  std::uint32_t through_tick = 0;
-};
-
 // L'ÉTAT D'UNE PARTIE COOP SUR CE CLIENT.
 //
 // `confirmed` est la vérité : elle n'avance que par des entrées connues de tous.
@@ -95,12 +95,19 @@ class SurvivorsMatch {
 
   // UNE ENTRÉE LOCALE, une par tic. Faux si le client a trop d'avance : il attend.
   [[nodiscard]] bool PushLocal(const SurvivorsTeamInput& input);
-  // LA TRAME À ENVOYER, ou rien si ce tic n'en appelle pas.
+  // LA TRAME À ENVOYER, ou rien si ce tic n'en appelle pas. La partie finie, la
+  // dernière entrée part sans attendre son tour : plus aucune ne la suivra.
   [[nodiscard]] std::optional<std::vector<std::uint8_t>> TakeFrame();
-  // UNE TRAME REÇUE d'un autre joueur. Faux si elle est mal formée. Une entrée déjà
-  // connue s'ignore : UDP et TCP portent les mêmes.
+  // UNE TRAME DU CHEMIN FIABLE, d'un autre joueur. Faux si elle est mal formée. Une
+  // entrée déjà connue s'ignore.
   bool Receive(std::size_t player, std::span<const std::uint8_t> bytes);
-  void Leave(const LockstepLeave& leave);
+  // UNE TRAME DU CHEMIN RAPIDE : le dernier cap de ce joueur, pour le présent. Elle
+  // ne confirme rien.
+  void Hear(std::size_t player, std::span<const std::uint8_t> bytes);
+  // UN JOUEUR QUI PART, annoncé par le chemin fiable après toutes ses trames : son
+  // héros passe au robot au tic qui suit sa dernière entrée connue. Tous les clients
+  // ont reçu les mêmes : c'est le même tic partout.
+  void Leave(std::size_t player);
   // Exécute tous les tics dont les entrées sont connues, puis recalcule `present`.
   void Advance();
 
@@ -122,7 +129,9 @@ class SurvivorsMatch {
     std::uint32_t first_tick = 0;
     std::uint32_t known_through = 0;  // les tics < à ceci sont connus
     std::uint8_t last_heading = kNoHeading;
-    std::optional<std::uint32_t> left_after;  // robot à partir du tic qui suit
+    std::optional<std::uint32_t> heard_tick;  // le dernier tic du chemin rapide
+    std::uint8_t heard_heading = kNoHeading;
+    std::optional<std::uint32_t> robot_from;  // le robot joue à partir de ce tic
     std::optional<SurvivorsBot> robot;
   };
   [[nodiscard]] bool TickReady(std::uint32_t tick) const noexcept;
@@ -137,6 +146,7 @@ class SurvivorsMatch {
   std::array<Player, kMostHeroes> players_;
   std::uint32_t next_local_tick_ = 0;    // le tic que la prochaine entrée locale vaudra
   std::deque<SurvivorsTeamInput> sent_;  // les dernières entrées locales, pour la redondance
+  std::uint32_t framed_next_tick_ = 0;   // le premier tic qu'aucune trame n'a porté
   std::uint32_t frame_due_tick_ = 0;
   // Nos empreintes des derniers tics, et celles reçues des autres.
   struct DigestAt {

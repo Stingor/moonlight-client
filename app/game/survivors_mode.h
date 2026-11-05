@@ -258,7 +258,7 @@ class SurvivorsMode {
   std::array<std::optional<std::uint16_t>, ro::sim::kMostHeroes> ally_jobs_{};
   std::vector<ro::ui::SurvivorsPrepareCoopMember> coop_members_;
   std::vector<const char*> coop_refusals_;
-  bool coop_ready_ = false;
+  bool coop_wait_told_ = false;
   bool coop_left_told_ = false;
 };
 

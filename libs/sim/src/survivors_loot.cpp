@@ -291,7 +291,9 @@ void Purify(SurvivorsField& field, std::int32_t reach_units) {
 void SeizeGems(SurvivorsField& field) {
   const std::int32_t pull_start = std::max(field.rules->tuning.gem_pull_start_units, 1);
   for (SurvivorsGem& gem : field.gems) {
-    if (gem.pull_units == 0) gem.pull_units = pull_start;
+    if (gem.pull_units != 0) continue;
+    gem.pull_units = pull_start;
+    gem.pull_hero = static_cast<std::uint8_t>(field.stage);
   }
 }
 

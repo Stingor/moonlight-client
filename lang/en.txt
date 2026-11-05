@@ -476,6 +476,9 @@ tr: Reveal 25 different items in Roggle.
 fr: Dévoiler un item dans Roggle.
 tr: Reveal an item in Roggle.
 
+fr: En attente des autres joueurs…
+tr: Waiting for the other players…
+
 fr: En coop, relever un allié à terre, au prix d'une montée de niveau.
 tr: In co-op, revive a fallen ally, at the cost of a level-up.
 
@@ -517,6 +520,9 @@ tr: The party's game cannot start.
 
 fr: Le groupe compte plus de quatre membres.
 tr: The party has more than four members.
+
+fr: Le groupe ne répond plus : vous quittez la partie.
+tr: The party is no longer responding: you are leaving the game.
 
 fr: Le personnage est mort.
 tr: Your character is dead.
@@ -1790,6 +1796,9 @@ tr: Aim with the mouse, fine-tune with the wheel, click to shoot.
 fr: Vitesse de marche augmentée.
 tr: Increased walk speed.
 
+fr: Votre groupe est déjà en partie.
+tr: Your party is already in a game.
+
 fr: Vous montez votre Peco Peco : vitesse de marche augmentée.
 tr: You ride your Peco Peco: increased walk speed.
 
@@ -1840,6 +1849,9 @@ tr: Your character died in the game.
 
 fr: Vous avez reçu une invitation.
 tr: You received an invitation.
+
+fr: Vous n'êtes plus dans la partie du groupe.
+tr: You are no longer in the party's game.
 
 fr: Vous parlez
 tr: You are talking

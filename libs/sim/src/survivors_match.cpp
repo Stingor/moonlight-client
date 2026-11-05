@@ -113,7 +113,10 @@ std::optional<LockstepFrame> DecodeLockstepFrame(std::span<const std::uint8_t> b
 
 SurvivorsMatch::SurvivorsMatch(SurvivorsRun run, std::size_t local_player,
                                std::uint32_t input_delay_ticks)
-    : play_(std::move(run)), local_player_(local_player), next_local_tick_(input_delay_ticks) {
+    : play_(std::move(run)),
+      local_player_(local_player),
+      next_local_tick_(input_delay_ticks),
+      framed_next_tick_(input_delay_ticks) {
   // Les premiers tics, avant que la première entrée ne vaille : tout le monde à
   // l'arrêt.
   Player& local = players_[local_player_];
@@ -127,7 +130,7 @@ SurvivorsMatch::SurvivorsMatch(SurvivorsRun run, std::size_t local_player,
 }
 
 bool SurvivorsMatch::left(std::size_t player) const noexcept {
-  return players_[player].left_after.has_value();
+  return players_[player].robot_from.has_value();
 }
 
 std::uint32_t SurvivorsMatch::lead_ticks() const noexcept {
@@ -142,13 +145,21 @@ bool SurvivorsMatch::PushLocal(const SurvivorsTeamInput& input) {
   local.known_through = next_local_tick_ + 1U;
   ++next_local_tick_;
   sent_.push_back(input);
-  while (sent_.size() > kLockstepRedundantTicks) sent_.pop_front();
+  // Une entrée ne s'oublie qu'une fois portée par une trame : une longue image pousse
+  // plusieurs tics d'un coup, et aucun ne doit manquer aux autres.
+  while (sent_.size() > kLockstepRedundantTicks &&
+         next_local_tick_ - sent_.size() < framed_next_tick_) {
+    sent_.pop_front();
+  }
   return true;
 }
 
 std::optional<std::vector<std::uint8_t>> SurvivorsMatch::TakeFrame() {
-  if (sent_.empty() || next_local_tick_ < frame_due_tick_) return std::nullopt;
+  if (sent_.empty() || next_local_tick_ == framed_next_tick_) return std::nullopt;
+  const bool over = play_.run().field().phase == SurvivorsPhase::kOver;
+  if (next_local_tick_ < frame_due_tick_ && !over) return std::nullopt;
   frame_due_tick_ = next_local_tick_ + kLockstepFrameEveryTicks;
+  framed_next_tick_ = next_local_tick_;
   std::vector<std::uint8_t> bytes;
   bytes.reserve(kFrameHeaderBytes + sent_.size() * kInputBytes + kDigestBytes);
   PutU32(bytes, next_local_tick_ - 1U);
@@ -170,12 +181,13 @@ bool SurvivorsMatch::Receive(std::size_t player, std::span<const std::uint8_t> b
   const std::optional<LockstepFrame> frame = DecodeLockstepFrame(bytes);
   if (!frame.has_value()) return false;
   Player& other = players_[player];
+  if (other.robot_from.has_value()) return true;
   const std::uint64_t first_of_frame =
       std::uint64_t{frame->through_tick} + 1U - frame->inputs.size();
   for (std::size_t index = 0; index < frame->inputs.size(); ++index) {
     const std::uint64_t tick = first_of_frame + index;
     // Une entrée déjà connue s'ignore ; un trou se comble par une trame suivante.
-    if (tick != other.known_through) continue;
+    if (tick != other.known_through || other.pending.size() >= kLockstepMostPendingTicks) continue;
     other.pending.push_back(frame->inputs[index]);
     other.last_heading = frame->inputs[index].heading;
     ++other.known_through;
@@ -188,11 +200,23 @@ bool SurvivorsMatch::Receive(std::size_t player, std::span<const std::uint8_t> b
   return true;
 }
 
-void SurvivorsMatch::Leave(const LockstepLeave& leave) {
-  if (leave.player >= HeroCount(play_.run().field()) || leave.player == local_player_) return;
-  Player& player = players_[leave.player];
-  player.left_after = leave.through_tick;
-  const ClassRule* hero_class = ClassAt(play_.run().field(), leave.player);
+void SurvivorsMatch::Hear(std::size_t player, std::span<const std::uint8_t> bytes) {
+  if (player >= HeroCount(play_.run().field()) || player == local_player_) return;
+  const std::optional<LockstepFrame> frame = DecodeLockstepFrame(bytes);
+  if (!frame.has_value() || frame->inputs.empty()) return;
+  Player& other = players_[player];
+  if (other.robot_from.has_value()) return;
+  if (other.heard_tick.has_value() && frame->through_tick <= *other.heard_tick) return;
+  other.heard_tick = frame->through_tick;
+  other.heard_heading = frame->inputs.back().heading;
+}
+
+void SurvivorsMatch::Leave(std::size_t player_index) {
+  if (player_index >= HeroCount(play_.run().field()) || player_index == local_player_) return;
+  Player& player = players_[player_index];
+  if (player.robot_from.has_value()) return;
+  player.robot_from = player.known_through;
+  const ClassRule* hero_class = ClassAt(play_.run().field(), player_index);
   player.robot.emplace(hero_class != nullptr && hero_class->melee ? KnightBotProfile()
                                                                   : MageBotProfile());
 }
@@ -200,7 +224,7 @@ void SurvivorsMatch::Leave(const LockstepLeave& leave) {
 bool SurvivorsMatch::TickReady(std::uint32_t tick) const noexcept {
   for (std::size_t player = 0; player < HeroCount(play_.run().field()); ++player) {
     const Player& each = players_[player];
-    if (each.left_after.has_value() && tick > *each.left_after) continue;
+    if (each.robot_from.has_value() && tick >= *each.robot_from) continue;
     if (tick >= each.known_through) return false;
   }
   return true;
@@ -213,7 +237,7 @@ void SurvivorsMatch::RunConfirmedTick() {
   std::array<SurvivorsTeamInput, kMostHeroes> inputs{};
   for (std::size_t player = 0; player < count; ++player) {
     Player& each = players_[player];
-    if (each.left_after.has_value() && tick > *each.left_after) {
+    if (each.robot_from.has_value() && tick >= *each.robot_from) {
       // LE ROBOT REPREND : le même calcul sur chaque client, au même tic.
       run.PutHeroOnStage(player);
       inputs[player].heading = each.robot->Steer(run.field()).heading;
@@ -264,7 +288,9 @@ void SurvivorsMatch::RecomputePresent() {
   const std::size_t count = HeroCount(present.field());
   std::array<SurvivorsTeamInput, kMostHeroes> inputs{};
   for (std::size_t player = 0; player < count; ++player) {
-    inputs[player].heading = players_[player].last_heading;
+    const Player& each = players_[player];
+    const bool heard_newer = each.heard_tick.has_value() && *each.heard_tick >= each.known_through;
+    inputs[player].heading = heard_newer ? each.heard_heading : each.last_heading;
   }
   const Player& local = players_[local_player_];
   const std::uint32_t first = local.first_tick;

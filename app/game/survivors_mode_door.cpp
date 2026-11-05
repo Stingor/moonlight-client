@@ -69,11 +69,18 @@ void SurvivorsMode::FollowDoor(SurvivorsStage& stage, const SurvivorsContext& co
     stage.ShowEnding(std::move(*ending));
     clock_.Follow(false, context.now_ms);
   }
+  // QUITTER L'ACCUEIL QUITTE SON SALON : les autres n'attendront pas un joueur parti
+  // ailleurs, et aucun départ ne le rattrapera plus tard.
+  const auto forsake_lobby = [&] {
+    if (context.coop != nullptr && !stage.coop()) context.coop->Forsake(*context.link);
+  };
   if (stage.owns_screen()) {
+    forsake_lobby();
     windows.survivors_prepare_composed = false;
     return;
   }
   if (!windows.survivors_prepare.open) {
+    forsake_lobby();
     if (stage.screen() == SurvivorsScreen::kPreparing) stage.Close();
     windows.survivors_prepare_composed = false;
     windows.survivors_meta.CloseAll();
@@ -108,7 +115,10 @@ void SurvivorsMode::FollowDoor(SurvivorsStage& stage, const SurvivorsContext& co
                      context.tables, context.ranking, context.now_ms);
   windows.survivors_prepare_composed = true;
   FollowCoopDoor(stage, context, asked, refusal.has_value());
-  if (asked.start && !refusal.has_value() && !stage.coop()) Enter(stage, context, ChosenBolt());
+  if (asked.start && !refusal.has_value() && !stage.coop()) {
+    forsake_lobby();
+    Enter(stage, context, ChosenBolt());
+  }
 }
 
 void SurvivorsMode::Enter(SurvivorsStage& stage, const SurvivorsContext& context,
@@ -259,7 +269,6 @@ void SurvivorsMode::Exit(SurvivorsStage& stage, const SurvivorsContext& context)
     context.coop->Ask(*context.link, ro::net::SurvivorsCoopAction::kLeave);
   }
   coop_left_told_ = false;
-  coop_ready_ = false;
   // LA MUSIQUE REFAIT SUIVRE LA CARTE DU PERSONNAGE, au volume des options.
   context.music->Forget();
   context.audio->SetMusicVolume(music_volume_.player_volume());

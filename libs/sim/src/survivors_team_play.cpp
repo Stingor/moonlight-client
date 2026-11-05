@@ -12,6 +12,8 @@
 #include "ro/sim/survivors_geometry.h"
 #include "ro/sim/survivors_match.h"
 
+#include "survivors_fnv.h"
+
 namespace ro::sim {
 
 namespace {
@@ -23,9 +25,6 @@ constexpr std::uint8_t kLebPayloadMask = 0x7F;
 constexpr std::size_t kMostLebBytes = 5;
 constexpr std::size_t kByteBits = 8;
 constexpr std::size_t kU64Bytes = 8;
-// Le décalage de FNV-1a sur 64 bits, et son multiplicateur.
-constexpr std::uint64_t kFnvOffset = 14695981039346656037ULL;
-constexpr std::uint64_t kFnvPrime = 1099511628211ULL;
 
 [[nodiscard]] core::Error Corrupt(std::string detail) {
   return core::Fail(core::ErrorCode::kCorruptData, "journal coop : " + std::move(detail)).error();
@@ -158,60 +157,7 @@ void WritePlayer(Writer& out, std::uint16_t class_id, std::uint16_t first_skill_
   return heading == kNoHeading || heading < kHeadingSteps;
 }
 
-// FNV-1a, octet par octet : le même résultat sur toute machine.
-class Digest {
- public:
-  void Add(std::uint64_t value) noexcept {
-    for (std::size_t index = 0; index < kU64Bytes; ++index) {
-      hash_ ^= (value >> (index * kByteBits)) & 0xFFU;
-      hash_ *= kFnvPrime;
-    }
-  }
-  void AddSigned(std::int64_t value) noexcept { Add(static_cast<std::uint64_t>(value)); }
-  void AddPoint(FieldPoint point) noexcept {
-    AddSigned(point.x);
-    AddSigned(point.y);
-  }
-  [[nodiscard]] std::uint64_t value() const noexcept { return hash_; }
-
- private:
-  std::uint64_t hash_ = kFnvOffset;
-};
-
 }  // namespace
-
-std::uint64_t SurvivorsRulesDigest(const SurvivorsRules& rules) {
-  Digest digest;
-  digest.Add(rules.ruleset_version);
-  digest.Add(rules.run_ms);
-  digest.Add(rules.classes.size());
-  for (const ClassRule& rule : rules.classes) {
-    digest.Add(rule.class_id);
-    digest.AddSigned(rule.max_hp);
-    digest.Add(rule.walk_ms_per_cell);
-    digest.Add(rule.skill_pool.size());
-    digest.Add(rule.card_pool.size());
-  }
-  digest.Add(rules.skills.size());
-  for (const SurvivorsSkillRule& rule : rules.skills) {
-    digest.Add(rule.skill_id);
-    digest.Add(rule.levels.size());
-  }
-  digest.Add(rules.foes.size());
-  for (const FoeRule& rule : rules.foes) {
-    digest.Add(rule.foe_id);
-    digest.AddSigned(rule.hp);
-    digest.AddSigned(rule.touch_damage);
-    digest.Add(rule.exp);
-  }
-  digest.Add(rules.arenas.size());
-  for (const SurvivorsTeamScale& scale : kTeamScales) {
-    digest.AddSigned(scale.exp_needed_pct);
-    digest.AddSigned(scale.foe_hp_pct);
-    digest.AddSigned(scale.batch_pct);
-  }
-  return digest.value();
-}
 
 std::vector<std::uint8_t> EncodeSurvivorsCoopPart(const SurvivorsCoopPart& part) {
   Writer out;
@@ -370,7 +316,7 @@ core::Result<SurvivorsTeamJournal> DecodeSurvivorsTeamJournal(std::span<const st
 }
 
 std::uint64_t SurvivorsDigest(const SurvivorsField& field) {
-  Digest digest;
+  FnvDigest digest;
   digest.Add(field.ticks);
   digest.Add(field.step);
   digest.Add(static_cast<std::uint64_t>(field.phase));

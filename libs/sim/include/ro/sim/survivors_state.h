@@ -309,6 +309,7 @@ struct SurvivorsGem {
   FieldPoint previous_position;
   std::uint32_t exp = 0;
   std::int32_t pull_units = 0;  // 0 tant que l'aimant ne l'a pas saisie
+  std::uint8_t pull_hero = 0;   // le héros qui l'a saisie, le seul qu'elle suit
 };
 // Le bilan d'une partie : ce que le score lit, et ce que le rejeu compare.
 struct SurvivorsTally {

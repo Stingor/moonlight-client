@@ -145,7 +145,16 @@ class SurvivorsStage {
   }
   // Ce que le fil a apporté pour la partie coop, et ce qu'il doit porter.
   void CoopReceive(std::size_t player, std::span<const std::uint8_t> payload);
-  void CoopLeave(const ro::sim::LockstepLeave& leave);
+  void CoopHear(std::size_t player, std::span<const std::uint8_t> payload);
+  void CoopLeave(std::size_t player);
+  // La partie confirmée est finie : plus aucune entrée de ce joueur n'y compte.
+  [[nodiscard]] bool coop_over() const noexcept;
+  // Le temps d'écran depuis que le dernier tic confirmé a changé : celui qu'on passe
+  // à attendre les autres.
+  [[nodiscard]] std::uint64_t coop_stalled_ms() const noexcept { return coop_stalled_ms_; }
+  // Ce joueur quitte l'équipe, quel que soit l'écran : les autres continuent sans
+  // lui, avec le robot, et il passe au bilan.
+  void AbandonCoop();
   [[nodiscard]] std::optional<std::vector<std::uint8_t>> TakeCoopFrame();
   // L'arène est montée : kLoading → kArriving.
   void Loaded();
@@ -225,6 +234,9 @@ class SurvivorsStage {
   // Le lockstep d'une partie coop ; `play_` montre alors son présent.
   std::optional<ro::sim::SurvivorsMatch> match_;
   std::uint32_t coop_pending_ms_ = 0;
+  std::uint32_t coop_last_tick_ = 0;
+  std::uint64_t coop_stalled_ms_ = 0;
+  std::vector<ro::sim::SurvivorsOffer> coop_offers_;
   std::optional<ro::sim::SurvivorsAnswer> coop_ballot_;
   std::optional<SurvivorsEnding> ending_;
   SurvivorsRunBoard board_;

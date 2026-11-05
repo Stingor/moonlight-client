@@ -117,6 +117,10 @@ FrameOutcome SurvivorsCoopMode::ApplyFrame(const ro::net::Frame& frame) {
       std::optional<ro::net::SurvivorsCoopStart> start =
           ro::net::DecodeSurvivorsCoopStart(frame.bytes);
       if (!start.has_value()) return FrameOutcome::kUndecodable;
+      // Le fil est ordonné : ce qui précède un départ vient de la partie d'avant.
+      frames_.clear();
+      leaves_.clear();
+      excluded_ = false;
       start_ = std::move(*start);
       return FrameOutcome::kApplied;
     }
@@ -147,6 +151,7 @@ void SurvivorsCoopMode::Forget() {
   leaves_.clear();
   roster_.clear();
   names_.clear();
+  excluded_ = false;
 }
 
 std::optional<ro::net::SurvivorsCoopStart> SurvivorsCoopMode::TakeStart() {
@@ -162,7 +167,18 @@ void SurvivorsCoopMode::Ask(ro::net::Connection& link, ro::net::SurvivorsCoopAct
   link.Send(*bytes);
 }
 
-void SurvivorsCoopMode::Roster(const ro::net::SurvivorsCoopStart& start) {
+void SurvivorsCoopMode::Forsake(ro::net::Connection& link) {
+  if (lobby_.state != ro::net::SurvivorsCoopState::kLobby && !start_.has_value()) return;
+  Ask(link, ro::net::SurvivorsCoopAction::kLeave);
+  lobby_ = {};
+  start_.reset();
+}
+
+bool SurvivorsCoopMode::TakeExcluded() noexcept { return std::exchange(excluded_, false); }
+
+void SurvivorsCoopMode::Roster(const ro::net::SurvivorsCoopStart& start,
+                               std::uint32_t own_char_id) {
+  own_char_id_ = own_char_id;
   roster_.clear();
   names_.clear();
   for (const ro::net::SurvivorsCoopPlayer& player : start.players) {
@@ -191,7 +207,7 @@ void SurvivorsCoopMode::Carry(SurvivorsStage& stage, ro::net::Connection& link,
   if (fast_path.take) {
     for (const ro::net::SurvivorsCoopFrame& frame : fast_path.take()) {
       if (const std::optional<std::size_t> player = PlayerOf(frame.char_id)) {
-        stage.CoopReceive(*player, frame.payload);
+        stage.CoopHear(*player, frame.payload);
       }
     }
   }
@@ -203,8 +219,10 @@ void SurvivorsCoopMode::Carry(SurvivorsStage& stage, ro::net::Connection& link,
   frames_.clear();
   // Un départ se lit APRÈS les trames : sur le TCP, il les suit toutes.
   for (const ro::net::SurvivorsCoopLeft& left : leaves_) {
-    if (const std::optional<std::size_t> player = PlayerOf(left.char_id)) {
-      stage.CoopLeave(ro::sim::LockstepLeave{.player = *player, .through_tick = left.through_tick});
+    if (left.char_id == own_char_id_) {
+      excluded_ = true;
+    } else if (const std::optional<std::size_t> player = PlayerOf(left.char_id)) {
+      stage.CoopLeave(*player);
     }
   }
   leaves_.clear();

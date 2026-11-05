@@ -422,11 +422,17 @@ void GatherGems(SurvivorsField& field) {
   std::size_t kept = 0;
   for (std::size_t index = 0; index < field.gems.size(); ++index) {
     SurvivorsGem gem = field.gems[index];
-    gem.previous_position = gem.position;
+    // UNE GEMME SAISIE NE SUIT QUE CELUI QUI L'A SAISIE, et se lâche s'il tombe.
+    if (gem.pull_units > 0 && gem.pull_hero != field.stage && HeroAt(field, gem.pull_hero).down) {
+      gem.pull_units = 0;
+    }
+    const bool followed_elsewhere = gem.pull_units > 0 && gem.pull_hero != field.stage;
+    if (!followed_elsewhere) gem.previous_position = gem.position;
     if (gem.pull_units == 0 && DistanceSquared(gem.position, hero) <= magnet * magnet) {
       gem.pull_units = pull_start;
+      gem.pull_hero = static_cast<std::uint8_t>(field.stage);
     }
-    if (gem.pull_units > 0) {
+    if (gem.pull_units > 0 && !followed_elsewhere) {
       const std::uint32_t distance =
           IntegerSqrt(static_cast<std::uint64_t>(DistanceSquared(gem.position, hero)));
       const auto stride =

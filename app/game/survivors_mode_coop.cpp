@@ -29,6 +29,10 @@ using ro::net::SurvivorsCoopState;
 // Le visage d'un personnage sans acteur : le même que seul.
 constexpr std::uint8_t kFallbackFaceSex = 1;
 constexpr std::uint16_t kFallbackFaceHair = 1;
+// L'attente des autres se dit après ceci, et ce joueur renonce après cela : un allié
+// figé mais connecté ne doit retenir personne à jamais.
+constexpr std::uint64_t kCoopWaitNoticeMs = 3000;
+constexpr std::uint64_t kCoopGiveUpMs = 30000;
 
 [[nodiscard]] bool Sitting(const ro::sim::World& world) {
   const ro::sim::Actor* player = world.player();
@@ -44,12 +48,10 @@ void SurvivorsMode::FollowCoopDoor(SurvivorsStage& stage, const SurvivorsContext
   MinigameWindows& windows = *context.minigames;
   const ro::net::SurvivorsCoopLobby& lobby = coop.lobby();
   const bool in_lobby = lobby.state == SurvivorsCoopState::kLobby;
-  if (!in_lobby) coop_ready_ = false;
 
   if (asked.coop_enter) coop.Ask(*context.link, SurvivorsCoopAction::kEnter);
   if (asked.coop_leave) {
     coop.Ask(*context.link, SurvivorsCoopAction::kLeave);
-    coop_ready_ = false;
   }
   if (asked.coop_ready && !refused) {
     // LA PART DE CE JOUEUR : la partie libre que l'accueil a réglée, et son apparence.
@@ -80,12 +82,15 @@ void SurvivorsMode::FollowCoopDoor(SurvivorsStage& stage, const SurvivorsContext
       const std::vector<std::uint8_t> look = EncodeCoopLook(face);
       bytes.insert(bytes.end(), look.begin(), look.end());
       coop.Ask(*context.link, SurvivorsCoopAction::kReady, bytes);
-      coop_ready_ = true;
     }
   }
 
+  // CE JOUEUR EST PRÊT QUAND LE SERVEUR LE DIT : un paquet refusé par sa cadence ne
+  // laisse pas croire le contraire.
+  bool own_ready = false;
   coop_members_.clear();
   for (const ro::net::SurvivorsCoopMember& member : lobby.members) {
+    own_ready = own_ready || (member.char_id == context.own_char_id && member.ready);
     coop_members_.push_back(
         ro::ui::SurvivorsPrepareCoopMember{.name = member.name.c_str(), .ready = member.ready});
   }
@@ -102,9 +107,12 @@ void SurvivorsMode::FollowCoopDoor(SurvivorsStage& stage, const SurvivorsContext
          ro::core::TrText("Un membre du groupe n'est ni en ville ni en intérieur."));
   say_if(ro::net::kSurvivorsCoopNoClient,
          ro::core::TrText("Un membre du groupe joue sur un client qui ne connaît pas la coop."));
+  if (lobby.state == SurvivorsCoopState::kPlaying) {
+    coop_refusals_.push_back(ro::core::TrText("Votre groupe est déjà en partie."));
+  }
   windows.survivors_prepare_view.coop = ro::ui::SurvivorsPrepareCoop{.shown = coop.announced(),
                                                                      .in_lobby = in_lobby,
-                                                                     .ready = coop_ready_,
+                                                                     .ready = own_ready,
                                                                      .members = coop_members_,
                                                                      .refusals = coop_refusals_};
   EnterCoop(stage, context);
@@ -121,7 +129,6 @@ void SurvivorsMode::EnterCoop(SurvivorsStage& stage, const SurvivorsContext& con
     context.say(ro::core::Tr("La partie du groupe ne peut pas commencer."));
     ro::core::LogWarning("coop : {}", why);
     coop.Ask(*context.link, SurvivorsCoopAction::kLeave);
-    coop_ready_ = false;
   };
   if (!departure.has_value()) {
     refuse("le départ se lit mal, ou les règles des clients diffèrent");
@@ -137,7 +144,9 @@ void SurvivorsMode::EnterCoop(SurvivorsStage& stage, const SurvivorsContext& con
     refuse("le sol de l'arène ne se lit pas");
     return;
   }
-  coop.Roster(*started);
+  coop.Roster(*started, context.own_char_id);
+  // Ce que le chemin rapide a gardé vient de la partie d'avant.
+  if (context.voice != nullptr) (void)context.voice->TakeCoop();
   stage.Open();
   if (auto begun = stage.BeginCoop(Rules(), std::move(*walk), departure->start,
                                    departure->local_player, departure->input_delay_ticks);
@@ -150,6 +159,7 @@ void SurvivorsMode::EnterCoop(SurvivorsStage& stage, const SurvivorsContext& con
   ally_faces_ = departure->looks;
   ally_jobs_ = {};
   coop_left_told_ = false;
+  coop_wait_told_ = false;
   if (!posture_.seated_by_us() && posture_.SitOnEntry(Sitting(*context.world)) &&
       context.link->is_open()) {
     if (auto sat = ro::net::RequestSit(*context.link, true); !sat) {
@@ -176,8 +186,25 @@ bool SurvivorsMode::FollowCoopFrame(SurvivorsStage& stage, const SurvivorsContex
     };
   }
   context.coop->Carry(stage, *context.link, fast_path);
-  // UN JOUEUR QUI ABANDONNE quitte l'équipe tout de suite, sans attendre son bilan.
-  if (!stage.coop() && !coop_left_told_) {
+  const bool excluded = context.coop->TakeExcluded();
+  if (stage.coop() && !stage.coop_over() && !coop_left_told_) {
+    if (excluded) {
+      context.say(ro::core::Tr("Vous n'êtes plus dans la partie du groupe."));
+      stage.AbandonCoop();
+    } else if (stage.coop_stalled_ms() >= kCoopGiveUpMs) {
+      context.say(ro::core::Tr("Le groupe ne répond plus : vous quittez la partie."));
+      stage.AbandonCoop();
+    } else if (stage.coop_stalled_ms() < kCoopWaitNoticeMs) {
+      coop_wait_told_ = false;
+    } else if (!coop_wait_told_) {
+      coop_wait_told_ = true;
+      context.say(ro::core::Tr("En attente des autres joueurs…"));
+    }
+  }
+  // UN JOUEUR QUI ABANDONNE OU QUI A FINI quitte l'équipe tout de suite, sans attendre
+  // de quitter son bilan : c'est ce qui rend le salon au groupe. Ses dernières entrées
+  // viennent de partir.
+  if ((!stage.coop() || stage.coop_over()) && !coop_left_told_) {
     context.coop->Ask(*context.link, SurvivorsCoopAction::kLeave);
     coop_left_told_ = true;
   }

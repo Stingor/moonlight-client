@@ -51,7 +51,7 @@ struct SurvivorsCoopDeparture {
     const ro::sim::SurvivorsRules& rules);
 
 // LE CHEMIN RAPIDE, par l'UDP de la voix : ce qu'il a apporté, et ce qu'on lui confie.
-// Vide, le serveur de carte porte tout.
+// Il ne fait que mieux prédire le présent ; le serveur de carte porte la partie.
 struct SurvivorsCoopFastPath {
   std::function<std::vector<ro::net::SurvivorsCoopFrame>()> take;
   std::function<void(std::vector<std::uint8_t>)> post;
@@ -80,6 +80,9 @@ class SurvivorsCoopMode {
   void Ask(ro::net::Connection& link, ro::net::SurvivorsCoopAction action,
            std::span<const std::uint8_t> part = {});
 
+  // Ce joueur renonce au salon ou au départ qui l'attend, une fois.
+  void Forsake(ro::net::Connection& link);
+
   // UNE IMAGE DE PARTIE COOP : ce que le fil a apporté entre dans l'étage, un joueur
   // parti passe au robot, et les trames de l'étage partent par les deux chemins. La
   // voix peut manquer : le serveur de carte porte tout.
@@ -89,7 +92,9 @@ class SurvivorsCoopMode {
   // Les noms des joueurs de la partie, dans l'ordre des places.
   [[nodiscard]] std::span<const std::string> player_names() const noexcept { return names_; }
   // Tient la liste des joueurs pendant la partie.
-  void Roster(const ro::net::SurvivorsCoopStart& start);
+  void Roster(const ro::net::SurvivorsCoopStart& start, std::uint32_t own_char_id);
+  // Le serveur a sorti ce joueur de la partie, une fois.
+  [[nodiscard]] bool TakeExcluded() noexcept;
 
  private:
   [[nodiscard]] std::optional<std::size_t> PlayerOf(std::uint32_t char_id) const noexcept;
@@ -101,6 +106,8 @@ class SurvivorsCoopMode {
   std::vector<ro::net::SurvivorsCoopFrame> frames_;
   std::vector<ro::net::SurvivorsCoopLeft> leaves_;
   std::vector<std::uint32_t> roster_;
+  std::uint32_t own_char_id_ = 0;
+  bool excluded_ = false;
   std::vector<std::string> names_;
 };
 

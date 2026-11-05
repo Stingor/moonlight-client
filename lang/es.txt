@@ -476,6 +476,9 @@ tr: Revela 25 objetos distintos en Roggle.
 fr: Dévoiler un item dans Roggle.
 tr: Revela un objeto en Roggle.
 
+fr: En attente des autres joueurs…
+tr: Esperando a los demás jugadores…
+
 fr: En coop, relever un allié à terre, au prix d'une montée de niveau.
 tr: En cooperativo, levanta a un aliado caído, a costa de una subida de nivel.
 
@@ -517,6 +520,9 @@ tr: La partida del grupo no puede empezar.
 
 fr: Le groupe compte plus de quatre membres.
 tr: El grupo tiene más de cuatro miembros.
+
+fr: Le groupe ne répond plus : vous quittez la partie.
+tr: El grupo ya no responde: abandonas la partida.
 
 fr: Le personnage est mort.
 tr: Tu personaje está muerto.
@@ -1790,6 +1796,9 @@ tr: Apunta con el ratón, afina con la rueda y haz clic para disparar.
 fr: Vitesse de marche augmentée.
 tr: Velocidad de marcha aumentada.
 
+fr: Votre groupe est déjà en partie.
+tr: Tu grupo ya está en una partida.
+
 fr: Vous montez votre Peco Peco : vitesse de marche augmentée.
 tr: Montas tu Peco Peco: velocidad de marcha aumentada.
 
@@ -1840,6 +1849,9 @@ tr: Tu personaje ha muerto en el juego.
 
 fr: Vous avez reçu une invitation.
 tr: Has recibido una invitación.
+
+fr: Vous n'êtes plus dans la partie du groupe.
+tr: Ya no estás en la partida del grupo.
 
 fr: Vous parlez
 tr: Está hablando

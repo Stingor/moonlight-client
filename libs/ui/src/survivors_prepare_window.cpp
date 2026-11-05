@@ -302,6 +302,9 @@ void DrawCoop(const SurvivorsPrepareCoop& coop, SurvivorsPrepareAsk& asked, cons
     if (SkinButton(core::Tr("Coop : salon du groupe"), art, ImVec2(-1.0F, 0.0F))) {
       asked.coop_enter = true;
     }
+    for (const char* const refusal : coop.refusals) {
+      ColoredText(kRefusalColor, SurvivorsText(refusal));
+    }
     return;
   }
   ImGui::TextUnformatted(core::Tr("Salon du groupe"));

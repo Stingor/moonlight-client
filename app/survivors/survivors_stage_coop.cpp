@@ -37,6 +37,9 @@ ro::core::Result<void> SurvivorsStage::BeginCoop(const ro::sim::SurvivorsRules& 
   if (!run) return std::unexpected(run.error());
   match_.emplace(std::move(*run), local_player, input_delay_ticks);
   coop_pending_ms_ = 0;
+  coop_last_tick_ = 0;
+  coop_stalled_ms_ = 0;
+  coop_offers_.clear();
   coop_ballot_.reset();
   play_->Show(match_->present(), 0);
   return {};
@@ -46,8 +49,24 @@ void SurvivorsStage::CoopReceive(std::size_t player, std::span<const std::uint8_
   if (match_.has_value()) (void)match_->Receive(player, payload);
 }
 
-void SurvivorsStage::CoopLeave(const ro::sim::LockstepLeave& leave) {
-  if (match_.has_value()) match_->Leave(leave);
+void SurvivorsStage::CoopHear(std::size_t player, std::span<const std::uint8_t> payload) {
+  if (match_.has_value()) match_->Hear(player, payload);
+}
+
+void SurvivorsStage::CoopLeave(std::size_t player) {
+  if (match_.has_value()) match_->Leave(player);
+}
+
+bool SurvivorsStage::coop_over() const noexcept {
+  return match_.has_value() && match_->confirmed().field().phase == SurvivorsPhase::kOver;
+}
+
+void SurvivorsStage::AbandonCoop() {
+  if (!match_.has_value()) return;
+  play_->Abandon();
+  ending_ = EndingOf(play_->run().field(), board_);
+  match_.reset();
+  Enter(SurvivorsScreen::kSummary);
 }
 
 std::optional<std::vector<std::uint8_t>> SurvivorsStage::TakeCoopFrame() {
@@ -69,11 +88,7 @@ void SurvivorsStage::AdvanceCoop(std::uint32_t elapsed_ms, const SurvivorsIntent
     Enter(SurvivorsScreen::kPaused);
   } else if (screen_ == SurvivorsScreen::kPaused) {
     if (intent.abandon) {
-      // Le joueur quitte l'équipe ; les autres continuent sans lui, avec le robot.
-      play_->Abandon();
-      ending_ = EndingOf(play_->run().field(), board_);
-      match_.reset();
-      Enter(SurvivorsScreen::kSummary);
+      AbandonCoop();
       return;
     }
     if ((intent.escape || intent.resume) && guard_.Accepts(clock_ms_)) {
@@ -99,6 +114,9 @@ void SurvivorsStage::AdvanceCoop(std::uint32_t elapsed_ms, const SurvivorsIntent
     coop_pending_ms_ -= ro::sim::kSurvivorsStepMs;
   }
   match_->Advance();
+  const std::uint32_t confirmed_tick = match_->confirmed().field().ticks;
+  coop_stalled_ms_ = confirmed_tick == coop_last_tick_ ? coop_stalled_ms_ + elapsed_ms : 0;
+  coop_last_tick_ = confirmed_tick;
   news_ = match_->TakeNews();
   chests_.insert(chests_.end(), news_.chests.begin(), news_.chests.end());
   play_->Show(match_->present(), coop_pending_ms_);
@@ -118,7 +136,13 @@ void SurvivorsStage::FollowCoopRun() {
     return;
   }
   if (field.phase == SurvivorsPhase::kChoosing) {
-    if (screen_ != SurvivorsScreen::kChoosing) Enter(SurvivorsScreen::kChoosing);
+    // UN VOTE QUI EN SUIT UN AUTRE, ou une relance, offre autre chose sans quitter la
+    // phase : il repasse par l'entrée, pour qu'un clic parti trop tôt ne vote pas pour
+    // une offre qu'on n'a pas lue.
+    if (screen_ != SurvivorsScreen::kChoosing || coop_offers_ != field.offers) {
+      coop_offers_ = field.offers;
+      Enter(SurvivorsScreen::kChoosing);
+    }
     return;
   }
   if (field.hold_ticks_left > 0) {

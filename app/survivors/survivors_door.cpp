@@ -43,7 +43,9 @@ bool FreezeAndSave(SurvivorsStage& stage, const std::filesystem::path& client_ro
   if (!stage.Freeze()) return false;
   const ro::sim::SurvivorsPlay* play = stage.play();
   const SurvivorsEnding* ending = stage.ending();
-  if (play == nullptr || ending == nullptr) return true;
+  // Une partie coop n'a pas de journal à rejouer : elle laisse celui de la dernière
+  // partie seule.
+  if (play == nullptr || ending == nullptr || stage.board().coop) return true;
   if (auto saved = SaveInterruptedRun(client_root, play->journal(), *ending); !saved) {
     ro::core::LogWarning("survivors : partie interrompue non écrite — {}",
                          ro::core::Describe(saved.error()));

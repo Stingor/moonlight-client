@@ -495,16 +495,19 @@ SurvivorsNews SurvivorsRun::TakeNews() { return std::exchange(field_.news, Survi
 
 void SurvivorsRun::Orbs(std::vector<SurvivorsOrb>& out) const {
   out.clear();
-  survivors::CollectOrbs(field_, out);
-  // Les orbes des alliés : chacun passe en scène le temps de les lire, et le
-  // héros 0 y revient avant de rendre la main.
-  if (field_.allies.empty()) return;
+  if (field_.allies.empty()) {
+    survivors::CollectOrbs(field_, out);
+    return;
+  }
+  // Chaque héros debout passe en scène le temps de lire ses orbes, et celui qui y
+  // était y revient avant de rendre la main.
   auto& staged = const_cast<SurvivorsField&>(field_);
-  for (std::size_t index = 1; index < HeroCount(field_); ++index) {
+  const std::size_t was_staged = staged.stage;
+  for (std::size_t index = 0; index < HeroCount(field_); ++index) {
     PutOnStage(staged, index);
     if (!staged.hero.down) survivors::CollectOrbs(staged, out);
   }
-  PutOnStage(staged, 0);
+  PutOnStage(staged, was_staged);
 }
 
 }  // namespace ro::sim
