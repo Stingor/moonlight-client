@@ -226,6 +226,11 @@ struct EventRouting {
 // ⚠ L'INTERFACE L'A DÉJÀ VU quand cette fonction le reçoit : elle ne sait ce
 // qu'il y a sous le curseur que si elle a vu la souris bouger, et le lui donner
 // après coup lui ferait manquer d'une image ce qu'elle doit savoir maintenant.
+// LA TOUCHE ENFONCÉE PART-ELLE AU JEU ? Le verdict de `KeyGoesToGame`, avec ce que
+// le monde et la conversation réclament à cet instant.
+[[nodiscard]] bool KeyDownGoesToGame(const EventRouting& to, const ro::ui::InputGate& gate,
+                                     const SDL_KeyboardEvent& key);
+
 void RouteEvent(const EventRouting& to, const SDL_Event& event);
 
 }  // namespace moonclient

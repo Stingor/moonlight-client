@@ -2099,7 +2099,8 @@ add_executable(moonclient
     game/ui_stage_battleground.cpp
     game/ui_stage_navigation.cpp
     game/map_editor_keys.cpp
-    game/window_events.cpp)
+    game/window_events.cpp
+    game/window_key_gate.cpp)
 
 target_link_libraries(moonclient
     PRIVATE moonclient_chatlinks moonclient_chatcommands moonclient_skillrefusal moonclient_skillrules moonclient_songmusic moonclient_music moonclient_ranknotices moonclient_chatpreview moonclient_cursor moonclient_targeting moonclient_quickcast moonclient_skillfacts moonclient_calloptions moonclient_spritesounds moonclient_debug moonclient_versus moonclient_damage moonclient_display moonclient_entitybars moonclient_names moonclient_equip moonclient_effect_nodes moonclient_effects moonclient_stage moonclient_map_sign moonclient_screenshot moonclient_voice moonclient_voiceoptions moonclient_itemdrop moonclient_items moonclient_itemtoast moonclient_balloons moonclient_statuses moonclient_titles

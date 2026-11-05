@@ -127,17 +127,6 @@ void VisitOrApproachStore(const EventRouting& to, std::uint32_t owner_id,
   return true;
 }
 
-// LE DIALOGUE EST-IL À L'ÉCRAN, ET MONTRE-T-IL UNE LISTE ? La fenêtre suit le
-// monde sans rien décider : c'est donc le monde qui répond, et la boucle n'a pas
-// à interroger l'affichage.
-[[nodiscard]] bool NpcDialogShown(const ro::sim::World* world) {
-  return world != nullptr && world->npc_dialog().has_value();
-}
-
-[[nodiscard]] bool NpcMenuShown(const ro::sim::World* world) {
-  return NpcDialogShown(world) && world->npc_dialog()->prompt == ro::sim::NpcPrompt::kMenu;
-}
-
 [[nodiscard]] KeyPress KeyPressOf(const EventRouting& to) {
   return {.chat = to.chat,
           .skills = to.grimoire,
@@ -611,33 +600,7 @@ void RouteEvent(const EventRouting& to, const SDL_Event& event) {
       break;
 
     case SDL_EVENT_KEY_DOWN:
-      // 🔴 DEUX AVALAGES, ET PAS UN SEUL. Tant que l'interface prenait le
-      // clavier SANS NUANCE, la barre de conversation éteignait le jeu entier :
-      // ni F1 à F9, ni Alt+E, ni Inser tant qu'elle avait le focus — et un objet
-      // simplement GLISSÉ faisait la même chose, ImGui comptant l'élément tenu
-      // comme une prise de clavier.
-      //
-      // Une SAISIE ne réclame que les touches qui écrivent : `GameOnlyKey` dit
-      // celles qu'elle ne peut pas utiliser, et elles reviennent au jeu. Une
-      // prise TOTALE — une modale — garde tout, parce qu'il faut lui répondre
-      // avant le reste.
-      //
-      // 🔴 ET LA BARRE DÉPLIÉE PAR LE BATTLE MODE RÉCLAME LES FRAPPES, même
-      // sans le clavier : une lettre tapée là s'écrit dedans au lieu de faire
-      // marcher le personnage. Voir `ChatBarKeepsKey`.
-      //
-      // 🔴 ET LE DIALOGUE D'UN PNJ GARDE CE QU'IL LIT, lui aussi sans le
-      // clavier : Entrée y répond au script, et déplier la conversation
-      // par-dessus la page ferait taper la frappe suivante dans une phrase.
-      if (!KeyGoesToGame({.interface_has_keyboard = gate.keyboard_to_ui,
-                          .typing = gate.typing_to_ui,
-                          .chat_bar_takes_typing =
-                              to.chat != nullptr &&
-                              ro::ui::ChatBarTakesTyping(to.chat->input.battle_mode,
-                                                         to.chat->input.unfolded, gate.text_to_ui),
-                          .npc_dialog_open = NpcDialogShown(to.world),
-                          .npc_menu_open = NpcMenuShown(to.world)},
-                         event.key.key, event.key.mod)) {
+      if (!KeyDownGoesToGame(to, gate, event.key)) {
         break;
       }
       // LE MODE CLAVIER DU GRIMOIRE PREND SA TOUCHE AVANT TOUT : sinon F1

@@ -199,6 +199,9 @@ struct ChatInputState {
   // en tête d'image.
   bool enter_pending = false;
   bool escape_pending = false;
+  // Alt Gr vient de lancer une macro : le caractère que sa frappe compose ne
+  // doit pas entrer dans le champ.
+  bool altgr_text_pending = false;
   // CE QUE LE JOUEUR A TAPÉ PENDANT QUE LA BARRE N'AVAIT PAS ENCORE LE CLAVIER.
   //
   // 🔴 MIS DE CÔTÉ, PAS ÉCRIT DANS LE TAMPON. ImGui vide sa file de caractères

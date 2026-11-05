@@ -19,6 +19,16 @@ void Game::PumpEvents(std::uint32_t now_ms) {
     if (NoteAfkInput(event, now_ms)) {
       continue;
     }
+    // 🔴 LE CARACTÈRE D'UNE MACRO LANCÉE PAR ALT GR N'ENTRE PAS DANS LE CHAMP. Il
+    // suit sa touche ; une touche suivante prouve qu'elle n'en composait aucun,
+    // et le caractère à venir est alors le sien.
+    ro::ui::ChatInputState& chat_input = windows_.chat.main.input;
+    if (event.type == SDL_EVENT_KEY_DOWN || event.type == SDL_EVENT_KEY_UP) {
+      chat_input.altgr_text_pending = false;
+    } else if (event.type == SDL_EVENT_TEXT_INPUT && chat_input.altgr_text_pending) {
+      chat_input.altgr_text_pending = false;
+      continue;
+    }
     // L'INTERFACE VOIT TOUT, AVANT TOUT LE MONDE : il lui faut avoir vu la souris
     // bouger, et ce qu'elle en dit décide à qui revient le geste (`window_events.h`).
     interface_->TakeEvent(event);

@@ -38,7 +38,8 @@ namespace moonclient {
 //   - Ctrl+Alt, quand ce faux Ctrl passe quand même ;
 //   - MODE, la touche de sélection de niveau des claviers sous X11.
 // Le prix : sur un clavier sans AltGr, Alt droit ne sert de raccourci qu'hors
-// saisie. Alt gauche reste la touche des raccourcis partout.
+// saisie, sauf l'exception de `AltGrMacroKey`. Alt gauche reste la touche des
+// raccourcis partout.
 //
 // Ctrl seul reste avalé de toute façon — c'est copier, coller, tout
 // sélectionner.
@@ -56,6 +57,25 @@ namespace moonclient {
 // système — n'est pas un raccourci : tenir Alt pour faire « Alt+E » ne doit
 // pas, à lui seul, déclencher quoi que ce soit.
 [[nodiscard]] bool IsModifierKey(SDL_Keycode key);
+
+// ALT GR PEUT-IL LANCER LA MACRO DE CETTE TOUCHE DEPUIS LA CONVERSATION VIDE ?
+//
+// 🔴 UN CHAMP VIDE N'A PAS DE PHRASE À ABÎMER : Alt Gr y sert de touche de macro
+// tant que la touche en porte une. Dès la première lettre, il écrit de nouveau.
+// La règle complète se lit dans `KeyClaims::empty_chat_holds_macro`.
+//
+// ⚠ ALT DROIT SEUL : c'est la forme d'Alt Gr sous Windows, et la seule que la
+// table des raccourcis lit comme Alt. Les autres formes continuent d'écrire.
+//
+// ⚠ JAMAIS LE ZÉRO, qui écrit l'arobase sur un clavier français : une commande
+// commence justement par elle, dans un champ vide.
+[[nodiscard]] bool AltGrMacroKey(SDL_Keycode key, SDL_Keymod held);
+
+// OUBLIE L'ACCENT MORT QU'ALT GR VIENT D'ARMER SUR UNE TOUCHE DEVENUE MACRO.
+//
+// 🔴 SINON LA FRAPPE SUIVANTE S'EN COIFFE : Alt Gr+é arme le tilde du clavier
+// français sans rien écrire, et le « n » d'après deviendrait « ñ ».
+void ForgetPendingDeadKey();
 
 // UN PRESET D'ÉQUIPEMENT SE REMET-IL PENDANT UNE SAISIE ?
 //
@@ -123,6 +143,10 @@ struct KeyClaims {
   bool npc_dialog_open = false;
   // Cette fenêtre montre une liste de choix.
   bool npc_menu_open = false;
+  // La conversation écrit, son champ est vide, et cette touche tenue avec Alt
+  // désigne une macro remplie. Aucun autre champ ne le lève : l'éditeur des
+  // macros doit pouvoir écrire ce qu'Alt Gr compose.
+  bool empty_chat_holds_macro = false;
 };
 
 // LE VERDICT DE LA BOUCLE, en une ligne : la touche part-elle au jeu ?

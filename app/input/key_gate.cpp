@@ -1,5 +1,9 @@
 #include "input/key_gate.h"
 
+#if defined(_WIN32)
+#include <windows.h>
+#endif
+
 namespace moonclient {
 
 bool IsModifierKey(SDL_Keycode key) {
@@ -34,6 +38,25 @@ bool GameOnlyKey(SDL_Keycode key, SDL_Keymod held) {
   return (held & SDL_KMOD_LALT) != 0 && (held & kAltGrForms) == 0;
 }
 
+bool AltGrMacroKey(SDL_Keycode key, SDL_Keymod held) {
+  constexpr SDL_Keymod kChordModifiers =
+      SDL_KMOD_ALT | SDL_KMOD_CTRL | SDL_KMOD_SHIFT | SDL_KMOD_GUI | SDL_KMOD_MODE;
+  return (held & kChordModifiers) == SDL_KMOD_RALT && key != SDLK_0 && !IsModifierKey(key);
+}
+
+void ForgetPendingDeadKey() {
+#if defined(_WIN32)
+  // Traduire une touche consomme l'accent en attente : Espace le rend seul, et
+  // ce rendu ne part nulle part.
+  constexpr int kOutputChars = 8;
+  constexpr int kKeyStates = 256;
+  const BYTE no_key_held[kKeyStates] = {};
+  WCHAR discarded[kOutputChars] = {};
+  static_cast<void>(ToUnicode(VK_SPACE, MapVirtualKeyW(VK_SPACE, MAPVK_VK_TO_VSC), no_key_held,
+                              discarded, kOutputChars, 0));
+#endif
+}
+
 bool FunctionKey(SDL_Keycode key) { return key >= SDLK_F1 && key <= SDLK_F12; }
 
 bool PresetKeyLive(bool text_input, SDL_Keycode key) { return !text_input || FunctionKey(key); }
@@ -61,6 +84,11 @@ bool KeyGoesToGame(const KeyClaims& claims, SDL_Keycode key, SDL_Keymod held) {
   // doit pas d'abord déplier la conversation.
   if (claims.npc_dialog_open && NpcDialogKeepsKey(claims.npc_menu_open, key, held)) {
     return false;
+  }
+  // ⚠ UNE MODALE RESTE PLUS FORTE : la macro n'interrompt qu'une saisie.
+  if (claims.empty_chat_holds_macro && AltGrMacroKey(key, held) &&
+      (claims.typing || !claims.interface_has_keyboard)) {
+    return true;
   }
   if (claims.chat_bar_takes_typing && ChatBarKeepsKey(key, held)) {
     return false;
