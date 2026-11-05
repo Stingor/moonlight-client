@@ -296,10 +296,20 @@ void EndLogFile(std::string_view why) {
   FileGate()->set_sinks({});
 }
 
+namespace {
+
+thread_local bool this_thread_is_logging = false;
+
+}  // namespace
+
+bool ThisThreadIsLogging() noexcept { return this_thread_is_logging; }
+
 void WriteLog(LogLevel level, const std::source_location& where, std::string text) {
+  this_thread_is_logging = true;
   spdlog::default_logger_raw()->log(
       spdlog::source_loc{where.file_name(), static_cast<int>(where.line()), where.function_name()},
       SpdlogLevelOf(level), "{}", text);
+  this_thread_is_logging = false;
 
   // ⚠ LA MÉMOIRE GARDE TOUT, même ce que spdlog vient d'écarter par son
   // niveau. Ce n'est pas une incohérence : le niveau de spdlog gouverne la

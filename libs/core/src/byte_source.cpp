@@ -4,6 +4,8 @@
 #include <system_error>
 #include <utility>
 
+#include "ro/core/utf8_path.h"
+
 namespace ro::core {
 
 Result<std::vector<std::uint8_t>> ByteSource::ReadBlock(std::uint64_t offset, std::uint64_t count) {
@@ -39,12 +41,12 @@ Result<std::unique_ptr<FileByteSource>> FileByteSource::Open(const std::filesyst
   std::error_code code;
   const std::uintmax_t file_size = std::filesystem::file_size(path, code);
   if (code) {
-    return Fail(ErrorCode::kIoFailure, path.string() + " : " + code.message());
+    return Fail(ErrorCode::kIoFailure, Utf8FromPath(path) + " : " + code.message());
   }
 
   std::ifstream stream(path, std::ios::binary);
   if (!stream) {
-    return Fail(ErrorCode::kIoFailure, path.string() + " : ouverture impossible");
+    return Fail(ErrorCode::kIoFailure, Utf8FromPath(path) + " : ouverture impossible");
   }
 
   // Le constructeur est privé : make_unique ne peut pas l'appeler.

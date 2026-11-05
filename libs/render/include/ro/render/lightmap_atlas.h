@@ -13,7 +13,7 @@ namespace ro::render {
 //
 // Le GND porte une petite lightmap par carreau — quelques dizaines de milliers
 // pour une ville. Les envoyer une par une à la carte graphique coûterait autant
-// de changements d'état ; on les assemble donc en une seule texture carrée.
+// de changements d'état ; on les assemble donc en une seule texture.
 //
 // Chaque lightmap est faite d'un plan ALPHA (l'ombre, multiplicative) suivi
 // d'une couleur RGB par texel (la lumière, additive). Les deux ne se composent

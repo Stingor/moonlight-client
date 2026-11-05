@@ -4,6 +4,8 @@
 #include <string>
 #include <utility>
 
+#include "ro/core/utf8_path.h"
+
 namespace ro::core {
 
 Result<void> MemoryByteSink::Append(std::span<const std::uint8_t> bytes) {
@@ -22,13 +24,13 @@ Result<void> MemoryByteSink::Overwrite(std::uint64_t offset, std::span<const std
 Result<std::unique_ptr<FileByteSink>> FileByteSink::Create(const std::filesystem::path& path) {
   std::ofstream stream(path, std::ios::binary | std::ios::trunc);
   if (!stream) {
-    return Fail(ErrorCode::kIoFailure, "impossible de créer " + path.string());
+    return Fail(ErrorCode::kIoFailure, "impossible de créer " + Utf8FromPath(path));
   }
   return std::unique_ptr<FileByteSink>(new FileByteSink(path, std::move(stream)));
 }
 
 Result<void> FileByteSink::Broken() const {
-  return Fail(ErrorCode::kIoFailure, "écriture impossible dans " + path_.string());
+  return Fail(ErrorCode::kIoFailure, "écriture impossible dans " + Utf8FromPath(path_));
 }
 
 Result<void> FileByteSink::Append(std::span<const std::uint8_t> bytes) {

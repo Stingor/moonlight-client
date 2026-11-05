@@ -131,7 +131,8 @@ std::optional<std::size_t> Evolve(SurvivorsField& field, std::size_t slot,
   owned = OwnedSkill{.skill_id = evolution.evolved_skill_id,
                      .level = 1,
                      .ready_step = field.step,
-                     .phase_step = field.step};
+                     // Les skills ont déjà tiré à ce pas : sa phase part au suivant.
+                     .phase_step = field.step + 1};
   CountOne(field.hero.evolutions);
   CountOne(field.tally.evolutions);
   if (field.news.evolutions.size() < kMostNewsEvolutions) {
@@ -205,9 +206,12 @@ void GrowthCandidates(const SurvivorsField& field, std::vector<Growth>& candidat
   }
   OwnedSkill& owned = hero.skills[growth.index];
   ++owned.level;
-  // Une orbite montée de niveau repart au début de sa phase active.
+  // Une orbite montée de niveau repart au début de sa phase active, au pas
+  // suivant : les skills ont déjà tiré à celui-ci.
   const SurvivorsSkillRule* rule = FindSkill(rules, owned.skill_id);
-  if (rule != nullptr && rule->archetype == SkillArchetype::kOrbit) owned.phase_step = field.step;
+  if (rule != nullptr && rule->archetype == SkillArchetype::kOrbit) {
+    owned.phase_step = field.step + 1;
+  }
   return SurvivorsChestGain{
       .kind = ChestGainKind::kSkillLevel, .id = owned.skill_id, .level = owned.level};
 }

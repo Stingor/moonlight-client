@@ -176,7 +176,7 @@ SurvivorsFrameView SurvivorsViews::Compose(const SurvivorsStage& stage,
   switch (screen) {
     case SurvivorsScreen::kChoosing:
       if (field == nullptr) break;
-      ComposeOffer(*field, rules, stage.accepts_input(), facts.pressed_card_key,
+      ComposeOffer(*field, rules, stage.accepts_input(), facts.pressed_card_key, facts.typing,
                    stage.board().kind != SurvivorsBoardKind::kFree,
                    facts.options.objective_skill_id, tables);
       if (stage.board().coop) ComposeVote(*field, facts.coop_names);
@@ -309,8 +309,9 @@ void SurvivorsViews::ComposeHud(const SurvivorsField& field, const ro::sim::Surv
 }
 
 void SurvivorsViews::ComposeOffer(const SurvivorsField& field, const ro::sim::SurvivorsRules& rules,
-                                  bool accepts_input, int pressed_card_key, bool charges_withheld,
-                                  std::uint16_t objective_skill_id, const SurvivorsTables& tables) {
+                                  bool accepts_input, int pressed_card_key, bool typing,
+                                  bool charges_withheld, std::uint16_t objective_skill_id,
+                                  const SurvivorsTables& tables) {
   offer_cards_.clear();
   const SurvivorsObjectivePath objective = SurvivorsObjectivePathOf(rules, objective_skill_id);
   for (const ro::sim::SurvivorsOffer& offer : field.offers) {
@@ -353,6 +354,7 @@ void SurvivorsViews::ComposeOffer(const SurvivorsField& field, const ro::sim::Su
   offer_ = ro::ui::SurvivorsOfferView{.cards = offer_cards_,
                                       .accepts_input = accepts_input,
                                       .pressed_card_key = pressed_card_key,
+                                      .typing = typing,
                                       .rerolls = field.rerolls_left,
                                       .skips = field.skips_left,
                                       .banishes = field.banishes_left,

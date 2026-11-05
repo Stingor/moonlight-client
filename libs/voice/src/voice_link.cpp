@@ -102,7 +102,6 @@ void VoiceLink::Open(std::uint32_t now_ms) {
   told_listened_.reset();
   told_talking_.reset();
   listens_many_ = false;
-  refusal_.reset();
   detail_.clear();
   state_ = VoiceLinkState::kAuthenticating;
   last_ping_ms_ = now_ms;
@@ -188,6 +187,7 @@ void VoiceLink::ReadUdp(std::uint32_t now_ms) {
     const std::optional<UdpReceived> received =
         DecodeUdp(std::span<const std::uint8_t>(datagram.data(), **read));
     if (!received.has_value()) continue;
+    last_udp_heard_ms_ = now_ms;
     if (received->kind == UdpKind::kHello) {
       udp_ready_ = true;
     } else if (received->heard.has_value()) {
@@ -204,6 +204,9 @@ void VoiceLink::Apply(const ServerMessage& message, std::uint32_t now_ms) {
         using Said = std::decay_t<decltype(said)>;
         if constexpr (std::is_same_v<Said, AuthAccepted>) {
           state_ = VoiceLinkState::kOnline;
+          // ⚠ PAS À L'OUVERTURE : un refus se redit à chaque essai, et le joueur le
+          // lirait entre deux. Le serveur envoie ses refus APRÈS cet accord.
+          refusal_.reset();
           blocked_.clear();
           udp_identity_ = UdpIdentity{.session_id = session_id_,
                                       .character_id = target_.character_id,
@@ -245,6 +248,11 @@ void VoiceLink::Apply(const ServerMessage& message, std::uint32_t now_ms) {
           refusal_ = said.kind;
           detail_ = said.message;
           core::LogWarning("voix : le serveur refuse ({})", said.message);
+        } else if constexpr (std::is_same_v<Said, RefusalLifted>) {
+          if (refusal_ == said.kind) {
+            refusal_.reset();
+            detail_.clear();
+          }
         }
       },
       message);
@@ -289,6 +297,9 @@ void VoiceLink::FollowTalking(std::uint32_t now_ms) {
 
 void VoiceLink::Greet(std::uint32_t now_ms) {
   if (!udp_.is_open() || now_ms < next_hello_ms_) return;
+  // UN SERVEUR QUI NE RÉPOND PLUS au salut n'entend sans doute plus rien : la
+  // parole repasse par le TCP, jusqu'à ce qu'un salut aboutisse.
+  if (udp_ready_ && now_ms - last_udp_heard_ms_ >= kVoiceUdpSilentMs) udp_ready_ = false;
   const std::vector<std::uint8_t> hello = EncodeUdpHello(udp_identity_);
   static_cast<void>(udp_.Send(hello));
   next_hello_ms_ = now_ms + (udp_ready_ ? kVoiceHelloKeepMs : kVoiceHelloRetryMs);
@@ -363,7 +374,7 @@ void VoiceLink::SendVoice(std::span<const std::uint8_t> opus) {
   if (udp_.is_open() && udp_ready_) {
     const std::vector<std::uint8_t> datagram =
         EncodeUdpVoice(udp_identity_, spoken_channel(), sequence, opus);
-    if (core::Result<bool> sent = udp_.Send(datagram); sent.has_value()) return;
+    if (core::Result<bool> sent = udp_.Send(datagram); sent.has_value() && *sent) return;
   }
   // À DÉFAUT D'UDP, LE TCP — tant qu'il avance : une trame retenue derrière
   // d'autres arriverait trop tard pour servir.

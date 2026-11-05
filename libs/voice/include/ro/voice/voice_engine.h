@@ -1,6 +1,7 @@
 #pragma once
 
 #include <atomic>
+#include <chrono>
 #include <cstdint>
 #include <mutex>
 #include <thread>
@@ -13,6 +14,10 @@ namespace ro::voice {
 // Le pas du fil de la voix : quatre par trame de 20 ms, pour qu'un paquet
 // reçu ou une trame du micro n'attende jamais longtemps.
 inline constexpr std::uint32_t kVoiceStepMs = 5;
+
+// Au-delà, la boucle de jeu est figée : la touche « Parler » qu'elle disait
+// enfoncée ne se lit plus, et le micro se referme au lieu de rester ouvert.
+inline constexpr std::uint32_t kVoiceMostSteerAgeMs = 500;
 
 // ── LA VOIX SUR SON PROPRE FIL ──────────────────────────────────────────────
 //
@@ -50,6 +55,7 @@ class VoiceEngine {
   VoiceLink link_;
   mutable std::mutex guard_;
   VoiceControls controls_;
+  std::chrono::steady_clock::time_point steered_at_;
   std::vector<BlockOrder> block_orders_;
   std::vector<std::vector<std::uint8_t>> coop_to_send_;
   std::vector<CoopRelayed> coop_received_;

@@ -66,6 +66,8 @@ struct SurvivorsViewFacts {
   // La rangée des chiffres de l'image, par sa place : voir
   // `SurvivorsOfferView::pressed_card_key`.
   int pressed_card_key = 0;
+  // Une saisie est ouverte : voir `SurvivorsOfferView::typing`.
+  bool typing = false;
   // L'alerte qui a mis en pause, quand c'est le monde réel.
   std::optional<RealWorldAlert> banner;
   // EN COOP, ce que le HUD doit dire : rien n'y met en pause, et la conversation peut
@@ -163,7 +165,7 @@ class SurvivorsViews {
                   const SurvivorsTables& tables);
   // Une offre qui mène au sort `objective_skill_id` (0 : aucun) le dit.
   void ComposeOffer(const ro::sim::SurvivorsField& field, const ro::sim::SurvivorsRules& rules,
-                    bool accepts_input, int pressed_card_key, bool charges_withheld,
+                    bool accepts_input, int pressed_card_key, bool typing, bool charges_withheld,
                     std::uint16_t objective_skill_id, const SurvivorsTables& tables);
   // LE VOTE D'UNE PARTIE COOP, par-dessus les offres composées.
   void ComposeVote(const ro::sim::SurvivorsField& field, std::span<const std::string> names);

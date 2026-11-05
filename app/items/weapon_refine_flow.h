@@ -136,7 +136,9 @@ class WeaponRefineFlow {
   // ── LA CHAÎNE ──────────────────────────────────────────────────────────────
   std::uint32_t auto_recast_at_ = 0;
   int auto_chain_ = 0;
-  const char* stop_reason_ = nullptr;
+  // ⚠ UNE COPIE : le pointeur de `Tr` meurt au prochain chargement du catalogue, et
+  // cette raison survit aux images. Vide : aucun arrêt à dire.
+  std::string stop_reason_;
   std::uint32_t auto_refine_at_ = 0;
   int auto_refine_count_ = 0;
   bool paused_ = false;

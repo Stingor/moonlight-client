@@ -152,6 +152,8 @@ core::Result<ServerMessage> ParseServerMessage(std::string_view json) {
     return Refusal{.kind = RefusalKind::kLicenseRequired, .message = type};
   }
   if (type == "flood_banned") return Refusal{.kind = RefusalKind::kFlooded, .message = type};
+  if (type == "admin_unbanned") return RefusalLifted{.kind = RefusalKind::kBanned};
+  if (type == "license_granted") return RefusalLifted{.kind = RefusalKind::kLicenseRequired};
   return Unread{.type = type};
 }
 

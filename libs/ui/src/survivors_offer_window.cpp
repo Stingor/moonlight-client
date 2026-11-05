@@ -40,6 +40,7 @@ constexpr std::array<ImGuiKey, kMostOfferCards> kPadKeys = {ImGuiKey_Keypad1, Im
 
 // La carte dont la touche est pressée à cette image, ou rien.
 [[nodiscard]] std::optional<std::uint8_t> PressedCard(const SurvivorsOfferView& view) {
+  if (view.typing) return std::nullopt;
   const int shown = std::min(static_cast<int>(view.cards.size()), kMostOfferCards);
   if (view.pressed_card_key >= 1 && view.pressed_card_key <= shown) {
     return static_cast<std::uint8_t>(view.pressed_card_key - 1);
@@ -115,8 +116,9 @@ constexpr std::array<ImGuiKey, kMostOfferCards> kPadKeys = {ImGuiKey_Keypad1, Im
                                                            const SkinArt& art) {
   std::optional<SurvivorsOfferAsk> asked;
   std::array<char, kLineSize> line = {};
-  // Dans la garde, les boutons sont grisés et les touches se taisent aussi.
-  const bool live = view.accepts_input;
+  // Dans la garde, les boutons sont grisés et les touches se taisent aussi ;
+  // pendant une saisie, seules les touches se taisent.
+  const bool live = view.accepts_input && !view.typing;
   bool first = true;
   const auto next = [&first]() {
     if (!first) ImGui::SameLine();
@@ -193,7 +195,7 @@ std::optional<SurvivorsOfferAsk> DrawSurvivorsOfferWindow(SurvivorsOfferState& s
   static WindowName name(kOfferTitle, kOfferId);
   const ImGuiViewport* screen = ImGui::GetMainViewport();
   ImGui::SetNextWindowPos(screen->GetCenter(), ImGuiCond_Always, ImVec2(0.5F, 0.5F));
-  ImGui::SetNextWindowFocus();
+  if (!view.typing) ImGui::SetNextWindowFocus();
   if (!BeginSkinnedWindow(name.Get(), nullptr, art, SkinnedTitle::kBar, kModalFlags)) {
     EndSkinnedWindow();
     return asked;

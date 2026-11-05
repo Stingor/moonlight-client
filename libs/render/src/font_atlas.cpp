@@ -8,6 +8,9 @@
 #include <vector>
 
 #include <ft2build.h>
+
+#include "ro/core/byte_source.h"
+#include "ro/core/utf8_path.h"
 #include FT_FREETYPE_H
 
 namespace ro::render {
@@ -92,9 +95,22 @@ core::Result<FontAtlas> FontAtlas::Load(const std::filesystem::path& font_path, 
   if (FT_Init_FreeType(&library.handle) != 0) {
     return Fail(ErrorCode::kIoFailure, "FreeType ne s'initialise pas");
   }
+  // ⚠ LE FICHIER SE LIT ICI, ET FREETYPE LE REÇOIT EN MÉMOIRE : son ouverture
+  // prend un nom étroit, que Windows lit dans la page ANSI. `bytes` survit à
+  // `face`, qui les relit jusqu'à sa fermeture.
+  const std::string shown_path = core::Utf8FromPath(font_path);
+  auto font_file = core::FileByteSource::Open(font_path);
+  if (!font_file.has_value()) {
+    return Fail(ErrorCode::kNotFound, "police illisible : " + shown_path);
+  }
+  auto bytes = (*font_file)->ReadBlock(0, (*font_file)->size());
+  if (!bytes.has_value()) {
+    return Fail(ErrorCode::kNotFound, "police illisible : " + shown_path);
+  }
   Face face;
-  if (FT_New_Face(library.handle, font_path.string().c_str(), 0, &face.handle) != 0) {
-    return Fail(ErrorCode::kNotFound, "police illisible : " + font_path.string());
+  if (FT_New_Memory_Face(library.handle, bytes->data(), static_cast<FT_Long>(bytes->size()), 0,
+                         &face.handle) != 0) {
+    return Fail(ErrorCode::kNotFound, "police illisible : " + shown_path);
   }
   if (FT_Set_Pixel_Sizes(face.handle, 0, static_cast<FT_UInt>(pixel_height)) != 0) {
     return Fail(ErrorCode::kInvalidArgument, "taille de police refusée");

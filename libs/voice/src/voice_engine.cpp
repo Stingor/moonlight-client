@@ -19,6 +19,7 @@ VoiceEngine::~VoiceEngine() {
 void VoiceEngine::Steer(const VoiceControls& controls) {
   const std::lock_guard<std::mutex> lock(guard_);
   controls_ = controls;
+  steered_at_ = std::chrono::steady_clock::now();
 }
 
 void VoiceEngine::Block(std::uint32_t character_id, bool blocked) {
@@ -53,6 +54,9 @@ void VoiceEngine::Run() {
     {
       const std::lock_guard<std::mutex> lock(guard_);
       controls = controls_;
+      if (Clock::now() - steered_at_ > std::chrono::milliseconds(kVoiceMostSteerAgeMs)) {
+        controls.talking = false;
+      }
       orders.swap(block_orders_);
       coop_out.swap(coop_to_send_);
     }

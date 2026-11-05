@@ -247,7 +247,7 @@ void WeaponRefineFlow::ScheduleAutoRecast(RefineOutcome outcome,
     stop_reason_ = cause;
     return;
   }
-  stop_reason_ = nullptr;
+  stop_reason_.clear();
   ++auto_chain_;
   auto_recast_at_ = Deadline(now_ms, kAutoRecastDelayMs);
 }
@@ -279,7 +279,7 @@ void WeaponRefineFlow::RetryRecast(const WeaponRefineSettings& settings, bool wi
     return;
   }
   auto_recast_at_ = Deadline(now_ms, kAutoRecastDelayMs);
-  stop_reason_ = nullptr;
+  stop_reason_.clear();
   log_.Add(ro::core::Printed(Tr("Relance jetée par le délai de lancement : nouvel essai (%d/%d)."),
                              recast_retries_, kMostRecastRetries),
            ro::ui::SkinTone::kWarn);
@@ -324,7 +324,7 @@ void WeaponRefineFlow::Tick(const ro::ui::WeaponRefineWindowAction& asked,
           pending_ = Pending::kRefine;
           pending_index_ = target;
           last_send_ms_ = now_ms;
-          stop_reason_ = nullptr;
+          stop_reason_.clear();
           ++auto_refine_count_;
         }
       }
@@ -390,14 +390,14 @@ void WeaponRefineFlow::Apply(const ro::ui::WeaponRefineWindowAction& asked,
       pending_ = Pending::kRecast;
       auto_chain_ = 0;
       auto_recast_at_ = 0;
-      stop_reason_ = nullptr;
+      stop_reason_.clear();
       recast_retries_ = 0;
       paused_ = false;
       break;
     case WeaponRefineVerb::kStartChain: {
       chain_consent_ = true;
       paused_ = false;
-      stop_reason_ = nullptr;
+      stop_reason_.clear();
       // ⚠ LE RÉGLAGE NE SE COCHE QU'APRÈS CETTE IMAGE, par la partie : la chaîne
       // se programme donc comme s'il l'était déjà.
       WeaponRefineSettings chained = settings;
@@ -414,7 +414,7 @@ void WeaponRefineFlow::Apply(const ro::ui::WeaponRefineWindowAction& asked,
       if (pending_ == Pending::kRefine || pending_ == Pending::kRecast) {
         pending_ = Pending::kNone;
       }
-      stop_reason_ = nullptr;
+      stop_reason_.clear();
       log_.Add(Tr("Chaîne automatique arrêtée à la demande."), ro::ui::SkinTone::kWarn);
       break;
     case WeaponRefineVerb::kClose:
@@ -510,7 +510,7 @@ void WeaponRefineFlow::ResetSession(ro::ui::WeaponRefineWindowState& state) {
   pending_ = Pending::kNone;
   auto_recast_at_ = 0;
   auto_chain_ = 0;
-  stop_reason_ = nullptr;
+  stop_reason_.clear();
   auto_refine_at_ = 0;
   auto_refine_count_ = 0;
   paused_ = false;
@@ -638,7 +638,7 @@ void WeaponRefineFlow::Compose(const ro::sim::World& world,
     view_.chain_note = ro::ui::RefineChainNote::kPaused;
   } else if (settings.auto_refine && !chain_consent_ && !entries_.empty() && !consumed_) {
     view_.chain_note = ro::ui::RefineChainNote::kReady;
-  } else if (stop_reason_ != nullptr && settings.chains()) {
+  } else if (!stop_reason_.empty() && settings.chains()) {
     view_.chain_note = ro::ui::RefineChainNote::kStopped;
     view_.stop_reason = stop_reason_;
   }

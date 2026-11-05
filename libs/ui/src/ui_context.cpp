@@ -1,5 +1,6 @@
 #include "ro/ui/ui_context.h"
 
+#include "ro/core/utf8_path.h"
 #include "ro/ui/modal_box.h"
 #include "ro/ui/skin_look.h"
 #include "ro/ui/wheel_gate.h"
@@ -207,7 +208,8 @@ void UiContext::UseLayout(const LayoutProfile& layout) {
 
 void UiContext::UseSettingsFile(const std::filesystem::path& path) {
   MakeCurrent();
-  settings_path_ = path.string();
+  // En UTF-8 : c'est ainsi qu'ImGui lit le nom qu'il ouvre.
+  settings_path_ = core::Utf8FromPath(path);
   // ⚠ IMGUI NE COPIE PAS CE CHEMIN : il garde le pointeur et le relit à chaque
   // écriture. C'est `settings_path_` qui le fait vivre.
   ImGui::GetIO().IniFilename = settings_path_.c_str();

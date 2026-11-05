@@ -154,10 +154,15 @@ Result<void> AwaitConnection(NativeSocket handle, int timeout_ms) {
 
 #if defined(_WIN32)
   FD_SET(static_cast<SOCKET>(handle), &writable);
+  // ⚠ WINSOCK DIT L'ÉCHEC D'UNE CONNEXION DANS LES EXCEPTIONS, jamais dans les
+  // inscriptibles : sans cet ensemble, un refus attendrait tout le délai.
+  fd_set failed;
+  FD_ZERO(&failed);
+  FD_SET(static_cast<SOCKET>(handle), &failed);
   // Winsock ignore ce premier argument : ses ensembles portent les descripteurs
   // eux-mêmes, pas un intervalle. Le calculer y produirait une conversion
   // dépassant la taille d'un int sur un descripteur haut.
-  const int ready = select(0, nullptr, &writable, nullptr, &limit);
+  const int ready = select(0, nullptr, &writable, &failed, &limit);
 #else
   FD_SET(handle, &writable);
   const int ready = select(handle + 1, nullptr, &writable, nullptr, &limit);

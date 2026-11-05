@@ -51,6 +51,9 @@ struct SurvivorsOfferView {
   // « 1 » sans Maj est « & ». 0 : aucune ; 1 à 4 : la carte dite. Le pavé
   // numérique et la rangée QWERTY se lisent aussi par ImGui.
   int pressed_card_key = 0;
+  // UNE SAISIE EST OUVERTE : les frappes vont au texte. Les touches se taisent,
+  // la fenêtre ne prend plus le clavier, et la souris répond toujours.
+  bool typing = false;
   int rerolls = 0;
   int skips = 0;
   int banishes = 0;

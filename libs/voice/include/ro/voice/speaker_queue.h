@@ -55,6 +55,7 @@ class SpeakerQueue {
   std::optional<std::int64_t> last_received_;
   std::uint16_t last_sequence_ = 0;
   std::int64_t next_ = 0;
+  std::int64_t last_played_ = 0;
   bool playing_ = false;
   std::size_t missed_ = 0;
 };

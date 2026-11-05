@@ -9,6 +9,8 @@
 #include <system_error>
 #include <utility>
 
+#include "ro/core/utf8_path.h"
+
 #include "patcher/http_patch_fetcher.h"
 #include "web/curl_handle.h"
 
@@ -206,7 +208,7 @@ ro::core::Result<void> HttpPatchFetcher::FetchToFile(const std::string& url,
   auto written = [&]() -> ro::core::Result<void> {
     std::ofstream out(partial, std::ios::binary | std::ios::trunc);
     if (!out) {
-      return Refused(url, "impossible d'écrire " + partial.string());
+      return Refused(url, "impossible d'écrire " + ro::core::Utf8FromPath(partial));
     }
     auto read = Get(
         url, limit_bytes, stop, on_progress,
@@ -214,13 +216,13 @@ ro::core::Result<void> HttpPatchFetcher::FetchToFile(const std::string& url,
           out.write(piece.data(), static_cast<std::streamsize>(piece.size()));
           return static_cast<bool>(out);
         },
-        [&partial] { return "écriture interrompue sur " + partial.string(); });
+        [&partial] { return "écriture interrompue sur " + ro::core::Utf8FromPath(partial); });
     if (!read) {
       return read;
     }
     out.close();
     if (!out) {
-      return Refused(url, "écriture interrompue sur " + partial.string());
+      return Refused(url, "écriture interrompue sur " + ro::core::Utf8FromPath(partial));
     }
     return {};
   }();
@@ -235,7 +237,8 @@ ro::core::Result<void> HttpPatchFetcher::FetchToFile(const std::string& url,
   std::filesystem::rename(partial, destination, renamed);
   if (renamed) {
     std::filesystem::remove(partial, ignored);
-    return Refused(url, "impossible de nommer " + destination.string() + " : " + renamed.message());
+    return Refused(url, "impossible de nommer " + ro::core::Utf8FromPath(destination) + " : " +
+                            renamed.message());
   }
   return {};
 }

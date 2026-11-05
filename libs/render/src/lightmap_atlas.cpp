@@ -53,22 +53,25 @@ LightmapAtlas BuildLightmapAtlas(const formats::GndMap& gnd) {
     return atlas;
   }
 
-  // CÔTÉ DE L'ATLAS : la plus petite grille carrée qui range TOUTES les
-  // lightmaps, et rien de plus. Le mesurer sur les dimensions de la carte
-  // réservait plus de quarante mégaoctets à une carte de 200 × 200 qui en
-  // occupe moins de dix — en mémoire, puis autant en mémoire graphique.
+  // TAILLE DE L'ATLAS : la plus petite grille carrée de cellules qui range TOUTES
+  // les lightmaps, et rien de plus. L'atlas n'est carré que si elles le sont :
+  // chaque axe suit sa propre dimension, et il pèse donc ce que pèsent ses données. Le mesurer sur
+  // les dimensions de la carte réservait plus de quarante mégaoctets à une carte de 200 × 200 qui
+  // en occupe moins de dix — en mémoire, puis autant en mémoire graphique.
   auto per_side = static_cast<std::int32_t>(std::sqrt(static_cast<double>(count)));
   while (static_cast<std::int64_t>(per_side) * per_side < count) {
     ++per_side;
   }
-  const std::int32_t side = per_side * std::max(cell_width, cell_height);
-  if (side <= 0) {
+  const std::int32_t atlas_width = per_side * cell_width;
+  const std::int32_t atlas_height = per_side * cell_height;
+  if (atlas_width <= 0 || atlas_height <= 0) {
     return atlas;
   }
 
-  atlas.image.width = side;
-  atlas.image.height = side;
-  atlas.image.pixels.assign(static_cast<std::size_t>(side) * static_cast<std::size_t>(side) * 4, 0);
+  atlas.image.width = atlas_width;
+  atlas.image.height = atlas_height;
+  atlas.image.pixels.assign(
+      static_cast<std::size_t>(atlas_width) * static_cast<std::size_t>(atlas_height) * 4, 0);
 
   const std::size_t texels_per_lightmap =
       static_cast<std::size_t>(cell_width) * static_cast<std::size_t>(cell_height);
@@ -79,7 +82,7 @@ LightmapAtlas BuildLightmapAtlas(const formats::GndMap& gnd) {
   std::int32_t origin_y = 0;
   for (std::int32_t index = 0; index < count; ++index) {
     const std::size_t base = static_cast<std::size_t>(index) * bytes_per_lightmap;
-    if (base + bytes_per_lightmap <= source.size() && origin_y + cell_height <= side) {
+    if (base + bytes_per_lightmap <= source.size() && origin_y + cell_height <= atlas_height) {
       const std::uint8_t* alpha = source.data() + base;
       const std::uint8_t* color = alpha + texels_per_lightmap;
 
@@ -87,7 +90,7 @@ LightmapAtlas BuildLightmapAtlas(const formats::GndMap& gnd) {
         for (std::int32_t x = 0; x < cell_width; ++x) {
           const std::size_t destination =
               (static_cast<std::size_t>(origin_x + x) +
-               static_cast<std::size_t>(side) * static_cast<std::size_t>(origin_y + y)) *
+               static_cast<std::size_t>(atlas_width) * static_cast<std::size_t>(origin_y + y)) *
               4;
           // La couleur source est rangée en RGB, comme l'atlas. ⚠ LA LIRE EN BGR
           // échange le rouge et le bleu : la lumière chaude d'une lanterne sort
@@ -103,7 +106,7 @@ LightmapAtlas BuildLightmapAtlas(const formats::GndMap& gnd) {
     }
 
     origin_x += cell_width;
-    if (origin_x + cell_width > side) {
+    if (origin_x + cell_width > atlas_width) {
       origin_x = 0;
       origin_y += cell_height;
     }
@@ -111,20 +114,21 @@ LightmapAtlas BuildLightmapAtlas(const formats::GndMap& gnd) {
 
   // Coordonnées de texture : la marge dit où le carreau commence, l'étendue
   // combien il parcourt.
-  const auto side_float = static_cast<float>(side);
-  const float unit = 1.0F / side_float;
-  const float margin = kMarginTexels * unit;
-  const float step_x = static_cast<float>(cell_width) / side_float;
-  const float step_y = static_cast<float>(cell_height) / side_float;
-  const float span_x = kSpanTexels * unit;
-  const float span_y = kSpanTexels * unit;
-  const std::int32_t per_row = side / cell_width;
+  const float unit_x = 1.0F / static_cast<float>(atlas_width);
+  const float unit_y = 1.0F / static_cast<float>(atlas_height);
+  const float margin_x = kMarginTexels * unit_x;
+  const float margin_y = kMarginTexels * unit_y;
+  const float step_x = static_cast<float>(cell_width) * unit_x;
+  const float step_y = static_cast<float>(cell_height) * unit_y;
+  const float span_x = kSpanTexels * unit_x;
+  const float span_y = kSpanTexels * unit_y;
+  const std::int32_t per_row = per_side;
 
   atlas.minimum.reserve(static_cast<std::size_t>(count));
   atlas.maximum.reserve(static_cast<std::size_t>(count));
   for (std::int32_t index = 0; index < count; ++index) {
-    const float x = static_cast<float>(index % per_row) * step_x + margin;
-    const float y = static_cast<float>(index / per_row) * step_y + margin;
+    const float x = static_cast<float>(index % per_row) * step_x + margin_x;
+    const float y = static_cast<float>(index / per_row) * step_y + margin_y;
     atlas.minimum.push_back({x, y});
     atlas.maximum.push_back({x + span_x, y + span_y});
   }

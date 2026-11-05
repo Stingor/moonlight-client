@@ -35,6 +35,8 @@ inline constexpr std::uint32_t kVoicePingMs = 15'000;
 // l'adresse d'un client muet depuis 30 s.
 inline constexpr std::uint32_t kVoiceHelloRetryMs = 1000;
 inline constexpr std::uint32_t kVoiceHelloKeepMs = 10'000;
+// Trois saluts sans réponse : l'UDP ne passe plus.
+inline constexpr std::uint32_t kVoiceUdpSilentMs = 3 * kVoiceHelloKeepMs;
 // Combien d'audio la sortie garde d'avance : assez pour qu'un pas en retard ne
 // la vide pas, peu pour que la voix reste vive.
 inline constexpr std::size_t kVoicePlaybackLeadFrames = 3;
@@ -174,6 +176,7 @@ class VoiceLink {
   bool udp_ready_ = false;
   std::vector<CoopRelayed> coop_received_;
   std::uint32_t next_hello_ms_ = 0;
+  std::uint32_t last_udp_heard_ms_ = 0;
   std::uint32_t last_ping_ms_ = 0;
   std::uint32_t retry_at_ms_ = 0;
 

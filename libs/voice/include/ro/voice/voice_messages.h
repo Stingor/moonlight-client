@@ -90,6 +90,10 @@ struct Refusal {
   RefusalKind kind = RefusalKind::kError;
   std::string message;  // le texte du serveur, en anglais, pour le journal
 };
+// Un refus que le serveur lève sans fermer la liaison.
+struct RefusalLifted {
+  RefusalKind kind = RefusalKind::kError;
+};
 // LES JOUEURS BLOQUÉS QUI SONT EN LIGNE, dits après l'authentification.
 // ⚠ TUS QUAND IL N'Y EN A AUCUN : la liste se vide à l'authentification.
 struct BlockedPlayers {
@@ -106,9 +110,9 @@ struct Unread {
   std::string type;
 };
 
-using ServerMessage =
-    std::variant<AuthAccepted, OwnPlace, NearbyPlayers, ChannelAccepted, ListenAccepted, WarState,
-                 RoomJoined, RoomLeft, Pong, Refusal, BlockedPlayers, BlockChanged, Unread>;
+using ServerMessage = std::variant<AuthAccepted, OwnPlace, NearbyPlayers, ChannelAccepted,
+                                   ListenAccepted, WarState, RoomJoined, RoomLeft, Pong, Refusal,
+                                   RefusalLifted, BlockedPlayers, BlockChanged, Unread>;
 
 // Ce que dit un texte du serveur, ou une erreur s'il n'est pas un objet JSON
 // muni d'un `type`.

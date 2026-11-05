@@ -39,15 +39,16 @@ constexpr std::uint32_t kTalkKeyReminderMs = 15'000;
 
 [[nodiscard]] std::string NoticeOf(const rv::VoiceStatus& status, const VoiceFacts& facts,
                                    std::uint32_t online_since_ms) {
-  if (status.state == rv::VoiceLinkState::kLost) {
-    return Tr("Voix : serveur injoignable, nouvel essai…");
-  }
+  // ⚠ LE REFUS AVANT LA PERTE : le serveur ferme juste après l'avoir dit.
   if (status.refusal == rv::RefusalKind::kBanned) return Tr("Voix : coupée par un MJ.");
   if (status.refusal == rv::RefusalKind::kLicenseRequired) {
     return Tr("Voix : réservée aux comptes qui l'ont.");
   }
   if (status.refusal == rv::RefusalKind::kFlooded) {
     return Tr("Voix : coupée quelques minutes, trop de paquets.");
+  }
+  if (status.state == rv::VoiceLinkState::kLost) {
+    return Tr("Voix : serveur injoignable, nouvel essai…");
   }
   if (status.state != rv::VoiceLinkState::kOnline) return {};
   if (status.war && !status.in_room && facts.settings.channel == 0) {
@@ -208,6 +209,7 @@ void VoiceMode::Compose(const VoiceFacts& facts) {
   blocked_.clear();
   input_percent_.reset();
   if (engine_ == nullptr) {
+    was_online_ = false;
     if (devices_failed_ && facts.settings.enabled && service_.has_value()) {
       overlay_.notice = Tr("Voix : aucun appareil de son ne s'ouvre.");
     }

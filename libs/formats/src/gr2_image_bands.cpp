@@ -116,6 +116,10 @@ class BandDecoder {
     if (width == 1 && !NextRow(window, pitch, width)) {
       return;
     }
+    // ⚠ DEUX PLAGES NULLES N'AVANCENT DE RIEN, et un flux abîmé peut en rendre
+    // sans fin : cette bande s'arrête là.
+    constexpr std::uint32_t kMostEmptyRuns = 4096;
+    std::uint32_t empty_runs = 0;
     while (true) {
       std::uint32_t run = RawEscaped(runs, kRunEscapeBits);
       if (run >= kFirstLongRun) {
@@ -128,6 +132,11 @@ class BandDecoder {
       }
       if (zero_run != 0) {
         zero_run += kShortestZeroRun;
+      }
+      if (run != 0 || zero_run != 0) {
+        empty_runs = 0;
+      } else if (++empty_runs >= kMostEmptyRuns) {
+        return;
       }
       while (run != 0) {
         if (window.left_in_row > 1) {

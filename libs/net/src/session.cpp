@@ -714,9 +714,13 @@ PhaseState MapPhase::Advance() {
   // l'ordre compte : décider si les premiers octets portent une trame demande
   // de les voir avant que le découpeur ne s'en saisisse.
   link_.Receive();
-  if (step_ == Step::kAwaitingAccountId && !DecideBareAccountId()) {
+  if (step_ == Step::kAwaitingAccountId && !DecideBareAccountId() &&
+      link_.received_status() == LinkStatus::kOpen) {
     // Trop tôt pour savoir si ces octets portent une trame. On ne découpe rien
     // et on repassera : les octets restent dans le tampon.
+    //
+    // ⚠ UNE LIAISON FERMÉE N'APPORTERA RIEN DE PLUS : ce qui reste se découpe,
+    // car l'avis d'éviction tient en trois octets, suivis de la fermeture.
     state_ = LinkVerdict(link_.received_status(), link_, error_);
     return state_;
   }
@@ -725,6 +729,11 @@ PhaseState MapPhase::Advance() {
   if (polled.raw.size() == kBareAccountIdSize) {
     core::ByteReader reader(polled.raw);
     account_id_ = reader.U32();
+    step_ = Step::kAwaitingAccept;
+  } else if (!polled.frames.empty()) {
+    // 🔴 UN FLUX QUI S'OUVRE PAR UNE TRAME N'A PAS D'IDENTIFIANT NU. Le juger
+    // encore prendrait une trame de quatre octets suivie de l'accord pour cet
+    // identifiant, et elle serait perdue.
     step_ = Step::kAwaitingAccept;
   }
 

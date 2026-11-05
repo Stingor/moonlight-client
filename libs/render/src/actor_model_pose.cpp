@@ -65,7 +65,10 @@ std::optional<std::vector<float>> EvaluateGrannyCurve(const GrannyCurve& curve, 
   const std::size_t knot = FindKnot(knots, time);
   std::vector<double> result;
   const std::int32_t degree = std::max(curve.degree, 0);
-  if (degree == 0 || knots.size() == 1) {
+  // Au-delà du second degré, la courbe vaut le point de son nœud : aucune fenêtre
+  // à bâtir, dont la taille viendrait d'un champ du fichier.
+  constexpr std::int32_t kMostBlendedDegree = 2;
+  if (degree == 0 || degree > kMostBlendedDegree || knots.size() == 1) {
     result = ControlAt(curve, knot);
   } else {
     // La fenêtre de la B-spline : `degré` nœuds de part et d'autre, bornés aux
@@ -104,8 +107,6 @@ std::optional<std::vector<float>> EvaluateGrannyCurve(const GrannyCurve& curve, 
                        weight_previous * points[center - 1][lane] +
                        weight_here * points[center][lane];
       }
-    } else {
-      result = points[center];
     }
   }
   if (dimension == kOrientationSize) {

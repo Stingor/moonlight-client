@@ -112,7 +112,7 @@ struct PatchScreenText {
   }
   auto image = ro::formats::DecodeImage(ro::core::Utf8FromPath(path->filename()), *bytes);
   if (!image) {
-    ro::core::LogWarning("skin : {} illisible ({})", path->string(),
+    ro::core::LogWarning("skin : {} illisible ({})", ro::core::Utf8FromPath(*path),
                          ro::core::Describe(image.error()));
     return backdrop;
   }

@@ -58,11 +58,11 @@ std::filesystem::path ResolveIgnoringCase(const std::filesystem::path& root,
       continue;
     }
 
-    const std::string wanted = core::AsciiLower(segment.string());
+    const std::string wanted = core::AsciiLower(core::Utf8FromPath(segment));
     bool found = false;
     for (const std::filesystem::directory_entry& entry :
          std::filesystem::directory_iterator(resolved, code)) {
-      if (core::AsciiLower(entry.path().filename().string()) == wanted) {
+      if (core::AsciiLower(core::Utf8FromPath(entry.path().filename())) == wanted) {
         resolved = entry.path();
         found = true;
         break;
@@ -117,7 +117,7 @@ std::vector<std::filesystem::path> DiskSpellings(const std::filesystem::path& ro
 Result<Vfs> Vfs::Mount(const MountOptions& options) {
   std::error_code code;
   if (!std::filesystem::is_directory(options.root, code)) {
-    return Fail(ErrorCode::kNotFound, options.root.string() + " n'est pas un dossier");
+    return Fail(ErrorCode::kNotFound, core::Utf8FromPath(options.root) + " n'est pas un dossier");
   }
 
   Vfs mounted;
@@ -138,7 +138,7 @@ Result<Vfs> Vfs::Mount(const MountOptions& options) {
                     // est la cause des « sprite absent », « modèle absent » et « son absent »
                     // qui rempliront le reste du journal.
             LogWarning("archive ignorée : {} ({}) — ce qu'elle porte manquera à tout le reste",
-                       archive_path.string(), core::Describe(archive.error()));
+                       core::Utf8FromPath(archive_path), core::Describe(archive.error()));
         continue;
       }
       return std::unexpected(archive.error());
@@ -148,7 +148,7 @@ Result<Vfs> Vfs::Mount(const MountOptions& options) {
 
   if (mounted.archives_.empty() && mounted.data_directory_.empty()) {
     return Fail(ErrorCode::kNotFound,
-                options.root.string() + " : ni dossier data\\ ni archive lisible");
+                core::Utf8FromPath(options.root) + " : ni dossier data\\ ni archive lisible");
   }
   // APRÈS les archives, et il le faut : la table se lit par ce même système de
   // fichiers, qui la trouve sous `data\yaml_files\` du disque comme dans une

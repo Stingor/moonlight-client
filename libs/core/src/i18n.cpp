@@ -6,6 +6,8 @@
 #include <set>
 #include <utility>
 
+#include "ro/core/utf8_path.h"
+
 namespace ro::core {
 namespace {
 
@@ -142,7 +144,7 @@ std::size_t LanguageSerial() {
 Result<void> LoadLanguage(const std::filesystem::path& path, std::string language) {
   std::ifstream file(path, std::ios::binary);
   if (!file) {
-    return Fail(ErrorCode::kNotFound, "catalogue introuvable : " + path.string());
+    return Fail(ErrorCode::kNotFound, "catalogue introuvable : " + Utf8FromPath(path));
   }
 
   std::map<std::string, std::string, std::less<>> read;
@@ -165,7 +167,7 @@ Result<void> LoadLanguage(const std::filesystem::path& path, std::string languag
         // sous la clé précédente donnerait une interface qui ment. On refuse le
         // catalogue entier : à moitié chargé, personne ne saurait quelle moitié.
         return Fail(ErrorCode::kCorruptData,
-                    "catalogue : une traduction sans texte francais — " + path.string());
+                    "catalogue : une traduction sans texte francais — " + Utf8FromPath(path));
       }
       read.insert_or_assign(french, AfterPrefix(view, kTranslatedPrefix));
       waiting = false;
@@ -202,7 +204,7 @@ Result<void> ExportMissing(const std::filesystem::path& path) {
   const std::vector<std::string> absent = MissingTexts();
   std::ofstream file(path, std::ios::binary);
   if (!file) {
-    return Fail(ErrorCode::kIoFailure, "gabarit impossible a ecrire : " + path.string());
+    return Fail(ErrorCode::kIoFailure, "gabarit impossible a ecrire : " + Utf8FromPath(path));
   }
   file << "# Textes demandes et absents du catalogue.\n";
   file << "# Completer chaque ligne 'tr:' puis fusionner dans le catalogue.\n\n";

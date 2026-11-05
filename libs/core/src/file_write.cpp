@@ -3,6 +3,8 @@
 #include <fstream>
 #include <system_error>
 
+#include "ro/core/utf8_path.h"
+
 namespace ro::core {
 namespace {
 
@@ -28,7 +30,7 @@ Result<void> WriteFileAtomically(const std::filesystem::path& path, std::string_
     // et les comparaisons d'un test ne tiendraient plus.
     std::ofstream file(pending, std::ios::binary | std::ios::trunc);
     if (!file) {
-      return Fail(ErrorCode::kIoFailure, pending.string());
+      return Fail(ErrorCode::kIoFailure, Utf8FromPath(pending));
     }
     file.write(content.data(), static_cast<std::streamsize>(content.size()));
     file.flush();
@@ -37,7 +39,7 @@ Result<void> WriteFileAtomically(const std::filesystem::path& path, std::string_
       // cible telle qu'elle était.
       file.close();
       std::filesystem::remove(pending, failed);
-      return Fail(ErrorCode::kIoFailure, pending.string());
+      return Fail(ErrorCode::kIoFailure, Utf8FromPath(pending));
     }
   }  // fermeture du flux — donc vidage complet — AVANT le remplacement
 
@@ -45,7 +47,7 @@ Result<void> WriteFileAtomically(const std::filesystem::path& path, std::string_
   if (failed) {
     std::error_code ignored;
     std::filesystem::remove(pending, ignored);
-    return Fail(ErrorCode::kIoFailure, path.string() + " : " + failed.message());
+    return Fail(ErrorCode::kIoFailure, Utf8FromPath(path) + " : " + failed.message());
   }
   return {};
 }
@@ -79,7 +81,7 @@ Result<void> WriteFileAtomicallyWith(const std::filesystem::path& path,
   std::filesystem::rename(pending, path, failed);
   if (failed) {
     std::filesystem::remove(pending, ignored);
-    return Fail(ErrorCode::kIoFailure, path.string() + " : " + failed.message());
+    return Fail(ErrorCode::kIoFailure, Utf8FromPath(path) + " : " + failed.message());
   }
   return {};
 }

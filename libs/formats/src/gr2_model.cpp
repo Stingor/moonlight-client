@@ -6,6 +6,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <optional>
+#include <set>
 #include <span>
 #include <string>
 #include <string_view>
@@ -44,6 +45,9 @@ constexpr std::size_t kRgbaBytes = 4;
 constexpr std::array<std::string_view, 3> kDiffuseUsages = {"color", "Diffuse Color", "BaseColor"};
 // Un matériau renvoie à d'autres par ses cartes : on n'en suit pas davantage.
 constexpr std::uint32_t kDeepestMaterial = 16;
+// Le pas d'un sommet peut tenir en un octet, et sa forme lue en demande quarante :
+// la mémoire du fichier ne borne donc pas ce qu'un maillage réserverait.
+constexpr std::uint32_t kMostMeshVertices = 1U << 22U;
 
 // Un poids réel se ramène à l'octet.
 constexpr double kWeightScale = 255.0;
@@ -176,15 +180,20 @@ core::Result<GrannyTextureImage> ReadTexture(Gr2File& file, const Gr2Object& tex
 }
 
 // La texture d'un matériau : la sienne, ou la première que portent ses cartes.
-Gr2Object TextureOfMaterial(Gr2File& file, const Gr2Object& material, std::uint32_t depth) {
-  if (!material.present() || depth > kDeepestMaterial) {
+//
+// ⚠ UN MATÉRIAU NE SE VISITE QU'UNE FOIS : la profondeur seule laisse un matériau
+// nommé plusieurs fois par ses propres cartes se parcourir sans fin en pratique.
+Gr2Object TextureOfMaterial(Gr2File& file, const Gr2Object& material, std::uint32_t depth,
+                            std::set<std::uint32_t>& visited) {
+  if (!material.present() || depth > kDeepestMaterial || !visited.insert(material.address).second) {
     return {};
   }
   if (const Gr2Object own = file.Reference(material, "Texture"); own.present()) {
     return own;
   }
   for (const Gr2Object& map : file.Array(material, "Maps")) {
-    if (const Gr2Object found = TextureOfMaterial(file, file.Reference(map, "Map"), depth + 1);
+    if (const Gr2Object found =
+            TextureOfMaterial(file, file.Reference(map, "Map"), depth + 1, visited);
         found.present()) {
       return found;
     }
@@ -197,7 +206,8 @@ Gr2Object TextureOfMaterial(Gr2File& file, const Gr2Object& material, std::uint3
 // consulté.
 Gr2Object DiffuseTexture(Gr2File& file, const Gr2Object& material) {
   for (const Gr2Object& map : file.Array(material, "Maps")) {
-    const Gr2Object texture = TextureOfMaterial(file, file.Reference(map, "Map"), 1);
+    std::set<std::uint32_t> visited;
+    const Gr2Object texture = TextureOfMaterial(file, file.Reference(map, "Map"), 1, visited);
     if (!texture.present()) {
       continue;
     }
@@ -221,7 +231,7 @@ GrannyMesh ReadMesh(Gr2File& file, const Gr2Object& mesh,
   out.name = file.String(mesh, "Name");
   const gr2::Gr2VariantArray vertices =
       file.VariantArray(file.Reference(mesh, "PrimaryVertexData"), "Vertices");
-  if (vertices.count != 0) {
+  if (vertices.count != 0 && vertices.count <= kMostMeshVertices) {
     const std::uint32_t stride = file.SizeOf(vertices.type);
     const std::optional<Gr2Member> position = file.MemberNamed(vertices.type, "Position");
     const std::optional<Gr2Member> normal = file.MemberNamed(vertices.type, "Normal");

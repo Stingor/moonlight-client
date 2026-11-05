@@ -134,6 +134,10 @@ struct FormatFrom {
 // font que le nommer.
 void WriteLog(LogLevel level, const std::source_location& where, std::string text);
 
+// Vrai pendant que CE fil écrit une ligne : il tient alors peut-être un verrou
+// de puits, et un gestionnaire de faute ne doit pas journaliser par-dessus.
+[[nodiscard]] bool ThisThreadIsLogging() noexcept;
+
 // ⚠ LA MISE AU POINT N'EXISTE QU'EN DEBUG (`kDevTools`). Ailleurs l'appel ne
 // formate rien et n'écrit rien : un relevé semé pour comprendre une image — le
 // recensement de la scène — ne doit ni coûter ni remplir le journal du joueur.

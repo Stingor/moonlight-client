@@ -16,6 +16,7 @@
 
 #include "ro/core/build_stamp.h"
 #include "ro/core/log.h"
+#include "ro/core/utf8_path.h"
 
 #if defined(_WIN32)
 #include <windows.h>
@@ -134,8 +135,10 @@ void WriteReport(const std::string& stamp, const std::string& fault, const std::
     // on rend la main tout de suite : ni la ligne du bas ni la boîte du joueur
     // ne s'exécutent, et un journal qui dirait seulement « rapport impossible »
     // ne dirait même pas qu'il y a eu plantage.
-    LogError("PLANTAGE : {} — le rapport n'a pas pu s'écrire dans {}, il ne reste que ce journal",
-             fault, path.string());
+    if (!ThisThreadIsLogging()) {
+      LogError("PLANTAGE : {} — le rapport n'a pas pu s'écrire dans {}, il ne reste que ce journal",
+               fault, Utf8FromPath(path));
+    }
     return;
   }
   WriteHeader(report, stamp, fault);
@@ -158,8 +161,8 @@ void WriteReport(const std::string& stamp, const std::string& fault, const std::
   report.close();
   // 🔴 ET SEULEMENT SI LE JOURNAL EST LIBRE : tenu par ce fil, le reprendre
   // figerait le client avant que la boîte ne dise au joueur où est le rapport.
-  if (log_free) {
-    LogError("PLANTAGE : {} — rapport dans {}", fault, path.string());
+  if (log_free && !ThisThreadIsLogging()) {
+    LogError("PLANTAGE : {} — rapport dans {}", fault, Utf8FromPath(path));
   }
   TellThePlayer(path, fault);
 }

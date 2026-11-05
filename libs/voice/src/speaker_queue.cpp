@@ -22,8 +22,15 @@ std::int64_t SpeakerQueue::Unwrap(std::uint16_t sequence) {
 
 void SpeakerQueue::Push(std::uint16_t sequence, std::span<const std::uint8_t> packet) {
   const std::int64_t at = Unwrap(sequence);
-  // Trop tard : sa place est déjà jouée.
-  if (playing_ && at < next_) return;
+  if (playing_ && at < next_) {
+    // Trop tard : sa place est déjà jouée.
+    if (missed_ == 0 || at <= last_played_) return;
+    // 🔴 UNE REPRISE DE PAROLE : la file à sec avance à chaque trame, l'émetteur
+    // ne numérote que ce qu'il envoie. Ce paquet n'a donc rien de périmé, et tous
+    // les suivants tomberaient de même : la lecture repart de lui, après sa marge.
+    playing_ = false;
+    missed_ = 0;
+  }
   queued_.insert_or_assign(at, std::vector<std::uint8_t>(packet.begin(), packet.end()));
   while (queued_.size() > kSpeakerMostQueuedFrames) {
     queued_.erase(queued_.begin());
@@ -56,6 +63,7 @@ SpeakerFrame SpeakerQueue::Pop() {
     frame.packet = std::move(expected->second);
     queued_.erase(expected);
     missed_ = 0;
+    last_played_ = next_;
   } else if (!queued_.empty()) {
     frame.step = SpeakerStep::kLost;
     if (queued_.begin()->first == next_ + 1) {

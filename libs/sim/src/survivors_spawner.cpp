@@ -187,13 +187,17 @@ std::uint32_t HatchFoe(SurvivorsField& field, const FoeRule& rule, FieldPoint at
 
 namespace {
 
-// Un lot ou un plancher de vague, à l'échelle de l'équipe. `wave_batch_born`
-// compte dans un octet : un lot n'en sort pas.
+// Un lot ou un plancher de vague, à l'échelle de l'équipe.
 [[nodiscard]] std::size_t ScaledCrowd(const SurvivorsField& field, std::size_t crowd) noexcept {
-  constexpr std::size_t kMostCrowd = 255;
   if (field.allies.empty()) return crowd;
   const auto pct = static_cast<std::size_t>(TeamScaleOf(field).batch_pct);
-  return std::min(crowd * pct / static_cast<std::size_t>(kPercent), kMostCrowd);
+  return crowd * pct / static_cast<std::size_t>(kPercent);
+}
+
+// `wave_batch_born` compte dans un octet : un lot n'en sort pas.
+[[nodiscard]] std::size_t ScaledBatch(const SurvivorsField& field, std::size_t batch) noexcept {
+  constexpr std::size_t kMostBatch = 255;
+  return std::min(ScaledCrowd(field, batch), kMostBatch);
 }
 
 }  // namespace
@@ -218,7 +222,7 @@ void SpawnFoes(SurvivorsField& field) {
     // reprend au pas suivant pour son SEUL reste, compté quelle que soit la
     // vague en vigueur. Un lot que le plafond réduit est accompli.
     if (field.step - field.wave_spawn_step >= StepsOf(wave.interval_ms)) {
-      const std::size_t batch = ScaledCrowd(field, wave.batch);
+      const std::size_t batch = ScaledBatch(field, wave.batch);
       const std::size_t owed = batch - std::min<std::size_t>(batch, field.wave_batch_born);
       const std::size_t room = most_foes - std::min(most_foes, field.foes.size());
       const std::size_t wanted = std::min(owed, room);

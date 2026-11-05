@@ -32,6 +32,9 @@ constexpr std::uint32_t kDeepestNesting = 64;
 // Un tableau : son compte, puis l'adresse de ses éléments ; un tableau de
 // type propre porte d'abord ce type.
 constexpr std::uint32_t kArrayPointerField = 4;
+// Le pas d'un élément peut tenir en un octet, et son objet lu en demande huit : la
+// mémoire du fichier ne borne donc pas ce qu'un tableau réserverait.
+constexpr std::int32_t kMostArrayItems = 1 << 24;
 constexpr std::uint32_t kVariantCountField = 4;
 constexpr std::uint32_t kVariantPointerField = 8;
 
@@ -256,7 +259,7 @@ std::vector<Gr2Object> Gr2File::Array(const Gr2Object& object, std::string_view 
   // ⚠ UN PAS NUL TIENT TOUJOURS DANS LA MÉMOIRE — un type sans membre, ou qui
   // se contient lui-même —, et le compte, lu du fichier, partirait tel quel
   // en réservation : des gigaoctets pour un fichier de quelques octets.
-  if (stride == 0 ||
+  if (stride == 0 || count > kMostArrayItems ||
       !memory_.Holds(first, std::uint64_t{stride} * static_cast<std::uint32_t>(count))) {
     memory_.Invalidate();
     return items;
