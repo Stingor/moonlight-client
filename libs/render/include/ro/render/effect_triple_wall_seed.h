@@ -19,10 +19,9 @@ namespace ro::render {
 // appelle son bâtisseur deux fois de suite ; n'en poser qu'un donnerait la
 // moitié des murs, entrelacés autrement.
 //
-// ⚠ ET DEUX DES SIX IDENTIFIANTS SONT ÉCARTÉS. Leur bâtisseur ne reçoit pas un
-// azimut mais un INDEX — zéro à trois pour l'un, dix et onze pour l'autre —, et
-// ce que cet index devient n'est pas mesuré. Le générateur les refuse
-// bruyamment plutôt que de leur prêter l'azimut des quatre autres.
+// ⚠ L'ANGE D'UNE MONTÉE DE NIVEAU LES POSE À DEUX TICS DE SUITE : un nœud par
+// tic, l'azimut zéro au soixante-cinquième et quarante-cinq au suivant. Voir
+// `EffectTripleWallPattern::one_azimuth_per_tick`.
 
 // DE COMBIEN LES QUATRE PISTES D'UN NŒUD S'ÉCARTENT : un quart de tour.
 inline constexpr std::int16_t kTripleWallDegreesPerTrack = 90;
@@ -50,7 +49,19 @@ struct EffectTripleWallPattern {
   // quatre : son mur vert ne paraît qu'un quart de seconde après le début de
   // l'effet. Le semer au premier tic le montrerait en avance sur le reste.
   EffectNodeSchedule schedule;
+  // VRAI QUAND CHAQUE TIC DE L'HORAIRE POSE UN SEUL AZIMUT, dans leur ordre. Faux
+  // quand le seul tic de l'horaire pose les deux.
+  bool one_azimuth_per_tick = false;
 };
+
+// LES AZIMUTS que ce patron pose à ce tic de son horaire.
+[[nodiscard]] constexpr std::span<const std::int16_t> EffectTripleWallAzimuthsAt(
+    const EffectTripleWallPattern& pattern, std::int32_t tick) {
+  const std::span<const std::int16_t> azimuths = kTripleWallNodeAzimuths;
+  return pattern.one_azimuth_per_tick
+             ? azimuths.subspan(static_cast<std::size_t>(tick - pattern.schedule.first_tick), 1)
+             : azimuths;
+}
 
 [[nodiscard]] std::span<const EffectTripleWallPattern> EffectTripleWallPatternTable();
 

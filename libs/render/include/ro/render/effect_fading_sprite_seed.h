@@ -11,6 +11,7 @@
 #include "ro/render/effect_node_fwd.h"
 #include "ro/render/effect_node_pool_fwd.h"
 #include "ro/render/effect_node_seed.h"
+#include "ro/render/effect_render_word.h"
 #include "ro/render/effect_track.h"
 
 namespace ro::render {
@@ -29,14 +30,19 @@ namespace ro::render {
 // rangée par APPEL et non une par effet. N'en semer qu'une montrerait un ange
 // sans ailes.
 
-// COMBIEN DE CRANS de traînée ce nœud garde. Le client les tient dans le nœud,
-// et c'est cette longueur qui donne au sprite son sillage.
-inline constexpr std::size_t kFadingSpriteTrailSteps = 4;
+// DE COMBIEN L'ANCRE NAÎT PLUS HAUT que le point de l'effet : notre axe vertical
+// monte, c'est donc une addition.
+inline constexpr float kFadingSpriteSpawnHeight = 40.0F;
+inline constexpr float kFadingSpriteHanbokSpawnHeight = 30.0F;
 
-// DE COMBIEN L'ANCRE NAÎT PLUS HAUT que le point de l'effet, dans le repère du
-// client — qui descend, donc c'est une soustraction.
-inline constexpr float kFadingSpriteSpawnHeight = -40.0F;
-inline constexpr float kFadingSpriteHanbokSpawnHeight = -30.0F;
+// LE MOT DE RENDU de chaque style. Voir `effect_render_word.h`.
+//
+// ⚠ LE CORPS DU HANBOK SEUL NE S'AJOUTE PAS : il se mélange à l'ordinaire et passe
+// par-dessus tout, décor et acteurs compris. Les autres sprites s'ajoutent, sous
+// l'épreuve de profondeur.
+inline constexpr std::uint32_t kFadingSpriteRenderWord = kEffectRenderWordOfAdditiveSprite;
+inline constexpr std::uint32_t kFadingSpriteHanbokBodyRenderWord =
+    kEffectRenderWordOfConstructor | kEffectRenderWordOverEverything;
 
 // UN APPEL du bâtisseur : un sprite, un style, et quand il naît.
 struct EffectFadingSpritePattern {

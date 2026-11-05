@@ -10,19 +10,24 @@ namespace ro::render {
 // LE MOUVEMENT DU SOUS-TYPE 85 : un sprite qui S'ÉLÈVE en s'allumant, puis
 // s'efface.
 //
-// C'est l'ange de `EF_ANGEL2`, ses ailes et ses plumes.
+// C'est l'ange d'une montée de niveau, ses ailes et ses plumes : `EF_ANGEL2` pour
+// le super apprenti, `EF_ANGEL3` pour la lignée taekwon.
 //
 // ⚠ CE MOUVEMENT NE BOUGE PAS DES PISTES, seul de ceux que nous portons. Il mène
 // l'ALPHA du nœud, son INDEX D'IMAGE et sa POSITION ; la piste ne lui sert que
 // d'ancre. Le chercher dans les pistes ferait conclure qu'il ne fait rien.
 //
-// ⚠ ET IL MONTE, MÊME S'IL RETRANCHE. Le repère du client descend : son moins
-// quarante est un quarante au-dessus. Le bâtisseur pose donc l'ancre plus haut
-// que l'effet, et ce mouvement l'élève encore d'un dixième par tic. Lire la
-// soustraction comme une chute ferait traverser le sol à un ange qui s'envole.
+// ⚠ NOTRE AXE VERTICAL MONTE : s'élever, c'est AJOUTER à l'ordonnée. Le bâtisseur
+// pose l'ancre au-dessus de l'effet, et ce mouvement l'élève encore d'un dixième
+// par tic. Retrancher enterrerait l'ange, et l'épreuve de profondeur le cacherait
+// tout entier sans qu'aucun compte de nœuds ou de quads ne change.
 
 // DE COMBIEN L'ANCRE S'ÉLÈVE À CHAQUE TIC.
 inline constexpr float kFadingSpriteRisePerTick = 0.1F;
+
+// À PARTIR DE CE TIC, plus aucun style ne monte : le corps ne fait plus que
+// tenir, puis s'éteindre.
+inline constexpr std::int32_t kFadingSpriteRiseEndTick = 50;
 
 // LES MARQUES QUE CETTE FAMILLE EMPLOIE : le STYLE, qui choisit la rampe, et le
 // TIC DE NAISSANCE, qui plafonne l'alpha des nœuds resemés.
@@ -77,8 +82,8 @@ inline constexpr std::int32_t kFadingSpriteLastFrame = 29;
 inline constexpr std::int32_t kFadingSpriteHanbokFrameEveryTicks = 4;
 inline constexpr std::int32_t kFadingSpriteHanbokLastFrame = 15;
 
-// UN TIC DU NŒUD : son alpha, son image, sa position, et son historique de
-// traînée.
+// UN TIC DU NŒUD : son alpha, son image et sa position. Il n'a qu'une seule trace :
+// le sprite se peint une fois, au point du nœud.
 void AdvanceFadingSpriteNode(PooledEffectNode& pooled);
 
 }  // namespace ro::render

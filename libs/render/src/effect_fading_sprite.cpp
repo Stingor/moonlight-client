@@ -4,7 +4,6 @@
 
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_track.h"
-#include "ro/render/effect_trail_history.h"
 
 namespace ro::render {
 namespace {
@@ -21,6 +20,9 @@ struct RiseSchedule {
 
 [[nodiscard]] RiseSchedule RiseScheduleOf(std::uint8_t style, std::uint8_t birth,
                                           std::int32_t ticks) {
+  if (ticks >= kFadingSpriteRiseEndTick) {
+    return {0.0F, 0.0F};
+  }
   if (birth != 0) {
     return {kFadingSpriteRebornStep, kFadingSpriteRebornCeiling - static_cast<float>(birth)};
   }
@@ -30,8 +32,8 @@ struct RiseSchedule {
     case kFadingSpriteHanbokBody:
       return {kFadingSpriteHanbokRiseStep, kFadingSpriteHanbokCeiling};
     case kFadingSpriteHanbokWings:
-      // ⚠ CELUI-CI NE MONTE PAS, IL S'ÉTEINT : le client remet son alpha à zéro
-      // à chaque tic. Ce sont les ailes du hanbok, que seule la traînée montre.
+      // ⚠ CELLES-CI RESTENT ÉTEINTES : seuls leurs nœuds resemés se montrent, par
+      // la rampe du tic de naissance.
       return {0.0F, 0.0F};
     case kFadingSpriteBody:
       return {kFadingSpriteRiseStep, kFadingSpriteBodyCeiling};
@@ -92,24 +94,15 @@ void AdvanceFadingSpriteNode(PooledEffectNode& pooled) {
   EffectTrack& track = pooled.tracks.front();
   if (track.active) {
     ++track.ticks;
-    // ⚠ IL S'ÉLÈVE EN RETRANCHANT : le repère du client descend.
-    track.anchor.y -= kFadingSpriteRisePerTick;
+    track.anchor.y += kFadingSpriteRisePerTick;
     // LE NŒUD SUIT SON ANCRE, et c'est ce qui le fait monter à l'écran.
     pooled.ground_position = track.anchor;
 
     const std::uint8_t style = track.mark[kFadingSpriteMarkOfStyle];
     const std::uint8_t birth = track.mark[kFadingSpriteMarkOfBirthTick];
     const RiseSchedule rise = RiseScheduleOf(style, birth, track.ticks);
-    if (style == kFadingSpriteHanbokWings && birth == 0) {
-      pooled.node.alpha = 0.0F;
-    } else if (rise.step > 0.0F && pooled.node.alpha < rise.ceiling) {
-      // ⚠ LE CLIENT TESTE AVANT D'AJOUTER, ET NE BORNE PAS. L'alpha dépasse donc
-      // son plafond du dernier pas, et c'est ce qui empêche le CORPS de
-      // s'éteindre : passé le centième tic, sa montée de cinq et sa chute de
-      // quatre se répondent, et il oscille autour de son plafond jusqu'à ce que
-      // le nœud meure. Borner à `plafond` ferait retomber l'ange à zéro — et il
-      // ne le fait pas.
-      pooled.node.alpha += rise.step;
+    if (rise.step > 0.0F && pooled.node.alpha < rise.ceiling) {
+      pooled.node.alpha = std::min(pooled.node.alpha + rise.step, rise.ceiling);
     }
 
     // L'IMAGE N'AVANCE QU'APRÈS LE TRENTIÈME TIC, et le client la borne.
@@ -125,10 +118,6 @@ void AdvanceFadingSpriteNode(PooledEffectNode& pooled) {
       pooled.node.alpha = std::max(pooled.node.alpha - descent.step, 0.0F);
     }
   }
-
-  // L'HISTORIQUE RECULE D'UN CRAN, que la piste vive ou non : le client le fait
-  // reculer en sortant, hors de toute garde.
-  AdvanceEffectTrailHistory(pooled.trail, pooled.node, pooled.ground_position);
 }
 
 }  // namespace ro::render

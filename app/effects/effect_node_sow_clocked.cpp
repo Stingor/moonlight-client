@@ -117,10 +117,10 @@ bool EffectNodesInPlay::PlayTripleWalls(std::uint32_t effect_id, glm::vec3 groun
     if (TextureFor(std::string(pattern.texture)).empty()) {
       continue;
     }
-    // ⚠ DEUX NŒUDS PAR EFFET, aux azimuts zéro et quarante-cinq : le site
-    // appelle son bâtisseur deux fois de suite. N'en poser qu'un donnerait la
-    // moitié des murs, entrelacés autrement.
-    for (const std::int16_t azimuth : ro::render::kTripleWallNodeAzimuths) {
+    // ⚠ DEUX NŒUDS PAR EFFET, aux azimuts zéro et quarante-cinq, au même tic ou à
+    // deux tics de suite. N'en poser qu'un donnerait la moitié des murs,
+    // entrelacés autrement.
+    for (const std::int16_t azimuth : ro::render::EffectTripleWallAzimuthsAt(pattern, tick)) {
       pool_.Add(ro::render::SowEffectTripleWallNode(pattern, azimuth, ground_position,
                                                     ro::render::EffectNodeLifeFor(effect_id)));
     }

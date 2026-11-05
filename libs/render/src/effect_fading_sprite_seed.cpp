@@ -5,7 +5,6 @@
 #include "ro/core/sorted_table.h"
 #include "ro/render/effect_node_pool.h"
 #include "ro/render/effect_pooled_node_shape.h"
-#include "ro/render/effect_trail_history.h"
 
 namespace ro::render {
 
@@ -43,15 +42,14 @@ PooledEffectNode SowEffectFadingSpriteNode(const EffectFadingSpritePattern& patt
   // brillant lui retirerait son apparition.
   pooled.node.alpha = 0.0F;
   pooled.node.frame = 0;
+  pooled.node.render_word = pattern.style == kFadingSpriteHanbokBody
+                                ? kFadingSpriteHanbokBodyRenderWord
+                                : kFadingSpriteRenderWord;
   pooled.tracks = SeedEffectFadingSpriteTracks(pattern, anchor, tick);
   // LE NŒUD PART DE SON ANCRE, déjà plus haut que le point de l'effet.
   pooled.ground_position = pooled.tracks.front().anchor;
   pooled.owner_position = anchor;
   pooled.resource_paths = {std::string(pattern.sprite_base)};
-  pooled.trail.resize(kFadingSpriteTrailSteps);
-  for (EffectTrailStep& notch : pooled.trail) {
-    notch.ground_position = pooled.ground_position;
-  }
   return pooled;
 }
 

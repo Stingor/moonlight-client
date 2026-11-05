@@ -134,8 +134,7 @@ void AdvanceTracksOf(PooledEffectNode& pooled, const EffectScatterWorld& world,
       return;
     case PooledNodeShape::kFadingSprite:
       // ⚠ CE MOUVEMENT NE TOUCHE À AUCUNE PISTE, et c'est pourquoi il prend le
-      // nœud entier : il mène son alpha, son image et sa position, puis fait
-      // reculer sa traînée d'un cran.
+      // nœud entier : il mène son alpha, son image et sa position.
       AdvanceFadingSpriteNode(pooled);
       return;
     case PooledNodeShape::kTeleportRings:
