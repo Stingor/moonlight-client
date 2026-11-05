@@ -36,6 +36,12 @@ class SurvivorsPlay {
   // journal le rendraient irrejouable.
   [[nodiscard]] const SurvivorsRun& run() const noexcept { return run_; }
   [[nodiscard]] const SurvivorsJournal& journal() const noexcept { return journal_; }
+  // CE QUE LE DESSIN MONTRE D'UNE PARTIE TENUE AILLEURS (le lockstep d'une coop) : la
+  // partie, et le temps déjà écoulé du pas suivant.
+  void Show(const SurvivorsRun& run, std::uint32_t pending_ms) {
+    run_ = run;
+    pending_ms_ = pending_ms;
+  }
   // Part du pas suivant déjà écoulée, en millièmes : l'interpolation du dessin.
   [[nodiscard]] std::uint32_t blend_per_mille() const noexcept;
 

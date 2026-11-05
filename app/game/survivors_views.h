@@ -87,6 +87,8 @@ struct SurvivorsViewFacts {
   // LE CLASSEMENT : la marque du HUD, la section de l'écran de fin et le
   // tableau mondial par-dessus lui. Nul, rien du classement ne paraît.
   const SurvivorsRankingMode* ranking = nullptr;
+  // Les noms des joueurs d'une partie coop, dans l'ordre des places.
+  std::span<const std::string> coop_names;
   // L'heure de l'image : le sprite de la fiche du Codex s'anime sur elle.
   std::uint32_t now_ms = 0;
 };
@@ -154,6 +156,10 @@ class SurvivorsViews {
   void ComposeOffer(const ro::sim::SurvivorsField& field, const ro::sim::SurvivorsRules& rules,
                     bool accepts_input, int pressed_card_key, bool charges_withheld,
                     std::uint16_t objective_skill_id, const SurvivorsTables& tables);
+  // LE VOTE D'UNE PARTIE COOP, par-dessus les offres composées.
+  void ComposeVote(const ro::sim::SurvivorsField& field, std::span<const std::string> names);
+  // LES ALLIÉS au HUD d'une partie coop.
+  void ComposeAllies(const ro::sim::SurvivorsField& field, const SurvivorsViewFacts& facts);
   void ComposeChest(const SurvivorsStage& stage, const SurvivorsTables& tables);
   void ComposePause(const SurvivorsStage& stage, const ro::sim::SurvivorsField* field,
                     const SurvivorsViewFacts& facts);
@@ -208,6 +214,8 @@ class SurvivorsViews {
   std::vector<ro::ui::SurvivorsEdgeTarget> edge_targets_;
   std::vector<ro::ui::SurvivorsMinimapDot> minimap_dots_;
   std::vector<ro::ui::SurvivorsOfferCard> offer_cards_;
+  std::vector<ro::ui::SurvivorsOfferRaise> offer_raises_;
+  std::vector<ro::ui::SurvivorsHudAlly> hud_allies_;
   std::vector<ro::ui::SurvivorsChestGainRow> chest_gains_;
   std::vector<ImTextureID> roulette_icons_;
   std::vector<ro::ui::SurvivorsMeasureRow> measure_rows_;

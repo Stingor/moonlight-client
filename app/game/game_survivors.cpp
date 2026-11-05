@@ -201,6 +201,9 @@ void Game::FrameSurvivors(std::uint32_t now_ms) {
       .minigames = &windows_.minigames,
       .minigame_stage = &pieces_.minigames,
       .ranking = &survivors_ranking_,
+      .coop = &survivors_presence_->coop,
+      .voice = &voice_,
+      .own_char_id = ticket_.character_id,
       .aside = WorldAside{.on_town_map = towns != nullptr && !towns->On(world_.map_name()).empty(),
                           .on_indoor_map = camera_rig_.indoor(),
                           .trade_open = deal != ro::sim::DealPhase::kNone,
@@ -245,6 +248,8 @@ void Game::FrameSurvivors(std::uint32_t now_ms) {
           },
       .now_ms = now_ms});
   const SurvivorsContext& context = survivors_mode_->context();
+  // La liaison perdue emporte le salon : la prochaine le redira.
+  if (!link_.is_open()) survivors_presence_->coop.Forget();
   survivors_mode_->FollowDoor(survivors_, context);
   // LA PRÉSENCE EN ARÈNE, à chaque image, muette tant que le serveur ne l'a pas
   // annoncée : elle dit aussi la sortie, une fois la salle refermée.

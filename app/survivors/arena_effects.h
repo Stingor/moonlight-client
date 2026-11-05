@@ -197,6 +197,7 @@ class ArenaEffects {
   ro::vfs::Vfs* vfs_ = nullptr;
   const ro::render::SpriteCatalog* sprites_ = nullptr;
   ArenaSkillLooks looks_;
+  std::vector<ro::sim::SurvivorsZone> team_zones_;
   ArenaEffectSwitches switches_;
   ArenaEffectBudget budget_;
   ro::render::EffectCatalog catalog_;

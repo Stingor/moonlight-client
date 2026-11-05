@@ -10,6 +10,7 @@
 #include "ro/sim/survivors_journal.h"
 
 #include "game/survivors_codex_desk.h"
+#include "game/survivors_coop_mode.h"
 #include "game/survivors_mode_slot.h"
 #include "game/survivors_ranking_desk.h"
 #include "options/game_option_ids.h"
@@ -71,6 +72,9 @@ constexpr std::uint16_t kFallbackHeroHair = 1;
       break;
     case ro::ui::SurvivorsOfferVerb::kBanish:
       answer.kind = ro::sim::AnswerKind::kBanish;
+      break;
+    case ro::ui::SurvivorsOfferVerb::kRaise:
+      answer.kind = ro::sim::AnswerKind::kRaise;
       break;
   }
   return answer;
@@ -253,6 +257,12 @@ SurvivorsPainted SurvivorsMode::Frame(SurvivorsStage& stage, const SurvivorsCont
         context.minigames->survivors_prepare.open = true;
         return SurvivorsPainted{};
       case SummaryStep::kReplay:
+        // « Rejouer » ne vaut que seul : une équipe repasse par son salon.
+        if (stage.board().coop) {
+          Exit(stage, context);
+          context.minigames->survivors_prepare.open = true;
+          return SurvivorsPainted{};
+        }
         Enter(stage, context, ChosenBolt());
         if (!stage.owns_screen()) return SurvivorsPainted{};
         return Frame(stage, context);
@@ -262,6 +272,7 @@ SurvivorsPainted SurvivorsMode::Frame(SurvivorsStage& stage, const SurvivorsCont
   const Clock::time_point simulated = Clock::now();
   stage.Advance(elapsed_ms, intent);
   measures_.Record(ArenaMeasure::kSimulation, MsSince(simulated));
+  if (!FollowCoopFrame(stage, context)) return SurvivorsPainted{};
   if (options_open != nullptr) pause_options_.Settle(*options_open, stage.screen());
   FollowEntered(stage, context);
 
@@ -305,15 +316,21 @@ void SurvivorsMode::FollowEntered(SurvivorsStage& stage, const SurvivorsContext&
       if (stage.pause_cause() != PauseCause::kWorldAlert) banner_.reset();
       return;
     case SurvivorsScreen::kSummary:
-      // UNE PARTIE LIBRE COMPTE POUR LES TROPHÉES, quelle que soit son issue.
-      trophies_.FollowEntered(stage, context.minigame_stage, context.client_root);
+      // UNE PARTIE LIBRE COMPTE POUR LES TROPHÉES, quelle que soit son issue, sauf en
+      // coop, hors classement elle aussi.
+      if (!stage.board().coop) {
+        trophies_.FollowEntered(stage, context.minigame_stage, context.client_root);
+      }
       // UNE PARTIE CLASSÉE FINIE ENVOIE SES COMPOSANTES, une fois.
-      if (context.ranking != nullptr) context.ranking->FollowEnded(stage, false);
+      if (context.ranking != nullptr && !stage.board().coop) {
+        context.ranking->FollowEnded(stage, false);
+      }
       // TOUTE PARTIE CRÉDITE LE CARNET (Q10), une fois ; l'écran de fin lit
       // le carnet relu.
       book_.FollowEntered(stage, Rules(), context.client_root);
       TellDamagedCopy(book_.TakeDamagedCopy(), context.say);
       desk_.Reload(context.client_root, context.say);
+      if (stage.board().coop) run_saved_ = true;
       if (!run_saved_ && stage.play() != nullptr) {
         if (auto saved = SaveLastRun(context.client_root, stage.play()->journal()); !saved) {
           ro::core::LogWarning("survivors : journal non écrit — {}",
@@ -356,6 +373,7 @@ void SurvivorsMode::PaintArena(const SurvivorsStage& stage, const SurvivorsConte
     arena_->SetHeroLook(HeroLook(face, *field.hero_class, hero_job));
     hero_job_ = hero_job;
   }
+  PoseAllyLooks(stage);
   play.run().Orbs(orbs_);
   const ArenaFrameFacts facts{
       .field = &field,
@@ -411,6 +429,8 @@ SurvivorsFrameView SurvivorsMode::View(const SurvivorsStage& stage,
                          .trophies = trophies_.won(),
                          .meta = &context.minigames->survivors_meta,
                          .ranking = context.ranking,
+                         .coop_names = context.coop != nullptr ? context.coop->player_names()
+                                                               : std::span<const std::string>{},
                          .now_ms = context.now_ms},
       context.tables);
   if (sign_view_.has_value()) view.map_sign = &*sign_view_;

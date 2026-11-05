@@ -34,7 +34,9 @@ void SurvivorsMode::PlaySounds(const ro::sim::SurvivorsNews& news,
   const std::vector<std::string> effect_sounds =
       arena_.has_value() ? arena_->TakeEffectSounds() : std::vector<std::string>{};
   if (!context.audio->sound_audible()) return;
-  if (news.hero_hurt > 0) PlaySound(kHeroHurtSound, ArenaSoundRank::kHeroHurt, context);
+  // Le joueur n'entend que les coups de son héros.
+  if (news.hurt_by_hero[local_hero_] > 0)
+    PlaySound(kHeroHurtSound, ArenaSoundRank::kHeroHurt, context);
   if (news.level_ups > 0 || !news.evolutions.empty()) {
     PlaySound(ro::sim::kBaseLevelUpSound, ArenaSoundRank::kRise, context);
   }

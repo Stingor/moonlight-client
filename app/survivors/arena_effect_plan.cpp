@@ -224,7 +224,18 @@ void CollectArenaLaunches(const ro::sim::SurvivorsNews& news, const ro::sim::Sur
                                 .at = field.hero.position});
     }
     for (const ro::sim::SurvivorsCast& cast : news.casts) {
-      if (const SkillLook* look = looks.Find(cast.skill_id)) PlanCast(cast, *look, out);
+      const SkillLook* look = looks.Find(cast.skill_id);
+      if (look == nullptr) continue;
+      // LE SORT D'UN ALLIÉ part de lui : seul le héros local porte un effet sur lui.
+      if (cast.hero_index != field.stage && look->bearer == SkillBearer::kHero) {
+        SkillLook on_ground = *look;
+        on_ground.bearer = SkillBearer::kGround;
+        ro::sim::SurvivorsCast from_ally = cast;
+        from_ally.to = cast.from;
+        PlanCast(from_ally, on_ground, out);
+        continue;
+      }
+      PlanCast(cast, *look, out);
     }
   }
   std::vector<std::uint32_t> struck_serials;

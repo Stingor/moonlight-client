@@ -86,6 +86,8 @@ inline constexpr std::uint32_t kHordeBirthFadeMs = 333;
 inline constexpr std::uint32_t kHeroGestureEveryMs = 2000;
 // L'incantation tient sa première image pendant cette durée.
 inline constexpr std::uint32_t kHeroCastHoldMs = 600;
+// Un héros à terre reste à la dernière image de sa chute : ce temps la dépasse.
+inline constexpr float kDownMotionMs = 100000.0F;
 // Un mort, sa chute jouée, s'efface pendant cette durée.
 inline constexpr std::uint32_t kFallFadeMs = 1000;
 // Au plus autant de morts s'effacent à la fois ; le plus ancien cède.
@@ -158,6 +160,9 @@ class HordePoses {
 
   void PoseHero(const ro::sim::SurvivorsField& field, std::uint64_t presentation_ms,
                 std::uint32_t blend_per_mille, const HordeTimesOf& times_of);
+  // Les alliés d'une partie coop, après le héros : `look_id` est l'index du héros + 1.
+  void PoseAllies(const ro::sim::SurvivorsField& field, std::uint64_t presentation_ms,
+                  std::uint32_t blend_per_mille);
   void PoseFoes(const ro::sim::SurvivorsField& field, std::uint64_t presentation_ms,
                 std::uint32_t blend_per_mille, const HordeTimesOf& times_of);
   void PoseFalling(std::uint64_t presentation_ms, const HordeTimesOf& times_of);

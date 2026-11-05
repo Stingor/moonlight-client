@@ -112,6 +112,20 @@ struct SurvivorsPrepareMeta {
   const char* board_arena_name = "";
 };
 
+// LE SALON DU GROUPE, dans l'accueil. `shown` : le serveur tient la coop.
+struct SurvivorsPrepareCoopMember {
+  const char* name = "";
+  bool ready = false;
+};
+struct SurvivorsPrepareCoop {
+  bool shown = false;
+  bool in_lobby = false;
+  bool ready = false;
+  std::span<const SurvivorsPrepareCoopMember> members;
+  // Ce qui empêche de partir, ligne à ligne. ⚠ EN FRANÇAIS, marqué, traduit au dessin.
+  std::span<const char* const> refusals;
+};
+
 struct SurvivorsPrepareView {
   std::span<const SurvivorsBoltChoice> bolts;
   std::uint16_t chosen_skill_id = 0;
@@ -124,6 +138,7 @@ struct SurvivorsPrepareView {
   const char* key_south = "S";
   const char* key_east = "D";
   std::optional<SurvivorsPrepareMeta> meta;
+  SurvivorsPrepareCoop coop;
 };
 
 struct SurvivorsPrepareState {
@@ -142,6 +157,9 @@ struct SurvivorsPrepareAsk {
   std::optional<SurvivorsMetaPlace> open_place;
   bool open_ranking = false;  // le classement mondial
   bool start = false;
+  bool coop_enter = false;
+  bool coop_ready = false;
+  bool coop_leave = false;
 };
 
 inline constexpr const char* kSurvivorsPrepareId = "survivors_prepare";

@@ -105,8 +105,10 @@ void ArenaNumbers::Notice(const ro::sim::SurvivorsNews& news, const ro::sim::Sur
   for (const ro::sim::SurvivorsHit& hit : news.hits) {
     pool_.Add(hit.foe_serial, false, hit.at, hit.amount, hit.efficiency_pct, now_ms);
   }
-  if (news.hero_hurt > 0) {
-    pool_.Add(0, true, field.hero.position, news.hero_hurt, kHurtEfficiencyPct, now_ms);
+  for (std::size_t index = 0; index < ro::sim::HeroCount(field); ++index) {
+    const std::int32_t hurt = news.hurt_by_hero[index];
+    if (hurt <= 0) continue;
+    pool_.Add(0, true, ro::sim::HeroAt(field, index).position, hurt, kHurtEfficiencyPct, now_ms);
   }
 }
 

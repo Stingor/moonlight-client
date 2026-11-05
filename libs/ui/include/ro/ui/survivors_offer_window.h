@@ -29,6 +29,18 @@ struct SurvivorsOfferCard {
   int next_level = 1;
   bool evolves = false;    // la prendre ouvre une évolution
   bool objective = false;  // elle mène au sort épinglé en objectif au Codex
+  // EN COOP : le héros qui la recevra, ses voix, et si le joueur a voté pour elle.
+  const char* for_hero = nullptr;
+  int votes = 0;
+  bool my_vote = false;
+};
+
+// UN HÉROS À RELEVER, au vote d'une montée de niveau en coop.
+struct SurvivorsOfferRaise {
+  std::uint8_t hero_index = 0;
+  const char* name = "";
+  int votes = 0;
+  bool my_vote = false;
 };
 
 struct SurvivorsOfferView {
@@ -45,6 +57,11 @@ struct SurvivorsOfferView {
   // Vrai au défi et en partie classée, qui partent sans charges Kafra : la
   // fenêtre le dit, pour qu'aucun joueur ne les cherche.
   bool charges_withheld = false;
+  // EN COOP : le vote. Sans votants, le choix est celui du joueur seul.
+  int voters = 0;
+  float vote_time_left = 0.0F;  // de 1 à 0
+  int leaves = 0;
+  std::span<const SurvivorsOfferRaise> raises;
 };
 
 // Le bannissement armé tient d'une image à l'autre : la fenêtre le garde ici.
@@ -52,10 +69,10 @@ struct SurvivorsOfferState {
   bool banishing = false;
 };
 
-enum class SurvivorsOfferVerb : std::uint8_t { kPick, kReroll, kSkip, kBanish };
+enum class SurvivorsOfferVerb : std::uint8_t { kPick, kReroll, kSkip, kBanish, kRaise };
 struct SurvivorsOfferAsk {
   SurvivorsOfferVerb verb = SurvivorsOfferVerb::kPick;
-  std::uint8_t card_index = 0;  // pour kPick et kBanish
+  std::uint8_t card_index = 0;  // pour kPick et kBanish ; le héros pour kRaise
   [[nodiscard]] bool operator==(const SurvivorsOfferAsk&) const = default;
 };
 

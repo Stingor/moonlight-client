@@ -27,6 +27,12 @@ using ro::render::SpriteLayout;
 
 HordeComposer::HordeComposer(ro::render::ActorWardrobe& wardrobe) noexcept : wardrobe_(&wardrobe) {}
 
+void HordeComposer::SetAllyLook(std::size_t hero_index, const ro::render::ActorLook& look) {
+  if (hero_index + 1U < ally_outfits_.size()) {
+    ally_outfits_[hero_index + 1U] = wardrobe_->OutfitFor(look);
+  }
+}
+
 void HordeComposer::SetHeroLook(const ro::render::ActorLook& look) {
   hero_outfit_ = wardrobe_->OutfitFor(look);
 }
@@ -68,7 +74,9 @@ const HordeComposer::KnownOutfit& HordeComposer::KnownOf(HordeBodyKind kind,
 }
 
 ro::render::ActorOutfit* HordeComposer::OutfitOf(HordeBodyKind kind, std::uint16_t look_id) {
-  if (kind == HordeBodyKind::kHero) return hero_outfit_;
+  if (kind == HordeBodyKind::kHero) {
+    return look_id == 0 || look_id >= ally_outfits_.size() ? hero_outfit_ : ally_outfits_[look_id];
+  }
   return KnownOf(kind, look_id).outfit;
 }
 

@@ -421,7 +421,11 @@ void SurvivorsRun::StepTeam(std::span<const SurvivorsInput> inputs) {
   survivors::RebuildGrid(field_);
   // Un héros tombé laisse ses coups en vol finir leur course.
   survivors::ForEachHero(field_, [this] {
+    const std::size_t casts_before = field_.news.casts.size();
     if (!field_.hero.down) survivors::FireSkills(field_);
+    for (std::size_t cast = casts_before; cast < field_.news.casts.size(); ++cast) {
+      field_.news.casts[cast].hero_index = field_.stage;
+    }
     survivors::LandStrikes(field_);
     survivors::LandBlasts(field_);
     survivors::AdvanceShots(field_);

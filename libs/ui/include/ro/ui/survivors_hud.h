@@ -67,6 +67,14 @@ struct SurvivorsEdgeTarget {
   SurvivorsEdgeKind kind = SurvivorsEdgeKind::kChest;
 };
 
+// UN ALLIÉ, au HUD d'une partie coop.
+struct SurvivorsHudAlly {
+  const char* name = "";
+  float fill = 1.0F;
+  bool down = false;
+  std::optional<ImVec2> feet_px;
+};
+
 struct SurvivorsHudView {
   int level = 1;
   float exp_fill = 0.0F;  // de 0 à 1, vers le niveau suivant
@@ -80,6 +88,8 @@ struct SurvivorsHudView {
   std::span<const SurvivorsEdgeTarget> edge_targets;
   int unread_whispers = 0;  // 0 : rien n'est dit
   std::optional<ImVec2> hero_feet_px;
+  // EN COOP : la jauge sous chaque allié visible, et la liste de l'équipe.
+  std::span<const SurvivorsHudAlly> allies;
   float hero_fill = 1.0F;
   // Sous les compteurs, les charges qui restent et les vies ; une charge à
   // zéro garde sa case, des vies à zéro ne montrent rien.

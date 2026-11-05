@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
@@ -11,6 +12,7 @@
 #include "ro/render/actor_wardrobe.h"
 #include "ro/render/sprite_catalog.h"
 #include "ro/render/sprite_renderer.h"
+#include "ro/sim/survivors_rules.h"
 
 #include "survivors/horde_poses.h"
 
@@ -66,6 +68,8 @@ class HordeComposer {
   // L'apparence du héros : voir `HeroLook`. Sans elle, le héros n'a pas de
   // corps.
   void SetHeroLook(const ro::render::ActorLook& look);
+  // L'apparence du héros `hero_index` en coop, posé avec `look_id` = index + 1.
+  void SetAllyLook(std::size_t hero_index, const ro::render::ActorLook& look);
 
   // Les durées des motions d'une apparence, lues sur son `.act` ; zéro pour
   // une apparence sans corps.
@@ -106,6 +110,7 @@ class HordeComposer {
 
   ro::render::ActorWardrobe* wardrobe_;
   ro::render::ActorOutfit* hero_outfit_ = nullptr;
+  std::array<ro::render::ActorOutfit*, ro::sim::kMostHeroes + 1U> ally_outfits_{};
   // Quelques dizaines d'apparences au plus, cherchées en ligne.
   std::vector<KnownOutfit> known_;
   std::vector<ro::render::DrawnActor> drawn_;

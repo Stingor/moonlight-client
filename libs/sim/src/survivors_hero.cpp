@@ -106,6 +106,7 @@ bool HurtHero(SurvivorsField& field, std::int32_t damage) {
       std::int64_t{damage} - armor, 1, std::numeric_limits<std::int32_t>::max()));
   hero.hp = SaturatedAdd(hero.hp, -std::int64_t{taken});
   field.news.hero_hurt = SaturatedAdd(field.news.hero_hurt, taken);
+  field.news.hurt_by_hero[field.stage] = SaturatedAdd(field.news.hurt_by_hero[field.stage], taken);
   if (hero.hp > 0) return false;
   // La partie n'est perdue qu'à la dernière vie : une relève ne compte pas de
   // chute au bilan.

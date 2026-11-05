@@ -27,7 +27,8 @@ constexpr float kIconSide = 64.0F;
 constexpr ImU32 kNewColor = kSkinGoldTextColor;
 constexpr ImU32 kEvolveColor = kSkinEvolveTextColor;
 constexpr ImU32 kObjectiveColor = kSkinGoldTextColor;
-constexpr std::size_t kLineSize = 64;
+constexpr std::size_t kLineSize = 96;
+constexpr float kVoteBarHeight = 6.0F;
 constexpr ImGuiWindowFlags kModalFlags =
     ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse |
     ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings;
@@ -68,6 +69,10 @@ constexpr std::array<ImGuiKey, kMostOfferCards> kPadKeys = {ImGuiKey_Keypad1, Im
     ImGui::Image(card.icon, ImVec2(wide * scale, high * scale));
   }
   ImGui::TextWrapped("%s", card.name);
+  if (card.for_hero != nullptr) {
+    std::snprintf(line.data(), line.size(), core::Tr("Pour %s"), card.for_hero);
+    ColoredText(kObjectiveColor, line.data());
+  }
   if (card.owned_level == 0) {
     ColoredText(kNewColor, core::Tr("NEW!"));
   } else {
@@ -82,6 +87,12 @@ constexpr std::array<ImGuiKey, kMostOfferCards> kPadKeys = {ImGuiKey_Keypad1, Im
   if (card.objective) {
     ImGui::SameLine();
     ColoredText(kObjectiveColor, core::Tr("Objectif"));
+  }
+  if (card.for_hero != nullptr) {
+    std::snprintf(line.data(), line.size(),
+                  card.my_vote ? core::Tr("%d voix, dont la vôtre") : core::Tr("%d voix"),
+                  card.votes);
+    FaintText(line.data());
   }
   ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
   ImGui::TextWrapped("%s", SurvivorsText(card.description));
@@ -144,6 +155,35 @@ constexpr std::array<ImGuiKey, kMostOfferCards> kPadKeys = {ImGuiKey_Keypad1, Im
   return asked;
 }
 
+// EN COOP : la minuterie du vote, et les héros qu'on peut relever au prix de cette
+// montée de niveau.
+[[nodiscard]] std::optional<SurvivorsOfferAsk> DrawRaises(const SurvivorsOfferView& view,
+                                                          const SkinArt& art) {
+  std::optional<SurvivorsOfferAsk> asked;
+  if (view.voters == 0) return asked;
+  ImGui::ProgressBar(std::clamp(view.vote_time_left, 0.0F, 1.0F), ImVec2(-1.0F, kVoteBarHeight),
+                     "");
+  std::array<char, kLineSize> line = {};
+  for (const SurvivorsOfferRaise& raise : view.raises) {
+    ImGui::PushID(raise.hero_index);
+    std::snprintf(line.data(), line.size(),
+                  raise.my_vote ? core::Tr("Relever %s (%d voix, dont la vôtre)")
+                                : core::Tr("Relever %s (%d voix)"),
+                  raise.name, raise.votes);
+    if (SkinButton(line.data(), art)) {
+      asked = SurvivorsOfferAsk{.verb = SurvivorsOfferVerb::kRaise, .card_index = raise.hero_index};
+    }
+    ImGui::PopID();
+  }
+  if (!view.raises.empty()) {
+    std::snprintf(line.data(), line.size(),
+                  core::Tr("Une feuille part, et cette montée de niveau avec elle. Feuilles : %d"),
+                  view.leaves);
+    FaintText(line.data());
+  }
+  return asked;
+}
+
 }  // namespace
 
 std::optional<SurvivorsOfferAsk> DrawSurvivorsOfferWindow(SurvivorsOfferState& state,
@@ -170,6 +210,7 @@ std::optional<SurvivorsOfferAsk> DrawSurvivorsOfferWindow(SurvivorsOfferState& s
     }
   }
   std::optional<SurvivorsOfferAsk> charge = DrawCharges(state, view, art);
+  if (const std::optional<SurvivorsOfferAsk> raise = DrawRaises(view, art)) charge = raise;
   if (!view.accepts_input) {
     ImGui::EndDisabled();
   }

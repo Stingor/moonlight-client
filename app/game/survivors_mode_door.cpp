@@ -9,6 +9,7 @@
 #include "ro/core/log.h"
 #include "ro/net/action.h"
 
+#include "game/survivors_coop_mode.h"
 #include "game/survivors_mode.h"
 #include "game/survivors_ranking_desk.h"
 #include "survivors/arena_choice.h"
@@ -106,7 +107,8 @@ void SurvivorsMode::FollowDoor(SurvivorsStage& stage, const SurvivorsContext& co
   views_.ComposeMeta(windows.survivors_prepare_view, windows.survivors_meta, desk_, book_, Rules(),
                      context.tables, context.ranking, context.now_ms);
   windows.survivors_prepare_composed = true;
-  if (asked.start && !refusal.has_value()) Enter(stage, context, ChosenBolt());
+  FollowCoopDoor(stage, context, asked, refusal.has_value());
+  if (asked.start && !refusal.has_value() && !stage.coop()) Enter(stage, context, ChosenBolt());
 }
 
 void SurvivorsMode::Enter(SurvivorsStage& stage, const SurvivorsContext& context,
@@ -136,6 +138,7 @@ void SurvivorsMode::Enter(SurvivorsStage& stage, const SurvivorsContext& context
                          ro::core::Describe(begun.error()));
     return;
   }
+  local_hero_ = 0;
   // « Rejouer » garde le personnage assis par nous : rien à redemander.
   if (!posture_.seated_by_us() && posture_.SitOnEntry(Sitting(*context.world)) &&
       context.link->is_open()) {
@@ -143,6 +146,10 @@ void SurvivorsMode::Enter(SurvivorsStage& stage, const SurvivorsContext& context
       ro::core::LogWarning("survivors : s'asseoir — {}", ro::core::Describe(sat.error()));
     }
   }
+  AfterBegin(context);
+}
+
+void SurvivorsMode::AfterBegin(const SurvivorsContext& context) {
   context.minigames->survivors_prepare.open = false;
   context.minigames->survivors_meta.CloseAll();
   music_volume_.Follow(context.audio->music_volume());
@@ -248,6 +255,11 @@ void SurvivorsMode::Exit(SurvivorsStage& stage, const SurvivorsContext& context)
       ro::core::LogWarning("survivors : se relever — {}", ro::core::Describe(stood.error()));
     }
   }
+  if (stage.board().coop && !coop_left_told_ && context.coop != nullptr) {
+    context.coop->Ask(*context.link, ro::net::SurvivorsCoopAction::kLeave);
+  }
+  coop_left_told_ = false;
+  coop_ready_ = false;
   // LA MUSIQUE REFAIT SUIVRE LA CARTE DU PERSONNAGE, au volume des options.
   context.music->Forget();
   context.audio->SetMusicVolume(music_volume_.player_volume());
@@ -273,7 +285,8 @@ void SurvivorsMode::Freeze(SurvivorsStage& stage, MinigameStage& minigames,
 
 void SurvivorsMode::FreezeRun(SurvivorsStage& stage, MinigameStage* minigames,
                               const std::filesystem::path& client_root) {
-  if (!trophies_.Freeze(stage, minigames, client_root)) return;
+  // Une partie coop ne compte pour aucun trophée.
+  if (!trophies_.Freeze(stage, stage.board().coop ? nullptr : minigames, client_root)) return;
   run_saved_ = true;
   // UNE PARTIE CLASSÉE FIGÉE N'ENVOIE RIEN : la liaison qui la porte est perdue.
   if (context_.ranking != nullptr) context_.ranking->FollowEnded(stage, true);

@@ -174,12 +174,35 @@ void DrawFoundCard(ImDrawList& draw, const SurvivorsHudCard& card, ImVec2 far) {
   draw.AddRect(top_left, bottom_right, kSlotEdge);
 }
 
+constexpr float kAllyListMarginPx = 12.0F;
+constexpr float kAllyListTopPx = 96.0F;
+constexpr float kAllyBarWidthPx = 120.0F;
+constexpr float kAllyGapPx = 6.0F;
+constexpr ImU32 kAllyNameColor = IM_COL32(255, 255, 255, 255);
+constexpr ImU32 kAllyDownColor = IM_COL32(255, 80, 80, 255);
+
 void DrawHeroGauge(ImDrawList& draw, ImVec2 feet, float fill) {
   const EntityBarLook look;
   const ImVec2 top_left(feet.x - look.width_pixels * 0.5F, feet.y + look.offset_pixels);
   const ImVec2 bottom_right(top_left.x + look.width_pixels, top_left.y + look.height_pixels);
   const float shown = std::clamp(fill, 0.0F, 1.0F);
   PaintEntityBar(draw, top_left, bottom_right, shown, EntityBarFillColor(look, shown), look);
+}
+
+// La jauge sous chaque allié visible, et, en haut à gauche, chacun avec ses PV : un
+// allié à terre l'est écrit en rouge.
+void DrawAllies(ImDrawList& draw, std::span<const SurvivorsHudAlly> allies, ImVec2 corner) {
+  ImVec2 at(corner.x + kAllyListMarginPx, corner.y + kAllyListTopPx);
+  for (const SurvivorsHudAlly& ally : allies) {
+    if (ally.feet_px.has_value() && !ally.down) DrawHeroGauge(draw, *ally.feet_px, ally.fill);
+    draw.AddText(at, ally.down ? kAllyDownColor : kAllyNameColor, ally.name);
+    const EntityBarLook look;
+    const ImVec2 bar_top(at.x, at.y + ImGui::GetTextLineHeight());
+    const ImVec2 bar_end(bar_top.x + kAllyBarWidthPx, bar_top.y + look.height_pixels);
+    const float shown = ally.down ? 0.0F : std::clamp(ally.fill, 0.0F, 1.0F);
+    PaintEntityBar(draw, bar_top, bar_end, shown, EntityBarFillColor(look, shown), look);
+    at.y += ImGui::GetTextLineHeight() + look.height_pixels + kAllyGapPx;
+  }
 }
 
 }  // namespace
@@ -278,6 +301,7 @@ void DrawSurvivorsHud(const SurvivorsHudView& view) {
   if (view.hero_feet_px.has_value()) {
     DrawHeroGauge(draw, *view.hero_feet_px, view.hero_fill);
   }
+  DrawAllies(draw, view.allies, screen->Pos);
   // Sans pieds connus, les avis se posent au centre de l'écran, où se tient
   // le héros que la caméra suit.
   DrawSurvivorsHudNotices(draw, view.notices,

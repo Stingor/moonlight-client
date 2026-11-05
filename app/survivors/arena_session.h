@@ -97,6 +97,9 @@ class ArenaSession {
   void Restart();
   // L'apparence du héros pour cette image : voir `HeroLook`.
   void SetHeroLook(const ro::render::ActorLook& look) { composer_.SetHeroLook(look); }
+  void SetAllyLook(std::size_t hero_index, const ro::render::ActorLook& look) {
+    composer_.SetAllyLook(hero_index, look);
+  }
   void SetSwitches(ArenaEffectSwitches switches) { effects_.set_switches(switches); }
   void SetHordeSunShadows(bool shown) { scene_.set_horde_sun_shadows(shown); }
   void Wheel(float notches) noexcept { camera_.Wheel(notches); }

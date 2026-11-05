@@ -118,6 +118,7 @@ void HordePoses::Pose(const ro::sim::SurvivorsField& field, std::uint64_t presen
                       std::uint32_t blend_per_mille, const HordeTimesOf& times_of) {
   poses_.clear();
   PoseHero(field, presentation_ms, blend_per_mille, times_of);
+  PoseAllies(field, presentation_ms, blend_per_mille);
   PoseFoes(field, presentation_ms, blend_per_mille, times_of);
   PoseFalling(presentation_ms, times_of);
   PoseGround(field, presentation_ms, blend_per_mille);
@@ -152,7 +153,10 @@ void HordePoses::PoseHero(const ro::sim::SurvivorsField& field, std::uint64_t pr
   const ro::sim::SurvivorsHero& hero = field.hero;
   HordePose pose{.kind = HordeBodyKind::kHero,
                  .cell = Interpolated(hero.previous_position, hero.position, blend_per_mille)};
-  if (field.tally.outcome == ro::sim::SurvivorsOutcome::kFell) {
+  if (hero.down) {
+    pose.motion = Motion::kDie;
+    pose.motion_ms = kDownMotionMs;
+  } else if (field.tally.outcome == ro::sim::SurvivorsOutcome::kFell) {
     pose.motion = Motion::kDie;
     pose.motion_ms = ElapsedSince(presentation_ms, MsOfStep(field.step));
   } else if (hero.position != hero.previous_position) {
@@ -178,6 +182,29 @@ void HordePoses::PoseHero(const ro::sim::SurvivorsField& field, std::uint64_t pr
   }
   pose.direction = DirectionOf(hero.facing, pose.motion != Motion::kDie);
   poses_.push_back(pose);
+}
+
+void HordePoses::PoseAllies(const ro::sim::SurvivorsField& field, std::uint64_t presentation_ms,
+                            std::uint32_t blend_per_mille) {
+  std::uint16_t ally_rank = 0;
+  for (std::size_t index = 0; index < ro::sim::HeroCount(field); ++index) {
+    if (index == field.stage) continue;
+    ++ally_rank;
+    const ro::sim::SurvivorsHero& hero = ro::sim::HeroAt(field, index);
+    HordePose pose{.kind = HordeBodyKind::kHero,
+                   .cell = Interpolated(hero.previous_position, hero.position, blend_per_mille)};
+    pose.look_id = static_cast<std::uint16_t>(index + 1U);
+    pose.sim_id = static_cast<std::uint32_t>(index);
+    if (hero.down) {
+      pose.motion = Motion::kDie;
+      pose.motion_ms = kDownMotionMs;
+    } else {
+      pose.motion = hero.position != hero.previous_position ? Motion::kWalk : Motion::kReady;
+      pose.motion_ms = static_cast<float>(presentation_ms);
+    }
+    pose.direction = DirectionOf(hero.facing, pose.motion != Motion::kDie);
+    poses_.push_back(pose);
+  }
 }
 
 void HordePoses::PoseFoes(const ro::sim::SurvivorsField& field, std::uint64_t presentation_ms,

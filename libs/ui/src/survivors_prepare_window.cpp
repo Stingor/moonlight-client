@@ -293,6 +293,29 @@ void DrawPlaces(const SurvivorsPrepareMeta& meta, SurvivorsPrepareAsk& asked, co
   DrawPending(*meta.ranking);
 }
 
+// LE SALON DU GROUPE : y entrer, y lire les membres et ce qui empêche de partir, s'y
+// dire prêt avec la classe et les réglages de la partie libre.
+void DrawCoop(const SurvivorsPrepareCoop& coop, SurvivorsPrepareAsk& asked, const SkinArt& art) {
+  if (!coop.shown) return;
+  ImGui::Separator();
+  if (!coop.in_lobby) {
+    if (SkinButton(core::Tr("Coop : salon du groupe"), art, ImVec2(-1.0F, 0.0F))) {
+      asked.coop_enter = true;
+    }
+    return;
+  }
+  ImGui::TextUnformatted(core::Tr("Salon du groupe"));
+  for (const SurvivorsPrepareCoopMember& member : coop.members) {
+    ImGui::Text(member.ready ? core::Tr("%s : prêt") : core::Tr("%s : en attente"), member.name);
+  }
+  for (const char* const refusal : coop.refusals) {
+    ColoredText(kRefusalColor, SurvivorsText(refusal));
+  }
+  if (!coop.ready && SkinButton(core::Tr("Prêt"), art)) asked.coop_ready = true;
+  if (!coop.ready) ImGui::SameLine();
+  if (SkinButton(core::Tr("Quitter le salon"), art)) asked.coop_leave = true;
+}
+
 }  // namespace
 
 SurvivorsPrepareAsk DrawSurvivorsPrepareWindow(SurvivorsPrepareState& state,
@@ -328,6 +351,7 @@ SurvivorsPrepareAsk DrawSurvivorsPrepareWindow(SurvivorsPrepareState& state,
   }
   DrawControls(view);
   if (view.meta.has_value()) DrawPlaces(*view.meta, asked, art);
+  DrawCoop(view.coop, asked, art);
   ImGui::Separator();
   // Une partie classée que le classement grise ne part pas : sa raison se dit
   // sous « Partir ».

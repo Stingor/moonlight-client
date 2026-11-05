@@ -91,6 +91,10 @@ class VoiceMode {
   [[nodiscard]] std::vector<std::string> BlockedNames() const;
   // La liaison était ouverte à la dernière pompe.
   [[nodiscard]] bool online() const noexcept { return was_online_; }
+  // LA COOP SURVIVORS par l'UDP de la voix : sans liaison, rien ne part et rien
+  // n'arrive, et le serveur de carte porte tout.
+  void PostCoop(std::vector<std::uint8_t> payload);
+  [[nodiscard]] std::vector<ro::voice::CoopRelayed> TakeCoop();
   // Ne plus entendre ce joueur, ou l'entendre de nouveau. Sans effet sur un
   // joueur que la voix ne connaît pas.
   void Block(std::string_view name, bool blocked);

@@ -54,6 +54,7 @@ ro::core::Result<void> SurvivorsStage::Begin(const ro::sim::SurvivorsRules& rule
                                : ro::sim::SurvivorsRun::Start(rules, start);
   if (!run) return std::unexpected(run.error());
   play_.emplace(std::move(*run));
+  match_.reset();
   board_ = board;
   ending_.reset();
   news_ = {};
@@ -77,6 +78,24 @@ void SurvivorsStage::Advance(std::uint32_t elapsed_ms, const SurvivorsIntent& in
   entered_.reset();
   news_ = {};
   clock_ms_ += elapsed_ms;
+  if (match_.has_value()) {
+    switch (screen_) {
+      case SurvivorsScreen::kArriving:
+      case SurvivorsScreen::kPlaying:
+      case SurvivorsScreen::kPaused:
+      case SurvivorsScreen::kChoosing:
+      case SurvivorsScreen::kChest:
+        AdvanceCoop(elapsed_ms, intent);
+        return;
+      case SurvivorsScreen::kClosed:
+      case SurvivorsScreen::kPreparing:
+      case SurvivorsScreen::kLoading:
+      case SurvivorsScreen::kDying:
+      case SurvivorsScreen::kWon:
+      case SurvivorsScreen::kSummary:
+        break;
+    }
+  }
   switch (screen_) {
     case SurvivorsScreen::kClosed:
     case SurvivorsScreen::kPreparing:

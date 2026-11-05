@@ -23,6 +23,17 @@
 #include "survivors/survivors_looks.h"
 
 namespace moonclient {
+
+// LES ZONES DE TOUTE L'ÉQUIPE, chacune sous le numéro unique que la partie lui donne.
+static std::span<const ro::sim::SurvivorsZone> TeamZonesOf(
+    const ro::sim::SurvivorsField& field, std::vector<ro::sim::SurvivorsZone>& out) {
+  out.clear();
+  for (std::size_t index = 0; index < ro::sim::HeroCount(field); ++index) {
+    const std::vector<ro::sim::SurvivorsZone>& zones = ro::sim::ZonesAt(field, index);
+    out.insert(out.end(), zones.begin(), zones.end());
+  }
+  return out;
+}
 namespace {
 
 // LE HÉROS DU MONDE PRIVÉ, puis ses orbes, une par acteur à partir de la
@@ -268,7 +279,7 @@ ArenaZoneGroundHands ArenaEffects::PutOutHands() {
 
 void ArenaEffects::KeepZoneGrounds(const ro::sim::SurvivorsField& field, const GroundOf& ground_of,
                                    std::uint32_t now_ms) {
-  PlanArenaZoneGrounds(field.zones, looks_, switches_, zone_ground_plan_);
+  PlanArenaZoneGrounds(TeamZonesOf(field, team_zones_), looks_, switches_, zone_ground_plan_);
   const std::size_t sown_before = zone_grounds_.sown_total();
   zone_grounds_.Keep(zone_ground_plan_, now_ms,
                      ArenaZoneGroundHandsOn(
@@ -452,8 +463,9 @@ void ArenaEffects::Advance(const ro::sim::SurvivorsNews& news, const ro::sim::Su
 }
 
 void ArenaEffects::KeepZones(const ro::sim::SurvivorsField& field, std::uint32_t now_ms) {
-  std::erase_if(flames_, [&field](const ZoneFlame& flame) {
-    return std::ranges::none_of(field.zones, [&flame](const ro::sim::SurvivorsZone& zone) {
+  (void)TeamZonesOf(field, team_zones_);
+  std::erase_if(flames_, [this](const ZoneFlame& flame) {
+    return std::ranges::none_of(team_zones_, [&flame](const ro::sim::SurvivorsZone& zone) {
       return zone.serial == flame.zone_serial;
     });
   });
@@ -462,7 +474,7 @@ void ArenaEffects::KeepZones(const ro::sim::SurvivorsField& field, std::uint32_t
     return;
   }
   std::vector<ro::sim::FieldPoint> points;
-  for (const ro::sim::SurvivorsZone& zone : field.zones) {
+  for (const ro::sim::SurvivorsZone& zone : team_zones_) {
     // Un bloc de barrière n'a pas de flamme : son unité au sol le montre.
     if (zone.archetype == ro::sim::SkillArchetype::kBarrier) continue;
     const SkillLook* look = looks_.Find(zone.skill_id);

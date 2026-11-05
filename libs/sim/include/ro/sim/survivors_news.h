@@ -69,6 +69,7 @@ struct SurvivorsCast {
   std::uint32_t target_serial = 0;
   std::uint32_t land_step = 0;
   std::uint8_t spread_steps = 0;
+  std::uint8_t hero_index = 0;  // le héros qui lance ; 0 en solo
 };
 inline constexpr std::size_t kMostNewsWarnings = 128;
 // Un ajout se fait en FIN d'énumération.
@@ -150,7 +151,9 @@ struct SurvivorsNews {
   bool reborn = false;  // le héros vient de renaître (ClassRule::reborn_level)
   std::uint32_t gems_gathered = 0;
   std::int32_t hero_hurt = 0;  // somme des dégâts encaissés
-  std::uint32_t dropped = 0;   // nouvelles écartées par les plafonds
+  // Les mêmes, par héros.
+  std::array<std::int32_t, kMostHeroes> hurt_by_hero = {};
+  std::uint32_t dropped = 0;  // nouvelles écartées par les plafonds
   std::vector<SurvivorsCardNews> cards_found;
   std::vector<SurvivorsReviveNews> revives;
   // Les héros tombés à terre à ce pas, en coop.

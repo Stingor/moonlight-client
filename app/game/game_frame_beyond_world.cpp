@@ -347,6 +347,11 @@ ro::net::FrameOutcome Game::ApplyFrameBeyondWorld(const ro::net::Frame& received
       outcome == ro::net::FrameOutcome::kUnhandled) {
     outcome = present;
   }
+  // ET LA COOP DU MODE SURVIVORS.
+  if (const ro::net::FrameOutcome coop = survivors_presence_->coop.ApplyFrame(received);
+      outcome == ro::net::FrameOutcome::kUnhandled) {
+    outcome = coop;
+  }
   // ET OÙ JOINDRE LE SERVEUR VOIX.
   if (const ro::net::FrameOutcome voiced = voice_.ApplyFrame(received);
       outcome == ro::net::FrameOutcome::kUnhandled) {

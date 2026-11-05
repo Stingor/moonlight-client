@@ -809,6 +809,7 @@ add_library(moonclient_minigames STATIC
     game/survivors_ranking_desk.cpp
     game/survivors_ranking_mode.cpp
     game/survivors_presence_mode.cpp
+    game/survivors_coop_mode.cpp
     game/survivors_presence_labels.cpp
     game/survivors_objective.cpp
     game/survivors_trophy_count.cpp
@@ -850,6 +851,7 @@ add_library(moonclient_survivors STATIC
     survivors/survivors_screen_look.cpp
     survivors/survivors_sightings.cpp
     survivors/survivors_stage.cpp
+    survivors/survivors_stage_coop.cpp
     survivors/survivors_world_facts.cpp)
 
 target_link_libraries(moonclient_survivors
@@ -1917,6 +1919,7 @@ add_executable(moonclient
     game/survivors_mode.cpp
     game/survivors_mode_door.cpp
     game/survivors_mode_sound.cpp
+    game/survivors_mode_coop.cpp
     game/survivors_views.cpp
     game/survivors_meta_views.cpp
     game/survivors_codex_views.cpp
@@ -2147,7 +2150,8 @@ endif()
 # LA COQUILLE DU CLIENT INCLUT TOUTES LES ÉTAPES : son objet dépasse le nombre
 # de sections qu'un objet MSVC ordinaire admet (C1128).
 if(MSVC)
-    set_source_files_properties(game/client_shell.cpp PROPERTIES COMPILE_OPTIONS /bigobj)
+    set_source_files_properties(game/client_shell.cpp game/game_open.cpp PROPERTIES
+                                COMPILE_OPTIONS /bigobj)
 endif()
 
 # 🔴 LE RUNTIME C++ VOYAGE AVEC L'EXÉCUTABLE, à côté de lui.

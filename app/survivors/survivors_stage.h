@@ -1,11 +1,14 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include "ro/core/error.h"
 #include "ro/sim/survivors_geometry.h"
+#include "ro/sim/survivors_match.h"
 #include "ro/sim/survivors_news.h"
 #include "ro/sim/survivors_play.h"
 #include "ro/sim/survivors_rules.h"
@@ -61,6 +64,8 @@ inline constexpr std::uint32_t kArrivalMs = 1200;
 inline constexpr std::uint32_t kChestRouletteMs = 1500;
 inline constexpr std::uint32_t kDeathVeilMs = 3000;
 inline constexpr std::uint32_t kVictoryBannerMs = 3000;
+// La roulette d'un coffre en coop : la pause commune est courte.
+inline constexpr std::uint32_t kCoopChestRouletteMs = 800;
 
 // L'INTENTION D'UNE IMAGE, traduite des événements par app.
 struct SurvivorsIntent {
@@ -86,6 +91,8 @@ struct SurvivorsRunBoard {
   // majorent au crédit. Jamais au défi ni en partie classée, où le serveur ne
   // pourrait pas vérifier qu'elle était éteinte.
   bool without_minimap = false;
+  // UNE PARTIE EN COOP : hors du classement, des trophées et du dernier journal.
+  bool coop = false;
   [[nodiscard]] bool operator==(const SurvivorsRunBoard&) const = default;
 };
 
@@ -125,6 +132,21 @@ class SurvivorsStage {
                                std::optional<ro::sim::WalkMap> arena,
                                const ro::sim::SurvivorsStart& start,
                                const SurvivorsRunBoard& board = {}) = delete;
+  // UNE PARTIE COOP : mêmes refus que `Begin`, voir `survivors_stage_coop.cpp`.
+  [[nodiscard]] ro::core::Result<void> BeginCoop(const ro::sim::SurvivorsRules& rules,
+                                                 std::optional<ro::sim::WalkMap> arena,
+                                                 const ro::sim::SurvivorsStart& start,
+                                                 std::size_t local_player,
+                                                 std::uint32_t input_delay_ticks);
+  // Le lockstep est en cours sur cet étage.
+  [[nodiscard]] bool coop() const noexcept { return match_.has_value(); }
+  [[nodiscard]] const ro::sim::SurvivorsMatch* match() const noexcept {
+    return match_.has_value() ? &*match_ : nullptr;
+  }
+  // Ce que le fil a apporté pour la partie coop, et ce qu'il doit porter.
+  void CoopReceive(std::size_t player, std::span<const std::uint8_t> payload);
+  void CoopLeave(const ro::sim::LockstepLeave& leave);
+  [[nodiscard]] std::optional<std::vector<std::uint8_t>> TakeCoopFrame();
   // L'arène est montée : kLoading → kArriving.
   void Loaded();
   // Une image de `elapsed_ms` de temps d'écran. Les nouvelles de la partie
@@ -193,11 +215,17 @@ class SurvivorsStage {
   // L'écran que la partie impose après un pas ou une réponse : la fin, un
   // coffre ouvert, un choix, sinon le jeu.
   void FollowRun();
+  void AdvanceCoop(std::uint32_t elapsed_ms, const SurvivorsIntent& intent);
+  void FollowCoopRun();
   void TakeNews();
 
   SurvivorsScreen screen_ = SurvivorsScreen::kClosed;
   std::optional<SurvivorsScreen> entered_;
   std::optional<ro::sim::SurvivorsPlay> play_;
+  // Le lockstep d'une partie coop ; `play_` montre alors son présent.
+  std::optional<ro::sim::SurvivorsMatch> match_;
+  std::uint32_t coop_pending_ms_ = 0;
+  std::optional<ro::sim::SurvivorsAnswer> coop_ballot_;
   std::optional<SurvivorsEnding> ending_;
   SurvivorsRunBoard board_;
   ro::sim::SurvivorsNews news_;

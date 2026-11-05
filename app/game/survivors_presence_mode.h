@@ -10,6 +10,7 @@
 #include "ro/net/survivors_presence.h"
 #include "ro/net/world_update.h"
 
+#include "game/survivors_coop_mode.h"
 #include "game/survivors_presence_labels.h"
 #include "game/survivors_ranking_mode.h"
 #include "survivors/survivors_stage.h"
@@ -91,6 +92,8 @@ class SurvivorsPresenceMode {
 struct SurvivorsPresence {
   SurvivorsPresenceMode mode;
   SurvivorsPresenceLabels labels;
+  // La coop du mode : elle vit ici, à côté de la présence, sur le même fil.
+  SurvivorsCoopMode coop;
 };
 
 }  // namespace moonclient

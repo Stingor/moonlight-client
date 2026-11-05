@@ -92,6 +92,12 @@ tr: %d s
 fr: %d sur %d
 tr: %d of %d
 
+fr: %d voix
+tr: %d votes
+
+fr: %d voix, dont la vôtre
+tr: %d votes, including yours
+
 fr: %d zones — 1 sous le curseur
 tr: %d zones — 1 under the cursor
 
@@ -181,6 +187,9 @@ tr: %s: %d requested, %d in inventory
 fr: %s : %s
 tr: %s: %s
 
+fr: %s : en attente
+tr: %s: waiting
+
 fr: %s : il manque %s
 tr: %s: missing %s
 
@@ -192,6 +201,9 @@ tr: %s: left-click no longer does anything on it. Right-click to unblock it or t
 
 fr: %s : matériaux au complet — inventory plein ou niveau insuffisant
 tr: %s: materials complete — inventory full or level too low
+
+fr: %s : prêt
+tr: %s: ready
 
 fr: %s : vous avez bloqué le clic gauche sur ce NPC. Clic droit dessus pour le débloquer.
 tr: %s: you blocked left-click on this NPC. Right-click it to unblock.
@@ -386,6 +398,9 @@ tr: Counts the players online.
 fr: Conservateur
 tr: Curator
 
+fr: Coop : salon du groupe
+tr: Co-op: party lobby
+
 fr: Coucher (h)
 tr: Sunset (h)
 
@@ -479,6 +494,9 @@ tr: Earn a ball from a single Roggle shot.
 fr: Grille éparse
 tr: Scattered grid
 
+fr: Il faut au moins deux membres du groupe en ligne.
+tr: At least two party members must be online.
+
 fr: Il faut être en ville ou dans un intérieur.
 tr: You must be in a town or indoors.
 
@@ -490,6 +508,15 @@ tr: Item revealed!
 
 fr: Items dévoilés : %d sur %d
 tr: Items revealed: %d of %d
+
+fr: La partie du groupe a divergé : elle s'arrête ici.
+tr: The party's game has desynchronised: it stops here.
+
+fr: La partie du groupe ne peut pas commencer.
+tr: The party's game cannot start.
+
+fr: Le groupe compte plus de quatre membres.
+tr: The party has more than four members.
 
 fr: Le personnage est mort.
 tr: Your character is dead.
@@ -515,20 +542,47 @@ tr: Talk (voice)
 fr: Plateau :
 tr: Board:
 
+fr: Pour %s
+tr: For %s
+
 fr: Première pièce
 tr: First piece
 
 fr: Proximité
 tr: Nearby
 
+fr: Prêt
+tr: Ready
+
 fr: Pyramide
 tr: Pyramid
+
+fr: Quitter le salon
+tr: Leave the lobby
 
 fr: Rafale ! +%d
 tr: Volley! +%d
 
+fr: Relever %s (%d voix)
+tr: Revive %s (%d votes)
+
+fr: Relever %s (%d voix, dont la vôtre)
+tr: Revive %s (%d votes, including yours)
+
+fr: Salon du groupe
+tr: Party lobby
+
 fr: Tir lointain ! +%d
 tr: Long shot! +%d
+
+fr: Un membre du groupe est hors ligne.
+tr: A party member is offline.
+
+fr: Un membre du groupe joue sur un client qui ne connaît pas la coop.
+tr: A party member is on a client that doesn't support co-op.
+
+fr: Un membre du groupe n'est ni en ville ni en intérieur.
+tr: A party member is neither in town nor indoors.
 
 fr: Un PNJ vous parle.
 tr: An NPC is talking to you.
@@ -556,6 +610,9 @@ tr: A storm crashes down on the nearest monster and strikes in bursts.
 
 fr: Un cône de feu jaillit devant vous, là où vous marchez.
 tr: A cone of fire bursts out in front of you, where you walk.
+
+fr: Une feuille part, et cette montée de niveau avec elle. Feuilles : %d
+tr: One leaf is spent, and this level-up with it. Leaves: %d
 
 fr: Une rafale de boules d'eau s'abat sur le monstre le plus robuste.
 tr: A volley of water balls crashes onto the sturdiest monster.

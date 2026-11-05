@@ -179,6 +179,7 @@ SurvivorsFrameView SurvivorsViews::Compose(const SurvivorsStage& stage,
       ComposeOffer(*field, rules, stage.accepts_input(), facts.pressed_card_key,
                    stage.board().kind != SurvivorsBoardKind::kFree,
                    facts.options.objective_skill_id, tables);
+      if (stage.board().coop) ComposeVote(*field, facts.coop_names);
       view.offer = &offer_;
       view.offer_state = &offer_state_;
       break;
@@ -303,6 +304,7 @@ void SurvivorsViews::ComposeHud(const SurvivorsField& field, const ro::sim::Surv
       }
     }
   }
+  ComposeAllies(field, facts);
 }
 
 void SurvivorsViews::ComposeOffer(const SurvivorsField& field, const ro::sim::SurvivorsRules& rules,
@@ -354,6 +356,66 @@ void SurvivorsViews::ComposeOffer(const SurvivorsField& field, const ro::sim::Su
                                       .skips = field.skips_left,
                                       .banishes = field.banishes_left,
                                       .charges_withheld = charges_withheld};
+}
+
+void SurvivorsViews::ComposeVote(const SurvivorsField& field, std::span<const std::string> names) {
+  const auto name_of = [names](std::size_t hero_index) {
+    return hero_index < names.size() ? names[hero_index].c_str() : "";
+  };
+  const auto votes_for = [&field](const ro::sim::SurvivorsAnswer& answer) {
+    int votes = 0;
+    for (const std::optional<ro::sim::SurvivorsAnswer>& ballot : field.ballots) {
+      if (ballot.has_value() && *ballot == answer) ++votes;
+    }
+    return votes;
+  };
+  const std::optional<ro::sim::SurvivorsAnswer>& mine = field.ballots[field.stage];
+  for (std::size_t index = 0; index < offer_cards_.size(); ++index) {
+    const ro::sim::SurvivorsAnswer pick{.kind = ro::sim::AnswerKind::kPick,
+                                        .offer_index = static_cast<std::uint8_t>(index)};
+    offer_cards_[index].for_hero = name_of(field.offers[index].hero_index);
+    offer_cards_[index].votes = votes_for(pick);
+    offer_cards_[index].my_vote = mine.has_value() && *mine == pick;
+  }
+  offer_raises_.clear();
+  if (field.leaves_left > 0) {
+    for (std::size_t index = 0; index < ro::sim::HeroCount(field); ++index) {
+      if (!ro::sim::HeroAt(field, index).down) continue;
+      const ro::sim::SurvivorsAnswer raise{.kind = ro::sim::AnswerKind::kRaise,
+                                           .offer_index = static_cast<std::uint8_t>(index)};
+      offer_raises_.push_back(
+          ro::ui::SurvivorsOfferRaise{.hero_index = static_cast<std::uint8_t>(index),
+                                      .name = name_of(index),
+                                      .votes = votes_for(raise),
+                                      .my_vote = mine.has_value() && *mine == raise});
+    }
+  }
+  offer_.voters = static_cast<int>(ro::sim::HeroCount(field));
+  offer_.vote_time_left = field.vote_ticks_left == 0 ? 1.0F
+                                                     : static_cast<float>(field.vote_ticks_left) /
+                                                           static_cast<float>(ro::sim::kVoteTicks);
+  offer_.leaves = field.leaves_left;
+  offer_.raises = offer_raises_;
+}
+
+void SurvivorsViews::ComposeAllies(const SurvivorsField& field, const SurvivorsViewFacts& facts) {
+  hud_allies_.clear();
+  for (std::size_t index = 0; index < ro::sim::HeroCount(field); ++index) {
+    if (index == field.stage) continue;
+    const ro::sim::SurvivorsHero& hero = ro::sim::HeroAt(field, index);
+    ro::ui::SurvivorsHudAlly ally;
+    ally.name = index < facts.coop_names.size() ? facts.coop_names[index].c_str() : "";
+    ally.fill = Fill(hero.hp, hero.max_hp);
+    ally.down = hero.down;
+    if (facts.arena != nullptr) {
+      if (const std::optional<glm::vec2> feet = facts.arena->ScreenOf(
+              facts.arena->GroundAt(hero.position), facts.width, facts.height)) {
+        ally.feet_px = ImVec2(feet->x, feet->y);
+      }
+    }
+    hud_allies_.push_back(ally);
+  }
+  hud_.allies = hud_allies_;
 }
 
 void SurvivorsViews::ComposeChest(const SurvivorsStage& stage, const SurvivorsTables& tables) {

@@ -72,6 +72,15 @@ VoiceMode::VoiceMode(const VoiceLengthOf& length_of) {
 
 VoiceMode::~VoiceMode() { Stop(); }
 
+void VoiceMode::PostCoop(std::vector<std::uint8_t> payload) {
+  if (engine_) engine_->PostCoop(std::move(payload));
+}
+
+std::vector<ro::voice::CoopRelayed> VoiceMode::TakeCoop() {
+  if (!engine_) return {};
+  return engine_->TakeCoop();
+}
+
 ro::net::FrameOutcome VoiceMode::ApplyFrame(const ro::net::Frame& frame) {
   if (frame.opcode != ro::net::kVoiceServiceOpcode) return ro::net::FrameOutcome::kUnhandled;
   std::optional<ro::net::VoiceService> service = ro::net::DecodeVoiceService(frame.bytes);

@@ -74,6 +74,9 @@ void AppendSurvivorsNews(SurvivorsNews& into, SurvivorsNews&& more) {
   into.reborn = into.reborn || more.reborn;
   into.gems_gathered += more.gems_gathered;
   into.hero_hurt += more.hero_hurt;
+  for (std::size_t index = 0; index < into.hurt_by_hero.size(); ++index) {
+    into.hurt_by_hero[index] += more.hurt_by_hero[index];
+  }
   into.dropped += more.dropped;
   Extend(into.cards_found, std::move(more.cards_found));
   Extend(into.revives, std::move(more.revives));
@@ -249,8 +252,9 @@ void SurvivorsMatch::CheckDigests() {
 
 void SurvivorsMatch::RecomputePresent() {
   const SurvivorsRun& confirmed = play_.run();
-  if (confirmed.field().phase == SurvivorsPhase::kOver ||
-      next_local_tick_ <= confirmed.field().ticks) {
+  // Un vote ou une pause de coffre ne se prédisent pas : le présent les attend.
+  if (confirmed.field().phase != SurvivorsPhase::kRunning ||
+      confirmed.field().hold_ticks_left > 0 || next_local_tick_ <= confirmed.field().ticks) {
     present_ = confirmed;
     return;
   }

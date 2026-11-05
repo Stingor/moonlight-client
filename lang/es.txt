@@ -92,6 +92,12 @@ tr: %d s
 fr: %d sur %d
 tr: %d de %d
 
+fr: %d voix
+tr: %d votos
+
+fr: %d voix, dont la vôtre
+tr: %d votos, incluido el tuyo
+
 fr: %d zones — 1 sous le curseur
 tr: %d zonas — 1 bajo el cursor
 
@@ -181,6 +187,9 @@ tr: %s: %d pedidos, %d en el inventory
 fr: %s : %s
 tr: %s: %s
 
+fr: %s : en attente
+tr: %s: esperando
+
 fr: %s : il manque %s
 tr: %s: falta %s
 
@@ -192,6 +201,9 @@ tr: %s: el clic izquierdo ya no hace nada sobre él. Clic derecho para desbloque
 
 fr: %s : matériaux au complet — inventory plein ou niveau insuffisant
 tr: %s: materiales completos — inventory lleno o nivel insuficiente
+
+fr: %s : prêt
+tr: %s: listo
 
 fr: %s : vous avez bloqué le clic gauche sur ce NPC. Clic droit dessus pour le débloquer.
 tr: %s: has bloqueado el clic izquierdo en este NPC. Clic derecho para desbloquearlo.
@@ -386,6 +398,9 @@ tr: Cuenta los jugadores conectados.
 fr: Conservateur
 tr: Conservador
 
+fr: Coop : salon du groupe
+tr: Cooperativo: sala del grupo
+
 fr: Coucher (h)
 tr: Ocaso (h)
 
@@ -479,6 +494,9 @@ tr: Gana una bola con un tiro de Roggle.
 fr: Grille éparse
 tr: Rejilla dispersa
 
+fr: Il faut au moins deux membres du groupe en ligne.
+tr: Hacen falta al menos dos miembros del grupo en línea.
+
 fr: Il faut être en ville ou dans un intérieur.
 tr: Debes estar en una ciudad o en un interior.
 
@@ -490,6 +508,15 @@ tr: ¡Objeto revelado!
 
 fr: Items dévoilés : %d sur %d
 tr: Objetos revelados: %d de %d
+
+fr: La partie du groupe a divergé : elle s'arrête ici.
+tr: La partida del grupo se ha desincronizado: termina aquí.
+
+fr: La partie du groupe ne peut pas commencer.
+tr: La partida del grupo no puede empezar.
+
+fr: Le groupe compte plus de quatre membres.
+tr: El grupo tiene más de cuatro miembros.
 
 fr: Le personnage est mort.
 tr: Tu personaje está muerto.
@@ -515,20 +542,47 @@ tr: Hablar (voz)
 fr: Plateau :
 tr: Tablero:
 
+fr: Pour %s
+tr: Para %s
+
 fr: Première pièce
 tr: Primera pieza
 
 fr: Proximité
 tr: Cercanía
 
+fr: Prêt
+tr: Listo
+
 fr: Pyramide
 tr: Pirámide
+
+fr: Quitter le salon
+tr: Salir de la sala
 
 fr: Rafale ! +%d
 tr: ¡Ráfaga! +%d
 
+fr: Relever %s (%d voix)
+tr: Levantar a %s (%d votos)
+
+fr: Relever %s (%d voix, dont la vôtre)
+tr: Levantar a %s (%d votos, incluido el tuyo)
+
+fr: Salon du groupe
+tr: Sala del grupo
+
 fr: Tir lointain ! +%d
 tr: ¡Tiro lejano! +%d
+
+fr: Un membre du groupe est hors ligne.
+tr: Un miembro del grupo está desconectado.
+
+fr: Un membre du groupe joue sur un client qui ne connaît pas la coop.
+tr: Un miembro del grupo usa un cliente sin cooperativo.
+
+fr: Un membre du groupe n'est ni en ville ni en intérieur.
+tr: Un miembro del grupo no está ni en la ciudad ni en un interior.
 
 fr: Un PNJ vous parle.
 tr: Un PNJ te está hablando.
@@ -556,6 +610,9 @@ tr: Una tormenta cae sobre el monstruo más cercano y golpea en ráfagas.
 
 fr: Un cône de feu jaillit devant vous, là où vous marchez.
 tr: Un cono de fuego brota delante de ti, hacia donde caminas.
+
+fr: Une feuille part, et cette montée de niveau avec elle. Feuilles : %d
+tr: Se gasta una hoja, y con ella esta subida de nivel. Hojas: %d
 
 fr: Une rafale de boules d'eau s'abat sur le monstre le plus robuste.
 tr: Una ráfaga de bolas de agua cae sobre el monstruo más resistente.

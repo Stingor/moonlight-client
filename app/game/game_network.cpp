@@ -266,7 +266,8 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
     // table des longueurs connaît leurs ZC.
     PumpHandshake(link_, handshake_, reported_handshake_, pieces_,
                   settings_->options().pages().mvp_tracker.settings().enabled,
-                  survivors_ranking_.caps() | survivors_presence_->mode.caps() | voice_.caps(),
+                  survivors_ranking_.caps() | survivors_presence_->mode.caps() |
+                      survivors_presence_->coop.caps() | voice_.caps(),
                   now_ms);
   }
 

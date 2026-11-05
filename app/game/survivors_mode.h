@@ -55,6 +55,9 @@ namespace moonclient {
 // l'arène ne part au serveur, sauf s'asseoir à l'entrée et se relever à la
 // sortie (U4).
 
+class SurvivorsCoopMode;
+class VoiceMode;
+
 // CE QUE LE MODE EMPRUNTE À LA PARTIE pour une image. ⚠ TOUT PEUT MANQUER sauf
 // le monde, les fenêtres de la salle et le son : sans garde-robe ni archives,
 // la partie refuse de commencer, en le disant.
@@ -74,6 +77,11 @@ struct SurvivorsContext {
   // Le classement : une partie classée ou un défi y demande son jeton et y
   // envoie sa fin. Nul, toute partie part libre.
   SurvivorsRankingMode* ranking = nullptr;
+  // La coop : le salon du groupe et le transport des entrées. Nulle, pas de coop.
+  SurvivorsCoopMode* coop = nullptr;
+  // La voix, dont l'UDP double le serveur de carte en coop. Nulle : le serveur seul.
+  VoiceMode* voice = nullptr;
+  std::uint32_t own_char_id = 0;
   WorldAside aside;
   // LA FENÊTRE D'OPTIONS DU JEU et ses pages, que « Options » ouvre par-dessus
   // la pause. Nulle, la pause n'en ouvre pas.
@@ -188,6 +196,19 @@ class SurvivorsMode {
   // libre, la première pour le défi et la partie classée. Nulle sans classe.
   [[nodiscard]] const ro::sim::ClassRule* PlayingClass() const;
   [[nodiscard]] std::uint16_t ChosenBolt() const;
+  // Ce qui suit le commencement d'une partie, seule ou en coop : s'asseoir, garder
+  // le volume, surveiller le monde réel.
+  void AfterBegin(const SurvivorsContext& context);
+  // LE SALON DU GROUPE, à chaque image de l'accueil : voir `survivors_mode_coop.cpp`.
+  void FollowCoopDoor(SurvivorsStage& stage, const SurvivorsContext& context,
+                      const ro::ui::SurvivorsPrepareAsk& asked, bool refused);
+  // Le départ que le serveur a donné : la partie commence, ou le salon se quitte.
+  void EnterCoop(SurvivorsStage& stage, const SurvivorsContext& context);
+  // UNE IMAGE DE COOP après l'étage : le transport, la divergence, le départ.
+  // Faux quand la partie s'est refermée.
+  [[nodiscard]] bool FollowCoopFrame(SurvivorsStage& stage, const SurvivorsContext& context);
+  // L'apparence des alliés, à leur métier du moment.
+  void PoseAllyLooks(const SurvivorsStage& stage);
 
   SurvivorsContext context_;
   bool loading_now_ = false;
@@ -230,6 +251,15 @@ class SurvivorsMode {
   // Ctrl+Tab a masqué la minimap ; elle le reste d'une partie à l'autre.
   bool minimap_hidden_ = false;
   std::array<std::string, 4> key_labels_;
+  // LA COOP : le héros de ce joueur, les visages et les métiers des autres, ce que
+  // le salon montre, et si le serveur sait déjà que ce joueur a quitté la partie.
+  std::size_t local_hero_ = 0;
+  std::array<ro::render::ActorLook, ro::sim::kMostHeroes> ally_faces_{};
+  std::array<std::optional<std::uint16_t>, ro::sim::kMostHeroes> ally_jobs_{};
+  std::vector<ro::ui::SurvivorsPrepareCoopMember> coop_members_;
+  std::vector<const char*> coop_refusals_;
+  bool coop_ready_ = false;
+  bool coop_left_told_ = false;
 };
 
 }  // namespace moonclient
