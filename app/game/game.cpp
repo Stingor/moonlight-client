@@ -199,6 +199,9 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
   // que la veille. Voir `game_survivors.cpp`.
   FrameSurvivors(now_ms);
   if (survivors_.owns_screen()) {
+    // UNE PARTIE COOP PEUT PARTIR PENDANT LA VEILLE, au « prêt » d'un autre : la veille
+    // ne tourne plus sous l'arène, et elle cacherait toute son interface à jamais.
+    afk_screen_.EndNow(afk_idle_, camera_);
     DrawInterface(now_ms);
     const ro::render::DrawableSize drawable = gl_->drawable_size();
     const ro::render::Resolution points = gl_->size();

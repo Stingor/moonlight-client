@@ -206,6 +206,26 @@ void DealStage::Note(const ro::ui::DealLineRef& line, bool hovered, bool describ
 
 // ── LA PROPOSITION ─────────────────────────────────────────────────────────
 
+void DealStage::RefuseWhileAway(ro::net::Connection& link) {
+  ro::core::Result<void> sent;
+  switch (deal_.phase()) {
+    case ro::sim::DealPhase::kNone:
+      away_cancel_sent_ = false;
+      return;
+    case ro::sim::DealPhase::kProposed:
+      if (deal_.answer_sent()) return;
+      sent = ro::net::AnswerDealProposal(link, deal_, false);
+      break;
+    case ro::sim::DealPhase::kProposing:
+    case ro::sim::DealPhase::kOpen:
+      if (away_cancel_sent_) return;
+      away_cancel_sent_ = true;
+      sent = ro::net::CancelDeal(link, deal_);
+      break;
+  }
+  if (!sent) ro::core::LogError("échange : {}", ro::core::Describe(sent.error()));
+}
+
 void DealStage::FollowProposal(DealWindows& windows, const TradeContext& context) {
   const ro::ui::DealProposalAction answer = std::exchange(windows.proposal_answer, {});
   // ÉCHAP BAISSE L'INTERRUPTEUR SANS RIEN ÉMETTRE : une boîte montrée puis

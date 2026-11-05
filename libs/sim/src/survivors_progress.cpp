@@ -91,8 +91,14 @@ void GainExp(SurvivorsField& field, std::uint32_t exp) {
     CountOne(field.news.level_ups);
   }
   if (!was_reborn && field.hero_class != nullptr && Reborn(*field.hero_class, hero.level)) {
-    field.news.reborn = true;
     RecomputeStats(field);
+  }
+  for (std::size_t index = 0; index < HeroCount(field); ++index) {
+    const ClassRule* hero_class = ClassAt(field, index);
+    if (hero_class != nullptr && !Reborn(*hero_class, level_before) &&
+        Reborn(*hero_class, hero.level)) {
+      field.news.reborn_by_hero[index] = true;
+    }
   }
   // Le niveau de l'équipe vaut pour tous, et fait renaître les autres classes.
   if (!field.allies.empty() && hero.level != level_before) {
@@ -182,8 +188,14 @@ struct OfferCandidate {
   };
   ForEachHero(field, [&] {
     const std::uint32_t behind = most_levels - SkillLevelsOf(field.hero);
+    const std::uint16_t mount_card_id =
+        field.hero_class != nullptr ? field.hero_class->mount_card_item_id : std::uint16_t{0};
     for (OfferCandidate& candidate : OfferCandidates(field)) {
-      if (candidate.offer.kind == OfferKind::kNewCard && card_taken(candidate.offer.id)) continue;
+      // Une carte neuve ne va qu'à un héros, sauf sa monture, qui est personnelle.
+      if (candidate.offer.kind == OfferKind::kNewCard && candidate.offer.id != mount_card_id &&
+          card_taken(candidate.offer.id)) {
+        continue;
+      }
       candidate.offer.hero_index = field.stage;
       candidate.weight += candidate.weight * behind;
       team.push_back(candidate);
@@ -456,12 +468,20 @@ void GatherGems(SurvivorsField& field) {
 
 void BuildOffers(SurvivorsField& field) {
   if (field.rules == nullptr || field.hero_class == nullptr) return;
+  field.vote_serial = static_cast<std::uint8_t>(field.vote_serial + 1U);
   std::vector<OfferCandidate> candidates =
       field.allies.empty() ? OfferCandidates(field) : TeamOfferCandidates(field);
   // Le tirage de la chance a lieu dans tous les cas : le flux des offres ne
   // dépend pas du nombre de candidats.
-  const auto luck_pct = static_cast<std::uint32_t>(
-      std::clamp<std::int64_t>(field.hero.stats.Of(SurvivorsStat::kLuckPct), 0, kWholeChance));
+  // Le tirage est celui de l'équipe : la meilleure chance de ses héros.
+  std::int64_t best_luck = 0;
+  for (std::size_t index = 0; index < HeroCount(field); ++index) {
+    best_luck =
+        std::max<std::int64_t>(best_luck, HeroAt(field, index).stats.Of(SurvivorsStat::kLuckPct));
+  }
+  const auto luck_pct = static_cast<std::uint32_t>(std::clamp<std::int64_t>(
+      field.allies.empty() ? field.hero.stats.Of(SurvivorsStat::kLuckPct) : best_luck, 0,
+      kWholeChance));
   const std::uint32_t lucky = field.offer_random.Chance(luck_pct, kWholeChance) ? 1U : 0U;
   const std::uint32_t wanted =
       std::min<std::uint32_t>(std::uint32_t{field.rules->caps.offers} + lucky, kMostOffers);
@@ -510,9 +530,14 @@ bool BallotAccepted(const SurvivorsField& field, SurvivorsAnswer ballot) {
 
 void AdvanceVote(SurvivorsField& field, std::span<const SurvivorsTeamInput> inputs) {
   if (field.vote_ticks_left == 0) field.vote_ticks_left = kVoteTicks;
-  const std::size_t voters = HeroCount(field);
-  for (std::size_t voter = 0; voter < std::min(voters, inputs.size()); ++voter) {
-    if (inputs[voter].ballot.has_value() && BallotAccepted(field, *inputs[voter].ballot)) {
+  const std::size_t heroes = HeroCount(field);
+  std::size_t voters = 0;
+  for (std::size_t voter = 0; voter < heroes; ++voter) {
+    if (!field.voter_gone[voter]) ++voters;
+  }
+  for (std::size_t voter = 0; voter < std::min(heroes, inputs.size()); ++voter) {
+    if (!field.voter_gone[voter] && inputs[voter].ballot.has_value() &&
+        BallotAccepted(field, *inputs[voter].ballot)) {
       field.ballots[voter] = inputs[voter].ballot;
     }
   }
@@ -523,7 +548,7 @@ void AdvanceVote(SurvivorsField& field, std::span<const SurvivorsTeamInput> inpu
   std::size_t option_count = 0;
   std::size_t cast = 0;
   std::uint32_t best = 0;
-  for (std::size_t voter = 0; voter < voters; ++voter) {
+  for (std::size_t voter = 0; voter < heroes; ++voter) {
     if (!field.ballots[voter].has_value()) continue;
     ++cast;
     std::size_t option = 0;

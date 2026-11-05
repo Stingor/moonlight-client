@@ -52,6 +52,9 @@ inline constexpr std::string_view kInterruptedEndingFileName = "interrupted_run.
 [[nodiscard]] ro::core::Result<void> SaveInterruptedRun(const std::filesystem::path& client_root,
                                                         const ro::sim::SurvivorsJournal& journal,
                                                         const SurvivorsEnding& ending);
+// La fin seule, pour une partie sans journal à rejouer.
+[[nodiscard]] ro::core::Result<void> SaveInterruptedEnding(const std::filesystem::path& client_root,
+                                                           const SurvivorsEnding& ending);
 // La fin d'une partie interrompue, retirée du disque ; rien sans fichier. Un
 // fichier illisible se retire aussi, en le disant au journal du client : il
 // ne se montrerait jamais.

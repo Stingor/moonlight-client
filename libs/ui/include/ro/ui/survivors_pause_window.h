@@ -40,6 +40,8 @@ struct SurvivorsPauseView {
   SurvivorsPauseReason reason = SurvivorsPauseReason::kPlayer;
   // Le bandeau d'une alerte du monde réel. ⚠ EN FRANÇAIS, marqué par `TrText`.
   const char* alert_banner = nullptr;
+  // EN COOP : rien ne s'arrête derrière ce menu, et le héros reste à découvert.
+  bool world_runs = false;
   bool accepts_input = false;
   bool reduced_effects = false;
   // La case « Afficher les mesures » paraît : un outil de développement.

@@ -54,6 +54,7 @@ inline constexpr std::uint32_t kSurvivorsCoopTooFew = 0x02;
 inline constexpr std::uint32_t kSurvivorsCoopOffline = 0x04;
 inline constexpr std::uint32_t kSurvivorsCoopOutOfTown = 0x08;
 inline constexpr std::uint32_t kSurvivorsCoopNoClient = 0x10;
+inline constexpr std::uint32_t kSurvivorsCoopNotInLobby = 0x20;
 
 struct SurvivorsCoopMember {
   std::uint32_t char_id = 0;

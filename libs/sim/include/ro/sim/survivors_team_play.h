@@ -19,7 +19,7 @@ namespace ro::sim {
 // de partie : c'est lui qui date les entrées, et que le réseau échange.
 inline constexpr std::uint16_t kSurvivorsTeamJournalVersion = 3;
 
-enum class TeamJournalKind : std::uint8_t { kHeading = 0, kBallot = 1 };
+enum class TeamJournalKind : std::uint8_t { kHeading = 0, kBallot = 1, kLeft = 2 };
 struct TeamJournalEntry {
   std::uint32_t tick = 0;
   std::uint8_t player = 0;
@@ -67,6 +67,8 @@ class SurvivorsTeamPlay {
   // Un tic, un jeu d'entrées par héros, dans l'ordre de leur index. Un cap ne
   // s'inscrit que s'il change ; un bulletin, que si la partie l'accepte.
   void Tick(std::span<const SurvivorsTeamInput> inputs);
+  // Ce joueur a quitté la partie, au tic courant : le journal le garde.
+  void MarkLeft(std::size_t player);
   [[nodiscard]] SurvivorsNews TakeNews() { return run_.TakeNews(); }
   [[nodiscard]] const SurvivorsRun& run() const noexcept { return run_; }
   [[nodiscard]] SurvivorsRun& mutable_run() noexcept { return run_; }

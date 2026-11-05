@@ -135,9 +135,11 @@ std::optional<std::size_t> Evolve(SurvivorsField& field, std::size_t slot,
   CountOne(field.hero.evolutions);
   CountOne(field.tally.evolutions);
   if (field.news.evolutions.size() < kMostNewsEvolutions) {
-    field.news.evolutions.push_back(SurvivorsEvolutionNews{.slot = static_cast<std::uint8_t>(slot),
-                                                           .from_skill_id = from_skill_id,
-                                                           .to_skill_id = owned.skill_id});
+    field.news.evolutions.push_back(
+        SurvivorsEvolutionNews{.slot = static_cast<std::uint8_t>(slot),
+                               .from_skill_id = from_skill_id,
+                               .to_skill_id = owned.skill_id,
+                               .hero_index = static_cast<std::uint8_t>(field.stage)});
   } else {
     ++field.news.dropped;
   }
@@ -409,8 +411,11 @@ void GatherPickups(SurvivorsField& field) {
       continue;
     }
     if (field.news.pickups_taken.size() < kMostNewsPickups) {
-      field.news.pickups_taken.push_back(SurvivorsPickupNews{
-          .kind = pickup.kind, .item_id = pickup.item_id, .at = pickup.position});
+      field.news.pickups_taken.push_back(
+          SurvivorsPickupNews{.kind = pickup.kind,
+                              .item_id = pickup.item_id,
+                              .at = pickup.position,
+                              .hero_index = static_cast<std::uint8_t>(field.stage)});
     } else {
       ++field.news.dropped;
     }

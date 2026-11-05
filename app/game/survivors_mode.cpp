@@ -200,7 +200,10 @@ SurvivorsPainted SurvivorsMode::Frame(SurvivorsStage& stage, const SurvivorsCont
   if (Watched(stage.screen())) {
     report = watch_.Observe(
         RealFactsOf(*context.world, context.aside, whispers_.Follow(context.world->chat_lines())));
-    if (const std::optional<RealWorldAlert> banner = report.banner()) banner_ = banner;
+    if (const std::optional<RealWorldAlert> banner = report.banner()) {
+      banner_ = banner;
+      if (stage.coop()) NoteCoopAlert(context.now_ms);
+    }
   }
 
   SurvivorsGestures gestures = route_.TakeGestures();
@@ -272,21 +275,23 @@ SurvivorsPainted SurvivorsMode::Frame(SurvivorsStage& stage, const SurvivorsCont
   const Clock::time_point simulated = Clock::now();
   stage.Advance(elapsed_ms, intent);
   measures_.Record(ArenaMeasure::kSimulation, MsSince(simulated));
-  if (!FollowCoopFrame(stage, context)) return SurvivorsPainted{};
+  FollowCoopFrame(stage, context);
   if (options_open != nullptr) pause_options_.Settle(*options_open, stage.screen());
   FollowEntered(stage, context);
 
   SurvivorsPainted painted;
   const SurvivorsEnding* ending = stage.ending();
+  // LA PAUSE D'UNE COOP N'EST QU'UN MENU : le monde continue, et se dessine comme tel.
+  const bool coop_menu = stage.coop() && stage.screen() == SurvivorsScreen::kPaused;
   painted.desaturation = SurvivorsDesaturation(
-      stage.screen(),
+      coop_menu ? SurvivorsScreen::kPlaying : stage.screen(),
       ending != nullptr && ending->tally.outcome == ro::sim::SurvivorsOutcome::kFell);
   if (arena_.has_value() && stage.play() != nullptr && SurvivorsArenaShown(stage.screen())) {
     PaintArena(stage, context);
     painted.arena = true;
   }
   if (stage.owns_screen()) {
-    views_.NoticeFinds(stage.news(), stage.presentation_ms());
+    views_.NoticeFinds(stage.news(), local_hero_, stage.presentation_ms());
     if (stage.play() != nullptr && context.damage_meter != nullptr) {
       const ro::vfs::MonsterList* monsters = context.tables.monsters;
       RecordArenaBlows(
@@ -380,7 +385,10 @@ void SurvivorsMode::PaintArena(const SurvivorsStage& stage, const SurvivorsConte
       .orbs = orbs_,
       .news = &stage.news(),
       .presentation_ms = stage.presentation_ms(),
-      .blend_per_mille = stage.screen() == SurvivorsScreen::kPlaying ? play.blend_per_mille() : 0,
+      .blend_per_mille = stage.screen() == SurvivorsScreen::kPlaying ||
+                                 (stage.coop() && stage.screen() == SurvivorsScreen::kPaused)
+                             ? play.blend_per_mille()
+                             : 0,
       .arrival_ms = stage.arrival_ms(),
       .victory_ms = stage.screen() == SurvivorsScreen::kWon
                         ? std::optional<std::uint64_t>(stage.screen_elapsed_ms())
@@ -419,6 +427,7 @@ SurvivorsFrameView SurvivorsMode::View(const SurvivorsStage& stage,
                          .height = context.height,
                          .pressed_card_key = pressed_card_key_,
                          .banner = banner_,
+                         .team_notice = TeamNotice(stage, context.now_ms),
                          .unread_whispers = whispers_.received(),
                          .minimap_shown = !minimap_hidden_ && !stage.board().without_minimap,
                          .options = options_,

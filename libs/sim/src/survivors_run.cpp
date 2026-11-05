@@ -406,6 +406,10 @@ void SurvivorsRun::StepTeam(std::span<const SurvivorsInput> inputs) {
     survivors::MoveHero(field_, input);
     if (!field_.allies.empty()) HoldLeash(field_, from);
   });
+  // Un héros à terre ne bouge plus : rien ne doit l'interpoler entre deux positions.
+  survivors::ForEachHero(field_, [this] {
+    if (field_.hero.down) field_.hero.previous_position = field_.hero.position;
+  });
   // Un héros en scène sert de théâtre à ce qui ne dépend pas d'un héros : le
   // cadre d'apparition, la grille, les plantes qui naissent.
   PutAnchorOnStage(field_);
@@ -423,13 +427,13 @@ void SurvivorsRun::StepTeam(std::span<const SurvivorsInput> inputs) {
   survivors::ForEachHero(field_, [this] {
     const std::size_t casts_before = field_.news.casts.size();
     if (!field_.hero.down) survivors::FireSkills(field_);
-    for (std::size_t cast = casts_before; cast < field_.news.casts.size(); ++cast) {
-      field_.news.casts[cast].hero_index = field_.stage;
-    }
     survivors::LandStrikes(field_);
     survivors::LandBlasts(field_);
     survivors::AdvanceShots(field_);
     survivors::AdvanceZones(field_);
+    for (std::size_t cast = casts_before; cast < field_.news.casts.size(); ++cast) {
+      field_.news.casts[cast].hero_index = field_.stage;
+    }
   });
   survivors::BuryFoes(field_);
   // La chute du boss final clôt la partie dans BuryFoes : ni menace ni contact
@@ -471,6 +475,12 @@ void SurvivorsRun::Tick(std::span<const SurvivorsTeamInput> inputs) {
     headings[index].heading = inputs[index].heading;
   }
   StepTeam(headings);
+}
+
+void SurvivorsRun::MarkVoterGone(std::size_t player) {
+  if (player >= field_.voter_gone.size()) return;
+  field_.voter_gone[player] = true;
+  field_.ballots[player].reset();
 }
 
 bool SurvivorsRun::BallotValid(SurvivorsAnswer ballot) const {

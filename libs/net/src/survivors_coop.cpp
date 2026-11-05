@@ -13,6 +13,7 @@
 
 #include "ro/core/byte_reader.h"
 #include "ro/core/byte_writer.h"
+#include "ro/core/text.h"
 #include "ro/proto/map_packets.h"
 
 namespace ro::net {
@@ -114,7 +115,7 @@ std::optional<SurvivorsCoopLobby> DecodeSurvivorsCoopLobby(std::span<const std::
     const std::span<const std::uint8_t> name =
         frame.subspan(at + kU32Bytes + 1U, kSurvivorsCoopNameBytes);
     const auto end = std::ranges::find(name, std::uint8_t{0});
-    member.name.assign(name.begin(), end);
+    member.name = core::Utf8FromCp1252(std::string(name.begin(), end));
     lobby.members.push_back(std::move(member));
   }
   return lobby;

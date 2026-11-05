@@ -91,6 +91,9 @@ struct SurvivorsHudView {
   // EN COOP : la jauge sous chaque allié visible, et la liste de l'équipe.
   std::span<const SurvivorsHudAlly> allies;
   float hero_fill = 1.0F;
+  // Ce que le HUD doit dire à l'équipe, au centre sous les compteurs. ⚠ EN FRANÇAIS,
+  // marqué par `TrText`. Nul : rien.
+  const char* team_notice = nullptr;
   // Sous les compteurs, les charges qui restent et les vies ; une charge à
   // zéro garde sa case, des vies à zéro ne montrent rien.
   std::span<const SurvivorsHudCharge> charges;

@@ -24,8 +24,9 @@ struct SurvivorsHit {
   std::int32_t amount = 0;
   std::int32_t efficiency_pct = 100;
   std::uint16_t skill_id = 0;
-  bool froze = false;    // le coup a gelé le monstre
-  bool knocked = false;  // le coup l'a repoussé
+  bool froze = false;           // le coup a gelé le monstre
+  bool knocked = false;         // le coup l'a repoussé
+  std::uint8_t hero_index = 0;  // le héros qui l'a porté ; 0 en solo
 };
 struct SurvivorsFall {
   std::uint32_t foe_serial = 0;
@@ -110,12 +111,14 @@ struct SurvivorsEvolutionNews {
   std::uint8_t slot = 0;
   std::uint16_t from_skill_id = 0;
   std::uint16_t to_skill_id = 0;
+  std::uint8_t hero_index = 0;  // le héros qui évolue ; 0 en solo
 };
 // Un objet ramassé en `at`.
 struct SurvivorsPickupNews {
   PickupKind kind = PickupKind::kGold;
   std::uint16_t item_id = 0;
   FieldPoint at;
+  std::uint8_t hero_index = 0;  // le héros qui l'a pris ; 0 en solo
 };
 inline constexpr std::size_t kMostNewsBossMoves = 64;
 // Un coup de boss parti : annoncé (bond, charge, séisme) ou joué tout de suite
@@ -148,7 +151,9 @@ struct SurvivorsNews {
   std::vector<std::uint32_t> boss_arrivals;  // serials
   std::vector<SurvivorsBossMoveNews> boss_moves;
   std::uint16_t level_ups = 0;
-  bool reborn = false;  // le héros vient de renaître (ClassRule::reborn_level)
+  // Les héros qui viennent de renaître (ClassRule::reborn_level) : le niveau est
+  // commun, mais chaque classe a le sien.
+  std::array<bool, kMostHeroes> reborn_by_hero = {};
   std::uint32_t gems_gathered = 0;
   std::int32_t hero_hurt = 0;  // somme des dégâts encaissés
   // Les mêmes, par héros.
@@ -161,6 +166,16 @@ struct SurvivorsNews {
   // Les cartes tombées au sol, sous le plafond des cartes ramassées.
   std::vector<SurvivorsCardNews> cards_dropped;
 };
+
+// Ce héros vient d'évoluer ou de renaître : son corps change.
+[[nodiscard]] inline bool HeroChangedBody(const SurvivorsNews& news,
+                                          std::size_t hero_index) noexcept {
+  if (hero_index < news.reborn_by_hero.size() && news.reborn_by_hero[hero_index]) return true;
+  for (const SurvivorsEvolutionNews& evolution : news.evolutions) {
+    if (evolution.hero_index == hero_index) return true;
+  }
+  return false;
+}
 
 // Ajoute à `into` les nouvelles de `more`, plus récentes : une image peut couvrir
 // plusieurs tics.

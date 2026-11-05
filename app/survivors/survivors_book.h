@@ -136,7 +136,7 @@ struct SurvivorsFeat {
 enum class RecordVerdict : std::uint8_t {
   kPlaced,       // inscrite, à `record_rank`
   kBelowBoard,   // hors des dix meilleures
-  kAbandoned,    // abandonnée ou interrompue : jamais aux records (Q10)
+  kAbandoned,    // abandonnée, interrompue ou d'équipe : jamais aux records (Q10)
   kNotNeutral,   // un défi ou une partie classée joués avec la méta : refusés
   kNotThisWeek,  // un défi dont la graine ou le bolt n'est pas celui de sa semaine
 };

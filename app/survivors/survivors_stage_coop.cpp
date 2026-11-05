@@ -24,6 +24,13 @@ namespace moonclient {
 using ro::sim::SurvivorsOutcome;
 using ro::sim::SurvivorsPhase;
 
+namespace {
+
+constexpr std::uint32_t kTenths = 10;
+constexpr std::uint32_t kEaseShareTenths = 9;
+
+}  // namespace
+
 ro::core::Result<void> SurvivorsStage::BeginCoop(const ro::sim::SurvivorsRules& rules,
                                                  std::optional<ro::sim::WalkMap> arena,
                                                  const ro::sim::SurvivorsStart& start,
@@ -63,6 +70,9 @@ bool SurvivorsStage::coop_over() const noexcept {
 
 void SurvivorsStage::AbandonCoop() {
   if (!match_.has_value()) return;
+  // Le bilan se lit de la partie confirmée : le présent peut croire à une fin qui n'a
+  // jamais eu lieu.
+  play_->Show(match_->confirmed(), 0);
   play_->Abandon();
   ending_ = EndingOf(play_->run().field(), board_);
   match_.reset();
@@ -98,14 +108,20 @@ void SurvivorsStage::AdvanceCoop(std::uint32_t elapsed_ms, const SurvivorsIntent
   if (screen_ == SurvivorsScreen::kChoosing && intent.answer.has_value() &&
       guard_.Accepts(clock_ms_)) {
     coop_ballot_ = intent.answer;
+    coop_ballot_vote_ = match_->confirmed().field().vote_serial;
   }
   // Une entrée par tic ; sans avance permise, le temps attend les autres.
-  coop_pending_ms_ += elapsed_ms;
+  // Trop d'avance : le temps de ce client coule un peu moins vite, et l'écart avec les
+  // autres se résorbe de lui-même.
+  coop_pending_ms_ += match_->lead_ticks() > ro::sim::kLockstepEaseLeadTicks
+                          ? elapsed_ms * kEaseShareTenths / kTenths
+                          : elapsed_ms;
   const std::uint8_t heading =
       screen_ == SurvivorsScreen::kPlaying ? intent.heading : ro::sim::kNoHeading;
   while (coop_pending_ms_ >= ro::sim::kSurvivorsStepMs) {
     ro::sim::SurvivorsTeamInput input{.heading = heading};
     input.ballot = coop_ballot_;
+    input.ballot_vote = coop_ballot_vote_;
     if (!match_->PushLocal(input)) {
       coop_pending_ms_ = 0;
       break;

@@ -71,6 +71,9 @@ void RebuildGrid(SurvivorsField& field);
 // vie d'orbite nulle, vitesse ou vie de tir nulle, aire ou longueur nulle) ne
 // tire rien, sans diviser par zéro.
 void FireSkills(SurvivorsField& field);
+// Annonce `kind` pour chaque orbite allumée du héros en scène : un héros qui tombe
+// les éteint et un héros relevé les rallume, sans attendre leur phase.
+void TellOrbits(SurvivorsField& field, CastKind kind);
 // survivors_skills.cpp. Les frappes arrivées à leur pas, et leurs rebonds.
 void LandStrikes(SurvivorsField& field);
 // survivors_blasts.cpp. Les éclats et les novas arrivés à leur pas.

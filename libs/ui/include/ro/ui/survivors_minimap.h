@@ -31,6 +31,7 @@ enum class SurvivorsMinimapMark : std::uint8_t {
   kEmperium,
   kMiniBoss,
   kBoss,
+  kAlly,
 };
 
 struct SurvivorsMinimapDot {

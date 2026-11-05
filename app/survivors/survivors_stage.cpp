@@ -33,6 +33,7 @@ SurvivorsEnding EndingOf(const ro::sim::SurvivorsField& field, const SurvivorsRu
                          .recap = field.recap,
                          .cards = field.hero.cards,
                          .zeny = field.hero.zeny,
+                         .own_evolved = field.hero.evolutions > 0,
                          .board = board};
 }
 
@@ -128,6 +129,8 @@ void SurvivorsStage::Advance(std::uint32_t elapsed_ms, const SurvivorsIntent& in
 
 bool SurvivorsStage::Freeze() {
   if (!play_) return false;
+  // En coop, le bilan se lit de la partie confirmée, pas de ce que le présent prédit.
+  if (match_.has_value()) play_->Show(match_->confirmed(), 0);
   if (screen_ == SurvivorsScreen::kDying || screen_ == SurvivorsScreen::kWon) {
     Enter(SurvivorsScreen::kSummary);
     return true;

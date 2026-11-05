@@ -512,6 +512,9 @@ tr: Item revealed!
 fr: Items dévoilés : %d sur %d
 tr: Items revealed: %d of %d
 
+fr: La partie continue : votre héros reste à découvert.
+tr: The game goes on: your hero is exposed.
+
 fr: La partie du groupe a divergé : elle s'arrête ici.
 tr: The party's game has desynchronised: it stops here.
 
@@ -532,6 +535,9 @@ tr: The storage is open.
 
 fr: La liaison avec le serveur est perdue.
 tr: The connection to the server is lost.
+
+fr: Les clients du groupe n'ont pas la même version : la partie ne peut pas commencer.
+tr: The party's clients are not on the same version: the game cannot start.
 
 fr: Marquer 10 000 points en un seul tir de Roggle.
 tr: Score 10,000 points in a single Roggle shot.
@@ -589,6 +595,9 @@ tr: A party member is on a client that doesn't support co-op.
 
 fr: Un membre du groupe n'est ni en ville ni en intérieur.
 tr: A party member is neither in town nor indoors.
+
+fr: Un membre du groupe n'est pas au salon.
+tr: A party member is not in the lobby.
 
 fr: Un PNJ vous parle.
 tr: An NPC is talking to you.
@@ -1798,6 +1807,9 @@ tr: Increased walk speed.
 
 fr: Votre groupe est déjà en partie.
 tr: Your party is already in a game.
+
+fr: Votre personnage est occupé : la partie du groupe part sans vous.
+tr: Your character is busy: the party's game is leaving without you.
 
 fr: Vous montez votre Peco Peco : vitesse de marche augmentée.
 tr: You ride your Peco Peco: increased walk speed.

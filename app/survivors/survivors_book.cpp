@@ -239,6 +239,9 @@ void TrimPastChallengeWeeks(SurvivorsSave& save, const ro::sim::IsoWeek& current
   TrimPastChallengeWeeks(save, current_week);
   const ro::sim::SurvivorsTally& tally = ending.tally;
   if (tally.outcome == ro::sim::SurvivorsOutcome::kAbandoned) return RecordVerdict::kAbandoned;
+  // Une partie d'équipe compte pour les déblocages, mais ne se mêle pas aux records
+  // d'un joueur seul.
+  if (ending.board.coop) return RecordVerdict::kAbandoned;
   const bool challenge = ending.board.kind == SurvivorsBoardKind::kChallenge;
   const bool ranked = ending.board.kind == SurvivorsBoardKind::kRanked;
   if (challenge) {

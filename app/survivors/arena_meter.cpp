@@ -29,6 +29,8 @@ void RecordArenaBlows(const ro::sim::SurvivorsNews& news, const ro::sim::Survivo
     }
     std::unordered_map<std::uint16_t, std::string> names;
     for (const ro::sim::SurvivorsHit& hit : news.hits) {
+      // Le compteur est celui de ce joueur : les coups des alliés ne sont pas les siens.
+      if (hit.hero_index != field.stage) continue;
       ro::sim::MeterBlow blow{.mode = ro::sim::MeterMode::kDamageDone,
                               .who = self_id,
                               .amount = hit.amount,
@@ -43,10 +45,11 @@ void RecordArenaBlows(const ro::sim::SurvivorsNews& news, const ro::sim::Survivo
       meter.Record(blow, now_ms);
     }
   }
-  if (news.hero_hurt > 0) {
+  const std::int32_t own_hurt = news.hurt_by_hero[field.stage];
+  if (own_hurt > 0) {
     meter.Record(
         ro::sim::MeterBlow{
-            .mode = ro::sim::MeterMode::kDamageTaken, .who = self_id, .amount = news.hero_hurt},
+            .mode = ro::sim::MeterMode::kDamageTaken, .who = self_id, .amount = own_hurt},
         now_ms);
   }
 }

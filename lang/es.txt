@@ -512,6 +512,9 @@ tr: ¡Objeto revelado!
 fr: Items dévoilés : %d sur %d
 tr: Objetos revelados: %d de %d
 
+fr: La partie continue : votre héros reste à découvert.
+tr: La partida continúa: tu héroe queda expuesto.
+
 fr: La partie du groupe a divergé : elle s'arrête ici.
 tr: La partida del grupo se ha desincronizado: termina aquí.
 
@@ -532,6 +535,9 @@ tr: El storage está abierto.
 
 fr: La liaison avec le serveur est perdue.
 tr: Se perdió la conexión con el servidor.
+
+fr: Les clients du groupe n'ont pas la même version : la partie ne peut pas commencer.
+tr: Los clientes del grupo no tienen la misma versión: la partida no puede empezar.
 
 fr: Marquer 10 000 points en un seul tir de Roggle.
 tr: Consigue 10 000 puntos en un solo tiro de Roggle.
@@ -589,6 +595,9 @@ tr: Un miembro del grupo usa un cliente sin cooperativo.
 
 fr: Un membre du groupe n'est ni en ville ni en intérieur.
 tr: Un miembro del grupo no está ni en la ciudad ni en un interior.
+
+fr: Un membre du groupe n'est pas au salon.
+tr: Un miembro del grupo no está en la sala.
 
 fr: Un PNJ vous parle.
 tr: Un PNJ te está hablando.
@@ -1798,6 +1807,9 @@ tr: Velocidad de marcha aumentada.
 
 fr: Votre groupe est déjà en partie.
 tr: Tu grupo ya está en una partida.
+
+fr: Votre personnage est occupé : la partie du groupe part sans vous.
+tr: Tu personaje está ocupado: la partida del grupo sale sin ti.
 
 fr: Vous montez votre Peco Peco : vitesse de marche augmentée.
 tr: Montas tu Peco Peco: velocidad de marcha aumentada.

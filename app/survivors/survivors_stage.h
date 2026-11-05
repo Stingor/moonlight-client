@@ -106,6 +106,8 @@ struct SurvivorsEnding {
   ro::sim::SurvivorsRecap recap;
   std::vector<ro::sim::OwnedCard> cards;
   std::uint32_t zeny = 0;
+  // Ce héros a évolué. En coop, `tally` compte les évolutions de toute l'équipe.
+  bool own_evolved = false;
   SurvivorsRunBoard board;
   [[nodiscard]] bool operator==(const SurvivorsEnding&) const = default;
 };
@@ -238,6 +240,7 @@ class SurvivorsStage {
   std::uint64_t coop_stalled_ms_ = 0;
   std::vector<ro::sim::SurvivorsOffer> coop_offers_;
   std::optional<ro::sim::SurvivorsAnswer> coop_ballot_;
+  std::uint8_t coop_ballot_vote_ = 0;
   std::optional<SurvivorsEnding> ending_;
   SurvivorsRunBoard board_;
   ro::sim::SurvivorsNews news_;

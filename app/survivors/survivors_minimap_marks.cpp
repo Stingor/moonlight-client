@@ -37,10 +37,10 @@ using ro::ui::SurvivorsMinimapMark;
 }
 
 // L'ordre de peinture : chaque marque après celles qui la précèdent ici.
-constexpr std::array<SurvivorsMinimapMark, 7> kPaintOrder{
+constexpr std::array<SurvivorsMinimapMark, 8> kPaintOrder{
     SurvivorsMinimapMark::kPlant, SurvivorsMinimapMark::kItem,     SurvivorsMinimapMark::kCard,
     SurvivorsMinimapMark::kChest, SurvivorsMinimapMark::kEmperium, SurvivorsMinimapMark::kMiniBoss,
-    SurvivorsMinimapMark::kBoss,
+    SurvivorsMinimapMark::kBoss,  SurvivorsMinimapMark::kAlly,
 };
 
 }  // namespace
@@ -56,6 +56,12 @@ void SurvivorsMinimapDotsOf(const ro::sim::SurvivorsField& field,
   };
   for (const SurvivorsMinimapMark wanted : kPaintOrder) {
     switch (wanted) {
+      case SurvivorsMinimapMark::kAlly:
+        for (std::size_t index = 0; index < ro::sim::HeroCount(field); ++index) {
+          const ro::sim::SurvivorsHero& ally = ro::sim::HeroAt(field, index);
+          if (index != field.stage && !ally.down) add(ally.position, wanted);
+        }
+        break;
       case SurvivorsMinimapMark::kPlant:
         for (const ro::sim::SurvivorsPlant& plant : field.plants) add(plant.position, wanted);
         break;

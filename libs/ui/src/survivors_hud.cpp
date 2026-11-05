@@ -7,6 +7,8 @@
 #include "ro/core/i18n.h"
 #include "ro/ui/entity_bars.h"
 
+#include "survivors_text.h"
+
 namespace ro::ui {
 namespace {
 
@@ -47,6 +49,9 @@ constexpr std::size_t kNumberTextSize = 48;
 // l'illustration, et la part de sa vie qu'elle met à entrer, puis à sortir.
 constexpr float kCardVignetteHeight = 150.0F;
 constexpr float kCardSlideShare = 0.1F;
+
+constexpr float kTeamNoticeHeightShare = 0.18F;
+constexpr ImU32 kTeamNoticeColor = IM_COL32(255, 210, 90, 255);
 
 void ShadowedText(ImDrawList& draw, ImVec2 at, ImU32 color, const char* text) {
   draw.AddText(ImVec2(at.x + kShadowOffset, at.y + kShadowOffset), kShadowColor, text);
@@ -302,6 +307,14 @@ void DrawSurvivorsHud(const SurvivorsHudView& view) {
     DrawHeroGauge(draw, *view.hero_feet_px, view.hero_fill);
   }
   DrawAllies(draw, view.allies, screen->Pos);
+  if (view.team_notice != nullptr) {
+    const char* const notice = SurvivorsText(view.team_notice);
+    const float notice_width = ImGui::CalcTextSize(notice).x;
+    ShadowedText(draw,
+                 ImVec2(screen->GetCenter().x - notice_width / 2.0F,
+                        origin.y + screen->Size.y * kTeamNoticeHeightShare),
+                 kTeamNoticeColor, notice);
+  }
   // Sans pieds connus, les avis se posent au centre de l'écran, où se tient
   // le héros que la caméra suit.
   DrawSurvivorsHudNotices(draw, view.notices,

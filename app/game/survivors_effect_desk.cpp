@@ -210,16 +210,19 @@ void PickupNotices::ShownAt(std::uint64_t now_ms, std::vector<PickupNoticeShown>
 void PermanentEffectsOf(const ro::sim::SurvivorsField& field, const ro::sim::SurvivorsRules& rules,
                         std::vector<SurvivorsPermanentEffect>& out) {
   out.clear();
-  for (const ro::sim::OwnedCard& card : field.hero.cards) {
-    const ro::sim::CardRule* rule = ro::sim::FindCard(rules, card.card_item_id);
-    if (rule == nullptr) continue;
-    const std::optional<std::int32_t> value = CardValueAt(*rule, card.level);
-    if (!value.has_value()) continue;
-    out.push_back(SurvivorsPermanentEffect{.source = SurvivorsPermanentSource::kCard,
-                                           .id = card.card_item_id,
-                                           .level = card.level,
-                                           .figure = FigureOfStat(rule->stat),
-                                           .value = *value});
+  // Les cartes de toute l'équipe : leurs effets valent pour chaque héros.
+  for (std::size_t hero = 0; hero < ro::sim::HeroCount(field); ++hero) {
+    for (const ro::sim::OwnedCard& card : ro::sim::HeroAt(field, hero).cards) {
+      const ro::sim::CardRule* rule = ro::sim::FindCard(rules, card.card_item_id);
+      if (rule == nullptr) continue;
+      const std::optional<std::int32_t> value = CardValueAt(*rule, card.level);
+      if (!value.has_value()) continue;
+      out.push_back(SurvivorsPermanentEffect{.source = SurvivorsPermanentSource::kCard,
+                                             .id = card.card_item_id,
+                                             .level = card.level,
+                                             .figure = FigureOfStat(rule->stat),
+                                             .value = *value});
+    }
   }
   // Les Bénédictions se lisent dans le bonus que le départ porte : en défi et
   // en partie classée, il est nul, et aucune ne paraît.

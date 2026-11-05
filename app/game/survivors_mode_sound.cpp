@@ -37,7 +37,7 @@ void SurvivorsMode::PlaySounds(const ro::sim::SurvivorsNews& news,
   // Le joueur n'entend que les coups de son héros.
   if (news.hurt_by_hero[local_hero_] > 0)
     PlaySound(kHeroHurtSound, ArenaSoundRank::kHeroHurt, context);
-  if (news.level_ups > 0 || !news.evolutions.empty()) {
+  if (news.level_ups > 0 || ro::sim::HeroChangedBody(news, local_hero_)) {
     PlaySound(ro::sim::kBaseLevelUpSound, ArenaSoundRank::kRise, context);
   }
   const ArenaCardSounds cards = CardSoundsOf(news);
@@ -106,7 +106,7 @@ void SurvivorsMode::FollowMusic(const SurvivorsStage& stage, const SurvivorsCont
   }
   const ArenaMusicCue cue = music_.Advance(
       ArenaMusicFacts{.presentation_ms = stage.presentation_ms(),
-                      .paused = SurvivorsMusicPaused(stage.screen()),
+                      .paused = SurvivorsMusicPaused(stage.screen()) && !stage.coop(),
                       .field_track = arena_.has_value() ? arena_->field_track() : kArenaFieldTrack,
                       .player_track = context.music->chosen(),
                       .music_volume = music_volume_.player_volume()});

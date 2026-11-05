@@ -21,6 +21,7 @@ constexpr ImU32 kCardColor = IM_COL32(90, 160, 255, 255);
 constexpr ImU32 kItemColor = IM_COL32(250, 220, 70, 255);
 constexpr ImU32 kEmperiumColor = IM_COL32(255, 255, 255, 255);
 constexpr ImU32 kMiniBossColor = IM_COL32(255, 150, 40, 255);
+constexpr ImU32 kAllyColor = IM_COL32(90, 200, 255, 255);
 constexpr ImU32 kBossColor = IM_COL32(235, 45, 45, 255);
 // LE CRÂNE D'UN BOSS : une tête, deux orbites, une mâchoire.
 constexpr float kSkullRadius = 5.0F;
@@ -61,6 +62,8 @@ constexpr float kOpaque = 255.0F;
       return kMiniBossColor;
     case SurvivorsMinimapMark::kBoss:
       return kBossColor;
+    case SurvivorsMinimapMark::kAlly:
+      return kAllyColor;
   }
   return kItemColor;
 }
@@ -148,6 +151,7 @@ float DrawSurvivorsMinimap(ImDrawList& draw, ImVec2 top_right, const SurvivorsMi
       case SurvivorsMinimapMark::kMiniBoss:
         DrawSkull(draw, at, color);
         break;
+      case SurvivorsMinimapMark::kAlly:
       case SurvivorsMinimapMark::kPlant:
       case SurvivorsMinimapMark::kChest:
       case SurvivorsMinimapMark::kCard:

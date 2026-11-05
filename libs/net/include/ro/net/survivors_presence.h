@@ -45,6 +45,9 @@ enum class SurvivorsPresenceState : std::uint8_t {
 // libre.
 inline constexpr std::uint8_t kSurvivorsPresenceRanked = 0x01;
 inline constexpr std::uint8_t kSurvivorsPresenceChallenge = 0x02;
+// Le serveur n'en dit rien à personne : le joueur ne se montre pas, ou lit son bilan.
+// Le personnage reste protégé des demandes qu'il ne verrait pas.
+inline constexpr std::uint8_t kSurvivorsPresenceHidden = 0x04;
 
 // Ce que le client dit de lui. L'arène, la classe et les drapeaux sont nuls
 // hors de l'arène.

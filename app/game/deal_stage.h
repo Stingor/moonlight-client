@@ -54,6 +54,10 @@ class DealStage {
   // `/notrade` : toute proposition reçue se refuse d'elle-même, sans boîte.
   void RefuseProposals(bool refuse) noexcept { refuse_proposals_ = refuse; }
 
+  // UNE PARTIE DE SURVIVORS TIENT L'ÉCRAN : une proposition reçue se refuse, et celle
+  // qu'on a faite, ou un échange ouvert, s'annule : personne ne verrait leur fenêtre.
+  void RefuseWhileAway(ro::net::Connection& link);
+
   // Une partie commence : rien de la précédente ne survit.
   void StartSession();
 
@@ -114,6 +118,8 @@ class DealStage {
   ro::sim::ApproachWalkClock* approach_clock_ = nullptr;
   std::optional<Approach> approach_;
   bool refuse_proposals_ = false;
+  // L'annulation est partie : le serveur n'a pas encore répondu.
+  bool away_cancel_sent_ = false;
   std::uint32_t news_said_ = 0;
   // Le nom du partenaire, gardé au-delà de la fermeture : les nouvelles qui la
   // disent le nomment encore.

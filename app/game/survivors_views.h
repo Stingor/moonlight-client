@@ -68,6 +68,9 @@ struct SurvivorsViewFacts {
   int pressed_card_key = 0;
   // L'alerte qui a mis en pause, quand c'est le monde réel.
   std::optional<RealWorldAlert> banner;
+  // EN COOP, ce que le HUD doit dire : rien n'y met en pause, et la conversation peut
+  // être fermée. ⚠ EN FRANÇAIS, marqué par `TrText`.
+  const char* team_notice = nullptr;
   std::uint32_t unread_whispers = 0;
   // LA MINIMAP SE MONTRE : la touche ne l'a pas masquée, et la partie n'est
   // pas partie sans elle.
@@ -131,9 +134,14 @@ class SurvivorsViews {
   // LES CARTES ET LES OBJETS RAMASSÉS des nouvelles que l'image vient de
   // prendre, une fois chacun : la vignette d'une carte paraît au HUD (Q6),
   // l'avis d'un objet à effet au-dessus du héros.
-  void NoticeFinds(const ro::sim::SurvivorsNews& news, std::uint64_t presentation_ms) {
+  void NoticeFinds(const ro::sim::SurvivorsNews& news, std::size_t local_hero,
+                   std::uint64_t presentation_ms) {
     card_vignettes_.Notice(news.cards_found, presentation_ms);
-    pickup_notices_.Notice(news.pickups_taken, presentation_ms);
+    own_pickups_.clear();
+    for (const ro::sim::SurvivorsPickupNews& pickup : news.pickups_taken) {
+      if (pickup.hero_index == local_hero) own_pickups_.push_back(pickup);
+    }
+    pickup_notices_.Notice(own_pickups_, presentation_ms);
   }
 
   // Une fenêtre qui s'ouvre repart de son état neuf.
@@ -149,6 +157,7 @@ class SurvivorsViews {
   void ComposeClassChoices(const ro::sim::SurvivorsRules& rules, const SurvivorsSave& save,
                            const SurvivorsTables& tables, std::uint16_t free_class_id,
                            ro::ui::SurvivorsPrepareMeta& meta);
+  std::vector<ro::sim::SurvivorsPickupNews> own_pickups_;
   void ComposeHud(const ro::sim::SurvivorsField& field, const ro::sim::SurvivorsRules& rules,
                   std::uint64_t clock_ms, const SurvivorsViewFacts& facts,
                   const SurvivorsTables& tables);

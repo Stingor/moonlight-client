@@ -206,7 +206,7 @@ class SurvivorsMode {
   void EnterCoop(SurvivorsStage& stage, const SurvivorsContext& context);
   // UNE IMAGE DE COOP après l'étage : le transport, la divergence, le départ.
   // Faux quand la partie s'est refermée.
-  [[nodiscard]] bool FollowCoopFrame(SurvivorsStage& stage, const SurvivorsContext& context);
+  void FollowCoopFrame(SurvivorsStage& stage, const SurvivorsContext& context);
   // L'apparence des alliés, à leur métier du moment.
   void PoseAllyLooks(const SurvivorsStage& stage);
 
@@ -258,7 +258,12 @@ class SurvivorsMode {
   std::array<std::optional<std::uint16_t>, ro::sim::kMostHeroes> ally_jobs_{};
   std::vector<ro::ui::SurvivorsPrepareCoopMember> coop_members_;
   std::vector<const char*> coop_refusals_;
-  bool coop_wait_told_ = false;
+  // L'alerte du monde réel se dit au HUD jusqu'à ce moment : rien ne met en pause.
+  std::uint64_t coop_alert_until_ms_ = 0;
+  std::uint64_t coop_playing_seen_ms_ = 0;
+  void NoteCoopAlert(std::uint64_t now_ms);
+  [[nodiscard]] const char* TeamNotice(const SurvivorsStage& stage,
+                                       std::uint64_t now_ms) const noexcept;
   bool coop_left_told_ = false;
 };
 

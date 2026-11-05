@@ -18,6 +18,10 @@
 
 #include <SDL3/SDL.h>
 
+#include "ro/net/adoption.h"
+#include "ro/net/friends.h"
+#include "ro/net/guild.h"
+#include "ro/net/party.h"
 #include "ro/render/screen_tint.h"
 #include "ro/sim/deal.h"
 #include "ro/sim/survivors_rules.h"
@@ -188,6 +192,37 @@ void Game::DrawSurvivorsInterface(std::uint32_t now_ms) {
 }
 
 void Game::FrameSurvivors(std::uint32_t now_ms) {
+  // 🔴 TANT QU'UNE PARTIE TIENT L'ÉCRAN, ce qui attend une réponse se refuse : le joueur
+  // ne le verrait pas, et l'autre attendrait. Le serveur refuse déjà ce qui arrive
+  // ensuite ; ceci prend ce qui était là avant l'entrée, ou s'est croisé avec elle.
+  if (survivors_.owns_screen() && link_.is_open()) {
+    const auto report = [](const char* what, const ro::core::Result<void>& sent) {
+      if (!sent)
+        ro::core::LogWarning("{} : refus non émis — {}", what, ro::core::Describe(sent.error()));
+    };
+    pieces_.trade.deal().RefuseWhileAway(link_);
+    if (const auto& party = party_.invitation(); party.has_value()) {
+      report("groupe", ro::net::AnswerPartyInvitation(link_, party->party_id, false));
+      party_.ForgetInvitation();
+    }
+    if (const auto& asker = friends_.invitation(); asker.has_value()) {
+      report("ami", ro::net::AnswerFriendRequest(link_, asker->account_id, asker->char_id, false));
+      friends_.ForgetInvitation();
+    }
+    if (const auto& guild = guild_book_.invitation(); guild.has_value()) {
+      report("guilde", ro::net::AnswerGuildInvitation(link_, guild->guild_id, false));
+      guild_book_.ForgetInvitation();
+    }
+    if (const auto& alliance = guild_book_.alliance_offer(); alliance.has_value()) {
+      report("alliance", ro::net::AnswerGuildAlliance(link_, alliance->inviter_account_id, false));
+      guild_book_.ForgetAllianceOffer();
+    }
+    ro::sim::AdoptionDesk& adoption = pieces_.adoption.desk();
+    if (const auto& parent = adoption.invitation(); parent.has_value()) {
+      report("adoption", ro::net::AnswerAdoption(link_, *parent, false));
+      adoption.ForgetInvitation();
+    }
+  }
   const ro::vfs::TownInfo* towns = navi_.towns();
   const ro::sim::DealPhase deal = pieces_.trade.deal().deal().phase();
   survivors_mode_->Remember(SurvivorsContext{
@@ -207,7 +242,8 @@ void Game::FrameSurvivors(std::uint32_t now_ms) {
       .aside = WorldAside{.on_town_map = towns != nullptr && !towns->On(world_.map_name()).empty(),
                           .on_indoor_map = camera_rig_.indoor(),
                           .trade_open = deal != ro::sim::DealPhase::kNone,
-                          .trade_offered = deal == ro::sim::DealPhase::kProposed,
+                          .trade_offered = deal == ro::sim::DealPhase::kProposed &&
+                                           !pieces_.trade.deal().deal().answer_sent(),
                           .shop_open = pieces_.trade.HoldsWorld(),
                           .loading = moving_.has_value() || !stage_.has_value(),
                           .party_invited = party_.invitation().has_value(),

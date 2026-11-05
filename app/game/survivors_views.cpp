@@ -287,6 +287,7 @@ void SurvivorsViews::ComposeHud(const SurvivorsField& field, const ro::sim::Surv
     }
   }
   hud_.edge_targets = edge_targets_;
+  hud_.team_notice = facts.team_notice;
   hud_.minimap.shown = facts.minimap_shown;
   if (facts.minimap_shown) {
     SurvivorsMinimapDotsOf(field, rules, minimap_dots_);
@@ -492,6 +493,7 @@ void SurvivorsViews::ComposePause(const SurvivorsStage& stage, const SurvivorsFi
   pause_ = ro::ui::SurvivorsPauseView{
       .reason = ReasonOf(stage.pause_cause()),
       .alert_banner = facts.banner.has_value() ? BannerText(*facts.banner) : nullptr,
+      .world_runs = stage.coop(),
       .accepts_input = stage.accepts_input(),
       .reduced_effects = facts.options.reduced_effects,
       .measures_offered = ro::core::kDevTools,
@@ -529,7 +531,8 @@ void SurvivorsViews::ComposeSummary(const SurvivorsStage& stage,
   if (hero_class != rules.classes.end()) {
     // Le corps de la fin : rené, évolué, ou celui du départ.
     std::uint16_t job = hero_class->job_id;
-    if (ending->tally.evolutions > 0 && hero_class->evolved_job_id != 0) {
+    const bool evolved = ending->board.coop ? ending->own_evolved : ending->tally.evolutions > 0;
+    if (evolved && hero_class->evolved_job_id != 0) {
       job = hero_class->evolved_job_id;
     }
     if (ro::sim::Reborn(*hero_class, ending->tally.level) && hero_class->reborn_job_id != 0) {

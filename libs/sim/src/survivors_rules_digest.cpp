@@ -4,6 +4,7 @@
 #include <string_view>
 #include <type_traits>
 
+#include "ro/sim/survivors_bot.h"
 #include "ro/sim/survivors_match.h"
 #include "ro/sim/survivors_rules.h"
 #include "ro/sim/survivors_run.h"
@@ -130,6 +131,14 @@ void PutTerrain(FnvDigest& digest, const TerrainRule& terrain) {
   });
 }
 
+// Un robot joue le héros d'un joueur parti, sur chaque client.
+void PutBot(FnvDigest& digest, const SurvivorsBotProfile& profile) {
+  PutNumbers(digest, profile.skill_order);
+  PutNumbers(digest, profile.card_order);
+  PutAll(digest, profile.threat_radius_units, profile.panic_radius_units, profile.gem_reach_units,
+         profile.edge_margin_units, profile.heal_below_pct, profile.steady_steps);
+}
+
 void PutCaps(FnvDigest& digest, const SurvivorsCaps& caps) {
   PutAll(digest, caps.most_foes, caps.most_shots, caps.most_strikes, caps.most_gems,
          caps.skill_slots, caps.card_slots, caps.offers, caps.most_blasts, caps.most_zones,
@@ -198,7 +207,9 @@ std::uint64_t SurvivorsRulesDigest(const SurvivorsRules& rules) {
   PutAll(digest, rules.revive.hp_pct, rules.revive.invulnerable_ms, rules.revive.push_units);
   PutEach(digest, rules.terrains, [&](const TerrainRule& terrain) { PutTerrain(digest, terrain); });
   // Les règles d'équipe, écrites en constantes.
-  PutAll(digest, kTeamLeashCells, kMostTeamCharges, kVoteTicks);
+  PutAll(digest, kTeamLeashCells, kMostTeamCharges, kVoteTicks, kChestHoldTicks);
+  PutBot(digest, MageBotProfile());
+  PutBot(digest, KnightBotProfile());
   for (const SurvivorsTeamScale& scale : kTeamScales) {
     PutAll(digest, scale.exp_needed_pct, scale.foe_hp_pct, scale.batch_pct);
   }

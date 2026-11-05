@@ -108,7 +108,9 @@ void ArenaNumbers::Notice(const ro::sim::SurvivorsNews& news, const ro::sim::Sur
   for (std::size_t index = 0; index < ro::sim::HeroCount(field); ++index) {
     const std::int32_t hurt = news.hurt_by_hero[index];
     if (hurt <= 0) continue;
-    pool_.Add(0, true, ro::sim::HeroAt(field, index).position, hurt, kHurtEfficiencyPct, now_ms);
+    // Chaque héros a son nombre : ses blessures ne se fondent pas avec celles d'un autre.
+    pool_.Add(static_cast<std::uint32_t>(index), true, ro::sim::HeroAt(field, index).position, hurt,
+              kHurtEfficiencyPct, now_ms);
   }
 }
 

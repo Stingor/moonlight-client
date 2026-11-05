@@ -16,7 +16,7 @@ namespace ro::sim {
 namespace {
 
 constexpr std::size_t kFrameHeaderBytes = 5;
-constexpr std::size_t kInputBytes = 2;
+constexpr std::size_t kInputBytes = 3;
 constexpr std::size_t kDigestBytes = 12;
 constexpr std::size_t kU32Bytes = 4;
 constexpr std::size_t kU64Bytes = 8;
@@ -71,7 +71,9 @@ void AppendSurvivorsNews(SurvivorsNews& into, SurvivorsNews&& more) {
   Extend(into.boss_arrivals, std::move(more.boss_arrivals));
   Extend(into.boss_moves, std::move(more.boss_moves));
   into.level_ups = static_cast<std::uint16_t>(into.level_ups + more.level_ups);
-  into.reborn = into.reborn || more.reborn;
+  for (std::size_t index = 0; index < into.reborn_by_hero.size(); ++index) {
+    into.reborn_by_hero[index] = into.reborn_by_hero[index] || more.reborn_by_hero[index];
+  }
   into.gems_gathered += more.gems_gathered;
   into.hero_hurt += more.hero_hurt;
   for (std::size_t index = 0; index < into.hurt_by_hero.size(); ++index) {
@@ -102,6 +104,7 @@ std::optional<LockstepFrame> DecodeLockstepFrame(std::span<const std::uint8_t> b
       input.ballot = UnpackAnswer(ballot);
       if (!input.ballot.has_value()) return std::nullopt;
     }
+    input.ballot_vote = bytes[kFrameHeaderBytes + index * kInputBytes + 2U];
     frame.inputs.push_back(input);
   }
   if (bytes.size() == inputs_end + kDigestBytes) {
@@ -116,7 +119,8 @@ SurvivorsMatch::SurvivorsMatch(SurvivorsRun run, std::size_t local_player,
     : play_(std::move(run)),
       local_player_(local_player),
       next_local_tick_(input_delay_ticks),
-      framed_next_tick_(input_delay_ticks) {
+      framed_next_tick_(input_delay_ticks),
+      input_delay_ticks_(input_delay_ticks) {
   // Les premiers tics, avant que la première entrée ne vaille : tout le monde à
   // l'arrêt.
   Player& local = players_[local_player_];
@@ -139,7 +143,8 @@ std::uint32_t SurvivorsMatch::lead_ticks() const noexcept {
 }
 
 bool SurvivorsMatch::PushLocal(const SurvivorsTeamInput& input) {
-  if (lead_ticks() > kLockstepMostLeadTicks) return false;
+  const bool started = play_.run().field().ticks > input_delay_ticks_;
+  if (lead_ticks() > (started ? kLockstepMostLeadTicks : kLockstepStartLeadTicks)) return false;
   Player& local = players_[local_player_];
   local.pending.push_back(input);
   local.known_through = next_local_tick_ + 1U;
@@ -167,6 +172,7 @@ std::optional<std::vector<std::uint8_t>> SurvivorsMatch::TakeFrame() {
   for (const SurvivorsTeamInput& input : sent_) {
     bytes.push_back(input.heading);
     bytes.push_back(input.ballot.has_value() ? PackAnswer(*input.ballot) : kLockstepNoBallot);
+    bytes.push_back(input.ballot_vote);
   }
   if (digest_to_send_.has_value()) {
     PutU32(bytes, digest_to_send_->tick);
@@ -238,18 +244,21 @@ void SurvivorsMatch::RunConfirmedTick() {
   for (std::size_t player = 0; player < count; ++player) {
     Player& each = players_[player];
     if (each.robot_from.has_value() && tick >= *each.robot_from) {
-      // LE ROBOT REPREND : le même calcul sur chaque client, au même tic.
+      // LE ROBOT REPREND : le même calcul sur chaque client, au même tic. Il marche et
+      // combat, mais ne vote pas : seuls les humains décident.
+      if (!run.field().voter_gone[player]) play_.MarkLeft(player);
       run.PutHeroOnStage(player);
       inputs[player].heading = each.robot->Steer(run.field()).heading;
-      if (run.field().phase == SurvivorsPhase::kChoosing) {
-        inputs[player].ballot = each.robot->Choose(run.field());
-      }
       continue;
     }
     if (tick < each.first_tick) continue;
     inputs[player] = each.pending.front();
     each.pending.pop_front();
     ++each.first_tick;
+    // Un bulletin déposé pour un autre vote ne compte pour rien. Le journal n'en sait
+    // rien : il ne garde que ce qui a compté.
+    if (inputs[player].ballot_vote != run.field().vote_serial) inputs[player].ballot.reset();
+    inputs[player].ballot_vote = 0;
   }
   run.PutHeroOnStage(0);
   play_.Tick(std::span<const SurvivorsTeamInput>(inputs.data(), count));

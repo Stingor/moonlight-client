@@ -18,6 +18,8 @@ namespace {
 namespace rn = ro::net;
 
 constexpr std::int64_t kMsPerSecond = 1000;
+// Le serveur fait expirer une présence silencieuse : on la redit à ce rythme.
+constexpr std::int64_t kSurvivorsPresenceRefreshMs = 5 * 60 * kMsPerSecond;
 
 }  // namespace
 
@@ -33,12 +35,17 @@ rn::SurvivorsPresenceAsk PresenceOfStage(const SurvivorsStage& stage) {
     case SurvivorsScreen::kPaused:
       ask.state = rn::SurvivorsPresenceState::kPaused;
       break;
-    case SurvivorsScreen::kClosed:
-    case SurvivorsScreen::kPreparing:
-    case SurvivorsScreen::kLoading:
+    // LA FIN TIENT ENCORE L'ÉCRAN : le joueur n'est plus en partie pour les autres, mais
+    // il ne verrait pas ce qu'on lui demande.
     case SurvivorsScreen::kDying:
     case SurvivorsScreen::kWon:
     case SurvivorsScreen::kSummary:
+      ask.state = rn::SurvivorsPresenceState::kPaused;
+      ask.flags = rn::kSurvivorsPresenceHidden;
+      break;
+    case SurvivorsScreen::kClosed:
+    case SurvivorsScreen::kPreparing:
+    case SurvivorsScreen::kLoading:
       return ask;
   }
   const ro::sim::SurvivorsPlay* play = stage.play();
@@ -48,10 +55,10 @@ rn::SurvivorsPresenceAsk PresenceOfStage(const SurvivorsStage& stage) {
   ask.class_id = start.class_id;
   switch (stage.board().kind) {
     case SurvivorsBoardKind::kRanked:
-      ask.flags = rn::kSurvivorsPresenceRanked;
+      ask.flags |= rn::kSurvivorsPresenceRanked;
       break;
     case SurvivorsBoardKind::kChallenge:
-      ask.flags = rn::kSurvivorsPresenceChallenge;
+      ask.flags |= rn::kSurvivorsPresenceChallenge;
       break;
     case SurvivorsBoardKind::kFree:
       break;
@@ -106,8 +113,12 @@ std::optional<std::vector<std::uint8_t>> SurvivorsPresenceMode::Due(
     return std::nullopt;
   }
   if (!announced_) return std::nullopt;
-  const rn::SurvivorsPresenceAsk wanted = facts.shown ? facts.own : rn::SurvivorsPresenceAsk{};
-  if (wanted == sent_) return std::nullopt;
+  rn::SurvivorsPresenceAsk wanted = facts.own;
+  const bool in_arena = wanted.state != rn::SurvivorsPresenceState::kOut;
+  if (in_arena && !facts.shown) wanted.flags |= rn::kSurvivorsPresenceHidden;
+  const bool refresh_due = in_arena && sent_at_ms_.has_value() &&
+                           facts.now_ms >= *sent_at_ms_ + kSurvivorsPresenceRefreshMs;
+  if (wanted == sent_ && !refresh_due) return std::nullopt;
   if (sent_at_ms_.has_value() && facts.now_ms < *sent_at_ms_ + kSurvivorsPresenceSendEveryMs) {
     return std::nullopt;
   }

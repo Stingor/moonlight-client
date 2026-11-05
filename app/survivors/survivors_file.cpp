@@ -200,6 +200,11 @@ ro::core::Result<void> SaveInterruptedRun(const std::filesystem::path& client_ro
                                           const ro::sim::SurvivorsJournal& journal,
                                           const SurvivorsEnding& ending) {
   if (auto saved = SaveLastRun(client_root, journal); !saved) return saved;
+  return SaveInterruptedEnding(client_root, ending);
+}
+
+ro::core::Result<void> SaveInterruptedEnding(const std::filesystem::path& client_root,
+                                             const SurvivorsEnding& ending) {
   return WriteBytes(SurvivorsSavePath(client_root, kInterruptedEndingFileName),
                     EncodeSurvivorsEnding(ending));
 }

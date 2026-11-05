@@ -297,7 +297,7 @@ core::Result<SurvivorsTeamJournal> DecodeSurvivorsTeamJournal(std::span<const st
       if (!ValidHeading(value)) return std::unexpected(Corrupt("cap invalide"));
     } else if (kind == static_cast<std::uint8_t>(TeamJournalKind::kBallot)) {
       if (!UnpackAnswer(value)) return std::unexpected(Corrupt("bulletin illisible"));
-    } else {
+    } else if (kind != static_cast<std::uint8_t>(TeamJournalKind::kLeft)) {
       return std::unexpected(Corrupt("sorte d'entrée inconnue"));
     }
     journal.entries.push_back(TeamJournalEntry{.tick = static_cast<std::uint32_t>(tick),
@@ -362,6 +362,14 @@ SurvivorsTeamPlay::SurvivorsTeamPlay(SurvivorsRun run) : run_(std::move(run)) {
   last_headings_.fill(kNoHeading);
 }
 
+void SurvivorsTeamPlay::MarkLeft(std::size_t player) {
+  journal_.entries.push_back(TeamJournalEntry{.tick = run_.field().ticks,
+                                              .player = static_cast<std::uint8_t>(player),
+                                              .kind = TeamJournalKind::kLeft,
+                                              .value = 0});
+  run_.MarkVoterGone(player);
+}
+
 void SurvivorsTeamPlay::Tick(std::span<const SurvivorsTeamInput> inputs) {
   const std::uint32_t tick = run_.field().ticks;
   const std::size_t players = std::min(inputs.size(), kMostHeroes);
@@ -409,6 +417,9 @@ core::Result<std::uint64_t> ReplaySurvivorsTeam(const SurvivorsRules& rules,
           break;
         case TeamJournalKind::kBallot:
           inputs[entry.player].ballot = UnpackAnswer(entry.value);
+          break;
+        case TeamJournalKind::kLeft:
+          run.MarkVoterGone(entry.player);
           break;
       }
     }

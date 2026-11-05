@@ -342,6 +342,21 @@ void TendStance(SurvivorsField& field, std::size_t index, const SurvivorsSkillRu
 
 }  // namespace
 
+void TellOrbits(SurvivorsField& field, CastKind kind) {
+  if (field.rules == nullptr) return;
+  for (const OwnedSkill& owned : field.hero.skills) {
+    const SurvivorsSkillRule* rule = FindSkill(*field.rules, owned.skill_id);
+    if (rule == nullptr || rule->archetype != SkillArchetype::kOrbit) continue;
+    const SkillLevel* level = LevelOf(*rule, owned);
+    if (level == nullptr || !PhaseOf(owned, *level, field.step).active) continue;
+    PublishCast(field.news, SurvivorsCast{.skill_id = rule->skill_id,
+                                          .kind = kind,
+                                          .from = field.hero.position,
+                                          .to = field.hero.position,
+                                          .hero_index = static_cast<std::uint8_t>(field.stage)});
+  }
+}
+
 void FireSkills(SurvivorsField& field) {
   if (field.rules == nullptr) return;
   const std::size_t slots = std::min(field.hero.skills.size(), kMostSkillSlots);
@@ -466,7 +481,8 @@ void HurtFoe(SurvivorsField& field, SurvivorsFoe& foe, SurvivorsDamage damage,
                                            .efficiency_pct = damage.efficiency_pct,
                                            .skill_id = skill_id,
                                            .froze = applied.froze,
-                                           .knocked = applied.knocked});
+                                           .knocked = applied.knocked,
+                                           .hero_index = static_cast<std::uint8_t>(field.stage)});
   } else {
     ++field.news.dropped;
   }

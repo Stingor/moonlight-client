@@ -82,6 +82,8 @@ class SurvivorsCoopMode {
 
   // Ce joueur renonce au salon ou au départ qui l'attend, une fois.
   void Forsake(ro::net::Connection& link);
+  // Ce que le serveur a dit du salon ne vaut plus.
+  void ForgetLobby() { lobby_ = {}; }
 
   // UNE IMAGE DE PARTIE COOP : ce que le fil a apporté entre dans l'étage, un joueur
   // parti passe au robot, et les trames de l'étage partent par les deux chemins. La

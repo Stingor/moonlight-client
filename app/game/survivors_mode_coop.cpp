@@ -29,10 +29,15 @@ using ro::net::SurvivorsCoopState;
 // Le visage d'un personnage sans acteur : le même que seul.
 constexpr std::uint8_t kFallbackFaceSex = 1;
 constexpr std::uint16_t kFallbackFaceHair = 1;
-// L'attente des autres se dit après ceci, et ce joueur renonce après cela : un allié
-// figé mais connecté ne doit retenir personne à jamais.
+// L'attente des autres se dit après ceci. Le serveur sort de la partie un joueur figé
+// bien avant cela : renoncer ne sert que s'il ne le fait pas, ou s'il est perdu.
 constexpr std::uint64_t kCoopWaitNoticeMs = 3000;
-constexpr std::uint64_t kCoopGiveUpMs = 30000;
+constexpr std::uint64_t kCoopGiveUpMs = 90000;
+// « Votre groupe est déjà en partie » se dit ce temps : le serveur ne dit pas à qui est
+// resté dehors que la partie s'est finie, et un nouveau clic le lui apprendrait.
+constexpr std::uint64_t kCoopPlayingNoticeMs = 8000;
+// Une alerte du monde réel reste dite tout ce temps.
+constexpr std::uint64_t kCoopAlertNoticeMs = 6000;
 
 [[nodiscard]] bool Sitting(const ro::sim::World& world) {
   const ro::sim::Actor* player = world.player();
@@ -48,6 +53,14 @@ void SurvivorsMode::FollowCoopDoor(SurvivorsStage& stage, const SurvivorsContext
   MinigameWindows& windows = *context.minigames;
   const ro::net::SurvivorsCoopLobby& lobby = coop.lobby();
   const bool in_lobby = lobby.state == SurvivorsCoopState::kLobby;
+  if (lobby.state != SurvivorsCoopState::kPlaying) {
+    coop_playing_seen_ms_ = 0;
+  } else if (coop_playing_seen_ms_ == 0) {
+    coop_playing_seen_ms_ = context.now_ms;
+  } else if (context.now_ms - coop_playing_seen_ms_ >= kCoopPlayingNoticeMs) {
+    coop.ForgetLobby();
+    coop_playing_seen_ms_ = 0;
+  }
 
   if (asked.coop_enter) coop.Ask(*context.link, SurvivorsCoopAction::kEnter);
   if (asked.coop_leave) {
@@ -105,6 +118,8 @@ void SurvivorsMode::FollowCoopDoor(SurvivorsStage& stage, const SurvivorsContext
   say_if(ro::net::kSurvivorsCoopOffline, ro::core::TrText("Un membre du groupe est hors ligne."));
   say_if(ro::net::kSurvivorsCoopOutOfTown,
          ro::core::TrText("Un membre du groupe n'est ni en ville ni en intérieur."));
+  say_if(ro::net::kSurvivorsCoopNotInLobby,
+         ro::core::TrText("Un membre du groupe n'est pas au salon."));
   say_if(ro::net::kSurvivorsCoopNoClient,
          ro::core::TrText("Un membre du groupe joue sur un client qui ne connaît pas la coop."));
   if (lobby.state == SurvivorsCoopState::kPlaying) {
@@ -125,13 +140,24 @@ void SurvivorsMode::EnterCoop(SurvivorsStage& stage, const SurvivorsContext& con
   if (!started.has_value()) return;
   const std::optional<SurvivorsCoopDeparture> departure =
       DepartureOf(*started, context.own_char_id, Rules());
-  const auto refuse = [&](const char* why) {
-    context.say(ro::core::Tr("La partie du groupe ne peut pas commencer."));
+  const auto refuse = [&](const char* why, const char* said = ro::core::Tr(
+                                               "La partie du groupe ne peut pas commencer.")) {
+    context.say(said);
     ro::core::LogWarning("coop : {}", why);
     coop.Ask(*context.link, SurvivorsCoopAction::kLeave);
   };
   if (!departure.has_value()) {
-    refuse("le départ se lit mal, ou les règles des clients diffèrent");
+    refuse("le départ se lit mal, ou les règles des clients diffèrent",
+           ro::core::Tr("Les clients du groupe n'ont pas la même version : la partie ne peut pas "
+                        "commencer."));
+    return;
+  }
+  // CE QUI INTERDIT D'ENTRER a pu survenir après « prêt » : une boutique, un dialogue, un
+  // monstre. Un échange, lui, s'annule tout seul une fois en partie.
+  if (const std::optional<EntryRefusal> entry = Judge(EntryFactsOf(*context.world, context.aside));
+      entry.has_value() && *entry != EntryRefusal::kTradeOpen) {
+    refuse(RefusalText(*entry),
+           ro::core::Tr("Votre personnage est occupé : la partie du groupe part sans vous."));
     return;
   }
   const ro::sim::ArenaRule* arena = ro::sim::FindArena(Rules(), departure->start.arena_id);
@@ -159,7 +185,7 @@ void SurvivorsMode::EnterCoop(SurvivorsStage& stage, const SurvivorsContext& con
   ally_faces_ = departure->looks;
   ally_jobs_ = {};
   coop_left_told_ = false;
-  coop_wait_told_ = false;
+  coop_alert_until_ms_ = 0;
   if (!posture_.seated_by_us() && posture_.SitOnEntry(Sitting(*context.world)) &&
       context.link->is_open()) {
     if (auto sat = ro::net::RequestSit(*context.link, true); !sat) {
@@ -169,8 +195,8 @@ void SurvivorsMode::EnterCoop(SurvivorsStage& stage, const SurvivorsContext& con
   AfterBegin(context);
 }
 
-bool SurvivorsMode::FollowCoopFrame(SurvivorsStage& stage, const SurvivorsContext& context) {
-  if (context.coop == nullptr || !stage.board().coop) return true;
+void SurvivorsMode::FollowCoopFrame(SurvivorsStage& stage, const SurvivorsContext& context) {
+  if (context.coop == nullptr || !stage.board().coop) return;
   SurvivorsCoopFastPath fast_path;
   if (context.voice != nullptr) {
     fast_path.take = [voice = context.voice] {
@@ -188,17 +214,18 @@ bool SurvivorsMode::FollowCoopFrame(SurvivorsStage& stage, const SurvivorsContex
   context.coop->Carry(stage, *context.link, fast_path);
   const bool excluded = context.coop->TakeExcluded();
   if (stage.coop() && !stage.coop_over() && !coop_left_told_) {
-    if (excluded) {
+    // UNE DIVERGENCE N'EST LA FAUTE DE PERSONNE : la partie s'arrête ici, mais son bilan
+    // et ce qu'elle a rapporté restent acquis.
+    if (stage.match()->diverged()) {
+      context.say(ro::core::Tr("La partie du groupe a divergé : elle s'arrête ici."));
+      ro::core::LogWarning("coop : l'empreinte d'un autre client diffère de la nôtre");
+      stage.AbandonCoop();
+    } else if (excluded) {
       context.say(ro::core::Tr("Vous n'êtes plus dans la partie du groupe."));
       stage.AbandonCoop();
     } else if (stage.coop_stalled_ms() >= kCoopGiveUpMs) {
       context.say(ro::core::Tr("Le groupe ne répond plus : vous quittez la partie."));
       stage.AbandonCoop();
-    } else if (stage.coop_stalled_ms() < kCoopWaitNoticeMs) {
-      coop_wait_told_ = false;
-    } else if (!coop_wait_told_) {
-      coop_wait_told_ = true;
-      context.say(ro::core::Tr("En attente des autres joueurs…"));
     }
   }
   // UN JOUEUR QUI ABANDONNE OU QUI A FINI quitte l'équipe tout de suite, sans attendre
@@ -208,12 +235,20 @@ bool SurvivorsMode::FollowCoopFrame(SurvivorsStage& stage, const SurvivorsContex
     context.coop->Ask(*context.link, SurvivorsCoopAction::kLeave);
     coop_left_told_ = true;
   }
-  const ro::sim::SurvivorsMatch* match = stage.match();
-  if (match == nullptr || !match->diverged()) return true;
-  context.say(ro::core::Tr("La partie du groupe a divergé : elle s'arrête ici."));
-  ro::core::LogWarning("coop : l'empreinte d'un autre client diffère de la nôtre");
-  Exit(stage, context);
-  return false;
+}
+
+const char* SurvivorsMode::TeamNotice(const SurvivorsStage& stage,
+                                      std::uint64_t now_ms) const noexcept {
+  if (!stage.coop() || stage.coop_over()) return nullptr;
+  if (stage.coop_stalled_ms() >= kCoopWaitNoticeMs) {
+    return ro::core::TrText("En attente des autres joueurs…");
+  }
+  if (banner_.has_value() && now_ms < coop_alert_until_ms_) return BannerText(*banner_);
+  return nullptr;
+}
+
+void SurvivorsMode::NoteCoopAlert(std::uint64_t now_ms) {
+  coop_alert_until_ms_ = now_ms + kCoopAlertNoticeMs;
 }
 
 void SurvivorsMode::PoseAllyLooks(const SurvivorsStage& stage) {

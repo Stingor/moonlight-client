@@ -117,6 +117,9 @@ void SurvivorsMode::FollowDoor(SurvivorsStage& stage, const SurvivorsContext& co
   FollowCoopDoor(stage, context, asked, refusal.has_value());
   if (asked.start && !refusal.has_value() && !stage.coop()) {
     forsake_lobby();
+    // La vue pointe dans le salon qui vient de s'effacer, et un départ qui échoue laisse
+    // la fenêtre ouverte.
+    windows.survivors_prepare_view.coop = {};
     Enter(stage, context, ChosenBolt());
   }
 }

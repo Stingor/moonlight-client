@@ -108,6 +108,8 @@ struct SurvivorsAnswer {
 struct SurvivorsTeamInput {
   std::uint8_t heading = kNoHeading;
   std::optional<SurvivorsAnswer> ballot;
+  // Le vote pour lequel ce bulletin a été déposé : voir `SurvivorsField::vote_serial`.
+  std::uint8_t ballot_vote = 0;
   [[nodiscard]] bool operator==(const SurvivorsTeamInput&) const = default;
 };
 // Les flux d'aléa, dérivés de la graine : un flux par usage, pour qu'un tirage
@@ -192,7 +194,14 @@ struct SurvivorsField {
   // Le vote ouvert : le bulletin de chaque héros, et les tics qu'il lui reste ;
   // 0 : il s'ouvrira au prochain tic.
   std::array<std::optional<SurvivorsAnswer>, kMostHeroes> ballots;
+  // LES JOUEURS PARTIS : un robot joue leur héros, mais seuls les humains décident. Ils
+  // ne comptent plus dans la majorité.
+  std::array<bool, kMostHeroes> voter_gone = {};
   std::uint32_t vote_ticks_left = 0;
+  // Le numéro des offres en cours, modulo 256. Un bulletin ne porte qu'un index : sans
+  // lui, un clic parti pendant un vote compterait dans le suivant, sur une offre que
+  // le joueur n'a pas lue.
+  std::uint8_t vote_serial = 0;
   // Les tics de la pause d'un coffre : la partie n'avance pas tant qu'il en reste.
   std::uint32_t hold_ticks_left = 0;
   std::vector<SurvivorsFoe> foes;           // ordre de naissance
@@ -340,6 +349,8 @@ class SurvivorsRun {
   // Le vote ouvert accepte ce bulletin : une offre présente, une charge ou une
   // feuille en réserve, un héros à terre pour une relève.
   [[nodiscard]] bool BallotValid(SurvivorsAnswer ballot) const;
+  // Ce joueur a quitté la partie : son bulletin s'efface, et il ne vote plus.
+  void MarkVoterGone(std::size_t player);
   // Faux hors kChoosing, pour un index hors des offres, une charge épuisée, ou
   // un bannissement de kHeal ou kZeny. Une relève : faux sans feuille, ou pour
   // un héros debout ou inconnu.

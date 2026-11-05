@@ -86,6 +86,7 @@ void Revive(SurvivorsField& field) {
 void RaiseHero(SurvivorsField& field) {
   field.hero.down = false;
   Rise(field);
+  TellOrbits(field, CastKind::kOrbitOn);
 }
 
 void MoveHero(SurvivorsField& field, SurvivorsInput input) {
@@ -119,6 +120,7 @@ bool HurtHero(SurvivorsField& field, std::int32_t damage) {
   if (!field.allies.empty()) {
     hero.down = true;
     field.news.heroes_down.push_back(static_cast<std::uint8_t>(field.stage));
+    TellOrbits(field, CastKind::kOrbitOff);
     bool someone_stands = false;
     for (std::size_t index = 0; index < HeroCount(field); ++index) {
       someone_stands = someone_stands || !HeroAt(field, index).down;

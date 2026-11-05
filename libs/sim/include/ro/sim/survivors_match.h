@@ -22,7 +22,7 @@ namespace ro::sim {
 // tic, et un tic ne s'exécute que lorsque les entrées de tous sont arrivées.
 //
 // UNE TRAME : [through_tick:4][count:1] puis `count` entrées des tics
-// (through_tick − count + 1 … through_tick), chacune [cap:1][bulletin:1], et
+// (through_tick − count + 1 … through_tick), chacune [cap:1][bulletin:1][vote:1], et
 // éventuellement [digest_tick:4][digest:8]. Tout est petit-boutiste.
 //
 // DEUX CHEMINS, DEUX RÔLES. Seul le chemin fiable, qui livre à tous les mêmes trames
@@ -42,8 +42,14 @@ inline constexpr std::uint32_t kLockstepDigestEveryTicks = 50;
 // Le client ne se donne pas plus de cette avance sur le dernier tic confirmé :
 // au-delà, il attend les autres.
 inline constexpr std::uint32_t kLockstepMostLeadTicks = 25;
-// Les entrées d'un autre joueur gardées en attente de leur tic : le double de ce
-// que son avance permet à un client honnête. Au-delà, elles s'ignorent.
+// AU DÉPART, l'avance reste très courte tant qu'aucun tic n'a été confirmé : personne
+// ne joue seul pendant qu'un autre monte encore son arène. Un joueur en avance y
+// resterait sinon pour toute la partie.
+inline constexpr std::uint32_t kLockstepStartLeadTicks = 4;
+// Au-delà de cette avance, le client ralentit un peu, et l'écart se résorbe.
+inline constexpr std::uint32_t kLockstepEaseLeadTicks = 15;
+// Les entrées d'un autre joueur gardées en attente de leur tic : bien plus que ce que
+// son avance permet à un client honnête. Au-delà, elles s'ignorent.
 inline constexpr std::size_t kLockstepMostPendingTicks = std::size_t{kLockstepMostLeadTicks} * 8U;
 // Une trame ne dépasse pas ces octets : le contrat du serveur.
 inline constexpr std::size_t kLockstepMostFrameBytes = 256;
@@ -147,6 +153,7 @@ class SurvivorsMatch {
   std::uint32_t next_local_tick_ = 0;    // le tic que la prochaine entrée locale vaudra
   std::deque<SurvivorsTeamInput> sent_;  // les dernières entrées locales, pour la redondance
   std::uint32_t framed_next_tick_ = 0;   // le premier tic qu'aucune trame n'a porté
+  std::uint32_t input_delay_ticks_ = 0;
   std::uint32_t frame_due_tick_ = 0;
   // Nos empreintes des derniers tics, et celles reçues des autres.
   struct DigestAt {

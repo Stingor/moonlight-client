@@ -28,6 +28,11 @@ constexpr ImGuiWindowFlags kModalFlags =
 
 // Ce qui a mis en pause, quand ce n'est pas le joueur.
 void DrawReason(const SurvivorsPauseView& view) {
+  if (view.world_runs) {
+    ColoredText(kAlertColor, core::Tr("La partie continue : votre héros reste à découvert."));
+    ImGui::Separator();
+    return;
+  }
   switch (view.reason) {
     case SurvivorsPauseReason::kPlayer:
       return;
