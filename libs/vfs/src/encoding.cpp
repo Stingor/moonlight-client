@@ -1,6 +1,7 @@
 #include "ro/vfs/encoding.h"
 
 #include <algorithm>
+#include <utility>
 #include <vector>
 
 #ifdef _WIN32
@@ -50,14 +51,23 @@ Result<std::string> FromWide(std::wstring_view wide, unsigned int code_page) {
   if (wide.empty()) {
     return std::string{};
   }
-  const int needed = WideCharToMultiByte(code_page, 0, wide.data(), static_cast<int>(wide.size()),
-                                         nullptr, 0, nullptr, nullptr);
+  // ⚠ UN CARACTÈRE ABSENT DE LA PAGE NE FAIT PAS ÉCHOUER L'APPEL : il devient
+  // « ? » ou son plus proche voisin, ce qui donne un autre nom. L'UTF-8 écrit tout
+  // caractère, et le système y refuse ces deux paramètres.
+  const bool can_replace = code_page != CP_UTF8;
+  const DWORD flags = can_replace ? WC_NO_BEST_FIT_CHARS : 0;
+  BOOL replaced = FALSE;
+  const int needed = WideCharToMultiByte(
+      code_page, flags, wide.data(), static_cast<int>(wide.size()), nullptr, 0, nullptr, nullptr);
   if (needed <= 0) {
     return Fail(ErrorCode::kCorruptData, "séquence intraduisible depuis UTF-16");
   }
   std::string narrow(static_cast<std::size_t>(needed), '\0');
-  WideCharToMultiByte(code_page, 0, wide.data(), static_cast<int>(wide.size()), narrow.data(),
-                      needed, nullptr, nullptr);
+  WideCharToMultiByte(code_page, flags, wide.data(), static_cast<int>(wide.size()), narrow.data(),
+                      needed, nullptr, can_replace ? &replaced : nullptr);
+  if (replaced != FALSE) {
+    return Fail(ErrorCode::kCorruptData, "caractère absent de la page de code");
+  }
   return narrow;
 }
 
@@ -137,6 +147,12 @@ Result<std::string> Cp949ToUtf8(std::string_view cp949) {
   }
   return converted;
 #endif
+}
+
+std::string FileNameOfRaw(std::string_view raw) {
+  std::string decoded = Cp949ToUtf8Lossy(raw);
+  const core::Result<std::string> back = Utf8ToCp949(decoded);
+  return back.has_value() && *back == raw ? std::move(decoded) : std::string(raw);
 }
 
 std::string Cp949ToUtf8Lossy(std::string_view cp949) {

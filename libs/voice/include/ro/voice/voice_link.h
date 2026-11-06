@@ -6,6 +6,7 @@
 #include <optional>
 #include <set>
 #include <span>
+#include <stop_token>
 #include <string>
 #include <vector>
 
@@ -23,14 +24,20 @@ namespace ro::voice {
 // le micro quand le joueur parle et mêle ce qu'elle entend vers la sortie. Elle
 // n'a pas de fil à elle : `VoiceEngine` la fait avancer, et un essai aussi.
 
-// Combien attendre la connexion : le fil de la voix attend avec elle, et la
-// partie attend le fil quand elle se ferme.
+// Combien attendre la connexion : le fil de la voix attend avec elle.
 inline constexpr int kVoiceConnectTimeoutMs = 2000;
 // Combien attendre avant de retenter une liaison perdue ou refusée.
 inline constexpr std::uint32_t kVoiceRetryMs = 5000;
 // Le battement de contrôle : le serveur n'en exige pas, il dit que la liaison
 // vit des deux côtés.
 inline constexpr std::uint32_t kVoicePingMs = 15'000;
+// Combien attendre l'accord du serveur. ⚠ AU-DELÀ DE CE QU'IL PEUT LE TENIR : il
+// retient 30 s une authentification en attendant le serveur de carte, puis
+// raccroche de lui-même. Ce délai-ci n'attrape qu'un serveur figé.
+inline constexpr std::uint32_t kVoiceAuthTimeoutMs = 45'000;
+// En ligne, le silence qui fait tomber la liaison : deux battements sans rien
+// recevoir, pas même la réponse au premier.
+inline constexpr std::uint32_t kVoiceSilentMs = 2 * kVoicePingMs;
 // Le salut UDP, répété jusqu'à la réponse, puis entretenu : le serveur oublie
 // l'adresse d'un client muet depuis 30 s.
 inline constexpr std::uint32_t kVoiceHelloRetryMs = 1000;
@@ -128,7 +135,8 @@ struct VoiceStatus {
 
 class VoiceLink {
  public:
-  VoiceLink(VoiceTarget target, VoiceDevices devices);
+  // `abandon` interrompt l'attente d'une connexion en cours.
+  VoiceLink(VoiceTarget target, VoiceDevices devices, std::stop_token abandon = {});
 
   void Steer(const VoiceControls& controls) { controls_ = controls; }
   // Ne plus entendre ce personnage, ou l'entendre de nouveau. Perdu quand la
@@ -146,6 +154,9 @@ class VoiceLink {
  private:
   void Open(std::uint32_t now_ms);
   void Drop(std::uint32_t now_ms, std::string why);
+  // Fait tomber une liaison dont le serveur ne dit plus rien : le noyau de
+  // celui-ci accuse encore réception, et aucune écriture n'échouera.
+  void DropIfSilent(std::uint32_t now_ms);
   void ReadTcp(std::uint32_t now_ms);
   void ReadUdp(std::uint32_t now_ms);
   void Apply(const ServerMessage& message, std::uint32_t now_ms);
@@ -165,6 +176,7 @@ class VoiceLink {
 
   VoiceTarget target_;
   VoiceDevices devices_;
+  std::stop_token abandon_;
   VoiceControls controls_;
 
   net::TcpSocket tcp_;
@@ -179,6 +191,10 @@ class VoiceLink {
   std::uint32_t last_udp_heard_ms_ = 0;
   std::uint32_t last_ping_ms_ = 0;
   std::uint32_t retry_at_ms_ = 0;
+  std::uint32_t opened_ms_ = 0;
+  std::uint32_t last_heard_ms_ = 0;
+  // La connexion vient d'échouer : le pas suivant date le repos.
+  bool connect_just_failed_ = false;
 
   VoiceLinkState state_ = VoiceLinkState::kConnecting;
   std::string detail_;

@@ -1,9 +1,9 @@
 #pragma once
 
-#include <atomic>
 #include <chrono>
 #include <cstdint>
 #include <mutex>
+#include <stop_token>
 #include <thread>
 #include <vector>
 
@@ -26,8 +26,9 @@ inline constexpr std::uint32_t kVoiceMostSteerAgeMs = 500;
 // partie ne lui parle que par deux portes gardées : ce que le joueur demande,
 // et ce que la liaison rend.
 //
-// La destruction arrête le fil et l'attend : au plus le délai d'une connexion
-// en cours.
+// La destruction arrête le fil et l'attend : une connexion en cours s'abandonne
+// aussitôt, et seule une résolution de nom en cours se fait attendre, parce que
+// le système n'offre pas de l'interrompre.
 class VoiceEngine {
  public:
   VoiceEngine(VoiceTarget target, VoiceDevices devices);
@@ -52,6 +53,7 @@ class VoiceEngine {
 
   void Run();
 
+  std::stop_source stopping_;
   VoiceLink link_;
   mutable std::mutex guard_;
   VoiceControls controls_;
@@ -60,7 +62,6 @@ class VoiceEngine {
   std::vector<std::vector<std::uint8_t>> coop_to_send_;
   std::vector<CoopRelayed> coop_received_;
   VoiceStatus status_;
-  std::atomic<bool> stopping_ = false;
   std::thread worker_;
 };
 

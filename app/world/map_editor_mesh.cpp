@@ -11,7 +11,7 @@
 namespace moonclient {
 namespace {
 
-std::string CitedName(std::string_view raw) { return ro::vfs::Cp949ToUtf8Lossy(raw); }
+std::string CitedName(std::string_view raw) { return ro::vfs::FileNameOfRaw(raw); }
 
 std::string RawName(std::string_view utf8) {
   auto raw = ro::vfs::Utf8ToCp949(utf8);

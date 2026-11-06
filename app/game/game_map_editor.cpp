@@ -519,7 +519,7 @@ void Game::OpenMapModelMenu(std::size_t model_index, std::uint32_t now_ms) {
   built.subject = static_cast<std::uint32_t>(model_index);
   built.name =
       std::format("#{} {}", model_index,
-                  ro::vfs::Cp949ToUtf8Lossy(stage_->scene.rsw.models()[model_index].model_name));
+                  ro::vfs::FileNameOfRaw(stage_->scene.rsw.models()[model_index].model_name));
   built.family = ro::core::Tr("Modèle de la carte");
   built.hangul_name = true;
   built.items.push_back(ro::ui::EntityMenuItem{.label = ro::core::Tr("Ouvrir avec l'éditeur"),
@@ -640,6 +640,8 @@ void Game::PlayMapModelVerb(int verb) {
                                     .animation_speed = placed.animation_speed};
       const std::size_t originals = stage_->scene.unfixed_models.size();
       if (*model >= originals && *model - originals < document.added().size()) {
+        // Le nom du document, et non celui du RSW : voir `MapEditorSession::Duplicate`.
+        copied.model_file = document.added()[*model - originals].model_file;
         copied.opacity = document.added()[*model - originals].opacity;
       } else if (const ro::mapedit::ModelEdit* edit = document.ModelAt(*model)) {
         copied.opacity = edit->opacity;

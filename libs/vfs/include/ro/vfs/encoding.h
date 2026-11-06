@@ -15,6 +15,9 @@ namespace ro::vfs {
 // ignore qu'un encodage existe. Laisser fuir le CP949 dans les couches hautes,
 // c'est se condamner à des noms illisibles et à des recherches qui échouent
 // selon la locale de la machine.
+//
+// Un caractère que le CP949 n'a pas, ou un UTF-8 invalide, fait échouer
+// `Utf8ToCp949` : un remplacement donnerait le nom d'un autre fichier.
 [[nodiscard]] core::Result<std::string> Utf8ToCp949(std::string_view utf8);
 [[nodiscard]] core::Result<std::string> Cp949ToUtf8(std::string_view cp949);
 
@@ -22,6 +25,12 @@ namespace ro::vfs {
 // intraduisible devient '?' au lieu de faire échouer l'appel. À ne JAMAIS
 // utiliser pour construire une clé de recherche.
 [[nodiscard]] std::string Cp949ToUtf8Lossy(std::string_view cp949);
+
+// LE NOM DE FICHIER QUE PORTENT CES OCTETS. Un nom hors CP949 reste en UTF-8 dans
+// le document, si bien que seuls les octets qui font l'aller-retour se lisent en
+// CP949 ; les autres se rendent tels quels. Des octets UTF-8 qui forment aussi
+// des paires CP949 valides se lisent en CP949 : ils désignent toujours le fichier.
+[[nodiscard]] std::string FileNameOfRaw(std::string_view raw);
 
 #ifdef _WIN32
 // Des octets lus dans une page de code Windows. Échoue si la page ne les admet

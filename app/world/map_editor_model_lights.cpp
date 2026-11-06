@@ -41,7 +41,7 @@ const ro::formats::RswModel* MapEditorSession::SelectedPose(
 
 std::string MapEditorSession::SelectedFile(const ro::render::MapScene& scene) const {
   const ro::formats::RswModel* pose = SelectedPose(scene);
-  return pose != nullptr ? ro::vfs::Cp949ToUtf8Lossy(pose->model_name) : std::string();
+  return pose != nullptr ? ro::vfs::FileNameOfRaw(pose->model_name) : std::string();
 }
 
 std::optional<std::size_t> MapEditorSession::ChosenModelLight(const ro::render::MapScene& scene,

@@ -1,8 +1,15 @@
 #pragma once
 
+#include <cstddef>
+#include <cstdint>
 #include <filesystem>
+#include <span>
 #include <string>
 #include <string_view>
+
+#if defined(_WIN32)
+struct _CONTEXT;
+#endif
 
 namespace ro::core {
 
@@ -37,7 +44,16 @@ namespace ro::core {
 // À appeler UNE FOIS, et AVANT `InitLogging` : ouvrir le journal peut déjà
 // échouer, et le rapport n'a besoin que de son dossier. Sans journal, il le dit
 // sur la console.
-void InstallCrashReporter(std::filesystem::path folder);
+//
+// UN DÉBORDEMENT DE PILE se rapporte depuis un fil auxiliaire, puisque celui qui
+// faute n'a plus de quoi travailler. Le rapport donne alors la pile du fil fautif
+// en adresses dans leur module, sans noms de fonctions ; le vidage la porte
+// entière.
+enum class CrashNotice : std::uint8_t {
+  kBox,     // une boîte du système dit au joueur où est le rapport
+  kSilent,  // rien que les fichiers : personne n'est là pour fermer une boîte
+};
+void InstallCrashReporter(std::filesystem::path folder, CrashNotice notice = CrashNotice::kBox);
 
 // REPOSE le filtre, et dit au journal si quelqu'un l'avait remplacé.
 //
@@ -51,5 +67,19 @@ void RearmCrashReporter(std::string_view moment);
 // Exposé parce que c'est la seule partie qui se vérifie sans planter : le reste
 // est du câblage vers le système d'exploitation.
 [[nodiscard]] std::string DescribeFault(unsigned long code);
+
+// Combien de modules une liste de `capacity_bytes` octets porte vraiment, quand
+// le système dit qu'il lui en aurait fallu `needed_bytes` : il annonce ce besoin
+// même s'il n'a pas tout écrit.
+[[nodiscard]] std::size_t ListedModuleCount(std::size_t needed_bytes, std::size_t capacity_bytes,
+                                            std::size_t handle_bytes) noexcept;
+
+#if defined(_WIN32)
+// LES ADRESSES D'UNE PILE, déroulée depuis les registres d'un fil, et combien ont
+// été relevées. Une pile illisible arrête le relevé sans faute : ce qui est déjà
+// relevé reste.
+[[nodiscard]] std::size_t WalkStackFrom(const _CONTEXT& registers,
+                                        std::span<std::uint64_t> addresses) noexcept;
+#endif
 
 }  // namespace ro::core

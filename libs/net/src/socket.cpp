@@ -1,5 +1,6 @@
 #include "ro/net/socket.h"
 
+#include <algorithm>
 #include <array>
 #include <cstdio>
 #include <cstring>
@@ -40,6 +41,10 @@ using core::Result;
 
 // Le port tient sur cinq chiffres ; getaddrinfo l'attend sous forme de texte.
 constexpr std::size_t kPortTextSize = 6;
+
+// L'attente d'une connexion se coupe en tranches : c'est ce qu'un abandon
+// demandé attend au plus.
+constexpr int kConnectSliceMs = 50;
 
 #if defined(_WIN32)
 
@@ -145,12 +150,14 @@ bool PeerRefused(int code) { return code == ECONNREFUSED; }
 // seconde question, un socket devenu inscriptible PARCE QUE la connexion a
 // échoué serait pris pour un succès, et l'échec n'apparaîtrait qu'au premier
 // envoi.
-Result<void> AwaitConnection(NativeSocket handle, int timeout_ms) {
+// Attend qu'une connexion aboutisse, une tranche de temps au plus. Rend le
+// compte de `select` : zéro si rien n'est arrivé.
+int WaitForConnectionSlice(NativeSocket handle, int slice_ms) {
   fd_set writable;
   FD_ZERO(&writable);
   timeval limit = timeval();
-  limit.tv_sec = timeout_ms / 1000;
-  limit.tv_usec = (timeout_ms % 1000) * 1000;
+  limit.tv_sec = slice_ms / 1000;
+  limit.tv_usec = (slice_ms % 1000) * 1000;
 
 #if defined(_WIN32)
   FD_SET(static_cast<SOCKET>(handle), &writable);
@@ -162,11 +169,21 @@ Result<void> AwaitConnection(NativeSocket handle, int timeout_ms) {
   // Winsock ignore ce premier argument : ses ensembles portent les descripteurs
   // eux-mêmes, pas un intervalle. Le calculer y produirait une conversion
   // dépassant la taille d'un int sur un descripteur haut.
-  const int ready = select(0, nullptr, &writable, &failed, &limit);
+  return select(0, nullptr, &writable, &failed, &limit);
 #else
   FD_SET(handle, &writable);
-  const int ready = select(handle + 1, nullptr, &writable, nullptr, &limit);
+  return select(handle + 1, nullptr, &writable, nullptr, &limit);
 #endif
+}
+
+Result<void> AwaitConnection(NativeSocket handle, int timeout_ms, const std::stop_token& abandon) {
+  int ready = 0;
+  for (int left_ms = timeout_ms; ready == 0 && left_ms > 0; left_ms -= kConnectSliceMs) {
+    if (abandon.stop_requested()) {
+      return Fail(ErrorCode::kIoFailure, "connexion abandonnée");
+    }
+    ready = WaitForConnectionSlice(handle, std::min(left_ms, kConnectSliceMs));
+  }
   if (ready == 0) {
     return Fail(ErrorCode::kIoFailure, "délai de connexion dépassé");
   }
@@ -320,7 +337,8 @@ void TcpSocket::Close() noexcept {
   }
 }
 
-Result<TcpSocket> TcpSocket::Connect(std::string_view host, std::uint16_t port, int timeout_ms) {
+Result<TcpSocket> TcpSocket::Connect(std::string_view host, std::uint16_t port, int timeout_ms,
+                                     const std::stop_token& abandon) {
   EnsureSubsystem();
 
   const std::string host_text(host);
@@ -368,7 +386,7 @@ Result<TcpSocket> TcpSocket::Connect(std::string_view host, std::uint16_t port, 
         last = Error{ErrorCode::kIoFailure, "connexion : " + DescribeError(code)};
         continue;
       }
-      Result<void> awaited = AwaitConnection(handle, timeout_ms);
+      Result<void> awaited = AwaitConnection(handle, timeout_ms, abandon);
       if (!awaited.has_value()) {
         last = awaited.error();
         continue;

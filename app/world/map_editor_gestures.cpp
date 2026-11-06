@@ -114,16 +114,20 @@ MapEditorSession::Outcome MapEditorSession::Duplicate(const ro::render::MapScene
   const ro::mapedit::MapEdit before = store.Document(map_name_);
   // LA COPIE GARDE L'OPACITÉ du modèle, comme son placement.
   std::optional<float> opacity;
+  // ⚠ UN MODÈLE AJOUTÉ GARDE LE NOM DE SON DOCUMENT : celui du RSW a été converti, et
+  // un nom que le CP949 n'écrit pas ne s'y relit pas.
+  std::string model_file = ro::vfs::Cp949ToUtf8Lossy(placed.model_name);
   if (rank >= original_count_) {
     const std::size_t slot = rank - original_count_;
     if (slot < before.added().size()) {
       opacity = before.added()[slot].opacity;
+      model_file = before.added()[slot].model_file;
     }
   } else if (const ro::mapedit::ModelEdit* edit = before.ModelAt(rank)) {
     opacity = edit->opacity;
   }
   ro::mapedit::MapEdit after = before;
-  after.AddModel(ro::mapedit::AddedModel{.model_file = ro::vfs::Cp949ToUtf8Lossy(placed.model_name),
+  after.AddModel(ro::mapedit::AddedModel{.model_file = std::move(model_file),
                                          .position = placed.position,
                                          .rotation = placed.rotation,
                                          .scale = placed.scale,

@@ -18,17 +18,27 @@ using core::ErrorCode;
 using core::Fail;
 using core::Result;
 
-// Le chemin interne passé par l'appelant est en UTF-8 ; la clé de recherche est
-// en CP949 normalisé. Une conversion qui échoue n'est pas fatale : un chemin
-// purement ASCII traverse tel quel, ce qui couvre l'immense majorité des appels.
 // Le dossier du disque, tel qu'il commence toute clé interne.
 constexpr std::string_view kDataFolderKey = "data/";
 // Le même, sous la forme d'une clé déjà normalisée : minuscules, antislash.
 constexpr std::string_view kDataFolderDiskKey = "data\\";
+#ifdef _WIN32
+// La page de code UTF-8 de Windows : `vfs.cpp` n'inclut pas `windows.h`.
+constexpr unsigned int kCodePageUtf8 = 65001;
+#endif
 
+// Le chemin interne passé par l'appelant est en UTF-8 ; la clé de recherche est
+// en CP949 normalisé.
+//
+// UN NOM QUE LE CP949 N'ÉCRIT PAS (« décor.rsm » déposé par le joueur) n'existe
+// dans aucune archive : sa clé est son UTF-8 normalisé, que seul le disque peut
+// servir. ⚠ MINUSCULÉ D'ABORD : ces octets ne sont pas des paires CP949, et la
+// normalisation y prendrait une lettre pour une queue.
 std::string ToLookupKey(std::string_view utf8_path) {
-  auto cp949 = Utf8ToCp949(utf8_path);
-  return formats::NormalizeGrfPath(cp949 ? std::string_view(*cp949) : utf8_path);
+  if (auto cp949 = Utf8ToCp949(utf8_path); cp949) {
+    return formats::NormalizeGrfPath(*cp949);
+  }
+  return formats::NormalizeGrfPath(core::AsciiLower(utf8_path));
 }
 
 #ifndef _WIN32
@@ -85,7 +95,8 @@ std::filesystem::path ResolveIgnoringCase(const std::filesystem::path& root,
 // — ou par un outil qui recrache les octets bruts — il porte ces mêmes octets
 // relus en CP1252. Un client installé en français ne montre que la seconde
 // forme. On essaie les deux, sinon le fichier est déclaré absent alors qu'il est
-// là.
+// là. Une troisième sert la clé d'un nom que le CP949 n'écrit pas : voir
+// `ToLookupKey`.
 std::vector<std::filesystem::path> DiskSpellings(const std::filesystem::path& root,
                                                  std::string_view normalized_key,
                                                  [[maybe_unused]] unsigned int ansi_code_page) {
@@ -112,6 +123,13 @@ std::vector<std::filesystem::path> DiskSpellings(const std::filesystem::path& ro
     std::filesystem::path ansi = root / std::filesystem::path(*wide);
     if (spellings.empty() || spellings.front() != ansi) {
       spellings.push_back(std::move(ansi));
+    }
+  }
+  // Forme 3 : la clé est de l'UTF-8.
+  if (auto wide = WideFromCodePage(relative, kCodePageUtf8); wide) {
+    std::filesystem::path unicode = root / std::filesystem::path(*wide);
+    if (std::ranges::find(spellings, unicode) == spellings.end()) {
+      spellings.push_back(std::move(unicode));
     }
   }
 #else
@@ -301,6 +319,9 @@ std::vector<std::string> Vfs::List(std::string_view utf8_prefix,
   // Un set trie et dédoublonne : le même fichier peut être dans plusieurs
   // archives, et l'appelant ne veut pas le voir deux fois.
   std::set<std::string> found;
+  // Les clés d'un nom que le CP949 n'écrit pas : leurs octets sont déjà de
+  // l'UTF-8, et les décoder en CP949 donnerait un autre nom.
+  std::set<std::string> utf8_keys;
   const auto keep = [&](std::string_view name) {
     if (name.starts_with(prefix) && (suffix.empty() || name.ends_with(suffix))) {
       found.emplace(name);
@@ -331,16 +352,21 @@ std::vector<std::string> Vfs::List(std::string_view utf8_prefix,
         continue;
       }
       const std::u8string relative = walk->path().lexically_relative(data_directory_).u8string();
-      keep(ToLookupKey(
+      const std::string utf8_path =
           std::string(kDataFolderKey) +
-          std::string(reinterpret_cast<const char*>(relative.data()), relative.size())));
+          std::string(reinterpret_cast<const char*>(relative.data()), relative.size());
+      std::string key = ToLookupKey(utf8_path);
+      keep(key);
+      if (!Utf8ToCp949(utf8_path).has_value()) {
+        utf8_keys.insert(std::move(key));
+      }
     }
   }
 
   std::vector<std::string> listed;
   listed.reserve(found.size());
   for (const std::string& name : found) {
-    listed.push_back(Cp949ToUtf8Lossy(name));
+    listed.push_back(utf8_keys.contains(name) ? name : Cp949ToUtf8Lossy(name));
   }
   return listed;
 }

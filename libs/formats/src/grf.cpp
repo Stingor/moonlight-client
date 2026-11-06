@@ -88,10 +88,28 @@ Result<std::vector<std::uint8_t>> InflateExactly(std::span<const std::uint8_t> i
   return output;
 }
 
+// UNE PAIRE CP949 : un octet haut, puis une queue, qui peut être une lettre
+// ASCII mais jamais un séparateur.
+[[nodiscard]] constexpr bool IsCp949Lead(std::uint8_t byte) noexcept {
+  return byte >= 0x81 && byte <= 0xFE;
+}
+[[nodiscard]] constexpr bool IsCp949Trail(std::uint8_t byte) noexcept {
+  return (byte >= 'A' && byte <= 'Z') || (byte >= 'a' && byte <= 'z') ||
+         (byte >= 0x81 && byte <= 0xFE);
+}
+
 // La même normalisation que `NormalizeGrfPath`, mais SUR PLACE, dans la table
 // décompressée. C'est ce qui permet aux clés de n'être que des vues.
+//
+// ⚠ LA QUEUE D'UNE PAIRE N'EST PAS UNE LETTRE : 81 41 et 81 61 sont deux syllabes
+// différentes, et la minusculer changerait le nom.
 std::string_view NormalizeInPlace(std::span<std::uint8_t> name) {
-  for (std::uint8_t& byte : name) {
+  for (std::size_t at = 0; at < name.size(); ++at) {
+    std::uint8_t& byte = name[at];
+    if (IsCp949Lead(byte) && at + 1 < name.size() && IsCp949Trail(name[at + 1])) {
+      ++at;
+      continue;
+    }
     byte = byte == '/' ? static_cast<std::uint8_t>('\\') : core::AsciiLower(byte);
   }
   return {reinterpret_cast<const char*>(name.data()), name.size()};
@@ -243,14 +261,9 @@ Result<GrfListing> ListGrfEntries(core::ByteSource& source) {
 }
 
 std::string NormalizeGrfPath(std::string_view path) {
-  std::string normalized;
-  normalized.reserve(path.size());
-  for (const char character : path) {
-    const auto byte = static_cast<std::uint8_t>(character);
-    // 0x2F ne peut pas être le second octet d'une paire CP949 (ils commencent à
-    // 0x41), donc cette substitution ne peut pas abîmer un nom coréen.
-    normalized.push_back(byte == '/' ? '\\' : static_cast<char>(core::AsciiLower(byte)));
-  }
+  std::string normalized(path);
+  static_cast<void>(NormalizeInPlace(
+      std::span(reinterpret_cast<std::uint8_t*>(normalized.data()), normalized.size())));
   return normalized;
 }
 

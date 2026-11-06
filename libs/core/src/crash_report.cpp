@@ -1,5 +1,6 @@
 #include "ro/core/crash_report.h"
 
+#include <array>
 #include <atomic>
 #include <chrono>
 #include <csignal>
@@ -34,6 +35,19 @@ namespace {
 std::filesystem::path& ReportFolder() {
   static std::filesystem::path folder;
   return folder;
+}
+
+// Le rapport s'annonce-t-il par une boîte : voir `CrashNotice`.
+CrashNotice& ReportNotice() {
+  static CrashNotice notice = CrashNotice::kBox;
+  return notice;
+}
+
+// Le rapport en texte est écrit et fermé : ce qui suit n'est plus que la boîte, qui
+// attend le joueur aussi longtemps qu'il le faut.
+std::atomic<bool>& ReportIsWritten() {
+  static std::atomic<bool> written{false};
+  return written;
 }
 
 // « 20260914-161530 » : de quoi nommer deux plantages de la même partie sans
@@ -101,6 +115,9 @@ constexpr std::size_t kReportedLogLines = 200;
 // graphique, celui-là même qui vient peut-être de tomber.
 void TellThePlayer(const std::filesystem::path& path, const std::string& fault) {
 #if defined(_WIN32)
+  if (ReportNotice() == CrashNotice::kSilent) {
+    return;
+  }
   const std::wstring said =
       L"moonclient s'est arrêté : " + std::filesystem::path(fault).wstring() +
       L"\n\nUn rapport a été écrit à côté du jeu :\n" + path.filename().wstring() +
@@ -127,7 +144,11 @@ void WriteHeader(std::ostream& into, const std::string& stamp, const std::string
 }
 
 // Le rapport commun aux deux voies : celle du signal et celle du filtre.
-void WriteReport(const std::string& stamp, const std::string& fault, const std::string& detail) {
+//
+// `faulted_stack` remplace la pile prise ici quand le rapport s'écrit depuis un
+// autre fil que celui qui a fauté.
+void WriteReport(const std::string& stamp, const std::string& fault, const std::string& detail,
+                 const std::string* faulted_stack = nullptr) {
   const std::filesystem::path path = ReportPath(stamp, ".txt");
   std::ofstream report(path, std::ios::binary);
   if (!report) {
@@ -150,8 +171,12 @@ void WriteReport(const std::string& stamp, const std::string& fault, const std::
   // RIP nomme plus haut ; ce qui la précède est le chemin par lequel le système
   // nous a appelés. Le dire vaut mieux que de couper un nombre d'images fixe,
   // qui varierait avec le compilateur.
-  report << "PILE D'APPELS (les premieres images sont celles du rapporteur)\n";
-  WriteStack(report);
+  if (faulted_stack != nullptr) {
+    report << "PILE D'APPELS DU FIL FAUTIF (module+deplacement)\n" << *faulted_stack;
+  } else {
+    report << "PILE D'APPELS (les premieres images sont celles du rapporteur)\n";
+    WriteStack(report);
+  }
   report << "\nDERNIERES LIGNES DU JOURNAL\n";
   const bool log_free = WriteRecentLog(report);
   // ⚠ APRÈS LA FERMETURE, et ce n'est pas du rangement : journaliser alloue et
@@ -164,6 +189,7 @@ void WriteReport(const std::string& stamp, const std::string& fault, const std::
   if (log_free && !ThisThreadIsLogging()) {
     LogError("PLANTAGE : {} — rapport dans {}", fault, Utf8FromPath(path));
   }
+  ReportIsWritten() = true;
   TellThePlayer(path, fault);
 }
 
@@ -223,7 +249,7 @@ void ReportTerminate() {
   if (EnumProcessModules(GetCurrentProcess(), handles, sizeof(handles), &used) == 0) {
     return listed + "  (indisponible)\n";
   }
-  const std::size_t count = used / sizeof(HMODULE);
+  const std::size_t count = ListedModuleCount(used, sizeof(handles), sizeof(HMODULE));
   for (std::size_t index = 0; index < count; ++index) {
     char name[MAX_PATH] = {};
     if (GetModuleFileNameA(handles[index], name, sizeof(name)) == 0) {
@@ -237,6 +263,9 @@ void ReportTerminate() {
         std::format("  {:016x} {:>10} {}\n", reinterpret_cast<std::uintptr_t>(about.lpBaseOfDll),
                     about.SizeOfImage, name);
   }
+  if (const std::size_t needed = used / sizeof(HMODULE); needed > count) {
+    listed += std::format("  ({} autres modules, non listes)\n", needed - count);
+  }
   return listed;
 }
 
@@ -245,7 +274,7 @@ void ReportTerminate() {
 // C'est la pièce que le rapport en texte ne remplace pas : elle porte la pile
 // de TOUS les fils et les variables locales, là où le texte ne porte que ce
 // qu'on a pensé à écrire.
-void WriteDump(const std::string& stamp, EXCEPTION_POINTERS* report) {
+void WriteDump(const std::string& stamp, EXCEPTION_POINTERS* report, DWORD faulted_thread_id) {
   const std::filesystem::path path = ReportPath(stamp, ".dmp");
   HANDLE file = CreateFileW(path.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS,
                             FILE_ATTRIBUTE_NORMAL, nullptr);
@@ -253,7 +282,7 @@ void WriteDump(const std::string& stamp, EXCEPTION_POINTERS* report) {
     return;
   }
   MINIDUMP_EXCEPTION_INFORMATION about = {};
-  about.ThreadId = GetCurrentThreadId();
+  about.ThreadId = faulted_thread_id;
   about.ExceptionPointers = report;
   about.ClientPointers = FALSE;
   // ⚠ `WithIndirectlyReferencedMemory` ET RIEN DE PLUS : un vidage complet du
@@ -267,6 +296,9 @@ void WriteDump(const std::string& stamp, EXCEPTION_POINTERS* report) {
   CloseHandle(file);
 }
 
+// Ce que le système garde de pile à ce fil pour traiter son débordement.
+constexpr ULONG kOverflowStackReserveBytes = 64 * 1024;
+
 // Deux fautes que le système nomme sans que `windows.h` ne les définisse : elles
 // vivent dans `ntstatus.h`, qui ne s'inclut pas à côté de lui sans conflits.
 constexpr DWORD kHeapCorruptionCode = 0xC0000374;
@@ -279,13 +311,16 @@ std::atomic<bool>& AlreadyReported() {
   return reported;
 }
 
-LONG WINAPI ReportException(EXCEPTION_POINTERS* report) {
-  if (AlreadyReported().exchange(true)) {
-    return EXCEPTION_EXECUTE_HANDLER;
-  }
+// Écrit le vidage puis le rapport d'une faute, depuis le fil courant ou non.
+//
+// ⚠ JAMAIS EN LIGNE DANS LE FILTRE : son cadre de pile se réserverait à l'entrée de
+// celui-ci, et sur une pile débordée le filtre fauterait avant d'avoir décidé.
+__declspec(noinline) void ReportFault(EXCEPTION_POINTERS* report, DWORD faulted_thread_id,
+                                      const std::string* faulted_stack) {
   const EXCEPTION_RECORD& fault = *report->ExceptionRecord;
   std::string detail =
-      std::format("adresse : {:#x}\n", reinterpret_cast<std::uintptr_t>(fault.ExceptionAddress));
+      std::format("adresse : {:#x}\nfil     : {}\n",
+                  reinterpret_cast<std::uintptr_t>(fault.ExceptionAddress), faulted_thread_id);
   // ⚠ UNE VIOLATION D'ACCÈS DIT DAVANTAGE : le premier paramètre vaut zéro pour
   // une lecture et un pour une écriture, le second est l'adresse touchée. Zéro
   // y signifie presque toujours un pointeur nul déréférencé, et le savoir
@@ -299,8 +334,81 @@ LONG WINAPI ReportException(EXCEPTION_POINTERS* report) {
   detail += "\n" + DescribeModules();
 
   const std::string stamp = NowStamp();
-  WriteDump(stamp, report);
-  WriteReport(stamp, DescribeFault(fault.ExceptionCode), detail);
+  WriteDump(stamp, report, faulted_thread_id);
+  WriteReport(stamp, DescribeFault(fault.ExceptionCode), detail, faulted_stack);
+}
+
+// Le module et le déplacement dans celui-ci, qu'on retrouve avec les symboles de
+// cette révision.
+[[nodiscard]] std::string DescribeCodeAddress(DWORD64 address) {
+  HMODULE module = nullptr;
+  char name[MAX_PATH] = {};
+  if (GetModuleHandleExA(
+          GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+          reinterpret_cast<const char*>(address), &module) == 0 ||
+      GetModuleFileNameA(module, name, sizeof(name)) == 0) {
+    return std::format("{:#x}", address);
+  }
+  const std::string file_name = std::filesystem::path(name).filename().string();
+  return std::format("{}+{:#x}", file_name, address - reinterpret_cast<DWORD64>(module));
+}
+
+// LA PILE D'UN AUTRE FIL, déroulée depuis ses registres. `std::stacktrace` ne
+// sait prendre que celle du fil courant.
+constexpr std::size_t kMostFaultedFrames = 64;
+
+[[nodiscard]] std::string DescribeFaultedStack(const CONTEXT& faulted) {
+  std::array<std::uint64_t, kMostFaultedFrames> addresses = {};
+  const std::size_t walked = WalkStackFrom(faulted, addresses);
+  std::string said;
+  for (std::size_t frame = 0; frame < walked; ++frame) {
+    said += std::format("  {}\n", DescribeCodeAddress(addresses[frame]));
+  }
+  return said;
+}
+
+struct OverflowedFault {
+  EXCEPTION_POINTERS* report = nullptr;
+  DWORD thread_id = 0;
+};
+
+DWORD WINAPI ReportOverflowOnHelper(void* raw_fault) {
+  const OverflowedFault& fault = *static_cast<const OverflowedFault*>(raw_fault);
+  const std::string stack = DescribeFaultedStack(*fault.report->ContextRecord);
+  ReportFault(fault.report, fault.thread_id, &stack);
+  return 0;
+}
+
+// Combien attendre un rapport qui n'avance pas. ⚠ LE FIL QUI A DÉBORDÉ PEUT TENIR
+// UN VERROU, celui du tas ou des modules, que l'auxiliaire attendrait sans fin :
+// mieux vaut mourir sans rapport que rester figé.
+constexpr DWORD kOverflowReportPatienceMs = 30'000;
+
+// UN DÉBORDEMENT DE PILE NE SE RAPPORTE PAS SUR LE FIL QUI A FAUTÉ : il ne lui
+// reste que quelques kilo-octets, loin de ce que le formatage et le vidage
+// demandent, et une seconde faute tuerait le processus sans rien écrire.
+__declspec(noinline) void ReportOverflow(EXCEPTION_POINTERS* report) {
+  OverflowedFault fault{.report = report, .thread_id = GetCurrentThreadId()};
+  HANDLE helper = CreateThread(nullptr, 0, ReportOverflowOnHelper, &fault, 0, nullptr);
+  if (helper == nullptr) {
+    return;
+  }
+  if (WaitForSingleObject(helper, kOverflowReportPatienceMs) == WAIT_TIMEOUT &&
+      ReportIsWritten().load()) {
+    WaitForSingleObject(helper, INFINITE);
+  }
+  CloseHandle(helper);
+}
+
+LONG WINAPI ReportException(EXCEPTION_POINTERS* report) {
+  if (AlreadyReported().exchange(true)) {
+    return EXCEPTION_EXECUTE_HANDLER;
+  }
+  if (report->ExceptionRecord->ExceptionCode == EXCEPTION_STACK_OVERFLOW) {
+    ReportOverflow(report);
+  } else {
+    ReportFault(report, GetCurrentThreadId(), nullptr);
+  }
   // EXECUTE_HANDLER et non CONTINUE_SEARCH : la recherche mènerait au
   // gestionnaire par défaut de Windows, qui ouvre une boîte de dialogue ou se
   // tait selon la machine. On a dit ce qu'on avait à dire ; on s'arrête.
@@ -343,6 +451,42 @@ void ReportPureCall() {
 
 }  // namespace
 
+std::size_t ListedModuleCount(std::size_t needed_bytes, std::size_t capacity_bytes,
+                              std::size_t handle_bytes) noexcept {
+  return (needed_bytes < capacity_bytes ? needed_bytes : capacity_bytes) / handle_bytes;
+}
+
+#if defined(_WIN32)
+std::size_t WalkStackFrom(const CONTEXT& registers, std::span<std::uint64_t> addresses) noexcept {
+  // ⚠ LA PILE D'UN FIL EN FAUTE N'EST PAS SÛRE, et ce relevé précède tout le rapport :
+  // une faute ici ne doit coûter que les images suivantes. `__try` interdit tout
+  // objet à détruire dans cette fonction.
+  volatile std::size_t walked = 0;
+  __try {
+    CONTEXT walking = registers;
+    while (walked < addresses.size() && walking.Rip != 0) {
+      addresses[walked] = walking.Rip;
+      walked = walked + 1;
+      DWORD64 image_base = 0;
+      const PRUNTIME_FUNCTION unwinding = RtlLookupFunctionEntry(walking.Rip, &image_base, nullptr);
+      if (unwinding == nullptr) {
+        // Une fonction feuille ne déclare rien : l'adresse de retour est au sommet.
+        walking.Rip = *reinterpret_cast<const DWORD64*>(walking.Rsp);
+        walking.Rsp += sizeof(DWORD64);
+        continue;
+      }
+      void* handler_data = nullptr;
+      DWORD64 establisher_frame = 0;
+      RtlVirtualUnwind(UNW_FLAG_NHANDLER, image_base, walking.Rip, unwinding, &walking,
+                       &handler_data, &establisher_frame, nullptr);
+    }
+  } __except (EXCEPTION_EXECUTE_HANDLER) {
+    return walked;
+  }
+  return walked;
+}
+#endif
+
 std::string DescribeFault(unsigned long code) {
   // Les fautes qu'un client rencontre vraiment. Les autres se disent par leur
   // numéro : les nommer toutes ferait une table que personne ne lit.
@@ -370,10 +514,16 @@ std::string DescribeFault(unsigned long code) {
   }
 }
 
-void InstallCrashReporter(std::filesystem::path folder) {
+void InstallCrashReporter(std::filesystem::path folder, CrashNotice notice) {
   ReportFolder() = std::move(folder);
+  ReportNotice() = notice;
 
 #if defined(_WIN32)
+  // De quoi faire tourner le filtre et lancer le fil auxiliaire quand ce fil-ci,
+  // celui qui porte le jeu, déborde. Les autres gardent la réserve du système.
+  ULONG guaranteed_stack_bytes = kOverflowStackReserveBytes;
+  SetThreadStackGuarantee(&guaranteed_stack_bytes);
+
   // ⚠ LE FILTRE, ET SURTOUT PAS DE GESTIONNAIRE DE SIGNAL POUR LES FAUTES.
   //
   // C'est contre-intuitif : sous Windows, une violation

@@ -7,10 +7,11 @@
 namespace ro::voice {
 
 VoiceEngine::VoiceEngine(VoiceTarget target, VoiceDevices devices)
-    : link_(std::move(target), std::move(devices)), worker_([this] { Run(); }) {}
+    : link_(std::move(target), std::move(devices), stopping_.get_token()),
+      worker_([this] { Run(); }) {}
 
 VoiceEngine::~VoiceEngine() {
-  stopping_ = true;
+  stopping_.request_stop();
   if (worker_.joinable()) {
     worker_.join();
   }
@@ -45,7 +46,7 @@ std::vector<CoopRelayed> VoiceEngine::TakeCoop() {
 void VoiceEngine::Run() {
   using Clock = std::chrono::steady_clock;
   const Clock::time_point started = Clock::now();
-  while (!stopping_) {
+  while (!stopping_.stop_requested()) {
     const auto now_ms = static_cast<std::uint32_t>(
         std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - started).count());
     VoiceControls controls;

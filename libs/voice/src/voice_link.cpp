@@ -51,8 +51,8 @@ constexpr float kSampleCeiling = static_cast<float>(std::numeric_limits<std::int
 
 }  // namespace
 
-VoiceLink::VoiceLink(VoiceTarget target, VoiceDevices devices)
-    : target_(std::move(target)), devices_(std::move(devices)) {
+VoiceLink::VoiceLink(VoiceTarget target, VoiceDevices devices, std::stop_token abandon)
+    : target_(std::move(target)), devices_(std::move(devices)), abandon_(std::move(abandon)) {
   if (core::Result<OpusVoiceEncoder> made = OpusVoiceEncoder::Create(); made.has_value()) {
     encoder_.emplace(std::move(*made));
   } else {
@@ -62,6 +62,12 @@ VoiceLink::VoiceLink(VoiceTarget target, VoiceDevices devices)
 
 void VoiceLink::Step(std::uint32_t now_ms) {
   if (!tcp_.is_open()) {
+    // LE REPOS SE COMPTE DEPUIS LA FIN DE LA TENTATIVE : ce pas-ci, lui, a lu
+    // l'heure après l'attente de la connexion.
+    if (connect_just_failed_) {
+      connect_just_failed_ = false;
+      retry_at_ms_ = now_ms + kVoiceRetryMs;
+    }
     if (state_ == VoiceLinkState::kLost && now_ms < retry_at_ms_) {
       Capture(now_ms);
       Play(now_ms);
@@ -71,6 +77,8 @@ void VoiceLink::Step(std::uint32_t now_ms) {
     if (!tcp_.is_open()) return;
   }
   ReadTcp(now_ms);
+  if (!tcp_.is_open()) return;
+  DropIfSilent(now_ms);
   if (!tcp_.is_open()) return;
   ReadUdp(now_ms);
   Greet(now_ms);
@@ -89,9 +97,10 @@ void VoiceLink::Step(std::uint32_t now_ms) {
 void VoiceLink::Open(std::uint32_t now_ms) {
   state_ = VoiceLinkState::kConnecting;
   core::Result<net::TcpSocket> opened =
-      net::TcpSocket::Connect(target_.host, target_.port, kVoiceConnectTimeoutMs);
+      net::TcpSocket::Connect(target_.host, target_.port, kVoiceConnectTimeoutMs, abandon_);
   if (!opened.has_value()) {
     Drop(now_ms, core::Describe(opened.error()));
+    connect_just_failed_ = true;
     return;
   }
   tcp_ = std::move(*opened);
@@ -105,6 +114,8 @@ void VoiceLink::Open(std::uint32_t now_ms) {
   detail_.clear();
   state_ = VoiceLinkState::kAuthenticating;
   last_ping_ms_ = now_ms;
+  opened_ms_ = now_ms;
+  last_heard_ms_ = now_ms;
   SendText(AuthMessage(VoiceLogin{.account_id = target_.account_id,
                                   .character_id = target_.character_id,
                                   .login_id1 = target_.login_id1,
@@ -127,20 +138,31 @@ void VoiceLink::Drop(std::uint32_t now_ms, std::string why) {
   retry_at_ms_ = now_ms + kVoiceRetryMs;
 }
 
+void VoiceLink::DropIfSilent(std::uint32_t now_ms) {
+  if (state_ == VoiceLinkState::kAuthenticating && now_ms - opened_ms_ >= kVoiceAuthTimeoutMs) {
+    Drop(now_ms, "le serveur voix ne répond pas à l'authentification");
+  } else if (state_ == VoiceLinkState::kOnline && now_ms - last_heard_ms_ >= kVoiceSilentMs) {
+    Drop(now_ms, "le serveur voix ne répond plus");
+  }
+}
+
 void VoiceLink::ReadTcp(std::uint32_t now_ms) {
   std::array<std::uint8_t, kReadChunkBytes> chunk = {};
-  while (tcp_.is_open()) {
+  // ⚠ LA FIN DU FLUX ATTEND SON TOUR : le serveur écrit son refus puis ferme, et
+  // ce qui a été reçu avant la fermeture se lit avant de tomber.
+  std::optional<std::string> stream_end;
+  while (!stream_end.has_value()) {
     core::Result<net::ReceiveResult> read = tcp_.Receive(chunk);
     if (!read.has_value()) {
-      Drop(now_ms, core::Describe(read.error()));
-      return;
+      stream_end = core::Describe(read.error());
+    } else if (read->state == net::ReceiveState::kClosed) {
+      stream_end = "le serveur voix a fermé la liaison";
+    } else if (read->state == net::ReceiveState::kWouldBlock) {
+      break;
+    } else {
+      last_heard_ms_ = now_ms;
+      reader_.Feed(std::span<const std::uint8_t>(chunk.data(), read->bytes));
     }
-    if (read->state == net::ReceiveState::kClosed) {
-      Drop(now_ms, "le serveur voix a fermé la liaison");
-      return;
-    }
-    if (read->state == net::ReceiveState::kWouldBlock) break;
-    reader_.Feed(std::span<const std::uint8_t>(chunk.data(), read->bytes));
   }
   while (tcp_.is_open()) {
     core::Result<std::optional<StreamFrame>> next = reader_.Next();
@@ -148,7 +170,7 @@ void VoiceLink::ReadTcp(std::uint32_t now_ms) {
       Drop(now_ms, core::Describe(next.error()));
       return;
     }
-    if (!next->has_value()) return;
+    if (!next->has_value()) break;
     StreamFrame& frame = **next;
     switch (frame.kind) {
       case FrameKind::kText: {
@@ -171,6 +193,7 @@ void VoiceLink::ReadTcp(std::uint32_t now_ms) {
         return;
     }
   }
+  if (stream_end.has_value()) Drop(now_ms, std::move(*stream_end));
 }
 
 void VoiceLink::ReadUdp(std::uint32_t now_ms) {

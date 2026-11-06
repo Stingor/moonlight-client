@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <optional>
 #include <span>
+#include <stop_token>
 #include <string_view>
 
 #include "ro/core/error.h"
@@ -70,8 +71,12 @@ class TcpSocket {
   // L'hôte peut être un nom ou une adresse, en IPv4 comme en IPv6 : la
   // résolution rend les candidats dans l'ordre de préférence du système et ils
   // sont essayés l'un après l'autre.
+  //
+  // `abandon` interrompt l'attente d'une connexion. La résolution, elle, ne
+  // s'interrompt pas.
   [[nodiscard]] static core::Result<TcpSocket> Connect(std::string_view host, std::uint16_t port,
-                                                       int timeout_ms = kConnectTimeoutMs);
+                                                       int timeout_ms = kConnectTimeoutMs,
+                                                       const std::stop_token& abandon = {});
 
   // Lit ce qui est disponible, sans jamais attendre.
   [[nodiscard]] core::Result<ReceiveResult> Receive(std::span<std::uint8_t> into);
