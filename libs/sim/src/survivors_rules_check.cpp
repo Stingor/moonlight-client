@@ -93,6 +93,10 @@ template <typename Rule, typename IdOf>
       return Refuse(named + "majoration de dégâts hors de [0, " + std::to_string(kMostStatBonus) +
                     "]");
     }
+    if (PercentOutOfBounds(hero_class.final_boss_hp_bonus_pct)) {
+      return Refuse(named + "majoration du boss final de " +
+                    std::to_string(hero_class.final_boss_hp_bonus_pct) + " %");
+    }
     // Une renaissance a un corps ; sans niveau, ni corps ni bonus.
     if ((hero_class.reborn_level != 0) != (hero_class.reborn_job_id != 0) ||
         (hero_class.reborn_level == 0 &&

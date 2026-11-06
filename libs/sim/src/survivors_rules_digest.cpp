@@ -102,7 +102,7 @@ void PutContent(FnvDigest& digest, std::span<const WaveRule> waves,
 void PutClass(FnvDigest& digest, const ClassRule& rule) {
   PutAll(digest, rule.class_id, rule.max_hp, rule.walk_ms_per_cell, rule.magnet_units,
          rule.damage_pct_per_level, rule.damage_pct_cap, rule.mount_card_item_id, rule.reborn_level,
-         rule.reborn_damage_pct, rule.melee);
+         rule.reborn_damage_pct, rule.melee, rule.final_boss_hp_bonus_pct);
   PutNumbers(digest, rule.starter_skills);
   PutNumbers(digest, rule.skill_pool);
   PutNumbers(digest, rule.card_pool);
@@ -154,12 +154,13 @@ void PutTuning(FnvDigest& digest, const SurvivorsTuning& tuning) {
          tuning.hero_shove_pct, tuning.gem_pull_start_units, tuning.gem_pull_accel_units,
          tuning.offer_weight_owned, tuning.offer_weight_fresh, tuning.heal_offer_hp,
          tuning.zeny_offer, tuning.most_floor_spawns_per_step, tuning.spawn_tries_per_foe,
-         tuning.spawn_search_ring, tuning.most_cooldown_pct, tuning.boss_hp_growth_pct_per_minute,
-         tuning.boss_walk_scale_pct, tuning.knock_units_per_step, tuning.plant_block_cells,
-         tuning.plant_cells_per_plant, tuning.plant_kills_per_minute, tuning.plant_start_count,
-         tuning.plant_start_cells, tuning.most_live_plants, tuning.plant_forget_units,
-         tuning.pickup_radius_units, tuning.final_overtime_ms, tuning.curse_slow_pct,
-         tuning.curse_hurt_pct, tuning.blind_turn_ms);
+         tuning.spawn_search_ring, tuning.most_cooldown_pct, tuning.stance_least_rest_ms,
+         tuning.boss_hp_growth_pct_per_minute, tuning.boss_walk_scale_pct,
+         tuning.knock_units_per_step, tuning.plant_block_cells, tuning.plant_cells_per_plant,
+         tuning.plant_kills_per_minute, tuning.plant_start_count, tuning.plant_start_cells,
+         tuning.most_live_plants, tuning.plant_forget_units, tuning.pickup_radius_units,
+         tuning.final_overtime_ms, tuning.curse_slow_pct, tuning.curse_hurt_pct,
+         tuning.blind_turn_ms);
   PutNumbers(digest, std::span<const std::int32_t>(tuning.foe_radius_units));
 }
 

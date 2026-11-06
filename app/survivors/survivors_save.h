@@ -64,6 +64,8 @@ struct SurvivorsOptions {
   // `SurvivorsPresenceMode`.
   bool presence_shown = true;
   std::uint16_t first_skill_id = 0;  // 0 : aucun choix encore, Fire Bolt se présélectionne
+  // La classe retenue à l'accueil. 0 : aucun choix encore, la première.
+  std::uint16_t class_id = 0;
   // Le sort que le Codex a épinglé en objectif : ce qui y mène se signale au
   // choix de niveau. 0 : aucun.
   std::uint16_t objective_skill_id = 0;

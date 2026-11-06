@@ -35,10 +35,12 @@ namespace ro::ui {
 // ne prend ni le clavier ni la souris. La vue porte des identifiants de
 // texture, jamais un chemin ; les noms (boss) arrivent déjà résolus par `app`.
 
-// Une case de skill ou de carte.
+// Une case de skill ou de carte. `active` : la posture de ce skill dure, et sa
+// case se cerne d'or.
 struct SurvivorsHudSlot {
   ImTextureID icon = 0;  // 0 : pas d'icône, la case garde sa place
   int level = 0;
+  bool active = false;
 };
 
 // Une charge de la Kafra (U12) : l'icône de l'objet RO et les charges qui

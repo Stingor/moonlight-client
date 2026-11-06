@@ -113,6 +113,10 @@ struct SurvivorsEnding {
 };
 [[nodiscard]] SurvivorsEnding EndingOf(const ro::sim::SurvivorsField& field,
                                        const SurvivorsRunBoard& board);
+// LE MÉTIER QUE MONTRE LE BILAN : celui que le héros montrait à la fin de la
+// partie (ro::sim::HeroJobOf), évolué, rené ou monté.
+[[nodiscard]] std::uint16_t EndingJobOf(const ro::sim::ClassRule& hero_class,
+                                        const SurvivorsEnding& ending);
 
 class SurvivorsStage {
  public:

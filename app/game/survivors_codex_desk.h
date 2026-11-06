@@ -60,16 +60,18 @@ struct SurvivorsCodexRowsHeld {
 // longueur, durée, touches, ralentissement, gel, recul, rebonds, éclats. Les
 // mesures en dixièmes de case, les durées en ms. Les champs qui disent
 // comment le sort se joue (vitesse, période, rayon d'impact…) ne se montrent
-// pas.
+// pas. Une posture commence par son bonus, dans l'unité de la statistique
+// qu'elle majore, et ne dit pas de quantité.
 [[nodiscard]] std::vector<ro::ui::SurvivorsCodexFigure> SkillFiguresOf(
-    std::span<const ro::sim::SkillLevel> levels);
+    const ro::sim::SurvivorsSkillRule& skill);
 
 // Une mesure en sous-unités, en dixièmes de case arrondis.
 [[nodiscard]] std::int64_t CellTenthsOf(std::int64_t units) noexcept;
 
-// Les sorts, dans l'ordre des règles (la réserve, puis les évolués) ; un sort
-// de base nomme son évolution, un évolué ce dont il vient. Un sort que
-// verrouille un exploit porte la clé de cet exploit.
+// Les sorts, classe après classe, chacune dans l'ordre des règles (la réserve,
+// puis les évolués) ; un sort de base nomme son évolution et l'union où il
+// entre, un évolué ce dont il vient. Un sort que verrouille un exploit porte la
+// clé de cet exploit.
 void CodexSkillsOf(const ro::sim::SurvivorsRules& rules, const SurvivorsCodexSeen& seen,
                    SurvivorsCodexRowsHeld& held);
 // Les objets au sol dans l'ordre des règles, le coffre compris, puis les

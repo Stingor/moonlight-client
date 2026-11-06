@@ -150,6 +150,7 @@ SurvivorsRankingAsk DrawSurvivorsRankingWindow(SurvivorsRankingState& state,
   std::array<char, kLineSize> line = {};
   std::snprintf(line.data(), line.size(), core::Tr("Règles %d"), view.ruleset);
   FaintText(line.data());
+  if (*view.class_name != '\0') ImGui::Text(core::Tr("Classe : %s"), view.class_name);
   DrawTabs(state, asked, art);
   ImGui::Separator();
   const bool ranked = state.tab == SurvivorsRankingTab::kRanked;

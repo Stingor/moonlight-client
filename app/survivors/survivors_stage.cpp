@@ -37,6 +37,15 @@ SurvivorsEnding EndingOf(const ro::sim::SurvivorsField& field, const SurvivorsRu
                          .board = board};
 }
 
+std::uint16_t EndingJobOf(const ro::sim::ClassRule& hero_class, const SurvivorsEnding& ending) {
+  const bool evolved = ending.board.coop ? ending.own_evolved : ending.tally.evolutions > 0;
+  ro::sim::SurvivorsHero body;
+  body.level = ending.tally.level;
+  body.evolutions = evolved ? 1 : 0;
+  body.cards = ending.cards;
+  return ro::sim::HeroJobOf(hero_class, body);
+}
+
 void SurvivorsStage::Open() {
   if (screen_ == SurvivorsScreen::kClosed) Enter(SurvivorsScreen::kPreparing);
 }

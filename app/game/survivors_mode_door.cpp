@@ -34,11 +34,7 @@ constexpr std::uint16_t kFireBoltSkill = 19;
 }  // namespace
 
 const ro::sim::ClassRule* SurvivorsMode::PlayingClass() const {
-  const ro::sim::SurvivorsRules& rules = Rules();
-  if (book_.chosen() == SurvivorsBoardKind::kFree) {
-    return FreeClassOf(rules, desk_.save(), book_.free_class_id());
-  }
-  return rules.classes.empty() ? nullptr : &rules.classes.front();
+  return ChosenClassOf(Rules(), desk_.save(), book_.chosen_class_id());
 }
 
 std::uint16_t SurvivorsMode::ChosenBolt() const {
@@ -57,6 +53,7 @@ void SurvivorsMode::FollowDoor(SurvivorsStage& stage, const SurvivorsContext& co
   if (!options_loaded_) {
     desk_.Reload(context.client_root, context.say);
     options_ = desk_.save().options;
+    book_.ChooseClass(Rules(), options_.class_id);
     options_loaded_ = true;
   }
   FollowObjective(std::exchange(windows.survivors_meta.codex_answer, {}).objective_skill_id,
@@ -95,12 +92,18 @@ void SurvivorsMode::FollowDoor(SurvivorsStage& stage, const SurvivorsContext& co
   desk_.FollowPrepare(asked, windows.survivors_meta, book_, Rules(), context.client_root,
                       context.say);
   desk_.FollowShops(windows.survivors_meta, context.client_root, context.say);
+  if (asked.choose_class_id.has_value() && book_.chosen_class_id() != options_.class_id) {
+    const SurvivorsOptions before = options_;
+    options_.class_id = book_.chosen_class_id();
+    SaveOptions(before, context);
+  }
   if (context.ranking != nullptr) {
+    const ro::sim::ClassRule* playing = PlayingClass();
     FollowRankingAsks(
         *context.ranking, windows.survivors_meta.ranking,
         SurvivorsRankingAsks{.open = asked.open_ranking,
                              .window = std::exchange(windows.survivors_meta.ranking_answer, {})},
-        Rules());
+        Rules(), playing != nullptr ? playing->class_id : std::uint16_t{0});
   }
   if (asked.choose_skill_id.has_value() && *asked.choose_skill_id != options_.first_skill_id) {
     const SurvivorsOptions before = options_;
@@ -140,14 +143,16 @@ void SurvivorsMode::Enter(SurvivorsStage& stage, const SurvivorsContext& context
   // L'arène vient du départ : la prairie pour le défi et la partie classée,
   // celle de l'accueil pour la partie libre ; une classée sans classement
   // part libre sur la prairie.
-  const SurvivorsBookMode::Begun book_start =
+  const std::optional<SurvivorsBookMode::Begun> book_start =
       context.ranking != nullptr
           ? context.ranking->Launch(book_, Rules(), context.client_root, seed, first_skill_id)
-      : book_.chosen() == SurvivorsBoardKind::kRanked
-          ? book_.StartRankedAsFree(Rules(), context.client_root, seed, first_skill_id)
-          : book_.StartOf(Rules(), context.client_root, seed, first_skill_id);
+          : book_.StartAlone(Rules(), context.client_root, seed, first_skill_id);
   TellDamagedCopy(book_.TakeDamagedCopy(), context.say);
-  if (auto begun = BeginRun(stage, context, book_start); !begun) {
+  if (!book_start.has_value()) {
+    context.say(ro::core::Tr("Cette classe n'est pas débloquée : la partie ne part pas."));
+    return;
+  }
+  if (auto begun = BeginRun(stage, context, *book_start); !begun) {
     context.say(ro::core::Tr("L'arène des Survivants de Midgard ne peut pas se monter."));
     ro::core::LogWarning("survivors : la partie refuse de commencer — {}",
                          ro::core::Describe(begun.error()));

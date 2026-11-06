@@ -12,8 +12,10 @@
 #include <string_view>
 #include <vector>
 
+#include "ro/core/i18n.h"
 #include "ro/sim/survivors_geometry.h"
 #include "ro/sim/survivors_meta.h"
+#include "ro/sim/survivors_ranked.h"
 #include "ro/sim/survivors_records.h"
 #include "ro/sim/survivors_score.h"
 #include "ro/sim/survivors_state.h"
@@ -341,6 +343,13 @@ const ro::sim::ArenaRule* FreeArenaOf(const ro::sim::SurvivorsRules& rules,
   return chosen != nullptr ? chosen : DefaultArenaOf(rules);
 }
 
+const char* ClassTitleOf(const ro::sim::ClassRule& class_rule) {
+  const std::string_view key = class_rule.key;
+  if (key == "mage") return ro::core::Tr("Magicien");
+  if (key == "knight") return ro::core::Tr("Chevalier");
+  return nullptr;
+}
+
 std::string_view ClassUnlockFeat(const ro::sim::ClassRule& class_rule) {
   const auto found =
       std::ranges::find(kClassUnlocks, std::string_view(class_rule.key), &ClassUnlock::class_key);
@@ -354,31 +363,26 @@ bool ClassUnlocked(const ro::sim::SurvivorsRules& rules, const ro::sim::ClassRul
   return feat.empty() || HasFeat(save, feat);
 }
 
-const ro::sim::ClassRule* FreeClassOf(const ro::sim::SurvivorsRules& rules,
-                                      const SurvivorsSave& save, std::uint16_t class_id) {
+const ro::sim::ClassRule* ChosenClassOf(const ro::sim::SurvivorsRules& rules,
+                                        const SurvivorsSave& save, std::uint16_t class_id) {
   if (rules.classes.empty()) return nullptr;
   const ro::sim::ClassRule* chosen = class_id != 0 ? ro::sim::FindClass(rules, class_id) : nullptr;
   if (chosen != nullptr && ClassUnlocked(rules, *chosen, save)) return chosen;
   return &rules.classes.front();
 }
 
-std::uint16_t FirstSkillOf(const ro::sim::ClassRule& class_rule, std::uint16_t first_skill_id) {
-  const std::span<const std::uint16_t> starters = class_rule.starter_skills;
-  if (std::ranges::find(starters, first_skill_id) != starters.end()) return first_skill_id;
-  return starters.empty() ? std::uint16_t{0} : starters.front();
-}
-
 ro::sim::SurvivorsStart FreeStartOf(const ro::sim::SurvivorsRules& rules, const SurvivorsSave& save,
                                     std::uint64_t seed, std::uint16_t first_skill_id,
                                     std::uint16_t arena_id, std::uint16_t class_id) {
   const ro::sim::ArenaRule* arena = FreeArenaOf(rules, arena_id);
-  const ro::sim::ClassRule* chosen_class = FreeClassOf(rules, save, class_id);
+  const ro::sim::ClassRule* chosen_class = ChosenClassOf(rules, save, class_id);
   ro::sim::SurvivorsStart start{
       .seed = seed,
       .class_id = chosen_class == nullptr ? std::uint16_t{0} : chosen_class->class_id,
       .arena_id = arena == nullptr ? std::uint16_t{0} : arena->arena_id,
-      .first_skill_id =
-          chosen_class == nullptr ? first_skill_id : FirstSkillOf(*chosen_class, first_skill_id),
+      .first_skill_id = chosen_class == nullptr
+                            ? first_skill_id
+                            : ro::sim::FirstSkillOf(*chosen_class, first_skill_id),
       .loadout = {}};
   // Un carnet plus généreux que les règles ne fait pas refuser la partie : la
   // Cursed Water se ramène au plus haut rang que les règles connaissent.
@@ -410,12 +414,12 @@ std::uint16_t ChallengeFirstSkill(const ro::sim::ClassRule& class_rule,
 }
 
 ro::sim::SurvivorsStart ChallengeStartOf(const ro::sim::SurvivorsRules& rules,
-                                         const ro::sim::IsoWeek& week) {
-  const ro::sim::ClassRule* class_rule = rules.classes.empty() ? nullptr : &rules.classes.front();
+                                         const ro::sim::IsoWeek& week, std::uint16_t class_id) {
+  const ro::sim::ClassRule* class_rule = ro::sim::FindClass(rules, class_id);
   const ro::sim::ArenaRule* ranked_arena = ro::sim::FirstRankedArena(rules);
   return ro::sim::SurvivorsStart{
       .seed = ro::sim::SeedOfWeek(week.year, week.week),
-      .class_id = class_rule == nullptr ? std::uint16_t{0} : class_rule->class_id,
+      .class_id = class_id,
       .arena_id = ranked_arena == nullptr ? std::uint16_t{0} : ranked_arena->arena_id,
       .first_skill_id =
           class_rule == nullptr ? std::uint16_t{0} : ChallengeFirstSkill(*class_rule, week),

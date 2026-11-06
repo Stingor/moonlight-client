@@ -5895,7 +5895,7 @@ achievements:
     dependents: []
     window:
       summary: "Survivants de Midgard"
-      details: "Atteindre le niveau 40 dans une partie de Survivants de Midgard."
+      details: "Atteindre le niveau 40 avec le Magicien dans Survivants de Midgard."
       gauge: bullets
       group: "ADVENTURE"
       major: 6
@@ -5925,7 +5925,7 @@ achievements:
     dependents: []
     window:
       summary: "Survivants de Midgard"
-      details: "Vaincre Baphomet avec des skills Fire seulement."
+      details: "Gagner une partie avec le Magicien et des skills Fire seulement."
       gauge: bullets
       group: "ADVENTURE"
       major: 6
@@ -5940,7 +5940,7 @@ achievements:
     dependents: []
     window:
       summary: "Survivants de Midgard"
-      details: "Vaincre Baphomet sans aucune carte."
+      details: "Gagner une partie sans aucune carte."
       gauge: bullets
       group: "ADVENTURE"
       major: 6
@@ -6030,7 +6030,7 @@ achievements:
     dependents: []
     window:
       summary: "Survivants de Midgard"
-      details: "Obtenir chacun des skills évolués, au fil des parties."
+      details: "Obtenir chacun des skills évolués du Magicien, au fil des parties."
       gauge: bullets
       group: "ADVENTURE"
       major: 6
@@ -6060,7 +6060,7 @@ achievements:
     dependents: []
     window:
       summary: "Survivants de Midgard"
-      details: "Vaincre Baphomet dans une partie lancée sans minimap."
+      details: "Gagner une partie lancée sans minimap."
       gauge: bullets
       group: "ADVENTURE"
       major: 6
@@ -6247,3 +6247,123 @@ achievements:
       minor: 1
       objectives:
         - {text: "25 items dévoilés"}
+  910037:
+    name: "Brise-crane"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir Head Crush dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Head Crush obtenu"}
+  910038:
+    name: "Lance en spirale"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir Spiral Pierce dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Spiral Pierce obtenu"}
+  910039:
+    name: "Brise-genoux"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir Joint Beat dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Joint Beat obtenu"}
+  910040:
+    name: "Lame d'aura"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir Aura Blade dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Aura Blade obtenu"}
+  910041:
+    name: "Esprit affute"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir Concentration dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Concentration obtenu"}
+  910042:
+    name: "Berserker"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir Frenzy dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Frenzy obtenu"}
+  910043:
+    name: "Terre embrasee"
+    score: 30
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir Ignition Break, l'union de Bowling Bash et de Brandish Spear."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Ignition Break obtenu"}
+  910044:
+    name: "Grand chevalier"
+    score: 50
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir chacun des skills évolués du Chevalier, au fil des parties."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Tous les évolués du Chevalier"}

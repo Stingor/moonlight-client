@@ -170,11 +170,9 @@ void DrawSurvivorsRecordsWindow(SurvivorsRecordsState& state, const SurvivorsRec
   }
   DrawTabs(state, view, art);
   ImGui::Separator();
+  if (*view.class_name != '\0') ImGui::Text(core::Tr("Classe : %s"), view.class_name);
   switch (state.tab) {
     case SurvivorsRecordsTab::kFree:
-      if (*view.free_class_name != '\0') {
-        ImGui::Text(core::Tr("Classe : %s"), view.free_class_name);
-      }
       DrawTable("##free", view.free_runs, {.cursed_water = true});
       break;
     case SurvivorsRecordsTab::kChallenge:

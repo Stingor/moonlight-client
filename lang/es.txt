@@ -707,6 +707,18 @@ tr: Lanzas en espiral atraviesan toda la fila.
 fr: Un coup large brise les jambes des monstres et les fige.
 tr: Un golpe amplio rompe las piernas de los monstruos y los inmoviliza.
 
+fr: Une aura tranchante jaillit de vous et balaie la horde.
+tr: Un aura cortante brota de ti y barre a la horda.
+
+fr: Par moments, vous vous concentrez : vos dégâts augmentent.
+tr: A ratos te concentras: tu daño aumenta.
+
+fr: Par moments, la furie vous prend : vos dégâts explosent.
+tr: A ratos te invade la furia: tu daño se dispara.
+
+fr: Le sol explose autour de vous, trois fois de suite.
+tr: El suelo estalla a tu alrededor, tres veces seguidas.
+
 fr: Récupération de PV au fil du temps.
 tr: Recuperación de PV con el tiempo.
 
@@ -20993,8 +21005,8 @@ tr: Vencer a 1000 monstruos en una partida de Supervivientes de Midgard.
 fr: Mage aguerri
 tr: Mago curtido
 
-fr: Atteindre le niveau 40 dans une partie de Survivants de Midgard.
-tr: Alcanzar el nivel 40 en una partida de Supervivientes de Midgard.
+fr: Atteindre le niveau 40 avec le Magicien dans Survivants de Midgard.
+tr: Alcanzar el nivel 40 con el Mago en Supervivientes de Midgard.
 
 fr: Première carte
 tr: Primera carta
@@ -21005,14 +21017,14 @@ tr: Recoger una carta caída en una partida de Supervivientes de Midgard.
 fr: Pyromane
 tr: Pirómano
 
-fr: Vaincre Baphomet avec des skills Fire seulement.
-tr: Vencer a Baphomet solo con skills Fire.
+fr: Gagner une partie avec le Magicien et des skills Fire seulement.
+tr: Gana una partida con el Mago solo con skills Fire.
 
 fr: Esprit pur
 tr: Mente pura
 
-fr: Vaincre Baphomet sans aucune carte.
-tr: Vencer a Baphomet sin ninguna carta.
+fr: Gagner une partie sans aucune carte.
+tr: Gana una partida sin ninguna carta.
 
 fr: Blizzard
 tr: Ventisca
@@ -21056,8 +21068,8 @@ tr: Congela 1000 monstruos en una partida de Supervivientes de Midgard.
 fr: À l'aveugle
 tr: A ciegas
 
-fr: Vaincre Baphomet dans une partie lancée sans minimap.
-tr: Derrota a Baphomet en una partida iniciada sin minimapa.
+fr: Gagner une partie lancée sans minimap.
+tr: Gana una partida iniciada sin minimapa.
 
 fr: Souffle ardent
 tr: Aliento ardiente
@@ -21089,8 +21101,8 @@ tr: Escarcha
 fr: Obtenir Jack Frost, l'union de Water Ball et de Cold Bolt.
 tr: Obtén Jack Frost, la unión de Water Ball y Cold Bolt.
 
-fr: Obtenir chacun des skills évolués, au fil des parties.
-tr: Obtén cada una de las habilidades evolucionadas, a lo largo de las partidas.
+fr: Obtenir chacun des skills évolués du Magicien, au fil des parties.
+tr: Obtén cada una de las habilidades evolucionadas del Mago, a lo largo de las partidas.
 
 fr: Recharge de tous les skills raccourcie.
 tr: Recarga más corta para todas las habilidades.
@@ -21803,9 +21815,6 @@ tr: Se mantiene a distancia y dispara tras apuntar; no golpea por contacto.
 fr: Son hurlement presse le pas de ses loups.
 tr: Su aullido apresura a sus lobos.
 
-fr: Sorts
-tr: Hechizos
-
 fr: Séisme : %d cercles de %s toutes les %s, %d dégâts
 tr: Seísmo: %d círculos de %s cada %s, %d de daño
 
@@ -22453,3 +22462,90 @@ tr: No quedan intercambios: ¡a barajar!
 
 fr: 4 : une ligne · L ou T : une bombe · 5 : un Angeling
 tr: 4: una línea · L o T: una bomba · 5: un Angeling
+
+fr: Brise-crâne
+tr: Rompecráneos
+
+fr: Obtenir Head Crush dans une partie de Survivants de Midgard.
+tr: Obtén Head Crush en una partida de Supervivientes de Midgard.
+
+fr: Lance en spirale
+tr: Lanza en espiral
+
+fr: Obtenir Spiral Pierce dans une partie de Survivants de Midgard.
+tr: Obtén Spiral Pierce en una partida de Supervivientes de Midgard.
+
+fr: Brise-genoux
+tr: Romperrodillas
+
+fr: Obtenir Joint Beat dans une partie de Survivants de Midgard.
+tr: Obtén Joint Beat en una partida de Supervivientes de Midgard.
+
+fr: Lame d'aura
+tr: Hoja de aura
+
+fr: Obtenir Aura Blade dans une partie de Survivants de Midgard.
+tr: Obtén Aura Blade en una partida de Supervivientes de Midgard.
+
+fr: Esprit affûté
+tr: Mente afilada
+
+fr: Obtenir Concentration dans une partie de Survivants de Midgard.
+tr: Obtén Concentration en una partida de Supervivientes de Midgard.
+
+fr: Berserker
+tr: Berserker
+
+fr: Obtenir Frenzy dans une partie de Survivants de Midgard.
+tr: Obtén Frenzy en una partida de Supervivientes de Midgard.
+
+fr: Terre embrasée
+tr: Tierra abrasada
+
+fr: Obtenir Ignition Break, l'union de Bowling Bash et de Brandish Spear.
+tr: Obtén Ignition Break, la unión de Bowling Bash y Brandish Spear.
+
+fr: Grand chevalier
+tr: Gran caballero
+
+fr: Obtenir chacun des skills évolués du Chevalier, au fil des parties.
+tr: Obtén cada una de las habilidades evolucionadas del Caballero, a lo largo de las partidas.
+
+fr: Magicien
+tr: Mago
+
+fr: Chevalier
+tr: Caballero
+
+fr: Cette classe n'est pas débloquée : la partie ne part pas.
+tr: Esta clase no está desbloqueada: la partida no empieza.
+
+fr: Dégâts en plus
+tr: Daño adicional
+
+fr: Armure en plus
+tr: Armadura adicional
+
+fr: Soin par minute en plus
+tr: Curación adicional por minuto
+
+fr: Recharges réduites
+tr: Enfriamientos reducidos
+
+fr: Quantité en plus
+tr: Cantidad adicional
+
+fr: Aire en plus
+tr: Área adicional
+
+fr: Durées en plus
+tr: Duración adicional
+
+fr: Chance en plus
+tr: Suerte adicional
+
+fr: Aimant en plus
+tr: Alcance de imán adicional
+
+fr: Votre rang s'affiche à l'ouverture du classement.
+tr: Tu puesto aparece al abrir la clasificación.

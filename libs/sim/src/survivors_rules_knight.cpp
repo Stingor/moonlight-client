@@ -12,7 +12,7 @@ namespace ro::sim::survivors {
 
 namespace {
 
-// ── LE CHEVALIER : sa classe, ses sept skills et ses évolutions ────────────
+// ── LE CHEVALIER : sa classe, ses skills et ses évolutions ─────────────────
 // Il tient la ligne : plus de PV que le Magicien, une marche plus lente, un
 // aimant plus court, et des coups courts qui repoussent. Ses évolutions sont
 // les skills de Lord Knight. Épéiste au départ, il devient Chevalier à sa
@@ -25,13 +25,16 @@ constexpr std::uint16_t kLordKnightJobId = 4008;      // rené
 constexpr std::uint16_t kKnightPecoJobId = 13;        // monté sur son Peco Peco
 constexpr std::uint16_t kLordKnightPecoJobId = 4014;  // monté, rené
 constexpr std::uint16_t kKnightWeaponItemId = 1401;   // Javelin
-constexpr std::int32_t kKnightMaxHp = 600;
+constexpr std::int32_t kKnightMaxHp = 900;
 constexpr std::uint32_t kKnightWalkMsPerCell = 165;
 constexpr std::int32_t kKnightMagnetTenths = 24;
 constexpr std::int32_t kKnightDamagePctPerLevel = 1;
 constexpr std::int32_t kKnightDamagePctCap = 25;
 constexpr std::uint16_t kKnightRebornLevel = 50;
 constexpr std::int32_t kKnightRebornDamagePct = 5;
+// Il combat le boss final au corps à corps, à portée de tous ses coups : ces PV
+// font durer le combat de 20 à 60 s, et ses propres PV le lui font tenir.
+constexpr std::int32_t kKnightFinalBossHpBonusPct = 50;
 
 // Bash : le coup de lance, sur ce qui est à portée de bras.
 constexpr std::int32_t kBashReachTenths = 32;
@@ -282,6 +285,34 @@ constexpr std::array<SkillLevel, 1> kJointBeatLevels{{
      .cone_half_steps = 12},
 }};
 
+// Aura Blade : l'onde de Magnum Break, qu'il remplace, plus forte et plus large.
+constexpr std::array<SkillLevel, 1> kAuraBladeLevels{{
+    {.damage = 80, .cooldown_ms = 1300, .area_radius_units = Cells(5), .knockback_units = Cells(2)},
+}};
+
+// Concentration(durée en ms, recharge en ms, dégâts en %) : ses coups portent
+// mieux, par moments.
+constexpr std::array<SkillLevel, 1> kConcentrationLevels{{
+    Stance(8000, 15000, 25),
+}};
+
+// Frenzy(durée en ms, recharge en ms, dégâts en %) : plus du double du gain de
+// Concentration, moins longtemps.
+constexpr std::array<SkillLevel, 1> kFrenzyLevels{{
+    Stance(7000, 14000, 60),
+}};
+
+// Ignition Break : l'union de Bowling Bash et de Brandish Spear, trois
+// explosions autour du héros, qui repoussent.
+constexpr std::array<SkillLevel, 1> kIgnitionBreakLevels{{
+    {.damage = 65,
+     .cooldown_ms = 2500,
+     .amount = 3,
+     .interval_ms = 350,
+     .area_radius_units = Cells(6),
+     .knockback_units = Cells(2)},
+}};
+
 constexpr std::array<SurvivorsSkillRule, kKnightPoolSkillCount + kKnightEvolvedSkillCount>
     kKnightSkills{{
         {.skill_id = kBashId,
@@ -371,12 +402,54 @@ constexpr std::array<SurvivorsSkillRule, kKnightPoolSkillCount + kKnightEvolvedS
          .target = TargetRule::kNearest,
          .element = SurvivorsElement::kNeutral,
          .levels = kJointBeatLevels},
+        {.skill_id = kAuraBladeId,
+         .key = "aura_blade",
+         .description = core::TrText("Une aura tranchante jaillit de vous et balaie la horde."),
+         .archetype = SkillArchetype::kNova,
+         .target = TargetRule::kNearest,
+         .element = SurvivorsElement::kNeutral,
+         .levels = kAuraBladeLevels},
+        {.skill_id = kConcentrationId,
+         .key = "concentration",
+         .description = core::TrText("Par moments, vous vous concentrez : vos dégâts augmentent."),
+         .archetype = SkillArchetype::kStance,
+         .target = TargetRule::kNearest,
+         .element = SurvivorsElement::kNeutral,
+         .levels = kConcentrationLevels,
+         .stance_stat = SurvivorsStat::kDamagePct},
+        {.skill_id = kFrenzyId,
+         .key = "frenzy",
+         .description = core::TrText("Par moments, la furie vous prend : vos dégâts explosent."),
+         .archetype = SkillArchetype::kStance,
+         .target = TargetRule::kNearest,
+         .element = SurvivorsElement::kNeutral,
+         .levels = kFrenzyLevels,
+         .stance_stat = SurvivorsStat::kDamagePct},
+        {.skill_id = kIgnitionBreakId,
+         .key = "ignition_break",
+         .description = core::TrText("Le sol explose autour de vous, trois fois de suite."),
+         .archetype = SkillArchetype::kStorm,
+         .target = TargetRule::kHero,
+         .element = SurvivorsElement::kFire,
+         .levels = kIgnitionBreakLevels},
     }};
 
 constexpr std::array<EvolutionRule, kKnightEvolvedSkillCount> kKnightEvolutions{{
     {.skill_id = kBashId, .card_item_id = kGolemCardId, .evolved_skill_id = kHeadCrushId},
     {.skill_id = kPierceId, .card_item_id = kHornetCardId, .evolved_skill_id = kSpiralPierceId},
     {.skill_id = kSpearStabId, .card_item_id = kEclipseCardId, .evolved_skill_id = kJointBeatId},
+    {.skill_id = kMagnumBreakId,
+     .card_item_id = kDragonFlyCardId,
+     .evolved_skill_id = kAuraBladeId},
+    {.skill_id = kEndureId, .card_item_id = kPupaCardId, .evolved_skill_id = kConcentrationId},
+    {.skill_id = kTwoHandQuickenId,
+     .card_item_id = kVagabondWolfCardId,
+     .evolved_skill_id = kFrenzyId},
+    // L'UNION : Bowling Bash et Brandish Spear, tous deux au plus haut niveau.
+    {.skill_id = kBowlingBashId,
+     .card_item_id = 0,
+     .evolved_skill_id = kIgnitionBreakId,
+     .partner_skill_id = kBrandishSpearId},
 }};
 
 constexpr std::array<std::uint16_t, 3> kKnightStarterSkills{kBashId, kPierceId, kMagnumBreakId};
@@ -420,7 +493,8 @@ constexpr ClassRule kKnight{.class_id = kKnightClassId,
                             .reborn_level = kKnightRebornLevel,
                             .reborn_job_id = kLordKnightJobId,
                             .reborn_mounted_job_id = kLordKnightPecoJobId,
-                            .reborn_damage_pct = kKnightRebornDamagePct};
+                            .reborn_damage_pct = kKnightRebornDamagePct,
+                            .final_boss_hp_bonus_pct = kKnightFinalBossHpBonusPct};
 
 }  // namespace
 

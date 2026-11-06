@@ -57,6 +57,10 @@ inline constexpr std::uint16_t kTwoHandQuickenId = 60;
 inline constexpr std::uint16_t kSpiralPierceId = 397;
 inline constexpr std::uint16_t kHeadCrushId = 398;
 inline constexpr std::uint16_t kJointBeatId = 399;
+inline constexpr std::uint16_t kAuraBladeId = 355;
+inline constexpr std::uint16_t kConcentrationId = 357;
+inline constexpr std::uint16_t kFrenzyId = 359;
+inline constexpr std::uint16_t kIgnitionBreakId = 2006;
 
 inline constexpr std::uint16_t kHornetCardId = 4019;
 inline constexpr std::uint16_t kChonchonCardId = 4009;
@@ -120,7 +124,7 @@ inline constexpr std::size_t kShippedEvolvedSkillCount = 11;
 // évolués — et ses évolutions. ShippedClasses, ShippedSkills et
 // ShippedEvolutions les mettent après ceux du Magicien.
 inline constexpr std::size_t kKnightPoolSkillCount = 9;
-inline constexpr std::size_t kKnightEvolvedSkillCount = 3;
+inline constexpr std::size_t kKnightEvolvedSkillCount = 7;
 // Ses cartes propres, que ShippedCards met après celles du Magicien.
 inline constexpr std::size_t kKnightCardCount = 1;
 [[nodiscard]] const ClassRule& KnightClass();

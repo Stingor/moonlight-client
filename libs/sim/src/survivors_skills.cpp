@@ -317,7 +317,9 @@ void Bounce(SurvivorsField& field, const SurvivorsStrike& strike, const Survivor
 // LA POSTURE de l'emplacement `index` : éteinte à son terme, puis reprise à
 // chaque recharge, même sans monstre. Elle dure `life_ms` majoré de la durée,
 // et sa recharge se compte AVANT qu'elle ne prenne : Two-Hand Quicken ne
-// raccourcit pas la sienne. Les statistiques se refont à chaque bascule.
+// raccourcit pas la sienne. Aucune majoration ne la rend permanente : elle ne
+// reprend qu'après son plus court repos. Les statistiques se refont à chaque
+// bascule.
 void TendStance(SurvivorsField& field, std::size_t index, const SurvivorsSkillRule& rule,
                 const SkillLevel& level) {
   OwnedSkill& owned = field.hero.skills[index];
@@ -326,11 +328,14 @@ void TendStance(SurvivorsField& field, std::size_t index, const SurvivorsSkillRu
     RecomputeStats(field);
   }
   if (field.step < owned.ready_step) return;
-  owned.ready_step = ReadyAfter(field, level);
   const std::uint32_t steps = std::max<std::uint32_t>(
       ScaledSteps(level.life_ms, field.hero.stats.Of(SurvivorsStat::kDurationPct)), 1);
-  owned.stance_until_step = static_cast<std::uint32_t>(std::min<std::uint64_t>(
-      std::uint64_t{field.step} + steps, std::numeric_limits<std::uint32_t>::max()));
+  const std::uint64_t until_step = std::uint64_t{field.step} + steps;
+  const std::uint64_t rested_step = until_step + StepsOf(field.rules->tuning.stance_least_rest_ms);
+  constexpr std::uint64_t kLastStep = std::numeric_limits<std::uint32_t>::max();
+  owned.stance_until_step = static_cast<std::uint32_t>(std::min(until_step, kLastStep));
+  owned.ready_step = std::max(ReadyAfter(field, level),
+                              static_cast<std::uint32_t>(std::min(rested_step, kLastStep)));
   RecomputeStats(field);
   PublishCast(field.news, SurvivorsCast{.skill_id = rule.skill_id,
                                         .kind = CastKind::kStanceOn,

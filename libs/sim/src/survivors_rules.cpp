@@ -56,6 +56,7 @@ constexpr SurvivorsTuning kShippedTuning{
     .spawn_tries_per_foe = 4,
     .spawn_search_ring = 4,
     .most_cooldown_pct = 60,
+    .stance_least_rest_ms = 2000,
     // Les boss gardent leurs PV et leur propre marche : seule la horde croît
     // et ralentit.
     .boss_hp_growth_pct_per_minute = 0,

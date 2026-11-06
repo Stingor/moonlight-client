@@ -99,14 +99,21 @@ constexpr std::int32_t kPharaohArmorPct = 40;
   return rule;
 }
 
+// Un monstre qui porte une carte : il la lâche selon la règle de chute.
+[[nodiscard]] constexpr FoeRule WithCard(FoeRule rule, std::uint16_t card_item_id) noexcept {
+  rule.card_item_id = card_item_id;
+  return rule;
+}
+
 // Common(Id, niveau, taille, élément, PV, ms par case, contact, ms, XP[, comportement]).
+// WithCard(…, carte) : un porteur de carte.
 constexpr std::array<FoeRule, kDesertFoeCount> kDesertFoes{{
     Common(kPickyId, 3, kSmall, kFire, 14, 200, 4, 988, 1),
     Common(kBabyDesertWolfId, 9, kSmall, kFire, 20, 300, 5, 1600, 1),
     Common(kPecoPecoEggId, 3, kSmall, kNeutral, 50, kStillWalkMs, kNoTouchDamage, kNoTouchMs, 2,
            kStill),
     Common(kAntEggId, 4, kSmall, kNeutral, 50, kStillWalkMs, kNoTouchDamage, kNoTouchMs, 2, kStill),
-    Common(kPecoPecoId, 19, kLarge, kFire, 45, 200, 7, 1564, 3),
+    WithCard(Common(kPecoPecoId, 19, kLarge, kFire, 45, 200, 7, 1564, 3), kPecoPecoCardId),
     Common(kMukaId, 17, kLarge, kEarth, 50, 300, 7, 1960, 3),
     Common(kHodeId, 26, kMedium, kEarth, 40, 200, 7, 1480, 3, kBurrower),
     Common(kScorpionId, 24, kSmall, kFire, 30, 200, 7, 1564, 2),

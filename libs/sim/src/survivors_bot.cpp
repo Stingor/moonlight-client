@@ -463,10 +463,14 @@ const SurvivorsBotProfile& MageBotProfile() {
 
 const SurvivorsBotProfile& KnightBotProfile() {
   // Les coups qui portent quand il fuit d'abord ; les cônes, qui ne frappent
-  // que devant lui, à la fin.
-  static constexpr std::array<std::uint16_t, 9> kSkillOrder{5, 7, 62, 56, 8, 60, 59, 57, 58};
-  static constexpr std::array<std::uint16_t, 12> kCardOrder{4072, 4019, 4003, 4022, 4266, 4197,
-                                                            4031, 4179, 4183, 4147, 4016, 4001};
+  // que devant lui, à la fin, sauf Brandish Spear, qui fait son union avec
+  // Bowling Bash. Two-Hand Quicken entre à la place que cette union libère.
+  static constexpr std::array<std::uint16_t, 9> kSkillOrder{5, 7, 62, 56, 57, 8, 60, 59, 58};
+  // Les cartes qui ouvrent les évolutions de ces skills d'abord : les
+  // emplacements sont comptés, et une carte prise tard n'y trouverait plus de
+  // place.
+  static constexpr std::array<std::uint16_t, 12> kCardOrder{4072, 4019, 4179, 4003, 4183, 4031,
+                                                            4022, 4266, 4197, 4147, 4016, 4001};
   static const SurvivorsBotProfile kProfile{.skill_order = kSkillOrder,
                                             .card_order = kCardOrder,
                                             .threat_radius_units = Cells(3),

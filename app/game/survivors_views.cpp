@@ -200,7 +200,8 @@ SurvivorsFrameView SurvivorsViews::Compose(const SurvivorsStage& stage,
       // crédit au carnet.
       if (facts.meta != nullptr && facts.meta->codex.open && facts.save != nullptr) {
         SurvivorsMetaWindows& meta = *facts.meta;
-        ComposeCodex(meta, *facts.save, &stage.sightings(), rules, tables, facts.now_ms);
+        ComposeCodex(meta, *facts.save, &stage.sightings(), rules,
+                     field != nullptr ? field->hero_class : nullptr, tables, facts.now_ms);
         view.codex = &meta.codex_view;
         view.codex_state = &meta.codex;
         view.album = &meta.album_view;
@@ -227,7 +228,7 @@ SurvivorsFrameView SurvivorsViews::Compose(const SurvivorsStage& stage,
     case SurvivorsScreen::kPlaying:
       break;
   }
-  ComposeRanking(stage, facts, view);
+  ComposeRanking(stage, facts, rules, tables, view);
   return view;
 }
 
@@ -236,8 +237,9 @@ void SurvivorsViews::ComposeHud(const SurvivorsField& field, const ro::sim::Surv
                                 const SurvivorsTables& tables) {
   skill_slots_.clear();
   for (const ro::sim::OwnedSkill& skill : field.hero.skills) {
-    skill_slots_.push_back(
-        {.icon = SurvivorsSkillIcon(skill.skill_id, tables), .level = skill.level});
+    skill_slots_.push_back({.icon = SurvivorsSkillIcon(skill.skill_id, tables),
+                            .level = skill.level,
+                            .active = field.step < skill.stance_until_step});
   }
   card_slots_.clear();
   for (const ro::sim::OwnedCard& card : field.hero.cards) {
@@ -531,16 +533,7 @@ void SurvivorsViews::ComposeSummary(const SurvivorsStage& stage,
   const auto hero_class =
       std::ranges::find(rules.classes, ending->class_id, &ro::sim::ClassRule::class_id);
   if (hero_class != rules.classes.end()) {
-    // Le corps de la fin : rené, évolué, ou celui du départ.
-    std::uint16_t job = hero_class->job_id;
-    const bool evolved = ending->board.coop ? ending->own_evolved : ending->tally.evolutions > 0;
-    if (evolved && hero_class->evolved_job_id != 0) {
-      job = hero_class->evolved_job_id;
-    }
-    if (ro::sim::Reborn(*hero_class, ending->tally.level) && hero_class->reborn_job_id != 0) {
-      job = hero_class->reborn_job_id;
-    }
-    summary_.job_name = JobName(job, tables);
+    summary_.job_name = JobName(EndingJobOf(*hero_class, *ending), tables);
   }
   foe_rows_.clear();
   for (const ro::sim::SurvivorsCount& count : ending->recap.kills_by_foe) {

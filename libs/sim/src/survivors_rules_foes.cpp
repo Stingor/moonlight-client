@@ -145,7 +145,8 @@ constexpr std::array<FoeRule, kPlainsFoeCount> kFoes{{
         Common(kPupaId, 2, kSmall, kEarth, 60, kStillWalkMs, kNoTouchDamage, kNoTouchMs, 2, kStill),
         kPupaCardId),
     Common(kRockerId, 9, kMedium, kEarth, 30, 200, 7, 1864, 2),
-    Common(kCondorId, 5, kMedium, kWind, 24, 150, 6, 1148, 2),
+    // L'oiseau de la prairie : il porte la carte du Peco Peco, qui n'y naît pas.
+    WithCard(Common(kCondorId, 5, kMedium, kWind, 24, 150, 6, 1148, 2), kPecoPecoCardId),
     Common(kSavageBabeId, 7, kSmall, kEarth, 20, 400, 5, 1624, 2),
     WithCard(Common(kHornetId, 8, kSmall, kWind, 20, 150, 6, 1292, 2), kHornetCardId),
     Common(kFamiliarId, 8, kSmall, kDark, 18, 150, 5, 1276, 2, kFlyer),

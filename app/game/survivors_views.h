@@ -155,9 +155,15 @@ class SurvivorsViews {
   [[nodiscard]] const char* CardName(std::uint16_t card_item_id, const SurvivorsTables& tables);
   [[nodiscard]] const char* FoeName(std::uint16_t foe_id, const SurvivorsTables& tables);
   [[nodiscard]] const char* JobName(std::uint16_t job_id, const SurvivorsTables& tables);
-  // Les classes de la partie libre, la retenue, et ce qui débloque les autres.
+  // Le nom d'une classe, dans la langue du joueur ; à défaut, celui de son métier.
+  [[nodiscard]] const char* ClassName(const ro::sim::ClassRule& class_rule,
+                                      const SurvivorsTables& tables);
+  // Le nom à montrer d'une classe connue parmi plusieurs ; sinon vide.
+  [[nodiscard]] const char* ShownClassName(const ro::sim::SurvivorsRules& rules,
+                                           std::uint16_t class_id, const SurvivorsTables& tables);
+  // Les classes de l'accueil, la retenue, et ce qui débloque les autres.
   void ComposeClassChoices(const ro::sim::SurvivorsRules& rules, const SurvivorsSave& save,
-                           const SurvivorsTables& tables, std::uint16_t free_class_id,
+                           const SurvivorsTables& tables, std::uint16_t class_id,
                            ro::ui::SurvivorsPrepareMeta& meta);
   std::vector<ro::sim::SurvivorsPickupNews> own_pickups_;
   void ComposeHud(const ro::sim::SurvivorsField& field, const ro::sim::SurvivorsRules& rules,
@@ -192,14 +198,17 @@ class SurvivorsViews {
   void ComposeShop(SurvivorsMetaShop shop, SurvivorsMetaWindows& windows, const SurvivorsSave& save,
                    const SurvivorsTables& tables);
   void ComposeAlbum(SurvivorsMetaWindows& windows, const SurvivorsSave& save,
-                    const ro::sim::SurvivorsRules& rules, const SurvivorsTables& tables);
+                    const ro::sim::SurvivorsRules& rules, const ro::sim::ClassRule* album_class,
+                    const SurvivorsTables& tables);
   // LE CODEX OUVERT (`survivors_codex_views.cpp`), à l'accueil ou sur la
   // pause : les fiches tirées des règles, du carnet et du relevé de la partie
   // en cours (`live`, nul hors partie), puis leurs noms, leurs icônes, le
-  // sprite de l'entrée choisie, et l'Album de l'onglet Cartes.
+  // sprite de l'entrée choisie, et l'Album de l'onglet Cartes, celui de
+  // `album_class` : la classe retenue à l'accueil, celle du héros en partie.
   void ComposeCodex(SurvivorsMetaWindows& windows, const SurvivorsSave& save,
                     const SurvivorsCodexSeen* live, const ro::sim::SurvivorsRules& rules,
-                    const SurvivorsTables& tables, std::uint32_t now_ms);
+                    const ro::sim::ClassRule* album_class, const SurvivorsTables& tables,
+                    std::uint32_t now_ms);
   void NameCodexEntry(ro::ui::SurvivorsCodexEntry& entry, const SurvivorsTables& tables);
   void NameCodexLink(ro::ui::SurvivorsCodexLink& link, CodexLinkKind kind,
                      const SurvivorsTables& tables);
@@ -208,6 +217,7 @@ class SurvivorsViews {
   // LE CLASSEMENT DANS LA PARTIE : la marque « Classée » du HUD, la section de
   // l'écran de fin et le tableau mondial ouvert par-dessus lui.
   void ComposeRanking(const SurvivorsStage& stage, const SurvivorsViewFacts& facts,
+                      const ro::sim::SurvivorsRules& rules, const SurvivorsTables& tables,
                       SurvivorsFrameView& view);
   // Le skill que débloque chaque exploit : son icône et son nom.
   void NameFeats(std::span<ro::ui::SurvivorsFeatEntry> feats, const ro::sim::SurvivorsRules& rules,

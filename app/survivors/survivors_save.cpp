@@ -34,6 +34,7 @@ constexpr const char* kHordeSunShadowsField = "horde_sun_shadows";
 constexpr const char* kPauseWhileTypingField = "pause_while_typing";
 constexpr const char* kPresenceShownField = "presence_shown";
 constexpr const char* kFirstSkillIdField = "first_skill_id";
+constexpr const char* kClassIdField = "class_id";
 constexpr const char* kObjectiveSkillIdField = "objective_skill_id";
 
 constexpr const char* kMetaSection = "meta";
@@ -99,8 +100,8 @@ constexpr const char* kFileHeader =
     "# Le carnet du mode Survivants de Midgard de moonclient.\n"
     "#\n"
     "# options : effets reduits, mesures affichees, ombres du soleil de la horde,\n"
-    "# l'identifiant de competence du dernier premier sort choisi, et celui du\n"
-    "# sort epingle en objectif au Codex.\n"
+    "# l'identifiant de competence du dernier premier sort choisi, la classe retenue\n"
+    "# a l'accueil, et l'identifiant du sort epingle en objectif au Codex.\n"
     "# meta : les Zeny du mode, les rangs de l'Eglise et de la Kafra.\n"
     "# album : les cartes trouvees, les exploits, les compteurs.\n"
     "# records : les dix meilleures parties de chaque tableau.\n"
@@ -238,11 +239,11 @@ constexpr std::size_t kDateLength = 10;
   return out.c_str();
 }
 
-// L'identifiant de skill des réglages suit la conversion entière de yaml-cpp,
+// L'identifiant de skill ou de classe des réglages suit la conversion entière de yaml-cpp,
 // qui accepte une saisie à la main en hexadécimal (`0x0E`) ou signée (`+14`),
 // et non `from_chars` comme les autres comptes du carnet. 0 hors de 0..65535
 // ou d'un mauvais type.
-[[nodiscard]] std::uint16_t SkillIdIn(const YAML::Node& section, const char* field) {
+[[nodiscard]] std::uint16_t OptionIdIn(const YAML::Node& section, const char* field) {
   const YAML::Node value = section[field];
   if (!value || !value.IsScalar()) return 0;
   const long long read = value.as<long long>(0);
@@ -261,8 +262,9 @@ void ReadOptions(const YAML::Node& section, SurvivorsOptions& options) {
   options.horde_sun_shadows = FlagIn(section, kHordeSunShadowsField, options.horde_sun_shadows);
   options.pause_while_typing = FlagIn(section, kPauseWhileTypingField, options.pause_while_typing);
   options.presence_shown = FlagIn(section, kPresenceShownField, options.presence_shown);
-  options.first_skill_id = SkillIdIn(section, kFirstSkillIdField);
-  options.objective_skill_id = SkillIdIn(section, kObjectiveSkillIdField);
+  options.first_skill_id = OptionIdIn(section, kFirstSkillIdField);
+  options.class_id = OptionIdIn(section, kClassIdField);
+  options.objective_skill_id = OptionIdIn(section, kObjectiveSkillIdField);
 }
 
 // Où se range une clé du catalogue : sa place dans les rangs, et son rang
@@ -470,6 +472,7 @@ void WriteOptions(YAML::Emitter& out, const SurvivorsOptions& options) {
   out << YAML::Key << kPauseWhileTypingField << YAML::Value << options.pause_while_typing;
   out << YAML::Key << kPresenceShownField << YAML::Value << options.presence_shown;
   out << YAML::Key << kFirstSkillIdField << YAML::Value << options.first_skill_id;
+  out << YAML::Key << kClassIdField << YAML::Value << options.class_id;
   out << YAML::Key << kObjectiveSkillIdField << YAML::Value << options.objective_skill_id;
   out << YAML::EndMap;
 }

@@ -138,6 +138,8 @@ class SurvivorsRankingSession {
   void NoteService(const ro::net::SurvivorsService& service);
   void NoteFrame(const ro::net::SurvivorsTicket& ticket);
   void NoteFrame(const ro::net::SurvivorsResult& result);
+  // 🔴 UNE PAGE NE VAUT QUE POUR LA DERNIÈRE DEMANDE DE SON GENRE, clé entière :
+  // celle d'une classe quittée entre-temps, ou que rien n'a demandée, s'ignore.
   void NoteFrame(const ro::net::SurvivorsBoardPage& page);
   // À chaque image : l'échéance du jeton et un renvoi au plus.
   void Tick(const SurvivorsRankingNow& now);
@@ -180,7 +182,10 @@ class SurvivorsRankingSession {
   [[nodiscard]] std::uint16_t ruleset() const noexcept { return ruleset_; }
   // Le serveur du personnage connecté : ses résultats en attente sont les siens.
   [[nodiscard]] const std::string& server_key() const noexcept { return server_key_; }
-  [[nodiscard]] const SurvivorsHeldPage* page(ro::net::SurvivorsBoardKind board) const noexcept;
+  // La page tenue d'un genre de tableau pour la classe `class_id` ; nulle quand
+  // celle qui est tenue en montre une autre.
+  [[nodiscard]] const SurvivorsHeldPage* page(ro::net::SurvivorsBoardKind board,
+                                              std::uint16_t class_id) const noexcept;
   // L'instant d'où une demande de tableau peut repartir.
   [[nodiscard]] std::int64_t board_ready_at_ms() const noexcept;
   [[nodiscard]] std::span<const SurvivorsPendingResult> pending() const noexcept {
@@ -235,6 +240,8 @@ class SurvivorsRankingSession {
   std::vector<std::uint32_t> resend_;
 
   std::optional<std::int64_t> last_board_ask_ms_;
+  std::optional<ro::net::SurvivorsBoardKey> ranked_asked_;
+  std::optional<ro::net::SurvivorsBoardKey> challenge_asked_;
   std::optional<SurvivorsHeldPage> ranked_page_;
   std::optional<SurvivorsHeldPage> challenge_page_;
 

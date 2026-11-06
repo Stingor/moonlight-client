@@ -55,6 +55,13 @@ struct SurvivorsRankingFacts {
   SurvivorsRankingNow now;
 };
 
+// La page qu'une demande retenue par la cadence attend.
+struct SurvivorsBoardOwed {
+  ro::net::SurvivorsBoardKind board = ro::net::SurvivorsBoardKind::kRanked;
+  std::uint16_t class_id = 0;
+  [[nodiscard]] bool operator==(const SurvivorsBoardOwed&) const = default;
+};
+
 class SurvivorsRankingMode {
  public:
   // `length_of` vide : la table des longueurs du client.
@@ -81,10 +88,12 @@ class SurvivorsRankingMode {
   // LE DÉPART D'UNE PARTIE (Q2, Q3). Une partie classée ou un défi demande son
   // jeton ; une partie classée service fermé part libre. Le départ rendu est
   // celui à commencer tout de suite ; il peut attendre son jeton (`holding`).
-  [[nodiscard]] SurvivorsBookMode::Begun Launch(SurvivorsBookMode& book,
-                                                const ro::sim::SurvivorsRules& rules,
-                                                const std::filesystem::path& client_root,
-                                                std::uint64_t seed, std::uint16_t first_skill_id);
+  // 🔴 RIEN QUAND LE DÉFI OU LA PARTIE CLASSÉE TROUVE SA CLASSE VERROUILLÉE au
+  // carnet relu (`ChosenClassOpen`) : aucune trame ne part, aucune partie ne
+  // commence.
+  [[nodiscard]] std::optional<SurvivorsBookMode::Begun> Launch(
+      SurvivorsBookMode& book, const ro::sim::SurvivorsRules& rules,
+      const std::filesystem::path& client_root, std::uint64_t seed, std::uint16_t first_skill_id);
   // Vrai tant que le départ attend son jeton : l'écran de chargement le couvre.
   [[nodiscard]] bool holding() const noexcept {
     return session_.run_state() == SurvivorsRunRanking::kAwaiting;
@@ -101,16 +110,22 @@ class SurvivorsRankingMode {
   // elle n'envoie rien, ni une partie libre ou à départ chargé.
   void FollowEnded(const SurvivorsStage& stage, bool frozen_by_link_loss);
 
-  // LE TABLEAU MONDIAL DEMANDÉ pour l'arène et la classe des règles : vrai
-  // quand la demande part à la prochaine image — service ouvert et cadence
-  // passée.
-  bool AskBoard(const ro::sim::SurvivorsRules& rules, ro::net::SurvivorsBoardKind board);
+  // LE TABLEAU MONDIAL DEMANDÉ pour l'arène classée et la classe `class_id` :
+  // vrai quand la demande part à la prochaine image — classe connue, service
+  // ouvert et cadence passée.
+  bool AskBoard(const ro::sim::SurvivorsRules& rules, std::uint16_t class_id,
+                ro::net::SurvivorsBoardKind board);
   // LA PAGE QUE LA FENÊTRE DU TABLEAU ATTEND encore, la cadence ayant retenu
   // sa demande ; rien quand aucune n'est due.
-  [[nodiscard]] std::optional<ro::net::SurvivorsBoardKind> board_owed() const noexcept {
+  [[nodiscard]] const std::optional<SurvivorsBoardOwed>& board_owed() const noexcept {
     return board_owed_;
   }
-  void OweBoard(std::optional<ro::net::SurvivorsBoardKind> board) noexcept { board_owed_ = board; }
+  void OweBoard(std::optional<SurvivorsBoardOwed> board) noexcept { board_owed_ = board; }
+  // La classe dont la fenêtre du tableau montre les pages ; vrai quand elle
+  // vient de changer.
+  [[nodiscard]] bool FollowBoardClass(std::uint16_t class_id) noexcept {
+    return std::exchange(board_class_id_, class_id) != class_id;
+  }
 
   // CE QUE LA SESSION A DIT depuis la dernière lecture, déjà écrit au journal :
   // `app` en fait les lignes de conversation qu'il faut.
@@ -128,6 +143,7 @@ class SurvivorsRankingMode {
     SurvivorsBoardKind kind = SurvivorsBoardKind::kFree;
     std::uint64_t start_seed = 0;
     std::uint64_t local_seed = 0;
+    std::uint16_t class_id = 0;
     std::uint16_t first_skill_id = 0;
   };
 
@@ -144,7 +160,8 @@ class SurvivorsRankingMode {
   std::uint32_t character_id_ = 0;
   std::optional<PendingLaunch> launch_;
   SurvivorsRankingNow now_;
-  std::optional<ro::net::SurvivorsBoardKind> board_owed_;
+  std::optional<SurvivorsBoardOwed> board_owed_;
+  std::uint16_t board_class_id_ = 0;
   std::vector<SurvivorsRankingNotice> told_;
 };
 

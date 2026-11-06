@@ -18,7 +18,7 @@ namespace ro::sim {
 // LES RÈGLES DU MODE SURVIVORS : des données, injectées dans une partie.
 // Si l'essai de rejeu en or change, montez kSurvivorsRulesetVersion : un journal
 // ne se rejoue que contre la version de règles qui l'a produit.
-inline constexpr std::uint16_t kSurvivorsRulesetVersion = 4;
+inline constexpr std::uint16_t kSurvivorsRulesetVersion = 5;
 inline constexpr std::size_t kMostSkillLevels = 8;
 inline constexpr std::size_t kMostCardLevels = 5;
 inline constexpr std::uint8_t kMostOffers = 4;
@@ -260,6 +260,10 @@ struct ClassRule {
   std::uint16_t reborn_job_id = 0;
   std::uint16_t reborn_mounted_job_id = 0;
   std::int32_t reborn_damage_pct = 0;
+  // LE BOSS FINAL FACE À CETTE CLASSE : ses PV majorés de ce pourcentage, dans
+  // [0, kMostStatBonus] ; 0 le laisse tel que le contenu le décrit. À plusieurs,
+  // la plus forte majoration de l'équipe vaut pour tous.
+  std::int32_t final_boss_hp_bonus_pct = 0;
 };
 
 // Vrai quand un héros de ce niveau est rené.
@@ -346,6 +350,9 @@ struct SurvivorsTuning {
   std::uint8_t spawn_tries_per_foe = 0;
   std::int32_t spawn_search_ring = 0;
   std::int32_t most_cooldown_pct = 0;
+  // Le plus court repos d'une posture : quand la durée allongée rattrape la
+  // recharge raccourcie, elle retombe encore ce temps avant de reprendre.
+  std::uint32_t stance_least_rest_ms = 0;
   std::int32_t boss_hp_growth_pct_per_minute = 0;
   std::int32_t boss_walk_scale_pct = 0;
   std::int32_t knock_units_per_step = 0;  // vitesse d'un recul

@@ -57,7 +57,7 @@ constexpr std::uint16_t kTrophyIconItem = 714;
 
 void SurvivorsViews::ComposeClassChoices(const ro::sim::SurvivorsRules& rules,
                                          const SurvivorsSave& save, const SurvivorsTables& tables,
-                                         std::uint16_t free_class_id,
+                                         std::uint16_t class_id,
                                          ro::ui::SurvivorsPrepareMeta& meta) {
   class_hints_.clear();
   class_choices_.clear();
@@ -65,22 +65,35 @@ void SurvivorsViews::ComposeClassChoices(const ro::sim::SurvivorsRules& rules,
   for (const ro::sim::ClassRule& class_rule : rules.classes) {
     const std::uint64_t minutes = FeatMinutes(ClassUnlockFeat(class_rule));
     class_hints_.push_back(
-        minutes == 0 ? std::string()
-                     : ro::core::Printed(ro::core::Tr("%s : une partie tenue %u:00 le débloque."),
-                                         JobName(class_rule.job_id, tables),
-                                         static_cast<unsigned>(minutes)));
+        minutes == 0
+            ? std::string()
+            : ro::core::Printed(ro::core::Tr("%s : une partie tenue %u:00 le débloque."),
+                                ClassName(class_rule, tables), static_cast<unsigned>(minutes)));
   }
   for (std::size_t rank = 0; rank < rules.classes.size(); ++rank) {
     const ro::sim::ClassRule& class_rule = rules.classes[rank];
     class_choices_.push_back(
         ro::ui::SurvivorsClassChoice{.class_id = class_rule.class_id,
-                                     .name = JobName(class_rule.job_id, tables),
+                                     .name = ClassName(class_rule, tables),
                                      .locked = !ClassUnlocked(rules, class_rule, save),
                                      .unlock_hint = class_hints_[rank].c_str()});
   }
-  const ro::sim::ClassRule* free_class = FreeClassOf(rules, save, free_class_id);
-  meta.free_classes = class_choices_;
-  meta.free_class_id = free_class != nullptr ? free_class->class_id : std::uint16_t{0};
+  const ro::sim::ClassRule* chosen_class = ChosenClassOf(rules, save, class_id);
+  meta.classes = class_choices_;
+  meta.class_id = chosen_class != nullptr ? chosen_class->class_id : std::uint16_t{0};
+}
+
+const char* SurvivorsViews::ClassName(const ro::sim::ClassRule& class_rule,
+                                      const SurvivorsTables& tables) {
+  const char* title = ClassTitleOf(class_rule);
+  return title != nullptr ? title : JobName(class_rule.job_id, tables);
+}
+
+const char* SurvivorsViews::ShownClassName(const ro::sim::SurvivorsRules& rules,
+                                           std::uint16_t class_id, const SurvivorsTables& tables) {
+  // Une seule classe : rien à distinguer, la classe ne se nomme pas.
+  const ro::sim::ClassRule* class_rule = ro::sim::FindClass(rules, class_id);
+  return class_rule != nullptr && rules.classes.size() > 1 ? ClassName(*class_rule, tables) : "";
 }
 
 void SurvivorsViews::ComposeMeta(ro::ui::SurvivorsPrepareView& prepare,
@@ -91,7 +104,12 @@ void SurvivorsViews::ComposeMeta(ro::ui::SurvivorsPrepareView& prepare,
                                  std::uint32_t now_ms) {
   const SurvivorsSave& save = desk.save();
   const std::int64_t now_utc_s = book.now_utc();
-  ro::ui::SurvivorsPrepareMeta meta = PrepareMetaOf(rules, save, book.chosen(), now_utc_s);
+  ro::ui::SurvivorsPrepareMeta meta =
+      PrepareMetaOf(rules, save, book.chosen(), now_utc_s, book.chosen_class_id());
+  const ro::sim::ClassRule* chosen_class = ChosenClassOf(rules, save, book.chosen_class_id());
+  const std::uint16_t class_id =
+      chosen_class != nullptr ? chosen_class->class_id : std::uint16_t{0};
+  const char* class_name = ShownClassName(rules, class_id, tables);
   if (const std::uint16_t bolt = meta.challenge_bolt.skill_id; bolt != 0) {
     meta.challenge_bolt.icon = SurvivorsSkillIcon(bolt, tables);
     meta.challenge_bolt.name = SkillName(bolt, tables);
@@ -100,8 +118,9 @@ void SurvivorsViews::ComposeMeta(ro::ui::SurvivorsPrepareView& prepare,
   // ni compteur, ni l'onglet local des parties classées, ni le tableau.
   const bool ranking_open = ranking != nullptr && ranking->session().service_open();
   if (ranking != nullptr) {
-    meta.ranking = PrepareRankingOf(ranking->session(), ranking_rows_);
-    ComposeRankingWindow(*ranking, windows.ranking, windows.ranking_view, ranking_rows_);
+    meta.ranking = PrepareRankingOf(ranking->session(), ranking_rows_, class_id);
+    ComposeRankingWindow(*ranking, windows.ranking, windows.ranking_view, ranking_rows_, class_id,
+                         class_name);
   } else {
     windows.ranking.open = false;
   }
@@ -123,29 +142,29 @@ void SurvivorsViews::ComposeMeta(ro::ui::SurvivorsPrepareView& prepare,
       board_arena != nullptr ? ArenaNameOf(rules, *board_arena, tables.map_names) : std::string();
   meta.free_arenas = arena_choices_;
   meta.free_arena_id = free_arena != nullptr ? free_arena->arena_id : std::uint16_t{0};
-  ComposeClassChoices(rules, save, tables, book.free_class_id(), meta);
+  ComposeClassChoices(rules, save, tables, book.chosen_class_id(), meta);
   meta.board_arena_name = board_arena_name_.c_str();
   prepare.meta = meta;
   if (windows.church.open) ComposeShop(SurvivorsMetaShop::kChurch, windows, save, tables);
   if (windows.kafra.open) ComposeShop(SurvivorsMetaShop::kKafra, windows, save, tables);
-  if (windows.codex.open) ComposeCodex(windows, save, nullptr, rules, tables, now_ms);
+  if (windows.codex.open) {
+    ComposeCodex(windows, save, nullptr, rules, ChosenClassOf(rules, save, book.chosen_class_id()),
+                 tables, now_ms);
+  }
   if (windows.records.open) {
     const std::optional<SurvivorsCredit>& credit = book.credit();
     windows.records_view = RecordsViewOf(
         rules, save, now_utc_s,
         credit.has_value() ? std::optional<std::int64_t>(credit->played_at_utc_s) : std::nullopt,
-        record_rows_, book.free_arena_id(), book.free_class_id());
+        record_rows_, book.free_arena_id(), book.chosen_class_id());
     windows.records_view.ranked_shown = ranking_open;
-    const ro::sim::ClassRule* free_class = FreeClassOf(rules, save, book.free_class_id());
-    // Une seule classe : rien à distinguer, la classe ne se nomme pas.
-    windows.records_view.free_class_name = free_class != nullptr && rules.classes.size() > 1
-                                               ? JobName(free_class->job_id, tables)
-                                               : "";
+    windows.records_view.class_name = class_name;
   }
 }
 
 void SurvivorsViews::ComposeRanking(const SurvivorsStage& stage, const SurvivorsViewFacts& facts,
-                                    SurvivorsFrameView& view) {
+                                    const ro::sim::SurvivorsRules& rules,
+                                    const SurvivorsTables& tables, SurvivorsFrameView& view) {
   hud_.ranked = false;
   if (facts.ranking == nullptr) return;
   const SurvivorsRankingSession& session = facts.ranking->session();
@@ -154,7 +173,10 @@ void SurvivorsViews::ComposeRanking(const SurvivorsStage& stage, const Survivors
   if (view.summary != nullptr) summary_.ranking = SummaryRankOf(session, board);
   if (stage.screen() != SurvivorsScreen::kSummary || facts.meta == nullptr) return;
   SurvivorsMetaWindows& meta = *facts.meta;
-  ComposeRankingWindow(*facts.ranking, meta.ranking, meta.ranking_view, ranking_rows_);
+  // AU BILAN, LE TABLEAU EST CELUI DE LA CLASSE DE LA PARTIE.
+  const std::uint16_t class_id = SummaryClassId(stage);
+  ComposeRankingWindow(*facts.ranking, meta.ranking, meta.ranking_view, ranking_rows_, class_id,
+                       ShownClassName(rules, class_id, tables));
   if (!meta.ranking.open) return;
   view.ranking = &meta.ranking_view;
   view.ranking_state = &meta.ranking;
@@ -185,10 +207,11 @@ void SurvivorsViews::ComposeShop(SurvivorsMetaShop shop, SurvivorsMetaWindows& w
 
 void SurvivorsViews::ComposeAlbum(SurvivorsMetaWindows& windows, const SurvivorsSave& save,
                                   const ro::sim::SurvivorsRules& rules,
+                                  const ro::sim::ClassRule* album_class,
                                   const SurvivorsTables& tables) {
-  AlbumCardsOf(rules, save, album_cards_);
   const std::span<const std::uint16_t> pool =
-      rules.classes.empty() ? std::span<const std::uint16_t>() : rules.classes.front().card_pool;
+      album_class != nullptr ? album_class->card_pool : std::span<const std::uint16_t>();
+  AlbumCardsOf(rules, save, pool, album_cards_);
   for (std::size_t rank = 0; rank < album_cards_.size() && rank < pool.size(); ++rank) {
     ro::ui::SurvivorsAlbumEntry& entry = album_cards_[rank];
     const std::uint16_t card_item_id = pool[rank];

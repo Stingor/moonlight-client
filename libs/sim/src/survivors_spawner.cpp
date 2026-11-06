@@ -149,6 +149,16 @@ std::optional<FieldPoint> DrawSpawnPoint(SurvivorsField& field) {
   return std::nullopt;
 }
 
+std::int32_t FinalBossHpBonusPct(const SurvivorsField& field) {
+  std::int32_t bonus_pct = 0;
+  for (std::size_t hero_index = 0; hero_index < HeroCount(field); ++hero_index) {
+    if (const ClassRule* hero_class = ClassAt(field, hero_index)) {
+      bonus_pct = std::max(bonus_pct, hero_class->final_boss_hp_bonus_pct);
+    }
+  }
+  return bonus_pct;
+}
+
 std::uint32_t HatchFoe(SurvivorsField& field, const FoeRule& rule, FieldPoint at,
                        const HatchOptions& options) {
   const SurvivorsRules& rules = *field.rules;
@@ -160,6 +170,9 @@ std::uint32_t HatchFoe(SurvivorsField& field, const FoeRule& rule, FieldPoint at
   std::int32_t hp = PercentOfHp(rule.hp, kPercent + std::int64_t{growth_pct} * minutes);
   if (options.elite) hp = PercentOfHp(hp, rules.elites.hp_pct);
   if (!field.allies.empty()) hp = PercentOfHp(hp, TeamScaleOf(field).foe_hp_pct);
+  if (options.boss != nullptr && options.boss->final) {
+    hp = PercentOfHp(hp, kPercent + std::int64_t{FinalBossHpBonusPct(field)});
+  }
   // La Cursed Water du départ majore les PV après la croissance et l'élite ;
   // le rang 0 n'y touche pas.
   if (const std::uint8_t cursed = field.start.cursed_water;

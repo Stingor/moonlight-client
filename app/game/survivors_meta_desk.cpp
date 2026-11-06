@@ -39,10 +39,6 @@ constexpr std::size_t kSayTextSize = 256;
   return rules.cursed_water.empty() ? 0 : static_cast<int>(rules.cursed_water.size() - 1);
 }
 
-[[nodiscard]] const char* ClassKey(const ro::sim::SurvivorsRules& rules) {
-  return rules.classes.empty() ? "" : rules.classes.front().key;
-}
-
 // La clé de l'arène par défaut, celle du défi et de la partie classée.
 [[nodiscard]] const char* BoardArenaKey(const ro::sim::SurvivorsRules& rules) {
   const ro::sim::ArenaRule* arena = DefaultArenaOf(rules);
@@ -224,7 +220,7 @@ ro::ui::SurvivorsShopView ShopViewOf(const SurvivorsSave& save, SurvivorsMetaSho
 
 ro::ui::SurvivorsPrepareMeta PrepareMetaOf(const ro::sim::SurvivorsRules& rules,
                                            const SurvivorsSave& save, SurvivorsBoardKind board,
-                                           std::int64_t now_utc_s) {
+                                           std::int64_t now_utc_s, std::uint16_t class_id) {
   ro::ui::SurvivorsPrepareMeta meta;
   meta.board = TabOf(board);
   meta.zeny = save.meta.zeny;
@@ -240,8 +236,9 @@ ro::ui::SurvivorsPrepareMeta PrepareMetaOf(const ro::sim::SurvivorsRules& rules,
   meta.week_number = week.week;
   meta.week_left_s =
       (ro::sim::MondayOfIsoWeek(week) + kDaysPerWeek) * ro::sim::kSecondsPerDay - now_utc_s;
-  if (rules.classes.empty()) return meta;
-  const ro::sim::ClassRule& class_rule = rules.classes.front();
+  const ro::sim::ClassRule* chosen_class = ChosenClassOf(rules, save, class_id);
+  if (chosen_class == nullptr) return meta;
+  const ro::sim::ClassRule& class_rule = *chosen_class;
   const ro::sim::SurvivorsMetaStart start = ro::sim::LoadoutOf(Meta(), save.meta.ranks, class_rule);
   meta.lives = start.lives;
   meta.charges = start.loadout.rerolls + start.loadout.skips + start.loadout.banishes;
@@ -251,17 +248,20 @@ ro::ui::SurvivorsPrepareMeta PrepareMetaOf(const ro::sim::SurvivorsRules& rules,
       .skill_id = bolt, .description = bolt_rule != nullptr ? bolt_rule->description : ""};
   if (const SurvivorsBoard* best =
           FindBoard(save, class_rule.key, BoardArenaKey(rules), kChallengeBoardKey, week);
-      best != nullptr && !best->runs.empty()) {
+      // Les règles en vigueur se rangent en tête : une tête plus ancienne dit
+      // qu'aucune partie de la semaine ne les a jouées.
+      best != nullptr && !best->runs.empty() &&
+      best->runs.front().ruleset == rules.ruleset_version) {
     meta.week_best_score = best->runs.front().score;
   }
   return meta;
 }
 
 void AlbumCardsOf(const ro::sim::SurvivorsRules& rules, const SurvivorsSave& save,
+                  std::span<const std::uint16_t> card_pool,
                   std::vector<ro::ui::SurvivorsAlbumEntry>& cards) {
   cards.clear();
-  if (rules.classes.empty()) return;
-  for (const std::uint16_t card_item_id : rules.classes.front().card_pool) {
+  for (const std::uint16_t card_item_id : card_pool) {
     const ro::sim::CardRule* rule = ro::sim::FindCard(rules, card_item_id);
     ro::ui::SurvivorsAlbumEntry entry;
     if (rule != nullptr) {
@@ -296,15 +296,11 @@ ro::ui::SurvivorsRecordsView RecordsViewOf(const ro::sim::SurvivorsRules& rules,
                                            const SurvivorsSave& save, std::int64_t now_utc_s,
                                            std::optional<std::int64_t> latest_utc_s,
                                            SurvivorsRecordRowsHeld& held,
-                                           std::uint16_t free_arena_id,
-                                           std::uint16_t free_class_id) {
+                                           std::uint16_t free_arena_id, std::uint16_t class_id) {
   held = SurvivorsRecordRowsHeld{};
   const ro::sim::IsoWeek week = IsoWeekOfUtc(now_utc_s);
-  // Le défi et la partie classée sont ceux de la première classe ; la partie
-  // libre, celle de la classe retenue à l'accueil.
-  const std::string_view class_key = ClassKey(rules);
-  const ro::sim::ClassRule* free_class = FreeClassOf(rules, save, free_class_id);
-  const std::string_view free_class_key = free_class != nullptr ? free_class->key : class_key;
+  const ro::sim::ClassRule* chosen_class = ChosenClassOf(rules, save, class_id);
+  const std::string_view class_key = chosen_class != nullptr ? chosen_class->key : "";
   const ro::sim::ArenaRule* free_arena = FreeArenaOf(rules, free_arena_id);
   const std::string_view free_arena_key = free_arena != nullptr ? free_arena->key : "";
   const std::string_view board_arena_key = BoardArenaKey(rules);
@@ -318,8 +314,7 @@ ro::ui::SurvivorsRecordsView RecordsViewOf(const ro::sim::SurvivorsRules& rules,
   std::vector<const ro::sim::SurvivorsRecord*> ranked_runs;
   std::vector<const SurvivorsBoard*> past;
   for (const SurvivorsBoard& board : save.records) {
-    const bool free = board.board_key == kFreeBoardKey;
-    if (board.class_key != (free ? free_class_key : class_key)) continue;
+    if (board.class_key != class_key) continue;
     const bool challenge = board.board_key == kChallengeBoardKey;
     std::vector<const ro::sim::SurvivorsRecord*>* kept =
         board.board_key == kFreeBoardKey     ? &free_runs
@@ -426,6 +421,7 @@ void SurvivorsMetaDesk::FollowPrepare(const ro::ui::SurvivorsPrepareAsk& asked,
   if (asked.choose_board.has_value()) book.Choose(BoardKindOf(*asked.choose_board));
   if (asked.choose_arena_id.has_value()) book.ChooseArena(rules, *asked.choose_arena_id);
   if (asked.choose_class_id.has_value()) book.ChooseClass(rules, *asked.choose_class_id);
+  book.SettleClass(rules, save_);
   if (asked.choose_cursed_water.has_value()) {
     const int rank = *asked.choose_cursed_water;
     Mutate(

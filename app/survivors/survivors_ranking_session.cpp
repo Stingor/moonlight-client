@@ -138,10 +138,10 @@ void SurvivorsRankingSession::NoteFrame(const rn::SurvivorsBoardPage& page) {
   SurvivorsHeldPage held{.page = page, .received_at_ms = now_.steady_ms};
   switch (page.key.board) {
     case rn::SurvivorsBoardKind::kRanked:
-      ranked_page_ = std::move(held);
+      if (ranked_asked_ == page.key) ranked_page_ = std::move(held);
       break;
     case rn::SurvivorsBoardKind::kChallenge:
-      challenge_page_ = std::move(held);
+      if (challenge_asked_ == page.key) challenge_page_ = std::move(held);
       break;
     case rn::SurvivorsBoardKind::kUnknown:
       break;
@@ -254,6 +254,8 @@ bool SurvivorsRankingSession::AskBoard(const rn::SurvivorsBoardAsk& ask) {
   std::optional<std::vector<std::uint8_t>> frame = rn::EncodeSurvivorsBoardAsk(ask);
   if (!frame) return false;
   last_board_ask_ms_ = now_.steady_ms;
+  if (ask.board == rn::SurvivorsBoardKind::kRanked) ranked_asked_ = ask;
+  if (ask.board == rn::SurvivorsBoardKind::kChallenge) challenge_asked_ = ask;
   Push(std::move(frame));
   return true;
 }
@@ -282,11 +284,13 @@ const rn::SurvivorsTicket* SurvivorsRankingSession::ranked_ticket() const noexce
   return &*run_ticket_;
 }
 
-const SurvivorsHeldPage* SurvivorsRankingSession::page(
-    rn::SurvivorsBoardKind board) const noexcept {
+const SurvivorsHeldPage* SurvivorsRankingSession::page(rn::SurvivorsBoardKind board,
+                                                       std::uint16_t class_id) const noexcept {
   const std::optional<SurvivorsHeldPage>& held =
       board == rn::SurvivorsBoardKind::kChallenge ? challenge_page_ : ranked_page_;
-  if (board == rn::SurvivorsBoardKind::kUnknown || !held) return nullptr;
+  if (board == rn::SurvivorsBoardKind::kUnknown || !held || held->page.key.class_id != class_id) {
+    return nullptr;
+  }
   return &*held;
 }
 

@@ -181,33 +181,32 @@ void DrawFreeArena(const SurvivorsPrepareMeta& meta, SurvivorsPrepareAsk& asked,
   }
 }
 
-// La classe de la partie libre : une case par classe, sur une ligne ; une
+// La classe, de tous les onglets : une case par classe, sur une ligne ; une
 // classe verrouillée est grisée, et ce qui la débloque se lit dessous.
-void DrawFreeClass(const SurvivorsPrepareMeta& meta, SurvivorsPrepareAsk& asked,
-                   const SkinArt& art) {
-  if (meta.free_classes.size() < 2) return;
+void DrawClass(const SurvivorsPrepareMeta& meta, SurvivorsPrepareAsk& asked, const SkinArt& art) {
+  if (meta.classes.size() < 2) return;
   ImGui::SeparatorText(core::Tr("Classe"));
   bool first = true;
-  for (const SurvivorsClassChoice& choice : meta.free_classes) {
+  for (const SurvivorsClassChoice& choice : meta.classes) {
     if (!first) ImGui::SameLine();
     first = false;
     ImGui::PushID(choice.class_id);
     ImGui::BeginDisabled(choice.locked);
-    const bool chosen = choice.class_id == meta.free_class_id;
+    const bool chosen = choice.class_id == meta.class_id;
     if (SkinRadio(choice.name, chosen, art) && !chosen && !choice.locked) {
       asked.choose_class_id = choice.class_id;
     }
     ImGui::EndDisabled();
     ImGui::PopID();
   }
-  for (const SurvivorsClassChoice& choice : meta.free_classes) {
+  for (const SurvivorsClassChoice& choice : meta.classes) {
     if (choice.locked && *choice.unlock_hint != '\0') FaintText(choice.unlock_hint);
   }
 }
 
 void DrawFreeBoard(const SurvivorsPrepareView& view, const SurvivorsPrepareMeta& meta,
                    SurvivorsPrepareAsk& asked, const SkinArt& art) {
-  DrawFreeClass(meta, asked, art);
+  DrawClass(meta, asked, art);
   DrawFreeArena(meta, asked, art);
   asked.choose_skill_id = DrawBolts(view, art);
   DrawCursedWater(meta, asked, art);
@@ -217,7 +216,9 @@ void DrawFreeBoard(const SurvivorsPrepareView& view, const SurvivorsPrepareMeta&
               meta.lives, meta.charges);
 }
 
-void DrawChallengeBoard(const SurvivorsPrepareMeta& meta) {
+void DrawChallengeBoard(const SurvivorsPrepareMeta& meta, SurvivorsPrepareAsk& asked,
+                        const SkinArt& art) {
+  DrawClass(meta, asked, art);
   DrawArenaName(meta.board_arena_name);
   ImGui::TextUnformatted(SurvivorsWeekText(meta.week_year, meta.week_number).data());
   const std::int64_t hours = meta.week_left_s / kSecondsPerHour;
@@ -241,13 +242,16 @@ void DrawChallengeBoard(const SurvivorsPrepareMeta& meta) {
 void DrawRankedBoard(const SurvivorsPrepareView& view, const SurvivorsPrepareMeta& meta,
                      SurvivorsPrepareAsk& asked, const SkinArt& art) {
   const SurvivorsPrepareRanking& ranking = *meta.ranking;
+  DrawClass(meta, asked, art);
   DrawArenaName(meta.board_arena_name);
   asked.choose_skill_id = DrawBolts(view, art);
   ImGui::Separator();
   FaintText(core::Tr("Départ neutre : sans Bénédictions, sans charges, toutes les cartes."));
   FaintText(core::Tr("Graine tirée par le serveur."));
   std::array<char, kLineSize> line = {};
-  if (ranking.best_rank > 0) {
+  if (!ranking.best_known) {
+    FaintText(core::Tr("Votre rang s'affiche à l'ouverture du classement."));
+  } else if (ranking.best_rank > 0) {
     std::snprintf(line.data(), line.size(), core::Tr("Votre meilleur : %s, %s"),
                   SurvivorsRankText(ranking.best_rank).data(),
                   SurvivorsZeny(ranking.best_score).data());
@@ -345,7 +349,7 @@ SurvivorsPrepareAsk DrawSurvivorsPrepareWindow(SurvivorsPrepareState& state,
         DrawFreeBoard(view, *view.meta, asked, art);
         break;
       case SurvivorsBoardTab::kChallenge:
-        DrawChallengeBoard(*view.meta);
+        DrawChallengeBoard(*view.meta, asked, art);
         break;
       case SurvivorsBoardTab::kRanked:
         DrawRankedBoard(view, *view.meta, asked, art);

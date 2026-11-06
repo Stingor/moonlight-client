@@ -66,6 +66,17 @@ inline constexpr std::uint16_t kBrandishSpearSkill = 57;
 inline constexpr std::uint16_t kSpearStabSkill = 58;
 inline constexpr std::uint16_t kSpiralPierceSkill = 397;
 inline constexpr std::uint16_t kPierceSkill = 56;
+// Frenzy ne fait que teinter le corps dans le jeu, et le mode ne teint pas son
+// héros : il se montre par l'éclat de Giant Growth, dont le fichier est celui de
+// la furie. Sans bruit à lui ni à cet éclat, il sonne comme Two-Hand Quicken,
+// le skill dont il évolue.
+inline constexpr std::uint16_t kFrenzySkill = 359;
+inline constexpr std::uint16_t kGiantGrowthSkill = 2014;
+inline constexpr std::uint16_t kTwoHandQuickenSkill = 60;
+
+// MAGNUM BREAK a deux effets : ses anneaux, à l'annonce, et l'anneau de choc de
+// chaque victime, au coup. Le lancer du mode montre les anneaux.
+inline constexpr std::uint16_t kMagnumBreakSkill = 7;
 
 // Bash n'a pas d'effet de lancer dans le jeu, seulement l'étincelle de son
 // coup : le mode la pose sur le monstre frappé.

@@ -30,7 +30,30 @@ void SurvivorsBookMode::ChooseArena(const ro::sim::SurvivorsRules& rules,
 
 void SurvivorsBookMode::ChooseClass(const ro::sim::SurvivorsRules& rules,
                                     std::uint16_t class_id) noexcept {
-  if (ro::sim::FindClass(rules, class_id) != nullptr) free_class_id_ = class_id;
+  if (ro::sim::FindClass(rules, class_id) != nullptr) class_id_ = class_id;
+}
+
+std::uint16_t SurvivorsBookMode::board_class_id(
+    const ro::sim::SurvivorsRules& rules) const noexcept {
+  if (class_id_ != 0 || rules.classes.empty()) return class_id_;
+  return rules.classes.front().class_id;
+}
+
+void SurvivorsBookMode::SettleClass(const ro::sim::SurvivorsRules& rules,
+                                    const SurvivorsSave& save) {
+  const ro::sim::ClassRule* chosen = ro::sim::FindClass(rules, class_id_);
+  if (chosen != nullptr && !ClassUnlocked(rules, *chosen, save)) class_id_ = 0;
+}
+
+bool SurvivorsBookMode::ChosenClassOpen(const ro::sim::SurvivorsRules& rules,
+                                        const std::filesystem::path& client_root) {
+  const ro::sim::ClassRule* chosen = ro::sim::FindClass(rules, board_class_id(rules));
+  if (chosen == nullptr) return true;
+  // Une classe ouverte d'emblée ne dépend pas du carnet.
+  if (ClassUnlocked(rules, *chosen, SurvivorsSave{})) return true;
+  const SurvivorsSaveRead read = file_.Load(client_root);
+  if (read.damaged_copy.has_value()) damaged_copy_ = read.damaged_copy;
+  return ClassUnlocked(rules, *chosen, read.save);
 }
 
 SurvivorsBookMode::Begun SurvivorsBookMode::StartAs(SurvivorsBoardKind kind,
@@ -40,21 +63,35 @@ SurvivorsBookMode::Begun SurvivorsBookMode::StartAs(SurvivorsBoardKind kind,
                                                     std::uint16_t first_skill_id) {
   if (kind == SurvivorsBoardKind::kChallenge) {
     const ro::sim::IsoWeek week = IsoWeekOfUtc(now_utc_());
-    return Begun{.start = ChallengeStartOf(rules, week),
+    return Begun{.start = ChallengeStartOf(rules, week, board_class_id(rules)),
                  .board = SurvivorsRunBoard{.kind = SurvivorsBoardKind::kChallenge, .week = week}};
   }
   if (kind == SurvivorsBoardKind::kRanked) {
-    return Begun{.start = ro::sim::RankedStartOf(rules, seed, first_skill_id),
-                 .board = SurvivorsRunBoard{.kind = SurvivorsBoardKind::kRanked}};
+    return Begun{
+        .start = ro::sim::RankedStartOf(rules, seed, board_class_id(rules), first_skill_id),
+        .board = SurvivorsRunBoard{.kind = SurvivorsBoardKind::kRanked}};
   }
-  return FreeStart(rules, client_root, seed, first_skill_id, free_arena_id_, free_class_id_);
+  return FreeStart(rules, client_root, seed, first_skill_id, free_arena_id_, class_id_);
 }
 
 SurvivorsBookMode::Begun SurvivorsBookMode::StartRankedAsFree(
     const ro::sim::SurvivorsRules& rules, const std::filesystem::path& client_root,
+    std::uint64_t seed, std::uint16_t first_skill_id, std::uint16_t class_id) {
+  const ro::sim::ArenaRule* ranked_arena = ro::sim::FirstRankedArena(rules);
+  return FreeStart(rules, client_root, seed, first_skill_id,
+                   ranked_arena == nullptr ? std::uint16_t{0} : ranked_arena->arena_id, class_id);
+}
+
+std::optional<SurvivorsBookMode::Begun> SurvivorsBookMode::StartAlone(
+    const ro::sim::SurvivorsRules& rules, const std::filesystem::path& client_root,
     std::uint64_t seed, std::uint16_t first_skill_id) {
-  const ro::sim::SurvivorsStart ranked = ro::sim::RankedStartOf(rules, seed, first_skill_id);
-  return FreeStart(rules, client_root, seed, first_skill_id, ranked.arena_id, ranked.class_id);
+  if (kind_ != SurvivorsBoardKind::kFree && !ChosenClassOpen(rules, client_root)) {
+    return std::nullopt;
+  }
+  if (kind_ == SurvivorsBoardKind::kRanked) {
+    return StartRankedAsFree(rules, client_root, seed, first_skill_id, board_class_id(rules));
+  }
+  return StartOf(rules, client_root, seed, first_skill_id);
 }
 
 SurvivorsBookMode::Begun SurvivorsBookMode::FreeStart(const ro::sim::SurvivorsRules& rules,

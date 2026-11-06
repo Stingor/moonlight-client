@@ -707,6 +707,18 @@ tr: Spiralling spears pierce the whole line.
 fr: Un coup large brise les jambes des monstres et les fige.
 tr: A wide blow breaks the monsters' legs and holds them still.
 
+fr: Une aura tranchante jaillit de vous et balaie la horde.
+tr: A cutting aura bursts from you and sweeps the horde.
+
+fr: Par moments, vous vous concentrez : vos dégâts augmentent.
+tr: At times you focus: your damage rises.
+
+fr: Par moments, la furie vous prend : vos dégâts explosent.
+tr: At times fury takes you: your damage soars.
+
+fr: Le sol explose autour de vous, trois fois de suite.
+tr: The ground explodes around you, three times over.
+
 fr: Récupération de PV au fil du temps.
 tr: HP recovery over time.
 
@@ -20993,8 +21005,8 @@ tr: Defeat 1,000 monsters in a game of Midgard Survivors.
 fr: Mage aguerri
 tr: Seasoned Mage
 
-fr: Atteindre le niveau 40 dans une partie de Survivants de Midgard.
-tr: Reach level 40 in a game of Midgard Survivors.
+fr: Atteindre le niveau 40 avec le Magicien dans Survivants de Midgard.
+tr: Reach level 40 with the Mage in Midgard Survivors.
 
 fr: Première carte
 tr: First Card
@@ -21005,14 +21017,14 @@ tr: Pick up a dropped card in a game of Midgard Survivors.
 fr: Pyromane
 tr: Pyromaniac
 
-fr: Vaincre Baphomet avec des skills Fire seulement.
-tr: Defeat Baphomet with Fire skills only.
+fr: Gagner une partie avec le Magicien et des skills Fire seulement.
+tr: Win a game with the Mage using Fire skills only.
 
 fr: Esprit pur
 tr: Pure Mind
 
-fr: Vaincre Baphomet sans aucune carte.
-tr: Defeat Baphomet without any card.
+fr: Gagner une partie sans aucune carte.
+tr: Win a game without any card.
 
 fr: Blizzard
 tr: Blizzard
@@ -21056,8 +21068,8 @@ tr: Freeze 1,000 monsters in a Midgard Survivors run.
 fr: À l'aveugle
 tr: Blindfolded
 
-fr: Vaincre Baphomet dans une partie lancée sans minimap.
-tr: Defeat Baphomet in a run started without the minimap.
+fr: Gagner une partie lancée sans minimap.
+tr: Win a game started without the minimap.
 
 fr: Souffle ardent
 tr: Searing Breath
@@ -21089,8 +21101,8 @@ tr: Hoarfrost
 fr: Obtenir Jack Frost, l'union de Water Ball et de Cold Bolt.
 tr: Obtain Jack Frost, the union of Water Ball and Cold Bolt.
 
-fr: Obtenir chacun des skills évolués, au fil des parties.
-tr: Obtain each of the evolved skills, across runs.
+fr: Obtenir chacun des skills évolués du Magicien, au fil des parties.
+tr: Obtain each of the Mage's evolved skills, across runs.
 
 fr: Recharge de tous les skills raccourcie.
 tr: Shorter cooldown for every skill.
@@ -21803,9 +21815,6 @@ tr: Keeps its distance and shoots after aiming; it does not hit on contact.
 fr: Son hurlement presse le pas de ses loups.
 tr: Its howl hastens its wolves.
 
-fr: Sorts
-tr: Spells
-
 fr: Séisme : %d cercles de %s toutes les %s, %d dégâts
 tr: Quake: %d circles of %s every %s, %d damage
 
@@ -22453,3 +22462,90 @@ tr: No moves left: reshuffling!
 
 fr: 4 : une ligne · L ou T : une bombe · 5 : un Angeling
 tr: 4: a line · L or T: a bomb · 5: an Angeling
+
+fr: Brise-crâne
+tr: Skull Breaker
+
+fr: Obtenir Head Crush dans une partie de Survivants de Midgard.
+tr: Obtain Head Crush in a game of Midgard Survivors.
+
+fr: Lance en spirale
+tr: Spiral Lance
+
+fr: Obtenir Spiral Pierce dans une partie de Survivants de Midgard.
+tr: Obtain Spiral Pierce in a game of Midgard Survivors.
+
+fr: Brise-genoux
+tr: Kneecapper
+
+fr: Obtenir Joint Beat dans une partie de Survivants de Midgard.
+tr: Obtain Joint Beat in a game of Midgard Survivors.
+
+fr: Lame d'aura
+tr: Blade of Aura
+
+fr: Obtenir Aura Blade dans une partie de Survivants de Midgard.
+tr: Obtain Aura Blade in a game of Midgard Survivors.
+
+fr: Esprit affûté
+tr: Sharpened Mind
+
+fr: Obtenir Concentration dans une partie de Survivants de Midgard.
+tr: Obtain Concentration in a game of Midgard Survivors.
+
+fr: Berserker
+tr: Berserker
+
+fr: Obtenir Frenzy dans une partie de Survivants de Midgard.
+tr: Obtain Frenzy in a game of Midgard Survivors.
+
+fr: Terre embrasée
+tr: Scorched Earth
+
+fr: Obtenir Ignition Break, l'union de Bowling Bash et de Brandish Spear.
+tr: Obtain Ignition Break, the union of Bowling Bash and Brandish Spear.
+
+fr: Grand chevalier
+tr: Grand Knight
+
+fr: Obtenir chacun des skills évolués du Chevalier, au fil des parties.
+tr: Obtain each of the Knight's evolved skills, across runs.
+
+fr: Magicien
+tr: Mage
+
+fr: Chevalier
+tr: Knight
+
+fr: Cette classe n'est pas débloquée : la partie ne part pas.
+tr: This class is not unlocked: the run does not start.
+
+fr: Dégâts en plus
+tr: Extra damage
+
+fr: Armure en plus
+tr: Extra armor
+
+fr: Soin par minute en plus
+tr: Extra healing per minute
+
+fr: Recharges réduites
+tr: Cooldowns reduced
+
+fr: Quantité en plus
+tr: Extra amount
+
+fr: Aire en plus
+tr: Extra area
+
+fr: Durées en plus
+tr: Extra duration
+
+fr: Chance en plus
+tr: Extra luck
+
+fr: Aimant en plus
+tr: Extra magnet reach
+
+fr: Votre rang s'affiche à l'ouverture du classement.
+tr: Your rank appears once you open the leaderboard.

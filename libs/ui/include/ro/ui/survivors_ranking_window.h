@@ -23,7 +23,8 @@ namespace ro::ui {
 //     encore classé » ;
 //   - en pied « Actualiser », grisé tant que la cadence du serveur ne permet
 //     pas de redemander, « Fermer », et l'âge de la page ;
-//   - la version des règles en petit sous le titre.
+//   - la version des règles en petit sous le titre, et la classe dont ces
+//     tableaux sont ceux : il y en a un par classe.
 //
 // Les noms viennent du serveur et se posent tels quels : un nom de joueur ne
 // se traduit jamais. La fenêtre ne connaît aucun type de `sim` ni de `net` :
@@ -61,6 +62,9 @@ struct SurvivorsRankingPage {
 struct SurvivorsRankingView {
   SurvivorsRankingPage ranked;
   SurvivorsRankingPage challenge;
+  // La classe des deux tableaux (en UTF-8, déjà dans la langue du joueur ;
+  // vide, elle ne se nomme pas).
+  const char* class_name = "";
   int ruleset = 0;
   // La semaine ISO du défi telle que le serveur la compte.
   int week_year = 0;

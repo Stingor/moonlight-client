@@ -4,6 +4,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <iterator>
 #include <span>
 #include <string>
 #include <string_view>
@@ -68,6 +69,44 @@ constexpr std::array<SkillRow, 14> kSkillRows{{
      [](const Level& level) -> std::int64_t { return level.splash_pct; }},
 }};
 
+// LA LIGNE DU BONUS D'UNE POSTURE : son libellé et son unité suivent la
+// statistique qu'elle majore. Les règles refusent une posture sur les PV max ;
+// le libellé existe pour que le choix reste total.
+struct StanceRow {
+  Label label;
+  Unit unit;
+};
+[[nodiscard]] StanceRow StanceRowOf(ro::sim::SurvivorsStat stat) noexcept {
+  using Stat = ro::sim::SurvivorsStat;
+  switch (stat) {
+    case Stat::kDamagePct:
+      return {Label::kStanceDamage, Unit::kPercent};
+    case Stat::kMaxHp:
+      return {Label::kHpBoost, Unit::kPlain};
+    case Stat::kArmor:
+      return {Label::kStanceArmor, Unit::kPlain};
+    case Stat::kRegenPerMinute:
+      return {Label::kStanceRegen, Unit::kPlain};
+    case Stat::kWalkPct:
+      return {Label::kWalkBoost, Unit::kPercent};
+    case Stat::kCooldownPct:
+      return {Label::kStanceCooldown, Unit::kPercent};
+    case Stat::kAmount:
+      return {Label::kStanceAmount, Unit::kPlain};
+    case Stat::kAreaPct:
+      return {Label::kStanceArea, Unit::kPercent};
+    case Stat::kDurationPct:
+      return {Label::kStanceDuration, Unit::kPercent};
+    case Stat::kLuckPct:
+      return {Label::kStanceLuck, Unit::kPercent};
+    case Stat::kMagnetPct:
+      return {Label::kStanceMagnet, Unit::kPercent};
+    case Stat::kExpPct:
+      return {Label::kExpBoost, Unit::kPercent};
+  }
+  return {Label::kStanceDamage, Unit::kPercent};
+}
+
 [[nodiscard]] SurvivorsCodexFigure Single(Label label, Unit unit, std::int64_t value) {
   SurvivorsCodexFigure figure{.label = label, .unit = unit};
   figure.values[0] = value;
@@ -107,6 +146,36 @@ constexpr std::array<SkillRow, 14> kSkillRows{{
       .result = SkillLink(rule.evolved_skill_id),
       .max_level = MostLevelOf(rules, rule.skill_id),
       .union_of_two = union_of_two};
+}
+
+// L'union dont ce sort est le second : sa fiche la nomme comme celle du premier.
+[[nodiscard]] const ro::sim::EvolutionRule* FindUnionWith(const ro::sim::SurvivorsRules& rules,
+                                                          std::uint16_t skill_id) {
+  const auto found =
+      std::ranges::find(rules.evolutions, skill_id, &ro::sim::EvolutionRule::partner_skill_id);
+  return found != rules.evolutions.end() ? &*found : nullptr;
+}
+
+// LA CLASSE QU'UN SORT SERT : celle qui l'a dans sa réserve ou à son départ, et
+// pour un évolué, celle du sort dont il vient ; 0 pour aucune.
+[[nodiscard]] std::uint16_t ClassServedBy(const ro::sim::SurvivorsRules& rules,
+                                          std::uint16_t skill_id) {
+  const ro::sim::EvolutionRule* origin = ro::sim::FindEvolutionTo(rules, skill_id);
+  const std::uint16_t base_id = origin != nullptr ? origin->skill_id : skill_id;
+  for (const ro::sim::ClassRule& hero_class : rules.classes) {
+    if (std::ranges::find(hero_class.skill_pool, base_id) != hero_class.skill_pool.end() ||
+        std::ranges::find(hero_class.starter_skills, base_id) != hero_class.starter_skills.end()) {
+      return hero_class.class_id;
+    }
+  }
+  return 0;
+}
+
+// Le rang d'une classe dans les règles ; un sort sans classe vient après toutes.
+[[nodiscard]] std::size_t ClassRankOf(const ro::sim::SurvivorsRules& rules,
+                                      std::uint16_t class_id) {
+  const auto found = std::ranges::find(rules.classes, class_id, &ro::sim::ClassRule::class_id);
+  return static_cast<std::size_t>(std::distance(rules.classes.begin(), found));
 }
 
 // Ce qu'un objet au sol dit de lui : son effet selon sa sorte, sa durée, sa
@@ -185,6 +254,7 @@ void MarkEvolution(ro::ui::SurvivorsCodexEvolution& evolution, const LinkSight& 
 // Chaque lien d'une entrée reçoit `seen`.
 void MarkEntryLinks(SurvivorsCodexEntry& entry, const LinkSight& sight) {
   MarkEvolution(entry.evolution, sight);
+  MarkEvolution(entry.joined_union, sight);
   MarkEvolution(entry.evolved_from, sight);
   entry.card.card.seen = sight.Card(entry.card.card.ro_id);
   entry.escort.seen = sight.Foe(entry.escort.ro_id);
@@ -304,10 +374,23 @@ std::int64_t CellTenthsOf(std::int64_t units) noexcept {
   return (scaled >= 0 ? scaled + half : scaled - half) / ro::sim::kSubunitsPerCell;
 }
 
-std::vector<SurvivorsCodexFigure> SkillFiguresOf(std::span<const ro::sim::SkillLevel> levels) {
+std::vector<SurvivorsCodexFigure> SkillFiguresOf(const ro::sim::SurvivorsSkillRule& skill) {
+  const std::span<const ro::sim::SkillLevel> levels = skill.levels;
   const std::size_t count = std::min(levels.size(), ro::ui::kSurvivorsCodexMostLevels);
+  const bool stance = skill.archetype == ro::sim::SkillArchetype::kStance;
   std::vector<SurvivorsCodexFigure> figures;
+  if (stance) {
+    const StanceRow row = StanceRowOf(skill.stance_stat);
+    SurvivorsCodexFigure bonus{
+        .label = row.label, .unit = row.unit, .count = static_cast<std::uint8_t>(count)};
+    for (std::size_t level = 0; level < count; ++level) {
+      bonus.values[level] = levels[level].stance_bonus;
+    }
+    figures.push_back(bonus);
+  }
   for (const SkillRow& row : kSkillRows) {
+    // Une posture ne se compte pas : sa quantité reste à sa valeur par défaut.
+    if (stance && row.label == Label::kAmount) continue;
     SurvivorsCodexFigure figure{
         .label = row.label, .unit = row.unit, .count = static_cast<std::uint8_t>(count)};
     bool shown = false;
@@ -331,11 +414,17 @@ void CodexSkillsOf(const ro::sim::SurvivorsRules& rules, const SurvivorsCodexSee
                               .ro_id = skill.skill_id,
                               .description = skill.description,
                               .element = static_cast<std::uint8_t>(skill.element),
-                              .figures = held.Hold(SkillFiguresOf(skill.levels)),
-                              .unlock_feat = UnlockFeatOf(skill)};
+                              .figures = held.Hold(SkillFiguresOf(skill)),
+                              .unlock_feat = UnlockFeatOf(skill),
+                              .class_id = ClassServedBy(rules, skill.skill_id)};
     if (const ro::sim::EvolutionRule* evolution = ro::sim::FindEvolutionOf(rules, skill.skill_id)) {
       entry.has_evolution = true;
       entry.evolution = EvolutionOf(rules, *evolution);
+    }
+    if (const ro::sim::EvolutionRule* joined = FindUnionWith(rules, skill.skill_id)) {
+      entry.joins_union = true;
+      entry.joined_union = EvolutionOf(rules, *joined);
+      entry.joined_union.card = SkillLink(joined->skill_id);
     }
     if (const ro::sim::EvolutionRule* origin = ro::sim::FindEvolutionTo(rules, skill.skill_id)) {
       entry.evolved = true;
@@ -344,6 +433,9 @@ void CodexSkillsOf(const ro::sim::SurvivorsRules& rules, const SurvivorsCodexSee
     }
     tab.push_back(entry);
   }
+  std::ranges::stable_sort(tab, {}, [&rules](const SurvivorsCodexEntry& entry) {
+    return ClassRankOf(rules, entry.class_id);
+  });
 }
 
 void CodexItemsOf(const ro::sim::SurvivorsRules& rules, const SurvivorsCodexSeen& seen,

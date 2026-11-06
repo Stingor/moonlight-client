@@ -154,6 +154,11 @@ void DrawList(SurvivorsCodexState& state, std::span<const SurvivorsCodexEntry> e
   ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, kListTextAlign);
   for (std::size_t index = 0; index < entries.size(); ++index) {
     const SurvivorsCodexEntry& entry = entries[index];
+    // Les skills d'une classe se suivent : son nom les annonce.
+    if (entry.class_name[0] != '\0' &&
+        (index == 0 || std::string_view(entry.class_name) != entries[index - 1].class_name)) {
+      ColoredText(kHeadingColor, entry.class_name);
+    }
     ImGui::PushID(static_cast<int>(index));
     if (ListShowsIcon(entry)) {
       PaintImage(entry.icon, ImVec2(kListIconSide, kListIconSide), entry.seen);
@@ -224,23 +229,26 @@ void DrawFigureLines(std::span<const SurvivorsCodexFigure> figures) {
 
 // ── LES FICHES ──────────────────────────────────────────────────────────────
 
-void DrawEvolution(const SurvivorsCodexEntry& entry) {
+void DrawEvolutionLine(const SurvivorsCodexEvolution& evolution) {
   Line line = {};
-  if (entry.has_evolution) {
-    const SurvivorsCodexEvolution& evolution = entry.evolution;
-    ImGui::TextUnformatted(core::Tr("Évolution :"));
-    ImGui::SameLine();
-    DrawLink(evolution.card);
-    ImGui::SameLine();
-    std::snprintf(line.data(), line.size(),
-                  evolution.union_of_two ? core::Tr("+ les deux au niveau %d donnent")
-                                         : core::Tr("+ niveau %d donne"),
-                  static_cast<int>(evolution.max_level));
-    ImGui::TextUnformatted(line.data());
-    ImGui::SameLine();
-    DrawLink(evolution.result);
-  }
+  ImGui::TextUnformatted(core::Tr("Évolution :"));
+  ImGui::SameLine();
+  DrawLink(evolution.card);
+  ImGui::SameLine();
+  std::snprintf(line.data(), line.size(),
+                evolution.union_of_two ? core::Tr("+ les deux au niveau %d donnent")
+                                       : core::Tr("+ niveau %d donne"),
+                static_cast<int>(evolution.max_level));
+  ImGui::TextUnformatted(line.data());
+  ImGui::SameLine();
+  DrawLink(evolution.result);
+}
+
+void DrawEvolution(const SurvivorsCodexEntry& entry) {
+  if (entry.has_evolution) DrawEvolutionLine(entry.evolution);
+  if (entry.joins_union) DrawEvolutionLine(entry.joined_union);
   if (entry.evolved) {
+    Line line = {};
     const SurvivorsCodexEvolution& origin = entry.evolved_from;
     ImGui::TextUnformatted(core::Tr("Vient de :"));
     ImGui::SameLine();

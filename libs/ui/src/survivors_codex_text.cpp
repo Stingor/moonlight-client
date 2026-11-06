@@ -104,7 +104,7 @@ void Append(CodexText& text, const char* piece) {
 const char* CodexTabLabel(SurvivorsCodexTab tab) {
   switch (tab) {
     case SurvivorsCodexTab::kSkills:
-      return core::Tr("Sorts");
+      return core::Tr("Skills");
     case SurvivorsCodexTab::kCards:
       return core::Tr("Cartes");
     case SurvivorsCodexTab::kItems:
@@ -153,6 +153,24 @@ namespace {
       return core::Tr("Rebonds");
     case kSplash:
       return core::Tr("Éclats");
+    case kStanceDamage:
+      return core::Tr("Dégâts en plus");
+    case kStanceArmor:
+      return core::Tr("Armure en plus");
+    case kStanceRegen:
+      return core::Tr("Soin par minute en plus");
+    case kStanceCooldown:
+      return core::Tr("Recharges réduites");
+    case kStanceAmount:
+      return core::Tr("Quantité en plus");
+    case kStanceArea:
+      return core::Tr("Aire en plus");
+    case kStanceDuration:
+      return core::Tr("Durées en plus");
+    case kStanceLuck:
+      return core::Tr("Chance en plus");
+    case kStanceMagnet:
+      return core::Tr("Aimant en plus");
     case kHp:
       return core::Tr("PV");
     case kHpGrowthPerMinute:

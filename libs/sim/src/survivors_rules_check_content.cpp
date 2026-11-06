@@ -492,6 +492,14 @@ core::Result<void> CheckContentTuning(const SurvivorsRules& rules) {
     return checked;
   }
   if (auto checked = CheckPlantSowing(rules); !checked) return checked;
+  // Sans repos, une durée allongée et une recharge raccourcie rendraient une
+  // posture permanente.
+  if (tuning.stance_least_rest_ms == 0 &&
+      std::ranges::any_of(rules.skills, [](const SurvivorsSkillRule& skill) {
+        return skill.archetype == SkillArchetype::kStance;
+      })) {
+    return Refuse("réglages : posture sans repos minimal");
+  }
   // Un recul qui ne bouge pas d'une sous-unité par pas ne finit jamais.
   if (tuning.knock_units_per_step == 0) {
     for (const SurvivorsSkillRule& skill : rules.skills) {

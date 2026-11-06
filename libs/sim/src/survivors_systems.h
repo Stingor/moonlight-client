@@ -141,6 +141,10 @@ struct HatchOptions {
   bool elite = false;                       // majorations de EliteRule
   std::uint8_t drift_heading = kNoHeading;  // un essaim ou un raid file à ce cap
 };
+// survivors_spawner.cpp. La majoration des PV du boss final : la plus forte des
+// classes de l'équipe, héros tombés compris. Ni l'ordre des héros, ni celui qui
+// est en scène, ni qui est encore debout ne la changent.
+[[nodiscard]] std::int32_t FinalBossHpBonusPct(const SurvivorsField& field);
 // survivors_spawner.cpp. Le monstre `rule` naît en `at` : numéro suivant, PV
 // grandis de la minute en cours (au taux des boss pour un mini-boss ou un
 // boss), majorés pour une élite, marche à l'échelle du réglage (celle des boss,

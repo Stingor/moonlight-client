@@ -38,17 +38,29 @@ class SurvivorsBookMode {
   // (`FreeArenaOf`). Le défi et la partie classée ne la lisent pas.
   void ChooseArena(const ro::sim::SurvivorsRules& rules, std::uint16_t arena_id) noexcept;
   [[nodiscard]] std::uint16_t free_arena_id() const noexcept { return free_arena_id_; }
-  // LA CLASSE DE LA PARTIE LIBRE, de même ; une classe que le carnet n'a pas
-  // débloquée part comme la première (`FreeClassOf`).
+  // LA CLASSE RETENUE, de tous les onglets ; « Rejouer » la garde. Un Id que
+  // `rules` ne connaît pas ne se retient pas. 0 : la première.
   void ChooseClass(const ro::sim::SurvivorsRules& rules, std::uint16_t class_id) noexcept;
-  [[nodiscard]] std::uint16_t free_class_id() const noexcept { return free_class_id_; }
+  [[nodiscard]] std::uint16_t chosen_class_id() const noexcept { return class_id_; }
+  // L'Id de la classe retenue tel qu'un départ le porte : jamais 0 tant que
+  // les règles ont une classe.
+  [[nodiscard]] std::uint16_t board_class_id(const ro::sim::SurvivorsRules& rules) const noexcept;
+  // Une classe retenue que `save` n'a pas débloquée retombe sur la première :
+  // l'accueil, qui appelle ceci, la montre cochée à sa place.
+  void SettleClass(const ro::sim::SurvivorsRules& rules, const SurvivorsSave& save);
+  // 🔴 VRAI QUAND LE CARNET RELU A DÉBLOQUÉ LA CLASSE RETENUE. Le défi et la
+  // partie classée la jugent au départ et refusent de partir sur une autre :
+  // aucun repli ne mettrait au tableau d'une classe la partie d'une autre.
+  [[nodiscard]] bool ChosenClassOpen(const ro::sim::SurvivorsRules& rules,
+                                     const std::filesystem::path& client_root);
   // Les secondes UTC du moment, à l'horloge du mode.
   [[nodiscard]] std::int64_t now_utc() const { return now_utc_(); }
 
   // LE DÉPART DE LA PROCHAINE PARTIE et son tableau : la partie libre part du
   // carnet relu, sur `seed` et `first_skill_id` ; le défi part de la semaine
   // UTC du moment, et les ignore ; la partie classée part neutre, sur `seed`
-  // et `first_skill_id`, jusqu'à ce que la graine du serveur la remplace.
+  // et `first_skill_id`, jusqu'à ce que la graine du serveur la remplace. Le
+  // défi et la partie classée jouent la classe retenue.
   struct Begun {
     ro::sim::SurvivorsStart start;
     SurvivorsRunBoard board;
@@ -66,10 +78,17 @@ class SurvivorsBookMode {
   // fermé, jeton refusé ou venu trop tard, classement absent : elle part
   // libre, sur l'arène classée qu'elle demandait (la prairie, que l'onglet
   // « Partie classée » affiche), jamais sur celle que l'accueil a retenue pour
-  // la partie libre.
+  // la partie libre, et avec la classe `class_id` qu'elle demandait.
   [[nodiscard]] Begun StartRankedAsFree(const ro::sim::SurvivorsRules& rules,
                                         const std::filesystem::path& client_root,
-                                        std::uint64_t seed, std::uint16_t first_skill_id);
+                                        std::uint64_t seed, std::uint16_t first_skill_id,
+                                        std::uint16_t class_id);
+  // LE DÉPART SANS CLASSEMENT : une partie classée part libre (`StartRankedAsFree`).
+  // Rien quand le défi ou la partie classée trouve sa classe verrouillée
+  // (`ChosenClassOpen`).
+  [[nodiscard]] std::optional<Begun> StartAlone(const ro::sim::SurvivorsRules& rules,
+                                                const std::filesystem::path& client_root,
+                                                std::uint64_t seed, std::uint16_t first_skill_id);
 
   // Une partie neuve commence : elle sera créditée à son tour.
   void Restart() noexcept;
@@ -102,7 +121,7 @@ class SurvivorsBookMode {
   SurvivorsSaveFile file_;
   SurvivorsBoardKind kind_ = SurvivorsBoardKind::kFree;
   std::uint16_t free_arena_id_ = 0;
-  std::uint16_t free_class_id_ = 0;
+  std::uint16_t class_id_ = 0;
   bool credited_ = false;
   std::optional<SurvivorsCredit> credit_;
   std::optional<std::filesystem::path> damaged_copy_;

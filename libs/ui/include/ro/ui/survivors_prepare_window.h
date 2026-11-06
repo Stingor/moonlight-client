@@ -35,6 +35,9 @@ namespace ro::ui {
 // propose ; le défi et la partie classée nomment celle où ils se jouent, sans
 // choix. Une seule arène proposée se nomme sans choix elle aussi.
 //
+// LA CLASSE : la même dans tous les onglets, choisie dans chacun ; une seule
+// classe proposée ne se montre pas.
+//
 // Touches, fenêtre au premier plan : Tab change d'onglet, Entrée part.
 
 // Un bolt proposé, déjà résolu par `app`.
@@ -52,7 +55,7 @@ struct SurvivorsArenaChoice {
   std::uint16_t arena_id = 0;
   const char* name = "";  // ⚠ EN UTF-8, déjà dans la langue du joueur
 };
-// Une classe de la partie libre. Verrouillée, elle se montre grisée, avec ce
+// Une classe proposée à l'accueil. Verrouillée, elle se montre grisée, avec ce
 // qui la débloque.
 struct SurvivorsClassChoice {
   std::uint16_t class_id = 0;
@@ -72,7 +75,9 @@ struct SurvivorsPendingRow {
 // Ce que l'accueil montre du classement, présent seulement quand le serveur
 // l'a ouvert pour ces règles.
 struct SurvivorsPrepareRanking {
-  int best_rank = 0;  // 0 : aucune partie acceptée sur le tableau classé
+  // Faux tant que la page de la classe n'est pas tenue : son rang n'est pas su.
+  bool best_known = false;
+  int best_rank = 0;  // su, 0 : aucune partie acceptée sur le tableau classé
   std::uint64_t best_score = 0;
   // La raison qui grise l'onglet classé, dite au survol. ⚠ EN FRANÇAIS,
   // marquée par `TrText` ; nulle quand l'onglet s'ouvre.
@@ -105,10 +110,9 @@ struct SurvivorsPrepareMeta {
   // nomme pas).
   std::span<const SurvivorsArenaChoice> free_arenas;
   std::uint16_t free_arena_id = 0;
-  // Les classes de la partie libre et la retenue ; le défi et la partie
-  // classée jouent la première.
-  std::span<const SurvivorsClassChoice> free_classes;
-  std::uint16_t free_class_id = 0;
+  // Les classes et la retenue, que tous les onglets partagent.
+  std::span<const SurvivorsClassChoice> classes;
+  std::uint16_t class_id = 0;
   const char* board_arena_name = "";
 };
 
@@ -150,7 +154,7 @@ struct SurvivorsPrepareAsk {
   std::optional<SurvivorsBoardTab> choose_board;
   // L'arène de la partie libre ; le défi et la partie classée n'en choisissent pas.
   std::optional<std::uint16_t> choose_arena_id;
-  // La classe de la partie libre, jamais une classe verrouillée.
+  // La classe de tous les onglets, jamais une classe verrouillée.
   std::optional<std::uint16_t> choose_class_id;
   std::optional<int> choose_cursed_water;
   std::optional<bool> choose_without_minimap;

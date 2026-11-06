@@ -14,6 +14,11 @@ namespace {
 
 // L'effet que les tables du client donnent à ce skill, ou rien.
 [[nodiscard]] std::optional<std::uint32_t> TabledEffectOf(std::uint16_t skill_id) {
+  if (skill_id == kMagnumBreakSkill) {
+    if (const auto* announced = ro::render::SkillAnnouncedEffectOf(skill_id)) {
+      return announced->effect_id;
+    }
+  }
   if (const auto* damage = ro::render::SkillDamageEffectOf(skill_id)) return damage->effect_id;
   for (const ro::render::SkillEffectEntry& entry : ro::render::SkillEffectTable()) {
     if (entry.skill_id == skill_id) return entry.effect_id;
@@ -51,9 +56,16 @@ namespace {
       return kSpearStabSkill;
     case kSpiralPierceSkill:
       return kPierceSkill;
+    case kFrenzySkill:
+      return kGiantGrowthSkill;
     default:
       return skill_id;
   }
+}
+
+// Le skill dont ce skill emprunte le bruit de lancer, ou lui-même.
+[[nodiscard]] std::uint16_t SoundingSkillOf(std::uint16_t skill_id) {
+  return skill_id == kFrenzySkill ? kTwoHandQuickenSkill : skill_id;
 }
 
 // L'unité que ce skill pose au sol dans le jeu, ou rien.
@@ -94,7 +106,8 @@ namespace {
 // Les bruits du lancer : ceux de la compétence, sinon ceux de son effet, sauf
 // quand la troupe de l'effet sonne elle-même.
 [[nodiscard]] std::vector<ro::render::EffectSoundEntry> CastSoundsOf(const SkillLook& look) {
-  std::vector<ro::render::EffectSoundEntry> sounds = ro::render::SkillSounds(look.skill_id);
+  std::vector<ro::render::EffectSoundEntry> sounds =
+      ro::render::SkillSounds(SoundingSkillOf(look.skill_id));
   if (!sounds.empty() || ro::render::EffectSoundPlaysAtSowing(look.effect_id)) return sounds;
   const std::span<const ro::render::EffectSoundEntry> of_effect =
       ro::render::EffectSounds(look.effect_id);

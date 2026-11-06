@@ -12,8 +12,9 @@
 
 namespace ro::ui {
 
-// LE CODEX DES SURVIVANTS : six onglets — Sorts, Cartes, Objets, Plantes,
+// LE CODEX DES SURVIVANTS : six onglets — Skills, Cartes, Objets, Plantes,
 // Monstres, Boss et événements —, une liste à gauche, une fiche à droite.
+// Les skills d'une classe s'y suivent, sous le nom de cette classe.
 //
 // 🔴 UNE ENTRÉE NON VUE NE MONTRE QUE SA SILHOUETTE ET « ??? » : jamais son
 // nom, jamais son icône en couleur, jamais un de ses nombres. Elle se révèle
@@ -74,6 +75,17 @@ enum class SurvivorsCodexFigureLabel : std::uint8_t {
   kKnockback,
   kBounces,
   kSplash,
+  // Le bonus d'une posture, selon la statistique qu'elle majore. La marche, les
+  // PV et l'XP se disent comme ailleurs (`kWalkBoost`, `kHpBoost`, `kExpBoost`).
+  kStanceDamage,
+  kStanceArmor,
+  kStanceRegen,
+  kStanceCooldown,
+  kStanceAmount,
+  kStanceArea,
+  kStanceDuration,
+  kStanceLuck,
+  kStanceMagnet,
   // Un monstre ou un boss.
   kHp,
   kHpGrowthPerMinute,
@@ -124,8 +136,8 @@ struct SurvivorsCodexLink {
 };
 
 // L'évolution d'un sort de base : sa carte, au niveau maximal, donne l'évolué.
-// Une union nomme à la place de la carte un second sort (`card` désigne
-// alors une compétence), lui aussi au niveau maximal.
+// Une union nomme à la place de la carte l'autre sort (`card` désigne alors une
+// compétence), lui aussi au niveau maximal : elle se lit sur les deux fiches.
 struct SurvivorsCodexEvolution {
   SurvivorsCodexLink card;
   SurvivorsCodexLink result;
@@ -218,9 +230,15 @@ struct SurvivorsCodexEntry {
   // but sous la silhouette. "" sinon.
   const char* unlock_feat = "";
 
-  // Un sort.
+  // Un sort. `class_id` : la classe qu'il sert, 0 pour aucune ; `class_name` :
+  // son nom, posé par `app`, vide tant qu'il n'y a qu'une classe à distinguer.
+  std::uint16_t class_id = 0;
+  const char* class_name = "";
   bool has_evolution = false;
   SurvivorsCodexEvolution evolution;
+  // L'union dont il est le second, en plus de sa propre évolution s'il en a une.
+  bool joins_union = false;
+  SurvivorsCodexEvolution joined_union;
   bool evolved = false;
   SurvivorsCodexEvolution evolved_from;  // `result` est l'entrée elle-même
 

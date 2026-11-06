@@ -39,6 +39,16 @@ constexpr std::array<EvolvedTrophy, 2> kWarlockTrophies{{
     {survivors::kCrimsonRockId, MinigameTrophy::kSurvivorsCrimsonRock},
     {survivors::kJackFrostId, MinigameTrophy::kSurvivorsJackFrost},
 }};
+// Ceux des évolués du Chevalier.
+constexpr std::array<EvolvedTrophy, survivors::kKnightEvolvedSkillCount> kKnightTrophies{{
+    {survivors::kHeadCrushId, MinigameTrophy::kSurvivorsHeadCrush},
+    {survivors::kSpiralPierceId, MinigameTrophy::kSurvivorsSpiralPierce},
+    {survivors::kJointBeatId, MinigameTrophy::kSurvivorsJointBeat},
+    {survivors::kAuraBladeId, MinigameTrophy::kSurvivorsAuraBlade},
+    {survivors::kConcentrationId, MinigameTrophy::kSurvivorsConcentration},
+    {survivors::kFrenzyId, MinigameTrophy::kSurvivorsFrenzy},
+    {survivors::kIgnitionBreakId, MinigameTrophy::kSurvivorsIgnitionBreak},
+}};
 
 // Les trophées d'un skill de base porté à son plus haut niveau.
 constexpr std::array<EvolvedTrophy, 3> kTopLevelTrophies{{
@@ -63,34 +73,51 @@ constexpr std::array<EvolvedTrophy, 3> kTopLevelTrophies{{
          });
 }
 
-// Vrai si l'évolution part d'un skill de la réserve de la première classe, le
-// Magicien : « Grand sorcier » ne demande que les siennes.
-[[nodiscard]] bool OfFirstClass(const SurvivorsRules& rules, const EvolutionRule& evolution) {
-  if (rules.classes.empty()) return false;
-  const std::span<const std::uint16_t> pool = rules.classes.front().skill_pool;
-  return std::ranges::find(pool, evolution.skill_id) != pool.end();
-}
-
-// Ajoute au record les évolués que la partie possède, et dit si le record
-// tient tous ceux de la première classe, qui en a au moins un.
-[[nodiscard]] bool RememberEvolved(MinigameRecord& record, const SurvivorsField& field) {
-  if (field.rules == nullptr) return false;
-  const SurvivorsRules& rules = *field.rules;
+// Ajoute au record les évolués que la partie possède.
+void RememberEvolved(MinigameRecord& record, const SurvivorsField& field) {
+  if (field.rules == nullptr) return;
   std::vector<std::uint16_t>& kept = record.survivors_evolved;
-  for (const EvolutionRule& evolution : rules.evolutions) {
+  for (const EvolutionRule& evolution : field.rules->evolutions) {
     if (Owns(field, evolution.evolved_skill_id) &&
         !std::ranges::binary_search(kept, evolution.evolved_skill_id)) {
       kept.insert(std::ranges::upper_bound(kept, evolution.evolved_skill_id),
                   evolution.evolved_skill_id);
     }
   }
-  const auto of_first_class = [&rules](const EvolutionRule& evolution) {
-    return OfFirstClass(rules, evolution);
+}
+
+// Vrai si le record tient tous les évolués issus de la réserve `pool`, et que
+// les règles en connaissent au moins un.
+[[nodiscard]] bool HoldsAllEvolvedOf(const MinigameRecord& record, const SurvivorsField& field,
+                                     std::span<const std::uint16_t> pool) {
+  if (field.rules == nullptr) return false;
+  const auto from_pool = [pool](const EvolutionRule& evolution) {
+    return std::ranges::find(pool, evolution.skill_id) != pool.end();
   };
-  if (std::ranges::none_of(rules.evolutions, of_first_class)) return false;
-  return std::ranges::all_of(rules.evolutions, [&](const EvolutionRule& evolution) {
-    return !of_first_class(evolution) ||
-           std::ranges::binary_search(kept, evolution.evolved_skill_id);
+  const std::span<const EvolutionRule> evolutions = field.rules->evolutions;
+  if (std::ranges::none_of(evolutions, from_pool)) return false;
+  return std::ranges::all_of(evolutions, [&](const EvolutionRule& evolution) {
+    return !from_pool(evolution) ||
+           std::ranges::binary_search(record.survivors_evolved, evolution.evolved_skill_id);
+  });
+}
+
+// La réserve de la première classe, le Magicien ; vide sans règles ni classe.
+[[nodiscard]] std::span<const std::uint16_t> FirstClassPool(const SurvivorsField& field) {
+  if (field.rules == nullptr || field.rules->classes.empty()) return {};
+  return field.rules->classes.front().skill_pool;
+}
+
+// Vrai si le héros en scène est de la première classe, le Magicien.
+[[nodiscard]] bool PlaysFirstClass(const SurvivorsField& field) {
+  return field.rules != nullptr && !field.rules->classes.empty() && field.hero_class != nullptr &&
+         field.hero_class->class_id == field.rules->classes.front().class_id;
+}
+
+// Vrai si le boss dont la chute finit cette arène est Baphomet.
+[[nodiscard]] bool FinalBossIsBaphomet(const SurvivorsField& field) {
+  return std::ranges::any_of(field.content.bosses, [](const BossRule& boss) {
+    return boss.final && boss.foe_id == survivors::kBaphometId;
   });
 }
 
@@ -114,23 +141,25 @@ std::vector<MinigameTrophy> RecordSurvivors(MinigameRecord& record, const Surviv
   const bool no_card = field.hero.cards.empty();
   EarnMinigameTrophy(record, MinigameTrophy::kSurvivorsFiveMinutes, run.elapsed_ms() >= kHoldOutMs,
                      fresh);
-  EarnMinigameTrophy(record, MinigameTrophy::kSurvivorsVictory, victory, fresh);
+  EarnMinigameTrophy(record, MinigameTrophy::kSurvivorsVictory,
+                     victory && FinalBossIsBaphomet(field), fresh);
   EarnMinigameTrophy(record, MinigameTrophy::kSurvivorsFirstEvolution, tally.evolutions > 0, fresh);
   EarnMinigameTrophy(record, MinigameTrophy::kSurvivorsKills1000, tally.kills >= kManyKills, fresh);
-  EarnMinigameTrophy(record, MinigameTrophy::kSurvivorsLevel40, tally.level >= kSeasonedLevel,
-                     fresh);
+  EarnMinigameTrophy(record, MinigameTrophy::kSurvivorsLevel40,
+                     PlaysFirstClass(field) && tally.level >= kSeasonedLevel, fresh);
   // Première carte : une carte tombée et RAMASSÉE au sol, celle qui entre
   // dans l'Album ; une carte prise dans une offre n'en est pas une.
   EarnMinigameTrophy(record, MinigameTrophy::kSurvivorsFirstCard, !field.recap.cards_found.empty(),
                      fresh);
-  EarnMinigameTrophy(record, MinigameTrophy::kSurvivorsPyromaniac, victory && OnlyFireSkills(field),
-                     fresh);
+  EarnMinigameTrophy(record, MinigameTrophy::kSurvivorsPyromaniac,
+                     victory && PlaysFirstClass(field) && OnlyFireSkills(field), fresh);
   EarnMinigameTrophy(record, MinigameTrophy::kSurvivorsPureMind, victory && no_card, fresh);
   for (const EvolvedTrophy& evolved : kEvolvedTrophies) {
     EarnMinigameTrophy(record, evolved.trophy, Owns(field, evolved.skill_id), fresh);
   }
-  EarnMinigameTrophy(record, MinigameTrophy::kSurvivorsGrandWizard, RememberEvolved(record, field),
-                     fresh);
+  RememberEvolved(record, field);
+  EarnMinigameTrophy(record, MinigameTrophy::kSurvivorsGrandWizard,
+                     HoldsAllEvolvedOf(record, field, FirstClassPool(field)), fresh);
   EarnMinigameTrophy(record, MinigameTrophy::kSurvivorsDeepFreeze,
                      field.recap.freezes >= kManyFreezes, fresh);
   EarnMinigameTrophy(record, MinigameTrophy::kSurvivorsBlindVictory,
@@ -141,6 +170,11 @@ std::vector<MinigameTrophy> RecordSurvivors(MinigameRecord& record, const Surviv
   for (const EvolvedTrophy& evolved : kWarlockTrophies) {
     EarnMinigameTrophy(record, evolved.trophy, Owns(field, evolved.skill_id), fresh);
   }
+  for (const EvolvedTrophy& evolved : kKnightTrophies) {
+    EarnMinigameTrophy(record, evolved.trophy, Owns(field, evolved.skill_id), fresh);
+  }
+  EarnMinigameTrophy(record, MinigameTrophy::kSurvivorsGrandKnight,
+                     HoldsAllEvolvedOf(record, field, survivors::KnightClass().skill_pool), fresh);
   return fresh;
 }
 

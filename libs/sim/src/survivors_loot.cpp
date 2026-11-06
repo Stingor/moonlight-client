@@ -67,6 +67,18 @@ void CountOne(Counter& counter) noexcept {
   return false;
 }
 
+// Vrai si la réserve de la classe d'un héros de l'équipe contient cette carte.
+[[nodiscard]] bool TeamCanHoldCard(const SurvivorsField& field, std::uint16_t card_item_id) {
+  for (std::size_t index = 0; index < HeroCount(field); ++index) {
+    const ClassRule* hero_class = ClassAt(field, index);
+    if (hero_class != nullptr &&
+        std::ranges::find(hero_class->card_pool, card_item_id) != hero_class->card_pool.end()) {
+      return true;
+    }
+  }
+  return false;
+}
+
 // ── Les coffres ────────────────────────────────────────────────────────────
 
 // Vrai si le héros possède `skill_id` à son plus haut niveau.
@@ -356,6 +368,9 @@ void TakeCard(SurvivorsField& field, const SurvivorsPickup& card) {
 void DropCard(SurvivorsField& field, const SurvivorsFoe& foe, const FoeRule& rule,
               CardLanding landing) {
   if (rule.card_item_id == 0) return;
+  // Une carte qu'aucune classe de l'équipe ne peut tenir ne tombe pas : ni
+  // tirage, ni garantie consommée.
+  if (!TeamCanHoldCard(field, rule.card_item_id)) return;
   bool dropped = false;
   if (rule.rank != FoeRank::kCommon &&
       std::find(field.card_guarantees_spent.begin(), field.card_guarantees_spent.end(),

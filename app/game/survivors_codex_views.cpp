@@ -47,12 +47,17 @@ using ro::ui::SurvivorsCodexSheet;
 void SurvivorsViews::ComposeCodex(SurvivorsMetaWindows& windows, const SurvivorsSave& save,
                                   const SurvivorsCodexSeen* live,
                                   const ro::sim::SurvivorsRules& rules,
+                                  const ro::sim::ClassRule* album_class,
                                   const SurvivorsTables& tables, std::uint32_t now_ms) {
   windows.codex_view = ComposeSurvivorsCodex(rules, CodexSeenOf(rules, save, live), codex_rows_,
                                              FoundCardItemsOf(rules, save));
   windows.codex_view.objective_skill_id = windows.objective_skill_id;
   for (std::vector<ro::ui::SurvivorsCodexEntry>& tab : codex_rows_.entries) {
     for (ro::ui::SurvivorsCodexEntry& entry : tab) NameCodexEntry(entry, tables);
+  }
+  for (ro::ui::SurvivorsCodexEntry& entry :
+       codex_rows_.entries[static_cast<std::size_t>(ro::ui::SurvivorsCodexTab::kSkills)]) {
+    entry.class_name = ShownClassName(rules, entry.class_id, tables);
   }
   for (std::vector<ro::ui::SurvivorsCodexSource>& sources : codex_rows_.sources) {
     for (ro::ui::SurvivorsCodexSource& source : sources) {
@@ -65,8 +70,8 @@ void SurvivorsViews::ComposeCodex(SurvivorsMetaWindows& windows, const Survivors
     }
   }
   ComposeCodexSprite(windows.codex, tables, now_ms);
-  // L'ONGLET CARTES EST L'ALBUM, composé comme il l'a toujours été.
-  ComposeAlbum(windows, save, rules, tables);
+  // L'ONGLET CARTES EST L'ALBUM, celui de la classe.
+  ComposeAlbum(windows, save, rules, album_class, tables);
 }
 
 void SurvivorsViews::NameCodexEntry(ro::ui::SurvivorsCodexEntry& entry,
@@ -79,6 +84,8 @@ void SurvivorsViews::NameCodexEntry(ro::ui::SurvivorsCodexEntry& entry,
                     entry.evolution.union_of_two ? CodexLinkKind::kSkill : CodexLinkKind::kItem,
                     tables);
       NameCodexLink(entry.evolution.result, CodexLinkKind::kSkill, tables);
+      NameCodexLink(entry.joined_union.card, CodexLinkKind::kSkill, tables);
+      NameCodexLink(entry.joined_union.result, CodexLinkKind::kSkill, tables);
       NameCodexLink(entry.evolved_from.card,
                     entry.evolved_from.union_of_two ? CodexLinkKind::kSkill : CodexLinkKind::kItem,
                     tables);

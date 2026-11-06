@@ -26,6 +26,9 @@ constexpr float kSlotSize = 32.0F;
 constexpr float kSlotGap = 4.0F;
 constexpr ImU32 kSlotBack = IM_COL32(0, 0, 0, 140);
 constexpr ImU32 kSlotEdge = IM_COL32(255, 255, 255, 90);
+// Le cerne d'une posture qui dure.
+constexpr ImU32 kSlotActiveEdge = IM_COL32(255, 210, 90, 255);
+constexpr float kSlotActiveEdgeThickness = 2.0F;
 // Les icônes des charges et des vies, sous les compteurs.
 constexpr float kChargeIconSide = 20.0F;
 // Le texte sur la scène : blanc à l'ombre noire décalée d'un pixel.
@@ -79,7 +82,12 @@ float DrawSlots(ImDrawList& draw, ImVec2 corner, std::span<const SurvivorsHudSlo
     if (slot.icon != 0) {
       draw.AddImage(slot.icon, top_left, bottom_right);
     }
-    draw.AddRect(top_left, bottom_right, kSlotEdge);
+    if (slot.active) {
+      draw.AddRect(top_left, bottom_right, kSlotActiveEdge, 0.0F, ImDrawFlags_None,
+                   kSlotActiveEdgeThickness);
+    } else {
+      draw.AddRect(top_left, bottom_right, kSlotEdge);
+    }
     std::snprintf(level.data(), level.size(), "%d", slot.level);
     const ImVec2 size = ImGui::CalcTextSize(level.data());
     ShadowedText(draw, ImVec2(bottom_right.x - size.x - 1.0F, bottom_right.y - size.y), kTextColor,
