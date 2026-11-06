@@ -225,6 +225,18 @@ bool Inventory::InsertCard(std::uint16_t equip_slot, std::uint16_t card_slot) {
   return Take(card_slot, 1);
 }
 
+bool Inventory::Reforge(std::uint16_t client_slot, std::uint8_t refine_level, std::uint8_t grade,
+                        bool damaged, const std::array<std::uint32_t, kItemCardSlots>& cards,
+                        const std::array<ItemOption, kItemOptionSlots>& options) {
+  return ChangeSlot(items_, client_slot, revision_, [&](InventoryItem& item) {
+    item.refine_level = refine_level;
+    item.grade = grade;
+    item.damaged = damaged;
+    item.cards = cards;
+    item.options = options;
+  });
+}
+
 bool Inventory::Identify(std::uint16_t client_slot) {
   return ChangeSlot(items_, client_slot, revision_,
                     [](InventoryItem& item) { item.identified = true; });

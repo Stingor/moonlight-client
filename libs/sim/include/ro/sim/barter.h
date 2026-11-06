@@ -268,6 +268,10 @@ enum class BarterCartRefusal : std::uint8_t {
   kNotEnoughCurrency,
   // Étendu : le zeny du panier dépasse celui du personnage.
   kNotEnoughZeny,
+  // Le sac n'a pas les cases libres que demandent les objets neufs du panier.
+  kBagFull,
+  // La pile déjà au sac dépasserait `kBarterMostPerLine` avec ce qui arrive.
+  kStackOverLimit,
 };
 
 struct BarterCartCheck {
@@ -305,8 +309,14 @@ using BarterUnitWeight = std::function<std::optional<std::uint32_t>(std::uint32_
 // le contrôle reste du côté du refus, et le serveur garde le dernier mot. Un
 // poids, un zeny inconnus ne refusent rien.
 //
+// LES CASES DU SAC SE COMPTENT AVANT L'ÉCHANGE, comme au serveur : une devise qui
+// part ne libère rien. Un article qui s'empile n'en demande une que s'il n'a pas
+// déjà sa pile ; un article qui ne s'empile pas, une par exemplaire. Une capacité
+// que le serveur n'a pas encore dite ne refuse rien.
+//
 // ⚠ LES DEVISES SE COMPTENT COMME LE SERVEUR LES CHERCHE, besoins de toutes les
-// lignes cumulés, sans les objets portés ni les favoris : une devise qui
+// lignes cumulés, sans les objets portés, les favoris ni le non-identifié : une
+// devise qui
 // s'empile se prend dans la PREMIÈRE pile qui convient, et seulement là ; une
 // devise qui ne s'empile pas se prend exemplaire par exemplaire, au raffinement
 // exigé OU PLUS HAUT. Le compte est nécessaire, pas suffisant : le serveur sert

@@ -22549,3 +22549,99 @@ tr: Extra magnet reach
 
 fr: Votre rang s'affiche à l'ouverture du classement.
 tr: Your rank appears once you open the leaderboard.
+
+fr: %s [%d option(s)]
+tr: %s [%d option(s)]
+
+fr: (aucun item accepté dans l'inventory)
+tr: (no accepted item in the inventory)
+
+fr: Améliorer
+tr: Upgrade
+
+fr: Améliorer cette pièce ? Ses options seront retirées au sort, et l'item qui l'améliore sera consommé.
+tr: Upgrade this piece? Its options will be rerolled, and the item that upgrades it will be used up.
+
+fr: Cet item n'est pas accepté.
+tr: This item is not accepted.
+
+fr: Cette pièce est portée : ôtez-la d'abord.
+tr: This piece is equipped: take it off first.
+
+fr: Cette pièce n'est pas identifiée.
+tr: This piece is not identified.
+
+fr: Dans l'inventory
+tr: In the inventory
+
+fr: Déposez %d item(s) pour la synthèse.
+tr: Deposit %d item(s) for the synthesis.
+
+fr: Déposez la pièce à améliorer.
+tr: Deposit the piece to upgrade.
+
+fr: Déposé
+tr: Deposited
+
+fr: En attente de la réponse du serveur.
+tr: Waiting for the server's answer.
+
+fr: Il en faut %d.
+tr: %d are needed.
+
+fr: Il faut au moins %d option(s) sur la pièce.
+tr: The piece needs at least %d option(s).
+
+fr: Il faut déposer %d item(s).
+tr: %d item(s) must be deposited.
+
+fr: La fenêtre est fermée.
+tr: The window is closed.
+
+fr: Le client ne connaît pas encore cette recette du Laphine.
+tr: The client does not know this Laphine recipe yet.
+
+fr: Le raffinement est plus haut que nécessaire.
+tr: The refine level is higher than required.
+
+fr: L'inventory n'a plus assez de cases.
+tr: The inventory does not have enough free slots.
+
+fr: L'inventory ne peut pas tenir plus de %lld %s.
+tr: The inventory cannot hold more than %lld %s.
+
+fr: Le serveur a refusé l'amélioration.
+tr: The server refused the upgrade.
+
+fr: Le serveur a refusé la synthèse (code %d).
+tr: The server refused the synthesis (code %d).
+
+fr: Items acceptés
+tr: Accepted items
+
+fr: Items insuffisants pour la synthèse.
+tr: Insufficient synthesis materials.
+
+fr: Raffinement : +%d à +%d.
+tr: Refine: +%d to +%d.
+
+fr: Raffinement trop bas : +%d au moins.
+tr: Refine too low: at least +%d.
+
+fr: Raffinement trop haut : +%d au plus.
+tr: Refine too high: at most +%d.
+
+fr: Synthétiser
+tr: Synthesize
+
+fr: Synthétiser ? Ces items seront consommés :
+tr: Synthesize? These items will be used up:
+
+fr: Un item déposé n'est plus dans l'inventory.
+tr: A deposited item is no longer in the inventory.
+
+fr: Une carte est sertie ou la pièce est enchantée.
+tr: A card is inserted or the piece is enchanted.
+
+fr: Une pièce sertie n'est pas acceptée.
+tr: A piece with cards is not accepted.

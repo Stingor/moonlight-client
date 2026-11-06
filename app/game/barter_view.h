@@ -4,8 +4,7 @@
 // chaque refus et chaque résultat disent, et jusqu'où un ajout reste possible.
 //
 // ⚠ À PART DE L'ÉTAGE, ET SANS FIL NI TEXTURE : les noms et les icônes arrivent
-// par `BarterLooks`. C'est ce qui laisse tout ceci s'essayer sur un banc — le
-// troc est éteint sur le serveur, et le banc est la seule preuve.
+// par `BarterLooks`. C'est ce qui laisse tout ceci s'essayer sur un banc.
 
 #include <cstdint>
 #include <functional>

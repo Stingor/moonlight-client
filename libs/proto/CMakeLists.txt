@@ -19,6 +19,7 @@ add_library(ro_proto STATIC
     generated/ro/proto/packet_lengths.cpp
     generated/ro/proto/parsed_packets.cpp
     src/barter_packets.cpp
+    src/item_option_packets.cpp
     src/battleground_packets.cpp
     src/buying_store_packets.cpp
     src/cart_packets.cpp

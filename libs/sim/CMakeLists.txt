@@ -11,6 +11,7 @@
 add_library(ro_sim STATIC
     src/achievement_book.cpp
     src/barter.cpp
+    src/laphine.cpp
     src/battlefield.cpp
     src/entry_queue.cpp
     src/memorial_dungeon.cpp

@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "ro/ui/barter_window.h"
+#include "ro/ui/laphine_window.h"
 #include "ro/ui/npc_shop_window.h"
 #include "ro/ui/signboard_tip.h"
 
@@ -39,6 +40,14 @@ struct TradeWindows {
     ro::ui::BarterWindowAction answer;
   };
   Barter barter;
+
+  // LE LAPHINE : un objet utilisé ouvre sa fenêtre. Même contrat.
+  struct Laphine {
+    ro::ui::LaphineWindowState state;
+    const ro::ui::LaphineView* view = nullptr;
+    ro::ui::LaphineWindowAction answer;
+  };
+  Laphine laphine;
 
   // L'ÉCHOPPE D'ACHAT : la préparation, la mienne ouverte, son historique, et
   // celle d'un autre à qui je vends.

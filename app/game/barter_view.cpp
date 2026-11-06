@@ -135,6 +135,12 @@ std::string BarterRefusalText(BarterCartRefusal refusal, std::string_view item_n
       return Printed(ro::core::Tr("Pas assez de %s."), name.c_str());
     case BarterCartRefusal::kNotEnoughZeny:
       return ro::core::Tr("Zeny insuffisant.");
+    case BarterCartRefusal::kBagFull:
+      return GameOr(words, TradeWord::kOverCapacity,
+                    ro::core::Tr("L'inventory n'a plus assez de cases."));
+    case BarterCartRefusal::kStackOverLimit:
+      return Printed(ro::core::Tr("L'inventory ne peut pas tenir plus de %lld %s."),
+                     static_cast<long long>(ro::sim::kBarterMostPerLine), name.c_str());
   }
   return {};
 }

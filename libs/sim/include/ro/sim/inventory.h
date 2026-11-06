@@ -396,6 +396,11 @@ class Inventory {
   // vendu arrive ainsi, et le relevé doit pouvoir la ranger dans « ignorée »
   // plutôt que dans « appliquée ».
 
+  // La pièce vient d'être transformée : le serveur dit tout ce qu'elle est devenue.
+  bool Reforge(std::uint16_t client_slot, std::uint8_t refine_level, std::uint8_t grade,
+               bool damaged, const std::array<std::uint32_t, kItemCardSlots>& cards,
+               const std::array<ItemOption, kItemOptionSlots>& options);
+
   // La pièce est portée, à cet endroit, et se montre sous cette apparence.
   bool Wear(std::uint16_t client_slot, std::uint32_t worn_at, std::uint16_t view_id);
   bool TakeOff(std::uint16_t client_slot);

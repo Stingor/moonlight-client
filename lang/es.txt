@@ -22549,3 +22549,99 @@ tr: Alcance de imán adicional
 
 fr: Votre rang s'affiche à l'ouverture du classement.
 tr: Tu puesto aparece al abrir la clasificación.
+
+fr: %s [%d option(s)]
+tr: %s [%d opción(es)]
+
+fr: (aucun item accepté dans l'inventory)
+tr: (ningún item aceptado en el inventory)
+
+fr: Améliorer
+tr: Mejorar
+
+fr: Améliorer cette pièce ? Ses options seront retirées au sort, et l'item qui l'améliore sera consommé.
+tr: ¿Mejorar esta pieza? Sus opciones se volverán a sortear, y el item que la mejora se consumirá.
+
+fr: Cet item n'est pas accepté.
+tr: Este item no se acepta.
+
+fr: Cette pièce est portée : ôtez-la d'abord.
+tr: Esta pieza está equipada: quítatela primero.
+
+fr: Cette pièce n'est pas identifiée.
+tr: Esta pieza no está identificada.
+
+fr: Dans l'inventory
+tr: En el inventory
+
+fr: Déposez %d item(s) pour la synthèse.
+tr: Deposita %d item(s) para la síntesis.
+
+fr: Déposez la pièce à améliorer.
+tr: Deposita la pieza que quieres mejorar.
+
+fr: Déposé
+tr: Depositado
+
+fr: En attente de la réponse du serveur.
+tr: Esperando la respuesta del servidor.
+
+fr: Il en faut %d.
+tr: Hacen falta %d.
+
+fr: Il faut au moins %d option(s) sur la pièce.
+tr: La pieza necesita al menos %d opción(es).
+
+fr: Il faut déposer %d item(s).
+tr: Hay que depositar %d item(s).
+
+fr: La fenêtre est fermée.
+tr: La ventana está cerrada.
+
+fr: Le client ne connaît pas encore cette recette du Laphine.
+tr: El cliente aún no conoce esta receta del Laphine.
+
+fr: Le raffinement est plus haut que nécessaire.
+tr: El refinamiento es más alto de lo necesario.
+
+fr: L'inventory n'a plus assez de cases.
+tr: El inventory no tiene suficientes casillas libres.
+
+fr: L'inventory ne peut pas tenir plus de %lld %s.
+tr: El inventory no puede contener más de %lld %s.
+
+fr: Le serveur a refusé l'amélioration.
+tr: El servidor ha rechazado la mejora.
+
+fr: Le serveur a refusé la synthèse (code %d).
+tr: El servidor ha rechazado la síntesis (código %d).
+
+fr: Items acceptés
+tr: Items aceptados
+
+fr: Items insuffisants pour la synthèse.
+tr: Items insuficientes para la síntesis.
+
+fr: Raffinement : +%d à +%d.
+tr: Refinamiento: de +%d a +%d.
+
+fr: Raffinement trop bas : +%d au moins.
+tr: Refinamiento demasiado bajo: al menos +%d.
+
+fr: Raffinement trop haut : +%d au plus.
+tr: Refinamiento demasiado alto: como máximo +%d.
+
+fr: Synthétiser
+tr: Sintetizar
+
+fr: Synthétiser ? Ces items seront consommés :
+tr: ¿Sintetizar? Estos items se consumirán:
+
+fr: Un item déposé n'est plus dans l'inventory.
+tr: Un item depositado ya no está en el inventory.
+
+fr: Une carte est sertie ou la pièce est enchantée.
+tr: Tiene una carta engarzada o la pieza está encantada.
+
+fr: Une pièce sertie n'est pas acceptée.
+tr: No se acepta una pieza con cartas.

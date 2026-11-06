@@ -82,6 +82,7 @@
 #include "game/whisper_stage.h"
 #include "guard/cheat_guard.h"
 #include "items/doll_effects.h"
+#include "items/laphine_book.h"
 #include "mvp/mvp_tracker_stage.h"
 #include "options/commands_page.h"
 #include "party/party_booking_board.h"
@@ -436,6 +437,8 @@ struct GamePieces {
   // « @item » du staff ; le poids et le drapeau de buying store, qui laissent
   // les commerces refuser avant le serveur. Inconnue quand la table manque.
   ro::vfs::ItemProperties item_properties;
+  // CE QUE CHAQUE OBJET DU LAPHINE ACCEPTE. Vide quand la table manque.
+  LaphineBook laphine_book;
   // LES MONSTRES QUE LE SERVEUR CONNAÎT, que la liste « Monstre de la cible »
   // de l'IA des compagnons propose. Inconnue quand la table manque.
   ro::vfs::MonsterList monster_list;

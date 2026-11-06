@@ -1,0 +1,42 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  Le Laphine : ce que chaque objet déclencheur accepte
+#
+#  Exporté des tables laphine_* du serveur Moonlight et résolu sur son item_db
+#  (mode Prerenewal) par scripts/yaml_tables/laphine.py. Ne pas éditer à la main :
+#      python scripts/yaml_tables/laphine.py --serveur <dépôt moonlight>
+#
+#  Le serveur ne charge pas toutes ces recettes : il n'ouvre que celles de son
+#  mode et de ses imports. Une recette de trop ne se voit jamais.
+#
+#  synthesis : item, piles à déposer, raffinement admis, [objet, quantité]...
+#  upgrade   : item, raffinement admis, options exigées, cartes admises, cibles.
+#
+#  Lu par moonclient (app/items/laphine_book.h). Absent, une fenêtre du Laphine se
+#  referme en le disant.
+# ─────────────────────────────────────────────────────────────────────────────
+version: 1
+mode: Prerenewal
+synthesis: []
+upgrade:
+  - item: 100003
+    least_refine: 0
+    most_refine: 10
+    least_options: 0
+    cards_allowed: false
+    targets: [
+      1326, 1846, 2039, 2051, 13337, 13338, 13469, 16063, 16065, 18149,
+      18174, 21050, 26007, 26109, 28022, 28244, 28254, 28612, 28626, 28725,
+      28745, 28762, 32005, 32301, 500030, 510034, 530015, 550030, 550031, 570008,
+      580008, 600011, 610012, 620010, 630006, 630007
+    ]
+  - item: 100004
+    least_refine: 0
+    most_refine: 10
+    least_options: 0
+    cards_allowed: false
+    targets: [
+      1326, 1846, 2039, 2051, 13337, 13338, 13469, 16063, 16065, 18149,
+      18174, 21050, 26007, 26109, 28022, 28244, 28254, 28612, 28626, 28725,
+      28745, 28762, 32005, 32301, 500030, 510034, 530015, 550030, 550031, 570008,
+      580008, 600011, 610012, 620010, 630006, 630007
+    ]

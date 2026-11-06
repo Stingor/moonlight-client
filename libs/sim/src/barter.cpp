@@ -90,7 +90,7 @@ struct CurrencyPool {
 };
 
 [[nodiscard]] bool Counts(const InventoryItem& item, std::uint32_t item_id, CurrencyPool pool) {
-  if (item.item_id != item_id || item.amount <= 0) {
+  if (item.item_id != item_id || item.amount <= 0 || !item.identified) {
     return false;
   }
   if (item.equipped() && !pool.with_worn) {
@@ -236,6 +236,45 @@ struct CurrencyPool {
   return {};
 }
 
+// Ce que le panier demande au sac : une pile qui reste sous le plafond, et assez
+// de cases libres pour ce qui n'a pas encore sa place.
+[[nodiscard]] BarterCartCheck CheckBag(const Barter& barter, std::span<const BarterCartLine> cart,
+                                       const Inventory& inventory) {
+  const std::span<const InventoryItem> held = inventory.items();
+  std::uint64_t slots_needed = 0;
+  std::size_t last_new_line = 0;
+  for (std::size_t line = 0; line < cart.size(); ++line) {
+    const BarterItem& item = *barter.FindItem(cart[line].shop_index);
+    if (!TypeStacks(item.type)) {
+      slots_needed += cart[line].amount;
+      last_new_line = line;
+      continue;
+    }
+    const auto stack = std::ranges::find_if(
+        held, [&](const InventoryItem& owned) { return owned.item_id == item.item_id; });
+    if (stack == held.end()) {
+      ++slots_needed;
+      last_new_line = line;
+    } else if (std::uint64_t{cart[line].amount} + static_cast<std::uint64_t>(stack->amount) >
+               kBarterMostPerLine) {
+      return Refuse(BarterCartRefusal::kStackOverLimit, line, item.item_id);
+    }
+  }
+  const int capacity = inventory.capacity();
+  if (capacity <= 0) {
+    return {};
+  }
+  const std::uint64_t free_slots =
+      held.size() >= static_cast<std::size_t>(capacity)
+          ? 0
+          : static_cast<std::uint64_t>(static_cast<std::size_t>(capacity) - held.size());
+  if (slots_needed > free_slots) {
+    return Refuse(BarterCartRefusal::kBagFull, last_new_line,
+                  barter.FindItem(cart[last_new_line].shop_index)->item_id);
+  }
+  return {};
+}
+
 // Ce qu'une ligne change à la charge : l'article qui arrive, moins les devises
 // qui partent, chacune à la quantité payée.
 [[nodiscard]] std::int64_t LineLoadChange(const BarterItem& item, std::uint32_t amount,
@@ -316,6 +355,10 @@ struct CurrencyPool {
   const BarterCartCheck lines = CheckLines(barter, cart);
   if (!lines.passed()) {
     return lines;
+  }
+  const BarterCartCheck bag = CheckBag(barter, cart, inventory);
+  if (!bag.passed()) {
+    return bag;
   }
   const BarterCartCheck weight = CheckWeight(barter, cart, status, unit_weight);
   if (!weight.passed()) {
