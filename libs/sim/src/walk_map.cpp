@@ -9,6 +9,9 @@ bool Blocks(std::uint8_t server_cell) {
   return server_cell == kServerCellWall || server_cell == kServerCellGap;
 }
 
+// Le numéro de région d'une case bloquée.
+constexpr std::uint32_t kNoRegion = 0;
+
 }  // namespace
 
 WalkMap::WalkMap(std::int32_t width, std::int32_t height, std::vector<std::uint8_t> passable)
@@ -59,6 +62,58 @@ bool WalkMap::Passable(std::int32_t x, std::int32_t y) const noexcept {
   }
   return passable_[static_cast<std::size_t>(y) * static_cast<std::size_t>(width_) +
                    static_cast<std::size_t>(x)] != 0;
+}
+
+bool WalkMap::Connected(std::int32_t from_x, std::int32_t from_y, std::int32_t to_x,
+                        std::int32_t to_y) const {
+  if (!Passable(from_x, from_y) || !Passable(to_x, to_y)) {
+    return false;
+  }
+  if (region_of_cell_.empty()) {
+    LabelRegions();
+  }
+  const auto index_of = [this](std::int32_t x, std::int32_t y) {
+    return static_cast<std::size_t>(y) * static_cast<std::size_t>(width_) +
+           static_cast<std::size_t>(x);
+  };
+  return region_of_cell_[index_of(from_x, from_y)] == region_of_cell_[index_of(to_x, to_y)];
+}
+
+void WalkMap::LabelRegions() const {
+  region_of_cell_.assign(passable_.size(), kNoRegion);
+  const auto width = static_cast<std::size_t>(width_);
+  std::vector<std::size_t> pending;
+  std::uint32_t region = kNoRegion;
+  for (std::size_t seed = 0; seed < passable_.size(); ++seed) {
+    if (passable_[seed] == 0 || region_of_cell_[seed] != kNoRegion) {
+      continue;
+    }
+    ++region;
+    region_of_cell_[seed] = region;
+    pending.push_back(seed);
+    while (!pending.empty()) {
+      const std::size_t cell = pending.back();
+      pending.pop_back();
+      const auto visit = [&](std::size_t next) {
+        if (passable_[next] != 0 && region_of_cell_[next] == kNoRegion) {
+          region_of_cell_[next] = region;
+          pending.push_back(next);
+        }
+      };
+      if (cell % width != 0) {
+        visit(cell - 1);
+      }
+      if (cell % width + 1 < width) {
+        visit(cell + 1);
+      }
+      if (cell >= width) {
+        visit(cell - width);
+      }
+      if (cell + width < passable_.size()) {
+        visit(cell + width);
+      }
+    }
+  }
 }
 
 }  // namespace ro::sim

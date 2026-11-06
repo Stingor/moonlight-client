@@ -149,6 +149,12 @@ void World::Spawn(Actor actor) {
     actor.status_values = std::move(found->second.status_values);
     actor.status_second_values = std::move(found->second.status_second_values);
     actor.status_since_ms = std::move(found->second.status_since_ms);
+    // ET CE QUE SES PROPRES PAQUETS DISENT : les effets de chapeau, l'habit du
+    // GM et l'élément de ses sphères. Rien ne les redirait tant qu'il reste en
+    // vue, et sa coiffe s'éteindrait au premier pas.
+    actor.hat_effects = std::move(found->second.hat_effects);
+    actor.gm_outfit = found->second.gm_outfit;
+    actor.spirit_charm_element = found->second.spirit_charm_element;
     // ET SES PROTÉGÉS : une réannonce ne défait aucun trait de DEVOTION, et le
     // numéro perdu ferait prendre la liste gardée pour une annonce neuve.
     actor.devotion = found->second.devotion;

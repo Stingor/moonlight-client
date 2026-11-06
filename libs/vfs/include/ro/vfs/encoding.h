@@ -23,4 +23,12 @@ namespace ro::vfs {
 // utiliser pour construire une clé de recherche.
 [[nodiscard]] std::string Cp949ToUtf8Lossy(std::string_view cp949);
 
+#ifdef _WIN32
+// Des octets lus dans une page de code Windows. Échoue si la page ne les admet
+// pas : un nom d'archive n'a aucune raison d'être valide dans la page ANSI de la
+// machine, surtout en UTF-8 ou dans une autre page à deux octets.
+[[nodiscard]] core::Result<std::wstring> WideFromCodePage(std::string_view bytes,
+                                                          unsigned int code_page);
+#endif
+
 }  // namespace ro::vfs

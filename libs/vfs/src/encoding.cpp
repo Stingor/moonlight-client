@@ -153,4 +153,21 @@ std::string Cp949ToUtf8Lossy(std::string_view cp949) {
   return lossy;
 }
 
+#ifdef _WIN32
+Result<std::wstring> WideFromCodePage(std::string_view bytes, unsigned int code_page) {
+  if (bytes.empty()) {
+    return std::wstring{};
+  }
+  const int needed = MultiByteToWideChar(code_page, MB_ERR_INVALID_CHARS, bytes.data(),
+                                         static_cast<int>(bytes.size()), nullptr, 0);
+  if (needed <= 0) {
+    return Fail(ErrorCode::kCorruptData, "octets invalides dans cette page de code");
+  }
+  std::wstring wide(static_cast<std::size_t>(needed), L'\0');
+  MultiByteToWideChar(code_page, MB_ERR_INVALID_CHARS, bytes.data(), static_cast<int>(bytes.size()),
+                      wide.data(), needed);
+  return wide;
+}
+#endif
+
 }  // namespace ro::vfs

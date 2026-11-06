@@ -42,8 +42,14 @@ struct MountOptions {
 // l'outil qui l'a extrait, et les deux s'essaient. Un nom ASCII n'en a qu'une :
 // l'interroger deux fois coûterait un second `stat` à chaque lecture, pour un
 // fichier que presque toujours une archive sert.
-[[nodiscard]] std::vector<std::filesystem::path> DiskSpellings(const std::filesystem::path& root,
-                                                               std::string_view normalized_key);
+//
+// La seconde orthographe relit les octets dans `ansi_code_page`. Si cette page
+// ne les admet pas, elle n'existe pas, et seule la première s'essaie.
+// La page ANSI de la machine, `CP_ACP` de Windows.
+inline constexpr unsigned int kMachineAnsiCodePage = 0;
+[[nodiscard]] std::vector<std::filesystem::path> DiskSpellings(
+    const std::filesystem::path& root, std::string_view normalized_key,
+    unsigned int ansi_code_page = kMachineAnsiCodePage);
 
 // Système de fichiers virtuel du client : le disque d'abord, puis les archives.
 //

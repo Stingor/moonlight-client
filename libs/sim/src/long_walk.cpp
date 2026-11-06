@@ -69,6 +69,12 @@ std::optional<std::vector<CellPosition>> FindRoute(const WalkMap& map, CellPosit
   if (from.x >= width || from.y >= height || !map.Passable(to.x, to.y)) {
     return std::nullopt;
   }
+  // SANS LIEN, PAS DE RECHERCHE : elle inonderait toute la région de départ, et
+  // une approche vers une cible injoignable la redemande à chaque image. Une case
+  // de départ bloquée n'a pas de région, mais on peut en sortir : elle cherche.
+  if (map.Passable(from.x, from.y) && !map.Connected(from.x, from.y, to.x, to.y)) {
+    return std::nullopt;
+  }
   const auto index_of = [width](int x, int y) {
     return static_cast<std::size_t>(y) * static_cast<std::size_t>(width) +
            static_cast<std::size_t>(x);

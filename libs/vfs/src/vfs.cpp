@@ -87,7 +87,8 @@ std::filesystem::path ResolveIgnoringCase(const std::filesystem::path& root,
 // forme. On essaie les deux, sinon le fichier est déclaré absent alors qu'il est
 // là.
 std::vector<std::filesystem::path> DiskSpellings(const std::filesystem::path& root,
-                                                 std::string_view normalized_key) {
+                                                 std::string_view normalized_key,
+                                                 [[maybe_unused]] unsigned int ansi_code_page) {
   std::string relative(normalized_key);
   std::replace(relative.begin(), relative.end(), '\\',
                static_cast<char>(std::filesystem::path::preferred_separator));
@@ -100,13 +101,18 @@ std::vector<std::filesystem::path> DiskSpellings(const std::filesystem::path& ro
                                    reinterpret_cast<const char8_t*>(utf8->data()), utf8->size())));
   }
   // Forme 2 : les octets ont été écrits tels quels par un outil qui les lisait
-  // en CP1252. `path` construit depuis une std::string emploie la page ANSI,
-  // ce qui reproduit exactement cette orthographe.
+  // en CP1252. Les relire dans la page ANSI reproduit cette orthographe.
   //
-  // ⚠ SAUF SI ELLE ÉGALE LA PREMIÈRE, ce qui est le cas de tout nom ASCII.
-  std::filesystem::path ansi = root / std::filesystem::path(relative);
-  if (spellings.empty() || spellings.front() != ansi) {
-    spellings.push_back(std::move(ansi));
+  // ⚠ PAS PAR `path(std::string)` : ce constructeur LÈVE sur des octets que la
+  // page n'admet pas, et aucune fonction de lecture n'attend une exception.
+  //
+  // ⚠ ELLE NE S'AJOUTE PAS SI ELLE ÉGALE LA PREMIÈRE, ce qui est le cas de tout
+  // nom ASCII.
+  if (auto wide = WideFromCodePage(relative, ansi_code_page); wide) {
+    std::filesystem::path ansi = root / std::filesystem::path(*wide);
+    if (spellings.empty() || spellings.front() != ansi) {
+      spellings.push_back(std::move(ansi));
+    }
   }
 #else
   spellings.emplace_back(root / std::filesystem::path(relative));
@@ -340,15 +346,16 @@ std::vector<std::string> Vfs::List(std::string_view utf8_prefix,
 }
 
 std::filesystem::path FindOnDisk(const std::filesystem::path& root, std::string_view game_path) {
+  std::error_code code;
+  for (const std::filesystem::path& candidate : DiskSpellings(root, game_path)) {
+    if (std::filesystem::is_regular_file(candidate, code)) {
+      return candidate;
+    }
+  }
+#ifndef _WIN32
   std::string relative(game_path);
   std::replace(relative.begin(), relative.end(), '\\',
                static_cast<char>(std::filesystem::path::preferred_separator));
-  std::error_code code;
-  if (const std::filesystem::path direct = root / relative;
-      std::filesystem::is_regular_file(direct, code)) {
-    return direct;
-  }
-#ifndef _WIN32
   if (const std::filesystem::path found = ResolveIgnoringCase(root, relative);
       !found.empty() && std::filesystem::is_regular_file(found, code)) {
     return found;
