@@ -199,6 +199,7 @@ TerrainRenderer& TerrainRenderer::operator=(TerrainRenderer&& other) noexcept {
     std::swap(vertex_buffer_, other.vertex_buffer_);
     std::swap(index_buffer_, other.index_buffer_);
     std::swap(depth_chunks_, other.depth_chunks_);
+    std::swap(depth_grid_, other.depth_grid_);
     std::swap(depth_vertex_array_, other.depth_vertex_array_);
     std::swap(depth_index_buffer_, other.depth_index_buffer_);
     std::swap(uploads_, other.uploads_);
@@ -319,6 +320,7 @@ core::Result<void> TerrainRenderer::BeginUpload(const TerrainMesh& mesh,
                        ? mesh.depth_chunks
                        : std::make_shared<const TerrainDepthChunks>(BuildTerrainDepthChunks(mesh));
   depth_chunks_ = staged_chunks_->chunks;
+  depth_grid_ = staged_chunks_->grid;
   if (depth_vertex_array_ == 0) {
     glGenVertexArrays(1, &depth_vertex_array_);
     glGenBuffers(1, &depth_index_buffer_);
@@ -494,9 +496,10 @@ void TerrainRenderer::DrawSurfaces(const glm::mat4& view_projection, const Scene
 
   if (sight != nullptr) {
     glBindVertexArray(depth_vertex_array_);
-    for (const TerrainDepthChunk& chunk : depth_chunks_) {
+    depth_grid_.ForEachNear(sight->center, sight->radius, [&](std::uint32_t rank) {
+      const TerrainDepthChunk& chunk = depth_chunks_[rank];
       if (!sight->Sees(chunk.box)) {
-        continue;
+        return;
       }
       for (const TerrainDepthRun& run : chunk.runs) {
         BindSurface(run.surface);
@@ -504,7 +507,7 @@ void TerrainRenderer::DrawSurfaces(const glm::mat4& view_projection, const Scene
                        reinterpret_cast<void*>(static_cast<std::uintptr_t>(run.first_index) *
                                                sizeof(std::uint32_t)));
       }
-    }
+    });
     glBindVertexArray(0);
     return;
   }

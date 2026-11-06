@@ -91,4 +91,20 @@ bool SightedCasting(std::span<const ModelPoseBoxes> boxes, const ModelOpacities*
   return moving_seen;
 }
 
+bool SeesMovingCaster(std::span<const ModelPoseBoxes> boxes, const ModelOpacities* casting,
+                      const ShadowSight& sight) {
+  for (std::size_t model = 0; model < boxes.size(); ++model) {
+    const ModelPoseBoxes& poses = boxes[model];
+    const std::vector<std::uint8_t>* casts =
+        casting != nullptr && model < casting->size() ? &(*casting)[model] : nullptr;
+    for (std::size_t pose = poses.still_poses; pose < poses.boxes.size(); ++pose) {
+      const bool full = casts == nullptr || pose >= casts->size() || (*casts)[pose] == kVeilOpaque;
+      if (full && sight.Sees(poses.boxes[pose])) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 }  // namespace ro::render

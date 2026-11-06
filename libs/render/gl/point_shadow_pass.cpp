@@ -24,6 +24,9 @@ namespace {
 constexpr float kActorShadowCenterHeightWorld = 15.0F;
 constexpr float kActorShadowReachWorld = 25.0F;
 
+// Le rang de l'alpha dans `DrawnActor::tint`.
+constexpr std::size_t kTintAlphaRank = 3;
+
 // Un corps de l'image, tel que les faces le voient.
 struct ShadowActor {
   std::size_t lot = 0;
@@ -32,6 +35,29 @@ struct ShadowActor {
   glm::vec3 center{0.0F};
   float reach = 0.0F;
 };
+
+}  // namespace
+
+ActorShadowKey ActorShadowKeyOf(const DrawnActor& drawn) {
+  const ComposedActor& composed = *drawn.actor;
+  return ActorShadowKey{.composition = drawn.actor,
+                        .action_index = composed.action_index,
+                        .frame_index = composed.frame_index,
+                        .quad_count = composed.quads.size(),
+                        .lead_corner = composed.quads.front().corners[0],
+                        .ground_position = drawn.ground_position,
+                        .scale = drawn.scale,
+                        .height_scale = drawn.height_scale,
+                        .part_offset_pixels = drawn.part_offset_pixels,
+                        .screen_offset_pixels = drawn.screen_offset_pixels,
+                        .layer_spin_degrees = drawn.layer_spin_degrees,
+                        .grow_sprite_pixels = drawn.grow_sprite_pixels,
+                        .grow_screen_pixels = drawn.grow_screen_pixels,
+                        .shown_parts = drawn.shown_parts,
+                        .tint_alpha = drawn.tint[kTintAlphaRank]};
+}
+
+namespace {
 
 [[nodiscard]] std::vector<ShadowActor> ShadowActorsOf(const SunShadowCasters& casters) {
   std::vector<ShadowActor> actors;
@@ -43,19 +69,11 @@ struct ShadowActor {
       if (drawn.actor == nullptr || drawn.actor->quads.empty()) {
         continue;
       }
-      const ComposedActor& composed = *drawn.actor;
       const float scale = std::max(drawn.scale, 0.0F);
       actors.push_back(ShadowActor{
           .lot = lot,
           .drawn = &drawn,
-          .key = {.composition = drawn.actor,
-                  .action_index = composed.action_index,
-                  .frame_index = composed.frame_index,
-                  .quad_count = composed.quads.size(),
-                  .lead_corner = composed.quads.front().corners[0],
-                  .ground_position = drawn.ground_position,
-                  .scale = drawn.scale,
-                  .height_scale = drawn.height_scale},
+          .key = ActorShadowKeyOf(drawn),
           .center =
               drawn.ground_position + glm::vec3(0.0F, kActorShadowCenterHeightWorld * scale, 0.0F),
           .reach = kActorShadowReachWorld * scale});
@@ -82,13 +100,11 @@ struct ShadowActor {
   return box;
 }
 
-// Ce que voit la face `face` de la carte de `light`.
-[[nodiscard]] ShadowSight SightOf(const PointLight& light, std::size_t face) {
-  const float far_world = PointShadowFar(light.range_world);
-  return ShadowSight{.frustum = WorldFrustum::Of(
-                         PointShadowFaceViewProjections(ShiningFrom(light), far_world).at(face)),
+// Ce que voit la face de la carte de `light` que projette `view_projection`.
+[[nodiscard]] ShadowSight SightOf(const PointLight& light, const glm::mat4& view_projection) {
+  return ShadowSight{.frustum = WorldFrustum::Of(view_projection),
                      .center = ShiningFrom(light),
-                     .radius = far_world};
+                     .radius = PointShadowFar(light.range_world)};
 }
 
 // UNE FACE À REPEINDRE, et les corps qu'elle voit, par leur rang.
@@ -130,7 +146,7 @@ class FacePainter {
     const glm::mat4 view_projection =
         PointShadowFaceViewProjections(shining_from, PointShadowFar(light.range_world))
             .at(job.face);
-    const ShadowSight sight = SightOf(light, job.face);
+    const ShadowSight sight = SightOf(light, view_projection);
     stage_.BeginFace(static_cast<std::size_t>(slot.tier), slot.layer, job.face);
     if (casters_.terrain != nullptr) {
       casters_.terrain->DrawDepth(view_projection, &sight);
@@ -192,13 +208,13 @@ PointLightSet DrawPointShadows(PointLightStage& stage, const SunShadowCasters* c
     const std::optional<WorldBox> actor_models_box = casters->actor_model_renderer != nullptr
                                                          ? ActorModelsBox(casters->actor_models)
                                                          : std::nullopt;
-    const std::uint64_t generation = stage.NoteScene(PointShadowScene{
-        .terrain = casters->terrain,
-        .terrain_uploads = casters->terrain != nullptr ? casters->terrain->uploads() : 0,
-        .models = casters->models,
-        .model_uploads = casters->models != nullptr ? casters->models->uploads() : 0,
-        .casting_given = casters->model_casting != nullptr,
-        .casting = casters->model_casting != nullptr ? *casters->model_casting : ModelOpacities()});
+    const std::uint64_t generation = stage.NoteScene(
+        PointShadowScene{
+            .terrain = casters->terrain,
+            .terrain_uploads = casters->terrain != nullptr ? casters->terrain->uploads() : 0,
+            .models = casters->models,
+            .model_uploads = casters->models != nullptr ? casters->models->uploads() : 0},
+        casters->model_casting);
     FacePainter painter(stage, *casters, camera);
 
     // LES FACES À REPEINDRE, relevées d'abord : celles dont ce qui se tient
@@ -225,8 +241,10 @@ PointLightSet DrawPointShadows(PointLightStage& stage, const SunShadowCasters* c
           stage.BeginFace(static_cast<std::size_t>(slot.tier), slot.layer, face);
         }
       }
+      const std::array<glm::mat4, kCubeFaceCount> view_projections = PointShadowFaceViewProjections(
+          ShiningFrom(visible.lights[rank]), PointShadowFar(visible.lights[rank].range_world));
       for (std::size_t face = 0; face < kCubeFaceCount; ++face) {
-        const ShadowSight sight = SightOf(visible.lights[rank], face);
+        const ShadowSight sight = SightOf(visible.lights[rank], view_projections.at(face));
         FaceJob job{.rank = rank, .face = face};
         seen_keys.clear();
         for (std::size_t actor = 0; actor < actors.size(); ++actor) {
@@ -242,9 +260,9 @@ PointLightSet DrawPointShadows(PointLightStage& stage, const SunShadowCasters* c
           jobs.push_back(std::move(job));
           continue;
         }
-        const bool moving = job.actor_models_seen ||
-                            (casters->models != nullptr &&
-                             casters->models->Sighted(sight, casters->model_casting, sighted));
+        const bool moving =
+            job.actor_models_seen || (casters->models != nullptr &&
+                                      casters->models->SeesMoving(sight, casters->model_casting));
         if (moving && frame - painted.painted_frame >= kPointShadowAnimatedPeriod) {
           job.animated = true;
           animated_jobs.push_back(std::move(job));

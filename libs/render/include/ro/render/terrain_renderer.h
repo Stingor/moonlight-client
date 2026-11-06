@@ -166,6 +166,7 @@ class TerrainRenderer {
   // LE SOL EN BLOCS, pour les cartes d'ombre ponctuelles : ses propres indices,
   // sur les mêmes sommets.
   std::vector<TerrainDepthChunk> depth_chunks_;
+  TerrainDepthGrid depth_grid_;
   unsigned int depth_vertex_array_ = 0;
   unsigned int depth_index_buffer_ = 0;
   std::uint64_t uploads_ = 0;

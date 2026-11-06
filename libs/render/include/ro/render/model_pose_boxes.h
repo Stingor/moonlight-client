@@ -33,4 +33,9 @@ inline constexpr float kAnimatedPoseReachShare = 0.25F;
 bool SightedCasting(std::span<const ModelPoseBoxes> boxes, const ModelOpacities* casting,
                     const ShadowSight& sight, ModelOpacities& into);
 
+// LA MÊME RÉPONSE que `SightedCasting`, sans rien écrire : `sight` voit-elle une
+// pose animée qui porte ombre ? S'arrête à la première.
+[[nodiscard]] bool SeesMovingCaster(std::span<const ModelPoseBoxes> boxes,
+                                    const ModelOpacities* casting, const ShadowSight& sight);
+
 }  // namespace ro::render

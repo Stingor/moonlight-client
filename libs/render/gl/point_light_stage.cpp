@@ -64,6 +64,8 @@ PointLightStage& PointLightStage::operator=(PointLightStage&& other) noexcept {
     std::swap(cubes_, other.cubes_);
     std::swap(slots_, other.slots_);
     std::swap(scene_, other.scene_);
+    std::swap(casting_given_, other.casting_given_);
+    std::swap(casting_, other.casting_);
     std::swap(generation_, other.generation_);
     std::swap(frame_, other.frame_);
   }

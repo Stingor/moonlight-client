@@ -134,6 +134,10 @@ class ModelRenderer {
                ModelOpacities& into) const {
     return SightedCasting(pose_boxes_, casting, sight, into);
   }
+  // CETTE FACE VOIT-ELLE UNE POSE QUI S'ANIME ? Voir `SeesMovingCaster`.
+  [[nodiscard]] bool SeesMoving(const ShadowSight& sight, const ModelOpacities* casting) const {
+    return SeesMovingCaster(pose_boxes_, casting, sight);
+  }
 
   // LA PASSE TRANSLUCIDE DES POSES VOILÉES, par-dessus tout ce qui est peint :
   // leurs suites de faces triées de la plus lointaine à la plus proche, mêlées

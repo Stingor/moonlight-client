@@ -8,6 +8,7 @@
 #include <glm/glm.hpp>
 
 #include "ro/core/error.h"
+#include "ro/render/actor_layers.h"
 #include "ro/render/model_veil.h"
 #include "ro/render/point_lights.h"
 #include "ro/render/point_shadow.h"
@@ -34,6 +35,15 @@ struct ActorShadowKey {
   glm::vec3 ground_position{0.0F};
   float scale = 0.0F;
   float height_scale = 0.0F;
+  // Ce que le peintre applique encore à la silhouette à chaque image. L'alpha de
+  // la teinte en est, car la silhouette se découpe sur l'alpha final.
+  std::array<glm::vec2, kActorPartCount> part_offset_pixels{};
+  glm::vec2 screen_offset_pixels{0.0F};
+  float layer_spin_degrees = 0.0F;
+  float grow_sprite_pixels = 0.0F;
+  float grow_screen_pixels = 0.0F;
+  ActorPartSet shown_parts = 0;
+  std::uint8_t tint_alpha = 0;
 
   friend bool operator==(const ActorShadowKey&, const ActorShadowKey&) = default;
 };
@@ -55,16 +65,14 @@ struct PointShadowCube {
   std::uint64_t static_generation = 0;
 };
 
-// LE SOL ET LE DÉCOR QUE PEIGNENT LES CARTES : leurs renderers, combien de
-// fois chacun a été téléversé, et les poses du décor qui portent ombre. Qu'un
-// seul change, et toutes les cartes se repeignent.
+// LE SOL ET LE DÉCOR QUE PEIGNENT LES CARTES : leurs renderers, et combien de
+// fois chacun a été téléversé. Qu'un seul change, ou que changent les poses qui
+// portent ombre, et toutes les cartes se repeignent.
 struct PointShadowScene {
   const void* terrain = nullptr;
   std::uint64_t terrain_uploads = 0;
   const void* models = nullptr;
   std::uint64_t model_uploads = 0;
-  bool casting_given = false;
-  ModelOpacities casting;
 
   friend bool operator==(const PointShadowScene&, const PointShadowScene&) = default;
 };
@@ -108,9 +116,14 @@ class PointLightStage {
   // `scene` diffère de celle de l'image précédente.
   // Le rang de l'image qui commence.
   [[nodiscard]] std::uint64_t TakeFrame() noexcept { return ++frame_; }
-  [[nodiscard]] std::uint64_t NoteScene(const PointShadowScene& scene) {
-    if (!(scene == scene_)) {
+  [[nodiscard]] std::uint64_t NoteScene(const PointShadowScene& scene,
+                                        const ModelOpacities* casting) {
+    const bool same_casting =
+        casting != nullptr ? casting_given_ && *casting == casting_ : !casting_given_;
+    if (!(scene == scene_) || !same_casting) {
       scene_ = scene;
+      casting_given_ = casting != nullptr;
+      casting_ = casting != nullptr ? *casting : ModelOpacities();
       ++generation_;
     }
     return generation_;
@@ -143,6 +156,8 @@ class PointLightStage {
   std::array<std::vector<PointShadowCube>, kPointShadowTierCount> cubes_{};
   PointShadowSlots slots_;
   PointShadowScene scene_;
+  bool casting_given_ = false;
+  ModelOpacities casting_;
   // Une carte neuve porte la génération zéro : elle se peint à la première.
   std::uint64_t generation_ = 1;
   std::uint64_t frame_ = 0;

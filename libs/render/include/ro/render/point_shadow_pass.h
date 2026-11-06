@@ -23,6 +23,10 @@ struct PointShadowTally {
   std::size_t moving_faces = 0;
 };
 
+// CE QUE `drawn` DONNE À VOIR AUX FACES QUI LE VOIENT. `drawn.actor` doit porter
+// au moins un quad.
+[[nodiscard]] ActorShadowKey ActorShadowKeyOf(const DrawnActor& drawn);
+
 // LES LUMIÈRES PONCTUELLES D'UNE IMAGE, prêtes pour la passe de couleur.
 //
 // Garde de `points` celles dont la portée touche ce que voit `camera`, et les
