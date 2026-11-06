@@ -157,14 +157,28 @@ void WritePlayer(Writer& out, std::uint16_t class_id, std::uint16_t first_skill_
   return heading == kNoHeading || heading < kHeadingSteps;
 }
 
+// Ce qu'une part dit du sol de cette arène ; rien pour une arène générée, ou pour une
+// carte que ce client n'a pas su lire.
+[[nodiscard]] std::optional<std::uint64_t> GroundOf(const SurvivorsCoopPart& part,
+                                                    std::uint16_t arena_id) {
+  const auto found = std::ranges::find(part.grounds, arena_id, &SurvivorsArenaGround::arena_id);
+  return found != part.grounds.end() ? std::optional(found->digest) : std::nullopt;
+}
+
 }  // namespace
 
 std::vector<std::uint8_t> EncodeSurvivorsCoopPart(const SurvivorsCoopPart& part) {
   Writer out;
+  out.U16(kSurvivorsCoopPartFormat);
   out.U16(part.ruleset_version);
   out.U64(part.rules_digest);
   out.U16(part.arena_id);
   out.U8(part.cursed_water);
+  out.U8(static_cast<std::uint8_t>(part.grounds.size()));
+  for (const SurvivorsArenaGround& ground : part.grounds) {
+    out.U16(ground.arena_id);
+    out.U64(ground.digest);
+  }
   WritePlayer(out, part.player.class_id, part.player.first_skill_id, part.player.loadout,
               part.player.lives, part.player.leaves, part.player.locked_ids);
   return out.Take();
@@ -173,11 +187,17 @@ std::vector<std::uint8_t> EncodeSurvivorsCoopPart(const SurvivorsCoopPart& part)
 std::optional<SurvivorsCoopPart> DecodeSurvivorsCoopPart(std::span<const std::uint8_t> bytes,
                                                          std::size_t* trailing_bytes) {
   Reader in(bytes);
+  if (in.U16() != kSurvivorsCoopPartFormat) return std::nullopt;
   SurvivorsCoopPart part;
   part.ruleset_version = in.U16();
   part.rules_digest = in.U64();
   part.arena_id = in.U16();
   part.cursed_water = in.U8();
+  const std::size_t grounds = in.U8();
+  for (std::size_t index = 0; index < grounds && in.ok(); ++index) {
+    const std::uint16_t arena_id = in.U16();
+    part.grounds.push_back(SurvivorsArenaGround{.arena_id = arena_id, .digest = in.U64()});
+  }
   std::optional<SurvivorsAllyStart> player = ReadPlayer(in);
   if (!in.ok() || !player.has_value()) return std::nullopt;
   part.player = std::move(*player);
@@ -196,6 +216,9 @@ std::optional<SurvivorsStart> TeamStartOf(std::uint64_t seed, const SurvivorsRul
   for (std::size_t index = 0; index < parts.size(); ++index) {
     const SurvivorsCoopPart& part = parts[index];
     if (part.ruleset_version != rules.ruleset_version || part.rules_digest != rules_digest) {
+      return std::nullopt;
+    }
+    if (GroundOf(part, start.arena_id) != GroundOf(parts.front(), start.arena_id)) {
       return std::nullopt;
     }
     start.cursed_water = std::min(start.cursed_water, part.cursed_water);

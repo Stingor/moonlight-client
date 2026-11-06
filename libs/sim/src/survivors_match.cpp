@@ -149,6 +149,7 @@ bool SurvivorsMatch::PushLocal(const SurvivorsTeamInput& input) {
   local.pending.push_back(input);
   local.known_through = next_local_tick_ + 1U;
   ++next_local_tick_;
+  present_stale_ = true;
   sent_.push_back(input);
   // Une entrée ne s'oublie qu'une fois portée par une trame : une longue image pousse
   // plusieurs tics d'un coup, et aucun ne doit manquer aux autres.
@@ -188,6 +189,7 @@ bool SurvivorsMatch::Receive(std::size_t player, std::span<const std::uint8_t> b
   if (!frame.has_value()) return false;
   Player& other = players_[player];
   if (other.robot_from.has_value()) return true;
+  present_stale_ = true;
   const std::uint64_t first_of_frame =
       std::uint64_t{frame->through_tick} + 1U - frame->inputs.size();
   for (std::size_t index = 0; index < frame->inputs.size(); ++index) {
@@ -215,6 +217,7 @@ void SurvivorsMatch::Hear(std::size_t player, std::span<const std::uint8_t> byte
   if (other.heard_tick.has_value() && frame->through_tick <= *other.heard_tick) return;
   other.heard_tick = frame->through_tick;
   other.heard_heading = frame->inputs.back().heading;
+  present_stale_ = true;
 }
 
 void SurvivorsMatch::Leave(std::size_t player_index) {
@@ -237,6 +240,7 @@ bool SurvivorsMatch::TickReady(std::uint32_t tick) const noexcept {
 }
 
 void SurvivorsMatch::RunConfirmedTick() {
+  present_stale_ = true;
   SurvivorsRun& run = play_.mutable_run();
   const std::uint32_t tick = run.field().ticks;
   const std::size_t count = HeroCount(run.field());
@@ -285,15 +289,16 @@ void SurvivorsMatch::CheckDigests() {
 
 void SurvivorsMatch::RecomputePresent() {
   const SurvivorsRun& confirmed = play_.run();
+  // L'AFFECTATION GARDE LES TAMPONS DE L'IMAGE D'AVANT, et l'adresse que le dessin suit.
+  *present_ = confirmed;
   // Un vote ou une pause de coffre ne se prédisent pas : le présent les attend.
   if (confirmed.field().phase != SurvivorsPhase::kRunning ||
       confirmed.field().hold_ticks_left > 0 || next_local_tick_ <= confirmed.field().ticks) {
-    present_ = confirmed;
     return;
   }
   // LE PRÉSENT : les tics déjà joués par le joueur, les autres tenant leur cap. Un
   // vote ne se prédit pas : le présent s'y arrête.
-  SurvivorsRun present = confirmed;
+  SurvivorsRun& present = *present_;
   const std::size_t count = HeroCount(present.field());
   std::array<SurvivorsTeamInput, kMostHeroes> inputs{};
   for (std::size_t player = 0; player < count; ++player) {
@@ -312,7 +317,6 @@ void SurvivorsMatch::RecomputePresent() {
     (void)present.TakeNews();
   }
   present.PutHeroOnStage(local_player_);
-  present_ = std::move(present);
 }
 
 void SurvivorsMatch::Advance() {
@@ -320,7 +324,9 @@ void SurvivorsMatch::Advance() {
          TickReady(play_.run().field().ticks)) {
     RunConfirmedTick();
   }
+  if (!present_stale_) return;
   RecomputePresent();
+  present_stale_ = false;
 }
 
 }  // namespace ro::sim

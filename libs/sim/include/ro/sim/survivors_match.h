@@ -13,6 +13,7 @@
 #include "ro/sim/survivors_news.h"
 #include "ro/sim/survivors_run.h"
 #include "ro/sim/survivors_team_play.h"
+#include "ro/sim/walk_map.h"
 
 namespace ro::sim {
 
@@ -63,26 +64,44 @@ struct LockstepFrame {
 };
 [[nodiscard]] std::optional<LockstepFrame> DecodeLockstepFrame(std::span<const std::uint8_t> bytes);
 
-// LA PART D'UN JOUEUR dans le salon : ce qu'il apporte à la partie, et la version
-// des règles qu'il joue. Deux clients aux règles différentes divergeraient sans
-// erreur : ils ne partent pas ensemble.
+// Le sol d'une arène sur carte, tel que ce client le lit dans son installation. Une
+// arène générée n'en a pas : la graine fixe son sol.
+struct SurvivorsArenaGround {
+  std::uint16_t arena_id = 0;
+  std::uint64_t digest = 0;
+  [[nodiscard]] bool operator==(const SurvivorsArenaGround&) const = default;
+};
+
+// LA PART D'UN JOUEUR dans le salon : ce qu'il apporte à la partie, la version des
+// règles qu'il joue et les sols qu'il lit. Deux clients aux règles ou au sol
+// différents divergeraient sans erreur : ils ne partent pas ensemble. Chacun dit le
+// sol de TOUTES les arènes sur carte, parce que l'arène de l'équipe est celle du
+// premier, que les autres n'ont pas forcément choisie.
+//
+// LE FORMAT OUVRE LA PART, à une valeur hors de la plage des versions de règles :
+// un client de l'ancien format, dont la part s'ouvre par cette version, ne part donc
+// avec aucun client du nouveau, d'un côté comme de l'autre.
+inline constexpr std::uint16_t kSurvivorsCoopPartFormat = 0xC002;
 struct SurvivorsCoopPart {
   std::uint16_t ruleset_version = 0;
   std::uint64_t rules_digest = 0;
   std::uint16_t arena_id = 0;
   std::uint8_t cursed_water = 0;
+  std::vector<SurvivorsArenaGround> grounds;
   SurvivorsAllyStart player;
   [[nodiscard]] bool operator==(const SurvivorsCoopPart&) const = default;
 };
 // L'empreinte des règles : ce qui fixe une partie, classes, skills, vagues et échelle.
 [[nodiscard]] std::uint64_t SurvivorsRulesDigest(const SurvivorsRules& rules);
+// L'empreinte d'une grille de marche : ce qu'une arène sur carte tire du sol lu.
+[[nodiscard]] std::uint64_t SurvivorsGroundDigest(const WalkMap& map);
 [[nodiscard]] std::vector<std::uint8_t> EncodeSurvivorsCoopPart(const SurvivorsCoopPart& part);
 // Rend la part et ce qui la suit (`trailing_bytes`) : l'apparence, qu'app lit.
 [[nodiscard]] std::optional<SurvivorsCoopPart> DecodeSurvivorsCoopPart(
     std::span<const std::uint8_t> bytes, std::size_t* trailing_bytes);
 // LE DÉPART DE L'ÉQUIPE : la graine du serveur, l'arène du premier, et la Cursed
 // Water la plus basse, pour que personne ne subisse un monde plus dur qu'il ne l'a
-// choisi. Rien pour un mélange de règles.
+// choisi. Rien pour un mélange de règles, ou de sols de cette arène.
 [[nodiscard]] std::optional<SurvivorsStart> TeamStartOf(std::uint64_t seed,
                                                         const SurvivorsRules& rules,
                                                         std::span<const SurvivorsCoopPart> parts);
@@ -114,7 +133,9 @@ class SurvivorsMatch {
   // héros passe au robot au tic qui suit sa dernière entrée connue. Tous les clients
   // ont reçu les mêmes : c'est le même tic partout.
   void Leave(std::size_t player);
-  // Exécute tous les tics dont les entrées sont connues, puis recalcule `present`.
+  // Exécute tous les tics dont les entrées sont connues, puis recalcule `present` si
+  // une entrée, un cap entendu ou un tic l'ont changé : le recalcul rejoue toute
+  // l'avance, et rendrait sinon le même résultat.
   void Advance();
 
   [[nodiscard]] const SurvivorsRun& confirmed() const noexcept { return play_.run(); }
@@ -147,6 +168,7 @@ class SurvivorsMatch {
 
   SurvivorsTeamPlay play_;
   std::optional<SurvivorsRun> present_;
+  bool present_stale_ = false;  // ce qui nourrit `present_` a bougé depuis son calcul
   SurvivorsNews news_;
   std::size_t local_player_ = 0;
   std::array<Player, kMostHeroes> players_;

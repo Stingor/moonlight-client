@@ -64,7 +64,7 @@ void Hold(SurvivorsField& field, SurvivorsFoe& foe, SurvivorsZone& block) {
                  HeadingOf(foe.previous_position - block.from, field.hero.facing));
   foe.position = Slide(field.ground, foe.position, edge - foe.position);
   if (field.step < foe.touch_ready_step) return;
-  const FoeRule* rule = FindFoe(rules, foe.foe_id);
+  const FoeRule* rule = FoeRuleOf(rules, foe);
   if (rule == nullptr) return;
   block.block_hp -= std::max(rule->touch_damage, 1);
   foe.touch_ready_step = field.step + std::max<std::uint32_t>(StepsOf(rule->touch_interval_ms), 1);

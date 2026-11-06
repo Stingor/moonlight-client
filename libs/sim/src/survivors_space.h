@@ -218,11 +218,21 @@ void ForEachHero(SurvivorsField& field, Action&& action) {
   return found != foes.end() && found->serial == serial ? &*found : nullptr;
 }
 
+// LA RÈGLE D'UN MONSTRE, lue des milliers de fois par pas : le rang posé à sa naissance
+// dispense de parcourir la table, tant qu'il y désigne bien son espèce.
+[[nodiscard]] inline const FoeRule* FoeRuleOf(const SurvivorsRules& rules,
+                                              const SurvivorsFoe& foe) noexcept {
+  if (foe.rule_rank < rules.foes.size() && rules.foes[foe.rule_rank].foe_id == foe.foe_id) {
+    return &rules.foes[foe.rule_rank];
+  }
+  return FindFoe(rules, foe.foe_id);
+}
+
 // Le rayon d'un monstre, selon sa taille ; celui d'un petit pour un Id inconnu
 // des règles.
 [[nodiscard]] inline std::int32_t FoeRadius(const SurvivorsRules& rules,
                                             const SurvivorsFoe& foe) noexcept {
-  const FoeRule* rule = FindFoe(rules, foe.foe_id);
+  const FoeRule* rule = FoeRuleOf(rules, foe);
   const FoeSize size = rule != nullptr ? rule->size : FoeSize::kSmall;
   return rules.tuning.foe_radius_units[static_cast<std::size_t>(size)];
 }
@@ -237,7 +247,7 @@ void ForEachHero(SurvivorsField& field, Action&& action) {
 // Un mini-boss ou un boss : il ne subit qu'une part du ralentissement, et ni
 // gel ni recul.
 [[nodiscard]] inline bool IsBoss(const SurvivorsRules& rules, const SurvivorsFoe& foe) noexcept {
-  const FoeRule* rule = FindFoe(rules, foe.foe_id);
+  const FoeRule* rule = FoeRuleOf(rules, foe);
   return rule != nullptr && rule->rank != FoeRank::kCommon;
 }
 
@@ -300,7 +310,7 @@ enum class FoeAct : std::uint8_t { kNone, kShoot, kCharge, kBlink, kHide };
 // Les traits d'un monstre ; aucun pour un Id inconnu des règles.
 [[nodiscard]] inline std::uint8_t TraitsOf(const SurvivorsRules& rules,
                                            const SurvivorsFoe& foe) noexcept {
-  const FoeRule* rule = FindFoe(rules, foe.foe_id);
+  const FoeRule* rule = FoeRuleOf(rules, foe);
   return rule != nullptr ? rule->behaviour.traits : std::uint8_t{0};
 }
 
@@ -308,7 +318,7 @@ enum class FoeAct : std::uint8_t { kNone, kShoot, kCharge, kBlink, kHide };
 // pendant son acte de cachette, tant que `step < act_until_step`.
 [[nodiscard]] inline bool Hidden(const SurvivorsField& field, const SurvivorsFoe& foe) noexcept {
   if (foe.act_until_step <= field.step) return false;
-  const FoeRule* rule = FindFoe(*field.rules, foe.foe_id);
+  const FoeRule* rule = FoeRuleOf(*field.rules, foe);
   return rule != nullptr && ActOf(rule->behaviour) == FoeAct::kHide;
 }
 

@@ -20,6 +20,9 @@ namespace ro::sim {
 // DURABLEMENT au-delà ne peut donc être qu'un reste que rien n'a retiré : il se
 // dessinait à l'écran, et l'IA d'un compagnon le comptait parmi les monstres.
 //
+// LE CARRÉ SE MESURE ENTRE LES POSITIONS COURANTES, comme le serveur : un acteur
+// resté derrière un personnage qui s'éloigne lentement est encore en vue, même loin
+// de l'arrivée de sa marche.
 // ⚠ UNE MARGE ET UN DÉLAI, sans quoi la purge mordrait sur du vivant : un
 // acteur qui marche peut déborder le carré le temps que sa sortie arrive.
 // ⚠ ET RIEN TANT QUE LE SERVEUR N'A PAS DIT SON RAYON (`view_cells` nul) :

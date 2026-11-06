@@ -102,6 +102,9 @@ struct SurvivorsHero {
 struct SurvivorsFoe {
   std::uint32_t serial = 0;  // numéro de naissance, unique dans la partie
   std::uint16_t foe_id = 0;
+  // Son rang dans `SurvivorsRules::foes`, posé à sa naissance : un raccourci que
+  // `FoeRuleOf` vérifie. Il ne fixe rien de la partie.
+  std::uint16_t rule_rank = 0;
   FieldPoint position;
   FieldPoint previous_position;
   std::int32_t hp = 0;

@@ -48,7 +48,7 @@ ro::core::Result<void> SurvivorsStage::BeginCoop(const ro::sim::SurvivorsRules& 
   coop_stalled_ms_ = 0;
   coop_offers_.clear();
   coop_ballot_.reset();
-  play_->Show(match_->present(), 0);
+  play_->Watch(match_->present(), 0);
   return {};
 }
 
@@ -135,7 +135,7 @@ void SurvivorsStage::AdvanceCoop(std::uint32_t elapsed_ms, const SurvivorsIntent
   coop_last_tick_ = confirmed_tick;
   news_ = match_->TakeNews();
   chests_.insert(chests_.end(), news_.chests.begin(), news_.chests.end());
-  play_->Show(match_->present(), coop_pending_ms_);
+  play_->Watch(match_->present(), coop_pending_ms_);
   NoteSightings(sightings_, play_->run().field(), news_, presentation_.presentation_ms());
   presentation_.Follow(play_->run().field().step, play_->blend_per_mille());
   FollowCoopRun();

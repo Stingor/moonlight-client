@@ -238,8 +238,11 @@ void Separate(SurvivorsField& field) {
       if (j <= i) continue;
       SurvivorsFoe& first = field.foes[i];
       SurvivorsFoe& second = field.foes[j];
-      const std::int64_t reach = std::int64_t{radius_i} + FoeRadius(*field.rules, second);
       const std::int64_t distance_squared = DistanceSquared(first.position, second.position);
+      // Trop loin pour le plus grand rayon : celui du voisin ne changerait rien.
+      const std::int64_t widest_reach = std::int64_t{radius_i} + widest;
+      if (distance_squared >= widest_reach * widest_reach) continue;
+      const std::int64_t reach = std::int64_t{radius_i} + FoeRadius(*field.rules, second);
       if (distance_squared >= reach * reach) continue;
       // Un monstre au-dessus de la horde ne la pousse ni ne s'en écarte.
       if (((TraitsOf(*field.rules, first) | TraitsOf(*field.rules, second)) & kFoeOverHorde) != 0) {

@@ -4,6 +4,7 @@
 #include "ro/sim/sight_purge.h"
 
 #include <algorithm>
+#include <cmath>
 #include <cstdlib>
 #include <optional>
 #include <utility>
@@ -21,6 +22,21 @@ namespace {
          actor.posture != Posture::kDead;
 }
 
+struct PlainCell {
+  int x = 0;
+  int y = 0;
+};
+
+// LA CASE OÙ L'ACTEUR EST À CET INSTANT, le long de sa marche : c'est de là que le
+// serveur juge sa vue, et non de l'arrivée.
+[[nodiscard]] PlainCell CurrentCell(const Actor& actor, std::uint32_t now_ms) {
+  if (!actor.movement.has_value()) {
+    return PlainCell{actor.position.x, actor.position.y};
+  }
+  const FractionalCell cell = InterpolatedCell(actor, now_ms);
+  return PlainCell{static_cast<int>(std::lround(cell.x)), static_cast<int>(std::lround(cell.y))};
+}
+
 // Depuis quand ce suspect l'est : l'instant noté, ou maintenant s'il est neuf.
 [[nodiscard]] std::uint32_t SinceOf(const std::unordered_map<std::uint32_t, std::uint32_t>& noted,
                                     std::uint32_t actor_id, std::uint32_t now_ms) {
@@ -33,8 +49,8 @@ namespace {
 std::vector<PurgedActor> SightPurge::Sweep(World& world, int view_cells, std::uint32_t now_ms) {
   std::vector<PurgedActor> purged;
   const Actor* player = world.player();
-  const std::optional<CellPosition> center =
-      player != nullptr ? std::optional<CellPosition>(StandingCell(*player)) : std::nullopt;
+  const std::optional<PlainCell> center =
+      player != nullptr ? std::optional<PlainCell>(CurrentCell(*player, now_ms)) : std::nullopt;
   // LA VUE NE SE JUGE QUE SI LE SERVEUR A DIT SON RAYON ; les zéro PV, toujours.
   const bool sight_known = view_cells > 0 && center.has_value();
   const int bound_cells = view_cells + kSightPurgeMarginCells;
@@ -44,9 +60,9 @@ std::vector<PurgedActor> SightPurge::Sweep(World& world, int view_cells, std::ui
     if (actor_id == world.player_id()) {
       continue;
     }
-    const CellPosition cell = StandingCell(actor);
-    const int dx_cells = center.has_value() ? static_cast<int>(cell.x) - center->x : 0;
-    const int dy_cells = center.has_value() ? static_cast<int>(cell.y) - center->y : 0;
+    const PlainCell cell = CurrentCell(actor, now_ms);
+    const int dx_cells = center.has_value() ? cell.x - center->x : 0;
+    const int dy_cells = center.has_value() ? cell.y - center->y : 0;
     const PurgedActor gone{
         .actor_id = actor_id, .job = actor.look.job, .dx_cells = dx_cells, .dy_cells = dy_cells};
     if (StandsAtZeroHealth(actor)) {

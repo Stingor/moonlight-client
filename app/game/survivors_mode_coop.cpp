@@ -77,6 +77,7 @@ void SurvivorsMode::FollowCoopDoor(SurvivorsStage& stage, const SurvivorsContext
       part.rules_digest = ro::sim::SurvivorsRulesDigest(Rules());
       part.arena_id = begun.start.arena_id;
       part.cursed_water = begun.start.cursed_water;
+      part.grounds = ArenaGroundsOf(context.vfs, Rules());
       part.player.class_id = begun.start.class_id;
       part.player.first_skill_id = begun.start.first_skill_id;
       part.player.loadout = begun.start.loadout;
@@ -147,7 +148,7 @@ void SurvivorsMode::EnterCoop(SurvivorsStage& stage, const SurvivorsContext& con
     coop.Ask(*context.link, SurvivorsCoopAction::kLeave);
   };
   if (!departure.has_value()) {
-    refuse("le départ se lit mal, ou les règles des clients diffèrent",
+    refuse("le départ se lit mal, ou les règles ou le sol des clients diffèrent",
            ro::core::Tr("Les clients du groupe n'ont pas la même version : la partie ne peut pas "
                         "commencer."));
     return;

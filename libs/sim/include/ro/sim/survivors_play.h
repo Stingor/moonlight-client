@@ -31,22 +31,41 @@ class SurvivorsPlay {
   // journal irrejouable.
   void Abandon();
   // Les nouvelles accumulées depuis le dernier appel.
-  [[nodiscard]] SurvivorsNews TakeNews() { return run_.TakeNews(); }
+  [[nodiscard]] SurvivorsNews TakeNews() {
+    Adopt();
+    return run_.TakeNews();
+  }
   // En lecture seule : un pas, une réponse ou un abandon qui contourneraient le
   // journal le rendraient irrejouable.
-  [[nodiscard]] const SurvivorsRun& run() const noexcept { return run_; }
+  [[nodiscard]] const SurvivorsRun& run() const noexcept {
+    return watched_ != nullptr ? *watched_ : run_;
+  }
   [[nodiscard]] const SurvivorsJournal& journal() const noexcept { return journal_; }
   // CE QUE LE DESSIN MONTRE D'UNE PARTIE TENUE AILLEURS (le lockstep d'une coop) : la
   // partie, et le temps déjà écoulé du pas suivant.
   void Show(const SurvivorsRun& run, std::uint32_t pending_ms) {
+    watched_ = nullptr;
     run_ = run;
+    pending_ms_ = pending_ms;
+  }
+  // LA MÊME SANS COPIE, chaque image : `run` doit vivre tant qu'on la suit, jusqu'au
+  // prochain `Show`. Ce qui modifie la partie part d'une copie de ce qu'elle montre.
+  void Watch(const SurvivorsRun& run, std::uint32_t pending_ms) noexcept {
+    watched_ = &run;
     pending_ms_ = pending_ms;
   }
   // Part du pas suivant déjà écoulée, en millièmes : l'interpolation du dessin.
   [[nodiscard]] std::uint32_t blend_per_mille() const noexcept;
 
  private:
+  void Adopt() {
+    if (watched_ == nullptr) return;
+    run_ = *watched_;
+    watched_ = nullptr;
+  }
+
   SurvivorsRun run_;
+  const SurvivorsRun* watched_ = nullptr;
   SurvivorsJournal journal_;
   std::uint32_t pending_ms_ = 0;
   std::uint8_t last_heading_ = kNoHeading;

@@ -142,7 +142,7 @@ void TouchHero(SurvivorsField& field) {
     if (foe.hp <= 0 || foe.touch_ready_step > field.step) continue;
     // Un monstre gelé ou caché ne touche pas.
     if (Frozen(field, foe) || Hidden(field, foe)) continue;
-    const FoeRule* rule = FindFoe(rules, foe.foe_id);
+    const FoeRule* rule = FoeRuleOf(rules, foe);
     // Un monstre sans dégâts de contact ne blesse pas : le minimum d'un PV ne
     // vaut que pour un contact que l'armure absorbe.
     if (rule == nullptr || rule->touch_damage <= 0) continue;

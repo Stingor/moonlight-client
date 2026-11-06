@@ -339,7 +339,7 @@ void Steer(SurvivorsField& field, SurvivorsFoe& foe) {
   }
   foe.previous_position = foe.position;
   foe.steered = false;
-  const FoeRule* rule = FindFoe(*field.rules, foe.foe_id);
+  const FoeRule* rule = FoeRuleOf(*field.rules, foe);
   if (rule == nullptr) return;
   const FoeBehaviour& behaviour = rule->behaviour;
   const FoeAct act = ActOf(behaviour);

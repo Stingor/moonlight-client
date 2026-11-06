@@ -66,6 +66,8 @@ void SurvivorsMode::FollowDoor(SurvivorsStage& stage, const SurvivorsContext& co
   if (std::optional<SurvivorsEnding> ending =
           hub_door_.EndingToShow(windows.hub.open, stage.screen(), context.client_root)) {
     music_volume_.Follow(context.audio->music_volume());
+    // LE BILAN RELU D'UNE COOP : son équipe est déjà loin, personne à prévenir.
+    coop_left_told_ = ending->board.coop;
     stage.ShowEnding(std::move(*ending));
     clock_.Follow(false, context.now_ms);
   }

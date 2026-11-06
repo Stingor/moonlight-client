@@ -122,9 +122,12 @@ inline constexpr std::uint32_t kMoveSettleMs = 1000;
 
 inline constexpr std::int64_t kMsPerSecond = 1000;
 
+// L'ÉCART ENTRE DEUX INSTANTS DE L'HORLOGE DU CLIENT, signé et MODULAIRE : un instant
+// repris d'un fichier peut dater d'avant le zéro de cette horloge, et s'y replie. Juste
+// tant que l'écart tient sur 31 bits, soit plus de 24 jours.
 [[nodiscard]] inline std::int64_t SignedElapsedMs(std::uint32_t now_ms,
                                                   std::uint32_t since_ms) noexcept {
-  return static_cast<std::int64_t>(now_ms) - static_cast<std::int64_t>(since_ms);
+  return static_cast<std::int32_t>(now_ms - since_ms);
 }
 
 [[nodiscard]] inline std::int64_t MsOf(int seconds) noexcept {

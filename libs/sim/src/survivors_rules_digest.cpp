@@ -9,6 +9,7 @@
 #include "ro/sim/survivors_rules.h"
 #include "ro/sim/survivors_run.h"
 #include "ro/sim/survivors_terrain.h"
+#include "ro/sim/walk_map.h"
 
 #include "survivors_fnv.h"
 
@@ -163,6 +164,15 @@ void PutTuning(FnvDigest& digest, const SurvivorsTuning& tuning) {
 }
 
 }  // namespace
+
+std::uint64_t SurvivorsGroundDigest(const WalkMap& map) {
+  FnvDigest digest;
+  PutAll(digest, map.width(), map.height());
+  for (std::int32_t y = 0; y < map.height(); ++y) {
+    for (std::int32_t x = 0; x < map.width(); ++x) Put(digest, map.Passable(x, y));
+  }
+  return digest.value();
+}
 
 std::uint64_t SurvivorsRulesDigest(const SurvivorsRules& rules) {
   FnvDigest digest;

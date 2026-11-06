@@ -379,7 +379,7 @@ void BuryFallen(SurvivorsField& field) {
   const SurvivorsRules& rules = *field.rules;
   for (const SurvivorsFoe& foe : field.foes) {
     if (foe.hp > 0) continue;
-    const FoeRule* rule = FindFoe(*field.rules, foe.foe_id);
+    const FoeRule* rule = FoeRuleOf(*field.rules, foe);
     const FoeRank rank = rule != nullptr ? rule->rank : FoeRank::kCommon;
     if (field.news.falls.size() < kMostNewsFalls) {
       field.news.falls.push_back(SurvivorsFall{

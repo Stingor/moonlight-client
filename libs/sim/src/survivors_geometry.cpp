@@ -15,7 +15,7 @@ constexpr std::uint8_t kQuarterTurn = kHeadingSteps / 4;
 
 // Le sinus du cap, en 1024es : un quart de la table, renversé ou nié selon
 // le quart de tour.
-[[nodiscard]] std::int32_t SineOf(std::uint8_t heading) noexcept {
+[[nodiscard]] constexpr std::int32_t SineOf(std::uint8_t heading) noexcept {
   const std::size_t wrapped = static_cast<std::size_t>(heading) % kHeadingSteps;
   const std::size_t quarter = wrapped / kQuarterTurn;
   const std::size_t inside = wrapped % kQuarterTurn;
@@ -33,15 +33,13 @@ constexpr std::uint8_t kQuarterTurn = kHeadingSteps / 4;
   }
 }
 
-[[nodiscard]] std::int32_t CosineOf(std::uint8_t heading) noexcept {
+[[nodiscard]] constexpr std::int32_t CosineOf(std::uint8_t heading) noexcept {
   const std::uint32_t turned =
       (static_cast<std::uint32_t>(heading) % kHeadingSteps + kQuarterTurn) % kHeadingSteps;
   return SineOf(static_cast<std::uint8_t>(turned));
 }
 
-}  // namespace
-
-FieldPoint TurnVector(std::uint8_t heading, std::int32_t length) noexcept {
+[[nodiscard]] constexpr FieldPoint Turned(std::uint8_t heading, std::int32_t length) noexcept {
   // Le cap tourne dans le sens trigonométrique depuis le nord : x vaut −sin,
   // y vaut cos.
   const std::int64_t west = -static_cast<std::int64_t>(SineOf(heading)) * length;
@@ -50,12 +48,28 @@ FieldPoint TurnVector(std::uint8_t heading, std::int32_t length) noexcept {
           static_cast<std::int32_t>(north / kSubunitsPerCell)};
 }
 
+// Le vecteur d'une case de chaque cap : ce que `HeadingOf` compare, à chaque pas de
+// chaque monstre.
+constexpr std::array<FieldPoint, kHeadingSteps> kCellVectors = [] {
+  std::array<FieldPoint, kHeadingSteps> vectors{};
+  for (std::size_t heading = 0; heading < vectors.size(); ++heading) {
+    vectors[heading] = Turned(static_cast<std::uint8_t>(heading), kSubunitsPerCell);
+  }
+  return vectors;
+}();
+
+}  // namespace
+
+FieldPoint TurnVector(std::uint8_t heading, std::int32_t length) noexcept {
+  return Turned(heading, length);
+}
+
 std::uint8_t HeadingOf(FieldPoint delta, std::uint8_t fallback) noexcept {
   if (delta.x == 0 && delta.y == 0) return fallback;
   std::uint8_t best = 0;
   std::int64_t best_dot = 0;
   for (std::uint8_t heading = 0; heading < kHeadingSteps; ++heading) {
-    const FieldPoint unit = TurnVector(heading, kSubunitsPerCell);
+    const FieldPoint unit = kCellVectors[heading];
     const std::int64_t dot =
         static_cast<std::int64_t>(delta.x) * unit.x + static_cast<std::int64_t>(delta.y) * unit.y;
     if (heading == 0 || dot > best_dot) {

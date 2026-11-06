@@ -23,9 +23,11 @@ namespace {
 
 constexpr std::string_view kEndingSignature = "MSVE";
 // La version 1 s'arrête aux Zeny ; elle se lit encore, en partie libre, sans
-// carte tombée ni glaçage.
+// carte tombée ni glaçage. La version 2 s'arrête aux glaçages ; elle se lit
+// encore, hors coop.
 constexpr std::uint16_t kFirstEndingVersion = 1;
-constexpr std::uint16_t kEndingVersion = 2;
+constexpr std::uint16_t kBoardEndingVersion = 2;
+constexpr std::uint16_t kEndingVersion = 3;
 // La taille écrite d'une entrée de récapitulatif (id u16, valeur u64), d'une
 // carte portée (id u16, niveau u8) et d'une carte tombée (id u16) : une liste
 // annoncée plus longue que les octets restants est refusée, sans rien
@@ -117,6 +119,8 @@ std::vector<std::uint8_t> EncodeSurvivorsEnding(const SurvivorsEnding& ending) {
   out.U16(static_cast<std::uint16_t>(ending.recap.cards_found.size()));
   for (const std::uint16_t card_item_id : ending.recap.cards_found) out.U16(card_item_id);
   out.U64(ending.recap.chills);
+  out.U8(ending.board.coop ? 1 : 0);
+  out.U8(ending.own_evolved ? 1 : 0);
   return bytes;
 }
 
@@ -129,7 +133,7 @@ ro::core::Result<SurvivorsEnding> DecodeSurvivorsEnding(std::span<const std::uin
                    : Fail(ErrorCode::kUnexpectedEnd, "fin de partie : en-tête");
   }
   const std::uint16_t version = in.U16();
-  if (version != kFirstEndingVersion && version != kEndingVersion) {
+  if (version < kFirstEndingVersion || version > kEndingVersion) {
     return in.ok() ? Fail(ErrorCode::kUnsupportedVersion, "fin de partie : version")
                    : Fail(ErrorCode::kUnexpectedEnd, "fin de partie : version");
   }
@@ -163,7 +167,7 @@ ro::core::Result<SurvivorsEnding> DecodeSurvivorsEnding(std::span<const std::uin
   }
   ending.zeny = in.U32();
   std::uint8_t board_kind = 0;
-  if (version == kEndingVersion) {
+  if (version >= kBoardEndingVersion) {
     board_kind = in.U8();
     ending.board.week.year = in.I32();
     ending.board.week.week = in.U8();
@@ -176,6 +180,10 @@ ro::core::Result<SurvivorsEnding> DecodeSurvivorsEnding(std::span<const std::uin
       ending.recap.cards_found.push_back(in.U16());
     }
     ending.recap.chills = in.U64();
+  }
+  if (version >= kEndingVersion) {
+    ending.board.coop = in.U8() != 0;
+    ending.own_evolved = in.U8() != 0;
   }
   if (!in.ok()) return Fail(ErrorCode::kUnexpectedEnd, "fin de partie : tronquée");
   if (board_kind > static_cast<std::uint8_t>(SurvivorsBoardKind::kRanked)) {

@@ -170,6 +170,9 @@ std::uint32_t HatchFoe(SurvivorsField& field, const FoeRule& rule, FieldPoint at
   SurvivorsFoe foe;
   foe.serial = field.next_serial++;
   foe.foe_id = rule.foe_id;
+  if (const FoeRule* listed = FindFoe(rules, rule.foe_id); listed != nullptr) {
+    foe.rule_rank = static_cast<std::uint16_t>(listed - rules.foes.data());
+  }
   foe.position = at;
   foe.previous_position = at;
   foe.hp = hp;

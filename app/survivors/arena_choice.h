@@ -3,8 +3,10 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include "ro/core/error.h"
+#include "ro/sim/survivors_match.h"
 #include "ro/sim/survivors_rules.h"
 #include "ro/sim/walk_map.h"
 #include "ro/vfs/map_display_names.h"
@@ -33,6 +35,11 @@ namespace moonclient {
 // du GAT tels quels.
 [[nodiscard]] ro::core::Result<std::optional<ro::sim::WalkMap>> ArenaWalkOf(
     ro::vfs::Vfs* vfs, const ro::sim::ArenaRule& arena);
+
+// LE SOL DE CHAQUE ARÈNE SUR CARTE, tel que cette installation le lit : ce qu'un
+// joueur annonce à son équipe. Une carte illisible n'y figure pas.
+[[nodiscard]] std::vector<ro::sim::SurvivorsArenaGround> ArenaGroundsOf(
+    ro::vfs::Vfs* vfs, const ro::sim::SurvivorsRules& rules);
 
 // L'aspect du biome d'une arène générée ; nul pour une carte, ou pour un
 // terrain que le catalogue d'app ne dessine pas.

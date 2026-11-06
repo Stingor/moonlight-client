@@ -94,7 +94,7 @@ struct Push {
 // Le contact d'un monstre, au moins 1 : un monstre sans contact gêne encore
 // le passage. Celui d'une élite est majoré comme dans la partie.
 [[nodiscard]] std::int64_t ContactOf(const SurvivorsRules& rules, const SurvivorsFoe& foe) {
-  const FoeRule* rule = FindFoe(rules, foe.foe_id);
+  const FoeRule* rule = survivors::FoeRuleOf(rules, foe);
   std::int64_t contact = rule != nullptr ? rule->touch_damage : 0;
   if (foe.elite)
     contact = contact * std::clamp(rules.elites.touch_pct, 0, kMostStatBonus) / kPercent;

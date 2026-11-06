@@ -71,7 +71,7 @@ inline void PublishCast(SurvivorsNews& news, const SurvivorsCast& cast) {
 [[nodiscard]] inline SurvivorsElement ElementOf(const SurvivorsField& field,
                                                 const SurvivorsFoe& foe) {
   if (Frozen(field, foe)) return SurvivorsElement::kWater;
-  const FoeRule* rule = FindFoe(*field.rules, foe.foe_id);
+  const FoeRule* rule = FoeRuleOf(*field.rules, foe);
   return rule != nullptr ? rule->element : SurvivorsElement::kNeutral;
 }
 
@@ -174,7 +174,7 @@ inline void ExtendStatus(const SurvivorsField& field, std::uint32_t ms,
                       status.blind_ms == 0 && status.curse_ms == 0)) {
     return applied;
   }
-  const FoeRule* rule = FindFoe(*field.rules, foe.foe_id);
+  const FoeRule* rule = FoeRuleOf(*field.rules, foe);
   if (rule == nullptr || rule->rank != FoeRank::kCommon) return applied;
   const std::uint8_t traits = rule->behaviour.traits;
   if (status.freeze_ms > 0 && (traits & kFoeFreezeImmune) == 0) {

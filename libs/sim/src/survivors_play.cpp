@@ -20,6 +20,7 @@ SurvivorsPlay::SurvivorsPlay(SurvivorsRun run) : run_(std::move(run)) {
 }
 
 std::uint32_t SurvivorsPlay::Advance(std::uint32_t elapsed_ms, SurvivorsInput input) {
+  Adopt();
   if (run_.field().phase != SurvivorsPhase::kRunning) {
     pending_ms_ = 0;
     return 0;
@@ -55,6 +56,7 @@ std::uint32_t SurvivorsPlay::Advance(std::uint32_t elapsed_ms, SurvivorsInput in
 }
 
 bool SurvivorsPlay::Answer(SurvivorsAnswer answer) {
+  Adopt();
   const std::uint32_t step = run_.field().step;
   if (!run_.Answer(answer)) return false;
   journal_.entries.push_back(
@@ -64,6 +66,7 @@ bool SurvivorsPlay::Answer(SurvivorsAnswer answer) {
 }
 
 void SurvivorsPlay::Abandon() {
+  Adopt();
   if (run_.field().phase == SurvivorsPhase::kOver) return;
   journal_.entries.push_back(
       JournalEntry{.step = run_.field().step, .kind = JournalKind::kAbandon, .value = 0});

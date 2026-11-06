@@ -421,7 +421,8 @@ void SurvivorsRun::StepTeam(std::span<const SurvivorsInput> inputs) {
   survivors::RunBossScripts(field_);
   survivors::SteerFoes(field_);
   survivors::MoveHorde(field_);
-  survivors::ForEachStanding(field_, [this] { survivors::HoldBarriers(field_); });
+  // Les blocs d'un héros tombé retiennent la horde tant qu'ils tiennent.
+  survivors::ForEachHero(field_, [this] { survivors::HoldBarriers(field_); });
   survivors::RebuildGrid(field_);
   // Un héros tombé laisse ses coups en vol finir leur course.
   survivors::ForEachHero(field_, [this] {

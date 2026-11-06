@@ -36,6 +36,19 @@ ro::core::Result<std::optional<ro::sim::WalkMap>> ArenaWalkOf(ro::vfs::Vfs* vfs,
   return std::optional<ro::sim::WalkMap>(ro::sim::WalkMap::FromGat(*gat));
 }
 
+std::vector<ro::sim::SurvivorsArenaGround> ArenaGroundsOf(ro::vfs::Vfs* vfs,
+                                                          const ro::sim::SurvivorsRules& rules) {
+  std::vector<ro::sim::SurvivorsArenaGround> grounds;
+  for (const ro::sim::ArenaRule& arena : rules.arenas) {
+    auto walk = ArenaWalkOf(vfs, arena);
+    if (walk.has_value() && walk->has_value()) {
+      grounds.push_back(ro::sim::SurvivorsArenaGround{
+          .arena_id = arena.arena_id, .digest = ro::sim::SurvivorsGroundDigest(**walk)});
+    }
+  }
+  return grounds;
+}
+
 const BiomeLook* ArenaLookOf(const ro::sim::SurvivorsRules& rules,
                              const ro::sim::ArenaRule& arena) {
   if (arena.terrain_id == 0) return nullptr;
