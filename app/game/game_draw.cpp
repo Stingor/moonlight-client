@@ -673,7 +673,8 @@ void Game::ComposeActors(std::uint32_t now_ms, const ro::ui::PickTuning& pick_tu
       }
     }
     // ⚠ LE BALAYAGE VIENT APRÈS LA COMPOSITION, jamais pendant : oublier un style détruit
-    // les tenues qui le portaient, et le parcours les lirait mortes.
+    // les tenues qui le portaient, et le parcours les lirait mortes, comme la scène
+    // d'avant que la désignation à la souris relit jusqu'ici.
     styles_.Sweep(*pieces_.wardrobe, world_.styles());
     ReportCensus(census, reported_census_);
     // LA MARCHE QU'UN GESTE RETENAIT part dès que la motion a changé, d'après ce

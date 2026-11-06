@@ -278,14 +278,18 @@ void ClientShell::WaitForFrameLimit() {
 }
 
 ro::core::Result<void> ClientShell::Run(Screen& screen) {
+  // 🔴 UNE IMAGE RATÉE SORT PAR LA MÊME PORTE QUE LE JOUEUR QUI QUITTE : le
+  // processus s'arrête derrière, et ce qui attendait s'écrit ici ou jamais.
+  ro::core::Result<void> outcome;
   while (screen.running()) {
     // Une seule horloge par image : le réseau, les intentions et le dessin
     // voient le même instant.
     const auto now_ms = static_cast<std::uint32_t>(SDL_GetTicks());
     // ⚠ ET UNE SEULE MESURE DE LA FENÊTRE, en tête : voir `width()`.
     SDL_GetWindowSize(gl_->window(), &width_, &height_);
-    if (auto ok = screen.Frame(now_ms); !ok) {
-      return ok;
+    outcome = screen.Frame(now_ms);
+    if (!outcome) {
+      break;
     }
     gl_->SwapBuffers();
     WaitForFrameLimit();
@@ -300,7 +304,7 @@ ro::core::Result<void> ClientShell::Run(Screen& screen) {
   // quittée dans la sélection du personnage. Leurs sources meurent avec
   // l'écran ; leurs bruits, eux, jouent dans le mélangeur, qui reste.
   audio_.StopSounds(ro::audio::SoundChannel::kAmbience);
-  return {};
+  return outcome;
 }
 
 }  // namespace moonclient

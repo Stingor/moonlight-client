@@ -19,85 +19,96 @@
 
 namespace ro::render {
 
-void EffectNodePool::MoveAnchored(std::uint32_t anchor_id, glm::vec3 ground_position,
-                                  std::optional<float> owner_body_degrees) {
-  if (anchor_id == 0) {
+namespace {
+
+// UN NŒUD ACCROCHÉ SUIT SON PORTEUR : voir `EffectNodePool::MoveBearers`.
+void MoveWithBearer(PooledEffectNode& node, glm::vec3 ground_position,
+                    std::optional<float> owner_body_degrees) {
+  // 🔴 LE BOUCLIER ET L'ANNEAU DOUBLE RELISENT L'ANGLE DU CORPS À CHAQUE TIC,
+  // avant toute question de place : leur mouvement refait l'azimut depuis le
+  // porteur, et la figure pivote avec lui même quand l'effet ne le suit pas
+  // pas à pas.
+  if (owner_body_degrees.has_value() && (node.shape == PooledNodeShape::kSphereShell ||
+                                         node.shape == PooledNodeShape::kDoubleRibbon)) {
+    node.owner_facing_degrees = *owner_body_degrees;
+  }
+  // 🔴 UN NŒUD NE SUIT SON PORTEUR QU'AUX TICS OÙ SON EFFET LE FAIT. Un impact,
+  // une bouffée de poison restent où ils sont nés, même accrochés à l'acteur
+  // qui les a reçus ; une aura le suit pas à pas ; quelques effets ne le
+  // rejoignent qu'à un tic précis, et tout ce qu'ils ont déjà semé saute alors
+  // avec eux. Entre deux recalages, la place de l'ancre ne bouge pas non plus :
+  // le prochain rattrape tout le chemin parcouru depuis.
+  const std::int32_t effect_tick = node.sown_at_effect_tick + node.node.age_ticks;
+  if (!EffectFollowsBearerStepByStep(node.bearer_follow, effect_tick) &&
+      !EffectRejoinsBearerBetween(node.bearer_follow, node.followed_through_tick, effect_tick)) {
+    return;
+  }
+  node.followed_through_tick = effect_tick;
+  // 🔴 LE POINT DU NŒUD ET CELUI DE SON PORTEUR, du même pas. Quarante-cinq
+  // mouvements reposent le nœud sur `owner_position` à chaque tic, comme le
+  // client recopie la place de l'instance — que le bâtisseur recale sur le
+  // porteur. Laissé à sa place de naissance, ce porteur ramènerait le nœud en
+  // arrière à chaque tic : un effet accroché à un acteur qui marche resterait
+  // derrière lui.
+  //
+  // 🔴 ON TRANSLATE DU PAS DU PORTEUR, ON NE REPOSE PAS LE NŒUD. Recalculer sa
+  // place — `ancre + écart de naissance` — le ramène à son point de départ à
+  // chaque image et efface TOUT ce que son mouvement a accumulé depuis : la
+  // montée d'une étincelle de téléportation ne dépasserait jamais un tic, sa
+  // vitesse s'intégrant pendant que sa hauteur serait réécrite. L'orbite,
+  // elle, survivrait — elle se recalcule depuis son ancre —, ce qui rendrait
+  // la panne invisible à l'œil.
+  //
+  // ⚠ ET LA TRANSLATION GARDE CE QUE L'ÉCART GARDAIT DÉJÀ : la place du nœud
+  // dans sa couronne, sa sortie du terrain et son ENFOUISSEMENT. Les pointes de
+  // Frost Diver naissent trente unités sous terre et montent de vingt-huit ;
+  // recollées au sol, elles montaient de vingt-huit AU-DESSUS de leur cible.
+  const glm::vec3 step = ground_position - node.anchor_ground_position;
+  node.anchor_ground_position = ground_position;
+  if (step == glm::vec3{0.0F, 0.0F, 0.0F}) {
+    return;
+  }
+  // ⚠ SAUF LA PLUIE QUI RENAÎT : sa place est absolue, et seule sa
+  // renaissance relit le porteur. Voir `EffectChasedDriftIsReborn`.
+  // ⚠ L'ÉTAT DU TIC PRÉCÉDENT SUIT AUSSI : le porteur marche au rythme de
+  // l'image, et seul ce que le mouvement fait au tic glisse entre deux tics.
+  if (!EffectChasedDriftIsReborn(node.chased_drift)) {
+    node.ground_position += step;
+    if (node.previous_tick.has_value()) {
+      node.previous_tick->ground_position += step;
+    }
+  }
+  node.owner_position += step;
+  // ⚠ ET L'ANCRE DE L'ORBITE AVEC, sans quoi un nœud qui tourne autour d'un
+  // point reviendrait à son ancien cercle au tic suivant : sa place se
+  // RECALCULE depuis cette ancre, elle ne s'intègre pas.
+  node.orbit_anchor += step;
+  node.haunt_center += step;
+}
+
+}  // namespace
+
+void EffectNodePool::MoveBearers(std::span<const EffectBearerPlace> places_by_id) {
+  if (places_by_id.empty()) {
     return;
   }
   for (PooledEffectNode& node : nodes_) {
-    if (node.anchor_id != anchor_id) {
-      continue;
+    if (const EffectBearerPlace* anchor = FindBearerPlace(places_by_id, node.anchor_id)) {
+      MoveWithBearer(node, anchor->ground_position, anchor->owner_body_degrees);
     }
-    // 🔴 LE BOUCLIER ET L'ANNEAU DOUBLE RELISENT L'ANGLE DU CORPS À CHAQUE TIC,
-    // avant toute question de place : leur mouvement refait l'azimut depuis le
-    // porteur, et la figure pivote avec lui même quand l'effet ne le suit pas
-    // pas à pas.
-    if (owner_body_degrees.has_value() && (node.shape == PooledNodeShape::kSphereShell ||
-                                           node.shape == PooledNodeShape::kDoubleRibbon)) {
-      node.owner_facing_degrees = *owner_body_degrees;
+    if (const EffectBearerPlace* target = FindBearerPlace(places_by_id, node.target_actor_id)) {
+      node.target_position = target->ground_position;
     }
-    // 🔴 UN NŒUD NE SUIT SON PORTEUR QU'AUX TICS OÙ SON EFFET LE FAIT. Un impact,
-    // une bouffée de poison restent où ils sont nés, même accrochés à l'acteur
-    // qui les a reçus ; une aura le suit pas à pas ; quelques effets ne le
-    // rejoignent qu'à un tic précis, et tout ce qu'ils ont déjà semé saute alors
-    // avec eux. Entre deux recalages, la place de l'ancre ne bouge pas non plus :
-    // le prochain rattrape tout le chemin parcouru depuis.
-    const std::int32_t effect_tick = node.sown_at_effect_tick + node.node.age_ticks;
-    if (!EffectFollowsBearerStepByStep(node.bearer_follow, effect_tick) &&
-        !EffectRejoinsBearerBetween(node.bearer_follow, node.followed_through_tick, effect_tick)) {
-      continue;
-    }
-    node.followed_through_tick = effect_tick;
-    // 🔴 LE POINT DU NŒUD ET CELUI DE SON PORTEUR, du même pas. Quarante-cinq
-    // mouvements reposent le nœud sur `owner_position` à chaque tic, comme le
-    // client recopie la place de l'instance — que le bâtisseur recale sur le
-    // porteur. Laissé à sa place de naissance, ce porteur ramènerait le nœud en
-    // arrière à chaque tic : un effet accroché à un acteur qui marche resterait
-    // derrière lui.
-    //
-    // 🔴 ON TRANSLATE DU PAS DU PORTEUR, ON NE REPOSE PAS LE NŒUD. Recalculer sa
-    // place — `ancre + écart de naissance` — le ramène à son point de départ à
-    // chaque image et efface TOUT ce que son mouvement a accumulé depuis : la
-    // montée d'une étincelle de téléportation ne dépasserait jamais un tic, sa
-    // vitesse s'intégrant pendant que sa hauteur serait réécrite. L'orbite,
-    // elle, survivrait — elle se recalcule depuis son ancre —, ce qui rendrait
-    // la panne invisible à l'œil.
-    //
-    // ⚠ ET LA TRANSLATION GARDE CE QUE L'ÉCART GARDAIT DÉJÀ : la place du nœud
-    // dans sa couronne, sa sortie du terrain et son ENFOUISSEMENT. Les pointes de
-    // Frost Diver naissent trente unités sous terre et montent de vingt-huit ;
-    // recollées au sol, elles montaient de vingt-huit AU-DESSUS de leur cible.
-    const glm::vec3 step = ground_position - node.anchor_ground_position;
-    node.anchor_ground_position = ground_position;
-    if (step == glm::vec3{0.0F, 0.0F, 0.0F}) {
-      continue;
-    }
-    // ⚠ SAUF LA PLUIE QUI RENAÎT : sa place est absolue, et seule sa
-    // renaissance relit le porteur. Voir `EffectChasedDriftIsReborn`.
-    // ⚠ L'ÉTAT DU TIC PRÉCÉDENT SUIT AUSSI : le porteur marche au rythme de
-    // l'image, et seul ce que le mouvement fait au tic glisse entre deux tics.
-    if (!EffectChasedDriftIsReborn(node.chased_drift)) {
-      node.ground_position += step;
-      if (node.previous_tick.has_value()) {
-        node.previous_tick->ground_position += step;
-      }
-    }
-    node.owner_position += step;
-    // ⚠ ET L'ANCRE DE L'ORBITE AVEC, sans quoi un nœud qui tourne autour d'un
-    // point reviendrait à son ancien cercle au tic suivant : sa place se
-    // RECALCULE depuis cette ancre, elle ne s'intègre pas.
-    node.orbit_anchor += step;
-    node.haunt_center += step;
   }
 }
 
-void EffectNodePool::MoveTargeted(std::uint32_t target_actor_id, glm::vec3 ground_position) {
-  if (target_actor_id == 0) {
-    return;
-  }
-  for (PooledEffectNode& node : nodes_) {
-    if (node.target_actor_id == target_actor_id) {
-      node.target_position = ground_position;
+void EffectNodePool::CollectBearerIds(std::vector<std::uint32_t>& ids) const {
+  for (const PooledEffectNode& node : nodes_) {
+    if (node.anchor_id != 0) {
+      ids.push_back(node.anchor_id);
+    }
+    if (node.target_actor_id != 0) {
+      ids.push_back(node.target_actor_id);
     }
   }
 }
@@ -122,19 +133,6 @@ std::size_t EffectNodePool::DropOldestFromEffect(std::uint32_t effect_id, std::u
   }
   nodes_.erase(nodes_.begin() + static_cast<std::ptrdiff_t>(kept), nodes_.end());
   return dropped;
-}
-
-bool EffectNodePool::HasTargeted(std::uint32_t target_actor_id) const {
-  return target_actor_id != 0 &&
-         std::ranges::any_of(nodes_, [target_actor_id](const PooledEffectNode& node) {
-           return node.target_actor_id == target_actor_id;
-         });
-}
-
-bool EffectNodePool::HasAnchored(std::uint32_t anchor_id) const {
-  return anchor_id != 0 && std::ranges::any_of(nodes_, [anchor_id](const PooledEffectNode& node) {
-           return node.anchor_id == anchor_id;
-         });
 }
 
 void EffectNodePool::Shift(glm::vec3 world_delta) {

@@ -155,12 +155,31 @@ class EffectNodesInPlay {
   //
   // ⚠ SEULS SUIVENT LES EFFETS QUE LA TABLE DE SUIVI DU PORTEUR DÉSIGNE, et
   // parfois à partir d'un tic précis — voir `StepClocks`. 🔴 Les nœuds déjà
-  // nés sont emmenés aussi, du pas du porteur (`EffectNodePool::MoveAnchored`) :
+  // nés sont emmenés aussi, du pas du porteur (`EffectNodePool::MoveBearers`) :
   // un effet qui sème une fois puis dure n'a plus d'horloge pour le faire.
-  // `owner_body_degrees` : l'angle du corps, que le bouclier relit — voir `MoveAnchored`.
+  // `owner_body_degrees` : l'angle du corps, que le bouclier relit — voir `MoveBearers`.
   void FollowActor(std::uint32_t actor_id, glm::vec3 ground_position, float owner_facing_degrees,
                    std::optional<float> owner_body_degrees = std::nullopt);
-  [[nodiscard]] bool HasClocksAttachedTo(std::uint32_t actor_id) const;
+
+  // `FollowActor` POUR TOUTE UNE LISTE, triée par identifiant, en un seul
+  // parcours des horloges et des nœuds.
+  void FollowActors(std::span<const ro::render::EffectBearerPlace> places_by_id);
+  // Tout acteur qu'une horloge ou un nœud porte ou vise, trié et sans doublon.
+  void CollectBearerIds(std::vector<std::uint32_t>& ids) const;
+  // 🔴 FAIT SUIVRE TOUS LES PORTEURS : `place_of` rend la place d'un identifiant,
+  // ou rien s'il n'est pas à suivre. C'est le porteur qui se cherche dans le
+  // monde et non l'inverse, si bien qu'une foule sans effet ne coûte rien.
+  template <typename PlaceOf>
+  void FollowBearers(PlaceOf place_of) {
+    CollectBearerIds(bearer_ids_);
+    bearer_places_.clear();
+    for (const std::uint32_t bearer_id : bearer_ids_) {
+      if (const std::optional<ro::render::EffectBearerPlace> place = place_of(bearer_id)) {
+        bearer_places_.push_back(*place);
+      }
+    }
+    FollowActors(bearer_places_);
+  }
 
   // UN PORTEUR PARTI EMPORTE CE QU'IL PORTAIT : ses nœuds, d'écran compris, ET
   // son horloge ; et le trait tendu vers lui s'éteint (`LoseTargetsUnless`).
@@ -749,6 +768,9 @@ class EffectNodesInPlay {
   bool effects_shown_ = true;
   bool minimal_effects_ = false;
   std::vector<EffectClock> clocks_;
+  // Les listes de `FollowBearers`, gardées d'une image à l'autre pour leur mémoire.
+  std::vector<std::uint32_t> bearer_ids_;
+  std::vector<ro::render::EffectBearerPlace> bearer_places_;
   // Voir `DieWithBearerAtNext`. Zéro : l'instance vit sa vie.
   std::int32_t next_bearer_death_tick_ = 0;
   // LES SEMIS QUI ONT SONNÉ depuis le dernier `TakeSounds` : l'effet, et le

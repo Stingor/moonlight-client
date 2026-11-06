@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <map>
+#include <vector>
 
 #include "ro/render/actor_wardrobe.h"
 #include "ro/render/sprite_catalog.h"
@@ -57,12 +58,18 @@ class ActorStyles {
   // composée retient l'ADRESSE de sa palette, et la repeindre sous le même
   // pointeur ne se verrait qu'à la prochaine éviction. Le registre prend donc
   // le refus au sérieux au lieu de le contourner.
+  //
+  // 🔴 ET L'ANCIEN NE MEURT QU'AU BALAYAGE. `Dress` s'appelle n'importe quand
+  // dans l'image — le portrait, le cadre de la cible, la fiche —, alors que la
+  // scène de l'image précédente désigne encore les tenues de cet identifiant, et
+  // que la désignation à la souris la lit avant la composition suivante.
   void Dress(std::uint32_t gid, ro::render::ActorLook& look, ro::render::ActorWardrobe& wardrobe,
              const ro::sim::StyleBook& book);
 
   // Oublie les acteurs dont le livre ne parle plus, et rend à la garde-robe ce
-  // qu'ils tenaient. ⚠ ENTRE DEUX IMAGES : `ForgetStyle` invalide les tenues
-  // du style, et une composition en cours les lirait détruites.
+  // qu'ils tenaient, avec les identifiants que `Dress` a remplacés. ⚠ APRÈS LA
+  // COMPOSITION : `ForgetStyle` invalide les tenues du style, et une composition
+  // en cours, comme la scène qu'elle remplace, les lirait détruites.
   void Sweep(ro::render::ActorWardrobe& wardrobe, const ro::sim::StyleBook& book);
 
  private:
@@ -78,6 +85,8 @@ class ActorStyles {
   };
 
   std::map<std::uint32_t, Applied> applied_;
+  // Les identifiants remplacés, que le prochain `Sweep` rend à la garde-robe.
+  std::vector<std::uint32_t> retired_;
 };
 
 }  // namespace moonclient

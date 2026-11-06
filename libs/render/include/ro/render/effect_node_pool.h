@@ -40,6 +40,28 @@ namespace ro::render {
 // Description PURE : aucune texture n'est chargée ici, aucun contexte
 // graphique n'est touché. Voir `docs/adr/0014`.
 
+// LA PLACE D'UN PORTEUR À CETTE IMAGE, pour en faire suivre plusieurs d'un seul
+// parcours : voir `EffectNodePool::MoveBearers`.
+struct EffectBearerPlace {
+  std::uint32_t actor_id = 0;
+  glm::vec3 ground_position{0.0F, 0.0F, 0.0F};
+  float owner_facing_degrees = 0.0F;
+  // L'angle du corps, quand l'appelant le connaît : voir `MoveBearers`.
+  std::optional<float> owner_body_degrees;
+};
+
+// La place de ce porteur dans une liste TRIÉE par identifiant, ou rien.
+//
+// ⚠ ZÉRO N'Y EST JAMAIS TROUVÉ : c'est l'absence de porteur, et le suivre
+// emmènerait d'un seul coup tous les nœuds posés du monde.
+[[nodiscard]] inline const EffectBearerPlace* FindBearerPlace(
+    std::span<const EffectBearerPlace> places_by_id, std::uint32_t actor_id) {
+  const auto found =
+      std::ranges::lower_bound(places_by_id, actor_id, {}, &EffectBearerPlace::actor_id);
+  return actor_id != 0 && found != places_by_id.end() && found->actor_id == actor_id ? &*found
+                                                                                     : nullptr;
+}
+
 // Un nœud vivant, et où il joue.
 struct PooledEffectNode {
   EffectNode node;
@@ -53,7 +75,7 @@ struct PooledEffectNode {
   // suit le personnage qui l'a lancé. Le champ est donc PAR NŒUD et non par
   // troupe — deux effets joués ensemble n'ont pas le même porteur.
   //
-  // Il vaut l'ancre au semis, et `EffectNodePool::MoveAnchored` le déplace du
+  // Il vaut l'ancre au semis, et `EffectNodePool::MoveBearers` le déplace du
   // pas du porteur quand le nœud est accroché à un acteur ET que son effet le
   // suit à ce tic — voir `bearer_follow`. Sinon il reste où il est né.
   glm::vec3 owner_position{0.0F, 0.0F, 0.0F};
@@ -252,7 +274,7 @@ struct PooledEffectNode {
   //
   // Il vaut zéro tant que personne ne le met à jour — le nœud regarde alors
   // vers l'est, ce qui est arbitraire mais jamais inventé. La coquille le reçoit
-  // de `MoveAnchored`, comme l'anneau double ; voir `AdvanceSphereShellTracks`.
+  // de `MoveBearers`, comme l'anneau double ; voir `AdvanceSphereShellTracks`.
   float owner_facing_degrees = 0.0F;
 
   // À QUELLE HAUTEUR LE SPRITE DU PORTEUR VEUT SON AURA.
@@ -307,7 +329,7 @@ struct PooledEffectNode {
   float orbit_start_degrees = 0.0F;
   // L'ACTEUR QUE LE NŒUD VISE, zéro pour aucun : un numéro opaque, comme
   // `anchor_id`. Non nul, `target_position` reprend sa place à chaque fois que
-  // la fenêtre la donne — voir `EffectNodePool::MoveTargeted`. Un trait tendu
+  // la fenêtre la donne — voir `EffectNodePool::MoveBearers`. Un trait tendu
   // vers une cible qui marche la suit au lieu de viser la case qu'elle a
   // quittée.
   std::uint32_t target_actor_id = 0;
@@ -576,9 +598,13 @@ class EffectNodePool {
     return next_life_floor_ > 0 ? next_life_floor_ : table_life_ticks;
   }
 
-  // EMMÈNE CE QUI EST ACCROCHÉ LÀ, nœuds déjà nés compris — chacun aux tics où
-  // son effet reprend la place de son porteur, et à ceux-là seulement. Voir
-  // `PooledEffectNode::bearer_follow`.
+  // EMMÈNE CE QUI EST ACCROCHÉ À CES PORTEURS, nœuds déjà nés compris — chacun aux
+  // tics où son effet reprend la place de son porteur, et à ceux-là seulement. Voir
+  // `PooledEffectNode::bearer_follow`. Et CE QUI LES VISE reprend leur place comme
+  // point visé : voir `PooledEffectNode::target_actor_id`.
+  //
+  // La liste est TRIÉE par identifiant, et la troupe se parcourt une seule fois :
+  // un parcours par porteur est ce qu'une foule paierait à chaque image.
   //
   // 🔴 C'EST CE QUI MANQUAIT À UN EFFET QUI DURE. Faire suivre l'HORLOGE ne
   // déplace que les semis À VENIR ; un effet qui sème une fois et vit ensuite
@@ -588,10 +614,7 @@ class EffectNodePool {
   // `owner_body_degrees`, quand l'appelant le connaît, est l'angle du CORPS du
   // porteur tel que le client le tient : la coquille sphérique le relit à chaque
   // tic, qu'elle suive ou non sa place, et c'est lui qui tourne le bouclier.
-  void MoveAnchored(std::uint32_t anchor_id, glm::vec3 ground_position,
-                    std::optional<float> owner_body_degrees = std::nullopt);
-
-  [[nodiscard]] bool HasAnchored(std::uint32_t anchor_id) const;
+  void MoveBearers(std::span<const EffectBearerPlace> places_by_id);
 
   // LE MONDE ENTIER SE DÉPLACE DE `world_delta` : chaque point que la troupe
   // tient au niveau du nœud — sa place et celle du tic précédent, son porteur,
@@ -605,11 +628,9 @@ class EffectNodePool {
   // Vrai tant qu'un nœud a une piste allumée.
   [[nodiscard]] bool TracksAlive() const;
 
-  // LA CIBLE A BOUGÉ : chaque nœud qui la vise reprend sa place comme point
-  // visé. Voir `PooledEffectNode::target_actor_id`.
-  void MoveTargeted(std::uint32_t target_actor_id, glm::vec3 ground_position);
-
-  [[nodiscard]] bool HasTargeted(std::uint32_t target_actor_id) const;
+  // AJOUTE À `ids` les acteurs que cette troupe porte ou vise, sans zéro. Sans
+  // tri, et un même acteur y revient autant de fois qu'il a de nœuds.
+  void CollectBearerIds(std::vector<std::uint32_t>& ids) const;
 
   // RETIRE CE QUI EST ACCROCHÉ À UNE ANCRE QUE `still_here` REFUSE.
   //

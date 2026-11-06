@@ -23,7 +23,7 @@ namespace ro::render {
 // sur les deux appels ; le bâtisseur ne bâtit que si l'âge de l'instance est
 // nul. Deux nœuds au tic zéro, donc — et à chaque tic, la place de l'instance
 // recopiée du porteur, que notre troupe fait en translatant l'ancre
-// (`MoveAnchored`).
+// (`MoveBearers`).
 //
 // ⚠ LE CAP DE DÉPART VIENT DU PORTEUR, pas du bâtisseur : il reçoit l'angle du
 // corps de l'acteur moins un quart de tour. Un cap figé en constante figerait

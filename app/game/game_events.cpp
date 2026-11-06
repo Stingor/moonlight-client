@@ -17,6 +17,13 @@ void Game::PumpEvents(std::uint32_t now_ms) {
     // en cours — celui-là même qui déplacerait le personnage dans une direction que
     // le joueur n'a pas choisie, puisqu'il visait un décor vu sous un autre angle.
     if (NoteAfkInput(event, now_ms)) {
+      // ⚠ UN RELÂCHEMENT AVALÉ ATTEINT QUAND MÊME L'INTERFACE, et elle seule : son
+      // appui lui était parvenu avant la veille, et sans lui elle croirait le bouton
+      // tenu. 🔴 MAIS IL NE CLIQUE RIEN, ni en pleine veille ni sur un bouton que le
+      // pointeur a quitté sans qu'elle le voie : le mouvement a pu être avalé aussi.
+      if (event.type == SDL_EVENT_MOUSE_BUTTON_UP) {
+        interface_->TakeSwallowedRelease(event);
+      }
       continue;
     }
     // 🔴 LE CARACTÈRE D'UNE MACRO LANCÉE PAR ALT GR N'ENTRE PAS DANS LE CHAMP. Il

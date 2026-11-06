@@ -84,6 +84,14 @@ class MapEffects {
   void Raise(const MapEffectTable& table, std::span<const formats::RswEffect> objects,
              std::int32_t gnd_width, std::int32_t gnd_height);
 
+  // RELÈVE LA MÊME CARTE, parce que sa liste a changé ou que son relief a bougé.
+  //
+  // 🔴 LES CHEMINÉES PORTÉES PAR UN ACTEUR SURVIVENT, avec leur fumée : elles ne
+  // viennent pas de la liste, et l'effet qui les a demandées ne se rejoue pas.
+  // Leur porteur les recale à `FollowOwners`.
+  void RaiseKeepingCarried(const MapEffectTable& table, std::span<const formats::RswEffect> objects,
+                           std::int32_t gnd_width, std::int32_t gnd_height);
+
   // UNE CHEMINÉE POSÉE EN COURS DE PARTIE, à cette place de NOTRE repère : la
   // même classe que celle d'un objet 44 du RSW, que le gestionnaire d'effets
   // crée aussi pour un effet 44 annoncé sur un acteur. Elle vit comme les

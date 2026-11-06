@@ -117,7 +117,7 @@ inline constexpr std::int16_t kTwinDiscTiltPerTick = 3;
 // ⚠ ET LE NŒUD SUIT SON PORTEUR PAR L'INSTANCE : le mouvement recopie la place
 // de l'instance dans le nœud, et le bâtisseur, rappelé à chaque tic, recale
 // l'instance sur son porteur AVANT sa garde d'âge. C'est le pas que la
-// troupe applique à `ground_position` (`MoveAnchored`) : le mouvement ne le
+// troupe applique à `ground_position` (`MoveBearers`) : le mouvement ne le
 // touche pas.
 void AdvanceTwinDiscTracks(std::array<EffectTrack, kEffectTracksPerNode>& tracks);
 

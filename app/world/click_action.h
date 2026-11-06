@@ -364,6 +364,23 @@ struct WorldMouse {
   std::optional<ro::sim::KnownSkill> armed_at_press;
 };
 
+// LE BOUTON GAUCHE LÂCHE, ou ce relâchement ne sera jamais vu : le maintien
+// cesse de se redemander, et l'engagement retombe. Vrai quand le serveur doit
+// alors cesser d'attaquer : voir `ReleaseStopsAttack`.
+[[nodiscard]] inline bool LetGoLeft(WorldMouse& mouse) {
+  mouse.held_click = HeldClick::kNothing;
+  const bool stops_attack = ReleaseStopsAttack(mouse.engagement);
+  NoteRelease(mouse.engagement);
+  return stops_attack;
+}
+
+// LE BOUTON DROIT LÂCHE : ce que son appui avait retenu s'oublie.
+inline void LetGoRight(WorldMouse& mouse) {
+  mouse.right_on_signboard = false;
+  mouse.right_pressed_at.reset();
+  mouse.right_press_doubled = false;
+}
+
 // Ce qu'un clic gauche déclenche, dans l'ordre où le jeu tranche.
 //
 // LE GRIMOIRE D'ABORD — le panneau est devant la scène, et un clic dessus ne

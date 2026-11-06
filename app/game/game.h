@@ -323,6 +323,7 @@ class Game : public Screen,
   // Les émetteurs et les anneaux de vent de la carte : les monter à la première
   // image, les faire vivre, les peindre.
   void AdvanceMapEffects(std::uint32_t now_ms);
+  void FollowMapEffects(bool relief_moved);
   void DrawMapEffects();
   // Le relief suit GreyWorld, relu sur place : voir `ReloadStageRelief`. Puis
   // le sol s'arrondit ou non selon le réglage : voir `SyncStageGround`.
@@ -776,15 +777,13 @@ class Game : public Screen,
   // quatre-vingts nœuds par image. Remis à faux avec le reste, au changement de
   // carte — voir `ForgetWhatPlayed`.
   bool sky_raised_ = false;
-  // Ce que GreyWorld et les bascules d'effet en ont fait, et de la météo :
-  // sans sens tant qu'il n'est pas levé. Voir `RaiseMapSky`.
+  // Ce que GreyWorld et les bascules en ont fait, ciel et météo : voir `RaiseMapSky`.
   bool sky_hidden_ = false;
   bool weather_hidden_ = false;
   // Les effets de la carte ont-ils été montés sur CETTE scène ? Remis à faux au
   // seul changement de carte : un téléport sur place ne les recrée pas.
   bool map_effects_raised_ = false;
-  // Les objets d'effet levés, et la nuit de l'image précédente qui décide de
-  // ceux « nuit seulement » : voir `AdvanceMapEffects`.
+  // Les objets levés, et la nuit d'avant qui décide des « nuit seulement » : `FollowMapEffects`.
   std::vector<ro::formats::RswEffect> raised_effects_;
   float effect_night_ = 0.0F;
   // L'heure du ciel de l'image précédente, pour les plages d'heures.

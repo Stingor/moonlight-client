@@ -2,6 +2,7 @@
 // des polices, le dos, le fichier de réglages —, puis les polices et le skin
 // qu'on y choisit, et les événements qu'on lui passe.
 
+#include <cfloat>
 #include <cstddef>
 #include <filesystem>
 #include <memory>
@@ -9,6 +10,8 @@
 #include <string_view>
 #include <utility>
 #include <vector>
+
+#include <SDL3/SDL_events.h>
 
 #include "ro/ui/system_fonts.h"
 
@@ -86,6 +89,20 @@ void UiStage::TakeEvent(const SDL_Event& event) const {
   // qui ne visent aucune fenêtre. Ce qui tranche est le laissez-passer, qui
   // sait ce qu'il y a SOUS le curseur.
   static_cast<void>(backend_.ProcessEvent(event));
+}
+
+void UiStage::TakeSwallowedRelease(const SDL_Event& event) const {
+  // 🔴 LE BOUTON SE RELÂCHE HORS DE TOUT : rien n'est survolé à cet instant, si bien
+  // que le widget saisi perd la main sans être pressé.
+  //
+  // ⚠ ET LA VRAIE PLACE REVIENT À L'IMAGE SUIVANTE : ImGui ne traite pas de position
+  // après un changement de bouton dans la même image. Sans elle, l'interface se
+  // croirait sans curseur jusqu'au prochain mouvement, et un clic sur une fenêtre,
+  // souris immobile, tomberait dans le monde.
+  ImGuiIO& io = ImGui::GetIO();
+  io.AddMousePosEvent(-FLT_MAX, -FLT_MAX);
+  static_cast<void>(backend_.ProcessEvent(event));
+  io.AddMousePosEvent(event.button.x, event.button.y);
 }
 
 void UiStage::UseSkin(const ro::render::SkinTextures& textures) {

@@ -498,7 +498,7 @@ void AdvanceTracksOf(PooledEffectNode& pooled, const EffectScatterWorld& world,
     case PooledNodeShape::kTwinDisc:
       // ⚠ CE MOUVEMENT SUIT SON PORTEUR PAR L'INSTANCE, que le bâtisseur recale
       // sur le porteur à chaque tic. C'est le pas que la troupe applique à
-      // `ground_position` (`MoveAnchored`) ; le reposer sur `owner_position`,
+      // `ground_position` (`MoveBearers`) ; le reposer sur `owner_position`,
       // que rien ne rafraîchit, ramènerait les disques là où ils sont nés. Il
       // ne touche ensuite que les DEUX premières inclinaisons, qui mènent le
       // souffle.
@@ -717,7 +717,7 @@ void AdvanceTracksOf(PooledEffectNode& pooled, const EffectScatterWorld& world,
       return;
     case PooledNodeShape::kElectricArc:
       // ⚠ CE MOUVEMENT SUIT SON PORTEUR, et c'est la place du NŒUD qu'il lit :
-      // celle que la troupe translate du pas du porteur (`MoveAnchored`).
+      // celle que la troupe translate du pas du porteur (`MoveBearers`).
       // `owner_position`, que rien ne rafraîchit, laisserait l'arc là où il est
       // né.
       AdvanceElectricArcTracks(pooled.tracks, pooled.ground_position);
@@ -726,7 +726,7 @@ void AdvanceTracksOf(PooledEffectNode& pooled, const EffectScatterWorld& world,
       // ⚠ CE MOUVEMENT SUIT SON PORTEUR PAR L'INSTANCE : il recopie la place de
       // l'instance dans le nœud, et le bâtisseur, appelé à chaque tic par le
       // cas, recale l'instance sur son porteur avant sa garde d'âge. C'est le
-      // pas que la troupe applique à `ground_position` (`MoveAnchored`) ; le
+      // pas que la troupe applique à `ground_position` (`MoveBearers`) ; le
       // reposer sur `owner_position`, que rien ne rafraîchit, ramènerait les
       // disques là où ils sont nés.
       AdvanceFadingTwinDiscTracks(pooled.tracks, pooled.node.life_ticks);
@@ -734,7 +734,7 @@ void AdvanceTracksOf(PooledEffectNode& pooled, const EffectScatterWorld& world,
     case PooledNodeShape::kExpandingRing:
       // ⚠ CE MOUVEMENT SUIT SON PORTEUR PAR L'INSTANCE : le cas 169 recopie la
       // place de l'instance dans le nœud, que le bâtisseur, rappelé à chaque
-      // tic, recale sur le porteur. `MoveAnchored` translate `owner_position`
+      // tic, recale sur le porteur. `MoveBearers` translate `owner_position`
       // du pas du porteur.
       pooled.ground_position = pooled.owner_position;
       AdvanceExpandingRingTracks(pooled.tracks);
@@ -742,7 +742,7 @@ void AdvanceTracksOf(PooledEffectNode& pooled, const EffectScatterWorld& world,
     case PooledNodeShape::kRainstormCylinder:
       // ⚠ CE MOUVEMENT SUIT SON PORTEUR PAR L'INSTANCE : il recopie la place de
       // l'instance dans le nœud, que le bâtisseur, rappelé à chaque tic, recale
-      // sur le porteur. `MoveAnchored` translate `owner_position` du pas du
+      // sur le porteur. `MoveBearers` translate `owner_position` du pas du
       // porteur.
       pooled.ground_position = pooled.owner_position;
       AdvanceRainstormCylinderTracks(pooled.tracks, pooled.node.life_ticks);
@@ -754,7 +754,7 @@ void AdvanceTracksOf(PooledEffectNode& pooled, const EffectScatterWorld& world,
     case PooledNodeShape::kThunderScatter:
       // ⚠ CE MOUVEMENT SUIT SON PORTEUR PAR L'INSTANCE : il recopie la place de
       // l'instance dans le nœud, que le bâtisseur, rappelé à chaque tic, recale
-      // sur le porteur. `MoveAnchored` translate `owner_position` du pas du
+      // sur le porteur. `MoveBearers` translate `owner_position` du pas du
       // porteur. Seul le cap en dépend : les ancres sont déjà dans le monde.
       pooled.ground_position = pooled.owner_position;
       AdvanceThunderScatterTracks(pooled.tracks, pooled.ground_position,
@@ -765,7 +765,7 @@ void AdvanceTracksOf(PooledEffectNode& pooled, const EffectScatterWorld& world,
     case PooledNodeShape::kThunderFreeze:
       // ⚠ CE MOUVEMENT SUIT SON PORTEUR PAR L'INSTANCE : il recopie la place de
       // l'instance dans le nœud, que le bâtisseur, rappelé à chaque tic, recale
-      // sur le porteur. `MoveAnchored` translate `owner_position` du pas du
+      // sur le porteur. `MoveBearers` translate `owner_position` du pas du
       // porteur.
       pooled.ground_position = pooled.owner_position;
       AdvanceThunderFreezeTracks(pooled.tracks, pooled.billboard_turn_degrees,

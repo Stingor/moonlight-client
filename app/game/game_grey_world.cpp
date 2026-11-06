@@ -1,11 +1,6 @@
 // GREYWORLD CÔTÉ PARTIE : le relief de la carte suit le réglage, et le sol
 // arrondi aussi.
 
-#include <utility>
-#include <vector>
-
-#include "ro/render/map_effect_math.h"
-
 #include "game/game.h"
 #include "world/grey_world_view.h"
 
@@ -67,22 +62,9 @@ ro::core::Result<void> Game::FollowGreyWorldRelief() {
   //
   // ⚠ SANS LE BANDEAU DU NOM NI L'AMBIANCE SONORE, qui se lèvent avec les objets
   // à l'entrée d'une carte : on n'a pas changé de carte.
-  //
-  // 🔴 LES CHEMINÉES PORTÉES PAR UN ACTEUR SURVIVENT : la relève les efface avec
-  // celles de la carte, et rien ne les redemanderait. Leur porteur les recale à
-  // l'image suivante.
   model_clock_ = ro::render::ModelClock();
-  const ro::render::MapEffectFrame frame{stage_->scene.gnd.width(), stage_->scene.gnd.height()};
-  std::vector<std::pair<glm::vec3, std::uint32_t>> carried;
-  for (const ro::render::MapChimney& chimney : map_effects_.chimneys()) {
-    if (chimney.owner_id() != 0) {
-      carried.emplace_back(frame.ToWorld(chimney.native_position()), chimney.owner_id());
-    }
-  }
-  map_effects_.Raise(stage_->scene.effect_table, stage_->scene.rsw.effects(),
-                     stage_->scene.gnd.width(), stage_->scene.gnd.height());
-  for (const auto& [place, owner] : carried) {
-    map_effects_.AddChimney(place, owner);
+  if (map_effects_raised_) {
+    FollowMapEffects(true);
   }
   if (ground_units_.has_value()) {
     ground_units_->ForgetPlacement();

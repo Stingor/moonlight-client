@@ -609,64 +609,6 @@ std::int32_t EffectNodesInPlay::LastSowTick(std::uint32_t effect_id,
   return last_tick;
 }
 
-void EffectNodesInPlay::FollowActor(std::uint32_t actor_id, glm::vec3 ground_position,
-                                    float owner_facing_degrees,
-                                    std::optional<float> owner_body_degrees) {
-  if (actor_id == 0) {
-    return;
-  }
-  for (EffectClock& clock : clocks_) {
-    if (clock.attached_actor_id == actor_id) {
-      clock.bearer_ground_position = ground_position;
-      clock.owner_facing_degrees = owner_facing_degrees;
-      // ⚠ SES SEMIS À VENIR NE SUIVENT QUE SI L'EFFET SUIT : un effet qui reste
-      // où il est né sème jusqu'au bout à sa place de naissance, et un effet qui
-      // ne rejoint son porteur qu'à un tic précis s'y recale à ce tic-là — voir
-      // `StepClocks`.
-      if (ro::render::EffectFollowsBearerStepByStep(
-              ro::render::EffectBearerFollowOf(clock.effect_id), clock.age_ticks)) {
-        clock.ground_position = ground_position;
-      }
-    }
-  }
-  // 🔴 ET LES NŒUDS DÉJÀ NÉS AVEC. L'horloge ne commande que les semis À VENIR :
-  // un effet qui sème une fois puis vit dix mille tics n'a plus d'horloge du
-  // tout, et restait planté là où son porteur se tenait à la seconde où il l'a
-  // reçu. C'est ce que montrait l'anneau du classement PVP, abandonné derrière
-  // le joueur au premier pas.
-  pool_.MoveAnchored(actor_id, ground_position, owner_body_degrees);
-  // ET CE QUI LE VISE : un trait tendu vers lui reprend sa place, comme le
-  // client retrouve sa cible par son identifiant à chaque tic.
-  pool_.MoveTargeted(actor_id, ground_position);
-  // 🔴 ET LES NŒUDS D'ÉCRAN, SANS CONSULTER LA TABLE DE SUIVI : le client
-  // reprojette la place de leur porteur à chaque tic, même pour un impact qui
-  // reste où il est né dans le monde. La gerbe d'un Bash reçu par un monstre
-  // qui marche suit le monstre, et ne reste pas à la case du coup.
-  for (ScreenNodeInPlay& live : screen_nodes_) {
-    if (live.owner_actor_id == actor_id) {
-      live.owner_position = ground_position;
-    }
-  }
-}
-
-bool EffectNodesInPlay::HasClocksAttachedTo(std::uint32_t actor_id) const {
-  if (actor_id == 0) {
-    return false;
-  }
-  // ⚠ L'HORLOGE OU LE NŒUD, et la seconde moitié compte autant que la première :
-  // l'horloge d'un effet permanent meurt au premier tic, son nœud lui survit de
-  // dix mille. Ne demander que les horloges cessait de le faire suivre juste
-  // après l'avoir posé. Un nœud d'écran compte aussi, comme la gerbe d'un coup.
-  return std::ranges::any_of(clocks_,
-                             [actor_id](const EffectClock& clock) {
-                               return clock.attached_actor_id == actor_id;
-                             }) ||
-         pool_.HasAnchored(actor_id) || pool_.HasTargeted(actor_id) ||
-         std::ranges::any_of(screen_nodes_, [actor_id](const ScreenNodeInPlay& live) {
-           return live.owner_actor_id == actor_id;
-         });
-}
-
 // L'HORAIRE LUI-MÊME : ce qui fait battre les horloges et sème ce que chacune
 // doit à ce tic.
 //

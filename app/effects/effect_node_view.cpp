@@ -521,4 +521,77 @@ void EffectNodesInPlay::Shift(glm::vec3 world_delta) {
   if (local_player_position_.has_value()) *local_player_position_ += world_delta;
 }
 
+void EffectNodesInPlay::FollowActor(std::uint32_t actor_id, glm::vec3 ground_position,
+                                    float owner_facing_degrees,
+                                    std::optional<float> owner_body_degrees) {
+  if (actor_id == 0) {
+    return;
+  }
+  const ro::render::EffectBearerPlace place{.actor_id = actor_id,
+                                            .ground_position = ground_position,
+                                            .owner_facing_degrees = owner_facing_degrees,
+                                            .owner_body_degrees = owner_body_degrees};
+  FollowActors(std::span<const ro::render::EffectBearerPlace>(&place, 1));
+}
+
+void EffectNodesInPlay::FollowActors(std::span<const ro::render::EffectBearerPlace> places_by_id) {
+  if (places_by_id.empty()) {
+    return;
+  }
+  for (EffectClock& clock : clocks_) {
+    const ro::render::EffectBearerPlace* place =
+        ro::render::FindBearerPlace(places_by_id, clock.attached_actor_id);
+    if (place == nullptr) {
+      continue;
+    }
+    clock.bearer_ground_position = place->ground_position;
+    clock.owner_facing_degrees = place->owner_facing_degrees;
+    // ⚠ SES SEMIS À VENIR NE SUIVENT QUE SI L'EFFET SUIT : un effet qui reste
+    // où il est né sème jusqu'au bout à sa place de naissance, et un effet qui
+    // ne rejoint son porteur qu'à un tic précis s'y recale à ce tic-là — voir
+    // `StepClocks`.
+    if (ro::render::EffectFollowsBearerStepByStep(ro::render::EffectBearerFollowOf(clock.effect_id),
+                                                  clock.age_ticks)) {
+      clock.ground_position = place->ground_position;
+    }
+  }
+  // 🔴 ET LES NŒUDS DÉJÀ NÉS AVEC. L'horloge ne commande que les semis À VENIR :
+  // un effet qui sème une fois puis vit dix mille tics n'a plus d'horloge du
+  // tout, et resterait planté là où son porteur se tenait à la seconde où il l'a
+  // reçu. Ce qui le VISE reprend aussi sa place : un trait tendu vers lui suit,
+  // comme le client retrouve sa cible par son identifiant à chaque tic.
+  pool_.MoveBearers(places_by_id);
+  // 🔴 ET LES NŒUDS D'ÉCRAN, SANS CONSULTER LA TABLE DE SUIVI : le client
+  // reprojette la place de leur porteur à chaque tic, même pour un impact qui
+  // reste où il est né dans le monde. La gerbe d'un Bash reçu par un monstre
+  // qui marche suit le monstre, et ne reste pas à la case du coup.
+  for (ScreenNodeInPlay& live : screen_nodes_) {
+    if (const ro::render::EffectBearerPlace* place =
+            ro::render::FindBearerPlace(places_by_id, live.owner_actor_id)) {
+      live.owner_position = place->ground_position;
+    }
+  }
+}
+
+void EffectNodesInPlay::CollectBearerIds(std::vector<std::uint32_t>& ids) const {
+  ids.clear();
+  // ⚠ L'HORLOGE OU LE NŒUD, et la seconde moitié compte autant que la première :
+  // l'horloge d'un effet permanent meurt au premier tic, son nœud lui survit de
+  // dix mille. Un nœud d'écran compte aussi, comme la gerbe d'un coup.
+  for (const EffectClock& clock : clocks_) {
+    if (clock.attached_actor_id != 0) {
+      ids.push_back(clock.attached_actor_id);
+    }
+  }
+  pool_.CollectBearerIds(ids);
+  for (const ScreenNodeInPlay& live : screen_nodes_) {
+    if (live.owner_actor_id != 0) {
+      ids.push_back(live.owner_actor_id);
+    }
+  }
+  std::ranges::sort(ids);
+  const auto [kept_end, list_end] = std::ranges::unique(ids);
+  ids.erase(kept_end, list_end);
+}
+
 }  // namespace moonclient

@@ -15,6 +15,7 @@
 #include "ro/core/i18n.h"
 #include "ro/core/local_time.h"
 #include "ro/core/printed.h"
+#include "ro/net/action.h"
 #include "ro/net/player_settings.h"
 #include "ro/sim/pvp_rank.h"
 
@@ -90,7 +91,25 @@ void Game::StartAfkNow(std::uint32_t now_ms) {
   //
   // ⚠ LE MASQUE DE SDL EST CELUI DU COMPTEUR : `SDL_BUTTON_MASK(n)` vaut
   // `1 << (n - 1)`, exactement la numérotation d'`AfkIdle`.
-  afk_idle_.SwallowHeldButtons(SDL_GetMouseState(nullptr, nullptr));
+  const SDL_MouseButtonFlags held_buttons = SDL_GetMouseState(nullptr, nullptr);
+  afk_idle_.SwallowHeldButtons(held_buttons);
+  // 🔴 LE MONDE NE VERRA DONC PAS CE RELÂCHEMENT, et il lâche ici : une marche
+  // tenue se redemanderait sans fin pendant la veille et après le réveil, et le
+  // personnage marcherait seul vers la case sous la souris.
+  if ((held_buttons & SDL_BUTTON_LMASK) != 0) {
+    if (Rights().staff_tools && map_editor_.active()) {
+      map_editor_.Release();
+    }
+    if (LetGoLeft(world_mouse_) && link_.is_open()) {
+      ReportRefusal(ro::net::RequestStopAttack(link_));
+    }
+  }
+  if ((held_buttons & SDL_BUTTON_RMASK) != 0) {
+    LetGoRight(world_mouse_);
+  }
+  if ((held_buttons & SDL_BUTTON_MMASK) != 0) {
+    pieces_.shortcut_wheel.Cancel();
+  }
 }
 
 void Game::AdvanceAfk(std::uint32_t now_ms) {

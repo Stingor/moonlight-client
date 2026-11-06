@@ -118,6 +118,8 @@ BanquetDolls::Seated BanquetDolls::Seat(int seat, const ro::proto::CharacterInfo
   // celles que le jeu a gardées. Sans elles, chaque convive paraîtrait dans
   // ses couleurs natives. Le même registre que la carte, pour le même rendu.
   dressing_.Dress(static_cast<std::uint32_t>(character.GID), pose.look, *wardrobe_, styles_);
+  // ⚠ AUCUNE SCÈNE NE RETIENT LES TENUES D'ICI : l'identifiant remplacé se rend aussitôt.
+  dressing_.Sweep(*wardrobe_, styles_);
   // ⚠ LA POSE EST CELLE DU SIÈGE, que le mode « Personnaliser » règle : son
   // action, son orientation, sa tête et son image.
   pose.animation = static_cast<std::size_t>(std::max(place.animation, 0));

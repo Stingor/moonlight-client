@@ -566,14 +566,14 @@ class UiStage {
   // cela, une fenêtre déplacée puis le jeu fermé perdrait sa place.
   void SaveSettings() { ui_->SaveSettingsIfDirty(); }
 
-  // Donne l'événement à l'interface. À appeler sur CHAQUE événement, avant
-  // toute autre décision : ImGui ne sait ce qu'il y a sous le curseur que s'il
-  // a vu la souris bouger.
+  // Donne l'événement à l'interface. À appeler sur CHAQUE événement, avant toute
+  // autre décision : ImGui ne sait ce qu'il y a sous le curseur que s'il l'a vu bouger.
   void TakeEvent(const SDL_Event& event) const;
+  // Un relâchement que la veille a avalé, qui ne doit rien cliquer.
+  void TakeSwallowedRelease(const SDL_Event& event) const;
 
-  // Qui reçoit le geste. Se lit APRÈS `TakeEvent`, et porte le verdict de
-  // l'image précédente — c'est le fonctionnement normal d'une interface en mode
-  // immédiat, et non un retard à corriger.
+  // Qui reçoit le geste. Se lit APRÈS `TakeEvent`, et porte le verdict de l'image
+  // précédente : c'est ainsi que marche une interface en mode immédiat.
   [[nodiscard]] ro::ui::InputGate gate() const { return ui_->gate(); }
 
   // ÉCHAP A-T-IL UNE FENÊTRE À FERMER ? Tant que oui, la touche ne doit pas

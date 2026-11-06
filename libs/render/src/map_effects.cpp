@@ -1,6 +1,7 @@
 #include "ro/render/map_effects.h"
 
 #include <algorithm>
+#include <iterator>
 #include <map>
 #include <utility>
 
@@ -70,6 +71,20 @@ void MapEffects::Raise(const MapEffectTable& table, std::span<const formats::Rsw
                            draws_);
     }
   }
+}
+
+void MapEffects::RaiseKeepingCarried(const MapEffectTable& table,
+                                     std::span<const formats::RswEffect> objects,
+                                     std::int32_t gnd_width, std::int32_t gnd_height) {
+  std::vector<MapChimney> carried;
+  for (MapChimney& chimney : chimneys_) {
+    if (chimney.owner_id() != 0) {
+      carried.push_back(std::move(chimney));
+    }
+  }
+  Raise(table, objects, gnd_width, gnd_height);
+  chimneys_.insert(chimneys_.end(), std::make_move_iterator(carried.begin()),
+                   std::make_move_iterator(carried.end()));
 }
 
 void MapEffects::AddChimney(glm::vec3 world_position, std::uint32_t owner_id) {

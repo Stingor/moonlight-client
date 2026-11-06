@@ -78,7 +78,7 @@ void ActorStyles::Dress(std::uint32_t gid, ro::render::ActorLook& look,
     // Plus de couleurs : on rend l'acteur à son apparence native, et on rend
     // aussi son identifiant.
     if (known != applied_.end()) {
-      wardrobe.ForgetStyle(known->second.style);
+      retired_.push_back(known->second.style);
       applied_.erase(known);
     }
     return;
@@ -97,7 +97,7 @@ void ActorStyles::Dress(std::uint32_t gid, ro::render::ActorLook& look,
 
   // 🔴 UN IDENTIFIANT NEUF, JAMAIS UNE RÉÉCRITURE : voir l'en-tête.
   if (known != applied_.end()) {
-    wardrobe.ForgetStyle(known->second.style);
+    retired_.push_back(known->second.style);
   }
   const std::uint32_t style = wardrobe.NewStyleId();
   if (!wardrobe.SetStyle(style, Translate(*wanted))) {
@@ -112,6 +112,10 @@ void ActorStyles::Dress(std::uint32_t gid, ro::render::ActorLook& look,
 }
 
 void ActorStyles::Sweep(ro::render::ActorWardrobe& wardrobe, const ro::sim::StyleBook& book) {
+  for (const std::uint32_t style : retired_) {
+    wardrobe.ForgetStyle(style);
+  }
+  retired_.clear();
   std::vector<std::uint32_t> gone;
   for (const auto& [gid, applied] : applied_) {
     if (book.Find(gid) == nullptr) {

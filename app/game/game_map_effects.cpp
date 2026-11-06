@@ -77,19 +77,29 @@ void Game::RaiseMapSky(std::uint32_t now_ms) {
   sky_raised_ = true;
 }
 
-void Game::AdvanceMapEffects(std::uint32_t now_ms) {
+void Game::FollowMapEffects(bool relief_moved) {
   // LES OBJETS D'EFFET : ceux du RSW, ceux que l'édition ajoute et ceux que
   // portent les modèles, les « nuit seulement » tant que la nuit de l'image
   // précédente le veut. La liste qui change — un document retouché, la nuit
-  // qui tombe ou se lève — se relève.
+  // qui tombe ou se lève — se relève, comme tout ce qui s'était posé sur un
+  // relief qui vient de bouger.
   std::vector<ro::formats::RswEffect> wanted = ro::render::SceneMapEffects(
       stage_->scene, map_edits_.Document(stage_->name),
       map_edits_.Document(ro::mapedit::kModelLightsDocument), effect_night_, effect_hour_);
-  if (!map_effects_raised_ || !ro::render::SameMapEffects(wanted, raised_effects_)) {
+  if (!map_effects_raised_) {
+    // ⚠ UNE CARTE NEUVE PART DE RIEN : la cheminée d'un acteur quitté n'y a pas sa place.
     map_effects_.Raise(stage_->scene.effect_table, wanted, stage_->scene.gnd.width(),
                        stage_->scene.gnd.height());
     raised_effects_ = std::move(wanted);
+  } else if (relief_moved || !ro::render::SameMapEffects(wanted, raised_effects_)) {
+    map_effects_.RaiseKeepingCarried(stage_->scene.effect_table, wanted, stage_->scene.gnd.width(),
+                                     stage_->scene.gnd.height());
+    raised_effects_ = std::move(wanted);
   }
+}
+
+void Game::AdvanceMapEffects(std::uint32_t now_ms) {
+  FollowMapEffects(false);
   // LES SOURCES DE SON, au même instant : le client les crée dans la même passe
   // que les objets d'effet, juste après eux. Celles du RSW et celles que
   // l'édition ajoute, comme les effets ; la liste qui change se relève, chaque

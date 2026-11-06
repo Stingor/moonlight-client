@@ -626,12 +626,8 @@ void RouteEvent(const EventRouting& to, const SDL_Event& event) {
         if (to.map_editor != nullptr) {
           to.map_editor->Release();
         }
-        to.world_mouse->held_click = HeldClick::kNothing;
-        // Une attaque d'un seul clic qui frappait sans relâche s'arrête ici :
-        // voir `ReleaseStopsAttack`.
-        const bool stops_attack = ReleaseStopsAttack(to.world_mouse->engagement);
-        NoteRelease(to.world_mouse->engagement);
-        if (stops_attack && to.link->is_open()) {
+        // Une attaque d'un seul clic qui frappait sans relâche s'arrête ici.
+        if (LetGoLeft(*to.world_mouse) && to.link->is_open()) {
           ReportRefusal(ro::net::RequestStopAttack(*to.link));
         }
       }
@@ -641,9 +637,7 @@ void RouteEvent(const EventRouting& to, const SDL_Event& event) {
         OnRightRelease(to, event.button, gate.mouse_to_ui);
       }
       if (event.button.button == SDL_BUTTON_RIGHT) {
-        to.world_mouse->right_on_signboard = false;
-        to.world_mouse->right_pressed_at.reset();
-        to.world_mouse->right_press_doubled = false;
+        LetGoRight(*to.world_mouse);
       }
       break;
 

@@ -60,9 +60,6 @@ namespace moonclient {
 ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
   PumpEvents(now_ms);
   if (auto ok = PumpNetwork(now_ms); !ok) {
-    // LA PARTIE DE SURVIVORS EN COURS SE FIGE ET S'ÉCRIT (Q3) : la partie de
-    // jeu s'arrête ici, et l'étage du mode avec elle.
-    survivors_mode_->Freeze(survivors_, pieces_.minigames, client_root_);
     return ok;
   }
   FollowGmOutfit();  // Après le réseau, qui a pu faire réapparaître le joueur.

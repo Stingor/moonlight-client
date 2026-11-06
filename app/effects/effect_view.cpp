@@ -407,6 +407,28 @@ void EffectsInPlay::NoticeOptionEffects(const ro::sim::World& world, const MapSt
   std::erase_if(per_map_.seen_options,
                 [&world](const auto& entry) { return !world.actors().contains(entry.first); });
 
+  // L'EFFET SUIT SON PORTEUR — place, face et angle du corps : voir `FollowActor`.
+  //
+  // ⚠ AVANT LES SEMIS DE CETTE IMAGE : ce qui vient de naître part de la place
+  // qu'on lui donne, et n'a pas encore à suivre.
+  nodes_->FollowBearers(
+      [&](std::uint32_t bearer_id) -> std::optional<ro::render::EffectBearerPlace> {
+        const auto found = world.actors().find(bearer_id);
+        if (found == world.actors().end()) {
+          return std::nullopt;
+        }
+        const ro::sim::Actor& actor = found->second;
+        const ro::sim::FractionalCell cell =
+            ro::sim::InterpolatedCell(actor, planner.PathFor(actor), now_ms);
+        const std::array<float, 3> ground = GroundPositionAt(stage, cell.x, cell.y);
+        return ro::render::EffectBearerPlace{
+            .actor_id = bearer_id,
+            .ground_position = glm::vec3(ground[0], ground[1], ground[2]),
+            .owner_facing_degrees = OwnerFacingDegrees(actor, planner.PathFor(actor), now_ms),
+            .owner_body_degrees =
+                ClientBodyDegrees(actor, ro::sim::FacingAt(actor, planner.PathFor(actor), now_ms))};
+      });
+
   for (const auto& [id, actor] : world.actors()) {
     // 🔴 LE FRONT MONTANT SE LIT SUR LE PAQUET, PAS SUR L'IMAGE. Le client
     // tranche dans `clif_changeoption_recv` sur les deux mots du paquet reçu ;
@@ -421,16 +443,6 @@ void EffectsInPlay::NoticeOptionEffects(const ro::sim::World& world, const MapSt
     const auto vu = per_map_.seen_options.find(id);
     const bool rise = vu != per_map_.seen_options.end() && vu->second != actor.option_rise_count;
     per_map_.seen_options.insert_or_assign(id, actor.option_rise_count);
-    // L'EFFET SUIT SON PORTEUR — place, face et angle du corps : voir `FollowActor`.
-    if (nodes_->HasClocksAttachedTo(id)) {
-      const ro::sim::FractionalCell cell =
-          ro::sim::InterpolatedCell(actor, planner.PathFor(actor), now_ms);
-      const std::array<float, 3> ground = GroundPositionAt(stage, cell.x, cell.y);
-      nodes_->FollowActor(
-          id, glm::vec3(ground[0], ground[1], ground[2]),
-          OwnerFacingDegrees(actor, planner.PathFor(actor), now_ms),
-          ClientBodyDegrees(actor, ro::sim::FacingAt(actor, planner.PathFor(actor), now_ms)));
-    }
     for (const ro::render::OptionEffect& state : ro::render::OptionEffectTable()) {
       if ((actor.option & state.option_mask) == 0) {
         continue;

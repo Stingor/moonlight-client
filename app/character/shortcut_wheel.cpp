@@ -36,6 +36,12 @@ void ShortcutWheel::Close(bool use) {
   }
 }
 
+void ShortcutWheel::Cancel() {
+  if (open_ && opener_ == Opener::kMiddleButton) {
+    Close(/*use=*/false);
+  }
+}
+
 bool ShortcutWheel::TakeEvent(const SDL_Event& event, const Hotkeys& bindings, WheelGate gate,
                               SDL_Keymod held, glm::vec2* mouse) {
   if (!open_) {

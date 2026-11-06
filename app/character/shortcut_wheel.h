@@ -57,6 +57,11 @@ class ShortcutWheel {
   bool TakeKeyDown(const SDL_KeyboardEvent& key, const Hotkeys& bindings, WheelGate gate,
                    glm::vec2 mouse);
 
+  // LE RELÂCHEMENT DU BOUTON DU MILIEU NE VIENDRA PAS : la roue qu'il tenait
+  // ouverte se referme sans rien utiliser. ⚠ CELLE D'UNE TOUCHE RESTE : ce n'est
+  // pas ce bouton qui la tient.
+  void Cancel();
+
   [[nodiscard]] bool open() const noexcept { return open_; }
 
   // LA DEMANDE DES BARRES, augmentée de la case choisie au relâcher. ⚠ UN CLIC

@@ -231,6 +231,13 @@ HoveredActor DrawScreenOverlays(const ScreenOverlays& what, float aspect_ratio, 
   // qui lui rend les emoji : notre atlas de rendu est gravé en niveaux de gris
   // et borné au latin-1. La liste de FOND d'ImGui garde l'ordre voulu —
   // au-dessus des jauges qu'on vient de peindre, sous toutes les fenêtres.
+  //
+  // ⚠ UNE LISTE QUI NE SE RECOMPOSE PAS SE VIDE : ses vues désignent le texte des
+  // acteurs, qu'une liaison perdue ou un changement de carte peut avoir détruits,
+  // et l'étage d'interface la peint sans condition.
+  if (what.bubbles_on_screen != nullptr) {
+    what.bubbles_on_screen->clear();
+  }
   if (what.connected && !actors.drawn.empty() && what.bubbles_on_screen != nullptr) {
     *what.bubbles_on_screen = ChatBubblesOnScreen(
         camera, aspect_ratio, actors.drawn, actors.ids, world, now_ms, viewport_width,
