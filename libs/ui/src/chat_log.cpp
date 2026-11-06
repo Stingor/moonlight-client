@@ -33,19 +33,15 @@ using chat_log_detail::PlaceTarget;
 using chat_log_detail::SpoilerHit;
 using chat_log_detail::WithOverhang;
 
-// L'identifiant du menu d'un lien du fil, et celui de la case où sa cible attend.
+// L'identifiant du menu d'un lien du fil.
 //
-// 🔴 LA CIBLE SURVIT À L'IMAGE, et il le faut : le menu s'ouvre à l'image
-// SUIVANTE — l'identifiant d'un popup se hache avec la pile d'ids courante, donc
-// l'ouverture se demande et ne se fait pas sur-le-champ —, et le lien n'est alors
-// plus forcément survolé.
+// 🔴 SA CIBLE SURVIT À L'IMAGE, et il le faut : le menu vit sur plusieurs images,
+// et le lien n'est alors plus forcément survolé.
 //
-// ⚠ DANS LE MAGASIN DE LA FENÊTRE, jamais dans une variable de fichier : deux
-// chatbox détachées ont chacune leur fil, et une cible partagée ferait ouvrir
-// l'une sur le lien de l'autre. C'est le même rangement que la sélection du
-// texte riche.
+// ⚠ DANS LE CACHE DU FIL, jamais dans une variable de fichier : deux chatbox
+// détachées ont chacune leur fil, et une cible partagée ferait ouvrir l'une sur
+// le lien de l'autre. Voir `ChatHeldLink`.
 constexpr const char* kLinkMenuId = "lien";
-constexpr const char* kLinkMenuTargetKey = "##cible_lien";
 // LE MENU D'UNE LIGNE. Ce qu'il copiera est retenu par le cache du fil, au clic.
 constexpr const char* kLineMenuId = "ligne";
 // L'instant du dernier zoom, et la molette cumulée sous Ctrl.
@@ -166,6 +162,84 @@ void DrawLineMenu(const ChatLogLayout& laid) {
     ImGui::SetClipboardText(laid.held_body().c_str());
   }
   EndSkinPopup();
+}
+
+// Retient le lien de ce jeton, cherché dans le fil de cette image.
+void HoldLinkOfToken(std::span<const ChatLineView> lines, std::uint32_t token,
+                     ChatLogLayout& laid) {
+  for (const ChatLineView& line : lines) {
+    for (std::size_t rank = 0; rank < line.links.size(); ++rank) {
+      if (line.links[rank].token != token) {
+        continue;
+      }
+      const bool identified = line.seq != 0 || line.id != 0;
+      laid.HoldLink(ChatHeldLink{.line_seq = line.seq,
+                                 .line_id = line.id,
+                                 .line_text = identified ? std::string() : std::string(line.text),
+                                 .link_rank = rank,
+                                 .kind = line.links[rank].kind});
+      return;
+    }
+  }
+}
+
+[[nodiscard]] bool IsHeldLine(const ChatLineView& line, const ChatHeldLink& held) {
+  // ⚠ LA PLACE DANS LE FIL SUFFIT : l'identité change avec l'aspect de la ligne.
+  if (held.line_seq != 0) {
+    return line.seq == held.line_seq;
+  }
+  if (held.line_id != 0) {
+    return line.seq == 0 && line.id == held.line_id;
+  }
+  return line.seq == 0 && line.id == 0 && line.text == held.line_text;
+}
+
+// La ligne qui porte le lien retenu, ou nulle si elle est partie ou que ce lien
+// n'y est plus. ⚠ DANS TOUT LE FIL : un lien remonté hors de la vue reste la cible.
+[[nodiscard]] const ChatLineView* FindHeldLine(std::span<const ChatLineView> lines,
+                                               const ChatHeldLink& held) {
+  for (const ChatLineView& line : lines) {
+    if (IsHeldLine(line, held)) {
+      return held.link_rank < line.links.size() && line.links[held.link_rank].kind == held.kind &&
+                     line.links[held.link_rank].offset <= line.text.size()
+                 ? &line
+                 : nullptr;
+    }
+  }
+  return nullptr;
+}
+
+// LE MENU DU LIEN RETENU. Le jeton qu'il rend est celui de CETTE image : c'est
+// lui qu'`app` résout, dans la liste de cette image-ci.
+//
+// 🔴 LA LIGNE PARTIE, LE MENU SE FERME : un geste choisi sur ce qu'on ne voit
+// plus partirait vers rien, ou vers quelqu'un d'autre.
+[[nodiscard]] ChatLinkAsk DrawHeldLinkMenu(std::span<const ChatLineView> lines,
+                                           const ChatLogStyle& style, const ChatLogLayout& laid) {
+  if (!ImGui::IsPopupOpen(kLinkMenuId)) {
+    return {};
+  }
+  const ChatLineView* line = FindHeldLine(lines, laid.held_link());
+  if (line == nullptr) {
+    if (BeginSkinPopup(kLinkMenuId)) {
+      ImGui::CloseCurrentPopup();
+      EndSkinPopup();
+    }
+    return {};
+  }
+  const ChatLinkSpan& link = line->links[laid.held_link().link_rank];
+  std::string_view label = line->text.substr(link.offset, link.length);
+  // ⚠ LA TÊTE NOMME LE LIEN, PAS SON ÉTAT : la marque « · passé » se peint dans
+  // le fil, mais le menu la retire.
+  std::string unmarked;
+  if (link.mark_length != 0 && link.mark_at <= label.size() &&
+      link.mark_length <= label.size() - link.mark_at) {
+    unmarked = std::string(label.substr(0, link.mark_at));
+    unmarked += label.substr(link.mark_at + link.mark_length);
+    label = unmarked;
+  }
+  return DrawChatLinkMenu(kLinkMenuId, link.kind, link.item_id, link.token, label, style.link_facts,
+                          link.refusals, link.mvp, link.navi, link.url, style.staff_warp);
 }
 
 // Combien de lignes sont arrivées après la dernière lue. ⚠ PAR LA FIN : les
@@ -544,7 +618,6 @@ ChatLogAction DrawChatLog(std::span<const ChatLineView> lines, const ChatLogStyl
   // ⚠ SEULEMENT SI LA FENÊTRE EST SURVOLÉE : sans cette garde, un lien répondrait
   // sous une fenêtre posée par-dessus lui.
   ImGuiStorage* kept = ImGui::GetStateStorage();
-  const ImGuiID target_key = ImGui::GetID(kLinkMenuTargetKey);
   bool on_spoiler = false;
   bool on_link = false;
   if (ImGui::IsWindowHovered() && !pill_hovered) {
@@ -583,7 +656,7 @@ ChatLogAction DrawChatLog(std::span<const ChatLineView> lines, const ChatLogStyl
         gesture = ChatLinkGesture::kViewImage;
       }
       if (gesture == ChatLinkGesture::kMenu) {
-        kept->SetInt(target_key, static_cast<int>(hit.token));
+        HoldLinkOfToken(lines, hit.token, laid);
         ImGui::OpenPopup(kLinkMenuId);
       } else if (gesture != ChatLinkGesture::kNothing) {
         asked.gesture = gesture;
@@ -604,43 +677,7 @@ ChatLogAction DrawChatLog(std::span<const ChatLineView> lines, const ChatLogStyl
       }
     }
   }
-  // ⚠ LE NOM SE RETROUVE DANS LES MORCEAUX DE CETTE IMAGE-CI, il ne se garde pas :
-  // il pointe dans une ligne du monde, qui peut être partie. Absent, le menu perd
-  // sa tête et garde ses entrées — ce qui est exactement le bon ordre de pertes.
-  // ⚠ LA CIBLE SE RETIENT PAR SON JETON, qui la désigne SANS AMBIGUÏTÉ : deux
-  // liens du même objet à des raffinements différents partagent l'identifiant.
-  const auto wanted = static_cast<std::uint32_t>(kept->GetInt(target_key, 0));
-  std::string_view label;
-  ChatLinkKind target_kind = ChatLinkKind::kItem;
-  std::uint32_t target_item = 0;
-  const PlayerLinkRefusals* target_refusals = nullptr;
-  const MvpLinkMenuFacts* target_mvp = nullptr;
-  NaviSearchMenuFacts target_navi;
-  const ChatUrlFacts* target_url = nullptr;
-  // ⚠ LA TÊTE NOMME LE LIEN, PAS SON ÉTAT : la marque « · passé » se peint dans
-  // le fil, mais le menu la retire.
-  std::string unmarked;
-  for (const LinkHit& hit : hits) {
-    if (hit.token == wanted) {
-      label = hit.label;
-      target_kind = hit.kind;
-      target_item = hit.item_id;
-      target_refusals = hit.refusals;
-      target_mvp = hit.mvp;
-      target_navi = hit.navi;
-      target_url = hit.url;
-      if (hit.mark_length != 0 && hit.mark_at <= label.size() &&
-          hit.mark_length <= label.size() - hit.mark_at) {
-        unmarked = std::string(label.substr(0, hit.mark_at));
-        unmarked += label.substr(hit.mark_at + hit.mark_length);
-        label = unmarked;
-      }
-      break;
-    }
-  }
-  if (const ChatLinkAsk chosen =
-          DrawChatLinkMenu(kLinkMenuId, target_kind, target_item, wanted, label, style.link_facts,
-                           target_refusals, target_mvp, target_navi, target_url, style.staff_warp);
+  if (const ChatLinkAsk chosen = DrawHeldLinkMenu(lines, style, laid);
       chosen.gesture != ChatLinkGesture::kNothing) {
     asked.gesture = chosen.gesture;
     asked.kind = chosen.kind;

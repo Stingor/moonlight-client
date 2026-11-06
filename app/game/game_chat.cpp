@@ -99,8 +99,8 @@ void Game::StageChat(std::uint32_t now_ms) {
   // sans qu'il sorte. Elle porte ce que le joueur a choisi d'y lire.
   // ⚠ COMPOSÉE À L'IMAGE PRÉCÉDENTE : le compteur se compose après la
   // conversation, et une image de retard ne se voit pas.
-  chat_tabs_->HideMeter(!settings_->options().pages().damage_meter.look().shown);
-  chat_tabs_->FollowMeterDock(windows_.damage_meter.docked);
+  chat_tabs_->HideMeter(!settings_->options().pages().damage_meter.look().shown, windows_.chat);
+  chat_tabs_->FollowMeterDock(windows_.damage_meter.docked, windows_.chat);
   chat_tabs_->LabelMeter(pieces_.damage_meter.tab_label());
   // LES CONVERSATIONS 1:1 AVANT LE TRI : ce qu'elles prennent au fil n'y paraît
   // pas, et elles le prennent en lisant les lignes neuves. L'alarme sonne pour
@@ -336,14 +336,25 @@ void Game::ApplyChatAnswers(const UiStage::Answers& answers, std::uint32_t now_m
   // même image. Le jour où un geste viendrait d'ailleurs — une macro, un
   // raccourci — il faudrait retraduire entre deux.
   DamageMeterOptions& meter = settings_->options().pages().damage_meter;
+  // CE QUE LA FENÊTRE DU COMPTEUR A DEMANDÉ.
+  if (pieces_.damage_meter.Apply(answers.damage_meter, world_, meter)) {
+    settings_->file().Touch();
+  }
+  if (answers.damage_meter.open_settings) {
+    GameSettings::OpenOptionsAt(windows_, OptionSection::kDamageMeter);
+  }
+  if (answers.damage_meter.dock.has_value()) {
+    chat_tabs_->DockMeter(answers.damage_meter.dock->group, answers.damage_meter.dock->rank,
+                          windows_.chat);
+  }
   // L'ONGLET DU COMPTEUR LÂCHÉ HORS DE TOUTE BANDE redevient sa fenêtre, là
   // où on l'a lâché — et non une conversation qui ne porterait que lui.
   const ro::ui::ChatDrop& drop = answers.chat_drop;
   if (drop.asked && drop.to_new_window && chat_tabs_->IsMeter(drop.from_group, drop.from_tab)) {
-    chat_tabs_->UndockMeter();
+    chat_tabs_->UndockMeter(windows_.chat);
     windows_.damage_meter.place_at = drop.at;
   } else {
-    chat_tabs_->ApplyDrop(drop);
+    chat_tabs_->ApplyDrop(drop, windows_.chat);
   }
   for (const UiStage::ChatWindowAsk& ask : answers.chat) {
     // ⚠ AVANT `Apply`, qui réordonne : fermer la languette du compteur éteint
@@ -352,7 +363,7 @@ void Game::ApplyChatAnswers(const UiStage::Answers& answers, std::uint32_t now_m
       meter.SetShown(false);
       settings_->file().Touch();
     }
-    chat_tabs_->Apply(ask.group, ask.asked, windows_.chat.For(ask.group));
+    chat_tabs_->Apply(ask.group, ask.asked, windows_.chat);
     if (pieces_.damage_meter.Apply(ask.asked.meter, world_, meter)) {
       settings_->file().Touch();
     }

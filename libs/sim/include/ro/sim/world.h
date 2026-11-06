@@ -292,6 +292,10 @@ class World : public WorldHoldings, public WorldNpcDialog {
 
   // La conversation, de la plus ANCIENNE ligne à la plus récente. Elle traverse
   // les changements de carte : ce qui a été dit reste dit.
+  //
+  // 🔴 CE SPAN ET LES TEXTES DES LIGNES NE VALENT QUE JUSQU'À LA PROCHAINE LIGNE
+  // DITE, qui peut évincer ou réallouer. Qui les garde au-delà tient le fil par
+  // `LentChatLines`.
   [[nodiscard]] std::span<const ChatLine> chat_lines() const noexcept { return chat_lines_; }
   // Le rang de la DERNIÈRE ligne dite, évictions comprises. Zéro tant que
   // personne n'a rien dit.
@@ -596,6 +600,15 @@ class World : public WorldHoldings, public WorldNpcDialog {
   // parcouru : voir Actor::travelled_before_cells.
   void Halt(Actor& actor, CellPosition where);
 
+  // Fait entrer une ligne dans le fil : son rang, et l'éviction de son genre.
+  void AppendChatLine(ChatLine line);
+
+  friend class LentChatLines;
+  // Les lignes dites arrivent désormais dans `chat_waiting_`, et le fil ne bouge plus.
+  void HoldChat() noexcept;
+  // Le fil reçoit ce qui attendait, dans l'ordre où cela a été dit.
+  void ReleaseChat();
+
   std::unordered_map<std::uint32_t, Actor> actors_;
   const WalkMap* walk_map_ = nullptr;
   Departures departures_;
@@ -604,6 +617,9 @@ class World : public WorldHoldings, public WorldNpcDialog {
   // Combien de lignes ont été dites depuis le début, évictées comprises : c'est
   // le rang de la dernière.
   std::uint64_t chat_lines_seen_ = 0;
+  // Le fil est prêté, et ce qui se dit attend. Ces lignes n'ont pas encore de rang.
+  bool chat_held_ = false;
+  std::vector<ChatLine> chat_waiting_;
   int kept_per_kind_ = kChatLinesKeptPerKind;
   StyleBook styles_;
   QuestMarkers quest_markers_;
@@ -638,6 +654,29 @@ class World : public WorldHoldings, public WorldNpcDialog {
   std::uint32_t stat_raise_refusals_ = 0;
   PvpStanding pvp_standing_;
   ServerClock server_clock_;
+};
+
+// LE FIL DE CONVERSATION PRÊTÉ, le temps de sa portée.
+//
+// 🔴 QUI COMPOSE DES VUES SUR LES TEXTES DU FIL LES LIT PLUS TARD, et n'importe
+// quelle étape peut dire une ligne entre les deux. Une ligne dite évince la plus
+// ancienne de son genre et peut réallouer le vecteur : les vues liraient alors
+// un tampon libéré, ou le texte de la voisine.
+//
+// Tant que l'objet vit, ce qui se dit attend, et le fil ne bouge plus. Tout
+// entre à sa destruction, dans l'ordre où cela a été dit. La bulle d'un locuteur,
+// elle, se pose sur-le-champ : elle ne vit pas dans le fil.
+class LentChatLines {
+ public:
+  explicit LentChatLines(World& world) noexcept : world_(world) { world_.HoldChat(); }
+  ~LentChatLines() { world_.ReleaseChat(); }
+  LentChatLines(const LentChatLines&) = delete;
+  LentChatLines& operator=(const LentChatLines&) = delete;
+  LentChatLines(LentChatLines&&) = delete;
+  LentChatLines& operator=(LentChatLines&&) = delete;
+
+ private:
+  World& world_;
 };
 
 }  // namespace ro::sim

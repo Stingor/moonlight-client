@@ -6,6 +6,7 @@
 #include <span>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include <imgui.h>
@@ -169,6 +170,21 @@ struct ChatSpoilerKey {
   std::string line_text;
   bool operator==(const ChatSpoilerKey&) const = default;
 };
+// LE LIEN QU'UN MENU OUVERT DÉSIGNE : sa ligne, et son rang parmi les liens de
+// celle-ci.
+//
+// 🔴 PAS SON JETON : les jetons se renumérotent à chaque image, toutes fenêtres
+// confondues, et une ligne arrivée ailleurs ferait viser le voisin. La ligne se
+// reconnaît à sa place dans le fil, à défaut à son identité de mise en page, à
+// défaut à son texte.
+struct ChatHeldLink {
+  std::uint64_t line_seq = 0;
+  std::uint64_t line_id = 0;
+  // Vide quand la ligne a une place ou une identité.
+  std::string line_text;
+  std::size_t link_rank = 0;
+  ChatLinkKind kind = ChatLinkKind::kItem;
+};
 // Combien de révélations un fil retient ; les plus anciennes partent.
 inline constexpr std::size_t kMostRevealedSpoilers = 256;
 
@@ -219,6 +235,10 @@ class ChatLogLayout {
   [[nodiscard]] bool holds_copy() const noexcept { return holds_copy_; }
   [[nodiscard]] const std::string& held_line() const noexcept { return held_line_; }
   [[nodiscard]] const std::string& held_body() const noexcept { return held_body_; }
+
+  // LE LIEN DONT LE MENU EST OUVERT, retenu au clic droit.
+  void HoldLink(ChatHeldLink link) { held_link_ = std::move(link); }
+  [[nodiscard]] const ChatHeldLink& held_link() const noexcept { return held_link_; }
 
  private:
   // Ce dont toutes les hauteurs dépendent, hors des lignes elles-mêmes.
@@ -280,6 +300,7 @@ class ChatLogLayout {
   bool holds_copy_ = false;
   std::string held_line_;
   std::string held_body_;
+  ChatHeldLink held_link_;
 };
 
 // Dessine le fil dans la région courante, sur `height` pixels, et gère son
@@ -290,7 +311,7 @@ class ChatLogLayout {
 // partir de couleurs, pas de bitmaps.
 //
 // `layout` est le cache de CE fil ; nul, le fil entier se remet en page à chaque
-// image.
+// image, et rien n'y retient la cible d'un menu : celui d'un lien se referme.
 [[nodiscard]] ChatLogAction DrawChatLog(std::span<const ChatLineView> lines,
                                         const ChatLogStyle& style, float height, const SkinArt& art,
                                         ChatLogLayout* layout);

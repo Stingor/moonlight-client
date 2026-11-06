@@ -409,7 +409,8 @@ void Game::DrawInterface(std::uint32_t now_ms) {
   if (std::optional<std::string> said = screenshot_.TakeReport()) {
     world_.RecordChat(ro::sim::ChatKind::kServer, 0, std::move(*said), now_ms);
   }
-  // LES FAMILLES DE FENÊTRES COMPOSENT LEURS VUES — voir `game.h`.
+  // LES FAMILLES DE FENÊTRES COMPOSENT LEURS VUES (`game.h`), le fil prêté jusqu'au bout.
+  const ro::sim::LentChatLines chat_lent(world_);
   StageChat(now_ms);
   StageDescriptions(now_ms);
   StageContainers();
@@ -597,16 +598,6 @@ void Game::DrawInterface(std::uint32_t now_ms) {
   // écriture, et celle qui attend part au plus tard à la fermeture.
   if (answers.stat_bars_moved || answers.pvp_hud_moved || answers.menu_icons_moved) {
     settings_->file().Touch();
-  }
-  if (pieces_.damage_meter.Apply(answers.damage_meter, world_,
-                                 settings_->options().pages().damage_meter)) {
-    settings_->file().Touch();
-  }
-  if (answers.damage_meter.open_settings) {
-    GameSettings::OpenOptionsAt(windows_, OptionSection::kDamageMeter);
-  }
-  if (answers.damage_meter.dock.has_value()) {
-    chat_tabs_->DockMeter(answers.damage_meter.dock->group, answers.damage_meter.dock->rank);
   }
   // ⚠ MÊME RÈGLE POUR LA POIGNÉE DU BANDEAU : l'anti-rebond du fichier fait
   // qu'un glisser de deux secondes ne produit qu'une écriture.

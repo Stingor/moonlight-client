@@ -111,7 +111,8 @@ class ChatTabsView {
 
   // CE QU'UN JETON DE LIEN DÉSIGNE. ⚠ REFAITE À CHAQUE IMAGE, comme les vues :
   // le jeton n'est valable que pour l'image qui l'a rendu, et c'est suffisant —
-  // un geste se lit dans la foulée de l'image qui l'a vu.
+  // un geste se lit dans la foulée de l'image qui l'a vu. Un menu ouvert sur
+  // plusieurs images retient donc autre chose : voir `ro::ui::ChatHeldLink`.
   [[nodiscard]] const ChatLinkTarget* LinkOf(std::uint32_t token) const;
   [[nodiscard]] std::span<const ro::ui::ChatTypeToggle> types(std::uint32_t group) const;
 
@@ -131,35 +132,40 @@ class ChatTabsView {
   // retrait, un déplacement ou un détachement réordonne la liste des onglets,
   // et la fenêtre suivante lirait alors des rangs périmés — elle agirait sur
   // l'onglet d'à côté, ou sur celui d'une autre fenêtre.
+  //
+  // ⚠ IL PREND TOUTES LES FENÊTRES : un rattachement touche aussi la principale.
   void Apply(std::uint32_t group, const ro::ui::ChatWindowAction& asked,
-             ro::ui::ChatWindowState& state);
+             ro::ui::ChatWindows& windows);
 
   // Range une languette là où elle vient d'être lâchée.
   //
   // ⚠ LES DEUX RANGS SONT LOCAUX À LEUR BANDE, celui du départ comme celui de
   // l'arrivée, et ce sont deux bandes DIFFÉRENTES. C'est la seule fonction qui
-  // traduise deux numérotations à la fois.
-  void ApplyDrop(const ro::ui::ChatDrop& drop);
+  // traduise deux numérotations à la fois. Les deux fenêtres gardent sous les
+  // yeux l'onglet qu'elles montraient.
+  void ApplyDrop(const ro::ui::ChatDrop& drop, ro::ui::ChatWindows& windows);
 
   // ── LE COMPTEUR DE DÉGÂTS RANGÉ COMME UN ONGLET — chat_meter_tab.cpp ──────
+  // ⚠ TOUT CE QUI FAIT PARAÎTRE OU DISPARAÎTRE SA LANGUETTE PREND LES FENÊTRES :
+  // celles qui la portent gardent sous les yeux l'onglet qu'elles montraient.
   // Est-il rangé dans une conversation ?
   [[nodiscard]] bool meter_docked() const { return tabs_.MeterRank().has_value(); }
   // Cette languette de cette fenêtre est-elle celle du compteur ?
   [[nodiscard]] bool IsMeter(std::uint32_t group, int local) const;
   // Le range dans cette fenêtre, au rang de SA bande — moins un pour tout au
   // bout. Une fenêtre qui n'existe plus se lit comme la principale.
-  void DockMeter(std::uint32_t group, int local);
+  void DockMeter(std::uint32_t group, int local, ro::ui::ChatWindows& windows);
   // Le sort des onglets : il redevient une fenêtre à lui.
-  void UndockMeter();
+  void UndockMeter(ro::ui::ChatWindows& windows);
   // Ce que sa languette affiche, refait à chaque image : il porte le rythme.
   void LabelMeter(std::string label) { meter_label_ = std::move(label); }
   // ÉTEINT DANS LES RÉGLAGES, sa languette se cache sans qu'il quitte sa bande :
   // le fichier des onglets est commun, et un réglage d'un seul personnage ne
-  // doit pas le sortir de la conversation des autres.
-  void HideMeter(bool hidden) noexcept { meter_hidden_ = hidden; }
+  // doit pas le sortir de la conversation des autres. Une fois par image.
+  void HideMeter(bool hidden, ro::ui::ChatWindows& windows);
   // LE RANGEMENT SUIT LE PROFIL DE DISPOSITION, dont `wanted` est
   // l'interrupteur : voir `ChatTabs::FollowMeterDock`. Une fois par image.
-  void FollowMeterDock(bool& wanted);
+  void FollowMeterDock(bool& wanted, ro::ui::ChatWindows& windows);
 
   // ── LE FIL D'UN SALON — chat_room_lines.cpp ────────────────────────────
   // Ses lignes, décorées comme celles de la conversation et dans le MÊME jeu
@@ -274,13 +280,26 @@ class ChatTabsView {
 
  private:
   void SaveIfNeeded();
+  // LE RANG DANS SA BANDE de l'onglet de ce rang réel, s'il y était : on compte
+  // les languettes de la fenêtre qui le précèdent. Un compteur caché n'en a pas.
+  [[nodiscard]] int LocalRankOf(std::uint32_t group, std::size_t rank) const;
+  // Où la languette du compteur se dessine ; rien, rangé ailleurs ou caché.
+  struct MeterPlace {
+    std::uint32_t group = 0;
+    int local = 0;
+  };
+  [[nodiscard]] std::optional<MeterPlace> MeterPlaceNow() const;
+  // Recale l'onglet montré des fenêtres concernées, le compteur venu d'où il était.
+  void KeepShownAfterMeterMove(std::optional<MeterPlace> before,
+                               ro::ui::ChatWindows& windows) const;
   // Ramasse ce qui vient d'être dit. ⚠ APPELÉE MÊME FENÊTRE FERMÉE : ce qui se
   // dit alors se dit quand même, et le monde efface les plus anciennes lignes
   // de chaque genre.
   void Harvest(std::span<const ro::sim::ChatLine> chat);
 
   // Ce qu'UNE fenêtre montre, refait à chaque image. Les textes pointent dans
-  // `tabs_` et dans la conversation du monde : rien n'est recopié.
+  // `tabs_` et dans la conversation du monde : rien n'est recopié, et c'est
+  // pourquoi `Game::DrawInterface` tient le fil par `ro::sim::LentChatLines`.
   struct GroupViews {
     std::vector<ro::ui::ChatStripTab> tabs;
     // Le rang RÉEL de chaque languette. ⚠ SANS LUI LES DEUX NUMÉROTATIONS SE
@@ -347,6 +366,15 @@ class ChatTabsView {
   // arrivée ou partie, ou que ce qu'il montre a changé. — chat_tab_marks.cpp
   [[nodiscard]] bool UnreadOf(std::size_t rank, std::span<const ro::sim::ChatLine> chat);
 
+  // L'HEURE D'UNE LIGNE, telle que la boucle l'a datée. Minuit tant que le repère
+  // n'a pas été relevé.
+  struct LineClock {
+    std::uint8_t hour = 0;
+    std::uint8_t minute = 0;
+    std::uint8_t second = 0;
+  };
+  [[nodiscard]] LineClock ClockOf(std::uint32_t said_ms) const noexcept;
+
   // CE QU'UN ONGLET A RÉPONDU sur ses non-lus, et ce qui l'a décidé. ⚠ COMPARÉ
   // CHAMP À CHAMP : le même onglet aux mêmes lignes répond la même chose.
   struct UnreadMemo {
@@ -374,6 +402,8 @@ class ChatTabsView {
   std::string meter_label_;
   // Éteint dans les réglages : sa languette ne paraît pas, il garde sa place.
   bool meter_hidden_ = false;
+  // ⚠ LA PREMIÈRE IMAGE POSE L'ÉTAT, ELLE NE LE CHANGE PAS : rien n'a glissé.
+  bool meter_hidden_told_ = false;
   // Le rangement que le profil de disposition a vu à la dernière image.
   bool meter_dock_seen_ = false;
   const ro::vfs::ItemTable* items_ = nullptr;
@@ -411,12 +441,15 @@ class ChatTabsView {
   std::vector<std::uint32_t> living_;
   // Le compte de changements DÉJÀ enregistré. Voir `ChatTabs::revision`.
   std::uint32_t saved_revision_ = 0;
-  // La seconde du jour qu'il était quand l'horloge de la boucle valait zéro.
+  // La seconde du jour qu'il était quand l'horloge de la boucle valait zéro ;
+  // rien tant que le premier tri ne l'a pas relevée.
   //
   // ⚠ RELEVÉE UNE FOIS, et pas à chaque ligne : demander l'heure locale
   // soixante fois par image pour afficher soixante horodatages coûterait plus
   // que tout le reste de la fenêtre. Ensuite, ce n'est que de l'arithmétique.
-  int day_second_at_boot_ = -1;
+  //
+  // ⚠ ELLE PEUT ÊTRE NÉGATIVE : un client lancé avant minuit la relève après.
+  std::optional<int> day_second_at_boot_;
   // Le rang de la dernière ligne vue au dernier tri. C'est ce que « vider »
   // retient : tout ce qui précède disparaît de cet onglet-là.
   std::uint64_t last_seq_ = 0;

@@ -227,7 +227,7 @@ ChatTabsView::ChatTabsView(std::filesystem::path client_root)
 void ChatTabsView::Refresh(ro::ui::ChatWindows& windows, std::span<const ro::sim::ChatLine> chat,
                            std::uint32_t now_ms, const ro::ui::ChatAppearance& look,
                            bool diagnostic) {
-  if (day_second_at_boot_ < 0) {
+  if (!day_second_at_boot_.has_value()) {
     day_second_at_boot_ = DaySecondNow() - static_cast<int>(now_ms / kMsPerSecond);
   }
   // Le rang de la dernière ligne, mis de côté pour le geste : `Apply` tourne
@@ -247,7 +247,7 @@ void ChatTabsView::Refresh(ro::ui::ChatWindows& windows, std::span<const ro::sim
   // que rien à l'écran ne signalerait.
   // ⚠ LE COMPTEUR SEUL DANS UNE FLOTTANTE LA QUITTE : il redevient sa fenêtre.
   if (tabs_.lone_meter()) {
-    UndockMeter();
+    UndockMeter(windows);
   }
   living_ = tabs_.Groups();
   windows.Keep(living_);
@@ -366,20 +366,13 @@ void ChatTabsView::Refresh(ro::ui::ChatWindows& windows, std::span<const ro::sim
             desk_->ShownApart(line.seq)) {
           continue;
         }
-        // Le modulo ramène dans le jour, et l'ajout d'un jour écarte le négatif :
-        // une partie commencée à 00 h 10 porte un repère négatif dès que l'horloge
-        // de la boucle dépasse dix minutes.
-        const int second = ((day_second_at_boot_ + static_cast<int>(line.said_ms / kMsPerSecond)) %
-                                kSecondsPerDay +
-                            kSecondsPerDay) %
-                           kSecondsPerDay;
-        ro::ui::ChatLineView view{
-            .tag = diagnostic ? KindTag(line.kind) : kNoTag,
-            .type_tag = diagnostic ? ChatTypeTag(line.type) : kNoTag,
-            .color = ColorOfChatLine(line.kind, line.color),
-            .hour = static_cast<std::uint8_t>(second / kSecondsPerHour),
-            .minute = static_cast<std::uint8_t>((second / kSecondsPerMinute) % kSecondsPerMinute),
-            .second = static_cast<std::uint8_t>(second % kSecondsPerMinute)};
+        const LineClock clock = ClockOf(line.said_ms);
+        ro::ui::ChatLineView view{.tag = diagnostic ? KindTag(line.kind) : kNoTag,
+                                  .type_tag = diagnostic ? ChatTypeTag(line.type) : kNoTag,
+                                  .color = ColorOfChatLine(line.kind, line.color),
+                                  .hour = clock.hour,
+                                  .minute = clock.minute,
+                                  .second = clock.second};
         ShowLine(line, WhisperSurface::kLog, view, views);
         view.id = CarriesMvpLink(view) ? 0 : look_bits | kLiveLine | line.seq;
         // ⚠ LE RANG NU, MÊME QUAND L'IDENTITÉ EST NULLE : c'est lui qui compte ce
@@ -477,7 +470,8 @@ const ro::ui::ChatTabLook& ChatTabsView::tuned_look(std::uint32_t group) const {
 }
 
 void ChatTabsView::Apply(std::uint32_t group, const ro::ui::ChatWindowAction& asked,
-                         ro::ui::ChatWindowState& state) {
+                         ro::ui::ChatWindows& windows) {
+  ro::ui::ChatWindowState& state = windows.For(group);
   const auto found = shown_.find(group);
   if (found == shown_.end()) {
     return;  // une fenêtre que le tri ne connaît plus : ses rangs ne valent rien
@@ -553,13 +547,20 @@ void ChatTabsView::Apply(std::uint32_t group, const ro::ui::ChatWindowAction& as
   }
   // ── OÙ CET ONGLET EST MONTRÉ ──────────────────────────────────────
   if (const std::size_t rank = real(asked.detach_tab); rank != kNoTab) {
-    static_cast<void>(tabs_.Detach(rank));
-    // ⚠ LA FENÊTRE QUI VIENT DE LE PERDRE REGARDE AILLEURS : son rang désignait
-    // celui qui est parti, et la languette d'à côté a pris sa place.
+    // ⚠ SEUL DANS SA FENÊTRE, IL N'EN SORT PAS, et rien ne glisse.
+    if (tabs_.Detach(rank) != group) {
+      state.tab = ShownAfterLeaving(state.tab, asked.detach_tab);
+    }
+    // ⚠ LA LANGUETTE RÉGLÉE EST PARTIE : son rang désigne maintenant sa voisine.
     state.configuring = -1;
   }
   if (const std::size_t rank = real(asked.attach_tab); rank != kNoTab) {
     tabs_.Attach(rank, 0);
+    // LES DEUX FENÊTRES GARDENT SOUS LES YEUX CE QU'ELLES MONTRAIENT.
+    if (group != 0) {
+      state.tab = ShownAfterLeaving(state.tab, asked.attach_tab);
+      windows.main.tab = ShownAfterArrival(windows.main.tab, LocalRankOf(0, rank));
+    }
     state.configuring = -1;
   }
   if (asked.tuned_look) {
@@ -572,44 +573,31 @@ void ChatTabsView::Apply(std::uint32_t group, const ro::ui::ChatWindowAction& as
     }
   }
   if (const std::size_t rank = real(asked.remove_tab); rank != kNoTab) {
+    // ⚠ LE DERNIER FIL NE SE RETIRE PAS, et rien ne glisse alors.
+    const std::size_t tabs_before = tabs_.count();
     tabs_.Remove(rank);
+    if (tabs_.count() < tabs_before) {
+      state.tab = ShownAfterLeaving(state.tab, asked.remove_tab);
+    }
     state.configuring = -1;
   }
   SaveIfNeeded();
 }
 
-void ChatTabsView::ApplyDrop(const ro::ui::ChatDrop& drop) {
-  if (!drop.asked) {
-    return;
+ChatTabsView::LineClock ChatTabsView::ClockOf(std::uint32_t said_ms) const noexcept {
+  if (!day_second_at_boot_.has_value()) {
+    return {};
   }
-  const auto from = shown_.find(drop.from_group);
-  if (from == shown_.end() || drop.from_tab < 0 ||
-      static_cast<std::size_t>(drop.from_tab) >= from->second.ranks.size()) {
-    return;
-  }
-  const std::size_t moved = from->second.ranks[static_cast<std::size_t>(drop.from_tab)];
-
-  if (drop.to_new_window) {
-    static_cast<void>(tabs_.Detach(moved));
-    SaveIfNeeded();
-    return;
-  }
-
-  const auto into = shown_.find(drop.to_group);
-  if (into == shown_.end()) {
-    return;  // une fenêtre que le tri ne connaît plus
-  }
-  // ⚠ LES RANGS DE LA BANDE VISÉE SONT CEUX D'AVANT LE DÉPÔT, et c'est
-  // exactement ce qu'il faut : ils décrivent la bande telle que le joueur la
-  // voyait en lâchant.
-  const std::vector<std::size_t>& target = into->second.ranks;
-  const std::size_t before =
-      drop.to_rank >= 0 && static_cast<std::size_t>(drop.to_rank) < target.size()
-          ? target[static_cast<std::size_t>(drop.to_rank)]
-          : (target.empty() ? tabs_.count() : target.back() + 1);
-  tabs_.Attach(moved, drop.to_group);
-  tabs_.Move(moved, before);
-  SaveIfNeeded();
+  // Le modulo ramène dans le jour, et l'ajout d'un jour écarte le négatif : un
+  // repère relevé après minuit par un client lancé avant l'est.
+  const int second =
+      ((*day_second_at_boot_ + static_cast<int>(said_ms / kMsPerSecond)) % kSecondsPerDay +
+       kSecondsPerDay) %
+      kSecondsPerDay;
+  return LineClock{
+      .hour = static_cast<std::uint8_t>(second / kSecondsPerHour),
+      .minute = static_cast<std::uint8_t>((second / kSecondsPerMinute) % kSecondsPerMinute),
+      .second = static_cast<std::uint8_t>(second % kSecondsPerMinute)};
 }
 
 void ChatTabsView::Harvest(std::span<const ro::sim::ChatLine> chat) {
@@ -618,19 +606,15 @@ void ChatTabsView::Harvest(std::span<const ro::sim::ChatLine> chat) {
       continue;
     }
     harvested_through_ = line.seq;
-    const int second =
-        ((day_second_at_boot_ + static_cast<int>(line.said_ms / kMsPerSecond)) % kSecondsPerDay +
-         kSecondsPerDay) %
-        kSecondsPerDay;
-    seen_.push_back(PastChatLine{
-        .type = line.type,
-        // ⚠ UN CHUCHOTEMENT AVEC SON EN-TÊTE : sans lui, il se relirait comme une
-        // parole publique.
-        .text = WhisperLogText(line, words_),
-        .hour = static_cast<std::uint8_t>(second / kSecondsPerHour),
-        .minute = static_cast<std::uint8_t>((second / kSecondsPerMinute) % kSecondsPerMinute),
-        .second = static_cast<std::uint8_t>(second % kSecondsPerMinute),
-        .color = ShownRgbOfChatLine(line.kind, line.color)});
+    const LineClock clock = ClockOf(line.said_ms);
+    seen_.push_back(PastChatLine{.type = line.type,
+                                 // ⚠ UN CHUCHOTEMENT AVEC SON EN-TÊTE : sans lui, il se relirait
+                                 // comme une parole publique.
+                                 .text = WhisperLogText(line, words_),
+                                 .hour = clock.hour,
+                                 .minute = clock.minute,
+                                 .second = clock.second,
+                                 .color = ShownRgbOfChatLine(line.kind, line.color)});
     // ⚠ UN FICHIER PAR JOUR, MINUIT COMPRIS : une partie qui passe minuit
     // rouvre le journal du nouveau jour, coiffé de son repère. Sans cela les
     // lignes d'après minuit tombaient dans le fichier de la veille, où leur

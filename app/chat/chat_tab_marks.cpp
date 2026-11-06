@@ -1,12 +1,15 @@
 // LES REPÈRES DES ONGLETS : la taille du texte qu'un Ctrl + molette fait varier,
-// les vignettes que les lignes montrent, et les non-lus des languettes. À part
-// de `chat_tab_view.cpp`, qui n'a plus la place de les porter.
+// les vignettes que les lignes montrent, les non-lus des languettes et le lâcher
+// d'une languette. À part de `chat_tab_view.cpp`, qui n'a plus la place de les
+// porter.
 
 #include <algorithm>
+#include <cstddef>
 #include <cstdint>
 #include <span>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 #include "chat/chat_tab_view.h"
 
@@ -141,6 +144,54 @@ bool ChatTabsView::ZoomLook(std::uint32_t group, int steps) {
     SaveIfNeeded();
   }
   return true;
+}
+
+void ChatTabsView::ApplyDrop(const ro::ui::ChatDrop& drop, ro::ui::ChatWindows& windows) {
+  if (!drop.asked) {
+    return;
+  }
+  const auto from = shown_.find(drop.from_group);
+  if (from == shown_.end() || drop.from_tab < 0 ||
+      static_cast<std::size_t>(drop.from_tab) >= from->second.ranks.size()) {
+    return;
+  }
+  const std::size_t moved = from->second.ranks[static_cast<std::size_t>(drop.from_tab)];
+
+  if (drop.to_new_window) {
+    // ⚠ SEULE DANS SA FENÊTRE, ELLE N'EN SORT PAS, et rien n'y glisse.
+    if (tabs_.Detach(moved) != drop.from_group) {
+      ro::ui::ChatWindowState& source = windows.For(drop.from_group);
+      source.tab = ShownAfterLeaving(source.tab, drop.from_tab);
+    }
+    SaveIfNeeded();
+    return;
+  }
+
+  const auto into = shown_.find(drop.to_group);
+  if (into == shown_.end()) {
+    return;  // une fenêtre que le tri ne connaît plus
+  }
+  // ⚠ LES RANGS DE LA BANDE VISÉE SONT CEUX D'AVANT LE DÉPÔT, et c'est
+  // exactement ce qu'il faut : ils décrivent la bande telle que le joueur la
+  // voyait en lâchant.
+  const std::vector<std::size_t>& target = into->second.ranks;
+  const std::size_t before =
+      drop.to_rank >= 0 && static_cast<std::size_t>(drop.to_rank) < target.size()
+          ? target[static_cast<std::size_t>(drop.to_rank)]
+          : (target.empty() ? tabs_.count() : target.back() + 1);
+  tabs_.Attach(moved, drop.to_group);
+  tabs_.Move(moved, before);
+  // LES DEUX FENÊTRES GARDENT SOUS LES YEUX CE QU'ELLES MONTRAIENT. Lâchée au-delà
+  // de la dernière languette, elle ne déplace rien dans la bande d'arrivée.
+  if (drop.to_group != drop.from_group) {
+    ro::ui::ChatWindowState& source = windows.For(drop.from_group);
+    source.tab = ShownAfterLeaving(source.tab, drop.from_tab);
+    if (drop.to_rank >= 0 && static_cast<std::size_t>(drop.to_rank) < target.size()) {
+      ro::ui::ChatWindowState& arrival = windows.For(drop.to_group);
+      arrival.tab = ShownAfterArrival(arrival.tab, drop.to_rank);
+    }
+  }
+  SaveIfNeeded();
 }
 
 }  // namespace moonclient

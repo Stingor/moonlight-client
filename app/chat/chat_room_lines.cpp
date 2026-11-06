@@ -16,24 +16,11 @@
 namespace moonclient {
 namespace {
 
-constexpr int kSecondsPerMinute = 60;
-constexpr int kSecondsPerHour = 60 * kSecondsPerMinute;
-constexpr int kSecondsPerDay = 24 * kSecondsPerHour;
-constexpr std::uint32_t kMsPerSecond = 1000;
-
 // Une couleur du serveur, rouge, vert puis bleu, et l'opacité qui est la nôtre.
 constexpr int kRedShift = 16;
 constexpr int kGreenShift = 8;
 constexpr std::uint32_t kByteMask = 0xFF;
 constexpr int kOpaque = 255;
-
-// L'heure du jour d'une ligne, en secondes, depuis la seconde du jour relevée
-// au démarrage.
-[[nodiscard]] int DaySecondOf(int day_second_at_boot, std::uint32_t said_ms) {
-  return ((day_second_at_boot + static_cast<int>(said_ms / kMsPerSecond)) % kSecondsPerDay +
-          kSecondsPerDay) %
-         kSecondsPerDay;
-}
 
 }  // namespace
 
@@ -51,17 +38,13 @@ void ChatTabsView::RefreshRoom(std::span<const ro::sim::ChatLine> lines, std::ui
   // version brute.
   const std::uint64_t look_bits = LookBits(false);
   for (const ro::sim::ChatLine& line : lines) {
-    ro::ui::ChatLineView view{.color = IM_COL32((line.color >> kRedShift) & kByteMask,
-                                                (line.color >> kGreenShift) & kByteMask,
-                                                line.color & kByteMask, kOpaque)};
-    // L'heure, comme dans la conversation : le repère est la seconde du jour
-    // relevée au démarrage, et le salon n'en tient que si elle l'a été.
-    if (day_second_at_boot_ >= 0) {
-      const int second = DaySecondOf(day_second_at_boot_, line.said_ms);
-      view.hour = static_cast<std::uint8_t>(second / kSecondsPerHour);
-      view.minute = static_cast<std::uint8_t>((second / kSecondsPerMinute) % kSecondsPerMinute);
-      view.second = static_cast<std::uint8_t>(second % kSecondsPerMinute);
-    }
+    const LineClock clock = ClockOf(line.said_ms);
+    ro::ui::ChatLineView view{
+        .color = IM_COL32((line.color >> kRedShift) & kByteMask,
+                          (line.color >> kGreenShift) & kByteMask, line.color & kByteMask, kOpaque),
+        .hour = clock.hour,
+        .minute = clock.minute,
+        .second = clock.second};
     // UNE LIGNE DE SALON PORTE TOUJOURS SON LOCUTEUR EN TÊTE, « Nom : texte ». ⚠
     // IL NE SE CHERCHE QUE SI LA LIGNE PORTE UN `<MVPL>` : la question se pose à
     // chaque ligne, à chaque image.
@@ -80,16 +63,12 @@ ChatLogDump ChatTabsView::SaveRoomLog(std::span<const ro::sim::ChatLine> lines,
   std::vector<PastChatLine> written;
   written.reserve(lines.size());
   for (const ro::sim::ChatLine& line : lines) {
-    PastChatLine past{.type = line.type, .text = line.text};
-    // Sans repère d'heure, la ligne porte minuit, comme elle n'en porte aucune
-    // à l'écran.
-    if (day_second_at_boot_ >= 0) {
-      const int second = DaySecondOf(day_second_at_boot_, line.said_ms);
-      past.hour = static_cast<std::uint8_t>(second / kSecondsPerHour);
-      past.minute = static_cast<std::uint8_t>((second / kSecondsPerMinute) % kSecondsPerMinute);
-      past.second = static_cast<std::uint8_t>(second % kSecondsPerMinute);
-    }
-    written.push_back(std::move(past));
+    const LineClock clock = ClockOf(line.said_ms);
+    written.push_back(PastChatLine{.type = line.type,
+                                   .text = line.text,
+                                   .hour = clock.hour,
+                                   .minute = clock.minute,
+                                   .second = clock.second});
   }
   return DumpChatRoomLog(client_root_, room_title, written);
 }

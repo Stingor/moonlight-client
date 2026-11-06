@@ -165,6 +165,7 @@ add_library(ro_sim STATIC
     src/world.cpp
     src/world_attack_element.cpp
     src/world_bearers.cpp
+    src/world_chat.cpp
     src/world_combo.cpp
     src/world_blade_stop.cpp
     src/world_glide.cpp

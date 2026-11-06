@@ -224,6 +224,19 @@ struct ChatTab {
   return shown;
 }
 
+// L'ONGLET MONTRÉ, APRÈS QU'UNE LANGUETTE A QUITTÉ SA BANDE au rang `gone` : ce
+// qui la suivait glisse d'un rang. Elle-même partie, c'est sa voisine de droite
+// qui se montre, à son rang.
+[[nodiscard]] constexpr int ShownAfterLeaving(int shown, int gone) noexcept {
+  return shown > gone ? shown - 1 : shown;
+}
+
+// L'ONGLET MONTRÉ, APRÈS QU'UNE LANGUETTE EST ARRIVÉE dans sa bande au rang `came` :
+// ce qui l'occupait glisse d'un rang.
+[[nodiscard]] constexpr int ShownAfterArrival(int shown, int came) noexcept {
+  return shown >= came ? shown + 1 : shown;
+}
+
 class ChatTabs {
  public:
   // Part avec l'onglet du client : un seul, qui accepte `kDefaultChatTypes`.

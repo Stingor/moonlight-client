@@ -626,56 +626,6 @@ bool World::AnnounceSkill(std::uint32_t caster_id, std::uint16_t skill_id, std::
   return true;
 }
 
-void World::RecordWhisper(WhisperFacts facts, std::string text, std::uint32_t said_ms) {
-  RecordChat(ChatKind::kWhisper, 0, std::move(text), said_ms);
-  chat_lines_.back().whisper = std::move(facts);
-}
-
-void World::ShowSpeech(std::uint32_t speaker_id, std::string text, std::uint32_t said_ms,
-                       std::uint32_t bubble_bgr) {
-  if (const auto found = actors_.find(speaker_id); found != actors_.end()) {
-    found->second.chat_text = std::move(text);
-    found->second.chat_since_ms = said_ms;
-    found->second.chat_bgr = bubble_bgr;
-  }
-}
-
-void World::RecordChat(ChatKind kind, ChatType type, std::uint32_t speaker_id, std::string text,
-                       std::uint32_t said_ms, std::uint32_t color,
-                       std::optional<ChatAuthor> author) {
-  ShowSpeech(speaker_id, text, said_ms);
-  // ÉVICTION PAR GENRE : les plus anciennes de CE genre-là s'en vont.
-  //
-  // ⚠ DEUX AU PLUS PAR LIGNE ARRIVÉE quand la borne est dépassée, et non une :
-  // une seule retirée pour une ajoutée laisserait le compte où il est, et une
-  // borne abaissée ne prendrait jamais effet. Deux, et non tout l'excédent :
-  // le trop-plein s'écoule au fil des lignes, sans vider d'un coup ce que le
-  // joueur est en train de lire.
-  constexpr int kMostEvictedPerLine = 2;
-  const auto of_kind = static_cast<int>(std::ranges::count_if(
-      chat_lines_, [kind](const ChatLine& line) { return line.kind == kind; }));
-  int evicted = std::min(of_kind - kept_per_kind_ + 1, kMostEvictedPerLine);
-  if (evicted > 0) {
-    std::erase_if(chat_lines_, [kind, &evicted](const ChatLine& line) {
-      if (evicted == 0 || line.kind != kind) {
-        return false;
-      }
-      --evicted;
-      return true;
-    });
-  }
-  // Le rang part à UN : une marque de vidage à zéro ne désigne aucune ligne.
-  ++chat_lines_seen_;
-  chat_lines_.push_back(ChatLine{.seq = chat_lines_seen_,
-                                 .kind = kind,
-                                 .type = type,
-                                 .speaker_id = speaker_id,
-                                 .text = std::move(text),
-                                 .said_ms = said_ms,
-                                 .color = color,
-                                 .author = std::move(author)});
-}
-
 void World::PlaceSkillUnit(const SkillUnit& unit) { skill_units_[unit.id] = unit; }
 
 bool World::RemoveSkillUnit(std::uint32_t id) { return skill_units_.erase(id) != 0; }

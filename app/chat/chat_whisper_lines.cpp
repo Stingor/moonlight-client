@@ -19,11 +19,6 @@
 namespace moonclient {
 namespace {
 
-constexpr int kSecondsPerMinute = 60;
-constexpr int kSecondsPerHour = 60 * kSecondsPerMinute;
-constexpr int kSecondsPerDay = 24 * kSecondsPerHour;
-constexpr std::uint32_t kMsPerSecond = 1000;
-
 // Une couleur de ligne, rouge, vert puis bleu, et l'opacité qui est la nôtre.
 constexpr int kRedShift = 16;
 constexpr int kGreenShift = 8;
@@ -196,17 +191,11 @@ void ChatTabsView::RefreshWhispers(std::span<const ro::sim::ChatLine> chat,
           line.whisper.peer_name != conversation.peer) {
         continue;
       }
-      ro::ui::ChatLineView view{.color = ColorOf(ConversationColor(line.whisper.side))};
-      // L'heure, comme dans le fil, quand le repère du jour est connu.
-      if (day_second_at_boot_ >= 0) {
-        const int second = ((day_second_at_boot_ + static_cast<int>(line.said_ms / kMsPerSecond)) %
-                                kSecondsPerDay +
-                            kSecondsPerDay) %
-                           kSecondsPerDay;
-        view.hour = static_cast<std::uint8_t>(second / kSecondsPerHour);
-        view.minute = static_cast<std::uint8_t>((second / kSecondsPerMinute) % kSecondsPerMinute);
-        view.second = static_cast<std::uint8_t>(second % kSecondsPerMinute);
-      }
+      const LineClock clock = ClockOf(line.said_ms);
+      ro::ui::ChatLineView view{.color = ColorOf(ConversationColor(line.whisper.side)),
+                                .hour = clock.hour,
+                                .minute = clock.minute,
+                                .second = clock.second};
       ShowLine(line, WhisperSurface::kConversation, view, views);
       view.id = CarriesMvpLink(view) ? 0 : look_bits | line.seq;
       view.seq = line.seq;
