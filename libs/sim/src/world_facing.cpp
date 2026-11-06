@@ -214,6 +214,17 @@ bool World::Turn(std::uint32_t id, std::uint8_t direction, std::uint8_t head_dir
   return true;
 }
 
+bool World::ChangeWalkingSpeed(std::uint32_t id, std::uint16_t ms_per_cell, std::uint32_t now_ms) {
+  const auto found = actors_.find(id);
+  if (found == actors_.end()) {
+    return false;
+  }
+  Actor& actor = found->second;
+  actor.movement_started_ms = WalkStartAfterSpeedChange(actor, walk_map_, ms_per_cell, now_ms);
+  actor.speed_ms_per_cell = ms_per_cell;
+  return true;
+}
+
 bool World::Reposition(std::uint32_t id, std::uint16_t x, std::uint16_t y, std::uint32_t now_ms) {
   const auto found = actors_.find(id);
   if (found == actors_.end()) {

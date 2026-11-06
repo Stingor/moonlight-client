@@ -25,7 +25,8 @@ namespace ro::net {
 //
 // Le coût du cran suivant et le solde de points, eux, arrivent bien par
 // `ZC_PAR_CHANGE`.
-[[nodiscard]] FrameOutcome ApplyCharacterFrame(const Frame& frame, sim::World& world);
+[[nodiscard]] FrameOutcome ApplyCharacterFrame(const Frame& frame, sim::World& world,
+                                               std::uint32_t now_ms);
 
 // « Je monte cette caractéristique. »
 //

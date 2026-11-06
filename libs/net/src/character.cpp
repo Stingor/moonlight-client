@@ -71,13 +71,22 @@ constexpr std::uint8_t kStatUpAccepted = 1;
 
 }  // namespace
 
-FrameOutcome ApplyCharacterFrame(const Frame& frame, sim::World& world) {
+FrameOutcome ApplyCharacterFrame(const Frame& frame, sim::World& world, std::uint32_t now_ms) {
   switch (frame.opcode) {
     case proto::ZcParChange::kOpcode:
-      return Decoded<proto::ZcParChange>(frame, [&world](const auto& packet) {
+      return Decoded<proto::ZcParChange>(frame, [&world, now_ms](const auto& packet) {
         // ⚠ CE PAQUET NE NOMME PERSONNE : il ne parle que du joueur, et c'est
         // pourquoi il n'y a aucun identifiant à lire. Le serveur l'émet pour
         // CHAQUE valeur qui change, une à la fois.
+        //
+        // La vitesse arrive ici, et le joueur a pu partir avant elle : il reste
+        // où il en est de sa marche. Sans joueur posé, le paramètre suit la voie
+        // commune, qui le dit reconnu et sans destinataire.
+        if (packet.varID == static_cast<std::uint16_t>(sim::ServerParameter::kSpeed) &&
+            world.ChangeWalkingSpeed(world.player_id(), static_cast<std::uint16_t>(packet.count),
+                                     now_ms)) {
+          return FrameOutcome::kApplied;
+        }
         return OutcomeOfParameter(world.SetPlayerParameter(packet.varID, packet.count),
                                   packet.varID);
       });

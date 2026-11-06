@@ -708,7 +708,7 @@ FrameOutcome ApplyFrame(const Frame& frame, sim::World& world, std::uint32_t now
     case proto::ZcStatus::kOpcode:
     case proto::ZcStatusChangeAck::kOpcode:
     case proto::ZcStatusChange::kOpcode:
-      return ApplyCharacterFrame(frame, world);
+      return ApplyCharacterFrame(frame, world, now_ms);
 
     // Le GRIMOIRE : ce que le personnage sait lancer, à part du monde.
     case proto::ZcSkillinfoList::kOpcode:

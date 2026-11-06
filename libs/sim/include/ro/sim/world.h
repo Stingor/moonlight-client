@@ -103,6 +103,11 @@ class World : public WorldHoldings, public WorldNpcDialog {
   // part, par le paramètre SP_SPEED.
   bool SetSpeed(std::uint32_t id, std::uint16_t ms_per_cell);
 
+  // La même, pour un acteur qui a déjà pu partir : il reste au même endroit de
+  // son chemin et poursuit à la nouvelle vitesse. Voir
+  // `WalkStartAfterSpeedChange`. Faux pour un inconnu.
+  bool ChangeWalkingSpeed(std::uint32_t id, std::uint16_t ms_per_cell, std::uint32_t now_ms);
+
   // Pose ou retire un état, et l'inscrit au journal `state_arrivals()`. Faux
   // pour un inconnu. `value` est le `val1` du paquet 0x043F, `second_value` son
   // `val2` : RETENUES pour les seuls états qui en montrent quelque chose, que

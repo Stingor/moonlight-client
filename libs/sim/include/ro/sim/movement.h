@@ -188,4 +188,18 @@ inline constexpr float kSubCellCenter = 8.0F;
 [[nodiscard]] FractionalCell PositionAt(const Actor& actor, const WalkMap* map,
                                         std::uint32_t at_ms);
 
+// L'INSTANT DE DÉPART QUI GARDE L'ACTEUR AU MÊME ENDROIT DE SON CHEMIN une fois
+// sa vitesse changée.
+//
+// La position se déduit du temps écoulé et de la vitesse COURANTE : changer
+// l'une sans l'autre ferait reculer ou bondir l'acteur, et une marche achevée
+// reprendrait en cours de route. Le temps déjà écoulé se convertit donc à la
+// nouvelle vitesse, et qui était arrivé le reste.
+//
+// Rend le départ actuel quand rien n'est à convertir : aucun déplacement, un
+// glissement, dont la vitesse est imposée, ou une vitesse inconnue d'un côté.
+[[nodiscard]] std::uint32_t WalkStartAfterSpeedChange(const Actor& actor, const WalkMap* map,
+                                                      std::uint16_t new_ms_per_cell,
+                                                      std::uint32_t now_ms);
+
 }  // namespace ro::sim

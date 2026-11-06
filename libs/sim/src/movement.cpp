@@ -59,9 +59,9 @@ struct Stage {
 
 // Rend chaque étape à `visit`, qui rend vrai pour s'arrêter.
 template <typename Visit>
-void ForEachStage(const Actor& actor, const WalkPath& path, Visit visit) {
+void ForEachStageAtSpeed(const Actor& actor, const WalkPath& path, std::uint16_t speed,
+                         Visit visit) {
   const CellMovement& movement = *actor.movement;
-  const std::uint16_t speed = MovingSpeedOf(actor);
   FractionalCell here{
       static_cast<float>(movement.from.x) +
           (static_cast<float>(movement.sub_x) - kSubCellCenter) / kSubCellsPerCell,
@@ -118,6 +118,21 @@ void ForEachStage(const Actor& actor, const WalkPath& path, Visit visit) {
     }
     here = target;
   }
+}
+
+template <typename Visit>
+void ForEachStage(const Actor& actor, const WalkPath& path, Visit visit) {
+  ForEachStageAtSpeed(actor, path, MovingSpeedOf(actor), visit);
+}
+
+// La durée exacte du chemin à cette vitesse, sans l'arrondi d'une durée rendue.
+float PathDurationMs(const Actor& actor, const WalkPath& path, std::uint16_t speed) {
+  float total_ms = 0.0F;
+  ForEachStageAtSpeed(actor, path, speed, [&total_ms](const Stage& stage) {
+    total_ms += stage.duration_ms;
+    return false;
+  });
+  return total_ms;
 }
 
 // L'HORLOGE DE LA MARCHE, qui s'arrête à la mort.
@@ -359,6 +374,31 @@ FractionalCell PositionAt(const Actor& actor, const WalkMap* map, std::uint32_t 
   const std::optional<WalkPath> found =
       map != nullptr ? FindWalkPath(*map, actor.movement->from, actor.movement->to) : std::nullopt;
   return InterpolatedCell(actor, found.has_value() ? *found : StraightPathOf(actor), at_ms);
+}
+
+std::uint32_t WalkStartAfterSpeedChange(const Actor& actor, const WalkMap* map,
+                                        std::uint16_t new_ms_per_cell, std::uint32_t now_ms) {
+  const std::uint16_t old_ms_per_cell = MovingSpeedOf(actor);
+  if (!actor.movement.has_value() || actor.glide_ms_per_cell != 0 || old_ms_per_cell == 0 ||
+      new_ms_per_cell == 0) {
+    return actor.movement_started_ms;
+  }
+  const std::uint32_t clock_ms = WalkClockMs(actor, now_ms);
+  if (clock_ms <= actor.movement_started_ms) {
+    return actor.movement_started_ms;
+  }
+  const std::optional<WalkPath> found =
+      map != nullptr ? FindWalkPath(*map, actor.movement->from, actor.movement->to) : std::nullopt;
+  const WalkPath path = found.has_value() ? *found : StraightPathOf(actor);
+  const float old_total_ms = PathDurationMs(actor, path, old_ms_per_cell);
+  const float new_total_ms = PathDurationMs(actor, path, new_ms_per_cell);
+  const auto elapsed_ms = static_cast<float>(clock_ms - actor.movement_started_ms);
+  // Arrondie vers le haut : qui est arrivé ne doit pas repartir pour une fraction
+  // de milliseconde. Un chemin vide vaut une arrivée.
+  const float progress = old_total_ms > 0.0F ? std::min(elapsed_ms / old_total_ms, 1.0F) : 1.0F;
+  const auto new_elapsed_ms = static_cast<std::uint32_t>(std::ceil(new_total_ms * progress));
+  // Un départ ne remonte pas avant l'origine de l'horloge de l'appelant.
+  return new_elapsed_ms >= clock_ms ? 0 : clock_ms - new_elapsed_ms;
 }
 
 std::uint8_t FacingAt(const Actor& actor, std::uint32_t now_ms) {
