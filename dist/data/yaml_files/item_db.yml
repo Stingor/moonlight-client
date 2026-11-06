@@ -7416,7 +7416,7 @@ Body:
     Script: |
       bonus bDex,2; bonus bLuk,2;
   - Id: 1326
-    AegisName: Illusion_War_Axe
+    AegisName: War_Axe_IL
     Name: "Illusion War Axe [2]"
     Type: Weapon
     SubType: 1hAxe
@@ -14841,7 +14841,7 @@ Body:
     Script: |
       bonus bAspd,1; bonus bAspdRate,getrefine(); bonus2 bAddSize,Size_Medium,getrefine();
   - Id: 1846
-    AegisName: Illusion_Combo_Battle_Glove
+    AegisName: Combo_Battle_Glove_IL
     Name: "Illusion Combo Battle Glove [2]"
     Type: Weapon
     SubType: Knuckle
@@ -17057,7 +17057,7 @@ Body:
     Script: |
       bonus bMatk,230; .@r = getrefine(); .@b = 40; .@c = 5; if(.@r>=5){ .@b += (.@r-5)*15+20; .@c += .@r-5; } bonus2 bMagicAddRace2,RC2_BioLab,.@b; bonus2 bSubRace2,RC2_BioLab,.@c; bonus2 bIgnoreMdefRace2Rate,RC2_BioLab,(.@r-5)*10;
   - Id: 2039
-    AegisName: Illusion_Wizardry_Staff
+    AegisName: Wizardy_Staff_IL
     Name: "Illusion Wizardry Staff [2]"
     Type: Weapon
     SubType: 2hStaff
@@ -17094,7 +17094,7 @@ Body:
     Script: |
       bonus bMatk,300; .@r = getrefine; bonus bInt,7; bonus bMatkRate,.@r/2; bonus bUnbreakableWeapon; if (.@r>=9) .@val = 15; else if (.@r>=7) .@val = 5; if (.@r>=11) bonus2 bSubSize,Size_All,20; if (.@r>=13) bonus bDelayrate,-15; bonus2 bMagicAtkEle,Ele_Fire,.@val; bonus2 bMagicAtkEle,Ele_Earth,.@val; bonus2 bMagicAtkEle,Ele_Water,.@val; bonus2 bMagicAtkEle,Ele_Holy,.@val;
   - Id: 2051
-    AegisName: Illusion_Survivor's_Staff
+    AegisName: Survival_Staff_IL
     Name: "Illusion Survivor's Staff [2]"
     Type: Weapon
     SubType: 2hStaff
@@ -27095,6 +27095,21 @@ Body:
     EquipLevelMin: 100
     Script: |
       bonus bMaxHP,100; bonus bMaxSP,20; bonus bCritical,(readparam(bLuk)/10); if(readparam(bLuk)>=110) bonus bCritAtkRate,1;
+  - Id: 2935
+    AegisName: Sprint_Glove
+    Name: "Sprint Gloves [1]"
+    Type: Armor
+    Buy: 5500
+    Sell: 2750
+    Weight: 100
+    Slots: 1
+    Jobs: {Alchemist: true, Assassin: true, BardDancer: true, Blacksmith: true, Crusader: true, Hunter: true, Knight: true, Monk: true, Priest: true, Rogue: true, Sage: true, Wizard: true}
+    Classes: {Upper: true, Third: true, Third_Upper: true, Third_Baby: true}
+    Locations: {Both_Accessory: true}
+    ArmorLevel: 1
+    Script: |
+      bonus bVariableCastrate,-1;
+      bonus bDelayrate,-1;
   - Id: 2936
     AegisName: Recovery_Ring
     Name: "Recovery Ring [1]"
@@ -56097,6 +56112,11 @@ Body:
     Sell: 128
     Weight: 10
     Flags: {BuyingStore: true}
+  - Id: 7324
+    AegisName: IL_Kraken_Leg
+    Name: Deep Sea Kraken's Leg
+    Weight: 10
+    Flags: {BuyingStore: true}
   - Id: 7325
     AegisName: Tube
     Name: Flexible Tube
@@ -61315,7 +61335,7 @@ Body:
     Script: |
       itemheal rand(45,65),0;
   - Id: 11569
-    AegisName: Orange_Potion_
+    AegisName: Orange_Potion_B
     Name: Orange Potion
     Type: Healing
     Buy: 10
@@ -61615,6 +61635,14 @@ Body:
     Weight: 50
     Script: |
       itemheal rand(100,150),0;
+  - Id: 11620
+    AegisName: Bearopy
+    Name: Bear Rope
+    Type: Healing
+    Buy: 420
+    Sell: 210
+    Weight: 10
+    Flags: {BuyingStore: true}
   - Id: 11701
     AegisName: Girl_Bunch_Of_Flower
     Name: Girl's Bouquet
@@ -68859,6 +68887,16 @@ Body:
     Weight: 10
     Script: |
       getgroupitem(IG_Patron_Scroll);
+  - Id: 12858
+    AegisName: Golden_Potion_RG
+    Name: RG Golden Potion
+    Type: Usable
+    Weight: 30
+    Delay: {Duration: 1000, Status: Reuse_Limit_F}
+    Script: |
+      percentheal 100,100;
+      sc_start SC_KYRIE,100000,10;
+      skilleffect "PR_KYRIE",0;
   - Id: 12860
     AegisName: Mommy_Day_Cake
     Name: Mommy Day Cake
@@ -74101,7 +74139,7 @@ Body:
     Script: |
       .@r = getrefine(); .@bonus = 20; if (.@r>=7) { bonus bLongAtkRate,10; } if (.@r>=9) { .@bonus += 20; } bonus2 bSkillAtk,"KO_HUUMARANKA",.@bonus;
   - Id: 13337
-    AegisName: Illusion_Huuma_Fluttering_Snow
+    AegisName: Huuma_Flutter_Snow_IL
     Name: "Illusion Huuma Fluttering Snow [2]"
     Type: Weapon
     SubType: Huuma
@@ -74119,7 +74157,7 @@ Body:
     Script: |
       bonus bMatk,50; .@r = getrefine(); bonus bBaseAtk,(30*(.@r/3)); bonus bLongAtkRate,(3*.@r);
   - Id: 13338
-    AegisName: Illusion_Wing_Shuriken
+    AegisName: Huuma_Bird_Wing_IL
     Name: "Illusion Wing Shuriken [2]"
     Type: Weapon
     SubType: Huuma
@@ -75010,7 +75048,7 @@ Body:
     Script: |
       .@r = getrefine(); .@hp = -1000; bonus3 bAutoSpell,"MG_COLDBOLT",5,100; if (.@r >= 7) { .@atk = 65; .@hp += 500; if (.@r >= 10) { bonus bAspd,1; .@atk += 45; .@hp += 500; } bonus bBaseAtk,.@atk; } if (.@hp) { bonus bMaxHP,.@hp; }
   - Id: 13469
-    AegisName: Illusion_Immaterial_Sword
+    AegisName: Immaterial_Sword_IL
     Name: "Illusion Immaterial Sword [2]"
     Type: Weapon
     SubType: 1hSword
@@ -85936,7 +85974,7 @@ Body:
     Script: |
       bonus bMdef,5; bonus bBaseAtk,10; .@r = getrefine(); if(.@r>=7){ bonus2 bSubRace,RC_DemiHuman,2; bonus2 bSubRace,RC_PLAYER_HUMAN,2; } if(.@r>=8){ bonus2 bSubRace,RC_DemiHuman,2; bonus2 bSubRace,RC_PLAYER_HUMAN,2; } if(.@r>=9){ bonus2 bSubRace,RC_DemiHuman,2; bonus2 bSubRace,RC_PLAYER_HUMAN,2; }
   - Id: 15195
-    AegisName: Illusion_Puente_Robe
+    AegisName: Puente_Robe_IL
     Name: "Illusion Puente Robe [1]"
     Type: Armor
     Buy: 141000
@@ -85964,7 +86002,7 @@ Body:
     Script: |
       .@r = getrefine(); if (.@r >= 13) { .@val = 11; } else if (.@r >= 11) { .@val = 7; } else if (.@r >= 8) { .@val = 5; } if (readparam(bStr) >= 125) { .@val += .@r; } if (.@val) { bonus2 bAddClass,Class_All,.@val; }
   - Id: 15348
-    AegisName: Illusion_Goibne_Armor
+    AegisName: Goibne_Armor_IL
     Name: "Illusion Goibne Armor [1]"
     Type: Armor
     Buy: 141000
@@ -87066,7 +87104,7 @@ Body:
     Script: |
       bonus bUnbreakableWeapon; bonus2 bAddEff,Eff_Stun,(300*getrefine());
   - Id: 16063
-    AegisName: Illusion_Long_Mace
+    AegisName: Long_Mace_IL
     Name: "Illusion Long Mace [2]"
     Type: Weapon
     SubType: Mace
@@ -87084,7 +87122,7 @@ Body:
     Script: |
       bonus bLongAtkDef,(10+3*(getrefine()/2));
   - Id: 16065
-    AegisName: Illusion_Iron_Driver
+    AegisName: Iron_Driver_IL
     Name: Illusion Iron Driver
     Type: Weapon
     SubType: Mace
@@ -93749,7 +93787,7 @@ Body:
     Script: |
       .@r = getrefine(); .@bonus = 5*(readparam(bDex)/20); if (.@r>=7) { .@bonus += 10; } if (.@r>=9) { bonus2 bSkillAtk,"AC_DOUBLE",50; } bonus bLongAtkRate,.@bonus;
   - Id: 18149
-    AegisName: Illusion_Ballista
+    AegisName: Balistar_IL
     Name: "Illusion Ballista [2]"
     Type: Weapon
     SubType: Bow
@@ -93768,7 +93806,7 @@ Body:
     Script: |
       bonus bLongAtkRate,getrefine();
   - Id: 18174
-    AegisName: Illusion_Hunter_Bow
+    AegisName: Hunter_Bow_IL
     Name: "Illusion Hunter Bow [2]"
     Type: Weapon
     SubType: Bow
@@ -100288,7 +100326,7 @@ Body:
     Script: |
       .@r = getrefine(); bonus bBaseAtk,5*(.@r/2); bonus bMatk,5*.@r/2; bonus bAspdRate,2*(.@r/3); if (.@r>=8) { bonus2 bSkillCooldown,"SU_SVG_SPIRIT",-4000*getskilllv("SU_LUNATICCARROTBEAT"); bonus2 bSkillCooldown,"SU_NYANGGRASS",-8000*getskilllv("SU_CN_METEOR"); bonus2 bSkillCooldown,"SU_BUNCHOFSHRIMP",-4000*getskilllv("SU_FRESHSHRIMP"); } if (.@r>=11) bonus bDelayrate,-15;
   - Id: 19209
-    AegisName: Illusion_Nurse_Cap
+    AegisName: Nurse_Cap_IL
     Name: "Illusion Nurse Cap [1]"
     Type: Armor
     Buy: 13500
@@ -100304,7 +100342,7 @@ Body:
     Script: |
       .@r = getrefine(); bonus bInt,(1+(.@r/2)); bonus bHealPower,(3*(.@r/2));
   - Id: 19210
-    AegisName: Illusion_Apple_of_Archer
+    AegisName: Apple_Of_Archer_IL
     Name: "Illusion Apple of Archer [1]"
     Type: Armor
     Buy: 13500
@@ -100319,7 +100357,7 @@ Body:
     Script: |
       bonus bDex,(3+(getrefine()/2));
   - Id: 19223
-    AegisName: Illusion_Cap
+    AegisName: Cap_IL
     Name: "Illusion Cap [1]"
     Type: Armor
     Buy: 34500
@@ -100334,6 +100372,32 @@ Body:
     View: 14
     Script: |
       bonus2 bAddClass,Class_All,1; bonus bBaseAtk,(2*getrefine());
+  - Id: 19238
+    AegisName: PoringTownOnion
+    Name: Poring Village Leek
+    Type: Armor
+    Buy: 100
+    Sell: 50
+    Weight: 100
+    Locations: {Head_Low: true}
+    ArmorLevel: 1
+    EquipLevelMin: 30
+    View: 824
+    Script: |
+      autobonus "{ bonus bSpeedRate,25; }",50,5000,BF_NORMAL,"{ showscript \"Smokie-formation!\"; active_transform 1056,5000; /*SMOKIE*/ }";
+  - Id: 19239
+    AegisName: PoringTownCarrot
+    Name: Poring Village Carrot
+    Type: Armor
+    Buy: 100
+    Sell: 50
+    Weight: 100
+    Locations: {Head_Low: true}
+    ArmorLevel: 1
+    EquipLevelMin: 30
+    View: 829
+    Script: |
+      autobonus "{ bonus bSpeedRate,25; }",50,5000,BF_NORMAL,"{ showscript \"Lunatic-formation!\"; active_transform 1063,5000; /*LUNATIC*/ }";
   - Id: 19246
     AegisName: Royal_Guard_Necklace
     Name: Royal Guard Necklace
@@ -100347,7 +100411,7 @@ Body:
     Script: |
       bonus bAspd,1;
   - Id: 19247
-    AegisName: Illusion_Fancy_Flower
+    AegisName: Fancy_Flower_IL
     Name: "Illusion Fancy Flower [1]"
     Type: Armor
     Buy: 10500
@@ -100420,7 +100484,7 @@ Body:
     Script: |
       bonus bCritAtkRate,5;
   - Id: 19344
-    AegisName: Illusion_Hot_blooded_Headband
+    AegisName: Headband_Of_Power_IL
     Name: "Illusion Hot-blooded Headband [1]"
     Type: Armor
     Buy: 19500
@@ -100435,7 +100499,7 @@ Body:
     Script: |
       .@r = getrefine(); bonus bStr,2; bonus bBaseAtk,(10*(.@r/2)); if (.@r >= 7) { bonus2 bAddEle,Ele_Water,10; bonus2 bAddEle,Ele_Wind,10; bonus2 bAddEle,Ele_Earth,10; bonus2 bAddEle,Ele_Neutral,10; if (.@r >= 9) { bonus2 bAddSize,Size_Small,15; bonus2 bAddSize,Size_Large,15; } }
   - Id: 19366
-    AegisName: Illusion_Goibne_Helm
+    AegisName: Goibne_Helmet_IL
     Name: "Illusion Goibne Helm [1]"
     Type: Armor
     Buy: 34500
@@ -100516,7 +100580,7 @@ Body:
     Locations: {Costume_Head: true}
     View: 1806
   - Id: 19428
-    AegisName: Illusion_Morpheus's_Hood
+    AegisName: Morpheus_Hood_IL
     Name: "Illusion Morpheus's Hood [1]"
     Type: Armor
     Buy: 34500
@@ -108929,7 +108993,7 @@ Body:
     Script: |
       .@r = getrefine(); .@bonus = 20; if (.@r>=7) { .@bonus += 5; } if (.@r>=9) { .@bonus += 5; } bonus2 bSubEle,Ele_Neutral,.@bonus;
   - Id: 20838
-    AegisName: Illusion_Muffler
+    AegisName: Muffler_IL
     Name: "Illusion Muffler [1]"
     Type: Armor
     Buy: 57000
@@ -108944,7 +109008,7 @@ Body:
     Script: |
       .@r = getrefine(); bonus bMaxHP,(100+(100*.@r)); bonus bMaxSP,(10+(5*.@r));
   - Id: 20840
-    AegisName: Illusion_Ancient_Cape
+    AegisName: Cape_Of_Ancient_Lord_IL
     Name: "Illusion Ancient Cape [1]"
     Type: Armor
     Buy: 57000
@@ -108966,7 +109030,7 @@ Body:
     View: 13
     Trade: {Override: 99, NoDrop: true, NoSell: true}
   - Id: 20847
-    AegisName: Illusion_Survivor_Manteau
+    AegisName: Clack_Of_Servival_IL
     Name: "Illusion Survivor Manteau [1]"
     Type: Armor
     Buy: 57000
@@ -108995,7 +109059,7 @@ Body:
     Script: |
       .@r = getrefine(); if (.@r >= 8) { bonus bBaseAtk,20; if (.@r >= 11) { .@val = -3; if (.@r >= 13) { .@val += -4; } } } if (readparam(bVit) >= 125) { .@val += -10; } if (.@val) { bonus bDelayrate,.@val; }
   - Id: 20923
-    AegisName: Illusion_Goibne_Spaulders
+    AegisName: Goibne_Shoulder_IL
     Name: "Illusion Goibne Spaulders [1]"
     Type: Armor
     Buy: 57000
@@ -109138,7 +109202,7 @@ Body:
     Script: |
       .@r = getrefine(); bonus bMaxHP,(300+(100*(.@r/2))); bonus bMaxHPRate,(2*(.@r/3)); if (.@r >= 7) { bonus2 bAddClass,Class_All,7; } if (.@r >= 9) { bonus bVariableCastrate,-10; }
   - Id: 20948
-    AegisName: Illusion_Morpheus's_Shawl
+    AegisName: Morpheus_Shawl_IL
     Name: "Illusion Morpheus's Shawl [1]"
     Type: Armor
     Buy: 57000
@@ -109550,7 +109614,7 @@ Body:
     Script: |
       .@r = getrefine(); bonus bUnbreakableWeapon; bonus bCritical,5; if (.@r >= 7) { bonus bAspdRate,7; if (.@r >= 9) { bonus bCritAtkRate,15; if (.@r >= 11) { bonus2 bAddSize,Size_Small,20; bonus2 bAddSize,Size_Medium,20; } } }
   - Id: 21050
-    AegisName: Illusion_Tae_Goo_Lyeon
+    AegisName: Taegoolyeon_IL
     Name: "Illusion Tae Goo Lyeon [2]"
     Type: Weapon
     SubType: 2hSword
@@ -110530,7 +110594,7 @@ Body:
     Script: |
       .@bonus = 5; .@r = getrefine(); if (.@r >=7) { .@bonus += 5; } if (.@r >=9) { .@bonus += 5; } bonus bMaxSPrate,.@bonus; bonus bSpeedRate,25; /* fix me: unknown speed value */
   - Id: 22133
-    AegisName: Illusion_Shoes
+    AegisName: Shoes_IL
     Name: "Illusion Shoes [1]"
     Type: Armor
     Buy: 45000
@@ -110573,7 +110637,7 @@ Body:
     Script: |
       .@r = getrefine(); bonus bMaxHP,500; bonus bMaxSP,50; bonus bMaxHPrate,2*(.@r/3); bonus bMaxSPrate,.@r/3; if (.@r >= 9) { .@val = -300; if (.@r >= 12) { .@val -= 200; if (.@r >= 14) { bonus bDelayRate,-5; } } bonus bFixedCast,.@val; }
   - Id: 22190
-    AegisName: Illusion_Boots
+    AegisName: Boots_IL
     Name: "Illusion Boots [1]"
     Type: Armor
     Buy: 45000
@@ -110588,7 +110652,7 @@ Body:
     Script: |
       .@r = getrefine(); bonus bCritical,(5*(.@r/3)); bonus bAspdRate,.@r;
   - Id: 22192
-    AegisName: Illusion_Goibne's_Greaves
+    AegisName: Goibne_Boots_IL
     Name: "Illusion Goibne's Greaves [1]"
     Type: Armor
     Buy: 45000
@@ -112731,6 +112795,44 @@ Body:
     Weight: 250
     Script: |
       getitem 13232,500;
+  - Id: 23142
+    AegisName: EXPUP_Potion1
+    Name: Minor Growth Elixir
+    Type: Usable
+    Buy: 2
+    Sell: 1
+    Weight: 10
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      getexp (BaseLevel < 100)?15000:1500,0;
+  - Id: 23143
+    AegisName: JEXPUP_Potion1
+    Name: Minor Job Elixir
+    Type: Usable
+    Buy: 2
+    Sell: 1
+    Weight: 10
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      getexp 0,(BaseLevel < 100)?15000:1500;
+  - Id: 23144
+    AegisName: EXPUP_Potion1Box
+    Name: Minor Growth Elixir Box
+    Type: Usable
+    Buy: 2
+    Sell: 1
+    Weight: 10
+    Script: |
+      getitem 23142,5;
+  - Id: 23145
+    AegisName: JEXPUP_Potion1Box
+    Name: Minor Job Elixir Box
+    Type: Usable
+    Buy: 2
+    Sell: 1
+    Weight: 10
+    Script: |
+      getitem 23143,5;
   - Id: 23177
     AegisName: Kafra_Card_
     Name: Kafra Card
@@ -112765,7 +112867,7 @@ Body:
     Script: |
       pet;
   - Id: 23191
-    AegisName: Varetyr_Spear_Scroll_1_5
+    AegisName: Varetyr_5_Scroll
     Name: Level 5 Varetyr Spear
     Type: Delayconsume
     Buy: 10
@@ -112774,7 +112876,7 @@ Body:
     Script: |
       itemskill "SO_VARETYR_SPEAR",5;
   - Id: 23192
-    AegisName: Diamond_Dust_Scroll_1_5
+    AegisName: DiamondDust5_Scroll
     Name: Level 5 Diamond Dust
     Type: Delayconsume
     Buy: 10
@@ -112783,7 +112885,7 @@ Body:
     Script: |
       itemskill "SO_DIAMONDDUST",5;
   - Id: 23193
-    AegisName: Crimson_Rock_Scroll_1_5
+    AegisName: CrimsonRock_5_Scroll
     Name: Level 5 Crimson Rock
     Type: Delayconsume
     Buy: 10
@@ -112792,7 +112894,7 @@ Body:
     Script: |
       itemskill "WL_CRIMSONROCK",5;
   - Id: 23194
-    AegisName: Sienna_Execrate_Scroll_1_5
+    AegisName: Sienna_5_Scroll
     Name: Level 5 Sienna Execrate
     Type: Delayconsume
     Buy: 10
@@ -112810,7 +112912,7 @@ Body:
     Script: |
       getgroupitem(IG_Agust_Lucky_Scroll);
   - Id: 23228
-    AegisName: Hazy_Mooncake
+    AegisName: HazyMooncake
     Name: Hazy Mooncake
     Type: Healing
     Buy: 768
@@ -112857,6 +112959,15 @@ Body:
     Weight: 10
     Script: |
       itemskill "AL_TELEPORT",1;
+  - Id: 23302
+    AegisName: PoringsPreciousBox
+    Name: Poring Treasure Box
+    Type: Usable
+    Weight: 200
+    EquipLevelMin: 30
+    Flags: {Container: true}
+    Script: |
+      getgroupitem(IG_PORINGSPRECIOUSBOX);
   - Id: 23307
     AegisName: S_Shining_Def_Scroll
     Name: "[Sale] Shining Defense Scroll"
@@ -113069,6 +113180,10 @@ Body:
     Name: Cotton Tufts
     Category: Pet Food
     Weight: 10
+  - Id: 25235
+    AegisName: StoneForWork
+    Name: Crafted Stone
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
   - Id: 25238
     AegisName: New_Normal_Lubricant
     Name: New Normal Lubricant
@@ -113098,33 +113213,100 @@ Body:
     Name: Rock Ridge Coin
     Category: Valuable
   - Id: 25256
-    AegisName: Hazy_Dream_Fragment
+    AegisName: HazyDream
     Name: Hazy Dream Fragment
     Weight: 10
   - Id: 25257
-    AegisName: Bloody_Love_Letter
+    AegisName: Bloody_LoveLetter
     Name: Bloody Love Letter
     Buy: 780
     Sell: 390
     Weight: 10
   - Id: 25258
-    AegisName: Broken_Arrow
+    AegisName: BrokenArrow
     Name: Broken Arrow
     Buy: 550
     Sell: 275
+    Weight: 10
+  - Id: 25259
+    AegisName: SubjugationFlyer
+    Name: Recruitment Leaflet
+    Buy: 778
+    Sell: 389
     Weight: 10
   - Id: 25260
     AegisName: Fragment_of_Purple_Ore
     Name: Fragment of Purple Ore
     Category: Quest
+  - Id: 25261
+    AegisName: Torn_Diary
+    Name: Torn Paper
+    Buy: 900
+    Sell: 450
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25262
+    AegisName: Dried_Clover
+    Name: Well-dried Clover
+    Buy: 1200
+    Sell: 600
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25263
+    AegisName: Short_Bat_Fur
+    Name: Short Bat Hair
+    Buy: 790
+    Sell: 395
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25264
+    AegisName: NightmareOfLump
+    Name: Cluster of Nightmares
+    Buy: 822
+    Sell: 411
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25265
+    AegisName: Shining_Spore
+    Name: Shining Spore
+    Buy: 342
+    Sell: 171
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25266
+    AegisName: Dried_Leaf_Of_Ygg
+    Name: Dried Yggdrasil Leaf
+    Buy: 450
+    Sell: 225
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25267
+    AegisName: SuspiciousMagicCircle
+    Name: Suspicious Pentacle
+    Buy: 970
+    Sell: 485
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25268
+    AegisName: Sticky_Blood
+    Name: Sticky Blood
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+  - Id: 25269
+    AegisName: Mushroom_Sap
+    Name: Mushroom Sap
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+  - Id: 25270
+    AegisName: Swaying_Mane
+    Name: Wavy Mane
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
   - Id: 25271
-    AegisName: Illusion_Stone
+    AegisName: IllusionStone
     Name: Illusion Stone
     Category: Quest
     Buy: 10
     Sell: 5
   - Id: 25272
-    AegisName: Illusion_Gemstone
+    AegisName: IllusoryStone
     Name: Illusion Gemstone
     Weight: 10
   - Id: 25276
@@ -113189,6 +113371,59 @@ Body:
     AegisName: Sweets_Festival_Coin
     Name: Sweets Festival Coin
     Category: Valuable
+  - Id: 25297
+    AegisName: Frozen_PieceOfRock
+    Name: Frozen Stone Fragment
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25298
+    AegisName: SpritJewel
+    Name: Spirit Jewel
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25299
+    AegisName: Snowball
+    Name: Snowball
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25300
+    AegisName: KTULLANUXsEye
+    Name: Ktullanux Eye
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25309
+    AegisName: Dry_Branch
+    Name: Dry Twig
+    Weight: 10
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+  - Id: 25311
+    AegisName: PieceOfBlackSpirit
+    Name: Piece of Black Horn
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25312
+    AegisName: OldDoll
+    Name: Fine Old Doll
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25313
+    AegisName: OldShell
+    Name: Old Shell
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25314
+    AegisName: ShipsLog
+    Name: Logbooks
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25315
+    AegisName: Piece_Of_Shell
+    Name: Shell Fragment
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+  - Id: 25316
+    AegisName: Shabby_Metal_Chip
+    Name: Old Metal Pieces
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
   - Id: 25375
     AegisName: Powerful_Soul_Essence
     Name: Powerful Soul Essence
@@ -113204,6 +113439,83 @@ Body:
     Name: World Moving Rights
     Buy: 20
     Sell: 10
+  - Id: 25615
+    AegisName: NasariansSoulstone
+    Name: Nasarin's Soul Stone
+    Buy: 440
+    Sell: 220
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25616
+    AegisName: Green_Bearopy
+    Name: Green Bear Rope
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25617
+    AegisName: Chonchon_Doll_HQ
+    Name: Fine Chonchon Doll
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25618
+    AegisName: Gothic_China_Doll
+    Name: Gothic Porcelain Doll
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25619
+    AegisName: Clay_Doll
+    Name: Clay Doll
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25633
+    AegisName: Token_Of_Wootan
+    Name: Wootan's Token
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25634
+    AegisName: Wootan_D_S_Piece
+    Name: Wootan Defender's Shield Piece
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25635
+    AegisName: Wootan_F_Fur
+    Name: Wootan Warrior's Fur
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25636
+    AegisName: Shooting_Stone
+    Name: Shooting Stone
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25637
+    AegisName: Hair_Leaf
+    Name: Leaf-like Hair
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25638
+    AegisName: Token_Of_Bigstone
+    Name: Megalithic Token
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25639
+    AegisName: Fragment_Of_Rock
+    Name: Fragment of Rock
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25640
+    AegisName: Pot_Stone
+    Name: Potted Stone
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25641
+    AegisName: Hard_Mud
+    Name: Hard Mud
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25642
+    AegisName: Weak_Worm
+    Name: Vulnerable Worm
+    Weight: 10
+    Flags: {BuyingStore: true}
   - Id: 25669
     AegisName: EP17_1_EVT02
     Name: Mysterious Component
@@ -113604,8 +113916,59 @@ Body:
     Sell: 2500
     Weight: 20
     Flags: {BuyingStore: true}
+  - Id: 25892
+    AegisName: Abysmal_Clam
+    Name: Deep Sea Shell
+    Buy: 840
+    Sell: 420
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25893
+    AegisName: Deepsea_Fish_Tail
+    Name: Deep Sea Fish's Tail
+    Buy: 840
+    Sell: 420
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25894
+    AegisName: Rotten_Deepseafish
+    Name: Rotten Deep Sea Fish
+    Buy: 840
+    Sell: 420
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25895
+    AegisName: Deep_Sea_Starfish
+    Name: Deep Sea Starfish
+    Buy: 840
+    Sell: 420
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25896
+    AegisName: Deep_Sea_Crab
+    Name: Deep Sea Crab
+    Buy: 840
+    Sell: 420
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25897
+    AegisName: Crown_Of_Witch
+    Name: Deep Sea Witch's Crown
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25898
+    AegisName: Siroods_Fish_Rod
+    Name: Searud's Fishing Rod
+    Trade: {NoDrop: true, NoTrade: true, NoSell: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+  - Id: 25899
+    AegisName: E_Abyss1
+    Name: Abyssal Essence
+    Buy: 1200
+    Sell: 600
+    Weight: 10
+    Flags: {BuyingStore: true}
   - Id: 26007
-    AegisName: Illusion_Spectral_Spear
+    AegisName: Spectral_Spear_IL
     Name: "Illusion Spectral Spear [1]"
     Type: Weapon
     SubType: 2hSpear
@@ -113671,7 +114034,7 @@ Body:
     Script: |
       bonus bMatk,150; .@r = getrefine(); .@bonus = 10; if (.@r>=7) { .@bonus += 5; } if (.@r>=9) { .@bonus += 10; } bonus bHealPower,.@bonus;
   - Id: 26109
-    AegisName: Illusion_Staff_of_Bordeaux
+    AegisName: Staff_Of_Bordeaux_IL
     Name: "Illusion Staff of Bordeaux [2]"
     Type: Weapon
     SubType: Staff
@@ -114024,7 +114387,7 @@ Body:
     Script: |
       bonus3 bAddEff,Eff_Burning,700,ATF_WEAPON|ATF_MAGIC;
   - Id: 27081
-    AegisName: Angry_Moonlight_Flower_Card
+    AegisName: AngerMoonlight_Card
     Name: Angry Moonlight Flower Card
     Type: Card
     Buy: 20
@@ -114034,7 +114397,7 @@ Body:
     Script: |
       skill "PA_PRESSURE",4;
   - Id: 27082
-    AegisName: Angry_Nine_Tail_Card
+    AegisName: AngerNineTail_Card
     Name: Angry Nine Tail Card
     Type: Card
     Buy: 20
@@ -114044,7 +114407,7 @@ Body:
     Script: |
       .@val = 5; bonus bCritAtkRate,10; if (getrefine() >= 10) { .@val += 10; } bonus bCritical,.@val;
   - Id: 27083
-    AegisName: Resentful_Bongun_Card
+    AegisName: BitterBonGun_Card
     Name: Resentful Bongun Card
     Type: Card
     Buy: 20
@@ -114054,7 +114417,7 @@ Body:
     Script: |
       bonus bBaseAtk,20; bonus bMatk,20;
   - Id: 27084
-    AegisName: Resentful_Sohee_Card
+    AegisName: BitterSohee_Card
     Name: Resentful Sohee Card
     Type: Card
     Buy: 20
@@ -114064,7 +114427,7 @@ Body:
     Script: |
       bonus bMatk,10; if (getrefine() >= 10) { bonus bMatkRate,2; }
   - Id: 27085
-    AegisName: Resentful_Munak_Card
+    AegisName: BitterMunak_Card
     Name: Resentful Munak Card
     Type: Card
     Buy: 20
@@ -114074,7 +114437,7 @@ Body:
     Script: |
       bonus bBaseAtk,15; bonus bMatk,15;
   - Id: 27086
-    AegisName: Resentful_Soldier_Card
+    AegisName: BitterArcherSk_Card
     Name: Resentful Soldier Card
     Type: Card
     Buy: 20
@@ -114084,7 +114447,7 @@ Body:
     Script: |
       if (getiteminfo(getequipid(EQI_COMPOUND_ON),11) == W_BOW) { bonus3 bAutoSpell,"AC_DOUBLE",5,30; if (getrefine() >= 10) { bonus2 bWeaponDamageRate,W_BOW,20; } }
   - Id: 27087
-    AegisName: Truthful_Wizard_Card
+    AegisName: WizardOfVeritas_Card
     Name: Truthful Wizard Card
     Type: Card
     Buy: 20
@@ -114094,7 +114457,7 @@ Body:
     Script: |
       bonus bMatk,25; autobonus "{ bonus bNoCastCancel; }",5,5000,BF_MAGIC,"{ showscript \"This is the truth!\"; }";
   - Id: 27088
-    AegisName: Fury_Hero_Card
+    AegisName: FuryHero_Card
     Name: Fury Hero Card
     Type: Card
     Buy: 20
@@ -114104,7 +114467,7 @@ Body:
     Script: |
       bonus2 bAddClass,Class_All,2; bonus5 bAutoSpell,"SM_ENDURE",1,5,BF_SHORT,0;
   - Id: 27101
-    AegisName: Sweet_Nightmare_Card
+    AegisName: SweetNightM_Card
     Name: Sweet Nightmare Card
     Type: Card
     Buy: 20
@@ -114114,7 +114477,7 @@ Body:
     Script: |
       bonus bMatk,20; bonus bNoCastCancel;
   - Id: 27102
-    AegisName: Matt_Drainliar_Card
+    AegisName: MattDrainliar_Card
     Name: Matt Drainliar Card
     Type: Card
     Buy: 20
@@ -114124,7 +114487,7 @@ Body:
     Script: |
       bonus2 bResEff,Eff_Burning,10000;
   - Id: 27103
-    AegisName: Living_Dead_Card
+    AegisName: LivingDead_Card
     Name: Living Dead Card
     Type: Card
     Buy: 20
@@ -114134,7 +114497,7 @@ Body:
     Script: |
       bonus bBaseAtk,20; bonus bUnbreakableWeapon; bonus bUnbreakableArmor;
   - Id: 27104
-    AegisName: Furious_Dracula_Card
+    AegisName: Ill_Dracula_Card
     Name: Furious Dracula Card
     Type: Card
     Buy: 20
@@ -114194,7 +114557,7 @@ Body:
     Script: |
       bonus2 bSubDefEle,Ele_Neutral,10; bonus bMaxHP,500;
   - Id: 27110
-    AegisName: Furious_Gazeti_Card
+    AegisName: AngerGazeti_Card
     Name: Furious Gazeti Card
     Type: Card
     Buy: 20
@@ -114204,7 +114567,7 @@ Body:
     Script: |
       bonus bLongAtkDef,20;
   - Id: 27111
-    AegisName: Furious_Snowier_Card
+    AegisName: AngerSnowier_Card
     Name: Furious Snowier Card
     Type: Card
     Buy: 20
@@ -114214,7 +114577,7 @@ Body:
     Script: |
       bonus2 bAddItemHealRate,11522,50; bonus2 bAddItemHealRate,11523,50; bonus2 bAddItemHealRate,11524,50;
   - Id: 27112
-    AegisName: Furious_Ice Titan_Card
+    AegisName: AngerIceTitan_Card
     Name: Furious Ice Titan Card
     Type: Card
     Buy: 20
@@ -114224,7 +114587,7 @@ Body:
     Script: |
       bonus bDef,(1+getrefine());
   - Id: 27113
-    AegisName: Awaken_Ktullanux_Card
+    AegisName: AwakenKtullanux_Card
     Name: Awaken Ktullanux Card
     Type: Card
     Buy: 20
@@ -114234,7 +114597,7 @@ Body:
     Script: |
       bonus2 bMagicAtkEle,Ele_Water,(20+(3*getrefine()));
   - Id: 27114
-    AegisName: Ominous_Solider_Card
+    AegisName: OminousSolider_Card
     Name: Ominous Solider Card
     Type: Card
     Buy: 20
@@ -114244,7 +114607,7 @@ Body:
     Script: |
       bonus bDef,5; bonus bMaxHPrate,(5+getrefine()); if (BaseLevel >= 160) bonus bVit,3;
   - Id: 27115
-    AegisName: Ominous_Permeter_Card
+    AegisName: OminousPermeter_Card
     Name: Ominous Permeter Card
     Type: Card
     Buy: 20
@@ -114254,7 +114617,7 @@ Body:
     Script: |
       .@r = getrefine(); bonus bInt,1; bonus bMaxSP,(80+10*(.@r/2)); if (.@r >= 7) { bonus bSPrecovRate,30; }
   - Id: 27116
-    AegisName: Ominous_Heater_Card
+    AegisName: OminousHeater_Card
     Name: Ominous Heater Card
     Type: Card
     Buy: 20
@@ -114264,7 +114627,7 @@ Body:
     Script: |
       bonus bCritical,3; bonus bCritAtkRate,5;
   - Id: 27117
-    AegisName: Ominous_Assaulter_Card
+    AegisName: OminousAssulter_Card
     Name: Ominous Assaulter Card
     Type: Card
     Buy: 20
@@ -114274,7 +114637,7 @@ Body:
     Script: |
       .@type = getiteminfo(getequipid(EQI_COMPOUND_ON),11); if (.@type == W_WHIP || .@type == W_MUSICAL || .@type == W_BOOK || .@type == W_2HSWORD || .@type == W_2HSPEAR) { .@r = getrefine(); bonus bCritical,5; bonus bBaseAtk,(3*.@r); } bonus bCritAtkRate,(10+.@r);
   - Id: 27118
-    AegisName: Ominous_Freezer_Card
+    AegisName: OminousFreezer_Card
     Name: Ominous Freezer Card
     Type: Card
     Buy: 20
@@ -114284,7 +114647,7 @@ Body:
     Script: |
       bonus bMaxHPrate,10; bonus bStr,2;
   - Id: 27119
-    AegisName: Ominous_Turtle_General_Card
+    AegisName: OminousTurtleG_Card
     Name: Ominous Turtle General Card
     Type: Card
     Buy: 20
@@ -114915,7 +115278,7 @@ Body:
     Script: |
       bonus2 bAddEle,Ele_Dark,30; bonus2 bAddEle,Ele_Undead,30; bonus2 bMagicAddEle,Ele_Dark,30; bonus2 bMagicAddEle,Ele_Undead,30; bonus2 bAddEle,Ele_Holy,-30; bonus2 bAddEle,Ele_Fire,-30; bonus2 bMagicAddEle,Ele_Holy,-30; bonus2 bMagicAddEle,Ele_Fire,-30;
   - Id: 27286
-    AegisName: Colorful_Teddy_Bear_Card
+    AegisName: Colorful_T_Bear_Card
     Name: Colorful Teddy Bear Card
     Type: Card
     Buy: 20
@@ -114925,7 +115288,7 @@ Body:
     Script: |
       bonus bMatk,5; bonus2 bMagicAddSize,Size_Large,15;
   - Id: 27287
-    AegisName: Shiny_Teddy_Bear_Card
+    AegisName: Shining_T_Bear_Card
     Name: Shiny Teddy Bear Card
     Type: Card
     Buy: 20
@@ -114935,7 +115298,7 @@ Body:
     Script: |
       bonus bUseSPrate,10; bonus2 bMagicAtkEle,Ele_Holy,(3*getrefine());
   - Id: 27288
-    AegisName: Hardworking_Pitman_Card
+    AegisName: Pitman_Worker_Card
     Name: Hardworking Pitman Card
     Type: Card
     Buy: 20
@@ -114945,7 +115308,7 @@ Body:
     Script: |
       .@val = 10; bonus2 bAddClass,Class_All,5; if (getrefine() >= 10) { .@val += 5; } bonus bHit,.@val; if (Class == Job_Assassin_Cross) bonus2 bSkillAtk,"ASC_BREAKER",5;
   - Id: 27289
-    AegisName: Soul_Fragment_Card
+    AegisName: Fragment_Of_Soul_Card
     Name: Soul Fragment Card
     Type: Card
     Buy: 20
@@ -114955,7 +115318,7 @@ Body:
     Script: |
       bonus bMatk,5; bonus2 bMagicAddSize,Size_Medium,15;
   - Id: 27290
-    AegisName: Haunted_Obsidian_Card
+    AegisName: Sinister_Obsidian_Card
     Name: Haunted Obsidian Card
     Type: Card
     Buy: 20
@@ -114965,7 +115328,7 @@ Body:
     Script: |
       .@agi = readparam(bAgi); .@val = .@agi/10; if (.@val) { bonus bFlee,(3*.@val); bonus bAspdRate,.@val; if (.@agi >= 120) { bonus bAspd,1; } }
   - Id: 27291
-    AegisName: Ancient_Tri_Joint_Card
+    AegisName: Ancient_Trijoint_Card
     Name: Ancient Tri Joint Card
     Type: Card
     Buy: 20
@@ -114975,7 +115338,7 @@ Body:
     Script: |
       bonus bBaseAtk,30; bonus bMaxHPrate,-1;
   - Id: 27292
-    AegisName: Ancient_Stalactic_Golem_Card
+    AegisName: Ancient_Sta_Golem_Card
     Name: Ancient Stalactic Golem Card
     Type: Card
     Buy: 20
@@ -115005,7 +115368,7 @@ Body:
     Script: |
       .@val = 30; if (getrefine() >= 10) { .@val += 20; } bonus2 bIgnoreDefClassRate,Class_Boss,.@val;
   - Id: 27295
-    AegisName: Ancient_Stone_Shooter_Card
+    AegisName: Ancient_S_Shooter_Card
     Name: Ancient Stone Shooter Card
     Type: Card
     Buy: 20
@@ -115015,7 +115378,7 @@ Body:
     Script: |
       .@luk = readparam(bLuk); .@aspd = .@crit = .@luk/10; if (.@luk >= 120) { .@crit += 5; } bonus bAspdRate,.@aspd; bonus bCritAtkRate,.@crit;
   - Id: 27296
-    AegisName: Ancient_Wootan_Shooter_Card
+    AegisName: Ancient_W_Shooter_Card
     Name: Ancient Wootan Shooter Card
     Type: Card
     Buy: 20
@@ -115025,7 +115388,7 @@ Body:
     Script: |
       .@dex = readparam(bDex); .@val = .@dex/10; if (.@val) { bonus bAspdRate,.@val; bonus2 bWeaponDamageRate,W_BOW,.@val; if (.@dex >= 120) { bonus bBaseAtk,40; } }
   - Id: 27297
-    AegisName: Ancient_Wootan_Fighter_Card
+    AegisName: Ancient_W_Fighter_Card
     Name: Ancient Wootan Fighter Card
     Type: Card
     Buy: 20
@@ -115035,7 +115398,7 @@ Body:
     Script: |
       bonus bCritical,5; bonus bCritAtkRate,10;
   - Id: 27298
-    AegisName: Ancient_Wootan_Defender_Card
+    AegisName: Ancient_W_Deffend_Card
     Name: Ancient Wootan Defender Card
     Type: Card
     Buy: 20
@@ -115700,7 +116063,7 @@ Body:
     Script: |
       bonus bBaseAtk,pow(getrefine(),2)*125/100;
   - Id: 28022
-    AegisName: Illusion_Infiltrator
+    AegisName: Infiltrator_IL
     Name: "Illusion Infiltrator [2]"
     Type: Weapon
     SubType: Katar
@@ -115719,7 +116082,7 @@ Body:
     Script: |
       bonus2 bAddRace,RC_DemiHuman,60; bonus2 bAddRace,RC_PLAYER_HUMAN,60; bonus bDef,3; .@flee = 5; .@flee2 = 2; if (getrefine() >= 9) { .@flee += 5; .@flee2 += 2; bonus2 bAddClass,Class_All,5; } bonus bFlee,.@flee; bonus bFlee2,.@flee2;
   - Id: 28023
-    AegisName: Illusion_Sharpened_Legbone_of_Ghoul
+    AegisName: Ghoul_Leg_IL
     Name: "Illusion Sharpened Legbone of Ghoul [2]"
     Type: Weapon
     SubType: Katar
@@ -116231,7 +116594,7 @@ Body:
     Script: |
       bonus bDex,2; bonus2 bAddClass,Class_All,2; bonus bLongAtkRate,(.@r/2)*5; if(.@r > 6){ bonus bAspdRate,5; } if(.@r > 8){ bonus2 bSkillAtk,"RL_D_TAIL",15 + (.@r > 11 ? 15 : 0); }
   - Id: 28244
-    AegisName: Illusion_Gate_Keeper_DD
+    AegisName: Gate_KeeperDD_IL
     Name: "Illusion Gate Keeper DD [2]"
     Type: Weapon
     SubType: Shotgun
@@ -116267,7 +116630,7 @@ Body:
     Script: |
       .@r = getrefine(); bonus2 bAddClass,Class_All,3; if (.@r >= 7) { bonus bLongAtkRate,7; if (.@r >= 9) { bonus2 bSkillAtk,"RL_HAMMER_OF_GOD",20; if (.@r >= 11) { bonus2 bSkillCooldown,"RL_HAMMER_OF_GOD",-5000; } } }
   - Id: 28254
-    AegisName: Illusion_Butcher
+    AegisName: Butcher_IL
     Name: "Illusion Butcher [2]"
     Type: Weapon
     SubType: Gatling
@@ -117252,7 +117615,7 @@ Body:
     Script: |
       bonus bDex,4; skill "AL_TELEPORT",1;
   - Id: 28483
-    AegisName: Royal_Guardian_Ring
+    AegisName: ProtectRingofKing
     Name: "Royal Guardian Ring [1]"
     Type: Armor
     Buy: 6500
@@ -117312,7 +117675,7 @@ Body:
     Script: |
       bonus bAllStats,1; bonus2 bAddRace,RC_All,2; bonus2 bMagicAddRace,RC_All,2; if(BaseLevel>=150) { bonus bAllStats,1; bonus2 bAddRace,RC_All,2; bonus2 bMagicAddRace,RC_All,2; }
   - Id: 28508
-    AegisName: Illusion_Skull_Ring
+    AegisName: Skul_Ring_IL
     Name: "Illusion Skull Ring [1]"
     Type: Armor
     Buy: 5500
@@ -117324,7 +117687,7 @@ Body:
     Script: |
       bonus3 bAddEff,Eff_Curse,5000,ATF_SELF|ATF_TARGET|ATF_SHORT|ATF_WEAPON;
   - Id: 28509
-    AegisName: Illusion_Ring
+    AegisName: Ring_IL
     Name: "Illusion Ring [1]"
     Type: Armor
     Buy: 5500
@@ -117337,7 +117700,7 @@ Body:
     Script: |
       bonus bStr,3; if (readparam(bStr) >= 100) { bonus bBaseAtk,30; }
   - Id: 28510
-    AegisName: A_Vampire's_Servant
+    AegisName: Vampire's_Servant
     Name: "A Vampire's Servant [1]"
     Type: Armor
     Buy: 6500
@@ -117488,7 +117851,7 @@ Body:
     Script: |
       bonus bMatk,150; .@r = getrefine(); bonus bInt,4; .@bonus = 10; if (.@r>=7) { .@bonus += 10; } if (.@r>=9) { .@bonus += 10; } bonus2 bSkillAtk,"MG_FIREBOLT",.@bonus; bonus2 bSkillAtk,"MG_COLDBOLT",.@bonus; bonus2 bSkillAtk,"MG_LIGHTNINGBOLT",.@bonus;
   - Id: 28612
-    AegisName: Illusion_Apocalypse
+    AegisName: Book_Of_The_Apo_IL
     Name: "Illusion Apocalypse [2]"
     Type: Weapon
     SubType: Book
@@ -117506,7 +117869,7 @@ Body:
     Script: |
       .@val = 10 + 10*(min(getrefine(),10)/3); bonus2 bAddEle,Ele_Water,.@val; bonus2 bAddEle,Ele_Earth,.@val; bonus2 bAddEle,Ele_Fire,.@val; bonus2 bAddEle,Ele_Wind,.@val; bonus2 bSubDefEle,Ele_Holy,-30;
   - Id: 28626
-    AegisName: Illusion_Tablet
+    AegisName: Tablet_IL
     Name: "Illusion Tablet [2]"
     Type: Weapon
     SubType: Book
@@ -117687,7 +118050,7 @@ Body:
     Script: |
       .@r = getrefine(); bonus2 bSkillAtk,"KO_BAKURETSU",getskilllv("NJ_TOBIDOUGU"); if (.@r>=9) { bonus bLongAtkRate,5; } else if (.@r>=7) { bonus bLongAtkRate,2; }
   - Id: 28725
-    AegisName: Illusion_Moonlight_Dagger
+    AegisName: Moonlight_Sword_IL
     Name: "Illusion Moonlight Dagger [1]"
     Type: Weapon
     SubType: Dagger
@@ -117705,7 +118068,7 @@ Body:
     Script: |
       bonus bMaxSPrate,10; .@val = 3; if (getrefine() >= 10) { .@val += 4; } bonus bSPDrainValue,.@val;
   - Id: 28745
-    AegisName: Illusion_Counter_Dagger
+    AegisName: Counter_Dagger_IL
     Name: "Illusion Counter Dagger [2]"
     Type: Weapon
     SubType: Dagger
@@ -117740,7 +118103,7 @@ Body:
     Script: |
       bonus bMatk,150; .@r = getrefine(); .@dmg = 5; if (.@r >= 7) { .@dmg += 10; if (.@r >= 9) { bonus2 bSkillAtk,"KO_HAPPOKUNAI",20; if (.@r >= 11) { bonus2 bAddRace,RC_Demon,10; bonus2 bMagicAddRace,RC_Demon,10; bonus2 bAddRace,RC_Undead,10; bonus2 bMagicAddRace,RC_Undead,10; } } } bonus2 bAddEle,Ele_Undead,.@dmg; bonus2 bMagicAddEle,Ele_Undead,.@dmg; bonus2 bAddEle,Ele_Dark,.@dmg; bonus2 bMagicAddEle,Ele_Dark,.@dmg;
   - Id: 28762
-    AegisName: Illusion_Bazerald
+    AegisName: Bazerald_IL
     Name: "Illusion Bazerald [2]"
     Type: Weapon
     SubType: Dagger
@@ -118076,7 +118439,7 @@ Body:
     Script: |
       .@r = getrefine(); if(BaseLevel>=150) { bonus bDef,10+.@r; }
   - Id: 28922
-    AegisName: Illusion_Sacred_Mission
+    AegisName: Herald_Of_GOD_IL
     Name: "Illusion Sacred Mission [1]"
     Type: Armor
     Buy: 133000
@@ -118214,6 +118577,13 @@ Body:
     Sell: 10
     Script: |
       if (getrefine()>=7) { bonus bVit,7; } if (getallrefine()>=24) { bonus bVit,1; bonus bMaxHPrate,8; } if (getallrefine()>=26) { bonus bVit,1; bonus bMaxHPrate,2; }
+  - Id: 29047
+    AegisName: Fatal0
+    Name: Fatal
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bCritAtkRate,3;
   - Id: 29061
     AegisName: Ambition1Lv
     Name: Mettle Lv. 1
@@ -118826,6 +119196,20 @@ Body:
     Sell: 5
     Script: |
       skill "ALL_RESURRECTION",1;
+  - Id: 29208
+    AegisName: SPdrain2_Top
+    Name: SPabsorp2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bSPDrainRate,20,1;
+  - Id: 29210
+    AegisName: HPdrain23
+    Name: HPabsorp2 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bHPDrainRate,20,3;
   - Id: 29310
     AegisName: Racing_RK_1
     Name: Racing(Rune Knight) 1Lv
@@ -125345,7 +125729,7 @@ Body:
     Locations: {Costume_Head: true}
     View: 1122
   - Id: 32005
-    AegisName: Illusion_Pole_Axe
+    AegisName: Pole_Axe_IL
     Name: "Illusion Pole Axe [2]"
     Type: Weapon
     SubType: 1hSpear
@@ -125646,7 +126030,7 @@ Body:
     Script: |
       bonus bMatkRate,5; bonus bVariableCastrate,-10;
   - Id: 32238
-    AegisName: Illusion_Morpheus's_Ring
+    AegisName: Morpheus_Ring_IL
     Name: "Illusion Morpheus's Ring [1]"
     Type: Armor
     Buy: 5500
@@ -125658,7 +126042,7 @@ Body:
     Script: |
       bonus bInt,3; bonus bMaxSPrate,5;
   - Id: 32239
-    AegisName: Illusion_Morpheus's_Bracelet
+    AegisName: Morpheus_Armlet_IL
     Name: "Illusion Morpheus's Bracelet [1]"
     Type: Armor
     Buy: 5500
@@ -125670,7 +126054,7 @@ Body:
     Script: |
       bonus bInt,3; bonus bMaxSPrate,5;
   - Id: 32301
-    AegisName: Illusion_Gold_Lux
+    AegisName: Gold_Lux_IL
     Name: "Illusion Gold Lux [2]"
     Type: Weapon
     SubType: Revolver
@@ -125741,6 +126125,18 @@ Body:
     Refineable: true
     Script: |
       .@r = getrefine(); bonus2 bSkillCooldown,"GN_SPORE_EXPLOSION",-1000; bonus bBaseAtk,4*.@r; if (.@r>=11) .@val = 50; else if (.@r>=9) .@val = 30; bonus2 bSkillAtk,"GN_SPORE_EXPLOSION",.@val;
+  - Id: 100003
+    AegisName: ILL_Piece_A
+    Name: Red Phantom Resonance Stone
+    Type: DelayConsume
+    Script: |
+      laphine_upgrade();
+  - Id: 100004
+    AegisName: ILL_Piece_B
+    Name: Azure Mirage Resonance Stone
+    Type: DelayConsume
+    Script: |
+      laphine_upgrade();
   - Id: 300076
     AegisName: Beta_Guards_Ng_Card
     Name: Broken Beta Guards Card
@@ -126049,6 +126445,250 @@ Body:
       bonus bInt,1;
       bonus bLuk,2;
       bonus bMaxHPrate,10;
+  - Id: 300140
+    AegisName: ILL_Sropho_Card
+    Name: Abysmal Sropho Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Hand: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      .@r = getrefine();
+      bonus2 bMagicAtkEle,Ele_Wind,3;
+      if (.@r>=9) {
+         bonus2 bMagicAtkEle,Ele_Wind,2;
+      }
+      if (.@r>=11) {
+         bonus2 bMagicAtkEle,Ele_Wind,5;
+      }
+  - Id: 300141
+    AegisName: ILL_Obeaune_Card
+    Name: Abysmal Obeaune Card
+    Type: Card
+    Weight: 10
+    Locations: {Both_Accessory: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bMatk,30;
+  - Id: 300142
+    AegisName: ILL_Deviace_Card
+    Name: Abysmal Deviace Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Hand: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      .@r = getrefine();
+      bonus2 bAddRace,RC_Fish,5;
+      bonus2 bAddEle,Ele_Water,5;
+      if (.@r>=7) {
+         bonus2 bAddEle,Ele_Water,5;
+      }
+      if (.@r>=9) {
+         bonus2 bAddRace,RC_Fish,5;
+      }
+  - Id: 300143
+    AegisName: ILL_Marse_Card
+    Name: Abysmal Marse Card
+    Type: Card
+    Weight: 10
+    Locations: {Left_Hand: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus2 bSubEle,Ele_Earth,15;
+      bonus2 bSubRace,RC_Insect,15;
+  - Id: 300144
+    AegisName: ILL_Merman_Card
+    Name: Abysmal Merman Card
+    Type: Card
+    Weight: 10
+    Locations: {Shoes: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bBaseAtk,4*(readparam(bStr)/15);
+  - Id: 300145
+    AegisName: ILL_Abysmal_Witch_Card
+    Name: Abysmal Witch Card
+    Type: Card
+    Weight: 10
+    Locations: {Garment: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus2 bMagicAtkEle,Ele_Fire,100;
+      bonus2 bMagicAtkEle,Ele_Dark,100;
+      bonus2 bSubEle,Ele_All,-30;
+  - Id: 300146
+    AegisName: ILL_Sedora_Card
+    Name: Abysmal Sedora Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Hand: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus2 bCriticalAddRace,RC_Fish,30;
+  - Id: 300147
+    AegisName: ILL_Sword_Fish_Card
+    Name: Abysmal Swordfish Card
+    Type: Card
+    Weight: 10
+    Locations: {Head_Top: true, Head_Mid: true, Head_Low: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus2 bSubEle,Ele_Water,10;
+      if (getrefine()>=9) {
+         bonus2 bMagicAddEle,Ele_Water,10;
+      }
+  - Id: 300148
+    AegisName: ILL_Strouf_Card
+    Name: Abysmal Strouf Card
+    Type: Card
+    Weight: 10
+    Locations: {Armor: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bMaxHPrate,10;
+      bonus bMaxSPrate,5;
+      if (getrefine()>=9) {
+         bonus2 bMagicAddEle,Ele_Water,5;
+         bonus2 bAddEle,Ele_Water,5;
+      }
+  - Id: 300149
+    AegisName: ILL_Phen_Card
+    Name: Abysmal Phen Card
+    Type: Card
+    Weight: 10
+    Locations: {Garment: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus2 bSubEle,Ele_Neutral,15;
+      bonus2 bMagicAtkEle,Ele_Wind,3*getrefine();
+  - Id: 300150
+    AegisName: ILL_King_Dramoh_Card
+    Name: Abysmal King Dramoh Card
+    Type: Card
+    Weight: 10
+    Locations: {Head_Top: true, Head_Mid: true, Head_Low: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bMaxHPrate,-5;
+      bonus2 bAddClass,Class_All,(getrefine()/3);
+  - Id: 300151
+    AegisName: ILL_Kraken_Card
+    Name: Abysmal Kraken Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Hand: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bLongAtkRate,25;
+      bonus bPerfectHitAddRate,5;
+  - Id: 300230
+    AegisName: ILL_Andre_Card
+    Name: Diligent Andre Card
+    Type: Card
+    Weight: 10
+    Locations: {Left_Hand: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bSubRace,RC_Insect,20;
+      bonus bMaxHPrate,getrefine();
+  - Id: 300231
+    AegisName: ILL_Andre_soldier_Card
+    Name: Diligent Soldier Andre Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Hand: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bAddSize,Size_Small,20;
+      bonus2 bAddSize,Size_Medium,20;
+      bonus bBreakArmorRate,1;
+  - Id: 300232
+    AegisName: ILL_Andre_larva_Card
+    Name: Diligent Andre Larva Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Hand: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus2 bAddRace,RC_Insect,20;
+      bonus2 bMagicAddRace,RC_Insect,20;
+  - Id: 300233
+    AegisName: ILL_Deniro_Card
+    Name: Diligent Deniro Card
+    Type: Card
+    Weight: 10
+    Locations: {Left_Hand: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bSubRace,RC_Insect,20;
+      bonus bMaxHPrate,getrefine();
+  - Id: 300234
+    AegisName: ILL_Piere_Card
+    Name: Diligent Piere Card
+    Type: Card
+    Weight: 10
+    Locations: {Left_Hand: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bIgnoreDefRaceRate,RC_Plant,15;
+      bonus2 bAddRace,RC_Plant,5*(getrefine()/2);
+  - Id: 300235
+    AegisName: ILL_Ant_egg_Card
+    Name: Mushy Ant Egg Card
+    Type: Card
+    Weight: 10
+    Locations: {Left_Hand: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bMaxSPrate,10;
+      bonus bMaxHPrate,getrefine();
+  - Id: 300236
+    AegisName: ILL_Giearth_Card
+    Name: Intrepid Giearth Card
+    Type: Card
+    Weight: 10
+    Locations: {Head_Top: true, Head_Mid: true, Head_Low: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bResEff,Eff_Confusion,10000;
+      bonus2 bResEff,Eff_Blind,10000;
+      bonus2 bAddRace,RC_Insect,4*(getrefine()/2);
+  - Id: 300237
+    AegisName: ILL_Farmiliar_Card
+    Name: Intrepid Familiar Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Hand: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bIgnoreMdefRaceRate,RC_Brute,15;
+      bonus2 bMagicAddRace,RC_Brute,5*(getrefine()/2);
+  - Id: 300238
+    AegisName: ILL_Vitata_Card
+    Name: Diligent Vitata Card
+    Type: Card
+    Weight: 10
+    Locations: {Head_Low: true, Head_Mid: true, Head_Top: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bMagicAtkEle,Ele_Poison,5;
+      if (getrefine()>=9) {
+        bonus2 bMagicAtkEle,Ele_Poison,5;
+        skill "AL_HEAL",5;
+      }
+  - Id: 300239
+    AegisName: ILL_Maya_Card
+    Name: Silent Maya Card
+    Type: Card
+    Weight: 10
+    Locations: {Left_Hand: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bMagicAddRace,RC_Brute,50;
+      bonus2 bMagicAddRace,RC_Player_Doram,50;
+      bonus2 bMagicAddRace,RC_Plant,50;
+      bonus bUseSPrate,50;
   - Id: 300254
     AegisName: Amitera_Card
     Name: Amitera Card
@@ -126164,6 +126804,31 @@ Body:
     Type: Armor
     Locations: {Costume_Head: true}
     View: 1952
+  - Id: 400053
+    AegisName: Morrigane_Helm_IL
+    Name: "Illusion Morrigane's Helm [1]"
+    Type: Armor
+    Buy: 34500
+    Sell: 11500
+    Weight: 500
+    Defense: 8
+    Slots: 1
+    Jobs: {All: true, Novice: false}
+    Locations: {Head_Top: true}
+    ArmorLevel: 1
+    EquipLevelMin: 130
+    Refineable: true
+    View: 257
+    Script: |
+      .@r = getrefine();
+      bonus bCritical,5;
+      bonus bStr,5;
+      if (.@r>=7) {
+         bonus bBaseAtk,50;
+      }
+      if (.@r>=9) {
+         bonus bAspdRate,10;
+      }
   - Id: 400055
     AegisName: C_ShineSantaPoringE
     Name: Costume Shiny Santa Poring Hat
@@ -131739,6 +132404,199 @@ Body:
     Type: Armor
     Locations: {Costume_Head: true}
     View: 2806
+  - Id: 450144
+    AegisName: Saint_Robe_IL
+    Name: "Illusion Saint Robe [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Weight: 600
+    Defense: 12
+    Slots: 1
+    Jobs: {Acolyte: true, Alchemist: true, Blacksmith: true, Merchant: true, Monk: true, Priest: true}
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 120
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHPrate,10;
+      bonus bMaxSPrate,10;
+      bonus bMdef,10;
+      if (.@r>=9) {
+         bonus2 bSubRace,RC_Fish,15;
+      }
+      if (.@r>=11) {
+         bonus2 bIgnoreDefRaceRate,RC_Fish,20;
+      }
+  - Id: 450145
+    AegisName: Water_Sprits_Armor_IL
+    Name: "Illusion Saphien's Armor of Ocean [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Weight: 2200
+    Defense: 12
+    Slots: 1
+    Jobs: {Alchemist: true, Blacksmith: true, Crusader: true, Knight: true, Merchant: true, Swordman: true}
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 120
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHPrate,10;
+      bonus bMaxHP,125*.@r;
+      if (.@r>=7) {
+         bonus bDef,5;
+      }
+      if (.@r>=9) {
+         autobonus2 "{ bonus2 bSubEle,Ele_Water,15; }",1,5000,BF_MAGIC|BF_WEAPON;
+      }
+  - Id: 450146
+    AegisName: Chain_Mail_IL
+    Name: "Illusion Chain Mail [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Weight: 3300
+    Defense: 12
+    Slots: 1
+    Jobs: {Alchemist: true, Assassin: true, Blacksmith: true, Crusader: true, Knight: true, Merchant: true, Rogue: true, Swordman: true, Thief: true}
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 120
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHPrate,10;
+      bonus bMaxSPrate,10;
+      bonus bBaseAtk,4*.@r;
+      bonus2 bAddEle,Ele_Fire,4*(.@r/3);
+      bonus2 bAddEle,Ele_Water,4*(.@r/3);
+      if (.@r>=9) {
+         bonus2 bAddClass,Class_All,10;
+      }
+      if (.@r>=11) {
+         bonus bAspdRate,10;
+      }
+  - Id: 450182
+    AegisName: Sprint_Mail_IL
+    Name: "Illusion Sprint Mail [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Weight: 1500
+    Defense: 12
+    Slots: 1
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 130
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bHPrecovRate,20;
+      bonus bVit,5;
+      if (.@r>=7) {
+         bonus bHPrecovRate,20;
+         if (.@r>=9) {
+            bonus bDelayrate,-5;
+            if (.@r>=11) {
+               bonus bDelayrate,-7;
+            }
+         }
+      }
+  - Id: 460017
+    AegisName: Guard_IL
+    Name: "Illusion Guard [1]"
+    Type: Armor
+    Buy: 133000
+    Sell: 26600
+    Weight: 600
+    Defense: 8
+    Slots: 1
+    Locations: {Left_Hand: true}
+    ArmorLevel: 1
+    EquipLevelMin: 120
+    Refineable: true
+    View: 1
+    Script: |
+      bonus bAspd,2;
+      bonus bPerfectHitAddRate,3*(min(getrefine(),12)/2);
+  - Id: 460018
+    AegisName: Siver_Guard_IL
+    Name: "Illusion Silver Guard [1]"
+    Type: Armor
+    Buy: 133000
+    Sell: 26600
+    Weight: 300
+    Defense: 8
+    Slots: 1
+    Locations: {Left_Hand: true}
+    ArmorLevel: 1
+    EquipLevelMin: 120
+    Refineable: true
+    View: 1
+    Script: |
+      bonus bVariableCastrate,-7;
+      bonus bDelayrate,-(min(getrefine(),12)/2);
+  - Id: 470066
+    AegisName: Sprint_Shoes_IL
+    Name: "Illusion Sprint Shoes [1]"
+    Type: Armor
+    Buy: 45000
+    Sell: 11250
+    Weight: 700
+    Defense: 6
+    Slots: 1
+    Locations: {Shoes: true}
+    ArmorLevel: 1
+    EquipLevelMin: 130
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bSPrecovRate,20;
+      bonus bAgi,5;
+      if (.@r>=7) {
+         bonus bSPrecovRate,20;
+         if (.@r>=9) {
+            bonus bMaxHPrate,5;
+            bonus bMaxSPrate,5;
+            if (.@r>=11) {
+               bonus2 bAddSize,Size_All,15;
+            }
+         }
+      }
+  - Id: 480054
+    AegisName: Morrigane_Manyeau_IL
+    Name: "Illusion Morrigane's Manteau [1]"
+    Type: Armor
+    Buy: 57000
+    Sell: 14250
+    Weight: 600
+    Defense: 6
+    Slots: 1
+    Jobs: {All: true, Novice: false}
+    Locations: {Garment: true}
+    ArmorLevel: 1
+    EquipLevelMin: 130
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bLuk,5;
+      bonus bFlee,20;
+      if (.@r>=7) {
+         bonus2 bAddRace,RC_Fish,5;
+         bonus2 bAddRace,RC_Insect,5;
+         bonus2 bAddRace,RC_Demon,5;
+         bonus2 bAddRace,RC_DemiHuman,5;
+      }
+      if (.@r>=9) {
+         bonus2 bAddRace,RC_Fish,10;
+         bonus2 bAddRace,RC_Insect,10;
+         bonus2 bAddRace,RC_Demon,10;
+         bonus2 bAddRace,RC_DemiHuman,10;
+      }
   - Id: 480055
     AegisName: C_Wing_Of_Angel_Move_RD
     Name: Costume Celestial Red Angel Wings
@@ -132983,6 +133841,62 @@ Body:
     Type: Armor
     Locations: {Costume_Garment: true}
     View: 303
+  - Id: 490069
+    AegisName: Morrigane_Belt_IL
+    Name: "Illusion Morrigane's Belt [1]"
+    Type: Armor
+    Buy: 5500
+    Sell: 2750
+    Weight: 200
+    Slots: 1
+    Jobs: {All: true, Novice: false}
+    Locations: {Right_Accessory: true}
+    ArmorLevel: 1
+    EquipLevelMin: 130
+    Script: |
+      bonus bMaxHPrate,5;
+      bonus bStr,3;
+  - Id: 490070
+    AegisName: Morrigane_Pendant_IL
+    Name: "Illusion Morrigane's Pendant [1]"
+    Type: Armor
+    Buy: 5500
+    Sell: 2750
+    Weight: 200
+    Slots: 1
+    Jobs: {All: true, Novice: false}
+    Locations: {Left_Accessory: true}
+    ArmorLevel: 1
+    EquipLevelMin: 130
+    Script: |
+      bonus bCritical,5;
+      bonus bBaseAtk,20;
+  - Id: 490120
+    AegisName: Sprint_Ring_IL
+    Name: "Illusion Sprint Ring [1]"
+    Type: Armor
+    Buy: 5500
+    Sell: 2750
+    Weight: 100
+    Slots: 1
+    Locations: {Left_Accessory: true}
+    ArmorLevel: 1
+    EquipLevelMin: 130
+    Script: |
+      bonus bVariableCastrate,-10;
+  - Id: 490121
+    AegisName: Sprint_Glove_IL
+    Name: "Illusion Sprint Glove [1]"
+    Type: Armor
+    Buy: 5500
+    Sell: 2750
+    Weight: 100
+    Slots: 1
+    Locations: {Right_Accessory: true}
+    ArmorLevel: 1
+    EquipLevelMin: 130
+    Script: |
+      bonus bDelayrate,-3;
   - Id: 490242
     AegisName: C_Valkyrie_Hair
     Name: Costume Valkyrie Hair
@@ -133038,6 +133952,38 @@ Body:
       if (.@r>=9) {
          bonus bAspdRate,10;
       }
+  - Id: 500030
+    AegisName: Excalibur_IL
+    Name: "Illusion Excalibur [2]"
+    Type: Weapon
+    SubType: 1hSword
+    Buy: 9500000
+    Sell: 95000
+    Weight: 1000
+    Attack: 120
+    Range: 1
+    Slots: 2
+    Jobs: {Crusader: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 120
+    Refineable: true
+    Script: |
+      bonus bMatk,180;
+      .@r = getrefine();
+      bonus bDelayrate,-5;
+      bonus bMatkRate,5;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"LG_RAYOFGENESIS",15;
+         if (.@r>=9) {
+            bonus2 bMagicAtkEle,Ele_Neutral,15;
+            bonus2 bMagicAtkEle,Ele_Holy,15;
+            bonus bVariableCastrate,-10;
+            if (.@r>=11) {
+               bonus2 bSkillAtk,"LG_RAYOFGENESIS",25;
+            }
+         }
+      }
   - Id: 510008
     AegisName: Ep172_1h_Dagger
     Name: Wrath Rack
@@ -133086,6 +134032,38 @@ Body:
       if (.@r>=10) {
          bonus bDelayrate,-10;
       }
+  - Id: 510034
+    AegisName: Ancient_Dagger_IL
+    Name: "Illusion Ancient Dagger [2]"
+    Type: Weapon
+    SubType: Dagger
+    Buy: 9370000
+    Sell: 93700
+    Weight: 600
+    Attack: 107
+    Range: 1
+    Slots: 2
+    Jobs: {Rogue: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 120
+    Refineable: true
+    Script: |
+      bonus bMatk,180;
+      .@r = getrefine();
+      bonus bSPrecovRate,10;
+      bonus bMaxSP,100;
+      autobonus "{ bonus bMatkRate,10; bonus bMatk,70; }",1,10000,BF_WEAPON;
+      if (.@r>=7) {
+         bonus2 bMagicAtkEle,Ele_All,15;
+         if (.@r>=9) {
+            bonus2 bMagicAddSize,Size_Medium,20;
+            bonus2 bMagicAddSize,Size_Large,20;
+            if (.@r>=11) {
+               autobonus "{ bonus2 bMagicAddRace,RC_All,15; }",1,10000,BF_MAGIC;
+            }
+         }
+      }
   - Id: 520002
     AegisName: Ep172_1h_Axe
     Name: Pride Steel
@@ -133126,6 +134104,40 @@ Body:
       bonus bMatkRate,3*.@r;
       if (.@r>=9) {
          bonus bVariableCastrate,-10;
+      }
+  - Id: 530015
+    AegisName: Gelerdria_IL
+    Name: "Illusion Gelerdria [2]"
+    Type: Weapon
+    SubType: 1hSpear
+    Buy: 10000000
+    Sell: 100000
+    Weight: 2000
+    Attack: 170
+    Range: 3
+    Slots: 2
+    Jobs: {Crusader: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 120
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bCritical,15;
+      bonus bMaxHPrate,10;
+      bonus bAspdRate,2*(.@r/3);
+      bonus bBaseAtk,20*(.@r/3);
+      if (.@r>=7) {
+         bonus bCritAtkRate,30;
+         bonus2 bSkillAtk,"LG_CANNONSPEAR",25;
+         if (.@r>=9) {
+            bonus bLongAtkRate,15;
+            bonus2 bSkillAtk,"LG_BANISHINGPOINT",25;
+            if (.@r>=11) {
+               bonus2 bSkillAtk,"LG_BANISHINGPOINT",20;
+               bonus2 bSkillAtk,"LG_CANNONSPEAR",20;
+            }
+         }
       }
   - Id: 540004
     AegisName: Ep172_1h_Book
@@ -133204,6 +134216,82 @@ Body:
       if (.@r>=9) {
          bonus bVariableCastrate,-10;
       }
+  - Id: 550030
+    AegisName: Thorn_Staff_IL
+    Name: "Illusion Thorn Staff of Darkness [2]"
+    Type: Weapon
+    SubType: Staff
+    Buy: 8900000
+    Sell: 89000
+    Weight: 1200
+    Attack: 60
+    Range: 1
+    Slots: 2
+    Jobs: {Acolyte: true, Mage: true, Monk: true, Priest: true, Sage: true, SoulLinker: true, Wizard: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 120
+    Refineable: true
+    Script: |
+      bonus bMatk,180;
+      .@r = getrefine();
+      bonus bAtkEle,Ele_Dark;
+      bonus bUnbreakableWeapon;
+      bonus bInt,3;
+      bonus bDex,3;
+      bonus2 bIgnoreMdefRaceRate,RC_All,3*.@r;
+      bonus2 bIgnoreMdefRaceRate,RC_Player_Human,-3*.@r;
+      bonus2 bIgnoreMdefRaceRate,RC_Player_Doram,-3*.@r;
+      bonus bDelayrate,-3*(.@r/2);
+      if (.@r>=7) {
+         bonus bVariableCastrate,-7;
+         bonus bMatkRate,7;
+         if (.@r>=9) {
+            bonus2 bMagicAddRace,RC_Angel,20;
+            bonus2 bMagicAddEle,Ele_Holy,20;
+            if (.@r>=11) {
+               bonus2 bMagicAtkEle,Ele_Ghost,15;
+               bonus2 bMagicAtkEle,Ele_Undead,15;
+               bonus2 bMagicAtkEle,Ele_Poison,15;
+               bonus2 bMagicAtkEle,Ele_Dark,15;
+            }
+         }
+      }
+  - Id: 550031
+    AegisName: Dea_Staff_IL
+    Name: "Illusion Dea Staff [2]"
+    Type: Weapon
+    SubType: Staff
+    Buy: 8800000
+    Sell: 88000
+    Weight: 1000
+    Attack: 50
+    Range: 1
+    Slots: 2
+    Jobs: {Priest: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 120
+    Refineable: true
+    Script: |
+      bonus bMatk,190;
+      .@r = getrefine();
+      bonus bAtkEle,Ele_Holy;
+      bonus bUnbreakableWeapon;
+      bonus bVit,2;
+      bonus bInt,6;
+      autobonus "{ bonus2 bSPRegenRate,150,1000; }",1,4000,BF_MAGIC;
+      bonus2 bSkillAtk,"AB_JUDEX",20*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bMagicAtkEle,Ele_Holy,15;
+         if (.@r>=9) {
+            bonus bDelayrate,-15;
+            bonus2 bSkillAtk,"AB_JUDEX",30;
+            if (.@r>=11) {
+               autobonus3 "{ bonus2 bMagicAddSize,Size_All,20; }",1000,15000,"PR_MAGNUS";
+            }
+         }
+      }
   - Id: 560004
     AegisName: Ep172_Bh_Knuck
     Name: Ira Fist
@@ -133245,6 +134333,40 @@ Body:
       if (.@r>=7) {
          bonus bVariableCastrate,-10;
       }
+  - Id: 570008
+    AegisName: Electronic_Guitar_IL
+    Name: "Illusion Electric Guitar [2]"
+    Type: Weapon
+    SubType: Musical
+    Buy: 10000000
+    Sell: 100000
+    Weight: 1800
+    Attack: 170
+    Range: 1
+    Slots: 2
+    Jobs: {BardDancer: true}
+    Gender: Male
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 120
+    Refineable: true
+    Script: |
+      bonus bMatk,180;
+      .@r = getrefine();
+      bonus bLongAtkRate,3*(.@r/2);
+      bonus bMatk,6*(.@r/2);
+      if (.@r>=7) {
+         bonus2 bMagicAtkEle,Ele_Neutral,10;
+         bonus2 bSkillUseSPrate,"WM_SEVERE_RAINSTORM",10;
+      }
+      if (.@r>=9) {
+         bonus2 bSkillAtk,"WM_SEVERE_RAINSTORM_MELEE",15;
+         bonus2 bSkillAtk,"WM_REVERBERATION",15;
+      }
+      if (.@r>=11) {
+         bonus2 bMagicAddEle,Ele_Water,10;
+         bonus2 bSkillCooldown,"WM_SEVERE_RAINSTORM",-1000;
+      }
   - Id: 580005
     AegisName: Ep172_1h_Whip
     Name: Pigritia Spark
@@ -133267,6 +134389,40 @@ Body:
       bonus bMatkRate,10*(.@r/3);
       if (.@r>=7) {
          bonus bVariableCastrate,-10;
+      }
+  - Id: 580008
+    AegisName: Electric_Eel_IL
+    Name: "Illusion Electric Eel [2]"
+    Type: Weapon
+    SubType: Whip
+    Buy: 10000000
+    Sell: 100000
+    Weight: 1800
+    Attack: 170
+    Range: 2
+    Slots: 2
+    Jobs: {BardDancer: true}
+    Gender: Female
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 120
+    Refineable: true
+    Script: |
+      bonus bMatk,180;
+      .@r = getrefine();
+      bonus bLongAtkRate,3*(.@r/2);
+      bonus bMatk,6*(.@r/2);
+      if (.@r>=7) {
+         bonus2 bMagicAtkEle,Ele_Neutral,10;
+         bonus2 bSkillUseSPrate,"WM_SEVERE_RAINSTORM",10;
+      }
+      if (.@r>=9) {
+         bonus2 bSkillAtk,"WM_SEVERE_RAINSTORM_MELEE",15;
+         bonus2 bSkillAtk,"WM_REVERBERATION",15;
+      }
+      if (.@r>=11) {
+         bonus2 bMagicAddEle,Ele_Water,10;
+         bonus2 bSkillCooldown,"WM_SEVERE_RAINSTORM",-1000;
       }
   - Id: 590006
     AegisName: Ep172_1h_Hammer
@@ -133316,6 +134472,36 @@ Body:
       if (.@r>=10) {
          bonus bDelayrate,-10;
       }
+  - Id: 600011
+    AegisName: Death_Guidance_IL
+    Name: "Illusion Death Guidance [2]"
+    Type: Weapon
+    SubType: 2hSword
+    Buy: 10700000
+    Sell: 107000
+    Weight: 2000
+    Attack: 240
+    Range: 1
+    Slots: 2
+    Jobs: {Crusader: true, Knight: true, Swordman: true}
+    Classes: {Upper: true, Third: true, Third_Upper: true, Third_Baby: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 120
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,4*.@r;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"RK_STORMBLAST",20;
+      }
+      if (.@r>=9) {
+         autobonus "{ bonus2 bHPRegenRate,getrefine()*50,1000; }",30,4000,BF_WEAPON;
+      }
+      if (.@r>=11) {
+         bonus bCritAtkRate,15;
+         bonus bCritical,15;
+      }
   - Id: 610006
     AegisName: Ep172_Bh_Katar
     Name: Avaritia Metal
@@ -133334,6 +134520,70 @@ Body:
     Script: |
       .@r = getrefine();
       bonus bBaseAtk,30*.@r;
+  - Id: 610012
+    AegisName: KatarOfCold_Icicle_IL
+    Name: "Illusion Katar of Frozen Icicle [2]"
+    Type: Weapon
+    SubType: Katar
+    Buy: 10500000
+    Sell: 105000
+    Weight: 1200
+    Attack: 220
+    Range: 1
+    Slots: 2
+    Jobs: {Assassin: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 120
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,5*.@r;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"GC_CROSSIMPACT",20;
+      }
+      if (.@r>=9) {
+         bonus bAspdRate,10;
+      }
+      if (.@r>=11) {
+         bonus2 bAddRace,RC_Insect,10;
+         bonus2 bAddEle,Ele_Fire,10;
+         bonus bCritical,15;
+      }
+  - Id: 620010
+    AegisName: Doom_Slayer_IL
+    Name: "Illusion Doom Slayer [2]"
+    Type: Weapon
+    SubType: 2hAxe
+    Buy: 10800000
+    Sell: 108000
+    Weight: 7000
+    Attack: 250
+    Range: 1
+    Slots: 2
+    Jobs: {Alchemist: true, Blacksmith: true, Merchant: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 120
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      if (readparam(bStr)>=100) {
+         bonus bBaseAtk,75;
+      }
+      if (.@r>=7) {
+         bonus bVariableCastrate,-10;
+         if (.@r>=9) {
+            bonus2 bAddSize,Size_All,20;
+            bonus bLongAtkRate,15;
+            bonus bShortAtkRate,15;
+            if (.@r>=11) {
+               bonus bDelayrate,-10;
+            }
+         }
+      }
+      bonus bVariableCastrate,-5;
   - Id: 630003
     AegisName: Ep172_Bh_Spear
     Name: Luxuria Pierce
@@ -133352,6 +134602,68 @@ Body:
     Script: |
       .@r = getrefine();
       bonus bBaseAtk,30*.@r;
+  - Id: 630006
+    AegisName: Brionac_IL
+    Name: "Illusion Brionac [2]"
+    Type: Weapon
+    SubType: 2hSpear
+    Buy: 10400000
+    Sell: 104000
+    Weight: 3000
+    Attack: 210
+    Range: 3
+    Slots: 2
+    Jobs: {Crusader: true, Knight: true, Swordman: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 120
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,10;
+      bonus2 bSkillAtk,"LG_OVERBRAND",5*(.@r/2);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"LG_OVERBRAND",20;
+      }
+      if (.@r>=9) {
+         bonus2 bAddSize,Size_Medium,15;
+         bonus2 bAddSize,Size_Large,15;
+      }
+      if (.@r>=11) {
+         bonus2 bAddRace,RC_Fish,30;
+         bonus2 bAddRace,RC_Demon,30;
+      }
+  - Id: 630007
+    AegisName: Zephyrus_IL
+    Name: "Illusion Zephyrus [2]"
+    Type: Weapon
+    SubType: 2hSpear
+    Buy: 10800000
+    Sell: 108000
+    Weight: 3300
+    Attack: 250
+    Range: 3
+    Slots: 2
+    Jobs: {Crusader: true, Knight: true, Swordman: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 120
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,4*.@r;
+      bonus bLongAtkRate,3*(.@r/2);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"LK_SPIRALPIERCE",20;
+      }
+      if (.@r>=9) {
+         bonus bLongAtkRate,5;
+      }
+      if (.@r>=11) {
+         bonus2 bAddSize,Size_Medium,10;
+         bonus2 bAddSize,Size_Large,10;
+         bonus bHit,10;
+      }
   - Id: 640005
     AegisName: Ep172_Bh_Staff
     Name: Pride Stone
@@ -133538,6 +134850,76 @@ Body:
     Buy: 250
     Sell: 125
     Weight: 10
+  - Id: 1000504
+    AegisName: Dry_Sand
+    Name: Dry Sand
+  - Id: 1000505
+    AegisName: Opaque_Liquid
+    Name: Opaque Liquid
+  - Id: 1000506
+    AegisName: Shell_Of_Cognition
+    Name: Shell of Awareness
+  - Id: 1000510
+    AegisName: IL_Twins_Feeler
+    Name: Ant Antennae
+    Buy: 720
+    Sell: 360
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1000511
+    AegisName: IL_Twins_Leg
+    Name: Ant Legs
+    Buy: 750
+    Sell: 375
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1000512
+    AegisName: IL_Twins_Jaw
+    Name: Ant's Jaw
+    Buy: 900
+    Sell: 450
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1000513
+    AegisName: IL_Twins_Acid
+    Name: Dangerous Acid
+    Buy: 900
+    Sell: 450
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1000514
+    AegisName: IL_Twins_Hat
+    Name: Gaia's Worn Hat
+    Buy: 1000
+    Sell: 500
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1000515
+    AegisName: IL_Twins_Shovel
+    Name: Small Shovel
+    Buy: 937
+    Sell: 468
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1000516
+    AegisName: IL_Twins_Fang
+    Name: Bat Jawbone
+    Buy: 875
+    Sell: 437
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1000517
+    AegisName: IL_Twins_Fur
+    Name: Bat Fur
+    Buy: 840
+    Sell: 420
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1000518
+    AegisName: IL_Twins_Crown
+    Name: Maya's Crown
+    Weight: 10
+    Flags: {BuyingStore: true}
   - Id: 1001083
     AegisName: Turn_Yellow_Leaf
     Name: Maple Leaves
