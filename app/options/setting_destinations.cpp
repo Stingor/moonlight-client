@@ -122,6 +122,8 @@ constexpr auto kDestinations = std::to_array<SettingDestination>({
     PageTab("entities_monsters", TrText("Monstres"), OptionSection::kEntityBars,
             EntityPageTab::kMonster),
     PageTab("entities_boss", TrText("Boss"), OptionSection::kEntityBars, EntityPageTab::kBoss),
+    PageTab("entities_companions", TrText("Compagnons"), OptionSection::kEntityBars,
+            EntityPageTab::kCompanion),
     PageTab("entities_npc", TrText("PNJ"), OptionSection::kEntityBars, EntityPageTab::kOther),
     PageTab("entities_ground_items", TrText("Items au sol"), OptionSection::kEntityBars,
             EntityPageTab::kGroundItem),
@@ -265,7 +267,7 @@ constexpr auto kDestinations = std::to_array<SettingDestination>({
 // pourrait se lier, et une clé de trop ouvrirait un onglet absent.
 static_assert(ro::ui::kShortcutBarCount == 8);
 static_assert(ro::ui::kStatBarCount == 7);
-static_assert(kEntityPageTabCount == 8);
+static_assert(kEntityPageTabCount == 9);
 static_assert(static_cast<std::size_t>(DamageTab::kCount) == 3);
 static_assert(kHotkeyTabCount == 6);
 static_assert(ro::ui::kAchievementTabCount == kAchievementFeatTab + 1);

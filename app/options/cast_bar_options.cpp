@@ -17,7 +17,7 @@ using ro::ui::OptionRowView;
 // sens d'un numéro sans que le fichier le dise.
 constexpr const char* kReplacedKey = "cast_bar_replaced";
 constexpr std::array<const char*, ro::ui::kEntityBarKindCount> kKindNames = {
-    "self", "party", "players", "monsters", "boss", "others",
+    "self", "party", "players", "monsters", "boss", "others", "companions",
 };
 
 [[nodiscard]] std::string KindKey(std::size_t kind, const char* what) {

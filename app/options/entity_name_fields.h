@@ -47,9 +47,10 @@ namespace moonclient {
     case EntityNameField::kTitle:
       return kind != NamePlateKind::kGroundItem;
     case EntityNameField::kAside:
-      return kind != NamePlateKind::kNonPlayer;
+      return kind != NamePlateKind::kNonPlayer && kind != NamePlateKind::kCompanion;
     case EntityNameField::kBanner:
-      return kind != NamePlateKind::kNonPlayer && kind != NamePlateKind::kGroundItem;
+      return kind != NamePlateKind::kNonPlayer && kind != NamePlateKind::kCompanion &&
+             kind != NamePlateKind::kGroundItem;
     // Le reste vaut partout : une étiquette a toujours une couleur, une place,
     // et un moment où elle paraît.
     case EntityNameField::kShown:

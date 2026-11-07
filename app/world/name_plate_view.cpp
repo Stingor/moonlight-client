@@ -28,7 +28,8 @@ ro::render::NamePlateKind NamePlateKindOf(const ro::sim::Actor& actor,
       return actor.boss != ro::sim::BossRank::kNone ? ro::render::NamePlateKind::kBoss
                                                     : ro::render::NamePlateKind::kMonster;
     case ro::sim::ActorKind::kNonPlayer:
-      return ro::render::NamePlateKind::kNonPlayer;
+      return actor.familiar != ro::sim::Familiar::kNone ? ro::render::NamePlateKind::kCompanion
+                                                        : ro::render::NamePlateKind::kNonPlayer;
     case ro::sim::ActorKind::kItem:
       return ro::render::NamePlateKind::kGroundItem;
     case ro::sim::ActorKind::kPlayer:

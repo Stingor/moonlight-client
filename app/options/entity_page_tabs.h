@@ -35,6 +35,7 @@ enum class EntityPageTab : std::size_t {
   kPlayer,
   kMonster,
   kBoss,
+  kCompanion,
   kOther,
   kGroundItem,
   kSignboards,
@@ -64,6 +65,8 @@ inline constexpr std::size_t kEntityPageTabCount = static_cast<std::size_t>(Enti
       return {.bars = EntityBarKind::kMonster, .name = NamePlateKind::kMonster};
     case EntityPageTab::kBoss:
       return {.bars = EntityBarKind::kBoss, .name = NamePlateKind::kBoss};
+    case EntityPageTab::kCompanion:
+      return {.bars = EntityBarKind::kCompanion, .name = NamePlateKind::kCompanion};
     case EntityPageTab::kOther:
       return {.bars = EntityBarKind::kOther, .name = NamePlateKind::kNonPlayer};
     case EntityPageTab::kSignboards:
@@ -91,9 +94,8 @@ inline constexpr std::size_t kEntityPageTabCount = static_cast<std::size_t>(Enti
   if (tab == EntityPageTab::kGroundItem) {
     return ro::render::EntityNameKindName(ro::render::NamePlateKind::kGroundItem);
   }
-  // « PNJ » ET NON « AUTRES » : c'est ce que l'onglet porte d'abord, et le nom
-  // qu'il a côté étiquettes. L'infobulle de ses barres dit le reste —
-  // familiers, homoncules, mercenaires.
+  // « PNJ » ET NON « AUTRES » : c'est ce que l'onglet porte, et le nom qu'il a
+  // côté étiquettes.
   if (tab == EntityPageTab::kOther) {
     return ro::render::EntityNameKindName(ro::render::NamePlateKind::kNonPlayer);
   }

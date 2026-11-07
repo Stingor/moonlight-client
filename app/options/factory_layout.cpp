@@ -221,7 +221,7 @@ ro::render::EntityNamesLook FactoryEntityNames() {
     look.kinds[static_cast<std::size_t>(kind)].offset_pixels = pixels;
   };
   look.kinds[static_cast<std::size_t>(NamePlateKind::kOwn)].shown = true;
-  // Collés au sprite pour les êtres, à deux pixels pour un PNJ et un butin, à
+  // Collés au sprite pour les êtres, à deux pixels pour un PNJ, un compagnon et un butin, à
   // trois pour soi : son nom passe sous sa propre barre.
   gap(NamePlateKind::kOwn, 3.0F);
   gap(NamePlateKind::kPlayer, 0.0F);
@@ -229,6 +229,7 @@ ro::render::EntityNamesLook FactoryEntityNames() {
   gap(NamePlateKind::kMonster, 0.0F);
   gap(NamePlateKind::kBoss, 0.0F);
   gap(NamePlateKind::kGroundItem, 2.0F);
+  gap(NamePlateKind::kCompanion, 2.0F);
   return look;
 }
 

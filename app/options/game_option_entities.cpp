@@ -1,8 +1,8 @@
 // LES RANGÉES DES BARRES DE VIE ET DE MAGIE DES ENTITÉS, un onglet par espèce.
 //
 // ⚠ À PART DU CATALOGUE, pour la raison des jauges libres et des barres de
-// raccourcis : ceci est une BOUCLE, pas une liste de littéraux qu'on copie six
-// fois. Les six espèces portent les mêmes vingt-cinq réglages.
+// raccourcis : ceci est une BOUCLE, pas une liste de littéraux qu'on copie sept
+// fois. Les sept espèces portent les mêmes vingt-quatre réglages.
 //
 // 🔴 CE QUI RESTE AU-DESSUS DES ONGLETS N'EST PAS « CE QUI SE RESSEMBLE », C'EST
 // « CE QUI NE PEUT PAS DIFFÉRER » : le maître et le mode réglage. Tout le reste diffère
@@ -49,7 +49,7 @@ constexpr float kPercentScale = 100.0F;
 
 }  // namespace
 
-// CE QUI VAUT POUR LES SIX ESPÈCES, puis les onglets.
+// CE QUI VAUT POUR TOUTES LES ESPÈCES, puis les onglets.
 void GameOptions::BuildEntityBarShared() {
   entity_bar_shared_rows_.clear();
   // 🔴 LE MODE RÉGLAGE EN TÊTE, ET POUR TOUT : c'est lui qui montre le cadre
@@ -127,13 +127,19 @@ const char* GameOptions::EntityBarSourceHelp(std::size_t kind) {
           "divisions par zéro, et ce point ne veut rien dire.");
     case ro::ui::EntityBarKind::kOther:
       return Tr(
-          "PNJ, familiers, homoncules, mercenaires : leur vie n'arrive que par le "
-          "dossier de la CIBLE, quand le serveur la donne. Ailleurs, rien ne la porte.");
+          "La vie d'un PNJ n'arrive que par le dossier de la CIBLE, quand le serveur la "
+          "donne. Ailleurs, rien ne la porte.");
+    case ro::ui::EntityBarKind::kCompanion:
+      return Tr(
+          "La vie et la magie de ton homoncule et de ton mercenaire viennent de leur fiche, "
+          "connue en permanence. Celle de ton élémentaire arrive aussi, sans sa magie.\n\n"
+          "Un pet n'a pas de vie à montrer, et le serveur ne donne pas celle du compagnon "
+          "d'un autre joueur : ces barres-là ne paraissent pas.");
   }
   return nullptr;
 }
 
-// LES VINGT-CINQ RÉGLAGES D'UNE ESPÈCE.
+// LES VINGT-QUATRE RÉGLAGES D'UNE ESPÈCE.
 //
 // 🔴 CE QUI NE S'APPLIQUE PAS EST GRISÉ, JAMAIS RETIRÉ. Une ligne qui disparaît
 // quand on éteint son maître fait sauter la mise en page, et le joueur cherche

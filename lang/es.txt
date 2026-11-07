@@ -8380,6 +8380,9 @@ tr: Mostrar el borde al colocar
 fr: Montrer les noms
 tr: Mostrar los nombres
 
+fr: Compagnons
+tr: Compañeros
+
 fr: Items au sol
 tr: Objetos en el suelo
 
@@ -12658,8 +12661,14 @@ tr: Quien tiene una tienda, de venta o de compra, ya no lleva barra, diga lo que
 fr: Montrer pour cette espèce
 tr: Mostrar para esta clase
 
-fr: PNJ, familiers, homoncules, mercenaires : leur vie n'arrive que par le dossier de la CIBLE, quand le serveur la donne. Ailleurs, rien ne la porte.
-tr: PNJ, mascotas, homúnculos, mercenarios: sus HP solo llegan por la ficha del OBJETIVO, cuando el servidor los da. Nada más los transporta.
+fr: La vie d'un PNJ n'arrive que par le dossier de la CIBLE, quand le serveur la donne. Ailleurs, rien ne la porte.
+tr: Los HP de un PNJ solo llegan por la ficha del OBJETIVO, cuando el servidor los da. Nada más los transmite.
+
+fr: La vie et la magie de ton homoncule et de ton mercenaire viennent de leur fiche, connue en permanence. Celle de ton élémentaire arrive aussi, sans sa magie.\n\nUn pet n'a pas de vie à montrer, et le serveur ne donne pas celle du compagnon d'un autre joueur : ces barres-là ne paraissent pas.
+tr: Los HP y SP de tu homúnculo y de tu mercenario vienen de su ficha, conocida en todo momento. Los HP de tu elemental también llegan, sin sus SP.\n\nUna mascota no tiene HP que mostrar, y el servidor no da los del compañero de otro jugador: esas barras no aparecen.
+
+fr: Un pet, un homoncule, un mercenaire ou un élémentaire reçoit son nom par le même paquet qu'un PNJ : ni parenthèse ni seconde ligne n'existent pour lui, et c'est pourquoi cet onglet ne les propose pas.
+tr: Una mascota, un homúnculo, un mercenario o un elemental recibe su nombre por el mismo paquete que un PNJ: ni el paréntesis ni la segunda línea existen para él, y por eso esta pestaña no los ofrece.
 
 fr: Place et taille
 tr: Lugar y tamaño

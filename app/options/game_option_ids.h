@@ -530,10 +530,10 @@ static_assert(static_cast<int>(StatBarField::kCount) == kStatBarFieldsPerBar);
 
 // ── LES BARRES DE VIE ET DE MAGIE DES ENTITÉS ───────────────────────────────
 //
-// Même encodage que les jauges libres, et pour la même raison : SIX espèces qui
-// portent les mêmes vingt-quatre réglages sont cent quarante-quatre entrées
-// d'énumération qu'on écrirait à la main, et cent quarante-quatre occasions de
-// se tromper de numéro.
+// Même encodage que les jauges libres, et pour la même raison : SEPT espèces qui
+// portent les mêmes vingt-quatre réglages sont cent soixante-huit entrées
+// d'énumération qu'on écrirait à la main, et autant d'occasions de se tromper de
+// numéro.
 //
 // ⚠ TROIS MILLE, PARCE QUE LES DEUX AUTRES BASES SONT PRISES. Les gardes des
 // trois aiguillages se recouvrent sans se marcher dessus : chacun rejette ce qui
@@ -586,12 +586,12 @@ inline constexpr int kEntityNameNoteRow = kEntityBarRowBase - 3;
 
 // ── LES ÉTIQUETTES DES ENTITÉS ──────────────────────────────────────────────
 //
-// Même encodage, et pour la même raison : six espèces qui portent les mêmes
-// onze réglages.
+// Même encodage, et pour la même raison : sept espèces qui portent les mêmes
+// douze réglages.
 //
 // ⚠ QUATRE MILLE, AU-DESSUS DES BARRES. Les bases se suivent sans se
 // recouvrir parce que chaque aiguillage rejette ce qui dépasse SON propre
-// nombre d'objets — et celui des barres s'arrête à 3000 + 6 × 24, soit 3144.
+// nombre d'objets — et celui des barres s'arrête à 3000 + 7 × 24, soit 3168.
 inline constexpr int kEntityNameRowBase = 4000;
 inline constexpr int kEntityNameFieldsPerKind = 12;
 enum class EntityNameField : int {
@@ -647,10 +647,10 @@ static_assert(static_cast<int>(EntityNameField::kCount) == kEntityNameFieldsPerK
 // nuancier d'une barre par le curseur d'une étiquette. Rien à l'écran ne le
 // dirait : le mauvais réglage bougerait, simplement.
 //
-// ⚠ SIX EST LE NOMBRE D'ESPÈCES des deux familles. Il est écrit ici plutôt
+// ⚠ SEPT EST LE NOMBRE D'ESPÈCES des deux familles. Il est écrit ici plutôt
 // qu'inclus depuis `ro/ui` et `ro/render` : ce fichier ne connaît aucune des
 // deux couches, et la garde mordrait de toute façon dès qu'un champ s'ajoute.
-inline constexpr int kEntityKindsPerFamily = 6;
+inline constexpr int kEntityKindsPerFamily = 7;
 static_assert(kEntityBarRowBase + kEntityKindsPerFamily * kEntityBarFieldsPerKind <
                   kEntityNameRowBase,
               "les lignes des barres d'entité déborderaient sur celles des étiquettes");

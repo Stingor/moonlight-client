@@ -205,9 +205,16 @@ std::array<EntityBarLook, kEntityBarKindCount> DefaultEntityBars() {
   boss.height_pixels = 8.0F;
   boss.text = EntityBarText::kPercent;
 
-  // TOUT LE RESTE : même réserve que pour un joueur, et pour la même raison.
+  // LES PNJ : éteinte. Un PNJ ne combat pas, et cliquer dessus pour lui parler
+  // ferait paraître une barre qui ne dit rien.
   EntityBarLook& other = bars[static_cast<std::size_t>(EntityBarKind::kOther)];
+  other.shown = false;
   other.when = EntityBarWhen::kHoveredOrTarget;
+
+  // LES COMPAGNONS : montrée même intacte, comme le groupe, et pour la même
+  // raison. Seuls les miens ont une vie connue : ceux des autres restent nus.
+  EntityBarLook& companion = bars[static_cast<std::size_t>(EntityBarKind::kCompanion)];
+  companion.when = EntityBarWhen::kAlways;
 
   return bars;
 }
@@ -459,6 +466,8 @@ const char* EntityBarKindName(EntityBarKind kind) {
       return core::Tr("Boss");
     case EntityBarKind::kOther:
       return core::Tr("Autres");
+    case EntityBarKind::kCompanion:
+      return core::Tr("Compagnons");
   }
   return "";
 }

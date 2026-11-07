@@ -1,5 +1,7 @@
 #include "world/screen_overlays.h"
 
+#include <array>
+#include <cstdint>
 #include <optional>
 #include <span>
 #include <string>
@@ -146,8 +148,22 @@ HoveredActor DrawScreenOverlays(const ScreenOverlays& what, float aspect_ratio, 
   // laquelle est vraiment peinte. L'ordre de PEINTURE, lui, ne s'en trouve pas
   // changé : rien n'est dessiné ici.
   if (what.connected && what.entity_bars.shown && what.entity_bars_on_screen != nullptr) {
+    const ro::sim::HomunculusSheet& homunculus = pieces.homunculus.homunculus().sheet();
+    const ro::sim::MercenaryProfile& mercenary = pieces.mercenary.book().profile();
+    const std::array<OwnCompanionGauges, kOwnCompanionSheets> own_companions = {{
+        {.actor_id = pieces.homunculus.own_homunculus_id(),
+         .health = static_cast<std::int32_t>(homunculus.hp),
+         .max_health = static_cast<std::int32_t>(homunculus.max_hp),
+         .magic = static_cast<std::int32_t>(homunculus.sp),
+         .max_magic = static_cast<std::int32_t>(homunculus.max_sp)},
+        {.actor_id = pieces.mercenary.own_mercenary_id(),
+         .health = mercenary.hp,
+         .max_health = mercenary.max_hp,
+         .magic = mercenary.sp,
+         .max_magic = mercenary.max_sp},
+    }};
     *what.entity_bars_on_screen = EntityBarsOnScreen(
-        camera, aspect_ratio, actors.drawn, actors.ids, world, party,
+        camera, aspect_ratio, actors.drawn, actors.ids, world, party, own_companions,
         hovered.actor != nullptr ? hovered.actor->id : 0, viewport_width, viewport_height);
     // ⚠ RETIRÉES DE LA LISTE ET NON SEULEMENT DU DESSIN : le nom d'un marchand
     // s'écarte de la barre qu'il chevaucherait, et une barre tue ne doit pas

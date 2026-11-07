@@ -8380,6 +8380,9 @@ tr: Show the outline while placing
 fr: Montrer les noms
 tr: Show names
 
+fr: Compagnons
+tr: Companions
+
 fr: Items au sol
 tr: Ground items
 
@@ -12658,8 +12661,14 @@ tr: Anyone running a shop, selling or buying, no longer carries a bar, whatever 
 fr: Montrer pour cette espèce
 tr: Show for this kind
 
-fr: PNJ, familiers, homoncules, mercenaires : leur vie n'arrive que par le dossier de la CIBLE, quand le serveur la donne. Ailleurs, rien ne la porte.
-tr: NPCs, pets, homunculi, mercenaries: their HP only comes through the TARGET record, when the server gives it. Nothing else carries it.
+fr: La vie d'un PNJ n'arrive que par le dossier de la CIBLE, quand le serveur la donne. Ailleurs, rien ne la porte.
+tr: An NPC's HP only comes through the TARGET record, when the server gives it. Nothing else carries it.
+
+fr: La vie et la magie de ton homoncule et de ton mercenaire viennent de leur fiche, connue en permanence. Celle de ton élémentaire arrive aussi, sans sa magie.\n\nUn pet n'a pas de vie à montrer, et le serveur ne donne pas celle du compagnon d'un autre joueur : ces barres-là ne paraissent pas.
+tr: The HP and SP of your homunculus and mercenary come from their sheet, known at all times. Your elemental's HP arrives too, without its SP.\n\nA pet has no HP to show, and the server doesn't give the HP of another player's companion: those bars never appear.
+
+fr: Un pet, un homoncule, un mercenaire ou un élémentaire reçoit son nom par le même paquet qu'un PNJ : ni parenthèse ni seconde ligne n'existent pour lui, et c'est pourquoi cet onglet ne les propose pas.
+tr: A pet, homunculus, mercenary or elemental gets its name through the same packet as an NPC: neither parenthesis nor second line exists for it, which is why this tab doesn't offer them.
 
 fr: Place et taille
 tr: Place and size

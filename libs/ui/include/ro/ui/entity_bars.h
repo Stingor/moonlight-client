@@ -70,12 +70,15 @@ enum class EntityBarKind : std::uint8_t {
   // AUTREMENT : une barre qu'on suit pendant dix minutes n'a pas la taille de
   // celle d'un mouton. Le paquet d'apparition porte le drapeau.
   kBoss = 4,
-  // PNJ, familiers, homoncules, mercenaires, élémentaires — tout le reste.
-  // Leur vie n'est connue que par le dossier de cible, quand le serveur la
-  // donne.
+  // LES PNJ, et ce qui n'a pas d'autre espèce. Leur vie n'est connue que par le
+  // dossier de cible, quand le serveur la donne.
   kOther = 5,
+  // PETS, HOMONCULES, MERCENAIRES, ÉLÉMENTAIRES. La vie de MON homoncule et de
+  // MON mercenaire vient de leur fiche, celle de mon élémentaire du paquet du
+  // groupe ; celle du compagnon d'un autre n'arrive pas.
+  kCompanion = 6,
 };
-inline constexpr std::size_t kEntityBarKindCount = 6;
+inline constexpr std::size_t kEntityBarKindCount = 7;
 
 // QUAND UNE BARRE PARAÎT.
 //
@@ -255,9 +258,10 @@ struct EntityBarLook {
 
 // LES DÉFAUTS, ESPÈCE PAR ESPÈCE.
 //
-// ⚠ UNE FONCTION ET NON UN AGRÉGAT VIDE : trois espèces s'écartent du défaut
-// commun, et c'est ici qu'on lit lesquelles — la mienne éteinte, le boss plus
-// large et bavard, le groupe montré même intact.
+// ⚠ UNE FONCTION ET NON UN AGRÉGAT VIDE : plusieurs espèces s'écartent du défaut
+// commun, et c'est ici qu'on lit lesquelles — la mienne et celle des PNJ
+// éteintes, le boss plus large et bavard, le groupe et les compagnons montrés
+// même intacts.
 [[nodiscard]] std::array<EntityBarLook, kEntityBarKindCount> DefaultEntityBars();
 
 // CE QUI VAUT POUR TOUTES LES ESPÈCES.

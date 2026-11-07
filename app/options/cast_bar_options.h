@@ -43,7 +43,7 @@ enum class CastBarField : int {
 
 // La place d'une espèce dans les identifiants : de quoi ajouter des champs
 // sans décaler les espèces suivantes.
-inline constexpr int kCastBarFieldsPerKind = 16;
+inline constexpr int kCastBarFieldsPerKind = 14;
 static_assert(static_cast<int>(CastBarField::kCount) <= kCastBarFieldsPerKind,
               "les réglages d'une espèce débordent sur la suivante");
 

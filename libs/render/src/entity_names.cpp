@@ -90,6 +90,8 @@ const char* EntityNameKindName(NamePlateKind kind) {
       return core::Tr("Boss");
     case NamePlateKind::kGroundItem:
       return core::Tr("Items au sol");
+    case NamePlateKind::kCompanion:
+      return core::Tr("Compagnons");
   }
   return "";
 }

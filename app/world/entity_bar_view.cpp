@@ -64,8 +64,25 @@ ro::ui::EntityBarKind EntityBarKindOf(const ro::sim::Actor& actor, const ro::sim
       // la liste du groupe porte.
       return party.Find(actor.id) != nullptr ? ro::ui::EntityBarKind::kParty
                                              : ro::ui::EntityBarKind::kPlayer;
+    case ro::sim::ActorKind::kNonPlayer:
+      return actor.familiar != ro::sim::Familiar::kNone ? ro::ui::EntityBarKind::kCompanion
+                                                        : ro::ui::EntityBarKind::kOther;
     default:
       return ro::ui::EntityBarKind::kOther;
+  }
+}
+
+void TakeOwnCompanionGauges(ro::ui::EntityBarView& what,
+                            std::span<const OwnCompanionGauges> own_companions) {
+  if (what.actor_id == 0) {
+    return;
+  }
+  for (const OwnCompanionGauges& own : own_companions) {
+    if (own.actor_id == what.actor_id) {
+      what.health = Told(own.health, own.max_health);
+      what.magic = Told(own.magic, own.max_magic);
+      return;
+    }
   }
 }
 
@@ -121,7 +138,8 @@ float EntityBarsAbove(const ro::sim::Actor& actor, const ro::sim::World& world,
 std::vector<ro::ui::EntityBarView> EntityBarsOnScreen(
     const ro::render::Camera& camera, float aspect_ratio,
     std::span<const ro::render::DrawnActor> drawn, std::span<const std::uint32_t> ids,
-    const ro::sim::World& world, const ro::sim::PartyRoster& party, std::uint32_t hovered_id,
+    const ro::sim::World& world, const ro::sim::PartyRoster& party,
+    std::span<const OwnCompanionGauges> own_companions, std::uint32_t hovered_id,
     float viewport_width, float viewport_height) {
   std::vector<ro::ui::EntityBarView> bars;
   const ro::sim::TargetDetail& told = world.target_detail();
@@ -176,6 +194,7 @@ std::vector<ro::ui::EntityBarView> EntityBarsOnScreen(
       // source que ma jauge libre, et les dédoubler les ferait diverger.
       what.magic = Told(static_cast<std::int32_t>(mine.sp), static_cast<std::int32_t>(mine.max_sp));
     }
+    TakeOwnCompanionGauges(what, own_companions);
 
     // Les PIEDS et le HAUT, tous deux : c'est le réglage qui choisit lequel
     // sert, et cette couche n'a pas à connaître ce choix.

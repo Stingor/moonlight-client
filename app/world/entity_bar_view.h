@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <span>
 #include <vector>
@@ -64,6 +65,26 @@ namespace moonclient {
 // ⚠ L'ÉCHELLE DU ZOOM EST PRISE ICI, une fois pour toute la carte, et posée sur
 // chaque vue : voir `ro::render::ApparentScale`.
 
+// 🔴 LA VIE DE MES COMPAGNONS NE PASSE PAS PAR L'ACTEUR : le paquet d'apparition
+// ne porte celle d'aucun d'eux, et le serveur ne la dit qu'à leur maître, sur
+// leur fiche. Ces jauges viennent donc de la fiche, et passent devant ce que
+// l'acteur en sait.
+struct OwnCompanionGauges {
+  // Zéro quand ce compagnon n'est pas là.
+  std::uint32_t actor_id = 0;
+  std::int32_t health = 0;
+  std::int32_t max_health = 0;
+  std::int32_t magic = 0;
+  std::int32_t max_magic = 0;
+};
+
+// Mon homoncule et mon mercenaire : un seul de chaque.
+inline constexpr std::size_t kOwnCompanionSheets = 2;
+
+// POSE SUR CETTE BARRE les jauges de la fiche qui lui revient, s'il y en a une.
+void TakeOwnCompanionGauges(ro::ui::EntityBarView& what,
+                            std::span<const OwnCompanionGauges> own_companions);
+
 // LA HAUTEUR QUE LES BARRES DE CET ACTEUR RÉSERVENT AU-DESSUS DE SA TÊTE, en
 // pixels — zéro quand elles se posent sous ses pieds, ou qu'elles sont éteintes.
 //
@@ -82,7 +103,8 @@ namespace moonclient {
 [[nodiscard]] std::vector<ro::ui::EntityBarView> EntityBarsOnScreen(
     const ro::render::Camera& camera, float aspect_ratio,
     std::span<const ro::render::DrawnActor> drawn, std::span<const std::uint32_t> ids,
-    const ro::sim::World& world, const ro::sim::PartyRoster& party, std::uint32_t hovered_id,
+    const ro::sim::World& world, const ro::sim::PartyRoster& party,
+    std::span<const OwnCompanionGauges> own_companions, std::uint32_t hovered_id,
     float viewport_width, float viewport_height);
 
 }  // namespace moonclient

@@ -118,6 +118,11 @@ const char* GameOptions::EntityNameSourceHelp(std::size_t kind) {
           "ligne n'existent pour lui, et c'est pourquoi cet onglet ne les propose pas.\n\n"
           "Attention : un portail est un PNJ sans nom : son étiquette reste vide quoi qu'on règle "
           "ici.");
+    case ro::render::NamePlateKind::kCompanion:
+      return Tr(
+          "Un pet, un homoncule, un mercenaire ou un élémentaire reçoit son nom par le même "
+          "paquet qu'un PNJ : ni parenthèse ni seconde ligne n'existent pour lui, et c'est "
+          "pourquoi cet onglet ne les propose pas.");
     case ro::render::NamePlateKind::kMonster:
     case ro::render::NamePlateKind::kBoss:
       return Tr(

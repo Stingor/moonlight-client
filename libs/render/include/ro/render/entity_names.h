@@ -57,8 +57,11 @@ enum class NamePlateKind : std::uint8_t {
   // LES OBJETS AU SOL. ⚠ LEUR NOM EST COMPOSÉ PAR NOUS, pas reçu : voir
   // `GroundItemName`. Le serveur ne nomme jamais un butin.
   kGroundItem = 5,
+  // PETS, HOMONCULES, MERCENAIRES, ÉLÉMENTAIRES : le même paquet de nom qu'un
+  // PNJ, mais on ne les règle pas comme la Kafra du coin.
+  kCompanion = 6,
 };
-inline constexpr std::size_t kNamePlateKindCount = 6;
+inline constexpr std::size_t kNamePlateKindCount = 7;
 
 // QUAND UNE ÉTIQUETTE PARAÎT.
 //

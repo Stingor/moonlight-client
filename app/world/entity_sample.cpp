@@ -17,23 +17,24 @@ namespace {
 // l'objet posé au sol.
 constexpr std::uint32_t kPoringJob = 1002;
 constexpr std::uint32_t kBaphometJob = 1039;
-// L'ONGLET « PNJ » PORTE AUSSI LES FAMILIERS, LES HOMONCULES ET LES
-// MERCENAIRES : son représentant tourne entre les quatre, chacun quelques
-// secondes, pour qu'on règle ses barres en les voyant tous.
+constexpr std::uint32_t kKafraJob = 117;
+constexpr const char* kKafraName = "Kafra Employee";
+// L'ONGLET « COMPAGNONS » : son représentant tourne entre le pet, l'homoncule et
+// le mercenaire, chacun quelques secondes, pour qu'on règle ses barres en les
+// voyant tous.
 struct Companion {
   std::uint32_t job = 0;
   const char* name = "";
 };
-constexpr std::array<Companion, kOtherSampleCount> kOtherSamples = {{
-    {.job = 117, .name = "Kafra Employee"},
+constexpr std::array<Companion, kCompanionSampleCount> kCompanionSamples = {{
     {.job = 1063, .name = "Lunatic"},
     {.job = 6001, .name = "Lif"},
     {.job = 6017, .name = "Archer Mercenary"},
 }};
-constexpr std::uint32_t kOtherSampleMs = 3'000;
+constexpr std::uint32_t kCompanionSampleMs = 3'000;
 
-[[nodiscard]] const Companion& OtherSampleAt(std::uint32_t now_ms) {
-  return kOtherSamples[(now_ms / kOtherSampleMs) % kOtherSamples.size()];
+[[nodiscard]] const Companion& CompanionSampleAt(std::uint32_t now_ms) {
+  return kCompanionSamples[(now_ms / kCompanionSampleMs) % kCompanionSamples.size()];
 }
 constexpr std::uint32_t kRedPotionItem = 501;
 // Le repli d'une échelle qu'on n'a pas su mesurer : un pixel pour un pixel.
@@ -76,7 +77,11 @@ void NameSample(const ro::ui::EntitySampleShown& drawn, const ro::sim::World& wo
       sample.badge = "Dark 3";
       break;
     case NamePlateKind::kNonPlayer:
-      sample.name = OtherSampleAt(now_ms).name;
+      sample.name = kKafraName;
+      sample.cast_skill = "Heal";
+      break;
+    case NamePlateKind::kCompanion:
+      sample.name = CompanionSampleAt(now_ms).name;
       sample.cast_skill = "Heal";
       break;
     case NamePlateKind::kGroundItem:
@@ -116,7 +121,10 @@ ro::render::ActorLook SampleLookOf(const ro::ui::EntitySampleShown& drawn,
       look.job = kBaphometJob;
       break;
     case EntityBarKind::kOther:
-      look.job = OtherSampleAt(now_ms).job;
+      look.job = kKafraJob;
+      break;
+    case EntityBarKind::kCompanion:
+      look.job = CompanionSampleAt(now_ms).job;
       break;
   }
   return look;
@@ -138,8 +146,8 @@ ro::ui::EntitySample EntitySampler::Compose(ro::render::ActorWardrobe* wardrobe,
   if (wardrobe == nullptr) {
     return sample;
   }
-  if (drawn.bars == ro::ui::EntityBarKind::kOther) {
-    sample.reserved_stature = OtherStature(*wardrobe) * sprite_scale;
+  if (drawn.bars == ro::ui::EntityBarKind::kCompanion) {
+    sample.reserved_stature = CompanionStature(*wardrobe) * sprite_scale;
   }
   ro::render::ActorVignette::Pose pose;
   pose.look = SampleLookOf(drawn, world, now_ms);
@@ -170,24 +178,24 @@ ro::ui::EntitySample EntitySampler::Compose(ro::render::ActorWardrobe* wardrobe,
   return Draw(*wardrobe, pose, std::move(sample));
 }
 
-float EntitySampler::OtherStature(ro::render::ActorWardrobe& wardrobe) {
+float EntitySampler::CompanionStature(ro::render::ActorWardrobe& wardrobe) {
   if (wardrobe_ != &wardrobe) {
-    other_tops_ = {};
+    companion_tops_ = {};
   }
   float tallest = 0.0F;
-  for (std::size_t rank = 0; rank < kOtherSamples.size(); ++rank) {
-    if (!other_tops_[rank].has_value()) {
+  for (std::size_t rank = 0; rank < kCompanionSamples.size(); ++rank) {
+    if (!companion_tops_[rank].has_value()) {
       ro::render::ActorLook look;
-      look.job = kOtherSamples[rank].job;
+      look.job = kCompanionSamples[rank].job;
       ro::render::ActorOutfit* outfit = wardrobe.OutfitFor(look);
       // LE HAUT DE TOUT CE QU'IL PORTE, coiffes comprises, au-dessus de ses
       // pieds — l'origine du sprite.
-      other_tops_[rank] =
+      companion_tops_[rank] =
           outfit != nullptr
               ? -ro::render::MeasureOutfitSpan(*outfit, ro::render::kAnimationIdle).all.min.y
               : 0.0F;
     }
-    tallest = std::max(tallest, *other_tops_[rank]);
+    tallest = std::max(tallest, *companion_tops_[rank]);
   }
   return tallest;
 }

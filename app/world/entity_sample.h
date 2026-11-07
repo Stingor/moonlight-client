@@ -22,8 +22,8 @@ namespace moonclient {
 
 // Le représentant de ce que le cadre montre : le personnage du joueur pour lui,
 // son groupe et les autres joueurs ; un Poring, un Baphomet, une Red Potion au
-// sol ; et pour les PNJ, tour à tour une Kafra, un familier, un homoncule et un
-// mercenaire. Un novice quand le joueur n'est pas encore là.
+// sol ; pour les PNJ, une Kafra ; pour les compagnons, tour à tour un pet, un
+// homoncule et un mercenaire. Un novice quand le joueur n'est pas encore là.
 [[nodiscard]] ro::render::ActorLook SampleLookOf(const ro::ui::EntitySampleShown& drawn,
                                                  const ro::sim::World& world, std::uint32_t now_ms);
 
@@ -31,8 +31,8 @@ namespace moonclient {
 // GRAND : ce qui sort de la boîte serait coupé.
 inline constexpr std::int32_t kSampleBoxPixels = 512;
 
-// Combien de représentants l'onglet PNJ fait tourner.
-inline constexpr std::size_t kOtherSampleCount = 4;
+// Combien de représentants l'onglet « Compagnons » fait tourner.
+inline constexpr std::size_t kCompanionSampleCount = 3;
 
 class EntitySampler {
  public:
@@ -57,13 +57,13 @@ class EntitySampler {
                                           const ro::render::ActorVignette::Pose& pose,
                                           ro::ui::EntitySample sample);
 
-  // LA STATURE DU PLUS GRAND des représentants de l'onglet PNJ, en pixels de
-  // sprite : voir `ro::ui::EntitySample::reserved_stature`.
-  [[nodiscard]] float OtherStature(ro::render::ActorWardrobe& wardrobe);
+  // LA STATURE DU PLUS GRAND des représentants de l'onglet « Compagnons », en
+  // pixels de sprite : voir `ro::ui::EntitySample::reserved_stature`.
+  [[nodiscard]] float CompanionStature(ro::render::ActorWardrobe& wardrobe);
 
   // Le haut de chacun, mesuré une fois : mesurer une tenue compose toutes ses
   // images, ce qui ne se refait pas à chaque image de jeu.
-  std::array<std::optional<float>, kOtherSampleCount> other_tops_{};
+  std::array<std::optional<float>, kCompanionSampleCount> companion_tops_{};
 
   // La garde-robe de la vignette, pour la refaire si elle en change.
   ro::render::ActorWardrobe* wardrobe_ = nullptr;

@@ -136,7 +136,7 @@ constexpr const char* kEntityBarsHideVendorsKey = "entities_bars_hide_vendors";
 // la raison des jauges : l'ordre de l'énumération changerait le sens d'un
 // numéro sans que le fichier le dise.
 constexpr std::array<const char*, ro::ui::kEntityBarKindCount> kEntityBarNames = {
-    "self", "party", "players", "monsters", "boss", "others",
+    "self", "party", "players", "monsters", "boss", "others", "companions",
 };
 
 [[nodiscard]] std::string EntityBarKey(std::size_t kind, const char* what) {
@@ -151,7 +151,7 @@ constexpr const char* kEntityNamesShownKey = "names_shown";
 constexpr const char* kEntityNamesFontKey = "names_font";
 
 constexpr std::array<const char*, ro::render::kNamePlateKindCount> kEntityNameNames = {
-    "self", "players", "npc", "monsters", "boss", "items",
+    "self", "players", "npc", "monsters", "boss", "items", "companions",
 };
 
 [[nodiscard]] std::string EntityNameKey(std::size_t kind, const char* what) {
