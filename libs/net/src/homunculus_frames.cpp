@@ -153,8 +153,12 @@ FrameOutcome ApplyHomunculusFrame(const Frame& frame, sim::Homunculus& homunculu
         return FrameOutcome::kUnhandled;
       }
       homunculus.SetAutoFeed(ack->value != 0);
-      echo.kind =
-          ack->value != 0 ? HomunculusEchoKind::kAutoFeedOn : HomunculusEchoKind::kAutoFeedOff;
+      // LE SERVEUR REDIT CE RÉGLAGE À CHAQUE CHANGEMENT DE CARTE, même pour un
+      // homoncule au repos : seul un homoncule sorti le fait écrire.
+      if (homunculus.active()) {
+        echo.kind =
+            ack->value != 0 ? HomunculusEchoKind::kAutoFeedOn : HomunculusEchoKind::kAutoFeedOff;
+      }
       return FrameOutcome::kApplied;
     }
     default:
