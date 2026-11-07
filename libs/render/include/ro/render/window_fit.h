@@ -11,18 +11,14 @@ namespace ro::render {
 // fenêtre déjà ôtés.
 //
 // Une taille qui tient revient TELLE QUELLE : c'est le choix du joueur. Une
-// taille qui déborde se réduit, aux mêmes proportions, jusqu'à une part de la
-// place — et non toute la place, parce que la barre de titre doit rester
-// atteignable quand les bords ne sont pas encore connus. Elle ne descend pas
-// sous un plancher, sauf sur un écran plus petit que lui.
+// taille qui déborde se réduit, aux mêmes proportions, jusqu'à occuper toute la
+// place : une demande plus grande ne rend ainsi jamais une fenêtre plus petite.
+// Elle ne descend pas sous un plancher, sauf sur un écran plus petit que lui.
 //
 // ⚠ UNE DEMANDE OU UNE PLACE VIDE REVIENT TELLE QUELLE : sans place connue, il
 // n'y a rien à borner, et une taille vide se remplace en amont par celle
 // d'usine.
 [[nodiscard]] Resolution FitWindowSize(Resolution wanted, Resolution room) noexcept;
-
-// La part de la place qu'occupe une fenêtre réduite.
-inline constexpr float kFittedRoomShare = 0.9F;
 
 // La plus petite fenêtre qu'on rende : en dessous, l'interface ne tient plus.
 inline constexpr Resolution kSmallestWindow{.width = 800, .height = 450};

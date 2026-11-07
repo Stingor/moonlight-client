@@ -154,9 +154,9 @@ core::Result<std::unique_ptr<GlContext>> GlContext::Create(const std::string& ti
   const SDL_WindowFlags flags =
       SDL_WINDOW_OPENGL | (visible ? SDL_WINDOW_RESIZABLE : SDL_WINDOW_HIDDEN);
   // 🔴 UNE FENÊTRE VISIBLE NAÎT SUR L'ÉCRAN : la taille d'usine ou celle du
-  // fichier peut dépasser un petit écran. Les bords ne sont pas encore connus,
-  // d'où la part réservée de `FitWindowSize`. Une fenêtre cachée — rendu hors
-  // écran — garde la taille demandée au pixel près.
+  // fichier peut dépasser un petit écran. Ses bords ne se lisent qu'une fois
+  // créée : elle se rebornera aussitôt, ci-dessous. Une fenêtre cachée — rendu
+  // hors écran — garde la taille demandée au pixel près.
   //
   // ⚠ ET ELLE NAÎT SUR L'ÉCRAN CHOISI, centrée : l'ouvrir sur le principal pour
   // la déplacer ensuite se verrait.
@@ -186,10 +186,17 @@ core::Result<std::unique_ptr<GlContext>> GlContext::Create(const std::string& ti
     return Fail(ErrorCode::kIoFailure, std::string("SDL_CreateWindow : ") + SDL_GetError());
   }
 
-  // ⚠ LA LIGNE AVANT L'APPEL, et non après : c'est dans le pilote graphique que
-  // tombent les fermetures sans rapport, et le journal doit alors s'arrêter sur
-  // ce qu'on lui demandait.
   if (visible) {
+    // Les bords se connaissent enfin : la barre de titre doit tenir sur l'écran
+    // avec la zone cliente, et la fenêtre reste centrée à sa taille définitive.
+    context->SetSize(Resolution{.width = width, .height = height});
+    SDL_SetWindowPosition(context->window_, static_cast<int>(centered), static_cast<int>(centered));
+    SDL_SyncWindow(context->window_);
+    context->KeepOnScreen();
+    asked = context->size();
+    // ⚠ LA LIGNE AVANT L'APPEL, et non après : c'est dans le pilote graphique que
+    // tombent les fermetures sans rapport, et le journal doit alors s'arrêter sur
+    // ce qu'on lui demandait.
     core::LogInfo("vidéo : fenêtre {}×{} posée, contexte OpenGL {}.{} core demandé", asked.width,
                   asked.height, kGlMajorVersion, kGlMinorVersion);
   }
