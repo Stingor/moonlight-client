@@ -1110,7 +1110,8 @@ add_library(moonclient_debug STATIC
     debug/debug_console.cpp
     debug/debug_json.cpp
     debug/debug_queries.cpp
-    debug/debug_request.cpp)
+    debug/debug_request.cpp
+    debug/glide_watch.cpp)
 target_link_libraries(moonclient_debug
     PUBLIC ro_core ro_sim ro_net
     PRIVATE ro_warnings)

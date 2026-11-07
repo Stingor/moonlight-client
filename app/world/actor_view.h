@@ -28,6 +28,7 @@
 #include "ro/sim/walk_path.h"
 #include "ro/sim/world_fwd.h"
 
+#include "debug/glide_watch.h"
 #include "world/actor_ghosts.h"
 #include "world/actor_styles.h"
 #include "world/actor_tint.h"
@@ -582,6 +583,8 @@ struct ComposedScene {
   // un coup, un ramassage ou une assise retiennent sa marche — voir
   // `DeferredWalk`.
   std::optional<PlayerGesture> player_gesture;
+  // ET CE QU'IL MONTRAIT : voir `GlideWatch`.
+  std::optional<ShownStep> player_shown;
   // CE QUE DURE LE CADAVRE d'une créature, réglé par le joueur : voir
   // `ro/render/vanish_fade.h`. `Clear` n'y touche pas.
   std::uint32_t corpse_fade_ms = ro::render::kClientCorpseFadeMs;
@@ -627,6 +630,7 @@ struct ComposedScene {
     hover_pixels.clear();
     ground_units = {};
     player_gesture.reset();
+    player_shown.reset();
   }
 };
 
@@ -685,6 +689,9 @@ struct ActorLighting {
   // LA LUEUR ÉLÉMENTAIRE autour de l'arme : voir `ElementGlowHueOf`.
   bool element_glow = true;
 };
+
+// Le nom d'une motion, pour le journal et la console.
+[[nodiscard]] std::string_view MotionNameOf(ro::render::Motion motion) noexcept;
 
 [[nodiscard]] SceneCensus ComposeScene(
     ro::render::ActorWardrobe* wardrobe, const ro::sim::World& world, ro::sim::WalkPlanner& planner,

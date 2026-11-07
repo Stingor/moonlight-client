@@ -40,6 +40,13 @@ namespace ro::sim {
 // de zéro. Un minimum gardé à vie se figerait sur la première heure : les
 // départs se dateraient de plus en plus tôt, et un acteur rapide serait dessiné
 // en avance sur sa vraie position.
+//
+// 🔴 ET LE BATTEMENT LUI POSE UN PLANCHER. Le serveur répond APRÈS notre demande :
+// un décalage qui daterait sa réponse avant notre envoi est impossible. Une trame
+// lue à une heure périmée — la fenêtre a gelé entre la prise de l'heure et la
+// lecture — donne justement un tel décalage, et le minimum le garderait deux
+// fenêtres durant : chaque pas se daterait trop tôt, le joueur serait arrivé
+// avant d'être parti, et il glisserait debout de case en case.
 class ServerClock {
  public:
   // La durée d'une fenêtre de mesure. L'estimation retient le meilleur trajet
@@ -74,16 +81,19 @@ class ServerClock {
   [[nodiscard]] std::uint32_t LocalTimeOf(std::uint32_t server_tick,
                                           std::uint32_t local_now_ms) const;
 
- private:
-  // Le décalage retenu : le meilleur de la fenêtre en cours et de la précédente.
+  // Le décalage retenu : ce qu'il faut ajouter à un instant du serveur.
   [[nodiscard]] std::uint32_t OffsetMs() const noexcept;
 
+ private:
   // Ce qu'il faut AJOUTER à un instant du serveur pour obtenir le nôtre, modulo
   // 2³² : le meilleur de la fenêtre en cours, puis celui de la précédente.
   std::uint32_t window_offset_ms_ = 0;
   std::uint32_t previous_offset_ms_ = 0;
   bool has_previous_ = false;
   std::uint32_t window_started_ms_ = 0;
+  // Le plus petit décalage possible, d'après le dernier battement abouti.
+  std::uint32_t floor_offset_ms_ = 0;
+  bool has_floor_ = false;
   bool known_ = false;
   std::uint32_t tick_sent_ms_ = 0;
   bool tick_pending_ = false;

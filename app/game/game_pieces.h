@@ -56,6 +56,7 @@
 #include "chat/chat_web_stage.h"
 #include "chat/emotion_view.h"
 #include "debug/debug_console.h"
+#include "debug/glide_watch.h"
 #include "game/achievement_stage.h"
 #include "game/adoption_stage.h"
 #include "game/battleground_stage.h"
@@ -250,6 +251,7 @@ struct GamePieces {
   std::optional<CurseMarks> curse_marks;
   // Ce que les poses figées tiennent d'une image à l'autre : voir `FrozenPoses`.
   FrozenPoses frozen_poses;
+  GlideWatch glide_watch;
   // La teinte que les altérations ont écrite sur chaque acteur : voir
   // `AilmentTints`.
   AilmentTints ailment_tints;

@@ -7,6 +7,7 @@
 #include "ro/ui/staff_tools.h"
 
 #include "debug/debug_console.h"
+#include "debug/glide_watch.h"
 #include "game/companion_ai_stage.h"
 
 namespace moonclient {
@@ -17,6 +18,6 @@ namespace moonclient {
 void ServeDebugConsole(DebugConsole& console, ro::ui::StaffToolsState& staff_tools,
                        bool staff_allowed, const ro::sim::World& world,
                        const ro::net::FrameTally& frames, const CompanionAiStage& companions,
-                       std::uint32_t now_ms);
+                       const GlideWatch& glide_watch, std::uint32_t now_ms);
 
 }  // namespace moonclient

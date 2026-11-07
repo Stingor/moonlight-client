@@ -288,6 +288,11 @@ ro::core::Result<void> ClientShell::Run(Screen& screen) {
   // processus s'arrête derrière, et ce qui attendait s'écrit ici ou jamais.
   ro::core::Result<void> outcome;
   while (screen.running()) {
+    // 🔴 LES ÉVÉNEMENTS SE SERVENT AVANT DE PRENDRE L'HEURE. Windows peut les y
+    // retenir plusieurs secondes — une fenêtre qu'on déplace —, et les trames
+    // arrivées entretemps se liraient à une heure périmée : l'horloge du serveur
+    // s'en trouverait faussée. Voir `ro::sim::ServerClock`.
+    KeepAlive();
     // Une seule horloge par image : le réseau, les intentions et le dessin
     // voient le même instant.
     const auto now_ms = static_cast<std::uint32_t>(SDL_GetTicks());

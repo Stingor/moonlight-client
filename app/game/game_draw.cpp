@@ -657,6 +657,7 @@ void Game::ComposeActors(std::uint32_t now_ms, const ro::ui::PickTuning& pick_tu
         ActorLightingOf(settings_->options().graphics(),
                         sun_shadows ? &stage_->ground_laid_light : &stage_->ground_light,
                         &pieces_.ailment_tints));
+    NoteShownStep(pieces_.glide_watch, world_, scene_actors_.player_shown);
     // LES ACTEURS EN MODÈLE rejoignent la scène APRÈS les sprites : ils n'y ont
     // qu'une emprise, et leurs triangles se peignent à part, plus bas.
     if (pieces_.actor_models.has_value() && pieces_.wardrobe.has_value()) {

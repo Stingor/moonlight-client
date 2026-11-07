@@ -28,6 +28,8 @@ void ServerClock::NoteServerTick(std::uint32_t server_tick, std::uint32_t local_
   if (tick_pending_) {
     tick_pending_ = false;
     round_trip_ms_ = static_cast<std::int32_t>(local_now_ms - tick_sent_ms_);
+    floor_offset_ms_ = tick_sent_ms_ - server_tick;
+    has_floor_ = true;
   }
   NoteServerTimestamp(server_tick, local_now_ms);
 }
@@ -60,10 +62,11 @@ void ServerClock::NoteServerTimestamp(std::uint32_t server_tick,
 }
 
 std::uint32_t ServerClock::OffsetMs() const noexcept {
-  if (has_previous_ && Before(previous_offset_ms_, window_offset_ms_)) {
-    return previous_offset_ms_;
-  }
-  return window_offset_ms_;
+  const std::uint32_t fastest_trip_ms =
+      has_previous_ && Before(previous_offset_ms_, window_offset_ms_) ? previous_offset_ms_
+                                                                      : window_offset_ms_;
+  return has_floor_ && Before(fastest_trip_ms, floor_offset_ms_) ? floor_offset_ms_
+                                                                 : fastest_trip_ms;
 }
 
 std::uint32_t ServerClock::LocalTimeOf(std::uint32_t server_tick,

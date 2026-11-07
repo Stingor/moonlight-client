@@ -715,7 +715,7 @@ void Game::DrawInterface(std::uint32_t now_ms) {
                           .kept_shown = zones_memory.kept_shown,
                           .now_ms = now_ms});
   ServeDebugConsole(pieces_.debug_console, windows_.staff_tools, Rights().staff_tools, world_,
-                    frame_tally_, pieces_.companion_ai, now_ms);
+                    frame_tally_, pieces_.companion_ai, pieces_.glide_watch, now_ms);
   pieces_.npc_illustration.Apply(answers.npc_illustration);
   ApplyContainerSwitches(answers, now_ms);
   ApplyBankAnswers(answers, now_ms);

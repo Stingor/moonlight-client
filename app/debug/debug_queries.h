@@ -10,6 +10,7 @@
 #include "ro/sim/world_fwd.h"
 
 #include "debug/debug_request.h"
+#include "debug/glide_watch.h"
 
 namespace moonclient {
 
@@ -34,6 +35,7 @@ struct DebugSources {
   const ro::sim::World* world = nullptr;
   const ro::net::FrameTally* frames = nullptr;
   std::span<const DebugCompanion> companions;
+  const GlideWatch* glide_watch = nullptr;
   std::uint32_t now_ms = 0;
 };
 

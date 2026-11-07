@@ -4,6 +4,7 @@
 #include <array>
 #include <charconv>
 #include <cstdlib>
+#include <format>
 #include <optional>
 #include <vector>
 
@@ -14,6 +15,7 @@
 #include "ro/sim/world.h"
 
 #include "debug/debug_json.h"
+#include "debug/glide_watch.h"
 
 namespace moonclient {
 namespace {
@@ -261,13 +263,14 @@ void WriteActorSummary(JsonWriter& out, const ro::sim::World& world, const Actor
 }
 
 void WriteHelp(JsonWriter& out) {
-  constexpr std::array<std::array<const char*, 2>, 8> kMethods = {{
+  constexpr std::array<std::array<const char*, 2>, 9> kMethods = {{
       {"help", "cette liste"},
       {"state", "carte, personnage, rayon de vue du serveur, nombre d'acteurs"},
       {"actors",
        "acteurs connus du client ; radius=N (carré), kind=monster|player|npc|item, "
        "limit=N"},
-      {"actor", "un acteur en détail ; id=N"},
+      {"actor", "un acteur en détail, faits de sa marche compris ; id=N"},
+      {"motion", "ce que le personnage montre : motion, image, glissade, faits de sa marche"},
       {"companions", "IA des compagnons : mode, cible, raison, refus de chaque monstre proche"},
       {"frames", "trames reçues récentes ; limit=N, opcode=0x0080, aid=N (cherché dans la tête)"},
       {"frame_tally", "verdicts des trames par opcode depuis la connexion"},
@@ -332,6 +335,14 @@ void WriteActors(JsonWriter& out, const DebugRequest& request, const DebugSource
 }
 
 // Rend faux quand l'acteur n'existe pas : la réponse devient une erreur.
+void WriteWalkFacts(JsonWriter& out, const Actor& actor, const DebugSources& sources) {
+  out.BeginObject();
+  for (const WalkFact& fact : WalkFactsOf(actor, sources.world->server_clock(), sources.now_ms)) {
+    out.Key(fact.key).String(fact.value);
+  }
+  out.EndObject();
+}
+
 [[nodiscard]] bool WriteActor(JsonWriter& out, const DebugRequest& request,
                               const DebugSources& sources) {
   const ro::sim::World& world = *sources.world;
@@ -367,8 +378,35 @@ void WriteActors(JsonWriter& out, const DebugRequest& request, const DebugSource
   } else {
     out.Null();
   }
+  out.Key("walk");
+  WriteWalkFacts(out, *actor, sources);
   out.EndObject();
   return true;
+}
+
+void WriteMotion(JsonWriter& out, const DebugSources& sources) {
+  out.BeginObject();
+  out.Key("glide_cells").String(std::format("{}", GlideWatch::kGlideCells));
+  if (sources.glide_watch != nullptr) {
+    const GlideWatch& watch = *sources.glide_watch;
+    out.Key("gliding").Bool(watch.gliding());
+    out.Key("episodes").Int(watch.episodes());
+    out.Key("cells_on_same_image").String(std::format("{:.2f}", watch.cells_on_same_image()));
+    out.Key("same_image_since_ms").Int(watch.same_image_since_ms());
+    out.Key("shown");
+    if (watch.last().has_value()) {
+      out.String(DescribeStep(*watch.last()));
+    } else {
+      out.Null();
+    }
+  }
+  out.Key("walk");
+  if (const Actor* player = sources.world->player(); player != nullptr) {
+    WriteWalkFacts(out, *player, sources);
+  } else {
+    out.Null();
+  }
+  out.EndObject();
 }
 
 void WriteCompanions(JsonWriter& out, const DebugSources& sources) {
@@ -533,6 +571,8 @@ std::string AnswerDebugRequest(const DebugRequest& request, const DebugSources& 
     if (!WriteActor(out, request, sources)) {
       return Failure(request.id, "acteur inconnu du client");
     }
+  } else if (method == "motion") {
+    WriteMotion(out, sources);
   } else if (method == "companions") {
     WriteCompanions(out, sources);
   } else if (method == "frames") {

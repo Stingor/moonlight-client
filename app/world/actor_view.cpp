@@ -319,6 +319,30 @@ void ApplyEffectCancellations(ro::sim::World& world) {
   }
 }
 
+std::string_view MotionNameOf(ro::render::Motion motion) noexcept {
+  switch (motion) {
+    case ro::render::Motion::kIdle:
+      return "kIdle";
+    case ro::render::Motion::kWalk:
+      return "kWalk";
+    case ro::render::Motion::kSit:
+      return "kSit";
+    case ro::render::Motion::kPickup:
+      return "kPickup";
+    case ro::render::Motion::kReady:
+      return "kReady";
+    case ro::render::Motion::kAttack:
+      return "kAttack";
+    case ro::render::Motion::kCast:
+      return "kCast";
+    case ro::render::Motion::kHurt:
+      return "kHurt";
+    case ro::render::Motion::kDie:
+      return "kDie";
+  }
+  return "?";
+}
+
 SceneCensus ComposeScene(ro::render::ActorWardrobe* wardrobe, const ro::sim::World& world,
                          ro::sim::WalkPlanner& planner, const MapStage& stage,
                          float camera_yaw_degrees, std::uint32_t now_ms, float looping_elapsed_ms,
@@ -416,6 +440,16 @@ SceneCensus ComposeScene(ro::render::ActorWardrobe* wardrobe, const ro::sim::Wor
     // l'état de ce qu'il fait, et une marche retenue le reste avec lui.
     if (id == world.player_id()) {
       scene.player_gesture = PlayerGesture{played.motion, played.action_state};
+      scene.player_shown =
+          ShownStep{.cell_x = cell.x,
+                    .cell_y = cell.y,
+                    .motion = MotionNameOf(played.motion),
+                    .animation = played.animation,
+                    .held_frame = played.held_frame,
+                    .walking = ro::sim::IsWalking(actor, path, now_ms),
+                    .glide_wanted = actor.glide_ms_per_cell != 0,
+                    .travelled_cells = ro::sim::TravelledCells(actor, path, now_ms),
+                    .now_ms = now_ms};
       if (scene.player_unseen && scene_id != 0) {
         ++census.hidden;
         return;
