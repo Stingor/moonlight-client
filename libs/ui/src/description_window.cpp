@@ -2,8 +2,10 @@
 
 #include <algorithm>
 #include <cstdio>
+#include <span>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include <imgui_internal.h>
 
@@ -14,6 +16,7 @@
 #include "ro/ui/skinned_window.h"
 
 #include "description_odds.h"
+#include "ui_scale.h"
 #include "ui_text.h"
 
 namespace ro::ui {
@@ -42,6 +45,8 @@ constexpr float kWindowPictureSidePixels = 120.0F;
 constexpr float kPreviewPictureHeightPixels = 110.0F;
 // De combien l'ombre d'un nom cassé se décale, dans l'aperçu.
 constexpr float kBrokenShadowPixels = 1.0F;
+// Ce qui sépare deux colonnes de texte de l'aperçu.
+constexpr float kPreviewColumnGapPixels = 12.0F;
 
 // LE FORGERON D'UN OBJET : bleu quand le serveur l'a nommé, rouge tant qu'il ne
 // l'a pas fait, sur un halo gris clair — les couleurs du client, pour son papier
@@ -192,10 +197,14 @@ constexpr int kPreviewStyleVars = 5;
   // sienne à côté, au lieu de se tasser dans ce que l'image lui laisse.
   const float picture_room =
       ShowsWholePicture(view) ? view.picture.width + kPictureGapPixels : 0.0F;
-  const float widest = kDescriptionPreviewWidest + picture_room;
+  const float widest = Px(kDescriptionPreviewWidest) + picture_room;
+  // ⚠ LA BORNE EST CELLE DE L'ÉCRAN, ET `widest` CELLE D'UNE COLONNE : c'est le
+  // texte, replié à `widest`, qui décide de la largeur, et un texte trop haut
+  // pour l'écran ouvre des colonnes supplémentaires.
+  const ImVec2 screen = ImGui::GetIO().DisplaySize;
   ImGui::SetNextWindowSizeConstraints(
-      ImVec2(0.0F, 0.0F),
-      ImVec2(widest, ImGui::GetIO().DisplaySize.y * kDescriptionPreviewScreenShare));
+      ImVec2(0.0F, 0.0F), ImVec2(std::max(widest, screen.x * kDescriptionPreviewScreenShare),
+                                 screen.y * kDescriptionPreviewScreenShare));
   return widest;
 }
 
@@ -206,6 +215,14 @@ void PopPreviewStyle() {
 
 // LE CORPS DE L'APERÇU, dans l'infobulle ou le panneau déjà ouvert.
 void DrawPreviewBody(const DescriptionView& view, const SkinArt& art, float widest);
+
+// LE TEXTE DE L'APERÇU, en autant de colonnes qu'il en faut pour tenir à l'écran
+// sous ce qui est déjà écrit et au-dessus de ce qui reste à écrire.
+//
+// 🔴 EN COLONNES, ET NON PAR UN ASCENSEUR : une infobulle ne reçoit pas la souris,
+// et ce qui dépasse de sa hauteur ne se lirait jamais.
+void DrawPreviewText(const DescriptionView& view, std::span<const std::string> lines,
+                     const SkinArt& art, float text_width);
 
 }  // namespace
 
@@ -305,13 +322,7 @@ void DrawPreviewBody(const DescriptionView& view, const SkinArt& art, float wide
     }
   }
   if (has_text) {
-    ImGui::BeginGroup();
-    RichText laid = LayOutRichTextHere(lines, ImGui::GetColorU32(ImGuiCol_Text), text_width);
-    KeepReadable(laid, art.look().paper);
-    // ⚠ DESSINÉ, PAS RENDU INTERACTIF : on ne sélectionne rien dans une
-    // infobulle, et l'on n'y suit aucun lien. Le résultat se jette.
-    static_cast<void>(DrawRichText("##apercu", laid, ImGui::GetTextLineHeightWithSpacing()));
-    ImGui::EndGroup();
+    DrawPreviewText(view, lines, art, text_width);
   } else if (picture.x <= 0.0F) {
     ImGui::TextDisabled("%s", core::Tr("(pas de description)"));
   }
@@ -322,6 +333,38 @@ void DrawPreviewBody(const DescriptionView& view, const SkinArt& art, float wide
   // angles droits et lui écraserait les coins.
   DrawDescPanelFrameAroundWindow(into, art, /*fill_bg=*/false);
   into->ChannelsMerge();
+}
+
+void DrawPreviewText(const DescriptionView& view, std::span<const std::string> lines,
+                     const SkinArt& art, float text_width) {
+  RichText laid = LayOutRichTextHere(lines, ImGui::GetColorU32(ImGuiCol_Text), text_width);
+  KeepReadable(laid, art.look().paper);
+
+  const float edge = DescPanelEdge(art);
+  const ImVec2 screen = ImGui::GetIO().DisplaySize;
+  const float line_height = ImGui::GetTextLineHeightWithSpacing();
+  const float gap = Px(kPreviewColumnGapPixels);
+  const ImVec2 at = ImGui::GetCursorPos();
+  const float room_below = screen.y * kDescriptionPreviewScreenShare - at.y - edge -
+                           static_cast<float>(PreviewInstanceRows(view)) * line_height;
+  const float room_right = screen.x * kDescriptionPreviewScreenShare - at.x - edge;
+  const int rows_per_column = std::max(1, static_cast<int>(room_below / line_height));
+  const int most_columns = std::max(1, static_cast<int>((room_right + gap) / (laid.width + gap)));
+  const std::vector<RichText> columns =
+      SplitRichTextColumns(std::move(laid), line_height, rows_per_column, most_columns);
+
+  ImGui::BeginGroup();
+  for (std::size_t rank = 0; rank < columns.size(); ++rank) {
+    if (rank > 0) {
+      ImGui::SameLine(0.0F, gap);
+    }
+    ImGui::PushID(static_cast<int>(rank));
+    // ⚠ DESSINÉ, PAS RENDU INTERACTIF : on ne sélectionne rien dans une
+    // infobulle, et l'on n'y suit aucun lien. Le résultat se jette.
+    static_cast<void>(DrawRichText("##apercu", columns[rank], line_height));
+    ImGui::PopID();
+  }
+  ImGui::EndGroup();
 }
 
 // LA LIGNE DU STAFF : « Staff : [N] [@item] ». La quantité est celle de l'état

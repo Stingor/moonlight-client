@@ -555,7 +555,8 @@ void FinishItemSheetLinks(DescriptionWindowState& state, const DescriptionView& 
 // elle n'a pas de barre de titre, donc le nom est DANS son corps ; elle ne se
 // clique pas, donc l'identifiant s'y écrit en clair au lieu du lien ; et elle
 // est étroite, donc son texte se serre à DROITE de l'illustration au lieu de
-// passer dessous.
+// passer dessous. Elle ne défile pas non plus : un texte trop haut pour l'écran
+// s'y pose en plusieurs colonnes.
 //
 // ⚠ ELLE OUVRE ET FERME SON INFOBULLE ELLE-MÊME, et il le faut : son habillage
 // — le cadre en boîte peint DERRIÈRE un contenu dont on ne connaît la taille
@@ -582,14 +583,14 @@ void NavigateDescription(DescriptionWindowState& state, std::uint32_t item_id);
 void OpenItemDescription(DescriptionWindowState& state, std::uint32_t item_id,
                          std::uint16_t from_slot, ItemHolder from_holder);
 
-// LA LARGEUR MAXIMALE DE L'APERÇU.
+// LA LARGEUR MAXIMALE D'UNE COLONNE DE L'APERÇU, en pixels d'interface.
 //
 // ⚠ UN PLAFOND, PAS UNE LARGEUR. L'infobulle se dimensionne sur son contenu :
 // une description courte donne une petite bulle, une longue s'arrête là. Une
 // largeur FIXE laisserait un grand vide sous « Potion rouge ».
 inline constexpr float kDescriptionPreviewWidest = 330.0F;
-// Et sa hauteur ne dépasse pas cette part de l'écran : au-delà, elle sortirait
-// par le haut ou par le bas selon la place, ce qui la rend illisible.
+// Ni sa hauteur ni sa largeur ne dépassent cette part de l'écran : au-delà, elle
+// sortirait par un bord selon la place, ce qui la rend illisible.
 inline constexpr float kDescriptionPreviewScreenShare = 0.8F;
 
 // LA PREMIÈRE LIGNE EST-ELLE LE LIEN DE BASE DE DONNÉES ?

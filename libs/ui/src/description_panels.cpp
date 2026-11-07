@@ -306,14 +306,37 @@ void ShowDollOver(DescriptionDollState& doll, ImGuiID wheel_id) {
   DrawItemDollTooltip(doll);
 }
 
+namespace {
+
+[[nodiscard]] bool HoldsCard(const DescriptionCardRow& card) { return card.id != 0; }
+
+}  // namespace
+
+int PreviewInstanceRows(const DescriptionView& view) {
+  // Un séparateur et un titre devant chaque bloc.
+  constexpr int kBlockHeadRows = 2;
+  constexpr int kPetFactRows = 2;
+  int rows = 0;
+  if (view.pet_egg && view.pet_inside) {
+    rows += kBlockHeadRows + kPetFactRows;
+  }
+  const auto card_rows = static_cast<int>(std::ranges::count_if(view.cards, HoldsCard));
+  if (!view.pet_egg && card_rows > 0) {
+    rows += kBlockHeadRows + card_rows;
+  }
+  if (!view.options.empty()) {
+    rows += kBlockHeadRows + static_cast<int>(view.options.size());
+  }
+  return rows;
+}
+
 void DrawPreviewInstance(const DescriptionView& view) {
   if (view.pet_egg && view.pet_inside) {
     ImGui::Separator();
     ImGui::TextColored(HeaderColor(), "%s", core::Tr("Pet"));
     DrawPetFacts(view);
   }
-  const bool any_card =
-      std::ranges::any_of(view.cards, [](const DescriptionCardRow& card) { return card.id != 0; });
+  const bool any_card = std::ranges::any_of(view.cards, HoldsCard);
   if (!view.pet_egg && any_card) {
     ImGui::Separator();
     ImGui::TextColored(HeaderColor(), "%s", core::Tr("Cartes / Enchants"));

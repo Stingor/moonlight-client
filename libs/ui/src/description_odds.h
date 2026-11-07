@@ -67,6 +67,9 @@ void ShowDollOver(DescriptionDollState& doll, ImGuiID wheel_id);
 
 // Les mêmes données en fin d'aperçu, en simples listes.
 void DrawPreviewInstance(const DescriptionView& view);
+// Les rangées que ce dessin occupera, un séparateur comptant pour une : le texte
+// qui le précède se dispose en sachant la place qu'il doit lui laisser.
+[[nodiscard]] int PreviewInstanceRows(const DescriptionView& view);
 
 // Ce qui sépare une illustration de ce qui se pose à sa droite.
 inline constexpr float kPictureGapPixels = 8.0F;

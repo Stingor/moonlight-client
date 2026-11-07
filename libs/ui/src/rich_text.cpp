@@ -3,8 +3,11 @@
 #include <algorithm>
 #include <array>
 #include <charconv>
+#include <cmath>
 #include <cstddef>
+#include <string_view>
 #include <utility>
+#include <vector>
 
 #include <imgui_internal.h>
 
@@ -356,6 +359,75 @@ RichText LayOutRichTextHere(std::span<const std::string> lines, ImU32 default_co
   const auto measure = [](std::string_view piece, void* /*owner*/) { return TextWidth(piece); };
   return LayOutRichText(lines, default_color, wrap_width, ImGui::GetTextLineHeightWithSpacing(),
                         measure, nullptr);
+}
+
+std::vector<RichText> SplitRichTextColumns(RichText laid, float line_height, int rows_per_column,
+                                           int most_columns) {
+  // La part de sa hauteur où une colonne cherche une fin de section : son dernier tiers.
+  constexpr int kSectionSearchShare = 3;
+  const int total_rows =
+      line_height > 0.0F ? static_cast<int>(std::lround(laid.height / line_height)) : 0;
+  std::vector<RichText> columns;
+  if (rows_per_column <= 0 || most_columns <= 1 || total_rows <= rows_per_column) {
+    columns.push_back(std::move(laid));
+    return columns;
+  }
+
+  const auto row_count = static_cast<std::size_t>(total_rows);
+  std::vector<char> row_is_empty(row_count, 1);
+  std::vector<char> row_ends_section(row_count, 1);
+  for (const RichBox& box : laid.boxes) {
+    if (box.row < 0 || box.row >= total_rows) {
+      continue;
+    }
+    const auto row = static_cast<std::size_t>(box.row);
+    row_is_empty[row] = 0;
+    const std::string_view piece = std::string_view(laid.text).substr(
+        static_cast<std::size_t>(box.offset), static_cast<std::size_t>(box.length));
+    if (piece.find_first_not_of('_') != std::string_view::npos) {
+      row_ends_section[row] = 0;
+    }
+  }
+
+  std::vector<int> column_starts;
+  for (int first_row = 0; first_row < total_rows;) {
+    column_starts.push_back(first_row);
+    int end_row = first_row + rows_per_column;
+    if (end_row >= total_rows || static_cast<int>(column_starts.size()) == most_columns) {
+      break;
+    }
+    const int earliest_end = end_row - rows_per_column / kSectionSearchShare;
+    for (int candidate = end_row; candidate > earliest_end; --candidate) {
+      if (row_ends_section[static_cast<std::size_t>(candidate - 1)] != 0) {
+        end_row = candidate;
+        break;
+      }
+    }
+    first_row = end_row;
+    while (first_row < total_rows && row_is_empty[static_cast<std::size_t>(first_row)] != 0) {
+      ++first_row;
+    }
+  }
+
+  for (std::size_t rank = 0; rank < column_starts.size(); ++rank) {
+    const int first_row = column_starts[rank];
+    const int end_row = rank + 1 < column_starts.size() ? column_starts[rank + 1] : total_rows;
+    RichText column;
+    column.text = laid.text;
+    column.links = laid.links;
+    column.width = laid.width;
+    column.height = static_cast<float>(end_row - first_row) * line_height;
+    for (const RichBox& box : laid.boxes) {
+      if (box.row >= first_row && box.row < end_row) {
+        RichBox moved = box;
+        moved.row -= first_row;
+        moved.top -= static_cast<float>(first_row) * line_height;
+        column.boxes.push_back(moved);
+      }
+    }
+    columns.push_back(std::move(column));
+  }
+  return columns;
 }
 
 void KeepReadable(RichText& laid, ImU32 paper) {

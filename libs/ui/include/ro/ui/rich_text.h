@@ -132,6 +132,23 @@ using RichMeasure = float (*)(std::string_view piece, void* owner);
                                       float wrap_width, float line_height, RichMeasure measure,
                                       void* owner);
 
+// UN BLOC DISPOSÉ, COUPÉ EN COLONNES d'au plus `rows_per_column` rangées, pour ce
+// qui ne peut pas défiler : une infobulle ne reçoit pas la molette.
+//
+// Chaque colonne est un bloc complet, à dessiner seul, dont les rangées repartent
+// de zéro. Couper APRÈS la disposition garde les replis et les couleurs ouvertes,
+// qu'une coupe sur les lignes de la source perdrait.
+//
+// Une colonne préfère finir sur une fin de section — une rangée vide ou un trait
+// de soulignés — si elle en trouve une dans le dernier tiers de sa hauteur ; la
+// suivante ne commence jamais par du vide. Un bloc qui tient en `rows_per_column`
+// rangées ressort entier, tel quel.
+//
+// ⚠ `most_columns` PRIME : la dernière colonne permise prend tout le reste, quitte
+// à dépasser sa hauteur.
+[[nodiscard]] std::vector<RichText> SplitRichTextColumns(RichText laid, float line_height,
+                                                         int rows_per_column, int most_columns);
+
 // LE TEXTE QUE MONTRE UN LIEN, tiré du texte plat : la tête de son menu.
 [[nodiscard]] std::string RichLinkText(const RichText& laid, int link);
 
