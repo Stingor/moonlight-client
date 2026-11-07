@@ -25,6 +25,7 @@ constexpr const char* kRoggleBestField = "roggle_best";
 constexpr const char* kRoggleDailyDayField = "roggle_daily_day";
 constexpr const char* kRoggleDailyBestField = "roggle_daily_best";
 constexpr const char* kRoggleRevealedField = "roggle_revealed";
+constexpr const char* kRoggleSkipRevealedField = "roggle_skip_revealed";
 constexpr const char* kTrophiesField = "trophies";
 constexpr const char* kSurvivorsEvolvedField = "survivors_evolved";
 
@@ -117,6 +118,10 @@ ro::core::Result<ro::sim::MinigameRecord> ReadMinigameRecord(std::string_view te
       const auto repeated = std::ranges::unique(record.roggle_revealed);
       record.roggle_revealed.erase(repeated.begin(), repeated.end());
     }
+    const YAML::Node skip_revealed = whole[kRoggleSkipRevealedField];
+    if (skip_revealed && skip_revealed.IsScalar()) {
+      record.roggle_skip_revealed = skip_revealed.as<bool>(false);
+    }
   } catch (const YAML::Exception& broken) {
     return ro::core::Fail(ro::core::ErrorCode::kCorruptData, broken.what());
   }
@@ -136,6 +141,9 @@ std::string WriteMinigameRecord(const ro::sim::MinigameRecord& record) {
     out << YAML::Key << kRoggleRevealedField << YAML::Value << YAML::Flow << YAML::BeginSeq;
     for (const std::uint32_t item_id : record.roggle_revealed) out << item_id;
     out << YAML::EndSeq;
+  }
+  if (record.roggle_skip_revealed) {
+    out << YAML::Key << kRoggleSkipRevealedField << YAML::Value << true;
   }
   out << YAML::Key << kTrophiesField << YAML::Value << YAML::BeginSeq;
   for (const ro::sim::MinigameTrophyText& text : ro::sim::MinigameTrophies()) {

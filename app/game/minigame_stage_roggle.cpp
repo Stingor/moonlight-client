@@ -145,8 +145,12 @@ void MinigameStage::StartRoggle(const MinigamePieces& pieces, bool daily) {
   ro::render::ItemIcons* icons = pieces.item_icons;
   const bool item_board =
       icons != nullptr && (daily || std::bernoulli_distribution(kItemBoardShare)(roggle_boards_));
-  const std::vector<std::uint32_t> none;
-  const std::vector<std::uint32_t>& items = item_board ? icons->CollectionItems() : none;
+  std::vector<std::uint32_t> items;
+  if (item_board) {
+    // Le défi reste le même pour tous, quel que soit le carnet de chacun.
+    items = daily ? icons->CollectionItems()
+                  : ro::sim::RoggleItemChoices(icons->CollectionItems(), record_->record);
+  }
   if (!items.empty()) {
     // ⚠ L'OBJET DU JOUR se tire de la sortie brute du générateur, que la norme
     // fixe : une distribution, elle, change d'une bibliothèque à l'autre.
@@ -172,13 +176,26 @@ void MinigameStage::StartRoggle(const MinigamePieces& pieces, bool daily) {
 void MinigameStage::ApplyRoggleAnswer(MinigameWindows& windows, const MinigamePieces& pieces) {
   const ro::ui::RoggleAsk pegs = std::exchange(windows.roggle_answer, {});
   roggle_watching_ = pegs.watching;
+  if (pegs.skip_revealed.has_value() && record_) {
+    record_->record.roggle_skip_revealed = *pegs.skip_revealed;
+    record_unsaved_ = true;
+  }
   if (pegs.new_game) {
     StartRoggle(pieces, false);
   }
   if (pegs.daily_game) {
     StartRoggle(pieces, true);
   }
-  if (pegs.new_game || pegs.daily_game) {
+  if (pegs.replay_game) {
+    // ⚠ UN DÉFI SE REJOUE SUR LE JOUR COURANT, qui l'a peut-être remplacé depuis :
+    // sa partie se retire à l'identique, et un score ne s'inscrit pas à un jour passé.
+    if (roggle_.daily()) {
+      StartRoggle(pieces, true);
+    } else {
+      roggle_.Replay();
+    }
+  }
+  if (pegs.new_game || pegs.daily_game || pegs.replay_game) {
     roggle_callouts_.clear();
     roggle_bursts_.clear();
   }
@@ -329,6 +346,7 @@ void MinigameStage::ComposeRoggle(MinigameWindows& windows, const MinigamePieces
     view.notebook_total = static_cast<int>(icons.CollectionItems().size());
   }
   view.notebook = roggle_notebook_;
+  view.skip_revealed = record_->record.roggle_skip_revealed;
   view.daily = roggle_.daily();
   view.daily_best = roggle_.daily() && record_->record.roggle_daily_day == roggle_.day()
                         ? record_->record.roggle_daily_best

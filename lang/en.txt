@@ -20918,6 +20918,15 @@ tr: R — Reroll (%d)
 fr: Rejouer
 tr: Play again
 
+fr: Nouvelle partie : sans les items dévoilés
+tr: New game: skip revealed items
+
+fr: Rejouer le même dessin
+tr: Replay the same picture
+
+fr: « Rejouer le même dessin » ou « Nouvelle partie ».
+tr: “Replay the same picture” or “New game”.
+
 fr: Survivants de Midgard
 tr: Midgard Survivors
 

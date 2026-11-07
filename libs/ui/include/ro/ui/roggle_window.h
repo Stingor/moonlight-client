@@ -134,6 +134,8 @@ struct RoggleView {
   // LE CARNET : les objets dévoilés, et combien l'installation en propose.
   std::span<const RoggleNotebookEntry> notebook;
   int notebook_total = 0;
+  // Une partie libre écarte les objets du carnet.
+  bool skip_revealed = false;
   bool daily = false;
   // Le meilleur score du défi d'aujourd'hui ; nul sans défi fini ce jour.
   int daily_best = 0;
@@ -163,7 +165,11 @@ struct RoggleAsk {
   int aim_nudge = 0;
   bool launch = false;
   bool new_game = false;
+  // Le plateau de la partie en cours, à l'identique.
+  bool replay_game = false;
   bool daily_game = false;
+  // Le joueur vient de changer l'option du carnet.
+  std::optional<bool> skip_revealed;
   // La fenêtre est dépliée et a le focus : la partie peut courir.
   bool watching = false;
 };

@@ -1,6 +1,7 @@
 #include "ro/sim/minigame_trophies.h"
 
 #include <algorithm>
+#include <iterator>
 
 #include "ro/sim/match3_game.h"
 #include "ro/sim/peg_game.h"
@@ -193,6 +194,19 @@ std::vector<MinigameTrophy> RecordRoggle(MinigameRecord& record, const PegGame& 
   EarnMinigameTrophy(record, MinigameTrophy::kRoggleTwentyFiveItems, revealed >= kRoggleMostItems,
                      fresh);
   return fresh;
+}
+
+std::vector<std::uint32_t> RoggleItemChoices(std::span<const std::uint32_t> items,
+                                             const MinigameRecord& record) {
+  const std::vector<std::uint32_t> all(items.begin(), items.end());
+  if (!record.roggle_skip_revealed) {
+    return all;
+  }
+  std::vector<std::uint32_t> unrevealed;
+  std::ranges::copy_if(all, std::back_inserter(unrevealed), [&record](std::uint32_t item_id) {
+    return !std::ranges::binary_search(record.roggle_revealed, item_id);
+  });
+  return unrevealed.empty() ? all : unrevealed;
 }
 
 void MergeMinigameRecord(MinigameRecord& into, const MinigameRecord& from) {

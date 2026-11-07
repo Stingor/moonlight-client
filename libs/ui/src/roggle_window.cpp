@@ -19,9 +19,8 @@
 namespace ro::ui {
 namespace {
 
-// La place que prennent les deux lignes du haut et les marges de la fenêtre.
+// Les marges de la fenêtre du carnet.
 constexpr float kChromeWidth = 16.0F;
-constexpr float kChromeHeight = 78.0F;
 constexpr float kRounding = 6.0F;
 
 // Les plots et la bille se dessinent un peu plus grands que leur contact.
@@ -231,21 +230,6 @@ void DrawHeader(RoggleState& state, const RoggleView& view, RoggleAsk& asked, co
     ImGui::SameLine(0.0F, gap);
     ImGui::TextColored(kOrangeText, "×%d", view.multiplier);
   }
-  ImGui::SameLine(0.0F, gap);
-  if (SkinSmallButton(core::Tr("Nouvelle partie"), art)) {
-    asked.new_game = true;
-  }
-  ImGui::SameLine();
-  if (SkinSmallButton(core::Tr("Défi du jour"), art)) {
-    asked.daily_game = true;
-  }
-  ImGui::SameLine();
-  char notebook[64];
-  std::snprintf(notebook, sizeof(notebook), core::Tr("Carnet (%d)"),
-                static_cast<int>(view.notebook.size()));
-  if (SkinSmallButton(notebook, art)) {
-    state.notebook_open = !state.notebook_open;
-  }
 
   FaintText(view.daily ? core::Tr("Défi du jour :") : core::Tr("Plateau :"));
   ImGui::SameLine();
@@ -260,7 +244,35 @@ void DrawHeader(RoggleState& state, const RoggleView& view, RoggleAsk& asked, co
     ImGui::SameLine();
     ImGui::Text("%d", view.best_score);
   } else {
-    FaintText(core::Tr("Visez à la souris, affinez à la molette, cliquez pour tirer."));
+    // ⚠ L'AIDE SE TAIT PLUTÔT QUE D'ÉLARGIR LA FENÊTRE : celle-ci épouse son
+    // contenu, et un long nom d'item ne lui laisse pas toujours la place.
+    const char* const hint =
+        core::Tr("Visez à la souris, affinez à la molette, cliquez pour tirer.");
+    const float used_px = ImGui::GetCursorPosX() - ImGui::GetStyle().WindowPadding.x;
+    if (used_px + ImGui::CalcTextSize(hint).x <= view.board.width) {
+      FaintText(hint);
+    } else {
+      ImGui::NewLine();
+    }
+  }
+
+  if (SkinSmallButton(core::Tr("Nouvelle partie"), art)) {
+    asked.new_game = true;
+  }
+  ImGui::SameLine();
+  if (SkinSmallButton(core::Tr("Rejouer le même dessin"), art)) {
+    asked.replay_game = true;
+  }
+  ImGui::SameLine();
+  if (SkinSmallButton(core::Tr("Défi du jour"), art)) {
+    asked.daily_game = true;
+  }
+  ImGui::SameLine();
+  char notebook[64];
+  std::snprintf(notebook, sizeof(notebook), core::Tr("Carnet (%d)"),
+                static_cast<int>(view.notebook.size()));
+  if (SkinSmallButton(notebook, art)) {
+    state.notebook_open = !state.notebook_open;
   }
 }
 
@@ -439,7 +451,7 @@ void DrawOutcome(ImDrawList* draw, ImVec2 origin, const RoggleView& view) {
     const bool won = view.phase == RogglePhase::kWon;
     DrawVeil(draw, origin, view, won ? kWonColor : kLostColor,
              won ? core::Tr("Gagné !") : core::Tr("Perdu…"),
-             core::Tr("« Nouvelle partie » pour rejouer."), middle_y);
+             core::Tr("« Rejouer le même dessin » ou « Nouvelle partie »."), middle_y);
     return;
   }
   if (view.paused) {
@@ -484,7 +496,8 @@ void ReadBoardInput(const RoggleView& view, ImVec2 origin, bool clicked, RoggleA
 }
 
 // LE CARNET : une case par objet dévoilé, son nom au survol.
-void DrawNotebook(RoggleState& state, const RoggleView& view, const SkinArt& art) {
+void DrawNotebook(RoggleState& state, const RoggleView& view, const SkinArt& art,
+                  RoggleAsk& asked) {
   static WindowName name(kRoggleNotebookTitle, kRoggleNotebookId);
   const float width = kNotebookCellPx * static_cast<float>(kNotebookColumns) + kChromeWidth;
   ImGui::SetNextWindowSize(ImVec2(width, kNotebookHeight), ImGuiCond_FirstUseEver);
@@ -495,6 +508,10 @@ void DrawNotebook(RoggleState& state, const RoggleView& view, const SkinArt& art
   }
   ImGui::Text(core::Tr("Items dévoilés : %d sur %d"), static_cast<int>(view.notebook.size()),
               view.notebook_total);
+  bool skip_revealed = view.skip_revealed;
+  if (SkinCheckBox(core::Tr("Nouvelle partie : sans les items dévoilés"), &skip_revealed, art)) {
+    asked.skip_revealed = skip_revealed;
+  }
   if (view.notebook.empty()) {
     FaintText(core::Tr("Videz un plateau d'item de son orange pour l'y ranger."));
   }
@@ -532,11 +549,11 @@ RoggleAsk DrawRoggleWindow(RoggleState& state, const RoggleView& view, const Ski
   }
   const RoggleBoard& board = view.board;
   static WindowName name(kRoggleTitle, kRoggleId);
-  ImGui::SetNextWindowSize(ImVec2(board.width + kChromeWidth, board.height + kChromeHeight),
-                           ImGuiCond_FirstUseEver);
   ConstrainNextWindowToScreen(name.Get());
+  // Le plateau se dessine à son échelle naturelle : la fenêtre épouse son contenu.
   if (!BeginSkinnedWindow(name.Get(), &state.open, art, SkinnedTitle::kBar,
-                          ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse)) {
+                          ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoScrollbar |
+                              ImGuiWindowFlags_NoScrollWithMouse)) {
     EndSkinnedWindow();
     return asked;
   }
@@ -586,7 +603,7 @@ RoggleAsk DrawRoggleWindow(RoggleState& state, const RoggleView& view, const Ski
   EndSkinnedWindow();
   // ⚠ APRÈS LE JEU : une fenêtre ne s'ouvre pas dans une autre.
   if (state.notebook_open) {
-    DrawNotebook(state, view, art);
+    DrawNotebook(state, view, art, asked);
   }
   return asked;
 }

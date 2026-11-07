@@ -119,8 +119,34 @@ void PegGame::StartBoard(PegLayout layout, bool daily, std::uint32_t day) {
   layout_ = layout;
   daily_ = daily;
   day_ = day;
+  OpenBoard();
+}
+
+void PegGame::OpenBoard() {
   purple_rotates_ = true;
   ChoosePurple();
+  opening_pegs_ = pegs_;
+  opening_random_ = random_;
+}
+
+void PegGame::Replay() {
+  if (opening_pegs_.empty()) {
+    return;
+  }
+  const PegLayout layout = layout_;
+  const bool daily = daily_;
+  const std::uint32_t day = day_;
+  const std::uint32_t item_id = item_id_;
+  const PegFrame picture_frame = picture_frame_;
+  pegs_ = opening_pegs_;
+  random_ = opening_random_;
+  Restart();
+  layout_ = layout;
+  daily_ = daily;
+  day_ = day;
+  item_id_ = item_id;
+  picture_frame_ = picture_frame;
+  purple_rotates_ = true;
 }
 
 bool PegGame::NewItemGame(const PegPicture& picture) {
@@ -144,13 +170,13 @@ bool PegGame::StartItemBoard(const PegPicture& picture, bool daily, std::uint32_
   day_ = day;
   item_id_ = picture.item_id;
   picture_frame_ = PegPictureFrame(picture);
-  purple_rotates_ = true;
-  ChoosePurple();
+  OpenBoard();
   return true;
 }
 
 void PegGame::SetPegs(std::vector<Peg> pegs) {
   pegs_ = std::move(pegs);
+  opening_pegs_.clear();
   Restart();
 }
 

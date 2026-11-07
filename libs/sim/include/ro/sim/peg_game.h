@@ -249,6 +249,10 @@ class PegGame {
   // quand l'image trace trop peu de plots.
   bool NewItemGame(const PegPicture& picture);
   bool NewDailyItemGame(std::uint32_t day, const PegPicture& picture);
+  // REJOUE LE MÊME DESSIN : le plateau de la partie en cours, tel qu'il s'est
+  // ouvert — mêmes plots, mêmes sortes, même hasard —, score et billes à neuf.
+  // Sans effet sur des plots posés par `SetPegs`.
+  void Replay();
 
   // Vise vers ce point du plateau.
   void Aim(PegPoint target) noexcept;
@@ -306,6 +310,7 @@ class PegGame {
  private:
   void StartBoard(PegLayout layout, bool daily, std::uint32_t day);
   bool StartItemBoard(const PegPicture& picture, bool daily, std::uint32_t day);
+  void OpenBoard();
   void Restart();
   void Step(float step_s);
   void MoveBucket(float step_s);
@@ -325,6 +330,9 @@ class PegGame {
   // qu'un défi du jour ne détourne pas.
   std::mt19937 seeds_;
   std::mt19937 random_;
+  // Le plateau et le hasard à l'ouverture de la partie : ce que `Replay` rétablit.
+  std::vector<Peg> opening_pegs_;
+  std::mt19937 opening_random_;
   std::vector<Peg> pegs_;
   std::vector<PegBall> balls_;
   // Les billes que Double Strafe ajoute, posées à la fin du pas.

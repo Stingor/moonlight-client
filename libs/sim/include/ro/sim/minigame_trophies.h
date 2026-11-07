@@ -104,6 +104,8 @@ struct MinigameRecord {
   // LE CARNET DE ROGGLE : les objets dont le plateau a été vidé de son orange,
   // croissants et sans doublon.
   std::vector<std::uint32_t> roggle_revealed;
+  // LE CHOIX DU JOUEUR : une partie libre écarte les objets du carnet.
+  bool roggle_skip_revealed = false;
   std::array<bool, kMinigameTrophyCount> unlocked = {};
   // LES CLÉS DE TROPHÉE QUE CE CATALOGUE NE CONNAÎT PAS, telles que lues : un
   // client plus récent les a gagnées, et elles se réécrivent avec le reste.
@@ -126,6 +128,12 @@ struct MinigameRecord {
 [[nodiscard]] std::vector<MinigameTrophy> RecordRojeweled(MinigameRecord& record,
                                                           const Match3Game& game);
 [[nodiscard]] std::vector<MinigameTrophy> RecordRoggle(MinigameRecord& record, const PegGame& game);
+
+// LES OBJETS QU'UNE PARTIE LIBRE PEUT TIRER : tous, ou ceux que le carnet n'a pas
+// encore quand le joueur écarte les autres. Un carnet complet les rend tous : il
+// reste de quoi jouer.
+[[nodiscard]] std::vector<std::uint32_t> RoggleItemChoices(std::span<const std::uint32_t> items,
+                                                           const MinigameRecord& record);
 
 // DEUX ENREGISTREMENTS EN UN : le meilleur de chaque score, chaque trophée
 // gagné de l'un ou de l'autre, chaque clé étrangère une seule fois.

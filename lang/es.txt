@@ -20918,6 +20918,15 @@ tr: R — Volver a tirar (%d)
 fr: Rejouer
 tr: Jugar de nuevo
 
+fr: Nouvelle partie : sans les items dévoilés
+tr: Nueva partida: sin los items revelados
+
+fr: Rejouer le même dessin
+tr: Repetir el mismo dibujo
+
+fr: « Rejouer le même dessin » ou « Nouvelle partie ».
+tr: «Repetir el mismo dibujo» o «Nueva partida».
+
 fr: Survivants de Midgard
 tr: Supervivientes de Midgard
 
