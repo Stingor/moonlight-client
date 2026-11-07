@@ -60,10 +60,6 @@ const char* FamilyLabel(PartyBookingJobFamily family) {
       return Tr("Premiers jobs");
     case PartyBookingJobFamily::kSecond:
       return Tr("Seconds jobs");
-    case PartyBookingJobFamily::kThirdOne:
-      return Tr("Troisièmes jobs (1)");
-    case PartyBookingJobFamily::kThirdTwo:
-      return Tr("Troisièmes jobs (2)");
     case PartyBookingJobFamily::kFirstHigh:
       return Tr("Premiers jobs transcendants");
     case PartyBookingJobFamily::kSecondHigh:

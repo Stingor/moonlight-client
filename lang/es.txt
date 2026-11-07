@@ -17638,12 +17638,6 @@ tr: Primeros oficios
 fr: Seconds jobs
 tr: Segundos oficios
 
-fr: Troisièmes jobs (1)
-tr: Terceros oficios (1)
-
-fr: Troisièmes jobs (2)
-tr: Terceros oficios (2)
-
 fr: Premiers jobs transcendants
 tr: Primeros oficios trascendentes
 

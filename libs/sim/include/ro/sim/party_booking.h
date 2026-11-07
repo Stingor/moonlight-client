@@ -72,18 +72,18 @@ inline constexpr std::int16_t kPartyBookingPageSize = 10;
 // Vrai pour un rôle, de `kPartyBookingRoleAttack` à `kPartyBookingRoleSupport`.
 [[nodiscard]] bool IsPartyBookingRole(std::int16_t code);
 
-// LES FAMILLES DE MÉTIERS, telles que la fenêtre les propose.
+// LES FAMILLES DE MÉTIERS, telles que la fenêtre les propose. Les troisièmes
+// jobs n'en font pas partie, mais leurs codes gardent un nom : une annonce
+// reçue qui en porte reste lisible.
 enum class PartyBookingJobFamily : std::uint8_t {
   kRoles,
   kFirst,
   kSecond,
-  kThirdOne,
-  kThirdTwo,
   kFirstHigh,
   kSecondHigh,
   kOther,
 };
-inline constexpr std::size_t kPartyBookingJobFamilyCount = 8;
+inline constexpr std::size_t kPartyBookingJobFamilyCount = 6;
 // Les codes d'une famille, dans l'ordre où la fenêtre les montre.
 [[nodiscard]] std::span<const std::int16_t> PartyBookingJobsOf(PartyBookingJobFamily family);
 

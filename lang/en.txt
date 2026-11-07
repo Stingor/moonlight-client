@@ -17638,12 +17638,6 @@ tr: First jobs
 fr: Seconds jobs
 tr: Second jobs
 
-fr: Troisièmes jobs (1)
-tr: Third jobs (1)
-
-fr: Troisièmes jobs (2)
-tr: Third jobs (2)
-
 fr: Premiers jobs transcendants
 tr: First high jobs
 

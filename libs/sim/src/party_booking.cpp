@@ -30,17 +30,21 @@ constexpr std::array<std::string_view, kPartyBookingLastJobCode - kPartyBookingF
 constexpr std::array<std::int16_t, 4> kRoles = {kPartyBookingRoleAttack, kPartyBookingRoleDefense,
                                                 kPartyBookingRoleHealer, kPartyBookingRoleSupport};
 
-// Le premier code de chaque famille de métiers, de `kFirst` à `kOther` : une
-// famille va de sa borne à la suivante, la dernière jusqu'au dernier code.
-constexpr std::array<std::int16_t, kPartyBookingJobFamilyCount - 1> kFamilyStarts = {
-    kPartyBookingFirstJobCode,  // Swordman
-    11,                         // Knight
-    24,                         // Rune Knight
-    30,                         // Royal Guard
-    37,                         // High Swordman
-    43,                         // Lord Knight
-    56,                         // Novice
+// Les codes d'une famille de métiers : de `first_code` inclus à `end_code` exclu.
+struct FamilyCodes {
+  std::int16_t first_code = 0;
+  std::int16_t end_code = 0;
 };
+
+// De `kFirst` à `kOther`. Les codes 24 à 36, de Rune Knight à Shadow Chaser, ne
+// sont proposés par aucune famille.
+constexpr std::array<FamilyCodes, kPartyBookingJobFamilyCount - 1> kFamilyCodes = {{
+    {.first_code = kPartyBookingFirstJobCode, .end_code = 11},     // Swordman
+    {.first_code = 11, .end_code = 24},                            // Knight
+    {.first_code = 37, .end_code = 43},                            // High Swordman
+    {.first_code = 43, .end_code = 56},                            // Lord Knight
+    {.first_code = 56, .end_code = kPartyBookingLastJobCode + 1},  // Novice
+}};
 
 constexpr std::array<std::int16_t, kPartyBookingLastJobCode - kPartyBookingFirstJobCode + 1>
 MakeJobCodes() {
@@ -75,13 +79,10 @@ std::span<const std::int16_t> PartyBookingJobsOf(PartyBookingJobFamily family) {
     return kRoles;
   }
   // Les rôles ne sont pas dans la table des bornes : elle commence à `kFirst`.
-  const std::size_t rank = static_cast<std::size_t>(family) - 1;
-  const int first = kFamilyStarts[rank];
-  const int end =
-      rank + 1 < kFamilyStarts.size() ? kFamilyStarts[rank + 1] : kPartyBookingLastJobCode + 1;
+  const FamilyCodes& codes = kFamilyCodes[static_cast<std::size_t>(family) - 1];
   return std::span<const std::int16_t>(kJobCodes).subspan(
-      static_cast<std::size_t>(first - kPartyBookingFirstJobCode),
-      static_cast<std::size_t>(end - first));
+      static_cast<std::size_t>(codes.first_code - kPartyBookingFirstJobCode),
+      static_cast<std::size_t>(codes.end_code - codes.first_code));
 }
 
 bool PartyBookingAdMatches(const PartyBookingAd& ad, const PartyBookingCriteria& criteria) {
