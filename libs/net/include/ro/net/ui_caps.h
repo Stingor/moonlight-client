@@ -95,6 +95,10 @@ inline constexpr std::uint32_t kUiCapSurvivorsPresence = 0x00200000;
 // CE CLIENT SAIT LIRE LA COOP DU MODE SURVIVORS (`survivors_coop.h`). Même règle :
 // elle n'entre dans le masque que si la table des longueurs connaît ses ZC.
 inline constexpr std::uint32_t kUiCapSurvivorsCoop = 0x00400000;
+// 🔴 UNE CAPACITÉ DE LECTURE : ce client lit une parole de PNJ (`ZC 0x02C1`) au-delà
+// du tampon de chat du serveur. Sans elle, le serveur la découpe en lignes de 243
+// octets ; avec elle, il l'envoie entière, jusqu'à 1024 octets.
+inline constexpr std::uint32_t kUiCapLongNpcTalk = 0x00800000;
 
 [[nodiscard]] core::Result<void> AnnounceUiCaps(Connection& link, std::uint32_t caps);
 
