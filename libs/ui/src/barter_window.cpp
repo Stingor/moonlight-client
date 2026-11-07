@@ -24,12 +24,12 @@ namespace {
 // de poids, et un panier qui totalise ce qui part.
 constexpr float kFirstLeftPixels = 100.0F;
 constexpr float kFirstTopPixels = 100.0F;
-constexpr float kFirstWidthPixels = 860.0F;
+constexpr float kFirstWidthPixels = 1000.0F;
 constexpr float kFirstHeightPixels = 500.0F;
 constexpr float kCartWidthPixels = 260.0F;
 constexpr float kLeastListWidthPixels = 200.0F;
 constexpr float kCartGapPixels = 8.0F;
-constexpr float kCostColumnPixels = 230.0F;
+constexpr float kLeastCostColumnPixels = 230.0F;
 constexpr float kStockColumnPixels = 60.0F;
 constexpr float kWeightColumnPixels = 50.0F;
 constexpr float kCloseButtonPixels = 90.0F;
@@ -45,6 +45,8 @@ constexpr ImVec4 kLackingText = kTradeRefusedText;
 
 // Les poids se tiennent en dixièmes, comme le serveur les compte.
 constexpr std::int64_t kWeightTenths = 10;
+
+constexpr const char* kHigherRefineMark = "(!)";
 
 constexpr const char* kConfirmId = "##barter_confirm";
 constexpr const char* kItemMenuId = "##barter_item_menu";
@@ -74,6 +76,13 @@ std::string CountSuffix(std::int64_t amount) { return "x" + TradeAmountText(amou
 
 // UNE DEVISE : l'icône, le nom raffinement compris, la quantité, puis ce que le
 // joueur en tient — vert s'il suffit à `needed`, rouge sinon.
+std::string HeldText(std::int64_t held) {
+  std::array<char, 64> text{};
+  std::snprintf(text.data(), text.size(), core::Tr("possédé %s"),
+                TradeAmountText(held, {}).c_str());
+  return text.data();
+}
+
 void DrawPrice(const BarterPriceView& price, std::int64_t needed, ItemLinkMenu& menu,
                BarterWindowAction& action) {
   const std::string suffix = CountSuffix(needed);
@@ -85,10 +94,8 @@ void DrawPrice(const BarterPriceView& price, std::int64_t needed, ItemLinkMenu& 
     SkinTooltip(tip.data());
   }
   ImGui::SameLine();
-  std::array<char, 64> held{};
-  std::snprintf(held.data(), held.size(), core::Tr("possédé %s"),
-                TradeAmountText(price.held, {}).c_str());
-  ImGui::TextColored(price.held >= needed ? kEnoughText : kLackingText, "%s", held.data());
+  ImGui::TextColored(price.held >= needed ? kEnoughText : kLackingText, "%s",
+                     HeldText(price.held).c_str());
   if (ImGui::IsItemHovered()) {
     SkinTooltip(
         core::Tr("Compté sans les items portés ni les favoris, que l'échange ne prend "
@@ -96,7 +103,7 @@ void DrawPrice(const BarterPriceView& price, std::int64_t needed, ItemLinkMenu& 
   }
   if (price.may_take_higher_refine) {
     ImGui::SameLine();
-    ImGui::TextColored(kLackingText, "(!)");
+    ImGui::TextColored(kLackingText, "%s", kHigherRefineMark);
     if (ImGui::IsItemHovered()) {
       SkinTooltip(core::Tr("Un exemplaire raffiné plus haut que l'exigence peut partir."));
     }
@@ -194,7 +201,7 @@ void DrawList(BarterWindowState& state, const BarterView& view, const SkinArt& a
   ImGui::TableSetupScrollFreeze(0, 1);
   ImGui::TableSetupColumn(core::Tr("Item"), ImGuiTableColumnFlags_WidthStretch);
   ImGui::TableSetupColumn(core::Tr("Coût"), ImGuiTableColumnFlags_WidthFixed,
-                          kCostColumnPixels * scale);
+                          BarterCostColumnWidth(view.offers));
   ImGui::TableSetupColumn(core::Tr("Stock"), ImGuiTableColumnFlags_WidthFixed,
                           kStockColumnPixels * scale);
   ImGui::TableSetupColumn(core::Tr("Poids"), ImGuiTableColumnFlags_WidthFixed,
@@ -342,6 +349,28 @@ void DrawConfirmation(BarterWindowState& state, const BarterView& view, const Sk
 
 }  // namespace
 
+float BarterPriceWidth(const BarterPriceView& price, std::int64_t needed) {
+  const float gap = ImGui::GetStyle().ItemSpacing.x;
+  const std::string name(price.item.name.empty() ? std::string_view("?") : price.item.name);
+  const std::string label = name + " " + CountSuffix(needed);
+  float width = kTradeIconPixels * Scale() + gap + ImGui::CalcTextSize(label.c_str()).x + gap +
+                ImGui::CalcTextSize(HeldText(price.held).c_str()).x;
+  if (price.may_take_higher_refine) {
+    width += gap + ImGui::CalcTextSize(kHigherRefineMark).x;
+  }
+  return width;
+}
+
+float BarterCostColumnWidth(std::span<const BarterOfferView> offers) {
+  float widest = kLeastCostColumnPixels * Scale();
+  for (const BarterOfferView& offer : offers) {
+    for (const BarterPriceView& price : offer.prices) {
+      widest = std::max(widest, BarterPriceWidth(price, price.amount));
+    }
+  }
+  return widest;
+}
+
 BarterRecap RecapBarterLines(std::span<const BarterOfferView> offers,
                              std::span<const BarterLine> lines) {
   BarterRecap recap;
@@ -443,7 +472,20 @@ BarterWindowAction DrawBarterWindow(BarterWindowState& state, const BarterView& 
 
     const float footer = TradeFooterHeight(art);
     const bool show_cart = !view.cart.empty();
-    const float cart_width = kCartWidthPixels * scale;
+    // LE PANIER TOTALISE LES MÊMES DEVISES : il s'élargit pour elles.
+    float cart_width = kCartWidthPixels * scale;
+    if (show_cart) {
+      std::vector<BarterLine> lines;
+      lines.reserve(view.cart.size());
+      for (const BarterCartLineView& line : view.cart) {
+        lines.push_back({.shop_index = line.shop_index, .amount = line.amount});
+      }
+      const float padding =
+          2.0F * ImGui::GetStyle().WindowPadding.x + ImGui::GetStyle().ScrollbarSize;
+      for (const BarterCost& cost : RecapBarterLines(view.offers, lines).costs) {
+        cart_width = std::max(cart_width, BarterPriceWidth(cost.price, cost.total) + padding);
+      }
+    }
     const float list_width =
         show_cart ? std::max(kLeastListWidthPixels * scale,
                              ImGui::GetContentRegionAvail().x - cart_width - kCartGapPixels * scale)

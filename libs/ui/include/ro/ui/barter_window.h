@@ -185,6 +185,16 @@ struct BarterRecap {
 [[nodiscard]] std::string BarterConfirmationText(std::span<const BarterOfferView> offers,
                                                  const BarterRecap& recap);
 
+// LA LARGEUR QUE PREND UNE DEVISE à cette quantité : icône, nom, quantité, ce que le
+// joueur en tient et sa mise en garde. Une colonne de coût se règle sur la plus large
+// de ses lignes : les noms du jeu sont trop inégaux pour une largeur fixe. À appeler
+// dans une image ImGui.
+[[nodiscard]] float BarterPriceWidth(const BarterPriceView& price, std::int64_t needed);
+
+// La plus large des devises d'une liste d'articles, jamais sous le plancher de la
+// colonne.
+[[nodiscard]] float BarterCostColumnWidth(std::span<const BarterOfferView> offers);
+
 // Remet la fenêtre à l'état d'une ouverture neuve.
 void OpenBarterOn(BarterWindowState& state, std::uint32_t opening_seq);
 
