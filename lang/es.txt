@@ -22672,3 +22672,6 @@ tr: Tiene una carta engarzada o la pieza está encantada.
 
 fr: Une pièce sertie n'est pas acceptée.
 tr: No se acepta una pieza con cartas.
+
+fr: %s, niveau %d\n%s
+tr: %s, nivel %d\n%s

@@ -31,9 +31,10 @@ namespace ro::ui {
 //   - la jauge verte de RO sous les pieds du héros, et au-dessus de lui l'avis
 //     d'un objet ramassé.
 //
-// 🔴 IL NE LIT AUCUNE ENTRÉE et ne rend rien : il n'ouvre aucune fenêtre, donc
-// ne prend ni le clavier ni la souris. La vue porte des identifiants de
-// texture, jamais un chemin ; les noms (boss) arrivent déjà résolus par `app`.
+// 🔴 IL NE PREND AUCUNE ENTRÉE et ne rend rien : il ne prend ni le clavier ni la
+// souris. Il lit seulement où est le curseur, pour l'infobulle d'une case, qui ne
+// se saisit pas : marcher vers le curseur continue dessous. La vue porte des
+// identifiants de texture, jamais un chemin ; les noms arrivent déjà résolus par `app`.
 
 // Une case de skill ou de carte. `active` : la posture de ce skill dure, et sa
 // case se cerne d'or.
@@ -41,7 +42,15 @@ struct SurvivorsHudSlot {
   ImTextureID icon = 0;  // 0 : pas d'icône, la case garde sa place
   int level = 0;
   bool active = false;
+  // Ce que dit son infobulle. Le nom est déjà résolu ; la description, ⚠ EN FRANÇAIS,
+  // marquée par `TrText`, se traduit au dessin.
+  const char* name = "";
+  const char* description = "";
 };
+
+// La case de la rangée partie de `corner` sous le point `mouse_px` ; nulle hors des cases.
+[[nodiscard]] const SurvivorsHudSlot* SurvivorsSlotAt(std::span<const SurvivorsHudSlot> slots,
+                                                      ImVec2 corner, ImVec2 mouse_px) noexcept;
 
 // Une charge de la Kafra (U12) : l'icône de l'objet RO et les charges qui
 // restent dans la partie.

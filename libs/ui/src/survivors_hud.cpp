@@ -6,6 +6,7 @@
 
 #include "ro/core/i18n.h"
 #include "ro/ui/entity_bars.h"
+#include "ro/ui/skin_tooltip.h"
 
 #include "survivors_text.h"
 
@@ -69,6 +70,12 @@ void DrawBar(ImDrawList& draw, ImVec2 top_left, ImVec2 bottom_right, float fill,
     const float right = top_left.x + (bottom_right.x - top_left.x) * shown;
     draw.AddRectFilled(top_left, ImVec2(right, bottom_right.y), ink);
   }
+}
+
+// L'infobulle d'une case : son nom et son niveau, puis ce qu'elle fait.
+void DrawSlotTooltip(const SurvivorsHudSlot& slot) {
+  SkinTooltipFormat(core::Tr("%s, niveau %d\n%s"), slot.name, slot.level,
+                    slot.description[0] != '\0' ? SurvivorsText(slot.description) : "");
 }
 
 // Une rangée de cases depuis `corner` ; rend l'abscisse qui suit la dernière.
@@ -220,6 +227,17 @@ void DrawAllies(ImDrawList& draw, std::span<const SurvivorsHudAlly> allies, ImVe
 
 }  // namespace
 
+const SurvivorsHudSlot* SurvivorsSlotAt(std::span<const SurvivorsHudSlot> slots, ImVec2 corner,
+                                        ImVec2 mouse_px) noexcept {
+  if (mouse_px.y < corner.y || mouse_px.y >= corner.y + kSlotSize) return nullptr;
+  float left = corner.x;
+  for (const SurvivorsHudSlot& slot : slots) {
+    if (mouse_px.x >= left && mouse_px.x < left + kSlotSize) return &slot;
+    left += kSlotSize + kSlotGap;
+  }
+  return nullptr;
+}
+
 float SurvivorsCardSlide(float fraction) noexcept {
   if (fraction <= 0.0F || fraction >= 1.0F) return 0.0F;
   return std::min({fraction / kCardSlideShare, (1.0F - fraction) / kCardSlideShare, 1.0F});
@@ -293,8 +311,17 @@ void DrawSurvivorsHud(const SurvivorsHudView& view) {
   }
 
   const float slots_top = below_bar + ImGui::GetTextLineHeight() + kMargin;
-  const float after_skills = DrawSlots(draw, ImVec2(origin.x + kMargin, slots_top), view.skills);
-  DrawSlots(draw, ImVec2(after_skills + kMargin, slots_top), view.cards);
+  const ImVec2 skills_corner(origin.x + kMargin, slots_top);
+  const float after_skills = DrawSlots(draw, skills_corner, view.skills);
+  const ImVec2 cards_corner(after_skills + kMargin, slots_top);
+  DrawSlots(draw, cards_corner, view.cards);
+  // Une fenêtre posée sur la case la garde pour elle.
+  if (!ImGui::GetIO().WantCaptureMouse) {
+    const ImVec2 mouse_px = ImGui::GetIO().MousePos;
+    const SurvivorsHudSlot* hovered = SurvivorsSlotAt(view.skills, skills_corner, mouse_px);
+    if (hovered == nullptr) hovered = SurvivorsSlotAt(view.cards, cards_corner, mouse_px);
+    if (hovered != nullptr) DrawSlotTooltip(*hovered);
+  }
   const float below_counters = DrawCounters(draw, view, far.x - kMargin, below_bar);
   const float below_charges =
       DrawChargesAndLives(draw, view, far.x - kMargin, below_counters + kSlotGap);

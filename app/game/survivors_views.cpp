@@ -237,14 +237,20 @@ void SurvivorsViews::ComposeHud(const SurvivorsField& field, const ro::sim::Surv
                                 const SurvivorsTables& tables) {
   skill_slots_.clear();
   for (const ro::sim::OwnedSkill& skill : field.hero.skills) {
+    const ro::sim::SurvivorsSkillRule* rule = ro::sim::FindSkill(rules, skill.skill_id);
     skill_slots_.push_back({.icon = SurvivorsSkillIcon(skill.skill_id, tables),
                             .level = skill.level,
-                            .active = field.step < skill.stance_until_step});
+                            .active = field.step < skill.stance_until_step,
+                            .name = SkillName(skill.skill_id, tables),
+                            .description = rule != nullptr ? rule->description : ""});
   }
   card_slots_.clear();
   for (const ro::sim::OwnedCard& card : field.hero.cards) {
-    card_slots_.push_back(
-        {.icon = SurvivorsItemIcon(card.card_item_id, tables), .level = card.level});
+    const ro::sim::CardRule* rule = ro::sim::FindCard(rules, card.card_item_id);
+    card_slots_.push_back({.icon = SurvivorsItemIcon(card.card_item_id, tables),
+                           .level = card.level,
+                           .name = CardName(card.card_item_id, tables),
+                           .description = rule != nullptr ? rule->description : ""});
   }
   hud_ = ro::ui::SurvivorsHudView{.level = field.hero.level,
                                   .exp_fill = Fill(field.hero.exp, ro::sim::TeamExpToNext(field)),

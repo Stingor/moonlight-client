@@ -22672,3 +22672,6 @@ tr: A card is inserted or the piece is enchanted.
 
 fr: Une pièce sertie n'est pas acceptée.
 tr: A piece with cards is not accepted.
+
+fr: %s, niveau %d\n%s
+tr: %s, level %d\n%s
