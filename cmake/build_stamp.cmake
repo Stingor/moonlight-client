@@ -6,49 +6,28 @@
 # autre donne des noms de fonctions faux, ce qui est pire que pas de noms.
 #
 # Le rapport porte donc de quoi retrouver la bonne : la version, la révision
-# exacte, et si l'arbre était propre au moment de bâtir.
+# exacte, et si l'arbre était propre au moment de bâtir. Le titre de la fenêtre
+# affiche cette même révision.
 #
-# ⚠ RELEVÉE À LA CONFIGURATION, pas à la compilation. Un commit fait sans
-# reconfigurer laisse donc une révision périmée — c'est sans conséquence pour
-# une publication, qui part toujours d'une configuration fraîche, et c'est le
-# prix à ne pas relancer git à chaque fichier compilé.
+# ⚠ RELEVÉE À CHAQUE BÂTISSE, par la cible `build_stamp` dont `ro_core` dépend :
+# un commit fait sans reconfigurer ne laisse pas de révision périmée. Le relevé
+# demande une fraction de seconde à git ; un commit relie ensuite ce qui lie
+# `ro_core`, dont le journal et le rapport de plantage portent le tampon.
 
 find_package(Git QUIET)
 
-set(MOONCLIENT_COMMIT "inconnue")
-set(MOONCLIENT_TREE "inconnu")
-
-if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
-  execute_process(
-      COMMAND "${GIT_EXECUTABLE}" rev-parse --short=12 HEAD
-      WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-      OUTPUT_VARIABLE MOONCLIENT_COMMIT
-      OUTPUT_STRIP_TRAILING_WHITESPACE
-      ERROR_QUIET)
-
-  # UN ARBRE SALE SE DIT. Un binaire bâti sur des retouches non validées ne
-  # correspond à aucune révision : le taire ferait chercher la panne dans un
-  # code qui n'est pas celui qui a planté. Les carnets du joueur, jamais
-  # compilés, n'en sont pas : même liste que NOTE_FILES de
-  # `scripts/build_identity.py`.
-  execute_process(
-      COMMAND "${GIT_EXECUTABLE}" status --porcelain -- .
-              ":(exclude)TODO.txt" ":(exclude)FIXME.txt"
-      WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-      OUTPUT_VARIABLE _dirty
-      OUTPUT_STRIP_TRAILING_WHITESPACE
-      ERROR_QUIET)
-  if(_dirty STREQUAL "")
-    set(MOONCLIENT_TREE "propre")
-  else()
-    set(MOONCLIENT_TREE "MODIFIE")
-  endif()
-  unset(_dirty)
-endif()
+set(MOONCLIENT_STAMP_SOURCE_DIR "${CMAKE_SOURCE_DIR}")
+set(MOONCLIENT_STAMP_BINARY_DIR "${CMAKE_BINARY_DIR}")
+include("${CMAKE_SOURCE_DIR}/cmake/build_stamp_write.cmake")
 
 message(STATUS "revision : ${MOONCLIENT_COMMIT} (arbre ${MOONCLIENT_TREE})")
 
-configure_file(
-    "${CMAKE_SOURCE_DIR}/cmake/build_stamp.h.in"
-    "${CMAKE_BINARY_DIR}/generated/ro/core/build_stamp.h"
-    @ONLY)
+add_custom_target(build_stamp
+    COMMAND "${CMAKE_COMMAND}"
+            "-DMOONCLIENT_STAMP_SOURCE_DIR=${CMAKE_SOURCE_DIR}"
+            "-DMOONCLIENT_STAMP_BINARY_DIR=${CMAKE_BINARY_DIR}"
+            "-DPROJECT_VERSION=${PROJECT_VERSION}"
+            "-DGIT_EXECUTABLE=${GIT_EXECUTABLE}"
+            -P "${CMAKE_SOURCE_DIR}/cmake/build_stamp_write.cmake"
+    BYPRODUCTS "${CMAKE_BINARY_DIR}/generated/ro/core/build_stamp.h"
+    VERBATIM)

@@ -15430,6 +15430,12 @@ tr: Name and map in the title
 fr: Le titre de la fenêtre commence par le pseudo et la carte, et la barre des tâches distingue ainsi deux clients ouverts.
 tr: The window title starts with the character name and the map, so the taskbar tells two open clients apart.
 
+fr: Révision du client dans le titre
+tr: Client revision in the title
+
+fr: Le titre de la fenêtre finit par le hash du commit sur lequel le client a été compilé.
+tr: The window title ends with the hash of the commit the client was built from.
+
 fr: Achat OK
 tr: Purchase OK
 

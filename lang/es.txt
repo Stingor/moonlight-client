@@ -15418,6 +15418,12 @@ tr: Nombre y mapa en el título
 fr: Le titre de la fenêtre commence par le pseudo et la carte, et la barre des tâches distingue ainsi deux clients ouverts.
 tr: El título de la ventana empieza por el nombre del personaje y el mapa, y así la barra de tareas distingue dos clientes abiertos.
 
+fr: Révision du client dans le titre
+tr: Revisión del cliente en el título
+
+fr: Le titre de la fenêtre finit par le hash du commit sur lequel le client a été compilé.
+tr: El título de la ventana termina con el hash del commit con el que se compiló el cliente.
+
 fr: Bandeau du nom de la carte
 tr: Cartel con el nombre del mapa
 

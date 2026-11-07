@@ -21,4 +21,7 @@ inline constexpr std::string_view kBuildCommit = "@MOONCLIENT_COMMIT@";
 // Un binaire bâti sur un arbre sale ne correspond à aucune révision.
 inline constexpr std::string_view kBuildTree = "@MOONCLIENT_TREE@";
 
+// La valeur de `kBuildTree` pour un arbre sans retouches.
+inline constexpr std::string_view kBuildTreeClean = "propre";
+
 }  // namespace ro::core

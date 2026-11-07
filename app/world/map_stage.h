@@ -180,19 +180,31 @@ inline constexpr std::string_view kWindowTitle = "Moonlight-Destiny";
 // barre des tâches, où une fenêtre de production lui ressemble trait pour trait.
 inline constexpr std::string_view kTestServerTitleMark = "[TEST] ";
 
-// LE TITRE DE LA FENÊTRE : le nom, puis la version du client — précédés de
-// `kTestServerTitleMark` quand `test_server`.
+// LA MARQUE D'UN BINAIRE BÂTI SUR DES RETOUCHES NON VALIDÉES, collée au hash :
+// il ne correspond exactement à aucune révision.
+inline constexpr std::string_view kModifiedTreeTitleMark = "+";
+
+// Ce que le titre porte autour du nom du jeu, en partie comme hors partie.
+struct WindowTitleMarks {
+  // Le hash du commit qui a produit ce binaire, après le nom.
+  bool revision_shown = true;
+  // `kTestServerTitleMark` en tête.
+  bool test_server = false;
+};
+
+// LE TITRE DE LA FENÊTRE : le nom, puis le hash du commit bâti —
+// « Moonlight-Destiny a8de56e6c012 ».
 //
-// ⚠ LA VERSION NE VA PAS DANS `kWindowTitle` : celui-là est aussi le nom du
-// fichier sur le disque, et l'exécutable que le joueur lance ne change pas de
-// nom d'une publication à l'autre.
-[[nodiscard]] std::string WindowTitle(bool test_server);
+// ⚠ LE HASH NE VA PAS DANS `kWindowTitle` : celui-là est aussi le nom du fichier
+// sur le disque, et l'exécutable que le joueur lance ne change pas de nom d'une
+// publication à l'autre.
+[[nodiscard]] std::string WindowTitle(const WindowTitleMarks& marks);
 
 // LE TITRE EN PARTIE : le pseudo et la carte en tête quand `names_shown`, et
 // tant que le monde les connaît — « Stingor - prontera - Moonlight-Destiny
-// 1.2.3 ». Sans eux, le titre seul. Voir `WindowTitleOptions`.
+// a8de56e6c012 ». Sans eux, le titre seul. Voir `WindowTitleOptions`.
 [[nodiscard]] std::string WindowTitle(bool names_shown, const ro::sim::World& world,
-                                      bool test_server);
+                                      const WindowTitleMarks& marks);
 
 // Ce qu'une carte chargée pèse, pour le journal.
 void ReportMapStage(const MapStage& stage);

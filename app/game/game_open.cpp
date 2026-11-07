@@ -163,7 +163,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   // ⚠ LA FENÊTRE EXISTE DÉJÀ, et elle n'a pas attendu la carte : la coquille
   // l'a ouverte avant nous. Il ne reste qu'à la NOMMER — c'est le seul reste,
   // ici, d'un ordre qui voulait une carte pour avoir une fenêtre.
-  gl_->SetTitle(WindowTitle(shell_.test_server()));
+  gl_->SetTitle(WindowTitle(shell_.TitleMarks()));
 
   auto terrain = ro::render::TerrainRenderer::Create();
   if (!terrain) {

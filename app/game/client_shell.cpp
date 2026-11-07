@@ -56,6 +56,12 @@ ClientShell::ClientShell(std::filesystem::path client_root, std::filesystem::pat
       web_(std::move(web)),
       layouts_(client_root_) {}
 
+WindowTitleMarks ClientShell::TitleMarks() {
+  return WindowTitleMarks{
+      .revision_shown = settings_->options().pages().window_title.revision_shown(),
+      .test_server = test_server_};
+}
+
 void ClientShell::ReportStage(const char* what) {
   // CE QUE CHAQUE ÉTAPE COÛTE, en millisecondes : un chargement se VOIT, et le
   // mesurer est le seul moyen de savoir s'il empire.
@@ -108,7 +114,7 @@ ro::core::Result<void> ClientShell::OpenWindow(int width, int height) {
   // ⚠ ET SUR L'ÉCRAN CHOISI, ou le principal s'il a été débranché.
   const ScreenChoice saved_screen = settings_->options().saved_screen();
   auto context = ro::render::GlContext::CreateWindowed(
-      WindowTitle(test_server_), first_width, first_height,
+      WindowTitle(TitleMarks()), first_width, first_height,
       [&saved_screen](std::span<const ro::render::ScreenInfo> connected) {
         return PickScreen(saved_screen, connected);
       });

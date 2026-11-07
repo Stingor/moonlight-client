@@ -11,14 +11,15 @@ namespace moonclient {
 
 // ── LE TITRE DE LA FENÊTRE, dans la section Interface ───────────────────────
 //
-// Une case : le pseudo et la carte en tête du titre — « Stingor - prontera -
-// Moonlight-Destiny 1.2.3 » —, lisibles dans la barre des tâches quand deux
-// clients tournent. Éteinte, le titre est celui du jeu seul. Voir
-// `WindowTitle`.
+// Deux cases. Le pseudo et la carte en tête du titre — « Stingor - prontera -
+// Moonlight-Destiny a8de56e6c012 » —, lisibles dans la barre des tâches quand
+// deux clients tournent. Le hash du commit bâti après le nom du jeu : il dit
+// d'un coup d'œil de quel binaire vient ce qu'on regarde. Voir `WindowTitle`.
 inline constexpr int kWindowTitleRowBase = 8000;
 
 enum class WindowTitleRow : int {
   kNamesShown = 0,
+  kRevisionShown,
   kCount,
 };
 
@@ -28,11 +29,12 @@ static_assert(kPetRowBase + static_cast<int>(PetRow::kCount) <= kWindowTitleRowB
 class WindowTitleOptions {
  public:
   [[nodiscard]] bool names_shown() const noexcept { return names_shown_; }
+  [[nodiscard]] bool revision_shown() const noexcept { return revision_shown_; }
 
   // ⚠ AVANT LA LECTURE DU FICHIER : la valeur présente ici est le défaut.
   void Declare(SettingsFile& into);
 
-  // Ajoute sa ligne à celles d'une section.
+  // Ajoute ses lignes à celles d'une section.
   void ComposeInto(std::vector<ro::ui::OptionRowView>& rows) const;
 
   // Rend vrai quand la ligne était la sienne.
@@ -40,6 +42,7 @@ class WindowTitleOptions {
 
  private:
   bool names_shown_ = true;
+  bool revision_shown_ = true;
 };
 
 }  // namespace moonclient

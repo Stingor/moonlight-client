@@ -26,6 +26,8 @@
 
 namespace moonclient {
 
+struct WindowTitleMarks;
+
 // CE QUE LA BOUCLE FAIT TOURNER : un écran, quel qu'il soit.
 //
 // 🔴 DEUX ÉCRANS PARTAGENT LA MÊME BOUCLE, et c'est ce que cette interface
@@ -135,6 +137,9 @@ class ClientShell {
   // sur tous les écrans. Posé par l'écran de connexion. Voir `WindowTitle`.
   void SetTestServer(bool test_server) noexcept { test_server_ = test_server; }
   [[nodiscard]] bool test_server() const noexcept { return test_server_; }
+  // Ce que le titre porte sur tous les écrans : le serveur choisi, et le réglage
+  // du joueur pour le hash. Voir `WindowTitle`.
+  [[nodiscard]] WindowTitleMarks TitleMarks();
   // L'ADRESSE DU SERVEUR DE CONNEXION CHOISI, `hôte:port`, posée par l'écran de
   // connexion : le classement survivors y range ses résultats en attente.
   void SetLoginAddress(std::string address) { login_address_ = std::move(address); }

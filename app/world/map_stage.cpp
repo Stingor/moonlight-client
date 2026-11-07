@@ -41,17 +41,25 @@ std::string GatFilePath(const ro::vfs::ResNameTable& res_names, std::string_view
 
 }  // namespace
 
-std::string WindowTitle(bool test_server) {
-  return std::string(test_server ? kTestServerTitleMark : std::string_view()) +
-         std::string(kWindowTitle) + " " + std::string(ro::core::kBuildVersion);
+std::string WindowTitle(const WindowTitleMarks& marks) {
+  std::string title(marks.test_server ? kTestServerTitleMark : std::string_view());
+  title.append(kWindowTitle);
+  if (marks.revision_shown) {
+    title.append(" ").append(ro::core::kBuildCommit);
+    if (ro::core::kBuildTree != ro::core::kBuildTreeClean) {
+      title.append(kModifiedTreeTitleMark);
+    }
+  }
+  return title;
 }
 
-std::string WindowTitle(bool names_shown, const ro::sim::World& world, bool test_server) {
+std::string WindowTitle(bool names_shown, const ro::sim::World& world,
+                        const WindowTitleMarks& marks) {
   if (!names_shown) {
-    return WindowTitle(test_server);
+    return WindowTitle(marks);
   }
   constexpr std::string_view kSeparator = " - ";
-  std::string title(test_server ? kTestServerTitleMark : std::string_view());
+  std::string title(marks.test_server ? kTestServerTitleMark : std::string_view());
   const std::array<std::string_view, 2> parts = {world.player_name(), world.map_name()};
   for (const std::string_view part : parts) {
     if (!part.empty()) {
@@ -59,7 +67,7 @@ std::string WindowTitle(bool names_shown, const ro::sim::World& world, bool test
     }
   }
   // La marque est déjà en tête : elle ne se répète pas avant le nom.
-  return title + WindowTitle(/*test_server=*/false);
+  return title + WindowTitle(WindowTitleMarks{.revision_shown = marks.revision_shown});
 }
 
 ro::core::Result<MapStage> LoadMapStage(ro::vfs::Vfs& vfs, std::string_view map_name,

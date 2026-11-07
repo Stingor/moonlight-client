@@ -46,6 +46,7 @@ target_link_libraries(ro_core
 # L'identite du binaire est PRODUITE par CMake, dans l'arbre de build : elle
 # depend de la revision, donc elle ne peut pas vivre dans les sources.
 target_include_directories(ro_core PUBLIC "${CMAKE_BINARY_DIR}/generated")
+add_dependencies(ro_core build_stamp)
 
 # LE RAPPORT DE PLANTAGE parle au systeme : il lui demande les registres, les
 # modules charges, et un vidage qu'un debogueur rouvrira. Les trois viennent de
