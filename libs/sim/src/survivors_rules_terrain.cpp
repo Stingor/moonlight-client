@@ -71,22 +71,24 @@ constexpr std::array<std::string_view, 5> kCactus = {".###.", "#####", "#####", 
 constexpr std::array<std::string_view, 3> kBones = {".#.", "###", ".#."};
 // Un pilier de ruine du désert, à 0,6 de sa taille : son fût de quatre cases,
 // et celles qu'il effleure.
-constexpr std::array<std::string_view, 6> kRuinPillar = {"..##..", ".####.", "######",
+constexpr std::array<std::string_view, 1> kRuinPillar = {"#"};
+constexpr std::array<std::string_view, 6> kFallenRuin = {"..##..", ".####.", "######",
                                                          "######", ".####.", "..##.."};
 // Un pan des ruines du désert, le repère : un carré de quatre cases.
 constexpr std::array<std::string_view, 4> kDesertRuins = {"####", "####", "####", "####"};
 
-constexpr std::array<TerrainPieceRule, 6> kDesertPieces{{
+constexpr std::array<TerrainPieceRule, 7> kDesertPieces{{
     {.piece_id = 1, .key = "palm", .footprint = kPalm, .weight = 8},
     {.piece_id = 2, .key = "palm_grove", .footprint = kPalmGrove, .weight = 5},
     {.piece_id = 3, .key = "cactus", .footprint = kCactus, .weight = 6},
     {.piece_id = 4, .key = "bones", .footprint = kBones, .weight = 8, .walkable = true},
-    {.piece_id = 5, .key = "ruin_pillar", .footprint = kRuinPillar, .weight = 3},
+    {.piece_id = 5, .key = "ruin_pillar", .footprint = kRuinPillar, .weight = 2},
     {.piece_id = 6,
      .key = "desert_ruins",
      .footprint = kDesertRuins,
      .weight = 1,
      .landmark = true},
+    {.piece_id = 7, .key = "fallen_ruin", .footprint = kFallenRuin, .weight = 1},
 }};
 
 constexpr std::array<TerrainRule, 2> kTerrains{{

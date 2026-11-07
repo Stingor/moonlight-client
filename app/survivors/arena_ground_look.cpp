@@ -172,9 +172,11 @@ constexpr std::array<GroundModelChoice, 3> kCacti{{
 constexpr std::array<GroundModelChoice, 1> kBonesModel{{
     {.model = "외부소품\\뼈다구04.rsm", .scale = 1.0F, .weight = 1, .shade_cells = 1.0F},
 }};
-constexpr std::array<GroundModelChoice, 3> kDesertPillars{{
+constexpr std::array<GroundModelChoice, 2> kDesertPillars{{
     {.model = "외부소품\\사막유적기둥01.rsm", .scale = 0.6F, .weight = 2, .shade_cells = 0.8F},
     {.model = "외부소품\\사막유적기둥03.rsm", .scale = 0.6F, .weight = 1, .shade_cells = 0.8F},
+}};
+constexpr std::array<GroundModelChoice, 1> kFallenRuinModel{{
     {.model = "외부소품\\사막유적기둥04.rsm", .scale = 0.6F, .weight = 1, .shade_cells = 0.8F},
 }};
 constexpr std::array<GroundModelChoice, 1> kDesertWall{{
@@ -194,17 +196,20 @@ constexpr std::array<PieceModelSlot, 1> kCactusSlots{
 constexpr std::array<PieceModelSlot, 1> kBonesSlots{
     {{.east_cells = 1.5F, .north_cells = 1.5F, .models = kBonesModel}}};
 constexpr std::array<PieceModelSlot, 1> kRuinPillarSlots{
-    {{.east_cells = 3.0F, .north_cells = 3.0F, .models = kDesertPillars}}};
+    {{.east_cells = 0.5F, .north_cells = 0.5F, .models = kDesertPillars}}};
+constexpr std::array<PieceModelSlot, 1> kFallenRuinSlots{
+    {{.east_cells = 3.0F, .north_cells = 3.0F, .models = kFallenRuinModel}}};
 // Le repère : un pan des ruines du désert, au milieu de son carré de 4 × 4.
 constexpr std::array<PieceModelSlot, 1> kDesertRuinsSlots{
     {{.east_cells = 2.0F, .north_cells = 2.0F, .models = kDesertWall, .any_yaw = false}}};
 
-constexpr std::array<PieceLook, 6> kDesertPieces{{
+constexpr std::array<PieceLook, 7> kDesertPieces{{
     {.key = "palm", .slots = kPalmSlots},
     {.key = "palm_grove", .slots = kPalmGroveSlots},
     {.key = "cactus", .slots = kCactusSlots},
     {.key = "bones", .slots = kBonesSlots},
     {.key = "ruin_pillar", .slots = kRuinPillarSlots},
+    {.key = "fallen_ruin", .slots = kFallenRuinSlots},
     {.key = "desert_ruins", .slots = kDesertRuinsSlots},
 }};
 
