@@ -82,8 +82,8 @@ ro::render::ActorOutfit* HordeComposer::OutfitOf(HordeBodyKind kind, std::uint16
 
 HordeMotionTimes HordeComposer::TimesOf(HordeBodyKind kind, std::uint16_t look_id) {
   if (kind == HordeBodyKind::kHero) {
-    return hero_outfit_ != nullptr ? TimesOfOutfit(*hero_outfit_, SpriteLayout::kPlayer)
-                                   : HordeMotionTimes{};
+    const ro::render::ActorOutfit* outfit = OutfitOf(kind, look_id);
+    return outfit != nullptr ? TimesOfOutfit(*outfit, SpriteLayout::kPlayer) : HordeMotionTimes{};
   }
   return KnownOf(kind, look_id).times;
 }

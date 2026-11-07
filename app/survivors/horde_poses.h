@@ -117,8 +117,8 @@ class HordePoses {
   // ⚠ AVANT `Pose` : leur direction et leur rang d'élite se lisent dans le
   // souvenir de l'image précédente, que `Pose` remplace.
   void NoticeFalls(std::span<const ro::sim::SurvivorsFall> falls, std::uint64_t presentation_ms);
-  // LES LANCERS DES DERNIERS PAS peuvent commencer un geste du héros à
-  // `presentation_ms` (voir `kHeroGestureEveryMs`).
+  // LES LANCERS DES DERNIERS PAS peuvent commencer un geste de leur héros à
+  // `presentation_ms` (voir `kHeroGestureEveryMs`), allié compris.
   void NoticeCasts(std::span<const ro::sim::SurvivorsCast> casts,
                    const ro::sim::SurvivorsField& field, std::uint64_t presentation_ms);
 
@@ -162,7 +162,11 @@ class HordePoses {
                 std::uint32_t blend_per_mille, const HordeTimesOf& times_of);
   // Les alliés d'une partie coop, après le héros : `look_id` est l'index du héros + 1.
   void PoseAllies(const ro::sim::SurvivorsField& field, std::uint64_t presentation_ms,
-                  std::uint32_t blend_per_mille);
+                  std::uint32_t blend_per_mille, const HordeTimesOf& times_of);
+  // Le geste en cours du héros `hero_index`, sur un corps immobile : la mêlée frappe, les
+  // autres incantent. `pose.look_id` doit déjà nommer sa tenue.
+  void PoseGesture(HordePose& pose, const ro::sim::SurvivorsField& field, std::size_t hero_index,
+                   std::uint64_t presentation_ms, const HordeTimesOf& times_of) const;
   void PoseFoes(const ro::sim::SurvivorsField& field, std::uint64_t presentation_ms,
                 std::uint32_t blend_per_mille, const HordeTimesOf& times_of);
   void PoseFalling(std::uint64_t presentation_ms, const HordeTimesOf& times_of);
@@ -173,8 +177,8 @@ class HordePoses {
   std::vector<FoeMemory> next_memory_;
   std::vector<FallingBody> falling_;
   std::vector<HordePose> poses_;
-  // Le début du dernier geste du héros, s'il en a fait un.
-  std::optional<std::uint64_t> gesture_started_ms_;
+  // Le début du dernier geste de chaque héros, s'il en a fait un.
+  std::array<std::optional<std::uint64_t>, ro::sim::kMostHeroes> gesture_started_ms_;
 };
 
 }  // namespace moonclient
