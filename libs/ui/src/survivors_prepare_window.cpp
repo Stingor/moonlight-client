@@ -313,7 +313,13 @@ void DrawCoop(const SurvivorsPrepareCoop& coop, SurvivorsPrepareAsk& asked, cons
   }
   ImGui::TextUnformatted(core::Tr("Salon du groupe"));
   for (const SurvivorsPrepareCoopMember& member : coop.members) {
-    ImGui::Text(member.ready ? core::Tr("%s : prêt") : core::Tr("%s : en attente"), member.name);
+    if (member.class_title != nullptr && member.skill_name != nullptr) {
+      ImGui::Text(
+          member.ready ? core::Tr("%s (%s, %s) : prêt") : core::Tr("%s (%s, %s) : en attente"),
+          member.name, member.class_title, member.skill_name);
+    } else {
+      ImGui::Text(member.ready ? core::Tr("%s : prêt") : core::Tr("%s : en attente"), member.name);
+    }
   }
   for (const char* const refusal : coop.refusals) {
     ColoredText(kRefusalColor, SurvivorsText(refusal));

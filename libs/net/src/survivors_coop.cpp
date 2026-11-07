@@ -98,6 +98,16 @@ std::optional<std::vector<std::uint8_t>> EncodeSurvivorsCoopFrameAsk(
   return bytes;
 }
 
+std::vector<std::uint8_t> SurvivorsCoopChoicePart(std::uint16_t class_id,
+                                                  std::uint16_t first_skill_id) {
+  std::vector<std::uint8_t> part;
+  part.reserve(2U * kU16Bytes);
+  core::ByteWriter writer(part);
+  writer.U16(class_id);
+  writer.U16(first_skill_id);
+  return part;
+}
+
 std::optional<SurvivorsCoopLobby> DecodeSurvivorsCoopLobby(std::span<const std::uint8_t> frame) {
   if (!HeaderHolds(frame, kSurvivorsCoopLobbyOpcode, kLobbyHeaderBytes)) return std::nullopt;
   const std::uint8_t state = frame[4];
@@ -116,6 +126,9 @@ std::optional<SurvivorsCoopLobby> DecodeSurvivorsCoopLobby(std::span<const std::
         frame.subspan(at + kU32Bytes + 1U, kSurvivorsCoopNameBytes);
     const auto end = std::ranges::find(name, std::uint8_t{0});
     member.name = core::Utf8FromCp1252(std::string(name.begin(), end));
+    const std::size_t choice_at = at + kU32Bytes + 1U + kSurvivorsCoopNameBytes;
+    member.class_id = U16At(frame, choice_at);
+    member.first_skill_id = U16At(frame, choice_at + kU16Bytes);
     lobby.members.push_back(std::move(member));
   }
   return lobby;

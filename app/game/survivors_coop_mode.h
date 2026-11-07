@@ -80,6 +80,10 @@ class SurvivorsCoopMode {
   void Ask(ro::net::Connection& link, ro::net::SurvivorsCoopAction action,
            std::span<const std::uint8_t> part = {});
 
+  // Vrai quand le salon ne montre pas encore ce choix pour ce joueur.
+  [[nodiscard]] bool ChoiceOwed(std::uint32_t own_char_id, std::uint16_t class_id,
+                                std::uint16_t first_skill_id) const noexcept;
+
   // Ce joueur renonce au salon ou au départ qui l'attend, une fois.
   void Forsake(ro::net::Connection& link);
   // Ce que le serveur a dit du salon ne vaut plus.

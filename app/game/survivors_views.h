@@ -150,6 +150,12 @@ class SurvivorsViews {
   void ResetOffer() noexcept { offer_state_ = {}; }
   void ResetPause() noexcept { pause_state_ = {}; }
 
+  // Le nom d'un skill de départ, pour la ligne d'un membre du salon.
+  [[nodiscard]] const char* StarterSkillName(std::uint16_t skill_id,
+                                             const SurvivorsTables& tables) {
+    return SkillName(skill_id, tables);
+  }
+
  private:
   [[nodiscard]] const char* SkillName(std::uint16_t skill_id, const SurvivorsTables& tables);
   [[nodiscard]] const char* CardName(std::uint16_t card_item_id, const SurvivorsTables& tables);

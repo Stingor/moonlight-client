@@ -5455,11 +5455,13 @@ struct CzMoonlightSurvivorsCoopLobby {
 // PACKET_ZC_MOONLIGHT_SURVIVORS_COOP_LOBBY_entry
 struct ZcMoonlightSurvivorsCoopLobbyEntry {
   // Taille sur le fil, en octets.
-  static constexpr std::size_t kWireSize = 29;
+  static constexpr std::size_t kWireSize = 33;
 
   std::uint32_t char_id = 0;
   std::uint8_t ready = 0;
   std::string name;
+  std::uint16_t class_id = 0;
+  std::uint16_t first_skill_id = 0;
 };
 
 // PACKET_ZC_MOONLIGHT_SURVIVORS_COOP_LOBBY

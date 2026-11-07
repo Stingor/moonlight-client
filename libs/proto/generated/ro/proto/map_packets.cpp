@@ -1186,6 +1186,8 @@ void ReadZcMoonlightSurvivorsCoopLobbyEntry(ByteReader& reader,
   value.char_id = static_cast<std::uint32_t>(reader.U32());
   value.ready = static_cast<std::uint8_t>(reader.U8());
   value.name = reader.FixedString(24);
+  value.class_id = static_cast<std::uint16_t>(reader.U16());
+  value.first_skill_id = static_cast<std::uint16_t>(reader.U16());
 }
 
 void WriteZcMoonlightSurvivorsCoopLobbyEntry(ByteWriter& writer,
@@ -1193,6 +1195,8 @@ void WriteZcMoonlightSurvivorsCoopLobbyEntry(ByteWriter& writer,
   writer.U32(static_cast<std::uint32_t>(value.char_id));
   writer.U8(static_cast<std::uint8_t>(value.ready));
   writer.FixedString(value.name, 24);
+  writer.U16(static_cast<std::uint16_t>(value.class_id));
+  writer.U16(static_cast<std::uint16_t>(value.first_skill_id));
 }
 
 void ReadCzSePcBuyCashitemListSub(ByteReader& reader, CzSePcBuyCashitemListSub& value) {

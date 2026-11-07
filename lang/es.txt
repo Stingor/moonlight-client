@@ -401,6 +401,12 @@ tr: Conservador
 fr: Coop : salon du groupe
 tr: Cooperativo: sala del grupo
 
+fr: %s (%s, %s) : prêt
+tr: %s (%s, %s): listo
+
+fr: %s (%s, %s) : en attente
+tr: %s (%s, %s): en espera
+
 fr: Coucher (h)
 tr: Ocaso (h)
 

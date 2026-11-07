@@ -257,6 +257,7 @@ class SurvivorsMode {
   std::array<ro::render::ActorLook, ro::sim::kMostHeroes> ally_faces_{};
   std::array<std::optional<std::uint16_t>, ro::sim::kMostHeroes> ally_jobs_{};
   std::vector<ro::ui::SurvivorsPrepareCoopMember> coop_members_;
+  std::uint64_t coop_choice_sent_ms_ = 0;
   std::vector<const char*> coop_refusals_;
   // L'alerte du monde réel se dit au HUD jusqu'à ce moment : rien ne met en pause.
   std::uint64_t coop_alert_until_ms_ = 0;

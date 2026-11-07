@@ -401,6 +401,12 @@ tr: Curator
 fr: Coop : salon du groupe
 tr: Co-op: party lobby
 
+fr: %s (%s, %s) : prêt
+tr: %s (%s, %s): ready
+
+fr: %s (%s, %s) : en attente
+tr: %s (%s, %s): waiting
+
 fr: Coucher (h)
 tr: Sunset (h)
 

@@ -18,8 +18,10 @@ namespace ro::net {
 // d'entrées. Voir le cahier `docs/survivors/lot-14-coop.md`.
 //
 //   CZ 0x0F58 LOBBY [op:2][len:2][action:1][part...]
+//                   kChoice : part = [class_id:2][first_skill_id:2]
 //   ZC 0x0F59 LOBBY [op:2][len:2][state:1][refusals:4][count:1]
-//                   puis count × [char_id:4][ready:1][name:24]
+//                   puis count × [char_id:4][ready:1][name:24][class_id:2]
+//                   [first_skill_id:2]
 //   ZC 0x0F5A START [op:2][len:2][seed:8][input_delay_ticks:1][count:1]
 //                   puis count × [char_id:4][part_len:2][part]
 //   CZ 0x0F5B FRAME [op:2][len:2][payload:4..256]
@@ -45,7 +47,7 @@ inline constexpr std::size_t kSurvivorsCoopLeastPayloadBytes = 4;
 inline constexpr std::size_t kSurvivorsCoopMostPayloadBytes = 256;
 inline constexpr std::size_t kSurvivorsCoopNameBytes = 24;
 
-enum class SurvivorsCoopAction : std::uint8_t { kEnter = 0, kReady = 1, kLeave = 2 };
+enum class SurvivorsCoopAction : std::uint8_t { kEnter = 0, kReady = 1, kLeave = 2, kChoice = 3 };
 enum class SurvivorsCoopState : std::uint8_t { kClosed = 0, kLobby = 1, kPlaying = 2 };
 
 // Ce qui empêche de partir, un bit par raison.
@@ -60,6 +62,10 @@ struct SurvivorsCoopMember {
   std::uint32_t char_id = 0;
   bool ready = false;
   std::string name;
+  // Ce que ce membre a annoncé, tel qu'il l'a dit : à lire contre les règles.
+  // 0 : rien encore.
+  std::uint16_t class_id = 0;
+  std::uint16_t first_skill_id = 0;
   [[nodiscard]] bool operator==(const SurvivorsCoopMember&) const = default;
 };
 struct SurvivorsCoopLobby {
@@ -93,6 +99,9 @@ struct SurvivorsCoopLeft {
 // Une part de plus de kSurvivorsCoopMostPartBytes se refuse : le serveur la jetterait.
 [[nodiscard]] std::optional<std::vector<std::uint8_t>> EncodeSurvivorsCoopLobbyAsk(
     SurvivorsCoopAction action, std::span<const std::uint8_t> part = {});
+// La part de `kChoice`.
+[[nodiscard]] std::vector<std::uint8_t> SurvivorsCoopChoicePart(std::uint16_t class_id,
+                                                                std::uint16_t first_skill_id);
 // Un payload hors de ses bornes se refuse.
 [[nodiscard]] std::optional<std::vector<std::uint8_t>> EncodeSurvivorsCoopFrameAsk(
     std::span<const std::uint8_t> payload);

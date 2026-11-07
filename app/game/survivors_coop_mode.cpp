@@ -167,6 +167,17 @@ void SurvivorsCoopMode::Ask(ro::net::Connection& link, ro::net::SurvivorsCoopAct
   link.Send(*bytes);
 }
 
+bool SurvivorsCoopMode::ChoiceOwed(std::uint32_t own_char_id, std::uint16_t class_id,
+                                   std::uint16_t first_skill_id) const noexcept {
+  if (lobby_.state != ro::net::SurvivorsCoopState::kLobby) return false;
+  for (const ro::net::SurvivorsCoopMember& member : lobby_.members) {
+    if (member.char_id == own_char_id) {
+      return member.class_id != class_id || member.first_skill_id != first_skill_id;
+    }
+  }
+  return false;
+}
+
 void SurvivorsCoopMode::Forsake(ro::net::Connection& link) {
   if (lobby_.state != ro::net::SurvivorsCoopState::kLobby && !start_.has_value()) return;
   Ask(link, ro::net::SurvivorsCoopAction::kLeave);

@@ -120,6 +120,9 @@ struct SurvivorsPrepareMeta {
 struct SurvivorsPrepareCoopMember {
   const char* name = "";
   bool ready = false;
+  // Ce qu'il a choisi, déjà dans la langue du joueur ; nuls tant qu'il n'a rien annoncé.
+  const char* class_title = nullptr;
+  const char* skill_name = nullptr;
 };
 struct SurvivorsPrepareCoop {
   bool shown = false;

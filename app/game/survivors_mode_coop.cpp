@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <optional>
@@ -13,6 +14,7 @@
 #include "game/survivors_coop_mode.h"
 #include "game/survivors_mode.h"
 #include "survivors/arena_choice.h"
+#include "survivors/survivors_book.h"
 #include "survivors/survivors_looks.h"
 #include "voice/voice_mode.h"
 #include "world/actor_view.h"
@@ -36,6 +38,9 @@ constexpr std::uint64_t kCoopGiveUpMs = 90000;
 // « Votre groupe est déjà en partie » se dit ce temps : le serveur ne dit pas à qui est
 // resté dehors que la partie s'est finie, et un nouveau clic le lui apprendrait.
 constexpr std::uint64_t kCoopPlayingNoticeMs = 8000;
+// Un choix que le serveur n'a pas encore montré se redit après ceci : sa cadence peut
+// l'avoir refusé.
+constexpr std::uint64_t kCoopChoiceRetryMs = 500;
 // Une alerte du monde réel reste dite tout ce temps.
 constexpr std::uint64_t kCoopAlertNoticeMs = 6000;
 
@@ -65,6 +70,19 @@ void SurvivorsMode::FollowCoopDoor(SurvivorsStage& stage, const SurvivorsContext
   if (asked.coop_enter) coop.Ask(*context.link, SurvivorsCoopAction::kEnter);
   if (asked.coop_leave) {
     coop.Ask(*context.link, SurvivorsCoopAction::kLeave);
+  }
+  // LE CHOIX DE CE JOUEUR, que les autres lisent au salon. Il part avant « prêt », qui le
+  // suit donc sur le fil : le serveur annule « prêt » quand le choix change.
+  const ro::sim::ClassRule* chosen_class = PlayingClass();
+  if (chosen_class != nullptr) {
+    const std::uint16_t chosen_skill = ChosenBolt();
+    if (coop.ChoiceOwed(context.own_char_id, chosen_class->class_id, chosen_skill) &&
+        (asked.coop_ready || coop_choice_sent_ms_ == 0 ||
+         context.now_ms - coop_choice_sent_ms_ >= kCoopChoiceRetryMs)) {
+      coop.Ask(*context.link, SurvivorsCoopAction::kChoice,
+               ro::net::SurvivorsCoopChoicePart(chosen_class->class_id, chosen_skill));
+      coop_choice_sent_ms_ = context.now_ms;
+    }
   }
   if (asked.coop_ready && !refused) {
     // LA PART DE CE JOUEUR : la partie libre que l'accueil a réglée, et son apparence.
@@ -105,8 +123,18 @@ void SurvivorsMode::FollowCoopDoor(SurvivorsStage& stage, const SurvivorsContext
   coop_members_.clear();
   for (const ro::net::SurvivorsCoopMember& member : lobby.members) {
     own_ready = own_ready || (member.char_id == context.own_char_id && member.ready);
-    coop_members_.push_back(
-        ro::ui::SurvivorsPrepareCoopMember{.name = member.name.c_str(), .ready = member.ready});
+    // Un choix que les règles de ce client ne connaissent pas ne se nomme pas.
+    const ro::sim::ClassRule* member_class = ro::sim::FindClass(Rules(), member.class_id);
+    const bool skill_known =
+        member_class != nullptr &&
+        std::ranges::find(member_class->starter_skills, member.first_skill_id) !=
+            member_class->starter_skills.end();
+    coop_members_.push_back(ro::ui::SurvivorsPrepareCoopMember{
+        .name = member.name.c_str(),
+        .ready = member.ready,
+        .class_title = member_class != nullptr ? ClassTitleOf(*member_class) : nullptr,
+        .skill_name = skill_known ? views_.StarterSkillName(member.first_skill_id, context.tables)
+                                  : nullptr});
   }
   coop_refusals_.clear();
   const auto say_if = [&](std::uint32_t bit, const char* text) {
