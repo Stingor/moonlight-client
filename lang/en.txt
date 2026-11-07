@@ -12244,8 +12244,8 @@ tr: Faces
 fr: Vitesse d'attaque ajoutée (valeur plate).
 tr: Attack speed added (flat value).
 
-fr: Vitesse de marche. PLUS BAS = PLUS RAPIDE ; 150 est la vitesse normale, 20 le plancher du serveur.\nEnvoyée au relâchement.
-tr: Walk speed. LOWER = FASTER; 150 is the normal speed, 20 the server's floor.\nSent on release.
+fr: Vitesse de marche. PLUS BAS = PLUS RAPIDE ; 150 est la vitesse normale, 20 le plancher du serveur.\nEnvoyée à la fin du geste.
+tr: Walk speed. LOWER = FASTER; 150 is the normal speed, 20 the server's floor.\nSent when the gesture ends.
 
 fr: Vitesse normale
 tr: Normal speed

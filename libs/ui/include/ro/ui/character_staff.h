@@ -2,8 +2,11 @@
 
 #include <array>
 #include <cstdint>
+#include <optional>
 #include <span>
 #include <string_view>
+
+#include "ro/ui/staff_slider.h"
 
 // LE VOLET DU STAFF : le troisième volet du mannequin.
 //
@@ -231,14 +234,11 @@ struct StaffPaneState {
   int refine_step = 1;
   int refine_place = 0;
 
-  // LA VITESSE MONTRÉE PAR LE CURSEUR.
-  //
-  // 🔴 LE SERVEUR EN EST LA SOURCE, ET ON LE SUIT PAR FRONT. Après notre propre
-  // envoi, il renvoie la valeur qu'on affiche déjà : s'aligner à chaque image
-  // ferait sauter le curseur en arrière le temps de l'aller-retour.
-  int speed = kWalkSpeedNormal;
-  int speed_sent = kWalkSpeedNormal;
-  int speed_seen = kWalkSpeedNormal;
+  // LA VITESSE EN COURS DE RÉGLAGE, puis la dernière envoyée. Le serveur reste la
+  // source : celle-ci n'est montrée que le temps qu'il la renvoie, et ses échos
+  // intermédiaires ne ramènent pas le curseur en arrière.
+  StaffWheelDraft speed_draft;
+  std::optional<StaffSliderPending> speed_pending;
 
   // Le filtre du menu des classes. ⚠ REMIS À ZÉRO À CHAQUE OUVERTURE : gardé
   // d'une fois sur l'autre, il rouvrirait la liste presque vide sans que rien ne

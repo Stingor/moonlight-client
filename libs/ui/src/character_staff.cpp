@@ -5,6 +5,7 @@
 #include <cmath>
 #include <cstdio>
 #include <cstring>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -205,36 +206,26 @@ void DrawJobPicker(StaffPaneState& state, const StaffPaneView& view, const SkinA
 // ── LA VITESSE DE MARCHE ────────────────────────────────────────────────────
 void DrawSpeed(StaffPaneState& state, const StaffPaneView& view, const SkinArt& art,
                StaffAction& action) {
-  // 🔴 UN FRONT, ET NON UN ALIGNEMENT À CHAQUE IMAGE : après notre propre envoi
-  // le serveur renvoie la valeur qu'on affiche déjà, donc le curseur ne saute
-  // jamais en arrière le temps de l'aller-retour.
-  if (view.server_speed != state.speed_seen) {
-    state.speed_seen = view.server_speed;
-    state.speed = view.server_speed;
-    state.speed_sent = view.server_speed;
-  }
+  const double now_s = ImGui::GetTime();
+  const int shown = StaffSliderShown(state.speed_pending, view.server_speed, now_s);
   ImGui::SetNextItemWidth(-1.0F);
-  static_cast<void>(
-      SkinSliderInt("##vitesse", &state.speed, kWalkSpeedFastest, kWalkSpeedSlowest, art, "%d"));
-  // 🔴 ENVOYÉE AU RELÂCHEMENT, JAMAIS PENDANT LE GLISSER. Chaque pose est une
-  // ligne de conversation ET un recalcul complet côté serveur : une par image de
-  // glisser noierait la conversation et le ferait travailler pour rien.
-  const bool released = ImGui::IsItemDeactivatedAfterEdit();
+  const std::optional<int> speed = StaffWheelSlider("##vitesse", shown, kWalkSpeedFastest,
+                                                    kWalkSpeedSlowest, state.speed_draft, art);
   if (ImGui::IsItemHovered()) {
     SkinTooltip(
         core::Tr("Vitesse de marche. PLUS BAS = PLUS RAPIDE ; 150 est la vitesse "
-                 "normale, 20 le plancher du serveur.\nEnvoyée au relâchement."));
+                 "normale, 20 le plancher du serveur.\nEnvoyée à la fin du geste."));
   }
-  if (released && state.speed != state.speed_sent) {
+  if (speed.has_value()) {
     action.order = StaffOrder::kSetSpeed;
-    action.amount = state.speed;
-    state.speed_sent = state.speed;
+    action.amount = *speed;
+    state.speed_pending = StaffSliderPending{.value = *speed, .sent_at_s = now_s};
   }
   if (SkinButton(core::Tr("Vitesse normale"), art,
                  ImVec2(ImGui::GetContentRegionAvail().x, 0.0F))) {
     action.order = StaffOrder::kNormalSpeed;
-    state.speed = kWalkSpeedNormal;
-    state.speed_sent = kWalkSpeedNormal;
+    state.speed_draft.value.reset();
+    state.speed_pending = StaffSliderPending{.value = kWalkSpeedNormal, .sent_at_s = now_s};
   }
   if (ImGui::IsItemHovered()) {
     SkinTooltip(core::Tr("Rend au personnage sa vitesse par défaut (150)."));

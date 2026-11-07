@@ -64,4 +64,25 @@ std::optional<int> StaffReleasedSlider(const char* label, int shown, int lowest,
                            draft);
 }
 
+std::optional<int> StaffWheelSlider(const char* label, int shown, int lowest, int highest,
+                                    StaffWheelDraft& draft, const SkinArt& art) {
+  int value = std::clamp(draft.value.value_or(shown), lowest, highest);
+  const bool changed = SkinSliderInt(label, &value, lowest, highest, art);
+  const double now_s = ImGui::GetTime();
+  if (changed) {
+    draft.changed_at_s = now_s;
+  }
+  const bool resting = now_s - draft.changed_at_s >= kStaffSliderRestSeconds;
+  const std::optional<int> settled =
+      StaffSliderSettle(value,
+                        StaffSliderGesture{
+                            .changed = changed,
+                            .active = ImGui::IsItemActive(),
+                            .released_after_edit = ImGui::IsItemDeactivatedAfterEdit(),
+                            .mouse_held = ImGui::IsMouseDown(ImGuiMouseButton_Left) || !resting,
+                        },
+                        draft.value);
+  return settled == shown ? std::nullopt : settled;
+}
+
 }  // namespace ro::ui

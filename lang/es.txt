@@ -12244,8 +12244,8 @@ tr: Caras
 fr: Vitesse d'attaque ajoutée (valeur plate).
 tr: Velocidad de ataque añadida (valor plano).
 
-fr: Vitesse de marche. PLUS BAS = PLUS RAPIDE ; 150 est la vitesse normale, 20 le plancher du serveur.\nEnvoyée au relâchement.
-tr: Velocidad de marcha. MÁS BAJO = MÁS RÁPIDO; 150 es la velocidad normal, 20 el mínimo del servidor.\nSe envía al soltar.
+fr: Vitesse de marche. PLUS BAS = PLUS RAPIDE ; 150 est la vitesse normale, 20 le plancher du serveur.\nEnvoyée à la fin du geste.
+tr: Velocidad de marcha. MÁS BAJO = MÁS RÁPIDO; 150 es la velocidad normal, 20 el mínimo del servidor.\nSe envía al terminar el gesto.
 
 fr: Vitesse normale
 tr: Velocidad normal

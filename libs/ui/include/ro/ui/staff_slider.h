@@ -2,7 +2,8 @@
 
 // LE CURSEUR D'UNE COMMANDE DU STAFF : il pose une valeur sur le serveur, donc
 // il n'envoie qu'au terme du geste et montre la valeur envoyée le temps que le
-// serveur la renvoie. Les fiches de l'homoncule et du familier le partagent.
+// serveur la renvoie. Les fiches de l'homoncule et du familier le partagent,
+// et le volet du staff pour la vitesse de marche.
 
 #include <optional>
 
@@ -14,6 +15,11 @@ namespace ro::ui {
 // serveur renvoie la fiche en une fraction de seconde ; un refus, lui, ne
 // renvoie rien, et le curseur doit bien finir par revenir à la valeur servie.
 inline constexpr double kStaffSliderAwaitSeconds = 5.0;
+
+// LE REPOS QUI CLÔT UN GESTE SANS BOUTON TENU, en secondes : au-delà, une salve
+// de crans de molette ou de clics sur une flèche est finie. Du même ordre que
+// la durée d'une salve de molette.
+inline constexpr double kStaffSliderRestSeconds = 0.35;
 
 // UNE VALEUR QU'UN CURSEUR DU STAFF A ENVOYÉE, et que le serveur n'a pas encore
 // renvoyée.
@@ -62,5 +68,23 @@ struct StaffSliderGesture {
 [[nodiscard]] std::optional<int> StaffReleasedSlider(const char* label, int shown, int lowest,
                                                      int highest, std::optional<int>& draft,
                                                      const SkinArt& art);
+
+// LE BROUILLON D'UN CURSEUR QUI PREND LA MOLETTE, et l'instant de son dernier
+// changement, sur l'horloge d'ImGui, en secondes.
+struct StaffWheelDraft {
+  std::optional<int> value;
+  double changed_at_s = 0.0;
+};
+
+// LE CURSEUR QUI PREND LA MOLETTE, réservé à une commande sans conséquence
+// durable. Rend la valeur à envoyer, rien tant que le geste dure ou si la valeur
+// finale est celle qu'il montrait déjà.
+//
+// 🔴 UN CRAN NE PART PAS TOUT SEUL : chaque envoi coûte une ligne de conversation
+// et un calcul au serveur. La salve se résume en un seul envoi, après
+// `kStaffSliderRestSeconds` sans changement.
+[[nodiscard]] std::optional<int> StaffWheelSlider(const char* label, int shown, int lowest,
+                                                  int highest, StaffWheelDraft& draft,
+                                                  const SkinArt& art);
 
 }  // namespace ro::ui
