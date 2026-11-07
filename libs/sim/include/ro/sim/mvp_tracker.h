@@ -33,6 +33,8 @@ enum class MvpSlotKind : std::uint8_t {
   kScriptTimer = 1,
   kScriptInvasion = 2,
   kSummonLock = 3,
+  // Illusion : appelé par les kills de la carte, le délai n'est qu'un minimum.
+  kScriptKillCount = 4,
 };
 
 // D'OÙ VIENT UNE OBSERVATION. ⚠ L'ORDRE EST L'ORDRE DE PRÉCISION : c'est par
