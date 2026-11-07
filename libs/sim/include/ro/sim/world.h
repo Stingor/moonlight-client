@@ -83,6 +83,13 @@ class World : public WorldHoldings, public WorldNpcDialog {
 
   // Met un acteur en marche, depuis le départ annoncé (voir movement_started_ms).
   bool StartMoving(std::uint32_t id, const CellMovement& path, std::uint32_t started_ms);
+  // La même, annoncée à `now_ms` pour un départ daté du serveur : ce que l'acteur
+  // montre à cet instant se raccorde à sa marche neuve. Voir ContinueShownWalk.
+  bool StartMoving(std::uint32_t id, const CellMovement& path, std::uint32_t started_ms,
+                   std::uint32_t now_ms);
+  // UN ACTEUR ANNONCÉ ENTIER ET EN MARCHE, à `now_ms` : l'entrée en vue de qui marche,
+  // ou la réannonce de qui y est déjà, raccordée à ce qu'il montrait.
+  void SpawnWalking(Actor actor, std::uint32_t now_ms);
   // Le fait GLISSER de sa case vers `to`, à la vitesse imposée et non à la sienne.
   bool StartGliding(std::uint32_t id, CellPosition to, std::uint16_t ms_per_cell,
                     std::uint32_t now_ms);

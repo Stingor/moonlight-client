@@ -2,6 +2,7 @@
 // du bond de Body Relocation. Voir `World::StartGliding`.
 
 #include <cmath>
+#include <utility>
 
 #include "ro/sim/movement.h"
 #include "ro/sim/world.h"
@@ -31,6 +32,18 @@ bool World::StartGliding(std::uint32_t id, CellPosition to, std::uint16_t ms_per
   }
   actors_.at(id).glide_ms_per_cell = ms_per_cell;
   return true;
+}
+
+void World::SpawnWalking(Actor actor, std::uint32_t now_ms) {
+  const std::uint32_t id = actor.id;
+  const auto known = actors_.find(id);
+  if (known == actors_.end()) {
+    Spawn(std::move(actor));
+    return;
+  }
+  const ShownWalk shown = ShownWalkAt(known->second, walk_map_, now_ms);
+  Spawn(std::move(actor));
+  ContinueShownWalk(actors_.at(id), walk_map_, shown, now_ms);
 }
 
 bool World::RecordPlayedEffect(std::uint32_t id, const PlayedEffect& played) {

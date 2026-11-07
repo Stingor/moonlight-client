@@ -256,6 +256,8 @@ void World::Halt(Actor& actor, CellPosition where) {
   actor.position = where;
   // Le déplacement tombe avec la position : c'est le sens même d'un arrêt.
   actor.movement.reset();
+  actor.walk_absorb_dx_cells = 0.0F;
+  actor.walk_absorb_dy_cells = 0.0F;
 }
 
 bool World::PlaceAt(std::uint32_t id, CellPosition where, std::optional<std::uint32_t> arrived_ms) {
@@ -274,10 +276,16 @@ bool World::PlaceAt(std::uint32_t id, CellPosition where, std::optional<std::uin
 }
 
 bool World::StartMoving(std::uint32_t id, const CellMovement& path, std::uint32_t started_ms) {
+  return StartMoving(id, path, started_ms, started_ms);
+}
+
+bool World::StartMoving(std::uint32_t id, const CellMovement& path, std::uint32_t started_ms,
+                        std::uint32_t now_ms) {
   const auto found = actors_.find(id);
   if (found == actors_.end()) {
     return false;
   }
+  const ShownWalk shown = ShownWalkAt(found->second, walk_map_, now_ms);
   // 🔴 UN DÉPLACEMENT NE PORTE AUCUNE DIRECTION. Les six octets de `MoveData`
   // sont deux cases et deux sous-cases, rien d'autre : `path.from.direction`
   // vaut donc ZÉRO — le NORD —, et l'affecter avec le reste met l'acteur dos à
@@ -314,6 +322,7 @@ bool World::StartMoving(std::uint32_t id, const CellMovement& path, std::uint32_
   // direction partirait d'un regard que le serveur a déjà remis à zéro, et le
   // tour s'y compterait de travers.
   found->second.head_direction = kGazeAhead;
+  ContinueShownWalk(found->second, walk_map_, shown, now_ms);
   return true;
 }
 

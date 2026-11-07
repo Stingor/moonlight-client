@@ -239,7 +239,8 @@ float TravelledCells(const Actor& actor, const WalkPath& path, std::uint32_t now
   // Ce qui précède le déplacement en cours COMPTE : le compteur du jeu court
   // sur toute la vie de l'acteur, et le remettre à zéro à chaque ordre de
   // marche tronquerait le cycle de l'animation.
-  return actor.travelled_before_cells + TravelledAlong(actor, path, now_ms);
+  return actor.travelled_before_cells + actor.travelled_correction_cells +
+         TravelledAlong(actor, path, now_ms);
 }
 
 std::uint8_t DirectionTowards(CellPosition from, CellPosition to, std::uint8_t fallback) {
@@ -337,7 +338,19 @@ CellPosition StoppedCell(const Actor& actor, const WalkPath& path, std::uint32_t
 }
 
 FractionalCell InterpolatedCell(const Actor& actor, const WalkPath& path, std::uint32_t now_ms) {
-  return Locate(actor, path, now_ms).cell;
+  FractionalCell cell = Locate(actor, path, now_ms).cell;
+  if (actor.walk_absorb_dx_cells == 0.0F && actor.walk_absorb_dy_cells == 0.0F) {
+    return cell;
+  }
+  // Un instant antérieur à la réannonce la voit encore entière.
+  const std::uint32_t age_ms =
+      now_ms > actor.walk_absorb_started_ms ? now_ms - actor.walk_absorb_started_ms : 0;
+  if (age_ms < kWalkAbsorbMs) {
+    const float left = 1.0F - static_cast<float>(age_ms) / static_cast<float>(kWalkAbsorbMs);
+    cell.x += actor.walk_absorb_dx_cells * left;
+    cell.y += actor.walk_absorb_dy_cells * left;
+  }
+  return cell;
 }
 
 std::uint8_t FacingAt(const Actor& actor, const WalkPath& path, std::uint32_t now_ms) {
@@ -367,13 +380,50 @@ FractionalCell InterpolatedCell(const Actor& actor, std::uint32_t now_ms) {
   return InterpolatedCell(actor, StraightPathOf(actor), now_ms);
 }
 
-FractionalCell PositionAt(const Actor& actor, const WalkMap* map, std::uint32_t at_ms) {
+namespace {
+
+// Le chemin que le dessin donne à cet acteur : celui de la carte, ou la ligne
+// droite quand elle manque ou qu'elle refuse le chemin annoncé.
+WalkPath PlannedPathOf(const Actor& actor, const WalkMap* map) {
   if (!actor.movement.has_value()) {
-    return InterpolatedCell(actor, at_ms);
+    return WalkPath{};
   }
-  const std::optional<WalkPath> found =
+  std::optional<WalkPath> found =
       map != nullptr ? FindWalkPath(*map, actor.movement->from, actor.movement->to) : std::nullopt;
-  return InterpolatedCell(actor, found.has_value() ? *found : StraightPathOf(actor), at_ms);
+  return found.has_value() ? std::move(*found) : StraightPathOf(actor);
+}
+
+}  // namespace
+
+FractionalCell PositionAt(const Actor& actor, const WalkMap* map, std::uint32_t at_ms) {
+  return InterpolatedCell(actor, PlannedPathOf(actor, map), at_ms);
+}
+
+ShownWalk ShownWalkAt(const Actor& actor, const WalkMap* map, std::uint32_t now_ms) {
+  const WalkPath path = PlannedPathOf(actor, map);
+  return ShownWalk{InterpolatedCell(actor, path, now_ms), TravelledCells(actor, path, now_ms)};
+}
+
+void ContinueShownWalk(Actor& actor, const WalkMap* map, const ShownWalk& shown,
+                       std::uint32_t now_ms) {
+  actor.walk_absorb_dx_cells = 0.0F;
+  actor.walk_absorb_dy_cells = 0.0F;
+  actor.travelled_correction_cells = 0.0F;
+  const WalkPath path = PlannedPathOf(actor, map);
+  actor.travelled_correction_cells = shown.travelled_cells - TravelledCells(actor, path, now_ms);
+  // Sans vitesse, l'acteur se téléporte : il n'y a pas de marche à raccorder.
+  if (MovingSpeedOf(actor) == 0) {
+    return;
+  }
+  const FractionalCell announced = InterpolatedCell(actor, path, now_ms);
+  const float gap_x = shown.cell.x - announced.x;
+  const float gap_y = shown.cell.y - announced.y;
+  if (std::hypot(gap_x, gap_y) > kWalkAbsorbLargestCells) {
+    return;
+  }
+  actor.walk_absorb_dx_cells = gap_x;
+  actor.walk_absorb_dy_cells = gap_y;
+  actor.walk_absorb_started_ms = now_ms;
 }
 
 std::uint32_t WalkStartAfterSpeedChange(const Actor& actor, const WalkMap* map,

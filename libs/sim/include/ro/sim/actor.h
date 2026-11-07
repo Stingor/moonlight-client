@@ -560,6 +560,17 @@ struct Actor {
   // repartirait de sa première image à chaque fois. Le personnage marcherait
   // d'un seul pied.
   float travelled_before_cells = 0.0F;
+  // CE QUI GARDE LE COMPTEUR CONTINU À UNE RÉANNONCE, en cases : l'écart entre la
+  // distance montrée juste avant et celle que le nouveau déplacement donne au
+  // même instant. Sans lui, les jambes sauteraient d'une image, en avant ou en
+  // arrière. Voir ContinueShownWalk.
+  float travelled_correction_cells = 0.0F;
+  // L'ÉCART QUE LA MARCHE MONTRÉE RÉSORBE, en cases, et depuis quand : ce qui
+  // séparait l'endroit où l'acteur se montrait de celui que la dernière annonce
+  // lui donne. Il s'éteint en kWalkAbsorbMs. Voir InterpolatedCell.
+  float walk_absorb_dx_cells = 0.0F;
+  float walk_absorb_dy_cells = 0.0F;
+  std::uint32_t walk_absorb_started_ms = 0;
   // La vie, quand le serveur la donne. Il ne la donne que d'un MONSTRE, sous un
   // réglage qui n'est pas toujours mis, et seulement une fois le monstre
   // entamé : moins un veut dire « on ne sait pas », et non « mort ».

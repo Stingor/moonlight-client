@@ -343,7 +343,7 @@ FrameOutcome ApplyFrame(const Frame& frame, sim::World& world, std::uint32_t now
         world.server_clock().NoteServerTimestamp(packet.moveStartTime, now_ms);
         actor.movement_started_ms = world.server_clock().LocalTimeOf(packet.moveStartTime, now_ms);
         actor.body_state_since_ms = now_ms;
-        world.Spawn(std::move(actor));
+        world.SpawnWalking(std::move(actor), now_ms);
         return FrameOutcome::kApplied;
       });
 
@@ -596,7 +596,12 @@ FrameOutcome ApplyFrame(const Frame& frame, sim::World& world, std::uint32_t now
         if (world.player_id() == 0) {
           return FrameOutcome::kIgnored;
         }
-        world.StartMoving(world.player_id(), sim::UnpackMovement(packet.moveData), now_ms);
+        // Sa marche se date comme celle des autres, à l'heure du SERVEUR : dater
+        // de l'arrivée de la trame ferait sauter le personnage à chaque
+        // réannonce, de toute la gigue du réseau et de l'image attendue.
+        world.server_clock().NoteServerTimestamp(packet.moveStartTime, now_ms);
+        world.StartMoving(world.player_id(), sim::UnpackMovement(packet.moveData),
+                          world.server_clock().LocalTimeOf(packet.moveStartTime, now_ms), now_ms);
         return FrameOutcome::kApplied;
       });
 

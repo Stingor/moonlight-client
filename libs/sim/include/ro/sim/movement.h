@@ -151,6 +151,9 @@ inline constexpr float kSubCellCenter = 8.0F;
 [[nodiscard]] CellPosition StoppedCell(const Actor& actor, const WalkPath& path,
                                        std::uint32_t now_ms);
 
+// C'est l'endroit où l'acteur SE MONTRE : son chemin, plus ce qu'il lui reste à
+// résorber d'une réannonce (voir ContinueShownWalk). `StoppedCell`, elle, juge
+// sur le seul chemin, comme le serveur.
 [[nodiscard]] FractionalCell InterpolatedCell(const Actor& actor, const WalkPath& path,
                                               std::uint32_t now_ms);
 
@@ -187,6 +190,40 @@ inline constexpr float kSubCellCenter = 8.0F;
 // s'il le faut, et non vers la case où elle s'arrêtera.
 [[nodiscard]] FractionalCell PositionAt(const Actor& actor, const WalkMap* map,
                                         std::uint32_t at_ms);
+
+// ── D'une annonce à la suivante ─────────────────────────────────────────────
+//
+// 🔴 UNE RÉANNONCE NE DÉPLACE PAS CE QUI EST À L'ÉCRAN. Le serveur redit la marche
+// à chaque case quand le clic reste tenu, et à chaque pas de qui vient d'être
+// touché. Sa date ne tombe jamais exactement où le chemin précédent en était : la
+// gigue du réseau et le retard de ses minuteries valent quelques millisecondes,
+// qu'un acteur montrerait comme un saut. L'écart se résorbe donc en douceur.
+//
+// LA DURÉE EST D'UN PAS ORDINAIRE, et elle tient plus que l'écart qu'elle résorbe :
+// un écart plus court que la durée ralentit l'acteur sans jamais le faire reculer.
+inline constexpr std::uint32_t kWalkAbsorbMs = 150;
+
+// AU-DELÀ DE CET ÉCART, EN CASES, L'ACTEUR SE POSE : le serveur l'a vraiment placé
+// ailleurs, et le faire glisser montrerait un trajet qu'il n'a pas fait.
+//
+// LE SEUIL SE DÉRIVE DE LA MARCHE LA PLUS RAPIDE : cette gigue-là, à cinquante
+// cases par seconde, doit encore se résorber.
+inline constexpr float kWalkAbsorbLargestLagMs = 40.0F;
+inline constexpr float kWalkAbsorbLargestCells =
+    kWalkAbsorbLargestLagMs / static_cast<float>(kFastestStepMs);
+
+// Ce qu'un acteur montre à un instant : à relever AVANT de lui donner sa marche
+// neuve.
+struct ShownWalk {
+  FractionalCell cell;
+  float travelled_cells = 0.0F;
+};
+[[nodiscard]] ShownWalk ShownWalkAt(const Actor& actor, const WalkMap* map, std::uint32_t now_ms);
+
+// Raccorde la marche neuve de `actor` à ce qu'il montrait : même position et même
+// distance parcourue à `now_ms`.
+void ContinueShownWalk(Actor& actor, const WalkMap* map, const ShownWalk& shown,
+                       std::uint32_t now_ms);
 
 // L'INSTANT DE DÉPART QUI GARDE L'ACTEUR AU MÊME ENDROIT DE SON CHEMIN une fois
 // sa vitesse changée.
