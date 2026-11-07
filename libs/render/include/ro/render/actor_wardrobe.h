@@ -371,6 +371,10 @@ class ActorWardrobe {
   // La fusion d'une teinte officielle sur un corps, gardée ici parce que les
   // pièces des vignettes en retiennent l'ADRESSE.
   std::map<std::pair<std::string, std::int16_t>, formats::Palette> swatch_palettes_;
+  // La palette d'un corps, complétée par celle de son sprite ; ses adresses sont stables, et
+  // celles de ses clés aussi, le sprite et la palette de serveur restant chargés.
+  std::map<std::pair<const LoadedActorSprite*, const formats::Palette*>, formats::Palette>
+      merged_body_palettes_;
   std::vector<std::string> missing_;
 };
 

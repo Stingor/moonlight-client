@@ -365,6 +365,15 @@ std::vector<ActorPiece> ActorWardrobe::Dress(const ActorLook& look) {
         palette_serial = styled->serial;
       }
     }
+    // LE CORPS GARDE LES COULEURS QUE SA PALETTE NE DÉFINIT PAS : un corps peut employer des
+    // index qu'elle laisse vides, et il sortirait noir (`MergeServerPalette`).
+    if (files.part == ActorPart::kBody && palette != nullptr && palette_serial == 0 &&
+        loaded->sprite.palette().has_value()) {
+      palette = &merged_body_palettes_
+                     .try_emplace(std::pair{loaded, palette},
+                                  MergeServerPalette(*loaded->sprite.palette(), palette))
+                     .first->second;
+    }
     pieces.push_back(DescribeActorPiece(*loaded, files.part, palette));
     pieces.back().palette_serial = palette_serial;
   }
