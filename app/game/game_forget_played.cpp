@@ -60,6 +60,7 @@ void Game::ForgetWhatPlayed() {
   // Le curseur armé vise la même carte révolue.
   grimoire_.CancelPending();
   grimoire_.Disarm();
+  pieces_.companion_ai.Disarm();
   // LA FLÈCHE RENAÎT CACHÉE, et son animation repart, même carte comprise.
   // L'engagement, lui, ne tombe que sur une AUTRE carte.
   EnterMap(world_mouse_.engagement, same_map);

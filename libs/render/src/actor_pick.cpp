@@ -358,6 +358,15 @@ std::optional<ScreenRect> ActorScreenRect(const Camera& camera, float aspect_rat
 std::optional<std::size_t> PickActor(const Camera& camera, float aspect_ratio,
                                      std::span<const DrawnActor> actors, float screen_x,
                                      float screen_y, float viewport_width, float viewport_height) {
+  return PickActorAmong(camera, aspect_ratio, actors, screen_x, screen_y, viewport_width,
+                        viewport_height, [](std::size_t /*index*/) { return true; });
+}
+
+std::optional<std::size_t> PickActorAmong(const Camera& camera, float aspect_ratio,
+                                          std::span<const DrawnActor> actors, float screen_x,
+                                          float screen_y, float viewport_width,
+                                          float viewport_height,
+                                          const std::function<bool(std::size_t)>& eligible) {
   const glm::vec3 eye = camera.Position();
   const glm::vec2 pointer{screen_x, screen_y};
   std::optional<std::size_t> picked;
@@ -366,6 +375,9 @@ std::optional<std::size_t> PickActor(const Camera& camera, float aspect_ratio,
   std::optional<std::size_t> picked_on_ground;
   float nearest_on_ground = std::numeric_limits<float>::max();
   for (std::size_t index = 0; index < actors.size(); ++index) {
+    if (!eligible(index)) {
+      continue;
+    }
     if (actors[index].ground_pick_radius > 0.0F) {
       if (!GroundDiscContains(camera, aspect_ratio, actors[index], pointer, viewport_width,
                               viewport_height)) {

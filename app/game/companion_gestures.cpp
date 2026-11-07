@@ -7,6 +7,7 @@
 #include "ro/sim/world.h"
 
 #include "game/companion_ai_stage.h"
+#include "game/companion_aim.h"
 #include "world/click_action.h"
 #include "world/versus_gate.h"
 
@@ -39,6 +40,27 @@ using ro::sim::AiCompanion;
 [[nodiscard]] bool Attackable(const ro::sim::World& world, const ro::sim::Actor& actor) {
   return actor.id != world.player_id() && ClickEngagesAttack(actor) &&
          ActorTakesClick(actor, CompanionVersus(world)) && ro::sim::CanBeTargeted(actor);
+}
+
+// L'ACTEUR QU'UN SKILL ARMÉ DÉSIGNE SOUS LA SOURIS.
+//
+// 🔴 UN SKILL OFFENSIF NE VOIT QUE CE QU'IL PEUT FRAPPER. L'homoncule au corps à
+// corps se superpose à sa proie : le désigner lancerait le skill sur lui-même, et
+// le serveur le jetterait sans un mot.
+[[nodiscard]] const ro::sim::Actor* AimedUnder(const CompanionPointer& at,
+                                               const CompanionAim& aim) {
+  if (aim.targeting != ro::sim::kSkillOnEnemy) {
+    return ActorUnder(at);
+  }
+  const std::optional<std::size_t> picked = ro::render::PickActorAmong(
+      *at.camera, at.aspect_ratio, at.drawn, at.pointer.x, at.pointer.y, at.viewport_width,
+      at.viewport_height, [&at](std::size_t index) {
+        const ro::sim::Actor* actor =
+            index < at.drawn_ids.size() ? at.world->Find(at.drawn_ids[index]) : nullptr;
+        return actor != nullptr && Attackable(*at.world, *actor);
+      });
+  return picked.has_value() && *picked < at.drawn_ids.size() ? at.world->Find(at.drawn_ids[*picked])
+                                                             : nullptr;
 }
 
 // L'ORDRE DIRECT d'un geste : attaquer l'acteur attaquable sous la souris, ou
@@ -81,7 +103,7 @@ bool CompanionLeftPress(CompanionAiStage& ai, const CompanionPointer& at, bool g
       if (const std::optional<ro::sim::CellPosition> cell = CellUnder(at); cell.has_value()) {
         static_cast<void>(ai.ReleaseOnGround(*cell));
       }
-    } else if (const ro::sim::Actor* actor = ActorUnder(at); actor != nullptr) {
+    } else if (const ro::sim::Actor* actor = AimedUnder(at, *ai.aim()); actor != nullptr) {
       static_cast<void>(ai.ReleaseOnActor(actor->id));
     }
     return true;

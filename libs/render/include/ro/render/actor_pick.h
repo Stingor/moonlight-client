@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <functional>
 #include <optional>
 #include <span>
 
@@ -157,5 +158,12 @@ void WidenToWholeFloor(ScreenRect& rect, float floor_pixels);
                                                    std::span<const DrawnActor> actors,
                                                    float screen_x, float screen_y,
                                                    float viewport_width, float viewport_height);
+
+// LA MÊME DÉSIGNATION, parmi les seuls rangs qu'`eligible` accepte : un acteur
+// écarté ne cache pas celui qui se tient derrière lui.
+[[nodiscard]] std::optional<std::size_t> PickActorAmong(
+    const Camera& camera, float aspect_ratio, std::span<const DrawnActor> actors, float screen_x,
+    float screen_y, float viewport_width, float viewport_height,
+    const std::function<bool(std::size_t)>& eligible);
 
 }  // namespace ro::render

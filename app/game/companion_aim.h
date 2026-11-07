@@ -5,7 +5,8 @@
 // Lancé depuis l'onglet ou une barre, un skill d'homoncule ou de mercenaire qui
 // vise un acteur ou une case ne part pas tout de suite : il s'ARME, et le clic
 // gauche suivant le donne à l'IA du compagnon, qui s'approche jusqu'à la portée
-// mesurée depuis LUI. Le personnage ne marche pas.
+// mesurée depuis LUI. Le personnage ne marche pas. Quick cast le lance de même,
+// sans clic, quand le joueur l'a réglé ainsi : voir `world/quick_cast.h`.
 
 #include <cstdint>
 
@@ -21,6 +22,8 @@ struct CompanionAim {
   int range_cells = 0;
   // Il vise une case ; sinon un acteur.
   bool on_ground = false;
+  // Ses drapeaux de visée, voir `ro::sim::KnownSkill::targeting`.
+  std::uint16_t targeting = 0;
 
   [[nodiscard]] friend bool operator==(const CompanionAim&, const CompanionAim&) = default;
 };

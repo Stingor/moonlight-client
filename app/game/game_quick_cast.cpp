@@ -28,14 +28,18 @@ namespace {
 // UNE ENTITÉ QU'UN SORT PEUT VISER À LA SOURIS : un joueur ou un monstre.
 //
 // ⚠ NI UN PNJ, NI UN FAMILIER, NI UN ITEM AU SOL : le serveur refuse tout sort
-// sur eux, et laisser la souris répondre « ce PNJ » volerait le sort à la cible
-// du mode Ciblage, qui, elle, l'aurait fait partir.
+// sur eux. La désignation les traverse : ils ne cachent ni le monstre derrière
+// eux, ni la cible du mode Ciblage quand il n'y a personne d'autre.
 //
 // Un sort offensif ne vise jamais soi-même, ni un cadavre. Un soutien peut
-// viser les deux : se soigner, relever un mort.
+// viser les deux : se soigner, relever un mort. Lui seul vise aussi un
+// homoncule ou un mercenaire.
 [[nodiscard]] bool SkillAimsAt(const ro::sim::Actor& actor, QuickCastAim aim,
                                std::uint32_t own_id) {
-  if (actor.kind != ro::sim::ActorKind::kPlayer && actor.kind != ro::sim::ActorKind::kMonster) {
+  const bool companion = actor.familiar == ro::sim::Familiar::kHomunculus ||
+                         actor.familiar == ro::sim::Familiar::kMercenary;
+  if (actor.kind != ro::sim::ActorKind::kPlayer && actor.kind != ro::sim::ActorKind::kMonster &&
+      !(companion && aim == QuickCastAim::kSupport)) {
     return false;
   }
   if (TargetIsConcealed(actor)) {
@@ -76,14 +80,32 @@ void Game::AdvanceQuickCast(std::uint32_t now_ms) {
     }
 
     [[nodiscard]] std::optional<ro::sim::KnownSkill> Armed() const override {
-      const ro::sim::KnownSkill* armed = game_.grimoire_.armed();
-      return armed != nullptr ? std::optional<ro::sim::KnownSkill>(*armed) : std::nullopt;
+      if (const ro::sim::KnownSkill* armed = game_.grimoire_.armed(); armed != nullptr) {
+        return *armed;
+      }
+      // UN SEUL ARMEMENT À LA FOIS : voir `CompanionAiStage::Advance`.
+      const std::optional<CompanionAim>& aim = game_.pieces_.companion_ai.aim();
+      if (!aim.has_value()) {
+        return std::nullopt;
+      }
+      return ro::sim::KnownSkill{.id = aim->skill_id,
+                                 .level = aim->skill_level,
+                                 .range_cells = static_cast<std::uint16_t>(aim->range_cells),
+                                 .targeting = aim->targeting};
     }
-    void Disarm() override { game_.grimoire_.Disarm(); }
+    void Disarm() override {
+      game_.grimoire_.Disarm();
+      game_.pieces_.companion_ai.Disarm();
+    }
     [[nodiscard]] bool CoolingDown(const ro::sim::KnownSkill& skill) const override {
-      return game_.world_.skill_book().CooldownRemainingMs(skill.id, now_ms_) > 0;
+      return OfCompanion(skill)
+                 ? game_.pieces_.companion_ai.RecastPaused(skill.id, now_ms_)
+                 : game_.world_.skill_book().CooldownRemainingMs(skill.id, now_ms_) > 0;
     }
-    [[nodiscard]] bool Casting() const override { return PlayerCasting(game_.world_, now_ms_); }
+    // ⚠ LE COMPAGNON LANCE PENDANT QUE SON MAÎTRE INCANTE.
+    [[nodiscard]] bool Casting(const ro::sim::KnownSkill& skill) const override {
+      return !OfCompanion(skill) && PlayerCasting(game_.world_, now_ms_);
+    }
 
     [[nodiscard]] bool MouseOnWorld() const override {
       // Une fenêtre sous le curseur, ou le panneau du grimoire : le joueur ne
@@ -106,14 +128,15 @@ void Game::AdvanceQuickCast(std::uint32_t now_ms) {
     }
     [[nodiscard]] std::uint32_t ActorUnderMouse(QuickCastAim aim) const override {
       const ComposedScene& scene = game_.scene_actors_;
-      const std::optional<std::size_t> picked =
-          ro::render::PickActor(game_.camera_, game_.aspect_ratio_, scene.drawn, game_.mouse_.x,
-                                game_.mouse_.y, Width(), Height());
-      if (!picked.has_value() || *picked >= scene.ids.size()) {
-        return 0;
-      }
-      const ro::sim::Actor* actor = game_.world_.Find(scene.ids[*picked]);
-      return actor != nullptr && SkillAimsAt(*actor, aim, game_.world_.player_id()) ? actor->id : 0;
+      const ro::sim::World& world = game_.world_;
+      const std::optional<std::size_t> picked = ro::render::PickActorAmong(
+          game_.camera_, game_.aspect_ratio_, scene.drawn, game_.mouse_.x, game_.mouse_.y, Width(),
+          Height(), [&scene, &world, aim](std::size_t index) {
+            const ro::sim::Actor* actor =
+                index < scene.ids.size() ? world.Find(scene.ids[index]) : nullptr;
+            return actor != nullptr && SkillAimsAt(*actor, aim, world.player_id());
+          });
+      return picked.has_value() && *picked < scene.ids.size() ? scene.ids[*picked] : 0;
     }
     [[nodiscard]] bool HudCastArmed() const override { return game_.targeting_.CastsOnTarget(); }
     [[nodiscard]] std::uint32_t HudTarget(QuickCastAim aim) const override {
@@ -138,6 +161,9 @@ void Game::AdvanceQuickCast(std::uint32_t now_ms) {
     }
 
     bool CastOnGround(const ro::sim::KnownSkill& skill, ro::sim::CellPosition where) override {
+      if (OfCompanion(skill)) {
+        return game_.pieces_.companion_ai.RecastOnGround(skill.id, where);
+      }
       // ⚠ COMME SUR UN ACTEUR : l'attaque ou le ramassage d'avant tombe, sans
       // quoi deux poursuites enverraient chacune leur marche, vers deux cases.
       game_.pickup_.reset();
@@ -148,6 +174,11 @@ void Game::AdvanceQuickCast(std::uint32_t now_ms) {
       return true;
     }
     bool CastOnActor(const ro::sim::KnownSkill& skill, std::uint32_t id) override {
+      // ⚠ NI L'ATTAQUE NI LE RAMASSAGE DU PERSONNAGE NE TOMBENT : c'est le
+      // compagnon qui lance, et ce qui retient le maître ne le retient pas.
+      if (OfCompanion(skill)) {
+        return game_.pieces_.companion_ai.RecastOnActor(skill.id, id);
+      }
       const ro::sim::Actor* target = game_.world_.Find(id);
       if (target == nullptr) {
         return false;
@@ -170,6 +201,9 @@ void Game::AdvanceQuickCast(std::uint32_t now_ms) {
     }
 
    private:
+    [[nodiscard]] bool OfCompanion(const ro::sim::KnownSkill& skill) const {
+      return game_.pieces_.companion_ai.ArmedLast(skill.id);
+    }
     [[nodiscard]] float Width() const { return static_cast<float>(game_.shell_.width()); }
     [[nodiscard]] float Height() const { return static_cast<float>(game_.shell_.height()); }
 
@@ -179,14 +213,16 @@ void Game::AdvanceQuickCast(std::uint32_t now_ms) {
 
   Hands hands(*this, now_ms);
   // Les armements viennent de TOUS les chemins — une touche, une case, une ligne
-  // du panneau — et la machine sait, par la frappe retenue, lequel est le sien.
-  QuickCastSignals seen{.arms = grimoire_.arms()};
+  // du panneau, le grimoire comme un compagnon — et la machine sait, par la frappe
+  // retenue, lequel est le sien.
+  QuickCastSignals seen{.arms = grimoire_.arms() + pieces_.companion_ai.arms()};
   if (shortcuts_.has_value()) {
     seen.item_uses = shortcuts_->item_uses();
     seen.item_slot = shortcuts_->last_item_slot();
     seen.item_id = shortcuts_->last_item_id();
   }
   quick_cast_.Advance(hands, seen, now_ms);
+  pieces_.companion_ai.SayAim(world_, now_ms, quick_cast_.arm_key() != 0);
 }
 
 }  // namespace moonclient

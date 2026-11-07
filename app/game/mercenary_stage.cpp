@@ -238,6 +238,7 @@ const char* MercenaryStage::Cast(ro::net::Connection& link, std::uint16_t skill_
         .skill_level = skill->level,
         .range_cells = skill->range_cells,
         .on_ground = ro::sim::SkillNeedsGround(ro::sim::KnownSkill{.targeting = skill->targeting}),
+        .targeting = skill->targeting,
     };
     return nullptr;
   }

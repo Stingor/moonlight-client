@@ -187,7 +187,7 @@ void QuickCast::Update(QuickCastHands& hands, std::uint32_t now_ms) {
   }
   // Une incantation en cours : la relance attendrait, autant ne rien émettre.
   // Seulement ici — un appui volontaire n'est jamais bloqué par cette lecture.
-  if (hands.Casting()) {
+  if (hands.Casting(repeat_skill_)) {
     return;
   }
   // La visée est RÉÉVALUÉE : au sol la case suit le curseur, et un monstre

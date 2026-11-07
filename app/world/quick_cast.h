@@ -12,6 +12,9 @@ namespace moonclient {
 
 // ── QUICK CAST : LANCER UN SORT EN UNE ACTION ───────────────────────────────
 //
+// Un skill de compagnon s'y traite comme un sort du joueur, à ceci près qu'il
+// part par l'IA du compagnon et que le personnage ne s'approche pas.
+//
 // Sans lui, un sort de zone ou ciblé demande deux gestes : la touche l'ARME,
 // puis le CLIC désigne. Quick cast supprime le second : dès qu'un sort s'arme,
 // la visée se résout d'elle-même et le sort part. Et il le RELANCE tant que la
@@ -101,8 +104,9 @@ class QuickCastHands {
   [[nodiscard]] virtual std::optional<ro::sim::KnownSkill> Armed() const = 0;
   virtual void Disarm() = 0;
   [[nodiscard]] virtual bool CoolingDown(const ro::sim::KnownSkill& skill) const = 0;
-  // Le personnage incante : une relance attendrait de toute façon la fin.
-  [[nodiscard]] virtual bool Casting() const = 0;
+  // Celui qui lance ce sort incante : une relance attendrait de toute façon la
+  // fin.
+  [[nodiscard]] virtual bool Casting(const ro::sim::KnownSkill& skill) const = 0;
 
   // La souris désigne-t-elle le MONDE, et non une fenêtre ?
   [[nodiscard]] virtual bool MouseOnWorld() const = 0;

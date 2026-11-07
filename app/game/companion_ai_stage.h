@@ -64,6 +64,10 @@ inline constexpr std::uint32_t kTacticSaveQuietMs = 1500;
 // compagnon » : assez pour que l'œil la trouve, assez court pour suivre la
 // suivante.
 inline constexpr std::uint32_t kDecidingRuleShownMs = 1200;
+// LA PAUSE D'UNE RELANCE TENUE APRÈS UN REFUS DU SERVEUR : le client ignore le
+// délai d'après-incantation d'un compagnon, et chaque refus montre une bulle et
+// une ligne de conversation.
+inline constexpr std::uint32_t kCompanionRecastPauseMs = 500;
 
 // CE QUE LA FENÊTRE « IA DU COMPAGNON » LIT DU RESTE DE LA PARTIE, pour nommer
 // les skills, les statuts, les monstres et les mots de leur fiche. Tout est
@@ -177,6 +181,26 @@ class CompanionAiStage {
   bool ReleaseOnActor(std::uint32_t actor_id);
   bool ReleaseOnGround(ro::sim::CellPosition cell);
   void Disarm() noexcept { aim_.reset(); }
+  // LES ARMEMENTS DEPUIS LE DÉBUT : un compte qui bouge dit à Quick cast qu'un
+  // skill vient de s'armer.
+  [[nodiscard]] std::uint32_t arms() const noexcept { return arms_; }
+  // « DÉSIGNE LA CIBLE », une fois par armement et seulement si le skill attend
+  // encore le clic : une touche que Quick cast surveille (`key_watches`) retire
+  // elle-même ce qui reste armé au relâchement.
+  void SayAim(ro::sim::World& world, std::uint32_t now_ms, bool key_watches);
+  // Ce skill est-il le dernier skill de compagnon armé ? C'est ce qui le
+  // distingue d'un skill du grimoire pour Quick cast.
+  [[nodiscard]] bool ArmedLast(std::uint16_t skill_id) const noexcept {
+    return last_aim_.has_value() && last_aim_->skill_id == skill_id;
+  }
+  // QUICK CAST LE LANCE SANS CLIC, et le relance alors que plus rien n'est armé.
+  // Rend faux sans compagnon, ou quand le skill vise autre chose.
+  bool RecastOnActor(std::uint16_t skill_id, std::uint32_t actor_id);
+  bool RecastOnGround(std::uint16_t skill_id, ro::sim::CellPosition cell);
+  // Le serveur vient de refuser ce skill : voir `kCompanionRecastPauseMs`.
+  [[nodiscard]] bool RecastPaused(std::uint16_t skill_id, std::uint32_t now_ms) const noexcept {
+    return refused_skill_id_ == skill_id && now_ms - refused_ms_ < kCompanionRecastPauseMs;
+  }
 
   // ── LES PROFILS, LEURS CONTEXTES ET CE QUI SURVIT ─────────────────────────
   //
@@ -289,7 +313,9 @@ class CompanionAiStage {
   [[nodiscard]] SeatedCompanion Seated(ro::sim::AiCompanion companion) noexcept;
   [[nodiscard]] std::array<SeatedCompanion, 2> SeatedAll() noexcept;
   // Rend vrai quand ce skill est armé, qu'il vienne de l'être ou le soit déjà.
-  bool Arm(const CompanionAim& aim, ro::sim::World& world, std::uint32_t now_ms);
+  bool Arm(const CompanionAim& aim);
+  void CommandOnActor(const CompanionAim& aim, std::uint32_t actor_id);
+  void CommandOnGround(const CompanionAim& aim, ro::sim::CellPosition cell);
   [[nodiscard]] Slot& SlotOf(ro::sim::AiCompanion companion) noexcept;
   [[nodiscard]] const Slot& SlotOf(ro::sim::AiCompanion companion) const noexcept;
   // LE PROFIL QUE LA FENÊTRE ÉDITE : celui qu'elle a choisi s'il existe encore,
@@ -349,6 +375,11 @@ class CompanionAiStage {
   // L'instant noté par `NoteArrival`, en attente du changement de carte.
   std::optional<std::uint32_t> noted_arrival_ms_;
   std::optional<CompanionAim> aim_;
+  std::optional<CompanionAim> last_aim_;
+  std::uint32_t arms_ = 0;
+  bool aim_said_ = false;
+  std::uint16_t refused_skill_id_ = 0;
+  std::uint32_t refused_ms_ = 0;
   // Le grimoire était armé à l'image précédente.
   bool grimoire_was_armed_ = false;
 

@@ -316,6 +316,7 @@ bool HomunculusStage::UseSkill(ro::net::Connection& link, ro::sim::World& world,
         .skill_level = static_cast<std::uint16_t>(cast_level),
         .range_cells = skill->range_cells,
         .on_ground = ro::sim::SkillNeedsGround(ro::sim::KnownSkill{.targeting = skill->targeting}),
+        .targeting = skill->targeting,
     };
     return false;
   }

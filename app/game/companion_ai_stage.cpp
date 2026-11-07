@@ -167,7 +167,7 @@ bool CompanionAiStage::Advance(ro::net::Connection& link, ro::sim::World& world,
   bool armed_now = false;
   for (std::optional<CompanionAim> asked :
        {homunculus.TakeAimRequest(), mercenary.TakeAimRequest()}) {
-    if (asked.has_value() && Arm(*asked, world, now_ms)) {
+    if (asked.has_value() && Arm(*asked)) {
       armed_now = true;
     }
   }
@@ -339,13 +339,7 @@ bool CompanionAiStage::ReleaseOnActor(std::uint32_t actor_id) {
   if (!aim_.has_value() || aim_->on_ground) {
     return false;
   }
-  const CompanionAim aim = *std::exchange(aim_, std::nullopt);
-  SlotOf(aim.companion)
-      .brain.Command(ro::sim::DirectOrder{.kind = ro::sim::DirectOrder::Kind::kSkillOnActor,
-                                          .target_id = actor_id,
-                                          .skill_id = aim.skill_id,
-                                          .skill_level = aim.skill_level,
-                                          .skill_range_cells = aim.range_cells});
+  CommandOnActor(*std::exchange(aim_, std::nullopt), actor_id);
   return true;
 }
 
@@ -353,14 +347,55 @@ bool CompanionAiStage::ReleaseOnGround(ro::sim::CellPosition cell) {
   if (!aim_.has_value() || !aim_->on_ground) {
     return false;
   }
-  const CompanionAim aim = *std::exchange(aim_, std::nullopt);
+  CommandOnGround(*std::exchange(aim_, std::nullopt), cell);
+  return true;
+}
+
+bool CompanionAiStage::RecastOnActor(std::uint16_t skill_id, std::uint32_t actor_id) {
+  if (!ArmedLast(skill_id) || last_aim_->on_ground || !present(last_aim_->companion)) {
+    return false;
+  }
+  aim_.reset();
+  CommandOnActor(*last_aim_, actor_id);
+  return true;
+}
+
+bool CompanionAiStage::RecastOnGround(std::uint16_t skill_id, ro::sim::CellPosition cell) {
+  if (!ArmedLast(skill_id) || !last_aim_->on_ground || !present(last_aim_->companion)) {
+    return false;
+  }
+  aim_.reset();
+  CommandOnGround(*last_aim_, cell);
+  return true;
+}
+
+void CompanionAiStage::CommandOnActor(const CompanionAim& aim, std::uint32_t actor_id) {
+  SlotOf(aim.companion)
+      .brain.Command(ro::sim::DirectOrder{.kind = ro::sim::DirectOrder::Kind::kSkillOnActor,
+                                          .target_id = actor_id,
+                                          .skill_id = aim.skill_id,
+                                          .skill_level = aim.skill_level,
+                                          .skill_range_cells = aim.range_cells});
+}
+
+void CompanionAiStage::CommandOnGround(const CompanionAim& aim, ro::sim::CellPosition cell) {
   SlotOf(aim.companion)
       .brain.Command(ro::sim::DirectOrder{.kind = ro::sim::DirectOrder::Kind::kSkillOnCell,
                                           .cell = cell,
                                           .skill_id = aim.skill_id,
                                           .skill_level = aim.skill_level,
                                           .skill_range_cells = aim.range_cells});
-  return true;
+}
+
+void CompanionAiStage::SayAim(ro::sim::World& world, std::uint32_t now_ms, bool key_watches) {
+  if (!aim_.has_value() || aim_said_ || key_watches) {
+    return;
+  }
+  aim_said_ = true;
+  world.RecordChat(
+      ro::sim::ChatKind::kServer, 0,
+      std::string(ro::core::Tr("Désigne la cible du skill (clic droit ou Échap pour annuler).")),
+      now_ms);
 }
 
 void CompanionAiStage::Follow(Slot& slot, const ro::sim::CompanionFacts& facts,
@@ -375,20 +410,19 @@ void CompanionAiStage::Follow(Slot& slot, const ro::sim::CompanionFacts& facts,
                                     arrived_ms_.value_or(now_ms)));
 }
 
-bool CompanionAiStage::Arm(const CompanionAim& aim, ro::sim::World& world, std::uint32_t now_ms) {
+bool CompanionAiStage::Arm(const CompanionAim& aim) {
   if (!present(aim.companion)) {
     return false;
   }
-  // ⚠ LE MÊME SKILL RÉARMÉ NE SE REDIT PAS : une touche tenue le redemande à
-  // chaque répétition.
+  // ⚠ LE MÊME SKILL RÉARMÉ NE COMPTE PAS : une touche tenue le redemande à chaque
+  // répétition.
   if (aim_ == aim) {
     return true;
   }
   aim_ = aim;
-  world.RecordChat(
-      ro::sim::ChatKind::kServer, 0,
-      std::string(ro::core::Tr("Désigne la cible du skill (clic droit ou Échap pour annuler).")),
-      now_ms);
+  last_aim_ = aim;
+  aim_said_ = false;
+  ++arms_;
   return true;
 }
 
@@ -410,6 +444,10 @@ void CompanionAiStage::ObserveFrame(const ro::net::Frame& frame, const Homunculu
   const std::optional<std::uint16_t> refused = ro::net::RefusedSkillOf(frame);
   if (!refused.has_value()) {
     return;
+  }
+  if (ArmedLast(*refused)) {
+    refused_skill_id_ = *refused;
+    refused_ms_ = now_ms;
   }
   if (homunculus.FindSkill(*refused) != nullptr) {
     SlotOf(AiCompanion::kHomunculus).brain.NoteSkillRefused(*refused, now_ms);
