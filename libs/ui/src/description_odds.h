@@ -36,6 +36,8 @@ void DrawDescriptionLink(DescriptionWindowState& state, const DescriptionLinkCel
 // `boss` : l'onglet « Boss / MVP », sinon « Monstres ».
 void DrawSourcesTab(DescriptionWindowState& state, const DescriptionView& view, bool boss,
                     const SkinArt& art, DescriptionWindowAction& action);
+void DrawMapDropsTab(DescriptionWindowState& state, const DescriptionView& view,
+                     DescriptionWindowAction& action);
 void DrawScriptsTab(const DescriptionScriptsView& scripts, const SkinArt& art);
 void DrawCombosTab(DescriptionWindowState& state, const DescriptionView& view, const SkinArt& art,
                    DescriptionWindowAction& action);

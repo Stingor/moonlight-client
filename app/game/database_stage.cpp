@@ -95,6 +95,11 @@ std::optional<ro::sim::MonsterSheet> DatabaseStage::BaseSheetOf(std::uint32_t mo
   return MonsterSheetOf(*monster, db_, [this](std::uint32_t item_id) { return ItemName(item_id); });
 }
 
+std::vector<ro::sim::MonsterMapDrop> DatabaseStage::MapDropsOf(std::uint32_t monster_id) const {
+  return MonsterMapDropsOf(db_, monster_id,
+                           [this](std::uint32_t item_id) { return ItemName(item_id); });
+}
+
 std::optional<ro::sim::MarketOffer> DatabaseStage::TakeGoTo() noexcept {
   return std::exchange(go_to_, std::nullopt);
 }
@@ -152,7 +157,8 @@ void DatabaseStage::Load() {
       return;
     }
     loading_ = std::async(std::launch::async, [texts = std::move(*texts)] {
-      return ro::vfs::ParseServerDb(texts.item_db, texts.mob_db, texts.context, texts.status_db);
+      return ro::vfs::ParseServerDb(texts.item_db, texts.mob_db, texts.context, texts.status_db,
+                                    texts.map_drop_db);
     });
   }
   if (!loading_.valid() ||
@@ -263,6 +269,9 @@ void DatabaseStage::FillItemSheet(ro::ui::ItemSheetHost host, std::uint32_t item
         part.fact_views.push_back(ro::ui::ItemSheetFact{.label = line.label, .value = line.value});
       }
       part.droppers = DropperRowsOf(db_, item_id);
+      part.map_drops = MapDropRowsOf(db_, item_id, [this](const std::string& map_name) {
+        return map_names_ != nullptr ? map_names_->LabelOf(map_name) : map_name;
+      });
     }
     const auto named =
         std::ranges::lower_bound(db_.items(), item_id, {}, &ro::vfs::ServerItem::item_id);
@@ -270,6 +279,7 @@ void DatabaseStage::FillItemSheet(ro::ui::ItemSheetHost host, std::uint32_t item
     base.facts = part.fact_views;
     base.ordinary = part.droppers.ordinary;
     base.boss = part.droppers.boss;
+    base.map_drops = part.map_drops;
     base.script = item->script;
     base.equip_script = item->equip_script;
     base.unequip_script = item->unequip_script;

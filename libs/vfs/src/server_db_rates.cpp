@@ -4,6 +4,9 @@
 #include <cctype>
 #include <cmath>
 #include <cstdint>
+#include <functional>
+#include <iterator>
+#include <span>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -205,6 +208,29 @@ const ServerStatus* ServerDb::FindStatus(std::string_view constant) const {
   });
   const auto found = std::ranges::lower_bound(statuses_, wanted, {}, &ServerStatus::constant);
   return found != statuses_.end() && found->constant == wanted ? &*found : nullptr;
+}
+
+void ServerDb::NoteMapDrops(std::vector<ServerMapDrop> drops) {
+  map_drops_ = std::move(drops);
+  std::ranges::stable_sort(map_drops_, std::greater{}, &ServerMapDrop::rate_thousandths);
+}
+
+std::vector<ServerMapDrop> ServerDb::MapDropsOfItem(std::uint32_t item_id) const {
+  std::vector<ServerMapDrop> found;
+  std::ranges::copy_if(map_drops_, std::back_inserter(found),
+                       [&](const ServerMapDrop& drop) { return drop.item_id == item_id; });
+  return found;
+}
+
+std::vector<ServerMapDrop> ServerDb::MapDropsOfMonster(std::uint32_t monster_id) const {
+  const std::span<const ServerSpawn> spawns = SpawnsOf(monster_id);
+  std::vector<ServerMapDrop> found;
+  std::ranges::copy_if(map_drops_, std::back_inserter(found), [&](const ServerMapDrop& drop) {
+    return drop.monster_id == monster_id ||
+           (drop.monster_id == kServerMapDropAllMonsters &&
+            std::ranges::find(spawns, drop.map_name, &ServerSpawn::map_name) != spawns.end());
+  });
+  return found;
 }
 
 std::span<const ServerSpawn> ServerDb::SpawnsOf(std::uint32_t monster_id) const {

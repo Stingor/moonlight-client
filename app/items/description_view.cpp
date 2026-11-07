@@ -453,6 +453,8 @@ void DescriptionView::NoteDatabase(const ItemSheetBase& base) {
   // 🔴 LE SERVEUR D'ABORD, LA BASE À DÉFAUT : elle ne remplit que ce qu'il n'a
   // pas encore dit, et sa réponse arrivée la remplace.
   view_.server_tabs = true;
+  view_.map_drops_known = true;
+  view_.map_drops = base.map_drops;
   const auto fill = [](ro::ui::DescriptionDropsView& drops,
                        std::span<const ro::ui::DescriptionDropRow> rows) {
     if (drops.fetch != ro::ui::DescriptionFetch::kReady) {

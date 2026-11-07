@@ -1,6 +1,7 @@
 // LA FICHE D'UN OBJET : les quatre onglets du serveur — « Monstres »,
 // « Boss / MVP », « Script », « Combos ». La base de données les remplit tant
 // que le serveur n'a pas répondu, ou hors ligne ; seuls les combos l'attendent.
+// « Map Drops » vient d'elle seule.
 //
 // 🔴 UN ONGLET SANS CONTENU SE GRISE, IL NE DISPARAÎT PAS : la barre garde la
 // même forme d'un objet à l'autre, et surtout elle ne se réorganise pas sous le
@@ -11,6 +12,7 @@
 #include <algorithm>
 #include <array>
 #include <cstdio>
+#include <numeric>
 #include <string>
 
 #include <imgui.h>
@@ -42,12 +44,18 @@ constexpr ImU32 kSelfColor = IM_COL32(230, 200, 90, 255);
 constexpr float kHundredthsPerPercent = 100.0F;
 constexpr std::uint8_t kMvpRank = 2;
 constexpr std::uint8_t kMiniBossRank = 1;
+// Une ligne qui vaut pour tous les monstres de sa carte.
+constexpr std::uint32_t kEveryMonster = 0;
 // Le plus large taux qu'une ligne écrit.
 constexpr const char* kWidestRate = "100.00%";
 constexpr std::size_t kRateBytes = 16;
 
 constexpr int kRateColumn = 1;
 constexpr int kKindColumn = 2;
+constexpr int kMapDropColumns = 4;
+constexpr int kMapDropMapColumn = 1;
+constexpr int kMapDropRateColumn = 2;
+constexpr int kMapDropOptionsColumn = 3;
 
 // « Chargement... » en attendant, l'appel au serveur quand personne n'a pu
 // demander.
@@ -58,6 +66,17 @@ constexpr int kKindColumn = 2;
     ImGui::TextDisabled("%s", core::Tr("Le serveur seul le sait : connectez-vous."));
   }
   return fetch == DescriptionFetch::kReady;
+}
+
+// Le rang d'un monstre devant son nom.
+void DrawBossRankMark(std::uint8_t boss_rank) {
+  if (boss_rank == kMvpRank) {
+    ImGui::TextColored(kMvpColor, "%s", core::Tr("[MVP]"));
+    ImGui::SameLine();
+  } else if (boss_rank == kMiniBossRank) {
+    ImGui::TextColored(kMiniBossColor, "%s", core::Tr("[Mini]"));
+    ImGui::SameLine();
+  }
 }
 
 // La table des monstres qui laissent tomber l'objet. `with_kind` : la colonne
@@ -129,13 +148,7 @@ void DrawDropTable(DescriptionWindowState& state, const DescriptionDropsView& dr
       const DescriptionDropRow& row = drops.rows[static_cast<std::size_t>(rank)];
       ImGui::TableNextRow();
       ImGui::TableNextColumn();
-      if (row.boss_rank == kMvpRank) {
-        ImGui::TextColored(kMvpColor, "%s", core::Tr("[MVP]"));
-        ImGui::SameLine();
-      } else if (row.boss_rank == kMiniBossRank) {
-        ImGui::TextColored(kMiniBossColor, "%s", core::Tr("[Mini]"));
-        ImGui::SameLine();
-      }
+      DrawBossRankMark(row.boss_rank);
       ImGui::PushID("source");
       ImGui::PushID(rank);
       const std::string shown = std::string(row.name) + " (" + std::to_string(row.monster_id) + ")";
@@ -225,6 +238,94 @@ void DrawSourcesTab(DescriptionWindowState& state, const DescriptionView& view, 
         boss ? state.boss_filters[view.item_id] : state.ordinary_filters[view.item_id];
     DrawDropTable(state, drops, filter, table_id, boss, action);
   }
+}
+
+void DrawMapDropsTab(DescriptionWindowState& state, const DescriptionView& view,
+                     DescriptionWindowAction& action) {
+  if (view.map_drops.empty()) {
+    ImGui::TextDisabled("%s", core::Tr("Aucune source."));
+    return;
+  }
+  constexpr ImGuiTableFlags kFlags = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg |
+                                     ImGuiTableFlags_Sortable | ImGuiTableFlags_Resizable |
+                                     ImGuiTableFlags_SizingFixedFit;
+  const char* const random_options = core::Tr("Aléatoires");
+  ImGui::PushStyleColor(ImGuiCol_TableHeaderBg, kHeaderColor);
+  if (ImGui::BeginTable("sources_cartes", kMapDropColumns, kFlags)) {
+    ImGui::TableSetupColumn(core::Tr("Monstre"), ImGuiTableColumnFlags_WidthStretch);
+    ImGui::TableSetupColumn(core::Tr("Carte"), ImGuiTableColumnFlags_WidthStretch);
+    ImGui::TableSetupColumn(
+        core::Tr("Taux"),
+        ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_PreferSortDescending |
+            ImGuiTableColumnFlags_DefaultSort,
+        std::max(SortedHeaderWidth(core::Tr("Taux")), WidestText({kWidestMapDropRate})));
+    ImGui::TableSetupColumn(
+        core::Tr("Options"), ImGuiTableColumnFlags_WidthFixed,
+        std::max(SortedHeaderWidth(core::Tr("Options")), WidestText({random_options})));
+    ImGui::TableHeadersRow();
+    state.drops_order.resize(view.map_drops.size());
+    std::iota(state.drops_order.begin(), state.drops_order.end(), 0);
+    if (const ImGuiTableSortSpecs* sort = ImGui::TableGetSortSpecs();
+        sort != nullptr && sort->SpecsCount > 0) {
+      const ImGuiTableColumnSortSpecs& spec = sort->Specs[0];
+      const bool ascending = spec.SortDirection == ImGuiSortDirection_Ascending;
+      std::ranges::stable_sort(state.drops_order, [&](int left, int right) {
+        const DescriptionMapDropRow& a = view.map_drops[static_cast<std::size_t>(left)];
+        const DescriptionMapDropRow& b = view.map_drops[static_cast<std::size_t>(right)];
+        int compared = 0;
+        if (spec.ColumnIndex == kMapDropRateColumn) {
+          compared = CompareValues(a.rate_thousandths, b.rate_thousandths);
+        } else if (spec.ColumnIndex == kMapDropOptionsColumn) {
+          compared = CompareValues(a.random_options, b.random_options);
+        } else if (spec.ColumnIndex == kMapDropMapColumn) {
+          compared = core::AsciiCompareFolded(a.map_label, b.map_label);
+        } else {
+          compared = core::AsciiCompareFolded(a.monster_name, b.monster_name);
+        }
+        return ascending ? compared < 0 : compared > 0;
+      });
+    }
+    for (const int rank : state.drops_order) {
+      const DescriptionMapDropRow& row = view.map_drops[static_cast<std::size_t>(rank)];
+      ImGui::TableNextRow();
+      ImGui::TableNextColumn();
+      ImGui::PushID("source_carte");
+      ImGui::PushID(rank);
+      if (row.monster_id == kEveryMonster) {
+        CellText(core::Tr("Tous les monstres"));
+      } else {
+        DrawBossRankMark(row.boss_rank);
+        const std::string shown =
+            std::string(row.monster_name) + " (" + std::to_string(row.monster_id) + ")";
+        DrawDescriptionLink(
+            state,
+            DescriptionLinkCell{
+                .id = row.monster_id, .monster = true, .name = row.monster_name, .shown = shown},
+            action);
+      }
+      ImGui::TableNextColumn();
+      const MapLinkGesture place = MapLinkCell(row.map_label);
+      if (place.hovered) {
+        action.hovered_map = row.map_name;
+      }
+      if (place.released) {
+        (ImGui::GetIO().KeyShift ? action.link_map : action.guide_map) = row.map_name;
+      }
+      ImGui::PopID();
+      ImGui::PopID();
+      ImGui::TableNextColumn();
+      CellText(MapDropRateText(row.rate_thousandths));
+      ImGui::TableNextColumn();
+      if (row.random_options) {
+        CellText(random_options);
+      }
+    }
+    ImGui::EndTable();
+  }
+  ImGui::PopStyleColor();
+  ImGui::TextColored(
+      kNoteColor, "%s",
+      core::Tr("En plus du butin, sur cette map. Les taux du serveur ne les changent pas."));
 }
 
 void DrawScriptsTab(const DescriptionScriptsView& scripts, const SkinArt& art) {

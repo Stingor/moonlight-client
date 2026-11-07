@@ -61,6 +61,9 @@ class MapDisplayNames {
   // table ne la nomme pas. ⚠ RIEN N'EST PAS UNE ERREUR : c'est à l'appelant de
   // dire ce que le client écrit alors.
   [[nodiscard]] std::optional<std::string_view> DisplayNameOf(std::string_view gat_name) const;
+  // CE QU'UNE LIGNE ÉCRIT D'UNE CARTE désignée sans extension : « Nom affiché
+  // (fichier) », ou le nom interne seul quand la table ne la nomme pas.
+  [[nodiscard]] std::string LabelOf(std::string_view map_name) const;
 
   [[nodiscard]] std::size_t size() const noexcept { return names_.size(); }
 

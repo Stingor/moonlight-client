@@ -4,7 +4,9 @@
 // largeur qui tient le plus long libellé TRADUIT, et le texte entier en bulle
 // quand la colonne, réglée plus étroite, le coupe. Interne à `ui`.
 
+#include <cstdint>
 #include <initializer_list>
+#include <string>
 #include <string_view>
 
 #include <imgui.h>
@@ -30,5 +32,19 @@ void TooltipWhole(std::string_view text);
 // Le texte d'une cellule, dans cette couleur — nulle : celle du texte ; coupé,
 // il se lit entier au survol.
 void CellText(std::string_view text, ImU32 color = 0);
+
+// UN NOM DE CARTE, avec les gestes de tout lien de lieu : l'appelant guide au
+// relâchement, pose son lien sous Maj, et demande l'infobulle au survol.
+struct MapLinkGesture {
+  bool hovered = false;
+  bool released = false;
+};
+[[nodiscard]] MapLinkGesture MapLinkCell(std::string_view label);
+
+// Le taux d'un map drop, en millièmes de pour cent : trois décimales, sans
+// quoi les plus rares s'écriraient 0,01 % ou 0,00 %.
+[[nodiscard]] std::string MapDropRateText(std::uint32_t rate_thousandths);
+// Le plus large de ces taux.
+inline constexpr const char* kWidestMapDropRate = "100.000%";
 
 }  // namespace ro::ui

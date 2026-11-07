@@ -20,7 +20,6 @@ namespace {
 // jusqu'à la réponse.
 constexpr std::uint32_t kAskPatienceMs = 5000;
 // Le serveur nomme la carte sans extension ; la table des noms, par son fichier.
-constexpr std::string_view kMapFileExtension = ".gat";
 
 // Les cinq Gardiens de forteresse que le jeu refuse de montrer.
 constexpr std::array<std::uint32_t, 5> kGuardianClasses = {1285, 1286, 1287, 1829, 1830};
@@ -127,6 +126,15 @@ bool MonsterSheet::shown_by_view() const {
 
 void MonsterSheet::NoteBase(std::uint32_t monster_id, ro::sim::MonsterSheet sheet) {
   base_[monster_id] = std::move(sheet);
+}
+
+void MonsterSheet::NoteMapDrops(std::uint32_t monster_id,
+                                std::vector<ro::sim::MonsterMapDrop> drops) {
+  map_drops_[monster_id] = std::move(drops);
+  // Les listes déjà faites sans eux se refont.
+  if (monster_id == lists_for_id_) {
+    lists_for_id_ = 0;
+  }
 }
 
 std::optional<MonsterSheet::Ask> MonsterSheet::NextAsk(const ro::sim::PlayerStatus& status,
@@ -264,18 +272,25 @@ void MonsterSheet::ComposeLists(const ro::sim::MonsterSheet& sheet) {
                                        .mvp_reward = drop.mvp_reward};
     drops_.push_back(std::move(shown));
   }
+  const auto map_label = [this](const std::string& map_name) {
+    return map_names_ != nullptr ? map_names_->LabelOf(map_name) : map_name;
+  };
+  map_drop_rows_.clear();
+  if (const auto known = map_drops_.find(shown_id_); known != map_drops_.end()) {
+    for (const ro::sim::MonsterMapDrop& drop : known->second) {
+      map_drop_rows_.push_back(
+          ro::ui::MonsterSheetMapDropView{.item_id = drop.item_id,
+                                          .name = drop.name,
+                                          .map_name = drop.map_name,
+                                          .map_label = map_label(drop.map_name),
+                                          .rate_thousandths = drop.rate_thousandths,
+                                          .random_options = drop.random_options});
+    }
+  }
   spawns_.clear();
   for (const ro::sim::MonsterSpawn& spawn : sheet.spawns) {
-    // ⚠ LA TABLE SE CONSULTE PAR LE NOM DE FICHIER, extension comprise.
-    const std::optional<std::string_view> shown =
-        map_names_ != nullptr
-            ? map_names_->DisplayNameOf(spawn.map_name + std::string(kMapFileExtension))
-            : std::nullopt;
-    std::string label = shown.has_value() && !shown->empty()
-                            ? std::string(*shown) + " (" + spawn.map_name + ")"
-                            : spawn.map_name;
     spawns_.push_back(ro::ui::MonsterSheetSpawnView{
-        .map_name = spawn.map_name, .label = std::move(label), .count = spawn.count});
+        .map_name = spawn.map_name, .label = map_label(spawn.map_name), .count = spawn.count});
   }
   skills_.clear();
   for (const ro::sim::MonsterSkill& skill : sheet.skills) {
@@ -338,6 +353,14 @@ const ro::ui::MonsterSheetView& MonsterSheet::Refresh(const ro::ui::MonsterSheet
   }
   // Les icônes se relisent à chaque image : le cache les garde, et une icône
   // téléversée plus tard doit apparaître sans attendre une nouvelle réponse.
+  for (ro::ui::MonsterSheetMapDropView& drop : map_drop_rows_) {
+    drop.icon = {};
+    if (item_icons_ != nullptr) {
+      if (const ro::render::IconTexture& icon = item_icons_->Get(drop.item_id); icon.usable()) {
+        drop.icon = SkinImageOf(icon);
+      }
+    }
+  }
   for (ro::ui::MonsterSheetDropView& drop : drops_) {
     drop.icon = {};
     if (item_icons_ != nullptr) {
@@ -424,6 +447,7 @@ const ro::ui::MonsterSheetView& MonsterSheet::Refresh(const ro::ui::MonsterSheet
   view_.namesake_origin = sheet->namesake_origin;
   view_.sprite_class = sheet->sprite_class;
   view_.drops = drops_;
+  view_.map_drops = map_drop_rows_;
   view_.spawns = spawns_;
   view_.skills = skills_;
 
@@ -468,6 +492,7 @@ void MonsterSheet::Forget() {
   lists_for_id_ = 0;
   lists_for_arrival_ = 0;
   drops_.clear();
+  map_drop_rows_.clear();
   spawns_.clear();
   skills_.clear();
   view_ = ro::ui::MonsterSheetView{};

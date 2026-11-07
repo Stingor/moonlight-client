@@ -34,10 +34,10 @@ constexpr int kFactColumns = 2;
 constexpr int kSellerColumns = 4;
 constexpr std::size_t kLabelBytes = 96;
 
-constexpr std::array<ItemSheetTab, 8> kTabs = {
+constexpr std::array<ItemSheetTab, 9> kTabs = {
     ItemSheetTab::kDescription, ItemSheetTab::kGeneral, ItemSheetTab::kOdds,
-    ItemSheetTab::kMonsters,    ItemSheetTab::kBoss,    ItemSheetTab::kScript,
-    ItemSheetTab::kCombos,      ItemSheetTab::kSellers,
+    ItemSheetTab::kMonsters,    ItemSheetTab::kBoss,    ItemSheetTab::kMapDrops,
+    ItemSheetTab::kScript,      ItemSheetTab::kCombos,  ItemSheetTab::kSellers,
 };
 
 // L'ONGLET EXISTE-T-IL pour cet objet ? Un onglet du serveur existe dès qu'on
@@ -55,6 +55,8 @@ constexpr std::array<ItemSheetTab, 8> kTabs = {
     case ItemSheetTab::kScript:
     case ItemSheetTab::kCombos:
       return view.server_tabs;
+    case ItemSheetTab::kMapDrops:
+      return view.map_drops_known;
     case ItemSheetTab::kSellers:
       return view.sellers_phase != ItemSheetSellersPhase::kAbsent;
   }
@@ -67,6 +69,8 @@ constexpr std::array<ItemSheetTab, 8> kTabs = {
       return SourcesKnownEmpty(view.drops_ordinary);
     case ItemSheetTab::kBoss:
       return SourcesKnownEmpty(view.drops_boss);
+    case ItemSheetTab::kMapDrops:
+      return view.map_drops.empty();
     case ItemSheetTab::kScript:
       return ScriptsKnownEmpty(view.scripts);
     case ItemSheetTab::kCombos:
@@ -94,6 +98,15 @@ constexpr std::array<ItemSheetTab, 8> kTabs = {
       return std::string(core::Tr("Monstres")) + "###sheet_monsters";
     case ItemSheetTab::kBoss:
       return std::string(core::Tr("Boss / MVP")) + "###sheet_boss";
+    case ItemSheetTab::kMapDrops: {
+      if (view.map_drops.empty()) {
+        return std::string(core::Tr("Map Drops")) + "###sheet_map_drops";
+      }
+      std::array<char, kLabelBytes> counted{};
+      std::snprintf(counted.data(), counted.size(), core::Tr("Map Drops (%d)"),
+                    static_cast<int>(view.map_drops.size()));
+      return std::string(counted.data()) + "###sheet_map_drops";
+    }
     case ItemSheetTab::kScript:
       return std::string(core::Tr("Script")) + "###sheet_script";
     case ItemSheetTab::kCombos:
@@ -205,6 +218,9 @@ void DrawTabBody(ItemSheetTab tab, DescriptionWindowState& state, const Descript
       return;
     case ItemSheetTab::kBoss:
       DrawSourcesTab(state, view, true, art, action);
+      return;
+    case ItemSheetTab::kMapDrops:
+      DrawMapDropsTab(state, view, action);
       return;
     case ItemSheetTab::kScript:
       DrawScriptsTab(view.scripts, art);

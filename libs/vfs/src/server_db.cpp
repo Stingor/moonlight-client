@@ -25,6 +25,7 @@ namespace {
 constexpr std::string_view kItemDbType = "ITEM_DB";
 constexpr std::string_view kMobDbType = "MOB_DB";
 constexpr std::string_view kStatusDbType = "STATUS_DB";
+constexpr std::string_view kMapDropDbType = "MAP_DROP_DB";
 constexpr int kContextVersion = 1;
 constexpr std::string_view kTrueText = "true";
 constexpr std::string_view kTreasureGroup = "Treasure";
@@ -305,6 +306,43 @@ ServerMonster MonsterOf(const formats::RathenaEntry& entry, const AegisIndex& it
   return monster;
 }
 
+// Les lignes d'une entrée de `map_drops.yml`. Un monstre ou un objet que la base
+// ne connaît pas ne donne rien.
+void AddMapDrops(const formats::RathenaEntry& entry, const AegisIndex& items,
+                 const AegisIndex& monsters, std::vector<ServerMapDrop>& drops) {
+  std::string map_name;
+  std::uint32_t monster_id = kServerMapDropAllMonsters;
+  const Field* lines = nullptr;
+  for (const Field& value : entry) {
+    if (value.key == "Map") {
+      map_name = FieldText(value);
+    } else if (value.key == "Monster") {
+      const auto found = monsters.find(core::AsciiLower(FieldText(value)));
+      if (found == monsters.end()) {
+        return;
+      }
+      monster_id = found->second;
+    } else if (value.key == "Drops") {
+      lines = &value;
+    }
+  }
+  if (lines == nullptr) {
+    return;
+  }
+  for (const Pairs& line : lines->list) {
+    const auto found = items.find(core::AsciiLower(PairValue(line, "Item")));
+    if (found == items.end()) {
+      continue;
+    }
+    drops.push_back(
+        ServerMapDrop{.map_name = map_name,
+                      .monster_id = monster_id,
+                      .item_id = found->second,
+                      .rate_thousandths = NumberIn<std::uint32_t>(PairValue(line, "Rate"), 0),
+                      .random_options = !PairValue(line, "RandomOptionGroup").empty()});
+  }
+}
+
 // Une ligne de `Bonuses`, ou rien quand l'un de ses champs ne se lit pas.
 [[nodiscard]] std::optional<ServerStatusBonus> StatusBonusOf(const Pairs& line) {
   constexpr std::uint16_t kNoType = 0;
@@ -432,8 +470,8 @@ std::vector<ServerSpawn> SpawnsOf(const YAML::Node& places) {
 }  // namespace
 
 core::Result<ServerDb> ParseServerDb(std::string_view item_db_text, std::string_view mob_db_text,
-                                     std::string_view context_text,
-                                     std::string_view status_db_text) {
+                                     std::string_view context_text, std::string_view status_db_text,
+                                     std::string_view map_drop_db_text) {
   if (item_db_text.empty() || mob_db_text.empty() || context_text.empty()) {
     return ServerDb{};
   }
@@ -504,8 +542,24 @@ core::Result<ServerDb> ParseServerDb(std::string_view item_db_text, std::string_
       }
     }
 
+    std::vector<ServerMapDrop> map_drops;
+    if (!map_drop_db_text.empty()) {
+      AegisIndex monster_ids;
+      for (const ServerMonster& monster : monsters) {
+        monster_ids.emplace(core::AsciiLower(monster.aegis_name), monster.monster_id);
+      }
+      if (auto read = formats::ReadRathenaDb(map_drop_db_text, kMapDropDbType, kServerMapDropDbPath,
+                                             [&](const formats::RathenaEntry& entry) {
+                                               AddMapDrops(entry, aegis, monster_ids, map_drops);
+                                             });
+          !read) {
+        return std::unexpected(read.error());
+      }
+    }
+
     ServerDb db = ServerDb::Known(std::move(items), std::move(monsters), settings);
     db.NoteStatuses(std::move(statuses));
+    db.NoteMapDrops(std::move(map_drops));
     if (const YAML::Node spawns = context["spawns"]; IsMapNode(spawns)) {
       for (const auto& pair : spawns) {
         db.NoteSpawns(NumberOf<std::uint32_t>(pair.first, 0), SpawnsOf(pair.second));
@@ -546,12 +600,15 @@ core::Result<ServerDbTexts> ReadServerDbTexts(Vfs& vfs) {
     }
     into->assign(reinterpret_cast<const char*>(bytes->data()), bytes->size());
   }
-  auto statuses = vfs.Read(std::string(kServerStatusDbPath));
-  if (statuses) {
-    texts.status_db.assign(reinterpret_cast<const char*>(statuses->data()), statuses->size());
-  } else if (statuses.error().code != core::ErrorCode::kNotFound) {
-    return std::unexpected(core::Error{
-        statuses.error().code, std::string(kServerStatusDbPath) + " : " + statuses.error().detail});
+  for (auto [path, into] : {std::pair{kServerStatusDbPath, &texts.status_db},
+                            std::pair{kServerMapDropDbPath, &texts.map_drop_db}}) {
+    auto bytes = vfs.Read(std::string(path));
+    if (bytes) {
+      into->assign(reinterpret_cast<const char*>(bytes->data()), bytes->size());
+    } else if (bytes.error().code != core::ErrorCode::kNotFound) {
+      return std::unexpected(
+          core::Error{bytes.error().code, std::string(path) + " : " + bytes.error().detail});
+    }
   }
   return texts;
 }

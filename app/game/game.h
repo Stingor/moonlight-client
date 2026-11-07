@@ -722,6 +722,7 @@ class Game : public Screen,
   void FollowMvpLink(const ro::ui::ChatLinkAsk& asked, const MvpLink& link, std::string_view sender,
                      std::uint32_t now_ms);
   void FollowCatalogItem(const ro::ui::ChatLinkAsk& asked, std::uint32_t now_ms);
+  void FollowMapGestures(std::string_view guide, std::string_view link, std::string_view hovered);
   void FollowItemGesture(ro::ui::ChatLinkGesture gesture, const ItemGestureTarget& item,
                          std::uint32_t now_ms);
   void FollowTradeItem(const TradeItemFocus& focus, std::uint32_t now_ms);

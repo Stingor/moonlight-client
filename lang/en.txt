@@ -275,6 +275,9 @@ tr: Line up three monsters of the same colour, in thirty moves.
 fr: Allège ou rétablit les effets.
 tr: Lightens or restores the effects.
 
+fr: Aléatoires
+tr: Random
+
 fr: Anneaux
 tr: Rings
 
@@ -488,6 +491,9 @@ tr: Waiting for the other players…
 fr: En coop, relever un allié à terre, au prix d'une montée de niveau.
 tr: In co-op, revive a fallen ally, at the cost of a level-up.
 
+fr: En plus du butin, sur cette map. Les taux du serveur ne les changent pas.
+tr: On top of the regular loot, on this map. Server drop rates do not change them.
+
 fr: Entendre les autres joueurs, et leur parler en tenant la touche « Parler (voix) » des raccourcis. Seulement sur un serveur qui ouvre la voix.
 tr: Hear the other players, and talk to them by holding the "Talk (voice)" shortcut key. Only on a server that opens voice.
 
@@ -545,6 +551,12 @@ tr: The connection to the server is lost.
 fr: Les clients du groupe n'ont pas la même version : la partie ne peut pas commencer.
 tr: The party's clients are not on the same version: the game cannot start.
 
+fr: Map Drops
+tr: Map Drops
+
+fr: Map Drops (%d)
+tr: Map Drops (%d)
+
 fr: Marquer 10 000 points en un seul tir de Roggle.
 tr: Score 10,000 points in a single Roggle shot.
 
@@ -592,6 +604,9 @@ tr: Party lobby
 
 fr: Tir lointain ! +%d
 tr: Long shot! +%d
+
+fr: Tous les monstres
+tr: All monsters
 
 fr: Un membre du groupe est hors ligne.
 tr: A party member is offline.

@@ -15,7 +15,7 @@ namespace ro::vfs {
 
 // ── LA BASE DE DONNÉES DU SERVEUR, POUR LA FENÊTRE « BASE DE DONNÉES » ──────
 //
-// Quatre tables exportées par `scripts/yaml_tables/server_db.py`, qui en dit les
+// Cinq tables exportées par `scripts/yaml_tables/server_db.py`, qui en dit les
 // règles (ADR 0116) :
 //
 //   item_db.yml         une item_db rAthena, FUSIONNÉE comme le serveur la
@@ -27,7 +27,9 @@ namespace ro::vfs {
 //   status.yml          la status_db fusionnée, réduite aux états à script,
 //                       avec les bonus de ceux dont le script se lit entier.
 //                       FACULTATIVE : absente, la base reste connue, sans
-//                       états.
+//                       états ;
+//   map_drops.yml       les map drops fusionnés, à plat : une entrée par
+//                       carte et par monstre. FACULTATIVE elle aussi.
 //
 // 🔴 LES BASES SE PARCOURENT SANS ANALYSEUR YAML : leur script les écrit
 // sous une forme stricte (`ro/formats/rathena_db_text.h`), qu'un curseur lit
@@ -40,6 +42,7 @@ inline constexpr std::string_view kServerItemDbPath = "data\\yaml_files\\item_db
 inline constexpr std::string_view kServerMobDbPath = "data\\yaml_files\\mob_db.yml";
 inline constexpr std::string_view kServerDbContextPath = "data\\yaml_files\\mob_db_context.yml";
 inline constexpr std::string_view kServerStatusDbPath = "data\\yaml_files\\status.yml";
+inline constexpr std::string_view kServerMapDropDbPath = "data\\yaml_files\\map_drops.yml";
 
 // Les centièmes de pour cent d'un taux qui tombe à coup sûr.
 inline constexpr std::uint32_t kDropRateWhole = 10000;
@@ -201,6 +204,22 @@ struct ServerStatus {
   std::vector<ServerStatusBonus> bonuses;
 };
 
+// Le monstre d'un map drop qui vaut pour tous ceux de la carte.
+inline constexpr std::uint32_t kServerMapDropAllMonsters = 0;
+
+// UN MAP DROP : le serveur le tire EN PLUS du butin du monstre tué sur
+// cette carte, ou sur une instance qui en est la copie. Ses taux de butin ne
+// le touchent pas : sans bonus de joueur, le taux écrit est le taux réel.
+struct ServerMapDrop {
+  std::string map_name;
+  std::uint32_t monster_id = kServerMapDropAllMonsters;
+  std::uint32_t item_id = 0;
+  // En millièmes de pour cent : 100 000 = 100 %.
+  std::uint32_t rate_thousandths = 0;
+  // L'objet tombe avec des options aléatoires.
+  bool random_options = false;
+};
+
 // LES RÉGLAGES DE BUTIN EFFECTIFS DU SERVEUR, ceux de `conf/battle/drops.conf`
 // après ses imports. Taux en pour cent (100 = tel quel), bornes en centièmes
 // de pour cent.
@@ -284,6 +303,13 @@ class ServerDb {
   void NoteStatuses(std::vector<ServerStatus> statuses);
   [[nodiscard]] const ServerStatus* FindStatus(std::string_view constant) const;
 
+  void NoteMapDrops(std::vector<ServerMapDrop> drops);
+  // Les map drops d'un objet, au taux décroissant.
+  [[nodiscard]] std::vector<ServerMapDrop> MapDropsOfItem(std::uint32_t item_id) const;
+  // Ceux d'un monstre, au taux décroissant : les siens, et ceux qui valent pour
+  // tous les monstres d'une carte où il apparaît.
+  [[nodiscard]] std::vector<ServerMapDrop> MapDropsOfMonster(std::uint32_t monster_id) const;
+
  private:
   struct Ratio {
     std::int64_t ratio = 0;
@@ -304,6 +330,8 @@ class ServerDb {
   std::unordered_map<std::uint32_t, std::vector<DropRef>> droppers_;
   // Rangés par constante.
   std::vector<ServerStatus> statuses_;
+  // Rangés au taux décroissant.
+  std::vector<ServerMapDrop> map_drops_;
 };
 
 // ── LE TAUX, COMME LE SERVEUR ───────────────────────────────────────────────
@@ -334,20 +362,23 @@ class ServerDb {
 
 // Lit les tables depuis leur texte. Refuse un texte qui n'est pas du YAML, une
 // en-tête qui n'est pas celle de la base attendue, ou un contexte d'une version
-// inconnue. Une status_db vide laisse la base sans états.
+// inconnue. Une status_db vide laisse la base sans états, une table de drops de
+// carte vide sans map drops.
 [[nodiscard]] core::Result<ServerDb> ParseServerDb(std::string_view item_db_text,
                                                    std::string_view mob_db_text,
                                                    std::string_view context_text,
-                                                   std::string_view status_db_text = {});
+                                                   std::string_view status_db_text = {},
+                                                   std::string_view map_drop_db_text = {});
 
 // Les textes de l'installation. L'UN DES TROIS PREMIERS ABSENT, tous vides :
-// `ParseServerDb` rend alors une base inconnue. La status_db absente reste
-// vide seule.
+// `ParseServerDb` rend alors une base inconnue. La status_db et les drops de
+// carte absents restent vides seuls.
 struct ServerDbTexts {
   std::string item_db;
   std::string mob_db;
   std::string context;
   std::string status_db;
+  std::string map_drop_db;
 };
 [[nodiscard]] core::Result<ServerDbTexts> ReadServerDbTexts(Vfs& vfs);
 

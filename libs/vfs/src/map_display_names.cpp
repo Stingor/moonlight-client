@@ -15,6 +15,7 @@ namespace ro::vfs {
 namespace {
 
 constexpr int kSupportedVersion = 1;
+constexpr std::string_view kMapFileExtension = ".gat";
 
 // La retouche de l'extension : un point suivi de trois caractères, sur un nom
 // d'au moins cette longueur.
@@ -124,6 +125,16 @@ std::optional<std::string_view> MapDisplayNames::DisplayNameOf(std::string_view 
     return std::nullopt;
   }
   return std::string_view(found->second);
+}
+
+std::string MapDisplayNames::LabelOf(std::string_view map_name) const {
+  const std::optional<std::string_view> shown =
+      DisplayNameOf(std::string(map_name) + std::string(kMapFileExtension));
+  std::string label(map_name);
+  if (shown.has_value() && !shown->empty()) {
+    label = std::string(*shown) + " (" + label + ")";
+  }
+  return label;
 }
 
 }  // namespace ro::vfs

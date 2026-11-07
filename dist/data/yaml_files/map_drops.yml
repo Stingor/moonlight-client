@@ -1,0 +1,497 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  Les map drops du serveur
+#
+#  Tiré de la base du serveur Moonlight (rAthena, mode Prerenewal) par
+#  scripts/yaml_tables/server_db.py, fusionnée comme le serveur la charge :
+#  db/map_drops.yml et chaque import en pied de fichier, dans l'ordre. Ne pas éditer à la
+#  main :
+#      python scripts/yaml_tables/server_db.py --serveur <dépôt moonlight>
+#
+#  Une entrée par carte et par monstre ; sans Monster, la ligne vaut pour tous
+#  les monstres de la carte. Rate est en n/100000. Le serveur tire ces lignes
+#  EN PLUS du butin du monstre, et ses taux de butin ne les touchent pas.
+#  RandomOptionGroup : l'objet tombe avec des options aléatoires de ce groupe.
+#
+#  Lu par moonclient (ro/vfs/server_db.h), à la première ouverture de la
+#  fenêtre « Base de données » seulement.
+# ─────────────────────────────────────────────────────────────────────────────
+
+Header:
+  Type: MAP_DROP_DB
+  Version: 2
+
+Body:
+  - Map: ant_d02_i
+    Monster: ILL_ANDRE
+    Drops:
+      - {Item: Excalibur_IL, Rate: 1000, RandomOptionGroup: ILL_MAGIC_NORMAL}
+      - {Item: IllusionStone, Rate: 2000}
+  - Map: ant_d02_i
+    Monster: ILL_ANDRE_LARVA
+    Drops:
+      - {Item: Guard_IL, Rate: 500}
+      - {Item: Sprint_Glove_IL, Rate: 500}
+      - {Item: IllusionStone, Rate: 2000}
+  - Map: ant_d02_i
+    Monster: ILL_ANT_EGG
+    Drops:
+      - {Item: Siver_Guard_IL, Rate: 500}
+      - {Item: Sprint_Shoes_IL, Rate: 500}
+      - {Item: IllusionStone, Rate: 2000}
+  - Map: ant_d02_i
+    Monster: ILL_DENIRO
+    Drops:
+      - {Item: Sprint_Mail_IL, Rate: 1000}
+      - {Item: IllusionStone, Rate: 2000}
+  - Map: ant_d02_i
+    Monster: ILL_FARMILIAR
+    Drops:
+      - {Item: Ancient_Dagger_IL, Rate: 1000, RandomOptionGroup: ILL_MAGIC_NORMAL}
+      - {Item: IllusionStone, Rate: 2000}
+  - Map: ant_d02_i
+    Monster: ILL_GIEARTH
+    Drops:
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Thorn_Staff_IL, Rate: 1000, RandomOptionGroup: ILL_MAGIC_NORMAL}
+      - {Item: Twins_Box_IL, Rate: 500}
+  - Map: ant_d02_i
+    Monster: ILL_MAYA
+    Drops:
+      - {Item: Ancient_Dagger_IL, Rate: 1250, RandomOptionGroup: ILL_MAGIC_BOSS}
+      - {Item: Dea_Staff_IL, Rate: 2500, RandomOptionGroup: ILL_MAGIC_BOSS}
+      - {Item: Doom_Slayer_IL, Rate: 1250, RandomOptionGroup: ILL_PHYSIC_BOSS}
+      - {Item: Excalibur_IL, Rate: 1250, RandomOptionGroup: ILL_MAGIC_BOSS}
+      - {Item: Gelerdria_IL, Rate: 1250, RandomOptionGroup: ILL_PHYSIC_BOSS}
+      - {Item: Guard_IL, Rate: 1250}
+      - {Item: Siver_Guard_IL, Rate: 1250}
+      - {Item: Sprint_Glove_IL, Rate: 1250}
+      - {Item: Sprint_Mail_IL, Rate: 1250}
+      - {Item: Sprint_Ring_IL, Rate: 1250}
+      - {Item: Sprint_Shoes_IL, Rate: 1250}
+      - {Item: IllusionStone, Rate: 15000}
+      - {Item: Thorn_Staff_IL, Rate: 1250, RandomOptionGroup: ILL_MAGIC_BOSS}
+      - {Item: S_Twins_Box_IL, Rate: 5000}
+  - Map: ant_d02_i
+    Monster: ILL_PIERE
+    Drops:
+      - {Item: Gelerdria_IL, Rate: 1000, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: IllusionStone, Rate: 2000}
+  - Map: ant_d02_i
+    Monster: ILL_SOLDIER_ANDR
+    Drops:
+      - {Item: Doom_Slayer_IL, Rate: 1000, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Twins_Box_IL, Rate: 500}
+  - Map: ant_d02_i
+    Monster: ILL_VITATA
+    Drops:
+      - {Item: Sprint_Ring_IL, Rate: 1000}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Twins_Box_IL, Rate: 500}
+  - Map: com_d02_i
+    Monster: ILL_MEGALITH
+    Drops:
+      - {Item: Hunter_Bow_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Luanda_Box_IL, Rate: 500}
+  - Map: com_d02_i
+    Monster: ILL_STALACTIC_GOLEM
+    Drops:
+      - {Item: Hunter_Bow_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Luanda_Box_IL, Rate: 500}
+  - Map: com_d02_i
+    Monster: ILL_STONE_SHOOTER
+    Drops:
+      - {Item: Hunter_Bow_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Luanda_Box_IL, Rate: 500}
+  - Map: com_d02_i
+    Monster: ILL_TAO_GUNKA
+    Drops:
+      - {Item: Goibne_Armor_IL, Rate: 5000}
+      - {Item: Goibne_Helmet_IL, Rate: 5000}
+      - {Item: IllusionStone, Rate: 15000}
+      - {Item: Tablet_IL, Rate: 5000, RandomOptionGroup: ILL_PHYSIC_BOSS}
+      - {Item: S_Luanda_Box_IL, Rate: 5000}
+  - Map: com_d02_i
+    Monster: ILL_TRI_JOINT
+    Drops:
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Tablet_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: Luanda_Box_IL, Rate: 500}
+  - Map: com_d02_i
+    Monster: ILL_WOOTAN_DEFENDER
+    Drops:
+      - {Item: Goibne_Boots_IL, Rate: 5000}
+      - {Item: Goibne_Shoulder_IL, Rate: 5000}
+      - {Item: Hunter_Bow_IL, Rate: 5000, RandomOptionGroup: ILL_PHYSIC_BOSS}
+      - {Item: IllusionStone, Rate: 15000}
+      - {Item: S_Luanda_Box_IL, Rate: 5000}
+  - Map: com_d02_i
+    Monster: ILL_WOOTAN_FIGHTER
+    Drops:
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Tablet_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: Luanda_Box_IL, Rate: 500}
+  - Map: com_d02_i
+    Monster: ILL_WOOTAN_SHOOTER
+    Drops:
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Tablet_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: Luanda_Box_IL, Rate: 500}
+  - Map: ein_d02_i
+    Monster: ILL_MINERAL
+    Drops:
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Survival_Staff_IL, Rate: 2500, RandomOptionGroup: ILL_MAGIC_NORMAL}
+      - {Item: Teddy_Bear_Box_IL, Rate: 500}
+  - Map: ein_d02_i
+    Monster: ILL_OBSIDIAN
+    Drops:
+      - {Item: Counter_Dagger_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Teddy_Bear_Box_IL, Rate: 500}
+  - Map: ein_d02_i
+    Monster: ILL_PITMAN
+    Drops:
+      - {Item: Gate_KeeperDD_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Teddy_Bear_Box_IL, Rate: 500}
+  - Map: ein_d02_i
+    Monster: ILL_TEDDY_BEAR_B
+    Drops:
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Survival_Staff_IL, Rate: 2500, RandomOptionGroup: ILL_MAGIC_NORMAL}
+      - {Item: Teddy_Bear_Box_IL, Rate: 500}
+  - Map: ein_d02_i
+    Monster: ILL_TEDDY_BEAR_G
+    Drops:
+      - {Item: Gate_KeeperDD_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Teddy_Bear_Box_IL, Rate: 500}
+  - Map: ein_d02_i
+    Monster: ILL_TEDDY_BEAR_R
+    Drops:
+      - {Item: Headband_Of_Power_IL, Rate: 2500}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Teddy_Bear_Box_IL, Rate: 500}
+  - Map: ein_d02_i
+    Monster: ILL_TEDDY_BEAR_S
+    Drops:
+      - {Item: Boots_IL, Rate: 5000}
+      - {Item: Counter_Dagger_IL, Rate: 5000, RandomOptionGroup: ILL_PHYSIC_BOSS}
+      - {Item: Gate_KeeperDD_IL, Rate: 5000, RandomOptionGroup: ILL_PHYSIC_BOSS}
+      - {Item: Headband_Of_Power_IL, Rate: 5000}
+      - {Item: IllusionStone, Rate: 5000}
+      - {Item: IllusionStone, Rate: 10000}
+      - {Item: IllusionStone, Rate: 15000}
+      - {Item: Survival_Staff_IL, Rate: 5000, RandomOptionGroup: ILL_MAGIC_BOSS}
+      - {Item: S_Teddy_Bear_Box_IL, Rate: 5000}
+  - Map: ein_d02_i
+    Monster: ILL_TEDDY_BEAR_W
+    Drops:
+      - {Item: Counter_Dagger_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Teddy_Bear_Box_IL, Rate: 500}
+  - Map: ein_d02_i
+    Monster: ILL_TEDDY_BEAR_Y
+    Drops:
+      - {Item: Boots_IL, Rate: 2500}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Teddy_Bear_Box_IL, Rate: 500}
+  - Map: gef_d01_i
+    Monster: ILL_DRACULA
+    Drops:
+      - {Item: Cape_Of_Ancient_Lord_IL, Rate: 5000}
+      - {Item: Balistar_IL, Rate: 5000, RandomOptionGroup: ILL_PHYSIC_BOSS}
+      - {Item: Book_Of_The_Apo_IL, Rate: 5000, RandomOptionGroup: ILL_PHYSIC_BOSS}
+      - {Item: Infiltrator_IL, Rate: 5000, RandomOptionGroup: ILL_PHYSIC_BOSS}
+      - {Item: Ring_IL, Rate: 5000}
+      - {Item: Ghoul_Leg_IL, Rate: 5000}
+      - {Item: Skul_Ring_IL, Rate: 5000}
+      - {Item: IllusionStone, Rate: 15000}
+      - {Item: Wizardy_Staff_IL, Rate: 5000, RandomOptionGroup: ILL_MAGIC_BOSS}
+      - {Item: S_Vampire_Box_IL, Rate: 5000}
+  - Map: gef_d01_i
+    Monster: ILL_DRAINLIAR
+    Drops:
+      - {Item: Balistar_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Vampire_Box_IL, Rate: 500}
+  - Map: gef_d01_i
+    Monster: ILL_GHOUL
+    Drops:
+      - {Item: Infiltrator_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: Skul_Ring_IL, Rate: 2500}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Vampire_Box_IL, Rate: 500}
+  - Map: gef_d01_i
+    Monster: ILL_NIGHTMARE
+    Drops:
+      - {Item: Ring_IL, Rate: 2500}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Wizardy_Staff_IL, Rate: 2500, RandomOptionGroup: ILL_MAGIC_NORMAL}
+      - {Item: Vampire_Box_IL, Rate: 500}
+  - Map: gef_d01_i
+    Monster: ILL_ZOMBIE
+    Drops:
+      - {Item: Cape_Of_Ancient_Lord_IL, Rate: 2500}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Vampire_Box_IL, Rate: 500}
+  - Map: gef_d01_i
+    Monster: ILL_ZOMBIE_C
+    Drops:
+      - {Item: Book_Of_The_Apo_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: Ghoul_Leg_IL, Rate: 2500}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Vampire_Box_IL, Rate: 500}
+  - Map: ice_d03_i
+    Monster: ILL_GAZETI
+    Drops:
+      - {Item: Frozen_Box_IL, Rate: 500}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Clack_Of_Servival_IL, Rate: 2500}
+  - Map: ice_d03_i
+    Monster: ILL_ICEICLE
+    Drops:
+      - {Item: Frozen_Box_IL, Rate: 500}
+      - {Item: IllusionStone, Rate: 2000}
+  - Map: ice_d03_i
+    Monster: ILL_ICE_TITAN
+    Drops:
+      - {Item: Frozen_Box_IL, Rate: 500}
+      - {Item: Combo_Battle_Glove_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: Herald_Of_GOD_IL, Rate: 2500}
+      - {Item: IllusionStone, Rate: 2000}
+  - Map: ice_d03_i
+    Monster: ILL_KTULLANUX
+    Drops:
+      - {Item: Cap_IL, Rate: 5000}
+      - {Item: Combo_Battle_Glove_IL, Rate: 5000, RandomOptionGroup: ILL_PHYSIC_BOSS}
+      - {Item: Huuma_Flutter_Snow_IL, Rate: 5000, RandomOptionGroup: ILL_PHYSIC_BOSS}
+      - {Item: Herald_Of_GOD_IL, Rate: 5000}
+      - {Item: IllusionStone, Rate: 15000}
+      - {Item: Clack_Of_Servival_IL, Rate: 5000}
+      - {Item: S_Frozen_Box_IL, Rate: 5000}
+  - Map: ice_d03_i
+    Monster: ILL_SNOWIER
+    Drops:
+      - {Item: Frozen_Box_IL, Rate: 500}
+      - {Item: Cap_IL, Rate: 2500}
+      - {Item: Huuma_Flutter_Snow_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: IllusionStone, Rate: 2000}
+  - Map: iz_d04_i
+    Monster: ILL_ABYSMAL_WITCH
+    Drops:
+      - {Item: Chain_Mail_IL, Rate: 5000}
+      - {Item: Electric_Eel_IL, Rate: 5000, RandomOptionGroup: ILL_MAGIC_BOSS}
+      - {Item: KatarOfCold_Icicle_IL, Rate: 5000, RandomOptionGroup: ILL_PHYSIC_BOSS}
+      - {Item: Morrigane_Belt_IL, Rate: 5000}
+      - {Item: Morrigane_Pendant_IL, Rate: 5000}
+      - {Item: Water_Sprits_Armor_IL, Rate: 5000}
+      - {Item: IllusionStone, Rate: 15000}
+      - {Item: Zephyrus_IL, Rate: 5000, RandomOptionGroup: ILL_PHYSIC_BOSS}
+      - {Item: S_Underwater_Box_IL, Rate: 5000}
+  - Map: iz_d04_i
+    Monster: ILL_DEVIACE
+    Drops:
+      - {Item: KatarOfCold_Icicle_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Underwater_Box_IL, Rate: 500}
+  - Map: iz_d04_i
+    Monster: ILL_MARSE
+    Drops:
+      - {Item: Water_Sprits_Armor_IL, Rate: 2500}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Underwater_Box_IL, Rate: 500}
+  - Map: iz_d04_i
+    Monster: ILL_MERMAN
+    Drops:
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Zephyrus_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: Underwater_Box_IL, Rate: 500}
+  - Map: iz_d04_i
+    Monster: ILL_OBEAUNE
+    Drops:
+      - {Item: Saint_Robe_IL, Rate: 2500}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Underwater_Box_IL, Rate: 500}
+  - Map: iz_d04_i
+    Monster: ILL_SROPHO
+    Drops:
+      - {Item: Electric_Eel_IL, Rate: 2500, RandomOptionGroup: ILL_MAGIC_NORMAL}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Underwater_Box_IL, Rate: 500}
+  - Map: iz_d05_i
+    Monster: ILL_KING_DRAMOH
+    Drops:
+      - {Item: Death_Guidance_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Underwater_Box_IL, Rate: 500}
+  - Map: iz_d05_i
+    Monster: ILL_KRAKEN
+    Drops:
+      - {Item: Brionac_IL, Rate: 5000, RandomOptionGroup: ILL_PHYSIC_BOSS}
+      - {Item: Death_Guidance_IL, Rate: 5000, RandomOptionGroup: ILL_PHYSIC_BOSS}
+      - {Item: Electronic_Guitar_IL, Rate: 5000, RandomOptionGroup: ILL_MAGIC_BOSS}
+      - {Item: Morrigane_Helm_IL, Rate: 5000}
+      - {Item: Morrigane_Manyeau_IL, Rate: 5000}
+      - {Item: Saint_Robe_IL, Rate: 5000}
+      - {Item: IllusionStone, Rate: 15000}
+      - {Item: S_Underwater_Box_IL, Rate: 5000}
+  - Map: iz_d05_i
+    Monster: ILL_PHEN
+    Drops:
+      - {Item: Chain_Mail_IL, Rate: 2500}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Underwater_Box_IL, Rate: 500}
+  - Map: iz_d05_i
+    Monster: ILL_SEDORA
+    Drops:
+      - {Item: Electronic_Guitar_IL, Rate: 2500, RandomOptionGroup: ILL_MAGIC_NORMAL}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Underwater_Box_IL, Rate: 500}
+  - Map: iz_d05_i
+    Monster: ILL_STROUF
+    Drops:
+      - {Item: Brionac_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Underwater_Box_IL, Rate: 500}
+  - Map: iz_d05_i
+    Monster: ILL_SWORD_FISH
+    Drops:
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Underwater_Box_IL, Rate: 500}
+  - Map: pay_d03_i
+    Monster: ILL_ARCHER_SKELETON
+    Drops:
+      - {Item: Apple_Of_Archer_IL, Rate: 2500}
+      - {Item: Staff_Of_Bordeaux_IL, Rate: 2500, RandomOptionGroup: ILL_MAGIC_NORMAL}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Moonlight_Box_IL, Rate: 500}
+  - Map: pay_d03_i
+    Monster: ILL_BON_GUN
+    Drops:
+      - {Item: Long_Mace_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: Spectral_Spear_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Moonlight_Box_IL, Rate: 500}
+  - Map: pay_d03_i
+    Monster: ILL_MOONLIGHT
+    Drops:
+      - {Item: Apple_Of_Archer_IL, Rate: 5000}
+      - {Item: Long_Mace_IL, Rate: 5000, RandomOptionGroup: ILL_PHYSIC_BOSS}
+      - {Item: Moonlight_Sword_IL, Rate: 5000, RandomOptionGroup: ILL_PHYSIC_BOSS}
+      - {Item: Muffler_IL, Rate: 5000}
+      - {Item: Nurse_Cap_IL, Rate: 5000}
+      - {Item: Puente_Robe_IL, Rate: 5000}
+      - {Item: Shoes_IL, Rate: 5000}
+      - {Item: Spectral_Spear_IL, Rate: 5000, RandomOptionGroup: ILL_PHYSIC_BOSS}
+      - {Item: Staff_Of_Bordeaux_IL, Rate: 5000, RandomOptionGroup: ILL_MAGIC_BOSS}
+      - {Item: IllusionStone, Rate: 15000}
+      - {Item: S_Moonlight_Box_IL, Rate: 5000}
+  - Map: pay_d03_i
+    Monster: ILL_MUNAK
+    Drops:
+      - {Item: Nurse_Cap_IL, Rate: 2500}
+      - {Item: Shoes_IL, Rate: 2500}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Moonlight_Box_IL, Rate: 500}
+  - Map: pay_d03_i
+    Monster: ILL_NINE_TAIL
+    Drops:
+      - {Item: Puente_Robe_IL, Rate: 2500}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Moonlight_Box_IL, Rate: 500}
+  - Map: pay_d03_i
+    Monster: ILL_SOHEE
+    Drops:
+      - {Item: Moonlight_Sword_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: Muffler_IL, Rate: 2500}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Moonlight_Box_IL, Rate: 500}
+  - Map: tur_d03_i
+    Monster: ILL_ASSULTER
+    Drops:
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Huuma_Bird_Wing_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: Turtle_Is_Box_IL, Rate: 500}
+  - Map: tur_d03_i
+    Monster: ILL_FREEZER
+    Drops:
+      - {Item: Immaterial_Sword_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Turtle_Is_Box_IL, Rate: 500}
+  - Map: tur_d03_i
+    Monster: ILL_HEATER
+    Drops:
+      - {Item: Pole_Axe_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Turtle_Is_Box_IL, Rate: 500}
+  - Map: tur_d03_i
+    Monster: ILL_PERMETER
+    Drops:
+      - {Item: Fancy_Flower_IL, Rate: 2500}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Turtle_Is_Box_IL, Rate: 500}
+  - Map: tur_d03_i
+    Monster: ILL_SOLIDER
+    Drops:
+      - {Item: Iron_Driver_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: War_Axe_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: Turtle_Is_Box_IL, Rate: 500}
+  - Map: tur_d03_i
+    Monster: ILL_TURTLE_GENERAL
+    Drops:
+      - {Item: Fancy_Flower_IL, Rate: 5000}
+      - {Item: Immaterial_Sword_IL, Rate: 5000, RandomOptionGroup: ILL_PHYSIC_BOSS}
+      - {Item: Iron_Driver_IL, Rate: 5000, RandomOptionGroup: ILL_PHYSIC_BOSS}
+      - {Item: Pole_Axe_IL, Rate: 5000, RandomOptionGroup: ILL_PHYSIC_BOSS}
+      - {Item: IllusionStone, Rate: 15000}
+      - {Item: War_Axe_IL, Rate: 5000, RandomOptionGroup: ILL_PHYSIC_BOSS}
+      - {Item: Huuma_Bird_Wing_IL, Rate: 5000, RandomOptionGroup: ILL_PHYSIC_BOSS}
+      - {Item: S_Turtle_Is_Box_IL, Rate: 5000}
+  - Map: tur_d04_i
+    Monster: ILL_ASSULTER
+    Drops:
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Huuma_Bird_Wing_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: Turtle_Is_Box_IL, Rate: 500}
+  - Map: tur_d04_i
+    Monster: ILL_FREEZER
+    Drops:
+      - {Item: Immaterial_Sword_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Turtle_Is_Box_IL, Rate: 500}
+  - Map: tur_d04_i
+    Monster: ILL_HEATER
+    Drops:
+      - {Item: Pole_Axe_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Turtle_Is_Box_IL, Rate: 500}
+  - Map: tur_d04_i
+    Monster: ILL_PERMETER
+    Drops:
+      - {Item: Fancy_Flower_IL, Rate: 2500}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Turtle_Is_Box_IL, Rate: 500}
+  - Map: tur_d04_i
+    Monster: ILL_SOLIDER
+    Drops:
+      - {Item: Iron_Driver_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: War_Axe_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: Turtle_Is_Box_IL, Rate: 500}
+  - Map: tur_d04_i
+    Monster: ILL_TURTLE_GENERAL
+    Drops:
+      - {Item: Fancy_Flower_IL, Rate: 5000}
+      - {Item: Immaterial_Sword_IL, Rate: 5000, RandomOptionGroup: ILL_PHYSIC_BOSS}
+      - {Item: Iron_Driver_IL, Rate: 5000, RandomOptionGroup: ILL_PHYSIC_BOSS}
+      - {Item: Pole_Axe_IL, Rate: 5000, RandomOptionGroup: ILL_PHYSIC_BOSS}
+      - {Item: IllusionStone, Rate: 15000}
+      - {Item: War_Axe_IL, Rate: 5000, RandomOptionGroup: ILL_PHYSIC_BOSS}
+      - {Item: Huuma_Bird_Wing_IL, Rate: 5000, RandomOptionGroup: ILL_PHYSIC_BOSS}
+      - {Item: S_Turtle_Is_Box_IL, Rate: 5000}

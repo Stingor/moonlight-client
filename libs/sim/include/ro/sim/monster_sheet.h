@@ -36,6 +36,18 @@ struct MonsterDrop {
   std::string name;
 };
 
+// CE QUE LE MONSTRE LAISSE EN PLUS SUR UNE CARTE. La base de données seule le
+// sait : la fiche du serveur n'en dit rien.
+struct MonsterMapDrop {
+  std::uint32_t item_id = 0;
+  // En millièmes de pour cent : 100 000 = 100 %.
+  std::uint32_t rate_thousandths = 0;
+  // L'objet tombe avec des options aléatoires.
+  bool random_options = false;
+  std::string map_name;
+  std::string name;
+};
+
 // Une carte où le monstre apparaît en permanence.
 //
 // ⚠ SEULS LES SPAWNS PERMANENTS : les invocations de script, les instances et

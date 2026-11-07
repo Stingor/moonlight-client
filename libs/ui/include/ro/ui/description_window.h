@@ -169,6 +169,22 @@ struct DescriptionDropRow {
   std::uint32_t rate_hundredths = 0;
 };
 
+// UN MAP DROP DE L'OBJET. La base seule le sait : le serveur n'en répond
+// rien, et ses lignes ne se mêlent pas aux sources qu'il donne.
+struct DescriptionMapDropRow {
+  // Zéro : tous les monstres de la carte.
+  std::uint32_t monster_id = 0;
+  std::string_view monster_name;
+  // Zéro ordinaire, un mini-boss, deux MVP.
+  std::uint8_t boss_rank = 0;
+  std::string map_name;
+  // « Nom affiché (fichier) », ou le nom interne seul.
+  std::string map_label;
+  // En millièmes de pour cent : 100 000 = 100 %.
+  std::uint32_t rate_thousandths = 0;
+  bool random_options = false;
+};
+
 // ⚠ LE SERVEUR D'ABORD, LA BASE À DÉFAUT : sa réponse porte les taux du moment
 // — événements, VIP —, celle de la base les taux réels du chargement. Tant
 // qu'il n'a pas répondu, ou hors ligne, la base remplit l'onglet
@@ -237,6 +253,7 @@ enum class ItemSheetTab : std::uint8_t {
   kOdds,
   kMonsters,
   kBoss,
+  kMapDrops,
   kScript,
   kCombos,
   kSellers,
@@ -367,6 +384,10 @@ struct DescriptionView {
   //
   // « Général » : vide, l'onglet n'existe pas — la base n'est pas encore lue.
   std::span<const ItemSheetFact> facts;
+  // « Map Drops » : faux, l'onglet n'existe pas — la base ne connaît pas
+  // l'objet ; vrai et vide, il se grise.
+  bool map_drops_known = false;
+  std::span<const DescriptionMapDropRow> map_drops;
   ItemSheetSellersPhase sellers_phase = ItemSheetSellersPhase::kAbsent;
   std::string_view sellers_status;
   std::span<const ItemSheetSellerRow> sellers;
@@ -500,6 +521,11 @@ struct DescriptionWindowAction {
   // Un geste sur une ligne de la table de tirage — ou son survol, pour
   // l'aperçu. ⚠ DÉCRIRE UN OBJET N'EN SORT PAS : la fenêtre navigue elle-même.
   ChatLinkAsk link;
+  // « Map Drops » : la carte d'une ligne à guider, à poser dans le chat, ou
+  // survolée.
+  std::string guide_map;
+  std::string link_map;
+  std::string hovered_map;
   // « Rafraichir » d'un onglet de sources : oublier la réponse, et redemander —
   // un taux bouge avec l'équipement et les événements.
   bool refresh_ordinary = false;

@@ -65,6 +65,8 @@ void Help(const char* text);
 void DrawResistTab(const MonsterSheetView& view);
 void DrawDropsTab(MonsterSheetWindowState& state, const MonsterSheetView& view, const SkinArt& art,
                   MonsterSheetAnswer& answer);
+void DrawMapDropsTab(MonsterSheetWindowState& state, const MonsterSheetView& view,
+                     const SkinArt& art, MonsterSheetAnswer& answer);
 void DrawSpawnsTab(MonsterSheetWindowState& state, const MonsterSheetView& view, const SkinArt& art,
                    MonsterSheetAnswer& answer);
 void DrawSkillsTab(MonsterSheetWindowState& state, const MonsterSheetView& view, const SkinArt& art,

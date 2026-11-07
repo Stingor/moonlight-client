@@ -4,11 +4,33 @@
 
 #include <algorithm>
 
+#include "ro/core/printed.h"
 #include "ro/ui/skin_tooltip.h"
 
 #include "ui_text.h"
 
 namespace ro::ui {
+
+namespace {
+
+constexpr double kThousandthsPerPercent = 1000.0;
+
+}  // namespace
+
+MapLinkGesture MapLinkCell(std::string_view label) {
+  // Sans l'opacité de la fenêtre : `CellText` la pose en couleur de texte, et
+  // ImGui l'applique en écrivant.
+  CellText(label, ImGui::ColorConvertFloat4ToU32(ImGui::GetStyleColorVec4(ImGuiCol_TextLink)));
+  const bool hovered = ImGui::IsItemHovered();
+  DecorateLink(hovered);
+  // Un lien se suit au relâchement, comme tout lien du client.
+  return MapLinkGesture{.hovered = hovered,
+                        .released = hovered && ImGui::IsMouseReleased(ImGuiMouseButton_Left)};
+}
+
+std::string MapDropRateText(std::uint32_t rate_thousandths) {
+  return core::Printed("%.3f%%", static_cast<double>(rate_thousandths) / kThousandthsPerPercent);
+}
 
 float WidestText(std::initializer_list<std::string_view> texts) {
   float widest = 0.0F;

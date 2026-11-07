@@ -126,6 +126,8 @@ void Game::RouteItemSheet(const ro::ui::DescriptionWindowAction& asked, std::uin
     item.item_id = 0;
   }
   FollowCatalogItem(item, now_ms);
+  // Une carte de « Map Drops ».
+  FollowMapGestures(asked.guide_map, asked.link_map, asked.hovered_map);
 
   // LES BOUTONS DE L'OBJET MONTRÉ.
   if (asked.open_vote_shop) {

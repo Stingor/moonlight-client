@@ -46,6 +46,7 @@ struct ItemSheetBase {
   bool known = false;
   std::span<const ro::ui::DescriptionDropRow> ordinary;
   std::span<const ro::ui::DescriptionDropRow> boss;
+  std::span<const ro::ui::DescriptionMapDropRow> map_drops;
   std::string_view script;
   std::string_view equip_script;
   std::string_view unequip_script;

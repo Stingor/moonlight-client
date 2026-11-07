@@ -41,6 +41,15 @@ struct DropperRows {
 };
 [[nodiscard]] DropperRows DropperRowsOf(const ro::vfs::ServerDb& db, std::uint32_t item_id);
 
+// Ce qu'une ligne écrit d'une carte désignée sans extension.
+using MapLabeler = std::function<std::string(const std::string& map_name)>;
+
+// LES MAP DROPS D'UN OBJET, au taux décroissant. ⚠ LES NOMS DE MONSTRE
+// POINTENT DANS `db`, qui doit leur survivre.
+[[nodiscard]] std::vector<ro::ui::DescriptionMapDropRow> MapDropRowsOf(const ro::vfs::ServerDb& db,
+                                                                       std::uint32_t item_id,
+                                                                       const MapLabeler& map_label);
+
 // La recherche que la saisie et les filtres de la fenêtre demandent.
 [[nodiscard]] ro::vfs::ItemSearch ItemSearchOf(const ro::ui::DatabaseFilters& filters,
                                                std::string_view text);
@@ -73,6 +82,11 @@ using ItemNamer = std::function<std::string(std::uint32_t item_id)>;
 [[nodiscard]] ro::sim::MonsterSheet MonsterSheetOf(const ro::vfs::ServerMonster& monster,
                                                    const ro::vfs::ServerDb& db,
                                                    const ItemNamer& item_name);
+
+// LES MAP DROPS D'UN MONSTRE, au taux décroissant.
+[[nodiscard]] std::vector<ro::sim::MonsterMapDrop> MonsterMapDropsOf(const ro::vfs::ServerDb& db,
+                                                                     std::uint32_t monster_id,
+                                                                     const ItemNamer& item_name);
 
 // `/db` ouvre la base de données ; `/db <texte>` l'ouvre sur cette recherche.
 // ⚠ UNE COMMANDE DE CE CLIENT : elle ne part jamais au serveur. Rien : la ligne

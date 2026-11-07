@@ -97,9 +97,27 @@ MonsterLink Game::DatabaseMonsterLink(std::uint32_t monster_id) const {
   return link;
 }
 
+namespace {
+
+// LES MAP DROPS DU MONSTRE MONTRÉ, une fois par monstre, la base lue. La
+// fiche du serveur n'en dit rien : ils ne dépendent pas de qui remplit la fiche.
+void NoteMapDropsOfShown(MonsterSheet& sheet, const DatabaseStage& database) {
+  const std::uint32_t shown = sheet.shown_id();
+  if (shown != 0 && !sheet.shown_by_view() && !sheet.HasMapDrops(shown) &&
+      database.db() != nullptr) {
+    sheet.NoteMapDrops(shown, database.MapDropsOf(shown));
+  }
+}
+
+}  // namespace
+
 bool Game::HostMonsterSheet(MonsterSheet& sheet) {
   DatabaseWindows& database = windows_.monster_sheet.database;
   ro::ui::MonsterSheetWindowState& state = windows_.monster_sheet.state;
+  // La fiche à part a besoin de la base pour ses map drops.
+  if (state.open) {
+    database_.Read();
+  }
   const ro::vfs::ServerDb* const db = database_.db();
   // UNE FICHE OUVERTE EN JEU, BASE OUVERTE : elle passe dans la base, qui la
   // connaît. Une classe de sprite que la base ne nomme pas reste à part.
@@ -114,6 +132,7 @@ bool Game::HostMonsterSheet(MonsterSheet& sheet) {
   // ⚠ UN SEUL COMPOSANT DE FICHE : tant que la fenêtre à part en montre une,
   // le panneau de la base n'en montre pas.
   if (shown == 0 || state.open) {
+    NoteMapDropsOfShown(sheet, database_);
     return false;
   }
   if (!sheet.HasBase(shown)) {
@@ -123,6 +142,7 @@ bool Game::HostMonsterSheet(MonsterSheet& sheet) {
     }
   }
   sheet.Show(shown);
+  NoteMapDropsOfShown(sheet, database_);
   return true;
 }
 

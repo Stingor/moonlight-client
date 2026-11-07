@@ -51,6 +51,10 @@ constexpr const char* kDropMenuId = "##mi_link_menu";
 // Les colonnes que les tris désignent.
 constexpr int kDropRateColumn = 1;
 constexpr int kDropKindColumn = 2;
+constexpr int kMapDropColumns = 4;
+constexpr int kMapDropMapColumn = 1;
+constexpr int kMapDropRateColumn = 2;
+constexpr int kMapDropOptionsColumn = 3;
 constexpr int kSpawnCountColumn = 1;
 constexpr int kSkillLevelColumn = 1;
 constexpr int kSkillIdColumn = 2;
@@ -99,7 +103,8 @@ void SortRows(std::vector<int>& order, std::span<const Row> rows, Compared compa
 
 // Un nom de butin, icône comprise, avec les gestes de tout objet
 // (`ro::ui::ItemLinkCell`).
-void DropCell(MonsterSheetWindowState& state, const MonsterSheetDropView& drop, int row,
+template <typename DropRow>
+void DropCell(MonsterSheetWindowState& state, const DropRow& drop, int row,
               MonsterSheetAnswer& answer) {
   ImGui::PushID(row);
   const char* const shown = drop.name.empty() ? core::Tr("(item inconnu)") : drop.name.c_str();
@@ -221,6 +226,70 @@ void DrawDropsTab(MonsterSheetWindowState& state, const MonsterSheetView& view, 
   DrawDropMenu(state, view, answer);
 }
 
+void DrawMapDropsTab(MonsterSheetWindowState& state, const MonsterSheetView& view,
+                     const SkinArt& art, MonsterSheetAnswer& answer) {
+  constexpr ImGuiTableFlags kFlags = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg |
+                                     ImGuiTableFlags_ScrollY | ImGuiTableFlags_Sortable |
+                                     ImGuiTableFlags_Resizable | ImGuiTableFlags_SizingFixedFit;
+  const char* const random_options = core::Tr("Aléatoires");
+  const float note_height = ImGui::GetTextLineHeightWithSpacing();
+  if (ImGui::BeginTable("##mi_map_drops", kMapDropColumns, kFlags, ImVec2(0.0F, -note_height))) {
+    ImGui::TableSetupColumn(core::Tr("Item"), ImGuiTableColumnFlags_WidthStretch);
+    ImGui::TableSetupColumn(core::Tr("Carte"), ImGuiTableColumnFlags_WidthStretch);
+    ImGui::TableSetupColumn(core::Tr("Taux"),
+                            ImGuiTableColumnFlags_WidthFixed |
+                                ImGuiTableColumnFlags_PreferSortDescending |
+                                ImGuiTableColumnFlags_DefaultSort,
+                            FixedColumnWidth(core::Tr("Taux"), {kWidestMapDropRate}));
+    ImGui::TableSetupColumn(core::Tr("Options"), ImGuiTableColumnFlags_WidthFixed,
+                            FixedColumnWidth(core::Tr("Options"), {random_options}));
+    ImGui::TableSetupScrollFreeze(0, 1);
+    ImGui::TableHeadersRow();
+
+    state.map_drop_order.resize(view.map_drops.size());
+    std::iota(state.map_drop_order.begin(), state.map_drop_order.end(), 0);
+    SortRows(
+        state.map_drop_order, view.map_drops,
+        [](const MonsterSheetMapDropView& left, const MonsterSheetMapDropView& right, int column) {
+          if (column == kMapDropRateColumn) {
+            return CompareValues(left.rate_thousandths, right.rate_thousandths);
+          }
+          if (column == kMapDropOptionsColumn) {
+            return CompareValues(left.random_options, right.random_options);
+          }
+          return column == kMapDropMapColumn
+                     ? core::AsciiCompareFolded(left.map_label, right.map_label)
+                     : core::AsciiCompareFolded(left.name, right.name);
+        });
+    for (const int rank : state.map_drop_order) {
+      const MonsterSheetMapDropView& drop = view.map_drops[static_cast<std::size_t>(rank)];
+      ImGui::TableNextRow();
+      ImGui::TableNextColumn();
+      DropCell(state, drop, rank, answer);
+      ImGui::TableNextColumn();
+      ImGui::PushID(rank);
+      const MapLinkGesture place = MapLinkCell(drop.map_label);
+      if (place.hovered) {
+        answer.hovered_map = drop.map_name;
+      }
+      if (place.released) {
+        (ImGui::GetIO().KeyShift ? answer.link_map : answer.guide_map) = drop.map_name;
+      }
+      ImGui::PopID();
+      ImGui::TableNextColumn();
+      CellText(MapDropRateText(drop.rate_thousandths));
+      ImGui::TableNextColumn();
+      if (drop.random_options) {
+        CellText(random_options);
+      }
+    }
+    PaintWindowScrollbar(art);
+    ImGui::EndTable();
+  }
+  Label(core::Tr("En plus du butin, sur cette map. Les taux du serveur ne les changent pas."));
+  DrawDropMenu(state, view, answer);
+}
+
 void DrawSpawnsTab(MonsterSheetWindowState& state, const MonsterSheetView& view, const SkinArt& art,
                    MonsterSheetAnswer& answer) {
   if (view.spawns.empty()) {
@@ -263,13 +332,11 @@ void DrawSpawnsTab(MonsterSheetWindowState& state, const MonsterSheetView& view,
       // saisie, le survol demande son infobulle — nom lisible et plan —, que
       // `app` compose.
       ImGui::PushID(rank);
-      Colored(LinkColor(), spawn.label.c_str());
-      const bool hovered = ImGui::IsItemHovered();
-      DecorateLink(hovered);
-      if (hovered) {
+      const MapLinkGesture place = MapLinkCell(spawn.label);
+      if (place.hovered) {
         answer.hovered_map = spawn.map_name;
       }
-      if (LinkReleased(hovered, false)) {
+      if (place.released) {
         (ImGui::GetIO().KeyShift ? answer.link_map : answer.guide_map) = spawn.map_name;
       }
       ImGui::PopID();

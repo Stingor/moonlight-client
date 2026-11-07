@@ -194,6 +194,39 @@ DropperRows DropperRowsOf(const ro::vfs::ServerDb& db, std::uint32_t item_id) {
   return rows;
 }
 
+std::vector<ro::ui::DescriptionMapDropRow> MapDropRowsOf(const ro::vfs::ServerDb& db,
+                                                         std::uint32_t item_id,
+                                                         const MapLabeler& map_label) {
+  std::vector<ro::ui::DescriptionMapDropRow> rows;
+  for (ro::vfs::ServerMapDrop& drop : db.MapDropsOfItem(item_id)) {
+    const ro::vfs::ServerMonster* const monster = db.FindMonster(drop.monster_id);
+    std::string label = map_label(drop.map_name);
+    rows.push_back(ro::ui::DescriptionMapDropRow{
+        .monster_id = drop.monster_id,
+        .monster_name = monster != nullptr ? std::string_view(monster->name) : std::string_view(),
+        .boss_rank = monster != nullptr ? monster->rank : ro::vfs::kServerMonsterOrdinary,
+        .map_name = std::move(drop.map_name),
+        .map_label = std::move(label),
+        .rate_thousandths = drop.rate_thousandths,
+        .random_options = drop.random_options});
+  }
+  return rows;
+}
+
+std::vector<ro::sim::MonsterMapDrop> MonsterMapDropsOf(const ro::vfs::ServerDb& db,
+                                                       std::uint32_t monster_id,
+                                                       const ItemNamer& item_name) {
+  std::vector<ro::sim::MonsterMapDrop> drops;
+  for (ro::vfs::ServerMapDrop& drop : db.MapDropsOfMonster(monster_id)) {
+    drops.push_back(ro::sim::MonsterMapDrop{.item_id = drop.item_id,
+                                            .rate_thousandths = drop.rate_thousandths,
+                                            .random_options = drop.random_options,
+                                            .map_name = std::move(drop.map_name),
+                                            .name = item_name(drop.item_id)});
+  }
+  return drops;
+}
+
 ro::vfs::ItemSearch ItemSearchOf(const ro::ui::DatabaseFilters& filters, std::string_view text) {
   ro::vfs::ItemSearch search{
       .text = text, .level_min = filters.item_level_min, .level_max = filters.item_level_max};

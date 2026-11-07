@@ -668,6 +668,15 @@ void DrawTabs(MonsterSheetWindowState& state, const MonsterSheetView& view, cons
     DrawDropsTab(state, view, art, answer);
     ImGui::EndTabItem();
   }
+  if (!view.map_drops.empty()) {
+    const std::string map_drops =
+        core::Printed(core::Tr("Map Drops (%d)"), static_cast<int>(view.map_drops.size())) +
+        "###mi_map_drops";
+    if (ImGui::BeginTabItem(map_drops.c_str())) {
+      DrawMapDropsTab(state, view, art, answer);
+      ImGui::EndTabItem();
+    }
+  }
   const std::string spawns = core::Printed("Spawns (%zu)###mi_spawns", view.spawns.size());
   if (ImGui::BeginTabItem(spawns.c_str())) {
     DrawSpawnsTab(state, view, art, answer);

@@ -30,6 +30,21 @@ constexpr float kSheetSoundPan = 0.0F;
 
 }  // namespace
 
+// LES GESTES D'UNE CARTE dans une table : la guider, poser son lien, ou son
+// survol. Vide : pas de geste.
+void Game::FollowMapGestures(std::string_view guide, std::string_view link,
+                             std::string_view hovered) {
+  if (!guide.empty()) {
+    navi_.GuideToPlace(std::string(guide), 0, 0);
+  }
+  if (!link.empty()) {
+    PostChatLink(PlaceLink{.map = std::string(link)});
+  }
+  if (!hovered.empty()) {
+    windows_.navigation.place_tip = PlaceTipOf(PlaceLink{.map = std::string(hovered)}, pieces_);
+  }
+}
+
 void Game::AdvanceMonsterSheet(std::uint32_t now_ms) {
   // LA BASE DE DONNÉES D'ABORD : elle peut héberger la fiche, et les gestes
   // qu'on y a faits sur elle sont ceux de cette image.
@@ -94,15 +109,7 @@ void Game::AdvanceMonsterSheet(std::uint32_t now_ms) {
   // monstre se tient ; le trajet se lit sur la minimap et au sol. Le Maj+clic
   // pose le `<NAVIL>` de la carte dans la saisie, et le survol emprunte
   // l'infobulle d'un lien de lieu : nom lisible et plan.
-  if (!answer.guide_map.empty()) {
-    navi_.GuideToPlace(answer.guide_map, 0, 0);
-  }
-  if (!answer.link_map.empty()) {
-    PostChatLink(PlaceLink{.map = answer.link_map});
-  }
-  if (!answer.hovered_map.empty()) {
-    windows_.navigation.place_tip = PlaceTipOf(PlaceLink{.map = answer.hovered_map}, pieces_);
-  }
+  FollowMapGestures(answer.guide_map, answer.link_map, answer.hovered_map);
 
   // ── LES GESTES SUR UN BUTIN, les mêmes que partout où un objet se montre ──
   //

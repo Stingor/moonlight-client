@@ -69,6 +69,12 @@ class MonsterSheet {
   // compétences et le gain d'EXP du personnage.
   void NoteBase(std::uint32_t monster_id, ro::sim::MonsterSheet sheet);
   [[nodiscard]] bool HasBase(std::uint32_t monster_id) const { return base_.contains(monster_id); }
+  // LES MAP DROPS DU MONSTRE, que la base seule sait : ils se montrent avec
+  // la fiche du serveur comme avec celle de la base.
+  void NoteMapDrops(std::uint32_t monster_id, std::vector<ro::sim::MonsterMapDrop> drops);
+  [[nodiscard]] bool HasMapDrops(std::uint32_t monster_id) const {
+    return map_drops_.contains(monster_id);
+  }
   // « Base de données » dans la fiche, APRÈS `Refresh`, qui remet la vue à zéro.
   void NoteDatabaseLink(bool shown) noexcept { view_.database_link = shown; }
 
@@ -168,6 +174,7 @@ class MonsterSheet {
   // Les fiches tirées de la base, par identifiant. Elles survivent au
   // changement de carte : la base ne change pas avec lui.
   std::map<std::uint32_t, ro::sim::MonsterSheet> base_;
+  std::map<std::uint32_t, std::vector<ro::sim::MonsterMapDrop>> map_drops_;
   std::map<std::uint32_t, Asked> asked_;
   std::uint32_t shown_id_ = 0;
   std::string seen_map_;
@@ -180,6 +187,7 @@ class MonsterSheet {
   std::uint32_t lists_for_id_ = 0;
   std::uint32_t lists_for_arrival_ = 0;
   std::vector<ro::ui::MonsterSheetDropView> drops_;
+  std::vector<ro::ui::MonsterSheetMapDropView> map_drop_rows_;
   std::vector<ro::ui::MonsterSheetSpawnView> spawns_;
   std::vector<ro::ui::MonsterSheetSkillView> skills_;
   ro::ui::MonsterSheetView view_;

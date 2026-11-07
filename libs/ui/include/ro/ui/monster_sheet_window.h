@@ -54,6 +54,19 @@ struct MonsterSheetDropView {
   bool mvp_reward = false;
 };
 
+// Un map drop du monstre : il s'ajoute à son butin, sur cette carte.
+struct MonsterSheetMapDropView {
+  std::uint32_t item_id = 0;
+  std::string name;
+  SkinImage icon;
+  std::string map_name;
+  // Ce que la ligne écrit de la carte, comme `MonsterSheetSpawnView::label`.
+  std::string map_label;
+  // En millièmes de pour cent.
+  std::uint32_t rate_thousandths = 0;
+  bool random_options = false;
+};
+
 struct MonsterSheetSpawnView {
   // Le nom interne, celui que les trois gestes de la ligne emportent.
   std::string map_name;
@@ -207,6 +220,7 @@ struct MonsterSheetView {
   std::uint32_t sprite_class = 0;
 
   std::span<const MonsterSheetDropView> drops;
+  std::span<const MonsterSheetMapDropView> map_drops;
   std::span<const MonsterSheetSpawnView> spawns;
   std::span<const MonsterSheetSkillView> skills;
 };
@@ -230,8 +244,9 @@ struct MonsterSheetWindowState {
   float sprite_box_height = 0.0F;
   WheelGateState wheel;
   ImGuiTextFilter drop_filter;
-  // L'ordre des trois tables, refait à chaque image depuis leur tri.
+  // L'ordre des tables, refait à chaque image depuis leur tri.
   std::vector<int> drop_order;
+  std::vector<int> map_drop_order;
   std::vector<int> spawn_order;
   std::vector<int> skill_order;
   // LE MENU D'UN BUTIN, armé au clic droit et ouvert hors de la table : une

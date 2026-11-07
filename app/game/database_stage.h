@@ -23,6 +23,7 @@
 #include "ro/sim/market.h"
 #include "ro/sim/world_fwd.h"
 #include "ro/ui/database_window.h"
+#include "ro/vfs/map_display_names.h"
 #include "ro/vfs/server_db.h"
 #include "ro/vfs/vfs.h"
 
@@ -50,6 +51,8 @@ class DatabaseStage {
   // adresse ne bouge pas de la partie.
   void See(ro::vfs::Vfs* vfs, const ro::vfs::ItemTable* items, ro::render::ItemIcons* icons,
            const ro::vfs::ItemWords* words);
+  // Les noms lisibles des cartes, pour les map drops. Nul : le nom interne.
+  void ReadsMaps(const ro::vfs::MapDisplayNames* names) noexcept { map_names_ = names; }
   // LA FICHE D'UN OBJET DE LA BASE EMPRUNTE CELLE DE LA FENÊTRE DE
   // DESCRIPTION : voir `DescriptionView::BorrowFrom`. Après `See`.
   void BorrowSheetFrom(DescriptionView& owner, ro::render::ActorWardrobe* wardrobe);
@@ -105,6 +108,8 @@ class DatabaseStage {
   }
   // La fiche d'un monstre tirée de la base, pour la fiche de monstre.
   [[nodiscard]] std::optional<ro::sim::MonsterSheet> BaseSheetOf(std::uint32_t monster_id) const;
+  // Les map drops d'un monstre, base lue.
+  [[nodiscard]] std::vector<ro::sim::MonsterMapDrop> MapDropsOf(std::uint32_t monster_id) const;
   // « Y aller » vers un PNJ vendeur, une fois.
   [[nodiscard]] std::optional<ro::sim::MarketOffer> TakeGoTo() noexcept;
 
@@ -126,6 +131,7 @@ class DatabaseStage {
     std::vector<ItemFactLine> facts;
     std::vector<ro::ui::ItemSheetFact> fact_views;
     DropperRows droppers;
+    std::vector<ro::ui::DescriptionMapDropRow> map_drops;
     std::uint32_t seller_rows_for = 0;
     std::vector<SellerLine> seller_lines;
     std::vector<ro::ui::ItemSheetSellerRow> seller_rows;
@@ -145,6 +151,7 @@ class DatabaseStage {
   [[nodiscard]] std::string ItemName(std::uint32_t item_id) const;
 
   ro::vfs::Vfs* vfs_ = nullptr;
+  const ro::vfs::MapDisplayNames* map_names_ = nullptr;
   TradeItems items_;
   std::optional<DescriptionView> description_;
 

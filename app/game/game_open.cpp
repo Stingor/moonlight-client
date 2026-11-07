@@ -671,6 +671,8 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
                          pieces_.skill_words.has_value() ? &*pieces_.skill_words : nullptr, vfs_);
   monster_sheet_->ReadsMaps(pieces_.map_display_names.has_value() ? &*pieces_.map_display_names
                                                                   : nullptr);
+  database_.ReadsMaps(pieces_.map_display_names.has_value() ? &*pieces_.map_display_names
+                                                            : nullptr);
   // LA NAVIGATION : les préférences du joueur, puis les tables du graphe, lues
   // en arrière-plan.
   navi_.Open(shell_.client_root(), shell_.mount_options());
