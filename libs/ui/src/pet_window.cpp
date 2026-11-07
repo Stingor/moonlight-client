@@ -1,6 +1,6 @@
 // LA FICHE DU FAMILIER : l'en-tête (sprite, nom-bouton, espèce, accessoire),
-// les deux jauges, les ordres, l'auto-alimentation, les évolutions et leur
-// panneau déplié. Voir l'en-tête.
+// les deux jauges, la section « Staff » sous son droit, les ordres,
+// l'auto-alimentation, les évolutions et leur panneau déplié. Voir l'en-tête.
 
 #include "ro/ui/pet_window.h"
 
@@ -8,6 +8,7 @@
 #include <array>
 #include <cfloat>
 #include <cstdio>
+#include <optional>
 #include <string>
 #include <string_view>
 
@@ -20,6 +21,7 @@
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
+#include "ro/ui/staff_slider.h"
 
 #include "pet_intimacy_text.h"
 #include "ui_scale.h"
@@ -63,6 +65,7 @@ constexpr float kGaugeShadowPixels = 1.0F;
 // relative ferait grandir la fenêtre d'une image à l'autre.
 constexpr float kRenameFieldPixels = 160.0F;
 constexpr float kRenameButtonPixels = 62.0F;
+constexpr float kStaffSliderPixels = 200.0F;
 constexpr float kOrderButtonPixels = 96.0F;
 constexpr int kReturnButtonOrders = 2;
 constexpr float kConfirmButtonPixels = 80.0F;
@@ -230,6 +233,51 @@ void DrawGauges(const PetWindowView& view) {
   }
   Gauge(core::Tr("Intimité"), view.intimacy, view.intimacy_most, kIntimacyGaugeColor);
   TextColored(kValueColor, PetIntimacyText(view.intimacy_label));
+}
+
+// UN CURSEUR DE LA SECTION « STAFF » : rend la valeur à envoyer, et note son
+// attente.
+//
+// ⚠ UNE VALEUR DÉJÀ MONTRÉE NE PART PAS : le serveur la refuserait en disant que
+// la jauge « est déjà au maximum ».
+[[nodiscard]] std::optional<int> StaffGaugeSlider(const char* label, int served, int lowest,
+                                                  int highest, std::optional<int>& draft,
+                                                  std::optional<StaffSliderPending>& pending,
+                                                  const SkinArt& art) {
+  const double now_s = ImGui::GetTime();
+  const int shown = StaffSliderShown(pending, served, now_s);
+  ImGui::SetNextItemWidth(Px(kStaffSliderPixels));
+  const std::optional<int> settled = StaffReleasedSlider(label, shown, lowest, highest, draft, art);
+  if (!settled.has_value() || *settled == shown) {
+    return std::nullopt;
+  }
+  pending = StaffSliderPending{.value = *settled, .sent_at_s = now_s};
+  return settled;
+}
+
+void DrawStaff(PetWindowState& state, const PetWindowView& view, const SkinArt& art,
+               PetWindowAction& action) {
+  if (!view.staff_allowed) {
+    return;
+  }
+  // ⚠ À CHAQUE IMAGE, sinon ImGui garde son propre état et le nôtre ne pilote
+  // rien. Le retour fait foi.
+  ImGui::SetNextItemOpen(state.staff_open);
+  state.staff_open = ImGui::CollapsingHeader(core::Tr("Staff###pet_staff"));
+  if (!state.staff_open) {
+    return;
+  }
+  ImGui::PushID("pet_staff");
+  action.staff_hunger = StaffGaugeSlider(core::Tr("Faim"), view.hunger, 0, view.hunger_most,
+                                         state.hunger_draft, state.hunger_pending, art);
+  SkinTooltip(core::Tr("@pethungry : pose la faim du pet (0 à 100)."));
+  action.staff_intimacy =
+      StaffGaugeSlider(core::Tr("Intimité"), view.intimacy, kPetStaffIntimacyLeast,
+                       view.intimacy_most, state.intimacy_draft, state.intimacy_pending, art);
+  SkinTooltip(
+      core::Tr("@petfriendly : pose l'intimité du pet (1 à 1000 : à zéro, le serveur "
+               "détruit son œuf)."));
+  ImGui::PopID();
 }
 
 void DrawFeed(PetWindowState& state, const PetWindowView& view, const SkinArt& art,
@@ -511,6 +559,7 @@ PetWindowAction DrawPetWindow(PetWindowState& state, const PetWindowView& view,
     DrawHeader(state, view, art, action);
     ImGui::Separator();
     DrawGauges(view);
+    DrawStaff(state, view, art, action);
     ImGui::Separator();
     DrawActions(state, view, art, action);
     if (!state.status.empty()) {

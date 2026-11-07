@@ -10,6 +10,7 @@
 #include "ro/ui/chat_link.h"
 #include "ro/ui/item_link_cell.h"
 #include "ro/ui/skin_art.h"
+#include "ro/ui/staff_slider.h"
 
 namespace ro::ui {
 
@@ -28,6 +29,11 @@ namespace ro::ui {
 // Les refus que le client opposait sans un mot sont DITS : l'accessoire absent
 // grise son bouton, l'évolution impossible dit pourquoi, le nom déjà changé ne
 // se propose plus.
+
+// 🔴 LE CURSEUR DU STAFF NE DESCEND PAS À ZÉRO : le serveur accepte cette
+// intimité, et elle détruit l'œuf du familier. Un geste de souris trop appuyé
+// ne doit pas coûter le familier.
+inline constexpr int kPetStaffIntimacyLeast = 1;
 
 // Le mot de l'intimité, traduit au dessin.
 enum class PetIntimacyLabel : std::uint8_t {
@@ -149,6 +155,10 @@ struct PetWindowView {
   SkinImage food_icon;
   std::string food_name;
   std::int64_t food_in_bag = 0;
+
+  // LE DROIT DU STAFF : il ne décide que de ce qui se montre, le serveur
+  // revalide chaque commande.
+  bool staff_allowed = false;
 };
 
 // L'état de la fenêtre, et ses deux réglages.
@@ -183,6 +193,14 @@ struct PetWindowState {
   // change la pile d'ids, et le surgissant ne s'y retrouverait pas.
   ItemLinkMenu link_menu;
 
+  // ── LA SECTION « STAFF », repliable — fermée par défaut ───────────────────
+  bool staff_open = false;
+  // Les brouillons ne vivent que pendant le geste : voir `StaffSliderSettle`.
+  std::optional<int> hunger_draft;
+  std::optional<int> intimacy_draft;
+  std::optional<StaffSliderPending> hunger_pending;
+  std::optional<StaffSliderPending> intimacy_pending;
+
   // ── LES RÉGLAGES ─────────────────────────────────────────────────────────
   // Recopiés à chaque image depuis la page de réglages, qui les garde.
   //
@@ -209,6 +227,9 @@ struct PetWindowAction {
   ChatLinkAsk link;
   // La puce de la barre de titre : ouvrir la page de réglages de la fiche.
   bool settings_asked = false;
+  // Ce que le staff veut poser sur le serveur.
+  std::optional<int> staff_hunger;
+  std::optional<int> staff_intimacy;
 };
 
 // Ouvre la fiche, panneau replié et confirmations retirées.

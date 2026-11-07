@@ -23,39 +23,6 @@
 namespace ro::ui {
 namespace {
 
-// UN CURSEUR QUI N'ENVOIE QU'AU TERME DU GESTE — voir `HomunculusStaffSettle`.
-// `shown` est ce qu'il montre hors geste.
-//
-// ⚠ IL NE PREND PAS LA MOLETTE : un cran effleuré en faisant défiler la fiche
-// enverrait une commande, et `@homlevel` ne se défait pas.
-//
-// Rend la valeur à envoyer, rien tant qu'il n'y a rien à envoyer.
-[[nodiscard]] std::optional<int> ReleasedSlider(const char* label, int shown, int lowest,
-                                                int highest, std::optional<int>& draft,
-                                                const SkinArt& art) {
-  int value = std::clamp(draft.value_or(shown), lowest, highest);
-  const bool changed =
-      SkinSliderInt(label, &value, lowest, highest, art, "%d", 0, SkinSliderWheel::kLeaves);
-  return HomunculusStaffSettle(value,
-                               HomunculusStaffGesture{
-                                   .changed = changed,
-                                   .active = ImGui::IsItemActive(),
-                                   .released_after_edit = ImGui::IsItemDeactivatedAfterEdit(),
-                                   .mouse_held = ImGui::IsMouseDown(ImGuiMouseButton_Left),
-                               },
-                               draft);
-}
-
-// La valeur que montre un curseur hors geste : l'envoyée tant qu'elle est
-// attendue, la servie sinon. Une attente échue s'efface ici.
-[[nodiscard]] int Shown(std::optional<HomunculusStaffPending>& pending, int served, double now_s) {
-  if (!HomunculusStaffAwaited(pending, served, now_s)) {
-    pending.reset();
-    return served;
-  }
-  return pending->value;
-}
-
 void Order(HomunculusTabAction& action, HomunculusStaffOrder order, int amount = 0) {
   action.verb = HomunculusVerb::kStaff;
   action.staff_order = order;
@@ -65,19 +32,19 @@ void Order(HomunculusTabAction& action, HomunculusStaffOrder order, int amount =
 void DrawSliders(HomunculusTabState& state, const HomunculusTabView& view, const SkinArt& art,
                  HomunculusTabAction& action) {
   const double now_s = ImGui::GetTime();
-  if (const std::optional<int> hunger =
-          ReleasedSlider(core::Tr("Faim"), Shown(state.hunger_pending, view.hunger, now_s), 0,
-                         kHomunculusStaffHungerMost, state.hunger_draft, art)) {
+  if (const std::optional<int> hunger = StaffReleasedSlider(
+          core::Tr("Faim"), StaffSliderShown(state.hunger_pending, view.hunger, now_s), 0,
+          kHomunculusStaffHungerMost, state.hunger_draft, art)) {
     Order(action, HomunculusStaffOrder::kSetHunger, *hunger);
-    state.hunger_pending = HomunculusStaffPending{.value = *hunger, .sent_at_s = now_s};
+    state.hunger_pending = StaffSliderPending{.value = *hunger, .sent_at_s = now_s};
   }
   SkinTooltip(core::Tr("@homhungry : pose la faim de l'homoncule (0 à 100)."));
 
-  if (const std::optional<int> intimacy =
-          ReleasedSlider(core::Tr("Intimité"), Shown(state.intimacy_pending, view.intimacy, now_s),
-                         0, kHomunculusStaffIntimacyMost, state.intimacy_draft, art)) {
+  if (const std::optional<int> intimacy = StaffReleasedSlider(
+          core::Tr("Intimité"), StaffSliderShown(state.intimacy_pending, view.intimacy, now_s), 0,
+          kHomunculusStaffIntimacyMost, state.intimacy_draft, art)) {
     Order(action, HomunculusStaffOrder::kSetIntimacy, *intimacy);
-    state.intimacy_pending = HomunculusStaffPending{.value = *intimacy, .sent_at_s = now_s};
+    state.intimacy_pending = StaffSliderPending{.value = *intimacy, .sent_at_s = now_s};
   }
   SkinTooltip(core::Tr("@homfriendly : pose l'intimité de l'homoncule (0 à 1000)."));
 
@@ -87,21 +54,21 @@ void DrawSliders(HomunculusTabState& state, const HomunculusTabView& view, const
   //
   // 🔴 GRISÉ TANT QU'UN NIVEAU EST ATTENDU : il montre le niveau demandé, et
   // aucune différence ne se calcule sur le niveau servi d'avant la réponse.
-  const int level_shown = Shown(state.level_pending, view.level, now_s);
+  const int level_shown = StaffSliderShown(state.level_pending, view.level, now_s);
   const bool level_awaited = state.level_pending.has_value();
   if (level_awaited) {
     state.level_draft.reset();
   }
   const int level_most = std::max({view.level, level_shown, view.staff_level_most});
   ImGui::BeginDisabled(level_awaited);
-  const std::optional<int> level = ReleasedSlider(core::Tr("Niveau visé"), level_shown, view.level,
-                                                  level_most, state.level_draft, art);
+  const std::optional<int> level = StaffReleasedSlider(
+      core::Tr("Niveau visé"), level_shown, view.level, level_most, state.level_draft, art);
   ImGui::EndDisabled();
   if (level.has_value()) {
     if (const std::optional<int> added =
             HomunculusStaffLevelsToAdd(*level, view.level, level_awaited)) {
       Order(action, HomunculusStaffOrder::kAddLevels, *added);
-      state.level_pending = HomunculusStaffPending{.value = *level, .sent_at_s = now_s};
+      state.level_pending = StaffSliderPending{.value = *level, .sent_at_s = now_s};
     }
   }
   SkinTooltip(level_awaited
@@ -176,37 +143,6 @@ void DrawTalk(HomunculusTabState& state, const SkinArt& art, HomunculusTabAction
 }
 
 }  // namespace
-
-bool HomunculusStaffAwaited(const std::optional<HomunculusStaffPending>& pending, int served,
-                            double now_s) noexcept {
-  return pending.has_value() && served != pending->value &&
-         now_s - pending->sent_at_s < kHomunculusStaffAwaitSeconds;
-}
-
-std::optional<int> HomunculusStaffSettle(int value, const HomunculusStaffGesture& gesture,
-                                         std::optional<int>& draft) {
-  if (gesture.released_after_edit) {
-    draft.reset();
-    return value;
-  }
-  if (gesture.active) {
-    // ⚠ UN CLIC QUI SAISIT SANS RIEN CHANGER NE FAIT PAS DE BROUILLON : il
-    // renverrait la valeur montrée au relâchement.
-    if (gesture.changed || draft.has_value()) {
-      draft = value;
-    }
-    return std::nullopt;
-  }
-  if (gesture.changed) {
-    draft = value;
-  }
-  if (draft.has_value() && !gesture.mouse_held) {
-    const int settled = *draft;
-    draft.reset();
-    return settled;
-  }
-  return std::nullopt;
-}
 
 std::optional<int> HomunculusStaffLevelsToAdd(int target, int served, bool awaited) noexcept {
   if (awaited || target <= served) {

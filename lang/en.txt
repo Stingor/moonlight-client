@@ -1103,6 +1103,12 @@ tr: @makehomun: the character already has a homunculus; the server will not crea
 fr: @nuke : une explosion sur sa case. Il meurt, avec la pénalité de mort habituelle.
 tr: @nuke: an explosion on their tile. They die, with the usual death penalty.
 
+fr: @petfriendly : pose l'intimité du pet (1 à 1000 : à zéro, le serveur détruit son œuf).
+tr: @petfriendly: sets the pet intimacy (1 to 1000: at zero, the server destroys its egg).
+
+fr: @pethungry : pose la faim du pet (0 à 100).
+tr: @pethungry: sets the pet hunger (0 to 100).
+
 fr: @resetcooltime : remet à zéro le temps de recharge de tous les skills (homoncule et mercenaire compris).
 tr: @resetcooltime: clears the cooldown of every skill (homunculus and mercenary included).
 
@@ -1777,6 +1783,9 @@ tr: Server %.*s
 
 fr: Seul ce client voit ce ciel : rien ne part au serveur.
 tr: Only this client sees this sky: nothing is sent to the server.
+
+fr: Staff###pet_staff
+tr: Staff###pet_staff
 
 fr: Suit un joueur en vue ; seule, cesse de suivre.
 tr: Follows a player in sight; alone, stops following.

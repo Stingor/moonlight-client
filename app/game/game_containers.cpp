@@ -58,6 +58,7 @@ void Game::StageContainers() {
   // LES TROIS COMPAGNONS QUI ONT UNE FICHE.
   pieces_.pet.Stage(*vfs_, world_, pieces_, windows_.pet, windows_.pet_view, windows_.pet_hatch,
                     windows_.pet_hatch_view);
+  windows_.pet_view.staff_allowed = Rights().staff_tools;
   pieces_.homunculus.Stage(world_, pieces_);
   pieces_.mercenary.Stage(world_, pieces_);
   // LA SAISIE QU'OUVRE LA POSE DE TALKIE BOX : la compétence attend son texte.

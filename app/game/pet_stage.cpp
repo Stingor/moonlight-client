@@ -8,6 +8,7 @@
 #include "ro/core/log.h"
 #include "ro/core/printed.h"
 #include "ro/core/text.h"
+#include "ro/net/chat_target.h"
 #include "ro/net/pet_frames.h"
 #include "ro/sim/pet_egg.h"
 #include "ro/vfs/item_link.h"
@@ -15,6 +16,7 @@
 
 #include "chat/banned_input.h"
 #include "game/game_pieces.h"
+#include "game/pet_staff_words.h"
 #include "game/skin_image_of.h"
 #include "items/creator_names.h"
 
@@ -458,6 +460,16 @@ void PetStage::Command(ro::net::Connection& link, ro::proto::PetCommand command)
   }
 }
 
+// 🔴 RIEN N'EST VALIDÉ ICI : le serveur revalide selon le groupe du compte, et
+// son refus arrive dans la conversation.
+void PetStage::SendStaffCommand(const std::string& line, ro::net::Connection& link,
+                                const ro::sim::World& world) const {
+  if (const auto sent = ro::net::SendServerCommand(link, world.player_name(), line); !sent) {
+    ro::core::LogWarning("commande de staff « {} » non émise : {}", line,
+                         ro::core::Describe(sent.error()));
+  }
+}
+
 void PetStage::FeedIfFood(ro::net::Connection& link, ro::sim::World& world) {
   // LE JEU REFUSE SANS RIEN ENVOYER quand la nourriture de l'espèce manque au
   // sac. ⚠ SANS TABLE, la nourriture est inconnue : le serveur tranchera.
@@ -537,6 +549,12 @@ void PetStage::Apply(const ro::ui::PetWindowAction& asked,
     if (const auto sent = ro::net::RequestPetEvolution(link, asked.evolve_to); !sent) {
       ro::core::LogWarning("évolution non demandée : {}", ro::core::Describe(sent.error()));
     }
+  }
+  if (asked.staff_hunger.has_value()) {
+    SendStaffCommand(PetStaffHungerCommand(*asked.staff_hunger), link, world);
+  }
+  if (asked.staff_intimacy.has_value()) {
+    SendStaffCommand(PetStaffIntimacyCommand(*asked.staff_intimacy), link, world);
   }
   if (hatched.hatch.has_value()) {
     if (const auto sent = ro::net::RequestPetEgg(link, *hatched.hatch); !sent) {

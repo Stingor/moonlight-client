@@ -454,6 +454,7 @@ add_library(moonclient_companionai STATIC
     game/companion_ai_session.cpp
     game/companion_ai_names.cpp
     game/homunculus_staff_words.cpp
+    game/pet_staff_words.cpp
     game/companion_ai_profile_gestures.cpp
     game/companion_ai_window_compose.cpp
     game/companion_ai_zones.cpp

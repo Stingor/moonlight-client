@@ -10,6 +10,7 @@
 
 #include "ro/ui/skin_art.h"
 #include "ro/ui/staff_homunculus.h"
+#include "ro/ui/staff_slider.h"
 
 namespace ro::ui {
 
@@ -38,46 +39,6 @@ inline constexpr int kHomunculusStaffIntimacyMost = 1000;
 inline constexpr int kHomunculusMutateLevelLeast = 99;
 // La phrase de `@homtalk` : le serveur en lit quatre-vingt-dix-neuf octets.
 inline constexpr std::size_t kHomunculusTalkBytes = 100;
-// LE TEMPS PENDANT LEQUEL UNE VALEUR ENVOYÉE EST ATTENDUE, en secondes. Le
-// serveur renvoie la fiche en une fraction de seconde ; un refus, lui, ne
-// renvoie rien, et le curseur doit bien finir par revenir à la valeur servie.
-inline constexpr double kHomunculusStaffAwaitSeconds = 5.0;
-
-// UNE VALEUR QU'UN CURSEUR DU STAFF A ENVOYÉE, et que le serveur n'a pas encore
-// renvoyée.
-struct HomunculusStaffPending {
-  int value = 0;
-  // L'instant de l'envoi, sur l'horloge d'ImGui, en secondes.
-  double sent_at_s = 0.0;
-};
-
-// VRAI TANT QUE `pending` EST ATTENDUE : la valeur servie ne l'a pas rejointe
-// et le délai n'est pas passé. Le curseur la montre pendant ce temps, au lieu
-// de la valeur servie, périmée.
-[[nodiscard]] bool HomunculusStaffAwaited(const std::optional<HomunculusStaffPending>& pending,
-                                          int served, double now_s) noexcept;
-
-// CE QU'A FAIT UN CURSEUR DU STAFF pendant une image.
-struct HomunculusStaffGesture {
-  // La valeur a bougé : glisser, flèche ou saisie.
-  bool changed = false;
-  // Le curseur est saisi : on le glisse, ou on tape sa valeur.
-  bool active = false;
-  // Il vient d'être lâché après avoir changé.
-  bool released_after_edit = false;
-  // Le bouton gauche est tenu.
-  bool mouse_held = false;
-};
-
-// LA VALEUR À ENVOYER au terme du geste, rien tant qu'il dure.
-//
-// 🔴 RIEN NE PART PENDANT LE GESTE : la valeur vit dans `draft` tant qu'on
-// glisse, et tant qu'une flèche est tenue — elle répète sans saisir le
-// curseur, donc seul le relâchement du bouton dit que le geste est fini.
-[[nodiscard]] std::optional<int> HomunculusStaffSettle(int value,
-                                                       const HomunculusStaffGesture& gesture,
-                                                       std::optional<int>& draft);
-
 // LES NIVEAUX QUE `@homlevel` DOIT AJOUTER pour mener `served` à `target`, rien
 // quand il n'y a rien à ajouter.
 //
@@ -201,11 +162,11 @@ struct HomunculusTabState {
   std::optional<int> intimacy_draft;
   // Le niveau VISÉ, et non le nombre de niveaux à ajouter.
   std::optional<int> level_draft;
-  std::optional<HomunculusStaffPending> hunger_pending;
-  std::optional<HomunculusStaffPending> intimacy_pending;
+  std::optional<StaffSliderPending> hunger_pending;
+  std::optional<StaffSliderPending> intimacy_pending;
   // ⚠ TANT QU'IL EST LÀ, LE CURSEUR DU NIVEAU EST GRISÉ : voir
   // `HomunculusStaffLevelsToAdd`.
-  std::optional<HomunculusStaffPending> level_pending;
+  std::optional<StaffSliderPending> level_pending;
   // Le rang de la forme choisie pour `@hommutate`.
   int mutation_rank = 0;
   std::array<char, kHomunculusTalkBytes> talk = {};

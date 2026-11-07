@@ -128,6 +128,9 @@ class PetStage {
   // Le dernier garde-fou de « nourrir » : la nourriture de l'espèce en sac.
   void FeedIfFood(ro::net::Connection& link, ro::sim::World& world);
   void Say(ro::sim::World& world, std::string text, std::uint32_t color) const;
+  // Une commande de staff, envoyée comme si le joueur la tapait.
+  void SendStaffCommand(const std::string& line, ro::net::Connection& link,
+                        const ro::sim::World& world) const;
 
   void ComposeWindow(const ro::sim::World& world, GamePieces& pieces,
                      ro::ui::PetWindowState& window, ro::ui::PetWindowView& view);

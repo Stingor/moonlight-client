@@ -1103,6 +1103,12 @@ tr: @makehomun: el personaje ya tiene un homúnculo; el servidor no crea un segu
 fr: @nuke : une explosion sur sa case. Il meurt, avec la pénalité de mort habituelle.
 tr: @nuke: una explosión en su casilla. Muere, con la penalización de muerte habitual.
 
+fr: @petfriendly : pose l'intimité du pet (1 à 1000 : à zéro, le serveur détruit son œuf).
+tr: @petfriendly: fija la intimidad del pet (1 a 1000: a cero, el servidor destruye su huevo).
+
+fr: @pethungry : pose la faim du pet (0 à 100).
+tr: @pethungry: fija el hambre del pet (0 a 100).
+
 fr: @resetcooltime : remet à zéro le temps de recharge de tous les skills (homoncule et mercenaire compris).
 tr: @resetcooltime: reinicia el tiempo de recarga de todas las habilidades (homúnculo y mercenario incluidos).
 
@@ -1777,6 +1783,9 @@ tr: Servidor %.*s
 
 fr: Seul ce client voit ce ciel : rien ne part au serveur.
 tr: Solo este cliente ve este cielo: nada se envía al servidor.
+
+fr: Staff###pet_staff
+tr: Staff###pet_staff
 
 fr: Suit un joueur en vue ; seule, cesse de suivre.
 tr: Sigue a un jugador a la vista; sola, deja de seguir.

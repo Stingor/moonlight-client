@@ -133,6 +133,7 @@ add_library(ro_ui STATIC
     src/guild_tab.cpp
     src/homunculus_tab.cpp
     src/homunculus_staff.cpp
+    src/staff_slider.cpp
     src/mercenary_tab.cpp
     src/pet_hatch_window.cpp
     src/pet_window.cpp
