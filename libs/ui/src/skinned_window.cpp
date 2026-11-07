@@ -580,6 +580,14 @@ bool BeginSkinnedWindow(const char* name, bool* open, const SkinArt& art, Skinne
   return visible;
 }
 
+float SkinnedFillBottomRoom() {
+  if (!g_painting.description) {
+    return 0.0F;
+  }
+  return std::max(0.0F,
+                  DescPanelEdge(*g_painting.art) - ImGui::GetCurrentWindow()->WindowPadding.y);
+}
+
 void EndSkinnedWindow() {
   // L'ASCENSEUR EN DERNIER, et il le faut : la taille de ce que la fenêtre
   // contient n'est connue qu'une fois son contenu écrit.

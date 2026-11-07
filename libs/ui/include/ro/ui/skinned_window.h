@@ -160,6 +160,15 @@ void SetNextWindowTitleShadow(ImU32 color);
 // changer. Elle sert à donner sa marge à ce qu'on pose dans le cadre.
 [[nodiscard]] float DescPanelEdge(const SkinArt& art);
 
+// CE QU'UN ENFANT QUI REMPLIT LA FENÊTRE HABILLÉE EN COURS LAISSE SOUS LUI : la
+// part du bas du cadre qu'ImGui ne compte pas dans sa marge. Nul ailleurs que
+// dans une description.
+//
+// 🔴 SANS CE RETRAIT, L'ENFANT PASSE SUR LE CADRE, et une fois que la fenêtre a
+// défilé elle ne cesse plus : la fermeture ajoute ce même écart sous le contenu,
+// qui déborde alors de lui-même, à toute taille.
+[[nodiscard]] float SkinnedFillBottomRoom();
+
 // LE CADRE « PANNEAU DE DESCRIPTION » — fond clair et cadre `sysbox` en neuf
 // morceaux — dans un rectangle quelconque, sur un ImDrawList QUELCONQUE.
 //

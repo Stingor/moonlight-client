@@ -17,6 +17,7 @@
 #include "ro/ui/item_link_cell.h"
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
+#include "ro/ui/skinned_window.h"
 
 #include "description_odds.h"
 #include "table_cells.h"
@@ -288,7 +289,7 @@ void DrawTabs(DescriptionWindowState& state, const DescriptionView& view, const 
       state.sheet_tab = tab;
     }
     // LE CONTENU DÉFILE SEUL : l'en-tête et les onglets restent en place.
-    if (ImGui::BeginChild("##item_sheet_body")) {
+    if (ImGui::BeginChild("##item_sheet_body", ImVec2(0.0F, -SkinnedFillBottomRoom()))) {
       DrawTabBody(tab, state, view, art, action);
       // L'ascenseur d'ImGui est transparent : c'est celui du jeu qui se voit.
       PaintWindowScrollbar(art);
