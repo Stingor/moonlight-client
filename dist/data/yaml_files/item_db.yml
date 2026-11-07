@@ -6889,7 +6889,7 @@ Body:
     EquipLevelMin: 140
     Refineable: true
     Script: |
-      bonus bDex,2; bonus bFlee,-30; bonus2 bAddRace,RC_DemiHuman,50; bonus2 bAddRace,RC_PLAYER_HUMAN,50; bonus2 bSkillAtk,"GC_CROSSIMPACT",30;
+      bonus bDex,2; bonus bFlee,-30; bonus2 bAddRace,RC_DemiHuman,50; bonus2 bAddRace,RC_PLAYER_HUMAN,50; bonus2 bSkillAtk,"AS_SONICBLOW",30;
   - Id: 1292
     AegisName: Upg_Katar
     Name: "Upg Katar [1]"
@@ -7432,7 +7432,7 @@ Body:
     EquipLevelMin: 120
     Refineable: true
     Script: |
-      bonus bStr,2; bonus bDex,2; bonus bLuk,2; .@r = getrefine(); if (.@r >= 9) { .@val = 40; } else if (.@r >= 7) { .@val = 20; } bonus2 bSkillAtk,"NC_AXETORNADO",(100+.@val); bonus2 bSkillAtk,"NC_AXEBOOMERANG",(100+.@val); bonus2 bSkillAtk,"GN_CART_TORNADO",(75+.@val);
+      bonus bStr,2; bonus bDex,2; bonus bLuk,2; .@r = getrefine(); if (.@r >= 9) { .@val = 40; } else if (.@r >= 7) { .@val = 20; } bonus2 bSkillAtk,"MC_MAMMONITE",(100+.@val); bonus2 bSkillAtk,"MC_CARTREVOLUTION",(100+.@val); bonus2 bSkillAtk,"WS_CARTTERMINATION",(75+.@val);
   - Id: 1333
     AegisName: Golden_Wrench
     Name: Golden Wrench
@@ -7450,7 +7450,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bUnbreakableWeapon; bonus2 bAddClass,Class_all,5; bonus bBaseAtk,4*.@r; if (.@r>=11) .@val = 35; else if (.@r>=9) .@val = 20; bonus2 bSkillAtk,"NC_AXEBOOMERANG",.@val; bonus2 bSkillAtk,"NC_POWERSWING",.@val;
+      .@r = getrefine(); bonus bUnbreakableWeapon; bonus2 bAddClass,Class_all,5; bonus bBaseAtk,4*.@r; if (getallrefine() >= 22) .@val = 35; else if (.@r>=9) .@val = 20; bonus2 bSkillAtk,"MC_CARTREVOLUTION",.@val; bonus2 bSkillAtk,"MC_MAMMONITE",.@val;
   - Id: 1336
     AegisName: Guardian_Knight_Axe
     Name: Guardian Knight Axe
@@ -7468,7 +7468,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      bonus bUnbreakableWeapon; bonus2 bAddClass,Class_All,5; .@r = getrefine(); bonus bLongAtkRate,.@r; if(.@r >= 9){ bonus2 bSkillAtk,"NC_POWERSWING",20; } if(.@r >= 11){ bonus2 bAddRace,RC_Undead,20; bonus2 bAddRace,RC_Angel,20; }
+      bonus bUnbreakableWeapon; bonus2 bAddClass,Class_All,5; .@r = getrefine(); bonus bLongAtkRate,.@r; if(.@r >= 9){ bonus2 bSkillAtk,"MC_MAMMONITE",20; } if(getallrefine() >= 22){ bonus2 bAddRace,RC_Undead,20; bonus2 bAddRace,RC_Angel,20; }
   - Id: 1351
     AegisName: Battle_Axe
     Name: "Battle Axe [3]"
@@ -8209,7 +8209,7 @@ Body:
     EquipLevelMin: 95
     Refineable: true
     Script: |
-      bonus bUnbreakableWeapon; bonus2 bAddRace,RC_PLAYER_HUMAN,40; bonus2 bIgnoreDefRaceRate,RC_PLAYER_HUMAN,30; .@r = getrefine(); if(.@r>=6) { bonus2 bSkillAtk,"NC_AXEBOOMERANG",80; bonus2 bSkillAtk,"NC_POWERSWING",80; } if(.@r>=9) { bonus2 bAddRace,RC_PLAYER_HUMAN,60; }
+      bonus bUnbreakableWeapon; bonus2 bAddRace,RC_PLAYER_HUMAN,40; bonus2 bIgnoreDefRaceRate,RC_PLAYER_HUMAN,30; .@r = getrefine(); if(.@r>=6) { bonus2 bSkillAtk,"MC_CARTREVOLUTION",80; bonus2 bSkillAtk,"MC_MAMMONITE",80; } if(.@r>=9) { bonus2 bAddRace,RC_PLAYER_HUMAN,60; }
   - Id: 1397
     AegisName: Bradium_Stonehammer_
     Name: "Bradium Stone Hammer [2]"
@@ -8810,7 +8810,7 @@ Body:
     EquipLevelMin: 102
     Refineable: true
     Script: |
-      bonus bMatk,40; .@r = getrefine(); bonus2 bSkillAtk,"LG_CANNONSPEAR",20+(.@r/2*3); bonus2 bSkillAtk,"LG_BANISHINGPOINT",20+(.@r/2*3);
+      bonus bMatk,40; .@r = getrefine(); bonus2 bSkillAtk,"PA_SHIELDCHAIN",20+(.@r/2*3); bonus2 bSkillAtk,"CR_HOLYCROSS",20+(.@r/2*3);
   - Id: 1434
     AegisName: P_Sphere1
     Name: Eden Spear I
@@ -8841,7 +8841,7 @@ Body:
     EquipLevelMin: 100
     Refineable: true
     Script: |
-      bonus bMaxSP,-100; bonus2 bSkillAtk,"LG_CANNONSPEAR",10; bonus bBaseAtk,(getrefine()/3);
+      bonus bMaxSP,-100; bonus2 bSkillAtk,"PA_SHIELDCHAIN",10; bonus bBaseAtk,(getrefine()/3);
   - Id: 1436
     AegisName: Velum_Spear
     Name: Vellum Spear
@@ -8858,7 +8858,7 @@ Body:
     EquipLevelMin: 95
     Refineable: true
     Script: |
-      bonus2 bAddRace,RC_PLAYER_HUMAN,60; .@r = getrefine(); if(.@r>=6) { bonus2 bSkillAtk,"RK_HUNDREDSPEAR",80; bonus2 bSkillAtk,"LG_PINPOINTATTACK",80; } if(.@r>=9) { bonus2 bAddRace,RC_PLAYER_HUMAN,30; }
+      bonus2 bAddRace,RC_PLAYER_HUMAN,60; .@r = getrefine(); if(.@r>=6) { bonus2 bSkillAtk,"KN_PIERCE",80; bonus2 bSkillAtk,"CR_HOLYCROSS",80; } if(.@r>=9) { bonus2 bAddRace,RC_PLAYER_HUMAN,30; }
   - Id: 1437
     AegisName: TE_Woe_Pike
     Name: TE Woe Pike
@@ -9674,7 +9674,7 @@ Body:
     WeaponLevel: 1
     EquipLevelMin: 50
     Script: |
-      bonus bUnbreakableWeapon; bonus3 bAddEffOnSkill,"KN_PIERCE",Eff_Bleeding,1000; bonus3 bAddEffOnSkill,"LK_SPIRALPIERCE",Eff_Bleeding,1000; bonus2 bSkillAtk,"LK_SPIRALPIERCE",100; bonus2 bSkillAtk,"LG_INSPIRATION",50; if(BaseLevel>99) { bonus bBaseAtk,30; }
+      bonus bUnbreakableWeapon; bonus3 bAddEffOnSkill,"KN_PIERCE",Eff_Bleeding,1000; bonus3 bAddEffOnSkill,"LK_SPIRALPIERCE",Eff_Bleeding,1000; bonus2 bSkillAtk,"LK_SPIRALPIERCE",100; bonus2 bSkillAtk,"PA_GOSPEL",50; if(BaseLevel>99) { bonus bBaseAtk,30; }
   - Id: 1490
     AegisName: Giant_Lance
     Name: Gigantic Lance
@@ -9727,7 +9727,7 @@ Body:
     EquipLevelMin: 95
     Refineable: true
     Script: |
-      bonus2 bAddRace,RC_PLAYER_HUMAN,80; .@r = getrefine(); if(.@r>=6) { bonus2 bSkillAtk,"LK_SPIRALPIERCE",100; bonus2 bSkillAtk,"LG_OVERBRAND",50; } if(.@r>=9) { autobonus2 "{ bonus bShortWeaponDamageReturn,20; bonus bMagicDamageReturn,20; }",100,2000,BF_WEAPON|BF_MAGIC,"{ specialeffect2 EF_REFLECTSHIELD; }"; }
+      bonus2 bAddRace,RC_PLAYER_HUMAN,80; .@r = getrefine(); if(.@r>=6) { bonus2 bSkillAtk,"LK_SPIRALPIERCE",100; bonus2 bSkillAtk,"KN_BRANDISHSPEAR",50; } if(.@r>=9) { autobonus2 "{ bonus bShortWeaponDamageReturn,20; bonus bMagicDamageReturn,20; }",100,2000,BF_WEAPON|BF_MAGIC,"{ specialeffect2 EF_REFLECTSHIELD; }"; }
   - Id: 1493
     AegisName: Metal_Lance
     Name: "Metal Lance [1]"
@@ -11227,7 +11227,7 @@ Body:
     EquipLevelMin: 100
     Refineable: true
     Script: |
-      bonus bMatk,160; bonus bAtkEle,Ele_Water; bonus bUnbreakableWeapon; bonus bDex,1; .@r = getrefine(); bonus2 bSkillAtk,"MG_COLDBOLT",(.@r*3); bonus2 bSkillAtk,"SO_DIAMONDDUST",(.@r*3); bonus2 bSkillUseSP,"MG_COLDBOLT",-(.@r*5); bonus2 bSkillUseSP,"SO_DIAMONDDUST",-(.@r*5);
+      bonus bMatk,160; bonus bAtkEle,Ele_Water; bonus bUnbreakableWeapon; bonus bDex,1; .@r = getrefine(); bonus2 bSkillAtk,"MG_COLDBOLT",(.@r*3); bonus2 bSkillUseSP,"MG_COLDBOLT",-(.@r*5); 
   - Id: 1585
     AegisName: Upg_Book
     Name: "Upg Book [1]"
@@ -11261,7 +11261,7 @@ Body:
     EquipLevelMin: 95
     Refineable: true
     Script: |
-      bonus bMatk,125; if(BaseLevel>104) { bonus bHealPower,(min(175,BaseLevel)/5)-20; if(getrefine()>=6) { bonus2 bSkillCooldown,"AB_LAUDAAGNUS",-3000; bonus2 bSkillCooldown,"AB_LAUDARAMUS",-3000; bonus2 bSkillCooldown,"AB_CLEARANCE",-10000; bonus2 bSkillUseSP,"AB_LAUDAAGNUS",-60; bonus2 bSkillUseSP,"AB_LAUDARAMUS",-60; bonus2 bSkillUseSP,"AB_CLEARANCE",-60; } }
+      bonus bMatk,125; if(BaseLevel>104) { bonus bHealPower,(min(175,BaseLevel)/5)-20; if(getrefine()>=6) { bonus bDelayrate,-25; bonus2 bSkillUseSP,"PR_STRECOVERY",-60; bonus2 bSkillUseSP,"PR_SLOWPOISON",-60; bonus2 bSkillUseSP,"PR_LEXAETERNA",-60; } }
   - Id: 1587
     AegisName: Velum_Encyclopedia
     Name: Vellum Great Encyclopedia
@@ -12322,7 +12322,7 @@ Body:
     EquipLevelMin: 102
     Refineable: true
     Script: |
-      bonus bMatk,170; .@r = getrefine(); if(.@r>5) { bonus2 bSkillAtk,"SO_PSYCHIC_WAVE",(.@r-5)*2; bonus bMaxHPrate,-(.@r-5)*2; } bonus2 bSkillVariableCast,"SO_PSYCHIC_WAVE",-3000; bonus2 bSkillUseSP,"SO_PSYCHIC_WAVE",-60;
+      bonus bMatk,170; .@r = getrefine(); if(.@r>5) { bonus2 bSkillAtk,"PF_SOULBURN",(.@r-5)*2; bonus bMaxHPrate,-(.@r-5)*2; } bonus2 bSkillVariableCast,"PF_SOULBURN",-3000; bonus2 bSkillUseSP,"PF_SOULBURN",-60;
     UnEquipScript: |
       itemheal 0,-100;
   - Id: 1655
@@ -12406,7 +12406,7 @@ Body:
     EquipLevelMin: 110
     Refineable: true
     Script: |
-      bonus bMatk,160; bonus bAtkEle,Ele_Holy; bonus bUnbreakableWeapon; .@r = getrefine(); bonus bHealPower,(.@r*6); bonus2 bSkillUseSP,"AL_HEAL",-(.@r*10); bonus2 bSkillUseSP,"AB_CHEAL",-(.@r*12); bonus2 bSkillUseSP,"AB_HIGHNESSHEAL",-(.@r*14);
+      bonus bMatk,160; bonus bAtkEle,Ele_Holy; bonus bUnbreakableWeapon; .@r = getrefine(); bonus bHealPower,(.@r*6); bonus2 bSkillUseSP,"AL_HEAL",-(.@r*14);
   - Id: 1660
     AegisName: Wand_Of_Affection2
     Name: "Empowered Wand Of Affection [1]"
@@ -12620,7 +12620,7 @@ Body:
     EquipLevelMin: 100
     Refineable: true
     Script: |
-      bonus bMatk,155; bonus2 bAddRace,RC_Undead,10; bonus2 bAddRace,RC_Demon,10; bonus2 bMagicAddRace,RC_Undead,10; bonus2 bMagicAddRace,RC_Demon,10; .@r = getrefine(); if(.@r>=9) { .@dmg = 5; if(.@r>=12) { .@dmg += 7; } bonus bMatkRate,.@dmg; }
+      bonus bMatk,155; bonus2 bAddRace,RC_Undead,10; bonus2 bAddRace,RC_Demon,10; bonus2 bMagicAddRace,RC_Undead,10; bonus2 bMagicAddRace,RC_Demon,10; .@r = getrefine(); if(.@r>=9) { .@dmg = 5; if(getallrefine() >= 24) { .@dmg += 7; } bonus bMatkRate,.@dmg; }
   - Id: 1673
     AegisName: Half_BF_Staff4
     Name: Half BF Staff4
@@ -12789,7 +12789,7 @@ Body:
     EquipLevelMin: 90
     Refineable: true
     Script: |
-      bonus bMatk,130; .@r = getrefine(); bonus2 bSkillAtk,"WL_HELLINFERNO",(getskilllv("WL_HELLINFERNO") >= 5 ? 100 : 0) + (.@r*10); bonus2 bIgnoreMdefRaceRate,RC_All,5; autobonus "{ bonus2 bVariableCastrate,\"WL_HELLINFERNO\",-30; }",.@r*20,5000,BF_MAGIC,"{ specialeffect2 EF_SPELLBREAKER; }";
+      bonus bMatk,130; .@r = getrefine(); bonus2 bSkillAtk,"WZ_FIREPILLAR",(getskilllv("WZ_FIREPILLAR") >= 5 ? 100 : 0) + (.@r*10); bonus2 bIgnoreMdefRaceRate,RC_All,5; autobonus "{ bonus2 bVariableCastrate,\"WZ_FIREPILLAR\",-30; }",.@r*20,5000,BF_MAGIC,"{ specialeffect2 EF_SPELLBREAKER; }";
   - Id: 1683
     AegisName: Enriched_Foxtail_Staff
     Name: "Enriched Foxtail Staff [1]"
@@ -12951,7 +12951,7 @@ Body:
     EquipLevelMin: 175
     Refineable: true
     Script: |
-      bonus bMatk,280; .@r = getrefine(); bonus bMatkRate,3*(.@r/2); bonus4 bAutoSpellOnSkill,"SU_FRESHSHRIMP","SU_ARCLOUSEDASH",max(1,getskilllv("SU_ARCLOUSEDASH")),200; bonus4 bAutoSpellOnSkill,"SU_SV_STEMSPEAR","SU_FRESHSHRIMP",max(1,getskilllv("SU_FRESHSHRIMP")),200; if(.@r>=7){ .@r = min(.@r,10)-7; bonus bWeaponAtkRate,(20*.@r)+40; bonus bWeaponMatkRate,(20*.@r)+40; }
+      bonus bMatk,280; .@r = getrefine(); bonus bMatkRate,3*(.@r/2); if(.@r>=7){ .@r = min(.@r,10)-7; bonus bWeaponAtkRate,(20*.@r)+40; bonus bWeaponMatkRate,(20*.@r)+40; }
   - Id: 1694
     AegisName: Foxtail_Model
     Name: "Foxtail Model [3]"
@@ -13023,7 +13023,7 @@ Body:
     EquipLevelMin: 175
     Refineable: true
     Script: |
-      bonus bLongAtkRate,9; bonus bMaxHPrate,7; .@r = getrefine(); bonus bLongAtkRate,.@r/2; bonus bMaxSP,(.@r/2)*20; bonus4 bAutoSpellOnSkill,"SU_PICKYPECK","SU_FRESHSHRIMP",max(1,getskilllv("SU_FRESHSHRIMP")),200; if(.@r>=7){ .@r = min(.@r,10)-7; bonus bWeaponAtkRate,(20*.@r)+40; bonus bWeaponMatkRate,(20*.@r)+40; }
+      bonus bLongAtkRate,9; bonus bMaxHPrate,7; .@r = getrefine(); bonus bLongAtkRate,.@r/2; bonus bMaxSP,(.@r/2)*20; if(.@r>=7){ .@r = min(.@r,10)-7; bonus bWeaponAtkRate,(20*.@r)+40; bonus bWeaponMatkRate,(20*.@r)+40; }
   - Id: 1698
     AegisName: Requiem_Arc_Wand
     Name: Requiem Arc Wand
@@ -14651,7 +14651,7 @@ Body:
     EquipLevelMin: 102
     Refineable: true
     Script: |
-      bonus2 bSkillAtk,"SR_EARTHSHAKER",20; bonus2 bSkillAtk,"SR_SKYNETBLOW",20; bonus bUseSPrate,5; .@r = getrefine(); if(.@r>6) { bonus bUseSPrate,-1*(.@r-6); }
+      bonus2 bSkillAtk,"MO_INVESTIGATE",20; bonus2 bSkillAtk,"MO_CHAINCOMBO",20; bonus bUseSPrate,5; .@r = getrefine(); if(.@r>6) { bonus bUseSPrate,-1*(.@r-6); }
   - Id: 1831
     AegisName: P_Knuckle1
     Name: Eden Knuckle I
@@ -14857,7 +14857,7 @@ Body:
     EquipLevelMin: 120
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus2 bSkillAtk,"SR_SKYNETBLOW",(10+5*(.@r/2)); bonus2 bSkillAtk,"SR_DRAGONCOMBO",(10+5*(.@r/2)); bonus2 bSkillAtk,"SR_TIGERCANNON",(5*(.@r/3));
+      .@r = getrefine(); bonus2 bSkillAtk,"MO_CHAINCOMBO",(10+5*(.@r/2)); bonus2 bSkillAtk,"MO_TRIPLEATTACK",(10+5*(.@r/2)); bonus2 bSkillAtk,"MO_COMBOFINISH",(5*(.@r/3));
   - Id: 1862
     AegisName: Burning_Knuckle-OS
     Name: "Burning Knuckle-OS [2]"
@@ -14875,7 +14875,7 @@ Body:
     EquipLevelMin: 130
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus2 bAddClass,Class_All,3; if (.@r >= 7) { bonus bAspdRate,7; if (.@r >= 9) { bonus2 bSkillAtk,"SR_RAMPAGEBLASTER",15; if (.@r >= 11) { bonus2 bAddSize,Size_Medium,20; bonus2 bAddSize,Size_Large,20; } } }
+      .@r = getrefine(); bonus2 bAddClass,Class_All,3; if (.@r >= 7) { bonus bAspdRate,7; if (.@r >= 9) { bonus2 bSkillAtk,"MO_EXTREMITYFIST",15; if (getallrefine() >= 22) { bonus2 bAddSize,Size_Medium,20; bonus2 bAddSize,Size_Large,20; } } }
   - Id: 1865
     AegisName: Raging_Dragon_Fist
     Name: Raging Dragon Fist
@@ -14893,7 +14893,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bBaseAtk,4*.@r; bonus2 bSkillAtk,"MO_CHAINCOMBO",30; if (.@r >= 9) { bonus2 bSkillAtk,"MO_COMBOFINISH",50; bonus2 bSkillAtk,"CH_CHAINCRUSH",50; } if (.@r >= 11) bonus2 bSkillAtk,"CH_CHAINCRUSH",30;
+      .@r = getrefine(); bonus bBaseAtk,4*.@r; bonus2 bSkillAtk,"MO_CHAINCOMBO",30; if (.@r >= 9) { bonus2 bSkillAtk,"MO_COMBOFINISH",50; bonus2 bSkillAtk,"CH_CHAINCRUSH",50; } if (getallrefine() >= 22) bonus2 bSkillAtk,"CH_CHAINCRUSH",30;
   - Id: 1866
     AegisName: Dedicated_Bandage
     Name: Dedicated Bandage
@@ -14911,7 +14911,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bBaseAtk,4*.@r; bonus bLongAtkRate,10; if (.@r >= 9) bonus2 bSkillAtk,"SR_KNUCKLEARROW",40; if (.@r >= 11) bonus bDelayrate,-7;
+      .@r = getrefine(); bonus bBaseAtk,4*.@r; bonus bLongAtkRate,10; if (.@r >= 9) bonus2 bSkillAtk,"MO_FINGEROFFENSIVE",40; if (getallrefine() >= 22) bonus bDelayrate,-7;
   - Id: 1900
     AegisName: Sinister_Viollin
     Name: "Violin of Vicious Mind [1]"
@@ -15456,7 +15456,7 @@ Body:
     EquipLevelMin: 102
     Refineable: true
     Script: |
-      bonus bMatk,50; .@r = getrefine(); if(.@r>5) { bonus2 bSkillUseSP,"MI_RUSH_WINDMILL",(.@r-5)*4; bonus2 bSkillUseSP,"WM_LULLABY_DEEPSLEEP",(.@r-5)*4; } bonus2 bSkillVariableCast,"MI_RUSH_WINDMILL",-2000; bonus2 bSkillVariableCast,"WM_LULLABY_DEEPSLEEP",-2000;
+      bonus bMatk,50; .@r = getrefine(); if(.@r>5) { bonus2 bSkillUseSP,"BA_WHISTLE",(.@r-5)*4; bonus2 bSkillUseSP,"BD_LULLABY",(.@r-5)*4; } bonus2 bSkillVariableCast,"BA_WHISTLE",-2000; bonus2 bSkillVariableCast,"BD_LULLABY",-2000;
   - Id: 1931
     AegisName: P_String_Inst1
     Name: Eden Guitar I
@@ -15527,7 +15527,7 @@ Body:
     EquipLevelMin: 130
     Refineable: true
     Script: |
-      bonus bMatk,120; bonus2 bSkillCooldown,"WM_RANDOMIZESPELL",-20;
+      bonus bMatk,120; 
   - Id: 1935
     AegisName: Ukulele_Of_Newoz
     Name: "Oz's New Ukulele [2]"
@@ -15546,7 +15546,7 @@ Body:
     EquipLevelMin: 130
     Refineable: true
     Script: |
-      bonus2 bSkillUseSP,"MI_RUSH_WINDMILL",20;
+      bonus2 bSkillUseSP,"BA_WHISTLE",20;
   - Id: 1936
     AegisName: Ru_Blue_Violin
     Name: "Blue Violin [1]"
@@ -15639,7 +15639,7 @@ Body:
     EquipLevelMin: 130
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bDex,.@r; bonus bInt,.@r; .@per = ((.@r > 9) ? 40 : ((.@r > 7) ? 20 : ((.@r > 5) ? 10 : 0))); bonus2 bSkillAtk,"WM_REVERBERATION",.@per; bonus2 bVariableCastrate,"WM_REVERBERATION",-.@per;
+      .@r = getrefine(); bonus bDex,.@r; bonus bInt,.@r; .@per = ((.@r > 9) ? 40 : ((.@r > 7) ? 20 : ((.@r > 5) ? 10 : 0))); bonus2 bSkillAtk,"BA_MUSICALSTRIKE",.@per; bonus2 bVariableCastrate,"BA_MUSICALSTRIKE",-.@per;
   - Id: 1941
     AegisName: Unity_Violin
     Name: "Unity Violin [1]"
@@ -16310,7 +16310,7 @@ Body:
     EquipLevelMin: 102
     Refineable: true
     Script: |
-      bonus bMatk,50; .@r = getrefine(); if(.@r>5) { bonus2 bSkillUseSP,"WA_SWING_DANCE",(.@r-5)*4; bonus2 bSkillUseSP,"WM_LULLABY_DEEPSLEEP",(.@r-5)*4; } bonus2 bSkillVariableCast,"WA_SWING_DANCE",-2000; bonus2 bSkillVariableCast,"WM_LULLABY_DEEPSLEEP",-2000;
+      bonus bMatk,50; .@r = getrefine(); if(.@r>5) { bonus2 bSkillUseSP,"DC_HUMMING",(.@r-5)*4; bonus2 bSkillUseSP,"BD_LULLABY",(.@r-5)*4; } bonus2 bSkillVariableCast,"DC_HUMMING",-2000; bonus2 bSkillVariableCast,"BD_LULLABY",-2000;
   - Id: 1985
     AegisName: Rosebine
     Name: Rosebine
@@ -16328,7 +16328,7 @@ Body:
     EquipLevelMin: 110
     Refineable: true
     Script: |
-      bonus bMatk,130; bonus bInt,2; bonus bAgi,-2; bonus3 bAutoSpell,"WM_VOICEOFSIREN",1,20;
+      bonus bMatk,130; bonus bInt,2; bonus bAgi,-2; bonus3 bAutoSpell,"DC_WINKCHARM",1,20;
   - Id: 1986
     AegisName: P_Tail1
     Name: Eden Tail I
@@ -16911,7 +16911,7 @@ Body:
     EquipLevelMin: 100
     Refineable: true
     Script: |
-      bonus bMatk,320; bonus bInt,25; bonus bDex,25; bonus3 bAddEff,Eff_Poison,1000,ATF_MAGIC; bonus3 bAutoSpell,"AB_SILENTIUM",1,100; bonus bUnbreakableWeapon;
+      bonus bMatk,320; bonus bInt,25; bonus bDex,25; bonus3 bAddEff,Eff_Poison,1000,ATF_MAGIC; bonus3 bAutoSpell,"PR_LEXDIVINA",1,100; bonus bUnbreakableWeapon;
   - Id: 2022
     AegisName: Staff_Of_Geffen
     Name: "Staff of Geffen [1]"
@@ -17110,7 +17110,7 @@ Body:
     EquipLevelMin: 120
     Refineable: true
     Script: |
-      bonus bMatk,240; .@r = getrefine(); bonus bDex,2; bonus bInt,2; bonus bMaxHP,600; bonus bUnbreakableWeapon; bonus bMatkRate,(.@r/2); if (.@r >= 7) { bonus2 bMagicAddSize,Size_Small,15; bonus2 bMagicAddSize,Size_Medium,15; if (.@r >= 9) { bonus2 bSubSize,Size_Small,15; bonus2 bSubSize,Size_Medium,15; if (.@r >= 11) { bonus2 bSubDefEle,Ele_Water,15; bonus2 bSubDefEle,Ele_Wind,15; bonus2 bSubDefEle,Ele_Earth,15; bonus2 bSubDefEle,Ele_Fire,15; } } }
+      bonus bMatk,240; .@r = getrefine(); bonus bDex,2; bonus bInt,2; bonus bMaxHP,600; bonus bUnbreakableWeapon; bonus bMatkRate,(.@r/2); if (.@r >= 7) { bonus2 bMagicAddSize,Size_Small,15; bonus2 bMagicAddSize,Size_Medium,15; if (.@r >= 9) { bonus2 bSubSize,Size_Small,15; bonus2 bSubSize,Size_Medium,15; if (getallrefine() >= 22) { bonus2 bSubDefEle,Ele_Water,15; bonus2 bSubDefEle,Ele_Wind,15; bonus2 bSubDefEle,Ele_Earth,15; bonus2 bSubDefEle,Ele_Fire,15; } } }
   - Id: 2055
     AegisName: Staff_of_Miracle
     Name: Staff of Miracle
@@ -17128,7 +17128,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bMatk,270+4*.@r; bonus bUnbreakableWeapon; bonus2 bMagicAtkEle,Ele_Ghost,5; if (.@r >= 9) { bonus2 bSkillAtk,"MG_SOULSTRIKE",20; bonus2 bSkillAtk,"HW_NAPALMVULCAN",20; bonus2 bSkillAtk,"WL_SOULEXPANSION",20; } if (.@r >= 11) { bonus2 bSkillAtk,"MG_SOULSTRIKE",30; bonus2 bSkillAtk,"HW_NAPALMVULCAN",30; }
+      .@r = getrefine(); bonus bMatk,270+4*.@r; bonus bUnbreakableWeapon; bonus2 bMagicAtkEle,Ele_Ghost,5; if (.@r >= 9) { bonus2 bSkillAtk,"MG_SOULSTRIKE",20; bonus2 bSkillAtk,"HW_NAPALMVULCAN",20; } if (getallrefine() >= 22) { bonus2 bSkillAtk,"MG_SOULSTRIKE",30; bonus2 bSkillAtk,"HW_NAPALMVULCAN",30; }
   - Id: 2056
     AegisName: Gravitation_Staff
     Name: Gravitation Staff
@@ -17146,7 +17146,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bMatk,280+4*.@r; bonus bUnbreakableWeapon; bonus2 bMagicAtkEle,Ele_Neutral,5; if (.@r >= 9) { bonus2 bSkillAtk,"HW_GRAVITATION",30; bonus2 bSkillAtk,"WL_DRAINLIFE",30; } if (.@r >= 11) { bonus2 bSkillCooldown,"HW_GRAVITATION",-2000; }
+      .@r = getrefine(); bonus bMatk,280+4*.@r; bonus bUnbreakableWeapon; bonus2 bMagicAtkEle,Ele_Neutral,5; if (.@r >= 9) { bonus2 bSkillAtk,"HW_GRAVITATION",30; bonus2 bSkillAtk,"MG_SOULSTRIKE",30; } if (getallrefine() >= 22) { bonus2 bSkillCooldown,"HW_GRAVITATION",-2000; }
   - Id: 2057
     AegisName: Adorare_Staff
     Name: Adorare Staff
@@ -17164,7 +17164,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bMatk,240+4*.@r; bonus bUnbreakableWeapon; bonus2 bMagicAtkEle,Ele_Holy,5; if (.@r >= 9) { bonus2 bSkillAtk,"AB_ADORAMUS",30; } if (.@r >= 11) { bonus2 bSubSize,Size_All,25; }
+      .@r = getrefine(); bonus bMatk,240+4*.@r; bonus bUnbreakableWeapon; bonus2 bMagicAtkEle,Ele_Holy,5; if (.@r >= 9) { bonus2 bSkillAtk,"PR_MAGNUS",30; } if (getallrefine() >= 22) { bonus2 bSubSize,Size_All,25; }
   - Id: 2101
     AegisName: Guard
     Name: Guard
@@ -17651,7 +17651,7 @@ Body:
     Refineable: true
     View: 2
     Script: |
-      .@r = getrefine(); bonus bMdef,3; if(.@r<11) { autobonus2 "{ bonus bShortWeaponDamageReturn,("+.@r+"*3); }",10,5000,BF_WEAPON,"{ specialeffect2 EF_GUARD; }"; } else { autobonus2 "{ bonus bShortWeaponDamageReturn,("+.@r+"*3); }",10,5000+(.@r/2*1000),BF_WEAPON,"{ specialeffect2 EF_GUARD; }"; }
+      .@r = getrefine(); bonus bMdef,3; if(getallrefine() < 22) { autobonus2 "{ bonus bShortWeaponDamageReturn,("+.@r+"*3); }",10,5000,BF_WEAPON,"{ specialeffect2 EF_GUARD; }"; } else { autobonus2 "{ bonus bShortWeaponDamageReturn,("+.@r+"*3); }",10,5000+(.@r/2*1000),BF_WEAPON,"{ specialeffect2 EF_GUARD; }"; }
   - Id: 2135
     AegisName: Shadow_Guard
     Name: "Shadow Guard [1]"
@@ -17908,7 +17908,7 @@ Body:
     Refineable: true
     View: 4
     Script: |
-      .@r = getrefine(); bonus bMdef,5; bonus2 bSkillAtk,"LG_SHIELDPRESS",(.@r>=6?20+((.@r-5)*2):20);
+      .@r = getrefine(); bonus bMdef,5; bonus2 bSkillAtk,"CR_SHIELDCHARGE",(.@r>=6?20+((.@r-5)*2):20);
   - Id: 2154
     AegisName: Toy_Shield
     Name: "Toy Shield [1]"
@@ -18425,7 +18425,7 @@ Body:
     Refineable: true
     View: 2
     Script: |
-      bonus2 bSubEle,Ele_Neutral,10; bonus2 bSubEle,Ele_Fire,10; bonus2 bSubEle,Ele_Water,10; bonus2 bSubEle,Ele_Wind,10; bonus2 bSubEle,Ele_Earth,10; bonus2 bSubEle,Ele_Dark,10; bonus2 bSubEle,Ele_Holy,10; bonus2 bSubEle,Ele_Ghost,10; bonus bMaxHP,500; bonus bMaxSP,50; if(getrefine()>=14) skill "MG_STONECURSE",5;
+      bonus2 bSubEle,Ele_Neutral,10; bonus2 bSubEle,Ele_Fire,10; bonus2 bSubEle,Ele_Water,10; bonus2 bSubEle,Ele_Wind,10; bonus2 bSubEle,Ele_Earth,10; bonus2 bSubEle,Ele_Dark,10; bonus2 bSubEle,Ele_Holy,10; bonus2 bSubEle,Ele_Ghost,10; bonus bMaxHP,500; bonus bMaxSP,50; if(getallrefine() >= 28) skill "MG_STONECURSE",5;
   - Id: 2195
     AegisName: Lian_Shield
     Name: "Lian Shield [1]"
@@ -21744,7 +21744,7 @@ Body:
     EquipLevelMin: 105
     Refineable: true
     Script: |
-      bonus bAgi,1; bonus bAspdRate,2; bonus2 bSkillUseSP,"WA_SWING_DANCE",32;
+      bonus bAgi,1; bonus bAspdRate,2; bonus2 bSkillUseSP,"DC_HUMMING",32;
   - Id: 2466
     AegisName: Training_Shoes
     Name: "Training Shoes [1]"
@@ -21838,7 +21838,7 @@ Body:
     EquipLevelMin: 100
     Refineable: true
     Script: |
-      bonus2 bSkillAtk,"AB_JUDEX",30; bonus2 bSkillUseSP,"AB_JUDEX",-40; bonus bMaxSP,150;
+      bonus2 bSkillAtk,"AL_HOLYLIGHT",30; bonus2 bSkillUseSP,"AL_HOLYLIGHT",-40; bonus bMaxSP,150;
   - Id: 2473
     AegisName: Para_Team_Boots4
     Name: Eden Team Boots IV
@@ -21938,7 +21938,7 @@ Body:
     EquipLevelMin: 100
     Refineable: true
     Script: |
-      bonus bAgi,2; bonus2 bSkillUseSP,"RA_AIMEDBOLT",10;
+      bonus bAgi,2; bonus2 bSkillUseSP,"SN_SHARPSHOOTING",10;
   - Id: 2480
     AegisName: Black_Wing_Boots
     Name: "Black Wing Boots [1]"
@@ -23082,7 +23082,7 @@ Body:
     Locations: {Garment: true}
     EquipLevelMin: 100
     Script: |
-      bonus bAgi,1; bonus2 bSkillAtk,"ASC_BREAKER",5; bonus2 bSkillAtk,"GC_CROSSIMPACT",5;
+      bonus bAgi,1; bonus2 bSkillAtk,"ASC_BREAKER",5; bonus2 bSkillAtk,"AS_SONICBLOW",5;
   - Id: 2569
     AegisName: Shawl_Of_Affection
     Name: Shawl Of Affection
@@ -23110,7 +23110,7 @@ Body:
     EquipLevelMin: 100
     Refineable: true
     Script: |
-      bonus bFlee,5; .@i = max(2,getskilllv("AB_ORATIO")); bonus5 bAutoSpellWhenHit,"AB_ORATIO",.@i,30,BF_WEAPON,0; bonus5 bAutoSpellWhenHit,"AB_ORATIO",.@i,40,BF_MAGIC,0;
+      bonus bFlee,5; .@i = max(2,getskilllv("PR_LEXAETERNA")); bonus5 bAutoSpellWhenHit,"PR_LEXAETERNA",.@i,30,BF_WEAPON,0; bonus5 bAutoSpellWhenHit,"PR_LEXAETERNA",.@i,40,BF_MAGIC,0;
   - Id: 2571
     AegisName: Para_Team_Manteau2
     Name: Eden Team Manteau II
@@ -26242,7 +26242,7 @@ Body:
     Locations: {Both_Accessory: true}
     EquipLevelMin: 110
     Script: |
-      bonus bMdef,1; bonus bInt,3; bonus bMaxSP,30; bonus2 bSkillAtk,"WL_SOULEXPANSION",10; bonus2 bSkillAtk,"SO_PSYCHIC_WAVE",10; bonus2 bSkillUseSP,"WL_SOULEXPANSION",-50; bonus2 bSkillUseSP,"SO_PSYCHIC_WAVE",-50;
+      bonus bMdef,1; bonus bInt,3; bonus bMaxSP,30; bonus2 bSkillAtk,"MG_SOULSTRIKE",10; bonus2 bSkillAtk,"PF_SOULBURN",10; bonus2 bSkillUseSP,"MG_SOULSTRIKE",-50; bonus2 bSkillUseSP,"PF_SOULBURN",-50;
   - Id: 2854
     AegisName: Alchemy_Glove
     Name: "Alchemy Glove [1]"
@@ -26589,7 +26589,7 @@ Body:
     Locations: {Both_Accessory: true}
     EquipLevelMin: 100
     Script: |
-      bonus bMaxHPrate,2; bonus2 bSkillUseSP,"LK_SPIRALPIERCE",5; bonus2 bSkillUseSP,"RK_HUNDREDSPEAR",5;
+      bonus bMaxHPrate,2; bonus2 bSkillUseSP,"LK_SPIRALPIERCE",5; bonus2 bSkillUseSP,"KN_PIERCE",5;
   - Id: 2884
     AegisName: Peuz_Seal
     Name: "Peuz's Seal [1]"
@@ -26773,7 +26773,7 @@ Body:
     Locations: {Both_Accessory: true}
     EquipLevelMin: 90
     Script: |
-      bonus2 bSkillAtk,"WM_METALICSOUND",150; bonus2 bSkillUseSP,"WM_METALICSOUND",-60; bonus bVariableCastrate,-50;
+      bonus2 bSkillAtk,"BA_MUSICALSTRIKE",150; bonus2 bSkillUseSP,"BA_MUSICALSTRIKE",-60; bonus bVariableCastrate,-50;
   - Id: 2900
     AegisName: Morrigane's_Belt_
     Name: "Morrigane's Belt [1]"
@@ -26832,7 +26832,7 @@ Body:
     Sell: 250
     Locations: {Both_Accessory: true}
     Script: |
-      skill "BS_MAXIMIZE",5; skill "BS_WEAPONPERFECT",5; skill "WL_RECOGNIZEDSPELL",5; skill "ECL_SNOWFLIP",1; skill "ECL_PEONYMAMY",1; skill "ECL_SADAGUI",1; skill "ECL_SEQUOIADUST",1; bonus2 bSkillCooldown,"WL_RECOGNIZEDSPELL",-180000; bonus bDelayRate,-100;
+      skill "BS_MAXIMIZE",5; skill "BS_WEAPONPERFECT",5; skill "HW_MAGICPOWER",5; skill "ECL_SNOWFLIP",1; skill "ECL_PEONYMAMY",1; skill "ECL_SADAGUI",1; skill "ECL_SEQUOIADUST",1;  bonus bDelayRate,-100;
   - Id: 2905
     AegisName: Super_Ora_Ora
     Name: Super Ora Ora
@@ -27475,7 +27475,7 @@ Body:
     Locations: {Both_Accessory: true}
     EquipLevelMin: 110
     Script: |
-      bonus bMaxHP,500; bonus bMaxSP,200; skill "PF_SPIDERWEB",1; bonus3 bAutoSpell,"SO_PSYCHIC_WAVE",1,1; bonus5 bAutoSpell,"HW_MAGICPOWER",1,1,BF_MAGIC,0; bonus5 bAutoSpell,"WZ_FROSTNOVA",10,10,BF_WEAPON|BF_MAGIC,0; bonus5 bAutoSpellWhenHit,"DC_SCREAM",1,1,BF_WEAPON|BF_MAGIC,0;
+      bonus bMaxHP,500; bonus bMaxSP,200; skill "PF_SPIDERWEB",1; bonus3 bAutoSpell,"PF_SOULBURN",1,1; bonus5 bAutoSpell,"HW_MAGICPOWER",1,1,BF_MAGIC,0; bonus5 bAutoSpell,"WZ_FROSTNOVA",10,10,BF_WEAPON|BF_MAGIC,0; bonus5 bAutoSpellWhenHit,"DC_SCREAM",1,1,BF_WEAPON|BF_MAGIC,0;
   - Id: 2981
     AegisName: RingOfHero
     Name: Warrior's Ring
@@ -27608,7 +27608,7 @@ Body:
     Locations: {Both_Accessory: true}
     EquipLevelMin: 130
     Script: |
-      bonus2 bAddClass,Class_All,6; bonus bMatkRate,6; bonus bAllStats,1; bonus5 bAutoSpellWhenHit,"SC_MAELSTROM",1,100,BF_MAGIC,0; if (Class == Job_Assassin_Cross) bonus2 bSkillAtk,"ASC_BREAKER",6;
+      bonus2 bAddClass,Class_All,6; bonus bMatkRate,6; bonus bAllStats,1; bonus5 bAutoSpellWhenHit,"ST_REJECTSWORD",1,100,BF_MAGIC,0; if (Class == Job_Assassin_Cross) bonus2 bSkillAtk,"ASC_BREAKER",6;
   - Id: 2995
     AegisName: Supplement_Part_Dex
     Name: "Supplement Part Dex [1]"
@@ -27621,7 +27621,7 @@ Body:
     Locations: {Both_Accessory: true}
     EquipLevelMin: 100
     Script: |
-      bonus bUseSPrate,-10; bonus bDelayrate,-10; bonus bVariableCastrate,-10; bonus2 bSkillCooldown,"NC_AXEBOOMERANG",-2000;
+      bonus bUseSPrate,-10; bonus bDelayrate,-10; bonus bVariableCastrate,-10; bonus bDelayrate,-10;
   - Id: 2996
     AegisName: Upgrade_Part_Gun_Barrel
     Name: "Reinforced Parts - Gun Barrel [1]"
@@ -27633,7 +27633,7 @@ Body:
     Locations: {Both_Accessory: true}
     EquipLevelMin: 100
     Script: |
-      bonus2 bAddClass,Class_All,4; bonus bHit,10; bonus2 bSkillAtk,"NC_BOOSTKNUCKLE",25;
+      bonus2 bAddClass,Class_All,4; bonus bHit,10; bonus2 bSkillAtk,"WS_CARTTERMINATION",25;
   - Id: 2997
     AegisName: RWC_Gold_Brooch
     Name: "RWC Gold Brooch [1]"
@@ -32965,7 +32965,7 @@ Body:
     Weight: 10
     Locations: {Head_Low: true, Head_Mid: true, Head_Top: true}
     Script: |
-      bonus bDelayRate,((getrefine()>14)?-20:-15);
+      bonus bDelayRate,((getallrefine() >= 30)?-20:-15);
   - Id: 4481
     AegisName: Sealed_Ktullanux_Card
     Name: Sealed Ktullanux Card
@@ -32975,7 +32975,7 @@ Body:
     Weight: 10
     Locations: {Armor: true}
     Script: |
-      bonus2 bAddEle,Ele_Fire,((getrefine()>14)?35:25); bonus5 bAutoSpellWhenHit,"WZ_FROSTNOVA",10,10,BF_WEAPON|BF_MAGIC,0;
+      bonus2 bAddEle,Ele_Fire,((getallrefine() >= 30)?35:25); bonus5 bAutoSpellWhenHit,"WZ_FROSTNOVA",10,10,BF_WEAPON|BF_MAGIC,0;
   - Id: 4482
     AegisName: Sealed_B_Ygnizem_Card
     Name: Sealed General Egnigem Cenia Card
@@ -32985,7 +32985,7 @@ Body:
     Weight: 10
     Locations: {Shoes: true}
     Script: |
-      .@rate = ((getrefine()>14)?7:5); bonus bMaxHPrate,.@rate; bonus bMaxSPrate,.@rate; bonus2 bHPRegenRate,50,10000; bonus2 bSPRegenRate,10,10000;
+      .@rate = ((getallrefine() >= 30)?7:5); bonus bMaxHPrate,.@rate; bonus bMaxSPrate,.@rate; bonus2 bHPRegenRate,50,10000; bonus2 bSPRegenRate,10,10000;
   - Id: 4483
     AegisName: Sealed_Dracula_Card
     Name: Sealed Dracula Card
@@ -32995,7 +32995,7 @@ Body:
     Weight: 10
     Locations: {Right_Hand: true}
     Script: |
-      bonus2 bSPDrainRate,((getrefine()>14)?70:50),5;
+      bonus2 bSPDrainRate,((getallrefine() >= 30)?70:50),5;
   - Id: 4484
     AegisName: Sealed_Mistress_Card
     Name: Sealed Mistress Card
@@ -33005,7 +33005,7 @@ Body:
     Weight: 10
     Locations: {Head_Low: true, Head_Mid: true, Head_Top: true}
     Script: |
-      bonus bNoGemStone; bonus bUseSPrate,((getrefine()>14)?35:50);
+      bonus bNoGemStone; bonus bUseSPrate,((getallrefine() >= 30)?35:50);
   - Id: 4485
     AegisName: Sealed_Gloom_Card
     Name: Sealed Gloom Under Night Card
@@ -33015,7 +33015,7 @@ Body:
     Weight: 10
     Locations: {Armor: true}
     Script: |
-      .@rate = ((getrefine()>14)?30:20); bonus2 bAddEle,Ele_Holy,.@rate; bonus2 bAddEle,Ele_Dark,.@rate; bonus2 bAddRace,RC_Angel,.@rate; bonus2 bAddRace,RC_Demon,.@rate;
+      .@rate = ((getallrefine() >= 30)?30:20); bonus2 bAddEle,Ele_Holy,.@rate; bonus2 bAddEle,Ele_Dark,.@rate; bonus2 bAddRace,RC_Angel,.@rate; bonus2 bAddRace,RC_Demon,.@rate;
   - Id: 4486
     AegisName: Sealed_Berz_Card
     Name: Sealed Berzebub Card
@@ -33065,7 +33065,7 @@ Body:
     Weight: 10
     Locations: {Shoes: true}
     Script: |
-      skill "AL_INCAGI",((getrefine()>14)?5:1);
+      skill "AL_INCAGI",((getallrefine() >= 30)?5:1);
   - Id: 4491
     AegisName: Sealed_B_Shecil_Card
     Name: Sealed Sniper Card
@@ -33075,7 +33075,7 @@ Body:
     Weight: 10
     Locations: {Right_Hand: true}
     Script: |
-      bonus bHPrecovRate,-100; bonus2 bHPDrainRate,50,((getrefine()>14)?15:10);
+      bonus bHPrecovRate,-100; bonus2 bHPDrainRate,50,((getallrefine() >= 30)?15:10);
   - Id: 4492
     AegisName: Sealed_Orc_Hero_Card
     Name: Sealed Orc Hero Card
@@ -33085,7 +33085,7 @@ Body:
     Weight: 10
     Locations: {Head_Low: true, Head_Mid: true, Head_Top: true}
     Script: |
-      bonus bVit,3; bonus2 bResEff,Eff_Stun,((getrefine()>14)?6000:4000);
+      bonus bVit,3; bonus2 bResEff,Eff_Stun,((getallrefine() >= 30)?6000:4000);
   - Id: 4493
     AegisName: Sealed_Tao_Card
     Name: Sealed Tao Gunka Card
@@ -33095,7 +33095,7 @@ Body:
     Weight: 10
     Locations: {Armor: true}
     Script: |
-      bonus bMaxHPrate,((getrefine()>14)?75:50); bonus bDefRate,-50; bonus bMdefRate,-50;
+      bonus bMaxHPrate,((getallrefine() >= 30)?75:50); bonus bDefRate,-50; bonus bMdefRate,-50;
   - Id: 4494
     AegisName: Sealed_TurtleG_Card
     Name: Sealed Turtle General Card
@@ -33105,7 +33105,7 @@ Body:
     Weight: 10
     Locations: {Right_Hand: true}
     Script: |
-      .@rate = ((getrefine()>14)?15:10); bonus2 bAddClass,Class_All,.@rate; bonus3 bAutoSpell,"SM_MAGNUM",10,15;
+      .@rate = ((getallrefine() >= 30)?15:10); bonus2 bAddClass,Class_All,.@rate; bonus3 bAutoSpell,"SM_MAGNUM",10,15;
   - Id: 4495
     AegisName: Sealed_Amon_Ra_Card
     Name: Sealed Amon Ra Card
@@ -33115,7 +33115,7 @@ Body:
     Weight: 10
     Locations: {Shoes: true}
     Script: |
-      bonus bAllStats,1; bonus3 bAutoSpellWhenHit,"PR_KYRIE",((getrefine()>14)?8:5),(15+35*(readparam(bInt)>=99));
+      bonus bAllStats,1; bonus3 bAutoSpellWhenHit,"PR_KYRIE",((getallrefine() >= 30)?8:5),(15+35*(readparam(bInt)>=99));
   - Id: 4496
     AegisName: Sealed_Drake_Card
     Name: Sealed Drake Card
@@ -33125,7 +33125,7 @@ Body:
     Weight: 10
     Locations: {Right_Hand: true}
     Script: |
-      .@rate = (getrefine()>=15?75:50); bonus2 bAddSize,Size_All,.@rate; bonus2 bMagicAddSize,Size_All,.@rate;
+      .@rate = (getallrefine() >= 30?75:50); bonus2 bAddSize,Size_All,.@rate; bonus2 bMagicAddSize,Size_All,.@rate;
   - Id: 4497
     AegisName: Sealed_Knight_WS_Card
     Name: Sealed Stormy Knight Card
@@ -33135,7 +33135,7 @@ Body:
     Weight: 10
     Locations: {Right_Hand: true}
     Script: |
-      bonus3 bAutoSpell,"WZ_STORMGUST",1,10; bonus2 bAddEff,Eff_Freeze,((getrefine()>14)?1500:1000);
+      bonus3 bAutoSpell,"WZ_STORMGUST",1,10; bonus2 bAddEff,Eff_Freeze,((getallrefine() >= 30)?1500:1000);
   - Id: 4498
     AegisName: Sealed_Lady_Tanee_Card
     Name: Sealed Lady Tanee Card
@@ -33145,7 +33145,7 @@ Body:
     Weight: 10
     Locations: {Shoes: true}
     Script: |
-      .@r = getrefine(); bonus bMaxHPrate,((.@r>14)?-50:-60); bonus bMaxSPrate,50; bonus2 bAddMonsterDropItem,513,100; bonus2 bAddItemHealRate,513,((.@r>14)?80:50);
+      .@r = getrefine(); bonus bMaxHPrate,((getallrefine() >= 30)?-50:-60); bonus bMaxSPrate,50; bonus2 bAddMonsterDropItem,513,100; bonus2 bAddItemHealRate,513,((getallrefine() >= 30)?80:50);
   - Id: 4499
     AegisName: Sealed_Samurai_Card
     Name: Sealed Samurai Spector Card
@@ -33155,7 +33155,7 @@ Body:
     Weight: 10
     Locations: {Right_Hand: true}
     Script: |
-      bonus bIgnoreDefClass,Class_Normal; bonus bHPrecovRate,-100; if (getrefine()>14) bonus2 bHPLossRate,777,8000; else bonus2 bHPLossRate,888,5000;
+      bonus bIgnoreDefClass,Class_Normal; bonus bHPrecovRate,-100; if (getallrefine() >= 30) bonus2 bHPLossRate,777,8000; else bonus2 bHPLossRate,888,5000;
     UnEquipScript: |
       if((Hp<=999) && !getmapflag(strcharinfo(3),mf_pvp) && !getmapflag(strcharinfo(3),mf_pvp_noparty) && !getmapflag(strcharinfo(3),mf_pvp_noguild)) { heal(1-Hp),0; } else { heal -999,0; }
   - Id: 4500
@@ -33167,7 +33167,7 @@ Body:
     Weight: 10
     Locations: {Armor: true}
     Script: |
-      bonus bShortWeaponDamageReturn,((getrefine()>14)?25:15);
+      bonus bShortWeaponDamageReturn,((getallrefine() >= 30)?25:15);
   - Id: 4501
     AegisName: Sealed_B_Magaleta_Card
     Name: Sealed High Priest Card
@@ -33177,7 +33177,7 @@ Body:
     Weight: 10
     Locations: {Armor: true}
     Script: |
-      bonus5 bAutoSpellWhenHit,"HP_ASSUMPTIO",1,((getrefine()>14)?35:25),BF_WEAPON|BF_MAGIC,0;
+      bonus5 bAutoSpellWhenHit,"HP_ASSUMPTIO",1,((getallrefine() >= 30)?35:25),BF_WEAPON|BF_MAGIC,0;
   - Id: 4502
     AegisName: Sealed_B_Harword_Card
     Name: Sealed MasterSmith Card
@@ -33187,7 +33187,7 @@ Body:
     Weight: 10
     Locations: {Right_Hand: true}
     Script: |
-      .@r = getrefine(); bonus bBreakWeaponRate,(.@r>14?800:500); bonus bBreakArmorRate,(.@r>14?600:500);
+      .@r = getrefine(); bonus bBreakWeaponRate,(getallrefine() >= 30?800:500); bonus bBreakArmorRate,(getallrefine() >= 30?600:500);
   - Id: 4503
     AegisName: Sealed_Apocalips_H_Card
     Name: Sealed Vesper Card
@@ -33197,7 +33197,7 @@ Body:
     Weight: 10
     Locations: {Head_Low: true, Head_Mid: true, Head_Top: true}
     Script: |
-      bonus bDex,2; bonus2 bIgnoreMdefClassRate,Class_Boss,((getrefine()>14)?25:15);
+      bonus bDex,2; bonus2 bIgnoreMdefClassRate,Class_Boss,((getallrefine() >= 30)?25:15);
   - Id: 4504
     AegisName: Sealed_Eddga_Card
     Name: Sealed Eddga Card
@@ -33207,7 +33207,7 @@ Body:
     Weight: 10
     Locations: {Shoes: true}
     Script: |
-      bonus bMaxHPrate,((getrefine()>14)?-35:-50); bonus bNoWalkDelay;
+      bonus bMaxHPrate,((getallrefine() >= 30)?-35:-50); bonus bNoWalkDelay;
   - Id: 4505
     AegisName: Scaraba_Card
     Name: Scaraba Card
@@ -33267,7 +33267,7 @@ Body:
     Weight: 10
     Locations: {Right_Hand: true}
     Script: |
-      bonus3 bAutoSpell,"WM_LULLABY_DEEPSLEEP",1,30;
+      bonus3 bAutoSpell,"BD_LULLABY",1,30;
   - Id: 4511
     AegisName: Little_Fatum_Card
     Name: Little Fatum Card
@@ -33519,7 +33519,7 @@ Body:
     Weight: 10
     Locations: {Right_Hand: true}
     Script: |
-      bonus2 bAddClass,Class_All,(getrefine()>=15?8:5); bonus5 bAutoSpell,"SA_DISPELL",1,1,BF_NORMAL,1; bonus bUnbreakableWeapon;
+      bonus2 bAddClass,Class_All,(getallrefine() >= 30?8:5); bonus5 bAutoSpell,"SA_DISPELL",1,1,BF_NORMAL,1; bonus bUnbreakableWeapon;
   - Id: 4536
     AegisName: Sealed_Atroce_Card
     Name: Sealed Atroce Card
@@ -33529,7 +33529,7 @@ Body:
     Weight: 10
     Locations: {Right_Hand: true}
     Script: |
-      .@r = getrefine(); bonus bBaseAtk,((.@r>14)?25:15); autobonus "{ bonus bAspdRate,(("+.@r+">14)?75:50); }",5,10000,0,"{ specialeffect2 EF_POTION_BERSERK; }";
+      .@r = getrefine(); bonus bBaseAtk,((getallrefine() >= 30)?25:15); autobonus "{ bonus bAspdRate,(("+.@r+">14)?75:50); }",5,10000,0,"{ specialeffect2 EF_POTION_BERSERK; }";
   - Id: 4537
     AegisName: Sealed_Phreeoni_Card
     Name: Sealed Phreeoni Card
@@ -33539,7 +33539,7 @@ Body:
     Weight: 10
     Locations: {Right_Hand: true}
     Script: |
-      bonus bHit,((getrefine()>14)?75:50);
+      bonus bHit,((getallrefine() >= 30)?75:50);
   - Id: 4538
     AegisName: Sealed_Bacsojin_Card
     Name: Sealed White Lady Card
@@ -33549,7 +33549,7 @@ Body:
     Weight: 10
     Locations: {Head_Low: true, Head_Mid: true, Head_Top: true}
     Script: |
-      .@r = getrefine(); bonus bHealPower,(.@r>14?25:15); bonus bUseSPrate,(.@r>14?20:30);
+      .@r = getrefine(); bonus bHealPower,(getallrefine() >= 30?25:15); bonus bUseSPrate,(getallrefine() >= 30?20:30);
   - Id: 4539
     AegisName: Sealed_F_Bishop_Card
     Name: Sealed Fallen Bishop Hibram Card
@@ -33559,7 +33559,7 @@ Body:
     Weight: 10
     Locations: {Shoes: true}
     Script: |
-      .@r = getrefine(); bonus bMatkRate,((.@r>14)?8:5); bonus bMaxSPrate,-50; .@rate = ((.@r>14)?33:25); bonus2 bMagicAddRace,RC_Angel,.@rate; bonus2 bMagicAddRace,RC_DemiHuman,.@rate; bonus2 bMagicAddRace,RC_PLAYER_HUMAN,.@rate;
+      .@r = getrefine(); bonus bMatkRate,((getallrefine() >= 30)?8:5); bonus bMaxSPrate,-50; .@rate = ((getallrefine() >= 30)?33:25); bonus2 bMagicAddRace,RC_Angel,.@rate; bonus2 bMagicAddRace,RC_DemiHuman,.@rate; bonus2 bMagicAddRace,RC_PLAYER_HUMAN,.@rate;
   - Id: 4540
     AegisName: SLD_Lord_Of_Death_Card
     Name: Sealed Lord of The Dead Card
@@ -33569,7 +33569,7 @@ Body:
     Weight: 10
     Locations: {Right_Hand: true}
     Script: |
-      .@rate = ((getrefine()>14)?350:250); bonus3 bAddEff,Eff_Stun,.@rate,ATF_SHORT; bonus3 bAddEff,Eff_Curse,.@rate,ATF_SHORT; bonus3 bAddEff,Eff_Silence,.@rate,ATF_SHORT; bonus3 bAddEff,Eff_Poison,.@rate,ATF_SHORT; bonus3 bAddEff,Eff_Bleeding,.@rate,ATF_SHORT; bonus2 bComaClass,Class_Normal,10;
+      .@rate = ((getallrefine() >= 30)?350:250); bonus3 bAddEff,Eff_Stun,.@rate,ATF_SHORT; bonus3 bAddEff,Eff_Curse,.@rate,ATF_SHORT; bonus3 bAddEff,Eff_Silence,.@rate,ATF_SHORT; bonus3 bAddEff,Eff_Poison,.@rate,ATF_SHORT; bonus3 bAddEff,Eff_Bleeding,.@rate,ATF_SHORT; bonus2 bComaClass,Class_Normal,10;
   - Id: 4541
     AegisName: SLD_B_Katrinn_Card
     Name: Sealed High Wizard Card
@@ -33579,9 +33579,9 @@ Body:
     Weight: 10
     Locations: {Head_Low: true, Head_Mid: true, Head_Top: true}
     Script: |
-      bonus2 bIgnoreMdefClassRate,Class_Normal,100; .@rate = ((getrefine()>14)?120:150); bonus bVariableCastrate,.@rate; bonus bSPrecovRate,-.@rate;
+      bonus2 bIgnoreMdefClassRate,Class_Normal,100; .@rate = ((getallrefine() >= 30)?120:150); bonus bVariableCastrate,.@rate; bonus bSPrecovRate,-.@rate;
     UnEquipScript: |
-      heal 0,((getrefine()>14)?-2000:-3000);
+      heal 0,((getallrefine() >= 30)?-2000:-3000);
   - Id: 4542
     AegisName: SLD_Detale_Card
     Name: Sealed Detale Card
@@ -33591,7 +33591,7 @@ Body:
     Weight: 10
     Locations: {Armor: true}
     Script: |
-      bonus2 bResEff,Eff_Freeze,(getrefine()>=15?6000:4000); bonus5 bAutoSpell,"SA_LANDPROTECTOR",1,1,BF_MAGIC,1; bonus bMdef,-20;
+      bonus2 bResEff,Eff_Freeze,(getallrefine() >= 30?6000:4000); bonus5 bAutoSpell,"SA_LANDPROTECTOR",1,1,BF_MAGIC,1; bonus bMdef,-20;
   - Id: 4543
     AegisName: SLD_Garm_Card
     Name: Sealed Hatii Card
@@ -33601,7 +33601,7 @@ Body:
     Weight: 10
     Locations: {Armor: true}
     Script: |
-      bonus2 bAddEffWhenHit,Eff_Freeze,((getrefine()>14)?4000:2500);
+      bonus2 bAddEffWhenHit,Eff_Freeze,((getallrefine() >= 30)?4000:2500);
   - Id: 4544
     AegisName: SLD_Dark_Snake_Card
     Name: Sealed Evil Snake Lord Card
@@ -33611,7 +33611,7 @@ Body:
     Weight: 10
     Locations: {Head_Low: true, Head_Mid: true, Head_Top: true}
     Script: |
-      bonus bInt,3; .@i = (getrefine()>14?7500:5000); bonus2 bResEff,Eff_Blind,.@i; bonus2 bResEff,Eff_Curse,.@i;
+      bonus bInt,3; .@i = (getallrefine() >= 30?7500:5000); bonus2 bResEff,Eff_Blind,.@i; bonus2 bResEff,Eff_Curse,.@i;
   - Id: 4545
     AegisName: Novice_Poring_Card
     Name: Novice Poring Card
@@ -33669,7 +33669,7 @@ Body:
     Weight: 10
     Locations: {Right_Hand: true}
     Script: |
-      if(getiteminfo(getequipid(EQI_HAND_R),11)==W_BOW) { bonus2 bSkillAtk,"RA_ARROWSTORM",50; bonus bCriticalLong,25+10*(getequiprefinerycnt(EQI_HAND_R)/4); bonus bHit,5; bonus3 bAutoSpell,"HT_PHANTASMIC",1,100; }
+      if(getiteminfo(getequipid(EQI_HAND_R),11)==W_BOW) { bonus2 bSkillAtk,"AC_SHOWER",50; bonus bCriticalLong,25+10*(getequiprefinerycnt(EQI_HAND_R)/4); bonus bHit,5; bonus3 bAutoSpell,"HT_PHANTASMIC",1,100; }
   - Id: 4552
     AegisName: Manny_Card
     Name: Manny Card
@@ -35903,8 +35903,7 @@ Body:
     Buy: 20
     Sell: 10
     Weight: 10
-    Script: |
-      bonus2 bSkillCooldown,"AB_HIGHNESSHEAL",-3000;
+    Script: "\n"
   - Id: 4804
     AegisName: Coluceo_Heal30
     Name: Catholic1Lv.
@@ -35914,7 +35913,7 @@ Body:
     Sell: 10
     Weight: 10
     Script: |
-      bonus2 bSkillUseSP,"AB_CHEAL",30;
+      bonus2 bSkillUseSP,"AL_HEAL",30;
   - Id: 4805
     AegisName: Heal_Amount2
     Name: Archbishop1Lv
@@ -37336,7 +37335,7 @@ Body:
     Type: Card
     SubType: Enchant
     Script: |
-      setarray .@skills$, "AL_HEAL", "PR_SANCTUARY", "AM_POTIONPITCHER", "AB_HIGHNESSHEAL", "AB_CHEAL"; for( .@i = 0; .@i < getarraysize(.@skills$); .@i++ ){ bonus2 bSkillHeal,.@skills$[.@i],2; bonus2 bSkillHeal2,.@skills$[.@i],2; } /* TODO: Depending on some recovery items HP recovery amount + 2% */
+      setarray .@skills$, "AL_HEAL", "PR_SANCTUARY", "AM_POTIONPITCHER"; for( .@i = 0; .@i < getarraysize(.@skills$); .@i++ ){ bonus2 bSkillHeal,.@skills$[.@i],2; bonus2 bSkillHeal2,.@skills$[.@i],2; } /* TODO: Depending on some recovery items HP recovery amount + 2% */
   - Id: 4957
     AegisName: Famitsus_Power
     Name: Famitsu's Power
@@ -37420,14 +37419,14 @@ Body:
     Type: Card
     SubType: Enchant
     Script: |
-      setarray .@skills$, "AL_HEAL", "PR_SANCTUARY", "AM_POTIONPITCHER", "AB_HIGHNESSHEAL", "AB_CHEAL"; for( .@i = 0; .@i < getarraysize(.@skills$); .@i++ ){ bonus2 bSkillHeal,.@skills$[.@i],1; }
+      setarray .@skills$, "AL_HEAL", "PR_SANCTUARY", "AM_POTIONPITCHER"; for( .@i = 0; .@i < getarraysize(.@skills$); .@i++ ){ bonus2 bSkillHeal,.@skills$[.@i],1; }
   - Id: 4969
     AegisName: Libra
     Name: Libra
     Type: Card
     SubType: Enchant
     Script: |
-      setarray .@skills$, "AL_HEAL", "PR_SANCTUARY", "AM_POTIONPITCHER", "AB_HIGHNESSHEAL", "AB_CHEAL"; for( .@i = 0; .@i < getarraysize(.@skills$); .@i++ ){ bonus2 bSkillHeal2,.@skills$[.@i],1; } /* TODO: Depending on some recovery items HP recovery amount + 1% */
+      setarray .@skills$, "AL_HEAL", "PR_SANCTUARY", "AM_POTIONPITCHER"; for( .@i = 0; .@i < getarraysize(.@skills$); .@i++ ){ bonus2 bSkillHeal2,.@skills$[.@i],1; } /* TODO: Depending on some recovery items HP recovery amount + 1% */
   - Id: 4970
     AegisName: Fire_Property_Reactor
     Name: Fire Property Reactor
@@ -46269,7 +46268,7 @@ Body:
     Refineable: true
     View: 597
     Script: |
-      bonus bInt,1; bonus bDex,1; bonus bLuk,1; .@r = getrefine(); if(.@r>6){ bonus bAtk,5; bonus bMatk,5; } if(.@r>8){ bonus2 bAddClass,Class_All,2; bonus bMatkRate,2; } if(.@r>11){ bonus2 bAddClass,Class_All,3; bonus bMatkRate,3; }
+      bonus bInt,1; bonus bDex,1; bonus bLuk,1; .@r = getrefine(); if(.@r>6){ bonus bAtk,5; bonus bMatk,5; } if(.@r>8){ bonus2 bAddClass,Class_All,2; bonus bMatkRate,2; } if(getallrefine() >= 24){ bonus2 bAddClass,Class_All,3; bonus bMatkRate,3; }
   - Id: 5667
     AegisName: Skull_Hood
     Name: "Skull Hood [1]"
@@ -47361,7 +47360,7 @@ Body:
     Refineable: true
     View: 628
     Script: |
-      bonus bInt,1; bonus bLuk,1; bonus bMdef,5; bonus bLongAtkRate,5; bonus2 bSkillUseSP,"MI_RUSH_WINDMILL",10; bonus2 bSkillUseSP,"MI_ECHOSONG",10;
+      bonus bInt,1; bonus bLuk,1; bonus bMdef,5; bonus bLongAtkRate,5; bonus2 bSkillUseSP,"BA_WHISTLE",10; bonus2 bSkillUseSP,"BA_POEMBRAGI",10;
   - Id: 5752
     AegisName: Midas_Whisper
     Name: "Midas Whispers [1]"
@@ -47472,7 +47471,7 @@ Body:
     Refineable: true
     View: 635
     Script: |
-      bonus bInt,1; bonus bLuk,1; bonus bMdef,5; bonus bLongAtkRate,5; bonus2 bSkillUseSP,"WA_SWING_DANCE",10; bonus2 bSkillUseSP,"WA_SYMPHONY_OF_LOVER",10;
+      bonus bInt,1; bonus bLuk,1; bonus bMdef,5; bonus bLongAtkRate,5; bonus2 bSkillUseSP,"DC_HUMMING",10; bonus2 bSkillUseSP,"DC_FORTUNEKISS",10;
   - Id: 5759
     AegisName: Noah_Hat
     Name: "Noah Hat [1]"
@@ -48964,7 +48963,7 @@ Body:
     Refineable: true
     View: 1121
     Script: |
-      .@r = getrefine(); bonus2 bSubSize,Size_All,5; if(.@r>=7) { .@level = getskilllv("AL_HEAL"); bonus3 bAutoSpellWhenHit,"AL_HEAL",(.@level ? .@level : 5),10; } if(.@r>=9) { bonus2 bSkillAtk,"LG_RAYOFGENESIS",20; }
+      .@r = getrefine(); bonus2 bSubSize,Size_All,5; if(.@r>=7) { .@level = getskilllv("AL_HEAL"); bonus3 bAutoSpellWhenHit,"AL_HEAL",(.@level ? .@level : 5),10; } if(.@r>=9) { bonus2 bSkillAtk,"CR_GRANDCROSS",20; }
   - Id: 5901
     AegisName: Focus_Beret
     Name: "Focus Beret [1]"
@@ -48980,7 +48979,7 @@ Body:
     Refineable: true
     View: 1122
     Script: |
-      .@r = getrefine(); bonus4 bAutoSpellOnSkill,"SR_DRAGONCOMBO","SR_FALLENEMPIRE",max(getskilllv("SR_FALLENEMPIRE"),1),100; if(.@r>=7) { autobonus "{ bonus bAspd,2; }",30,5000,0,"{ specialeffect2 EF_ENHANCE; }"; } if(.@r>=9) { bonus2 bSkillAtk,"SR_FALLENEMPIRE",30; }
+      .@r = getrefine(); bonus4 bAutoSpellOnSkill,"MO_TRIPLEATTACK","MO_CHAINCOMBO",max(getskilllv("MO_CHAINCOMBO"),1),100; if(.@r>=7) { autobonus "{ bonus bAspd,2; }",30,5000,0,"{ specialeffect2 EF_ENHANCE; }"; } if(.@r>=9) { bonus2 bSkillAtk,"MO_CHAINCOMBO",30; }
   - Id: 5902
     AegisName: Harvester_Hat
     Name: "Harvester Hat [1]"
@@ -48996,7 +48995,7 @@ Body:
     Refineable: true
     View: 1123
     Script: |
-      .@r = getrefine(); bonus2 bAddMonsterDropItem,6211,100; bonus2 bAddMonsterDropItem,6212,100; if(.@r>=7) { bonus2 bAddMonsterDropItem,6210,50; } if(.@r>=9) { bonus2 bSkillAtk,"GN_CARTCANNON",15; }
+      .@r = getrefine(); bonus2 bAddMonsterDropItem,6211,100; bonus2 bAddMonsterDropItem,6212,100; if(.@r>=7) { bonus2 bAddMonsterDropItem,6210,50; } if(.@r>=9) { bonus2 bSkillAtk,"AM_ACIDTERROR",15; }
   - Id: 5903
     AegisName: Deadman_Bandana
     Name: "Deadman Bandana [1]"
@@ -49044,7 +49043,7 @@ Body:
     Refineable: true
     View: 1126
     Script: |
-      .@r = getrefine(); bonus2 bSkillAtk,"WM_SEVERE_RAINSTORM",15; if(.@r>=7) { bonus bFixedCastrate,4*(getskilllv("WM_LESSON")); } if(.@r>=9) { bonus2 bSkillUseSP,"WM_SEVERE_RAINSTORM",10; }
+      .@r = getrefine(); bonus2 bSkillAtk,"CG_ARROWVULCAN",15; if(.@r>=7) { bonus bFixedCastrate,4*(getskilllv("BA_MUSICALLESSON")); } if(.@r>=9) { bonus2 bSkillUseSP,"CG_ARROWVULCAN",10; }
   - Id: 5906
     AegisName: Oni_Horns_
     Name: "Oni Horns [1]"
@@ -49060,7 +49059,7 @@ Body:
     Refineable: true
     View: 1127
     Script: |
-      bonus2 bSkillAtk,"GC_COUNTERSLASH",(10*getskilllv("GC_WEAPONBLOCKING")); .@r = getrefine(); if(.@r > 6){ bonus bAtk,20; bonus bHit,5; } if(.@r > 9){ bonus3 bAutoSpell,"GC_CROSSIMPACT",1,10; }
+      bonus2 bSkillAtk,"AS_SONICBLOW",(10*getskilllv("AS_LEFT")); .@r = getrefine(); if(.@r > 6){ bonus bAtk,20; bonus bHit,5; } if(.@r > 9){ bonus3 bAutoSpell,"AS_SONICBLOW",1,10; }
   - Id: 5907
     AegisName: Sea_Captain_Hat
     Name: "Sea Captain Hat [1]"
@@ -49076,7 +49075,7 @@ Body:
     Refineable: true
     View: 1128
     Script: |
-      bonus2 bSkillAtk,"NC_AXEBOOMERANG",20; .@dmg = 20; .@r = getrefine(); if (.@r>=7) { .@dmg += getskilllv("BS_WEAPONRESEARCH"); } if (.@r>=9) { .@dmg += getskilllv("NC_TRAININGAXE"); } bonus2 bSkillAtk,"NC_AXETORNADO",.@dmg;
+      bonus2 bSkillAtk,"MC_CARTREVOLUTION",20; .@dmg = 20; .@r = getrefine(); if (.@r>=7) { .@dmg += getskilllv("BS_WEAPONRESEARCH"); } if (.@r>=9) { .@dmg += getskilllv("BS_AXE"); } bonus2 bSkillAtk,"MC_MAMMONITE",.@dmg;
   - Id: 5909
     AegisName: C_Valkyrie_Circlet
     Name: Costume Valkyrie Circlet
@@ -49145,7 +49144,7 @@ Body:
     EquipLevelMin: 70
     View: 1202
     Script: |
-      .@dex = readparam(bDex); .@luk = readparam(bLuk); .@critical = 3 + (.@luk / 10); .@critical_dmg = 3 - (.@dex/10) * 2; .@sub_arrowstorm = 10; .@sub_gateofhell = 10; bonus bBaseAtk,(.@luk/10)*2; bonus bMatk,(.@luk / 10) * 2; if (.@luk > 107) { .@critical += 5; .@critical_dmg += 10; } if (.@luk > 119) { .@critical += 10; .@critical_dmg += 17; .@sub_arrowstorm += 30; .@sub_gateofhell += 30; } bonus bCritical,.@critical; bonus bCritAtkRate,.@critical_dmg; bonus2 bSubSkill,"RA_ARROWSTORM",.@sub_arrowstorm; bonus2 bSubSkill,"SR_GATEOFHELL",.@sub_gateofhell;
+      .@dex = readparam(bDex); .@luk = readparam(bLuk); .@critical = 3 + (.@luk / 10); .@critical_dmg = 3 - (.@dex/10) * 2; .@sub_arrowstorm = 10; .@sub_gateofhell = 10; bonus bBaseAtk,(.@luk/10)*2; bonus bMatk,(.@luk / 10) * 2; if (.@luk > 107) { .@critical += 5; .@critical_dmg += 10; } if (.@luk > 119) { .@critical += 10; .@critical_dmg += 17; .@sub_arrowstorm += 30; .@sub_gateofhell += 30; } bonus bCritical,.@critical; bonus bCritAtkRate,.@critical_dmg; bonus2 bSubSkill,"AC_SHOWER",.@sub_arrowstorm; bonus2 bSubSkill,"MO_EXTREMITYFIST",.@sub_gateofhell;
   - Id: 5919
     AegisName: Camellia_Hair_Pin
     Name: Camellia Hair Pin
@@ -49174,7 +49173,7 @@ Body:
     EquipLevelMin: 10
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bHealPower,10+((.@r/2) * 2); bonus2 bSkillUseSP,"AB_CHEAL",(.@r * 5);
+      .@r = getrefine(); bonus bHealPower,10+((.@r/2) * 2); bonus2 bSkillUseSP,"AL_HEAL",(.@r * 5);
   - Id: 5943
     AegisName: Owlviscount_Silk_Hat
     Name: "Owl Viscount Silk Hat [1]"
@@ -60163,6 +60162,13 @@ Body:
     AegisName: Fire_Golem_Egg
     Name: Fire Golem Egg
     Type: PetEgg
+  - Id: 9785
+    AegisName: Frozen_Box_IL
+    Name: Frozen Refine Box
+    Type: DelayConsume
+    Weight: 10
+    Script: |
+      laphine_upgrade();
   - Id: 10001
     AegisName: Skull_Helm
     Name: Skull Helm
@@ -70975,7 +70981,7 @@ Body:
     EquipLevelMin: 102
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus2 bSkillAtk,"SC_FATALMENACE",30+(.@r*2); bonus bMatkRate,(.@r*3);
+      .@r = getrefine(); bonus2 bSkillAtk,"RG_BACKSTAP",30+(.@r*2); bonus bMatkRate,(.@r*3);
   - Id: 13062
     AegisName: Ancient_Dagger
     Name: Ancient Dagger
@@ -71441,7 +71447,7 @@ Body:
     EquipLevelMin: 100
     Refineable: true
     Script: |
-      bonus2 bAddRace,RC_Undead,10; .@r = getrefine(); if(.@r>=9) { .@dmg = 5; if(.@r>=12) { .@dmg += 7; } bonus2 bAddClass,Class_All,.@dmg; }
+      bonus2 bAddRace,RC_Undead,10; .@r = getrefine(); if(.@r>=9) { .@dmg = 5; if(getallrefine() >= 24) { .@dmg += 7; } bonus2 bAddClass,Class_All,.@dmg; }
   - Id: 13096
     AegisName: Half_BF_Dagger2
     Name: Half BF Dagger2
@@ -71857,7 +71863,7 @@ Body:
     EquipLevelMin: 99
     Refineable: true
     Script: |
-      bonus2 bSkillAtk,"GS_DESPERADO",20; bonus2 bSkillAtk,"RL_FALLEN_ANGEL",20;
+      bonus2 bSkillAtk,"GS_DESPERADO",20; bonus2 bSkillAtk,"GS_MADNESSCANCEL",20;
   - Id: 13122
     AegisName: ALTAIR_ARES
     Name: Altair & Ares
@@ -72013,7 +72019,7 @@ Body:
     EquipLevelMin: 150
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bAspdRate,10; bonus bLongAtkRate,(.@r/2)*5 + (.@r > 11 ? 5 : 0); if(.@r > 6){ bonus bAspdRate,5; } if(.@r > 8){ bonus2 bSkillAtk,"RL_FIREDANCE",25; }
+      .@r = getrefine(); bonus bAspdRate,10; bonus bLongAtkRate,(.@r/2)*5 + (getallrefine() >= 24 ? 5 : 0); if(.@r > 6){ bonus bAspdRate,5; } if(.@r > 8){ bonus2 bSkillAtk,"GS_RAPIDSHOWER",25; }
   - Id: 13150
     AegisName: Branch
     Name: "Branch [3]"
@@ -73948,7 +73954,7 @@ Body:
     EquipLevelMin: 110
     Refineable: true
     Script: |
-      bonus bMatk,50; bonus2 bSkillAtk,"KO_HUUMARANKA",20;
+      bonus bMatk,50; bonus2 bSkillAtk,"NJ_HUUMA",20;
   - Id: 13314
     AegisName: Huuma_Fluttering_Snow
     Name: Wave Huuma Shuriken
@@ -74137,7 +74143,7 @@ Body:
     EquipLevelMin: 100
     Refineable: true
     Script: |
-      .@r = getrefine(); .@bonus = 20; if (.@r>=7) { bonus bLongAtkRate,10; } if (.@r>=9) { .@bonus += 20; } bonus2 bSkillAtk,"KO_HUUMARANKA",.@bonus;
+      .@r = getrefine(); .@bonus = 20; if (.@r>=7) { bonus bLongAtkRate,10; } if (.@r>=9) { .@bonus += 20; } bonus2 bSkillAtk,"NJ_HUUMA",.@bonus;
   - Id: 13337
     AegisName: Huuma_Flutter_Snow_IL
     Name: "Illusion Huuma Fluttering Snow [2]"
@@ -74173,7 +74179,7 @@ Body:
     EquipLevelMin: 120
     Refineable: true
     Script: |
-      bonus bDex,2; bonus2 bSkillAtk,"KO_HAPPOKUNAI",(9*getrefine());
+      bonus bDex,2; bonus2 bSkillAtk,"NJ_KUNAI",(9*getrefine());
   - Id: 13345
     AegisName: Huuma_Shuriken_Clearness
     Name: "Huuma Shuriken Clearness [2]"
@@ -74191,7 +74197,7 @@ Body:
     EquipLevelMin: 100
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bLongAtkRate,2*(.@r/3); bonus bBaseAtk,10*(.@r/2); if (.@r >= 7) { bonus2 bSkillAtk,"KO_HUUMARANKA",30; if (.@r >= 9) { bonus2 bSkillCooldown,"KO_HUUMARANKA",-1000; if (.@r >= 11) { bonus2 bAddEle,Ele_Fire,15; bonus2 bAddEle,Ele_Dark,15; bonus2 bAddRace,RC_Undead,30; bonus2 bAddRace,RC_Demon,30; } } }
+      .@r = getrefine(); bonus bLongAtkRate,2*(.@r/3); bonus bBaseAtk,10*(.@r/2); if (.@r >= 7) { bonus2 bSkillAtk,"NJ_HUUMA",30; if (.@r >= 9) { bonus bDelayrate,-5; if (getallrefine() >= 22) { bonus2 bAddEle,Ele_Fire,15; bonus2 bAddEle,Ele_Dark,15; bonus2 bAddRace,RC_Undead,30; bonus2 bAddRace,RC_Demon,30; } } }
   - Id: 13400
     AegisName: Cutlas_
     Name: "Cutlus [1]"
@@ -75064,7 +75070,7 @@ Body:
     EquipLevelMin: 120
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bSPDrainValue,-1; bonus bUnbreakableWeapon; if (.@r >= 12) { .@val = 20; } bonus2 bSPVanishRate,(80+(20*.@r)),(30+.@val);
+      .@r = getrefine(); bonus bSPDrainValue,-1; bonus bUnbreakableWeapon; if (getallrefine() >= 24) { .@val = 20; } bonus2 bSPVanishRate,(80+(20*.@r)),(30+.@val);
   - Id: 13493
     AegisName: Cannon_Rapier-OS
     Name: "Cannon Rapier-OS [2]"
@@ -75082,7 +75088,7 @@ Body:
     EquipLevelMin: 130
     Refineable: true
     Script: |
-      bonus bMatk,150; .@r = getrefine(); bonus3 bAutoSpell,"MG_FIREBALL",min(.@r,10),1; /* unknown rate */ if (.@r >= 7) { bonus bAspdRate,7; if (.@r >= 9) { bonus2 bSkillAtk,"MG_FIREBALL",30; if (.@r >= 11) { bonus3 bAutoSpell,"WL_HELLINFERNO",3,1; /* unknown rate */ } } }
+      bonus bMatk,150; .@r = getrefine(); bonus3 bAutoSpell,"MG_FIREBALL",min(.@r,10),1; /* unknown rate */ if (.@r >= 7) { bonus bAspdRate,7; if (.@r >= 9) { bonus2 bSkillAtk,"MG_FIREBALL",30; if (getallrefine() >= 22) { bonus3 bAutoSpell,"WZ_FIREPILLAR",3,1; /* unknown rate */ } } }
   - Id: 13500
     AegisName: Insurance60_Package
     Name: Life Insurrance Box
@@ -84706,7 +84712,7 @@ Body:
     EquipLevelMin: 100
     Refineable: true
     Script: |
-      bonus bDefEle,Ele_Holy; bonus bMdef,10; bonus bInt,1; bonus2 bSkillUseSP,"AB_CLEMENTIA",50;
+      bonus bDefEle,Ele_Holy; bonus bMdef,10; bonus bInt,1; bonus2 bSkillUseSP,"AL_BLESSING",50;
   - Id: 15030
     AegisName: Robe_Of_Judgement
     Name: Robe Of Judgement
@@ -85055,7 +85061,7 @@ Body:
     EquipLevelMin: 100
     Refineable: true
     Script: |
-      bonus bAgi,1; bonus4 bAutoSpellWhenHit,"KO_ZANZOU",1,50,1;
+      bonus bAgi,1; bonus4 bAutoSpellWhenHit,"NJ_UTSUSEMI",1,50,1;
   - Id: 15056
     AegisName: Special_Ninja_Suit_
     Name: "Special Ninja Suit [1]"
@@ -85334,7 +85340,7 @@ Body:
     EquipLevelMin: 160
     Refineable: true
     Script: |
-      bonus bMdef,5; bonus bMaxHPrate,5; bonus bMaxSPrate,5; bonus bMatk,10; bonus bBaseAtk,10; bonus bHit,10; bonus bFlee,10; bonus2 bSkillAtk,"LG_BANISHINGPOINT",10; bonus2 bSkillAtk,"RK_HUNDREDSPEAR",10; .@r = getrefine(); bonus5 bAutoSpell,"AL_HEAL",10,50+.@r,BF_SHORT,0; bonus5 bAutoSpell,"WZ_STORMGUST",10,50+.@r,BF_SHORT,1;
+      bonus bMdef,5; bonus bMaxHPrate,5; bonus bMaxSPrate,5; bonus bMatk,10; bonus bBaseAtk,10; bonus bHit,10; bonus bFlee,10; bonus2 bSkillAtk,"CR_HOLYCROSS",10; bonus2 bSkillAtk,"KN_PIERCE",10; .@r = getrefine(); bonus5 bAutoSpell,"AL_HEAL",10,50+.@r,BF_SHORT,0; bonus5 bAutoSpell,"WZ_STORMGUST",10,50+.@r,BF_SHORT,1;
   - Id: 15094
     AegisName: Hero_Magic_Coat
     Name: "Hero Magic Coat [1]"
@@ -85349,7 +85355,7 @@ Body:
     EquipLevelMin: 160
     Refineable: true
     Script: |
-      bonus bMatk,10; bonus bMaxHPrate,5; bonus bMaxSPrate,5; bonus bFlee,10; bonus2 bSkillAtk,"WL_CRIMSONROCK",10; bonus2 bSkillAtk,"SO_PSYCHIC_WAVE",10; .@r = getrefine(); if (.@r) { bonus bFixedCastrate,21-.@r/2; bonus bNoCastCancel2; bonus bMdef,.@r/2; }
+      bonus bMatk,10; bonus bMaxHPrate,5; bonus bMaxSPrate,5; bonus bFlee,10; bonus2 bSkillAtk,"WZ_METEOR",10; bonus2 bSkillAtk,"PF_SOULBURN",10; .@r = getrefine(); if (.@r) { bonus bFixedCastrate,21-.@r/2; bonus bNoCastCancel2; bonus bMdef,.@r/2; }
   - Id: 15095
     AegisName: Hero_Judgement_Shawl
     Name: "Hero Judgement Shawl [1]"
@@ -85364,7 +85370,7 @@ Body:
     EquipLevelMin: 160
     Refineable: true
     Script: |
-      bonus bMaxHPrate,5; bonus bMaxSPrate,5; bonus bMatk,10; bonus bBaseAtk,10; bonus bHit,10; bonus bFlee,10; bonus2 bSkillAtk,"AB_JUDEX",10; bonus2 bSkillAtk,"AB_ADORAMUS",10; bonus2 bSkillAtk,"SR_DRAGONCOMBO",10; bonus2 bSkillAtk,"SR_SKYNETBLOW",10; bonus2 bSkillAtk,"SR_EARTHSHAKER",10; .@r = getrefine(); bonus5 bAutoSpell,"PR_KYRIE",10,50+.@r,BF_SHORT,0; bonus5 bAutoSpell,"PR_LEXAETERNA",1,50+.@r,BF_MAGIC,1;
+      bonus bMaxHPrate,5; bonus bMaxSPrate,5; bonus bMatk,10; bonus bBaseAtk,10; bonus bHit,10; bonus bFlee,10; bonus2 bSkillAtk,"AL_HOLYLIGHT",10; bonus2 bSkillAtk,"PR_MAGNUS",10; bonus2 bSkillAtk,"MO_TRIPLEATTACK",10; bonus2 bSkillAtk,"MO_CHAINCOMBO",10; bonus2 bSkillAtk,"MO_INVESTIGATE",10; .@r = getrefine(); bonus5 bAutoSpell,"PR_KYRIE",10,50+.@r,BF_SHORT,0; bonus5 bAutoSpell,"PR_LEXAETERNA",1,50+.@r,BF_MAGIC,1;
   - Id: 15096
     AegisName: Hero_Trade_Mail
     Name: "Hero Trade Mail [1]"
@@ -85394,7 +85400,7 @@ Body:
     EquipLevelMin: 160
     Refineable: true
     Script: |
-      bonus bMaxHPrate,5; bonus bMaxSPrate,5; bonus2 bSkillAtk,"SC_FATALMENACE",10; bonus2 bSkillAtk,"SC_TRIANGLESHOT",10; bonus2 bSkillAtk,"GC_CROSSIMPACT",10; bonus2 bSkillAtk,"GC_CROSSRIPPERSLASHER",10; autobonus "{ bonus bCritical,20; bonus bFlee,20; bonus2 bAddClass,Class_All,10; bonus bMatkRate,10; }",(5+getrefine())*10,10000,BF_WEAPON;
+      bonus bMaxHPrate,5; bonus bMaxSPrate,5; bonus2 bSkillAtk,"RG_BACKSTAP",10; bonus2 bSkillAtk,"AC_DOUBLE",10; bonus2 bSkillAtk,"AS_SONICBLOW",10; bonus2 bSkillAtk,"ASC_METEORASSAULT",10; autobonus "{ bonus bCritical,20; bonus bFlee,20; bonus2 bAddClass,Class_All,10; bonus bMatkRate,10; }",(5+getrefine())*10,10000,BF_WEAPON;
   - Id: 15098
     AegisName: Hero_Taget_Suits
     Name: "Hero Target Suit [1]"
@@ -85834,7 +85840,7 @@ Body:
     EquipLevelMin: 100
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bDex,5; bonus bLongAtkRate,3*(.@r/2); if (.@r>=9) bonus2 bSkillAtk,"SC_TRIANGLESHOT",20;
+      .@r = getrefine(); bonus bDex,5; bonus bLongAtkRate,3*(.@r/2); if (.@r>=9) bonus2 bSkillAtk,"AC_DOUBLE",20;
   - Id: 15177
     AegisName: Elemental_Robe
     Name: Elemental Robe
@@ -85862,7 +85868,7 @@ Body:
     EquipLevelMin: 100
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bflee,5*(.@r/2); if (.@r>=9) bonus2 bSkillAtk,"KO_HAPPOKUNAI",20;
+      .@r = getrefine(); bonus bflee,5*(.@r/2); if (.@r>=9) bonus2 bSkillAtk,"NJ_KUNAI",20;
   - Id: 15179
     AegisName: Mine_Worker's_Vest
     Name: Mine Worker's Vest
@@ -85958,7 +85964,7 @@ Body:
     Locations: {Armor: true}
     Refineable: true
     Script: |
-      bonus2 bExpAddClass,Class_All,5; bonus2 bDropAddClass,Class_All,5; .@r = getrefine(); bonus bMaxHP,100*.@r; bonus bMaxSP,20*.@r; bonus bMaxHPrate,(3*(.@r>=7)+5*(.@r>=9)); bonus bMaxSPrate,(3*(.@r>=7)+5*(.@r>=9)); if(.@r>=12){ bonus bHPrecovRate,100; bonus bSPrecovRate,100; }
+      bonus2 bExpAddClass,Class_All,5; bonus2 bDropAddClass,Class_All,5; .@r = getrefine(); bonus bMaxHP,100*.@r; bonus bMaxSP,20*.@r; bonus bMaxHPrate,(3*(.@r>=7)+5*(.@r>=9)); bonus bMaxSPrate,(3*(.@r>=7)+5*(.@r>=9)); if(getallrefine() >= 24){ bonus bHPrecovRate,100; bonus bSPrecovRate,100; }
   - Id: 15189
     AegisName: Einherjar_Armor
     Name: "Einherjar Armor [1]"
@@ -86000,7 +86006,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); if (.@r >= 13) { .@val = 11; } else if (.@r >= 11) { .@val = 7; } else if (.@r >= 8) { .@val = 5; } if (readparam(bStr) >= 125) { .@val += .@r; } if (.@val) { bonus2 bAddClass,Class_All,.@val; }
+      .@r = getrefine(); if (getallrefine() >= 26) { .@val = 11; } else if (getallrefine() >= 22) { .@val = 7; } else if (.@r >= 8) { .@val = 5; } if (readparam(bStr) >= 125) { .@val += .@r; } if (.@val) { bonus2 bAddClass,Class_All,.@val; }
   - Id: 15348
     AegisName: Goibne_Armor_IL
     Name: "Illusion Goibne Armor [1]"
@@ -86114,7 +86120,7 @@ Body:
     EquipLevelMin: 130
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus2 bAddSize,Size_Medium,10; bonus2 bAddSize,Size_Large,10; bonus2 bMagicAddSize,Size_Medium,10; bonus2 bMagicAddSize,Size_Large,10; if(.@r > 6){ bonus2 bAddEle,Ele_Fire,10; bonus2 bAddEle,Ele_Dark,10; bonus2 bMagicAddEle,Ele_Fire,10; bonus2 bMagicAddEle,Ele_Dark,10; } if(.@r > 8){ bonus2 bSubRace,RC_Dragon,15; bonus2 bSubRace,RC_Formless,15; } if(.@r > 10){ bonus2 bSubSize,Size_Medium,10; bonus2 bSubSize,Size_Large,10; }
+      .@r = getrefine(); bonus2 bAddSize,Size_Medium,10; bonus2 bAddSize,Size_Large,10; bonus2 bMagicAddSize,Size_Medium,10; bonus2 bMagicAddSize,Size_Large,10; if(.@r > 6){ bonus2 bAddEle,Ele_Fire,10; bonus2 bAddEle,Ele_Dark,10; bonus2 bMagicAddEle,Ele_Fire,10; bonus2 bMagicAddEle,Ele_Dark,10; } if(.@r > 8){ bonus2 bSubRace,RC_Dragon,15; bonus2 bSubRace,RC_Formless,15; } if(getallrefine() >= 22){ bonus2 bSubSize,Size_Medium,10; bonus2 bSubSize,Size_Large,10; }
   - Id: 15389
     AegisName: King_Schmidt_Manteau
     Name: King Schmidt's Manteau
@@ -86128,7 +86134,7 @@ Body:
     EquipLevelMin: 130
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus2 bAddEle,Ele_Fire,(.@r/3)*2; bonus2 bAddEle,Ele_Dark,(.@r/3)*2; bonus2 bMagicAddEle,Ele_Fire,(.@r/3)*2; bonus2 bMagicAddEle,Ele_Dark,(.@r/3)*2; if(.@r > 6){ bonus2 bSubRace,RC_Dragon,5; bonus2 bSubRace,RC_Formless,5; } if(.@r > 10){ bonus2 bAddRace,RC_Dragon,15; bonus2 bAddRace,RC_Formless,15; bonus2 bMagicAddRace,RC_Dragon,15; bonus2 bMagicAddRace,RC_Formless,15; }
+      .@r = getrefine(); bonus2 bAddEle,Ele_Fire,(.@r/3)*2; bonus2 bAddEle,Ele_Dark,(.@r/3)*2; bonus2 bMagicAddEle,Ele_Fire,(.@r/3)*2; bonus2 bMagicAddEle,Ele_Dark,(.@r/3)*2; if(.@r > 6){ bonus2 bSubRace,RC_Dragon,5; bonus2 bSubRace,RC_Formless,5; } if(getallrefine() >= 22){ bonus2 bAddRace,RC_Dragon,15; bonus2 bAddRace,RC_Formless,15; bonus2 bMagicAddRace,RC_Dragon,15; bonus2 bMagicAddRace,RC_Formless,15; }
   - Id: 15825
     AegisName: C_Black_Musang_J
     Name: Costume Black Musang Hat
@@ -86506,7 +86512,7 @@ Body:
     EquipLevelMin: 102
     Refineable: true
     Script: |
-      bonus bMatk,100; .@r = getrefine(); if(.@r>=6){ bonus2 bSkillAtk,"GN_CRAZYWEED",20+((.@r-5)*2); bonus2 bSkillAtk,"GN_DEMONIC_FIRE",20+((.@r-5)*2); } else { bonus2 bSkillAtk,"GN_CRAZYWEED",20; bonus2 bSkillAtk,"GN_DEMONIC_FIRE",20; }
+      bonus bMatk,100; .@r = getrefine(); if(.@r>=6){ bonus2 bSkillAtk,"AM_DEMONSTRATION",20+((.@r-5)*2); } else { bonus2 bSkillAtk,"AM_DEMONSTRATION",20; }
   - Id: 16011
     AegisName: Adventure_Mace
     Name: Adventure Mace
@@ -86613,7 +86619,7 @@ Body:
     EquipLevelMin: 100
     Refineable: true
     Script: |
-      bonus bAtkEle,Ele_Dark; .@r = getrefine(); bonus3 bAutoSpell,"WL_HELLINFERNO",1,(.@r?.@r*20:20);
+      bonus bAtkEle,Ele_Dark; .@r = getrefine(); bonus3 bAutoSpell,"WZ_FIREPILLAR",1,(.@r?.@r*20:20);
   - Id: 16018
     AegisName: Mace_Of_Judgement2
     Name: "Empowered Mace Of Judgement [1]"
@@ -86784,7 +86790,7 @@ Body:
     EquipLevelMin: 100
     Refineable: true
     Script: |
-      bonus2 bAddRace,RC_Demon,10; bonus2 bAddRace,RC_Undead,10; .@r = getrefine(); bonus2 bAddClass,Class_All,(.@r>=12?12:(.@r>=9?5:0));
+      bonus2 bAddRace,RC_Demon,10; bonus2 bAddRace,RC_Undead,10; .@r = getrefine(); bonus2 bAddClass,Class_All,(getallrefine() >= 24?12:(.@r>=9?5:0));
   - Id: 16028
     AegisName: Thanos_Hammer
     Name: "Thanos Hammer [1]"
@@ -87138,7 +87144,7 @@ Body:
     EquipLevelMin: 120
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bAspd,(.@r/2); bonus2 bSkillAtk,"AB_DUPLELIGHT",(3*.@r);
+      .@r = getrefine(); bonus bAspd,(.@r/2); bonus2 bAddRace,RC_Undead,(3*.@r);
   - Id: 16088
     AegisName: Sapphire_Mace-OS
     Name: "Sapphire Mace-OS [2]"
@@ -87156,7 +87162,7 @@ Body:
     EquipLevelMin: 130
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bUnbreakableWeapon; bonus2 bAddClass,Class_All,3; if (.@r >= 7) { bonus bVariableCastrate,-7; if (.@r >= 9) { bonus2 bSkillAtk,"GN_CARTCANNON",20; if (.@r >= 11) { bonus bLongAtkRate,15; } } }
+      .@r = getrefine(); bonus bUnbreakableWeapon; bonus2 bAddClass,Class_All,3; if (.@r >= 7) { bonus bVariableCastrate,-7; if (.@r >= 9) { bonus2 bSkillAtk,"AM_ACIDTERROR",20; if (getallrefine() >= 22) { bonus bLongAtkRate,15; } } }
   - Id: 16089
     AegisName: Ultio-OS
     Name: "Ultio-OS [2]"
@@ -87174,7 +87180,7 @@ Body:
     EquipLevelMin: 130
     Refineable: true
     Script: |
-      bonus bMatk,170; .@r = getrefine(); bonus bMatkRate,3; if (.@r >= 7) { bonus bAspdRate,7; if (.@r >= 9) { bonus2 bSkillAtk,"AB_ADORAMUS",20; if (.@r >= 11) { bonus2 bMagicAtkEle,Ele_Holy,15; } } }
+      bonus bMatk,170; .@r = getrefine(); bonus bMatkRate,3; if (.@r >= 7) { bonus bAspdRate,7; if (.@r >= 9) { bonus2 bSkillAtk,"PR_MAGNUS",20; if (getallrefine() >= 22) { bonus2 bMagicAtkEle,Ele_Holy,15; } } }
   - Id: 16092
     AegisName: Engine_Pilebuncker
     Name: Engine Pilebuncker
@@ -87192,7 +87198,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bUnbreakableWeapon; bonus bAspdRate,.@r; bonus2 bSkillAtk,"NC_VULCANARM",10; if (.@r>=9) { bonus2 bSkillAtk,"NC_ARMSCANNON",15; bonus2 bSkillAtk,"NC_BOOSTKNUCKLE",15; } if (.@r>=11) bonus2 bSkillAtk,"NC_VULCANARM",15;
+      .@r = getrefine(); bonus bUnbreakableWeapon; bonus bAspdRate,.@r; if (.@r>=9) { bonus2 bSkillAtk,"WS_CARTTERMINATION",15; } if (getallrefine() >= 22) {}
   - Id: 16093
     AegisName: Coolant_Injection
     Name: Coolant Injection
@@ -87210,7 +87216,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bUnbreakableWeapon; bonus bLongAtkRate,10; bonus2 bAddClass,Class_All,.@r; if (.@r>=9) bonus2 bSkillAtk,"GN_CARTCANNON",25; if (.@r>=11) bonus bLongAtkRate,15;
+      .@r = getrefine(); bonus bUnbreakableWeapon; bonus bLongAtkRate,10; bonus2 bAddClass,Class_All,.@r; if (.@r>=9) bonus2 bSkillAtk,"AM_ACIDTERROR",25; if (getallrefine() >= 22) bonus bLongAtkRate,15;
   - Id: 16094
     AegisName: Gene_Rod
     Name: Gene Rod
@@ -87228,7 +87234,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bUnbreakableWeapon; bonus bBaseAtk,4*.@r; bonus2 bSkillAtk,"GN_CRAZYWEED",20; if (.@r>=9) bonus2 bSkillAtk,"GN_CRAZYWEED",30; if (.@r>=11) bonus2 bSkillCooldown,"GN_CRAZYWEED",-2000;
+      .@r = getrefine(); bonus bUnbreakableWeapon; bonus bBaseAtk,4*.@r; bonus2 bSkillAtk,"AM_DEMONSTRATION",20; if (.@r>=9) bonus2 bSkillAtk,"AM_DEMONSTRATION",30; if (getallrefine() >= 22) bonus bDelayrate,-10;
   - Id: 16095
     AegisName: Lucis_Flail
     Name: Lucis Flail
@@ -87246,7 +87252,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bUnbreakableWeapon; bonus bAspd,1; bonus bMatk,160+4*.@r; if (.@r>=9) { bonus2 bSkillAtk,"AB_DUPLELIGHT",40; } if (.@r>=11) bonus3 bAutoSpell,"AB_JUDEX",max(2,getskilllv("AB_JUDEX")),50; /* Unknow Rates */
+      .@r = getrefine(); bonus bUnbreakableWeapon; bonus bAspd,1; bonus bMatk,160+4*.@r; if (.@r>=9) { bonus2 bAddRace,RC_Undead,40; } if (getallrefine() >= 22) bonus3 bAutoSpell,"AL_HOLYLIGHT",max(2,getskilllv("AL_HOLYLIGHT")),50; /* Unknow Rates */
   - Id: 16096
     AegisName: Bright_Pendulum
     Name: Bright Pendulum
@@ -87264,7 +87270,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bUnbreakableWeapon; bonus bBaseAtk,4*.@r; bonus bVariableCastrate,-10; if (.@r>=9) { bonus2 bSkillAtk,"MO_FINGEROFFENSIVE",50; bonus2 bSkillAtk,"MO_INVESTIGATE",50; } if (.@r>=11) bonus2 bAddClass,Class_All,10;
+      .@r = getrefine(); bonus bUnbreakableWeapon; bonus bBaseAtk,4*.@r; bonus bVariableCastrate,-10; if (.@r>=9) { bonus2 bSkillAtk,"MO_FINGEROFFENSIVE",50; bonus2 bSkillAtk,"MO_INVESTIGATE",50; } if (getallrefine() >= 22) bonus2 bAddClass,Class_All,10;
   - Id: 16131
     AegisName: Lady_Tanee_Doll_Box
     Name: Lady Tanee Doll Box
@@ -93244,7 +93250,7 @@ Body:
     EquipLevelMin: 105
     Refineable: true
     Script: |
-      bonus bMatk,100; bonus bInt,4; bonus2 bSkillUseSP,"WM_SEVERE_RAINSTORM",10;
+      bonus bMatk,100; bonus bInt,4; bonus2 bSkillUseSP,"CG_ARROWVULCAN",10;
   - Id: 18104
     AegisName: Adventure_Bow
     Name: Adventure Bow
@@ -93334,7 +93340,7 @@ Body:
     EquipLevelMin: 100
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus2 bSkillAtk,"SC_TRIANGLESHOT",(.@r*2); bonus2 bSkillUseSP,"SC_TRIANGLESHOT",(.@r*2);
+      .@r = getrefine(); bonus2 bSkillAtk,"AC_DOUBLE",(.@r*2); bonus2 bSkillUseSP,"AC_DOUBLE",(.@r*2);
   - Id: 18110
     AegisName: Big_CrossBow
     Name: "Giant Crossbow [2]"
@@ -93352,7 +93358,7 @@ Body:
     EquipLevelMin: 110
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus2 bSkillAtk,"RA_ARROWSTORM",(.@r*5); bonus2 bSkillUseSP,"RA_ARROWSTORM",-(.@r*5); if(readparam(bAgi)>=120){ bonus bAspd,1; }
+      .@r = getrefine(); bonus2 bSkillAtk,"AC_SHOWER",(.@r*5); bonus2 bSkillUseSP,"AC_SHOWER",-(.@r*5); if(readparam(bAgi)>=120){ bonus bAspd,1; }
   - Id: 18111
     AegisName: Creeper_Bow
     Name: "Creeper Bow [2]"
@@ -93523,7 +93529,7 @@ Body:
     EquipLevelMin: 100
     Refineable: true
     Script: |
-      bonus2 bAddRace,RC_Demon,10; bonus2 bAddRace,RC_Undead,10; .@r = getrefine(); bonus2 bAddClass,Class_All,(.@r>=12?12:(.@r>=9?5:0));
+      bonus2 bAddRace,RC_Demon,10; bonus2 bAddRace,RC_Undead,10; .@r = getrefine(); bonus2 bAddClass,Class_All,(getallrefine() >= 24?12:(.@r>=9?5:0));
   - Id: 18121
     AegisName: Sinister_Bow
     Name: "Bow of Vicious Mind [1]"
@@ -93578,7 +93584,7 @@ Body:
     EquipLevelMin: 130
     Refineable: true
     Script: |
-      bonus bLongAtkRate,30; bonus2 bSkillCooldown,"WM_SEVERE_RAINSTORM",-2000; bonus2 bSkillUseSP,"WM_SEVERE_RAINSTORM",15;
+      bonus bLongAtkRate,30; bonus bDelayrate,-10; bonus2 bSkillUseSP,"CG_ARROWVULCAN",15;
   - Id: 18124
     AegisName: Half_BF_Bow1
     Name: Half BF Bow1
@@ -93822,7 +93828,7 @@ Body:
     EquipLevelMin: 120
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bCritical,.@r; if (.@r >= 7) { bonus bAspdRate,10; if (.@r >= 9) { bonus bCritAtkRate,15; if (.@r >= 11) { bonus2 bAddRace,RC_Insect,30; bonus2 bAddRace,RC_Brute,30; } } }
+      .@r = getrefine(); bonus bCritical,.@r; if (.@r >= 7) { bonus bAspdRate,10; if (.@r >= 9) { bonus bCritAtkRate,15; if (getallrefine() >= 22) { bonus2 bAddRace,RC_Insect,30; bonus2 bAddRace,RC_Brute,30; } } }
   - Id: 18178
     AegisName: Virtual_Bow-OS
     Name: "Virtual Bow-OS [2]"
@@ -93840,7 +93846,7 @@ Body:
     EquipLevelMin: 130
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus2 bAddClass,Class_All,3; if (.@r >= 7) { bonus bLongAtkRate,7; if (.@r >= 9) { .@dmg = 30; if (.@r >= 11) { .@dmg += 20; } bonus2 bSkillAtk,"RA_ARROWSTORM",.@dmg; } }
+      .@r = getrefine(); bonus2 bAddClass,Class_All,3; if (.@r >= 7) { bonus bLongAtkRate,7; if (.@r >= 9) { .@dmg = 30; if (getallrefine() >= 22) { .@dmg += 20; } bonus2 bSkillAtk,"AC_SHOWER",.@dmg; } }
   - Id: 18179
     AegisName: MH-P89-OS
     Name: "MH-P89-OS [2]"
@@ -93858,7 +93864,7 @@ Body:
     EquipLevelMin: 130
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus2 bAddClass,Class_All,3; if (.@r >= 7) { bonus bLongAtkRate,7; if (.@r >= 9) { bonus2 bSkillCooldown,"WM_SEVERE_RAINSTORM",-2000; if (.@r >= 11) { bonus2 bSkillAtk,"WM_SEVERE_RAINSTORM",15; } } }
+      .@r = getrefine(); bonus2 bAddClass,Class_All,3; if (.@r >= 7) { bonus bLongAtkRate,7; if (.@r >= 9) { bonus bDelayrate,-10; if (getallrefine() >= 22) { bonus2 bSkillAtk,"CG_ARROWVULCAN",15; } } }
   - Id: 18180
     AegisName: AC-B44-OS
     Name: "AC-B44-OS [2]"
@@ -93876,7 +93882,7 @@ Body:
     EquipLevelMin: 130
     Refineable: true
     Script: |
-      bonus bMatk,135; .@r = getrefine(); .@dmg = 5; if (.@r >= 7) { bonus bAspdRate,7; if (.@r >= 9) { bonus2 bSkillAtk,"SC_TRIANGLESHOT",15; if (.@r >= 11) { .@dmg += 10; } } } bonus2 bWeaponDamageRate,W_BOW,.@dmg;
+      bonus bMatk,135; .@r = getrefine(); .@dmg = 5; if (.@r >= 7) { bonus bAspdRate,7; if (.@r >= 9) { bonus2 bSkillAtk,"AC_DOUBLE",15; if (getallrefine() >= 22) { .@dmg += 10; } } } bonus2 bWeaponDamageRate,W_BOW,.@dmg;
   - Id: 18184
     AegisName: Rapid_Fire
     Name: Rapid Fire
@@ -93894,7 +93900,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bLongAtkRate,10; bonus bBaseAtk,4*.@r; if (.@r>=11) .@val = 35; else if (.@r>=9) .@val = 20; bonus2 bSkillAtk,"SC_TRIANGLESHOT",.@val;
+      .@r = getrefine(); bonus bLongAtkRate,10; bonus bBaseAtk,4*.@r; if (getallrefine() >= 22) .@val = 35; else if (.@r>=9) .@val = 20; bonus2 bSkillAtk,"AC_DOUBLE",.@val;
   - Id: 18185
     AegisName: Sharp_Star_Bow
     Name: Sharp Star Bow
@@ -93912,7 +93918,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bCritical,5; bonus bCritAtkRate,.@r; if (.@r>=9) bonus bLongAtkRate,7; if (.@r>=11) bonus2 bSkillAtk,"SN_SHARPSHOOTING",10;
+      .@r = getrefine(); bonus bCritical,5; bonus bCritAtkRate,.@r; if (.@r>=9) bonus bLongAtkRate,7; if (getallrefine() >= 22) bonus2 bSkillAtk,"SN_SHARPSHOOTING",10;
   - Id: 18186
     AegisName: Aiming_Bow
     Name: Aiming Bow
@@ -93930,7 +93936,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bDelayrate,-1*(5+.@r); if (.@r>=9) bonus2 bSkillAtk,"RA_AIMEDBOLT",30; if (.@r>=11) { bonus2 bSkillAtk,"RA_AIMEDBOLT",15; bonus2 bSkillCooldown,"RA_AIMEDBOLT",-1000; }
+      .@r = getrefine(); bonus bDelayrate,-1*(5+.@r); if (.@r>=9) bonus2 bSkillAtk,"SN_SHARPSHOOTING",30; if (getallrefine() >= 22) { bonus2 bSkillAtk,"SN_SHARPSHOOTING",15; bonus bDelayrate,-5; }
   - Id: 18187
     AegisName: Falken_Shooter
     Name: Falken Shooter
@@ -93948,7 +93954,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bLongAtkRate,10; bonus bBaseAtk,4*.@r; if (.@r>=9) bonus2 bSkillAtk,"RA_ARROWSTORM",25; if (.@r>=11) bonus2 bSkillCooldown,"RA_ARROWSTORM",-700;
+      .@r = getrefine(); bonus bLongAtkRate,10; bonus bBaseAtk,4*.@r; if (.@r>=9) bonus2 bSkillAtk,"AC_SHOWER",25; if (getallrefine() >= 22) bonus bDelayrate,-4;
   - Id: 18188
     AegisName: Wind_Gale
     Name: Wind Gale
@@ -93966,7 +93972,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bLongAtkRate,10+.@r; if (.@r>=9) bonus2 bSkillAtk,"WM_SEVERE_RAINSTORM",30; if (.@r>=11) bonus2 bSkillCooldown,"WM_SEVERE_RAINSTORM",-2000;
+      .@r = getrefine(); bonus bLongAtkRate,10+.@r; if (.@r>=9) bonus2 bSkillAtk,"CG_ARROWVULCAN",30; if (getallrefine() >= 22) bonus bDelayrate,-10;
   - Id: 18500
     AegisName: Cheer_Scarf6
     Name: Cheer Scarf6
@@ -95130,7 +95136,7 @@ Body:
     Refineable: true
     View: 755
     Script: |
-      .@r = getrefine(); bonus2 bAddMonsterDropItem,578,(.@r>10?200:100+(.@r*10));
+      .@r = getrefine(); bonus2 bAddMonsterDropItem,578,(getallrefine() >= 22?200:100+(.@r*10));
   - Id: 18590
     AegisName: Gemma_Hairband
     Name: "Gemma Hairband [1]"
@@ -95661,7 +95667,7 @@ Body:
     Refineable: true
     View: 784
     Script: |
-      bonus2 bAddRace,RC_DemiHuman,10; bonus2 bAddRace,RC_PLAYER_HUMAN,10; if (getrefine() > 10) { autobonus "{ bonus bAspdRate,100; }",10,7000,BF_WEAPON,"{ specialeffect2 EF_POTION_BERSERK; }"; }
+      bonus2 bAddRace,RC_DemiHuman,10; bonus2 bAddRace,RC_PLAYER_HUMAN,10; if (getallrefine() >= 22) { autobonus "{ bonus bAspdRate,100; }",10,7000,BF_WEAPON,"{ specialeffect2 EF_POTION_BERSERK; }"; }
   - Id: 18631
     AegisName: Ribbon_Chef_Hat
     Name: Ribbon Chef Hat
@@ -96201,7 +96207,7 @@ Body:
     Refineable: true
     View: 817
     Script: |
-      bonus bUnbreakableHelm; bonus bMdef,7; .@r = getrefine(); bonus bHealPower,(.@r>=7?5+(.@r-6):5); if (.@r>=9) { bonus bMatkRate, ( .@r >= 12 ? 12 : 7 ); }
+      bonus bUnbreakableHelm; bonus bMdef,7; .@r = getrefine(); bonus bHealPower,(.@r>=7?5+(.@r-6):5); if (.@r>=9) { bonus bMatkRate, ( getallrefine() >= 24 ? 12 : 7 ); }
   - Id: 18674
     AegisName: Planewing_Hat
     Name: "Planewing Hat [1]"
@@ -96807,7 +96813,7 @@ Body:
     Refineable: true
     View: 871
     Script: |
-      bonus2 bSubRace,RC_DemiHuman,10; bonus2 bSubRace,RC_PLAYER_HUMAN,10; bonus2 bAddItemHealRate,522,30; .@r = getrefine(); bonus bVariableCastrate,(.@r>=12)?(-5):((.@r>=10)?(-4):(-3));
+      bonus2 bSubRace,RC_DemiHuman,10; bonus2 bSubRace,RC_PLAYER_HUMAN,10; bonus2 bAddItemHealRate,522,30; .@r = getrefine(); bonus bVariableCastrate,(getallrefine() >= 24)?(-5):((.@r>=10)?(-4):(-3));
   - Id: 18730
     AegisName: Cryptura_Academy_Hat
     Name: "Cryptura Academy Hat [1]"
@@ -97493,7 +97499,7 @@ Body:
     Refineable: true
     View: 911
     Script: |
-      .@r = getrefine(); bonus2 bSkillAtk,"MG_LIGHTNINGBOLT",50; bonus2 bSkillAtk,"MG_FIREBOLT",50; bonus2 bSkillAtk,"MG_COLDBOLT",50; bonus bMdef,10; if(.@r>6) bonus2 bSkillAtk,"SO_SPELLFIST",25; if(.@r>8) bonus bAspd,5;
+      .@r = getrefine(); bonus2 bSkillAtk,"MG_LIGHTNINGBOLT",50; bonus2 bSkillAtk,"MG_FIREBOLT",50; bonus2 bSkillAtk,"MG_COLDBOLT",50; bonus bMdef,10; if(.@r>6) bonus2 bSkillAtk,"SA_AUTOSPELL",25; if(.@r>8) bonus bAspd,5;
   - Id: 18796
     AegisName: RWC_Champ_Crown_QF
     Name: "RWC Champ Crown Fourth Place [1]"
@@ -97971,7 +97977,7 @@ Body:
     Refineable: true
     View: 968
     Script: |
-      bonus bAllStats,1; if(getrefine()>11) bonus bAspd,2;
+      bonus bAllStats,1; if(getallrefine() >= 24) bonus bAspd,2;
   - Id: 18853
     AegisName: Berry_Hat_Decoration_
     Name: Tasty Strawberry Hat
@@ -97985,7 +97991,7 @@ Body:
     Refineable: true
     View: 968
     Script: |
-      bonus bAllStats,1; if(getrefine()>11) bonus bAspd,2;
+      bonus bAllStats,1; if(getallrefine() >= 24) bonus bAspd,2;
   - Id: 18854
     AegisName: ValentineYellowHeart
     Name: Yellow Valentine Heart
@@ -98074,7 +98080,7 @@ Body:
     Refineable: true
     View: 1033
     Script: |
-      bonus bDex,5; bonus2 bSubDefEle,Ele_Earth,3; bonus2 bSubRace,RC_DemiHuman,10; bonus2 bSubRace,RC_PLAYER_HUMAN,10; if (getrefine() >= 12) { bonus bShortWeaponDamageReturn,5; }
+      bonus bDex,5; bonus2 bSubDefEle,Ele_Earth,3; bonus2 bSubRace,RC_DemiHuman,10; bonus2 bSubRace,RC_PLAYER_HUMAN,10; if (getallrefine() >= 24) { bonus bShortWeaponDamageReturn,5; }
   - Id: 18861
     AegisName: Zaha_Doll_Hat_J
     Name: "Zaha Doll J Hat [1]"
@@ -98313,7 +98319,7 @@ Body:
     Refineable: true
     View: 1012
     Script: |
-      bonus bVit,3; .@r = getrefine(); bonus bMdef,(.@r>8?10:5); bonus bMatkRate,(.@r>8?6:2); if(.@r>11) bonus bFixedCastrate,-10;
+      bonus bVit,3; .@r = getrefine(); bonus bMdef,(.@r>8?10:5); bonus bMatkRate,(.@r>8?6:2); if(getallrefine() >= 24) bonus bFixedCastrate,-10;
   - Id: 18888
     AegisName: Maroon_Bunny_Band
     Name: "Maroon Bunny Band [1]"
@@ -98327,7 +98333,7 @@ Body:
     Refineable: true
     View: 1013
     Script: |
-      bonus bInt,5; bonus bLuk,5; .@r = getrefine(); bonus2 bAddClass,Class_All,(.@r>8?6:2); bonus bMatkRate,(.@r>8?9:5); if(.@r>11) bonus bFixedCastrate,-10;
+      bonus bInt,5; bonus bLuk,5; .@r = getrefine(); bonus2 bAddClass,Class_All,(.@r>8?6:2); bonus bMatkRate,(.@r>8?9:5); if(getallrefine() >= 24) bonus bFixedCastrate,-10;
   - Id: 18889
     AegisName: Golden_Bunny_Band
     Name: "Golden Bunny Band [1]"
@@ -98341,7 +98347,7 @@ Body:
     Refineable: true
     View: 1014
     Script: |
-      bonus bAgi,5; bonus bLuk,5; .@r = getrefine(); bonus2 bAddClass,Class_All,(.@r>8?7:2); if(.@r>8) bonus bMatkRate,5; if(.@r>11) bonus bFixedCastrate,-10;
+      bonus bAgi,5; bonus bLuk,5; .@r = getrefine(); bonus2 bAddClass,Class_All,(.@r>8?7:2); if(.@r>8) bonus bMatkRate,5; if(getallrefine() >= 24) bonus bFixedCastrate,-10;
   - Id: 18890
     AegisName: Gray_Bunny_Band
     Name: "Gray Bunny Band [1]"
@@ -98354,7 +98360,7 @@ Body:
     Refineable: true
     View: 1015
     Script: |
-      bonus bInt,5; bonus bLuk,5; .@r = getrefine(); bonus2 bAddClass,Class_All,(.@r>8?6:2); bonus bMatkRate,(.@r>8?9:5); if(.@r>11) bonus bFixedCastrate,-10;
+      bonus bInt,5; bonus bLuk,5; .@r = getrefine(); bonus2 bAddClass,Class_All,(.@r>8?6:2); bonus bMatkRate,(.@r>8?9:5); if(getallrefine() >= 24) bonus bFixedCastrate,-10;
   - Id: 18891
     AegisName: Husky_Hat
     Name: "Husky Hat [1]"
@@ -98399,7 +98405,7 @@ Body:
     Refineable: true
     View: 1018
     Script: |
-      bonus2 bSubRace,RC_DemiHuman,8; bonus2 bSubRace,RC_PLAYER_HUMAN,8; bonus2 bSubRace,RC_Dragon,8; bonus2 bAddItemGroupHealRate,IG_Meat,200; if(getrefine()>11){ bonus bMaxHPrate,7; bonus bMaxSPrate,3; }
+      bonus2 bSubRace,RC_DemiHuman,8; bonus2 bSubRace,RC_PLAYER_HUMAN,8; bonus2 bSubRace,RC_Dragon,8; bonus2 bAddItemGroupHealRate,IG_Meat,200; if(getallrefine() >= 24){ bonus bMaxHPrate,7; bonus bMaxSPrate,3; }
   - Id: 18894
     AegisName: Rainbow_Star
     Name: Rainbow Star
@@ -98547,7 +98553,7 @@ Body:
     Refineable: true
     View: 1032
     Script: |
-      bonus bMaxHPrate,10; bonus2 bSubRace,RC_DemiHuman,5; bonus2 bAddSize,Size_Medium,10; if(getrefine()>=12){ bonus bShortWeaponDamageReturn,5; }
+      bonus bMaxHPrate,10; bonus2 bSubRace,RC_DemiHuman,5; bonus2 bAddSize,Size_Medium,10; if(getallrefine() >= 24){ bonus bShortWeaponDamageReturn,5; }
   - Id: 18917
     AegisName: LoveLove_Balloon
     Name: LoveLove Balloon
@@ -98592,7 +98598,7 @@ Body:
     Locations: {Head_Low: true}
     View: 1051
     Script: |
-      bonus2 bSkillAtk,"WZ_VERMILION",3; bonus2 bSkillAtk,"WL_CHAINLIGHTNING",3; bonus bUseSPrate,5;
+      bonus2 bSkillAtk,"WZ_VERMILION",3; bonus bUseSPrate,5;
   - Id: 18929
     AegisName: Elephant_Model_Hat
     Name: "Elephant Model Hat [1]"
@@ -98622,7 +98628,7 @@ Body:
     Refineable: true
     View: 1066
     Script: |
-      bonus bStr,2+((getrefine()>=11) ? 3 : 0); bonus3 bAutoSpell,"KN_BOWLINGBASH",1,50;
+      bonus bStr,2+((getallrefine() >= 22) ? 3 : 0); bonus3 bAutoSpell,"KN_BOWLINGBASH",1,50;
   - Id: 18931
     AegisName: Lion_Model_Hat
     Name: "Lion Model Hat [1]"
@@ -98652,7 +98658,7 @@ Body:
     Refineable: true
     View: 1068
     Script: |
-      .@r = getrefine(); bonus bVit,2+((.@r >= 11) ? (.@r/11) : 0); bonus3 bAutoSpellWhenHit,"WZ_VERMILION",1,50;
+      .@r = getrefine(); bonus bVit,2+((getallrefine() >= 22) ? (.@r/11) : 0); bonus3 bAutoSpellWhenHit,"WZ_VERMILION",1,50;
   - Id: 18934
     AegisName: Fox_Ears_Bell_Ribbon
     Name: "Fox Ears Bell Ribbon [1]"
@@ -98704,7 +98710,7 @@ Body:
     Refineable: true
     View: 1073
     Script: |
-      bonus bInt,1; .@r = getrefine(); .@t = (.@r > 6 ? (.@r*2) : -((.@r/3*5))); bonus2 bSubSkill,"WZ_METEOR",20+.@t; bonus2 bSubSkill,"WL_CRIMSONROCK",20+.@t; bonus2 bSubSkill,"WL_COMET",5;
+      bonus bInt,1; .@r = getrefine(); .@t = (.@r > 6 ? (.@r*2) : -((.@r/3*5))); bonus2 bSubSkill,"WZ_METEOR",20+.@t; 
   - Id: 18940
     AegisName: 10_Gallon_Hat_Of_Flame
     Name: 10 Gallon Hat Of Flame
@@ -99520,7 +99526,7 @@ Body:
     Refineable: true
     View: 1463
     Script: |
-      .@r=getrefine(); bonus bMaxHPrate,5; bonus bMaxSPrate,5; bonus2 bSkillAtk,"RK_DRAGONBREATH",(.@r>=8?45:(.@r>=6?30:15)); bonus2 bSkillAtk,"RK_DRAGONBREATH_WATER",(.@r>=8?45:(.@r>=6?30:15));
+      .@r=getrefine(); bonus bMaxHPrate,5; bonus bMaxSPrate,5; bonus2 bSkillAtk,"KN_BOWLINGBASH",(.@r>=8?45:(.@r>=6?30:15)); 
   - Id: 19117
     AegisName: Poring_Sunglasses_
     Name: Poring Sunglasses
@@ -99892,7 +99898,7 @@ Body:
     Refineable: true
     View: 1444
     Script: |
-      bonus bAllStats,1; bonus bUseSPrate,-10; .@r = getrefine(); if (.@r >= 9) { bonus bAspd,1; } if (.@r >= 12) { bonus bSpeedRate,25; } bonus2 bExpAddRace,RC_All,5; bonus2 bDropAddRace,RC_All,5;
+      bonus bAllStats,1; bonus bUseSPrate,-10; .@r = getrefine(); if (.@r >= 9) { bonus bAspd,1; } if (getallrefine() >= 24) { bonus bSpeedRate,25; } bonus2 bExpAddRace,RC_All,5; bonus2 bDropAddRace,RC_All,5;
   - Id: 19158
     AegisName: C_GeminiS58_Eyes_Blue
     Name: Costume GeminiS58 Eyes Blue
@@ -99941,7 +99947,7 @@ Body:
     Refineable: true
     View: 1529
     Script: |
-      autobonus "{ bonus bBaseAtk,15; }",70,5000,BF_WEAPON,"{ specialeffect2 EF_ENHANCE; }"; autobonus "{ bonus bMatk,15; }",50,5000,BF_MAGIC,"{ specialeffect2 EF_SPELLBREAKER; }"; .@r = getrefine(); if(.@r >= 7){ bonus bAtk,10; bonus bMatk,10; if(.@r >= 9){ bonus bAllStats,1; if(.@r >= 12){ bonus2 bRegenPercentSP,1,10000; } } }
+      autobonus "{ bonus bBaseAtk,15; }",70,5000,BF_WEAPON,"{ specialeffect2 EF_ENHANCE; }"; autobonus "{ bonus bMatk,15; }",50,5000,BF_MAGIC,"{ specialeffect2 EF_SPELLBREAKER; }"; .@r = getrefine(); if(.@r >= 7){ bonus bAtk,10; bonus bMatk,10; if(.@r >= 9){ bonus bAllStats,1; if(getallrefine() >= 24){ bonus2 bRegenPercentSP,1,10000; } } }
   - Id: 19165
     AegisName: Para_Team_Hat160
     Name: "Awakened Eden Group Hat II [1]"
@@ -99955,7 +99961,7 @@ Body:
     Refineable: true
     View: 1530
     Script: |
-      autobonus "{ bonus bBaseAtk,30; }",70,5000,BF_WEAPON,"{ specialeffect2 EF_ENHANCE; }"; autobonus "{ bonus bMatk,30; }",50,5000,BF_MAGIC,"{ specialeffect2 EF_SPELLBREAKER; }"; .@r = getrefine(); if(.@r >= 7){ bonus bAtk,15; bonus bMatk,15; if(.@r >= 9){ bonus bAllStats,2; if(.@r >= 12){ bonus2 bRegenPercentHP,2,10000; bonus2 bRegenPercentSP,1,10000; } } }
+      autobonus "{ bonus bBaseAtk,30; }",70,5000,BF_WEAPON,"{ specialeffect2 EF_ENHANCE; }"; autobonus "{ bonus bMatk,30; }",50,5000,BF_MAGIC,"{ specialeffect2 EF_SPELLBREAKER; }"; .@r = getrefine(); if(.@r >= 7){ bonus bAtk,15; bonus bMatk,15; if(.@r >= 9){ bonus bAllStats,2; if(getallrefine() >= 24){ bonus2 bRegenPercentHP,2,10000; bonus2 bRegenPercentSP,1,10000; } } }
   - Id: 19166
     AegisName: RO_Celebration_Hat
     Name: "RO Celebration Hat [1]"
@@ -100082,7 +100088,7 @@ Body:
     Refineable: true
     View: 1134
     Script: |
-      .@r = getrefine(); bonus bBaseAtk,10*(.@r/2); bonus bAspdRate,2*((.@r/3)); if (.@r>=8) bonus bCritAtkRate,5*getskilllv("BS_OVERTHRUST"); if (.@r>=11) { skill "TF_DOUBLE",5; bonus bDoubleRate,25; }
+      .@r = getrefine(); bonus bBaseAtk,10*(.@r/2); bonus bAspdRate,2*((.@r/3)); if (.@r>=8) bonus bCritAtkRate,5*getskilllv("BS_OVERTHRUST"); if (getallrefine() >= 22) { skill "TF_DOUBLE",5; bonus bDoubleRate,25; }
   - Id: 19190
     AegisName: Racing_Cap_GN
     Name: Racing Cap (Geneticist)
@@ -100097,7 +100103,7 @@ Body:
     Refineable: true
     View: 1134
     Script: |
-      .@r = getrefine(); bonus bBaseAtk,10*(.@r/2); bonus bAspdRate,2*(.@r/3); if (.@r>=8) bonus2 bSkillAtk,"GN_CART_TORNADO",5*getskilllv("AM_AXEMASTERY"); if (.@r>=11) bonus3 bAutoSpell,"GN_CART_TORNADO",max(2,getskilllv("GN_CART_TORNADO")),50; /* Unknow Rates */
+      .@r = getrefine(); bonus bBaseAtk,10*(.@r/2); bonus bAspdRate,2*(.@r/3); if (.@r>=8) bonus2 bSkillAtk,"WS_CARTTERMINATION",5*getskilllv("AM_AXEMASTERY"); if (getallrefine() >= 22) bonus3 bAutoSpell,"WS_CARTTERMINATION",max(2,getskilllv("WS_CARTTERMINATION")),50; /* Unknow Rates */
   - Id: 19191
     AegisName: Racing_Cap_GC
     Name: Racing Cap (Guillotine Cross)
@@ -100112,7 +100118,7 @@ Body:
     Refineable: true
     View: 1134
     Script: |
-      .@r = getrefine(); bonus bBaseAtk,10*(.@r/2); bonus bAspdRate,2*(.@r/3); if (.@r>=8) bonus bCritAtkRate,5*getskilllv("AS_LEFT"); if (.@r>=11) autobonus "{ bonus bCritAtkRate,20; }",50,5000,BF_WEAPON; /* Unknow Rate and Effect */
+      .@r = getrefine(); bonus bBaseAtk,10*(.@r/2); bonus bAspdRate,2*(.@r/3); if (.@r>=8) bonus bCritAtkRate,5*getskilllv("AS_LEFT"); if (getallrefine() >= 22) autobonus "{ bonus bCritAtkRate,20; }",50,5000,BF_WEAPON; /* Unknow Rate and Effect */
   - Id: 19192
     AegisName: Racing_Cap_SC
     Name: Racing Cap (Shadow Chaser)
@@ -100127,7 +100133,7 @@ Body:
     Refineable: true
     View: 1134
     Script: |
-      .@r = getrefine(); bonus bMatk,10*(.@r/2); bonus bAspdRate,2*(.@r/3); if (.@r>=8) bonus bMatk,5*getskilllv("RG_PLAGIARISM"); if (.@r>=11) bonus3 bAutoSpell,"HW_MAGICPOWER",5,30; /* Unknow Rates */
+      .@r = getrefine(); bonus bMatk,10*(.@r/2); bonus bAspdRate,2*(.@r/3); if (.@r>=8) bonus bMatk,5*getskilllv("RG_PLAGIARISM"); if (getallrefine() >= 22) bonus3 bAutoSpell,"HW_MAGICPOWER",5,30; /* Unknow Rates */
   - Id: 19193
     AegisName: Racing_Cap_WL
     Name: Racing Cap (Warlock)
@@ -100142,7 +100148,7 @@ Body:
     Refineable: true
     View: 1134
     Script: |
-      .@r = getrefine(); bonus bMatk,10*(.@r/2); bonus bAspdRate,2*(.@r/3); if (.@r>=8) bonus2 bSkillCooldown,"WL_TETRAVORTEX",-500*(getskilllv("WZ_METEOR")+getskilllv("WZ_VERMILION")); if (.@r>=11) bonus2 bFixedCastrate,"HW_MAGICPOWER",-50;
+      .@r = getrefine(); bonus bMatk,10*(.@r/2); bonus bAspdRate,2*(.@r/3); if (.@r>=8) bonus bDelayrate,max(-25,-2*(getskilllv("WZ_METEOR")+getskilllv("WZ_VERMILION"))); if (getallrefine() >= 22) bonus2 bFixedCastrate,"HW_MAGICPOWER",-50;
   - Id: 19194
     AegisName: Racing_Cap_SO
     Name: Racing Cap (Sorcerer)
@@ -100157,7 +100163,7 @@ Body:
     Refineable: true
     View: 1134
     Script: |
-      .@r = getrefine(); bonus bMatk,10*(.@r/2); bonus bAspdRate,2*(.@r/3); if (.@r>=8) { bonus2 bSkillAtk,"MG_THUNDERSTORM",5*getskilllv("SA_AUTOSPELL"); bonus2 bSkillAtk,"MG_FIREBALL",5*getskilllv("SA_AUTOSPELL"); } if (.@r>=11) { bonus2 bSkillAtk,"MG_FIREBOLT",50; bonus2 bSkillAtk,"MG_LIGHTNINGBOLT",50; }
+      .@r = getrefine(); bonus bMatk,10*(.@r/2); bonus bAspdRate,2*(.@r/3); if (.@r>=8) { bonus2 bSkillAtk,"MG_THUNDERSTORM",5*getskilllv("SA_AUTOSPELL"); bonus2 bSkillAtk,"MG_FIREBALL",5*getskilllv("SA_AUTOSPELL"); } if (getallrefine() >= 22) { bonus2 bSkillAtk,"MG_FIREBOLT",50; bonus2 bSkillAtk,"MG_LIGHTNINGBOLT",50; }
   - Id: 19195
     AegisName: Racing_Cap_RK
     Name: Racing Cap (Rune Knight)
@@ -100172,7 +100178,7 @@ Body:
     Refineable: true
     View: 1134
     Script: |
-      .@r = getrefine(); bonus bBaseAtk,10*(.@r/2); bonus bAspdRate,2*(.@r/3); if (.@r>=8) bonus bCritAtkRate,5*getskilllv("KN_TWOHANDQUICKEN"); if (.@r>=11) { bonus bUnbreakableWeapon; skill "TF_DOUBLE",5; bonus bDoubleRate,25; }
+      .@r = getrefine(); bonus bBaseAtk,10*(.@r/2); bonus bAspdRate,2*(.@r/3); if (.@r>=8) bonus bCritAtkRate,5*getskilllv("KN_TWOHANDQUICKEN"); if (getallrefine() >= 22) { bonus bUnbreakableWeapon; skill "TF_DOUBLE",5; bonus bDoubleRate,25; }
   - Id: 19196
     AegisName: Racing_Cap_RG
     Name: Racing Cap (Royal Guard)
@@ -100187,7 +100193,7 @@ Body:
     Refineable: true
     View: 1134
     Script: |
-      .@r = getrefine(); bonus bBaseAtk,10*(.@r/2); bonus bAspdRate,2*(.@r/3); if (.@r>=8) bonus2 bSkillAtk,"LG_RAGEBURST",10*getskilllv("KN_SPEARMASTERY"); if (.@r>=11) bonus2 bSkillCooldown,"LG_EARTHDRIVE",-1000;
+      .@r = getrefine(); bonus bBaseAtk,10*(.@r/2); bonus bAspdRate,2*(.@r/3); if (.@r>=8) bonus2 bSkillAtk,"PA_SACRIFICE",10*getskilllv("KN_SPEARMASTERY"); if (getallrefine() >= 22) bonus bDelayrate,-5;
   - Id: 19197
     AegisName: Racing_Cap_AB
     Name: Racing Cap (Archbishop)
@@ -100202,7 +100208,7 @@ Body:
     Refineable: true
     View: 1134
     Script: |
-      .@r = getrefine(); bonus bMatk,10*(.@r/2); bonus bAspdRate,2*(.@r/3); if (.@r>=8) bonus2 bSkillAtk,"AB_DUPLELIGHT",10*getskilllv("PR_MACEMASTERY"); /*if (.@r>=11) bonus3 bAutoSpell,"AB_ADORAMUS",max(5,getskilllv("AB_ADORAMUS")),50; Unknow Rate and Blue Gemstone consume mechanic */
+      .@r = getrefine(); bonus bMatk,10*(.@r/2); bonus bAspdRate,2*(.@r/3); if (.@r>=8) bonus2 bAddRace,RC_Undead,10*getskilllv("PR_MACEMASTERY"); /*if (getallrefine() >= 22) bonus3 bAutoSpell,"PR_MAGNUS",max(5,getskilllv("PR_MAGNUS")),50; Unknow Rate and Blue Gemstone consume mechanic */
   - Id: 19198
     AegisName: Racing_Cap_SR
     Name: Racing Cap (Sura)
@@ -100217,7 +100223,7 @@ Body:
     Refineable: true
     View: 1134
     Script: |
-      .@r = getrefine(); bonus bBaseAtk,10*(.@r/2); bonus bAspdRate,2*(.@r/3); if (.@r>=8) bonus2 bSkillUseSP,"SR_KNUCKLEARROW",getskilllv("MO_COMBOFINISH"); if (.@r>=11) bonus2 bSkillAtk,"SR_KNUCKLEARROW",50;
+      .@r = getrefine(); bonus bBaseAtk,10*(.@r/2); bonus bAspdRate,2*(.@r/3); if (.@r>=8) bonus2 bSkillUseSP,"MO_FINGEROFFENSIVE",getskilllv("MO_COMBOFINISH"); if (getallrefine() >= 22) bonus2 bSkillAtk,"MO_FINGEROFFENSIVE",50;
   - Id: 19199
     AegisName: Racing_Cap_RA
     Name: Racing Cap (Ranger)
@@ -100232,7 +100238,7 @@ Body:
     Refineable: true
     View: 1134
     Script: |
-      .@r = getrefine(); bonus bBaseAtk,10*(.@r/2); bonus bAspdRate,2*(.@r/3); if (.@r>=8) bonus2 bSkillAtk,"RA_AIMEDBOLT",3*getskilllv("HT_STEELCROW"); if (.@r>=11) bonus bDelayrate,-15;
+      .@r = getrefine(); bonus bBaseAtk,10*(.@r/2); bonus bAspdRate,2*(.@r/3); if (.@r>=8) bonus2 bSkillAtk,"SN_SHARPSHOOTING",3*getskilllv("HT_STEELCROW"); if (getallrefine() >= 22) bonus bDelayrate,-15;
   - Id: 19200
     AegisName: Racing_Cap_MI
     Name: Racing Cap (Minstrel)
@@ -100248,7 +100254,7 @@ Body:
     Refineable: true
     View: 1134
     Script: |
-      .@r = getrefine(); bonus bBaseAtk,10*(.@r/2); bonus bAspdRate,2*(.@r/3); if (.@r>=8) bonus bBaseAtk,5*getskilllv("BA_MUSICALLESSON"); if (.@r>=11) bonus3 bAutoSpell,"WM_REVERBERATION",max(2,getskilllv("WM_REVERBERATION")),50; /* Unknow rates*/
+      .@r = getrefine(); bonus bBaseAtk,10*(.@r/2); bonus bAspdRate,2*(.@r/3); if (.@r>=8) bonus bBaseAtk,5*getskilllv("BA_MUSICALLESSON"); if (getallrefine() >= 22) bonus3 bAutoSpell,"BA_MUSICALSTRIKE",max(2,getskilllv("BA_MUSICALSTRIKE")),50; /* Unknow rates*/
   - Id: 19201
     AegisName: Racing_Cap_WA
     Name: Racing Cap (Wanderer)
@@ -100264,7 +100270,7 @@ Body:
     Refineable: true
     View: 1134
     Script: |
-      .@r = getrefine(); bonus bBaseAtk,10*(.@r/2); bonus bAspdRate,2*(.@r/3); if (.@r>=8) bonus bBaseAtk,5*getskilllv("DC_DANCINGLESSON"); if (.@r>=11) bonus3 bAutoSpell,"WM_REVERBERATION",max(2,getskilllv("WM_REVERBERATION")),50; /* Unknow rates*/
+      .@r = getrefine(); bonus bBaseAtk,10*(.@r/2); bonus bAspdRate,2*(.@r/3); if (.@r>=8) bonus bBaseAtk,5*getskilllv("DC_DANCINGLESSON"); if (getallrefine() >= 22) bonus3 bAutoSpell,"BA_MUSICALSTRIKE",max(2,getskilllv("BA_MUSICALSTRIKE")),50; /* Unknow rates*/
   - Id: 19202
     AegisName: Racing_Cap_GS
     Name: Racing Cap (Gunslinger)
@@ -100279,7 +100285,7 @@ Body:
     Refineable: true
     View: 1134
     Script: |
-      .@r = getrefine(); bonus bBaseAtk,10*(.@r/2); bonus bAspdRate,2*(.@r/3); if (.@r>=8) { bonus2 bSkillCooldown,"RL_HAMMER_OF_GOD",-2000*getskilllv("GS_PIERCINGSHOT"); bonus2 bSkillCooldown,"RL_D_TAIL",-200*getskilllv("GS_GROUNDDRIFT"); } if (.@r>=11) bonus2 bSkillCooldown,"RL_C_MARKER",-1000;
+      .@r = getrefine(); bonus bBaseAtk,10*(.@r/2); bonus bAspdRate,2*(.@r/3); if (.@r>=8) { bonus bDelayrate,max(-25,-10*getskilllv("GS_PIERCINGSHOT")); bonus bDelayrate,max(-25,-1*getskilllv("GS_GROUNDDRIFT")); } if (getallrefine() >= 22) bonus bDelayrate,-5;
   - Id: 19203
     AegisName: Racing_Cap_NJ
     Name: Racing Cap (Ninja)
@@ -100294,7 +100300,7 @@ Body:
     Refineable: true
     View: 1134
     Script: |
-      .@r = getrefine(); bonus bBaseAtk,10*(.@r/2); bonus bAspdRate,2*(.@r/3); if (.@r>=8) bonus bLongAtkRate,getskilllv("NJ_HUUMA"); if (.@r>=11) bonus2 bSkillAtk,"KO_HUUMARANKA",30;
+      .@r = getrefine(); bonus bBaseAtk,10*(.@r/2); bonus bAspdRate,2*(.@r/3); if (.@r>=8) bonus bLongAtkRate,getskilllv("NJ_HUUMA"); if (getallrefine() >= 22) bonus2 bSkillAtk,"NJ_HUUMA",30;
   - Id: 19204
     AegisName: Racing_Cap_SN
     Name: Racing Cap (Super Novice)
@@ -100309,7 +100315,7 @@ Body:
     Refineable: true
     View: 1134
     Script: |
-      .@r = getrefine(); bonus bBaseAtk,10*(.@r/2); bonus bAspdRate,2*(.@r/3); if (.@r>=8) bonus bCritAtkRate,10*getskilllv("TF_DOUBLE"); if (.@r>=11) { bonus bAspd,1; bonus bBaseAtk,20; }
+      .@r = getrefine(); bonus bBaseAtk,10*(.@r/2); bonus bAspdRate,2*(.@r/3); if (.@r>=8) bonus bCritAtkRate,10*getskilllv("TF_DOUBLE"); if (getallrefine() >= 22) { bonus bAspd,1; bonus bBaseAtk,20; }
   - Id: 19205
     AegisName: Racing_Cap_SU
     Name: Racing Cap (Summoner)
@@ -100324,7 +100330,7 @@ Body:
     Refineable: true
     View: 1134
     Script: |
-      .@r = getrefine(); bonus bBaseAtk,5*(.@r/2); bonus bMatk,5*.@r/2; bonus bAspdRate,2*(.@r/3); if (.@r>=8) { bonus2 bSkillCooldown,"SU_SVG_SPIRIT",-4000*getskilllv("SU_LUNATICCARROTBEAT"); bonus2 bSkillCooldown,"SU_NYANGGRASS",-8000*getskilllv("SU_CN_METEOR"); bonus2 bSkillCooldown,"SU_BUNCHOFSHRIMP",-4000*getskilllv("SU_FRESHSHRIMP"); } if (.@r>=11) bonus bDelayrate,-15;
+      .@r = getrefine(); bonus bBaseAtk,5*(.@r/2); bonus bMatk,5*.@r/2; bonus bAspdRate,2*(.@r/3); if (.@r>=8) { } if (getallrefine() >= 22) bonus bDelayrate,-15;
   - Id: 19209
     AegisName: Nurse_Cap_IL
     Name: "Illusion Nurse Cap [1]"
@@ -100551,7 +100557,7 @@ Body:
     Refineable: true
     View: 1134
     Script: |
-      .@r = getrefine(); bonus bBaseAtk,10*(.@r/2); bonus bAspdRate,2*(.@r/3); if (.@r>=8) bonus bBaseatk,5*getskilllv("TK_HPTIME"); if (.@r>=11) autobonus3 "{ bonus2 bSkillAtk,\"SJ_SOLARBURST\",30; }",1000,10000,"SJ_PROMINENCEKICK";
+      .@r = getrefine(); bonus bBaseAtk,10*(.@r/2); bonus bAspdRate,2*(.@r/3); if (.@r>=8) bonus bBaseatk,5*getskilllv("TK_HPTIME"); if (getallrefine() >= 22) autobonus3 "{ bonus2 bSkillAtk,\"TK_STORMKICK\",30; }",1000,10000,"TK_DOWNKICK";
   - Id: 19397
     AegisName: Racing_Cap_SL
     Name: Racing Cap (Soul Linker)
@@ -100566,7 +100572,7 @@ Body:
     Refineable: true
     View: 1134
     Script: |
-      .@r = getrefine(); bonus bMatk,10*(.@r/2); bonus bAspdRate,2*(.@r/3); if (.@r>=8) bonus bMaxSP,100*getskilllv("TK_SPTIME"); if (.@r>=11) autobonus3 "{ bonus2 bSkillAtk,\"SP_SPA\",30; bonus2 bSkillAtk,\"SP_SWHOO\",30; }",1000,10000,"SL_SMA";
+      .@r = getrefine(); bonus bMatk,10*(.@r/2); bonus bAspdRate,2*(.@r/3); if (.@r>=8) bonus bMaxSP,100*getskilllv("TK_SPTIME"); if (getallrefine() >= 22) autobonus3 "{ bonus2 bSkillAtk,\"SL_STIN\",30; bonus2 bSkillAtk,\"SL_STUN\",30; }",1000,10000,"SL_SMA";
   - Id: 19403
     AegisName: Memory_Of_Noodle
     Name: Costume Memories of Summer Noodles
@@ -109057,7 +109063,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); if (.@r >= 8) { bonus bBaseAtk,20; if (.@r >= 11) { .@val = -3; if (.@r >= 13) { .@val += -4; } } } if (readparam(bVit) >= 125) { .@val += -10; } if (.@val) { bonus bDelayrate,.@val; }
+      .@r = getrefine(); if (.@r >= 8) { bonus bBaseAtk,20; if (getallrefine() >= 22) { .@val = -3; if (getallrefine() >= 26) { .@val += -4; } } } if (readparam(bVit) >= 125) { .@val += -10; } if (.@val) { bonus bDelayrate,.@val; }
   - Id: 20923
     AegisName: Goibne_Shoulder_IL
     Name: "Illusion Goibne Spaulders [1]"
@@ -109451,7 +109457,7 @@ Body:
     EquipLevelMin: 100
     Refineable: true
     Script: |
-      bonus2 bAddRace,RC_Demon,10; bonus2 bAddRace,RC_Undead,10; .@r = getrefine(); if(.@r>=9) { .@dmg = 5; if(.@r>=12) { .@dmg += 7; } bonus2 bAddClass,Class_All,.@dmg; }
+      bonus2 bAddRace,RC_Demon,10; bonus2 bAddRace,RC_Undead,10; .@r = getrefine(); if(.@r>=9) { .@dmg = 5; if(getallrefine() >= 24) { .@dmg += 7; } bonus2 bAddClass,Class_All,.@dmg; }
   - Id: 21011
     AegisName: Giant_Blade
     Name: "Gigantic Blade [1]"
@@ -109612,7 +109618,7 @@ Body:
     EquipLevelMin: 130
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bUnbreakableWeapon; bonus bCritical,5; if (.@r >= 7) { bonus bAspdRate,7; if (.@r >= 9) { bonus bCritAtkRate,15; if (.@r >= 11) { bonus2 bAddSize,Size_Small,20; bonus2 bAddSize,Size_Medium,20; } } }
+      .@r = getrefine(); bonus bUnbreakableWeapon; bonus bCritical,5; if (.@r >= 7) { bonus bAspdRate,7; if (.@r >= 9) { bonus bCritAtkRate,15; if (getallrefine() >= 22) { bonus2 bAddSize,Size_Small,20; bonus2 bAddSize,Size_Medium,20; } } }
   - Id: 21050
     AegisName: Taegoolyeon_IL
     Name: "Illusion Tae Goo Lyeon [2]"
@@ -109630,7 +109636,7 @@ Body:
     EquipLevelMin: 120
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bFlee2,10; bonus bLongAtkRate,.@r*2; if (.@r >= 7) { bonus bUseSPrate,-20; if (.@r >= 9) { bonus bDelayrate,-20; if (.@r >= 11) { bonus bMaxHPrate,10; bonus bMaxSPrate,10; } } }
+      .@r = getrefine(); bonus bFlee2,10; bonus bLongAtkRate,.@r*2; if (.@r >= 7) { bonus bUseSPrate,-20; if (.@r >= 9) { bonus bDelayrate,-20; if (getallrefine() >= 22) { bonus bMaxHPrate,10; bonus bMaxSPrate,10; } } }
   - Id: 21051
     AegisName: Volar
     Name: Volar
@@ -109648,7 +109654,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus2 bSkillAtk,"KN_BOWLINGBASH",30; bonus bBaseAtk,4*.@r; if (.@r>=9) { bonus2 bSkillCooldown,"KN_BOWLINGBASH",-1000; bonus2 bSkillCooldown,"RK_IGNITIONBREAK",-1000; } if (.@r>=11) { bonus bUnbreakableWeapon; bonus2 bSkillAtk,"KN_BOWLINGBASH",20; }
+      .@r = getrefine(); bonus2 bSkillAtk,"KN_BOWLINGBASH",30; bonus bBaseAtk,4*.@r; if (.@r>=9) { bonus2 bSkillCooldown,"KN_BOWLINGBASH",-1000; bonus bDelayrate,-5; } if (getallrefine() >= 22) { bonus bUnbreakableWeapon; bonus2 bSkillAtk,"KN_BOWLINGBASH",20; }
   - Id: 21052
     AegisName: Vernan
     Name: Vernan
@@ -109666,7 +109672,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bLongAtkRate,.@r; bonus2 bAddClass,Class_All,5; if (.@r>=9) { bonus2 bSkillAtk,"LK_SPIRALPIERCE",30; bonus2 bSkillAtk,"RK_SONICWAVE",30; } if (.@r>=11) { bonus2 bSkillCooldown,"RK_SONICWAVE",-1500; }
+      .@r = getrefine(); bonus bLongAtkRate,.@r; bonus2 bAddClass,Class_All,5; if (.@r>=9) { bonus2 bSkillAtk,"LK_SPIRALPIERCE",30; } if (getallrefine() >= 22) { bonus bDelayrate,-8; }
   - Id: 21200
     AegisName: C_Tear_Drop
     Name: Costume Teardrop
@@ -109960,7 +109966,7 @@ Body:
     EquipLevelMin: 160
     Refineable: true
     Script: |
-      .@r = getrefine(); if (.@r>=8 && .@r<=10) .@i=5+.@r; else if (.@r>=11 && .@r<=13) .@i=5+(.@r*3); else if (.@r>13) .@i=42; bonus bVariableCastrate,-10-.@i;
+      .@r = getrefine(); if (getallrefine() >= 28) .@i=42; else if (getallrefine() >= 22) .@i=5+(.@r*3); else if (.@r>=8) .@i=5+.@r; bonus bVariableCastrate,-10-.@i;
   - Id: 22036
     AegisName: Vet_SliverFox_Boots
     Name: "Heroic Silver Fox Leather Boots [1]"
@@ -109974,7 +109980,7 @@ Body:
     EquipLevelMin: 160
     Refineable: true
     Script: |
-      .@r = getrefine(); if (.@r>=8 && .@r<=13) .@i=.@r; else if (.@r>13) .@i=13; bonus bLongAtkRate,5+.@i;
+      .@r = getrefine(); if (getallrefine() >= 28) .@i=13; else if (.@r>=8) .@i=.@r; bonus bLongAtkRate,5+.@i;
   - Id: 22037
     AegisName: Vet_Ungo_Boots
     Name: "Heroic Ungoliant Upgrade Boots [1]"
@@ -109988,7 +109994,7 @@ Body:
     EquipLevelMin: 160
     Refineable: true
     Script: |
-      .@r = getrefine(); if (.@r>=8 && .@r<=13) .@i=.@r; else if (.@r>13) .@i=13; bonus bUseSPrate,-5-.@i;
+      .@r = getrefine(); if (getallrefine() >= 28) .@i=13; else if (.@r>=8) .@i=.@r; bonus bUseSPrate,-5-.@i;
   - Id: 22042
     AegisName: Talaria_Shoes
     Name: "Talaria Shoes [1]"
@@ -110032,7 +110038,7 @@ Body:
     EquipLevelMin: 100
     Refineable: true
     Script: |
-      bonus2 bSkillUseSP,"NC_HOVERING",15; if(getrefine()>=7){bonus2 bSkillUseSP,"NC_HOVERING",-20;}
+      bonus2 bSkillUseSP,"WS_CARTBOOST",15; if(getrefine()>=7){bonus2 bSkillUseSP,"WS_CARTBOOST",-20;}
   - Id: 22045
     AegisName: Beach_Sandals
     Name: Summer Sandals
@@ -110292,7 +110298,7 @@ Body:
     EquipLevelMin: 175
     Refineable: true
     Script: |
-      bonus bMaxHPrate,10; bonus bMaxSPrate,5; .@r = getrefine()/2; bonus bMaxHP,100*.@r; bonus bMaxSP,20*.@r; if(.@r >= 4) bonus2 bSkillUseSP,"SU_LOPE",5;
+      bonus bMaxHPrate,10; bonus bMaxSPrate,5; .@r = getrefine()/2; bonus bMaxHP,100*.@r; bonus bMaxSP,20*.@r; if(.@r >= 4) {}
   - Id: 22089
     AegisName: Crimson_Gaiter_
     Name: "Crimson Gaiter [1]"
@@ -110621,7 +110627,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); if (.@r >= 8) { bonus bAspdRate,8; if (.@r >= 11) { bonus bAspd,1; if (.@r >= 13) { .@val = 10; } } } if (readparam(bLuk) >= 125) { .@val += 30; } if (.@val) { bonus bCritAtkRate,.@val; }
+      .@r = getrefine(); if (.@r >= 8) { bonus bAspdRate,8; if (getallrefine() >= 22) { bonus bAspd,1; if (getallrefine() >= 26) { .@val = 10; } } } if (readparam(bLuk) >= 125) { .@val += 30; } if (.@val) { bonus bCritAtkRate,.@val; }
   - Id: 22171
     AegisName: Ancient_Hero_Boots
     Name: "Ancient Hero Boots [1]"
@@ -110635,7 +110641,7 @@ Body:
     EquipLevelMin: 100
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bMaxHP,500; bonus bMaxSP,50; bonus bMaxHPrate,2*(.@r/3); bonus bMaxSPrate,.@r/3; if (.@r >= 9) { .@val = -300; if (.@r >= 12) { .@val -= 200; if (.@r >= 14) { bonus bDelayRate,-5; } } bonus bFixedCast,.@val; }
+      .@r = getrefine(); bonus bMaxHP,500; bonus bMaxSP,50; bonus bMaxHPrate,2*(.@r/3); bonus bMaxSPrate,.@r/3; if (.@r >= 9) { .@val = -300; if (getallrefine() >= 24) { .@val -= 200; if (getallrefine() >= 28) { bonus bDelayRate,-5; } } bonus bFixedCast,.@val; }
   - Id: 22190
     AegisName: Boots_IL
     Name: "Illusion Boots [1]"
@@ -113290,15 +113296,15 @@ Body:
   - Id: 25268
     AegisName: Sticky_Blood
     Name: Sticky Blood
-    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
   - Id: 25269
     AegisName: Mushroom_Sap
     Name: Mushroom Sap
-    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
   - Id: 25270
     AegisName: Swaying_Mane
     Name: Wavy Mane
-    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
   - Id: 25271
     AegisName: IllusionStone
     Name: Illusion Stone
@@ -113395,7 +113401,7 @@ Body:
     AegisName: Dry_Branch
     Name: Dry Twig
     Weight: 10
-    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
   - Id: 25311
     AegisName: PieceOfBlackSpirit
     Name: Piece of Black Horn
@@ -113423,7 +113429,7 @@ Body:
   - Id: 25316
     AegisName: Shabby_Metal_Chip
     Name: Old Metal Pieces
-    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
   - Id: 25375
     AegisName: Powerful_Soul_Essence
     Name: Powerful Soul Essence
@@ -114087,7 +114093,7 @@ Body:
     EquipLevelMin: 130
     Refineable: true
     Script: |
-      bonus bMatk,175; .@r = getrefine(); bonus bUnbreakableWeapon; bonus2 bMagicAddEle,Ele_Neutral,5; bonus2 bMagicAddEle,Ele_Earth,5; if (.@r >= 7) { bonus bVariableCastrate,-7; if (.@r >= 9) { autobonus "{ bonus2 bMagicAtkEle,Ele_Fire,30; }",5,10000,BF_MAGIC; /* unknown rate */ if (.@r >= 11) { bonus bDelayrate,-10; } } }
+      bonus bMatk,175; .@r = getrefine(); bonus bUnbreakableWeapon; bonus2 bMagicAddEle,Ele_Neutral,5; bonus2 bMagicAddEle,Ele_Earth,5; if (.@r >= 7) { bonus bVariableCastrate,-7; if (.@r >= 9) { autobonus "{ bonus2 bMagicAtkEle,Ele_Fire,30; }",5,10000,BF_MAGIC; /* unknown rate */ if (getallrefine() >= 22) { bonus bDelayrate,-10; } } }
   - Id: 26155
     AegisName: Meowmeow_Foxtail
     Name: "Meowmeow Foxtail [2]"
@@ -114105,7 +114111,7 @@ Body:
     EquipLevelMin: 100
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bMatk,300+10*(.@r/2); bonus bBaseAtk,10*(.@r/2); bonus2 bAddClass,Class_All,2*(.@r/3); bonus bMatkRate,2*(.@r/3); if (.@r >= 7) { bonus2 bSkillAtk,"SU_LUNATICCARROTBEAT",15; bonus2 bSkillAtk,"SU_SV_STEMSPEAR",15; if (.@r >= 9) { bonus bVariableCastrate,-10; bonus bAspdRate,10; if (.@r >= 11) { bonus2 bSkillAtk,"SU_PICKYPECK",15; bonus2 bSkillAtk,"SU_CN_METEOR",15; } } }
+      .@r = getrefine(); bonus bMatk,300+10*(.@r/2); bonus bBaseAtk,10*(.@r/2); bonus2 bAddClass,Class_All,2*(.@r/3); bonus bMatkRate,2*(.@r/3); if (.@r >= 7) { if (.@r >= 9) { bonus bVariableCastrate,-10; bonus bAspdRate,10; if (getallrefine() >= 22) { } } }
   - Id: 26158
     AegisName: Crimson_Rose_Stick
     Name: Crimson Rose Stick
@@ -114123,7 +114129,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bMatk,180+4*.@r; bonus bUnbreakableWeapon; bonus2 bMagicAtkEle,Ele_Fire,5; bonus2 bMagicAtkEle,Ele_Dark,5; if (.@r >= 9) { bonus2 bSkillAtk,"WL_HELLINFERNO",30; } if (.@r >= 11) { bonus2 bSkillCooldown,"WL_CRIMSONROCK",-1000; }
+      .@r = getrefine(); bonus bMatk,180+4*.@r; bonus bUnbreakableWeapon; bonus2 bMagicAtkEle,Ele_Fire,5; bonus2 bMagicAtkEle,Ele_Dark,5; if (.@r >= 9) { bonus2 bSkillAtk,"WZ_FIREPILLAR",30; } if (getallrefine() >= 22) { bonus bDelayrate,-5; }
   - Id: 26159
     AegisName: Psychic_Spear_Rod
     Name: Psychic Spear Rod
@@ -114141,7 +114147,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bMatk,180+4*.@r; bonus bUnbreakableWeapon; bonus2 bMagicAtkEle,Ele_Wind,5; bonus2 bMagicAtkEle,Ele_Neutral,5; if (.@r >= 9) { bonus2 bSkillAtk,"SO_PSYCHIC_WAVE",30; } if (.@r >= 11) { bonus2 bSkillCooldown,"SO_VARETYR_SPEAR",-2000; }
+      .@r = getrefine(); bonus bMatk,180+4*.@r; bonus bUnbreakableWeapon; bonus2 bMagicAtkEle,Ele_Wind,5; bonus2 bMagicAtkEle,Ele_Neutral,5; if (.@r >= 9) { bonus2 bSkillAtk,"PF_SOULBURN",30; } if (getallrefine() >= 22) { bonus bDelayrate,-10; }
   - Id: 26160
     AegisName: Dust_Grave
     Name: Dust Grave
@@ -114159,7 +114165,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bMatk,180; if (.@r >= 11) .@val = 50; else if (.@r >= 9) .@val = 30; bonus2 bSkillAtk,"SO_DIAMONDDUST",.@val; bonus2 bSkillAtk,"SO_EARTHGRAVE",.@val; bonus bMatk,4*.@r; bonus bUnbreakableWeapon; bonus2 bMagicAtkEle,Ele_Water,5; bonus2 bMagicAtkEle,Ele_Earth,5;
+      .@r = getrefine(); bonus bMatk,180; if (getallrefine() >= 22) .@val = 50; else if (.@r >= 9) .@val = 30; bonus2 bSkillAtk,"MG_COLDBOLT",.@val; bonus2 bSkillAtk,"WZ_EARTHSPIKE",.@val; bonus bMatk,4*.@r; bonus bUnbreakableWeapon; bonus2 bMagicAtkEle,Ele_Water,5; bonus2 bMagicAtkEle,Ele_Earth,5;
   - Id: 26161
     AegisName: Penitentia
     Name: Penitentia
@@ -114177,7 +114183,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bMatk,175+4*.@r; bonus bUnbreakableWeapon; bonus2 bMagicAtkEle,Ele_Holy,5; if (.@r >= 9) { bonus2 bSkillAtk,"PR_MAGNUS",(.@r>=11) ? 50 : 30; bonus2 bSkillAtk,"AB_JUDEX",30; }
+      .@r = getrefine(); bonus bMatk,175+4*.@r; bonus bUnbreakableWeapon; bonus2 bMagicAtkEle,Ele_Holy,5; if (.@r >= 9) { bonus2 bSkillAtk,"PR_MAGNUS",(getallrefine() >= 22) ? 50 : 30; bonus2 bSkillAtk,"AL_HOLYLIGHT",30; }
   - Id: 26200
     AegisName: Hippie_Rope
     Name: "Hippie Rope [2]"
@@ -114215,7 +114221,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bMatk,190+4*.@r; bonus2 bMagicAtkEle,Ele_Neutral,10; if (.@r>=9) bonus2 bSkillAtk,"WM_METALICSOUND",30; if (.@r>=11) bonus2 bSkillCooldown,"WM_METALICSOUND",-2000;
+      .@r = getrefine(); bonus bMatk,190+4*.@r; bonus2 bMagicAtkEle,Ele_Neutral,10; if (.@r>=9) bonus2 bSkillAtk,"BA_MUSICALSTRIKE",30; if (getallrefine() >= 22) bonus bDelayrate,-10;
   - Id: 26213
     AegisName: Scarlet_Ribbon
     Name: Scarlet Ribbon
@@ -114234,7 +114240,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bVariableCastrate,-10; bonus bLongAtkRate,.@r; if (.@r>=9) bonus2 bSkillCooldown,"WM_SEVERE_RAINSTORM",-1000; if (.@r>=11) bonus2 bSkillUseSPrate,"WM_SEVERE_RAINSTORM",20;
+      .@r = getrefine(); bonus bVariableCastrate,-10; bonus bLongAtkRate,.@r; if (.@r>=9) bonus bDelayrate,-5; if (getallrefine() >= 22) bonus2 bSkillUseSPrate,"CG_ARROWVULCAN",20;
   - Id: 27012
     AegisName: Kick_Step_Card
     Name: Kick Step Card
@@ -115426,7 +115432,7 @@ Body:
     Weight: 10
     Locations: {Both_Accessory: true}
     Script: |
-      bonus5 bAutoSpell,"WL_HELLINFERNO",3,1,ATF_SHORT|ATF_WEAPON,1; /* fix me: unknown rate */
+      bonus5 bAutoSpell,"WZ_FIREPILLAR",3,1,ATF_SHORT|ATF_WEAPON,1; /* fix me: unknown rate */
   - Id: 27306
     AegisName: Bellare_Card
     Name: Bellare Card
@@ -115436,7 +115442,7 @@ Body:
     Weight: 10
     Locations: {Right_Hand: true}
     Script: |
-      if (getiteminfo(getequipid(EQI_COMPOUND_ON),11) == W_REVOLVER) { .@r = getrefine(); bonus bHit,20; bonus bLongAtkRate,(5+.@r); if (.@r >= 10) { bonus2 bSkillAtk,"RL_FIREDANCE",15; } }
+      if (getiteminfo(getequipid(EQI_COMPOUND_ON),11) == W_REVOLVER) { .@r = getrefine(); bonus bHit,20; bonus bLongAtkRate,(5+.@r); if (.@r >= 10) { bonus2 bSkillAtk,"GS_RAPIDSHOWER",15; } }
   - Id: 27307
     AegisName: Greater_Bellare_Card
     Name: Greater Bellare Card
@@ -115446,7 +115452,7 @@ Body:
     Weight: 10
     Locations: {Right_Hand: true}
     Script: |
-      if (getiteminfo(getequipid(EQI_COMPOUND_ON),11) == W_GATLING) { .@r = getrefine(); bonus bHit,20; bonus bLongAtkRate,(5+.@r); if (.@r >= 10) { bonus2 bSkillAtk,"RL_R_TRIP",15; } }
+      if (getiteminfo(getequipid(EQI_COMPOUND_ON),11) == W_GATLING) { .@r = getrefine(); bonus bHit,20; bonus bLongAtkRate,(5+.@r); if (.@r >= 10) { bonus2 bSkillAtk,"GS_FULLBUSTER",15; } }
   - Id: 27308
     AegisName: Sanare_Card
     Name: Sanare Card
@@ -115456,7 +115462,7 @@ Body:
     Weight: 10
     Locations: {Right_Hand: true}
     Script: |
-      .@r = getrefine(); .@val = 2; if (.@r >= 9) { .@val += 3; } if (.@r >= 11) { .@val += 5; } bonus bHealPower,.@val;
+      .@r = getrefine(); .@val = 2; if (.@r >= 9) { .@val += 3; } if (getallrefine() >= 22) { .@val += 5; } bonus bHealPower,.@val;
   - Id: 27309
     AegisName: Greater_Sanare_Card
     Name: Greater Sanare Card
@@ -115576,7 +115582,7 @@ Body:
     Weight: 10
     Locations: {Right_Hand: true}
     Script: |
-      .@r = getrefine(); .@val = 3; if (.@r >= 9) { .@val += 2; if (.@r >= 11) { .@val += 5; } } bonus2 bMagicAtkEle,Ele_Fire,.@val;
+      .@r = getrefine(); .@val = 3; if (.@r >= 9) { .@val += 2; if (getallrefine() >= 22) { .@val += 5; } } bonus2 bMagicAtkEle,Ele_Fire,.@val;
   - Id: 27321
     AegisName: DespairGodMorocc_Card
     Name: Despair God Morocc Card
@@ -115937,7 +115943,7 @@ Body:
     EquipLevelMin: 100
     Refineable: true
     Script: |
-      bonus2 bAddRace,RC_Demon,10; bonus2 bAddRace,RC_Undead,10; .@r = getrefine(); if(.@r>=9) { .@dmg = 5; if(.@r>=12) { .@dmg += 7; } bonus2 bAddClass,Class_All,.@dmg; }
+      bonus2 bAddRace,RC_Demon,10; bonus2 bAddRace,RC_Undead,10; .@r = getrefine(); if(.@r>=9) { .@dmg = 5; if(getallrefine() >= 24) { .@dmg += 7; } bonus2 bAddClass,Class_All,.@dmg; }
   - Id: 28002
     AegisName: Half_BF_Katar2
     Name: Half BF Katar2
@@ -116117,7 +116123,7 @@ Body:
     EquipLevelMin: 130
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus2 bAddClass,Class_All,3; if (.@r >= 7) { bonus bAspdRate,7; if (.@r >= 9) { bonus2 bSkillAtk,"GC_CROSSRIPPERSLASHER",15; if (.@r >= 11) { bonus2 bAddSize,Size_Small,20; bonus2 bAddSize,Size_Medium,20; } } }
+      .@r = getrefine(); bonus2 bAddClass,Class_All,3; if (.@r >= 7) { bonus bAspdRate,7; if (.@r >= 9) { bonus2 bSkillAtk,"ASC_METEORASSAULT",15; if (getallrefine() >= 22) { bonus2 bAddSize,Size_Small,20; bonus2 bAddSize,Size_Medium,20; } } }
   - Id: 28042
     AegisName: Ripper_Cross
     Name: Ripper Cross
@@ -116135,7 +116141,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus2 bAddClass,Class_All,5; bonus bLongAtkRate,.@r; if (.@r>=9) bonus2 bSkillAtk,"GC_ROLLINGCUTTER",30; if (.@r>=11) bonus2 bSkillAtk,"GC_CROSSRIPPERSLASHER",20;
+      .@r = getrefine(); bonus2 bAddClass,Class_All,5; bonus bLongAtkRate,.@r; if (.@r>=9) bonus2 bSkillAtk,"AS_GRIMTOOTH",30; if (getallrefine() >= 22) bonus2 bSkillAtk,"ASC_METEORASSAULT",20;
   - Id: 28044
     AegisName: Agudo_Filo
     Name: Agudo Filo
@@ -116153,7 +116159,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bCritAtkRate,5; bonus bBaseAtk,4*.@r; if (.@r>=9) bonus2 bAddSize,Size_All,15; if (.@r>=11) { bonus bUnbreakableWeapon; bonus2 bAddClass,Class_All,7; }
+      .@r = getrefine(); bonus bCritAtkRate,5; bonus bBaseAtk,4*.@r; if (.@r>=9) bonus2 bAddSize,Size_All,15; if (getallrefine() >= 22) { bonus bUnbreakableWeapon; bonus2 bAddClass,Class_All,7; }
   - Id: 28100
     AegisName: Thanos_Axe
     Name: "Thanos Axe [1]"
@@ -116190,7 +116196,7 @@ Body:
     EquipLevelMin: 100
     Refineable: true
     Script: |
-      bonus bAtkEle,Ele_Wind; bonus2 bSkillCooldown,"NC_AXETORNADO",-1000;
+      bonus bAtkEle,Ele_Wind; bonus bDelayrate,-5;
   - Id: 28102
     AegisName: Half_BF_Two_Handed_Axe1
     Name: Half BF Two Handed Axe1
@@ -116347,7 +116353,7 @@ Body:
     EquipLevelMin: 130
     Refineable: true
     Script: |
-      .@r = getrefine(); .@red = 10; bonus bUnbreakableWeapon; if (.@r >= 7) { .@red += 15; if (.@r >= 9) { bonus bLongAtkRate,15; if (.@r >= 11) { bonus bDelayrate,-10; } } } bonus2 bSubSize,Size_Medium,.@red; bonus2 bSubSize,Size_Large,.@red;
+      .@r = getrefine(); .@red = 10; bonus bUnbreakableWeapon; if (.@r >= 7) { .@red += 15; if (.@r >= 9) { bonus bLongAtkRate,15; if (getallrefine() >= 22) { bonus bDelayrate,-10; } } } bonus2 bSubSize,Size_Medium,.@red; bonus2 bSubSize,Size_Large,.@red;
   - Id: 28138
     AegisName: Maxi_Spanner
     Name: Maxi Spanner
@@ -116365,7 +116371,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bBaseAtk,4*.@r; bonus bUnbreakableWeapon; bonus2 bSubSize,Size_Small,10; bonus2 bSubSize,Size_Medium,10; if (.@r>=9) { bonus2 bSkillCooldown,"NC_AXETORNADO",-1000; bonus2 bSkillCooldown,"NC_MAGMA_ERUPTION",-1000; } if (.@r>=11) bonus2 bSkillAtk,"NC_AXETORNADO",15;
+      .@r = getrefine(); bonus bBaseAtk,4*.@r; bonus bUnbreakableWeapon; bonus2 bSubSize,Size_Small,10; bonus2 bSubSize,Size_Medium,10; if (.@r>=9) { bonus bDelayrate,-5; } if (getallrefine() >= 22) bonus2 bSkillAtk,"MC_MAMMONITE",15;
   - Id: 28200
     AegisName: END_OF_HORIZO
     Name: "End Of The Horizon [1]"
@@ -116398,7 +116404,7 @@ Body:
     EquipLevelMin: 141
     Refineable: true
     Script: |
-      bonus3 bAutoSpell,"GC_CROSSIMPACT",1,50;
+      bonus3 bAutoSpell,"AS_SONICBLOW",1,50;
   - Id: 28202
     AegisName: Southern_Cross_R_
     Name: "Southern Cross [1]"
@@ -116416,7 +116422,7 @@ Body:
     EquipLevelMin: 141
     Refineable: true
     Script: |
-      bonus3 bAutoSpell,"GC_CROSSIMPACT",1,50;
+      bonus3 bAutoSpell,"AS_SONICBLOW",1,50;
   - Id: 28203
     AegisName: Half_BF_Rifle1
     Name: Half BF Rifle1
@@ -116466,7 +116472,7 @@ Body:
     EquipLevelMin: 120
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bLongAtkRate,15; if (.@r >= 7) { bonus2 bSkillAtk,"RL_AM_BLAST",30; bonus2 bSkillAtk,"RL_MASS_SPIRAL",30; if (.@r >= 9) { bonus2 bSkillCooldown,"RL_AM_BLAST",-1000; } }
+      .@r = getrefine(); bonus bLongAtkRate,15; if (.@r >= 7) { bonus2 bSkillAtk,"GS_TRACKING",30; bonus2 bSkillAtk,"GS_PIERCINGSHOT",30; if (.@r >= 9) { bonus bDelayrate,-5; } }
   - Id: 28224
     AegisName: Dustfire
     Name: "Dustfire [2]"
@@ -116484,7 +116490,7 @@ Body:
     EquipLevelMin: 120
     Refineable: true
     Script: |
-      bonus bSplashRange,1; bonus2 bAddEff,Eff_Blind,50; if (.@r >= 7) { bonus2 bSkillAtk,"RL_S_STORM",15; if (.@r >= 9) { bonus2 bSkillAtk,"RL_BANISHING_BUSTER",15; } }
+      bonus bSplashRange,1; bonus2 bAddEff,Eff_Blind,50; if (.@r >= 7) { bonus2 bSkillAtk,"GS_SPREADATTACK",15; if (.@r >= 9) { bonus2 bSkillAtk,"GS_FULLBUSTER",15; } }
   - Id: 28225
     AegisName: Burning_Rose
     Name: "Burning Rose [2]"
@@ -116502,7 +116508,7 @@ Body:
     EquipLevelMin: 120
     Refineable: true
     Script: |
-      bonus bLongAtkRate,15; if (.@r >= 7) { bonus2 bSkillAtk,"RL_FIRE_RAIN",30; if (.@r >= 9) { bonus2 bSkillCooldown,"RL_FIRE_RAIN",-1000; } }
+      bonus bLongAtkRate,15; if (.@r >= 7) { bonus2 bSkillAtk,"GS_SPREADATTACK",30; if (.@r >= 9) { bonus bDelayrate,-5; } }
   - Id: 28226
     AegisName: Avenger
     Name: "Avenger [2]"
@@ -116520,7 +116526,7 @@ Body:
     EquipLevelMin: 120
     Refineable: true
     Script: |
-      bonus bLongAtkRate,20; if (.@r >= 7) { bonus2 bSkillAtk,"RL_D_TAIL",15; if (.@r >= 9) { bonus2 bSkillCooldown,"RL_H_MINE",-1000; } }
+      bonus bLongAtkRate,20; if (.@r >= 7) { bonus2 bSkillAtk,"GS_DESPERADO",15; if (.@r >= 9) { bonus bDelayrate,-5; } }
   - Id: 28240
     AegisName: Calf_Kingcobra
     Name: Calf Kingcobra
@@ -116538,7 +116544,7 @@ Body:
     EquipLevelMin: 150
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bAspdRate,10 + (.@r > 6 ? 5 : 0); bonus bLongAtkRate,(.@r/2)*5 + (.@r > 11 ? 5 : 0); if(.@r > 8){ bonus bCritAtkRate,15; }
+      .@r = getrefine(); bonus bAspdRate,10 + (.@r > 6 ? 5 : 0); bonus bLongAtkRate,(.@r/2)*5 + (getallrefine() >= 24 ? 5 : 0); if(.@r > 8){ bonus bCritAtkRate,15; }
   - Id: 28241
     AegisName: Calf_Diamondback
     Name: Calf Diamondback
@@ -116556,7 +116562,7 @@ Body:
     EquipLevelMin: 150
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bDex,2; bonus2 bAddClass,Class_All,2; bonus bLongAtkRate,(.@r/2)*5 + (.@r > 11 ? 5 : 0); if(.@r > 6){ bonus2 bSkillAtk,"RL_R_TRIP",20; } if(.@r > 8){ bonus2 bSkillUseSPrate,"RL_R_TRIP",-5; }
+      .@r = getrefine(); bonus bDex,2; bonus2 bAddClass,Class_All,2; bonus bLongAtkRate,(.@r/2)*5 + (getallrefine() >= 24 ? 5 : 0); if(.@r > 6){ bonus2 bSkillAtk,"GS_FULLBUSTER",20; } if(.@r > 8){ bonus2 bSkillUseSPrate,"GS_FULLBUSTER",-5; }
   - Id: 28242
     AegisName: Calf_Anaconda
     Name: Calf Anaconda
@@ -116574,7 +116580,7 @@ Body:
     EquipLevelMin: 150
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bSplashRange,1; bonus bMaxSPrate,2; bonus bLongAtkRate,(.@r/2)*5 + (.@r > 8 ? 5 : 0); if(.@r > 6){ bonus2 bSkillAtk,"RL_BANISHING_BUSTER",20; } if(.@r > 11){ bonus2 bSkillUseSPrate,"RL_BANISHING_BUSTER",-15; }
+      .@r = getrefine(); bonus bSplashRange,1; bonus bMaxSPrate,2; bonus bLongAtkRate,(.@r/2)*5 + (.@r > 8 ? 5 : 0); if(.@r > 6){ bonus2 bSkillAtk,"GS_FULLBUSTER",20; } if(getallrefine() >= 24){ bonus2 bSkillUseSPrate,"GS_FULLBUSTER",-15; }
   - Id: 28243
     AegisName: Calf_Python
     Name: Calf Python
@@ -116592,7 +116598,7 @@ Body:
     EquipLevelMin: 150
     Refineable: true
     Script: |
-      bonus bDex,2; bonus2 bAddClass,Class_All,2; bonus bLongAtkRate,(.@r/2)*5; if(.@r > 6){ bonus bAspdRate,5; } if(.@r > 8){ bonus2 bSkillAtk,"RL_D_TAIL",15 + (.@r > 11 ? 15 : 0); }
+      bonus bDex,2; bonus2 bAddClass,Class_All,2; bonus bLongAtkRate,(.@r/2)*5; if(.@r > 6){ bonus bAspdRate,5; } if(.@r > 8){ bonus2 bSkillAtk,"GS_DESPERADO",15 + (.@r > 11 ? 15 : 0); }
   - Id: 28244
     AegisName: Gate_KeeperDD_IL
     Name: "Illusion Gate Keeper DD [2]"
@@ -116610,7 +116616,7 @@ Body:
     EquipLevelMin: 120
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bDex,1; bonus bSplashRange,1; .@val = 5*(.@r/2); if (.@r >= 7) { bonus bAspdRate,15; if (.@r >= 9) { .@val += 5; if (.@r >= 11) { bonus5 bAutoSpell,"GS_SPREADATTACK",max(6,getskilllv("GS_SPREADATTACK")),50,BF_LONG|BF_WEAPON,1; } } } bonus bLongAtkRate,.@val;
+      .@r = getrefine(); bonus bDex,1; bonus bSplashRange,1; .@val = 5*(.@r/2); if (.@r >= 7) { bonus bAspdRate,15; if (.@r >= 9) { .@val += 5; if (getallrefine() >= 22) { bonus5 bAutoSpell,"GS_SPREADATTACK",max(6,getskilllv("GS_SPREADATTACK")),50,BF_LONG|BF_WEAPON,1; } } } bonus bLongAtkRate,.@val;
   - Id: 28253
     AegisName: HR-S55-OS
     Name: "HR-S55-OS [2]"
@@ -116628,7 +116634,7 @@ Body:
     EquipLevelMin: 130
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus2 bAddClass,Class_All,3; if (.@r >= 7) { bonus bLongAtkRate,7; if (.@r >= 9) { bonus2 bSkillAtk,"RL_HAMMER_OF_GOD",20; if (.@r >= 11) { bonus2 bSkillCooldown,"RL_HAMMER_OF_GOD",-5000; } } }
+      .@r = getrefine(); bonus2 bAddClass,Class_All,3; if (.@r >= 7) { bonus bLongAtkRate,7; if (.@r >= 9) { bonus2 bSkillAtk,"GS_DUST",20; if (getallrefine() >= 22) { bonus bDelayrate,-25; } } }
   - Id: 28254
     AegisName: Butcher_IL
     Name: "Illusion Butcher [2]"
@@ -116646,7 +116652,7 @@ Body:
     EquipLevelMin: 120
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bLongAtkRate,2*(readparam(bStr)/15); bonus bBaseAtk,10*.@r; if (.@r >= 7) { bonus2 bSkillAtk,"RL_FIRE_RAIN",20; if (.@r >= 9) { bonus2 bSkillAtk,"RL_R_TRIP",15; if (.@r >= 11) { bonus2 bAddRace,RC_Brute,30; bonus2 bAddRace,RC_Demon,30; } } }
+      .@r = getrefine(); bonus bLongAtkRate,2*(readparam(bStr)/15); bonus bBaseAtk,10*.@r; if (.@r >= 7) { bonus2 bSkillAtk,"GS_SPREADATTACK",20; if (.@r >= 9) { bonus2 bSkillAtk,"GS_FULLBUSTER",15; if (getallrefine() >= 22) { bonus2 bAddRace,RC_Brute,30; bonus2 bAddRace,RC_Demon,30; } } }
   - Id: 28255
     AegisName: Master_Soul_Rifle
     Name: "Master Soul Rifle [2]"
@@ -116664,7 +116670,7 @@ Body:
     EquipLevelMin: 100
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bMatk,210+10*(.@r/3); bonus bAspdRate,3*(.@r/3); if (.@r >= 7) { bonus bAspd,1; bonus bMatkRate,5; if (.@r >= 9) { .@chance = 1; /* unknown rate*/ if (.@r >= 11) { .@chance += 1; bonus5 bAutoSpell,"WL_SOULEXPANSION",3,1,BF_LONG,1; } bonus5 bAutoSpell,"MG_SOULSTRIKE",10,.@chance,BF_LONG,1; } }
+      .@r = getrefine(); bonus bMatk,210+10*(.@r/3); bonus bAspdRate,3*(.@r/3); if (.@r >= 7) { bonus bAspd,1; bonus bMatkRate,5; if (.@r >= 9) { .@chance = 1; /* unknown rate*/ if (getallrefine() >= 22) { .@chance += 1; } bonus5 bAutoSpell,"MG_SOULSTRIKE",10,.@chance,BF_LONG,1; } }
   - Id: 28256
     AegisName: Demon_Slayer_Shot
     Name: "Demon Slayer Shot [2]"
@@ -116682,7 +116688,7 @@ Body:
     EquipLevelMin: 100
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bSplashRange,1; bonus bLongAtkRate,3*(.@r/2); bonus bMaxSPrate,2*(.@r/3); if (.@r >= 7) { bonus2 bAddClass,Class_Boss,10; if (.@r >= 9) { autobonus3 "{ bonus bBaseAtk,50; bonus bLongAtkRate,10; }",1000,90000,"RL_P_ALTER"; if (.@r >= 11) { bonus2 bAddRace,RC_Undead,15; bonus2 bAddRace,RC_Demon,15; } } }
+      .@r = getrefine(); bonus bSplashRange,1; bonus bLongAtkRate,3*(.@r/2); bonus bMaxSPrate,2*(.@r/3); if (.@r >= 7) { bonus2 bAddClass,Class_Boss,10; if (.@r >= 9) { autobonus3 "{ bonus bBaseAtk,50; bonus bLongAtkRate,10; }",1000,90000,"GS_ADJUSTMENT"; if (getallrefine() >= 22) { bonus2 bAddRace,RC_Undead,15; bonus2 bAddRace,RC_Demon,15; } } }
   - Id: 28257
     AegisName: Golden_Lord_Launcher
     Name: "Golden Lord Launcher [2]"
@@ -116700,7 +116706,7 @@ Body:
     EquipLevelMin: 100
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bLongAtkRate,3*(.@r/2); bonus bBaseAtk,15*(.@r/3); if (.@r >= 7) { .@val = 15; if (.@r >= 9) { bonus2 bSkillCooldown,"RL_D_TAIL",-1000; if (.@r >= 11) { .@val += 15; } } bonus2 bSkillAtk,"RL_D_TAIL",.@val; }
+      .@r = getrefine(); bonus bLongAtkRate,3*(.@r/2); bonus bBaseAtk,15*(.@r/3); if (.@r >= 7) { .@val = 15; if (.@r >= 9) { bonus bDelayrate,-5; if (getallrefine() >= 22) { .@val += 15; } } bonus2 bSkillAtk,"GS_DESPERADO",.@val; }
   - Id: 28258
     AegisName: The_Black
     Name: "The Black [2]"
@@ -116718,7 +116724,7 @@ Body:
     EquipLevelMin: 100
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bLongAtkRate,2*(.@r/3); bonus bBaseAtk,10*(.@r/2); if (.@r >= 7) { .@val = 15; bonus2 bSkillUseSPrate,"RL_R_TRIP",10; if (.@r >= 9) { autobonus3 "{ bonus bBaseAtk,50; bonus bLongAtkRate,10; }",1000,90000,"RL_P_ALTER"; if (.@r >= 11) { .@val += 15; } } bonus2 bSkillAtk,"RL_R_TRIP",.@val; }
+      .@r = getrefine(); bonus bLongAtkRate,2*(.@r/3); bonus bBaseAtk,10*(.@r/2); if (.@r >= 7) { .@val = 15; bonus2 bSkillUseSPrate,"GS_FULLBUSTER",10; if (.@r >= 9) { autobonus3 "{ bonus bBaseAtk,50; bonus bLongAtkRate,10; }",1000,90000,"GS_ADJUSTMENT"; if (getallrefine() >= 22) { .@val += 15; } } bonus2 bSkillAtk,"GS_FULLBUSTER",.@val; }
   - Id: 28302
     AegisName: Vesper_Core01_
     Name: "Vesper Core 01 [1]"
@@ -117024,7 +117030,7 @@ Body:
     Locations: {Both_Accessory: true}
     EquipLevelMin: 100
     Script: |
-      bonus bFlee2,5; bonus2 bSkillCooldown,"SU_SCAROFTAROU",-5000;
+      bonus bFlee2,5; 
   - Id: 28381
     AegisName: Cute_Grass_Necklace
     Name: "Cute Grass Necklace [1]"
@@ -117037,7 +117043,7 @@ Body:
     Locations: {Both_Accessory: true}
     EquipLevelMin: 100
     Script: |
-      bonus bHealPower,5; bonus2 bSkillCooldown,"SU_TUNAPARTY",-7000;
+      bonus bHealPower,5; 
   - Id: 28382
     AegisName: Charm_Grass_Necklace
     Name: "Charm Grass Necklace [1]"
@@ -117050,7 +117056,7 @@ Body:
     Locations: {Both_Accessory: true}
     EquipLevelMin: 100
     Script: |
-      bonus bMdef,5; bonus2 bVariableCastrate,"SU_CN_METEOR",-1000;
+      bonus bMdef,5; 
   - Id: 28386
     AegisName: Fallen_Monk_Rosary
     Name: "Fallen Monk Rosary [1]"
@@ -117062,7 +117068,7 @@ Body:
     Locations: {Both_Accessory: true}
     EquipLevelMin: 20
     Script: |
-      bonus bAspdRate,5; bonus bCritical,5; bonus2 bSkillUseSP,"CH_SOULCOLLECT",-5; if (BaseLevel > 14) bonus2 bSkillAtk,"SR_DRAGONCOMBO",BaseLevel/15; if (BaseLevel > 19) bonus2 bSkillAtk,"SR_KNUCKLEARROW",BaseLevel/20; if (BaseLevel > 29) bonus2 bSkillAtk,"SR_SKYNETBLOW",BaseLevel/30;
+      bonus bAspdRate,5; bonus bCritical,5; bonus2 bSkillUseSP,"CH_SOULCOLLECT",-5; if (BaseLevel > 14) bonus2 bSkillAtk,"MO_TRIPLEATTACK",BaseLevel/15; if (BaseLevel > 19) bonus2 bSkillAtk,"MO_FINGEROFFENSIVE",BaseLevel/20; if (BaseLevel > 29) bonus2 bSkillAtk,"MO_CHAINCOMBO",BaseLevel/30;
   - Id: 28387
     AegisName: Bishop_Necklace
     Name: Bishop Necklace
@@ -117085,7 +117091,7 @@ Body:
     Locations: {Both_Accessory: true}
     EquipLevelMin: 50
     Script: |
-      bonus bDex,5; bonus bLuk,5; bonus bInt,5; bonus2 bSkillAtk,"GN_SPORE_EXPLOSION",BaseLevel/5; bonus2 bVariableCastrate,"CR_ACIDDEMONSTRATION",-(BaseLevel/4); .@n = getskilllv("CR_SLIMPITCHER"); bonus bDex,.@n/2; bonus bLuk,.@n/2; bonus bInt,.@n/2; bonus bMatk,(.@n/2)*20;
+      bonus bDex,5; bonus bLuk,5; bonus bInt,5; bonus2 bSkillAtk,"AM_ACIDTERROR",BaseLevel/5; bonus2 bVariableCastrate,"CR_ACIDDEMONSTRATION",-(BaseLevel/4); .@n = getskilllv("CR_SLIMPITCHER"); bonus bDex,.@n/2; bonus bLuk,.@n/2; bonus bInt,.@n/2; bonus bMatk,(.@n/2)*20;
   - Id: 28411
     AegisName: Emerald_Earring
     Name: "Emerald Earring [1]"
@@ -117098,7 +117104,7 @@ Body:
     Locations: {Both_Accessory: true}
     EquipLevelMin: 50
     Script: |
-      bonus bDex,5; bonus bAgi,5; bonus bInt,5; bonus2 bSkillAtk,"CG_ARROWVULCAN",BaseLevel; bonus2 bSkillAtk,"BA_MUSICALSTRIKE",BaseLevel; bonus2 bSkillAtk,"DC_THROWARROW",BaseLevel; bonus2 bSkillAtk,"WM_METALICSOUND",2*(BaseLevel/5); .@n = getskilllv("WM_METALICSOUND"); bonus2 bVariableCastrate,"WM_METALICSOUND",.@n/2; bonus bDex,.@n/2; bonus bAgi,.@n/2; bonus bInt,.@n/2; bonus bMatk,(.@n/2)*20;
+      bonus bDex,5; bonus bAgi,5; bonus bInt,5; bonus2 bSkillAtk,"CG_ARROWVULCAN",BaseLevel; bonus2 bSkillAtk,"BA_MUSICALSTRIKE",BaseLevel; bonus2 bSkillAtk,"DC_THROWARROW",BaseLevel; .@n = getskilllv("BA_MUSICALSTRIKE"); bonus2 bVariableCastrate,"BA_MUSICALSTRIKE",.@n/2; bonus bDex,.@n/2; bonus bAgi,.@n/2; bonus bInt,.@n/2; bonus bMatk,(.@n/2)*20;
   - Id: 28413
     AegisName: Lesser_Mackerel_Talisman
     Name: "Lesser Mackerel Talisman [1]"
@@ -117238,7 +117244,7 @@ Body:
     Locations: {Both_Accessory: true}
     EquipLevelMin: 100
     Script: |
-      bonus2 bVariableCastrate,"SU_SV_STEMSPEAR",-50; bonus2 bSkillAtk,"SU_SV_STEMSPEAR",(readparam(bInt)/2)+(20 * getskilllv("SU_SV_STEMSPEAR")); /* Need to confirm damage formula */
+      /* Need to confirm damage formula */
   - Id: 28423
     AegisName: Fresh_Tuna_Talisman
     Name: "Fresh Tuna Talisman [1]"
@@ -117251,8 +117257,7 @@ Body:
     Jobs: {}
     Locations: {Both_Accessory: true}
     EquipLevelMin: 100
-    Script: |
-      bonus2 bSkillCooldown,"SU_TUNAPARTY",-5000; bonus3 bAutoSpellWhenHit,"SU_TUNAPARTY",max(1,getskilllv("SU_TUNAPARTY")),10;
+    Script: "\n"
   - Id: 28424
     AegisName: Chubby_Worm_Talisman
     Name: "Chubby Worm Talisman [1]"
@@ -117266,7 +117271,7 @@ Body:
     Locations: {Both_Accessory: true}
     EquipLevelMin: 100
     Script: |
-      bonus2 bVariableCastrate,"SU_PICKYPECK",-50; bonus2 bSkillAtk,"SU_PICKYPECK",(readparam(bDex)/2)+(20 * getskilllv("SU_PICKYPECK")); /* Need to confirm damage formula */
+      /* Need to confirm damage formula */
   - Id: 28425
     AegisName: Mercenary_Ring_Type_A
     Name: Mercenary Ring Type A
@@ -117903,7 +117908,7 @@ Body:
     EquipLevelMin: 130
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus2 bAddClass,Class_All,3; if (.@r >= 7) { bonus bAspdRate,7; if (.@r >= 9) { bonus2 bAddSize,Size_Small,20; bonus2 bAddSize,Size_Medium,20; if (.@r >= 11) { bonus bCritAtkRate,20; } } }
+      .@r = getrefine(); bonus2 bAddClass,Class_All,3; if (.@r >= 7) { bonus bAspdRate,7; if (.@r >= 9) { bonus2 bAddSize,Size_Small,20; bonus2 bAddSize,Size_Medium,20; if (getallrefine() >= 22) { bonus bCritAtkRate,20; } } }
   - Id: 28633
     AegisName: Boltijin
     Name: Boltijin
@@ -117921,7 +117926,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bMatk,175+4*.@r; if (.@r>=9) .@val = 30; if (.@r>=11) { bonus2 bSkillAtk,"WZ_EARTHSPIKE",50; bonus2 bSkillAtk,"WZ_HEAVENDRIVE",50; } bonus2 bSkillAtk,"MG_FIREBOLT",20+.@val; bonus2 bSkillAtk,"MG_COLDBOLT",20+.@val; bonus2 bSkillAtk,"MG_LIGHTNINGBOLT",20+.@val;
+      .@r = getrefine(); bonus bMatk,175+4*.@r; if (.@r>=9) .@val = 30; if (getallrefine() >= 22) { bonus2 bSkillAtk,"WZ_EARTHSPIKE",50; bonus2 bSkillAtk,"WZ_HEAVENDRIVE",50; } bonus2 bSkillAtk,"MG_FIREBOLT",20+.@val; bonus2 bSkillAtk,"MG_COLDBOLT",20+.@val; bonus2 bSkillAtk,"MG_LIGHTNINGBOLT",20+.@val;
   - Id: 28700
     AegisName: Ru_Gold_Dagger
     Name: "Ru Gold Dagger [2]"
@@ -118048,7 +118053,7 @@ Body:
     EquipLevelMin: 100
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus2 bSkillAtk,"KO_BAKURETSU",getskilllv("NJ_TOBIDOUGU"); if (.@r>=9) { bonus bLongAtkRate,5; } else if (.@r>=7) { bonus bLongAtkRate,2; }
+      .@r = getrefine(); bonus2 bSkillAtk,"NJ_BAKUENRYU",getskilllv("NJ_TOBIDOUGU"); if (.@r>=9) { bonus bLongAtkRate,5; } else if (.@r>=7) { bonus bLongAtkRate,2; }
   - Id: 28725
     AegisName: Moonlight_Sword_IL
     Name: "Illusion Moonlight Dagger [1]"
@@ -118083,7 +118088,7 @@ Body:
     WeaponLevel: 4
     EquipLevelMin: 120
     Script: |
-      .@r = getrefine(); bonus bCritical,90; bonus bCritAtkRate,(3*(.@r/2)); if (.@r >= 7) { bonus2 bAddClass,Class_All,5; if (.@r >= 9) { bonus2 bAddSize,Size_All,20; if (.@r >= 11) { bonus2 bAddEle,Ele_All,20; } } }
+      .@r = getrefine(); bonus bCritical,90; bonus bCritAtkRate,(3*(.@r/2)); if (.@r >= 7) { bonus2 bAddClass,Class_All,5; if (.@r >= 9) { bonus2 bAddSize,Size_All,20; if (getallrefine() >= 22) { bonus2 bAddEle,Ele_All,20; } } }
   - Id: 28755
     AegisName: Kuroiro-OS
     Name: "Kuroiro-OS [2]"
@@ -118101,7 +118106,7 @@ Body:
     EquipLevelMin: 130
     Refineable: true
     Script: |
-      bonus bMatk,150; .@r = getrefine(); .@dmg = 5; if (.@r >= 7) { .@dmg += 10; if (.@r >= 9) { bonus2 bSkillAtk,"KO_HAPPOKUNAI",20; if (.@r >= 11) { bonus2 bAddRace,RC_Demon,10; bonus2 bMagicAddRace,RC_Demon,10; bonus2 bAddRace,RC_Undead,10; bonus2 bMagicAddRace,RC_Undead,10; } } } bonus2 bAddEle,Ele_Undead,.@dmg; bonus2 bMagicAddEle,Ele_Undead,.@dmg; bonus2 bAddEle,Ele_Dark,.@dmg; bonus2 bMagicAddEle,Ele_Dark,.@dmg;
+      bonus bMatk,150; .@r = getrefine(); .@dmg = 5; if (.@r >= 7) { .@dmg += 10; if (.@r >= 9) { bonus2 bSkillAtk,"NJ_KUNAI",20; if (getallrefine() >= 22) { bonus2 bAddRace,RC_Demon,10; bonus2 bMagicAddRace,RC_Demon,10; bonus2 bAddRace,RC_Undead,10; bonus2 bMagicAddRace,RC_Undead,10; } } } bonus2 bAddEle,Ele_Undead,.@dmg; bonus2 bMagicAddEle,Ele_Undead,.@dmg; bonus2 bAddEle,Ele_Dark,.@dmg; bonus2 bMagicAddEle,Ele_Dark,.@dmg;
   - Id: 28762
     AegisName: Bazerald_IL
     Name: "Illusion Bazerald [2]"
@@ -118119,7 +118124,7 @@ Body:
     EquipLevelMin: 120
     Refineable: true
     Script: |
-      bonus bMatk,170; bonus bAtkEle,Ele_Fire; bonus bInt,5; .@r = getrefine(); bonus bMatkRate,(.@r/2); if (.@r >= 7) { bonus2 bMagicAtkEle,Ele_Fire,10; if (.@r >= 9) { bonus2 bSkillAtk,"MG_FIREBOLT",40; bonus2 bSkillAtk,"MG_FIREBALL",40; if (.@r >= 11) { bonus2 bSkillAtk,"WZ_METEOR",30; bonus2 bSkillAtk,"WL_CRIMSONROCK",30; } } }
+      bonus bMatk,170; bonus bAtkEle,Ele_Fire; bonus bInt,5; .@r = getrefine(); bonus bMatkRate,(.@r/2); if (.@r >= 7) { bonus2 bMagicAtkEle,Ele_Fire,10; if (.@r >= 9) { bonus2 bSkillAtk,"MG_FIREBOLT",40; bonus2 bSkillAtk,"MG_FIREBALL",40; if (getallrefine() >= 22) { bonus2 bSkillAtk,"WZ_METEOR",30; } } }
   - Id: 28763
     AegisName: Surudoi_Kaze
     Name: "Surudoi Kaze [2]"
@@ -118201,7 +118206,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bBaseAtk,4*.@r; bonus2 bSkillAtk,"RG_BACKSTAP",40; if (.@r>=9) bonus2 bSkillAtk,"SC_FATALMENACE",30; if (.@r>=11) bonus2 bSkillUseSPrate,"SC_FATALMENACE",10;
+      .@r = getrefine(); bonus bBaseAtk,4*.@r; bonus2 bSkillAtk,"RG_BACKSTAP",40; if (.@r>=9) {} if (getallrefine() >= 22) bonus2 bSkillUseSPrate,"RG_BACKSTAP",10;
   - Id: 28768
     AegisName: Platinum_Dagger
     Name: Platinum Dagger
@@ -118219,7 +118224,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bMatk,170+4*.@r; bonus bMatkRate,5; if (.@r>=9) { bonus2 bMagicAtkEle,Ele_Fire,15; bonus2 bMagicAtkEle,Ele_Wind,15; bonus2 bMagicAtkEle,Ele_Water,15; bonus2 bMagicAtkEle,Ele_Earth,15; } if (.@r>=11) autobonus "{ bonus bMatk,100; bonus2 bMagicAddSize,Size_All,30; }",50,10000,BF_WEAPON,"{ specialeffect2 EF_ENHANCE; }"; /* Unknow Rates and Specialeffect */
+      .@r = getrefine(); bonus bMatk,170+4*.@r; bonus bMatkRate,5; if (.@r>=9) { bonus2 bMagicAtkEle,Ele_Fire,15; bonus2 bMagicAtkEle,Ele_Wind,15; bonus2 bMagicAtkEle,Ele_Water,15; bonus2 bMagicAtkEle,Ele_Earth,15; } if (getallrefine() >= 22) autobonus "{ bonus bMatk,100; bonus2 bMagicAddSize,Size_All,30; }",50,10000,BF_WEAPON,"{ specialeffect2 EF_ENHANCE; }"; /* Unknow Rates and Specialeffect */
   - Id: 28900
     AegisName: Guardsmen's_Shield
     Name: "Guardsmen's Shield [1]"
@@ -118246,7 +118251,7 @@ Body:
     Refineable: true
     View: 1
     Script: |
-      bonus bAspd,3; bonus2 bAddRace,RC_All,5; bonus2 bMagicAddRace,RC_All,5; bonus bShortWeaponDamageReturn,10; autobonus2 "{ bonus bMagicDamageReturn,60; }",10,2000,BF_MAGIC,"{ specialeffect2 EF_WIND; }"; .@r = getrefine(); if(.@r>=7) { bonus bBaseAtk,5; bonus bMatk,5; } if(.@r>=9) { bonus bBaseAtk,15; bonus bMatk,15; } if(.@r>=12) { bonus bCritical,10; bonus bNoCastCancel; }
+      bonus bAspd,3; bonus2 bAddRace,RC_All,5; bonus2 bMagicAddRace,RC_All,5; bonus bShortWeaponDamageReturn,10; autobonus2 "{ bonus bMagicDamageReturn,60; }",10,2000,BF_MAGIC,"{ specialeffect2 EF_WIND; }"; .@r = getrefine(); if(.@r>=7) { bonus bBaseAtk,5; bonus bMatk,5; } if(.@r>=9) { bonus bBaseAtk,15; bonus bMatk,15; } if(getallrefine() >= 24) { bonus bCritical,10; bonus bNoCastCancel; }
   - Id: 28902
     AegisName: Mad_Bunny_
     Name: "Mad Bunny [1]"
@@ -118259,7 +118264,7 @@ Body:
     Refineable: true
     View: 1
     Script: |
-      bonus2 bAddRace,RC_All,5; bonus2 bMagicAddRace,RC_All,5; bonus bShortWeaponDamageReturn,10; autobonus2 "{ bonus bMagicDamageReturn,60; }",10,2000,BF_MAGIC,"{ specialeffect2 EF_WIND; }"; .@r = getrefine(); if(.@r>=7) { bonus bBaseAtk,5; bonus bMatk,5; } if(.@r>=9) { bonus bBaseAtk,15; bonus bMatk,15; } if(.@r>=12) { bonus bCritical,10; bonus bNoCastCancel; }
+      bonus2 bAddRace,RC_All,5; bonus2 bMagicAddRace,RC_All,5; bonus bShortWeaponDamageReturn,10; autobonus2 "{ bonus bMagicDamageReturn,60; }",10,2000,BF_MAGIC,"{ specialeffect2 EF_WIND; }"; .@r = getrefine(); if(.@r>=7) { bonus bBaseAtk,5; bonus bMatk,5; } if(.@r>=9) { bonus bBaseAtk,15; bonus bMatk,15; } if(getallrefine() >= 24) { bonus bCritical,10; bonus bNoCastCancel; }
   - Id: 28903
     AegisName: Scutum
     Name: "Scutum [1]"
@@ -118273,7 +118278,7 @@ Body:
     Refineable: true
     View: 1
     Script: |
-      .@r = getrefine(); bonus bFlee,5+(.@r*3); bonus bFlee2,1+(.@r*2); if (.@r > 10) { bonus bMaxHPrate,10; bonus bMaxSPrate,10; }
+      .@r = getrefine(); bonus bFlee,5+(.@r*3); bonus bFlee2,1+(.@r*2); if (getallrefine() >= 22) { bonus bMaxHPrate,10; bonus bMaxSPrate,10; }
   - Id: 28904
     AegisName: Unity_Guard
     Name: "Unity Guard [1]"
@@ -118453,7 +118458,7 @@ Body:
     Refineable: true
     View: 4
     Script: |
-      bonus bVit,3; bonus bInt,2; bonus bMdef,3; bonus bUnbreakableShield; bonus2 bSkillAtk,"LG_EARTHDRIVE",(7*getrefine());
+      bonus bVit,3; bonus bInt,2; bonus bMdef,3; bonus bUnbreakableShield; bonus2 bSkillAtk,"CR_SHIELDBOOMERANG",(7*getrefine());
   - Id: 28941
     AegisName: Excelion_Shield
     Name: Excelion Shield
@@ -119805,7 +119810,7 @@ Body:
     Weight: 10
     Locations: {Right_Hand: true}
     Script: |
-      bonus2 bSkillAtk,"RK_DRAGONBREATH",5; bonus2 bSkillAtk,"RK_DRAGONBREATH_WATER",5; if(getrefine()>=7) { bonus bDelayrate,-1; }
+      bonus2 bSkillAtk,"KN_BOWLINGBASH",5; if(getrefine()>=7) { bonus bDelayrate,-1; }
   - Id: 31013
     AegisName: LoVA_Realization_Bahamut_Card
     Name: LoVA Realization Bahamut Card
@@ -119815,7 +119820,7 @@ Body:
     Weight: 10
     Locations: {Right_Hand: true}
     Script: |
-      bonus2 bSkillAtk,"RK_DRAGONBREATH",15; bonus2 bSkillAtk,"RK_DRAGONBREATH_WATER",15; if(getrefine()>=7) { bonus bDelayrate,-3; }
+      bonus2 bSkillAtk,"KN_BOWLINGBASH",15; if(getrefine()>=7) { bonus bDelayrate,-3; }
   - Id: 31014
     AegisName: LoVA_Ragnarok_Card
     Name: LoVA Ragnarok Card
@@ -125745,7 +125750,7 @@ Body:
     EquipLevelMin: 120
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bStr,3; bonus bInt,2; bonus bDex,2; if (.@r >= 13) { .@val = -2000; } else if (.@r >= 9) { .@val = -1000; } bonus2 bSkillCooldown,"RK_HUNDREDSPEAR",.@val;
+      .@r = getrefine(); bonus bStr,3; bonus bInt,2; bonus bDex,2; if (getallrefine() >= 26) { .@val = -10; } else if (.@r >= 9) { .@val = -5; } bonus bDelayrate,.@val;
   - Id: 32013
     AegisName: Metal_Stick
     Name: Metal Stick
@@ -125763,7 +125768,7 @@ Body:
     EquipLevelMin: 150
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus2 bSkillAtk,"LG_CANNONSPEAR",10; if(.@r > 6){ bonus2 bSkillAtk,"LG_OVERBRAND",10 + (.@r > 8 ? 15 : 0); } if(.@r > 11){ bonus bDelayrate,-15; }
+      .@r = getrefine(); bonus2 bSkillAtk,"PA_SHIELDCHAIN",10; if(.@r > 6){ bonus2 bSkillAtk,"KN_BRANDISHSPEAR",10 + (.@r > 8 ? 15 : 0); } if(getallrefine() >= 24){ bonus bDelayrate,-15; }
   - Id: 32014
     AegisName: Brute_Spear
     Name: Brute Spear
@@ -125797,7 +125802,7 @@ Body:
     EquipLevelMin: 130
     Refineable: true
     Script: |
-      .@r = getrefine(); .@aspd = 3; if (.@r >= 7) { .@aspd += 7; if (.@r >= 9) { .@dmg = 20; if (.@r >= 11) { .@dmg += 15; } bonus2 bSkillAtk,"LG_BANISHINGPOINT",.@dmg; } } bonus bAspdRate,.@aspd;
+      .@r = getrefine(); .@aspd = 3; if (.@r >= 7) { .@aspd += 7; if (.@r >= 9) { .@dmg = 20; if (getallrefine() >= 22) { .@dmg += 15; } bonus2 bSkillAtk,"CR_HOLYCROSS",.@dmg; } } bonus bAspdRate,.@aspd;
   - Id: 32023
     AegisName: Argen_Blanco
     Name: Argen Blanco
@@ -125815,7 +125820,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus2 bSkillAtk,"KN_BRANDISHSPEAR",30; bonus bBaseAtk,4*.@r; if (.@r>=9) bonus2 bSkillCooldown,"RK_HUNDREDSPEAR",-1500; if (.@r>=11) bonus2 bSkillAtk,"KN_BRANDISHSPEAR",20;
+      .@r = getrefine(); bonus2 bSkillAtk,"KN_BRANDISHSPEAR",30; bonus bBaseAtk,4*.@r; if (.@r>=9) bonus bDelayrate,-8; if (getallrefine() >= 22) bonus2 bSkillAtk,"KN_BRANDISHSPEAR",20;
   - Id: 32024
     AegisName: Harve
     Name: Harve
@@ -125833,7 +125838,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus2 bSkillAtk,"PA_SHIELDCHAIN",40; bonus bLongAtkRate,.@r; if (.@r>=9) bonus2 bSkillAtk,"LG_SHIELDPRESS",30; if (.@r>=11) { bonus2 bSkillAtk,"PA_SHIELDCHAIN",20; bonus2 bSkillAtk,"LG_SHIELDPRESS",20; }
+      .@r = getrefine(); bonus2 bSkillAtk,"PA_SHIELDCHAIN",40; bonus bLongAtkRate,.@r; if (.@r>=9) bonus2 bSkillAtk,"CR_SHIELDCHARGE",30; if (getallrefine() >= 22) { bonus2 bSkillAtk,"PA_SHIELDCHAIN",20; bonus2 bSkillAtk,"CR_SHIELDCHARGE",20; }
   - Id: 32025
     AegisName: Fortridge
     Name: Fortridge
@@ -125851,7 +125856,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bDelayrate,-.@r; bonus2 bAddClass,Class_All,5; if (.@r>=9) bonus2 bSkillAtk,"LG_CANNONSPEAR",20; if (.@r>=11) bonus2 bSkillAtk,"LG_OVERBRAND",20;
+      .@r = getrefine(); bonus bDelayrate,-.@r; bonus2 bAddClass,Class_All,5; if (.@r>=9) bonus2 bSkillAtk,"PA_SHIELDCHAIN",20; if (getallrefine() >= 22) bonus2 bSkillAtk,"KN_BRANDISHSPEAR",20;
   - Id: 32107
     AegisName: Black_Circle
     Name: Black Circle
@@ -125870,7 +125875,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bMatk,190+4*.@r; bonus2 bMagicAtkEle,Ele_Neutral,10; if (.@r>=9) bonus2 bSkillAtk,"WM_METALICSOUND",30; if (.@r>=11) bonus2 bSkillCooldown,"WM_METALICSOUND",-2000;
+      .@r = getrefine(); bonus bMatk,190+4*.@r; bonus2 bMagicAtkEle,Ele_Neutral,10; if (.@r>=9) bonus2 bSkillAtk,"BA_MUSICALSTRIKE",30; if (getallrefine() >= 22) bonus bDelayrate,-10;
   - Id: 32108
     AegisName: Antique_Cello
     Name: Antique Cello
@@ -125889,7 +125894,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bVariableCastrate,-10; bonus bLongAtkRate,.@r; if (.@r>=9) bonus2 bSkillCooldown,"WM_SEVERE_RAINSTORM",-1000; if (.@r>=11) bonus2 bSkillUseSPrate,"WM_SEVERE_RAINSTORM",20;
+      .@r = getrefine(); bonus bVariableCastrate,-10; bonus bLongAtkRate,.@r; if (.@r>=9) bonus bDelayrate,-5; if (getallrefine() >= 22) bonus2 bSkillUseSPrate,"CG_ARROWVULCAN",20;
   - Id: 32207
     AegisName: Illusion_Booster_R
     Name: "Illusion Booster R [1]"
@@ -126070,7 +126075,7 @@ Body:
     EquipLevelMin: 120
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bHit,10; bonus bLongAtkRate,3*(.@r/2); if (.@r >= 7) { bonus2 bSkillAtk,"GS_DESPERADO",40; if (.@r >= 9) { bonus2 bSkillCooldown,"RL_HEAT_BARREL",-2000; if (.@r >= 11) { bonus2 bSkillAtk,"RL_FIREDANCE",30; } } }
+      .@r = getrefine(); bonus bHit,10; bonus bLongAtkRate,3*(.@r/2); if (.@r >= 7) { bonus2 bSkillAtk,"GS_DESPERADO",40; if (.@r >= 9) { bonus bDelayrate,-10; if (getallrefine() >= 22) { bonus2 bSkillAtk,"GS_RAPIDSHOWER",30; } } }
   - Id: 32302
     AegisName: Crimson_Rose
     Name: "Crimson Rose [2]"
@@ -126088,7 +126093,7 @@ Body:
     EquipLevelMin: 100
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bBaseAtk,10*(.@r/2); bonus bAspdRate,3*(.@r/3); if (.@r >= 7) { bonus bAspd,1; bonus2 bAddClass,Class_All,5; if (.@r >= 9) { bonus bCritAtkRate,20; if (.@r >= 11) { autobonus3 "{ bonus bCritical,20; bonus bLongAtkRate,15; }",1000,60000,"RL_HEAT_BARREL"; } } }
+      .@r = getrefine(); bonus bBaseAtk,10*(.@r/2); bonus bAspdRate,3*(.@r/3); if (.@r >= 7) { bonus bAspd,1; bonus2 bAddClass,Class_All,5; if (.@r >= 9) { bonus bCritAtkRate,20; if (getallrefine() >= 22) { autobonus3 "{ bonus bCritical,20; bonus bLongAtkRate,15; }",1000,60000,"GS_GATLINGFEVER"; } } }
   - Id: 32350
     AegisName: Farthezan
     Name: Farthezan
@@ -126106,7 +126111,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus bMatk,180; bonus2 bSkillAtk,"PA_PRESSURE",40; bonus bVariableCastrate,-.@r; if (.@r>=9) bonus2 bSkillAtk,"LG_RAYOFGENESIS",30; if (.@r>=11) { bonus2 bSkillAtk,"LG_RAYOFGENESIS",20; bonus2 bSkillAtk,"PA_PRESSURE",20; }
+      .@r = getrefine(); bonus bMatk,180; bonus2 bSkillAtk,"PA_PRESSURE",40; bonus bVariableCastrate,-.@r; if (.@r>=9) bonus2 bSkillAtk,"CR_GRANDCROSS",30; if (getallrefine() >= 22) { bonus2 bSkillAtk,"CR_GRANDCROSS",20; bonus2 bSkillAtk,"PA_PRESSURE",20; }
   - Id: 32351
     AegisName: Estal
     Name: Estal
@@ -126124,7 +126129,7 @@ Body:
     EquipLevelMin: 170
     Refineable: true
     Script: |
-      .@r = getrefine(); bonus2 bSkillCooldown,"GN_SPORE_EXPLOSION",-1000; bonus bBaseAtk,4*.@r; if (.@r>=11) .@val = 50; else if (.@r>=9) .@val = 30; bonus2 bSkillAtk,"GN_SPORE_EXPLOSION",.@val;
+      .@r = getrefine(); bonus bDelayrate,-5; bonus bBaseAtk,4*.@r; if (getallrefine() >= 22) .@val = 50; else if (.@r>=9) .@val = 30; bonus2 bSkillAtk,"AM_ACIDTERROR",.@val;
   - Id: 100003
     AegisName: ILL_Piece_A
     Name: Red Phantom Resonance Stone
@@ -126135,6 +126140,111 @@ Body:
     AegisName: ILL_Piece_B
     Name: Azure Mirage Resonance Stone
     Type: DelayConsume
+    Script: |
+      laphine_upgrade();
+  - Id: 100391
+    AegisName: Moonlight_Box_IL
+    Name: Moonlight Refine Box
+    Type: DelayConsume
+    Weight: 10
+    Script: |
+      laphine_upgrade();
+  - Id: 100392
+    AegisName: S_Moonlight_Box_IL
+    Name: Special Moonlight Refine Box
+    Type: DelayConsume
+    Weight: 10
+    Script: |
+      laphine_upgrade();
+  - Id: 100414
+    AegisName: Vampire_Box_IL
+    Name: Vampire Refine Box
+    Type: DelayConsume
+    Weight: 10
+    Script: |
+      laphine_upgrade();
+  - Id: 100415
+    AegisName: S_Vampire_Box_IL
+    Name: Special Vampire Refine Box
+    Type: DelayConsume
+    Weight: 10
+    Script: |
+      laphine_upgrade();
+  - Id: 100416
+    AegisName: S_Frozen_Box_IL
+    Name: Special Frozen Refine Box
+    Type: DelayConsume
+    Weight: 10
+    Script: |
+      laphine_upgrade();
+  - Id: 100417
+    AegisName: Turtle_Is_Box_IL
+    Name: Turtle Island Refine Box
+    Type: DelayConsume
+    Weight: 10
+    Script: |
+      laphine_upgrade();
+  - Id: 100418
+    AegisName: S_Turtle_Is_Box_IL
+    Name: Special Turtle Island Refine Box
+    Type: DelayConsume
+    Weight: 10
+    Script: |
+      laphine_upgrade();
+  - Id: 100419
+    AegisName: Teddy_Bear_Box_IL
+    Name: Teddy Bear Refine Box
+    Type: DelayConsume
+    Weight: 10
+    Script: |
+      laphine_upgrade();
+  - Id: 100420
+    AegisName: S_Teddy_Bear_Box_IL
+    Name: Special Teddy Bear Refine Box
+    Type: DelayConsume
+    Weight: 10
+    Script: |
+      laphine_upgrade();
+  - Id: 100421
+    AegisName: Luanda_Box_IL
+    Name: Luanda Refine Box
+    Type: DelayConsume
+    Weight: 10
+    Script: |
+      laphine_upgrade();
+  - Id: 100422
+    AegisName: S_Luanda_Box_IL
+    Name: Special Luanda Refine Box
+    Type: DelayConsume
+    Weight: 10
+    Script: |
+      laphine_upgrade();
+  - Id: 100425
+    AegisName: Underwater_Box_IL
+    Name: Underwater Refine Box
+    Type: DelayConsume
+    Weight: 10
+    Script: |
+      laphine_upgrade();
+  - Id: 100426
+    AegisName: S_Underwater_Box_IL
+    Name: Special Underwater Refine Box
+    Type: DelayConsume
+    Weight: 10
+    Script: |
+      laphine_upgrade();
+  - Id: 100699
+    AegisName: Twins_Box_IL
+    Name: Twins Refinement Box
+    Type: DelayConsume
+    Weight: 10
+    Script: |
+      laphine_upgrade();
+  - Id: 100700
+    AegisName: S_Twins_Box_IL
+    Name: Special Twins Refinement Box
+    Type: DelayConsume
+    Weight: 10
     Script: |
       laphine_upgrade();
   - Id: 300076
@@ -126458,7 +126568,7 @@ Body:
       if (.@r>=9) {
          bonus2 bMagicAtkEle,Ele_Wind,2;
       }
-      if (.@r>=11) {
+      if (getallrefine() >= 22) {
          bonus2 bMagicAtkEle,Ele_Wind,5;
       }
   - Id: 300141
@@ -132426,7 +132536,7 @@ Body:
       if (.@r>=9) {
          bonus2 bSubRace,RC_Fish,15;
       }
-      if (.@r>=11) {
+      if (getallrefine() >= 22) {
          bonus2 bIgnoreDefRaceRate,RC_Fish,20;
       }
   - Id: 450145
@@ -132477,7 +132587,7 @@ Body:
       if (.@r>=9) {
          bonus2 bAddClass,Class_All,10;
       }
-      if (.@r>=11) {
+      if (getallrefine() >= 22) {
          bonus bAspdRate,10;
       }
   - Id: 450182
@@ -132501,7 +132611,7 @@ Body:
          bonus bHPrecovRate,20;
          if (.@r>=9) {
             bonus bDelayrate,-5;
-            if (.@r>=11) {
+            if (getallrefine() >= 22) {
                bonus bDelayrate,-7;
             }
          }
@@ -132562,7 +132672,7 @@ Body:
          if (.@r>=9) {
             bonus bMaxHPrate,5;
             bonus bMaxSPrate,5;
-            if (.@r>=11) {
+            if (getallrefine() >= 22) {
                bonus2 bAddSize,Size_All,15;
             }
          }
@@ -133974,13 +134084,13 @@ Body:
       bonus bDelayrate,-5;
       bonus bMatkRate,5;
       if (.@r>=7) {
-         bonus2 bSkillAtk,"LG_RAYOFGENESIS",15;
+         bonus2 bSkillAtk,"CR_GRANDCROSS",15;
          if (.@r>=9) {
             bonus2 bMagicAtkEle,Ele_Neutral,15;
             bonus2 bMagicAtkEle,Ele_Holy,15;
             bonus bVariableCastrate,-10;
-            if (.@r>=11) {
-               bonus2 bSkillAtk,"LG_RAYOFGENESIS",25;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"CR_GRANDCROSS",25;
             }
          }
       }
@@ -134059,7 +134169,7 @@ Body:
          if (.@r>=9) {
             bonus2 bMagicAddSize,Size_Medium,20;
             bonus2 bMagicAddSize,Size_Large,20;
-            if (.@r>=11) {
+            if (getallrefine() >= 22) {
                autobonus "{ bonus2 bMagicAddRace,RC_All,15; }",1,10000,BF_MAGIC;
             }
          }
@@ -134129,13 +134239,13 @@ Body:
       bonus bBaseAtk,20*(.@r/3);
       if (.@r>=7) {
          bonus bCritAtkRate,30;
-         bonus2 bSkillAtk,"LG_CANNONSPEAR",25;
+         bonus2 bSkillAtk,"PA_SHIELDCHAIN",25;
          if (.@r>=9) {
             bonus bLongAtkRate,15;
-            bonus2 bSkillAtk,"LG_BANISHINGPOINT",25;
-            if (.@r>=11) {
-               bonus2 bSkillAtk,"LG_BANISHINGPOINT",20;
-               bonus2 bSkillAtk,"LG_CANNONSPEAR",20;
+            bonus2 bSkillAtk,"CR_HOLYCROSS",25;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"CR_HOLYCROSS",20;
+               bonus2 bSkillAtk,"PA_SHIELDCHAIN",20;
             }
          }
       }
@@ -134249,7 +134359,7 @@ Body:
          if (.@r>=9) {
             bonus2 bMagicAddRace,RC_Angel,20;
             bonus2 bMagicAddEle,Ele_Holy,20;
-            if (.@r>=11) {
+            if (getallrefine() >= 22) {
                bonus2 bMagicAtkEle,Ele_Ghost,15;
                bonus2 bMagicAtkEle,Ele_Undead,15;
                bonus2 bMagicAtkEle,Ele_Poison,15;
@@ -134281,13 +134391,13 @@ Body:
       bonus bVit,2;
       bonus bInt,6;
       autobonus "{ bonus2 bSPRegenRate,150,1000; }",1,4000,BF_MAGIC;
-      bonus2 bSkillAtk,"AB_JUDEX",20*(.@r/3);
+      bonus2 bSkillAtk,"AL_HOLYLIGHT",20*(.@r/3);
       if (.@r>=7) {
          bonus2 bMagicAtkEle,Ele_Holy,15;
          if (.@r>=9) {
             bonus bDelayrate,-15;
-            bonus2 bSkillAtk,"AB_JUDEX",30;
-            if (.@r>=11) {
+            bonus2 bSkillAtk,"AL_HOLYLIGHT",30;
+            if (getallrefine() >= 22) {
                autobonus3 "{ bonus2 bMagicAddSize,Size_All,20; }",1000,15000,"PR_MAGNUS";
             }
          }
@@ -134357,15 +134467,15 @@ Body:
       bonus bMatk,6*(.@r/2);
       if (.@r>=7) {
          bonus2 bMagicAtkEle,Ele_Neutral,10;
-         bonus2 bSkillUseSPrate,"WM_SEVERE_RAINSTORM",10;
+         bonus2 bSkillUseSPrate,"CG_ARROWVULCAN",10;
       }
       if (.@r>=9) {
-         bonus2 bSkillAtk,"WM_SEVERE_RAINSTORM_MELEE",15;
-         bonus2 bSkillAtk,"WM_REVERBERATION",15;
+         bonus2 bSkillAtk,"CG_ARROWVULCAN",15;
+         bonus2 bSkillAtk,"BA_MUSICALSTRIKE",15;
       }
-      if (.@r>=11) {
+      if (getallrefine() >= 22) {
          bonus2 bMagicAddEle,Ele_Water,10;
-         bonus2 bSkillCooldown,"WM_SEVERE_RAINSTORM",-1000;
+         bonus bDelayrate,-5;
       }
   - Id: 580005
     AegisName: Ep172_1h_Whip
@@ -134414,15 +134524,15 @@ Body:
       bonus bMatk,6*(.@r/2);
       if (.@r>=7) {
          bonus2 bMagicAtkEle,Ele_Neutral,10;
-         bonus2 bSkillUseSPrate,"WM_SEVERE_RAINSTORM",10;
+         bonus2 bSkillUseSPrate,"CG_ARROWVULCAN",10;
       }
       if (.@r>=9) {
-         bonus2 bSkillAtk,"WM_SEVERE_RAINSTORM_MELEE",15;
-         bonus2 bSkillAtk,"WM_REVERBERATION",15;
+         bonus2 bSkillAtk,"CG_ARROWVULCAN",15;
+         bonus2 bSkillAtk,"DC_THROWARROW",15;
       }
-      if (.@r>=11) {
+      if (getallrefine() >= 22) {
          bonus2 bMagicAddEle,Ele_Water,10;
-         bonus2 bSkillCooldown,"WM_SEVERE_RAINSTORM",-1000;
+         bonus bDelayrate,-5;
       }
   - Id: 590006
     AegisName: Ep172_1h_Hammer
@@ -134493,12 +134603,12 @@ Body:
       .@r = getrefine();
       bonus bBaseAtk,4*.@r;
       if (.@r>=7) {
-         bonus2 bSkillAtk,"RK_STORMBLAST",20;
+         bonus2 bSkillAtk,"KN_BOWLINGBASH",20;
       }
       if (.@r>=9) {
          autobonus "{ bonus2 bHPRegenRate,getrefine()*50,1000; }",30,4000,BF_WEAPON;
       }
-      if (.@r>=11) {
+      if (getallrefine() >= 22) {
          bonus bCritAtkRate,15;
          bonus bCritical,15;
       }
@@ -134540,12 +134650,12 @@ Body:
       .@r = getrefine();
       bonus bBaseAtk,5*.@r;
       if (.@r>=7) {
-         bonus2 bSkillAtk,"GC_CROSSIMPACT",20;
+         bonus2 bSkillAtk,"AS_SONICBLOW",20;
       }
       if (.@r>=9) {
          bonus bAspdRate,10;
       }
-      if (.@r>=11) {
+      if (getallrefine() >= 22) {
          bonus2 bAddRace,RC_Insect,10;
          bonus2 bAddEle,Ele_Fire,10;
          bonus bCritical,15;
@@ -134578,7 +134688,7 @@ Body:
             bonus2 bAddSize,Size_All,20;
             bonus bLongAtkRate,15;
             bonus bShortAtkRate,15;
-            if (.@r>=11) {
+            if (getallrefine() >= 22) {
                bonus bDelayrate,-10;
             }
          }
@@ -134621,15 +134731,15 @@ Body:
     Script: |
       .@r = getrefine();
       bonus2 bAddClass,Class_All,10;
-      bonus2 bSkillAtk,"LG_OVERBRAND",5*(.@r/2);
+      bonus2 bSkillAtk,"KN_BRANDISHSPEAR",5*(.@r/2);
       if (.@r>=7) {
-         bonus2 bSkillAtk,"LG_OVERBRAND",20;
+         bonus2 bSkillAtk,"KN_BRANDISHSPEAR",20;
       }
       if (.@r>=9) {
          bonus2 bAddSize,Size_Medium,15;
          bonus2 bAddSize,Size_Large,15;
       }
-      if (.@r>=11) {
+      if (getallrefine() >= 22) {
          bonus2 bAddRace,RC_Fish,30;
          bonus2 bAddRace,RC_Demon,30;
       }
@@ -134659,7 +134769,7 @@ Body:
       if (.@r>=9) {
          bonus bLongAtkRate,5;
       }
-      if (.@r>=11) {
+      if (getallrefine() >= 22) {
          bonus2 bAddSize,Size_Medium,10;
          bonus2 bAddSize,Size_Large,10;
          bonus bHit,10;
