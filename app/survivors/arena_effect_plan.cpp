@@ -51,6 +51,9 @@ void PlanCast(const ro::sim::SurvivorsCast& cast, const SkillLook& look,
   switch (cast.kind) {
     case ro::sim::CastKind::kStrike:
     case ro::sim::CastKind::kBlast:
+    // Le coup d'un allié tombe sur son monstre ; un soin, sur le héros soigné.
+    case ro::sim::CastKind::kSummonStrike:
+    case ro::sim::CastKind::kMend:
       out.push_back(ArenaLaunch{
           .effect_id = look.effect_id, .kind = ArenaLaunchKind::kOnGround, .at = cast.to});
       return;
@@ -81,6 +84,10 @@ void PlanCast(const ro::sim::SurvivorsCast& cast, const SkillLook& look,
     case ro::sim::CastKind::kRingOn:
     case ro::sim::CastKind::kZoneOff:
     case ro::sim::CastKind::kBlockOn:
+    // Les alliés aussi : leurs corps se lisent sur l'état.
+    case ro::sim::CastKind::kSummonOn:
+    case ro::sim::CastKind::kSummonOff:
+    case ro::sim::CastKind::kSummonSwap:
       return;
   }
 }

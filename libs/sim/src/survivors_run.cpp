@@ -132,6 +132,7 @@ void Exchange(SurvivorsField& field, SurvivorsKit& kit) {
   std::swap(field.strikes, kit.strikes);
   std::swap(field.blasts, kit.blasts);
   std::swap(field.zones, kit.zones);
+  std::swap(field.summons, kit.summons);
   std::swap(field.start.class_id, kit.start.class_id);
   std::swap(field.start.first_skill_id, kit.start.first_skill_id);
   std::swap(field.start.loadout, kit.start.loadout);
@@ -201,6 +202,10 @@ const std::vector<SurvivorsShot>& ShotsAt(const SurvivorsField& field, std::size
 
 const std::vector<SurvivorsZone>& ZonesAt(const SurvivorsField& field, std::size_t hero_index) {
   return hero_index == field.stage ? field.zones : KitAt(field, hero_index).zones;
+}
+
+const std::vector<SurvivorsSummon>& SummonsAt(const SurvivorsField& field, std::size_t hero_index) {
+  return hero_index == field.stage ? field.summons : KitAt(field, hero_index).summons;
 }
 
 void PutOnStage(SurvivorsField& field, std::size_t hero_index) {
@@ -436,6 +441,7 @@ void SurvivorsRun::StepTeam(std::span<const SurvivorsInput> inputs) {
     survivors::LandBlasts(field_);
     survivors::AdvanceShots(field_);
     survivors::AdvanceZones(field_);
+    survivors::AdvanceSummons(field_);
     survivors::TickPoison(field_);
     for (std::size_t cast = casts_before; cast < field_.news.casts.size(); ++cast) {
       field_.news.casts[cast].hero_index = field_.stage;

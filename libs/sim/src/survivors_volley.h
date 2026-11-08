@@ -51,6 +51,15 @@ namespace ro::sim::survivors {
                   Cells(kMostArenaSideCells));
 }
 
+// La recharge d'une salve, raccourcie par la statistique jusqu'au plafond des
+// réglages.
+[[nodiscard]] inline std::uint32_t ReadyAfter(const SurvivorsField& field,
+                                              const SkillLevel& level) noexcept {
+  const std::int64_t cut_pct = std::min<std::int64_t>(
+      field.hero.stats.Of(SurvivorsStat::kCooldownPct), field.rules->tuning.most_cooldown_pct);
+  return field.step + ScaledSteps(level.cooldown_ms, -cut_pct);
+}
+
 // La place qui reste sous un plafond pour `count` objets déjà en jeu.
 [[nodiscard]] inline std::size_t RoomUnder(std::size_t count, std::uint16_t cap) noexcept {
   return count < cap ? std::size_t{cap} - count : 0;

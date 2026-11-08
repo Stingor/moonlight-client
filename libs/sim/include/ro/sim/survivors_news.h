@@ -53,6 +53,11 @@ enum class CastKind : std::uint8_t {
   kBlockOn,
   kStanceOn,
   kBackSlide,
+  kSummonOn,
+  kSummonStrike,
+  kSummonOff,
+  kMend,
+  kSummonSwap,
 };
 // Un lancer : UNE nouvelle par frappe (kStrike, rebond compris) et par tir
 // (kShot), pas une par salve, avec le monstre visé et, pour une frappe, le pas
@@ -68,6 +73,13 @@ enum class CastKind : std::uint8_t {
 // même sorte, portent le héros dans `from` et `to`, au pas où ils prennent. Un
 // cône tourné vers l'arrière (kBackSlide) a les mesures d'un cône : le corps du
 // héros glisse de `from` vers `to` et revient, sans que sa position change.
+// Une invocation publie kSummonOn à sa naissance et kSummonOff à son départ, sa
+// place dans `from` et `to` ; chacun de ses coups (kSummonStrike) porte sa place
+// dans `from`, le monstre visé dans `to` et `target_serial`. Toutes trois
+// nomment l'allié par `summon_serial`. Un soin (kMend), d'un héros ou d'un allié,
+// porte le soignant dans `from` et le soigné dans `to`. Un échange de place
+// (kSummonSwap) porte l'ancienne place du héros dans `from` et la nouvelle dans
+// `to`.
 struct SurvivorsCast {
   std::uint16_t skill_id = 0;
   CastKind kind = CastKind::kStrike;
@@ -76,7 +88,8 @@ struct SurvivorsCast {
   std::uint32_t target_serial = 0;
   std::uint32_t land_step = 0;
   std::uint8_t spread_steps = 0;
-  std::uint8_t hero_index = 0;  // le héros qui lance ; 0 en solo
+  std::uint8_t hero_index = 0;      // le héros qui lance ; 0 en solo
+  std::uint32_t summon_serial = 0;  // l'allié invoqué qui agit ; 0 : aucun
 };
 inline constexpr std::size_t kMostNewsWarnings = 128;
 // Un ajout se fait en FIN d'énumération.

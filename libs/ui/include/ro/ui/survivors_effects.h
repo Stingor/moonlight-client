@@ -55,6 +55,9 @@ enum class SurvivorsEffectFigure : std::uint8_t {
   kExtraLives,
   kSproutPct,
   kFullHeal,  // sans valeur
+  kZenyPct,
+  kFreezeRiposteChancePct,
+  kSummonDamagePct,
 };
 
 // UN EFFET EN COURS, au HUD : l'icône de l'objet qui l'a donné, ce qui en

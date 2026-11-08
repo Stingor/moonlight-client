@@ -379,7 +379,7 @@ void SurvivorsMode::PoseMeeting(const SurvivorsStage& stage, const SurvivorsCont
   const std::optional<ro::sim::FieldPoint> place =
       MeetingPlaceOf(field.ground, field.hero.position, *meeting);
   if (!place.has_value()) return;
-  meeting_.Place(*place, meeting->leaves_at_run_ms);
+  meeting_.Place(*place, meeting->leaves_at_run_ms, meeting->zeny_wanted);
   meeting_rule_ = meeting;
   arena_->SetStrangerLook(MeetingBodyLook(*awaiting));
   const ro::ui::SkinImage job_icon = SkinImageAt(
@@ -398,7 +398,9 @@ void SurvivorsMode::FollowMeeting(const SurvivorsStage& stage, const SurvivorsCo
   if (meeting_rule_ == nullptr) return;
   const ro::sim::SurvivorsField& field = stage.play()->run().field();
   const std::uint64_t run_ms = std::uint64_t{field.step} * ro::sim::kSurvivorsStepMs;
-  if (!meeting_.Follow(field.hero.position, run_ms, stage.presentation_ms())) return;
+  if (!meeting_.Follow(field.hero.position, run_ms, stage.presentation_ms(), field.hero.zeny)) {
+    return;
+  }
   book_.Inscribe(meeting_rule_->feat_key, context.client_root);
   TellDamagedCopy(book_.TakeDamagedCopy(), context.say);
 }

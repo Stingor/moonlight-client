@@ -107,6 +107,17 @@ void GainExp(SurvivorsField& field, std::uint32_t exp) {
   }
 }
 
+// Vrai si le héros tient déjà un AUTRE skill du groupe exclusif de `rule`.
+[[nodiscard]] bool GroupTaken(const SurvivorsRules& rules, const SurvivorsHero& hero,
+                              const SurvivorsSkillRule& rule) {
+  if (rule.exclusive_group == 0) return false;
+  return std::ranges::any_of(hero.skills, [&](const OwnedSkill& owned) {
+    const SurvivorsSkillRule* held = FindSkill(rules, owned.skill_id);
+    return held != nullptr && held->skill_id != rule.skill_id &&
+           held->exclusive_group == rule.exclusive_group;
+  });
+}
+
 // Une offre tirée : son poids, dans l'ordre des réserves de la classe.
 struct OfferCandidate {
   SurvivorsOffer offer;
@@ -116,7 +127,8 @@ struct OfferCandidate {
 // Les offres possibles, skills puis cartes, dans l'ordre des réserves : un
 // possédé sous son niveau maximal, un nouveau tant qu'un emplacement est libre.
 // Un Id banni ou verrouillé n'y entre pas, ni un skill dont le héros possède
-// l'évolué, qu'il en soit le premier skill ou le second d'une union.
+// l'évolué, qu'il en soit le premier skill ou le second d'une union, ni un
+// nouveau d'un groupe exclusif dont il tient déjà un skill.
 [[nodiscard]] std::vector<OfferCandidate> OfferCandidates(SurvivorsField& field) {
   const SurvivorsRules& rules = *field.rules;
   const ClassRule& hero_class = *field.hero_class;
@@ -138,7 +150,8 @@ struct OfferCandidate {
             {{OfferKind::kSkillLevel, skill_id, static_cast<std::uint8_t>(owned->level + 1U)},
              rules.tuning.offer_weight_owned});
       }
-    } else if (hero.skills.size() < SkillSlots(field) && !rule->levels.empty()) {
+    } else if (hero.skills.size() < SkillSlots(field) && !rule->levels.empty() &&
+               !GroupTaken(rules, hero, *rule)) {
       candidates.push_back({{OfferKind::kNewSkill, skill_id, 1}, rules.tuning.offer_weight_fresh});
     }
   }
@@ -229,7 +242,7 @@ struct OfferCandidate {
     case OfferKind::kNewSkill: {
       const SurvivorsSkillRule* rule = FindSkill(rules, offer.id);
       if (rule == nullptr || OwnedSkillOf(hero, offer.id) != nullptr ||
-          hero.skills.size() >= SkillSlots(field)) {
+          hero.skills.size() >= SkillSlots(field) || GroupTaken(rules, hero, *rule)) {
         return false;
       }
       // Un skill acquis tire dès ce pas ; une orbite part au début de sa phase.

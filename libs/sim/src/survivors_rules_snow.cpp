@@ -109,20 +109,30 @@ constexpr FoeBehaviour kBossImmunities{
   return rule;
 }
 
+// Un porteur de carte : une carte de classe, qui ne tombe que pour une équipe
+// qui peut la tenir.
+[[nodiscard]] constexpr FoeRule WithCard(FoeRule rule, std::uint16_t card_item_id) noexcept {
+  rule.card_item_id = card_item_id;
+  return rule;
+}
+
 // Common(Id, niveau, taille, élément, PV, ms par case, contact, ms, XP[, comportement]).
+// WithCard(…, carte) : un porteur de carte.
 constexpr std::array<FoeRule, kSnowFoeCount> kSnowFoes{{
     Common(kSantaPoringId, 3, kMedium, kHoly, 16, 400, 4, 1672, 1),
-    Common(kMarinId, 15, kMedium, kWater, 22, 400, 5, 1872, 1),
-    Common(kCookieId, 25, kSmall, kNeutral, 20, 200, 5, 1036, 1),
+    WithCard(Common(kMarinId, 15, kMedium, kWater, 22, 400, 5, 1872, 1), kMarinCardId),
+    WithCard(Common(kCookieId, 25, kSmall, kNeutral, 20, 200, 5, 1036, 1), kCookieCardId),
     Common(kChristmasCookieId, 28, kSmall, kHoly, 40, 400, 7, 1248, 3),
     Common(kSiromaId, 42, kSmall, kWater, 30, 180, 4, 864, 2, kSiromaPack),
     Common(kCruiserId, 35, kMedium, kNeutral, 50, 400, 7, 1296, 3),
-    Common(kSasquatchId, 30, kLarge, kNeutral, 70, 300, 9, 1260, 5, kSasquatchCharge),
+    WithCard(Common(kSasquatchId, 30, kLarge, kNeutral, 70, 300, 9, 1260, 5, kSasquatchCharge),
+             kSasquatchCardId),
     Common(kGazetiId, 55, kMedium, kWater, 55, 190, 6, 1152, 6, kGazetiShards),
     Common(kRoweenId, 31, kMedium, kWind, 45, 200, 6, 824, 4, kRoweenPack),
     Common(kSnowierId, 60, kLarge, kWater, 110, 220, 12, 936, 10),
     Common(kBabyHatiiId, 61, kMedium, kWater, 90, 300, 13, 879, 10, kBabyHatiiPack),
-    Common(kIceTitanId, 60, kLarge, kWater, 170, 250, 20, 861, 18, kKnockbackImmune),
+    WithCard(Common(kIceTitanId, 60, kLarge, kWater, 170, 250, 20, 861, 18, kKnockbackImmune),
+             kIceTitanCardId),
     Common(kIceicleId, 38, kSmall, kWater, 40, kStillWalkMs, kNoTouchDamage, kNoTouchMs, 2, kStill),
     // Les mini-boss et le boss final : PV fixes, marche de leur BossRule.
     Boss(FoeRank::kMiniBoss, kChepetId, 42, kMedium, kFire, 700, 300, 12, 1072, 25),

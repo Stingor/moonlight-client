@@ -311,15 +311,6 @@ void Bounce(SurvivorsField& field, const SurvivorsStrike& strike, const Survivor
   }
 }
 
-// La recharge d'une salve, raccourcie par la statistique jusqu'au plafond des
-// réglages.
-[[nodiscard]] std::uint32_t ReadyAfter(const SurvivorsField& field,
-                                       const SkillLevel& level) noexcept {
-  const std::int64_t cut_pct = std::min<std::int64_t>(
-      field.hero.stats.Of(SurvivorsStat::kCooldownPct), field.rules->tuning.most_cooldown_pct);
-  return field.step + ScaledSteps(level.cooldown_ms, -cut_pct);
-}
-
 // LA POSTURE de l'emplacement `index` : éteinte à son terme, puis reprise à
 // chaque recharge, même sans monstre. Elle dure `life_ms` majoré de la durée,
 // et sa recharge se compte AVANT qu'elle ne prenne : Two-Hand Quicken ne
@@ -537,6 +528,12 @@ void FireSkills(SurvivorsField& field) {
         break;
       case SkillArchetype::kBarrier:
         fired = FireBarrier(field, slot, *rule, *level);
+        break;
+      case SkillArchetype::kSummon:
+        fired = FireSummon(field, slot, *rule, *level);
+        break;
+      case SkillArchetype::kMend:
+        fired = FireMend(field, *rule, *level);
         break;
       case SkillArchetype::kOrbit:   // tournée plus haut
       case SkillArchetype::kStance:  // tenue plus haut

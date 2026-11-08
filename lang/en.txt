@@ -23047,3 +23047,111 @@ tr: Hatii's cubs charge the hero.
 
 fr: Des titans de glace referment un anneau autour du héros.
 tr: Ice titans close a ring around the hero.
+
+fr: %s : il attend sur la neige un héros qui porte %u zeny, en partie libre, seul.
+tr: %s: he waits on the snow for a hero carrying %u zeny, in free play, alone.
+
+fr: Amistr repousse ce qu'il frappe, et prend votre place quand vous faiblissez.
+tr: Amistr pushes back what it strikes, and takes your place when you weaken.
+
+fr: Amistr, évolué, broie et renvoie la horde au loin.
+tr: Amistr, evolved, crushes the horde and sends it flying.
+
+fr: Armure augmentée : chaque coup reçu blesse moins.
+tr: Armor increased: every hit taken hurts less.
+
+fr: Des plantes poussent autour de vous et mordent ce qui passe.
+tr: Plants grow around you and bite whatever passes by.
+
+fr: Dégâts augmentés.
+tr: Damage increased.
+
+fr: Dégâts des invocations +%d %%
+tr: Summon damage +%d %%
+
+fr: Filir vole à vos côtés et frappe vite ce qui approche.
+tr: Filir flies at your side and strikes fast at whatever comes close.
+
+fr: Filir, évolué, frappe d'une force terrible.
+tr: Filir, evolved, strikes with terrible force.
+
+fr: Invocations : vos plantes et votre homoncule frappent plus fort.
+tr: Summons: your plants and your homunculus hit harder.
+
+fr: L'acide et la bombe, ensemble, écrasent le plus fort.
+tr: Acid and bomb together crush the strongest.
+
+fr: Le Marchand a vu vos zeny : sa classe est débloquée.
+tr: The Merchant saw your zeny: his class is unlocked.
+
+fr: Lif vous suit et soigne le héros le plus blessé.
+tr: Lif follows you and heals the most wounded hero.
+
+fr: Lif, évolué, soigne bien plus et frappe de loin.
+tr: Lif, evolved, heals far more and strikes from afar.
+
+fr: Marchand
+tr: Merchant
+
+fr: Par moments, votre armure devient presque impénétrable.
+tr: At times, your armor becomes almost impenetrable.
+
+fr: Par moments, votre armure enduite encaisse mieux les coups.
+tr: At times, your coated armor takes hits better.
+
+fr: Par moments, votre cri vous galvanise : vos dégâts montent.
+tr: At times, your shout spurs you on: your damage rises.
+
+fr: Plus de zeny : chaque Gold ramassé vaut davantage.
+tr: More zeny: every Gold picked up is worth more.
+
+fr: Rejoindre le Marchand sur la neige avec des zeny de la partie, seul
+tr: Join the Merchant on the snow with zeny from the run, alone
+
+fr: Riposte de gel %d %%
+tr: Frost riposte %d %%
+
+fr: Riposte de gel : un monstre qui vous touche peut geler.
+tr: Frost riposte: a monster that touches you may freeze.
+
+fr: Récupération : vous regagnez des PV au fil du temps.
+tr: Recovery: you regain HP over time.
+
+fr: Un boulet tiré du chariot éclate sur la foule la plus dense.
+tr: A cannonball fired from the cart bursts on the densest crowd.
+
+fr: Un coup de hache puissant frappe le monstre le plus proche.
+tr: A mighty axe blow strikes the nearest monster.
+
+fr: Un jardin de Geographer mord la horde et vous soigne.
+tr: A garden of Geographers bites the horde and heals you.
+
+fr: Une Marine Sphere posée près de vous saute sous la horde.
+tr: A Marine Sphere set near you blows up under the horde.
+
+fr: Une bombe incendiaire brûle le sol, vague après vague.
+tr: A fire bomb burns the ground, wave after wave.
+
+fr: Une fiole d'acide file sur le plus proche et le fait saigner.
+tr: A vial of acid flies at the nearest and makes it bleed.
+
+fr: Une potion condensée soigne largement le plus blessé.
+tr: A condensed potion heals the most wounded a great deal.
+
+fr: Une potion vole vers le héros le plus blessé et le soigne.
+tr: A potion flies to the most wounded hero and heals them.
+
+fr: Vanilmirth vous suit et frappe de loin un monstre au hasard.
+tr: Vanilmirth follows you and strikes a random monster from afar.
+
+fr: Vanilmirth, évolué, fait éclater la horde autour de sa cible.
+tr: Vanilmirth, evolved, blasts the horde around its target.
+
+fr: Votre chariot tourne autour de vous et repousse ce qu'il frappe.
+tr: Your cart spins around you and pushes back what it hits.
+
+fr: Votre chariot tourne en tornade et balaie la horde au loin.
+tr: Your cart spins like a tornado and sweeps the horde away.
+
+fr: Zeny ramassés +%d %%
+tr: Zeny picked up +%d %%

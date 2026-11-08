@@ -33,15 +33,21 @@ struct SurvivorsMeetingRule {
   std::int32_t east_cells = 0;
   std::int32_t north_cells = 0;
   std::uint64_t leaves_at_run_ms = 0;
+  // Les zeny de la partie que le héros doit porter pour qu'il le suive ; 0 :
+  // rien n'est demandé.
+  std::uint32_t zeny_wanted = 0;
 };
 // L'arène où le Voleur attend.
 inline constexpr std::string_view kMeetingArenaKey = "midgard_plains";
 // L'Archer guette dans le désert, et repart à 5:00.
 inline constexpr std::string_view kArcherMeetingArenaKey = "morroc_desert";
 inline constexpr std::uint64_t kArcherLeavesAtRunMs = 300000;
+// Le Marchand attend sur la neige, et ne suit qu'un héros qui a de quoi payer.
+inline constexpr std::string_view kMerchantMeetingArenaKey = "lutie_snowfield";
+inline constexpr std::uint32_t kMerchantZenyWanted = 150;
 // Le Voleur, à 150 cases vers le nord-est ; l'Archer, à une centaine vers le
-// sud-ouest.
-inline constexpr std::array<SurvivorsMeetingRule, 2> kShippedMeetings{{
+// sud-ouest ; le Marchand, à une centaine vers le sud-est.
+inline constexpr std::array<SurvivorsMeetingRule, 3> kShippedMeetings{{
     {.class_key = "thief",
      .feat_key = kMeetingFeat,
      .arena_key = kMeetingArenaKey,
@@ -53,6 +59,12 @@ inline constexpr std::array<SurvivorsMeetingRule, 2> kShippedMeetings{{
      .east_cells = -80,
      .north_cells = -60,
      .leaves_at_run_ms = kArcherLeavesAtRunMs},
+    {.class_key = "merchant",
+     .feat_key = kMerchantMeetingFeat,
+     .arena_key = kMerchantMeetingArenaKey,
+     .east_cells = 70,
+     .north_cells = -75,
+     .zeny_wanted = kMerchantZenyWanted},
 }};
 // La rencontre de cette classe, ou rien.
 [[nodiscard]] const SurvivorsMeetingRule* MeetingOfClass(std::string_view class_key) noexcept;
@@ -98,12 +110,18 @@ class SurvivorsMeeting {
  public:
   void Clear() noexcept { *this = SurvivorsMeeting{}; }
   // Il attend en `at`, jusqu'à l'heure de partie `leaves_at_run_ms` (0 : toute
-  // la partie).
-  void Place(ro::sim::FieldPoint at, std::uint64_t leaves_at_run_ms) noexcept;
-  // Le héros est à `hero`, à l'heure de partie `run_ms` : vrai à l'image où il
-  // le rejoint, une seule fois. L'heure passée, il est parti sans lui.
-  [[nodiscard]] bool Follow(ro::sim::FieldPoint hero, std::uint64_t run_ms,
-                            std::uint64_t now_ms) noexcept;
+  // la partie), un héros qui porte `zeny_wanted` zeny de la partie.
+  void Place(ro::sim::FieldPoint at, std::uint64_t leaves_at_run_ms,
+             std::uint32_t zeny_wanted = 0) noexcept;
+  // Le héros est à `hero`, à l'heure de partie `run_ms`, avec `hero_zeny` zeny
+  // de la partie : vrai à l'image où il le rejoint, une seule fois, s'il porte
+  // la somme demandée. L'heure passée, il est parti sans lui.
+  [[nodiscard]] bool Follow(ro::sim::FieldPoint hero, std::uint64_t run_ms, std::uint64_t now_ms,
+                            std::uint32_t hero_zeny = 0) noexcept;
+  // Les zeny qui manquent encore au héros qui en porte `hero_zeny`.
+  [[nodiscard]] std::uint32_t ZenyMissing(std::uint32_t hero_zeny) const noexcept {
+    return hero_zeny < zeny_wanted_ ? zeny_wanted_ - hero_zeny : 0;
+  }
   // Là où le corps attend ; rien dès qu'il est rejoint.
   [[nodiscard]] std::optional<ro::sim::FieldPoint> waiting_at() const noexcept;
   // Le corps à dessiner à `now_ms` ; rien une fois parti.
@@ -116,6 +134,7 @@ class SurvivorsMeeting {
   std::optional<std::uint64_t> met_ms_;
   std::optional<std::uint64_t> left_ms_;
   std::uint64_t leaves_at_run_ms_ = 0;
+  std::uint32_t zeny_wanted_ = 0;
 };
 
 }  // namespace moonclient

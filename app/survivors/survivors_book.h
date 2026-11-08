@@ -52,10 +52,12 @@ struct SurvivorsFeat {
 };
 
 // LES EXPLOITS DES RENCONTRES : rejoindre le Voleur sur la prairie, l'Archer dans
-// le désert. Chacun débloque sa classe, et s'inscrit à l'instant par
-// `InscribeFeat`, sans attendre la fin de la partie : voir `survivors_meeting.h`.
+// le désert, le Marchand sur la neige. Chacun débloque sa classe, et s'inscrit à
+// l'instant par `InscribeFeat`, sans attendre la fin de la partie : voir
+// `survivors_meeting.h`.
 inline constexpr std::string_view kMeetingFeat = "thief_met";
 inline constexpr std::string_view kArcherMeetingFeat = "archer_met";
+inline constexpr std::string_view kMerchantMeetingFeat = "merchant_met";
 
 // Les tables livrées : Golem et Mastering Card, et les cartes d'Eclipse, de
 // Dragon Fly, de Vagabond Wolf et de Baphomet, jusqu'à leur première chute,

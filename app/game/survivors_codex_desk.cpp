@@ -111,6 +111,9 @@ struct StanceRow {
     case Stat::kLifeStealPct:
     case Stat::kExtraLives:
     case Stat::kSproutPct:
+    case Stat::kZenyPct:
+    case Stat::kFreezeRiposteChancePct:
+    case Stat::kSummonDamagePct:
       break;
   }
   return {Label::kStanceDamage, Unit::kPercent};

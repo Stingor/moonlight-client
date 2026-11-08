@@ -82,6 +82,11 @@ void LandBlasts(SurvivorsField& field);
 void AdvanceShots(SurvivorsField& field);
 // survivors_zones.cpp. Les murs et les piliers touchent, puis s'éteignent.
 void AdvanceZones(SurvivorsField& field);
+// survivors_summons.cpp. LES INVOCATIONS du héros en scène, dans l'ordre de
+// leur naissance : celle dont le skill a quitté son emplacement ou dont la vie
+// est finie part ; les autres, si le héros est debout, marchent, échangent leur
+// place avec lui, soignent ou frappent.
+void AdvanceSummons(SurvivorsField& field);
 // survivors_skills.cpp. Les tics de poison dus sur les monstres que le héros en
 // scène a empoisonnés. Un tic n'est ni un coup ni un critique ; il n'épargne pas
 // le monstre, et il attend qu'un monstre caché reparaisse.
@@ -305,6 +310,12 @@ void SplashAround(SurvivorsField& field, const SurvivorsSplash& splash);
                             const SurvivorsSkillRule& rule, const SkillLevel& level);
 [[nodiscard]] bool FireRing(SurvivorsField& field, std::uint8_t slot,
                             const SurvivorsSkillRule& rule, const SkillLevel& level);
+// survivors_summons.cpp : l'invocation, sous `amount` alliés de l'emplacement
+// et sous le plafond de l'équipe, et le soin du héros le plus blessé à portée.
+[[nodiscard]] bool FireSummon(SurvivorsField& field, std::uint8_t slot,
+                              const SurvivorsSkillRule& rule, const SkillLevel& level);
+[[nodiscard]] bool FireMend(SurvivorsField& field, const SurvivorsSkillRule& rule,
+                            const SkillLevel& level);
 // survivors_zones.cpp : l'orage.
 [[nodiscard]] bool FireStorm(SurvivorsField& field, std::uint8_t slot,
                              const SurvivorsSkillRule& rule, const SkillLevel& level);

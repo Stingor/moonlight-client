@@ -51,6 +51,8 @@ bool SurvivorsBookMode::ChosenClassOpen(const ro::sim::SurvivorsRules& rules,
                                         const std::filesystem::path& client_root) {
   const ro::sim::ClassRule* chosen = ro::sim::FindClass(rules, board_class_id(rules));
   if (chosen == nullptr) return true;
+  // Une classe hors classement ne joue ni la partie classée ni le défi.
+  if (chosen->free_play_only && kind_ != SurvivorsBoardKind::kFree) return false;
   // Une classe ouverte d'emblée ne dépend pas du carnet.
   if (ClassUnlocked(rules, *chosen, SurvivorsSave{})) return true;
   const SurvivorsSaveRead read = file_.Load(client_root);

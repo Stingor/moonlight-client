@@ -528,11 +528,33 @@ const SurvivorsBotProfile& ArcherBotProfile() {
   return kProfile;
 }
 
+const SurvivorsBotProfile& MerchantBotProfile() {
+  // Ses coups de départ, l'homoncule de Filir, les plantes, la potion, puis
+  // l'acide et la bombe, qui font son union. Les autres homoncules restent
+  // derrière : le premier pris ferme les autres.
+  static constexpr std::array<std::uint16_t, 13> kSkillOrder{42,  153, 8009, 232,  231,  230, 229,
+                                                             233, 155, 236,  8013, 8001, 8005};
+  // La carte des homoncules et celle des plantes d'abord, puis celles qui
+  // ouvrent ses autres évolutions.
+  static constexpr std::array<std::uint16_t, 12> kCardOrder{4216, 4293, 4043, 4196, 4036, 4417,
+                                                            4072, 4003, 4197, 4147, 4016, 4001};
+  static const SurvivorsBotProfile kProfile{.skill_order = kSkillOrder,
+                                            .card_order = kCardOrder,
+                                            .threat_radius_units = Cells(4),
+                                            .panic_radius_units = Cells(2),
+                                            .gem_reach_units = Cells(10),
+                                            .edge_margin_units = Cells(20),
+                                            .heal_below_pct = 50,
+                                            .steady_steps = 5};
+  return kProfile;
+}
+
 const SurvivorsBotProfile* BotProfileOf(std::string_view class_key) {
   if (class_key == "mage") return &MageBotProfile();
   if (class_key == "knight") return &KnightBotProfile();
   if (class_key == "thief") return &ThiefBotProfile();
   if (class_key == "archer") return &ArcherBotProfile();
+  if (class_key == "merchant") return &MerchantBotProfile();
   return nullptr;
 }
 

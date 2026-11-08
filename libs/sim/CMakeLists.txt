@@ -144,11 +144,14 @@ add_library(ro_sim STATIC
     src/survivors_rules_terrain.cpp
     src/survivors_rules_thief.cpp
     src/survivors_rules_archer.cpp
+    src/survivors_rules_merchant.cpp
+    src/survivors_rules_homunculi.cpp
     src/survivors_rules_wizard.cpp
     src/survivors_run.cpp
     src/survivors_score.cpp
     src/survivors_shots.cpp
     src/survivors_skills.cpp
+    src/survivors_summons.cpp
     src/survivors_spawner.cpp
     src/survivors_terrain.cpp
     src/survivors_threats.cpp

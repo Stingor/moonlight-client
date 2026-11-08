@@ -163,6 +163,26 @@ bool HurtHero(SurvivorsField& field, std::int32_t damage) {
   return true;
 }
 
+namespace {
+
+// Le monstre que la riposte de gel saisit reste figé ce temps.
+constexpr std::uint32_t kRiposteFreezeMs = 1500;
+
+// LA RIPOSTE DE GEL : le monstre qui touche le héros gèle, par un Chance du flux
+// du combat, tiré pour un héros qui en a une chance et pour lui seul.
+void Riposte(SurvivorsField& field, SurvivorsFoe& foe) {
+  const std::int32_t chance_pct = field.hero.stats.Of(SurvivorsStat::kFreezeRiposteChancePct);
+  if (chance_pct <= 0) return;
+  constexpr auto kWholeChance = static_cast<std::uint32_t>(kWholeChancePct);
+  if (!field.combat_random.Chance(std::min(static_cast<std::uint32_t>(chance_pct), kWholeChance),
+                                  kWholeChance)) {
+    return;
+  }
+  static_cast<void>(ApplyStatus(field, foe, SurvivorsStatus{.freeze_ms = kRiposteFreezeMs}));
+}
+
+}  // namespace
+
 void TouchHero(SurvivorsField& field) {
   const SurvivorsRules& rules = *field.rules;
   const SurvivorsHero& hero = field.hero;
@@ -181,7 +201,9 @@ void TouchHero(SurvivorsField& field) {
                                FoeRadius(rules, foe) + rules.tuning.touch_reach_units;
     if (DistanceSquared(foe.position, hero.position) >= reach * reach) continue;
     foe.touch_ready_step = field.step + StepsOf(rule->touch_interval_ms);
-    if (HurtHero(field, TouchDamageOf(field, foe, *rule)) || field.hero.down) return;
+    const std::int32_t touch = TouchDamageOf(field, foe, *rule);
+    Riposte(field, foe);
+    if (HurtHero(field, touch) || field.hero.down) return;
   }
 }
 

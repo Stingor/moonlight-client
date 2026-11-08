@@ -269,6 +269,9 @@ void SurvivorsMode::FollowCoopFrame(SurvivorsStage& stage, const SurvivorsContex
 const char* SurvivorsMode::TeamNotice(const SurvivorsStage& stage,
                                       std::uint64_t now_ms) const noexcept {
   if (meeting_.TellingAt(stage.presentation_ms()) && meeting_rule_ != nullptr) {
+    if (meeting_rule_->feat_key == kMerchantMeetingFeat) {
+      return ro::core::TrText("Le Marchand a vu vos zeny : sa classe est débloquée.");
+    }
     return meeting_rule_->feat_key == kArcherMeetingFeat
                ? ro::core::TrText("L'Archer vous a rejoint : sa classe est débloquée.")
                : ro::core::TrText("Le Voleur vous a vu passer : sa classe est débloquée.");

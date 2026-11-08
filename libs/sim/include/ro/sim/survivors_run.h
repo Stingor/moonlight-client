@@ -166,6 +166,7 @@ struct SurvivorsKit {
   std::vector<SurvivorsStrike> strikes;
   std::vector<SurvivorsBlast> blasts;
   std::vector<SurvivorsZone> zones;
+  std::vector<SurvivorsSummon> summons;
   SurvivorsAllyStart start;
 };
 
@@ -213,6 +214,7 @@ struct SurvivorsField {
   std::vector<SurvivorsStrike> strikes;     // ordre d'émission
   std::vector<SurvivorsBlast> blasts;       // ordre d'émission
   std::vector<SurvivorsZone> zones;         // ordre de pose
+  std::vector<SurvivorsSummon> summons;     // ordre d'invocation
   std::vector<SurvivorsFoeShot> foe_shots;  // ordre de tir
   std::vector<SurvivorsHazard> hazards;     // ordre de pose
   std::vector<SurvivorsGem> gems;           // ordre de naissance
@@ -295,6 +297,9 @@ struct SurvivorsField {
 // Les coups du héros `hero_index`, pour le dessin.
 [[nodiscard]] const std::vector<SurvivorsZone>& ZonesAt(const SurvivorsField& field,
                                                         std::size_t hero_index);
+// Les invocations du héros `hero_index`, pour le dessin.
+[[nodiscard]] const std::vector<SurvivorsSummon>& SummonsAt(const SurvivorsField& field,
+                                                            std::size_t hero_index);
 // MET EN SCÈNE le héros `hero_index` : il échange sa place avec celui qui y est.
 // L'échange ne touche ni le niveau, ni l'EXP, ni les zenys de l'équipe.
 void PutOnStage(SurvivorsField& field, std::size_t hero_index);

@@ -156,6 +156,42 @@ inline constexpr std::uint32_t kBlastMinePrimerEffect = 106;
 inline constexpr std::uint32_t kClaymorePrimerEffect = 107;
 inline constexpr std::uint32_t kFreezingTrapPrimerEffect = 108;
 
+// LE MARCHAND. Ses skills n'ont presque rien aux tables du client : ils
+// empruntent l'effet d'un skill voisin, ou se replient sur l'étincelle du coup.
+// La Marine Sphere est un piège, et saute comme la mine.
+inline constexpr std::uint16_t kMammoniteSkill = 42;
+inline constexpr std::uint16_t kDemonstrationSkill = 229;
+inline constexpr std::uint16_t kAcidTerrorSkill = 230;
+inline constexpr std::uint16_t kPotionPitcherSkill = 231;
+inline constexpr std::uint16_t kBioCannibalizeSkill = 232;
+inline constexpr std::uint16_t kSphereMineSkill = 233;
+inline constexpr std::uint16_t kChemicalProtectionArmorSkill = 236;
+inline constexpr std::uint16_t kSlimPotionPitcherSkill = 478;
+inline constexpr std::uint16_t kFullChemicalProtectionSkill = 479;
+inline constexpr std::uint16_t kAcidDemonstrationSkill = 490;
+inline constexpr std::uint16_t kPlantCultivationSkill = 491;
+inline constexpr std::uint16_t kCartCannonSkill = 2477;
+inline constexpr std::uint16_t kTouchOfHealSkill = 8001;
+inline constexpr std::uint16_t kMentalChangeSkill = 8004;
+inline constexpr std::uint16_t kCastlingSkill = 8005;
+inline constexpr std::uint16_t kMoonlightSkill = 8009;
+inline constexpr std::uint16_t kSbr44Skill = 8012;
+inline constexpr std::uint16_t kCapriceSkill = 8013;
+inline constexpr std::uint16_t kBioExplosionSkill = 8016;
+// Les skills dont ils empruntent l'effet : le soin, Endure, Concentration, la
+// boule de feu, l'éclair de feu, Venom Splasher, Earth Spike et Sonic Blow.
+inline constexpr std::uint16_t kHealBorrowed = 28;
+inline constexpr std::uint16_t kEndureBorrowed = 8;
+inline constexpr std::uint16_t kConcentrationBorrowed = 357;
+inline constexpr std::uint16_t kFireBallBorrowed = 17;
+inline constexpr std::uint16_t kFireBoltBorrowed = 19;
+inline constexpr std::uint16_t kVenomSplasherBorrowed = 141;
+inline constexpr std::uint16_t kEarthSpikeBorrowed = 90;
+// La bombe de Demonstration brûle comme Fire Wall ; la fiole d'Acid Terror vole
+// comme la pierre de Throw Stone.
+inline constexpr std::uint32_t kDemonstrationFallbackEffect = 25;
+inline constexpr std::uint32_t kStrikeSparkFallbackEffect = 1;
+
 // MAGNUM BREAK a deux effets : ses anneaux, à l'annonce, et l'anneau de choc de
 // chaque victime, au coup. Le lancer du mode montre les anneaux.
 inline constexpr std::uint16_t kMagnumBreakSkill = 7;

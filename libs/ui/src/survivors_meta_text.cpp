@@ -83,6 +83,9 @@ const char* SurvivorsFeatGoal(std::string_view feat_key) {
   if (feat_key == "archer_met") {
     return core::Tr("Rejoindre l'Archer qui guette dans le désert, avant 5:00, seul");
   }
+  if (feat_key == "merchant_met") {
+    return core::Tr("Rejoindre le Marchand sur la neige avec des zeny de la partie, seul");
+  }
   return "";
 }
 

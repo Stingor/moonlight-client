@@ -96,6 +96,30 @@ inline constexpr std::uint16_t kTrueSightId = 380;
 inline constexpr std::uint16_t kClaymoreTrapId = 123;
 inline constexpr std::uint16_t kBlastMineId = 122;
 inline constexpr std::uint16_t kPhantasmicArrowId = 1009;
+// Le Marchand, ses homoncules, puis ses évolués.
+inline constexpr std::uint16_t kMammoniteId = 42;
+inline constexpr std::uint16_t kCartRevolutionId = 153;
+inline constexpr std::uint16_t kAcidTerrorId = 230;
+inline constexpr std::uint16_t kCrazyUproarId = 155;
+inline constexpr std::uint16_t kDemonstrationId = 229;
+inline constexpr std::uint16_t kSphereMineId = 233;
+inline constexpr std::uint16_t kBioCannibalizeId = 232;
+inline constexpr std::uint16_t kPotionPitcherId = 231;
+inline constexpr std::uint16_t kChemicalProtectionArmorId = 236;
+inline constexpr std::uint16_t kMoonlightId = 8009;
+inline constexpr std::uint16_t kCapriceId = 8013;
+inline constexpr std::uint16_t kTouchOfHealId = 8001;
+inline constexpr std::uint16_t kCastlingId = 8005;
+inline constexpr std::uint16_t kAcidDemonstrationId = 490;
+inline constexpr std::uint16_t kSlimPotionPitcherId = 478;
+inline constexpr std::uint16_t kFullChemicalProtectionId = 479;
+inline constexpr std::uint16_t kPlantCultivationId = 491;
+inline constexpr std::uint16_t kCartCannonId = 2477;
+inline constexpr std::uint16_t kCartTornadoId = 2476;
+inline constexpr std::uint16_t kSbr44Id = 8012;
+inline constexpr std::uint16_t kBioExplosionId = 8016;
+inline constexpr std::uint16_t kMentalChangeId = 8004;
+inline constexpr std::uint16_t kBloodLustId = 8008;
 
 inline constexpr std::uint16_t kHornetCardId = 4019;
 inline constexpr std::uint16_t kChonchonCardId = 4009;
@@ -118,6 +142,12 @@ inline constexpr std::uint16_t kPhreeoniCardId = 4121;
 inline constexpr std::uint16_t kWillowCardId = 4010;
 inline constexpr std::uint16_t kRockerCardId = 4021;
 inline constexpr std::uint16_t kYoyoCardId = 4051;
+inline constexpr std::uint16_t kAndreCardId = 4043;
+inline constexpr std::uint16_t kMukaCardId = 4036;
+inline constexpr std::uint16_t kIceTitanCardId = 4417;
+inline constexpr std::uint16_t kMarinCardId = 4196;
+inline constexpr std::uint16_t kSasquatchCardId = 4216;
+inline constexpr std::uint16_t kCookieCardId = 4293;
 
 inline constexpr std::uint16_t kLunaticId = 1063;
 inline constexpr std::uint16_t kPoringId = 1002;
@@ -193,6 +223,20 @@ inline constexpr std::size_t kArcherCardCount = 6;
 [[nodiscard]] std::span<const CardRule> ArcherCards();
 [[nodiscard]] std::span<const SurvivorsSkillRule> ArcherSkills();
 [[nodiscard]] std::span<const EvolutionRule> ArcherEvolutions();
+
+// survivors_rules_merchant.cpp : le Marchand, sur le même plan, après l'Archer.
+inline constexpr std::size_t kMerchantPoolSkillCount = 13;
+inline constexpr std::size_t kMerchantEvolvedSkillCount = 10;
+inline constexpr std::size_t kMerchantCardCount = 6;
+[[nodiscard]] const ClassRule& MerchantClass();
+[[nodiscard]] std::span<const CardRule> MerchantCards();
+[[nodiscard]] std::span<const SurvivorsSkillRule> MerchantSkills();
+[[nodiscard]] std::span<const EvolutionRule> MerchantEvolutions();
+// survivors_rules_homunculi.cpp : ses quatre homoncules et leurs évolués, que
+// la réserve et les évolutions du Marchand nomment. ShippedSkills les met après
+// ses autres skills, qui en sont d'autant moins nombreux.
+inline constexpr std::size_t kHomunculusSkillCount = 8;
+[[nodiscard]] std::span<const SurvivorsSkillRule> HomunculusSkills();
 
 // survivors_rules_foes.cpp : les monstres, leurs vagues, les arènes, la courbe
 // d'XP et la table des éléments.

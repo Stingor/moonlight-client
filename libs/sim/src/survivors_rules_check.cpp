@@ -199,7 +199,8 @@ template <typename Rule, typename IdOf>
 }
 
 [[nodiscard]] bool IsChanceStat(SurvivorsStat stat) noexcept {
-  return stat == SurvivorsStat::kCritPct || stat == SurvivorsStat::kDodgePct;
+  return stat == SurvivorsStat::kCritPct || stat == SurvivorsStat::kDodgePct ||
+         stat == SurvivorsStat::kFreezeRiposteChancePct;
 }
 
 // LES STATISTIQUES QUI NE SE RETRANCHENT PAS : une carte les porte de 0 à
@@ -208,7 +209,8 @@ template <typename Rule, typename IdOf>
 [[nodiscard]] std::optional<std::int32_t> MostCardValue(SurvivorsStat stat) noexcept {
   if (stat == SurvivorsStat::kLifeStealPct) return kMostLifeStealPct;
   if (stat == SurvivorsStat::kExtraLives) return kMostCardLives;
-  if (stat == SurvivorsStat::kRangedDamagePct || stat == SurvivorsStat::kSproutPct) {
+  if (stat == SurvivorsStat::kRangedDamagePct || stat == SurvivorsStat::kSproutPct ||
+      stat == SurvivorsStat::kZenyPct || stat == SurvivorsStat::kSummonDamagePct) {
     return kMostStatBonus;
   }
   return std::nullopt;

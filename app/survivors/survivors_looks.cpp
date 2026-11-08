@@ -39,6 +39,7 @@ namespace {
     case kAnkleSnareSkill:
     case kSkidTrapSkill:
     case kLandMineSkill:
+    case kSphereMineSkill:
       return kLandMinePrimerEffect;
     case kFreezingTrapSkill:
       return kFreezingTrapPrimerEffect;
@@ -73,6 +74,13 @@ namespace {
       return kArrowFallbackEffect;
     case kArrowShowerSkill:
       return kArrowShowerEffect;
+    case kDemonstrationSkill:
+      return kDemonstrationFallbackEffect;
+    case kMammoniteSkill:
+    case kBioCannibalizeSkill:
+    case kMoonlightSkill:
+    case kCastlingSkill:
+      return kStrikeSparkFallbackEffect;
     default:
       return std::nullopt;
   }
@@ -102,6 +110,7 @@ namespace {
 [[nodiscard]] std::optional<std::uint32_t> ThrownEffectOf(std::uint16_t skill_id) {
   switch (skill_id) {
     case kThrowStoneSkill:
+    case kAcidTerrorSkill:
       return kThrownStoneEffect;
     case kThrowVenomKnifeSkill:
       return kThrownVenomKnifeEffect;
@@ -133,6 +142,26 @@ namespace {
     case kBeastStrafingSkill:
     case kPhantasmicArrowSkill:
       return kSharpShootingSkill;
+    case kPotionPitcherSkill:
+    case kSlimPotionPitcherSkill:
+    case kTouchOfHealSkill:
+    case kMentalChangeSkill:
+      return kHealBorrowed;
+    case kChemicalProtectionArmorSkill:
+      return kEndureBorrowed;
+    case kFullChemicalProtectionSkill:
+      return kConcentrationBorrowed;
+    case kAcidDemonstrationSkill:
+      return kVenomSplasherBorrowed;
+    case kCartCannonSkill:
+    case kBioExplosionSkill:
+      return kFireBallBorrowed;
+    case kCapriceSkill:
+      return kFireBoltBorrowed;
+    case kPlantCultivationSkill:
+      return kEarthSpikeBorrowed;
+    case kSbr44Skill:
+      return kSonicBlowSkill;
     default:
       return skill_id;
   }
@@ -169,6 +198,10 @@ namespace {
     case ro::sim::SkillArchetype::kStance:
     case ro::sim::SkillArchetype::kReflex:
       return SkillBearer::kHero;
+    // Un allié porte ses coups : son effet tombe sur le monstre qu'il frappe. Un
+    // soin tombe sur le héros soigné, qui n'est pas toujours le lanceur.
+    case ro::sim::SkillArchetype::kSummon:
+    case ro::sim::SkillArchetype::kMend:
     case ro::sim::SkillArchetype::kTargetStrike:
     case ro::sim::SkillArchetype::kClusterBlast:
     case ro::sim::SkillArchetype::kWall:

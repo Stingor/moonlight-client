@@ -172,6 +172,15 @@ SurvivorsFigureText SurvivorsEffectFigureText(SurvivorsEffectFigure figure, std:
     case SurvivorsEffectFigure::kFullHeal:
       std::snprintf(out, size, "%s", core::Tr("Rend tous les PV"));
       break;
+    case SurvivorsEffectFigure::kZenyPct:
+      std::snprintf(out, size, core::Tr("Zeny ramassés +%d %%"), shown);
+      break;
+    case SurvivorsEffectFigure::kFreezeRiposteChancePct:
+      std::snprintf(out, size, core::Tr("Riposte de gel %d %%"), shown);
+      break;
+    case SurvivorsEffectFigure::kSummonDamagePct:
+      std::snprintf(out, size, core::Tr("Dégâts des invocations +%d %%"), shown);
+      break;
   }
   return text;
 }

@@ -344,6 +344,23 @@ struct SurvivorsZone {
   std::uint32_t poison_ms = 0;
   std::int32_t poison_tick_damage = 0;
 };
+// UN ALLIÉ INVOQUÉ par un skill du héros (kSummon) : la horde ne le voit ni ne
+// le touche, et il traverse le décor. Ses coups se lisent au niveau courant du
+// skill de son emplacement ; il disparaît quand ce skill n'y est plus.
+struct SurvivorsSummon {
+  std::uint32_t serial = 0;
+  std::uint8_t skill_slot = 0;
+  std::uint16_t skill_id = 0;
+  std::uint16_t summon_class = 0;  // classe RO : nom et sprite côté app
+  FieldPoint position;
+  FieldPoint previous_position;
+  std::uint8_t facing = 0;
+  // Il disparaît au pas `expires_step` ; 0 : jamais.
+  std::uint32_t expires_step = 0;
+  // Son prochain coup ou soin, puis son prochain échange de place.
+  std::uint32_t ready_step = 0;
+  std::uint32_t swap_ready_step = 0;
+};
 struct SurvivorsGem {
   FieldPoint position;
   FieldPoint previous_position;

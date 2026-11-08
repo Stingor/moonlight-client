@@ -136,6 +136,7 @@ void HordePoses::Pose(const ro::sim::SurvivorsField& field, std::uint64_t presen
   PoseFoes(field, presentation_ms, blend_per_mille, times_of);
   PoseFalling(presentation_ms, times_of);
   PoseGround(field, presentation_ms, blend_per_mille);
+  PoseSummons(field, presentation_ms, blend_per_mille, times_of);
 }
 
 void HordePoses::Reset() {
@@ -143,6 +144,7 @@ void HordePoses::Reset() {
   next_memory_.clear();
   falling_.clear();
   poses_.clear();
+  summon_strikes_.clear();
   gesture_started_ms_ = {};
   slides_ = {};
 }
@@ -151,6 +153,17 @@ void HordePoses::NoticeCasts(std::span<const ro::sim::SurvivorsCast> casts,
                              const ro::sim::SurvivorsField& field, std::uint64_t presentation_ms) {
   if (field.tally.outcome == ro::sim::SurvivorsOutcome::kFell) return;
   for (const ro::sim::SurvivorsCast& cast : casts) {
+    if (cast.kind == ro::sim::CastKind::kSummonStrike) {
+      const auto known =
+          std::ranges::find(summon_strikes_, cast.summon_serial, &SummonStrike::serial);
+      if (known != summon_strikes_.end()) {
+        known->started_ms = presentation_ms;
+      } else {
+        summon_strikes_.push_back(
+            SummonStrike{.serial = cast.summon_serial, .started_ms = presentation_ms});
+      }
+      continue;
+    }
     if (cast.kind != ro::sim::CastKind::kBackSlide || cast.hero_index >= slides_.size()) continue;
     const ro::sim::FieldPoint rear = cast.to - cast.from;
     if (rear == ro::sim::FieldPoint{}) continue;
@@ -390,6 +403,44 @@ void HordePoses::PoseGround(const ro::sim::SurvivorsField& field, std::uint64_t 
                   .look_id = GemItemOf(gem.exp),
                   .motion_ms = at_rest,
                   .cell = Interpolated(gem.previous_position, gem.position, blend_per_mille)});
+  }
+}
+
+void HordePoses::PoseSummons(const ro::sim::SurvivorsField& field, std::uint64_t presentation_ms,
+                             std::uint32_t blend_per_mille, const HordeTimesOf& times_of) {
+  // Un allié parti oublie son dernier coup.
+  std::erase_if(summon_strikes_, [&](const SummonStrike& strike) {
+    for (std::size_t index = 0; index < ro::sim::HeroCount(field); ++index) {
+      for (const ro::sim::SurvivorsSummon& summon : ro::sim::SummonsAt(field, index)) {
+        if (summon.serial == strike.serial) return false;
+      }
+    }
+    return true;
+  });
+  for (std::size_t index = 0; index < ro::sim::HeroCount(field); ++index) {
+    for (const ro::sim::SurvivorsSummon& summon : ro::sim::SummonsAt(field, index)) {
+      const HordeMotionTimes times = times_of(HordeBodyKind::kSummon, summon.summon_class);
+      HordePose pose{
+          .kind = HordeBodyKind::kSummon,
+          .sim_id = summon.serial,
+          .look_id = summon.summon_class,
+          .motion_ms = static_cast<float>(presentation_ms),
+          .direction = DirectionOf(summon.facing, /*rounded=*/false),
+          .cell = Interpolated(summon.previous_position, summon.position, blend_per_mille),
+          .tint = kAlliedTint};
+      const auto strike = std::ranges::find(summon_strikes_, summon.serial, &SummonStrike::serial);
+      const float attack_ms = strike != summon_strikes_.end()
+                                  ? ElapsedSince(presentation_ms, strike->started_ms)
+                                  : times.attack_ms;
+      if (attack_ms < times.attack_ms) {
+        pose.motion = Motion::kAttack;
+        pose.motion_ms = attack_ms;
+      } else if (summon.previous_position != summon.position) {
+        pose.motion = Motion::kWalk;
+        pose.motion_ms = WalkingMs(presentation_ms, times.walk_ms, summon.serial);
+      }
+      poses_.push_back(pose);
+    }
   }
 }
 

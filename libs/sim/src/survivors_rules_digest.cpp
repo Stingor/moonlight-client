@@ -62,7 +62,8 @@ void PutSkillLevel(FnvDigest& digest, const SkillLevel& level) {
          level.knockback_units, level.freeze_ms, level.bounces, level.bounce_pct,
          level.bounce_reach_units, level.freeze_from_wave, level.blind_ms, level.curse_ms,
          level.cone_half_steps, level.block_hp, level.stance_bonus, level.poison_ms,
-         level.poison_tick_damage, level.reflex_below_hp_pct, level.reflex_sheathes);
+         level.poison_tick_damage, level.reflex_below_hp_pct, level.reflex_sheathes,
+         level.summon_class, level.leash_units, level.heal_pct);
 }
 
 void PutBehaviour(FnvDigest& digest, const FoeBehaviour& behaviour) {
@@ -103,7 +104,8 @@ void PutContent(FnvDigest& digest, std::span<const WaveRule> waves,
 void PutClass(FnvDigest& digest, const ClassRule& rule) {
   PutAll(digest, rule.class_id, rule.max_hp, rule.walk_ms_per_cell, rule.magnet_units,
          rule.damage_pct_per_level, rule.damage_pct_cap, rule.mount_card_item_id, rule.reborn_level,
-         rule.reborn_damage_pct, rule.attack_gesture, rule.final_boss_hp_bonus_pct);
+         rule.reborn_damage_pct, rule.attack_gesture, rule.final_boss_hp_bonus_pct,
+         rule.free_play_only);
   PutNumbers(digest, rule.starter_skills);
   PutNumbers(digest, rule.skill_pool);
   PutNumbers(digest, rule.card_pool);
@@ -146,7 +148,7 @@ void PutBot(FnvDigest& digest, const SurvivorsBotProfile& profile) {
 void PutCaps(FnvDigest& digest, const SurvivorsCaps& caps) {
   PutAll(digest, caps.most_foes, caps.most_shots, caps.most_strikes, caps.most_gems,
          caps.skill_slots, caps.card_slots, caps.offers, caps.most_blasts, caps.most_zones,
-         caps.most_foe_shots, caps.most_hazards, caps.most_pickups);
+         caps.most_foe_shots, caps.most_hazards, caps.most_pickups, caps.most_summons);
 }
 
 void PutTuning(FnvDigest& digest, const SurvivorsTuning& tuning) {
@@ -190,7 +192,7 @@ std::uint64_t SurvivorsRulesDigest(const SurvivorsRules& rules) {
   PutEach(digest, rules.classes, [&](const ClassRule& rule) { PutClass(digest, rule); });
   PutEach(digest, rules.skills, [&](const SurvivorsSkillRule& rule) {
     PutAll(digest, rule.skill_id, rule.archetype, rule.target, rule.element, rule.stance_stat,
-           rule.cone_behind);
+           rule.cone_behind, rule.exclusive_group);
     PutEach(digest, rule.levels, [&](const SkillLevel& level) { PutSkillLevel(digest, level); });
   });
   PutEach(digest, rules.cards, [&](const CardRule& rule) {

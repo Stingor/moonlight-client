@@ -78,6 +78,15 @@ enum class SkillArchetype : std::uint8_t {
   // Réflexe de survie : un coup reçu sous `reflex_below_hp_pct` % de PV le rend
   // intouchable `life_ms`, à sa recharge. Il ne tire rien de lui-même.
   kReflex,
+  // INVOCATION : des alliés posés près du héros, au plus `amount` à la fois, un
+  // de plus à chaque recharge. Chacun frappe le monstre le plus proche à
+  // `reach_units` toutes les `interval_ms`, ou soigne (`heal_pct`). Sans
+  // `speed_units_per_s`, il ne bouge pas ; sinon il suit le héros et fond sur
+  // ce qui entre dans sa laisse. `life_ms` nul : il dure toute la partie.
+  kSummon,
+  // SOIN : le héros debout le plus blessé à `reach_units`, lui compris, reprend
+  // `heal_pct` % de ses PV max, à la recharge. Rien ne part sans blessé.
+  kMend,
 };
 // Vrai pour un coup lancé de loin : projectile, tir guidé ou éclats visés. Les
 // frappes, les zones posées et les aires autour du héros n'en sont pas.
@@ -112,9 +121,15 @@ enum class SurvivorsStat : std::uint8_t {
   kExtraLives,
   // Le poids, en %, des plantes que seules les cartes font pousser.
   kSproutPct,
+  // Les zeny en plus, en %, de chaque Gold ramassé.
+  kZenyPct,
+  // La chance, en %, qu'un monstre qui touche le héros gèle.
+  kFreezeRiposteChancePct,
+  // Les dégâts en plus, en %, des coups des invocations.
+  kSummonDamagePct,
 };
-inline constexpr std::size_t kSurvivorsStatCount = 18;
-static_assert(static_cast<std::size_t>(SurvivorsStat::kSproutPct) + 1 == kSurvivorsStatCount);
+inline constexpr std::size_t kSurvivorsStatCount = 21;
+static_assert(static_cast<std::size_t>(SurvivorsStat::kSummonDamagePct) + 1 == kSurvivorsStatCount);
 // Une chance se tire sur 100. CheckSurvivorsRules refuse une carte qui en sortirait, une
 // posture qui la majorerait, et des cartes d'esquive qui rendraient un héros intouchable.
 inline constexpr std::int32_t kWholeChancePct = 100;
@@ -177,6 +192,14 @@ struct SkillLevel {
   // garde ses coups, et son premier coup en sortant est un critique.
   std::int32_t reflex_below_hp_pct = 0;
   bool reflex_sheathes = false;
+  // Invocation : la classe RO que l'allié montre (un monstre ou un homoncule),
+  // côté app ; la laisse, autour du héros, d'un allié qui marche. Une
+  // invocation qui porte `reflex_below_hp_pct` échange sa place avec celle du
+  // héros frappé sous ce seuil, à sa recharge.
+  std::uint16_t summon_class = 0;
+  std::int32_t leash_units = 0;
+  // Soin : la part, en %, des PV max rendue.
+  std::int32_t heal_pct = 0;
 };
 
 // La vitesse d'un tir en sous-unités par pas, tronquée vers zéro : celle du
@@ -201,6 +224,9 @@ struct SurvivorsSkillRule {
   SurvivorsStat stance_stat = SurvivorsStat::kArmor;
   // Cône : tourné vers l'arrière du cap du héros, et non vers l'avant.
   bool cone_behind = false;
+  // LE GROUPE EXCLUSIF : un héros n'en tient qu'un skill ; dès qu'il en tient
+  // un, les offres ne proposent plus les autres. 0 : aucun groupe.
+  std::uint8_t exclusive_group = 0;
 };
 
 struct CardRule {
@@ -315,6 +341,9 @@ struct ClassRule {
   // aussi à tout coéquipier d'un héros de cette classe. Une équipe qui ne la
   // compte pas ne les voit jamais.
   std::span<const std::uint16_t> lent_cards;
+  // HORS CLASSEMENT : la classe ne joue qu'en partie libre ; ni la partie
+  // classée ni le défi ne la prennent.
+  bool free_play_only = false;
 };
 
 // Vrai quand un héros de ce niveau est rené.
@@ -343,6 +372,7 @@ inline constexpr std::uint16_t kDefaultMostZones = 64;
 inline constexpr std::uint16_t kDefaultMostFoeShots = 128;
 inline constexpr std::uint16_t kDefaultMostHazards = 64;
 inline constexpr std::uint16_t kDefaultMostPickups = 128;
+inline constexpr std::uint16_t kDefaultMostSummons = 32;
 struct SurvivorsCaps {
   std::uint16_t most_foes = 0;
   std::uint16_t most_shots = 0;
@@ -359,6 +389,8 @@ struct SurvivorsCaps {
   std::uint16_t most_foe_shots = kDefaultMostFoeShots;
   std::uint16_t most_hazards = kDefaultMostHazards;
   std::uint16_t most_pickups = kDefaultMostPickups;  // les coffres passent hors plafond
+  // Les invocations de toute l'équipe.
+  std::uint16_t most_summons = kDefaultMostSummons;
 };
 // LES CAPS DES PLANTES DU DÉPART, dans l'ordre de leur pose, en pas d'une
 // case vers l'est et vers le nord : est, ouest, nord, sud, puis nord-est,

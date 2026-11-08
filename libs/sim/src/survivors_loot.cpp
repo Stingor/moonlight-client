@@ -331,7 +331,10 @@ void Apply(SurvivorsField& field, const SurvivorsPickup& pickup) {
           std::min<std::int64_t>(hero.max_hp, std::int64_t{hero.hp} + std::max(rule->amount, 0)));
       break;
     case PickupKind::kGold:
-      hero.zeny = SaturatedSum(hero.zeny, std::max(rule->amount, 0));
+      // Les cartes de zeny majorent chaque Gold ramassé.
+      hero.zeny =
+          SaturatedSum(hero.zeny, ScaledUnits(std::max(rule->amount, 0),
+                                              std::max(hero.stats.Of(SurvivorsStat::kZenyPct), 0)));
       break;
     case PickupKind::kManual:
       hero.exp_boost_until_step =

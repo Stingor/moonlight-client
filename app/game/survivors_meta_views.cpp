@@ -26,6 +26,7 @@
 #include "survivors/arena_choice.h"
 #include "survivors/survivors_book.h"
 #include "survivors/survivors_looks.h"
+#include "survivors/survivors_meeting.h"
 
 namespace moonclient {
 namespace {
@@ -73,6 +74,11 @@ void SurvivorsViews::ComposeClassChoices(const ro::sim::SurvivorsRules& rules,
       class_hints_.push_back(ro::core::Printed(
           ro::core::Tr("%s : il guette dans le désert jusqu'à 5:00, en partie libre, seul."),
           ClassName(class_rule, tables)));
+    } else if (feat == kMerchantMeetingFeat) {
+      class_hints_.push_back(ro::core::Printed(
+          ro::core::Tr("%s : il attend sur la neige un héros qui porte %u zeny, en partie libre, "
+                       "seul."),
+          ClassName(class_rule, tables), static_cast<unsigned>(kMerchantZenyWanted)));
     } else {
       class_hints_.push_back(
           minutes == 0

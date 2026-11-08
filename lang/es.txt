@@ -23047,3 +23047,111 @@ tr: Las crías de Hatii cargan contra el héroe.
 
 fr: Des titans de glace referment un anneau autour du héros.
 tr: Unos titanes de hielo cierran un anillo alrededor del héroe.
+
+fr: %s : il attend sur la neige un héros qui porte %u zeny, en partie libre, seul.
+tr: %s: espera en la nieve a un héroe que lleve %u zeny, en partida libre, solo.
+
+fr: Amistr repousse ce qu'il frappe, et prend votre place quand vous faiblissez.
+tr: Amistr repele lo que golpea y ocupa tu lugar cuando flaqueas.
+
+fr: Amistr, évolué, broie et renvoie la horde au loin.
+tr: Amistr, evolucionado, aplasta a la horda y la manda lejos.
+
+fr: Armure augmentée : chaque coup reçu blesse moins.
+tr: Armadura aumentada: cada golpe recibido hiere menos.
+
+fr: Des plantes poussent autour de vous et mordent ce qui passe.
+tr: Crecen plantas a tu alrededor que muerden a quien pasa.
+
+fr: Dégâts augmentés.
+tr: Daño aumentado.
+
+fr: Dégâts des invocations +%d %%
+tr: Daño de invocaciones +%d %%
+
+fr: Filir vole à vos côtés et frappe vite ce qui approche.
+tr: Filir vuela a tu lado y golpea rápido a lo que se acerca.
+
+fr: Filir, évolué, frappe d'une force terrible.
+tr: Filir, evolucionado, golpea con una fuerza terrible.
+
+fr: Invocations : vos plantes et votre homoncule frappent plus fort.
+tr: Invocaciones: tus plantas y tu homúnculo golpean más fuerte.
+
+fr: L'acide et la bombe, ensemble, écrasent le plus fort.
+tr: El ácido y la bomba, juntos, aplastan al más fuerte.
+
+fr: Le Marchand a vu vos zeny : sa classe est débloquée.
+tr: El Mercader vio tus zeny: su clase está desbloqueada.
+
+fr: Lif vous suit et soigne le héros le plus blessé.
+tr: Lif te sigue y cura al héroe más herido.
+
+fr: Lif, évolué, soigne bien plus et frappe de loin.
+tr: Lif, evolucionado, cura mucho más y golpea de lejos.
+
+fr: Marchand
+tr: Mercader
+
+fr: Par moments, votre armure devient presque impénétrable.
+tr: A ratos, tu armadura se vuelve casi impenetrable.
+
+fr: Par moments, votre armure enduite encaisse mieux les coups.
+tr: A ratos, tu armadura recubierta aguanta mejor los golpes.
+
+fr: Par moments, votre cri vous galvanise : vos dégâts montent.
+tr: A ratos, tu grito te enardece: tu daño sube.
+
+fr: Plus de zeny : chaque Gold ramassé vaut davantage.
+tr: Más zeny: cada Gold recogido vale más.
+
+fr: Rejoindre le Marchand sur la neige avec des zeny de la partie, seul
+tr: Reunirse con el Mercader en la nieve con zeny de la partida, solo
+
+fr: Riposte de gel %d %%
+tr: Réplica de hielo %d %%
+
+fr: Riposte de gel : un monstre qui vous touche peut geler.
+tr: Réplica de hielo: un monstruo que te toque puede congelarse.
+
+fr: Récupération : vous regagnez des PV au fil du temps.
+tr: Recuperación: recuperas PV con el tiempo.
+
+fr: Un boulet tiré du chariot éclate sur la foule la plus dense.
+tr: Una bala disparada desde el carro estalla sobre la multitud más densa.
+
+fr: Un coup de hache puissant frappe le monstre le plus proche.
+tr: Un potente hachazo golpea al monstruo más cercano.
+
+fr: Un jardin de Geographer mord la horde et vous soigne.
+tr: Un jardín de Geographer muerde a la horda y te cura.
+
+fr: Une Marine Sphere posée près de vous saute sous la horde.
+tr: Una Marine Sphere puesta cerca de ti estalla bajo la horda.
+
+fr: Une bombe incendiaire brûle le sol, vague après vague.
+tr: Una bomba incendiaria quema el suelo, oleada tras oleada.
+
+fr: Une fiole d'acide file sur le plus proche et le fait saigner.
+tr: Un frasco de ácido vuela hacia el más cercano y lo hace sangrar.
+
+fr: Une potion condensée soigne largement le plus blessé.
+tr: Una poción condensada cura mucho al más herido.
+
+fr: Une potion vole vers le héros le plus blessé et le soigne.
+tr: Una poción vuela hacia el héroe más herido y lo cura.
+
+fr: Vanilmirth vous suit et frappe de loin un monstre au hasard.
+tr: Vanilmirth te sigue y golpea de lejos a un monstruo al azar.
+
+fr: Vanilmirth, évolué, fait éclater la horde autour de sa cible.
+tr: Vanilmirth, evolucionado, hace estallar a la horda alrededor de su objetivo.
+
+fr: Votre chariot tourne autour de vous et repousse ce qu'il frappe.
+tr: Tu carro gira a tu alrededor y repele lo que golpea.
+
+fr: Votre chariot tourne en tornade et balaie la horde au loin.
+tr: Tu carro gira como un tornado y barre a la horda lejos.
+
+fr: Zeny ramassés +%d %%
+tr: Zeny recogidos +%d %%

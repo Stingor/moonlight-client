@@ -144,11 +144,12 @@ constexpr std::int64_t kReflexLeastRestMs = 1000;
 
 [[nodiscard]] core::Result<void> CheckLevelContent(const SurvivorsSkillRule& skill,
                                                    const SkillLevel& level, const std::string& at) {
-  if (auto checked = CheckMeasures<5>(at, {{{"aire", level.area_radius_units},
+  if (auto checked = CheckMeasures<6>(at, {{{"aire", level.area_radius_units},
                                             {"longueur", level.length_units},
                                             {"recul", level.knockback_units},
                                             {"portée de rebond", level.bounce_reach_units},
-                                            {"PV de bloc", level.block_hp}}});
+                                            {"PV de bloc", level.block_hp},
+                                            {"laisse", level.leash_units}}});
       !checked) {
     return checked;
   }
@@ -197,10 +198,43 @@ constexpr std::int64_t kReflexLeastRestMs = 1000;
        skill.stance_stat == SurvivorsStat::kDodgePct ||
        skill.stance_stat == SurvivorsStat::kLifeStealPct ||
        skill.stance_stat == SurvivorsStat::kExtraLives ||
-       skill.stance_stat == SurvivorsStat::kSproutPct)) {
+       skill.stance_stat == SurvivorsStat::kSproutPct ||
+       skill.stance_stat == SurvivorsStat::kZenyPct ||
+       skill.stance_stat == SurvivorsStat::kFreezeRiposteChancePct)) {
     return Refuse(at +
                   "de posture sans bonus, sans durée, plus longue que sa recharge, ou sur "
-                  "les PV max, une chance, le vol de vie, les relèves ou les plantes");
+                  "les PV max, une chance, le vol de vie, les relèves, les plantes ou les zeny");
+  }
+  // Une invocation montre une classe, en tient au moins une, frappe ou soigne
+  // à une portée, à un rythme ; un allié qui marche a sa laisse.
+  if (skill.archetype == SkillArchetype::kSummon &&
+      (level.summon_class == 0 || level.interval_ms == 0 || level.reach_units <= 0 ||
+       (level.damage <= 0 && level.heal_pct <= 0) ||
+       (level.speed_units_per_s > 0) != (level.leash_units > 0) ||
+       (level.speed_units_per_s > 0 && Stalls(level.speed_units_per_s)))) {
+    return Refuse(at +
+                  "d'invocation sans classe, sans rythme, sans portée, sans coup ni soin, ou "
+                  "qui marche sans laisse");
+  }
+  // Un soin rend une part des PV max, à portée.
+  if (skill.archetype == SkillArchetype::kMend &&
+      (level.heal_pct <= 0 || level.reach_units <= 0 || level.cooldown_ms == 0)) {
+    return Refuse(at + "de soin sans part, sans portée ou sans recharge");
+  }
+  if (level.heal_pct < 0 || level.heal_pct > kWholeHpPct ||
+      (level.heal_pct > 0 && skill.archetype != SkillArchetype::kSummon &&
+       skill.archetype != SkillArchetype::kMend)) {
+    return Refuse(at + "soin hors de [0, 100] %, ou hors d'une invocation ou d'un soin");
+  }
+  if ((level.summon_class != 0 || level.leash_units != 0) &&
+      skill.archetype != SkillArchetype::kSummon) {
+    return Refuse(at + "classe ou laisse d'invocation hors d'une invocation");
+  }
+  // Un échange de place sous un seuil de PV, à la recharge de l'invocation.
+  if (skill.archetype == SkillArchetype::kSummon && level.reflex_below_hp_pct != 0 &&
+      (level.reflex_below_hp_pct < 0 || level.reflex_below_hp_pct > kWholeHpPct ||
+       level.cooldown_ms == 0)) {
+    return Refuse(at + "d'échange de place de seuil hors de [1, 100] % ou sans recharge");
   }
   // Un réflexe rend intouchable un temps, à sa recharge, sous un seuil de PV.
   if (skill.archetype == SkillArchetype::kReflex &&
@@ -578,7 +612,7 @@ core::Result<void> CheckContentTuning(const SurvivorsRules& rules) {
   }
   const SurvivorsCaps& caps = rules.caps;
   if (caps.most_blasts == 0 || caps.most_zones == 0 || caps.most_foe_shots == 0 ||
-      caps.most_hazards == 0 || caps.most_pickups == 0) {
+      caps.most_hazards == 0 || caps.most_pickups == 0 || caps.most_summons == 0) {
     return Refuse("plafond du contenu nul");
   }
   return {};

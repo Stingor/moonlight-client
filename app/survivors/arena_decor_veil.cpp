@@ -18,6 +18,7 @@ namespace {
     case HordeBodyKind::kPickup:
       return 2;
     case HordeBodyKind::kPlant:
+    case HordeBodyKind::kSummon:
       return 3;
     case HordeBodyKind::kGem:
       return 4;

@@ -25,7 +25,19 @@ namespace moonclient {
 //
 // `kStranger` : le corps de la rencontre, que la simulation ignore. Il se compose
 // comme un joueur, et `HordePoses` ne le pose pas : voir `StrangerPoseAt`.
-enum class HordeBodyKind : std::uint8_t { kHero, kFoe, kFalling, kPlant, kGem, kPickup, kStranger };
+//
+// `kSummon` : un allié invoqué par un héros, plante ou homoncule, dessiné comme
+// un monstre de sa classe, sous la teinte des alliés.
+enum class HordeBodyKind : std::uint8_t {
+  kHero,
+  kFoe,
+  kFalling,
+  kPlant,
+  kGem,
+  kPickup,
+  kStranger,
+  kSummon
+};
 
 // LA POSE D'UN CORPS à cette image.
 struct HordePose {
@@ -118,6 +130,8 @@ inline constexpr std::array<std::uint8_t, 4> kEliteTint = {255, 210, 90, 255};
 inline constexpr std::array<std::uint8_t, 4> kChilledTint = {160, 200, 255, 255};
 // Gelé par un boss, le héros prend le même bleu tant qu'il marche ralenti.
 inline constexpr std::array<std::uint8_t, 4> kFrostedHeroTint = kChilledTint;
+// UN ALLIÉ INVOQUÉ verdit un peu : le joueur ne le prend pas pour la horde.
+inline constexpr std::array<std::uint8_t, 4> kAlliedTint = {200, 255, 200, 255};
 
 // La position d'un point de la simulation, en cases continues.
 [[nodiscard]] glm::vec2 CellOfField(glm::vec2 subunits) noexcept;
@@ -200,8 +214,18 @@ class HordePoses {
   void PoseFalling(std::uint64_t presentation_ms, const HordeTimesOf& times_of);
   void PoseGround(const ro::sim::SurvivorsField& field, std::uint64_t presentation_ms,
                   std::uint32_t blend_per_mille);
+  // Les alliés invoqués de chaque héros : ils frappent au coup qu'annonce leur
+  // nouvelle, marchent quand ils bougent, se tiennent sinon.
+  void PoseSummons(const ro::sim::SurvivorsField& field, std::uint64_t presentation_ms,
+                   std::uint32_t blend_per_mille, const HordeTimesOf& times_of);
 
   std::vector<FoeMemory> memory_;
+  // Le dernier coup de chaque allié invoqué : son numéro, et l'instant du coup.
+  struct SummonStrike {
+    std::uint32_t serial = 0;
+    std::uint64_t started_ms = 0;
+  };
+  std::vector<SummonStrike> summon_strikes_;
   std::vector<FoeMemory> next_memory_;
   std::vector<FallingBody> falling_;
   std::vector<HordePose> poses_;

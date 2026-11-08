@@ -70,6 +70,9 @@ class SurvivorsBot {
 // Le profil de l'Archer : il tient la horde au bout de ses flèches, et la
 // fait marcher sur les pièges qu'il laisse en fuyant.
 [[nodiscard]] const SurvivorsBotProfile& ArcherBotProfile();
+// Le profil du Marchand : il tient près de la horde, que sa hache et son
+// chariot doivent atteindre, et laisse ses invocations faire le reste.
+[[nodiscard]] const SurvivorsBotProfile& MerchantBotProfile();
 // Le profil de la classe `class_key` ; nullptr pour une clé qu'aucun robot ne
 // sait jouer.
 [[nodiscard]] const SurvivorsBotProfile* BotProfileOf(std::string_view class_key);

@@ -150,6 +150,12 @@ ro::ui::SurvivorsEffectFigure FigureOfStat(ro::sim::SurvivorsStat stat) noexcept
       return Figure::kExtraLives;
     case ro::sim::SurvivorsStat::kSproutPct:
       return Figure::kSproutPct;
+    case ro::sim::SurvivorsStat::kZenyPct:
+      return Figure::kZenyPct;
+    case ro::sim::SurvivorsStat::kFreezeRiposteChancePct:
+      return Figure::kFreezeRiposteChancePct;
+    case ro::sim::SurvivorsStat::kSummonDamagePct:
+      return Figure::kSummonDamagePct;
   }
   return Figure::kDamagePct;
 }

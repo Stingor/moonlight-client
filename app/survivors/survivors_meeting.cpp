@@ -64,15 +64,17 @@ std::optional<ro::sim::FieldPoint> MeetingPlaceOf(const ro::sim::SurvivorsGround
   return nearest;
 }
 
-void SurvivorsMeeting::Place(ro::sim::FieldPoint at, std::uint64_t leaves_at_run_ms) noexcept {
+void SurvivorsMeeting::Place(ro::sim::FieldPoint at, std::uint64_t leaves_at_run_ms,
+                             std::uint32_t zeny_wanted) noexcept {
   at_ = at;
   met_ms_.reset();
   left_ms_.reset();
   leaves_at_run_ms_ = leaves_at_run_ms;
+  zeny_wanted_ = zeny_wanted;
 }
 
-bool SurvivorsMeeting::Follow(ro::sim::FieldPoint hero, std::uint64_t run_ms,
-                              std::uint64_t now_ms) noexcept {
+bool SurvivorsMeeting::Follow(ro::sim::FieldPoint hero, std::uint64_t run_ms, std::uint64_t now_ms,
+                              std::uint32_t hero_zeny) noexcept {
   if (!at_.has_value() || met_ms_.has_value() || left_ms_.has_value()) return false;
   if (leaves_at_run_ms_ != 0 && run_ms >= leaves_at_run_ms_) {
     left_ms_ = now_ms;
@@ -81,6 +83,8 @@ bool SurvivorsMeeting::Follow(ro::sim::FieldPoint hero, std::uint64_t run_ms,
   if (ro::sim::DistanceSquared(hero, *at_) > Squared(ro::sim::Cells(kMeetingReachCells))) {
     return false;
   }
+  // Sans la somme, il attend : le héros peut revenir avec.
+  if (hero_zeny < zeny_wanted_) return false;
   met_ms_ = now_ms;
   return true;
 }
