@@ -19811,6 +19811,9 @@ tr: Extender la malla del modelo %zu
 fr: Ctrl+Z annule, Ctrl+Y ou Ctrl+Maj+Z rétablit, Ctrl+S enregistre, Ctrl+1 à Ctrl+6 choisissent l'outil, Ctrl+D duplique, Ctrl+F centre la caméra, Ctrl+flèches poussent, Suppr retire ou masque, Maj aimante un glissé. Ctrl+clic fait marcher le personnage.
 tr: Ctrl+Z deshace, Ctrl+Y o Ctrl+Mayús+Z rehace, Ctrl+S guarda, Ctrl+1 a Ctrl+6 eligen la herramienta, Ctrl+D duplica, Ctrl+F centra la cámara, Ctrl+flechas empujan, Supr quita u oculta, Mayús imanta un arrastre. Ctrl+clic hace caminar al personaje.
 
+fr: Avec Déplacer, Tourner ou Échelle, un modèle se saisit par son corps et se glisse au sol. Pendant le glissé, Maj l'incline, Alt le tourne sur lui-même, les deux à la fois aussi, et Ctrl aimante. Ctrl+Q et Ctrl+E le tournent de 45°, Ctrl+Maj+Q et Ctrl+Maj+E l'inclinent de 45°.
+tr: Con Mover, Girar o Escala, un modelo se agarra por su cuerpo y se arrastra por el suelo. Durante el arrastre, Mayús lo inclina, Alt lo gira sobre sí mismo, ambos a la vez también, y Ctrl imanta. Ctrl+Q y Ctrl+E lo giran 45°, Ctrl+Mayús+Q y Ctrl+Mayús+E lo inclinan 45°.
+
 fr: Ajouter une lumière
 tr: Añadir una luz
 

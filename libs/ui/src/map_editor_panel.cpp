@@ -71,7 +71,7 @@ constexpr WheelDrag kOpacityDrag{.drag_step = kOpacityStepPercent,
 constexpr const char* kMapEditorTitle = core::TrText("Éditeur de carte");
 constexpr const char* kMapEditorId = "map_editor";
 
-constexpr std::array<const char*, 5> kMapEditorHelp = {
+constexpr std::array<const char*, 6> kMapEditorHelp = {
     core::TrText("Un clic dans le monde désigne le modèle du décor sous la souris : la plus "
                  "petite boîte traversée gagne. Ses retouches se redésignent aussi depuis la "
                  "liste."),
@@ -86,6 +86,10 @@ constexpr std::array<const char*, 5> kMapEditorHelp = {
                  "Ctrl+6 choisissent l'outil, Ctrl+D duplique, Ctrl+F centre la caméra, "
                  "Ctrl+flèches poussent, Suppr retire ou masque, Maj aimante un glissé. "
                  "Ctrl+clic fait marcher le personnage."),
+    core::TrText("Avec Déplacer, Tourner ou Échelle, un modèle se saisit par son corps et se "
+                 "glisse au sol. Pendant le glissé, Maj l'incline, Alt le tourne sur lui-même, "
+                 "les deux à la fois aussi, et Ctrl aimante. Ctrl+Q et Ctrl+E le tournent de "
+                 "45°, Ctrl+Maj+Q et Ctrl+Maj+E l'inclinent de 45°."),
 };
 
 // Le rayon du cercle d'une lumière ponctuelle, en pixels.

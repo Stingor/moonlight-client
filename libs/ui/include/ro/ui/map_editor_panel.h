@@ -442,6 +442,13 @@ struct MoveEffect {
 struct Nudge {
   std::array<float, 3> delta{};
 };
+// Tourner le modèle désigné autour de l'axe `axis` du RSW (0 : x, 1 : y, la
+// verticale, 2 : z), jusqu'au multiple suivant de `step_degrees` dans le sens
+// de son signe.
+struct Turn {
+  std::size_t axis = 1;
+  float step_degrees = 0.0F;
+};
 // Ajouter une lumière ponctuelle à `position`, dans le repère du RSW ; sans
 // position, là où l'appelant pose ce qu'on ajoute.
 struct AddLight {
@@ -579,7 +586,7 @@ using MapEditorIntent = std::variant<
     map_editor::AddModelEffect, map_editor::SelectModelEffect, map_editor::SetModelEffect,
     map_editor::RemoveModelEffect, map_editor::MoveModelEffect, map_editor::SetCellBrush,
     map_editor::EndCellStroke, map_editor::ClearCells, map_editor::SetCellsWhy,
-    map_editor::BlockModelFootprint>;
+    map_editor::BlockModelFootprint, map_editor::Turn>;
 
 // CE QUE LE PANNEAU GARDE POUR LUI d'une image à la suivante : la saisie en
 // cours, qui n'est pas encore une intention.

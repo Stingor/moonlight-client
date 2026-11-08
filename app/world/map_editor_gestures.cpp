@@ -1,8 +1,9 @@
-// LES GESTES DU CLAVIER SUR CE QUI EST DÉSIGNÉ : pousser, dupliquer, supprimer.
-// Voir `MapEditorShortcut` et `TakeMapEditorKey`.
+// LES GESTES DU CLAVIER SUR CE QUI EST DÉSIGNÉ : pousser, tourner, dupliquer,
+// supprimer. Voir `MapEditorShortcut` et `TakeMapEditorKey`.
 
 #include <array>
 #include <cstdio>
+#include <optional>
 #include <utility>
 #include <vector>
 
@@ -19,6 +20,58 @@ namespace {
 constexpr std::size_t kDuplicateLabelCapacity = 192;
 
 }  // namespace
+
+std::array<float, 3> MapEditorNudge(NudgeDirection direction, bool shift_held) {
+  const float step = shift_held ? kNudgeWideUnits : kNudgeUnits;
+  switch (direction) {
+    case NudgeDirection::kLeft:
+      return {-step, 0.0F, 0.0F};
+    case NudgeDirection::kRight:
+      return {step, 0.0F, 0.0F};
+    case NudgeDirection::kUp:
+      return {0.0F, 0.0F, step};
+    case NudgeDirection::kDown:
+      return {0.0F, 0.0F, -step};
+  }
+  return {};
+}
+
+std::optional<ro::ui::MapEditorIntent> MapEditorShortcut(char key, bool shift_held) {
+  switch (key) {
+    case 'z':
+      return shift_held ? ro::ui::MapEditorIntent(ro::ui::map_editor::Redo{})
+                        : ro::ui::MapEditorIntent(ro::ui::map_editor::Undo{});
+    case 'y':
+      return ro::ui::map_editor::Redo{};
+    case 's':
+      return ro::ui::map_editor::Save{};
+    case 'd':
+      return ro::ui::map_editor::Duplicate{};
+    case 'f':
+      return ro::ui::map_editor::Focus{};
+    // Q ET E TOURNENT d'un pas de 45 degrés autour de la verticale ; avec Maj,
+    // ils inclinent autour de l'axe x.
+    case 'q':
+    case 'e':
+      return ro::ui::map_editor::Turn{
+          .axis = shift_held ? kTiltAxis : kTurnAxis,
+          .step_degrees = key == 'e' ? kTurnStepDegrees : -kTurnStepDegrees};
+    case '1':
+      return ro::ui::map_editor::SetTool{ro::ui::MapEditorTool::kMove};
+    case '2':
+      return ro::ui::map_editor::SetTool{ro::ui::MapEditorTool::kRotate};
+    case '3':
+      return ro::ui::map_editor::SetTool{ro::ui::MapEditorTool::kScale};
+    case '4':
+      return ro::ui::map_editor::SetTool{ro::ui::MapEditorTool::kVertices};
+    case '5':
+      return ro::ui::map_editor::SetTool{ro::ui::MapEditorTool::kRelief};
+    case '6':
+      return ro::ui::map_editor::SetTool{ro::ui::MapEditorTool::kCells};
+    default:
+      return std::nullopt;
+  }
+}
 
 MapEditorSession::Outcome MapEditorSession::Nudge(const std::array<float, 3>& delta,
                                                   const ro::render::MapScene& scene,
@@ -57,8 +110,18 @@ MapEditorSession::Outcome MapEditorSession::Nudge(const std::array<float, 3>& de
                                       .released = true},
         store);
   }
-  if (selection_.empty() || *selection_.model_index >= scene.rsw.models().size()) {
+  std::optional<ro::ui::map_editor::Place> place = SelectedModelPlace(scene, store);
+  if (!place.has_value()) {
     return {};
+  }
+  place->position = pushed(place->position);
+  return Place(*place, scene, store);
+}
+
+std::optional<ro::ui::map_editor::Place> MapEditorSession::SelectedModelPlace(
+    const ro::render::MapScene& scene, const MapEditStore& store) const {
+  if (selection_.empty() || *selection_.model_index >= scene.rsw.models().size()) {
+    return std::nullopt;
   }
   const std::size_t rank = *selection_.model_index;
   const ro::formats::RswModel& placed = scene.rsw.models()[rank];
@@ -70,12 +133,22 @@ MapEditorSession::Outcome MapEditorSession::Nudge(const std::array<float, 3>& de
   } else if (const ro::mapedit::ModelEdit* edit = document.ModelAt(rank)) {
     hidden = edit->hidden;
   }
-  return Place(ro::ui::map_editor::Place{.position = pushed(placed.position),
-                                         .rotation = placed.rotation,
-                                         .scale = placed.scale,
-                                         .hidden = hidden,
-                                         .released = true},
-               scene, store);
+  return ro::ui::map_editor::Place{.position = placed.position,
+                                   .rotation = placed.rotation,
+                                   .scale = placed.scale,
+                                   .hidden = hidden,
+                                   .released = true};
+}
+
+MapEditorSession::Outcome MapEditorSession::TurnSelected(const ro::ui::map_editor::Turn& turn,
+                                                         const ro::render::MapScene& scene,
+                                                         MapEditStore& store) {
+  std::optional<ro::ui::map_editor::Place> place = SelectedModelPlace(scene, store);
+  if (!place.has_value() || turn.axis >= place->rotation.size()) {
+    return {};
+  }
+  place->rotation[turn.axis] = SteppedAngle(place->rotation[turn.axis], turn.step_degrees);
+  return Place(*place, scene, store);
 }
 
 MapEditorSession::Outcome MapEditorSession::Duplicate(const ro::render::MapScene& scene,

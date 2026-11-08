@@ -14,51 +14,6 @@
 #include "world/map_editor_reasons.h"
 
 namespace moonclient {
-
-std::array<float, 3> MapEditorNudge(NudgeDirection direction, bool shift_held) {
-  const float step = shift_held ? kNudgeWideUnits : kNudgeUnits;
-  switch (direction) {
-    case NudgeDirection::kLeft:
-      return {-step, 0.0F, 0.0F};
-    case NudgeDirection::kRight:
-      return {step, 0.0F, 0.0F};
-    case NudgeDirection::kUp:
-      return {0.0F, 0.0F, step};
-    case NudgeDirection::kDown:
-      return {0.0F, 0.0F, -step};
-  }
-  return {};
-}
-
-std::optional<ro::ui::MapEditorIntent> MapEditorShortcut(char key, bool shift_held) {
-  switch (key) {
-    case 'z':
-      return shift_held ? ro::ui::MapEditorIntent(ro::ui::map_editor::Redo{})
-                        : ro::ui::MapEditorIntent(ro::ui::map_editor::Undo{});
-    case 'y':
-      return ro::ui::map_editor::Redo{};
-    case 's':
-      return ro::ui::map_editor::Save{};
-    case 'd':
-      return ro::ui::map_editor::Duplicate{};
-    case 'f':
-      return ro::ui::map_editor::Focus{};
-    case '1':
-      return ro::ui::map_editor::SetTool{ro::ui::MapEditorTool::kMove};
-    case '2':
-      return ro::ui::map_editor::SetTool{ro::ui::MapEditorTool::kRotate};
-    case '3':
-      return ro::ui::map_editor::SetTool{ro::ui::MapEditorTool::kScale};
-    case '4':
-      return ro::ui::map_editor::SetTool{ro::ui::MapEditorTool::kVertices};
-    case '5':
-      return ro::ui::map_editor::SetTool{ro::ui::MapEditorTool::kRelief};
-    case '6':
-      return ro::ui::map_editor::SetTool{ro::ui::MapEditorTool::kCells};
-    default:
-      return std::nullopt;
-  }
-}
 namespace {
 
 // La place d'un nom de geste ou d'une phrase d'état, zéro final compris.
@@ -77,6 +32,7 @@ void MapEditorSession::Leave() noexcept {
   view_point_.reset();
   gesture_before_.reset();
   drag_.reset();
+  body_drag_.reset();
   ground_stroke_.reset();
   cell_stroke_ = false;
   handles_.clear();
@@ -214,7 +170,7 @@ void MapEditorSession::Release() {
     queued_.emplace_back(ro::ui::map_editor::EndGroundStroke{});
     return;
   }
-  if (ReleaseCells() || !drag_.has_value()) {
+  if (ReleaseBody() || ReleaseCells() || !drag_.has_value()) {
     return;
   }
   ro::ui::map_editor::Place last = drag_->last;
@@ -340,6 +296,8 @@ MapEditorSession::Outcome MapEditorSession::Apply(const ro::ui::MapEditorIntent&
           return Delete(scene, store);
         } else if constexpr (std::is_same_v<Asked, intents::Nudge>) {
           return Nudge(asked.delta, scene, store);
+        } else if constexpr (std::is_same_v<Asked, intents::Turn>) {
+          return TurnSelected(asked, scene, store);
         } else if constexpr (std::is_same_v<Asked, intents::AddLight>) {
           return AddLight(asked.position, store);
         } else if constexpr (std::is_same_v<Asked, intents::SelectLight>) {

@@ -20,6 +20,7 @@
 
 #include "world/map_edit_store.h"
 #include "world/map_editor_gizmo.h"
+#include "world/map_editor_grab.h"
 
 namespace moonclient {
 
@@ -164,6 +165,7 @@ class MapEditorSession {
     selected_points_.clear();
     ground_dots_.clear();
     pending_why_.clear();
+    body_drag_.reset();
   }
   // Une nouvelle pour la barre d'état, venue d'ailleurs que de l'éditeur.
   void SetStatus(std::string status) { status_ = std::move(status); }
@@ -205,13 +207,22 @@ class MapEditorSession {
   [[nodiscard]] bool Grab(glm::vec2 pointer, const ro::ui::MapEditorView& view,
                           bool extend = false);
   [[nodiscard]] bool dragging() const noexcept {
-    return drag_.has_value() || ground_stroke_.has_value() || cell_stroke_;
+    return drag_.has_value() || body_drag_.has_value() || ground_stroke_.has_value() ||
+           cell_stroke_;
   }
   // Le glissé de la poignée saisie jusqu'en `pointer`, puis son relâcher : ils
   // deviennent des intentions de placement, que `TakeQueued` rend.
   // `snap` : Maj tenue, le placement s'aimante — voir `Snapped`.
   void DragTo(glm::vec2 pointer, bool snap = false);
   void Release();
+  // LE MODÈLE SAISI PAR SON CORPS : voir `BodyDragKeys`. L'appui en `pointer`,
+  // sous le rayon `ray`, vient de désigner le modèle de rang `model_index` ;
+  // rien ne se saisit avec un autre outil, ni pour un autre modèle.
+  void GrabModelBody(std::size_t model_index, glm::vec2 pointer, const ro::render::ScreenRay& ray,
+                     const ro::render::MapScene& scene);
+  [[nodiscard]] bool dragging_body() const noexcept { return body_drag_.has_value(); }
+  // Son glissé jusqu'en `pointer`, sous le rayon `ray`, avec les touches tenues.
+  void DragBodyTo(glm::vec2 pointer, const ro::render::ScreenRay& ray, BodyDragKeys keys);
   [[nodiscard]] std::vector<ro::ui::MapEditorIntent> TakeQueued();
   // Une intention venue du clavier, rendue avec celles des poignées.
   void Queue(ro::ui::MapEditorIntent intent) { queued_.push_back(std::move(intent)); }
@@ -580,6 +591,12 @@ class MapEditorSession {
   // La caméra regardera ce qui est désigné : la lumière, ou la pose du modèle
   // telle que l'édition la place.
   Outcome Focus(const ro::render::MapScene& scene, const MapEditStore& store);
+  // Le placement du modèle désigné, tel que l'édition le pose ; rien sans lui.
+  [[nodiscard]] std::optional<ro::ui::map_editor::Place> SelectedModelPlace(
+      const ro::render::MapScene& scene, const MapEditStore& store) const;
+  // Ctrl+Q et Ctrl+E : voir `ro::ui::map_editor::Turn`.
+  Outcome TurnSelected(const ro::ui::map_editor::Turn& turn, const ro::render::MapScene& scene,
+                       MapEditStore& store);
   // Ctrl+flèches : voir `ro::ui::map_editor::Nudge`.
   Outcome Nudge(const std::array<float, 3>& delta, const ro::render::MapScene& scene,
                 MapEditStore& store);
@@ -616,6 +633,23 @@ class MapEditorSession {
     float ground_height = 0.0F;
   };
   std::optional<Drag> drag_;
+  // LE MODÈLE SAISI PAR SON CORPS : le repère de la carte, la hauteur du plan
+  // où il glisse, le point de l'appui, le placement d'alors, le dernier donné,
+  // les touches du pas précédent et l'ancre du geste. `started` : le glissé a
+  // quitté la zone morte de l'appui.
+  struct BodyDrag {
+    ro::render::MapEffectFrame map_frame;
+    float world_height = 0.0F;
+    glm::vec2 from{0.0F, 0.0F};
+    bool started = false;
+    ro::ui::map_editor::Place start;
+    ro::ui::map_editor::Place last;
+    BodyDragKeys keys;
+    BodyAnchor anchor;
+  };
+  std::optional<BodyDrag> body_drag_;
+  // Le relâcher du modèle saisi par son corps ; faux sans lui.
+  bool ReleaseBody();
   std::vector<ro::ui::MapEditorIntent> queued_;
   std::optional<VertexContext> vertex_context_;
   std::vector<VertexDot> vertex_dots_;

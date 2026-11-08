@@ -322,7 +322,12 @@ void OnLeftPress(const EventRouting& to, const SDL_MouseButtonEvent& button,
       const ro::render::ScreenRay ray =
           ro::render::MakeScreenRay(*to.camera, window.width / window.height, pointer.x, pointer.y,
                                     window.width, window.height);
-      to.map_editor->Pick(ro::render::PickSceneModel(to.stage->scene, ray));
+      const std::optional<std::size_t> picked = ro::render::PickSceneModel(to.stage->scene, ray);
+      to.map_editor->Pick(picked);
+      // LE MODÈLE DÉSIGNÉ SE SAISIT AUSSI PAR SON CORPS : un glissé le déplace.
+      if (picked.has_value()) {
+        to.map_editor->GrabModelBody(*picked, pointer, ray, to.stage->scene);
+      }
     }
     return;
   }
@@ -713,7 +718,21 @@ void RouteEvent(const EventRouting& to, const SDL_Event& event) {
       *to.mouse = glm::vec2{event.motion.x, event.motion.y};
       // UNE POIGNÉE SAISIE suit la souris, fenêtres ou non, jusqu'au relâcher.
       if (to.map_editor != nullptr && to.map_editor->dragging()) {
-        to.map_editor->DragTo(*to.mouse, (SDL_GetModState() & SDL_KMOD_SHIFT) != 0);
+        const SDL_Keymod held = SDL_GetModState();
+        if (!to.map_editor->dragging_body()) {
+          to.map_editor->DragTo(*to.mouse, (held & SDL_KMOD_SHIFT) != 0);
+          break;
+        }
+        const WindowPixels window = PointerSpaceOf(*to.gl);
+        if (window.height > 0.0F) {
+          to.map_editor->DragBodyTo(
+              *to.mouse,
+              ro::render::MakeScreenRay(*to.camera, window.width / window.height, to.mouse->x,
+                                        to.mouse->y, window.width, window.height),
+              BodyDragKeys{.tilt = (held & SDL_KMOD_SHIFT) != 0,
+                           .turn = (held & SDL_KMOD_ALT) != 0,
+                           .snap = (held & SDL_KMOD_CTRL) != 0});
+        }
         break;
       }
       to.world_mouse->pressed = (event.motion.state & SDL_BUTTON_LMASK) != 0;

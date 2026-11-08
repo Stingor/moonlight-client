@@ -19811,6 +19811,9 @@ tr: Extend the mesh of model %zu
 fr: Ctrl+Z annule, Ctrl+Y ou Ctrl+Maj+Z rétablit, Ctrl+S enregistre, Ctrl+1 à Ctrl+6 choisissent l'outil, Ctrl+D duplique, Ctrl+F centre la caméra, Ctrl+flèches poussent, Suppr retire ou masque, Maj aimante un glissé. Ctrl+clic fait marcher le personnage.
 tr: Ctrl+Z undoes, Ctrl+Y or Ctrl+Shift+Z redoes, Ctrl+S saves, Ctrl+1 to Ctrl+6 pick the tool, Ctrl+D duplicates, Ctrl+F centres the camera, Ctrl+arrows nudge, Delete removes or hides, Shift snaps a drag. Ctrl+click walks the character.
 
+fr: Avec Déplacer, Tourner ou Échelle, un modèle se saisit par son corps et se glisse au sol. Pendant le glissé, Maj l'incline, Alt le tourne sur lui-même, les deux à la fois aussi, et Ctrl aimante. Ctrl+Q et Ctrl+E le tournent de 45°, Ctrl+Maj+Q et Ctrl+Maj+E l'inclinent de 45°.
+tr: With Move, Rotate or Scale, a model can be grabbed by its body and dragged along the ground. While dragging, Shift tilts it, Alt turns it on itself, both together work too, and Ctrl snaps. Ctrl+Q and Ctrl+E turn it by 45°, Ctrl+Shift+Q and Ctrl+Shift+E tilt it by 45°.
+
 fr: Ajouter une lumière
 tr: Add a light
 

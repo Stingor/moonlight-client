@@ -943,6 +943,7 @@ add_library(moonclient_graphics STATIC
     world/map_edit_store.cpp
     world/map_edit_sync.cpp
     world/map_editor_gizmo.cpp
+    world/map_editor_grab.cpp
     world/map_editor_cell_marks.cpp
     world/map_editor_cells.cpp
     world/map_editor_effects.cpp
