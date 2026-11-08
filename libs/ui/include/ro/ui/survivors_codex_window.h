@@ -6,6 +6,7 @@
 #include <optional>
 #include <span>
 #include <string_view>
+#include <vector>
 
 #include "ro/ui/skin_art.h"
 #include "ro/ui/survivors_album_window.h"
@@ -14,7 +15,8 @@ namespace ro::ui {
 
 // LE CODEX DES SURVIVANTS : six onglets — Skills, Cartes, Objets, Plantes,
 // Monstres, Boss et événements —, une liste à gauche, une fiche à droite.
-// Les skills d'une classe s'y suivent, sous le nom de cette classe.
+// Les skills d'une classe s'y suivent ; quand le mode en a plusieurs, un
+// onglet par classe ne montre que les siens.
 //
 // 🔴 UNE ENTRÉE NON VUE NE MONTRE QUE SA SILHOUETTE ET « ??? » : jamais son
 // nom, jamais son icône en couleur, jamais un de ses nombres. Elle se révèle
@@ -276,6 +278,9 @@ struct SurvivorsCodexView {
   std::array<std::span<const SurvivorsCodexEntry>, kSurvivorsCodexTabCount> entries;
   // Le sort épinglé en objectif ; 0 : aucun.
   std::uint16_t objective_skill_id = 0;
+  // La classe retenue à l'accueil : l'onglet de classe que l'onglet Skills
+  // ouvre d'abord. 0, ou une classe absente : la première.
+  std::uint16_t home_class_id = 0;
 };
 
 struct SurvivorsCodexState {
@@ -289,6 +294,11 @@ struct SurvivorsCodexState {
   // L'onglet que Tab vient de choisir : imposé à la barre jusqu'à ce qu'elle
   // le montre, la barre n'obéissant qu'à l'image d'après.
   std::optional<SurvivorsCodexTab> tab_wanted;
+  // L'ONGLET DE CLASSE de l'onglet Skills, quand le mode en a plusieurs : la
+  // liste n'y montre que les skills de cette classe. 0 : pas encore choisi.
+  // `class_wanted` s'impose à sa barre comme `tab_wanted` à la sienne.
+  std::uint16_t skill_class_id = 0;
+  std::optional<std::uint16_t> class_wanted;
 };
 
 // CE QUE LA FENÊTRE REND : `closed` à l'image où sa croix la ferme, et
@@ -301,8 +311,19 @@ struct SurvivorsCodexAsk {
 
 inline constexpr const char* kSurvivorsCodexId = "survivors_codex";
 
+// LES ONGLETS DE CLASSE de l'onglet Skills : une classe par nom posé, dans
+// l'ordre où la liste la rencontre. Vide sous deux classes : rien à séparer.
+[[nodiscard]] std::vector<std::uint16_t> SurvivorsCodexClassTabs(
+    std::span<const SurvivorsCodexEntry> skills);
+
+// Les rangs de `skills` que montre l'onglet de la classe `class_id` : ses
+// skills, et ceux qui ne servent aucune classe. Tous pour 0.
+[[nodiscard]] std::vector<std::size_t> SurvivorsCodexClassRows(
+    std::span<const SurvivorsCodexEntry> skills, std::uint16_t class_id);
+
 // LA FENÊTRE. Touches, fenêtre au premier plan : Tab passe à l'onglet suivant ;
-// flèches haut et bas dans la liste. L'onglet Cartes dessine l'Album, qui lit
+// flèches haut et bas dans la liste ; gauche et droite, dans l'onglet Skills,
+// passent d'une classe à l'autre. L'onglet Cartes dessine l'Album, qui lit
 // ses propres touches.
 SurvivorsCodexAsk DrawSurvivorsCodexWindow(SurvivorsCodexState& state,
                                            const SurvivorsCodexView& view,

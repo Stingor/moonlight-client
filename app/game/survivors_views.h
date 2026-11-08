@@ -185,7 +185,8 @@ class SurvivorsViews {
   // LE VOTE D'UNE PARTIE COOP, par-dessus les offres composées.
   void ComposeVote(const ro::sim::SurvivorsField& field, std::span<const std::string> names);
   // LES ALLIÉS au HUD d'une partie coop.
-  void ComposeAllies(const ro::sim::SurvivorsField& field, const SurvivorsViewFacts& facts);
+  void ComposeAllies(const ro::sim::SurvivorsField& field, const ro::sim::SurvivorsRules& rules,
+                     const SurvivorsViewFacts& facts, const SurvivorsTables& tables);
   void ComposeChest(const SurvivorsStage& stage, const SurvivorsTables& tables);
   void ComposePause(const SurvivorsStage& stage, const ro::sim::SurvivorsField* field,
                     const SurvivorsViewFacts& facts);

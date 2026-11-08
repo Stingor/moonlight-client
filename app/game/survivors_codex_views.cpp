@@ -52,6 +52,7 @@ void SurvivorsViews::ComposeCodex(SurvivorsMetaWindows& windows, const Survivors
   windows.codex_view = ComposeSurvivorsCodex(rules, CodexSeenOf(rules, save, live), codex_rows_,
                                              FoundCardItemsOf(rules, save));
   windows.codex_view.objective_skill_id = windows.objective_skill_id;
+  windows.codex_view.home_class_id = album_class != nullptr ? album_class->class_id : 0;
   for (std::vector<ro::ui::SurvivorsCodexEntry>& tab : codex_rows_.entries) {
     for (ro::ui::SurvivorsCodexEntry& entry : tab) NameCodexEntry(entry, tables);
   }

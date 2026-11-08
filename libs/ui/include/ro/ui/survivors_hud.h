@@ -83,6 +83,8 @@ struct SurvivorsEdgeTarget {
 // UN ALLIÉ, au HUD d'une partie coop.
 struct SurvivorsHudAlly {
   const char* name = "";
+  // Sa classe, déjà traduite, à droite de son nom ; "" : rien à distinguer.
+  const char* class_name = "";
   float fill = 1.0F;
   bool down = false;
   std::optional<ImVec2> feet_px;

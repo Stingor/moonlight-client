@@ -2,9 +2,11 @@
 
 #include <algorithm>
 #include <array>
+#include <cstdint>
 #include <cstdio>
 #include <span>
 #include <string_view>
+#include <vector>
 
 #include <imgui.h>
 
@@ -146,17 +148,19 @@ void DrawPortrait(SurvivorsCodexState& state, const SurvivorsCodexEntry& entry) 
 }
 
 // La liste et la fiche défilent chacune dans son cadre, ascenseur habillé.
-// Chaque ligne a la même hauteur, icône ou non.
+// Chaque ligne a la même hauteur, icône ou non. `rows` : les rangs montrés,
+// dans l'ordre. Sans onglet de classe, le nom d'une classe annonce ses skills.
 void DrawList(SurvivorsCodexState& state, std::span<const SurvivorsCodexEntry> entries,
-              bool scroll_to_selected, const SkinArt& art) {
+              std::span<const std::size_t> rows, bool class_tabs, bool scroll_to_selected,
+              const SkinArt& art) {
   std::size_t& selected = state.selected[RankOf(state.tab)];
   ImGui::BeginChild("##codex_list", ImVec2(kListWidth, 0.0F), ImGuiChildFlags_Borders);
   ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, kListTextAlign);
-  for (std::size_t index = 0; index < entries.size(); ++index) {
+  for (std::size_t row = 0; row < rows.size(); ++row) {
+    const std::size_t index = rows[row];
     const SurvivorsCodexEntry& entry = entries[index];
-    // Les skills d'une classe se suivent : son nom les annonce.
-    if (entry.class_name[0] != '\0' &&
-        (index == 0 || std::string_view(entry.class_name) != entries[index - 1].class_name)) {
+    if (!class_tabs && entry.class_name[0] != '\0' &&
+        (row == 0 || std::string_view(entry.class_name) != entries[rows[row - 1]].class_name)) {
       ColoredText(kHeadingColor, entry.class_name);
     }
     ImGui::PushID(static_cast<int>(index));
@@ -176,13 +180,18 @@ void DrawList(SurvivorsCodexState& state, std::span<const SurvivorsCodexEntry> e
   ImGui::EndChild();
 }
 
-// Flèches haut et bas, fenêtre au premier plan ; vrai si le choix a bougé.
-[[nodiscard]] bool ReadListKeys(SurvivorsCodexState& state, std::size_t count) {
-  if (count == 0 || !ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows)) return false;
+// Flèches haut et bas, fenêtre au premier plan, parmi les rangs montrés ;
+// vrai si le choix a bougé.
+[[nodiscard]] bool ReadListKeys(SurvivorsCodexState& state, std::span<const std::size_t> rows) {
+  if (rows.empty() || !ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows)) {
+    return false;
+  }
   std::size_t& selected = state.selected[RankOf(state.tab)];
+  const auto at = std::ranges::find(rows, selected);
+  const auto row = static_cast<std::size_t>(at - rows.begin());
   const std::size_t before = selected;
-  if (ImGui::IsKeyPressed(ImGuiKey_UpArrow) && selected > 0) --selected;
-  if (ImGui::IsKeyPressed(ImGuiKey_DownArrow) && selected + 1 < count) ++selected;
+  if (ImGui::IsKeyPressed(ImGuiKey_UpArrow) && row > 0) selected = rows[row - 1];
+  if (ImGui::IsKeyPressed(ImGuiKey_DownArrow) && row + 1 < rows.size()) selected = rows[row + 1];
   return selected != before;
 }
 
@@ -485,7 +494,75 @@ void DrawTabs(SurvivorsCodexState& state, const SkinArt& art) {
   EndSkinTabBar();
 }
 
+// LA CLASSE MONTRÉE par l'onglet Skills : celle que l'état tient, sinon celle
+// de l'accueil, sinon la première. Gauche et droite passent à la voisine.
+void SettleClass(SurvivorsCodexState& state, std::span<const std::uint16_t> classes,
+                 std::uint16_t home_class_id) {
+  if (std::ranges::find(classes, state.skill_class_id) == classes.end()) {
+    state.skill_class_id = std::ranges::find(classes, home_class_id) != classes.end()
+                               ? home_class_id
+                               : classes.front();
+    state.class_wanted = state.skill_class_id;
+  }
+  if (ImGui::IsWindowAppearing()) state.class_wanted = state.skill_class_id;
+  if (!ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows)) return;
+  const auto rank =
+      static_cast<std::size_t>(std::ranges::find(classes, state.skill_class_id) - classes.begin());
+  std::size_t wanted = rank;
+  if (ImGui::IsKeyPressed(ImGuiKey_LeftArrow) && rank > 0) wanted = rank - 1;
+  if (ImGui::IsKeyPressed(ImGuiKey_RightArrow) && rank + 1 < classes.size()) wanted = rank + 1;
+  if (wanted == rank) return;
+  state.skill_class_id = classes[wanted];
+  state.class_wanted = state.skill_class_id;
+}
+
+// La barre des classes, sous celle des onglets, comme elle.
+void DrawClassTabs(SurvivorsCodexState& state, std::span<const SurvivorsCodexEntry> skills,
+                   std::span<const std::uint16_t> classes, const SkinArt& art) {
+  if (!BeginSkinTabBar("##codex_classes", art)) return;
+  Line label = {};
+  for (const std::uint16_t class_id : classes) {
+    const auto named = std::ranges::find(skills, class_id, &SurvivorsCodexEntry::class_id);
+    // Une identité fixe : le nom traduit change avec la langue.
+    std::snprintf(label.data(), label.size(), "%s###codex_class_%u", named->class_name,
+                  static_cast<unsigned>(class_id));
+    const ImGuiTabItemFlags flags =
+        state.class_wanted == class_id ? ImGuiTabItemFlags_SetSelected : ImGuiTabItemFlags_None;
+    if (ImGui::BeginTabItem(label.data(), nullptr, flags)) {
+      if (!state.class_wanted.has_value()) {
+        state.skill_class_id = class_id;
+      } else if (*state.class_wanted == class_id) {
+        state.class_wanted.reset();
+      }
+      ImGui::EndTabItem();
+    }
+  }
+  EndSkinTabBar();
+}
+
 }  // namespace
+
+std::vector<std::uint16_t> SurvivorsCodexClassTabs(std::span<const SurvivorsCodexEntry> skills) {
+  std::vector<std::uint16_t> classes;
+  for (const SurvivorsCodexEntry& entry : skills) {
+    if (entry.class_id == 0 || entry.class_name[0] == '\0') continue;
+    if (std::ranges::find(classes, entry.class_id) == classes.end()) {
+      classes.push_back(entry.class_id);
+    }
+  }
+  if (classes.size() < 2) classes.clear();
+  return classes;
+}
+
+std::vector<std::size_t> SurvivorsCodexClassRows(std::span<const SurvivorsCodexEntry> skills,
+                                                 std::uint16_t class_id) {
+  std::vector<std::size_t> rows;
+  for (std::size_t index = 0; index < skills.size(); ++index) {
+    const std::uint16_t served = skills[index].class_id;
+    if (class_id == 0 || served == 0 || served == class_id) rows.push_back(index);
+  }
+  return rows;
+}
 
 SurvivorsCodexAsk DrawSurvivorsCodexWindow(SurvivorsCodexState& state,
                                            const SurvivorsCodexView& view,
@@ -512,9 +589,24 @@ SurvivorsCodexAsk DrawSurvivorsCodexWindow(SurvivorsCodexState& state,
   const std::span<const SurvivorsCodexEntry> entries = view.entries[RankOf(state.tab)];
   std::size_t& selected = state.selected[RankOf(state.tab)];
   if (!entries.empty()) selected = std::min(selected, entries.size() - 1);
-  const bool moved = ReadListKeys(state, entries.size());
-  DrawList(state, entries, moved, art);
-  if (!entries.empty()) {
+  // L'ONGLET SKILLS, sous plusieurs classes, n'en montre qu'une : la liste et
+  // ses flèches ne voient que ses skills, et le choix y reste.
+  std::vector<std::uint16_t> classes;
+  if (state.tab == SurvivorsCodexTab::kSkills) classes = SurvivorsCodexClassTabs(entries);
+  std::uint16_t shown_class_id = 0;
+  bool class_moved = false;
+  if (!classes.empty()) {
+    const std::uint16_t before = state.skill_class_id;
+    SettleClass(state, classes, view.home_class_id);
+    DrawClassTabs(state, entries, classes, art);
+    shown_class_id = state.skill_class_id;
+    class_moved = shown_class_id != before;
+  }
+  const std::vector<std::size_t> rows = SurvivorsCodexClassRows(entries, shown_class_id);
+  if (!rows.empty() && std::ranges::find(rows, selected) == rows.end()) selected = rows.front();
+  const bool moved = ReadListKeys(state, rows) || class_moved;
+  DrawList(state, entries, rows, !classes.empty(), moved, art);
+  if (!rows.empty()) {
     ImGui::SameLine();
     ask.objective_skill_id =
         DrawSheet(state, entries[selected], album_view.feats, view.objective_skill_id, art);

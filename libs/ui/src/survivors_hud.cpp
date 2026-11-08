@@ -203,6 +203,9 @@ constexpr float kAllyBarWidthPx = 120.0F;
 constexpr float kAllyGapPx = 6.0F;
 constexpr ImU32 kAllyNameColor = IM_COL32(255, 255, 255, 255);
 constexpr ImU32 kAllyDownColor = IM_COL32(255, 80, 80, 255);
+// La classe d'un allié suit son nom, en or clair, lisible sur l'arène.
+constexpr float kAllyClassGapPx = 6.0F;
+constexpr ImU32 kAllyClassColor = IM_COL32(240, 200, 120, 255);
 
 void DrawHeroGauge(ImDrawList& draw, ImVec2 feet, float fill) {
   const EntityBarLook look;
@@ -219,6 +222,11 @@ void DrawAllies(ImDrawList& draw, std::span<const SurvivorsHudAlly> allies, ImVe
   for (const SurvivorsHudAlly& ally : allies) {
     if (ally.feet_px.has_value() && !ally.down) DrawHeroGauge(draw, *ally.feet_px, ally.fill);
     draw.AddText(at, ally.down ? kAllyDownColor : kAllyNameColor, ally.name);
+    if (ally.class_name[0] != '\0') {
+      const float name_width = ImGui::CalcTextSize(ally.name).x;
+      draw.AddText(ImVec2(at.x + name_width + kAllyClassGapPx, at.y), kAllyClassColor,
+                   ally.class_name);
+    }
     const EntityBarLook look;
     const ImVec2 bar_top(at.x, at.y + ImGui::GetTextLineHeight());
     const ImVec2 bar_end(bar_top.x + kAllyBarWidthPx, bar_top.y + look.height_pixels);

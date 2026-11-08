@@ -346,7 +346,7 @@ void SurvivorsViews::ComposeHud(const SurvivorsField& field, const ro::sim::Surv
       }
     }
   }
-  ComposeAllies(field, facts);
+  ComposeAllies(field, rules, facts, tables);
 }
 
 void SurvivorsViews::ComposeOffer(const SurvivorsField& field, const ro::sim::SurvivorsRules& rules,
@@ -442,13 +442,19 @@ void SurvivorsViews::ComposeVote(const SurvivorsField& field, std::span<const st
   offer_.raises = offer_raises_;
 }
 
-void SurvivorsViews::ComposeAllies(const SurvivorsField& field, const SurvivorsViewFacts& facts) {
+void SurvivorsViews::ComposeAllies(const SurvivorsField& field,
+                                   const ro::sim::SurvivorsRules& rules,
+                                   const SurvivorsViewFacts& facts, const SurvivorsTables& tables) {
   hud_allies_.clear();
   for (std::size_t index = 0; index < ro::sim::HeroCount(field); ++index) {
     if (index == field.stage) continue;
     const ro::sim::SurvivorsHero& hero = ro::sim::HeroAt(field, index);
     ro::ui::SurvivorsHudAlly ally;
     ally.name = index < facts.coop_names.size() ? facts.coop_names[index].c_str() : "";
+    if (const ro::sim::ClassRule* hero_class = ro::sim::ClassAt(field, index);
+        hero_class != nullptr) {
+      ally.class_name = ShownClassName(rules, hero_class->class_id, tables);
+    }
     ally.fill = Fill(hero.hp, hero.max_hp);
     ally.down = hero.down;
     if (facts.arena != nullptr) {
