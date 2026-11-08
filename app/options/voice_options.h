@@ -23,8 +23,8 @@ namespace moonclient {
 // L'interrupteur, la touche « Parler », le canal où l'on parle et où l'on
 // écoute, le volume des voix et celui du micro, les deux appareils, l'icône
 // au-dessus de qui parle, et comment le micro part : à la touche ou à la voix,
-// avec un délai au relâchement et un seuil qu'on règle devant le niveau du
-// micro. Le côté d'où vient une voix suit « Son spatialisé ».
+// après un appui tenu assez longtemps, avec un délai au relâchement et un
+// seuil qu'on règle devant le niveau du micro. Le côté d'où vient une voix suit « Son spatialisé ».
 // Voir l'ADR 0135.
 inline constexpr int kVoiceRowBase = 9400;
 
@@ -58,6 +58,7 @@ enum class VoiceRow : int {
   kBarVertical,
   kBarSpeakers,
   kBarFade,
+  kPress,
   kCount,
 };
 
@@ -86,6 +87,10 @@ inline constexpr float kVoiceLevelAtFullScale = 0.2F;
 inline constexpr float kVoiceDefaultActivationPercent = 15.0F;
 inline constexpr int kVoiceDefaultReleaseMs = 300;
 inline constexpr int kVoiceMostReleaseMs = 1000;
+// L'APPUI QUI FAIT PARLER : une touche frappée plus brièvement, comme une
+// lettre écrite dans la conversation, n'ouvre pas le micro.
+inline constexpr int kVoiceDefaultPressMs = 300;
+inline constexpr int kVoiceMostPressMs = 1000;
 // LA BARRE DE LA VOIX : sa taille et son opacité, en pour cent.
 inline constexpr float kVoiceBarLeastScalePercent = 60.0F;
 inline constexpr float kVoiceBarMostScalePercent = 200.0F;
@@ -168,8 +173,20 @@ struct VoiceSettings {
   std::string speakers;
   int speaking_icon = 0;  // une `SpeakingIcon`
   int talk_mode = 0;      // un `VoiceTalkMode`
+  int press_ms = kVoiceDefaultPressMs;
   int release_ms = kVoiceDefaultReleaseMs;
   float activation_percent = kVoiceDefaultActivationPercent;
+};
+
+// LE PASSAGE D'UNE TOUCHE DE LA VOIX : elle ne fait parler qu'une fois tenue
+// sans interruption depuis l'appui minimal. Un relâchement remet le compte à
+// zéro.
+class VoicePressGate {
+ public:
+  [[nodiscard]] bool Pass(bool held, std::uint32_t now_ms, std::uint32_t least_ms) noexcept;
+
+ private:
+  std::optional<std::uint32_t> held_since_ms_;
 };
 
 // UN CHOIX D'APPAREIL tel que la ligne le montre : « celui du système » en

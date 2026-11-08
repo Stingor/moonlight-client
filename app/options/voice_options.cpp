@@ -33,6 +33,7 @@ constexpr const char* kSpeakersKey = "voice_speakers";
 constexpr const char* kSpeakingIconKey = "voice_speaking_icon";
 constexpr const char* kTalkModeKey = "voice_talk_mode";
 constexpr const char* kReleaseKey = "voice_release_ms";
+constexpr const char* kPressKey = "voice_press_ms";
 constexpr const char* kActivationKey = "voice_activation_percent";
 constexpr const char* kListenedKey = "voice_listened";
 constexpr const char* kSelfMutedKey = "voice_self_muted";
@@ -109,6 +110,7 @@ void VoiceOptions::Declare(SettingsFile& into) {
   into.Declare(kSpeakersKey, &settings_.speakers);
   into.Declare(kSpeakingIconKey, &settings_.speaking_icon);
   into.Declare(kTalkModeKey, &settings_.talk_mode);
+  into.Declare(kPressKey, &settings_.press_ms);
   into.Declare(kReleaseKey, &settings_.release_ms);
   into.Declare(kActivationKey, &settings_.activation_percent);
   into.Declare(kListenedKey, &settings_.listened);
@@ -148,6 +150,15 @@ std::optional<ro::ui::OptionsWindowAction> VoiceBarAction(const ro::ui::VoiceBar
   return asked;
 }
 
+bool VoicePressGate::Pass(bool held, std::uint32_t now_ms, std::uint32_t least_ms) noexcept {
+  if (!held) {
+    held_since_ms_.reset();
+    return false;
+  }
+  if (!held_since_ms_.has_value()) held_since_ms_ = now_ms;
+  return now_ms - *held_since_ms_ >= least_ms;
+}
+
 void VoiceOptions::ListDevicesWith(DeviceLister microphones, DeviceLister speakers) {
   list_microphones_ = std::move(microphones);
   list_speakers_ = std::move(speakers);
@@ -166,6 +177,7 @@ VoiceSettings VoiceOptions::settings() const noexcept {
   sane.speaking_icon =
       std::clamp(sane.speaking_icon, 0, static_cast<int>(SpeakingIcon::kCount) - 1);
   sane.talk_mode = std::clamp(sane.talk_mode, 0, static_cast<int>(VoiceTalkMode::kCount) - 1);
+  sane.press_ms = std::clamp(sane.press_ms, 0, kVoiceMostPressMs);
   sane.release_ms = std::clamp(sane.release_ms, 0, kVoiceMostReleaseMs);
   sane.activation_percent = std::clamp(sane.activation_percent, 0.0F, kPercent);
   return sane;
@@ -216,6 +228,18 @@ void VoiceOptions::ComposeInto(std::vector<OptionRowView>& rows) {
       .help = Tr("On parle sur le canal par défaut en tenant cette touche. C'est la même que "
                  "« Parler (voix) » dans les raccourcis clavier."),
       .kind = OptionKind::kAction,
+      .disabled = !sane.enabled});
+  rows.push_back(OptionRowView{
+      .id = VoiceRowId(VoiceRow::kPress),
+      .label = Tr("Appui minimal"),
+      .help = Tr("Combien tenir une touche de la voix avant que le micro parte : une lettre "
+                 "frappée en écrivant dans la conversation ne vous fait pas parler. 0 : dès "
+                 "l'appui."),
+      .kind = OptionKind::kSlider,
+      .value = static_cast<float>(sane.press_ms),
+      .lowest = 0.0F,
+      .highest = static_cast<float>(kVoiceMostPressMs),
+      .format = "%.0f ms",
       .disabled = !sane.enabled});
   rows.push_back(OptionRowView{
       .id = VoiceRowId(VoiceRow::kRelease),
@@ -484,6 +508,9 @@ bool VoiceOptions::Change(const ro::ui::OptionsWindowAction& asked) {
       break;
     case VoiceRow::kTalkMode:
       settings_.talk_mode = asked.chosen;
+      break;
+    case VoiceRow::kPress:
+      settings_.press_ms = static_cast<int>(std::lround(asked.value));
       break;
     case VoiceRow::kRelease:
       settings_.release_ms = static_cast<int>(std::lround(asked.value));

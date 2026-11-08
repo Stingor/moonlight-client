@@ -136,6 +136,8 @@ class VoiceMode {
   // parole tient le délai au relâchement — une fin de phrase ne change pas de
   // canal. Le canal par défaut quand rien ne part.
   std::optional<int> talk_channel_;
+  // Au rang de `VoiceTalkKey`.
+  std::array<VoicePressGate, kVoiceTalkKeyCount> press_gates_{};
   bool transmitting_ = false;
   ro::ui::VoiceOverlayState overlay_;
   std::optional<float> input_percent_;

@@ -167,19 +167,26 @@ void VoiceMode::Pump(const VoiceFacts& facts) {
   } else if (engine_ == nullptr && !devices_failed_) {
     Start(facts);
   }
+  // UNE TOUCHE NE COMPTE QU'APRÈS L'APPUI MINIMAL, chacune le sien : toutes
+  // sont relues à chaque image, pour qu'un appui commencé se mesure même
+  // pendant qu'une autre parle.
+  std::array<bool, kVoiceTalkKeyCount> passed{};
+  for (std::size_t rank = 0; rank < kVoiceTalkKeyCount; ++rank) {
+    passed[rank] =
+        press_gates_[rank].Pass(engine_ != nullptr && TalkKeyHeld(facts.talk_keys[rank]),
+                                facts.now_ms, static_cast<std::uint32_t>(facts.settings.press_ms));
+  }
   // UNE TOUCHE DE CANAL TENUE passe avant « Parler » et la voix, qui parlent
   // sur le canal par défaut.
   std::optional<int> held_channel;
-  for (std::size_t rank = 1; rank < kVoiceTalkKeyCount && engine_ != nullptr; ++rank) {
-    if (TalkKeyHeld(facts.talk_keys[rank])) {
+  for (std::size_t rank = 1; rank < kVoiceTalkKeyCount; ++rank) {
+    if (passed[rank]) {
       held_channel = static_cast<int>(rank) - 1;
       break;
     }
   }
   const bool talking =
-      engine_ != nullptr &&
-      (held_channel.has_value() ||
-       TalkKeyHeld(facts.talk_keys[static_cast<std::size_t>(VoiceTalkKey::kDefault)]));
+      held_channel.has_value() || passed[static_cast<std::size_t>(VoiceTalkKey::kDefault)];
   if (talking) {
     talk_channel_ = held_channel.value_or(facts.settings.channel);
   } else if (!transmitting_) {

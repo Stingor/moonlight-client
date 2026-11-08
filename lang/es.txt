@@ -22352,6 +22352,12 @@ tr: Modo de voz
 fr: En tenant la touche, rien ne part sans elle. À la voix, le micro part dès qu'il vous entend plus fort que le seuil ; la touche marche aussi.
 tr: Manteniendo la tecla, nada se envía sin ella. Con activación por voz, el micrófono envía en cuanto te oye por encima del umbral; la tecla también funciona.
 
+fr: Appui minimal
+tr: Pulsación mínima
+
+fr: Combien tenir une touche de la voix avant que le micro parte : une lettre frappée en écrivant dans la conversation ne vous fait pas parler. 0 : dès l'appui.
+tr: Cuánto mantener una tecla de voz antes de que se abra el micro: una letra escrita en el chat no te hace hablar. 0: en cuanto se pulsa.
+
 fr: Délai au relâchement
 tr: Retardo al soltar
 

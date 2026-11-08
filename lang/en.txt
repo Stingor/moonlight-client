@@ -22352,6 +22352,12 @@ tr: Speaking mode
 fr: En tenant la touche, rien ne part sans elle. À la voix, le micro part dès qu'il vous entend plus fort que le seuil ; la touche marche aussi.
 tr: With push to talk, nothing is sent without the key. With voice activation, the microphone sends as soon as it hears you louder than the threshold; the key works too.
 
+fr: Appui minimal
+tr: Minimum press
+
+fr: Combien tenir une touche de la voix avant que le micro parte : une lettre frappée en écrivant dans la conversation ne vous fait pas parler. 0 : dès l'appui.
+tr: How long to hold a voice key before the microphone opens: a letter typed in the chat does not make you speak. 0: as soon as it is pressed.
+
 fr: Délai au relâchement
 tr: Release delay
 
