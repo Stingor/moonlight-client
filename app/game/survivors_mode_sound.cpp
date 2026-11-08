@@ -57,7 +57,7 @@ void SurvivorsMode::PlaySounds(const ro::sim::SurvivorsNews& news,
   // un par sort et par image, quel que soit le nombre de monstres touchés.
   std::set<std::uint16_t> thudded;
   for (const ro::sim::SurvivorsHit& hit : news.hits) {
-    if (hit.skill_id == 0 || !thudded.insert(hit.skill_id).second) continue;
+    if (hit.skill_id == 0 || hit.poison_tick || !thudded.insert(hit.skill_id).second) continue;
     const ro::sim::SurvivorsSkillRule* rule = ro::sim::FindSkill(Rules(), hit.skill_id);
     if (rule == nullptr || !SkillThudsOnHit(SkillLookOf(*rule))) continue;
     PlaySound(ro::render::SkillBlowSound(draw++), ArenaSoundRank::kSkill, context);

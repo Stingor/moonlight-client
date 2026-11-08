@@ -75,6 +75,9 @@ enum class SkillArchetype : std::uint8_t {
   kCone,          // cône devant le héros, dans son cap
   kBarrier,       // blocs posés entre le héros et la horde, qu'elle ne traverse pas
   kStance,        // posture : un état sur le héros, `life_ms` toutes les `cooldown_ms`
+  // Réflexe de survie : un coup reçu sous `reflex_below_hp_pct` % de PV le rend
+  // intouchable `life_ms`, à sa recharge. Il ne tire rien de lui-même.
+  kReflex,
 };
 // kHero : une aire centrée sur le héros, et non sur un monstre visé.
 enum class TargetRule : std::uint8_t { kNearest, kRandom, kStrongest, kDensest, kHero };
@@ -91,9 +94,19 @@ enum class SurvivorsStat : std::uint8_t {
   kLuckPct,
   kMagnetPct,
   kExpPct,
+  kCritPct,   // la chance, en %, qu'un coup du héros soit critique : il compte double
+  kDodgePct,  // la chance, en %, qu'un coup reçu par le héros le manque
 };
-inline constexpr std::size_t kSurvivorsStatCount = 12;
-static_assert(static_cast<std::size_t>(SurvivorsStat::kExpPct) + 1 == kSurvivorsStatCount);
+inline constexpr std::size_t kSurvivorsStatCount = 14;
+static_assert(static_cast<std::size_t>(SurvivorsStat::kDodgePct) + 1 == kSurvivorsStatCount);
+// Une chance se tire sur 100. CheckSurvivorsRules refuse une carte qui en sortirait, une
+// posture qui la majorerait, et des cartes d'esquive qui rendraient un héros intouchable.
+inline constexpr std::int32_t kWholeChancePct = 100;
+// LES STATISTIQUES QU'UN LOADOUT PEUT PORTER, les premières de l'énumération :
+// ce sont elles que les journaux écrivent. Les suivantes ne viennent que des
+// cartes et des postures, et un journal écrit avant elles se relit toujours.
+inline constexpr std::size_t kSurvivorsLoadoutStatCount = 12;
+static_assert(static_cast<std::size_t>(SurvivorsStat::kExpPct) + 1 == kSurvivorsLoadoutStatCount);
 enum class FoeRank : std::uint8_t { kCommon, kMiniBoss, kBoss };
 enum class FoeSize : std::uint8_t { kSmall, kMedium, kLarge };
 inline constexpr std::size_t kFoeSizeCount = 3;
@@ -135,6 +148,16 @@ struct SkillLevel {
   // Posture : ce qu'elle ajoute à la statistique `stance_stat` du skill, tant
   // qu'elle dure.
   std::int32_t stance_bonus = 0;
+  // Le poison que le coup pose : `poison_tick_damage` avant bonus et élément,
+  // à chaque tic de `poison_tick_ms`, pendant `poison_ms`.
+  std::uint32_t poison_ms = 0;
+  std::int32_t poison_tick_damage = 0;
+  // Réflexe : le seuil de PV, en %, sous lequel un coup reçu le déclenche ; et
+  // vrai quand le héros, intouchable, marche mais ne lance plus de skill (ce qui
+  // est déjà parti arrive). Faux : il
+  // garde ses coups, et son premier coup en sortant est un critique.
+  std::int32_t reflex_below_hp_pct = 0;
+  bool reflex_sheathes = false;
 };
 
 // La vitesse d'un tir en sous-unités par pas, tronquée vers zéro : celle du
@@ -157,6 +180,8 @@ struct SurvivorsSkillRule {
   // Posture : la statistique que `stance_bonus` majore. Jamais les PV max :
   // la fin de la posture les retirerait au héros.
   SurvivorsStat stance_stat = SurvivorsStat::kArmor;
+  // Cône : tourné vers l'arrière du cap du héros, et non vers l'avant.
+  bool cone_behind = false;
 };
 
 struct CardRule {
@@ -247,6 +272,8 @@ struct ClassRule {
   std::span<const std::uint16_t> skill_pool;
   std::span<const std::uint16_t> card_pool;
   std::uint16_t evolved_job_id = 0;  // apparence après une évolution, côté app
+  // L'arme des corps évolué et rené, côté app ; 0 : celle du départ, sur tous.
+  std::uint16_t evolved_weapon_item_id = 0;
   bool melee = false;  // lance d'un geste d'attaque plutôt que d'incantation, côté app
   // LA MONTURE : le héros qui tient cette carte monte, et montre
   // `mounted_job_id`, puis `reborn_mounted_job_id` une fois rené. 0 : aucune
@@ -386,6 +413,9 @@ struct SurvivorsTuning {
   std::int32_t curse_slow_pct = 0;
   std::int32_t curse_hurt_pct = 0;
   std::uint32_t blind_turn_ms = 0;
+  // LE POISON, que seuls les communs subissent : un tic toutes les
+  // `poison_tick_ms`.
+  std::uint32_t poison_tick_ms = 0;
 };
 
 // LA CHUTE DES CARTES. Un tué qui porte une carte la lâche une fois sur
@@ -500,7 +530,10 @@ struct SurvivorsRules {
 // d'apparition) ; des élites sans objet de
 // coffre ; un coffre promet de 1 à kMostChestGains gains hors de cet ordre ;
 // la partie et son dépassement dépassent 32 bits de ms ; une mesure neuve
-// dépasse la plus grande arène ; un plafond neuf est nul.
+// dépasse la plus grande arène ; un plafond neuf est nul ; un poison sans durée
+// ou sans dégâts, hors d'une frappe, d'un tir ou d'un orage, ou sans période de
+// tic dans les réglages ; un réflexe sans durée, sans recharge, ou dont le seuil
+// sort de [1, 100] % de PV ; un cône tourné vers l'arrière qui n'est pas un cône.
 // La méta est refusée enfin si : un monstre porte une carte absente du
 // catalogue ; la cote de chute est nulle ; la table de la Cursed Water n'est
 // ni vide ni de kMostCursedWater + 1 rangs, son rang 0 majore quelque chose,

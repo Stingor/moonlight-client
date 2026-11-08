@@ -93,6 +93,9 @@ struct SurvivorsCoopPart {
 };
 // L'empreinte des règles : ce qui fixe une partie, classes, skills, vagues et échelle.
 [[nodiscard]] std::uint64_t SurvivorsRulesDigest(const SurvivorsRules& rules);
+// L'empreinte d'un profil de robot, telle qu'elle entre dans celle des règles : le robot
+// de sa classe joue le héros d'un joueur parti, sur chaque client.
+[[nodiscard]] std::uint64_t SurvivorsBotDigest(const SurvivorsBotProfile& profile);
 // L'empreinte d'une grille de marche : ce qu'une arène sur carte tire du sol lu.
 [[nodiscard]] std::uint64_t SurvivorsGroundDigest(const WalkMap& map);
 [[nodiscard]] std::vector<std::uint8_t> EncodeSurvivorsCoopPart(const SurvivorsCoopPart& part);

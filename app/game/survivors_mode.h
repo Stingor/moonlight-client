@@ -36,6 +36,7 @@
 #include "survivors/real_world_watch.h"
 #include "survivors/survivors_door.h"
 #include "survivors/survivors_keys.h"
+#include "survivors/survivors_meeting.h"
 #include "survivors/survivors_route.h"
 #include "survivors/survivors_save.h"
 #include "survivors/survivors_stage.h"
@@ -185,6 +186,10 @@ class SurvivorsMode {
   void FollowObjective(std::optional<std::uint16_t> wanted, const SurvivorsContext& context);
   void FollowEntered(SurvivorsStage& stage, const SurvivorsContext& context);
   void PaintArena(const SurvivorsStage& stage, const SurvivorsContext& context);
+  // LA RENCONTRE DE CETTE PARTIE : le corps se pose à son montage, s'il y a lieu,
+  // puis attend que le héros le rejoigne. Voir `survivors_meeting.h`.
+  void PoseMeeting(const SurvivorsStage& stage, const SurvivorsContext& context);
+  void FollowMeeting(const SurvivorsStage& stage, const SurvivorsContext& context);
   void PlaySounds(const ro::sim::SurvivorsNews& news, const SurvivorsContext& context);
   void PlaySound(std::string_view name, ArenaSoundRank rank, const SurvivorsContext& context);
   void FollowMusic(const SurvivorsStage& stage, const SurvivorsContext& context);
@@ -245,6 +250,9 @@ class SurvivorsMode {
   SurvivorsBookMode book_;
   // Le carnet de l'accueil et les intentions de ses fenêtres de méta.
   SurvivorsMetaDesk desk_;
+  SurvivorsMeeting meeting_;
+  // L'icône que la flèche de la rencontre montre.
+  ImTextureID meeting_icon_ = ImTextureID{0};
   // L'apparence du héros posée, et si elle était celle de l'évolution.
   std::optional<std::uint16_t> hero_job_;
   int pressed_card_key_ = 0;

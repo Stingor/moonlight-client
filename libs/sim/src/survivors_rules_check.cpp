@@ -1,5 +1,6 @@
 #include "survivors_rules_check.h"
 
+#include <algorithm>
 #include <array>
 #include <cstddef>
 #include <cstdint>
@@ -186,7 +187,13 @@ template <typename Rule, typename IdOf>
   return {};
 }
 
+[[nodiscard]] bool IsChanceStat(SurvivorsStat stat) noexcept {
+  return stat == SurvivorsStat::kCritPct || stat == SurvivorsStat::kDodgePct;
+}
+
 [[nodiscard]] core::Result<void> CheckCards(const SurvivorsRules& rules) {
+  // Toutes les cartes d'esquive au plus haut niveau : le héros reste touchable.
+  std::int64_t most_dodge_pct = 0;
   for (const CardRule& card : rules.cards) {
     if (card.per_level.empty() || card.per_level.size() > kMostCardLevels) {
       return Refuse("carte " + std::to_string(card.card_item_id) + " : " +
@@ -198,7 +205,18 @@ template <typename Rule, typename IdOf>
         return Refuse("carte " + std::to_string(card.card_item_id) + " : valeur " +
                       std::to_string(value) + " au-delà de ±" + std::to_string(kMostStatBonus));
       }
+      if (IsChanceStat(card.stat) && (value < 0 || value > kWholeChancePct)) {
+        return Refuse("carte " + std::to_string(card.card_item_id) + " : chance de " +
+                      std::to_string(value) + " %, de 0 à " + std::to_string(kWholeChancePct));
+      }
     }
+    if (card.stat == SurvivorsStat::kDodgePct) {
+      most_dodge_pct += *std::ranges::max_element(card.per_level);
+    }
+  }
+  if (most_dodge_pct >= kWholeChancePct) {
+    return Refuse("les cartes d'esquive rendent le héros intouchable : " +
+                  std::to_string(most_dodge_pct) + " %");
   }
   return {};
 }

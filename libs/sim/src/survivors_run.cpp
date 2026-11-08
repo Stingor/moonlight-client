@@ -432,6 +432,7 @@ void SurvivorsRun::StepTeam(std::span<const SurvivorsInput> inputs) {
     survivors::LandBlasts(field_);
     survivors::AdvanceShots(field_);
     survivors::AdvanceZones(field_);
+    survivors::TickPoison(field_);
     for (std::size_t cast = casts_before; cast < field_.news.casts.size(); ++cast) {
       field_.news.casts[cast].hero_index = field_.stage;
     }

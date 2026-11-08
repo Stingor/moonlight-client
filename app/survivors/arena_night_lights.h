@@ -44,10 +44,10 @@ inline constexpr float kArenaLanternHeightWorld = 10.0F;
 [[nodiscard]] std::optional<ro::render::PointLight> ArenaLantern(std::uint64_t presentation_ms,
                                                                  glm::vec3 hero_feet_world);
 
-// Les pieds du héros parmi les corps composés, appariés à leurs étiquettes ;
-// rien s'il n'a pas de corps.
-[[nodiscard]] std::optional<glm::vec3> ArenaHeroFeet(std::span<const ro::render::DrawnActor> drawn,
-                                                     std::span<const HordeTag> tags);
+// LA CASE DU HÉROS, en tête des poses : sa `cell`, que suivent la caméra, le sol
+// et ce qu'il porte, lanterne comprise, et non le corps qui glisse
+// (`DrawnCellOf`). Rien quand la première pose n'est pas la sienne.
+[[nodiscard]] std::optional<glm::vec2> ArenaHeroCell(std::span<const HordePose> poses) noexcept;
 
 // LA LUEUR D'UN OBJET AU SOL — gemme, objet, coffre, carte — : son sprite peint
 // une seconde fois, élargi de tant de pixels d'écran de chaque côté et AJOUTÉ,

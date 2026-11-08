@@ -135,8 +135,8 @@ std::vector<std::uint8_t> EncodeSurvivorsJournal(const SurvivorsJournal& journal
   writer.U16(journal.start.class_id);
   writer.U16(journal.start.arena_id);
   writer.U16(journal.start.first_skill_id);
-  for (const std::int32_t bonus : journal.start.loadout.bonus.values) {
-    WriteLeb128(writer, ZigzagOf(bonus));
+  for (std::size_t stat = 0; stat < kSurvivorsLoadoutStatCount; ++stat) {
+    WriteLeb128(writer, ZigzagOf(journal.start.loadout.bonus.values[stat]));
   }
   writer.U8(journal.start.loadout.rerolls);
   writer.U8(journal.start.loadout.skips);
@@ -184,10 +184,10 @@ core::Result<SurvivorsJournal> DecodeSurvivorsJournal(std::span<const std::uint8
   journal.start.arena_id = reader.U16();
   journal.start.first_skill_id = reader.U16();
   if (!reader.ok()) return Undecodable(core::ErrorCode::kUnexpectedEnd, "départ tronqué");
-  for (std::int32_t& bonus : journal.start.loadout.bonus.values) {
+  for (std::size_t stat = 0; stat < kSurvivorsLoadoutStatCount; ++stat) {
     core::Result<std::uint32_t> zigzag = ReadLeb128(reader, "bonus");
     if (!zigzag) return std::unexpected(std::move(zigzag.error()));
-    bonus = UnzigzagOf(*zigzag);
+    journal.start.loadout.bonus.values[stat] = UnzigzagOf(*zigzag);
   }
   if (!LoadoutWithinBounds(journal.start.loadout)) {
     return Undecodable(core::ErrorCode::kCorruptData,

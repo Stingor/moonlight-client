@@ -188,7 +188,13 @@ void DrawClass(const SurvivorsPrepareMeta& meta, SurvivorsPrepareAsk& asked, con
   ImGui::SeparatorText(core::Tr("Classe"));
   bool first = true;
   for (const SurvivorsClassChoice& choice : meta.classes) {
-    if (!first) ImGui::SameLine();
+    // Une case qui ne tient plus sur la ligne passe à la suivante.
+    const float wanted_width = ImGui::GetFrameHeight() + ImGui::GetStyle().ItemInnerSpacing.x +
+                               ImGui::CalcTextSize(choice.name).x;
+    if (!first) {
+      ImGui::SameLine();
+      if (wanted_width > ImGui::GetContentRegionAvail().x) ImGui::NewLine();
+    }
     first = false;
     ImGui::PushID(choice.class_id);
     ImGui::BeginDisabled(choice.locked);

@@ -9,6 +9,7 @@
 #include "ro/sim/level_up_effect.h"
 #include "ro/sim/survivors_journal.h"
 
+#include "game/skin_image_of.h"
 #include "game/survivors_codex_desk.h"
 #include "game/survivors_coop_mode.h"
 #include "game/survivors_mode_slot.h"
@@ -278,6 +279,7 @@ SurvivorsPainted SurvivorsMode::Frame(SurvivorsStage& stage, const SurvivorsCont
   FollowCoopFrame(stage, context);
   if (options_open != nullptr) pause_options_.Settle(*options_open, stage.screen());
   FollowEntered(stage, context);
+  FollowMeeting(stage, context);
 
   SurvivorsPainted painted;
   const SurvivorsEnding* ending = stage.ending();
@@ -362,6 +364,39 @@ void SurvivorsMode::FollowEntered(SurvivorsStage& stage, const SurvivorsContext&
   }
 }
 
+void SurvivorsMode::PoseMeeting(const SurvivorsStage& stage, const SurvivorsContext& context) {
+  meeting_.Clear();
+  const ro::sim::SurvivorsField& field = stage.play()->run().field();
+  const ro::sim::ArenaRule* arena = ro::sim::FindArena(Rules(), field.start.arena_id);
+  if (arena == nullptr) return;
+  const ro::sim::ClassRule* awaiting =
+      book_.ClassAwaiting(Rules(), *arena, stage.board(), context.client_root);
+  TellDamagedCopy(book_.TakeDamagedCopy(), context.say);
+  if (awaiting == nullptr) return;
+  const std::optional<ro::sim::FieldPoint> place =
+      MeetingPlaceOf(field.ground, field.hero.position);
+  if (!place.has_value()) return;
+  meeting_.Place(*place);
+  arena_->SetStrangerLook(MeetingBodyLook(*awaiting));
+  const ro::ui::SkinImage job_icon = SkinImageAt(
+      context.images, std::string(kJobIconPrefix) + std::to_string(awaiting->job_id) + ".bmp");
+  // À défaut de celle du métier, l'icône du premier skill ; sans skill de départ, aucune.
+  meeting_icon_ = ImTextureID{0};
+  if (job_icon.usable()) {
+    meeting_icon_ = job_icon.id;
+  } else if (!awaiting->starter_skills.empty()) {
+    meeting_icon_ = SurvivorsSkillIcon(awaiting->starter_skills.front(), context.tables);
+  }
+}
+
+void SurvivorsMode::FollowMeeting(const SurvivorsStage& stage, const SurvivorsContext& context) {
+  if (stage.screen() != SurvivorsScreen::kPlaying || stage.play() == nullptr) return;
+  const ro::sim::FieldPoint hero = stage.play()->run().field().hero.position;
+  if (!meeting_.Follow(hero, stage.presentation_ms())) return;
+  book_.Inscribe(kMeetingFeat, context.client_root);
+  TellDamagedCopy(book_.TakeDamagedCopy(), context.say);
+}
+
 void SurvivorsMode::PaintArena(const SurvivorsStage& stage, const SurvivorsContext& context) {
   const ro::sim::SurvivorsPlay& play = *stage.play();
   const ro::sim::SurvivorsField& field = play.run().field();
@@ -375,11 +410,15 @@ void SurvivorsMode::PaintArena(const SurvivorsStage& stage, const SurvivorsConte
         player != nullptr ? LookOf(*player)
                           : ro::render::ActorLook{
                                 .player = true, .sex = kFallbackHeroSex, .hair = kFallbackHeroHair};
-    arena_->SetHeroLook(HeroLook(face, *field.hero_class, hero_job));
+    arena_->SetHeroLook(HeroLook(face, *field.hero_class, hero_job), *field.hero_class);
     hero_job_ = hero_job;
   }
   PoseAllyLooks(stage);
   play.run().Orbs(orbs_);
+  std::optional<HordePose> stranger;
+  if (const std::optional<SurvivorsMeetingBody> body = meeting_.BodyAt(stage.presentation_ms())) {
+    stranger = StrangerPoseAt(body->at, body->opacity);
+  }
   const ArenaFrameFacts facts{
       .field = &field,
       .orbs = orbs_,
@@ -393,6 +432,7 @@ void SurvivorsMode::PaintArena(const SurvivorsStage& stage, const SurvivorsConte
       .victory_ms = stage.screen() == SurvivorsScreen::kWon
                         ? std::optional<std::uint64_t>(stage.screen_elapsed_ms())
                         : std::nullopt,
+      .stranger = stranger,
       .viewport_width = context.width,
       .viewport_height = context.height};
   const Clock::time_point composed = Clock::now();
@@ -429,6 +469,8 @@ SurvivorsFrameView SurvivorsMode::View(const SurvivorsStage& stage,
                          .typing = context.typing,
                          .banner = banner_,
                          .team_notice = TeamNotice(stage, context.now_ms),
+                         .meeting_at = meeting_.waiting_at(),
+                         .meeting_icon = meeting_icon_,
                          .unread_whispers = whispers_.received(),
                          .minimap_shown = !minimap_hidden_ && !stage.board().without_minimap,
                          .options = options_,

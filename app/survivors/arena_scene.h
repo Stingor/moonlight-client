@@ -42,6 +42,9 @@ struct ArenaOverlays {
   float viewport_width = 0.0F;
   float viewport_height = 0.0F;
   std::span<const glm::vec3> veil_targets;
+  // Le sol sous la case du héros (`ArenaHeroCell`), où pend la lanterne ; rien sans
+  // héros.
+  std::optional<glm::vec3> hero_feet;
 };
 
 // UN RECENTRAGE FAIT : la fenêtre passée de `from` à `to`, ce que devient un

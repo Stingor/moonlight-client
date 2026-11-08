@@ -31,9 +31,13 @@ struct SurvivorsLoadout {
 };
 // Chaque bonus dans [−kMostStatBonus, kMostStatBonus] : ce que Start et le
 // décodage d'un journal exigent, pour que les statistiques tiennent en 32 bits.
+// Une statistique hors de celles d'un loadout y vaut zéro : le journal ne
+// l'écrit pas.
 [[nodiscard]] inline bool LoadoutWithinBounds(const SurvivorsLoadout& loadout) noexcept {
-  for (const std::int32_t bonus : loadout.bonus.values) {
+  for (std::size_t stat = 0; stat < loadout.bonus.values.size(); ++stat) {
+    const std::int32_t bonus = loadout.bonus.values[stat];
     if (bonus < -kMostStatBonus || bonus > kMostStatBonus) return false;
+    if (stat >= kSurvivorsLoadoutStatCount && bonus != 0) return false;
   }
   return true;
 }

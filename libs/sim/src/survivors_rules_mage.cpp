@@ -590,28 +590,31 @@ constexpr ClassRule kMage{.class_id = kMageClassId,
                           .reborn_damage_pct = kMageRebornDamagePct};
 
 constexpr std::size_t kKnightSkillCount = kKnightPoolSkillCount + kKnightEvolvedSkillCount;
+constexpr std::size_t kThiefSkillCount = kThiefPoolSkillCount + kThiefEvolvedSkillCount;
 constexpr std::size_t kSkillCount =
-    kPoolSkills.size() + kShippedEvolvedSkillCount + kKnightSkillCount;
+    kPoolSkills.size() + kShippedEvolvedSkillCount + kKnightSkillCount + kThiefSkillCount;
 
 }  // namespace
 
 std::span<const ClassRule> ShippedClasses() {
   // Le Magicien en tête : la partie classée et le défi prennent la première
   // classe.
-  static const std::array<ClassRule, 2> kClasses{kMage, KnightClass()};
+  static const std::array<ClassRule, 3> kClasses{kMage, KnightClass(), ThiefClass()};
   return kClasses;
 }
 
 std::span<const SurvivorsSkillRule> ShippedSkills() {
   // Une table IMMUABLE, assemblée au premier appel : la réserve du Magicien,
-  // ses évolués, puis les skills du Chevalier, dans cet ordre.
+  // ses évolués, puis les skills du Chevalier et ceux du Voleur, dans cet ordre.
   static const std::array<SurvivorsSkillRule, kSkillCount> kSkills = [] {
     std::array<SurvivorsSkillRule, kSkillCount> skills{};
     const std::span<const SurvivorsSkillRule> evolved = ShippedEvolvedSkills();
     const std::span<const SurvivorsSkillRule> knight = KnightSkills();
+    const std::span<const SurvivorsSkillRule> thief = ThiefSkills();
     auto out = std::copy(kPoolSkills.begin(), kPoolSkills.end(), skills.begin());
     out = std::copy_n(evolved.begin(), std::min(evolved.size(), kShippedEvolvedSkillCount), out);
-    std::copy_n(knight.begin(), std::min(knight.size(), kKnightSkillCount), out);
+    out = std::copy_n(knight.begin(), std::min(knight.size(), kKnightSkillCount), out);
+    std::copy_n(thief.begin(), std::min(thief.size(), kThiefSkillCount), out);
     return skills;
   }();
   return kSkills;
@@ -619,14 +622,17 @@ std::span<const SurvivorsSkillRule> ShippedSkills() {
 
 std::span<const CardRule> ShippedCards() {
   // Une table IMMUABLE, assemblée au premier appel : les cartes du Magicien,
-  // puis celles du Chevalier.
-  static const std::array<CardRule, kCards.size() + kKnightCardCount> kAllCards = [] {
-    std::array<CardRule, kCards.size() + kKnightCardCount> cards{};
-    const std::span<const CardRule> knight = KnightCards();
-    auto out = std::copy(kCards.begin(), kCards.end(), cards.begin());
-    std::copy_n(knight.begin(), std::min(knight.size(), kKnightCardCount), out);
-    return cards;
-  }();
+  // puis celles du Chevalier et celles du Voleur.
+  static const std::array<CardRule, kCards.size() + kKnightCardCount + kThiefCardCount> kAllCards =
+      [] {
+        std::array<CardRule, kCards.size() + kKnightCardCount + kThiefCardCount> cards{};
+        const std::span<const CardRule> knight = KnightCards();
+        const std::span<const CardRule> thief = ThiefCards();
+        auto out = std::copy(kCards.begin(), kCards.end(), cards.begin());
+        out = std::copy_n(knight.begin(), std::min(knight.size(), kKnightCardCount), out);
+        std::copy_n(thief.begin(), std::min(thief.size(), kThiefCardCount), out);
+        return cards;
+      }();
   return kAllCards;
 }
 

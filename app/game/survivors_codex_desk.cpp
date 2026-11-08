@@ -103,6 +103,10 @@ struct StanceRow {
       return {Label::kStanceMagnet, Unit::kPercent};
     case Stat::kExpPct:
       return {Label::kExpBoost, Unit::kPercent};
+    // Aucune posture ne les majore : seule une carte les porte.
+    case Stat::kCritPct:
+    case Stat::kDodgePct:
+      break;
   }
   return {Label::kStanceDamage, Unit::kPercent};
 }

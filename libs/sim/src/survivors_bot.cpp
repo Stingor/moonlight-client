@@ -290,7 +290,10 @@ SurvivorsInput SurvivorsBot::Steer(const SurvivorsField& field) {
   if (field.rules == nullptr) return SurvivorsInput{};
   const SurvivorsRules& rules = *field.rules;
   const FieldPoint hero = field.hero.position;
-  const std::int64_t threat = std::max(profile_.threat_radius_units, 0);
+  const bool retreating =
+      profile_.retreat_below_pct > 0 && BelowPct(field.hero, profile_.retreat_below_pct);
+  const std::int64_t threat =
+      std::max(retreating ? profile_.retreat_radius_units : profile_.threat_radius_units, 0);
   const std::int64_t panic = std::max(profile_.panic_radius_units, 0);
   const std::int64_t reach = std::max(profile_.gem_reach_units, 0);
   // Un monstre peut croiser le segment d'une gemme s'il est à moins de sa
@@ -482,8 +485,35 @@ const SurvivorsBotProfile& KnightBotProfile() {
   return kProfile;
 }
 
-const SurvivorsBotProfile& BotProfileOf(std::string_view class_key) {
-  return class_key == "knight" ? KnightBotProfile() : MageBotProfile();
+const SurvivorsBotProfile& ThiefBotProfile() {
+  // Ses deux coups de départ d'abord, le nuage, l'union qu'Envenom fait avec
+  // Sprinkle Sand, puis Back Slide, qui frappe ce qui le talonne quand il fuit.
+  // Il tient la horde au bout de ses coups de dague ; sous 30 % de PV, il la tient
+  // au large, où seuls ses coups à distance portent.
+  static constexpr std::array<std::uint16_t, 10> kSkillOrder{48,  52, 140, 149, 150,
+                                                             138, 51, 137, 152, 49};
+  // L'esquive d'abord : c'est elle qui le fait tenir devant le boss final. Puis les
+  // cartes qui ouvrent les évolutions de ces skills, puis le critique.
+  static constexpr std::array<std::uint16_t, 14> kCardOrder{
+      4102, 4019, 4022, 4183, 4266, 4072, 4044, 4003, 4009, 4197, 4179, 4147, 4016, 4001};
+  static const SurvivorsBotProfile kProfile{.skill_order = kSkillOrder,
+                                            .card_order = kCardOrder,
+                                            .threat_radius_units = Cells(4),
+                                            .panic_radius_units = Cells(2),
+                                            .gem_reach_units = Cells(10),
+                                            .edge_margin_units = Cells(20),
+                                            .heal_below_pct = 50,
+                                            .steady_steps = 5,
+                                            .retreat_below_pct = 30,
+                                            .retreat_radius_units = Cells(7)};
+  return kProfile;
+}
+
+const SurvivorsBotProfile* BotProfileOf(std::string_view class_key) {
+  if (class_key == "mage") return &MageBotProfile();
+  if (class_key == "knight") return &KnightBotProfile();
+  if (class_key == "thief") return &ThiefBotProfile();
+  return nullptr;
 }
 
 std::uint32_t PlayBot(SurvivorsPlay& play, SurvivorsBot& bot, std::uint32_t most_steps,

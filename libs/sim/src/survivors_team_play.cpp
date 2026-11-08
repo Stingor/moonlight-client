@@ -118,7 +118,9 @@ void WritePlayer(Writer& out, std::uint16_t class_id, std::uint16_t first_skill_
                  const std::vector<std::uint16_t>& locked_ids) {
   out.U16(class_id);
   out.U16(first_skill_id);
-  for (const std::int32_t bonus : loadout.bonus.values) out.Zigzag(bonus);
+  for (std::size_t stat = 0; stat < kSurvivorsLoadoutStatCount; ++stat) {
+    out.Zigzag(loadout.bonus.values[stat]);
+  }
   out.U8(loadout.rerolls);
   out.U8(loadout.skips);
   out.U8(loadout.banishes);
@@ -132,10 +134,10 @@ void WritePlayer(Writer& out, std::uint16_t class_id, std::uint16_t first_skill_
   SurvivorsAllyStart player;
   player.class_id = in.U16();
   player.first_skill_id = in.U16();
-  for (std::int32_t& bonus : player.loadout.bonus.values) {
+  for (std::size_t stat = 0; stat < kSurvivorsLoadoutStatCount; ++stat) {
     const std::optional<std::int32_t> read = in.Zigzag();
     if (!read) return std::nullopt;
-    bonus = *read;
+    player.loadout.bonus.values[stat] = *read;
   }
   if (!LoadoutWithinBounds(player.loadout)) return std::nullopt;
   player.loadout.rerolls = in.U8();
@@ -365,12 +367,25 @@ std::uint64_t SurvivorsDigest(const SurvivorsField& field) {
     digest.Add(hero.down ? 1U : 0U);
     digest.Add(hero.skills.size());
     digest.Add(hero.cards.size());
+    // Un réflexe et un poison n'entrent qu'une fois posés : l'empreinte d'une
+    // partie qui n'en a jamais vu ne change pas.
+    if (hero.veil_until_step != 0) {
+      digest.Add(hero.veil_until_step);
+      digest.Add(hero.veil_sheathes ? 1U : 0U);
+      digest.Add(hero.critical_due ? 1U : 0U);
+    }
   }
   digest.Add(field.foes.size());
   for (const SurvivorsFoe& foe : field.foes) {
     digest.Add(foe.serial);
     digest.AddPoint(foe.position);
     digest.AddSigned(foe.hp);
+    if (foe.poison_until_step != 0) {
+      digest.Add(foe.poison_until_step);
+      digest.Add(foe.poison_next_step);
+      digest.AddSigned(foe.poison_tick_damage);
+      digest.Add(foe.poison_hero);
+    }
   }
   digest.Add(field.gems.size());
   digest.Add(field.pickups.size());

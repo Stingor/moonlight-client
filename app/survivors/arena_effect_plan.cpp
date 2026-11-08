@@ -63,6 +63,7 @@ void PlanCast(const ro::sim::SurvivorsCast& cast, const SkillLook& look,
                                 .target = cast.to});
       return;
     case ro::sim::CastKind::kConeOn:
+    case ro::sim::CastKind::kBackSlide:
       PlanCone(cast, look, out);
       return;
     case ro::sim::CastKind::kStormOn:
@@ -240,6 +241,8 @@ void CollectArenaLaunches(const ro::sim::SurvivorsNews& news, const ro::sim::Sur
   }
   std::vector<std::uint32_t> struck_serials;
   for (const ro::sim::SurvivorsHit& hit : news.hits) {
+    // Un tic de poison n'est pas un coup : il n'a que son chiffre.
+    if (hit.poison_tick) continue;
     const SkillLook* look = looks.Find(hit.skill_id);
     if (look == nullptr) continue;
     out.push_back(ArenaLaunch{.effect_id = switches.reduced ? kPlainHitEffect : look->hit_effect_id,

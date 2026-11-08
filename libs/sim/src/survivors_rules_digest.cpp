@@ -61,7 +61,8 @@ void PutSkillLevel(FnvDigest& digest, const SkillLevel& level) {
          level.area_radius_units, level.splash_pct, level.length_units, level.zone_hits,
          level.knockback_units, level.freeze_ms, level.bounces, level.bounce_pct,
          level.bounce_reach_units, level.freeze_from_wave, level.blind_ms, level.curse_ms,
-         level.cone_half_steps, level.block_hp, level.stance_bonus);
+         level.cone_half_steps, level.block_hp, level.stance_bonus, level.poison_ms,
+         level.poison_tick_damage, level.reflex_below_hp_pct, level.reflex_sheathes);
 }
 
 void PutBehaviour(FnvDigest& digest, const FoeBehaviour& behaviour) {
@@ -137,7 +138,8 @@ void PutBot(FnvDigest& digest, const SurvivorsBotProfile& profile) {
   PutNumbers(digest, profile.skill_order);
   PutNumbers(digest, profile.card_order);
   PutAll(digest, profile.threat_radius_units, profile.panic_radius_units, profile.gem_reach_units,
-         profile.edge_margin_units, profile.heal_below_pct, profile.steady_steps);
+         profile.edge_margin_units, profile.heal_below_pct, profile.steady_steps,
+         profile.retreat_below_pct, profile.retreat_radius_units);
 }
 
 void PutCaps(FnvDigest& digest, const SurvivorsCaps& caps) {
@@ -160,7 +162,7 @@ void PutTuning(FnvDigest& digest, const SurvivorsTuning& tuning) {
          tuning.plant_kills_per_minute, tuning.plant_start_count, tuning.plant_start_cells,
          tuning.most_live_plants, tuning.plant_forget_units, tuning.pickup_radius_units,
          tuning.final_overtime_ms, tuning.curse_slow_pct, tuning.curse_hurt_pct,
-         tuning.blind_turn_ms);
+         tuning.blind_turn_ms, tuning.poison_tick_ms);
   PutNumbers(digest, std::span<const std::int32_t>(tuning.foe_radius_units));
 }
 
@@ -175,12 +177,19 @@ std::uint64_t SurvivorsGroundDigest(const WalkMap& map) {
   return digest.value();
 }
 
+std::uint64_t SurvivorsBotDigest(const SurvivorsBotProfile& profile) {
+  FnvDigest digest;
+  PutBot(digest, profile);
+  return digest.value();
+}
+
 std::uint64_t SurvivorsRulesDigest(const SurvivorsRules& rules) {
   FnvDigest digest;
   PutAll(digest, rules.ruleset_version, rules.run_ms);
   PutEach(digest, rules.classes, [&](const ClassRule& rule) { PutClass(digest, rule); });
   PutEach(digest, rules.skills, [&](const SurvivorsSkillRule& rule) {
-    PutAll(digest, rule.skill_id, rule.archetype, rule.target, rule.element, rule.stance_stat);
+    PutAll(digest, rule.skill_id, rule.archetype, rule.target, rule.element, rule.stance_stat,
+           rule.cone_behind);
     PutEach(digest, rule.levels, [&](const SkillLevel& level) { PutSkillLevel(digest, level); });
   });
   PutEach(digest, rules.cards, [&](const CardRule& rule) {
@@ -221,6 +230,7 @@ std::uint64_t SurvivorsRulesDigest(const SurvivorsRules& rules) {
   PutAll(digest, kTeamLeashCells, kMostTeamCharges, kVoteTicks, kChestHoldTicks);
   PutBot(digest, MageBotProfile());
   PutBot(digest, KnightBotProfile());
+  PutBot(digest, ThiefBotProfile());
   for (const SurvivorsTeamScale& scale : kTeamScales) {
     PutAll(digest, scale.exp_needed_pct, scale.foe_hp_pct, scale.batch_pct);
   }

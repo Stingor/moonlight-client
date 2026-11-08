@@ -39,6 +39,8 @@ enum class SurvivorsEffectFigure : std::uint8_t {
   kLuckPct,
   kMagnetPct,
   kExpPct,
+  kCritPct,
+  kDodgePct,
   kHeal,
   kZeny,
   kPurifyCells,  // la portée de la purification, en cases

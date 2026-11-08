@@ -72,6 +72,13 @@ struct SurvivorsHero {
   std::uint8_t evolutions = 0;  // skills évolués par un coffre
   // Relevé, il ne prend aucun coup tant que `step < invulnerable_until_step`.
   std::uint32_t invulnerable_until_step = 0;
+  // Le réflexe de survie, tant que `step < veil_until_step` : il le rend
+  // invulnérable. `veil_sheathes` : il marche mais ne lance plus de skill ; ce
+  // qui est déjà parti arrive.
+  // `critical_due` : son premier coup après ce pas sera un critique.
+  std::uint32_t veil_until_step = 0;
+  bool veil_sheathes = false;
+  bool critical_due = false;
   // En coop : tombé sans vie de réserve. Il ne bouge, ne tire ni ne ramasse
   // plus, et la horde l'ignore. Jamais vrai en solo.
   bool down = false;
@@ -156,6 +163,16 @@ struct SurvivorsFoe {
   // Vrai tant qu'un coup de boss (bond, charge, fuite) mène son corps :
   // RunBossScripts le déplace, ni SteerFoes ni la poursuite ne le font.
   bool scripted = false;
+  // Empoisonné tant que `step < poison_until_step` (0 : il ne l'est pas) : le
+  // prochain tic tombe à `poison_next_step`, et chaque tic est le coup de
+  // `poison_skill_id`, porté par le héros `poison_hero`.
+  std::uint32_t poison_until_step = 0;
+  std::uint32_t poison_next_step = 0;
+  std::int32_t poison_tick_damage = 0;
+  std::uint16_t poison_skill_id = 0;
+  std::uint8_t poison_hero = 0;
+  // Le dernier héros qui l'a blessé : sa chute lui est créditée.
+  std::uint8_t last_hurt_hero = 0;
 };
 // La place, dans `rehit_ready_step`, de l'emplacement `slot` du héros
 // `hero_index`.
@@ -243,6 +260,8 @@ struct SurvivorsShot {
   // Un projectile droit : il garde sa vitesse de départ, sans se tourner vers
   // un monstre.
   bool straight = false;
+  std::uint32_t poison_ms = 0;
+  std::int32_t poison_tick_damage = 0;
 };
 struct SurvivorsStrike {
   std::uint32_t foe_serial = 0;
@@ -258,6 +277,8 @@ struct SurvivorsStrike {
   std::uint8_t bounces = 0;
   std::int32_t bounce_pct = 0;
   std::int32_t bounce_reach_units = 0;
+  std::uint32_t poison_ms = 0;
+  std::int32_t poison_tick_damage = 0;
 };
 // Un éclat d'aire en chute : celui d'un skill, visé sur un monstre, ou une nova
 // posée sur le héros. Aucune promesse : une aire ne se répartit pas entre ses
@@ -306,6 +327,9 @@ struct SurvivorsZone {
   std::uint32_t curse_ms = 0;
   // Barrière : les PV qui restent au bloc ; à zéro, il éclate.
   std::int32_t block_hp = 0;
+  // Orage : le poison de chaque coup.
+  std::uint32_t poison_ms = 0;
+  std::int32_t poison_tick_damage = 0;
 };
 struct SurvivorsGem {
   FieldPoint position;

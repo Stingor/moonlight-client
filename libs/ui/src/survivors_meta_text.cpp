@@ -8,6 +8,7 @@
 
 #include "ro/core/i18n.h"
 #include "ro/ui/inventory_window.h"
+#include "ro/ui/survivors_album_window.h"
 #include "ro/ui/survivors_ranking_window.h"
 
 namespace ro::ui {
@@ -76,6 +77,9 @@ const char* SurvivorsFeatGoal(std::string_view feat_key) {
   if (feat_key == "thunderstorm") return core::Tr("Niveau atteint en une seule partie");
   if (feat_key == "water_ball") return core::Tr("Monstres Fire vaincus, au cumul");
   if (feat_key == "ice_wall") return core::Tr("Survivre en une seule partie");
+  if (feat_key == "thief_met") {
+    return core::Tr("Rejoindre le Voleur qui attend sur la prairie, en partie libre, seul");
+  }
   return "";
 }
 

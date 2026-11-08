@@ -68,7 +68,7 @@ struct SurvivorsHudCard {
   float fraction = 0.0F;
 };
 
-enum class SurvivorsEdgeKind : std::uint8_t { kBoss, kChest };
+enum class SurvivorsEdgeKind : std::uint8_t { kBoss, kChest, kMeeting };
 
 // Une cible désignée par une flèche de bord quand elle sort du champ, à sa
 // place projetée sur l'écran (hors du cadre, ou dedans : rien n'est alors
@@ -76,6 +76,8 @@ enum class SurvivorsEdgeKind : std::uint8_t { kBoss, kChest };
 struct SurvivorsEdgeTarget {
   ImVec2 screen_px;
   SurvivorsEdgeKind kind = SurvivorsEdgeKind::kChest;
+  // L'icône posée en retrait de la flèche ; 0 : la flèche seule.
+  ImTextureID icon = 0;
 };
 
 // UN ALLIÉ, au HUD d'une partie coop.

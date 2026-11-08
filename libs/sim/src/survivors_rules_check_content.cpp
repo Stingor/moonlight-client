@@ -131,6 +131,17 @@ template <std::size_t kCount>
          archetype == SkillArchetype::kBarrier;
 }
 
+// LE PLUS COURT REPOS D'UN RÉFLEXE, entre sa fin et sa reprise, à la recharge la
+// plus réduite : sans lui, le héros serait intouchable sans fin.
+constexpr std::int64_t kReflexLeastRestMs = 1000;
+
+// Le réflexe `level` laisse un repos après lui : sa recharge, réduite du plafond des
+// réglages, dépasse sa durée d'au moins kReflexLeastRestMs.
+[[nodiscard]] bool RestsAfterReflex(const SkillLevel& level, const SurvivorsTuning& tuning) {
+  const std::int64_t shortest_cooldown_ms = Scaled(level.cooldown_ms, -tuning.most_cooldown_pct);
+  return shortest_cooldown_ms >= std::int64_t{level.life_ms} + kReflexLeastRestMs;
+}
+
 [[nodiscard]] core::Result<void> CheckLevelContent(const SurvivorsSkillRule& skill,
                                                    const SkillLevel& level, const std::string& at) {
   if (auto checked = CheckMeasures<5>(at, {{{"aire", level.area_radius_units},
@@ -182,10 +193,26 @@ template <std::size_t kCount>
   // que sa recharge.
   if (skill.archetype == SkillArchetype::kStance &&
       (level.stance_bonus == 0 || level.life_ms == 0 || level.cooldown_ms <= level.life_ms ||
-       skill.stance_stat == SurvivorsStat::kMaxHp)) {
+       skill.stance_stat == SurvivorsStat::kMaxHp || skill.stance_stat == SurvivorsStat::kCritPct ||
+       skill.stance_stat == SurvivorsStat::kDodgePct)) {
     return Refuse(at +
                   "de posture sans bonus, sans durée, plus longue que sa recharge, ou sur "
-                  "les PV max");
+                  "les PV max ou une chance");
+  }
+  // Un réflexe rend intouchable un temps, à sa recharge, sous un seuil de PV.
+  if (skill.archetype == SkillArchetype::kReflex &&
+      (level.life_ms == 0 || level.cooldown_ms == 0 || level.reflex_below_hp_pct <= 0 ||
+       level.reflex_below_hp_pct > kWholeHpPct)) {
+    return Refuse(at + "de réflexe sans durée, sans recharge, ou de seuil hors de [1, 100] %");
+  }
+  // Un poison a une durée et des dégâts, et seuls ces coups le posent.
+  if ((level.poison_ms == 0) != (level.poison_tick_damage <= 0)) {
+    return Refuse(at + "de poison sans durée ou sans dégâts");
+  }
+  if (level.poison_ms > 0 && skill.archetype != SkillArchetype::kTargetStrike &&
+      skill.archetype != SkillArchetype::kHoming && skill.archetype != SkillArchetype::kLinear &&
+      skill.archetype != SkillArchetype::kStorm) {
+    return Refuse(at + "de poison hors d'une frappe, d'un tir ou d'un orage");
   }
   if (skill.archetype == SkillArchetype::kStorm) {
     // Plusieurs vagues se suivent à un intervalle ; un orage posé sur un
@@ -250,6 +277,9 @@ core::Result<void> CheckSkillContent(const SurvivorsRules& rules) {
     if (skill.target == TargetRule::kRandom && skill.archetype == SkillArchetype::kClusterBlast) {
       return Refuse(named + "ciblage au hasard d'un éclat");
     }
+    if (skill.cone_behind && skill.archetype != SkillArchetype::kCone) {
+      return Refuse(named + "tourné vers l'arrière hors d'un cône");
+    }
     // Seul un orage se pose sur le héros.
     if (skill.target == TargetRule::kHero && skill.archetype != SkillArchetype::kStorm) {
       return Refuse(named + "ciblage du héros hors d'un orage");
@@ -258,6 +288,12 @@ core::Result<void> CheckSkillContent(const SurvivorsRules& rules) {
       const std::string at = named + "niveau " + std::to_string(index + 1) + " ";
       if (auto checked = CheckLevelContent(skill, skill.levels[index], at); !checked) {
         return checked;
+      }
+      if (skill.archetype == SkillArchetype::kReflex &&
+          !RestsAfterReflex(skill.levels[index], rules.tuning)) {
+        return Refuse(at +
+                      "de réflexe dont la recharge au plus réduit ne dépasse pas sa durée de " +
+                      std::to_string(kReflexLeastRestMs) + " ms");
       }
     }
   }
@@ -499,6 +535,14 @@ core::Result<void> CheckContentTuning(const SurvivorsRules& rules) {
         return skill.archetype == SkillArchetype::kStance;
       })) {
     return Refuse("réglages : posture sans repos minimal");
+  }
+  // Un poison sans période de tic ne suivrait aucun rythme réglé.
+  if (tuning.poison_tick_ms == 0 &&
+      std::ranges::any_of(rules.skills, [](const SurvivorsSkillRule& skill) {
+        return std::ranges::any_of(skill.levels,
+                                   [](const SkillLevel& level) { return level.poison_ms > 0; });
+      })) {
+    return Refuse("réglages : poison sans période de tic");
   }
   // Un recul qui ne bouge pas d'une sous-unité par pas ne finit jamais.
   if (tuning.knock_units_per_step == 0) {

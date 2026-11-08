@@ -42,13 +42,9 @@ std::optional<ro::render::PointLight> ArenaLantern(std::uint64_t presentation_ms
   return lantern;
 }
 
-std::optional<glm::vec3> ArenaHeroFeet(std::span<const ro::render::DrawnActor> drawn,
-                                       std::span<const HordeTag> tags) {
-  const std::size_t count = std::min(drawn.size(), tags.size());
-  for (std::size_t index = 0; index < count; ++index) {
-    if (tags[index].kind == HordeBodyKind::kHero) return drawn[index].ground_position;
-  }
-  return std::nullopt;
+std::optional<glm::vec2> ArenaHeroCell(std::span<const HordePose> poses) noexcept {
+  if (poses.empty() || poses.front().kind != HordeBodyKind::kHero) return std::nullopt;
+  return poses.front().cell;
 }
 
 float ArenaItemHaloAlpha(std::uint64_t presentation_ms) noexcept {

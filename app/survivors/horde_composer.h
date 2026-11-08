@@ -11,6 +11,7 @@
 
 #include "ro/render/actor_wardrobe.h"
 #include "ro/render/sprite_catalog.h"
+#include "ro/render/sprite_frame.h"
 #include "ro/render/sprite_renderer.h"
 #include "ro/sim/survivors_rules.h"
 
@@ -66,10 +67,13 @@ class HordeComposer {
   HordeComposer& operator=(const HordeComposer&) = delete;
 
   // L'apparence du héros : voir `HeroLook`. Sans elle, le héros n'a pas de
-  // corps.
-  void SetHeroLook(const ro::render::ActorLook& look);
+  // corps. Sa classe décide du rang de son geste : voir `HeroAttackAnimation`.
+  void SetHeroLook(const ro::render::ActorLook& look, const ro::sim::ClassRule& hero_class);
   // L'apparence du héros `hero_index` en coop, posé avec `look_id` = index + 1.
-  void SetAllyLook(std::size_t hero_index, const ro::render::ActorLook& look);
+  void SetAllyLook(std::size_t hero_index, const ro::render::ActorLook& look,
+                   const ro::sim::ClassRule& hero_class);
+  // L'apparence de l'inconnu de la rencontre : voir `HordeBodyKind::kStranger`.
+  void SetStrangerLook(const ro::render::ActorLook& look);
 
   // Les durées des motions d'une apparence, lues sur son `.act` ; zéro pour
   // une apparence sans corps.
@@ -107,10 +111,17 @@ class HordeComposer {
   // demande.
   [[nodiscard]] const KnownOutfit& KnownOf(HordeBodyKind kind, std::uint16_t look_id);
   [[nodiscard]] ro::render::ActorOutfit* OutfitOf(HordeBodyKind kind, std::uint16_t look_id);
+  // Le rang de l'animation que cette pose joue.
+  [[nodiscard]] std::size_t AnimationOf(const HordePose& pose) const noexcept;
+  // Le rang du geste d'attaque du héros posé avec `look_id`.
+  [[nodiscard]] std::size_t HeroAttackRank(std::uint16_t look_id) const noexcept;
 
   ro::render::ActorWardrobe* wardrobe_;
   ro::render::ActorOutfit* hero_outfit_ = nullptr;
   std::array<ro::render::ActorOutfit*, ro::sim::kMostHeroes + 1U> ally_outfits_{};
+  std::size_t hero_attack_ = ro::render::kAnimationAttack2;
+  std::array<std::size_t, ro::sim::kMostHeroes + 1U> ally_attacks_{};
+  ro::render::ActorOutfit* stranger_outfit_ = nullptr;
   // Quelques dizaines d'apparences au plus, cherchées en ligne.
   std::vector<KnownOutfit> known_;
   std::vector<ro::render::DrawnActor> drawn_;

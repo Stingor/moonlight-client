@@ -225,6 +225,7 @@ bool SurvivorsMode::Mount(SurvivorsStage& stage, const SurvivorsContext& context
   PoseArenaOptions();
   arena_->SetQuake(context.quake);
   hero_job_.reset();
+  PoseMeeting(stage, context);
   // LA CHAUFFE : chaque espèce de la première vague, et les bolts de départ.
   const ro::sim::SurvivorsField& field = stage.play()->run().field();
   std::vector<std::uint16_t> skills;

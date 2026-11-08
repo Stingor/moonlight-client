@@ -73,6 +73,9 @@ struct SurvivorsViewFacts {
   // EN COOP, ce que le HUD doit dire : rien n'y met en pause, et la conversation peut
   // être fermée. ⚠ EN FRANÇAIS, marqué par `TrText`.
   const char* team_notice = nullptr;
+  // Là où le corps de la rencontre attend, et l'icône de sa flèche.
+  std::optional<ro::sim::FieldPoint> meeting_at;
+  ImTextureID meeting_icon = ImTextureID{0};
   std::uint32_t unread_whispers = 0;
   // LA MINIMAP SE MONTRE : la touche ne l'a pas masquée, et la partie n'est
   // pas partie sans elle.

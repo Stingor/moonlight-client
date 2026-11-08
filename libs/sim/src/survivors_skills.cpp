@@ -91,7 +91,9 @@ namespace {
                                             .knockback_units = level.knockback_units,
                                             .bounces = level.bounces,
                                             .bounce_pct = level.bounce_pct,
-                                            .bounce_reach_units = level.bounce_reach_units});
+                                            .bounce_reach_units = level.bounce_reach_units,
+                                            .poison_ms = level.poison_ms,
+                                            .poison_tick_damage = level.poison_tick_damage});
     PublishCast(field.news, SurvivorsCast{.skill_id = rule.skill_id,
                                           .kind = CastKind::kStrike,
                                           .from = field.hero.position,
@@ -144,7 +146,9 @@ namespace {
                       .curse_ms = level.curse_ms,
                       .splash_radius_units = AreaUnits(field, level.area_radius_units),
                       .splash_pct = level.splash_pct,
-                      .straight = false});
+                      .straight = false,
+                      .poison_ms = level.poison_ms,
+                      .poison_tick_damage = level.poison_tick_damage});
     PublishCast(field.news, SurvivorsCast{.skill_id = rule.skill_id,
                                           .kind = CastKind::kShot,
                                           .from = hero,
@@ -242,7 +246,9 @@ void SpinOrbit(SurvivorsField& field, std::uint8_t slot, const SurvivorsSkillRul
                                            const SurvivorsFoe& foe) noexcept {
   return SurvivorsStatus{.freeze_ms = strike.freeze_ms,
                          .knockback_units = strike.knockback_units,
-                         .knock_heading = HeadingAway(field.hero.position, foe, field.hero.facing)};
+                         .knock_heading = HeadingAway(field.hero.position, foe, field.hero.facing),
+                         .poison_ms = strike.poison_ms,
+                         .poison_tick_damage = strike.poison_tick_damage};
 }
 
 // Un glaçage compte au récapitulatif quand il fait passer un monstre encore en
@@ -345,7 +351,100 @@ void TendStance(SurvivorsField& field, std::size_t index, const SurvivorsSkillRu
                                         .land_step = field.step});
 }
 
+// Le coup en cours est critique : celui qu'un réflexe promet au sortir, sinon un
+// tirage, pour un héros qui a une chance et pour lui seul.
+[[nodiscard]] bool RollCritical(SurvivorsField& field) {
+  SurvivorsHero& hero = field.hero;
+  if (hero.critical_due && field.step >= hero.veil_until_step) {
+    hero.critical_due = false;
+    return true;
+  }
+  const std::int32_t chance_pct = hero.stats.Of(SurvivorsStat::kCritPct);
+  if (chance_pct <= 0) return false;
+  constexpr auto kWholeChance = static_cast<std::uint32_t>(kWholeChancePct);
+  return field.combat_random.Chance(std::min(static_cast<std::uint32_t>(chance_pct), kWholeChance),
+                                    kWholeChance);
+}
+
+// Ce qu'un coup ou un tic retire au monstre, et ce qu'il en dit.
+struct HurtNature {
+  bool critical = false;
+  bool poison_tick = false;
+};
+
+void DealHurt(SurvivorsField& field, SurvivorsFoe& foe, SurvivorsDamage damage,
+              std::uint16_t skill_id, const SurvivorsStatus& status, HurtNature nature) {
+  foe.hp -= damage.amount;
+  foe.hurt_step = field.step;
+  foe.last_hurt_hero = static_cast<std::uint8_t>(field.stage);
+  const auto dealt = static_cast<std::uint64_t>(std::max(damage.amount, 0));
+  field.tally.damage_dealt += dealt;
+  CountInRecap(field.recap.damage_by_skill, skill_id, dealt);
+  const StatusApplied applied = ApplyStatus(field, foe, status);
+  if (applied.poisoned) foe.poison_skill_id = skill_id;
+  if (field.news.hits.size() < kMostNewsHits) {
+    field.news.hits.push_back(SurvivorsHit{.foe_serial = foe.serial,
+                                           .at = foe.position,
+                                           .amount = damage.amount,
+                                           .efficiency_pct = damage.efficiency_pct,
+                                           .skill_id = skill_id,
+                                           .froze = applied.froze,
+                                           .knocked = applied.knocked,
+                                           .hero_index = static_cast<std::uint8_t>(field.stage),
+                                           .critical = nature.critical,
+                                           .poison_tick = nature.poison_tick});
+  } else {
+    ++field.news.dropped;
+  }
+}
+
 }  // namespace
+
+void TickPoison(SurvivorsField& field) {
+  if (field.rules == nullptr) return;
+  const std::uint32_t period_steps =
+      std::max<std::uint32_t>(StepsOf(field.rules->tuning.poison_tick_ms), 1);
+  for (SurvivorsFoe& foe : field.foes) {
+    if (foe.poison_until_step == 0 || foe.poison_hero != field.stage || foe.hp <= 0) continue;
+    if (field.step >= foe.poison_next_step && Tangible(field, foe)) {
+      foe.poison_next_step = field.step + period_steps;
+      const SurvivorsDamage damage =
+          DamageAgainst(field, foe.poison_tick_damage, SurvivorsElement::kPoison, foe);
+      if (damage.amount > 0) {
+        DealHurt(field, foe, damage, foe.poison_skill_id, {}, HurtNature{.poison_tick = true});
+      }
+    }
+    if (field.step >= foe.poison_until_step) foe.poison_until_step = 0;
+  }
+}
+
+void TriggerReflex(SurvivorsField& field) {
+  if (field.rules == nullptr) return;
+  SurvivorsHero& hero = field.hero;
+  for (OwnedSkill& owned : hero.skills) {
+    const SurvivorsSkillRule* rule = FindSkill(*field.rules, owned.skill_id);
+    if (rule == nullptr || rule->archetype != SkillArchetype::kReflex) continue;
+    const SkillLevel* level = LevelOf(*rule, owned);
+    if (level == nullptr || field.step < owned.ready_step) continue;
+    if (std::int64_t{hero.hp} * kPercent >=
+        std::int64_t{hero.max_hp} * level->reflex_below_hp_pct) {
+      continue;
+    }
+    hero.veil_until_step = field.step + 1 + StepsOf(level->life_ms);
+    hero.veil_sheathes = level->reflex_sheathes;
+    hero.critical_due = !level->reflex_sheathes;
+    hero.invulnerable_until_step = std::max(hero.invulnerable_until_step, hero.veil_until_step);
+    owned.ready_step = ReadyAfter(field, *level);
+    PublishCast(field.news, SurvivorsCast{.skill_id = rule->skill_id,
+                                          .kind = CastKind::kStanceOn,
+                                          .from = hero.position,
+                                          .to = hero.position,
+                                          .target_serial = 0,
+                                          .land_step = field.step,
+                                          .hero_index = static_cast<std::uint8_t>(field.stage)});
+    return;
+  }
+}
 
 void TellOrbits(SurvivorsField& field, CastKind kind) {
   if (field.rules == nullptr) return;
@@ -372,13 +471,16 @@ void FireSkills(SurvivorsField& field) {
     if (rule == nullptr) continue;
     const SkillLevel* level = LevelOf(*rule, owned);
     if (level == nullptr || level->amount == 0) continue;
+    // Un réflexe part d'un coup reçu ; une posture se tient même sans frapper.
+    if (rule->archetype == SkillArchetype::kReflex) continue;
+    if (rule->archetype == SkillArchetype::kStance) {
+      TendStance(field, index, *rule, *level);
+      continue;
+    }
+    if (HeroSheathed(field)) continue;
     // Une orbite tourne selon sa phase ; ni salve ni recharge.
     if (rule->archetype == SkillArchetype::kOrbit) {
       SpinOrbit(field, slot, *rule, *level);
-      continue;
-    }
-    if (rule->archetype == SkillArchetype::kStance) {
-      TendStance(field, index, *rule, *level);
       continue;
     }
     if (field.step < owned.ready_step) continue;
@@ -416,6 +518,7 @@ void FireSkills(SurvivorsField& field) {
         break;
       case SkillArchetype::kOrbit:   // tournée plus haut
       case SkillArchetype::kStance:  // tenue plus haut
+      case SkillArchetype::kReflex:  // écarté plus haut
         break;
     }
     // Sans salve, le skill attend : il tire au premier pas où il le peut.
@@ -473,24 +576,9 @@ SurvivorsDamage DamageAgainst(const SurvivorsField& field, std::int32_t base,
 
 void HurtFoe(SurvivorsField& field, SurvivorsFoe& foe, SurvivorsDamage damage,
              std::uint16_t skill_id, const SurvivorsStatus& status) {
-  foe.hp -= damage.amount;
-  foe.hurt_step = field.step;
-  const auto dealt = static_cast<std::uint64_t>(std::max(damage.amount, 0));
-  field.tally.damage_dealt += dealt;
-  CountInRecap(field.recap.damage_by_skill, skill_id, dealt);
-  const StatusApplied applied = ApplyStatus(field, foe, status);
-  if (field.news.hits.size() < kMostNewsHits) {
-    field.news.hits.push_back(SurvivorsHit{.foe_serial = foe.serial,
-                                           .at = foe.position,
-                                           .amount = damage.amount,
-                                           .efficiency_pct = damage.efficiency_pct,
-                                           .skill_id = skill_id,
-                                           .froze = applied.froze,
-                                           .knocked = applied.knocked,
-                                           .hero_index = static_cast<std::uint8_t>(field.stage)});
-  } else {
-    ++field.news.dropped;
-  }
+  const bool critical = damage.amount > 0 && RollCritical(field);
+  if (critical) damage.amount = SaturatedAdd(damage.amount, damage.amount);
+  DealHurt(field, foe, damage, skill_id, status, HurtNature{.critical = critical});
 }
 
 void CollectOrbs(const SurvivorsField& field, std::vector<SurvivorsOrb>& out) {

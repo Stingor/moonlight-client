@@ -63,12 +63,19 @@ void SurvivorsViews::ComposeClassChoices(const ro::sim::SurvivorsRules& rules,
   class_choices_.clear();
   // Les textes d'abord : une liste qui grandit déplacerait les textes désignés.
   for (const ro::sim::ClassRule& class_rule : rules.classes) {
-    const std::uint64_t minutes = FeatMinutes(ClassUnlockFeat(class_rule));
-    class_hints_.push_back(
-        minutes == 0
-            ? std::string()
-            : ro::core::Printed(ro::core::Tr("%s : une partie tenue %u:00 le débloque."),
-                                ClassName(class_rule, tables), static_cast<unsigned>(minutes)));
+    const std::string_view feat = ClassUnlockFeat(class_rule);
+    const std::uint64_t minutes = FeatMinutes(feat);
+    if (feat == kMeetingFeat) {
+      class_hints_.push_back(
+          ro::core::Printed(ro::core::Tr("%s : il attend sur la prairie, en partie libre, seul."),
+                            ClassName(class_rule, tables)));
+    } else {
+      class_hints_.push_back(
+          minutes == 0
+              ? std::string()
+              : ro::core::Printed(ro::core::Tr("%s : une partie tenue %u:00 le débloque."),
+                                  ClassName(class_rule, tables), static_cast<unsigned>(minutes)));
+    }
   }
   for (std::size_t rank = 0; rank < rules.classes.size(); ++rank) {
     const ro::sim::ClassRule& class_rule = rules.classes[rank];
@@ -245,7 +252,18 @@ void SurvivorsViews::NameFeats(std::span<ro::ui::SurvivorsFeatEntry> feats,
     const std::string_view key = feat.key;
     const auto skill = std::ranges::find_if(
         rules.skills, [key](const ro::sim::SurvivorsSkillRule& rule) { return key == rule.key; });
-    if (skill == rules.skills.end()) continue;
+    if (skill == rules.skills.end()) {
+      // Un exploit sans skill de même clé se nomme par la classe qu'il débloque.
+      const auto unlocked = std::ranges::find_if(
+          rules.classes,
+          [key](const ro::sim::ClassRule& rule) { return ClassUnlockFeat(rule) == key; });
+      if (unlocked == rules.classes.end()) continue;
+      feat.name = ClassName(*unlocked, tables);
+      if (!unlocked->starter_skills.empty()) {
+        feat.icon = SurvivorsSkillIcon(unlocked->starter_skills.front(), tables);
+      }
+      continue;
+    }
     feat.icon = SurvivorsSkillIcon(skill->skill_id, tables);
     feat.name = SkillName(skill->skill_id, tables);
   }

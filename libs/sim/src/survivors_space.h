@@ -273,6 +273,12 @@ inline bool DropPickup(SurvivorsField& field, PickupKind kind, std::uint16_t ite
 
 // ── Les statuts ────────────────────────────────────────────────────────────
 
+// Le héros en scène, sous un réflexe qui rengaine, marche mais ne lance plus de
+// skill ; ce qui est déjà parti, frappe planifiée ou tir en vol, arrive.
+[[nodiscard]] inline bool HeroSheathed(const SurvivorsField& field) noexcept {
+  return field.hero.veil_sheathes && field.step < field.hero.veil_until_step;
+}
+
 [[nodiscard]] inline bool Frozen(const SurvivorsField& field, const SurvivorsFoe& foe) noexcept {
   return field.step < foe.freeze_until_step;
 }

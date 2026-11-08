@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -33,14 +34,28 @@ inline constexpr std::uint16_t kGroundCardItem = 4001;
 
 // LE HÉROS (U7) : la tête, la coiffure, les coiffes, la cape et les couleurs
 // du personnage (`player`), sur le corps du métier `job` que le héros montre
-// (ro::sim::HeroJobOf : évolué, monté) et l'arme de sa classe. `job` nul : le
-// métier de la classe.
+// (ro::sim::HeroJobOf : évolué, monté) et l'arme de ce corps : celle du départ
+// sur le corps de départ, celle de l'évolution sur tout autre quand la classe
+// en a une. `job` nul : le métier de la classe.
 //
 // ⚠ CE QUI CHANGERAIT LE CORPS EST RETIRÉ : costume, monture, habit de GM,
 // combinaison, tête d'orc et bouclier sont ceux du personnage, pas du mode.
 [[nodiscard]] ro::render::ActorLook HeroLook(const ro::render::ActorLook& player,
                                              const ro::sim::ClassRule& hero_class,
                                              std::uint16_t job) noexcept;
+
+// LE CORPS DE LA RENCONTRE : le métier et l'arme du départ de la classe, sous une
+// tête ordinaire, sans rien du personnage du joueur.
+[[nodiscard]] ro::render::ActorLook MeetingBodyLook(const ro::sim::ClassRule& hero_class) noexcept;
+
+// LE RANG D'ANIMATION DU GESTE D'ATTAQUE d'un héros d'apparence `look`.
+//
+// Une classe qui change d'arme avec son corps suit le jeu (`AttackAnimation`) :
+// un katar n'a d'images qu'à son rang, et un geste au rang ordinaire le rendrait
+// invisible. Toute autre classe garde le rang ordinaire d'un joueur.
+[[nodiscard]] std::size_t HeroAttackAnimation(const ro::render::SpriteCatalog& catalog,
+                                              const ro::sim::ClassRule& hero_class,
+                                              const ro::render::ActorLook& look);
 
 // ── LA TABLE D'APPARENCE DES SKILLS ─────────────────────────────────────────
 
@@ -74,6 +89,38 @@ inline constexpr std::uint16_t kFrenzySkill = 359;
 inline constexpr std::uint16_t kGiantGrowthSkill = 2014;
 inline constexpr std::uint16_t kTwoHandQuickenSkill = 60;
 
+// LE VOLEUR. Double Attack n'a dans le jeu que l'étincelle de ses coups, comme
+// Bash : le mode la pose sur le monstre frappé.
+inline constexpr std::uint16_t kDoubleAttackSkill = 48;
+inline constexpr std::uint32_t kDoubleAttackFallbackEffect = 1;
+// Sprinkle Sand et Enchant Poison naissent dans le jeu sur leur cible, que la
+// horde n'est pas : leur effet reste le leur, écrit ici et porté par le héros.
+inline constexpr std::uint16_t kSprinkleSandSkill = 149;
+inline constexpr std::uint32_t kSprinkleSandFallbackEffect = 310;
+inline constexpr std::uint16_t kEnchantPoisonSkill = 138;
+inline constexpr std::uint32_t kEnchantPoisonFallbackEffect = 125;
+// Throw Stone et Throw Venom Knife : l'objet qui vole du lanceur à sa cible,
+// effet du jeu qu'aucune table de compétence ne nomme.
+inline constexpr std::uint16_t kThrowStoneSkill = 152;
+inline constexpr std::uint32_t kThrownStoneEffect = 308;
+inline constexpr std::uint16_t kThrowVenomKnifeSkill = 1004;
+inline constexpr std::uint32_t kThrownVenomKnifeEffect = 600;
+// Back Slide n'a pas d'effet dans le jeu : le recul se montre par l'élan de
+// Bowling Bash, qui repousse comme lui.
+inline constexpr std::uint16_t kBackSlideSkill = 150;
+inline constexpr std::uint16_t kBowlingBashSkill = 62;
+// Improve Dodge n'en a pas non plus : sa marche se montre par Wind Walk.
+inline constexpr std::uint16_t kImproveDodgeSkill = 49;
+inline constexpr std::uint16_t kWindWalkSkill = 383;
+// Cloaking se montre par Hiding, le skill dont il évolue.
+inline constexpr std::uint16_t kCloakingSkill = 135;
+inline constexpr std::uint16_t kHidingSkill = 51;
+// Sonic Blow : l'effet de son lancer n'a pas de bruit à lui, et le repli des
+// tables en donnerait un qui n'est pas le sien. Il sonne comme l'effet de ses
+// coups.
+inline constexpr std::uint16_t kSonicBlowSkill = 136;
+inline constexpr std::uint32_t kSonicBlowSoundingEffect = 122;
+
 // MAGNUM BREAK a deux effets : ses anneaux, à l'annonce, et l'anneau de choc de
 // chaque victime, au coup. Le lancer du mode montre les anneaux.
 inline constexpr std::uint16_t kMagnumBreakSkill = 7;
@@ -94,6 +141,10 @@ inline constexpr std::uint16_t kIceWallSkill = 87;
 inline constexpr std::uint32_t kIceWallUnit = 141;
 // Son lancer n'a pas d'effet au tableau : il se montre par le bloc lui-même.
 inline constexpr std::uint32_t kIceWallFallbackEffect = 74;
+// Venom Dust : le nuage de poison de l'unité du jeu, tant que sa zone dure.
+inline constexpr std::uint16_t kVenomDustSkill = 140;
+inline constexpr std::uint32_t kVenomDustUnit = 146;
+inline constexpr std::uint32_t kVenomDustFallbackEffect = 171;
 
 // HEAVEN'S DRIVE pose un orage sans unité au sol : son champ de pointes se joue
 // à sa naissance, au point de l'orage, pour que la horde voie où il blesse.
@@ -142,8 +193,10 @@ struct SkillLook {
   std::uint16_t icon_skill_id = 0;
 };
 
-// L'apparence d'un skill des règles : l'effet du coup, sinon celui de la table
-// ordinaire, sinon celui de l'annonce, sinon le repli écrit. Où il naît se lit
+// L'apparence d'un skill des règles : l'objet que son lancer fait voler, sinon
+// le repli écrit d'un skill que le jeu fait naître sur sa cible, sinon l'effet du
+// coup, celui de la table ordinaire, celui de l'annonce, et le repli écrit de ce
+// que les tables ne nomment pas. Où il naît se lit
 // sur l'archétype : une orbite, un projectile qui part du héros et une nova
 // sont portés par lui, tout le reste se pose au sol. L'effet au sol d'une zone
 // est celui que la table des unités entretient pour l'unité du skill.

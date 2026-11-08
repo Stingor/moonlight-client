@@ -143,17 +143,21 @@ bool FireNova(SurvivorsField& field, const SurvivorsSkillRule& rule, const Skill
   return true;
 }
 
-// LE CÔNE : devant le héros, dans son cap, long de `reach_units` majoré de
-// l'aire du héros et ouvert de `cone_half_steps` caps de part et d'autre.
-// Chaque monstre vivant dont le centre y tombe (à la portée près de son
-// rayon), par index croissant, prend son coup au pas du lancer, et un recul
-// qui l'écarte du héros. Il casse les plantes le long de son axe. Il attend
-// un monstre dans le cône.
+// LE CÔNE : devant le héros, dans son cap, ou derrière lui pour un cône tourné
+// vers l'arrière, long de `reach_units` majoré de l'aire du héros et ouvert de
+// `cone_half_steps` caps de part et d'autre. Chaque monstre vivant dont le centre
+// y tombe (à la portée près de son rayon), par index croissant, prend son coup au
+// pas du lancer, un recul qui l'écarte du héros, et l'aveuglement du niveau. Il
+// casse les plantes le long de son axe. Il attend un monstre dans le cône. Le
+// héros ne bouge pas.
 bool FireCone(SurvivorsField& field, const SurvivorsSkillRule& rule, const SkillLevel& level) {
   const std::int32_t length = AreaUnits(field, level.reach_units);
   if (length <= 0 || level.cone_half_steps == 0) return false;
   const FieldPoint hero = field.hero.position;
-  const std::uint8_t facing = field.hero.facing;
+  const std::uint8_t facing =
+      rule.cone_behind
+          ? static_cast<std::uint8_t>((field.hero.facing + kHeadingSteps / 2) % kHeadingSteps)
+          : field.hero.facing;
   GatherNearby(field, hero, QueryUnits(field, length));
   std::erase_if(field.nearby, [&](std::uint32_t index) {
     const SurvivorsFoe& foe = field.foes[index];
@@ -176,17 +180,19 @@ bool FireCone(SurvivorsField& field, const SurvivorsSkillRule& rule, const Skill
     SurvivorsFoe& foe = field.foes[index];
     const SurvivorsStatus status{.freeze_ms = level.freeze_ms,
                                  .knockback_units = level.knockback_units,
-                                 .knock_heading = HeadingAway(hero, foe, facing)};
+                                 .knock_heading = HeadingAway(hero, foe, facing),
+                                 .blind_ms = level.blind_ms};
     HurtFoe(field, foe, DamageAgainst(field, level.damage, rule.element, foe), rule.skill_id,
             status);
   }
-  PublishCast(field.news, SurvivorsCast{.skill_id = rule.skill_id,
-                                        .kind = CastKind::kConeOn,
-                                        .from = hero,
-                                        .to = tip,
-                                        .target_serial = 0,
-                                        .land_step = 0,
-                                        .spread_steps = level.cone_half_steps});
+  PublishCast(field.news,
+              SurvivorsCast{.skill_id = rule.skill_id,
+                            .kind = rule.cone_behind ? CastKind::kBackSlide : CastKind::kConeOn,
+                            .from = hero,
+                            .to = tip,
+                            .target_serial = 0,
+                            .land_step = 0,
+                            .spread_steps = level.cone_half_steps});
   return true;
 }
 

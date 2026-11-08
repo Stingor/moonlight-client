@@ -382,8 +382,11 @@ void BuryFallen(SurvivorsField& field) {
     const FoeRule* rule = FoeRuleOf(*field.rules, foe);
     const FoeRank rank = rule != nullptr ? rule->rank : FoeRank::kCommon;
     if (field.news.falls.size() < kMostNewsFalls) {
-      field.news.falls.push_back(SurvivorsFall{
-          .foe_serial = foe.serial, .foe_id = foe.foe_id, .at = foe.position, .rank = rank});
+      field.news.falls.push_back(SurvivorsFall{.foe_serial = foe.serial,
+                                               .foe_id = foe.foe_id,
+                                               .at = foe.position,
+                                               .rank = rank,
+                                               .hero_index = foe.last_hurt_hero});
     } else {
       ++field.news.dropped;
     }

@@ -27,12 +27,15 @@ struct SurvivorsHit {
   bool froze = false;           // le coup a gelé le monstre
   bool knocked = false;         // le coup l'a repoussé
   std::uint8_t hero_index = 0;  // le héros qui l'a porté ; 0 en solo
+  bool critical = false;        // un critique : `amount` compte déjà double
+  bool poison_tick = false;     // un tic de poison, et non un coup
 };
 struct SurvivorsFall {
   std::uint32_t foe_serial = 0;
   std::uint16_t foe_id = 0;
   FieldPoint at;
   FoeRank rank = FoeRank::kCommon;
+  std::uint8_t hero_index = 0;  // le dernier héros qui l'a blessé ; 0 en solo
 };
 // Un ajout se fait en FIN d'énumération.
 enum class CastKind : std::uint8_t {
@@ -49,6 +52,7 @@ enum class CastKind : std::uint8_t {
   kConeOn,
   kBlockOn,
   kStanceOn,
+  kBackSlide,
 };
 // Un lancer : UNE nouvelle par frappe (kStrike, rebond compris) et par tir
 // (kShot), pas une par salve, avec le monstre visé et, pour une frappe, le pas
@@ -60,8 +64,10 @@ enum class CastKind : std::uint8_t {
 // aux mêmes points, quand elle s'éteint. Un cône (kConeOn) porte le héros dans
 // `from`, la pointe de son axe dans `to` et sa demi-ouverture en caps dans
 // `spread_steps` ; un bloc de barrière (kBlockOn), une zone, sa case dans
-// `from` et `to`. Une posture (kStanceOn) porte le héros dans `from` et `to`,
-// au pas où elle prend.
+// `from` et `to`. Une posture (kStanceOn) et un réflexe de survie, qui publie la
+// même sorte, portent le héros dans `from` et `to`, au pas où ils prennent. Un
+// cône tourné vers l'arrière (kBackSlide) a les mesures d'un cône : le corps du
+// héros glisse de `from` vers `to` et revient, sans que sa position change.
 struct SurvivorsCast {
   std::uint16_t skill_id = 0;
   CastKind kind = CastKind::kStrike;
@@ -158,6 +164,8 @@ struct SurvivorsNews {
   std::int32_t hero_hurt = 0;  // somme des dégâts encaissés
   // Les mêmes, par héros.
   std::array<std::int32_t, kMostHeroes> hurt_by_hero = {};
+  // Les coups que chaque héros a esquivés.
+  std::array<std::uint32_t, kMostHeroes> dodged_by_hero = {};
   std::uint32_t dropped = 0;  // nouvelles écartées par les plafonds
   std::vector<SurvivorsCardNews> cards_found;
   std::vector<SurvivorsReviveNews> revives;

@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <functional>
 #include <optional>
+#include <string_view>
 #include <utility>
 
 #include "ro/sim/survivors_rules.h"
@@ -92,6 +93,14 @@ class SurvivorsBookMode {
 
   // Une partie neuve commence : elle sera créditée à son tour.
   void Restart() noexcept;
+  // LA CLASSE QUI ATTEND LE HÉROS de cette partie, d'après le carnet relu : voir
+  // `ClassAwaitingMeeting`. Un carnet illisible n'en fait attendre aucune.
+  [[nodiscard]] const ro::sim::ClassRule* ClassAwaiting(const ro::sim::SurvivorsRules& rules,
+                                                        const ro::sim::ArenaRule& arena,
+                                                        const SurvivorsRunBoard& board,
+                                                        const std::filesystem::path& client_root);
+  // Inscrit à l'instant cet exploit au carnet : une chute ensuite ne le retire pas.
+  void Inscribe(std::string_view feat_key, const std::filesystem::path& client_root);
   // L'IMAGE QUI VIENT DE S'AVANCER : une partie entrée dans le bilan crédite
   // le carnet.
   void FollowEntered(const SurvivorsStage& stage, const ro::sim::SurvivorsRules& rules,

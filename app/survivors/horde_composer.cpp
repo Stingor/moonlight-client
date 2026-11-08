@@ -11,10 +11,11 @@ namespace {
 
 using ro::render::SpriteLayout;
 
-// Le héros se compose comme un joueur ; tout le reste est un sprite unique,
-// disposé comme une créature.
+// Le héros et l'inconnu se composent comme des joueurs ; tout le reste est un
+// sprite unique, disposé comme une créature.
 [[nodiscard]] SpriteLayout LayoutOf(HordeBodyKind kind) noexcept {
-  return kind == HordeBodyKind::kHero ? SpriteLayout::kPlayer : SpriteLayout::kCreature;
+  return kind == HordeBodyKind::kHero || kind == HordeBodyKind::kStranger ? SpriteLayout::kPlayer
+                                                                          : SpriteLayout::kCreature;
 }
 
 // Une gemme et un objet au sol sont des objets ; un mort et une plante, des
@@ -27,26 +28,46 @@ using ro::render::SpriteLayout;
 
 HordeComposer::HordeComposer(ro::render::ActorWardrobe& wardrobe) noexcept : wardrobe_(&wardrobe) {}
 
-void HordeComposer::SetAllyLook(std::size_t hero_index, const ro::render::ActorLook& look) {
+void HordeComposer::SetAllyLook(std::size_t hero_index, const ro::render::ActorLook& look,
+                                const ro::sim::ClassRule& hero_class) {
   if (hero_index + 1U < ally_outfits_.size()) {
     ally_outfits_[hero_index + 1U] = wardrobe_->OutfitFor(look);
+    ally_attacks_[hero_index + 1U] = HeroAttackAnimation(wardrobe_->catalog(), hero_class, look);
   }
 }
 
-void HordeComposer::SetHeroLook(const ro::render::ActorLook& look) {
+void HordeComposer::SetHeroLook(const ro::render::ActorLook& look,
+                                const ro::sim::ClassRule& hero_class) {
   hero_outfit_ = wardrobe_->OutfitFor(look);
+  hero_attack_ = HeroAttackAnimation(wardrobe_->catalog(), hero_class, look);
+}
+
+void HordeComposer::SetStrangerLook(const ro::render::ActorLook& look) {
+  stranger_outfit_ = wardrobe_->OutfitFor(look);
+}
+
+std::size_t HordeComposer::HeroAttackRank(std::uint16_t look_id) const noexcept {
+  return look_id == 0 || look_id >= ally_attacks_.size() ? hero_attack_ : ally_attacks_[look_id];
+}
+
+std::size_t HordeComposer::AnimationOf(const HordePose& pose) const noexcept {
+  if (pose.kind == HordeBodyKind::kHero && pose.motion == ro::render::Motion::kAttack) {
+    return HeroAttackRank(pose.look_id);
+  }
+  return ro::render::AnimationFor(pose.motion, LayoutOf(pose.kind));
 }
 
 namespace {
 
-// Les durées des motions d'une tenue, lues sur son `.act`.
+// Les durées des motions d'une tenue, lues sur son `.act` ; son attaque se joue
+// au rang `attack_animation`.
 [[nodiscard]] HordeMotionTimes TimesOfOutfit(const ro::render::ActorOutfit& outfit,
-                                             SpriteLayout layout) {
+                                             SpriteLayout layout, std::size_t attack_animation) {
   const auto duration = [&](ro::render::Motion motion) {
     return outfit.AnimationDurationMs(ro::render::AnimationFor(motion, layout));
   };
   return HordeMotionTimes{.walk_ms = duration(ro::render::Motion::kWalk),
-                          .attack_ms = duration(ro::render::Motion::kAttack),
+                          .attack_ms = outfit.AnimationDurationMs(attack_animation),
                           .hurt_ms = duration(ro::render::Motion::kHurt),
                           .die_ms = duration(ro::render::Motion::kDie)};
 }
@@ -64,12 +85,14 @@ const HordeComposer::KnownOutfit& HordeComposer::KnownOf(HordeBodyKind kind,
   ro::render::ActorOutfit* outfit =
       wardrobe_->OutfitFor(item ? ItemLook(look_id) : FoeLook(look_id));
   if (outfit == nullptr) missing_.push_back(HordeLookRef{.kind = looked, .look_id = look_id});
-  known_.push_back(KnownOutfit{.kind = looked,
-                               .look_id = look_id,
-                               .outfit = outfit,
-                               .times = outfit != nullptr
-                                            ? TimesOfOutfit(*outfit, SpriteLayout::kCreature)
-                                            : HordeMotionTimes{}});
+  const std::size_t attack =
+      ro::render::AnimationFor(ro::render::Motion::kAttack, SpriteLayout::kCreature);
+  known_.push_back(KnownOutfit{
+      .kind = looked,
+      .look_id = look_id,
+      .outfit = outfit,
+      .times = outfit != nullptr ? TimesOfOutfit(*outfit, SpriteLayout::kCreature, attack)
+                                 : HordeMotionTimes{}});
   return known_.back();
 }
 
@@ -77,14 +100,19 @@ ro::render::ActorOutfit* HordeComposer::OutfitOf(HordeBodyKind kind, std::uint16
   if (kind == HordeBodyKind::kHero) {
     return look_id == 0 || look_id >= ally_outfits_.size() ? hero_outfit_ : ally_outfits_[look_id];
   }
+  if (kind == HordeBodyKind::kStranger) return stranger_outfit_;
   return KnownOf(kind, look_id).outfit;
 }
 
 HordeMotionTimes HordeComposer::TimesOf(HordeBodyKind kind, std::uint16_t look_id) {
   if (kind == HordeBodyKind::kHero) {
     const ro::render::ActorOutfit* outfit = OutfitOf(kind, look_id);
-    return outfit != nullptr ? TimesOfOutfit(*outfit, SpriteLayout::kPlayer) : HordeMotionTimes{};
+    return outfit != nullptr
+               ? TimesOfOutfit(*outfit, SpriteLayout::kPlayer, HeroAttackRank(look_id))
+               : HordeMotionTimes{};
   }
+  // L'inconnu se tient immobile : il n'a aucune motion à chronométrer.
+  if (kind == HordeBodyKind::kStranger) return HordeMotionTimes{};
   return KnownOf(kind, look_id).times;
 }
 
@@ -102,7 +130,7 @@ void HordeComposer::Compose(std::span<const HordePose> poses, const GroundOf& gr
     if (outfit == nullptr) continue;
     const bool hero = pose.kind == HordeBodyKind::kHero;
     if (hero && drawn_.size() == heroes) ++heroes;
-    const std::size_t animation = ro::render::AnimationFor(pose.motion, LayoutOf(pose.kind));
+    const std::size_t animation = AnimationOf(pose);
     ro::render::DrawnActor drawn;
     drawn.actor = &outfit->Composed(animation, pose.direction, pose.motion_ms,
                                     ro::render::MotionLoops(pose.motion), pose.held_frame);

@@ -6367,3 +6367,123 @@ achievements:
       minor: 1
       objectives:
         - {text: "Tous les évolués du Chevalier"}
+  910045:
+    name: "Lame sonique"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir Sonic Blow dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Sonic Blow obtenu"}
+  910046:
+    name: "Briseur d'ames"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir Soul Destroyer dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Soul Destroyer obtenu"}
+  910047:
+    name: "Eclats de venin"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir Venom Splasher dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Venom Splasher obtenu"}
+  910048:
+    name: "Venin mortel"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir Enchant Deadly Poison dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Enchant Deadly Poison obtenu"}
+  910049:
+    name: "Insaisissable"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir Cloaking dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Cloaking obtenu"}
+  910050:
+    name: "Couteau empoisonne"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir Throw Venom Knife dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Throw Venom Knife obtenu"}
+  910051:
+    name: "Assaut meteore"
+    score: 30
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir Meteor Assault, l'union d'Envenom et de Sprinkle Sand."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Meteor Assault obtenu"}
+  910052:
+    name: "Grand voleur"
+    score: 50
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir chacun des skills évolués du Voleur, au fil des parties."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Tous les évolués du Voleur"}

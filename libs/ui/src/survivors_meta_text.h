@@ -6,7 +6,8 @@
 // `ui` ne connaît aucun type de `sim`. Avec eux, les dates et les montants des
 // fenêtres de la méta. Le fichier source tient aussi les phrases du
 // classement par code, déclarées dans `ro/ui/survivors_ranking_window.h`
-// parce qu'`app` les dit en conversation.
+// parce qu'`app` les dit en conversation, et le but d'un exploit, déclaré dans
+// `ro/ui/survivors_album_window.h` pour qu'un essai relie les clés du carnet.
 //
 // ⚠ À PART DE `survivors_text.cpp`, qui TRANSMET des textes marqués ailleurs
 // et que le relevé des traductions écarte pour cela : ceux-ci se déclarent
@@ -33,9 +34,6 @@ using SurvivorsEffectText = std::array<char, kSurvivorsEffectTextSize>;
 
 // Ce que fait un service Kafra, traduit ; "" pour une clé inconnue.
 [[nodiscard]] const char* SurvivorsKafraDescription(std::string_view service_key);
-
-// Le but d'un exploit, traduit ; "" pour une clé inconnue.
-[[nodiscard]] const char* SurvivorsFeatGoal(std::string_view feat_key);
 
 // UNE DATE UTC « AAAA-MM-JJ », depuis des jours ou des secondes comptés du
 // 1970-01-01.

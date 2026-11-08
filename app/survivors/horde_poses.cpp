@@ -83,6 +83,20 @@ float WalkingMs(std::uint64_t presentation_ms, float walk_ms, std::uint32_t sim_
   return static_cast<float>(presentation_ms) + phase_ms;
 }
 
+float BackSlideShareAt(float elapsed_ms) noexcept {
+  const float half_ms = static_cast<float>(kBackSlideMs) / 2.0F;
+  if (elapsed_ms <= 0.0F || elapsed_ms >= static_cast<float>(kBackSlideMs)) return 0.0F;
+  return elapsed_ms <= half_ms ? elapsed_ms / half_ms : 2.0F - elapsed_ms / half_ms;
+}
+
+HordePose StrangerPoseAt(ro::sim::FieldPoint at, float opacity) noexcept {
+  HordePose pose{.kind = HordeBodyKind::kStranger, .cell = CellOfPoint(at)};
+  // Les images de son attente sont les orientations de son regard : il en tient une.
+  pose.held_frame = 0;
+  pose.tint[kAlpha] = static_cast<std::uint8_t>(std::clamp(opacity, 0.0F, 1.0F) * kOpaque);
+  return pose;
+}
+
 glm::vec2 CellOfField(glm::vec2 subunits) noexcept {
   return subunits / static_cast<float>(ro::sim::kSubunitsPerCell) - glm::vec2(kHalfCell);
 }
@@ -130,11 +144,20 @@ void HordePoses::Reset() {
   falling_.clear();
   poses_.clear();
   gesture_started_ms_ = {};
+  slides_ = {};
 }
 
 void HordePoses::NoticeCasts(std::span<const ro::sim::SurvivorsCast> casts,
                              const ro::sim::SurvivorsField& field, std::uint64_t presentation_ms) {
   if (field.tally.outcome == ro::sim::SurvivorsOutcome::kFell) return;
+  for (const ro::sim::SurvivorsCast& cast : casts) {
+    if (cast.kind != ro::sim::CastKind::kBackSlide || cast.hero_index >= slides_.size()) continue;
+    const ro::sim::FieldPoint rear = cast.to - cast.from;
+    if (rear == ro::sim::FieldPoint{}) continue;
+    slides_[cast.hero_index] = HeroSlide{
+        .started_ms = presentation_ms,
+        .rear = glm::normalize(glm::vec2(static_cast<float>(rear.x), static_cast<float>(rear.y)))};
+  }
   const std::size_t heroes = std::min(ro::sim::HeroCount(field), gesture_started_ms_.size());
   for (std::size_t index = 0; index < heroes; ++index) {
     const ro::sim::SurvivorsHero& hero = ro::sim::HeroAt(field, index);
@@ -170,6 +193,15 @@ void HordePoses::PoseGesture(HordePose& pose, const ro::sim::SurvivorsField& fie
   }
 }
 
+void HordePoses::PoseSlide(HordePose& pose, std::size_t hero_index,
+                           std::uint64_t presentation_ms) const {
+  if (hero_index >= slides_.size() || !slides_[hero_index].has_value()) return;
+  if (pose.motion == Motion::kDie) return;
+  const HeroSlide& slide = *slides_[hero_index];
+  pose.slide_cells = slide.rear * kBackSlideReachCells *
+                     BackSlideShareAt(ElapsedSince(presentation_ms, slide.started_ms));
+}
+
 void HordePoses::PoseHero(const ro::sim::SurvivorsField& field, std::uint64_t presentation_ms,
                           std::uint32_t blend_per_mille, const HordeTimesOf& times_of) {
   const ro::sim::SurvivorsHero& hero = field.hero;
@@ -190,6 +222,7 @@ void HordePoses::PoseHero(const ro::sim::SurvivorsField& field, std::uint64_t pr
     pose.motion_ms = static_cast<float>(presentation_ms);
     PoseGesture(pose, field, field.stage, presentation_ms, times_of);
   }
+  PoseSlide(pose, field.stage, presentation_ms);
   pose.direction = DirectionOf(hero.facing, pose.motion != Motion::kDie);
   poses_.push_back(pose);
 }
@@ -214,6 +247,7 @@ void HordePoses::PoseAllies(const ro::sim::SurvivorsField& field, std::uint64_t 
       pose.motion_ms = static_cast<float>(presentation_ms);
       if (!moving) PoseGesture(pose, field, index, presentation_ms, times_of);
     }
+    PoseSlide(pose, index, presentation_ms);
     pose.direction = DirectionOf(hero.facing, pose.motion != Motion::kDie);
     poses_.push_back(pose);
   }

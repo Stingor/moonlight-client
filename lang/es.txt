@@ -344,6 +344,12 @@ tr: ¡Bola de regalo!
 fr: Billes : %d
 tr: Bolas: %d
 
+fr: Blessé, vous disparaissez sans cesser de frapper, et votre premier coup en sortant est un critique.
+tr: Herido, desapareces sin dejar de golpear, y tu primer golpe al salir es un crítico.
+
+fr: Blessé, vous vous terrez un instant : rien ne vous touche, mais vous ne frappez plus.
+tr: Herido, te ocultas un instante: nada te toca, pero dejas de golpear.
+
 fr: Bloque les chuchotements de ce joueur ; seule, liste les bloqués.
 tr: Bloquea los susurros de este jugador; sola, lista los bloqueados.
 
@@ -371,8 +377,14 @@ tr: La del juego
 fr: Celle du jeu est la police du client d'origine. Le titre garde sa place : une police plus large se coupe plus tôt en « ... », et la souris sur le titre le montre en entier.
 tr: La del juego es la fuente del cliente original. El título conserva su espacio: una fuente más ancha se corta antes con «...», y pasar el ratón por el título lo muestra entero.
 
+fr: Chance d'esquive : certains coups le manquent.
+tr: Probabilidad de esquiva: algunos golpes no le alcanzan.
+
 fr: Chance d'une quatrième offre à la montée de niveau.
 tr: Probabilidad de una cuarta oferta al subir de nivel.
+
+fr: Chance de critique : certains coups comptent double.
+tr: Probabilidad de crítico: algunos golpes cuentan el doble.
 
 fr: Chuchote à un joueur ; seule, compte les joueurs connectés.
 tr: Susurra a un jugador; sola, cuenta los jugadores conectados.
@@ -434,6 +446,9 @@ tr: Desactiva o restablece los efectos.
 fr: Coups : %d
 tr: Movimientos: %d
 
+fr: Critique +%d %%
+tr: Crítico +%d %%
+
 fr: Crée un groupe.
 tr: Crea un grupo.
 
@@ -461,8 +476,17 @@ tr: ¡Último naranja!
 fr: Des boules de feu tournent autour de vous.
 tr: Bolas de fuego giran a tu alrededor.
 
+fr: Des coups de dague frappent le monstre à portée de bras.
+tr: Golpes de daga golpean al monstruo al alcance de tu brazo.
+
+fr: Des couteaux droits traversent la file et l'empoisonnent.
+tr: Cuchillos rectos atraviesan la fila y la envenenan.
+
 fr: Des éclats d'esprit frappent là où les monstres se pressent.
 tr: Estallidos de espíritu golpean donde se agolpan los monstruos.
+
+fr: Du sable jeté devant vous aveugle la horde.
+tr: Arena lanzada ante ti ciega a la horda.
 
 fr: Déclencher trois pouvoirs dans une partie de Roggle.
 tr: Activa tres poderes en una partida de Roggle.
@@ -497,6 +521,9 @@ tr: Además del botín, en este mapa. Las tasas del servidor no los cambian.
 fr: Entendre les autres joueurs, et leur parler en tenant la touche « Parler (voix) » des raccourcis. Seulement sur un serveur qui ouvre la voix.
 tr: Oír a los demás jugadores, y hablarles manteniendo pulsada la tecla «Hablar (voz)» de los atajos. Solo en un servidor que abre la voz.
 
+fr: Esquive +%d %%
+tr: Esquiva +%d %%
+
 fr: Feuilles restantes : %d
 tr: Hojas restantes: %d
 
@@ -508,6 +535,9 @@ tr: Gana una bola con un tiro de Roggle.
 
 fr: Grille éparse
 tr: Rejilla dispersa
+
+fr: Huit coups s'abattent presque ensemble sur le plus proche.
+tr: Ocho golpes caen casi a la vez sobre el más cercano.
 
 fr: Il faut au moins deux membres du groupe en ligne.
 tr: Hacen falta al menos dos miembros del grupo en línea.
@@ -542,6 +572,9 @@ tr: El grupo ya no responde: abandonas la partida.
 fr: Le personnage est mort.
 tr: Tu personaje está muerto.
 
+fr: Le poison éclate là où les monstres se pressent.
+tr: El veneno estalla donde los monstruos se agolpan.
+
 fr: Le storage est ouvert.
 tr: El storage está abierto.
 
@@ -565,6 +598,15 @@ tr: Mejor del día:
 
 fr: On vous propose un échange.
 tr: Alguien te propone un intercambio.
+
+fr: Par moments, un venin mortel : vos dégâts explosent.
+tr: A ratos, un veneno mortal: tu daño se dispara.
+
+fr: Par moments, vos lames s'enduisent : vos dégâts augmentent.
+tr: A ratos, tus hojas se impregnan: tu daño aumenta.
+
+fr: Par moments, vous filez : votre vitesse de marche augmente.
+tr: A ratos, sales disparado: tu velocidad de marcha aumenta.
 
 fr: Parler (voix)
 tr: Hablar (voz)
@@ -608,6 +650,15 @@ tr: ¡Tiro lejano! +%d
 fr: Tous les monstres
 tr: Todos los monstruos
 
+fr: Un bond en arrière blesse et repousse ce qui vous talonne.
+tr: Un salto atrás hiere y repele lo que te pisa los talones.
+
+fr: Un coup droit et court transperce la file des monstres.
+tr: Un golpe recto y corto atraviesa la fila de monstruos.
+
+fr: Un coup empoisonné : le monstre perd ses PV peu à peu.
+tr: Un golpe envenenado: el monstruo pierde PV poco a poco.
+
 fr: Un membre du groupe est hors ligne.
 tr: Un miembro del grupo está desconectado.
 
@@ -635,6 +686,9 @@ tr: Un monstruo hostil está demasiado cerca.
 fr: Un mur de feu devant vous brûle et repousse les monstres.
 tr: Un muro de fuego delante de ti quema y repele a los monstruos.
 
+fr: Un nuage de poison blesse et empoisonne, vague après vague.
+tr: Una nube de veneno hiere y envenena, oleada tras oleada.
+
 fr: Un trait de glace file droit, transperce et gèle.
 tr: Un rayo de hielo vuela recto, atraviesa y congela.
 
@@ -649,6 +703,15 @@ tr: Un cono de fuego brota delante de ti, hacia donde caminas.
 
 fr: Une feuille part, et cette montée de niveau avec elle. Feuilles : %d
 tr: Se gasta una hoja, y con ella esta subida de nivel. Hojas: %d
+
+fr: Une lame d'énergie, très forte, part droit sur le plus proche.
+tr: Una hoja de energía, muy fuerte, sale recta hacia el más cercano.
+
+fr: Une onde sombre jaillit de vous et balaie la horde.
+tr: Una onda oscura brota de ti y barre a la horda.
+
+fr: Une pierre lancée frappe le monstre le plus proche.
+tr: Una piedra lanzada golpea al monstruo más cercano.
 
 fr: Une rafale de boules d'eau s'abat sur le monstre le plus robuste.
 tr: Una ráfaga de bolas de agua cae sobre el monstruo más resistente.
@@ -22696,3 +22759,63 @@ tr: No se acepta una pieza con cartas.
 
 fr: %s, niveau %d\n%s
 tr: %s, nivel %d\n%s
+
+fr: %s : il attend sur la prairie, en partie libre, seul.
+tr: %s: espera en la Pradera de Midgard, en partida libre, solo.
+
+fr: Le Voleur vous a vu passer : sa classe est débloquée.
+tr: El Ladrón te ha visto pasar: su clase queda desbloqueada.
+
+fr: Rejoindre le Voleur qui attend sur la prairie, en partie libre, seul
+tr: Reunirse con el Ladrón que espera en la Pradera de Midgard, en partida libre, solo
+
+fr: Voleur
+tr: Ladrón
+
+fr: Lame sonique
+tr: Hoja sónica
+
+fr: Obtenir Sonic Blow dans une partie de Survivants de Midgard.
+tr: Obtén Sonic Blow en una partida de Supervivientes de Midgard.
+
+fr: Briseur d'âmes
+tr: Rompealmas
+
+fr: Obtenir Soul Destroyer dans une partie de Survivants de Midgard.
+tr: Obtén Soul Destroyer en una partida de Supervivientes de Midgard.
+
+fr: Éclats de venin
+tr: Esquirlas de veneno
+
+fr: Obtenir Venom Splasher dans une partie de Survivants de Midgard.
+tr: Obtén Venom Splasher en una partida de Supervivientes de Midgard.
+
+fr: Venin mortel
+tr: Veneno mortal
+
+fr: Obtenir Enchant Deadly Poison dans une partie de Survivants de Midgard.
+tr: Obtén Enchant Deadly Poison en una partida de Supervivientes de Midgard.
+
+fr: Insaisissable
+tr: Camuflado
+
+fr: Obtenir Cloaking dans une partie de Survivants de Midgard.
+tr: Obtén Cloaking en una partida de Supervivientes de Midgard.
+
+fr: Couteau empoisonné
+tr: Cuchillo envenenado
+
+fr: Obtenir Throw Venom Knife dans une partie de Survivants de Midgard.
+tr: Obtén Throw Venom Knife en una partida de Supervivientes de Midgard.
+
+fr: Assaut météore
+tr: Asalto meteórico
+
+fr: Obtenir Meteor Assault, l'union d'Envenom et de Sprinkle Sand.
+tr: Obtén Meteor Assault, la unión de Envenom y Sprinkle Sand.
+
+fr: Grand voleur
+tr: Gran ladrón
+
+fr: Obtenir chacun des skills évolués du Voleur, au fil des parties.
+tr: Obtén cada una de las habilidades evolucionadas del Ladrón, a lo largo de las partidas.

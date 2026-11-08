@@ -8,6 +8,7 @@
 #include "ro/render/skill_effect_table.h"
 #include "ro/render/skill_hit_effect.h"
 #include "ro/render/skill_unit_table.h"
+#include "ro/render/sprite_frame.h"
 
 namespace moonclient {
 namespace {
@@ -42,6 +43,35 @@ namespace {
       return kIceWallFallbackEffect;
     case kBashSkill:
       return kBashFallbackEffect;
+    case kDoubleAttackSkill:
+      return kDoubleAttackFallbackEffect;
+    case kVenomDustSkill:
+      return kVenomDustFallbackEffect;
+    default:
+      return std::nullopt;
+  }
+}
+
+// L'effet de ce skill que le jeu fait naître sur sa cible, écrit pour que le
+// héros le porte ; il passe avant les tables, qui le poseraient sur la horde.
+[[nodiscard]] std::optional<std::uint32_t> HeroBorneFallbackOf(std::uint16_t skill_id) {
+  switch (skill_id) {
+    case kSprinkleSandSkill:
+      return kSprinkleSandFallbackEffect;
+    case kEnchantPoisonSkill:
+      return kEnchantPoisonFallbackEffect;
+    default:
+      return std::nullopt;
+  }
+}
+
+// L'objet que le lancer de ce skill fait voler, ou rien.
+[[nodiscard]] std::optional<std::uint32_t> ThrownEffectOf(std::uint16_t skill_id) {
+  switch (skill_id) {
+    case kThrowStoneSkill:
+      return kThrownStoneEffect;
+    case kThrowVenomKnifeSkill:
+      return kThrownVenomKnifeEffect;
     default:
       return std::nullopt;
   }
@@ -58,6 +88,12 @@ namespace {
       return kPierceSkill;
     case kFrenzySkill:
       return kGiantGrowthSkill;
+    case kBackSlideSkill:
+      return kBowlingBashSkill;
+    case kImproveDodgeSkill:
+      return kWindWalkSkill;
+    case kCloakingSkill:
+      return kHidingSkill;
     default:
       return skill_id;
   }
@@ -72,6 +108,7 @@ namespace {
 [[nodiscard]] std::optional<std::uint32_t> GroundUnitOf(std::uint16_t skill_id) {
   if (skill_id == kFirePillarSkill) return kFirePillarWaitingUnit;
   if (skill_id == kIceWallSkill) return kIceWallUnit;
+  if (skill_id == kVenomDustSkill) return kVenomDustUnit;
   return std::nullopt;
 }
 
@@ -91,6 +128,7 @@ namespace {
     case ro::sim::SkillArchetype::kNova:
     case ro::sim::SkillArchetype::kCone:
     case ro::sim::SkillArchetype::kStance:
+    case ro::sim::SkillArchetype::kReflex:
       return SkillBearer::kHero;
     case ro::sim::SkillArchetype::kTargetStrike:
     case ro::sim::SkillArchetype::kClusterBlast:
@@ -106,6 +144,11 @@ namespace {
 // Les bruits du lancer : ceux de la compétence, sinon ceux de son effet, sauf
 // quand la troupe de l'effet sonne elle-même.
 [[nodiscard]] std::vector<ro::render::EffectSoundEntry> CastSoundsOf(const SkillLook& look) {
+  if (look.skill_id == kSonicBlowSkill) {
+    const std::span<const ro::render::EffectSoundEntry> blows =
+        ro::render::EffectSounds(kSonicBlowSoundingEffect);
+    return std::vector<ro::render::EffectSoundEntry>(blows.begin(), blows.end());
+  }
   std::vector<ro::render::EffectSoundEntry> sounds =
       ro::render::SkillSounds(SoundingSkillOf(look.skill_id));
   if (!sounds.empty() || ro::render::EffectSoundPlaysAtSowing(look.effect_id)) return sounds;
@@ -137,7 +180,10 @@ ro::render::ActorLook HeroLook(const ro::render::ActorLook& player,
   look.sex = player.sex;
   look.hair = player.hair;
   look.headgears = player.headgears;
-  look.weapon = hero_class.weapon_item_id;
+  const bool evolved_body = look.job != hero_class.job_id;
+  look.weapon = evolved_body && hero_class.evolved_weapon_item_id != 0
+                    ? hero_class.evolved_weapon_item_id
+                    : hero_class.weapon_item_id;
   look.robe = player.robe;
   look.hair_palette = player.hair_palette;
   // La couleur de vêtement du serveur se traduit par métier : elle vaut sur le
@@ -147,13 +193,39 @@ ro::render::ActorLook HeroLook(const ro::render::ActorLook& player,
   return look;
 }
 
+ro::render::ActorLook MeetingBodyLook(const ro::sim::ClassRule& hero_class) noexcept {
+  constexpr std::uint8_t kMeetingSexMale = 1;
+  constexpr std::uint16_t kMeetingHair = 2;
+  return ro::render::ActorLook{.player = true,
+                               .job = hero_class.job_id,
+                               .sex = kMeetingSexMale,
+                               .hair = kMeetingHair,
+                               .weapon = hero_class.weapon_item_id};
+}
+
+std::size_t HeroAttackAnimation(const ro::render::SpriteCatalog& catalog,
+                                const ro::sim::ClassRule& hero_class,
+                                const ro::render::ActorLook& look) {
+  // Le rang des taekwons seuls se tire au sort, et aucune classe n'en joue.
+  constexpr std::uint8_t kNoDraw = 0;
+  if (hero_class.evolved_weapon_item_id == 0) {
+    return ro::render::AnimationFor(ro::render::Motion::kAttack, ro::render::SpriteLayout::kPlayer);
+  }
+  return ro::render::AttackAnimation(catalog, look, kNoDraw);
+}
+
 SkillLook SkillLookOf(const ro::sim::SurvivorsSkillRule& skill) {
   SkillLook look{.skill_id = skill.skill_id,
                  .bearer = BearerOf(skill.archetype),
                  .icon_skill_id = skill.skill_id};
   const std::uint16_t shown = ShownSkillOf(skill.skill_id);
   look.effect_skill_id = shown;
-  if (const std::optional<std::uint32_t> tabled = TabledEffectOf(shown)) {
+  if (const std::optional<std::uint32_t> thrown = ThrownEffectOf(shown)) {
+    look.effect_id = *thrown;
+  } else if (const std::optional<std::uint32_t> borne = HeroBorneFallbackOf(shown)) {
+    look.effect_id = *borne;
+    look.fallback = true;
+  } else if (const std::optional<std::uint32_t> tabled = TabledEffectOf(shown)) {
     look.effect_id = *tabled;
   } else if (const std::optional<std::uint32_t> fallback = FallbackEffectOf(shown)) {
     look.effect_id = *fallback;

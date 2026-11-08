@@ -79,6 +79,9 @@ void AppendSurvivorsNews(SurvivorsNews& into, SurvivorsNews&& more) {
   for (std::size_t index = 0; index < into.hurt_by_hero.size(); ++index) {
     into.hurt_by_hero[index] += more.hurt_by_hero[index];
   }
+  for (std::size_t index = 0; index < into.dodged_by_hero.size(); ++index) {
+    into.dodged_by_hero[index] += more.dodged_by_hero[index];
+  }
   into.dropped += more.dropped;
   Extend(into.cards_found, std::move(more.cards_found));
   Extend(into.revives, std::move(more.revives));
@@ -225,9 +228,17 @@ void SurvivorsMatch::Leave(std::size_t player_index) {
   Player& player = players_[player_index];
   if (player.robot_from.has_value()) return;
   player.robot_from = player.known_through;
+  // Un héros sans robot à sa classe, sous des règles d'essai, joue comme un Magicien
+  // ou un Chevalier selon son geste : tous les clients en décident de même.
   const ClassRule* hero_class = ClassAt(play_.run().field(), player_index);
-  player.robot.emplace(hero_class != nullptr && hero_class->melee ? KnightBotProfile()
-                                                                  : MageBotProfile());
+  const SurvivorsBotProfile* profile =
+      hero_class != nullptr ? BotProfileOf(hero_class->key) : nullptr;
+  if (profile != nullptr) {
+    player.robot.emplace(*profile);
+  } else {
+    player.robot.emplace(hero_class != nullptr && hero_class->melee ? KnightBotProfile()
+                                                                    : MageBotProfile());
+  }
 }
 
 bool SurvivorsMatch::TickReady(std::uint32_t tick) const noexcept {

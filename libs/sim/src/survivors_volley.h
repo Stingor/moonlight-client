@@ -150,6 +150,8 @@ inline void OrderTargets(SurvivorsField& field, TargetRule target,
 struct StatusApplied {
   bool froze = false;
   bool knocked = false;
+  // Le tic de ce coup est celui que le monstre garde : son skill le crédite.
+  bool poisoned = false;
 };
 
 // Prolonge `until_step` jusqu'à `step + StepsOf(ms × (100 + durée) / 100)`,
@@ -162,16 +164,19 @@ inline void ExtendStatus(const SurvivorsField& field, std::uint32_t ms,
                                         until, std::numeric_limits<std::uint32_t>::max())));
 }
 
-// Le gel, le recul, l'aveuglement et la malédiction d'un coup sur un monstre
-// vivant. Gel, aveuglement et malédiction durent `ms × (100 + durée) / 100`,
-// sans jamais raccourcir ceux en cours ; le recul remplace celui en cours.
-// Aucun sur un boss ; ni gel ni recul sur un monstre qui y est insensible par
-// ses traits.
+// Le gel, le recul, l'aveuglement, la malédiction et le poison d'un coup sur un
+// monstre vivant. Gel, aveuglement, malédiction et poison durent `ms × (100 +
+// durée) / 100`, sans jamais raccourcir ceux en cours ; le recul remplace celui
+// en cours. Aucun sur un boss ; ni gel ni recul sur un monstre qui y est
+// insensible par ses traits ; aucun poison sur celui que l'élément Poison
+// n'atteint pas. Un poison reposé garde le rythme de ses tics et le tic le plus
+// fort : il ne passe au héros qui le repose, et à son skill, que si son tic est
+// au moins aussi fort. Plus faible, il ne fait que prolonger celui en cours.
 [[nodiscard]] inline StatusApplied ApplyStatus(SurvivorsField& field, SurvivorsFoe& foe,
                                                const SurvivorsStatus& status) {
   StatusApplied applied;
   if (foe.hp <= 0 || (status.freeze_ms == 0 && status.knockback_units <= 0 &&
-                      status.blind_ms == 0 && status.curse_ms == 0)) {
+                      status.blind_ms == 0 && status.curse_ms == 0 && status.poison_ms == 0)) {
     return applied;
   }
   const FoeRule* rule = FoeRuleOf(*field.rules, foe);
@@ -187,6 +192,20 @@ inline void ExtendStatus(const SurvivorsField& field, std::uint32_t ms,
   }
   if (status.blind_ms > 0) ExtendStatus(field, status.blind_ms, foe.blind_until_step);
   if (status.curse_ms > 0) ExtendStatus(field, status.curse_ms, foe.curse_until_step);
+  if (status.poison_ms > 0 &&
+      ElementPct(*field.rules, SurvivorsElement::kPoison, ElementOf(field, foe)) > 0) {
+    const bool fresh = foe.poison_until_step <= field.step;
+    ExtendStatus(field, status.poison_ms, foe.poison_until_step);
+    if (fresh) {
+      foe.poison_next_step =
+          field.step + std::max<std::uint32_t>(StepsOf(field.rules->tuning.poison_tick_ms), 1);
+    }
+    if (fresh || status.poison_tick_damage >= foe.poison_tick_damage) {
+      foe.poison_tick_damage = status.poison_tick_damage;
+      foe.poison_hero = static_cast<std::uint8_t>(field.stage);
+      applied.poisoned = true;
+    }
+  }
   if (status.knockback_units > 0 && (traits & kFoeKnockbackImmune) == 0) {
     foe.knock_heading = static_cast<std::uint8_t>(status.knock_heading % kHeadingSteps);
     foe.knock_left_units = status.knockback_units;

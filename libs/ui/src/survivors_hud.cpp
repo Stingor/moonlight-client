@@ -48,6 +48,9 @@ constexpr float kArrowLength = 18.0F;
 constexpr float kArrowHalfWidth = 9.0F;
 constexpr ImU32 kBossArrow = IM_COL32(230, 50, 50, 255);
 constexpr ImU32 kChestArrow = IM_COL32(90, 170, 255, 255);
+constexpr ImU32 kMeetingArrow = IM_COL32(120, 230, 120, 255);
+constexpr float kArrowIconSide = 24.0F;
+constexpr float kArrowIconGap = 4.0F;
 constexpr std::size_t kNumberTextSize = 48;
 // La vignette de la carte ramassée : sa hauteur à l'écran, la largeur suivant
 // l'illustration, et la part de sa vie qu'elle met à entrer, puis à sortir.
@@ -280,6 +283,32 @@ std::optional<EdgeArrowPlace> PlaceEdgeArrow(ImVec2 frame_min, ImVec2 frame_max,
   };
 }
 
+namespace {
+
+[[nodiscard]] ImU32 ArrowColorOf(SurvivorsEdgeKind kind) noexcept {
+  switch (kind) {
+    case SurvivorsEdgeKind::kBoss:
+      return kBossArrow;
+    case SurvivorsEdgeKind::kChest:
+      return kChestArrow;
+    case SurvivorsEdgeKind::kMeeting:
+      return kMeetingArrow;
+  }
+  return kChestArrow;
+}
+
+// L'icône d'une cible, derrière sa flèche, du côté du centre de l'écran.
+void DrawArrowIcon(ImDrawList& draw, const EdgeArrowPlace& place, ImTextureID icon) {
+  const float behind = kArrowLength + kArrowIconGap + kArrowIconSide * 0.5F;
+  const ImVec2 center(place.tip.x - std::cos(place.angle_radians) * behind,
+                      place.tip.y - std::sin(place.angle_radians) * behind);
+  const float half = kArrowIconSide * 0.5F;
+  draw.AddImage(icon, ImVec2(center.x - half, center.y - half),
+                ImVec2(center.x + half, center.y + half));
+}
+
+}  // namespace
+
 void DrawSurvivorsHud(const SurvivorsHudView& view) {
   ImDrawList& draw = *ImGui::GetBackgroundDrawList();
   const ImGuiViewport* screen = ImGui::GetMainViewport();
@@ -335,7 +364,8 @@ void DrawSurvivorsHud(const SurvivorsHudView& view) {
   for (const SurvivorsEdgeTarget& target : view.edge_targets) {
     if (const std::optional<EdgeArrowPlace> place =
             PlaceEdgeArrow(origin, far, kArrowInset, target.screen_px)) {
-      DrawArrow(draw, *place, target.kind == SurvivorsEdgeKind::kBoss ? kBossArrow : kChestArrow);
+      DrawArrow(draw, *place, ArrowColorOf(target.kind));
+      if (target.icon != 0) DrawArrowIcon(draw, *place, target.icon);
     }
   }
   if (view.hero_feet_px.has_value()) {

@@ -21,6 +21,8 @@ namespace {
       return 3;
     case HordeBodyKind::kGem:
       return 4;
+    case HordeBodyKind::kStranger:
+      return 1;
     case HordeBodyKind::kFalling:
       return std::nullopt;
   }

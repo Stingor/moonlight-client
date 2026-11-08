@@ -136,6 +136,11 @@ ro::ui::SurvivorsEffectFigure FigureOfStat(ro::sim::SurvivorsStat stat) noexcept
       return Figure::kMagnetPct;
     case ro::sim::SurvivorsStat::kExpPct:
       return Figure::kExpPct;
+    // Seule une carte les porte : une bénédiction ne les majore pas.
+    case ro::sim::SurvivorsStat::kCritPct:
+      return Figure::kCritPct;
+    case ro::sim::SurvivorsStat::kDodgePct:
+      return Figure::kDodgePct;
   }
   return Figure::kDamagePct;
 }

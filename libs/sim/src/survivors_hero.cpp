@@ -98,9 +98,28 @@ void MoveHero(SurvivorsField& field, SurvivorsInput input) {
   hero.position = Slide(field.ground, hero.position, TurnVector(heading, HeroPace(field)));
 }
 
+namespace {
+
+// Le coup qui arrive manque le héros en scène : un tirage, pour lui seul et s'il a une
+// chance. Un héros sans esquive ne consomme rien.
+[[nodiscard]] bool RollDodge(SurvivorsField& field) {
+  const std::int32_t chance_pct = field.hero.stats.Of(SurvivorsStat::kDodgePct);
+  if (chance_pct <= 0) return false;
+  constexpr auto kWholeChance = static_cast<std::uint32_t>(kWholeChancePct);
+  return field.combat_random.Chance(std::min(static_cast<std::uint32_t>(chance_pct), kWholeChance),
+                                    kWholeChance);
+}
+
+}  // namespace
+
 bool HurtHero(SurvivorsField& field, std::int32_t damage) {
   SurvivorsHero& hero = field.hero;
   if (hero.down || field.step < hero.invulnerable_until_step) return false;
+  // Un coup esquivé n'a pas eu lieu : ni PV, ni réflexe, ni relève, ni son de blessure.
+  if (RollDodge(field)) {
+    ++field.news.dodged_by_hero[field.stage];
+    return false;
+  }
   const std::int32_t armor = hero.stats.Of(SurvivorsStat::kArmor);
   // En 64 bits : une armure négative ne fait pas déborder la soustraction.
   const std::int32_t taken = static_cast<std::int32_t>(std::clamp<std::int64_t>(
@@ -108,7 +127,10 @@ bool HurtHero(SurvivorsField& field, std::int32_t damage) {
   hero.hp = SaturatedAdd(hero.hp, -std::int64_t{taken});
   field.news.hero_hurt = SaturatedAdd(field.news.hero_hurt, taken);
   field.news.hurt_by_hero[field.stage] = SaturatedAdd(field.news.hurt_by_hero[field.stage], taken);
-  if (hero.hp > 0) return false;
+  if (hero.hp > 0) {
+    TriggerReflex(field);
+    return false;
+  }
   // La partie n'est perdue qu'à la dernière vie : une relève ne compte pas de
   // chute au bilan.
   if (field.lives_left > 0) {

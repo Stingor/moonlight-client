@@ -74,6 +74,31 @@ constexpr const char* kUnseenEffectsLabel = ro::core::TrText("Effets hors champ"
   return ro::ui::SurvivorsPauseReason::kPlayer;
 }
 
+// Au-delà de cette distance, la place de la flèche se prolonge depuis un point
+// proche du héros : un point lointain peut passer derrière la caméra, et sa
+// projection ne dirait plus rien.
+constexpr std::int32_t kMeetingArrowProbeCells = 12;
+
+// Là où la flèche de la rencontre vise, sur l'écran.
+[[nodiscard]] std::optional<glm::vec2> MeetingArrowScreen(const ArenaSession& arena,
+                                                          ro::sim::FieldPoint hero,
+                                                          ro::sim::FieldPoint target, float width,
+                                                          float height) {
+  const auto distance = static_cast<float>(
+      ro::sim::IntegerSqrt(static_cast<std::uint64_t>(ro::sim::DistanceSquared(hero, target))));
+  const auto probe_units = static_cast<float>(ro::sim::Cells(kMeetingArrowProbeCells));
+  if (distance <= probe_units) return arena.ScreenOf(arena.GroundAt(target), width, height);
+  const ro::sim::FieldPoint along = target - hero;
+  const float share = probe_units / distance;
+  const ro::sim::FieldPoint probe{
+      hero.x + static_cast<std::int32_t>(static_cast<float>(along.x) * share),
+      hero.y + static_cast<std::int32_t>(static_cast<float>(along.y) * share)};
+  const std::optional<glm::vec2> from = arena.ScreenOf(arena.GroundAt(hero), width, height);
+  const std::optional<glm::vec2> to = arena.ScreenOf(arena.GroundAt(probe), width, height);
+  if (!from.has_value() || !to.has_value()) return std::nullopt;
+  return *from + (*to - *from) / share;
+}
+
 }  // namespace
 
 ImTextureID SurvivorsSkillIcon(std::uint16_t skill_id, const SurvivorsTables& tables) {
@@ -292,6 +317,14 @@ void SurvivorsViews::ComposeHud(const SurvivorsField& field, const ro::sim::Surv
     if (const std::optional<glm::vec2> at = screen_of(pickup.position)) {
       edge_targets_.push_back(
           {.screen_px = ImVec2(at->x, at->y), .kind = ro::ui::SurvivorsEdgeKind::kChest});
+    }
+  }
+  if (facts.meeting_at.has_value() && facts.arena != nullptr) {
+    if (const std::optional<glm::vec2> at = MeetingArrowScreen(
+            *facts.arena, field.hero.position, *facts.meeting_at, facts.width, facts.height)) {
+      edge_targets_.push_back({.screen_px = ImVec2(at->x, at->y),
+                               .kind = ro::ui::SurvivorsEdgeKind::kMeeting,
+                               .icon = facts.meeting_icon});
     }
   }
   hud_.edge_targets = edge_targets_;

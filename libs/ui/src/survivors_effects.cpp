@@ -124,6 +124,12 @@ SurvivorsFigureText SurvivorsEffectFigureText(SurvivorsEffectFigure figure, std:
     case SurvivorsEffectFigure::kExpPct:
       std::snprintf(out, size, core::Tr("Expérience +%d %%"), shown);
       break;
+    case SurvivorsEffectFigure::kCritPct:
+      std::snprintf(out, size, core::Tr("Critique +%d %%"), shown);
+      break;
+    case SurvivorsEffectFigure::kDodgePct:
+      std::snprintf(out, size, core::Tr("Esquive +%d %%"), shown);
+      break;
     case SurvivorsEffectFigure::kHeal:
       std::snprintf(out, size, core::Tr("PV +%d"), shown);
       break;

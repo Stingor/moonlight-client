@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <optional>
 #include <span>
+#include <string_view>
 
 #include <imgui.h>
 
@@ -42,6 +43,11 @@ enum class SurvivorsFeatMeasure : std::uint8_t {
   kSurvivedMs,  // la plus longue partie survécue, en millisecondes
   kCount,       // un compte au cumul
 };
+
+// LE BUT D'UN EXPLOIT, désigné par sa clé stable, traduit ; "" pour une clé
+// inconnue. Public parce que les clés viennent du carnet d'`app` : un essai
+// vérifie que chacune a son texte.
+[[nodiscard]] const char* SurvivorsFeatGoal(std::string_view feat_key);
 
 // Un skill à débloquer par exploit.
 struct SurvivorsFeatEntry {

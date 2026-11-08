@@ -9,6 +9,8 @@
 #include "ro/core/log.h"
 #include "ro/sim/survivors_ranked.h"
 
+#include "survivors/survivors_meeting.h"
+
 namespace moonclient {
 namespace {
 
@@ -107,6 +109,26 @@ SurvivorsBookMode::Begun SurvivorsBookMode::FreeStart(const ro::sim::SurvivorsRu
   if (read.damaged_copy.has_value()) damaged_copy_ = read.damaged_copy;
   return Begun{.start = FreeStartOf(rules, read.save, seed, first_skill_id, arena_id, class_id),
                .board = SurvivorsRunBoard{.without_minimap = read.save.meta.without_minimap}};
+}
+
+const ro::sim::ClassRule* SurvivorsBookMode::ClassAwaiting(
+    const ro::sim::SurvivorsRules& rules, const ro::sim::ArenaRule& arena,
+    const SurvivorsRunBoard& board, const std::filesystem::path& client_root) {
+  const SurvivorsSaveRead read = file_.Load(client_root);
+  if (read.damaged_copy.has_value()) damaged_copy_ = read.damaged_copy;
+  return read.file_unread ? nullptr : ClassAwaitingMeeting(rules, arena, board, read.save);
+}
+
+void SurvivorsBookMode::Inscribe(std::string_view feat_key,
+                                 const std::filesystem::path& client_root) {
+  const ro::core::Result<SurvivorsSaveRead> written = file_.Mutate(
+      client_root, [feat_key](SurvivorsSave& save) { return InscribeFeat(save, feat_key); });
+  if (!written) {
+    ro::core::LogWarning("survivors : exploit non inscrit au carnet — {}",
+                         ro::core::Describe(written.error()));
+    return;
+  }
+  if (written->damaged_copy.has_value()) damaged_copy_ = written->damaged_copy;
 }
 
 void SurvivorsBookMode::Restart() noexcept {

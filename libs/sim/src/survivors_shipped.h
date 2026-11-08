@@ -61,6 +61,24 @@ inline constexpr std::uint16_t kAuraBladeId = 355;
 inline constexpr std::uint16_t kConcentrationId = 357;
 inline constexpr std::uint16_t kFrenzyId = 359;
 inline constexpr std::uint16_t kIgnitionBreakId = 2006;
+// Le Voleur, puis ses évolués.
+inline constexpr std::uint16_t kDoubleAttackId = 48;
+inline constexpr std::uint16_t kEnvenomId = 52;
+inline constexpr std::uint16_t kThrowStoneId = 152;
+inline constexpr std::uint16_t kSprinkleSandId = 149;
+inline constexpr std::uint16_t kBackSlideId = 150;
+inline constexpr std::uint16_t kGrimtoothId = 137;
+inline constexpr std::uint16_t kVenomDustId = 140;
+inline constexpr std::uint16_t kEnchantPoisonId = 138;
+inline constexpr std::uint16_t kImproveDodgeId = 49;
+inline constexpr std::uint16_t kHidingId = 51;
+inline constexpr std::uint16_t kSonicBlowId = 136;
+inline constexpr std::uint16_t kSoulDestroyerId = 379;
+inline constexpr std::uint16_t kVenomSplasherId = 141;
+inline constexpr std::uint16_t kEnchantDeadlyPoisonId = 378;
+inline constexpr std::uint16_t kCloakingId = 135;
+inline constexpr std::uint16_t kThrowVenomKnifeId = 1004;
+inline constexpr std::uint16_t kMeteorAssaultId = 406;
 
 inline constexpr std::uint16_t kHornetCardId = 4019;
 inline constexpr std::uint16_t kChonchonCardId = 4009;
@@ -75,6 +93,8 @@ inline constexpr std::uint16_t kDragonFlyCardId = 4179;
 inline constexpr std::uint16_t kVagabondWolfCardId = 4183;
 inline constexpr std::uint16_t kBaphometCardId = 4147;
 inline constexpr std::uint16_t kPecoPecoCardId = 4031;
+inline constexpr std::uint16_t kSmokieCardId = 4044;
+inline constexpr std::uint16_t kWhisperCardId = 4102;
 
 inline constexpr std::uint16_t kLunaticId = 1063;
 inline constexpr std::uint16_t kPoringId = 1002;
@@ -108,8 +128,8 @@ inline constexpr std::uint16_t kDesertTerrainId = 2;
 
 // survivors_rules_mage.cpp : les classes, les skills et les cartes. Les skills
 // sont ceux de la réserve du Magicien, puis les évolués de
-// ShippedEvolvedSkills, puis ceux du Chevalier : une seule table, que
-// FindSkill parcourt.
+// ShippedEvolvedSkills, puis ceux du Chevalier et ceux du Voleur : une seule
+// table, que FindSkill parcourt.
 [[nodiscard]] std::span<const ClassRule> ShippedClasses();
 [[nodiscard]] std::span<const SurvivorsSkillRule> ShippedSkills();
 [[nodiscard]] std::span<const CardRule> ShippedCards();
@@ -131,6 +151,15 @@ inline constexpr std::size_t kKnightCardCount = 1;
 [[nodiscard]] std::span<const CardRule> KnightCards();
 [[nodiscard]] std::span<const SurvivorsSkillRule> KnightSkills();
 [[nodiscard]] std::span<const EvolutionRule> KnightEvolutions();
+
+// survivors_rules_thief.cpp : le Voleur, sur le même plan, après le Chevalier.
+inline constexpr std::size_t kThiefPoolSkillCount = 10;
+inline constexpr std::size_t kThiefEvolvedSkillCount = 7;
+inline constexpr std::size_t kThiefCardCount = 2;
+[[nodiscard]] const ClassRule& ThiefClass();
+[[nodiscard]] std::span<const CardRule> ThiefCards();
+[[nodiscard]] std::span<const SurvivorsSkillRule> ThiefSkills();
+[[nodiscard]] std::span<const EvolutionRule> ThiefEvolutions();
 
 // survivors_rules_foes.cpp : les monstres, leurs vagues, les arènes, la courbe
 // d'XP et la table des éléments.

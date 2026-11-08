@@ -56,6 +56,8 @@ struct ArenaFrameFacts {
   std::uint32_t arrival_ms = 0;
   // Le temps d'écran depuis la victoire ; rien hors du bandeau « Victoire ! ».
   std::optional<std::uint64_t> victory_ms;
+  // Le corps de la rencontre, que la simulation ignore ; rien sans lui.
+  std::optional<HordePose> stranger;
   float viewport_width = 0.0F;
   float viewport_height = 0.0F;
 };
@@ -96,10 +98,15 @@ class ArenaSession {
   // la caméra repart du héros.
   void Restart();
   // L'apparence du héros pour cette image : voir `HeroLook`.
-  void SetHeroLook(const ro::render::ActorLook& look) { composer_.SetHeroLook(look); }
-  void SetAllyLook(std::size_t hero_index, const ro::render::ActorLook& look) {
-    composer_.SetAllyLook(hero_index, look);
+  void SetHeroLook(const ro::render::ActorLook& look, const ro::sim::ClassRule& hero_class) {
+    composer_.SetHeroLook(look, hero_class);
   }
+  void SetAllyLook(std::size_t hero_index, const ro::render::ActorLook& look,
+                   const ro::sim::ClassRule& hero_class) {
+    composer_.SetAllyLook(hero_index, look, hero_class);
+  }
+  // L'apparence du corps que `ArenaFrameFacts::stranger` pose.
+  void SetStrangerLook(const ro::render::ActorLook& look) { composer_.SetStrangerLook(look); }
   void SetSwitches(ArenaEffectSwitches switches) { effects_.set_switches(switches); }
   void SetHordeSunShadows(bool shown) { scene_.set_horde_sun_shadows(shown); }
   void Wheel(float notches) noexcept { camera_.Wheel(notches); }

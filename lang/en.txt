@@ -344,6 +344,12 @@ tr: Free ball!
 fr: Billes : %d
 tr: Balls: %d
 
+fr: Blessé, vous disparaissez sans cesser de frapper, et votre premier coup en sortant est un critique.
+tr: When wounded, you vanish without ceasing to strike, and your first blow on leaving is a critical.
+
+fr: Blessé, vous vous terrez un instant : rien ne vous touche, mais vous ne frappez plus.
+tr: When wounded, you go to ground for a moment: nothing touches you, but you stop striking.
+
 fr: Bloque les chuchotements de ce joueur ; seule, liste les bloqués.
 tr: Blocks this player's whispers; alone, lists the blocked ones.
 
@@ -371,8 +377,14 @@ tr: The game's
 fr: Celle du jeu est la police du client d'origine. Le titre garde sa place : une police plus large se coupe plus tôt en « ... », et la souris sur le titre le montre en entier.
 tr: The game's is the original client's font. The title keeps its room: a wider font gets cut into "..." sooner, and hovering the title shows it in full.
 
+fr: Chance d'esquive : certains coups le manquent.
+tr: Dodge chance: some blows miss him.
+
 fr: Chance d'une quatrième offre à la montée de niveau.
 tr: Chance of a fourth offer on level up.
+
+fr: Chance de critique : certains coups comptent double.
+tr: Critical chance: some blows count double.
 
 fr: Chuchote à un joueur ; seule, compte les joueurs connectés.
 tr: Whispers to a player; alone, counts the players online.
@@ -434,6 +446,9 @@ tr: Turns the effects off or back on.
 fr: Coups : %d
 tr: Moves: %d
 
+fr: Critique +%d %%
+tr: Critical +%d %%
+
 fr: Crée un groupe.
 tr: Creates a party.
 
@@ -461,8 +476,17 @@ tr: Last orange!
 fr: Des boules de feu tournent autour de vous.
 tr: Fireballs circle around you.
 
+fr: Des coups de dague frappent le monstre à portée de bras.
+tr: Dagger strikes hit the monster within arm's reach.
+
+fr: Des couteaux droits traversent la file et l'empoisonnent.
+tr: Straight knives pass through the line and poison it.
+
 fr: Des éclats d'esprit frappent là où les monstres se pressent.
 tr: Spirit bursts strike where monsters crowd together.
+
+fr: Du sable jeté devant vous aveugle la horde.
+tr: Sand thrown ahead of you blinds the horde.
 
 fr: Déclencher trois pouvoirs dans une partie de Roggle.
 tr: Trigger three powers in a game of Roggle.
@@ -497,6 +521,9 @@ tr: On top of the regular loot, on this map. Server drop rates do not change the
 fr: Entendre les autres joueurs, et leur parler en tenant la touche « Parler (voix) » des raccourcis. Seulement sur un serveur qui ouvre la voix.
 tr: Hear the other players, and talk to them by holding the "Talk (voice)" shortcut key. Only on a server that opens voice.
 
+fr: Esquive +%d %%
+tr: Dodge +%d %%
+
 fr: Feuilles restantes : %d
 tr: Leaves left: %d
 
@@ -508,6 +535,9 @@ tr: Earn a ball from a single Roggle shot.
 
 fr: Grille éparse
 tr: Scattered grid
+
+fr: Huit coups s'abattent presque ensemble sur le plus proche.
+tr: Eight blows fall almost together on the nearest monster.
 
 fr: Il faut au moins deux membres du groupe en ligne.
 tr: At least two party members must be online.
@@ -542,6 +572,9 @@ tr: The party is no longer responding: you are leaving the game.
 fr: Le personnage est mort.
 tr: Your character is dead.
 
+fr: Le poison éclate là où les monstres se pressent.
+tr: Poison bursts where the monsters crowd together.
+
 fr: Le storage est ouvert.
 tr: The storage is open.
 
@@ -565,6 +598,15 @@ tr: Today's best:
 
 fr: On vous propose un échange.
 tr: Someone is offering you a trade.
+
+fr: Par moments, un venin mortel : vos dégâts explosent.
+tr: At times, a deadly venom: your damage soars.
+
+fr: Par moments, vos lames s'enduisent : vos dégâts augmentent.
+tr: At times, your blades are coated: your damage increases.
+
+fr: Par moments, vous filez : votre vitesse de marche augmente.
+tr: At times, you dash: your walking speed increases.
 
 fr: Parler (voix)
 tr: Talk (voice)
@@ -608,6 +650,15 @@ tr: Long shot! +%d
 fr: Tous les monstres
 tr: All monsters
 
+fr: Un bond en arrière blesse et repousse ce qui vous talonne.
+tr: A leap backward wounds and pushes away what is on your heels.
+
+fr: Un coup droit et court transperce la file des monstres.
+tr: A short, straight strike pierces the line of monsters.
+
+fr: Un coup empoisonné : le monstre perd ses PV peu à peu.
+tr: A poisoned strike: the monster loses HP little by little.
+
 fr: Un membre du groupe est hors ligne.
 tr: A party member is offline.
 
@@ -635,6 +686,9 @@ tr: A hostile monster is too close.
 fr: Un mur de feu devant vous brûle et repousse les monstres.
 tr: A wall of fire in front of you burns and pushes back monsters.
 
+fr: Un nuage de poison blesse et empoisonne, vague après vague.
+tr: A poison cloud wounds and poisons, wave after wave.
+
 fr: Un trait de glace file droit, transperce et gèle.
 tr: A bolt of ice flies straight, pierces and freezes.
 
@@ -649,6 +703,15 @@ tr: A cone of fire bursts out in front of you, where you walk.
 
 fr: Une feuille part, et cette montée de niveau avec elle. Feuilles : %d
 tr: One leaf is spent, and this level-up with it. Leaves: %d
+
+fr: Une lame d'énergie, très forte, part droit sur le plus proche.
+tr: A very strong blade of energy flies straight at the nearest monster.
+
+fr: Une onde sombre jaillit de vous et balaie la horde.
+tr: A dark wave bursts from you and sweeps the horde.
+
+fr: Une pierre lancée frappe le monstre le plus proche.
+tr: A thrown stone hits the nearest monster.
 
 fr: Une rafale de boules d'eau s'abat sur le monstre le plus robuste.
 tr: A volley of water balls crashes onto the sturdiest monster.
@@ -22696,3 +22759,63 @@ tr: A piece with cards is not accepted.
 
 fr: %s, niveau %d\n%s
 tr: %s, level %d\n%s
+
+fr: %s : il attend sur la prairie, en partie libre, seul.
+tr: %s: he is waiting on the Midgard Plains, in a free run, alone.
+
+fr: Le Voleur vous a vu passer : sa classe est débloquée.
+tr: The Thief saw you pass by: his class is unlocked.
+
+fr: Rejoindre le Voleur qui attend sur la prairie, en partie libre, seul
+tr: Reach the Thief who waits on the Midgard Plains, in a free run, alone
+
+fr: Voleur
+tr: Thief
+
+fr: Lame sonique
+tr: Sonic Blade
+
+fr: Obtenir Sonic Blow dans une partie de Survivants de Midgard.
+tr: Obtain Sonic Blow in a game of Midgard Survivors.
+
+fr: Briseur d'âmes
+tr: Soul Breaker
+
+fr: Obtenir Soul Destroyer dans une partie de Survivants de Midgard.
+tr: Obtain Soul Destroyer in a game of Midgard Survivors.
+
+fr: Éclats de venin
+tr: Venom Shards
+
+fr: Obtenir Venom Splasher dans une partie de Survivants de Midgard.
+tr: Obtain Venom Splasher in a game of Midgard Survivors.
+
+fr: Venin mortel
+tr: Deadly Venom
+
+fr: Obtenir Enchant Deadly Poison dans une partie de Survivants de Midgard.
+tr: Obtain Enchant Deadly Poison in a game of Midgard Survivors.
+
+fr: Insaisissable
+tr: Cloaked
+
+fr: Obtenir Cloaking dans une partie de Survivants de Midgard.
+tr: Obtain Cloaking in a game of Midgard Survivors.
+
+fr: Couteau empoisonné
+tr: Venom Knife
+
+fr: Obtenir Throw Venom Knife dans une partie de Survivants de Midgard.
+tr: Obtain Throw Venom Knife in a game of Midgard Survivors.
+
+fr: Assaut météore
+tr: Meteor Assault
+
+fr: Obtenir Meteor Assault, l'union d'Envenom et de Sprinkle Sand.
+tr: Obtain Meteor Assault, the union of Envenom and Sprinkle Sand.
+
+fr: Grand voleur
+tr: Grand Thief
+
+fr: Obtenir chacun des skills évolués du Voleur, au fil des parties.
+tr: Obtain each of the Thief's evolved skills, across runs.

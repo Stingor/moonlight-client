@@ -222,9 +222,9 @@ void ArenaScene::Paint(LitFrame& frame, const ro::render::Camera& camera, float 
   // LA NUIT RESTE LISIBLE : la lanterne suit le héros, et chaque objet au sol
   // luit.
   carried_lights_.clear();
-  if (const std::optional<glm::vec3> hero_feet = ArenaHeroFeet(horde.drawn(), horde.tags())) {
+  if (overlays.hero_feet.has_value()) {
     if (const std::optional<ro::render::PointLight> lantern =
-            ArenaLantern(presentation_ms, *hero_feet)) {
+            ArenaLantern(presentation_ms, *overlays.hero_feet)) {
       carried_lights_.push_back(*lantern);
     }
   }

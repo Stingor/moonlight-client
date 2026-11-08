@@ -43,6 +43,7 @@ enum class FeatCounter : std::uint8_t {
   kWindKills,       // les monstres Wind vaincus au cumul
   kBestLevel,       // le plus haut niveau atteint en une partie
   kFireKills,       // les monstres Fire vaincus au cumul
+  kMet,             // une rencontre : 1 une fois faite, sans compteur au carnet
 };
 struct SurvivorsFeat {
   const char* key = "";
@@ -50,12 +51,17 @@ struct SurvivorsFeat {
   std::uint64_t threshold = 0;
 };
 
+// L'EXPLOIT DE LA RENCONTRE : rejoindre le Voleur sur la prairie. Il débloque sa
+// classe, et s'inscrit à l'instant par `InscribeFeat`, sans attendre la fin de la
+// partie : voir `survivors_meeting.h`.
+inline constexpr std::string_view kMeetingFeat = "thief_met";
+
 // Les tables livrées : Golem et Mastering Card, et les cartes d'Eclipse, de
 // Dragon Fly, de Vagabond Wolf et de Baphomet, jusqu'à leur première chute,
 // Sight jusqu'à une partie survécue 5:00, Frost Diver jusqu'à 500 glaçages,
 // Earth Spike jusqu'à 300 monstres Wind vaincus, Thunderstorm jusqu'au
 // niveau 25 dans une partie, Water Ball jusqu'à 500 monstres Fire vaincus,
-// Ice Wall jusqu'à une partie survécue 10:00.
+// Ice Wall jusqu'à une partie survécue 10:00, et l'exploit de la rencontre.
 [[nodiscard]] std::span<const SurvivorsUnlock> ShippedSurvivorsUnlocks();
 [[nodiscard]] std::span<const SurvivorsFeat> ShippedSurvivorsFeats();
 
@@ -64,6 +70,8 @@ struct SurvivorsFeat {
 // Où en est un exploit : son compteur au cumul, et s'il est inscrit.
 [[nodiscard]] std::uint64_t FeatProgressOf(const SurvivorsSave& save, const SurvivorsFeat& feat);
 [[nodiscard]] bool FeatReached(const SurvivorsSave& save, const SurvivorsFeat& feat);
+// INSCRIT UN EXPLOIT au carnet. Vrai quand il n'y était pas.
+bool InscribeFeat(SurvivorsSave& save, std::string_view key);
 
 // Le tableau de ces clés ; nul quand le carnet n'en a pas.
 [[nodiscard]] const SurvivorsBoard* FindBoard(const SurvivorsSave& save, std::string_view class_key,
@@ -89,7 +97,8 @@ struct SurvivorsFeat {
                                                     std::uint16_t arena_id);
 
 // UNE CLASSE DÉBLOQUÉE (Q6 du lot 12) : la première l'est toujours ; le
-// Chevalier, par le même exploit qu'Ice Wall, une partie tenue 10:00.
+// Chevalier, par le même exploit qu'Ice Wall, une partie tenue 10:00 ; le Voleur,
+// par sa rencontre.
 [[nodiscard]] bool ClassUnlocked(const ro::sim::SurvivorsRules& rules,
                                  const ro::sim::ClassRule& class_rule, const SurvivorsSave& save);
 // LE NOM D'UNE CLASSE, dans la langue du joueur, distinct de celui de son métier

@@ -82,6 +82,10 @@ void LandBlasts(SurvivorsField& field);
 void AdvanceShots(SurvivorsField& field);
 // survivors_zones.cpp. Les murs et les piliers touchent, puis s'éteignent.
 void AdvanceZones(SurvivorsField& field);
+// survivors_skills.cpp. Les tics de poison dus sur les monstres que le héros en
+// scène a empoisonnés. Un tic n'est ni un coup ni un critique ; il n'épargne pas
+// le monstre, et il attend qu'un monstre caché reparaisse.
+void TickPoison(SurvivorsField& field);
 // survivors_progress.cpp. Les monstres à PV nuls tombent et laissent leur gemme,
 // celle de l'XP qu'un voleur portait, leur flaque, et le coffre d'une élite ou
 // d'un mini-boss. La chute du boss final pose kOver, kVictory.
@@ -227,9 +231,14 @@ void RaiseHero(SurvivorsField& field);
 
 // survivors_hero.cpp. `damage` moins l'armure du héros, au moins 1, retiré de
 // ses PV et compté dans `hero_hurt` ; rien pendant l'invulnérabilité d'une
-// relève. PV à 0 : une vie de réserve le relève (ReviveRule) et rend faux ;
-// sans vie, kOver, kFell, et vrai.
+// relève ou d'un réflexe. Debout, le coup peut déclencher son réflexe
+// (TriggerReflex). PV à 0 : une vie de réserve le relève (ReviveRule) et rend
+// faux ; sans vie, kOver, kFell, et vrai.
 bool HurtHero(SurvivorsField& field, std::int32_t damage);
+// survivors_skills.cpp. Le réflexe du héros en scène part, s'il en a un de prêt
+// et que ses PV sont sous son seuil : invulnérable dès ce pas et pendant
+// `life_ms`, sa recharge comptée de ce pas, et un SurvivorsCast kStanceOn.
+void TriggerReflex(SurvivorsField& field);
 
 // Des dégâts calculés contre un monstre, et l'efficacité d'élément appliquée.
 struct SurvivorsDamage {
@@ -243,17 +252,22 @@ struct SurvivorsDamage {
 [[nodiscard]] SurvivorsDamage DamageAgainst(const SurvivorsField& field, std::int32_t base,
                                             SurvivorsElement attack, const SurvivorsFoe& foe);
 // Ce qu'un coup inflige en plus des dégâts : un gel, un recul au cap
-// `knock_heading`, un aveuglement et une malédiction.
+// `knock_heading`, un aveuglement, une malédiction et un poison.
 struct SurvivorsStatus {
   std::uint32_t freeze_ms = 0;
   std::int32_t knockback_units = 0;
   std::uint8_t knock_heading = 0;
   std::uint32_t blind_ms = 0;
   std::uint32_t curse_ms = 0;
+  std::uint32_t poison_ms = 0;
+  std::int32_t poison_tick_damage = 0;
 };
-// survivors_skills.cpp. Retire les PV, pose `hurt_step`, ajoute `damage_dealt`,
-// applique `status` à un monstre qui survit (ApplyStatus), publie un
-// SurvivorsHit qui dit s'il a gelé ou repoussé.
+// survivors_skills.cpp. Double le coup s'il est critique : le premier après un
+// réflexe qui le promet, sinon par un Chance du flux du combat, tiré pour un
+// héros qui a une chance de critique et pour lui seul, et jamais pour un coup
+// nul. Puis retire les PV, pose `hurt_step`, ajoute `damage_dealt`, applique
+// `status` à un monstre qui survit (ApplyStatus), publie un SurvivorsHit qui dit
+// s'il a gelé ou repoussé et s'il est critique.
 void HurtFoe(SurvivorsField& field, SurvivorsFoe& foe, SurvivorsDamage damage,
              std::uint16_t skill_id, const SurvivorsStatus& status = {});
 // Les salves des archétypes d'aire et de zone, que FireSkills aiguille : vrai

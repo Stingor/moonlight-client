@@ -13,6 +13,7 @@
 #include "survivors/arena_choice.h"
 #include "survivors/arena_ground_follow.h"
 #include "survivors/arena_ground_relief.h"
+#include "survivors/arena_night_lights.h"
 
 namespace moonclient {
 namespace {
@@ -151,8 +152,13 @@ void ArenaSession::Compose(const ArenaFrameFacts& facts, const GraphicsOptions& 
     }
     shown = faded_;
   }
+  if (facts.stranger.has_value()) {
+    if (!facts.victory_ms.has_value()) faded_.assign(shown.begin(), shown.end());
+    faded_.push_back(*facts.stranger);
+    shown = faded_;
+  }
   composer_.Compose(
-      shown, [this](const HordePose& pose) { return scene_.GroundAtCell(pose.cell); },
+      shown, [this](const HordePose& pose) { return scene_.GroundAtCell(DrawnCellOf(pose)); },
       scene_.ShadowsOf(frame_));
   ArenaVeilTargets(
       shown, rules_, [this](glm::vec2 cell) { return scene_.GroundAtCell(cell); }, veil_targets_);
@@ -169,13 +175,17 @@ void ArenaSession::Compose(const ArenaFrameFacts& facts, const GraphicsOptions& 
 
 void ArenaSession::Paint(const ArenaFrameFacts& facts, const GraphicsOptions& graphics,
                          std::uint32_t now_ms) {
-  scene_.Paint(frame_, camera_.camera(), AspectOf(facts.viewport_width, facts.viewport_height),
-               graphics, facts.presentation_ms, now_ms, composer_,
-               ArenaOverlays{.effects = &effects_,
-                             .numbers = &numbers_,
-                             .viewport_width = facts.viewport_width,
-                             .viewport_height = facts.viewport_height,
-                             .veil_targets = veil_targets_});
+  const std::optional<glm::vec2> hero = hero_cell();
+  scene_.Paint(
+      frame_, camera_.camera(), AspectOf(facts.viewport_width, facts.viewport_height), graphics,
+      facts.presentation_ms, now_ms, composer_,
+      ArenaOverlays{.effects = &effects_,
+                    .numbers = &numbers_,
+                    .viewport_width = facts.viewport_width,
+                    .viewport_height = facts.viewport_height,
+                    .veil_targets = veil_targets_,
+                    .hero_feet = hero.has_value() ? std::optional(scene_.GroundAtCell(*hero))
+                                                  : std::nullopt});
 }
 
 std::optional<glm::vec2> ArenaSession::ScreenOf(glm::vec3 world, float viewport_width,
@@ -217,10 +227,7 @@ std::optional<ro::sim::FieldPoint> ArenaSession::FieldPointUnder(glm::vec2 scree
 }
 
 std::optional<glm::vec2> ArenaSession::hero_cell() const noexcept {
-  if (poses_.poses().empty() || poses_.poses().front().kind != HordeBodyKind::kHero) {
-    return std::nullopt;
-  }
-  return poses_.poses().front().cell;
+  return ArenaHeroCell(poses_.poses());
 }
 
 }  // namespace moonclient

@@ -27,6 +27,10 @@ struct SurvivorsBotProfile {
   std::int32_t edge_margin_units = 0;          // en deçà d'un bord, il revient vers le centre
   std::int32_t heal_below_pct = 0;             // sous ces PV en %, Meat et soin
   std::uint32_t steady_steps = 0;              // un cap tenu au moins autant de pas
+  // Sous ces PV en %, il ne tient plus au contact : il fuit de `retreat_radius_units`
+  // au lieu de `threat_radius_units`. 0 : il tient jusqu'au bout.
+  std::int32_t retreat_below_pct = 0;
+  std::int32_t retreat_radius_units = 0;
 };
 
 class SurvivorsBot {
@@ -60,9 +64,12 @@ class SurvivorsBot {
 // Le profil du Chevalier : il tient plus près de la horde, que ses coups
 // courts doivent atteindre.
 [[nodiscard]] const SurvivorsBotProfile& KnightBotProfile();
-// Le profil de la classe `class_key` : celui du Chevalier pour « knight »,
-// celui du Magicien sinon.
-[[nodiscard]] const SurvivorsBotProfile& BotProfileOf(std::string_view class_key);
+// Le profil du Voleur : il tient au bout de ses coups, et lâche prise une fois
+// blessé, plus fragile que le Chevalier.
+[[nodiscard]] const SurvivorsBotProfile& ThiefBotProfile();
+// Le profil de la classe `class_key` ; nullptr pour une clé qu'aucun robot ne
+// sait jouer.
+[[nodiscard]] const SurvivorsBotProfile* BotProfileOf(std::string_view class_key);
 
 // Joue jusqu'à la fin de la partie, `most_steps` pas, ou une réponse refusée :
 // `Answer(Choose)` à chaque choix, sinon `Advance(20 ms, Steer)`, en rappelant

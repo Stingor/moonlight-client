@@ -62,6 +62,10 @@ namespace moonclient {
   return SkinImageOf(images->GetOurs(path));
 }
 
+// L'ICÔNE D'UN MÉTIER, sous le dossier d'interface : le préfixe que suit
+// l'identifiant du métier, puis l'extension du bitmap. Celle de la liste de groupe.
+inline constexpr std::string_view kJobIconPrefix = "renewalparty\\icon_jobs_";
+
 // CE QU'UNE PIÈCE PEINTE SUR DU BLANC MONTRE SUR UN PAPIER SOMBRE : l'art
 // d'interface retourné, ou l'objet peint détouré.
 using DarkPaperVariant =

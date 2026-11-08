@@ -142,8 +142,8 @@ void TriggerPillar(SurvivorsField& field, SurvivorsZone& zone) {
 }
 
 // Une vague d'orage, à son pas : chaque monstre vivant du disque, par index
-// croissant, prend son coup, avec l'aveuglement et la malédiction de l'orage ;
-// à partir de `freeze_from_wave`, il gèle. Le recul l'écarte du centre. Une
+// croissant, prend son coup, avec l'aveuglement, la malédiction et le poison de
+// l'orage ; à partir de `freeze_from_wave`, il gèle. Le recul l'écarte du centre. Une
 // vague compte pour un coup, même sans monstre dans le disque.
 void StrikeStorm(SurvivorsField& field, SurvivorsZone& zone) {
   if (field.step < zone.armed_step) return;
@@ -157,7 +157,9 @@ void StrikeStorm(SurvivorsField& field, SurvivorsZone& zone) {
                                  .knockback_units = zone.knockback_units,
                                  .knock_heading = HeadingAway(zone.from, foe, zone.push_heading),
                                  .blind_ms = zone.blind_ms,
-                                 .curse_ms = zone.curse_ms};
+                                 .curse_ms = zone.curse_ms,
+                                 .poison_ms = zone.poison_ms,
+                                 .poison_tick_damage = zone.poison_tick_damage};
     HurtFoe(field, foe, DamageAgainst(field, zone.damage, zone.element, foe), zone.skill_id,
             status);
   }
@@ -283,6 +285,8 @@ bool FireStorm(SurvivorsField& field, std::uint8_t slot, const SurvivorsSkillRul
   zone.freeze_from_wave = level.freeze_from_wave;
   zone.blind_ms = level.blind_ms;
   zone.curse_ms = level.curse_ms;
+  zone.poison_ms = level.poison_ms;
+  zone.poison_tick_damage = level.poison_tick_damage;
   field.zones.push_back(zone);
   PublishZone(field.news, zone, CastKind::kStormOn);
   return true;

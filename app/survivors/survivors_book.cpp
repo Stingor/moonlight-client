@@ -51,23 +51,25 @@ constexpr std::array<SurvivorsUnlock, 12> kUnlocks{{
     {.key = "ice_wall", .condition = UnlockCondition::kFeat},
 }};
 
-constexpr std::array<SurvivorsFeat, 6> kFeats{{
+constexpr std::array<SurvivorsFeat, 7> kFeats{{
     {.key = "sight", .counter = FeatCounter::kBestSurvivedMs, .threshold = kSightSurvivedMs},
     {.key = "frost_diver", .counter = FeatCounter::kChills, .threshold = kFrostDiverChills},
     {.key = "earth_spike", .counter = FeatCounter::kWindKills, .threshold = kEarthSpikeWindKills},
     {.key = "thunderstorm", .counter = FeatCounter::kBestLevel, .threshold = kThunderstormLevel},
     {.key = "water_ball", .counter = FeatCounter::kFireKills, .threshold = kWaterBallFireKills},
     {.key = "ice_wall", .counter = FeatCounter::kBestSurvivedMs, .threshold = kIceWallSurvivedMs},
+    {.key = kMeetingFeat.data(), .counter = FeatCounter::kMet, .threshold = 1},
 }};
 
 // LES CLASSES QUI SE DÉBLOQUENT, chacune par un exploit du carnet. Le
-// Chevalier partage celui d'Ice Wall.
+// Chevalier partage celui d'Ice Wall ; le Voleur a le sien.
 struct ClassUnlock {
   std::string_view class_key;
   std::string_view feat_key;
 };
-constexpr std::array<ClassUnlock, 1> kClassUnlocks{{
+constexpr std::array<ClassUnlock, 2> kClassUnlocks{{
     {.class_key = "knight", .feat_key = "ice_wall"},
+    {.class_key = "thief", .feat_key = kMeetingFeat},
 }};
 
 [[nodiscard]] std::uint64_t SaturatedAdd(std::uint64_t total, std::uint64_t amount) noexcept {
@@ -126,6 +128,9 @@ constexpr std::array<ClassUnlock, 1> kClassUnlocks{{
       return counters.best_level;
     case FeatCounter::kFireKills:
       return counters.fire_kills;
+    // Une rencontre s'inscrit d'elle-même : aucun compteur ne l'atteint.
+    case FeatCounter::kMet:
+      break;
   }
   return 0;
 }
@@ -293,11 +298,18 @@ std::span<const SurvivorsUnlock> ShippedSurvivorsUnlocks() { return kUnlocks; }
 std::span<const SurvivorsFeat> ShippedSurvivorsFeats() { return kFeats; }
 
 std::uint64_t FeatProgressOf(const SurvivorsSave& save, const SurvivorsFeat& feat) {
+  if (feat.counter == FeatCounter::kMet) return HasFeat(save, feat.key) ? feat.threshold : 0;
   return CounterOf(save.album.counters, feat.counter);
 }
 
 bool FeatReached(const SurvivorsSave& save, const SurvivorsFeat& feat) {
   return HasFeat(save, feat.key);
+}
+
+bool InscribeFeat(SurvivorsSave& save, std::string_view key) {
+  if (HasFeat(save, key)) return false;
+  save.album.feats.emplace_back(key);
+  return true;
 }
 
 const SurvivorsBoard* FindBoard(const SurvivorsSave& save, std::string_view class_key,
@@ -347,6 +359,7 @@ const char* ClassTitleOf(const ro::sim::ClassRule& class_rule) {
   const std::string_view key = class_rule.key;
   if (key == "mage") return ro::core::Tr("Magicien");
   if (key == "knight") return ro::core::Tr("Chevalier");
+  if (key == "thief") return ro::core::Tr("Voleur");
   return nullptr;
 }
 

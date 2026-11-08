@@ -31,7 +31,6 @@ constexpr int kHeadBudget = 8;
 constexpr std::int32_t kHeadBoxPixels = 32;
 
 // L'art du groupe, sous le dossier d'interface.
-constexpr std::string_view kJobIconPrefix = "renewalparty\\icon_jobs_";
 constexpr std::string_view kCrownPath = "renewalparty\\ico_partyCrown.bmp";
 constexpr std::string_view kMinimapFolder = "map\\";
 constexpr std::string_view kBitmapExtension = ".bmp";

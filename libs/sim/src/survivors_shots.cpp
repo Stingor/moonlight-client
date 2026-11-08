@@ -130,7 +130,9 @@ namespace {
   const SurvivorsStatus status{.freeze_ms = shot.freeze_ms,
                                .knockback_units = shot.knockback_units,
                                .knock_heading = HeadingOf(shot.velocity, field.hero.facing),
-                               .curse_ms = shot.curse_ms};
+                               .curse_ms = shot.curse_ms,
+                               .poison_ms = shot.poison_ms,
+                               .poison_tick_damage = shot.poison_tick_damage};
   // L'éclat part d'où le monstre ÉTAIT touché : le recul du coup ne le déplace pas.
   const FieldPoint struck_at = touched->position;
   HurtFoe(field, *touched, DamageAgainst(field, shot.damage, element, *touched), shot.skill_id,
@@ -208,7 +210,9 @@ bool FireLinear(SurvivorsField& field, std::uint8_t slot, const SurvivorsSkillRu
                       .curse_ms = level.curse_ms,
                       .splash_radius_units = AreaUnits(field, level.area_radius_units),
                       .splash_pct = level.splash_pct,
-                      .straight = true});
+                      .straight = true,
+                      .poison_ms = level.poison_ms,
+                      .poison_tick_damage = level.poison_tick_damage});
     PublishCast(field.news, SurvivorsCast{.skill_id = rule.skill_id,
                                           .kind = CastKind::kShot,
                                           .from = hero,

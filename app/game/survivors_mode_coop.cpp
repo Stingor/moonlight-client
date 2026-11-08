@@ -268,6 +268,9 @@ void SurvivorsMode::FollowCoopFrame(SurvivorsStage& stage, const SurvivorsContex
 
 const char* SurvivorsMode::TeamNotice(const SurvivorsStage& stage,
                                       std::uint64_t now_ms) const noexcept {
+  if (meeting_.TellingAt(stage.presentation_ms())) {
+    return ro::core::TrText("Le Voleur vous a vu passer : sa classe est débloquée.");
+  }
   if (!stage.coop() || stage.coop_over()) return nullptr;
   if (stage.coop_stalled_ms() >= kCoopWaitNoticeMs) {
     return ro::core::TrText("En attente des autres joueurs…");
@@ -289,7 +292,7 @@ void SurvivorsMode::PoseAllyLooks(const SurvivorsStage& stage) {
     if (hero_class == nullptr) continue;
     const std::uint16_t job = ro::sim::HeroJobOf(*hero_class, ro::sim::HeroAt(field, index));
     if (ally_jobs_[index] == job) continue;
-    arena_->SetAllyLook(index, HeroLook(ally_faces_[index], *hero_class, job));
+    arena_->SetAllyLook(index, HeroLook(ally_faces_[index], *hero_class, job), *hero_class);
     ally_jobs_[index] = job;
   }
 }

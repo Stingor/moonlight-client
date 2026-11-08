@@ -61,6 +61,9 @@ struct ArenaNumber {
   // La plus forte efficacité des coups fusionnés.
   std::int32_t efficiency_pct = 0;
   std::uint64_t born_ms = 0;
+  // Un critique : il jaillit comme tel, sur son étoile, et ne se fond qu'avec un
+  // autre critique.
+  bool critical = false;
 };
 
 // LA RÉSERVE DES NOMBRES VIVANTS, sans GPU.
@@ -68,7 +71,7 @@ class ArenaNumberPool {
  public:
   // Un coup sur le monstre `foe_serial`, ou sur le héros si `hero_hurt`.
   void Add(std::uint32_t foe_serial, bool hero_hurt, ro::sim::FieldPoint at, std::int32_t amount,
-           std::int32_t efficiency_pct, std::uint64_t now_ms);
+           std::int32_t efficiency_pct, std::uint64_t now_ms, bool critical = false);
   // Retire les nombres éteints à `now_ms`.
   void Expire(std::uint64_t now_ms);
   void Clear() noexcept { live_.clear(); }

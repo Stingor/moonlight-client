@@ -856,6 +856,7 @@ add_library(moonclient_survivors STATIC
     survivors/survivors_door.cpp
     survivors/survivors_file.cpp
     survivors/survivors_keys.cpp
+    survivors/survivors_meeting.cpp
     survivors/survivors_pending.cpp
     survivors/survivors_ranking_session.cpp
     survivors/survivors_route.cpp

@@ -11,8 +11,10 @@
 namespace moonclient {
 namespace {
 
-// Tout coup sur un monstre jaillit, comme en partie.
-constexpr ro::render::NumberStyle kArenaNumberStyle = ro::render::NumberStyle::kBursting;
+// Tout coup sur un monstre jaillit, comme en partie, et le critique à sa façon.
+[[nodiscard]] constexpr ro::render::NumberStyle NumberStyleOf(bool critical) noexcept {
+  return critical ? ro::render::NumberStyle::kCriticalBurst : ro::render::NumberStyle::kBursting;
+}
 // L'efficacité d'une blessure du héros : elle n'en a pas, sa couleur est fixe.
 constexpr std::int32_t kHurtEfficiencyPct = 100;
 
@@ -22,7 +24,7 @@ constexpr std::size_t kMarkSprite = 1;
 [[nodiscard]] bool Expired(const ArenaNumber& number, std::uint64_t now_ms) {
   const auto elapsed_ms = static_cast<float>(now_ms - number.born_ms);
   if (number.amount == 0) return elapsed_ms >= ro::render::kMissLifeTicks * ro::render::kMarkTickMs;
-  return ro::render::FloatingNumberExpired(kArenaNumberStyle, elapsed_ms);
+  return ro::render::FloatingNumberExpired(NumberStyleOf(number.critical), elapsed_ms);
 }
 
 }  // namespace
@@ -41,10 +43,14 @@ ArenaNumberStyle ArenaNumberStyleOf(std::int32_t amount, std::int32_t efficiency
 }
 
 void ArenaNumberPool::Add(std::uint32_t foe_serial, bool hero_hurt, ro::sim::FieldPoint at,
-                          std::int32_t amount, std::int32_t efficiency_pct, std::uint64_t now_ms) {
+                          std::int32_t amount, std::int32_t efficiency_pct, std::uint64_t now_ms,
+                          bool critical) {
   // LA FUSION : un nombre encore jeune de la même cible reçoit le coup.
   for (ArenaNumber& number : live_) {
+    // Un « Miss » ne se fond qu'avec un autre : il ne doit ni disparaître dans un
+    // chiffre, ni le devenir.
     if (number.foe_serial == foe_serial && number.hero_hurt == hero_hurt &&
+        number.critical == critical && (number.amount == 0) == (amount == 0) &&
         now_ms - number.born_ms < kArenaNumberMergeMs) {
       number.amount += amount;
       number.efficiency_pct = std::max(number.efficiency_pct, efficiency_pct);
@@ -57,7 +63,8 @@ void ArenaNumberPool::Add(std::uint32_t foe_serial, bool hero_hurt, ro::sim::Fie
                           .at = at,
                           .amount = amount,
                           .efficiency_pct = efficiency_pct,
-                          .born_ms = now_ms};
+                          .born_ms = now_ms,
+                          .critical = critical};
   if (live_.size() < kMostArenaNumbers) {
     live_.push_back(fresh);
     return;
@@ -103,14 +110,19 @@ ro::core::Result<void> ArenaNumbers::Open(ro::vfs::Vfs& vfs) {
 void ArenaNumbers::Notice(const ro::sim::SurvivorsNews& news, const ro::sim::SurvivorsField& field,
                           std::uint64_t now_ms) {
   for (const ro::sim::SurvivorsHit& hit : news.hits) {
-    pool_.Add(hit.foe_serial, false, hit.at, hit.amount, hit.efficiency_pct, now_ms);
+    pool_.Add(hit.foe_serial, false, hit.at, hit.amount, hit.efficiency_pct, now_ms, hit.critical);
   }
   for (std::size_t index = 0; index < ro::sim::HeroCount(field); ++index) {
+    const auto hero_key = static_cast<std::uint32_t>(index);
+    const ro::sim::FieldPoint at = ro::sim::HeroAt(field, index).position;
+    // Une esquive montre « Miss » : zéro dégât.
+    if (news.dodged_by_hero[index] > 0) {
+      pool_.Add(hero_key, true, at, 0, kHurtEfficiencyPct, now_ms);
+    }
     const std::int32_t hurt = news.hurt_by_hero[index];
     if (hurt <= 0) continue;
     // Chaque héros a son nombre : ses blessures ne se fondent pas avec celles d'un autre.
-    pool_.Add(static_cast<std::uint32_t>(index), true, ro::sim::HeroAt(field, index).position, hurt,
-              kHurtEfficiencyPct, now_ms);
+    pool_.Add(hero_key, true, at, hurt, kHurtEfficiencyPct, now_ms);
   }
 }
 
@@ -146,12 +158,14 @@ void ArenaNumbers::Compose(std::uint64_t now_ms, const GroundOf& ground_of) {
                                    ro::render::DamageMark::kMiss, style.color, elapsed_ms, look)
                              : ro::render::ComposedActor{};
     } else {
-      composed_[index] = ro::render::ComposeFloatingNumber(
-          digits,
-          ro::render::FloatingNumber{.value = static_cast<std::uint32_t>(number.amount),
-                                     .color = style.color,
-                                     .style = kArenaNumberStyle},
-          elapsed_ms, look);
+      const ro::render::FloatingNumber shown{.value = static_cast<std::uint32_t>(number.amount),
+                                             .color = style.color,
+                                             .style = NumberStyleOf(number.critical)};
+      composed_[index] =
+          number.critical && has_mark
+              ? ro::render::ComposeCriticalNumber(digits, shown, sprites_[kMarkSprite].sprite,
+                                                  sprites_[kMarkSprite].animation, elapsed_ms, look)
+              : ro::render::ComposeFloatingNumber(digits, shown, elapsed_ms, look);
     }
   }
   for (std::size_t index = 0; index < composed_.size(); ++index) {

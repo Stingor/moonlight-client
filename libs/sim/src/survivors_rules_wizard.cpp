@@ -273,15 +273,19 @@ constexpr std::array<EvolutionRule, kShippedEvolvedSkillCount> kEvolutions{{
 std::span<const SurvivorsSkillRule> ShippedEvolvedSkills() { return kEvolvedSkills; }
 
 std::span<const EvolutionRule> ShippedEvolutions() {
-  // Celles du Magicien, puis celles du Chevalier, assemblées au premier appel.
-  static const std::array<EvolutionRule, kShippedEvolvedSkillCount + kKnightEvolvedSkillCount>
-      kAll = [] {
-        std::array<EvolutionRule, kShippedEvolvedSkillCount + kKnightEvolvedSkillCount> all{};
-        const std::span<const EvolutionRule> knight = KnightEvolutions();
-        auto out = std::copy(kEvolutions.begin(), kEvolutions.end(), all.begin());
-        std::copy_n(knight.begin(), std::min(knight.size(), kKnightEvolvedSkillCount), out);
-        return all;
-      }();
+  // Celles du Magicien, puis du Chevalier, puis du Voleur, assemblées au premier
+  // appel.
+  constexpr std::size_t kAllCount =
+      kShippedEvolvedSkillCount + kKnightEvolvedSkillCount + kThiefEvolvedSkillCount;
+  static const std::array<EvolutionRule, kAllCount> kAll = [] {
+    std::array<EvolutionRule, kAllCount> all{};
+    const std::span<const EvolutionRule> knight = KnightEvolutions();
+    const std::span<const EvolutionRule> thief = ThiefEvolutions();
+    auto out = std::copy(kEvolutions.begin(), kEvolutions.end(), all.begin());
+    out = std::copy_n(knight.begin(), std::min(knight.size(), kKnightEvolvedSkillCount), out);
+    std::copy_n(thief.begin(), std::min(thief.size(), kThiefEvolvedSkillCount), out);
+    return all;
+  }();
   return kAll;
 }
 

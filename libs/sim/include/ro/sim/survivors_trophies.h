@@ -48,6 +48,12 @@ class SurvivorsRun;
 //   à la fin de la partie.
 // - « Grand chevalier » : chacun des skills évolués du Chevalier obtenu au moins
 //   une fois, au fil des parties.
+// - « Lame sonique », « Briseur d'âmes », « Éclats de venin », « Venin mortel »,
+//   « Insaisissable », « Couteau empoisonné », « Assaut météore » : Sonic Blow, Soul
+//   Destroyer, Venom Splasher, Enchant Deadly Poison, Cloaking, Throw Venom Knife,
+//   Meteor Assault possédé à la fin de la partie.
+// - « Grand voleur » : chacun des skills évolués du Voleur obtenu au moins une fois,
+//   au fil des parties.
 
 // CE QUE LA PARTIE NE SAIT PAS D'ELLE-MÊME, et qu'`app` dit : la minimap est
 // un affichage, que la simulation ignore.
