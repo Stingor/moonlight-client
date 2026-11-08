@@ -14859,7 +14859,7 @@ Body:
     Script: |
       .@r = getrefine(); bonus2 bSkillAtk,"MO_CHAINCOMBO",(10+5*(.@r/2)); bonus2 bSkillAtk,"MO_TRIPLEATTACK",(10+5*(.@r/2)); bonus2 bSkillAtk,"MO_COMBOFINISH",(5*(.@r/3));
   - Id: 1862
-    AegisName: Burning_Knuckle-OS
+    AegisName: Burning_Knuckle_OS
     Name: "Burning Knuckle-OS [2]"
     Type: Weapon
     SubType: Knuckle
@@ -52861,7 +52861,7 @@ Body:
     Sell: 5
     Weight: 10
   - Id: 6751
-    AegisName: Crushed_Can_Iron_Plate
+    AegisName: Distorted_Iron_Plate
     Name: Crushed Can Iron Plate
     Buy: 10
     Sell: 5
@@ -75192,7 +75192,7 @@ Body:
     Script: |
       .@r = getrefine(); bonus bSPDrainValue,-1; bonus bUnbreakableWeapon; if (getallrefine() >= 24) { .@val = 20; } bonus2 bSPVanishRate,(80+(20*.@r)),(30+.@val);
   - Id: 13493
-    AegisName: Cannon_Rapier-OS
+    AegisName: Cannon_Rapier_OS
     Name: "Cannon Rapier-OS [2]"
     Type: Weapon
     SubType: 1hSword
@@ -87266,7 +87266,7 @@ Body:
     Script: |
       .@r = getrefine(); bonus bAspd,(.@r/2); bonus2 bAddRace,RC_Undead,(3*.@r);
   - Id: 16088
-    AegisName: Sapphire_Mace-OS
+    AegisName: Saphir_Hall_OS
     Name: "Sapphire Mace-OS [2]"
     Type: Weapon
     SubType: Mace
@@ -87284,8 +87284,8 @@ Body:
     Script: |
       .@r = getrefine(); bonus bUnbreakableWeapon; bonus2 bAddClass,Class_All,3; if (.@r >= 7) { bonus bVariableCastrate,-7; if (.@r >= 9) { bonus2 bSkillAtk,"AM_ACIDTERROR",20; if (getallrefine() >= 22) { bonus bLongAtkRate,15; } } }
   - Id: 16089
-    AegisName: Ultio-OS
-    Name: "Ultio-OS [2]"
+    AegisName: Ultio_Spes_OS
+    Name: "Ultio_Spes_OS [2]"
     Type: Weapon
     SubType: Mace
     Buy: 9800000
@@ -93984,7 +93984,7 @@ Body:
     Script: |
       .@r = getrefine(); bonus bCritical,.@r; if (.@r >= 7) { bonus bAspdRate,10; if (.@r >= 9) { bonus bCritAtkRate,15; if (getallrefine() >= 22) { bonus2 bAddRace,RC_Insect,30; bonus2 bAddRace,RC_Brute,30; } } }
   - Id: 18178
-    AegisName: Virtual_Bow-OS
+    AegisName: Virtual_Bow_OS
     Name: "Virtual Bow-OS [2]"
     Type: Weapon
     SubType: Bow
@@ -94002,8 +94002,8 @@ Body:
     Script: |
       .@r = getrefine(); bonus2 bAddClass,Class_All,3; if (.@r >= 7) { bonus bLongAtkRate,7; if (.@r >= 9) { .@dmg = 30; if (getallrefine() >= 22) { .@dmg += 20; } bonus2 bSkillAtk,"AC_SHOWER",.@dmg; } }
   - Id: 18179
-    AegisName: MH-P89-OS
-    Name: "MH-P89-OS [2]"
+    AegisName: MH_P89_OS
+    Name: "MH_P89_OS [2]"
     Type: Weapon
     SubType: Bow
     Buy: 10000000
@@ -94020,8 +94020,8 @@ Body:
     Script: |
       .@r = getrefine(); bonus2 bAddClass,Class_All,3; if (.@r >= 7) { bonus bLongAtkRate,7; if (.@r >= 9) { bonus bDelayrate,-10; if (getallrefine() >= 22) { bonus2 bSkillAtk,"CG_ARROWVULCAN",15; } } }
   - Id: 18180
-    AegisName: AC-B44-OS
-    Name: "AC-B44-OS [2]"
+    AegisName: AC_B44_OS
+    Name: "AC_B44_OS [2]"
     Type: Weapon
     SubType: Bow
     Buy: 10200000
@@ -109787,7 +109787,7 @@ Body:
     Script: |
       .@bStr = readparam(bStr); .@r = getrefine(); bonus bBaseAtk,(min(120,.@bStr)); if (.@bStr > 119) bonus bBaseAtk,160; else if (.@bStr > 107) bonus bBaseAtk,80; else if (.@bStr > 94) bonus bBaseAtk,40; if (.@r > 6) bonus bUnbreakableWeapon; bonus4 bAutoSpell,"NPC_WIDECURSE",4,100,0; if (.@r > 8) bonus4 bAutoSpellOnSkill,"LK_BERSERK","BS_OVERTHRUST",5,100;
   - Id: 21047
-    AegisName: Beam_Claymor-OS
+    AegisName: Beam_Claymore_OS
     Name: "Beam Claymor-OS [2]"
     Type: Weapon
     SubType: 2hSword
@@ -113204,6 +113204,48 @@ Body:
     Weight: 10
     Script: |
       input .@megaphone$; announce strcharinfo(0) + ": " + .@megaphone$,bc_all,0xFF0000;
+  - Id: 23776
+    AegisName: EP17_1_SPC05
+    Name: Weapon Modifier (Physical)
+    Type: DelayConsume
+    Weight: 50
+    Script: |
+      laphine_upgrade();
+  - Id: 23777
+    AegisName: EP17_1_SPC06
+    Name: Advanced Weapon Modifier (Physical)
+    Type: DelayConsume
+    Weight: 50
+    Script: |
+      laphine_upgrade();
+  - Id: 23778
+    AegisName: EP17_1_SPC07
+    Name: Super Weapon Modifier (Physical)
+    Type: DelayConsume
+    Weight: 50
+    Script: |
+      laphine_upgrade();
+  - Id: 23779
+    AegisName: EP17_1_SPC08
+    Name: Weapon Modifier (Magic)
+    Type: DelayConsume
+    Weight: 50
+    Script: |
+      laphine_upgrade();
+  - Id: 23780
+    AegisName: EP17_1_SPC09
+    Name: Advanced Weapon Modifier (Magic)
+    Type: DelayConsume
+    Weight: 50
+    Script: |
+      laphine_upgrade();
+  - Id: 23781
+    AegisName: EP17_1_SPC10
+    Name: Super Weapon Modifier (Magic)
+    Type: DelayConsume
+    Weight: 50
+    Script: |
+      laphine_upgrade();
   - Id: 23815
     AegisName: Magma_Essence
     Name: Lava Essence
@@ -113745,6 +113787,14 @@ Body:
     Name: Vulnerable Worm
     Weight: 10
     Flags: {BuyingStore: true}
+  - Id: 25665
+    AegisName: Dienes_Envelope
+    Name: Dien's Precious Envelope
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+  - Id: 25666
+    AegisName: Id_Card
+    Name: Identification Bracelet
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
   - Id: 25668
     AegisName: EP17_1_EVT01
     Name: Damaged Weapon
@@ -113756,7 +113806,7 @@ Body:
     Sell: 2500
     Weight: 10
   - Id: 25670
-    AegisName: M_M_Defense
+    AegisName: EP17_1_EVT03
     Name: Modification Module (Defense)
     Type: Card
     SubType: Enchant
@@ -113766,7 +113816,7 @@ Body:
     Script: |
       .@r = getrefine(); .@def = 5; if (.@r >= 9) { .@def += 5; } else if (.@r >= 7) { .@def += 5; } bonus bDef,.@def;
   - Id: 25671
-    AegisName: M_M_Magic_Defense
+    AegisName: EP17_1_EVT04
     Name: Modification Module (Magic Defense)
     Type: Card
     SubType: Enchant
@@ -113776,7 +113826,7 @@ Body:
     Script: |
       .@r = getrefine(); .@mdef = 2; if (.@r >= 9) { .@mdef += 6; } else if (.@r >= 7) { .@mdef += 3; } bonus bMDef,.@mdef;
   - Id: 25672
-    AegisName: M_M_Vit
+    AegisName: EP17_1_EVT05
     Name: Modification Module (Vit)
     Type: Card
     SubType: Enchant
@@ -113786,7 +113836,7 @@ Body:
     Script: |
       bonus bVit,3;
   - Id: 25673
-    AegisName: M_M_Luk
+    AegisName: EP17_1_EVT06
     Name: Modification Module (Luk)
     Type: Card
     SubType: Enchant
@@ -113796,7 +113846,7 @@ Body:
     Script: |
       bonus bLuk,3;
   - Id: 25674
-    AegisName: M_M_Str
+    AegisName: EP17_1_EVT07
     Name: Modification Module (Str)
     Type: Card
     SubType: Enchant
@@ -113806,7 +113856,7 @@ Body:
     Script: |
       bonus bStr,3;
   - Id: 25675
-    AegisName: M_M_Agi
+    AegisName: EP17_1_EVT08
     Name: Modification Module (Agi)
     Type: Card
     SubType: Enchant
@@ -113816,7 +113866,7 @@ Body:
     Script: |
       bonus bAgi,3;
   - Id: 25676
-    AegisName: M_M_Int
+    AegisName: EP17_1_EVT09
     Name: Modification Module (Int)
     Type: Card
     SubType: Enchant
@@ -113826,7 +113876,7 @@ Body:
     Script: |
       bonus bInt,3;
   - Id: 25677
-    AegisName: M_M_Dex
+    AegisName: EP17_1_EVT10
     Name: Modification Module (Dex)
     Type: Card
     SubType: Enchant
@@ -113836,7 +113886,7 @@ Body:
     Script: |
       bonus bDex,3;
   - Id: 25678
-    AegisName: M_M_HP_recovery
+    AegisName: EP17_1_EVT11
     Name: Modification Module (HP recovery)
     Type: Card
     SubType: Enchant
@@ -113846,7 +113896,7 @@ Body:
     Script: |
       bonus bHPrecovRate,20;
   - Id: 25679
-    AegisName: M_M_SP_recovery
+    AegisName: EP17_1_EVT12
     Name: Modification Module (SP recovery)
     Type: Card
     SubType: Enchant
@@ -113856,7 +113906,7 @@ Body:
     Script: |
       bonus bSPrecovRate,20;
   - Id: 25680
-    AegisName: M_M_Spell5
+    AegisName: EP17_1_EVT13
     Name: Modification Module (Spell)
     Type: Card
     SubType: Enchant
@@ -113866,7 +113916,7 @@ Body:
     Script: |
       bonus bMatk,18; bonus bVariableCastrate,-10;
   - Id: 25681
-    AegisName: M_M_Attack_Delay_4
+    AegisName: EP17_1_EVT14
     Name: Modification Module (Attack Speed)
     Type: Card
     SubType: Enchant
@@ -113876,7 +113926,7 @@ Body:
     Script: |
       bonus bAspdRate,10;
   - Id: 25682
-    AegisName: M_M_Fatal4
+    AegisName: EP17_1_EVT15
     Name: Modification Module (Fatal)
     Type: Card
     SubType: Enchant
@@ -113886,7 +113936,7 @@ Body:
     Script: |
       bonus bCritAtkRate,10; bonus bCritical,4;
   - Id: 25683
-    AegisName: M_M_Expert_Archer5
+    AegisName: EP17_1_EVT16
     Name: Modification Module (Expert Archer)
     Type: Card
     SubType: Enchant
@@ -113896,7 +113946,7 @@ Body:
     Script: |
       bonus bLongAtkRate,10;
   - Id: 25684
-    AegisName: M_M_Vital
+    AegisName: EP17_1_EVT17
     Name: Modification Module (Vital)
     Type: Card
     SubType: Enchant
@@ -113906,7 +113956,7 @@ Body:
     Script: |
       .@r = getrefine(); bonus bMaxHPrate,5; if (.@r >= 9) { bonus bMaxHP,1250; } else if (.@r >= 7) { bonus bMaxHP,500; }
   - Id: 25685
-    AegisName: M_M_Mental
+    AegisName: EP17_1_EVT18
     Name: Modification Module (Mental)
     Type: Card
     SubType: Enchant
@@ -113916,7 +113966,7 @@ Body:
     Script: |
       .@r = getrefine(); bonus bMaxSPrate,5; if (.@r >= 9) { bonus bMaxSP,250; } else if (.@r >= 7) { bonus bMaxSP,100; }
   - Id: 25686
-    AegisName: M_M_Heal
+    AegisName: EP17_1_EVT19
     Name: Modification Module (Heal)
     Type: Card
     SubType: Enchant
@@ -113926,7 +113976,7 @@ Body:
     Script: |
       .@r = getrefine(); .@val = 5; if (.@r >= 9) { .@val += 10; } else if (.@r >= 7) { .@val += 5; } bonus bHealPower,.@val;
   - Id: 25687
-    AegisName: M_M_Power
+    AegisName: EP17_1_EVT20
     Name: Modification Module (Power)
     Type: Card
     SubType: Enchant
@@ -113936,7 +113986,7 @@ Body:
     Script: |
       .@r = getrefine(); bonus2 bAddClass,Class_All,5; if (.@r >= 9) { bonus bBaseAtk,50; } else if (.@r >= 7) { bonus bBaseAtk,25; }
   - Id: 25688
-    AegisName: M_M_Magic
+    AegisName: EP17_1_EVT21
     Name: Modification Module (Magic)
     Type: Card
     SubType: Enchant
@@ -113946,7 +113996,7 @@ Body:
     Script: |
       .@r = getrefine(); bonus bMatkRate,5; if (.@r >= 9) { bonus bMatk,50; } else if (.@r >= 7) { bonus bMatk,25; }
   - Id: 25689
-    AegisName: M_M_Shooter
+    AegisName: EP17_1_EVT22
     Name: Modification Module (Shooter)
     Type: Card
     SubType: Enchant
@@ -113956,7 +114006,7 @@ Body:
     Script: |
       .@r = getrefine(); .@val = 3; if (.@r >= 9) { .@val += 4; } else if (.@r >= 7) { .@val += 2; } bonus bLongAtkRate,.@val;
   - Id: 25690
-    AegisName: M_M_Fast
+    AegisName: EP17_1_EVT23
     Name: Modification Module (Fast)
     Type: Card
     SubType: Enchant
@@ -113966,7 +114016,7 @@ Body:
     Script: |
       .@r = getrefine(); bonus bAspd,1; if (.@r >= 9) { bonus bAspdRate,6; } else if (.@r >= 7) { bonus bAspdRate,3; }
   - Id: 25691
-    AegisName: M_M_Caster
+    AegisName: EP17_1_EVT24
     Name: Modification Module (Caster)
     Type: Card
     SubType: Enchant
@@ -113976,7 +114026,7 @@ Body:
     Script: |
       .@r = getrefine(); .@val = -5; if (.@r >= 9) { .@val -= 6; } else if (.@r >= 7) { .@val -= 3; } bonus bVariableCastrate,.@val;
   - Id: 25692
-    AegisName: M_M_Critical
+    AegisName: EP17_1_EVT25
     Name: Modification Module (Critical)
     Type: Card
     SubType: Enchant
@@ -113986,7 +114036,7 @@ Body:
     Script: |
       .@r = getrefine(); bonus bCritical,5; if (.@r >= 9) { bonus bCritAtkRate,10; } else if (.@r >= 7) { bonus bCritAtkRate,5; }
   - Id: 25693
-    AegisName: M_M_Delay_After_skill
+    AegisName: EP17_1_EVT26
     Name: Modification Module (Delay after skill)
     Type: Card
     SubType: Enchant
@@ -113996,7 +114046,7 @@ Body:
     Script: |
       .@r = getrefine(); .@val = -5; if (.@r >= 9) { .@val -= 10; } else if (.@r >= 7) { .@val -= 5; } bonus bDelayrate,.@val;
   - Id: 25694
-    AegisName: M_M_Fixed_Casting
+    AegisName: EP17_1_EVT27
     Name: Modification Module (Fixed Casting)
     Type: Card
     SubType: Enchant
@@ -114006,7 +114056,7 @@ Body:
     Script: |
       .@r = getrefine(); .@val = -300; if (.@r >= 9) { .@val -= 400; } else if (.@r >= 7) { .@val -= 200; } bonus bFixedCast,.@val;
   - Id: 25695
-    AegisName: M_M_Above_All
+    AegisName: EP17_1_EVT28
     Name: Modification Module (Above All)
     Type: Card
     SubType: Enchant
@@ -114016,7 +114066,7 @@ Body:
     Script: |
       .@r = getrefine(); bonus2 bSubEle,Ele_All,5; if (.@r >= 7) { bonus2 bSubSize,Size_All,5; if (.@r >= 9) { bonus2 bSubRace,RC_All,5; bonus2 bSubRace,RC_PLAYER_HUMAN,-5; } }
   - Id: 25696
-    AegisName: M_M_Drain_Life
+    AegisName: EP17_1_EVT29
     Name: Modification Module (Drain Life)
     Type: Card
     SubType: Enchant
@@ -114026,7 +114076,7 @@ Body:
     Script: |
       bonus2 bHPDrainRate,20,2;
   - Id: 25697
-    AegisName: M_M_Drain_Soul
+    AegisName: EP17_1_EVT30
     Name: Modification Module (Drain Soul)
     Type: Card
     SubType: Enchant
@@ -114036,7 +114086,7 @@ Body:
     Script: |
       bonus2 bSPDrainRate,10,1;
   - Id: 25698
-    AegisName: M_M_Magic_Healing
+    AegisName: EP17_1_EVT31
     Name: Modification Module (Magic Healing)
     Type: Card
     SubType: Enchant
@@ -114046,7 +114096,7 @@ Body:
     Script: |
       autobonus "{ bonus2 bHPRegenRate,400,500; }",20,10000,BF_MAGIC;
   - Id: 25699
-    AegisName: M_M_Magic_Soul
+    AegisName: EP17_1_EVT32
     Name: Modification Module (Magic Soul)
     Type: Card
     SubType: Enchant
@@ -114056,7 +114106,7 @@ Body:
     Script: |
       autobonus "{ bonus2 bSPRegenRate,80,500; }",10,10000,BF_MAGIC;
   - Id: 25700
-    AegisName: M_M_Unlimited_Vital
+    AegisName: EP17_1_EVT33
     Name: Modification Module (Unlimited Vital)
     Type: Card
     SubType: Enchant
@@ -114066,7 +114116,7 @@ Body:
     Script: |
       autobonus2 "{ bonus bVit,50; bonus2 bHPRegenRate,400,500; bonus2 bSPLossRate,20,1000; }",10,10000,BF_WEAPON|BF_MAGIC; /* unknown rate */
   - Id: 25701
-    AegisName: M_M_Spell_Buster
+    AegisName: EP17_1_EVT34
     Name: Modification Module (Spell Buster)
     Type: Card
     SubType: Enchant
@@ -114076,7 +114126,7 @@ Body:
     Script: |
       autobonus "{ bonus bInt,50; bonus bMatkRate,15; bonus2 bAddClass,Class_All,-15; }",20,10000,BF_MAGIC; /* unknown rate */
   - Id: 25702
-    AegisName: M_M_Firing_Shot
+    AegisName: EP17_1_EVT35
     Name: Modification Module (Firing Shot)
     Type: Card
     SubType: Enchant
@@ -114086,7 +114136,7 @@ Body:
     Script: |
       autobonus "{ bonus bDex,50; bonus bLongAtkRate,10; bonus2 bSPLossRate,20,1000; }",20,10000,BF_WEAPON; /* unknown rate */
   - Id: 25703
-    AegisName: M_M_Overpower
+    AegisName: EP17_1_EVT36
     Name: Modification Module (Overpower)
     Type: Card
     SubType: Enchant
@@ -114096,7 +114146,7 @@ Body:
     Script: |
       autobonus "{ bonus bStr,50; bonus2 bAddClass,Class_All,15; bonus bMatkRate,-15; }",20,10000,BF_WEAPON; /* unknown rate */
   - Id: 25704
-    AegisName: M_M_Fatal_Flash
+    AegisName: EP17_1_EVT37
     Name: Modification Module (Fatal Flash)
     Type: Card
     SubType: Enchant
@@ -114106,7 +114156,7 @@ Body:
     Script: |
       autobonus "{ bonus bStr,50; bonus bCritAtkRate,10; bonus2 bHPLossRate,300,1000; }",20,10000,BF_WEAPON; /* unknown rate */
   - Id: 25705
-    AegisName: M_M_Lucky_Strike
+    AegisName: EP17_1_EVT38
     Name: Modification Module (Lucky Strike)
     Type: Card
     SubType: Enchant
@@ -114421,7 +114471,7 @@ Body:
     Script: |
       bonus bMatk,140; bonus bInt,2; bonus bFlee,2*getrefine(); if(getrefine()>= 10) { bonus bFlee2,10; }
   - Id: 26151
-    AegisName: Rutilus_Stick-OS
+    AegisName: Rutilus_Stick_OS
     Name: "Rutilus Stick-OS [2]"
     Type: Weapon
     SubType: Staff
@@ -115987,7 +116037,7 @@ Body:
     Script: |
       bonus2 bAddEle,Ele_Poison,40;
   - Id: 27320
-    AegisName: E_EA1L_card
+    AegisName: E_EA1L_Card
     Name: E-EA1L card
     Type: Card
     Buy: 20
@@ -116520,8 +116570,8 @@ Body:
     Script: |
       autobonus "{ bonus bDefEle,Ele_Undead; sc_start SC_ENDURE,6000,1; }",40,6000,BF_WEAPON|BF_SHORT,"{ active_transform 1036,6000; }";
   - Id: 28038
-    AegisName: Meuchler-OS
-    Name: "Meuchler-OS [2]"
+    AegisName: Meuchler_OS
+    Name: "Meuchler_OS [2]"
     Type: Weapon
     SubType: Katar
     Buy: 10200000
@@ -116781,8 +116831,8 @@ Body:
     Script: |
       bonus bUnbreakableWeapon; autobonus "{ bonus bCritical,20; }",5,7000,BF_SHORT,"{ specialeffect2 EF_ENCHANCE; }"; .@r = getrefine(); if (.@r>=9) { bonus bCritAtkRate,15; } else if (.@r>=7) { bonus bCritAtkRate,5; }
   - Id: 28136
-    AegisName: Blasti-OS
-    Name: "Blasti-OS [2]"
+    AegisName: Blasti_OS
+    Name: "Blasti_OS [2]"
     Type: Weapon
     SubType: 2hAxe
     Buy: 12300000
@@ -117094,8 +117144,8 @@ Body:
     Script: |
       .@r = getrefine(); bonus bDex,1; bonus bSplashRange,1; .@val = 5*(.@r/2); if (.@r >= 7) { bonus bAspdRate,15; if (.@r >= 9) { .@val += 5; if (getallrefine() >= 22) { bonus5 bAutoSpell,"GS_SPREADATTACK",max(6,getskilllv("GS_SPREADATTACK")),50,BF_LONG|BF_WEAPON,1; } } } bonus bLongAtkRate,.@val;
   - Id: 28253
-    AegisName: HR-S55-OS
-    Name: "HR-S55-OS [2]"
+    AegisName: HR_S55_OS
+    Name: "HR_S55_OS [2]"
     Type: Weapon
     SubType: Rifle
     Buy: 10800000
@@ -118368,7 +118418,7 @@ Body:
     Script: |
       .@val = 10 + 10*(min(getrefine(),10)/3); bonus2 bAddEle,Ele_Dark,.@val; bonus2 bAddEle,Ele_Undead,.@val; bonus2 bAddEle,Ele_Poison,.@val; bonus2 bAddEle,Ele_Ghost,.@val; bonus2 bSubDefEle,Ele_Dark,-30;
   - Id: 28629
-    AegisName: Circuit_Board-OS
+    AegisName: Circuit_Board_OS
     Name: "Circuit Board-OS [2]"
     Type: Weapon
     SubType: Book
@@ -118598,8 +118648,8 @@ Body:
     Script: |
       .@r = getrefine(); bonus bCritical,90; bonus bCritAtkRate,(3*(.@r/2)); if (.@r >= 7) { bonus2 bAddClass,Class_All,5; if (.@r >= 9) { bonus2 bAddSize,Size_All,20; if (getallrefine() >= 22) { bonus2 bAddEle,Ele_All,20; } } }
   - Id: 28755
-    AegisName: Kuroiro-OS
-    Name: "Kuroiro-OS [2]"
+    AegisName: Kuroiro_OS
+    Name: "Kuroiro_OS [2]"
     Type: Weapon
     SubType: Dagger
     Buy: 9800000
@@ -119788,6 +119838,20 @@ Body:
     SubType: Enchant
     Script: |
       bonus2 bHPDrainRate,20,3;
+  - Id: 29228
+    AegisName: Steal
+    Name: Steal
+    Type: Card
+    SubType: Enchant
+    Script: |
+      skill "TF_STEAL",1;
+  - Id: 29229
+    AegisName: Teleport
+    Name: Teleport
+    Type: Card
+    SubType: Enchant
+    Script: |
+      skill "AL_TELEPORT",1;
   - Id: 29310
     AegisName: Racing_RK_1
     Name: Racing(Rune Knight) 1Lv
@@ -120124,6 +120188,301 @@ Body:
     SubType: Enchant
     Buy: 20
     Sell: 10
+  - Id: 29527
+    AegisName: Improve_Orb_Def
+    Name: Modification Orb (DEF)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bDef,25;
+      if (.@r>=7) {
+         bonus bDef,10;
+         if (.@r>=9) {
+            bonus bDef,10;
+         }
+      }
+  - Id: 29528
+    AegisName: Improve_Orb_Mdef
+    Name: Modification Orb (MDEF)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMdef,2;
+      if (.@r>=7) {
+         bonus bMdef,3;
+         if (.@r>=9) {
+            bonus bMdef,3;
+         }
+      }
+  - Id: 29529
+    AegisName: Improve_Orb_HealHP
+    Name: Modification Orb (HP Recovery)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bHPrecovRate,20;
+  - Id: 29530
+    AegisName: Improve_Orb_Spirit
+    Name: Modification Orb (Spirit)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMaxSPrate,5;
+      if (.@r>=7) {
+         bonus bMaxSP,100;
+         if (.@r>=9) {
+            bonus bMaxSP,150;
+         }
+      }
+  - Id: 29531
+    AegisName: Improve_Orb_Health
+    Name: Modification Orb (Health)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHPrate,5;
+      if (.@r>=7) {
+         bonus bMaxHP,500;
+         if (.@r>=9) {
+            bonus bMaxHP,750;
+         }
+      }
+  - Id: 29532
+    AegisName: Improve_Orb_HealSP
+    Name: Modification Orb (SP Recovery)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bSPrecovRate,20;
+  - Id: 29533
+    AegisName: Improve_Orb_Heal
+    Name: Modification Orb (Heal)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bHealPower,5;
+      if (.@r>=7) {
+         bonus bHealPower,5;
+         if (.@r>=9) {
+            bonus bHealPower,5;
+         }
+      }
+  - Id: 29534
+    AegisName: Improve_Orb_Atk
+    Name: Modification Orb (ATK)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,5;
+      if (.@r>=7) {
+         bonus bBaseAtk,25;
+         if (.@r>=9) {
+            bonus bBaseAtk,25;
+         }
+      }
+  - Id: 29535
+    AegisName: Improve_Orb_Matk
+    Name: Modification Orb (MATK)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMatkRate,5;
+      if (.@r>8) {
+         bonus bMatk,25;
+      }
+      else if (.@r>6) {
+         bonus bMatk,25;
+      }
+  - Id: 29536
+    AegisName: Improve_Orb_Archer
+    Name: Modification Orb (Sharpshooter)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bLongAtkRate,3;
+      if (.@r>=7) {
+         bonus bLongAtkRate,2;
+         if (.@r>=9) {
+            bonus bLongAtkRate,2;
+         }
+      }
+  - Id: 29537
+    AegisName: Improve_Orb_Speed
+    Name: Modification Orb (Speed)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bAspd,1;
+      if (.@r>=7) {
+         bonus bAspdRate,3;
+         if (.@r>=9) {
+            bonus bAspdRate,3;
+         }
+      }
+  - Id: 29538
+    AegisName: Improve_Orb_Cast
+    Name: Modification Orb (Caster)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bVariableCastrate,-5;
+      if (.@r>=7) {
+         bonus bVariableCastrate,-3;
+         if (.@r>=9) {
+            bonus bVariableCastrate,-3;
+         }
+      }
+  - Id: 29539
+    AegisName: Improve_Orb_Cri
+    Name: Modification Orb (Critical)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bCritical,10;
+      if (.@r>=7) {
+         bonus bCritAtkRate,5;
+         if (.@r>=9) {
+            bonus bCritAtkRate,5;
+         }
+      }
+  - Id: 29540
+    AegisName: Improve_Orb_Delay
+    Name: Modification Orb (Global Delay)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bDelayrate,-5;
+      if (.@r>=7) {
+         bonus bDelayrate,-5;
+         if (.@r>=9) {
+            bonus bDelayrate,-5;
+         }
+      }
+  - Id: 29541
+    AegisName: Improve_Orb_Fix
+    Name: Modification Orb (Fixed Casting)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bFixedCast,-300;
+      if (.@r>=7) {
+         bonus bFixedCast,-200;
+         if (.@r>=9) {
+            bonus bFixedCast,-200;
+         }
+      }
+  - Id: 29542
+    AegisName: Improve_Orb_Above
+    Name: Modification Orb (Above All)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSubEle,Ele_All,5;
+      if (.@r>=7) {
+         bonus2 bSubSize,Size_All,5;
+         if (.@r>=9) {
+            bonus2 bSubRace,RC_All,5;
+            bonus2 bSubRace,RC_Player_Human,-5;
+            bonus2 bSubRace,RC_Player_Doram,-5;
+         }
+      }
+  - Id: 29543
+    AegisName: Improve_Orb_Life
+    Name: Modification Orb (Drain Life)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bHPDrainRate,20,2;
+  - Id: 29544
+    AegisName: Improve_Orb_Soul
+    Name: Modification Orb (Drain Soul)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bSPDrainRate,10,1;
+  - Id: 29545
+    AegisName: Improve_Orb_M_Heal
+    Name: Modification Orb (Magic Healing)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      autobonus "{ bonus2 bHPRegenRate,400,500; }",20,10000,BF_MAGIC,"{ specialeffect2 EF_POTION_BERSERK; }";
+  - Id: 29546
+    AegisName: Improve_Orb_M_Soul
+    Name: Modification Orb (Magic Soul)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      autobonus "{ bonus2 bSPRegenRate,80,500; }",10,10000,BF_MAGIC,"{ specialeffect2 EF_POTION_BERSERK; }";
+  - Id: 29547
+    AegisName: Improve_Orb_L_Vit
+    Name: Modification Orb (Unlimited Vitality)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      autobonus2 "{ bonus bVit,50; bonus2 bHPRegenRate,400,500; bonus2 bSPLossRate,1,20000; }",50,10000,BF_NORMAL,"{ specialeffect2 EF_POTION_BERSERK; }";
+      autobonus2 "{ bonus bVit,50; bonus2 bHPRegenRate,400,500; bonus2 bSPLossRate,1,20000; }",50,10000,BF_MAGIC,"{ specialeffect2 EF_POTION_BERSERK; }";
+  - Id: 29548
+    AegisName: Improve_Orb_L_INT
+    Name: Modification Orb (Spell Buster)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      autobonus "{ bonus bInt,50; bonus bMatkRate,15; bonus2 bAddClass,Class_All,-15; }",30,10000,BF_MAGIC,"{ specialeffect2 EF_POTION_BERSERK; }";
+  - Id: 29549
+    AegisName: Improve_Orb_L_DEX
+    Name: Modification Orb (Fierce Shooter)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      autobonus "{ bonus bDex,50; bonus bLongAtkRate,10; bonus2 bSPLossRate,1,20000; }",30,10000,BF_NORMAL,"{ specialeffect2 EF_POTION_BERSERK; }";
+  - Id: 29550
+    AegisName: Improve_Orb_L_STR
+    Name: Modification Orb (Overpower)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      autobonus "{ bonus bStr,50; bonus2 bAddClass,Class_All,15; bonus bMatkRate,-15; }",30,10000,BF_NORMAL,"{ specialeffect2 EF_POTION_BERSERK; }";
+  - Id: 29551
+    AegisName: Improve_Orb_L_AGI
+    Name: Modification Orb (Fatal Flash)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      autobonus "{ bonus bAgi,50; bonus bCritAtkRate,10; bonus2 bHPLossRate,300,1000; }",30,10000,BF_NORMAL,"{ specialeffect2 EF_POTION_BERSERK; }";
+  - Id: 29552
+    AegisName: Improve_Orb_L_LUK
+    Name: Modification Orb (Lucky Strike)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      if (.@r>9) {
+         bonus bLuk,50;
+      }
+      if (.@r>4) {
+         .@r2 = .@r-4;
+         autobonus "{ bonus bLuk,50; }",(8+(.@r2*5)),(4+(.@r2*3))*1000,BF_NORMAL;
+         autobonus "{ bonus bLuk,50; }",(8+(.@r2*5)),(4+(.@r2*3))*1000,BF_MAGIC;
+      }
+      else {
+         autobonus "{ bonus bLuk,50; }",8,4000,BF_NORMAL;
+         autobonus "{ bonus bLuk,50; }",8,4000,BF_MAGIC;
+      }
   - Id: 29579
     AegisName: Racing_SG_1
     Name: Racing (Star Gladiator) 1Lv
@@ -126359,7 +126718,7 @@ Body:
     Script: |
       .@r = getrefine(); bonus bUnbreakableWeapon; bonus2 bIgnoreDefRaceRate,RC_All,5*.@r; bonus2 bAddRace,RC_PLAYER_HUMAN,80 + (.@r > 8 ? 20 : 0) + (.@r > 7 ? 35 : 0); if(.@r > 9){ bonus bMaxHPrate,15; bonus bMaxSPrate,15; }
   - Id: 32019
-    AegisName: Boost_Lance-OS
+    AegisName: Boost_Lance_OS
     Name: "Boost Lance-OS [2]"
     Type: Weapon
     SubType: 1hSpear
@@ -126899,6 +127258,56 @@ Body:
     Type: DelayConsume
     Script: |
       laphine_upgrade();
+  - Id: 100130
+    AegisName: Grace_Rifine_Ticket
+    Name: Grace Refine Ticket
+    Type: DelayConsume
+    Buy: 20
+    Sell: 10
+    EquipLevelMin: 150
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      laphine_upgrade();
+  - Id: 100133
+    AegisName: Grace_Convert1
+    Name: Grace Physical Modification Permit (Garment)
+    Type: DelayConsume
+    Buy: 20
+    Sell: 10
+    EquipLevelMin: 150
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      laphine_upgrade();
+  - Id: 100134
+    AegisName: Grace_Convert2
+    Name: Grace Magical Modification Permit (Garment)
+    Type: DelayConsume
+    Buy: 20
+    Sell: 10
+    EquipLevelMin: 150
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      laphine_upgrade();
+  - Id: 100137
+    AegisName: Grace_Convert3
+    Name: Grace Physical Modification Permit (Armor)
+    Type: DelayConsume
+    Buy: 20
+    Sell: 10
+    EquipLevelMin: 150
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      laphine_upgrade();
+  - Id: 100138
+    AegisName: Grace_Convert4
+    Name: Grace Magical Modification Permit (Armor)
+    Type: DelayConsume
+    Buy: 20
+    Sell: 10
+    EquipLevelMin: 150
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      laphine_upgrade();
   - Id: 100391
     AegisName: Moonlight_Box_IL
     Name: Moonlight Refine Box
@@ -127018,6 +127427,13 @@ Body:
     Weight: 10
     Script: |
       laphine_upgrade();
+  - Id: 100903
+    AegisName: Teleport_Ep17_01
+    Name: Border Area Cor Teleport Wing
+    Type: Usable
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      warp "sp_cor",152,158;
   - Id: 300001
     AegisName: Poisonous_Card
     Name: Poisonous Card
@@ -133353,6 +133769,720 @@ Body:
     Type: Armor
     Locations: {Costume_Head: true}
     View: 2806
+  - Id: 450086
+    AegisName: Grace_Breath_Armor
+    Name: "Grace Breath Armor [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Defense: 12
+    Slots: 1
+    Jobs: {Knight: true}
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHPrate,10;
+      if (.@r>=7)
+         bonus bVariableCastrate,-20;
+      if (.@r>=9)
+         bonus bMaxHPrate,10;
+  - Id: 450087
+    AegisName: Grace_Knight_Armor
+    Name: "Grace Knight Armor [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Defense: 12
+    Slots: 1
+    Jobs: {Knight: true}
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,100;
+      if (.@r>=7)
+         bonus bAspdRate,7;
+      if (.@r>=9)
+         bonus bCritAtkRate,10;
+  - Id: 450088
+    AegisName: Grace_Spear_Armor
+    Name: "Grace Spear Armor [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Defense: 12
+    Slots: 1
+    Jobs: {Crusader: true}
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,100;
+      if (.@r>=7)
+         bonus bAspdRate,7;
+      if (.@r>=9)
+         bonus bLongAtkRate,10;
+  - Id: 450089
+    AegisName: Grace_Genesis_Armor
+    Name: "Grace Genesis Armor [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Defense: 12
+    Slots: 1
+    Jobs: {Crusader: true}
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bMatk,100;
+      if (.@r>=7)
+         bonus2 bMagicAtkEle,Ele_Holy,10;
+      if (.@r>=9)
+         bonus2 bMagicAtkEle,Ele_Holy,10;
+  - Id: 450090
+    AegisName: Grace_Sharp_Suit
+    Name: "Grace Sharp Suit [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Defense: 12
+    Slots: 1
+    Jobs: {Hunter: true}
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,100;
+      if (.@r>=7)
+         bonus bAspdRate,7;
+      if (.@r>=9)
+         bonus bLongAtkRate,10;
+  - Id: 450091
+    AegisName: Grace_Aim_Suit
+    Name: "Grace Aimed Suit [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Defense: 12
+    Slots: 1
+    Jobs: {Hunter: true}
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,100;
+      if (.@r>=7)
+         bonus bAspdRate,7;
+      if (.@r>=9)
+         bonus bLongAtkRate,10;
+  - Id: 450092
+    AegisName: Grace_Severe_Suit
+    Name: "Grace Severe Suit [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Defense: 12
+    Slots: 1
+    Jobs: {BardDancer: true}
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,100;
+      if (.@r>=7)
+         bonus bVariableCastrate,-20;
+      if (.@r>=9)
+         bonus bLongAtkRate,10;
+  - Id: 450093
+    AegisName: Grace_Reverb_Suit
+    Name: "Grace Reverb Suit [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Defense: 12
+    Slots: 1
+    Jobs: {BardDancer: true}
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bMatk,100;
+      if (.@r>=7)
+         bonus2 bMagicAtkEle,Ele_Neutral,10;
+      if (.@r>=9)
+         bonus2 bMagicAtkEle,Ele_Neutral,10;
+  - Id: 450094
+    AegisName: Grace_Adora_Robe
+    Name: "Grace Adora Robe [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Defense: 12
+    Slots: 1
+    Jobs: {Priest: true}
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bMatk,100;
+      if (.@r>=7)
+         bonus2 bMagicAtkEle,Ele_Holy,10;
+      if (.@r>=9)
+         bonus2 bMagicAtkEle,Ele_Holy,10;
+  - Id: 450095
+    AegisName: Grace_Duple_Robe
+    Name: "Grace Duple Robe [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Defense: 12
+    Slots: 1
+    Jobs: {Priest: true}
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,100;
+      if (.@r>=7)
+         bonus bAspdRate,7;
+      if (.@r>=9)
+         bonus bCritAtkRate,10;
+  - Id: 450096
+    AegisName: Grace_Knuckle_Suit
+    Name: "Grace Knuckle Suit [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Defense: 12
+    Slots: 1
+    Jobs: {Monk: true}
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,100;
+      if (.@r>=7)
+         bonus bMaxSPrate,20;
+      if (.@r>=9)
+         bonus2 bAddClass,Class_All,10;
+  - Id: 450097
+    AegisName: Grace_Tiger_Suit
+    Name: "Grace Tiger Suit [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Defense: 12
+    Slots: 1
+    Jobs: {Monk: true}
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bMaxSPrate,10;
+      if (.@r>=7)
+         bonus bMaxHPrate,5;
+      if (.@r>=9)
+         bonus bMaxHPrate,5;
+  - Id: 450098
+    AegisName: Grace_Tonado_Armor
+    Name: "Grace Tornado Armor [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Defense: 12
+    Slots: 1
+    Jobs: {Blacksmith: true}
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,100;
+      if (.@r>=7)
+         bonus bAspdRate,7;
+      if (.@r>=9)
+         bonus2 bAddClass,Class_All,10;
+  - Id: 450099
+    AegisName: Grace_Vulcan_Armor
+    Name: "Grace Vulcan Armor [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Defense: 12
+    Slots: 1
+    Jobs: {Blacksmith: true}
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,100;
+      if (.@r>=7)
+         bonus bAspdRate,7;
+      if (.@r>=9)
+         bonus bLongAtkRate,10;
+  - Id: 450100
+    AegisName: Grace_Kart_Suit
+    Name: "Grace Cart Cannon Suit [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Defense: 12
+    Slots: 1
+    Jobs: {Alchemist: true}
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,100;
+      if (.@r>=7)
+         bonus bVariableCastrate,-20;
+      if (.@r>=9)
+         bonus bLongAtkRate,10;
+  - Id: 450101
+    AegisName: Grace_Kart_Suit2
+    Name: "Grace Cart Tornado Suit [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Defense: 12
+    Slots: 1
+    Jobs: {Alchemist: true}
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,100;
+      if (.@r>=7)
+         bonus bAspdRate,7;
+      if (.@r>=9)
+         bonus2 bAddClass,Class_All,10;
+  - Id: 450102
+    AegisName: Grace_Rolling_Suit
+    Name: "Grace Rolling Suit [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Defense: 12
+    Slots: 1
+    Jobs: {Assassin: true}
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,100;
+      if (.@r>=7)
+         bonus bAspdRate,7;
+      if (.@r>=9)
+         bonus bLongAtkRate,10;
+  - Id: 450103
+    AegisName: Grace_Assasin_Suit
+    Name: "Grace Assassin Suit [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Defense: 12
+    Slots: 1
+    Jobs: {Assassin: true}
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,100;
+      if (.@r>=7)
+         bonus bAspdRate,7;
+      if (.@r>=9)
+         bonus bCritAtkRate,10;
+  - Id: 450104
+    AegisName: Grace_Fatal_Suit
+    Name: "Grace Fatal Suit [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Defense: 12
+    Slots: 1
+    Jobs: {Rogue: true}
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,100;
+      if (.@r>=7)
+         bonus bAspdRate,7;
+      if (.@r>=9)
+         bonus2 bAddClass,Class_All,10;
+  - Id: 450105
+    AegisName: Grace_Stalker_Suit
+    Name: "Grace Stalker Suit [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Defense: 12
+    Slots: 1
+    Jobs: {Rogue: true}
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bMatk,100;
+      if (.@r>=7)
+         bonus bAspdRate,7;
+      if (.@r>=9)
+         bonus2 bMagicAtkEle,Ele_Fire,10;
+  - Id: 450108
+    AegisName: Grace_Trip_Suit
+    Name: "Grace Trip Suit [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Defense: 12
+    Slots: 1
+    Jobs: {Gunslinger: true}
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,100;
+      if (.@r>=7)
+         bonus2 bAddClass,Class_All,10;
+      if (.@r>=9)
+         bonus bLongAtkRate,10;
+  - Id: 450109
+    AegisName: Grace_Firerain_Suit
+    Name: "Grace Fire Rain Suit [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Defense: 12
+    Slots: 1
+    Jobs: {Gunslinger: true}
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,100;
+      if (.@r>=7)
+         bonus2 bAddClass,Class_All,10;
+      if (.@r>=9)
+         bonus bLongAtkRate,10;
+  - Id: 450110
+    AegisName: Grace_Crimson_Robe
+    Name: "Grace Crimson Robe [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Defense: 12
+    Slots: 1
+    Jobs: {Wizard: true}
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bMatk,100;
+      if (.@r>=7)
+         bonus bVariableCastrate,-20;
+      if (.@r>=9)
+         bonus2 bMagicAtkEle,Ele_Fire,10;
+  - Id: 450111
+    AegisName: Grace_Frost_Robe
+    Name: "Grace Frost Robe [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Defense: 12
+    Slots: 1
+    Jobs: {Wizard: true}
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bMatk,100;
+      if (.@r>=7)
+         bonus bVariableCastrate,-20;
+      if (.@r>=9)
+         bonus2 bMagicAtkEle,Ele_Water,10;
+  - Id: 450112
+    AegisName: Grace_Psychic_Robe
+    Name: "Grace Psychic Robe [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Defense: 12
+    Slots: 1
+    Jobs: {Sage: true}
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bMatk,100;
+      if (.@r>=7)
+         bonus bVariableCastrate,-20;
+      if (.@r>=9)
+         bonus2 bMagicAtkEle,Ele_Neutral,10;
+  - Id: 450113
+    AegisName: Grace_Dust_Robe
+    Name: "Grace Dust Robe [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Defense: 12
+    Slots: 1
+    Jobs: {Sage: true}
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bMatk,100;
+      if (.@r>=7)
+         bonus bVariableCastrate,-20;
+      if (.@r>=9)
+         bonus2 bMagicAtkEle,Ele_Water,10;
+  - Id: 450114
+    AegisName: Grace_Sun_Suit
+    Name: "Grace Sun Suit [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Defense: 12
+    Slots: 1
+    Jobs: {StarGladiator: true}
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,100;
+      if (.@r>=7)
+         bonus bAspdRate,7;
+      if (.@r>=9)
+         bonus2 bAddClass,Class_All,10;
+  - Id: 450115
+    AegisName: Grace_Moon_Suit
+    Name: "Grace Moon Suit [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Defense: 12
+    Slots: 1
+    Jobs: {StarGladiator: true}
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,100;
+      if (.@r>=7)
+         bonus2 bAddClass,Class_All,10;
+      if (.@r>=9)
+         bonus2 bAddClass,Class_All,10;
+  - Id: 450116
+    AegisName: Grace_Ninja_Suit
+    Name: "Grace Ninja Suit [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Defense: 12
+    Slots: 1
+    Jobs: {Ninja: true}
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bMatk,100;
+      if (.@r>=7)
+         bonus bVariableCastrate,-20;
+      if (.@r>=9)
+         bonus2 bMagicAtkEle,Ele_All,10;
+  - Id: 450117
+    AegisName: Grace_Kunai_Suit
+    Name: "Grace Kunai Suit [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Defense: 12
+    Slots: 1
+    Jobs: {Ninja: true}
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,100;
+      if (.@r>=7)
+         bonus2 bAddClass,Class_All,10;
+      if (.@r>=9)
+         bonus bLongAtkRate,10;
+  - Id: 450118
+    AegisName: Grace_Swhoo_Robe
+    Name: "Grace Eswhoo Robe [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Defense: 12
+    Slots: 1
+    Jobs: {SoulLinker: true}
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bMatk,100;
+      if (.@r>=7)
+         bonus2 bMagicAtkEle,Ele_Dark,10;
+      if (.@r>=9)
+         bonus2 bMagicAtkEle,Ele_Dark,10;
+  - Id: 450119
+    AegisName: Grace_Explosion_Robe
+    Name: "Grace Explosion Robe [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Defense: 12
+    Slots: 1
+    Jobs: {SoulLinker: true}
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bMatk,100;
+      if (.@r>=7)
+         bonus2 bMagicAtkEle,Ele_Dark,10;
+      if (.@r>=9)
+         bonus2 bMagicAtkEle,Ele_Dark,10;
+  - Id: 450125
+    AegisName: Grace_Snovice_Suit
+    Name: "Grace Super Novice Suit [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Defense: 12
+    Slots: 1
+    Jobs: {Novice: true, SuperNovice: true}
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,100;
+      if (.@r>=7)
+         bonus bAspdRate,7;
+      if (.@r>=9)
+         bonus bMaxHPrate,10;
+  - Id: 450126
+    AegisName: Grace_Snovice_Robe
+    Name: "Grace Super Novice Robe [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Defense: 12
+    Slots: 1
+    Jobs: {Novice: true, SuperNovice: true}
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bMatk,100;
+      if (.@r>=7)
+         bonus bAspdRate,7;
+      if (.@r>=9)
+         bonus bMaxHPrate,10;
   - Id: 450144
     AegisName: Saint_Robe_IL
     Name: "Illusion Saint Robe [1]"
@@ -133517,6 +134647,48 @@ Body:
     Script: |
       bonus bVariableCastrate,-7;
       bonus bDelayrate,-(min(getrefine(),12)/2);
+  - Id: 470020
+    AegisName: Grace_Attack_Boots
+    Name: "Grace Attack Boots [1]"
+    Type: Armor
+    Buy: 45000
+    Sell: 11250
+    Defense: 6
+    Slots: 1
+    Locations: {Shoes: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,20;
+      bonus bHit,20;
+      if (.@r>=7)
+         bonus bFixedCast,-500;
+      if (.@r>=9)
+         bonus bLongAtkRate,10;
+  - Id: 470021
+    AegisName: Grace_Magic_Boots
+    Name: "Grace Magic Boots [1]"
+    Type: Armor
+    Buy: 45000
+    Sell: 11250
+    Defense: 6
+    Slots: 1
+    Locations: {Shoes: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bMatk,20;
+      bonus bFlee,20;
+      if (.@r>=7)
+         bonus bFixedCast,-500;
+      if (.@r>=9)
+         bonus2 bMagicAtkEle,Ele_All,10;
   - Id: 470066
     AegisName: Sprint_Shoes_IL
     Name: "Illusion Sprint Shoes [1]"
@@ -133544,6 +134716,46 @@ Body:
             }
          }
       }
+  - Id: 480018
+    AegisName: Grace_Attack_Manteau
+    Name: "Grace Attack Manteau [1]"
+    Type: Armor
+    Buy: 57000
+    Sell: 14250
+    Defense: 6
+    Slots: 1
+    Locations: {Garment: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bAspdRate,7;
+      if (.@r>=7)
+         bonus bDelayrate,-5;
+      if (.@r>=9)
+         bonus2 bAddClass,Class_All,10;
+  - Id: 480019
+    AegisName: Grace_Magic_Manteau
+    Name: "Grace Magic Manteau [1]"
+    Type: Armor
+    Buy: 57000
+    Sell: 14250
+    Defense: 6
+    Slots: 1
+    Locations: {Garment: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bVariableCastrate,-10;
+      if (.@r>=7)
+         bonus bDelayrate,-5;
+      if (.@r>=9)
+         bonus2 bMagicAtkEle,Ele_All,10;
   - Id: 480054
     AegisName: Morrigane_Manyeau_IL
     Name: "Illusion Morrigane's Manteau [1]"
@@ -134818,6 +136030,38 @@ Body:
     Type: Armor
     Locations: {Costume_Garment: true}
     View: 303
+  - Id: 490019
+    AegisName: Grace_Attack_Ring
+    Name: "Grace Attack Ring [1]"
+    Type: Armor
+    Buy: 6500
+    Sell: 3250
+    Defense: 1
+    Slots: 1
+    Locations: {Right_Accessory: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      bonus bAspdRate,7;
+      bonus bVariableCastrate,-10;
+      bonus bCritAtkRate,10;
+  - Id: 490020
+    AegisName: Grace_Magic_Ring
+    Name: "Grace Magic Ring [1]"
+    Type: Armor
+    Buy: 6500
+    Sell: 3250
+    Defense: 1
+    Slots: 1
+    Locations: {Right_Accessory: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      bonus bAspdRate,7;
+      bonus bVariableCastrate,-10;
+      bonus2 bMagicAddEle,Ele_All,10;
   - Id: 490069
     AegisName: Morrigane_Belt_IL
     Name: "Illusion Morrigane's Belt [1]"

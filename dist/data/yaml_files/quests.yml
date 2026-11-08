@@ -2924,6 +2924,21 @@ quests:
     icon: gq
     summary: Lv10 (Fire element) attack
     description: Damage the fire element egg
+  2300:
+    title: "Training Center: Talk to General Reindeer"
+    icon: lq
+    summary: "Training Center: Talk to General Reindeer"
+    description: "Training Center: Talk to General Reindeer."
+  2301:
+    title: "Training Center: Leave the boat"
+    icon: lq
+    summary: "Training Center: Leave the boat"
+    description: "Training Center: Leave the boat."
+  2302:
+    title: "Training Center: Formation"
+    icon: lq
+    summary: "Training Center: Formation"
+    description: "Training Center: Formation."
   2303:
     title: Saving Valentine's
     description: You can help the Orc transform the lovers back to normal by using the Love Wand.
@@ -3707,6 +3722,216 @@ quests:
     icon: ev
     summary: 04:00 reset time
     description: 해당 이벤트 퀘스트는 대기시간 종료 후, 프론테라의 <NAVI>[쇼콜라]<INFO>prontera,163,98,0,101,0</INFO></NAVI>를 통해 반복 수행이 가능합니다.
+  3407:
+    title: "The Fishing Rod of the Missing Person"
+    icon: lq
+    summary: "The Fishing Rod of the Missing Person"
+    description: "The Fishing Rod of the Missing Person."
+  3408:
+    title: "Procurement of Abyssal Essence"
+    icon: lq
+    summary: "Procurement of Abyssal Essence"
+    description: "Procurement of Abyssal Essence."
+  3409:
+    title: "Vortex leading to the Deep Sea"
+    icon: lq
+    summary: "Vortex leading to the Deep Sea"
+    description: "Vortex leading to the Deep Sea."
+  3410:
+    title: "Sirud to the Surface"
+    icon: lq
+    summary: "Sirud to the Surface"
+    description: "Sirud to the Surface."
+  3411:
+    title: "Defeating Deep Sea Creatures"
+    icon: lq
+    summary: "Deep Sea Sropho x10, Deep Sea Marse x10, Deep Sea Deviace x10"
+    description: "Defeating Deep Sea Creatures."
+  3412:
+    title: "Collect Abyssal Essence"
+    icon: lq
+    summary: "Collect Abyssal Essence"
+    description: "Collect Abyssal Essence."
+  3413:
+    title: "Collect Abyssal Essence - Daily"
+    icon: lq
+    summary: "Collect Abyssal Essence - Daily"
+    description: "Collect Abyssal Essence - Daily."
+  3414:
+    title: "Collect Abyssal Essence - Standby"
+    icon: dq
+    summary: "Wait for the reset time"
+    description: "Collect Abyssal Essence - Standby."
+  3415:
+    title: "Defeat Deep Sea Creatures in the Upper Layers - Daily"
+    icon: lq
+    summary: "Deep Sea Sropho x10, Deep Sea Marse x10, Deep Sea Deviace x10"
+    description: "Defeat Deep Sea Creatures in the Upper Layers - Daily."
+  3416:
+    title: "Defeat Deep Sea Creatures in the Upper Layers - Standby"
+    icon: dq
+    summary: "Wait for the reset time"
+    description: "Defeat Deep Sea Creatures in the Upper Layers - Standby."
+  3417:
+    title: "Defeat Deep Sea Creatures in the Lower Layers - Daily"
+    icon: lq
+    summary: "Deep Sea Swordfish x10, Deep Sea Phen x10, Deep Sea King Dramoh x10"
+    description: "Defeat Deep Sea Creatures in the Lower Layers - Daily."
+  3418:
+    title: "Defeat Deep Sea Creatures in the Lower Layers - Standby"
+    icon: dq
+    summary: "Wait for the reset time"
+    description: "Defeat Deep Sea Creatures in the Lower Layers - Standby."
+  3419:
+    title: "Defeat Deep Sea fishmen in the Lower Layers - Daily"
+    icon: lq
+    summary: "Deep Sea Sedora x15, Deep Sea Strouf x15"
+    description: "Defeat Deep Sea fishmen in the Lower Layers - Daily."
+  3420:
+    title: "Defeat Deep Sea fishmen in the Lower Layers - Standby"
+    icon: dq
+    summary: "Wait for the reset time"
+    description: "Defeat Deep Sea fishmen in the Lower Layers - Standby."
+  3446:
+    title: "Illusion Investigation Team - Jiroker"
+    icon: lq
+    summary: "Illusion Investigation Team - Jiroker"
+    description: "Illusion Investigation Team - Jiroker."
+  3447:
+    title: "Illusion of Moonlight 100 Kills"
+    icon: lq
+    summary: "Illusion of Moonlight 100 Kills"
+    description: "Illusion of Moonlight 100 Kills."
+  3448:
+    title: "Illusion of Moonlight 100 Kills - Standby"
+    icon: dq
+    summary: "Wait for the reset time"
+    description: "Illusion of Moonlight 100 Kills - Standby."
+  3449:
+    title: "Illusion Investigation Team - Elysia"
+    icon: lq
+    summary: "Illusion Investigation Team - Elysia"
+    description: "Illusion Investigation Team - Elysia."
+  3450:
+    title: "Illusion of Frozen 100 Kills"
+    icon: lq
+    summary: "Illusion of Frozen 100 Kills"
+    description: "Illusion of Frozen 100 Kills."
+  3451:
+    title: "Illusion of Frozen 100 Kills - Standby"
+    icon: dq
+    summary: "Wait for the reset time"
+    description: "Illusion of Frozen 100 Kills - Standby."
+  3452:
+    title: "Illusion Investigation Team - Radimir"
+    icon: lq
+    summary: "Illusion Investigation Team - Radimir"
+    description: "Illusion Investigation Team - Radimir."
+  3453:
+    title: "Illusion of Vampire 100 Kills"
+    icon: lq
+    summary: "Illusion of Vampire 100 Kills"
+    description: "Illusion of Vampire 100 Kills."
+  3454:
+    title: "Illusion of Vampire 100 Kills - Standby"
+    icon: dq
+    summary: "Wait for the reset time"
+    description: "Illusion of Vampire 100 Kills - Standby."
+  3455:
+    title: "Illusion Investigation Team - Machoko"
+    icon: lq
+    summary: "Illusion Investigation Team - Machoko"
+    description: "Illusion Investigation Team - Machoko."
+  3456:
+    title: "Illusion of Teddy Bear 100 Kills"
+    icon: lq
+    summary: "Illusion of Teddy Bear 100 Kills"
+    description: "Illusion of Teddy Bear 100 Kills."
+  3457:
+    title: "Illusion of Teddy Bear 100 Kills - Standby"
+    icon: dq
+    summary: "Wait for the reset time"
+    description: "Illusion of Teddy Bear 100 Kills - Standby."
+  3458:
+    title: "Illusion Investigation Team - Orian"
+    icon: lq
+    summary: "Illusion Investigation Team - Orian"
+    description: "Illusion Investigation Team - Orian."
+  3459:
+    title: "Illusion of Abyss 100 Kills"
+    icon: lq
+    summary: "Illusion of Abyss 100 Kills"
+    description: "Illusion of Abyss 100 Kills."
+  3460:
+    title: "Illusion of Abyss 100 Kills - Standby"
+    icon: dq
+    summary: "Wait for the reset time"
+    description: "Illusion of Abyss 100 Kills - Standby."
+  3461:
+    title: "Illusion Investigation Team - Cassis"
+    icon: lq
+    summary: "Illusion Investigation Team - Cassis"
+    description: "Illusion Investigation Team - Cassis."
+  3462:
+    title: "Illusion of Luanda 100 Kills"
+    icon: lq
+    summary: "Illusion of Luanda 100 Kills"
+    description: "Illusion of Luanda 100 Kills."
+  3463:
+    title: "Illusion of Luanda 100 Kills - Standby"
+    icon: dq
+    summary: "Wait for the reset time"
+    description: "Illusion of Luanda 100 Kills - Standby."
+  3464:
+    title: "Illusion Investigation Team - Terrian"
+    icon: lq
+    summary: "Illusion Investigation Team - Terrian"
+    description: "Illusion Investigation Team - Terrian."
+  3465:
+    title: "Illusion of Labyrinth 100 Kills"
+    icon: lq
+    summary: "Illusion of Labyrinth 100 Kills"
+    description: "Illusion of Labyrinth 100 Kills."
+  3466:
+    title: "Illusion of Labyrinth 100 Kills - Standby"
+    icon: dq
+    summary: "Wait for the reset time"
+    description: "Illusion of Labyrinth 100 Kills - Standby."
+  3467:
+    title: "Illusion Investigation Team - Lister"
+    icon: lq
+    summary: "Illusion Investigation Team - Lister"
+    description: "Illusion Investigation Team - Lister."
+  3468:
+    title: "Illusion of Underwater 100 Kills"
+    icon: lq
+    summary: "Illusion of Underwater 100 Kills"
+    description: "Illusion of Underwater 100 Kills."
+  3469:
+    title: "Illusion of Underwater 100 Kills - Standby"
+    icon: dq
+    summary: "Wait for the reset time"
+    description: "Illusion of Underwater 100 Kills - Standby."
+  3470:
+    title: "Join the Illusion Investigation Team"
+    icon: lq
+    summary: "Join the Illusion Investigation Team"
+    description: "Join the Illusion Investigation Team."
+  3507:
+    title: "Illusion Investigation Team - Sheshin"
+    icon: lq
+    summary: "Illusion Investigation Team - Sheshin"
+    description: "Illusion Investigation Team - Sheshin."
+  3508:
+    title: "Illusion of Twins 100 Kills"
+    icon: lq
+    summary: "Illusion of Twins 100 Kills"
+    description: "Illusion of Twins 100 Kills."
+  3509:
+    title: "Illusion of Twins 100 Kills - Standby"
+    icon: dq
+    summary: "Wait for the reset time"
+    description: "Illusion of Twins 100 Kills - Standby."
   4000:
     title: Sherin's Job Interview
     description: You've got to pass Sherin's test to take a step forward.
@@ -11515,6 +11740,56 @@ quests:
     description: '해당 퀘스트는 일일 퀘스트로, 대기시간 만료 시 다시 받아 수행 할 수 있습니다.
 
       특수경계지역 코르의 <NAVI>유슬란<INFO>sp_cor,155,94,0,101,0</INFO></NAVI>을 통해 퀘스트 수주가 가능합니다.'
+  7879:
+    title: "New Poison Research"
+    icon: lq
+    summary: "Poisonous x20, Toxious x20"
+    description: "New Poison Research."
+  7880:
+    title: "New Poison Research - Standby"
+    icon: dq
+    summary: "Wait for the reset time"
+    description: "New Poison Research - Standby."
+  7881:
+    title: "Special Mineral Research 1"
+    icon: lq
+    summary: "Green Mineral x20, Red Mineral x20"
+    description: "Special Mineral Research 1."
+  7882:
+    title: "Special Mineral Research 1 - Standby"
+    icon: dq
+    summary: "Wait for the reset time"
+    description: "Special Mineral Research 1 - Standby."
+  7883:
+    title: "Special Mineral Research 2"
+    icon: lq
+    summary: "White Mineral x20, Purple Mineral x20"
+    description: "Special Mineral Research 2."
+  7884:
+    title: "Special Mineral Research 2 - Standby"
+    icon: dq
+    summary: "Wait for the reset time"
+    description: "Special Mineral Research 2 - Standby."
+  7885:
+    title: "Abyssman Research"
+    icon: lq
+    summary: "Abyssman x10"
+    description: "Abyssman Research."
+  7886:
+    title: "Abyssman Research - Waiting"
+    icon: dq
+    summary: "Abyssman Research - Waiting"
+    description: "Abyssman Research - Waiting."
+  7887:
+    title: "Mineworm Research"
+    icon: lq
+    summary: "Jewelry Ant x10, White Porcellio x10"
+    description: "Mineworm Research."
+  7888:
+    title: "Mineworm Research - Standby"
+    icon: dq
+    summary: "Wait for the reset time"
+    description: "Mineworm Research - Standby."
   7997:
     title: 고양이캔의 참맛
     summary: 04:00 reset time
@@ -13278,6 +13553,106 @@ quests:
     icon: dq
     summary: 굳은 익스플로젼, 굳은 블레이저 처치
     description: <NAVI>릴리 블랑<INFO>yuno_fild03,38,146,0,101,0</INFO></NAVI>은 굳은 익스플로젼 10마리, 굳은 블레이저 10마리를 처치하고 종족 차이를 보고해 달라고 한다.
+  8719:
+    title: "A new area somewhere in the anthill"
+    icon: lq
+    summary: "A new area somewhere in the anthill"
+    description: "A new area somewhere in the anthill."
+  8720:
+    title: "Mirko's Request (1)"
+    icon: lq
+    summary: "Mirko's Request (1)"
+    description: "Mirko's Request (1)."
+  8721:
+    title: "Where is Briashen"
+    icon: lq
+    summary: "Where is Briashen"
+    description: "Where is Briashen."
+  8722:
+    title: "Briashen's message"
+    icon: lq
+    summary: "Briashen's message"
+    description: "Briashen's message."
+  8723:
+    title: "Mirko's Request (2)"
+    icon: lq
+    summary: "Mirko's Request (2)"
+    description: "Mirko's Request (2)."
+  8724:
+    title: "Where is Khahris"
+    icon: lq
+    summary: "Where is Khahris"
+    description: "Where is Khahris."
+  8725:
+    title: "The same look...? (1)"
+    icon: lq
+    summary: "The same look...? (1)"
+    description: "The same look...? (1)."
+  8726:
+    title: "The same look...? (2)"
+    icon: lq
+    summary: "The same look...? (2)"
+    description: "The same look...? (2)."
+  8727:
+    title: "The same look...? (3)"
+    icon: lq
+    summary: "The same look...? (3)"
+    description: "The same look...? (3)."
+  8728:
+    title: "Who is Khahris?"
+    icon: lq
+    summary: "Who is Khahris?"
+    description: "Who is Khahris?."
+  8729:
+    title: "Where is Briashen (2)"
+    icon: lq
+    summary: "Where is Briashen (2)"
+    description: "Where is Briashen (2)."
+  8730:
+    title: "The Labyrinth of Perception"
+    icon: lq
+    summary: "The Labyrinth of Perception"
+    description: "The Labyrinth of Perception."
+  8731:
+    title: "Geological Survey"
+    icon: lq
+    summary: "Geological Survey"
+    description: "Geological Survey."
+  8732:
+    title: "Geological Survey - Standby"
+    icon: dq
+    summary: "Wait for the reset time"
+    description: "Geological Survey - Standby."
+  8733:
+    title: "Source of Power"
+    icon: lq
+    summary: "Source of Power"
+    description: "Source of Power."
+  8734:
+    title: "Source of Power - Standby"
+    icon: dq
+    summary: "Wait for the reset time"
+    description: "Source of Power - Standby."
+  8735:
+    title: "Same thing"
+    icon: lq
+    summary: "Diligent Soldier Andre x10, Diligent Piere x10, Diligent Vitata x10"
+    description: "Same thing."
+  8736:
+    title: "The Same Thing - Standby"
+    icon: dq
+    summary: "Wait for the reset time"
+    description: "The Same Thing - Standby."
+  8737:
+    title: "Shared Memories"
+    icon: lq
+    summary: "Shared Memories"
+    description: "Shared Memories."
+  8738:
+    title: "Shared Memories - Standby"
+    icon: dq
+    summary: "Wait for the reset time"
+    description: "Shared Memories - Standby."
   9000:
     title: Job Change to Knight
     summary: Talk with other members of Chivalry
@@ -25604,6 +25979,11 @@ quests:
     icon: ev
     summary: 04:00 reset time
     description: 가져다 주신 성수로 마력의 눈꽃을 키울 수 있어요. 새벽이 지난 후에 다시 찾아주세요. - <NAVI>[유진]<INFO>aldebaran,108,166,0,101,0</INFO></NAVI>
+  18000:
+    title: "Ready to enter"
+    icon: lq
+    summary: "Ready to enter"
+    description: "Ready to enter."
   18001:
     title: Delivery for Rooney
     summary: Lasda Midar
