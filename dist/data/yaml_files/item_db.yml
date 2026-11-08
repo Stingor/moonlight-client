@@ -112988,6 +112988,13 @@ Body:
     Weight: 10
     Script: |
       input .@megaphone$; announce strcharinfo(0) + ": " + .@megaphone$,bc_all,0xFF0000;
+  - Id: 23815
+    AegisName: Magma_Essence
+    Name: Lava Essence
+    Type: DelayConsume
+    Weight: 50
+    Script: |
+      laphine_upgrade();
   - Id: 25043
     AegisName: Thorny_Vine_Flute
     Name: Thorny Vine Flute

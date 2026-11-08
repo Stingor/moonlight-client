@@ -26,6 +26,14 @@ upgrade:
     targets: [
       1846, 13337, 19223, 20847, 28922
     ]
+  - item: 23815
+    least_refine: 0
+    most_refine: 10
+    least_options: 2
+    cards_allowed: false
+    targets: [
+      15378, 15379, 15380
+    ]
   - item: 100003
     least_refine: 0
     most_refine: 10

@@ -71051,6 +71051,7 @@ Body:
       - {Item: Shadowdecon_Ore, Rate: 80}
       - {Item: Lava_Leather_Suits, Rate: 50, RandomOptionGroup: MAGMA3}
       - {Item: Lava_Leather_Shoes, Rate: 50, RandomOptionGroup: MAGMA3}
+      - {Item: Magma_Essence, Rate: 5}
       - {Item: Firm_Blazzer_Card, Rate: 1, StealProtected: true}
   - Id: 20373
     AegisName: NIGHTMARE_TERROR_H
@@ -71089,6 +71090,7 @@ Body:
       - {Item: Blue_Herb, Rate: 25}
       - {Item: Shadowdecon_Ore, Rate: 80}
       - {Item: Lava_Leather_Manteau, Rate: 50, RandomOptionGroup: MAGMA3}
+      - {Item: Magma_Essence, Rate: 5}
       - {Item: Zelunium_Ore, Rate: 80}
       - {Item: Firm_Nightmare_T_Card, Rate: 1, StealProtected: true}
   - Id: 20374
@@ -71127,6 +71129,7 @@ Body:
       - {Item: Dragon_Train, Rate: 920}
       - {Item: Shadowdecon_Ore, Rate: 80}
       - {Item: Lava_Leather_Robe, Rate: 50, RandomOptionGroup: MAGMA3}
+      - {Item: Magma_Essence, Rate: 5}
       - {Item: Zelunium_Ore, Rate: 80}
       - {Item: Firm_Deleter2_Card, Rate: 1, StealProtected: true}
   - Id: 20375
@@ -71165,6 +71168,7 @@ Body:
       - {Item: Dragon_Train, Rate: 820}
       - {Item: Shadowdecon_Ore, Rate: 80}
       - {Item: Lava_Leather_Armor, Rate: 50, RandomOptionGroup: MAGMA3}
+      - {Item: Magma_Essence, Rate: 5}
       - {Item: Zelunium_Ore, Rate: 80}
       - {Item: Firm_Deleter1_Card, Rate: 1, StealProtected: true}
   - Id: 20376
@@ -71202,6 +71206,7 @@ Body:
       - {Item: Hot_Hair, Rate: 750}
       - {Item: Shadowdecon_Ore, Rate: 80}
       - {Item: Lava_Leather_Sandle, Rate: 50, RandomOptionGroup: MAGMA3}
+      - {Item: Magma_Essence, Rate: 5}
       - {Item: Zelunium_Ore, Rate: 80}
       - {Item: Firm_Explosion_Card, Rate: 1, StealProtected: true}
   - Id: 20377
@@ -71238,6 +71243,7 @@ Body:
       - {Item: Coal, Rate: 75}
       - {Item: Burning_Heart, Rate: 1500}
       - {Item: Fire_Scroll_1_3, Rate: 50}
+      - {Item: Magma_Essence, Rate: 5}
       - {Item: Shadowdecon_Ore, Rate: 80}
       - {Item: Lava_Leather_Hode, Rate: 50, RandomOptionGroup: MAGMA3}
       - {Item: Firm_Kaho_Card, Rate: 1, StealProtected: true}
@@ -71276,6 +71282,7 @@ Body:
       - {Item: Shadowdecon_Ore, Rate: 80}
       - {Item: Lava_Leather_Muffler, Rate: 50, RandomOptionGroup: MAGMA3}
       - {Item: Lava_Leather_Boots, Rate: 50, RandomOptionGroup: MAGMA3}
+      - {Item: Magma_Essence, Rate: 5}
       - {Item: Zelunium_Ore, Rate: 80}
       - {Item: Firm_Lava_G_Card, Rate: 1, StealProtected: true}
   - Id: 20381
