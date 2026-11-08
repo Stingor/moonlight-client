@@ -597,7 +597,7 @@ MapEditorSession::Outcome MapEditorSession::Revert(MapEditStore& store) {
       return {};
     }
     ro::mapedit::MapEdit after = before;
-    after.RemoveAdded(slot);
+    after.RemoveAdded(slot, original_count_);
     store.Set(map_name_, WithReasons(after));
     Line label{};
     std::snprintf(label.data(), label.size(), ro::core::Tr("Retirer le modèle %zu"), rank);

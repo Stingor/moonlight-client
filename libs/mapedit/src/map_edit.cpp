@@ -254,9 +254,19 @@ void MapEdit::RemoveSprite(std::size_t slot) {
   }
 }
 
-void MapEdit::RemoveAdded(std::size_t slot) {
-  if (slot < added_.size()) {
-    added_.erase(added_.begin() + static_cast<std::ptrdiff_t>(slot));
+void MapEdit::RemoveAdded(std::size_t slot, std::size_t original_count) {
+  if (slot >= added_.size()) {
+    return;
+  }
+  added_.erase(added_.begin() + static_cast<std::ptrdiff_t>(slot));
+  const std::size_t removed_rank = original_count + slot;
+  RemoveMesh(removed_rank);
+  // Le rang baisse d'une unité pour chaque retouche au-delà : l'ordre par rang
+  // est gardé.
+  for (MeshEdit& mesh : meshes_) {
+    if (mesh.model_index > removed_rank) {
+      --mesh.model_index;
+    }
   }
 }
 

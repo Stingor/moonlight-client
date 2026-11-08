@@ -498,8 +498,12 @@ class MapEdit {
   void AddModel(AddedModel model) { added_.push_back(std::move(model)); }
   // Remplace l'ajout de rang `slot` dans la liste ; hors de la liste, rien.
   void SetAdded(std::size_t slot, AddedModel model);
-  // Retire l'ajout de rang `slot` : les suivants remontent.
-  void RemoveAdded(std::size_t slot);
+  // Retire l'ajout de rang `slot` : les suivants remontent. Un ajout prend dans
+  // la carte le rang `original_count + slot`, où `original_count` est le nombre
+  // de modèles du RSW d'origine. Les retouches de maillage qui visent la pose
+  // retirée partent avec elle, et celles des ajouts suivants remontent d'un
+  // rang avec leur pose.
+  void RemoveAdded(std::size_t slot, std::size_t original_count);
 
   // La retouche du modèle de rang `model_index`, ou rien.
   [[nodiscard]] const ModelEdit* ModelAt(std::size_t model_index) const;
