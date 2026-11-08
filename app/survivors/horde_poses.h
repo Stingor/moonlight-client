@@ -165,6 +165,9 @@ class HordePoses {
   // commence toujours sa glissade, héros en marche compris.
   void NoticeCasts(std::span<const ro::sim::SurvivorsCast> casts,
                    const ro::sim::SurvivorsField& field, std::uint64_t presentation_ms);
+  // LES COUPS DES DERNIERS PAS : un monstre qu'un piège retient (`FreezeHolds`)
+  // ne bleuit pas tant que ce gel dure. ⚠ AVANT `Pose`, comme `NoticeFalls`.
+  void NoticeHits(std::span<const ro::sim::SurvivorsHit> hits);
 
   // POSE TOUS LES CORPS à `presentation_ms` : le héros d'abord, puis les
   // monstres, les morts, les plantes, les objets et les gemmes. Les positions
@@ -191,6 +194,8 @@ class HordePoses {
     bool hurting = false;
     std::uint8_t facing = 0;
     bool elite = false;
+    // Gelé par un piège qui retient : il ne bleuit pas.
+    bool held = false;
   };
   // Un mort qui joue sa chute puis s'efface.
   struct FallingBody {

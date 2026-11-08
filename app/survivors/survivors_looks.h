@@ -2,7 +2,9 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <optional>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include "ro/render/effect_sound_table.h"
@@ -19,6 +21,24 @@ namespace moonclient {
 
 // Un monstre ou une plante : un sprite unique, nommé par sa classe.
 [[nodiscard]] ro::render::ActorLook FoeLook(std::uint16_t foe_id) noexcept;
+
+// LE TIR D'UN MONSTRE QUE LE CLIENT NE MUNIT PAS : l'effet qui vole de lui au
+// point visé. Le Gazeti lance l'éclat de glace de Frost Diver ; rien pour les
+// autres, que leur flèche dessine.
+inline constexpr std::uint16_t kGazetiFoe = 1778;
+inline constexpr std::uint32_t kFrostDiverBoltEffect = 27;
+[[nodiscard]] std::optional<std::uint32_t> FoeShotEffectOf(std::uint16_t foe_id) noexcept;
+
+// UN MONSTRE QUI NE SE MONTRE QU'EN ATTAQUANT : l'Iceicle n'a qu'une ombre au
+// repos, et son glaçon ne paraît que dans sa chute d'attaque. Il se tient sur
+// l'image `standing_frame` de son attaque, planté au sol, et meurt en rejouant
+// l'attaque depuis `burst_frame`, où il éclate.
+struct SurvivorsStillPose {
+  std::size_t standing_frame = 0;
+  std::size_t burst_frame = 0;
+};
+inline constexpr std::uint16_t kIceicleFoe = 1789;
+[[nodiscard]] std::optional<SurvivorsStillPose> StillPoseOf(std::uint16_t foe_id) noexcept;
 
 // Un objet au sol, gemme comprise : le sprite que la table des objets donne.
 [[nodiscard]] ro::render::ActorLook ItemLook(std::uint16_t item_id) noexcept;
@@ -135,6 +155,9 @@ inline constexpr std::uint32_t kArrowFallbackEffect = 1;
 // L'arc que la flèche suppose : celui de l'Archer.
 inline constexpr std::uint16_t kArrowShooterJob = 3;
 inline constexpr std::uint16_t kArrowShooterWeapon = 1701;
+// LE BRUIT D'UNE FLÈCHE QUI TOUCHE : celui que le jeu donne à l'arc, à l'impact
+// et non au lâcher.
+inline constexpr std::string_view kArrowHitSound = "_hit_arrow.wav";
 // Arrow Shower (kArrowShowerSkill) : la pluie de flèches du jeu, au sol.
 inline constexpr std::uint32_t kArrowShowerEffect = 64;
 // Blitz Beat et Falcon Assault : le piqué du faucon, qui vole jusqu'où il
@@ -155,6 +178,13 @@ inline constexpr std::uint32_t kLandMinePrimerEffect = 97;
 inline constexpr std::uint32_t kBlastMinePrimerEffect = 106;
 inline constexpr std::uint32_t kClaymorePrimerEffect = 107;
 inline constexpr std::uint32_t kFreezingTrapPrimerEffect = 108;
+
+// UN GEL QUI N'EN EST PAS UN : Ankle Snare retient le monstre, et la mine le
+// secoue un instant. La simulation les compte comme un gel ; le monstre ne
+// bleuit pas pour autant.
+[[nodiscard]] constexpr bool FreezeHolds(std::uint16_t skill_id) noexcept {
+  return skill_id == kAnkleSnareSkill || skill_id == kLandMineSkill || skill_id == kBlastMineSkill;
+}
 
 // LE MARCHAND. Ses skills n'ont presque rien aux tables du client : ils
 // empruntent l'effet d'un skill voisin, ou se replient sur l'étincelle du coup.
@@ -301,5 +331,10 @@ struct SkillLook {
 // l'impact d'une compétence (`ro::render::SkillBlowSound`), et un lancer qui
 // ne touche rien reste muet.
 [[nodiscard]] bool SkillThudsOnHit(const SkillLook& look);
+
+// LE BRUIT QU'UN COUP DE CE SORT FAIT À L'IMPACT : la flèche d'arc pour un sort
+// qui tire des flèches, le coup sourd pour un sort sans bruit
+// (`SkillThudsOnHit`), rien sinon. `draw` tire la variante du coup sourd.
+[[nodiscard]] std::string SkillHitSoundOf(const SkillLook& look, std::uint32_t draw);
 
 }  // namespace moonclient

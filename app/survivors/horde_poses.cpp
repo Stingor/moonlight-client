@@ -149,6 +149,14 @@ void HordePoses::Reset() {
   slides_ = {};
 }
 
+void HordePoses::NoticeHits(std::span<const ro::sim::SurvivorsHit> hits) {
+  for (const ro::sim::SurvivorsHit& hit : hits) {
+    if (!hit.froze) continue;
+    const auto known = std::ranges::find(memory_, hit.foe_serial, &FoeMemory::serial);
+    if (known != memory_.end()) known->held = FreezeHolds(hit.skill_id);
+  }
+}
+
 void HordePoses::NoticeCasts(std::span<const ro::sim::SurvivorsCast> casts,
                              const ro::sim::SurvivorsField& field, std::uint64_t presentation_ms) {
   if (field.tally.outcome == ro::sim::SurvivorsOutcome::kFell) return;
@@ -307,10 +315,14 @@ void HordePoses::PoseFoes(const ro::sim::SurvivorsField& field, std::uint64_t pr
       pose.tint = kEliteTint;
     }
     const bool frozen = field.step < foe.freeze_until_step;
-    if (frozen) {
+    if (!frozen) memory.held = false;
+    next_memory_.back().held = memory.held;
+    if (frozen && !memory.held) {
       pose.tint = ro::render::kFrozenTint;
     } else if (field.step < foe.chill_until_step) {
       pose.tint = kChilledTint;
+    } else if (field.step < foe.poison_until_step) {
+      pose.tint = ro::render::kPoisonTint;
     }
     // Le fondu de naissance tempère l'opacité de la teinte retenue.
     const float born_ms = ElapsedSince(presentation_ms, MsOfStep(FadeFromStep(foe, rule)));
@@ -345,6 +357,13 @@ void HordePoses::PoseFoes(const ro::sim::SurvivorsField& field, std::uint64_t pr
       pose.motion = Motion::kIdle;
       pose.motion_ms = static_cast<float>(presentation_ms);
     }
+    // Celui qui ne se montre qu'en attaquant se tient, quoi qu'il fasse, sur
+    // l'image de son attaque où il est planté au sol.
+    if (const std::optional<SurvivorsStillPose> still = StillPoseOf(foe.foe_id)) {
+      pose.motion = Motion::kAttack;
+      pose.motion_ms = 0.0F;
+      pose.held_frame = still->standing_frame;
+    }
     poses_.push_back(pose);
   }
   std::swap(memory_, next_memory_);
@@ -370,6 +389,13 @@ void HordePoses::PoseFalling(std::uint64_t presentation_ms, const HordeTimesOf& 
     if (body.elite) {
       pose.scale = kEliteScale;
       pose.tint = kEliteTint;
+    }
+    // Sa mort n'aurait que son ombre : il éclate, l'image de l'attaque où il se
+    // brise, puis s'efface.
+    if (const std::optional<SurvivorsStillPose> still = StillPoseOf(body.foe_id)) {
+      pose.motion = Motion::kAttack;
+      pose.motion_ms = 0.0F;
+      pose.held_frame = still->burst_frame;
     }
     const float faded_ms = std::max(fade_ms(body), 0.0F);
     const float kept = 1.0F - faded_ms / static_cast<float>(kFallFadeMs);

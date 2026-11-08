@@ -167,6 +167,12 @@ class ArenaEffects {
     std::uint32_t from_serial = 0;
     std::uint32_t expires_step = 0;
   };
+  // UN PIÈGE POSÉ, que sa marque montre au moins un instant : posé dans la horde,
+  // il saute au pas même de sa pose, et sa zone n'est jamais lue.
+  struct TrapMark {
+    ro::sim::FieldPoint center;
+    std::uint32_t until_step = 0;
+  };
   // Une annonce, couchée au sol jusqu'à son coup.
   struct WarningMark {
     ro::sim::SurvivorsWarning warning;
@@ -180,8 +186,10 @@ class ArenaEffects {
   // neuf d'un skill qui tire à l'arc.
   void ShootHeroArrows(const ro::sim::SurvivorsField& field, const GroundOf& ground_of,
                        const ArenaSight& sight);
+  // LES TIRS DES MONSTRES : la munition de leur espèce, sinon l'effet que le
+  // mode donne à un tireur qui n'en a pas (`FoeShotEffectOf`).
   void ShootFoeShots(const ro::sim::SurvivorsField& field, const GroundOf& ground_of,
-                     const ArenaSight& sight);
+                     const ArenaSight& sight, std::uint32_t now_ms);
   void LayGroundMarks(const ro::sim::SurvivorsField& field);
   // Allume, repose et éteint les orbes, un acteur du monde privé chacune.
   void KeepOrbs(std::span<const ro::sim::SurvivorsOrb> orbs, const GroundOf& ground_of,
@@ -240,6 +248,7 @@ class ArenaEffects {
   std::vector<ZoneFlame> flames_;
   std::vector<ShotSeen> shots_;
   std::vector<WarningMark> warnings_;
+  std::vector<TrapMark> trap_marks_;
   std::vector<ro::render::GroundQuad> mark_quads_;
   // L'instant où s'éteint chaque effet lancé.
   ArenaEffectLives lives_;

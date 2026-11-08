@@ -3,6 +3,11 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
+#include <span>
+#include <utility>
+#include <vector>
+
+#include <imgui_internal.h>
 
 #include "ro/core/i18n.h"
 #include "ro/ui/entity_bars.h"
@@ -51,6 +56,12 @@ constexpr ImU32 kChestArrow = IM_COL32(90, 170, 255, 255);
 constexpr ImU32 kMeetingArrow = IM_COL32(120, 230, 120, 255);
 constexpr float kArrowIconSide = 24.0F;
 constexpr float kArrowIconGap = 4.0F;
+// Hors d'une fenêtre, la pointe s'en tient à cette distance : l'icône se peint
+// derrière elle, plus loin encore de la fenêtre.
+constexpr float kArrowClearance = kArrowHalfWidth + kArrowIconGap;
+// Une fenêtre qui couvre au moins cette part de l'écran est un fond, pas un
+// panneau.
+constexpr float kBackdropShare = 0.9F;
 constexpr std::size_t kNumberTextSize = 48;
 // La vignette de la carte ramassée : sa hauteur à l'écran, la largeur suivant
 // l'illustration, et la part de sa vie qu'elle met à entrer, puis à sortir.
@@ -265,12 +276,62 @@ std::array<char, kSurvivorsClockTextSize> SurvivorsClockText(std::uint64_t clock
 
 std::optional<EdgeArrowPlace> PlaceEdgeArrow(ImVec2 frame_min, ImVec2 frame_max, float inset_px,
                                              ImVec2 target) {
+  return PlaceEdgeArrow(frame_min, frame_max, inset_px, target, {}, 0.0F);
+}
+
+namespace {
+
+[[nodiscard]] bool Inside(ImVec2 point, ImVec2 low, ImVec2 high) noexcept {
+  return point.x >= low.x && point.x <= high.x && point.y >= low.y && point.y <= high.y;
+}
+
+// La fraction du chemin `from` + `toward` × t, t dans [0, 1], où la droite
+// entre dans le rectangle [low, high] ; rien si elle n'y entre pas, ou si elle
+// part de dedans.
+[[nodiscard]] std::optional<float> EntryInto(ImVec2 from, ImVec2 toward, ImVec2 low,
+                                             ImVec2 high) noexcept {
+  if (Inside(from, low, high)) return std::nullopt;
+  float enter = 0.0F;
+  float leave = 1.0F;
+  const std::array<float, 2> starts = {from.x, from.y};
+  const std::array<float, 2> steps = {toward.x, toward.y};
+  const std::array<float, 2> lows = {low.x, low.y};
+  const std::array<float, 2> highs = {high.x, high.y};
+  for (std::size_t axis = 0; axis < starts.size(); ++axis) {
+    if (steps[axis] == 0.0F) {
+      if (starts[axis] < lows[axis] || starts[axis] > highs[axis]) return std::nullopt;
+      continue;
+    }
+    float near = (lows[axis] - starts[axis]) / steps[axis];
+    float far = (highs[axis] - starts[axis]) / steps[axis];
+    if (near > far) std::swap(near, far);
+    enter = std::max(enter, near);
+    leave = std::min(leave, far);
+  }
+  if (enter > leave) return std::nullopt;
+  return enter;
+}
+
+}  // namespace
+
+std::optional<EdgeArrowPlace> PlaceEdgeArrow(ImVec2 frame_min, ImVec2 frame_max, float inset_px,
+                                             ImVec2 target,
+                                             std::span<const SurvivorsHudRect> covered,
+                                             float clearance_px) {
   const ImVec2 low(frame_min.x + inset_px, frame_min.y + inset_px);
   const ImVec2 high(frame_max.x - inset_px, frame_max.y - inset_px);
   if (low.x >= high.x || low.y >= high.y) {
     return std::nullopt;
   }
-  if (target.x >= low.x && target.x <= high.x && target.y >= low.y && target.y <= high.y) {
+  const auto grown = [clearance_px](const SurvivorsHudRect& rect) {
+    return SurvivorsHudRect{.min = ImVec2(rect.min.x - clearance_px, rect.min.y - clearance_px),
+                            .max = ImVec2(rect.max.x + clearance_px, rect.max.y + clearance_px)};
+  };
+  const bool hidden = std::ranges::any_of(covered, [&](const SurvivorsHudRect& rect) {
+    const SurvivorsHudRect wide = grown(rect);
+    return Inside(target, wide.min, wide.max);
+  });
+  if (Inside(target, low, high) && !hidden) {
     return std::nullopt;
   }
   const ImVec2 center((low.x + high.x) * 0.5F, (low.y + high.y) * 0.5F);
@@ -284,6 +345,14 @@ std::optional<EdgeArrowPlace> PlaceEdgeArrow(ImVec2 frame_min, ImVec2 frame_max,
   }
   if (toward_y != 0.0F) {
     reach = std::min(reach, ((toward_y > 0.0F ? high.y : low.y) - center.y) / toward_y);
+  }
+  // Puis la flèche recule hors de chaque fenêtre que sa droite traverse.
+  const ImVec2 toward(toward_x, toward_y);
+  for (const SurvivorsHudRect& rect : covered) {
+    const SurvivorsHudRect wide = grown(rect);
+    if (const std::optional<float> entry = EntryInto(center, toward, wide.min, wide.max)) {
+      reach = std::min(reach, *entry);
+    }
   }
   return EdgeArrowPlace{
       .tip = ImVec2(center.x + toward_x * reach, center.y + toward_y * reach),
@@ -303,6 +372,28 @@ namespace {
       return kMeetingArrow;
   }
   return kChestArrow;
+}
+
+// LES FENÊTRES QUI COUVRENT L'ÉCRAN à l'image précédente : la chatbox, les
+// panneaux restés ouverts. Le HUD se peint dessous ; une flèche de bord doit en
+// sortir. Ni fenêtre enfant, ni bulle, ni menu, ni fenêtre qui couvre presque
+// tout l'écran : celle-là n'est qu'un fond.
+[[nodiscard]] std::vector<SurvivorsHudRect> CoveredRects(ImVec2 screen_size) {
+  std::vector<SurvivorsHudRect> covered;
+  const ImGuiContext* context = ImGui::GetCurrentContext();
+  if (context == nullptr) return covered;
+  constexpr ImGuiWindowFlags kNotAPanel =
+      ImGuiWindowFlags_ChildWindow | ImGuiWindowFlags_Tooltip | ImGuiWindowFlags_Popup;
+  for (const ImGuiWindow* window : context->Windows) {
+    if (!window->WasActive || window->Hidden || (window->Flags & kNotAPanel) != 0) continue;
+    if (window->Size.x * window->Size.y >= kBackdropShare * screen_size.x * screen_size.y) {
+      continue;
+    }
+    covered.push_back(SurvivorsHudRect{
+        .min = window->Pos,
+        .max = ImVec2(window->Pos.x + window->Size.x, window->Pos.y + window->Size.y)});
+  }
+  return covered;
 }
 
 // L'icône d'une cible, derrière sa flèche, du côté du centre de l'écran.
@@ -369,9 +460,11 @@ void DrawSurvivorsHud(const SurvivorsHudView& view) {
           : below_charges;
   DrawSurvivorsHudEffects(draw, view.effects, far.x - kMargin, below_minimap + kSlotGap);
 
+  const std::vector<SurvivorsHudRect> covered =
+      view.edge_targets.empty() ? std::vector<SurvivorsHudRect>{} : CoveredRects(screen->Size);
   for (const SurvivorsEdgeTarget& target : view.edge_targets) {
     if (const std::optional<EdgeArrowPlace> place =
-            PlaceEdgeArrow(origin, far, kArrowInset, target.screen_px)) {
+            PlaceEdgeArrow(origin, far, kArrowInset, target.screen_px, covered, kArrowClearance)) {
       DrawArrow(draw, *place, ArrowColorOf(target.kind));
       if (target.icon != 0) DrawArrowIcon(draw, *place, target.icon);
     }

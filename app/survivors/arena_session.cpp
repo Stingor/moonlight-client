@@ -10,6 +10,7 @@
 #include <string>
 
 #include "ro/core/log.h"
+#include "ro/render/terrain_mesh.h"
 
 #include "survivors/arena_choice.h"
 #include "survivors/arena_ground_follow.h"
@@ -41,6 +42,7 @@ ArenaSession::ArenaSession(ro::vfs::Vfs& vfs, ro::render::ActorWardrobe& wardrob
     : composer_(wardrobe),
       effects_(vfs, wardrobe.catalog(), rules),
       carts_(vfs),
+      falcons_(vfs),
       camera_(rules.spawn_frame),
       rules_(rules) {}
 
@@ -86,6 +88,7 @@ bool ArenaSession::Shows(const ro::sim::SurvivorsStart& start) const noexcept {
 void ArenaSession::Restart() {
   poses_.Reset();
   carts_.Reset();
+  falcons_.Reset();
   camera_.Enter();
   effects_.Restart();
   numbers_.Restart();
@@ -145,6 +148,7 @@ void ArenaSession::Compose(const ArenaFrameFacts& facts, const GraphicsOptions& 
 
   frame_ = scene_.Begin(graphics, facts.presentation_ms);
   poses_.NoticeFalls(facts.news->falls, facts.presentation_ms);
+  poses_.NoticeHits(facts.news->hits);
   poses_.NoticeCasts(facts.news->casts, field, facts.presentation_ms);
   poses_.Pose(field, facts.presentation_ms, facts.blend_per_mille, composer_.TimesSource());
   // LES CHARIOTS : le héros qui fait tourner le sien le regarde, ce qui
@@ -173,6 +177,17 @@ void ArenaSession::Compose(const ArenaFrameFacts& facts, const GraphicsOptions& 
       shown, [this](const HordePose& pose) { return scene_.GroundAtCell(DrawnCellOf(pose)); },
       scene_.ShadowsOf(frame_));
   composer_.AppendCompanions(carts_.drawn());
+  // LES FAUCONS planent au-dessus de leurs héros, et piquent sur leurs coups.
+  falcons_.Compose(
+      field, facts.news->casts, faded_,
+      [this](glm::vec2 cell) { return scene_.GroundAtCell(cell); },
+      [this](float x, float z) {
+        const MapStage& stage = scene_.stage();
+        const std::array<float, 2> cell = ro::render::FractionalCellAt(stage.scene.gnd, x, z);
+        return GroundPositionAt(stage, cell[0], cell[1])[1];
+      },
+      renderer_ms);
+  composer_.AppendCompanions(falcons_.drawn());
   ArenaVeilTargets(
       shown, rules_, [this](glm::vec2 cell) { return scene_.GroundAtCell(cell); }, veil_targets_);
   if (!poses_.poses().empty() && poses_.poses().front().kind == HordeBodyKind::kHero) {

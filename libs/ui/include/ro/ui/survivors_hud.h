@@ -153,4 +153,17 @@ struct EdgeArrowPlace {
 [[nodiscard]] std::optional<EdgeArrowPlace> PlaceEdgeArrow(ImVec2 frame_min, ImVec2 frame_max,
                                                            float inset_px, ImVec2 target);
 
+// UN RECTANGLE DE L'ÉCRAN que couvre une fenêtre : la chatbox, un panneau.
+struct SurvivorsHudRect {
+  ImVec2 min;
+  ImVec2 max;
+};
+// LA MÊME PLACE, HORS DES FENÊTRES : la flèche recule le long de sa droite
+// jusqu'à sortir de chaque rectangle `covered`, gonflé de `clearance_px` pour
+// que son icône, dessinée derrière elle, en sorte aussi. Une cible dans le
+// cadre mais sous une fenêtre a sa flèche, au bord de la fenêtre.
+[[nodiscard]] std::optional<EdgeArrowPlace> PlaceEdgeArrow(
+    ImVec2 frame_min, ImVec2 frame_max, float inset_px, ImVec2 target,
+    std::span<const SurvivorsHudRect> covered, float clearance_px);
+
 }  // namespace ro::ui

@@ -45,8 +45,11 @@ static void TeamShotsOf(const ro::sim::SurvivorsField& field,
 }
 namespace {
 
-// La marque d'un piège qui attend.
-constexpr std::array<std::uint8_t, 4> kTrapColor = {220, 180, 60, 100};
+// La marque d'un piège qui attend : franche, pour trancher sur le sable.
+constexpr std::array<std::uint8_t, 4> kTrapColor = {230, 170, 40, 160};
+// Un piège posé se montre au moins ce temps, sur ce rayon, même sauté aussitôt.
+constexpr std::uint32_t kTrapMarkLeastMs = 600;
+constexpr std::int32_t kTrapMarkCells = 1;
 
 // LE HÉROS DU MONDE PRIVÉ, puis ses orbes, une par acteur à partir de la
 // suivante.
@@ -243,6 +246,7 @@ void ArenaEffects::Restart() {
   flames_.clear();
   shots_.clear();
   warnings_.clear();
+  trap_marks_.clear();
   mark_quads_.clear();
   lives_.Clear();
   ForgetOrbs();
@@ -496,7 +500,16 @@ void ArenaEffects::Advance(const ro::sim::SurvivorsNews& news, const ro::sim::Su
   std::erase_if(warnings_, [&field](const WarningMark& mark) {
     return field.step >= mark.warning.strike_step;
   });
-  ShootFoeShots(field, ground_of, sight);
+  for (const ro::sim::SurvivorsCast& cast : news.casts) {
+    if (cast.kind != ro::sim::CastKind::kRingOn) continue;
+    const SkillLook* look = looks_.Find(cast.skill_id);
+    if (look == nullptr || !look->trap) continue;
+    trap_marks_.push_back(TrapMark{.center = cast.from,
+                                   .until_step = field.step + ro::sim::StepsOf(kTrapMarkLeastMs)});
+  }
+  std::erase_if(trap_marks_,
+                [&field](const TrapMark& mark) { return field.step >= mark.until_step; });
+  ShootFoeShots(field, ground_of, sight, now_ms);
   ShootHeroArrows(field, ground_of, sight);
   LayGroundMarks(field);
 }
@@ -515,10 +528,13 @@ void ArenaEffects::KeepZones(const ro::sim::SurvivorsField& field, std::uint32_t
   std::vector<ro::sim::FieldPoint> points;
   for (const ro::sim::SurvivorsZone& zone : team_zones_) {
     // Un bloc de barrière n'a pas de flamme : son unité au sol le montre. Un
-    // piège non plus : sa marque au sol le montre.
+    // piège non plus : sa marque au sol le montre. Ni une zone dont l'effet
+    // EST le visuel entretenu de son unité (Venom Dust) : relancé sans porteur,
+    // il sèmerait sans fin, bien après la zone.
     if (zone.archetype == ro::sim::SkillArchetype::kBarrier) continue;
     const SkillLook* look = looks_.Find(zone.skill_id);
     if (look == nullptr || look->trap) continue;
+    if (look->ground_effect_id != 0 && look->effect_id == look->ground_effect_id) continue;
     ZonePoints(zone, points);
     for (const ro::sim::FieldPoint point : points) {
       const bool known = std::ranges::any_of(flames_, [&zone, point](const ZoneFlame& flame) {
@@ -547,7 +563,7 @@ void ArenaEffects::KeepZones(const ro::sim::SurvivorsField& field, std::uint32_t
 }
 
 void ArenaEffects::ShootFoeShots(const ro::sim::SurvivorsField& field, const GroundOf& ground_of,
-                                 const ArenaSight& sight) {
+                                 const ArenaSight& sight, std::uint32_t now_ms) {
   std::erase_if(shots_, [&field](const ShotSeen& seen) {
     return std::ranges::none_of(field.foe_shots, [&seen](const ro::sim::SurvivorsFoeShot& shot) {
       return shot.from_serial == seen.from_serial && shot.expires_step == seen.expires_step;
@@ -566,7 +582,8 @@ void ArenaEffects::ShootFoeShots(const ro::sim::SurvivorsField& field, const Gro
     if (shooter == field.foes.end()) continue;
     const ro::render::ActorLook look = FoeLook(shooter->foe_id);
     const std::string_view sprite = ro::render::ArrowSpriteOf(*sprites_, look, false);
-    if (sprite.empty()) continue;
+    const std::optional<std::uint32_t> bolt = FoeShotEffectOf(shooter->foe_id);
+    if (sprite.empty() && !bolt.has_value()) continue;
     const std::uint32_t steps = shot.expires_step > field.step ? shot.expires_step - field.step : 0;
     const ro::sim::FieldPoint lands = Along(shot.position, shot.velocity, steps);
     // UNE FLÈCHE EST UN EFFET SECONDAIRE : la dernière servie, et hors champ
@@ -576,6 +593,16 @@ void ArenaEffects::ShootFoeShots(const ro::sim::SurvivorsField& field, const Gro
       continue;
     }
     if (!budget_.Admit(ArenaEffectRank::kLoose)) continue;
+    // UN TIREUR SANS MUNITION au client tire l'effet que le mode lui donne, de
+    // sa place vers le point où le tir tombe.
+    if (sprite.empty()) {
+      Launch(ArenaLaunch{.effect_id = *bolt,
+                         .kind = ArenaLaunchKind::kOnGround,
+                         .at = shot.position,
+                         .target = lands},
+             ground_of, now_ms);
+      continue;
+    }
     const std::uint32_t flight_ms = steps * ro::sim::kSurvivorsStepMs;
     const glm::vec3 lift{0.0F, ro::render::kArrowFlightHeight, 0.0F};
     const auto life_ticks = static_cast<std::int32_t>(std::max<std::uint32_t>(
@@ -619,6 +646,11 @@ void ArenaEffects::LayGroundMarks(const ro::sim::SurvivorsField& field) {
     if (look == nullptr || !look->trap) continue;
     LayCells(*stage_, origin_cells_, zone.from, zone.from, zone.radius_units, kTrapColor,
              mark_quads_);
+  }
+  // Et ceux qui viennent d'être posés, même déjà sautés.
+  for (const TrapMark& mark : trap_marks_) {
+    LayCells(*stage_, origin_cells_, mark.center, mark.center, ro::sim::Cells(kTrapMarkCells),
+             kTrapColor, mark_quads_);
   }
 }
 

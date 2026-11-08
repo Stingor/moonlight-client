@@ -4,6 +4,7 @@
 #include <span>
 #include <string>
 
+#include "ro/render/attack_sound.h"
 #include "ro/render/effect_node_pattern_table.h"
 #include "ro/render/skill_effect_table.h"
 #include "ro/render/skill_hit_effect.h"
@@ -221,6 +222,9 @@ namespace {
         ro::render::EffectSounds(kSonicBlowSoundingEffect);
     return std::vector<ro::render::EffectSoundEntry>(blows.begin(), blows.end());
   }
+  // Une flèche sans effet de table ne joue pas l'étincelle de repli, ni à
+  // l'image ni au son : elle sonne à l'impact (`kArrowHitSound`).
+  if (look.shoots_arrow && look.fallback) return {};
   std::vector<ro::render::EffectSoundEntry> sounds =
       ro::render::SkillSounds(SoundingSkillOf(look.skill_id));
   if (!sounds.empty() || ro::render::EffectSoundPlaysAtSowing(look.effect_id)) return sounds;
@@ -234,6 +238,19 @@ namespace {
 
 ro::render::ActorLook FoeLook(std::uint16_t foe_id) noexcept {
   return ro::render::ActorLook{.job = foe_id};
+}
+
+std::optional<std::uint32_t> FoeShotEffectOf(std::uint16_t foe_id) noexcept {
+  if (foe_id == kGazetiFoe) return kFrostDiverBoltEffect;
+  return std::nullopt;
+}
+
+std::optional<SurvivorsStillPose> StillPoseOf(std::uint16_t foe_id) noexcept {
+  // L'image où le glaçon touche le sol, puis celle où il éclate : relevées dans
+  // l'attaque de son .act.
+  constexpr SurvivorsStillPose kIceicle{.standing_frame = 5, .burst_frame = 6};
+  if (foe_id == kIceicleFoe) return kIceicle;
+  return std::nullopt;
 }
 
 ro::render::ActorLook ItemLook(std::uint16_t item_id) noexcept {
@@ -330,6 +347,19 @@ std::vector<std::string> SkillSoundFilesOf(const SkillLook& look, std::uint32_t 
 
 bool SkillThudsOnHit(const SkillLook& look) {
   return !ro::render::EffectSoundPlaysAtSowing(look.effect_id) && CastSoundsOf(look).empty();
+}
+
+std::string SkillHitSoundOf(const SkillLook& look, std::uint32_t draw) {
+  if (look.shoots_arrow) return std::string(kArrowHitSound);
+  // UN PIÈGE SONNE QUAND IL SAUTE, du bruit de son amorce ; celui qui n'en a pas
+  // (Ankle Snare, Skid Trap) se tait.
+  if (look.trap) {
+    if (look.skill_id == kAnkleSnareSkill || look.skill_id == kSkidTrapSkill) return {};
+    const std::vector<std::string> primer = SkillSoundFilesOf(look, draw);
+    return primer.empty() ? std::string() : primer.front();
+  }
+  if (SkillThudsOnHit(look)) return ro::render::SkillBlowSound(draw);
+  return {};
 }
 
 }  // namespace moonclient

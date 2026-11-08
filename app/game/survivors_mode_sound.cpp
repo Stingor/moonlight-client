@@ -47,20 +47,28 @@ void SurvivorsMode::PlaySounds(const ro::sim::SurvivorsNews& news,
   // ne sonnent pas forcément pareil.
   std::uint32_t draw = context.now_ms;
   for (const ro::sim::SurvivorsCast& cast : news.casts) {
+    // Ce qui s'éteint se tait ; un piège sonne quand il saute, pas à sa pose.
+    if (cast.kind == ro::sim::CastKind::kZoneOff || cast.kind == ro::sim::CastKind::kOrbitOff ||
+        cast.kind == ro::sim::CastKind::kSummonOff) {
+      continue;
+    }
     const ro::sim::SurvivorsSkillRule* rule = ro::sim::FindSkill(Rules(), cast.skill_id);
     if (rule == nullptr) continue;
-    for (const std::string& file : SkillSoundFilesOf(SkillLookOf(*rule), draw++)) {
+    const SkillLook look = SkillLookOf(*rule);
+    if (look.trap) continue;
+    for (const std::string& file : SkillSoundFilesOf(look, draw++)) {
       PlaySound(file, ArenaSoundRank::kSkill, context);
     }
   }
-  // LES SORTS SANS BRUIT SONNENT À L'IMPACT, du coup sourd d'une compétence :
-  // un par sort et par image, quel que soit le nombre de monstres touchés.
+  // LES SORTS SANS BRUIT SONNENT À L'IMPACT, du coup sourd d'une compétence, et
+  // les flèches du bruit de l'arc : un par sort et par image, quel que soit le
+  // nombre de monstres touchés.
   std::set<std::uint16_t> thudded;
   for (const ro::sim::SurvivorsHit& hit : news.hits) {
     if (hit.skill_id == 0 || hit.poison_tick || !thudded.insert(hit.skill_id).second) continue;
     const ro::sim::SurvivorsSkillRule* rule = ro::sim::FindSkill(Rules(), hit.skill_id);
-    if (rule == nullptr || !SkillThudsOnHit(SkillLookOf(*rule))) continue;
-    PlaySound(ro::render::SkillBlowSound(draw++), ArenaSoundRank::kSkill, context);
+    if (rule == nullptr) continue;
+    PlaySound(SkillHitSoundOf(SkillLookOf(*rule), draw++), ArenaSoundRank::kSkill, context);
   }
   for (const std::string& file : effect_sounds) PlaySound(file, ArenaSoundRank::kSkill, context);
 }
