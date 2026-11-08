@@ -80,6 +80,14 @@ void ApplyEffectFileColorKey(Image& image);
 // que le jeu garde peint hors d'un `.str`.
 void ApplyEffectTextureColorKey(Image& image);
 
+// La transparence d'une image d'INTERFACE, telle que le jeu la téléverse : la
+// couleur clé à la précision de seize bits, sans le noir. Une carte de la
+// minimap peut peindre son vide d'un presque-magenta — (255, 2, 255) — que la
+// réduction à cinq bits ramène sur la clé.
+//
+// Seul l'alpha tombe : le téléversement repeint ces texels.
+void ApplyInterfaceColorKey(Image& image);
+
 // LA PROFONDEUR D'UNE TEXTURE D'EFFET, telle que le jeu la téléverse : seize
 // bits par texel. Une image sans canal alpha garde cinq bits par canal et un
 // bit d'alpha ; une image qui en a un en garde quatre, alpha compris. Chaque

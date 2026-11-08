@@ -128,9 +128,10 @@ const IconTexture& GameImages::Fetch(std::string_view path, bool ours, Treatment
   // aucun canal alpha : le magenta pur EST leur transparence, et c'est
   // antérieur à l'alpha. Un JPEG, lui, code AVEC PERTE — le magenta n'y ressort
   // pas pur, et des couleurs qui n'en étaient pas s'en approchent : la clé y
-  // percerait des trous au hasard et en manquerait ailleurs.
+  // percerait des trous au hasard et en manquerait ailleurs. Le magenta s'y lit
+  // à cinq bits par canal, comme le jeu qui téléverse ses BMP en seize bits.
   if (treatment != Treatment::kOpaque && core::AsciiEndsWithFolded(key, kColorKeyedSuffix)) {
-    formats::ApplyMagentaColorKey(*decoded);
+    formats::ApplyInterfaceColorKey(*decoded);
   }
   if (treatment == Treatment::kForDarkPaper) {
     formats::RemapForDarkPaper(*decoded);

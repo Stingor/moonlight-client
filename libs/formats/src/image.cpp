@@ -134,6 +134,10 @@ void ApplyEffectTextureColorKey(Image& image) {
   ApplySixteenBitColorKey(image, /*black_is_clear=*/false);
 }
 
+void ApplyInterfaceColorKey(Image& image) {
+  ApplySixteenBitColorKey(image, /*black_is_clear=*/false);
+}
+
 void QuantizeToEffectTextureDepth(Image& image) {
   const bool with_alpha = HasAlphaChannel(image);
   const int dropped_bits = DroppedBitsOf(image);
