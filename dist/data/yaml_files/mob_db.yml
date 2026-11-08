@@ -68242,7 +68242,7 @@ Body:
     DamageMotion: 550
     Ai: 04
     Drops:
-      - {Item: Crude_Ammo, Rate: 2500}
+      - {Item: CrudeAmmo, Rate: 2500}
       - {Item: Brigan, Rate: 1000, StealProtected: true}
       - {Item: Vigilante_Bow, Rate: 50, StealProtected: true}
       - {Item: Shotgun_Buffalo_Bandit_Card, Rate: 1, StealProtected: true}
@@ -70955,65 +70955,458 @@ Body:
     Modes: {Mvp: true}
   - Id: 20355
     AegisName: EP17_1_BELLARE1
-    Name: Heart Hunter Velare
-    Level: 200
-    Hp: 100000000
-    Sp: 10000
-    BaseExp: 16777215
-    JobExp: 10000000
-    MvpExp: 100000
-    Attack: 25000
-    Attack2: 65535
-    Defense: 35
-    MagicDefense: 53
-    Str: 898
-    Agi: 165
-    Vit: 149
-    Int: 172
-    Dex: 1057
-    Luk: 173
-    AttackRange: 6
+    Name: Heart Hunter Bellare
+    Level: 120
+    Hp: 11380
+    BaseExp: 18208
+    JobExp: 11835
+    Attack: 840
+    Attack2: 424
+    Defense: 26
+    MagicDefense: 17
+    Str: 56
+    Agi: 72
+    Vit: 43
+    Int: 53
+    Dex: 131
+    Luk: 67
+    AttackRange: 9
     SkillRange: 10
     ChaseRange: 12
     Size: Medium
-    ElementLevel: 4
-    WalkSpeed: 175
-    AttackMotion: 50
-    DamageMotion: 100
-    Ai: 21
-    Class: Boss
-    Modes: {Mvp: true}
+    Race: Demihuman
+    ElementLevel: 2
+    WalkSpeed: 200
+    AttackDelay: 864
+    AttackMotion: 1268
+    ClientAttackMotion: 288
+    DamageMotion: 480
+    Ai: 05
+    Drops:
+      - {Item: Heart_Hunter_Seal, Rate: 1250}
+      - {Item: Elunium_Stone, Rate: 150}
+      - {Item: Elunium, Rate: 12}
+      - {Item: EP17_1_EVT39, Rate: 5}
+      - {Item: EP17_1_EVT02, Rate: 10}
+      - {Item: Explosive_Powder, Rate: 30}
+      - {Item: Bellare_Card, Rate: 1, StealProtected: true}
   - Id: 20356
     AegisName: EP17_1_BELLARE2
-    Name: Heart Hunter Velare
-    Level: 200
-    Hp: 100000000
-    Sp: 10000
-    BaseExp: 16777215
-    JobExp: 10000000
-    MvpExp: 100000
-    Attack: 25000
-    Attack2: 65535
-    Defense: 35
-    MagicDefense: 53
-    Str: 898
-    Agi: 165
-    Vit: 149
-    Int: 172
-    Dex: 1057
-    Luk: 173
-    AttackRange: 6
+    Name: High Hunter Bellare
+    Level: 165
+    Hp: 109253
+    BaseExp: 174805
+    JobExp: 113623
+    Attack: 2454
+    Attack2: 869
+    Defense: 38
+    MagicDefense: 23
+    Str: 119
+    Agi: 101
+    Vit: 90
+    Int: 79
+    Dex: 172
+    Luk: 93
+    AttackRange: 9
     SkillRange: 10
     ChaseRange: 12
     Size: Medium
-    ElementLevel: 4
+    Race: Demihuman
+    ElementLevel: 3
     WalkSpeed: 175
-    AttackDelay: 50
-    AttackMotion: 25
-    DamageMotion: 50
-    Ai: 21
-    Class: Boss
-    Modes: {Mvp: true}
+    AttackDelay: 864
+    AttackMotion: 1268
+    ClientAttackMotion: 144
+    DamageMotion: 480
+    Ai: 05
+    Drops:
+      - {Item: Heart_Hunter_Seal, Rate: 2500}
+      - {Item: Elunium_Stone, Rate: 300}
+      - {Item: Elunium, Rate: 24}
+      - {Item: EP17_1_EVT39, Rate: 10}
+      - {Item: Explosive_Powder, Rate: 60}
+      - {Item: EP17_1_EVT02, Rate: 30}
+      - {Item: Shadowdecon_Ore, Rate: 70}
+      - {Item: High_Bellare_Card, Rate: 1, StealProtected: true}
+  - Id: 20357
+    AegisName: EP17_1_SANARE1
+    Name: Heart Hunter Sanare
+    Level: 120
+    Hp: 11588
+    BaseExp: 18541
+    JobExp: 12052
+    Attack: 765
+    Attack2: 504
+    Defense: 28
+    MagicDefense: 17
+    Str: 51
+    Agi: 51
+    Vit: 70
+    Int: 63
+    Dex: 117
+    Luk: 77
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Demihuman
+    ElementLevel: 2
+    WalkSpeed: 200
+    AttackDelay: 432
+    AttackMotion: 1268
+    ClientAttackMotion: 480
+    DamageMotion: 480
+    Ai: 04
+    Drops:
+      - {Item: CrudeAmmo, Rate: 1000}
+      - {Item: Heart_Hunter_Seal, Rate: 1250}
+      - {Item: Oridecon_Stone, Rate: 150}
+      - {Item: Oridecon, Rate: 12}
+      - {Item: EP17_1_EVT02, Rate: 10}
+      - {Item: Explosive_Powder, Rate: 30}
+      - {Item: Sanare_Card, Rate: 1, StealProtected: true}
+  - Id: 20358
+    AegisName: EP17_1_SANARE2
+    Name: High Hunter Sanare
+    Level: 168
+    Hp: 108173
+    BaseExp: 173077
+    JobExp: 112500
+    Attack: 2289
+    Attack2: 1579
+    Defense: 38
+    MagicDefense: 26
+    Str: 109
+    Agi: 97
+    Vit: 96
+    Int: 141
+    Dex: 139
+    Luk: 77
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Angel
+    Element: Dark
+    ElementLevel: 3
+    WalkSpeed: 175
+    AttackDelay: 432
+    AttackMotion: 1268
+    ClientAttackMotion: 480
+    DamageMotion: 480
+    Ai: 04
+    Drops:
+      - {Item: Heart_Hunter_Seal, Rate: 2500}
+      - {Item: Elunium_Stone, Rate: 300}
+      - {Item: Elunium, Rate: 24}
+      - {Item: EP17_1_EVT39, Rate: 10}
+      - {Item: Explosive_Powder, Rate: 60}
+      - {Item: EP17_1_EVT02, Rate: 30}
+      - {Item: Zelunium_Ore, Rate: 70}
+      - {Item: High_Sanare_Card, Rate: 1, StealProtected: true}
+  - Id: 20359
+    AegisName: EP17_1_PLAGA1
+    Name: Plaga
+    Level: 164
+    Hp: 108840
+    BaseExp: 174144
+    JobExp: 113194
+    Attack: 2952
+    Attack2: 1235
+    Defense: 35
+    MagicDefense: 24
+    Str: 144
+    Agi: 60
+    Vit: 39
+    Int: 113
+    Dex: 125
+    Luk: 70
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Dragon
+    ElementLevel: 2
+    WalkSpeed: 200
+    AttackDelay: 1280
+    AttackMotion: 1080
+    ClientAttackMotion: 528
+    DamageMotion: 240
+    Ai: 04
+    Drops:
+      - {Item: Fluorescent_Liquid, Rate: 1250}
+      - {Item: Solid_Shell, Rate: 800}
+      - {Item: Dragon's_Skin, Rate: 1000}
+      - {Item: Azure_Jewel, Rate: 50}
+      - {Item: EP17_1_EVT39, Rate: 5}
+      - {Item: Shadowdecon_Ore, Rate: 70}
+      - {Item: Zelunium_Ore, Rate: 70}
+      - {Item: Plaga_Card, Rate: 1, StealProtected: true}
+  - Id: 20360
+    AegisName: EP17_1_PLAGA2
+    Name: Mutant Plaga
+    Level: 178
+    Hp: 155498
+    BaseExp: 248797
+    JobExp: 161718
+    Attack: 4383
+    Attack2: 1626
+    Defense: 39
+    MagicDefense: 27
+    Str: 197
+    Agi: 93
+    Vit: 63
+    Int: 137
+    Dex: 172
+    Luk: 90
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Dragon
+    ElementLevel: 2
+    WalkSpeed: 175
+    AttackDelay: 1280
+    AttackMotion: 1080
+    ClientAttackMotion: 528
+    DamageMotion: 240
+    Ai: 04
+    Drops:
+      - {Item: Fluorescent_Liquid, Rate: 2500}
+      - {Item: Solid_Shell, Rate: 800}
+      - {Item: Dragon's_Skin, Rate: 1000}
+      - {Item: Azure_Jewel, Rate: 50}
+      - {Item: EP17_1_EVT39, Rate: 10}
+      - {Item: Shadowdecon_Ore, Rate: 100}
+      - {Item: Zelunium_Ore, Rate: 100}
+      - {Item: Mutant_Plaga_Card, Rate: 1, StealProtected: true}
+  - Id: 20361
+    AegisName: EP17_1_DOLOR1
+    Name: Dolor
+    Level: 122
+    Hp: 15044
+    BaseExp: 24070
+    JobExp: 15646
+    Attack: 1129
+    Attack2: 561
+    Defense: 29
+    MagicDefense: 17
+    Str: 74
+    Agi: 71
+    Vit: 83
+    Int: 69
+    Dex: 111
+    Luk: 2
+    AttackRange: 5
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Demihuman
+    Element: Poison
+    ElementLevel: 2
+    WalkSpeed: 200
+    AttackDelay: 1768
+    AttackMotion: 768
+    ClientAttackMotion: 540
+    DamageMotion: 576
+    Ai: 05
+    Drops:
+      - {Item: Tough_Scalelike_Stem, Rate: 1250}
+      - {Item: Sticky_Poison, Rate: 1000}
+      - {Item: Wooden_Block, Rate: 1000}
+      - {Item: EP17_1_EVT39, Rate: 5}
+      - {Item: Bloody_Rune, Rate: 800}
+      - {Item: Dolor_Card, Rate: 1, StealProtected: true}
+  - Id: 20362
+    AegisName: EP17_1_DOLOR2
+    Name: Mutant Dolor
+    Level: 173
+    Hp: 158889
+    Sp: 0
+    BaseExp: 254222
+    JobExp: 165244
+    Attack: 3655
+    Attack2: 1396
+    Defense: 40
+    MagicDefense: 26
+    Str: 169
+    Agi: 103
+    Vit: 109
+    Int: 121
+    Dex: 161
+    Luk: 6
+    AttackRange: 5
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Brute
+    Element: Poison
+    ElementLevel: 3
+    AttackDelay: 1768
+    AttackMotion: 768
+    ClientAttackMotion: 540
+    DamageMotion: 576
+    Ai: 05
+    Drops:
+      - {Item: Tough_Scalelike_Stem, Rate: 2500}
+      - {Item: Sticky_Poison, Rate: 2000}
+      - {Item: Wooden_Block, Rate: 2000}
+      - {Item: EP17_1_EVT39, Rate: 5}
+      - {Item: Bloody_Rune, Rate: 1600}
+      - {Item: Shadowdecon_Ore, Rate: 90}
+      - {Item: Zelunium_Ore, Rate: 90}
+      - {Item: Mt_Dolor_Card, Rate: 1, StealProtected: true}
+  - Id: 20363
+    AegisName: EP17_1_VENENUM1
+    Name: Venenum
+    Level: 123
+    Hp: 15039
+    BaseExp: 24062
+    JobExp: 15640
+    Attack: 1184
+    Attack2: 320
+    Defense: 29
+    MagicDefense: 16
+    Str: 77
+    Agi: 37
+    Vit: 90
+    Int: 39
+    Dex: 103
+    Luk: 3
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Brute
+    Element: Poison
+    ElementLevel: 2
+    WalkSpeed: 200
+    AttackDelay: 768
+    AttackMotion: 792
+    ClientAttackMotion: 360
+    DamageMotion: 432
+    Ai: 04
+    Drops:
+      - {Item: Sticky_Mucus, Rate: 1250}
+      - {Item: Sticky_Poison, Rate: 1000}
+      - {Item: Fluorescent_Liquid, Rate: 800}
+      - {Item: Elunium_Stone, Rate: 120}
+      - {Item: Elunium, Rate: 10}
+      - {Item: EP17_1_EVT39, Rate: 5}
+      - {Item: Venenum_Card, Rate: 1, StealProtected: true}
+  - Id: 20364
+    AegisName: EP17_1_VENENUM2
+    Name: Mutant Venenum
+    Level: 176
+    Hp: 157319
+    BaseExp: 251710
+    JobExp: 163612
+    Attack: 3894
+    Attack2: 1396
+    Defense: 41
+    MagicDefense: 26
+    Str: 177
+    Agi: 91
+    Vit: 113
+    Int: 119
+    Dex: 193
+    Luk: 9
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Demihuman
+    ElementLevel: 3
+    AttackDelay: 768
+    AttackMotion: 792
+    ClientAttackMotion: 360
+    DamageMotion: 432
+    Ai: 04
+    Drops:
+      - {Item: Sticky_Mucus, Rate: 2500}
+      - {Item: Sticky_Poison, Rate: 2000}
+      - {Item: Fluorescent_Liquid, Rate: 1600}
+      - {Item: Elunium_Stone, Rate: 240}
+      - {Item: Elunium, Rate: 20}
+      - {Item: EP17_1_EVT39, Rate: 10}
+      - {Item: Shadowdecon_Ore, Rate: 90}
+      - {Item: Mt_Venenum_Card, Rate: 1, StealProtected: true}
+  - Id: 20365
+    AegisName: EP17_1_TWIN_CAPUT1
+    Name: Twin Caput
+    Level: 125
+    Hp: 15022
+    BaseExp: 24035
+    JobExp: 15623
+    Attack: 1047
+    Attack2: 408
+    Defense: 30
+    MagicDefense: 17
+    Str: 67
+    Agi: 45
+    Vit: 103
+    Int: 49
+    Dex: 90
+    Luk: 30
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Demihuman
+    Element: Dark
+    ElementLevel: 2
+    WalkSpeed: 220
+    AttackDelay: 936
+    AttackMotion: 1020
+    ClientAttackMotion: 384
+    DamageMotion: 420
+    Ai: 04
+    Drops:
+      - {Item: Rune_Of_Darkness, Rate: 1250}
+      - {Item: Piece_Of_Darkness, Rate: 1000}
+      - {Item: Tooth_Of_, Rate: 800}
+      - {Item: Tendon, Rate: 1000}
+      - {Item: EP17_1_EVT39, Rate: 5}
+      - {Item: Caput_Card, Rate: 1, StealProtected: true}
+  - Id: 20366
+    AegisName: EP17_1_TWIN_CAPUT2
+    Name: Mutant Twin Caput
+    Level: 175
+    Hp: 157674
+    BaseExp: 252278
+    JobExp: 163981
+    Attack: 4091
+    Attack2: 1412
+    Defense: 40
+    MagicDefense: 26
+    Str: 187
+    Agi: 90
+    Vit: 101
+    Int: 121
+    Dex: 143
+    Luk: 45
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Demihuman
+    Element: Dark
+    ElementLevel: 2
+    WalkSpeed: 200
+    AttackDelay: 936
+    AttackMotion: 1020
+    ClientAttackMotion: 384
+    DamageMotion: 420
+    Ai: 04
+    Drops:
+      - {Item: Rune_Of_Darkness, Rate: 2500}
+      - {Item: Piece_Of_Darkness, Rate: 2000}
+      - {Item: Tooth_Of_, Rate: 1600}
+      - {Item: Tendon, Rate: 2000}
+      - {Item: EP17_1_EVT39, Rate: 10}
+      - {Item: Shadowdecon_Ore, Rate: 90}
+      - {Item: Zelunium_Ore, Rate: 90}
+      - {Item: Mt_Caput_Card, Rate: 1, StealProtected: true}
   - Id: 20372
     AegisName: BLAZZER_H
     Name: Rigid Blazer
@@ -71287,36 +71680,72 @@ Body:
       - {Item: Firm_Lava_G_Card, Rate: 1, StealProtected: true}
   - Id: 20381
     AegisName: EP17_1_R4885_BESTIA
-    Name: Bestia
+    Name: R48-85-Bestia
     Level: 174
-    Hp: 8885000
-    Sp: 10000
-    BaseExp: 5000000
-    JobExp: 10000000
-    MvpExp: 100000
-    Attack: 25000
-    Attack2: 65535
-    Defense: 35
-    MagicDefense: 53
-    Str: 898
-    Agi: 165
-    Vit: 149
-    Int: 172
-    Dex: 1057
-    Luk: 173
+    Hp: 2157280
+    BaseExp: 3451648
+    JobExp: 2243571
+    MvpExp: 4001500
+    Attack: 4520
+    Attack2: 4150
+    Defense: 48
+    MagicDefense: 33
+    Str: 220
+    Agi: 244
+    Vit: 72
+    Int: 118
+    Dex: 255
+    Luk: 95
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    Race: Brute
+    ElementLevel: 4
+    AttackDelay: 1020
+    AttackMotion: 144
+    ClientAttackMotion: 528
+    DamageMotion: 288
+    DamageTaken: 10
+    Ai: 21
+    Class: Boss
+    Modes: {Mvp: true}
+    MvpDrops:
+      - {Item: EP17_1_EVT01, Rate: 2000}
+      - {Item: Magic_Card_Album, Rate: 4000}
+    Drops:
+      - {Item: Piece_Of_Bone_Armor, Rate: 3950}
+      - {Item: Yggdrasilberry, Rate: 3500}
+      - {Item: Old_Violet_Box, Rate: 3500}
+      - {Item: EP17_1_EVT02, Rate: 4950}
+      - {Item: Zelunium, Rate: 50}
+      - {Item: R48_85_Bestia_Card, Rate: 1, StealProtected: true}
+  - Id: 20382
+    AegisName: G_TWIN_CAPUT2
+    Name: Twin Capute
+    Level: 175
+    Hp: 126757
+    Attack: 3619
+    Attack2: 1206
+    Defense: 42
+    MagicDefense: 22
+    Str: 197
+    Agi: 90
+    Vit: 139
+    Int: 35
+    Dex: 143
+    Luk: 45
     AttackRange: 1
     SkillRange: 10
     ChaseRange: 12
     Size: Medium
-    Race: Brute
-    ElementLevel: 4
-    WalkSpeed: 175
-    AttackDelay: 1024
-    AttackMotion: 624
-    DamageMotion: 336
-    Ai: 21
-    Class: Boss
-    Modes: {Mvp: true}
+    ElementLevel: 3
+    WalkSpeed: 200
+    AttackDelay: 936
+    AttackMotion: 1020
+    ClientAttackMotion: 384
+    DamageMotion: 420
+    Ai: 24
   - Id: 20419
     AegisName: MUSPELLSKOLL_H
     Name: Rigid Muspellskoll
