@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <array>
 #include <optional>
+#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -29,16 +30,37 @@ using ro::core::Tr;
 struct ScriptedSlotArt {
   std::string_view map;
   std::string_view label;
-  // Les monstres entre lesquels tourne le sprite, bornes comprises.
-  std::uint16_t first_mob_id = 0;
-  std::uint16_t last_mob_id = 0;
+  // Les monstres entre lesquels tourne le sprite, dans l'ordre ; jamais vide.
+  std::span<const std::uint16_t> mob_ids;
 };
 
-constexpr std::array<ScriptedSlotArt, 4> kScriptedSlotArt = {{
-    {"lhz_dun03", "MVP BioLab 3", 1646, 1651},
-    {"lhz_dun04", "MVP BioLab 4", 2235, 2241},
-    {"niflheim", "Lord of Death", 1373, 1373},
-    {"thana_boss", "Thanatos Phantom", 1708, 1708},
+// Le Bio Lab tire son MVP à chaque cycle ; Luanda alterne deux gardiens.
+constexpr std::array<std::uint16_t, 6> kBioLab3MobIds = {1646, 1647, 1648, 1649, 1650, 1651};
+constexpr std::array<std::uint16_t, 7> kBioLab4MobIds = {2235, 2236, 2237, 2238, 2239, 2240, 2241};
+constexpr std::array<std::uint16_t, 1> kLordOfDeathMobIds = {1373};
+constexpr std::array<std::uint16_t, 1> kThanatosMobIds = {1708};
+constexpr std::array<std::uint16_t, 1> kMoonlightFlowerMobIds = {3758};
+constexpr std::array<std::uint16_t, 1> kKtullanuxMobIds = {3796};
+constexpr std::array<std::uint16_t, 1> kDraculaMobIds = {3757};
+constexpr std::array<std::uint16_t, 1> kKrakenMobIds = {20811};
+constexpr std::array<std::uint16_t, 1> kDeepSeaWitchMobIds = {20843};
+constexpr std::array<std::uint16_t, 1> kTurtleGeneralMobIds = {3804};
+constexpr std::array<std::uint16_t, 2> kLuandaMobIds = {20273, 20277};
+constexpr std::array<std::uint16_t, 1> kMayaMobIds = {21395};
+
+constexpr std::array<ScriptedSlotArt, 12> kScriptedSlotArt = {{
+    {"lhz_dun03", "MVP BioLab 3", kBioLab3MobIds},
+    {"lhz_dun04", "MVP BioLab 4", kBioLab4MobIds},
+    {"niflheim", "Lord of Death", kLordOfDeathMobIds},
+    {"thana_boss", "Thanatos Phantom", kThanatosMobIds},
+    {"pay_d03_i", "Angry Moonlight Flower", kMoonlightFlowerMobIds},
+    {"ice_d03_i", "Awakened Ktullanux", kKtullanuxMobIds},
+    {"gef_d01_i", "Dracula of Rage", kDraculaMobIds},
+    {"iz_d04_i", "Deep Sea Kraken", kKrakenMobIds},
+    {"iz_d05_i", "Deep Sea Witch", kDeepSeaWitchMobIds},
+    {"tur_d04_i", "Ominous Turtle General", kTurtleGeneralMobIds},
+    {"com_d02_i", "Tao Gunka / Wootan Defender", kLuandaMobIds},
+    {"ant_d02_i", "Silent Maya", kMayaMobIds},
 }};
 
 [[nodiscard]] const ScriptedSlotArt* ScriptedArtOf(std::string_view map) {
@@ -46,14 +68,10 @@ constexpr std::array<ScriptedSlotArt, 4> kScriptedSlotArt = {{
   return found != kScriptedSlotArt.end() ? &*found : nullptr;
 }
 
-// Le sprite PEINT d'un créneau scripté : le premier monstre, ou celui de
+// Le sprite PEINT d'un créneau scripté : le seul monstre, ou celui de
 // l'instant quand la carte en porte plusieurs.
 [[nodiscard]] std::uint16_t TurningSprite(const ScriptedSlotArt& art, std::uint32_t now_ms) {
-  const auto span = static_cast<std::uint32_t>(art.last_mob_id - art.first_mob_id) + 1U;
-  if (span <= 1U) {
-    return art.first_mob_id;
-  }
-  return static_cast<std::uint16_t>(art.first_mob_id + (now_ms / kMvpScriptedSpriteTurnMs) % span);
+  return art.mob_ids[(now_ms / kMvpScriptedSpriteTurnMs) % art.mob_ids.size()];
 }
 
 constexpr std::int64_t kSecondsPerMinute = 60;
@@ -331,7 +349,7 @@ void MvpTrackerStage::ComposeSlots(std::uint32_t now_ms) {
       if (observation != nullptr && observation->mob_id != 0) {
         row.link_mob_id = observation->mob_id;
       } else if (art != nullptr) {
-        row.link_mob_id = art->first_mob_id;
+        row.link_mob_id = art->mob_ids.front();
       }
     }
     row.label = SlotLabel(slot);
