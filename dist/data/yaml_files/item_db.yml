@@ -14912,6 +14912,37 @@ Body:
     Refineable: true
     Script: |
       .@r = getrefine(); bonus bBaseAtk,4*.@r; bonus bLongAtkRate,10; if (.@r >= 9) bonus2 bSkillAtk,"MO_FINGEROFFENSIVE",40; if (getallrefine() >= 22) bonus bDelayrate,-7;
+  - Id: 1867
+    AegisName: Ein_1HKNUCK
+    Name: "Safety Knuckle [2]"
+    Type: Weapon
+    SubType: Knuckle
+    Buy: 10400000
+    Sell: 104000
+    Weight: 1800
+    Attack: 210
+    Range: 1
+    Slots: 2
+    Jobs: {Monk: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,10;
+      bonus2 bSkillAtk,"MO_FINGEROFFENSIVE",10;
+      if (.@r>=7) {
+         bonus bAspdRate,15;
+         bonus bBaseAtk,40;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"MO_FINGEROFFENSIVE",15;
+            autobonus "{ bonus2 bAddSize,Size_All,15; }",10,10000,BF_WEAPON;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-20;
+            }
+         }
+      }
   - Id: 1900
     AegisName: Sinister_Viollin
     Name: "Violin of Vicious Mind [1]"
@@ -17165,6 +17196,38 @@ Body:
     Refineable: true
     Script: |
       .@r = getrefine(); bonus bMatk,240+4*.@r; bonus bUnbreakableWeapon; bonus2 bMagicAtkEle,Ele_Holy,5; if (.@r >= 9) { bonus2 bSkillAtk,"PR_MAGNUS",30; } if (getallrefine() >= 22) { bonus2 bSubSize,Size_All,25; }
+  - Id: 2058
+    AegisName: Ein_BHSTAFF
+    Name: "Detecting Staff [2]"
+    Type: Weapon
+    SubType: 2hStaff
+    Buy: 10100000
+    Sell: 101000
+    Weight: 2000
+    Attack: 180
+    Range: 1
+    Slots: 2
+    Jobs: {Wizard: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      bonus bMatk,330;
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus bMatkRate,10;
+      if (.@r >= 7) {
+         bonus bMatk,60;
+         bonus bVariableCastrate,-10;
+      }
+      if (.@r >= 9) {
+         bonus2 bMagicAtkEle,Ele_Fire,15;
+         autobonus "{ bonus2 bMagicAddSize,Size_All,20; }",10,10000,BF_MAGIC;
+      }
+      if (getallrefine() >= 22) {
+         bonus bDelayrate,-20;
+      }
   - Id: 2101
     AegisName: Guard
     Name: Guard
@@ -60162,6 +60225,30 @@ Body:
     AegisName: Fire_Golem_Egg
     Name: Fire Golem Egg
     Type: PetEgg
+  - Id: 9514
+    AegisName: Ein_Ddbox
+    Name: Physical Modification Permit
+    Type: DelayConsume
+    Weight: 10
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      laphine_upgrade();
+  - Id: 9517
+    AegisName: Ein_UNDIUM
+    Name: Untouched Gemstone
+    Type: Usable
+    Weight: 10
+    Flags: {Container: true, DropEffect: CLIENT}
+    Script: |
+      getgroupitem(IG_EIN_UNDIUM);
+  - Id: 9529
+    AegisName: Ein_Ddbox2
+    Name: Magical Modification Permit
+    Type: DelayConsume
+    Weight: 10
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      laphine_upgrade();
   - Id: 9785
     AegisName: Frozen_Box_IL
     Name: Frozen Refine Box
@@ -74198,6 +74285,39 @@ Body:
     Refineable: true
     Script: |
       .@r = getrefine(); bonus bLongAtkRate,2*(.@r/3); bonus bBaseAtk,10*(.@r/2); if (.@r >= 7) { bonus2 bSkillAtk,"NJ_HUUMA",30; if (.@r >= 9) { bonus bDelayrate,-5; if (getallrefine() >= 22) { bonus2 bAddEle,Ele_Fire,15; bonus2 bAddEle,Ele_Dark,15; bonus2 bAddRace,RC_Undead,30; bonus2 bAddRace,RC_Demon,30; } } }
+  - Id: 13346
+    AegisName: Ein_BHHuuma
+    Name: "Grinder Huuma Shuriken [2]"
+    Type: Weapon
+    SubType: Huuma
+    Buy: 11100000
+    Sell: 111000
+    Weight: 1800
+    Attack: 280
+    Range: 1
+    Slots: 2
+    Jobs: {Ninja: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,15;
+      bonus bUnbreakableWeapon;
+      bonus2 bSkillAtk,"NJ_HUUMA",15;
+      if (.@r>=7) {
+         bonus bVariableCastrate,-15;
+         bonus bBaseAtk,60;
+      }
+      if (.@r>=9) {
+         bonus2 bSkillAtk,"NJ_HUUMA",20;
+         autobonus "{ bonus2 bAddSize,Size_All,20; }",1,10000,BF_WEAPON;
+      }
+      if (getallrefine() >= 22) {
+         bonus bDelayrate,-20;
+         bonus bDelayrate,-5;
+      }
   - Id: 13400
     AegisName: Cutlas_
     Name: "Cutlus [1]"
@@ -87271,6 +87391,40 @@ Body:
     Refineable: true
     Script: |
       .@r = getrefine(); bonus bUnbreakableWeapon; bonus bBaseAtk,4*.@r; bonus bVariableCastrate,-10; if (.@r>=9) { bonus2 bSkillAtk,"MO_FINGEROFFENSIVE",50; bonus2 bSkillAtk,"MO_INVESTIGATE",50; } if (getallrefine() >= 22) bonus2 bAddClass,Class_All,10;
+  - Id: 16099
+    AegisName: Ein_1HHAMMER
+    Name: "Rubber Hammer [2]"
+    Type: Weapon
+    SubType: Mace
+    Buy: 9900000
+    Sell: 99000
+    Weight: 1900
+    Attack: 160
+    Range: 1
+    Slots: 2
+    Jobs: {Priest: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      bonus bMatk,180;
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus bMatkRate,7;
+      bonus bHealPower,15;
+      bonus2 bSkillAtk,"PR_MAGNUS",10;
+      if (.@r>=7) {
+         bonus2 bMagicAtkEle,Ele_Holy,7;
+         bonus bVariableCastrate,-10;
+      }
+      if (.@r>=9) {
+         bonus2 bSkillAtk,"PR_MAGNUS",15;
+         autobonus "{ bonus2 bMagicAddSize,Size_All,15; }",1,5000,BF_MAGIC;
+      }
+      if (getallrefine() >= 22) {
+         bonus bDelayrate,-20;
+      }
   - Id: 16131
     AegisName: Lady_Tanee_Doll_Box
     Name: Lady Tanee Doll Box
@@ -93973,6 +94127,37 @@ Body:
     Refineable: true
     Script: |
       .@r = getrefine(); bonus bLongAtkRate,10+.@r; if (.@r>=9) bonus2 bSkillAtk,"CG_ARROWVULCAN",30; if (getallrefine() >= 22) bonus bDelayrate,-10;
+  - Id: 18190
+    AegisName: Ein_BHBOW
+    Name: "Bolt Shooter [2]"
+    Type: Weapon
+    SubType: Bow
+    Buy: 10400000
+    Sell: 104000
+    Weight: 1700
+    Attack: 210
+    Range: 5
+    Slots: 2
+    Jobs: {Hunter: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,10;
+      bonus2 bSkillAtk,"SN_SHARPSHOOTING",10;
+      if (.@r>=7) {
+         bonus bVariableCastrate,-10;
+         bonus bBaseAtk,60;
+      }
+      if (.@r>=9) {
+         bonus2 bSkillAtk,"SN_SHARPSHOOTING",15;
+         autobonus "{ bonus2 bAddSize,Size_All,20; }",1,10000,BF_WEAPON;
+      }
+      if (getallrefine() >= 22) {
+         bonus bDelayrate,-20;
+      }
   - Id: 18500
     AegisName: Cheer_Scarf6
     Name: Cheer Scarf6
@@ -109673,6 +109858,37 @@ Body:
     Refineable: true
     Script: |
       .@r = getrefine(); bonus bLongAtkRate,.@r; bonus2 bAddClass,Class_All,5; if (.@r>=9) { bonus2 bSkillAtk,"LK_SPIRALPIERCE",30; } if (getallrefine() >= 22) { bonus bDelayrate,-8; }
+  - Id: 21054
+    AegisName: Ein_BHSWORD
+    Name: "Claw Sword [2]"
+    Type: Weapon
+    SubType: 2hSword
+    Buy: 11300000
+    Sell: 113000
+    Weight: 3500
+    Attack: 300
+    Range: 1
+    Slots: 2
+    Jobs: {Knight: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bCritical,5;
+      bonus2 bAddClass,Class_All,15;
+      if (.@r>=7) {
+         bonus bCritAtkRate,25;
+         bonus bAspdRate,10;
+         if (.@r>=9) {
+            autobonus "{ bonus2 bAddSize,Size_All,20; }",1,5000,BF_WEAPON;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-20;
+               bonus bCritical,7;
+            }
+         }
+      }
   - Id: 21200
     AegisName: C_Tear_Drop
     Name: Costume Teardrop
@@ -114010,6 +114226,42 @@ Body:
     Name: Small Flashlight
     Weight: 10
     Flags: {BuyingStore: true}
+  - Id: 25809
+    AegisName: Ein_REDIUM
+    Name: Redium
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 25810
+    AegisName: Ein_RINDIUM
+    Name: Rindium
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 25811
+    AegisName: Ein_ODIUM
+    Name: Odium
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 25812
+    AegisName: Ein_PURDIUM
+    Name: Purdium
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 25813
+    AegisName: Ein_WHIDIUM
+    Name: Whidium
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 25814
+    AegisName: Ein_DYNITE
+    Name: Dynite
+    Weight: 10
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 25815
+    AegisName: Ein_SOLIDDUST
+    Name: Hardened Dust
+  - Id: 25816
+    AegisName: Ein_RUSTHELM
+    Name: Broken Trap
+    Weight: 10
+  - Id: 25817
+    AegisName: Ein_EYEROCK
+    Name: Bizarre Stone Carvings
+    Weight: 50
   - Id: 25892
     AegisName: Abysmal_Clam
     Name: Deep Sea Shell
@@ -114272,6 +114524,42 @@ Body:
     Refineable: true
     Script: |
       .@r = getrefine(); bonus bMatk,175+4*.@r; bonus bUnbreakableWeapon; bonus2 bMagicAtkEle,Ele_Holy,5; if (.@r >= 9) { bonus2 bSkillAtk,"PR_MAGNUS",(getallrefine() >= 22) ? 50 : 30; bonus2 bSkillAtk,"AL_HOLYLIGHT",30; }
+  - Id: 26162
+    AegisName: Ein_1HWAND
+    Name: "Welding Wand [2]"
+    Type: Weapon
+    SubType: Staff
+    Buy: 9900000
+    Sell: 99000
+    Weight: 1200
+    Attack: 160
+    Range: 1
+    Slots: 2
+    Jobs: {Mage: true, Sage: true, SoulLinker: true, Wizard: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      bonus bMatk,200;
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bMagicAtkEle,Ele_Neutral,7;
+      bonus2 bMagicAtkEle,Ele_Fire,7;
+      bonus2 bMagicAtkEle,Ele_Water,7;
+      if (.@r>=7) {
+         bonus bVariableCastrate,-10;
+         bonus bMatk,40;
+      }
+      if (.@r>=9) {
+         bonus2 bMagicAtkEle,Ele_Neutral,8;
+         bonus2 bMagicAtkEle,Ele_Fire,8;
+         bonus2 bMagicAtkEle,Ele_Water,8;
+         autobonus "{ bonus2 bMagicAddSize,Size_All,15; }",1,10000,BF_MAGIC;
+      }
+      if (getallrefine() >= 22) {
+         bonus bDelayrate,-20;
+      }
   - Id: 26200
     AegisName: Hippie_Rope
     Name: "Hippie Rope [2]"
@@ -114329,6 +114617,39 @@ Body:
     Refineable: true
     Script: |
       .@r = getrefine(); bonus bVariableCastrate,-10; bonus bLongAtkRate,.@r; if (.@r>=9) bonus bDelayrate,-5; if (getallrefine() >= 22) bonus2 bSkillUseSPrate,"CG_ARROWVULCAN",20;
+  - Id: 26215
+    AegisName: Ein_1HWHIP
+    Name: "Safety Whip [2]"
+    Type: Weapon
+    SubType: Whip
+    Buy: 10300000
+    Sell: 103000
+    Weight: 1400
+    Attack: 200
+    Range: 2
+    Slots: 2
+    Jobs: {BardDancer: true}
+    Gender: Female
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bLongAtkRate,10;
+      bonus2 bSkillAtk,"CG_ARROWVULCAN",10;
+      if (.@r>=7) {
+         bonus bVariableCastrate,-10;
+         bonus bBaseAtk,40;
+      }
+      if (.@r>=9) {
+         bonus2 bSkillAtk,"CG_ARROWVULCAN",15;
+         autobonus "{ bonus2 bAddSize,Size_All,15; }",1,10000,BF_WEAPON;
+      }
+      if (getallrefine() >= 22) {
+         bonus bDelayrate,-20;
+         bonus bDelayrate,-10;
+      }
   - Id: 27012
     AegisName: Kick_Step_Card
     Name: Kick Step Card
@@ -116248,6 +116569,37 @@ Body:
     Refineable: true
     Script: |
       .@r = getrefine(); bonus bCritAtkRate,5; bonus bBaseAtk,4*.@r; if (.@r>=9) bonus2 bAddSize,Size_All,15; if (getallrefine() >= 22) { bonus bUnbreakableWeapon; bonus2 bAddClass,Class_All,7; }
+  - Id: 28045
+    AegisName: Ein_BHKATAR
+    Name: "Bolt Crusher [2]"
+    Type: Weapon
+    SubType: Katar
+    Buy: 11300000
+    Sell: 113000
+    Weight: 2000
+    Attack: 300
+    Range: 1
+    Slots: 2
+    Jobs: {Assassin: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,10;
+      bonus2 bSkillAtk,"AS_GRIMTOOTH",10;
+      if (.@r>=7) {
+         bonus bAspdRate,10;
+         bonus bBaseAtk,60;
+      }
+      if (.@r>=9) {
+         bonus2 bSkillAtk,"AS_GRIMTOOTH",15;
+         autobonus "{ bonus2 bAddSize,Size_All,20; }",1,10000,BF_WEAPON;
+      }
+      if (getallrefine() >= 22) {
+         bonus bDelayrate,-20;
+      }
   - Id: 28100
     AegisName: Thanos_Axe
     Name: "Thanos Axe [1]"
@@ -116460,6 +116812,38 @@ Body:
     Refineable: true
     Script: |
       .@r = getrefine(); bonus bBaseAtk,4*.@r; bonus bUnbreakableWeapon; bonus2 bSubSize,Size_Small,10; bonus2 bSubSize,Size_Medium,10; if (.@r>=9) { bonus bDelayrate,-5; } if (getallrefine() >= 22) bonus2 bSkillAtk,"MC_MAMMONITE",15;
+  - Id: 28140
+    AegisName: Ein_BHAXE
+    Name: "Saw Axe [2]"
+    Type: Weapon
+    SubType: 2hAxe
+    Buy: 11800000
+    Sell: 118000
+    Weight: 5000
+    Attack: 350
+    Range: 1
+    Slots: 2
+    Jobs: {Blacksmith: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,10;
+      bonus bUnbreakableWeapon;
+      bonus2 bSkillAtk,"WS_CARTTERMINATION",10;
+      if (.@r>=7) {
+         bonus bVariableCastrate,-10;
+         bonus bBaseAtk,60;
+      }
+      if (.@r>=9) {
+         bonus bLongAtkRate,10;
+         autobonus "{ bonus2 bAddSize,Size_All,15; }",1,5000,BF_WEAPON;
+      }
+      if (getallrefine() >= 22) {
+         bonus bDelayrate,-20;
+      }
   - Id: 28200
     AegisName: END_OF_HORIZO
     Name: "End Of The Horizon [1]"
@@ -118015,6 +118399,38 @@ Body:
     Refineable: true
     Script: |
       .@r = getrefine(); bonus bMatk,175+4*.@r; if (.@r>=9) .@val = 30; if (getallrefine() >= 22) { bonus2 bSkillAtk,"WZ_EARTHSPIKE",50; bonus2 bSkillAtk,"WZ_HEAVENDRIVE",50; } bonus2 bSkillAtk,"MG_FIREBOLT",20+.@val; bonus2 bSkillAtk,"MG_COLDBOLT",20+.@val; bonus2 bSkillAtk,"MG_LIGHTNINGBOLT",20+.@val;
+  - Id: 28635
+    AegisName: Ein_1HBOOK
+    Name: "Safety Manual [2]"
+    Type: Weapon
+    SubType: Book
+    Buy: 10300000
+    Sell: 103000
+    Weight: 700
+    Attack: 200
+    Range: 1
+    Slots: 2
+    Jobs: {StarGladiator: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bCritical,3;
+      bonus2 bAddClass,Class_All,10;
+      if (.@r>=7) {
+         bonus bAspdRate,10;
+         bonus bBaseAtk,40;
+      }
+      if (.@r>=9) {
+         autobonus "{ bonus2 bAddSize,Size_All,15; }",1,10000,BF_WEAPON;
+         bonus bCritAtkRate,15;
+      }
+      if (getallrefine() >= 22) {
+         bonus bCritAtkRate,15;
+         bonus bDelayrate,-20;
+      }
   - Id: 28700
     AegisName: Ru_Gold_Dagger
     Name: "Ru Gold Dagger [2]"
@@ -118313,6 +118729,71 @@ Body:
     Refineable: true
     Script: |
       .@r = getrefine(); bonus bMatk,170+4*.@r; bonus bMatkRate,5; if (.@r>=9) { bonus2 bMagicAtkEle,Ele_Fire,15; bonus2 bMagicAtkEle,Ele_Wind,15; bonus2 bMagicAtkEle,Ele_Water,15; bonus2 bMagicAtkEle,Ele_Earth,15; } if (getallrefine() >= 22) autobonus "{ bonus bMatk,100; bonus2 bMagicAddSize,Size_All,30; }",50,10000,BF_WEAPON,"{ specialeffect2 EF_ENHANCE; }"; /* Unknow Rates and Specialeffect */
+  - Id: 28771
+    AegisName: Ein_1HDAGGER
+    Name: "Metal Detector Mk47 [2]"
+    Type: Weapon
+    SubType: Dagger
+    Buy: 10300000
+    Sell: 103000
+    Weight: 1000
+    Attack: 200
+    Range: 1
+    Slots: 2
+    Jobs: {Assassin: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,10;
+      bonus2 bSkillAtk,"AS_SONICBLOW",10;
+      if (.@r>=7) {
+         bonus bAspdRate,10;
+         bonus bBaseAtk,40;
+      }
+      if (.@r>=9) {
+         bonus2 bSkillAtk,"AS_SONICBLOW",15;
+         autobonus "{ bonus2 bAddSize,Size_All,15; }",1,10000,BF_WEAPON;
+      }
+      if (getallrefine() >= 22) {
+         bonus bDelayrate,-20;
+      }
+  - Id: 28772
+    AegisName: Ein_1HMAGGER
+    Name: "Jewel Detector Mk47 [2]"
+    Type: Weapon
+    SubType: Dagger
+    Buy: 10200000
+    Sell: 102000
+    Weight: 1000
+    Attack: 190
+    Range: 1
+    Slots: 2
+    Jobs: {Rogue: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      bonus bMatk,180;
+      .@r = getrefine();
+      bonus bMatkRate,10;
+      bonus2 bMagicAtkEle,Ele_Neutral,7;
+      bonus2 bMagicAtkEle,Ele_Fire,7;
+      if (.@r>=7) {
+         bonus bAspdRate,10;
+         bonus bMatk,40;
+      }
+      if (.@r>=9) {
+         bonus2 bMagicAtkEle,Ele_Neutral,8;
+         bonus2 bMagicAtkEle,Ele_Fire,8;
+         autobonus "{ bonus2 bMagicAddSize,Size_All,15; }",1,10000,BF_WEAPON;
+      }
+      if (getallrefine() >= 22) {
+         bonus bDelayrate,-20;
+      }
   - Id: 28900
     AegisName: Guardsmen's_Shield
     Name: "Guardsmen's Shield [1]"
@@ -125945,6 +126426,37 @@ Body:
     Refineable: true
     Script: |
       .@r = getrefine(); bonus bDelayrate,-.@r; bonus2 bAddClass,Class_All,5; if (.@r>=9) bonus2 bSkillAtk,"PA_SHIELDCHAIN",20; if (getallrefine() >= 22) bonus2 bSkillAtk,"KN_BRANDISHSPEAR",20;
+  - Id: 32026
+    AegisName: Ein_1HSPEAR
+    Name: "Blocking Spear [2]"
+    Type: Weapon
+    SubType: 1hSpear
+    Buy: 10400000
+    Sell: 104000
+    Weight: 3000
+    Attack: 210
+    Range: 3
+    Slots: 2
+    Jobs: {Crusader: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,10;
+      bonus2 bSkillAtk,"CR_HOLYCROSS",10;
+      if (.@r>=7) {
+         bonus bAspdRate,10;
+         bonus bBaseAtk,40;
+      }
+      if (.@r>=9) {
+         bonus2 bSkillAtk,"CR_HOLYCROSS",15;
+         autobonus "{ bonus2 bAddSize,Size_All,15; }",1,10000,BF_WEAPON;
+      }
+      if (getallrefine() >= 22) {
+         bonus bDelayrate,-20;
+      }
   - Id: 32107
     AegisName: Black_Circle
     Name: Black Circle
@@ -125983,6 +126495,39 @@ Body:
     Refineable: true
     Script: |
       .@r = getrefine(); bonus bVariableCastrate,-10; bonus bLongAtkRate,.@r; if (.@r>=9) bonus bDelayrate,-5; if (getallrefine() >= 22) bonus2 bSkillUseSPrate,"CG_ARROWVULCAN",20;
+  - Id: 32110
+    AegisName: Ein_1HLUTE
+    Name: "Safety Lute [2]"
+    Type: Weapon
+    SubType: Musical
+    Buy: 10300000
+    Sell: 103000
+    Weight: 1400
+    Attack: 200
+    Range: 1
+    Slots: 2
+    Jobs: {BardDancer: true}
+    Gender: Male
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bLongAtkRate,10;
+      bonus2 bSkillAtk,"CG_ARROWVULCAN",10;
+      if (.@r>=7) {
+         bonus bVariableCastrate,-10;
+         bonus bBaseAtk,40;
+      }
+      if (.@r>=9) {
+         bonus2 bSkillAtk,"CG_ARROWVULCAN",15;
+         autobonus "{ bonus2 bAddSize,Size_All,15; }",1,10000,BF_WEAPON;
+      }
+      if (getallrefine() >= 22) {
+         bonus bDelayrate,-20;
+         bonus bDelayrate,-10;
+      }
   - Id: 32207
     AegisName: Illusion_Booster_R
     Name: "Illusion Booster R [1]"
@@ -126146,6 +126691,64 @@ Body:
     EquipLevelMin: 130
     Script: |
       bonus bInt,3; bonus bMaxSPrate,5;
+  - Id: 32248
+    AegisName: Ein_SAFETY_PENDR
+    Name: "Safety Pendant R [1]"
+    Type: Armor
+    Buy: 6500
+    Sell: 3250
+    Weight: 100
+    Defense: 1
+    Slots: 1
+    Locations: {Right_Accessory: true}
+    ArmorLevel: 1
+    EquipLevelMin: 170
+    Script: |
+      bonus bAspdRate,5;
+      bonus bAllStats,5;
+  - Id: 32249
+    AegisName: Ein_SAFETY_PENDL
+    Name: "Safety Pendant B [1]"
+    Type: Armor
+    Buy: 6500
+    Sell: 3250
+    Weight: 100
+    Defense: 1
+    Slots: 1
+    Locations: {Right_Accessory: true}
+    ArmorLevel: 1
+    EquipLevelMin: 170
+    Script: |
+      bonus bAllStats,5;
+      bonus bVariableCastrate,-5;
+  - Id: 32250
+    AegisName: Ein_SAFETY_EPAULR
+    Name: "Safety Epaulet R [1]"
+    Type: Armor
+    Buy: 6500
+    Sell: 3250
+    Weight: 100
+    Defense: 1
+    Slots: 1
+    Locations: {Left_Accessory: true}
+    ArmorLevel: 1
+    EquipLevelMin: 170
+    Script: |
+      bonus2 bAddClass,Class_All,5;
+  - Id: 32251
+    AegisName: Ein_SAFETY_EPAULL
+    Name: "Safety Epaulet B [1]"
+    Type: Armor
+    Buy: 6500
+    Sell: 3250
+    Weight: 100
+    Defense: 1
+    Slots: 1
+    Locations: {Left_Accessory: true}
+    ArmorLevel: 1
+    EquipLevelMin: 170
+    Script: |
+      bonus bMatkRate,5;
   - Id: 32301
     AegisName: Gold_Lux_IL
     Name: "Illusion Gold Lux [2]"
@@ -126182,6 +126785,37 @@ Body:
     Refineable: true
     Script: |
       .@r = getrefine(); bonus bBaseAtk,10*(.@r/2); bonus bAspdRate,3*(.@r/3); if (.@r >= 7) { bonus bAspd,1; bonus2 bAddClass,Class_All,5; if (.@r >= 9) { bonus bCritAtkRate,20; if (getallrefine() >= 22) { autobonus3 "{ bonus bCritical,20; bonus bLongAtkRate,15; }",1000,60000,"GS_GATLINGFEVER"; } } }
+  - Id: 32303
+    AegisName: Ein_1HGUN
+    Name: "Bolt Revolver [2]"
+    Type: Weapon
+    SubType: Revolver
+    Buy: 10300000
+    Sell: 103000
+    Weight: 1800
+    Attack: 200
+    Range: 7
+    Slots: 2
+    Jobs: {Gunslinger: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bLongAtkRate,15;
+      bonus2 bSkillAtk,"GS_RAPIDSHOWER",15;
+      if (.@r>=7) {
+         bonus bAspdRate,10;
+         bonus bBaseAtk,60;
+      }
+      if (.@r>=9) {
+         bonus2 bSkillAtk,"GS_RAPIDSHOWER",20;
+         autobonus "{ bonus2 bAddSize,Size_All,20; }",1,10000,BF_WEAPON;
+      }
+      if (getallrefine() >= 22) {
+         bonus bDelayrate,-20;
+      }
   - Id: 32350
     AegisName: Farthezan
     Name: Farthezan
@@ -126218,6 +126852,37 @@ Body:
     Refineable: true
     Script: |
       .@r = getrefine(); bonus bDelayrate,-5; bonus bBaseAtk,4*.@r; if (getallrefine() >= 22) .@val = 50; else if (.@r>=9) .@val = 30; bonus2 bSkillAtk,"AM_ACIDTERROR",.@val;
+  - Id: 32352
+    AegisName: Ein_1HSWORD
+    Name: "Safety Saber [2]"
+    Type: Weapon
+    SubType: 1hSword
+    Buy: 10300000
+    Sell: 103000
+    Weight: 2500
+    Attack: 200
+    Range: 1
+    Slots: 2
+    Jobs: {Alchemist: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,10;
+      bonus2 bSkillAtk,"AM_ACIDTERROR",10;
+      if (.@r>=7) {
+         bonus bVariableCastrate,-10;
+         bonus bBaseAtk,40;
+         if (.@r>=9) {
+            bonus bLongAtkRate,7;
+            bonus2 bSkillAtk,"AM_ACIDTERROR",15;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-20;
+            }
+         }
+      }
   - Id: 100003
     AegisName: ILL_Piece_A
     Name: Red Phantom Resonance Stone
@@ -126349,6 +127014,74 @@ Body:
     Weight: 10
     Script: |
       laphine_upgrade();
+  - Id: 300001
+    AegisName: Poisonous_Card
+    Name: Poisonous Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Hand: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bAddEle,Ele_Poison,25;
+  - Id: 300002
+    AegisName: Toxious_Card
+    Name: Toxious Card
+    Type: Card
+    Weight: 10
+    Locations: {Armor: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bLongAtkDef,5;
+      bonus bMaxHPrate,10;
+  - Id: 300003
+    AegisName: Porcellio_W_Card
+    Name: White Porcellio Card
+    Type: Card
+    Weight: 10
+    Locations: {Shoes: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bBaseAtk,20;
+  - Id: 300004
+    AegisName: Neo_Mineral_Card
+    Name: Neo Mineral Card
+    Type: Card
+    Weight: 10
+    Locations: {Garment: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bDef,3;
+  - Id: 300005
+    AegisName: Abyss_Man_Card
+    Name: Abyssman Card
+    Type: Card
+    Weight: 10
+    Locations: {Shoes: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bMaxHPrate,10;
+      bonus2 bSkillAtk,"WZ_EARTHSPIKE",10;
+  - Id: 300006
+    AegisName: Jeweliant_Card
+    Name: Jewelry Ant Card
+    Type: Card
+    Weight: 10
+    Locations: {Left_Accessory: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus5 bAutoSpell,"PF_SOULBURN",1,100,BF_SHORT,1;
+  - Id: 300007
+    AegisName: Jungoliant_Card
+    Name: Jeweled Ungoliant Card
+    Type: Card
+    Weight: 10
+    Locations: {Armor: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bAddEle,Ele_Fire,40;
+      bonus2 bAddEle,Ele_Water,40;
+      bonus2 bAddRace,RC_Formless,40;
+      bonus2 bAddRace,RC_Plant,40;
   - Id: 300076
     AegisName: Beta_Guards_Ng_Card
     Name: Broken Beta Guards Card

@@ -18,6 +18,24 @@ version: 1
 mode: Prerenewal
 synthesis: []
 upgrade:
+  - item: 9514
+    least_refine: 0
+    most_refine: 10
+    least_options: 0
+    cards_allowed: false
+    targets: [
+      1867, 2058, 13346, 16099, 18190, 21054, 26162, 26215, 28045, 28140,
+      28635, 28771, 28772, 32026, 32110, 32303, 32352
+    ]
+  - item: 9529
+    least_refine: 0
+    most_refine: 10
+    least_options: 0
+    cards_allowed: false
+    targets: [
+      1867, 2058, 13346, 16099, 18190, 21054, 26162, 26215, 28045, 28140,
+      28635, 28771, 28772, 32026, 32110, 32303, 32352
+    ]
   - item: 9785
     least_refine: 4
     most_refine: 9
