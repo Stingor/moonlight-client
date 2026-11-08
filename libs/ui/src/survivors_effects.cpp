@@ -157,6 +157,21 @@ SurvivorsFigureText SurvivorsEffectFigureText(SurvivorsEffectFigure figure, std:
     case SurvivorsEffectFigure::kLeavesLeft:
       std::snprintf(out, size, core::Tr("Feuilles restantes : %d"), shown);
       break;
+    case SurvivorsEffectFigure::kRangedDamagePct:
+      std::snprintf(out, size, core::Tr("Dégâts à distance +%d %%"), shown);
+      break;
+    case SurvivorsEffectFigure::kLifeStealPct:
+      std::snprintf(out, size, core::Tr("Vol de vie %d %%"), shown);
+      break;
+    case SurvivorsEffectFigure::kExtraLives:
+      std::snprintf(out, size, core::Tr("Relèves +%d"), shown);
+      break;
+    case SurvivorsEffectFigure::kSproutPct:
+      std::snprintf(out, size, core::Tr("Plantes rares %d %%"), shown);
+      break;
+    case SurvivorsEffectFigure::kFullHeal:
+      std::snprintf(out, size, "%s", core::Tr("Rend tous les PV"));
+      break;
   }
   return text;
 }

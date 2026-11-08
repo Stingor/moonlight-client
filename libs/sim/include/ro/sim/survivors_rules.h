@@ -79,6 +79,12 @@ enum class SkillArchetype : std::uint8_t {
   // intouchable `life_ms`, à sa recharge. Il ne tire rien de lui-même.
   kReflex,
 };
+// Vrai pour un coup lancé de loin : projectile, tir guidé ou éclats visés. Les
+// frappes, les zones posées et les aires autour du héros n'en sont pas.
+[[nodiscard]] constexpr bool IsRangedArchetype(SkillArchetype archetype) noexcept {
+  return archetype == SkillArchetype::kLinear || archetype == SkillArchetype::kHoming ||
+         archetype == SkillArchetype::kClusterBlast;
+}
 // kHero : une aire centrée sur le héros, et non sur un monstre visé.
 enum class TargetRule : std::uint8_t { kNearest, kRandom, kStrongest, kDensest, kHero };
 enum class SurvivorsStat : std::uint8_t {
@@ -96,12 +102,25 @@ enum class SurvivorsStat : std::uint8_t {
   kExpPct,
   kCritPct,   // la chance, en %, qu'un coup du héros soit critique : il compte double
   kDodgePct,  // la chance, en %, qu'un coup reçu par le héros le manque
+  // Les dégâts en plus, en %, des coups à distance (IsRangedArchetype).
+  kRangedDamagePct,
+  // La part, en %, des dégâts d'un coup du héros qui lui revient en PV, sous le
+  // plafond `leech_most_pct_per_second` du réglage.
+  kLifeStealPct,
+  // Les relèves que les cartes donnent au héros : chaque gain s'ajoute une fois
+  // à ses vies de réserve.
+  kExtraLives,
+  // Le poids, en %, des plantes que seules les cartes font pousser.
+  kSproutPct,
 };
-inline constexpr std::size_t kSurvivorsStatCount = 14;
-static_assert(static_cast<std::size_t>(SurvivorsStat::kDodgePct) + 1 == kSurvivorsStatCount);
+inline constexpr std::size_t kSurvivorsStatCount = 18;
+static_assert(static_cast<std::size_t>(SurvivorsStat::kSproutPct) + 1 == kSurvivorsStatCount);
 // Une chance se tire sur 100. CheckSurvivorsRules refuse une carte qui en sortirait, une
 // posture qui la majorerait, et des cartes d'esquive qui rendraient un héros intouchable.
 inline constexpr std::int32_t kWholeChancePct = 100;
+// Le vol de vie d'une carte, et les relèves qu'elle donne, au plus.
+inline constexpr std::int32_t kMostLifeStealPct = 25;
+inline constexpr std::int32_t kMostCardLives = 3;
 // LES STATISTIQUES QU'UN LOADOUT PEUT PORTER, les premières de l'énumération :
 // ce sont elles que les journaux écrivent. Les suivantes ne viennent que des
 // cartes et des postures, et un journal écrit avant elles se relit toujours.
@@ -274,7 +293,8 @@ struct ClassRule {
   std::uint16_t evolved_job_id = 0;  // apparence après une évolution, côté app
   // L'arme des corps évolué et rené, côté app ; 0 : celle du départ, sur tous.
   std::uint16_t evolved_weapon_item_id = 0;
-  bool melee = false;  // lance d'un geste d'attaque plutôt que d'incantation, côté app
+  // Il lance ses skills d'un geste d'attaque plutôt que d'une incantation, côté app.
+  bool attack_gesture = false;
   // LA MONTURE : le héros qui tient cette carte monte, et montre
   // `mounted_job_id`, puis `reborn_mounted_job_id` une fois rené. 0 : aucune
   // monture.
@@ -291,6 +311,10 @@ struct ClassRule {
   // [0, kMostStatBonus] ; 0 le laisse tel que le contenu le décrit. À plusieurs,
   // la plus forte majoration de l'équipe vaut pour tous.
   std::int32_t final_boss_hp_bonus_pct = 0;
+  // LES CARTES PRÊTÉES : des cartes de sa réserve que les offres proposent
+  // aussi à tout coéquipier d'un héros de cette classe. Une équipe qui ne la
+  // compte pas ne les voit jamais.
+  std::span<const std::uint16_t> lent_cards;
 };
 
 // Vrai quand un héros de ce niveau est rené.
@@ -416,6 +440,8 @@ struct SurvivorsTuning {
   // LE POISON, que seuls les communs subissent : un tic toutes les
   // `poison_tick_ms`.
   std::uint32_t poison_tick_ms = 0;
+  // LE VOL DE VIE rend au plus ce pourcentage des PV max du héros par seconde.
+  std::int32_t leech_most_pct_per_second = 0;
 };
 
 // LA CHUTE DES CARTES. Un tué qui porte une carte la lâche une fois sur

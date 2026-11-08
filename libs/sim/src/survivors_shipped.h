@@ -79,6 +79,23 @@ inline constexpr std::uint16_t kEnchantDeadlyPoisonId = 378;
 inline constexpr std::uint16_t kCloakingId = 135;
 inline constexpr std::uint16_t kThrowVenomKnifeId = 1004;
 inline constexpr std::uint16_t kMeteorAssaultId = 406;
+// L'Archer, puis ses évolués.
+inline constexpr std::uint16_t kDoubleStrafeId = 46;
+inline constexpr std::uint16_t kArrowShowerId = 47;
+inline constexpr std::uint16_t kChargeArrowId = 148;
+inline constexpr std::uint16_t kImproveConcentrationId = 45;
+inline constexpr std::uint16_t kBlitzBeatId = 129;
+inline constexpr std::uint16_t kAnkleSnareId = 117;
+inline constexpr std::uint16_t kLandMineId = 116;
+inline constexpr std::uint16_t kSkidTrapId = 115;
+inline constexpr std::uint16_t kFreezingTrapId = 121;
+inline constexpr std::uint16_t kBeastStrafingId = 499;
+inline constexpr std::uint16_t kSharpShootingId = 382;
+inline constexpr std::uint16_t kFalconAssaultId = 381;
+inline constexpr std::uint16_t kTrueSightId = 380;
+inline constexpr std::uint16_t kClaymoreTrapId = 123;
+inline constexpr std::uint16_t kBlastMineId = 122;
+inline constexpr std::uint16_t kPhantasmicArrowId = 1009;
 
 inline constexpr std::uint16_t kHornetCardId = 4019;
 inline constexpr std::uint16_t kChonchonCardId = 4009;
@@ -95,6 +112,12 @@ inline constexpr std::uint16_t kBaphometCardId = 4147;
 inline constexpr std::uint16_t kPecoPecoCardId = 4031;
 inline constexpr std::uint16_t kSmokieCardId = 4044;
 inline constexpr std::uint16_t kWhisperCardId = 4102;
+inline constexpr std::uint16_t kArcherSkeletonCardId = 4094;
+inline constexpr std::uint16_t kHunterFlyCardId = 4115;
+inline constexpr std::uint16_t kPhreeoniCardId = 4121;
+inline constexpr std::uint16_t kWillowCardId = 4010;
+inline constexpr std::uint16_t kRockerCardId = 4021;
+inline constexpr std::uint16_t kYoyoCardId = 4051;
 
 inline constexpr std::uint16_t kLunaticId = 1063;
 inline constexpr std::uint16_t kPoringId = 1002;
@@ -160,6 +183,15 @@ inline constexpr std::size_t kThiefCardCount = 2;
 [[nodiscard]] std::span<const CardRule> ThiefCards();
 [[nodiscard]] std::span<const SurvivorsSkillRule> ThiefSkills();
 [[nodiscard]] std::span<const EvolutionRule> ThiefEvolutions();
+
+// survivors_rules_archer.cpp : l'Archer, sur le même plan, après le Voleur.
+inline constexpr std::size_t kArcherPoolSkillCount = 9;
+inline constexpr std::size_t kArcherEvolvedSkillCount = 7;
+inline constexpr std::size_t kArcherCardCount = 6;
+[[nodiscard]] const ClassRule& ArcherClass();
+[[nodiscard]] std::span<const CardRule> ArcherCards();
+[[nodiscard]] std::span<const SurvivorsSkillRule> ArcherSkills();
+[[nodiscard]] std::span<const EvolutionRule> ArcherEvolutions();
 
 // survivors_rules_foes.cpp : les monstres, leurs vagues, les arènes, la courbe
 // d'XP et la table des éléments.

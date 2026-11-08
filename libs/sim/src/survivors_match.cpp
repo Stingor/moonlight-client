@@ -236,8 +236,8 @@ void SurvivorsMatch::Leave(std::size_t player_index) {
   if (profile != nullptr) {
     player.robot.emplace(*profile);
   } else {
-    player.robot.emplace(hero_class != nullptr && hero_class->melee ? KnightBotProfile()
-                                                                    : MageBotProfile());
+    player.robot.emplace(hero_class != nullptr && hero_class->attack_gesture ? KnightBotProfile()
+                                                                             : MageBotProfile());
   }
 }
 

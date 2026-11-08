@@ -170,6 +170,10 @@ class ArenaEffects {
   void Launch(const ArenaLaunch& launch, const GroundOf& ground_of, std::uint32_t now_ms);
   // Tient les flammes des zones, et range dans `plan_` celles à rallumer.
   void KeepZones(const ro::sim::SurvivorsField& field, std::uint32_t now_ms);
+  // LES FLÈCHES DES HÉROS : la flèche de l'arc, du tir à sa fin, pour chaque tir
+  // neuf d'un skill qui tire à l'arc.
+  void ShootHeroArrows(const ro::sim::SurvivorsField& field, const GroundOf& ground_of,
+                       const ArenaSight& sight);
   void ShootFoeShots(const ro::sim::SurvivorsField& field, const GroundOf& ground_of,
                      const ArenaSight& sight);
   void LayGroundMarks(const ro::sim::SurvivorsField& field);
@@ -198,6 +202,9 @@ class ArenaEffects {
   const ro::render::SpriteCatalog* sprites_ = nullptr;
   ArenaSkillLooks looks_;
   std::vector<ro::sim::SurvivorsZone> team_zones_;
+  std::vector<ro::sim::SurvivorsShot> team_shots_;
+  // Les tirs dont la flèche est déjà partie, par numéro.
+  std::vector<std::uint32_t> arrows_;
   ArenaEffectSwitches switches_;
   ArenaEffectBudget budget_;
   ro::render::EffectCatalog catalog_;

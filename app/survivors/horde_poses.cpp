@@ -180,13 +180,13 @@ void HordePoses::PoseGesture(HordePose& pose, const ro::sim::SurvivorsField& fie
     return;
   }
   const ro::sim::ClassRule* hero_class = ro::sim::ClassAt(field, hero_index);
-  const bool melee = hero_class != nullptr && hero_class->melee;
+  const bool strikes = hero_class != nullptr && hero_class->attack_gesture;
   const float gesture_ms = ElapsedSince(presentation_ms, *gesture_started_ms_[hero_index]);
   const float attack_ms = times_of(HordeBodyKind::kHero, pose.look_id).attack_ms;
-  if (melee && gesture_ms < attack_ms) {
+  if (strikes && gesture_ms < attack_ms) {
     pose.motion = Motion::kAttack;
     pose.motion_ms = gesture_ms;
-  } else if (!melee && gesture_ms < static_cast<float>(kHeroCastHoldMs)) {
+  } else if (!strikes && gesture_ms < static_cast<float>(kHeroCastHoldMs)) {
     pose.motion = Motion::kCast;
     pose.motion_ms = gesture_ms;
     pose.held_frame = 0;

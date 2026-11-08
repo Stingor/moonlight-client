@@ -268,8 +268,10 @@ void SurvivorsMode::FollowCoopFrame(SurvivorsStage& stage, const SurvivorsContex
 
 const char* SurvivorsMode::TeamNotice(const SurvivorsStage& stage,
                                       std::uint64_t now_ms) const noexcept {
-  if (meeting_.TellingAt(stage.presentation_ms())) {
-    return ro::core::TrText("Le Voleur vous a vu passer : sa classe est débloquée.");
+  if (meeting_.TellingAt(stage.presentation_ms()) && meeting_rule_ != nullptr) {
+    return meeting_rule_->feat_key == kArcherMeetingFeat
+               ? ro::core::TrText("L'Archer vous a rejoint : sa classe est débloquée.")
+               : ro::core::TrText("Le Voleur vous a vu passer : sa classe est débloquée.");
   }
   if (!stage.coop() || stage.coop_over()) return nullptr;
   if (stage.coop_stalled_ms() >= kCoopWaitNoticeMs) {

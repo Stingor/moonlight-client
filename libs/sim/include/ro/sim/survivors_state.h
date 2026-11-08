@@ -79,6 +79,12 @@ struct SurvivorsHero {
   std::uint32_t veil_until_step = 0;
   bool veil_sheathes = false;
   bool critical_due = false;
+  // Les relèves que ses cartes lui ont déjà données (kExtraLives).
+  std::int32_t card_lives_granted = 0;
+  // LE VOL DE VIE de la seconde en cours, commencée au pas `leech_since_step` :
+  // ce qu'il a déjà rendu, sous le plafond du réglage.
+  std::uint32_t leech_since_step = 0;
+  std::int32_t leeched_hp = 0;
   // En coop : tombé sans vie de réserve. Il ne bouge, ne tire ni ne ramasse
   // plus, et la horde l'ignore. Jamais vrai en solo.
   bool down = false;

@@ -57,8 +57,8 @@ constexpr ChestRule kChest{.item_id = kOldBlueBoxId,
 // Les objets au sol : le coffre, puis ce que lâchent les plantes — Meat (+60
 // PV), Gold (+25 Zeny), Battle Manual (XP doublée 60 s), Speed Potion (marche
 // +50 % 10 s), Holy Water (purifie à douze cases), Bubble Gum (toutes les
-// gemmes).
-constexpr std::array<PickupRule, 7> kPickups{{
+// gemmes), Yggdrasil Berry (tous les PV).
+constexpr std::array<PickupRule, 8> kPickups{{
     {.kind = PickupKind::kChest, .item_id = kOldBlueBoxId},
     {.kind = PickupKind::kMeat, .item_id = 517, .amount = 60},
     {.kind = PickupKind::kGold, .item_id = 969, .amount = 25},
@@ -66,18 +66,21 @@ constexpr std::array<PickupRule, 7> kPickups{{
     {.kind = PickupKind::kHaste, .item_id = 12016, .amount = 50, .duration_ms = 10000},
     {.kind = PickupKind::kHolyWater, .item_id = 523, .reach_units = Cells(12)},
     {.kind = PickupKind::kMagnetAll, .item_id = 12210},
+    {.kind = PickupKind::kBerry, .item_id = 607},
 }};
 
 // Les plantes, nées au fil des tués : la classe RO de la plante, l'objet
 // qu'elle lâche, son poids au tirage. L'expérience d'abord (manuel, aimant),
-// puis la viande ; l'or, rare, vaut plus.
-constexpr std::array<PlantRule, 6> kPlants{{
+// puis la viande ; l'or, rare, vaut plus. Le Black Mushroom ne pousse que par
+// la carte Willow.
+constexpr std::array<PlantRule, 7> kPlants{{
     {.foe_id = 1078, .pickup = PickupKind::kMeat, .weight = 30},       // Red Plant
     {.foe_id = 1081, .pickup = PickupKind::kGold, .weight = 10},       // Yellow Plant
     {.foe_id = 1080, .pickup = PickupKind::kHaste, .weight = 10},      // Green Plant
     {.foe_id = 1079, .pickup = PickupKind::kManual, .weight = 30},     // Blue Plant
     {.foe_id = 1083, .pickup = PickupKind::kMagnetAll, .weight = 15},  // Shining Plant
     {.foe_id = 1082, .pickup = PickupKind::kHolyWater, .weight = 5},   // White Plant
+    {.foe_id = 1084, .pickup = PickupKind::kBerry, .weight = 10, .sprouted_by_cards = true},
 }};
 
 }  // namespace

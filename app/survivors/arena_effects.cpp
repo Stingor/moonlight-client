@@ -34,7 +34,19 @@ static std::span<const ro::sim::SurvivorsZone> TeamZonesOf(
   }
   return out;
 }
+// Les tirs de toute l'équipe, dans l'ordre de ses héros.
+static void TeamShotsOf(const ro::sim::SurvivorsField& field,
+                        std::vector<ro::sim::SurvivorsShot>& out) {
+  out.clear();
+  for (std::size_t index = 0; index < ro::sim::HeroCount(field); ++index) {
+    const std::vector<ro::sim::SurvivorsShot>& shots = ro::sim::ShotsAt(field, index);
+    out.insert(out.end(), shots.begin(), shots.end());
+  }
+}
 namespace {
+
+// La marque d'un piège qui attend.
+constexpr std::array<std::uint8_t, 4> kTrapColor = {220, 180, 60, 100};
 
 // LE HÉROS DU MONDE PRIVÉ, puis ses orbes, une par acteur à partir de la
 // suivante.
@@ -459,6 +471,7 @@ void ArenaEffects::Advance(const ro::sim::SurvivorsNews& news, const ro::sim::Su
     return field.step >= mark.warning.strike_step;
   });
   ShootFoeShots(field, ground_of, sight);
+  ShootHeroArrows(field, ground_of, sight);
   LayGroundMarks(field);
 }
 
@@ -475,10 +488,11 @@ void ArenaEffects::KeepZones(const ro::sim::SurvivorsField& field, std::uint32_t
   }
   std::vector<ro::sim::FieldPoint> points;
   for (const ro::sim::SurvivorsZone& zone : team_zones_) {
-    // Un bloc de barrière n'a pas de flamme : son unité au sol le montre.
+    // Un bloc de barrière n'a pas de flamme : son unité au sol le montre. Un
+    // piège non plus : sa marque au sol le montre.
     if (zone.archetype == ro::sim::SkillArchetype::kBarrier) continue;
     const SkillLook* look = looks_.Find(zone.skill_id);
-    if (look == nullptr) continue;
+    if (look == nullptr || look->trap) continue;
     ZonePoints(zone, points);
     for (const ro::sim::FieldPoint point : points) {
       const bool known = std::ranges::any_of(flames_, [&zone, point](const ZoneFlame& flame) {
@@ -567,6 +581,49 @@ void ArenaEffects::LayGroundMarks(const ro::sim::SurvivorsField& field) {
     if (field.step >= hazard.until_step) continue;
     LayCells(*stage_, origin_cells_, hazard.center, hazard.center, hazard.radius_units,
              hazard.kind == ro::sim::HazardKind::kPuddle ? kPuddleColor : kQuakeColor, mark_quads_);
+  }
+  // LES PIÈGES QUI ATTENDENT, de toute l'équipe : leur aire, en marque calme.
+  if (!switches_.shown) return;
+  for (const ro::sim::SurvivorsZone& zone : team_zones_) {
+    const SkillLook* look = looks_.Find(zone.skill_id);
+    if (look == nullptr || !look->trap) continue;
+    LayCells(*stage_, origin_cells_, zone.from, zone.from, zone.radius_units, kTrapColor,
+             mark_quads_);
+  }
+}
+
+void ArenaEffects::ShootHeroArrows(const ro::sim::SurvivorsField& field, const GroundOf& ground_of,
+                                   const ArenaSight& sight) {
+  TeamShotsOf(field, team_shots_);
+  std::erase_if(arrows_, [this](std::uint32_t serial) {
+    return std::ranges::none_of(team_shots_, [serial](const ro::sim::SurvivorsShot& shot) {
+      return shot.serial == serial;
+    });
+  });
+  const ro::render::ActorLook bow{
+      .player = true, .job = kArrowShooterJob, .weapon = kArrowShooterWeapon};
+  const std::string_view sprite = ro::render::ArrowSpriteOf(*sprites_, bow, false);
+  for (const ro::sim::SurvivorsShot& shot : team_shots_) {
+    if (std::ranges::find(arrows_, shot.serial) != arrows_.end()) continue;
+    const SkillLook* look = looks_.Find(shot.skill_id);
+    if (look == nullptr || !look->shoots_arrow) continue;
+    arrows_.push_back(shot.serial);
+    if (!switches_.shown || switches_.reduced || sprite.empty()) continue;
+    const std::uint32_t steps = shot.expires_step > field.step ? shot.expires_step - field.step : 0;
+    const ro::sim::FieldPoint lands = Along(shot.position, shot.velocity, steps);
+    if (!sight.Sees(shot.position) && !sight.Sees(lands)) {
+      budget_.NoteUnseen();
+      continue;
+    }
+    if (!budget_.Admit(ArenaEffectRank::kLoose)) continue;
+    const std::uint32_t flight_ms = steps * ro::sim::kSurvivorsStepMs;
+    const glm::vec3 lift{0.0F, ro::render::kArrowFlightHeight, 0.0F};
+    const auto life_ticks = static_cast<std::int32_t>(std::max<std::uint32_t>(
+        flight_ms / static_cast<std::uint32_t>(ro::render::kEffectTickMs), 1));
+    static_cast<void>(nodes_.ShootSprite(sprite, ground_of(shot.position) + lift,
+                                         ground_of(lands) + lift, life_ticks,
+                                         ro::render::ProjectileFlightOf(*sprites_, bow)));
+    ++launched_total_;
   }
 }
 

@@ -142,9 +142,9 @@ struct OfferCandidate {
       candidates.push_back({{OfferKind::kNewSkill, skill_id, 1}, rules.tuning.offer_weight_fresh});
     }
   }
-  for (const std::uint16_t card_item_id : hero_class.card_pool) {
+  const auto offer_card = [&](std::uint16_t card_item_id) {
     const CardRule* rule = FindCard(rules, card_item_id);
-    if (rule == nullptr || Banished(field, card_item_id) || Locked(field, card_item_id)) continue;
+    if (rule == nullptr || Banished(field, card_item_id) || Locked(field, card_item_id)) return;
     if (const OwnedCard* owned = OwnedCardOf(hero, card_item_id); owned != nullptr) {
       if (std::size_t{owned->level} < rule->per_level.size()) {
         candidates.push_back(
@@ -154,6 +154,22 @@ struct OfferCandidate {
     } else if (hero.cards.size() < rules.caps.card_slots && !rule->per_level.empty()) {
       candidates.push_back(
           {{OfferKind::kNewCard, card_item_id, 1}, rules.tuning.offer_weight_fresh});
+    }
+  };
+  for (const std::uint16_t card_item_id : hero_class.card_pool) offer_card(card_item_id);
+  // Puis les cartes que les classes des coéquipiers prêtent, après sa réserve,
+  // chacune une fois.
+  std::vector<std::uint16_t> lent;
+  for (std::size_t index = 0; index < HeroCount(field); ++index) {
+    const ClassRule* lender = ClassAt(field, index);
+    if (lender == nullptr) continue;
+    for (const std::uint16_t card_item_id : lender->lent_cards) {
+      if (std::ranges::find(hero_class.card_pool, card_item_id) != hero_class.card_pool.end() ||
+          std::ranges::find(lent, card_item_id) != lent.end()) {
+        continue;
+      }
+      lent.push_back(card_item_id);
+      offer_card(card_item_id);
     }
   }
   return candidates;
@@ -355,6 +371,15 @@ void RecomputeStats(SurvivorsField& field) {
     value = SaturatedAdd(value, level->stance_bonus);
   }
   hero.stats = stats;
+  // Chaque relève qu'une carte ajoute s'inscrit une fois dans ses vies.
+  const std::int32_t card_lives =
+      std::clamp(stats.Of(SurvivorsStat::kExtraLives), 0, kMostCardLives);
+  if (card_lives > hero.card_lives_granted) {
+    const std::int32_t added = card_lives - hero.card_lives_granted;
+    field.lives_left = static_cast<std::uint8_t>(
+        std::min<std::int32_t>(field.lives_left + added, std::numeric_limits<std::uint8_t>::max()));
+    hero.card_lives_granted = card_lives;
+  }
 
   // Un gain de PV max s'ajoute aux PV courants ; une perte les plafonne. Un
   // héros garde au moins un PV max.

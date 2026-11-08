@@ -366,6 +366,7 @@ void SurvivorsMode::FollowEntered(SurvivorsStage& stage, const SurvivorsContext&
 
 void SurvivorsMode::PoseMeeting(const SurvivorsStage& stage, const SurvivorsContext& context) {
   meeting_.Clear();
+  meeting_rule_ = nullptr;
   const ro::sim::SurvivorsField& field = stage.play()->run().field();
   const ro::sim::ArenaRule* arena = ro::sim::FindArena(Rules(), field.start.arena_id);
   if (arena == nullptr) return;
@@ -373,10 +374,13 @@ void SurvivorsMode::PoseMeeting(const SurvivorsStage& stage, const SurvivorsCont
       book_.ClassAwaiting(Rules(), *arena, stage.board(), context.client_root);
   TellDamagedCopy(book_.TakeDamagedCopy(), context.say);
   if (awaiting == nullptr) return;
+  const SurvivorsMeetingRule* meeting = MeetingOfClass(awaiting->key);
+  if (meeting == nullptr) return;
   const std::optional<ro::sim::FieldPoint> place =
-      MeetingPlaceOf(field.ground, field.hero.position);
+      MeetingPlaceOf(field.ground, field.hero.position, *meeting);
   if (!place.has_value()) return;
-  meeting_.Place(*place);
+  meeting_.Place(*place, meeting->leaves_at_run_ms);
+  meeting_rule_ = meeting;
   arena_->SetStrangerLook(MeetingBodyLook(*awaiting));
   const ro::ui::SkinImage job_icon = SkinImageAt(
       context.images, std::string(kJobIconPrefix) + std::to_string(awaiting->job_id) + ".bmp");
@@ -391,9 +395,11 @@ void SurvivorsMode::PoseMeeting(const SurvivorsStage& stage, const SurvivorsCont
 
 void SurvivorsMode::FollowMeeting(const SurvivorsStage& stage, const SurvivorsContext& context) {
   if (stage.screen() != SurvivorsScreen::kPlaying || stage.play() == nullptr) return;
-  const ro::sim::FieldPoint hero = stage.play()->run().field().hero.position;
-  if (!meeting_.Follow(hero, stage.presentation_ms())) return;
-  book_.Inscribe(kMeetingFeat, context.client_root);
+  if (meeting_rule_ == nullptr) return;
+  const ro::sim::SurvivorsField& field = stage.play()->run().field();
+  const std::uint64_t run_ms = std::uint64_t{field.step} * ro::sim::kSurvivorsStepMs;
+  if (!meeting_.Follow(field.hero.position, run_ms, stage.presentation_ms())) return;
+  book_.Inscribe(meeting_rule_->feat_key, context.client_root);
   TellDamagedCopy(book_.TakeDamagedCopy(), context.say);
 }
 

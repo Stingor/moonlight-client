@@ -195,6 +195,10 @@ const ClassRule* ClassAt(const SurvivorsField& field, std::size_t hero_index) {
   return hero_index == field.stage ? field.hero_class : KitAt(field, hero_index).hero_class;
 }
 
+const std::vector<SurvivorsShot>& ShotsAt(const SurvivorsField& field, std::size_t hero_index) {
+  return hero_index == field.stage ? field.shots : KitAt(field, hero_index).shots;
+}
+
 const std::vector<SurvivorsZone>& ZonesAt(const SurvivorsField& field, std::size_t hero_index) {
   return hero_index == field.stage ? field.zones : KitAt(field, hero_index).zones;
 }

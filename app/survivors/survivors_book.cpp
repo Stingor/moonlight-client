@@ -51,7 +51,7 @@ constexpr std::array<SurvivorsUnlock, 12> kUnlocks{{
     {.key = "ice_wall", .condition = UnlockCondition::kFeat},
 }};
 
-constexpr std::array<SurvivorsFeat, 7> kFeats{{
+constexpr std::array<SurvivorsFeat, 8> kFeats{{
     {.key = "sight", .counter = FeatCounter::kBestSurvivedMs, .threshold = kSightSurvivedMs},
     {.key = "frost_diver", .counter = FeatCounter::kChills, .threshold = kFrostDiverChills},
     {.key = "earth_spike", .counter = FeatCounter::kWindKills, .threshold = kEarthSpikeWindKills},
@@ -59,17 +59,19 @@ constexpr std::array<SurvivorsFeat, 7> kFeats{{
     {.key = "water_ball", .counter = FeatCounter::kFireKills, .threshold = kWaterBallFireKills},
     {.key = "ice_wall", .counter = FeatCounter::kBestSurvivedMs, .threshold = kIceWallSurvivedMs},
     {.key = kMeetingFeat.data(), .counter = FeatCounter::kMet, .threshold = 1},
+    {.key = kArcherMeetingFeat.data(), .counter = FeatCounter::kMet, .threshold = 1},
 }};
 
 // LES CLASSES QUI SE DÉBLOQUENT, chacune par un exploit du carnet. Le
-// Chevalier partage celui d'Ice Wall ; le Voleur a le sien.
+// Chevalier partage celui d'Ice Wall ; le Voleur et l'Archer ont le leur.
 struct ClassUnlock {
   std::string_view class_key;
   std::string_view feat_key;
 };
-constexpr std::array<ClassUnlock, 2> kClassUnlocks{{
+constexpr std::array<ClassUnlock, 3> kClassUnlocks{{
     {.class_key = "knight", .feat_key = "ice_wall"},
     {.class_key = "thief", .feat_key = kMeetingFeat},
+    {.class_key = "archer", .feat_key = kArcherMeetingFeat},
 }};
 
 [[nodiscard]] std::uint64_t SaturatedAdd(std::uint64_t total, std::uint64_t amount) noexcept {

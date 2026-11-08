@@ -10,6 +10,8 @@
 #include "ro/render/skill_unit_table.h"
 #include "ro/render/sprite_frame.h"
 
+#include "effects/effect_arrow_shower.h"
+
 namespace moonclient {
 namespace {
 
@@ -30,6 +32,25 @@ namespace {
   return std::nullopt;
 }
 
+// L'amorce d'un piège, celle de la mine pour les pièges qui n'en ont pas ; rien
+// pour un skill qui n'est pas un piège.
+[[nodiscard]] std::optional<std::uint32_t> TrapPrimerOf(std::uint16_t skill_id) {
+  switch (skill_id) {
+    case kAnkleSnareSkill:
+    case kSkidTrapSkill:
+    case kLandMineSkill:
+      return kLandMinePrimerEffect;
+    case kFreezingTrapSkill:
+      return kFreezingTrapPrimerEffect;
+    case kClaymoreTrapSkill:
+      return kClaymorePrimerEffect;
+    case kBlastMineSkill:
+      return kBlastMinePrimerEffect;
+    default:
+      return std::nullopt;
+  }
+}
+
 // Le repli écrit de ce skill, ou rien.
 [[nodiscard]] std::optional<std::uint32_t> FallbackEffectOf(std::uint16_t skill_id) {
   switch (skill_id) {
@@ -47,9 +68,21 @@ namespace {
       return kDoubleAttackFallbackEffect;
     case kVenomDustSkill:
       return kVenomDustFallbackEffect;
+    case kDoubleStrafeSkill:
+    case kChargeArrowSkill:
+      return kArrowFallbackEffect;
+    case kArrowShowerSkill:
+      return kArrowShowerEffect;
     default:
       return std::nullopt;
   }
+}
+
+// Vrai pour un skill dont les projectiles sont des flèches d'arc.
+[[nodiscard]] bool ShootsArrow(std::uint16_t skill_id) {
+  return skill_id == kDoubleStrafeSkill || skill_id == kChargeArrowSkill ||
+         skill_id == kBeastStrafingSkill || skill_id == kSharpShootingSkill ||
+         skill_id == kPhantasmicArrowSkill;
 }
 
 // L'effet de ce skill que le jeu fait naître sur sa cible, écrit pour que le
@@ -72,6 +105,9 @@ namespace {
       return kThrownStoneEffect;
     case kThrowVenomKnifeSkill:
       return kThrownVenomKnifeEffect;
+    case kBlitzBeatSkill:
+    case kFalconAssaultSkill:
+      return kFalconDiveEffect;
     default:
       return std::nullopt;
   }
@@ -94,6 +130,9 @@ namespace {
       return kWindWalkSkill;
     case kCloakingSkill:
       return kHidingSkill;
+    case kBeastStrafingSkill:
+    case kPhantasmicArrowSkill:
+      return kSharpShootingSkill;
     default:
       return skill_id;
   }
@@ -222,6 +261,8 @@ SkillLook SkillLookOf(const ro::sim::SurvivorsSkillRule& skill) {
   look.effect_skill_id = shown;
   if (const std::optional<std::uint32_t> thrown = ThrownEffectOf(shown)) {
     look.effect_id = *thrown;
+  } else if (const std::optional<std::uint32_t> primer = TrapPrimerOf(shown)) {
+    look.effect_id = *primer;
   } else if (const std::optional<std::uint32_t> borne = HeroBorneFallbackOf(shown)) {
     look.effect_id = *borne;
     look.fallback = true;
@@ -235,6 +276,12 @@ SkillLook SkillLookOf(const ro::sim::SurvivorsSkillRule& skill) {
   look.hit_effect_id = hit >= 0 ? static_cast<std::uint32_t>(hit) : kPlainHitEffect;
   look.ground_effect_id = GroundEffectOf(skill.skill_id);
   look.storm_sown = skill.skill_id == kHeavensDriveSkill;
+  look.shoots_arrow = ShootsArrow(skill.skill_id);
+  if (const std::optional<std::uint32_t> primer = TrapPrimerOf(skill.skill_id)) {
+    look.trap = true;
+    const bool primed = skill.skill_id != kAnkleSnareSkill && skill.skill_id != kSkidTrapSkill;
+    if (primed) look.hit_effect_id = *primer;
+  }
   return look;
 }
 

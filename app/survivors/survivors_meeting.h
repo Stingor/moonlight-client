@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <cstdint>
 #include <filesystem>
 #include <optional>
@@ -9,22 +10,52 @@
 #include "ro/sim/survivors_ground.h"
 #include "ro/sim/survivors_rules.h"
 
+#include "survivors/survivors_book.h"
 #include "survivors/survivors_save.h"
 #include "survivors/survivors_stage.h"
 
-// LA RENCONTRE : un corps attend sur la prairie, à une place fixe, tant que sa
-// classe n'est pas débloquée, et le héros qui le rejoint la débloque.
+// LA RENCONTRE : un corps attend sur son arène, à une place fixe, tant que sa
+// classe n'est pas débloquée, et le héros qui le rejoint la débloque. Certains
+// repartent à une heure de la partie : il faut les rejoindre avant.
 //
 // 🔴 HORS DE LA SIMULATION : le corps, sa place et la distance vivent ici. Rien
 // n'y tire au sort et rien n'entre dans une empreinte : les monstres passent à
 // travers, et le rejeu, le classement et les parties en or n'en voient rien.
 namespace moonclient {
 
-// La prairie, seule arène où il attend.
+// UNE RENCONTRE : la classe qui attend, l'exploit qui la débloque, son arène,
+// sa place depuis le départ, et l'heure de la partie où elle repart (0 : elle
+// attend toute la partie).
+struct SurvivorsMeetingRule {
+  std::string_view class_key;
+  std::string_view feat_key;
+  std::string_view arena_key;
+  std::int32_t east_cells = 0;
+  std::int32_t north_cells = 0;
+  std::uint64_t leaves_at_run_ms = 0;
+};
+// L'arène où le Voleur attend.
 inline constexpr std::string_view kMeetingArenaKey = "midgard_plains";
-// SA PLACE, depuis le départ : 150 cases, vers le nord-est.
-inline constexpr std::int32_t kMeetingEastCells = 120;
-inline constexpr std::int32_t kMeetingNorthCells = 90;
+// L'Archer guette dans le désert, et repart à 5:00.
+inline constexpr std::string_view kArcherMeetingArenaKey = "morroc_desert";
+inline constexpr std::uint64_t kArcherLeavesAtRunMs = 300000;
+// Le Voleur, à 150 cases vers le nord-est ; l'Archer, à une centaine vers le
+// sud-ouest.
+inline constexpr std::array<SurvivorsMeetingRule, 2> kShippedMeetings{{
+    {.class_key = "thief",
+     .feat_key = kMeetingFeat,
+     .arena_key = kMeetingArenaKey,
+     .east_cells = 120,
+     .north_cells = 90},
+    {.class_key = "archer",
+     .feat_key = kArcherMeetingFeat,
+     .arena_key = kArcherMeetingArenaKey,
+     .east_cells = -80,
+     .north_cells = -60,
+     .leaves_at_run_ms = kArcherLeavesAtRunMs},
+}};
+// La rencontre de cette classe, ou rien.
+[[nodiscard]] const SurvivorsMeetingRule* MeetingOfClass(std::string_view class_key) noexcept;
 // Une place qui n'est pas praticable cède à la plus proche qui l'est, dans cette
 // limite.
 inline constexpr std::int32_t kMeetingSearchCells = 32;
@@ -34,9 +65,9 @@ inline constexpr std::int32_t kMeetingReachCells = 2;
 inline constexpr std::uint64_t kMeetingFarewellMs = 1000;
 inline constexpr std::uint64_t kMeetingNoticeMs = 6000;
 
-// LA CLASSE QUI ATTEND LE HÉROS de ce départ : une partie libre, seule, sur la
-// prairie, et une classe que la rencontre débloque et que le carnet n'a pas
-// encore. Nulle sinon.
+// LA CLASSE QUI ATTEND LE HÉROS de ce départ : une partie libre, seule, sur
+// l'arène d'une rencontre, et une classe qu'elle débloque et que le carnet n'a
+// pas encore. Nulle sinon.
 //
 // ⚠ EN COOP, PERSONNE N'ATTEND : une partie d'équipe se joue à armes égales, et
 // le carnet d'un seul n'y change rien.
@@ -45,13 +76,14 @@ inline constexpr std::uint64_t kMeetingNoticeMs = 6000;
                                                              const SurvivorsRunBoard& board,
                                                              const SurvivorsSave& save);
 
-// LA PLACE DU CORPS sur le sol généré `ground`, pour un héros parti de `start` :
-// le décalage fixe, ou la case praticable la plus proche. Rien sur un sol borné,
-// ou sans case praticable à portée.
+// LA PLACE DU CORPS de la rencontre `meeting` sur le sol généré `ground`, pour
+// un héros parti de `start` : son décalage, ou la case praticable la plus
+// proche. Rien sur un sol borné, ou sans case praticable à portée.
 //
 // Elle interroge une copie du sol : celui de la partie garde son cache intact.
 [[nodiscard]] std::optional<ro::sim::FieldPoint> MeetingPlaceOf(
-    const ro::sim::SurvivorsGround& ground, ro::sim::FieldPoint start);
+    const ro::sim::SurvivorsGround& ground, ro::sim::FieldPoint start,
+    const SurvivorsMeetingRule& meeting);
 
 // CE QUE LE CORPS MONTRE à cet instant.
 struct SurvivorsMeetingBody {
@@ -60,13 +92,18 @@ struct SurvivorsMeetingBody {
   float opacity = 1.0F;
 };
 
-// LE CORPS D'UNE PARTIE : absent, il attend, puis il s'efface une fois rejoint.
+// LE CORPS D'UNE PARTIE : absent, il attend, puis il s'efface une fois rejoint,
+// ou une fois l'heure de son départ passée.
 class SurvivorsMeeting {
  public:
   void Clear() noexcept { *this = SurvivorsMeeting{}; }
-  void Place(ro::sim::FieldPoint at) noexcept;
-  // Le héros est à `hero` : vrai à l'image où il le rejoint, une seule fois.
-  [[nodiscard]] bool Follow(ro::sim::FieldPoint hero, std::uint64_t now_ms) noexcept;
+  // Il attend en `at`, jusqu'à l'heure de partie `leaves_at_run_ms` (0 : toute
+  // la partie).
+  void Place(ro::sim::FieldPoint at, std::uint64_t leaves_at_run_ms) noexcept;
+  // Le héros est à `hero`, à l'heure de partie `run_ms` : vrai à l'image où il
+  // le rejoint, une seule fois. L'heure passée, il est parti sans lui.
+  [[nodiscard]] bool Follow(ro::sim::FieldPoint hero, std::uint64_t run_ms,
+                            std::uint64_t now_ms) noexcept;
   // Là où le corps attend ; rien dès qu'il est rejoint.
   [[nodiscard]] std::optional<ro::sim::FieldPoint> waiting_at() const noexcept;
   // Le corps à dessiner à `now_ms` ; rien une fois parti.
@@ -77,6 +114,8 @@ class SurvivorsMeeting {
  private:
   std::optional<ro::sim::FieldPoint> at_;
   std::optional<std::uint64_t> met_ms_;
+  std::optional<std::uint64_t> left_ms_;
+  std::uint64_t leaves_at_run_ms_ = 0;
 };
 
 }  // namespace moonclient

@@ -46,6 +46,8 @@ void PlanCone(const ro::sim::SurvivorsCast& cast, const SkillLook& look,
 // L'effet qu'un lancer de skill fait naître, d'après sa sorte.
 void PlanCast(const ro::sim::SurvivorsCast& cast, const SkillLook& look,
               std::vector<ArenaLaunch>& out) {
+  // Une flèche sans effet de table n'est que la flèche que le tir dessine.
+  if (look.shoots_arrow && look.fallback) return;
   switch (cast.kind) {
     case ro::sim::CastKind::kStrike:
     case ro::sim::CastKind::kBlast:

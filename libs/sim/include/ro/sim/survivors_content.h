@@ -132,6 +132,7 @@ enum class PickupKind : std::uint8_t {
   // effacée avant la fin, ignorée par l'aimant et par les voleurs. Elle n'a
   // pas de PickupRule : son objet est la carte elle-même.
   kCard,
+  kBerry,  // Yggdrasil Berry : tous les PV
 };
 // Un objet au sol, ramassé au contact.
 struct PickupRule {
@@ -147,6 +148,9 @@ struct PlantRule {
   std::uint16_t foe_id = 0;  // classe RO : nom et sprite côté app
   PickupKind pickup = PickupKind::kGold;
   std::uint32_t weight = 0;
+  // Elle ne pousse que par les cartes : son poids est `weight` × kSproutPct %
+  // du héros en scène, nul sans carte.
+  bool sprouted_by_cards = false;
 };
 
 // Les gains qu'un coffre donne au plus : la nouvelle d'un coffre les porte tous.

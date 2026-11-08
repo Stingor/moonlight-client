@@ -346,6 +346,9 @@ void Apply(SurvivorsField& field, const SurvivorsPickup& pickup) {
     case PickupKind::kMagnetAll:
       SeizeGems(field);
       break;
+    case PickupKind::kBerry:
+      hero.hp = hero.max_hp;
+      break;
     case PickupKind::kChest:  // ouvert plus haut
     case PickupKind::kCard:   // ramassée par GatherPickups, sans effet
       break;

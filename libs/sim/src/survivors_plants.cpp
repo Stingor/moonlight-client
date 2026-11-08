@@ -36,10 +36,19 @@ namespace {
   return !rules.plants.empty() && rules.tuning.plant_kills_per_minute != 0;
 }
 
-[[nodiscard]] std::vector<std::uint32_t> PlantWeights(const SurvivorsRules& rules) {
+// Les poids des espèces : une plante que seules les cartes font pousser pèse
+// son poids × kSproutPct % du héros en scène, et rien sans carte.
+[[nodiscard]] std::vector<std::uint32_t> PlantWeights(const SurvivorsField& field) {
+  const SurvivorsRules& rules = *field.rules;
+  const std::int64_t sprout_pct = std::max(field.hero.stats.Of(SurvivorsStat::kSproutPct), 0);
   std::vector<std::uint32_t> weights;
   weights.reserve(rules.plants.size());
-  for (const PlantRule& plant : rules.plants) weights.push_back(plant.weight);
+  for (const PlantRule& plant : rules.plants) {
+    weights.push_back(
+        plant.sprouted_by_cards
+            ? static_cast<std::uint32_t>(std::int64_t{plant.weight} * sprout_pct / kPercent)
+            : plant.weight);
+  }
   return weights;
 }
 
@@ -80,7 +89,7 @@ void PlantField(SurvivorsField& field) {
   const SurvivorsRules& rules = *field.rules;
   if (!PlantedByBlocks(rules)) return;
   const std::int32_t block = rules.tuning.plant_block_cells;
-  const std::vector<std::uint32_t> weights = PlantWeights(rules);
+  const std::vector<std::uint32_t> weights = PlantWeights(field);
 
   const SurvivorsGround& ground = field.ground;
   std::vector<FieldPoint> open;
@@ -104,7 +113,7 @@ void SowStartPlants(SurvivorsField& field) {
   const SurvivorsRules& rules = *field.rules;
   if (!SownByKills(rules)) return;
   const SurvivorsTuning& tuning = rules.tuning;
-  const std::vector<std::uint32_t> weights = PlantWeights(rules);
+  const std::vector<std::uint32_t> weights = PlantWeights(field);
   const std::int32_t hero_x = CellOf(field.hero.position.x);
   const std::int32_t hero_y = CellOf(field.hero.position.y);
   const std::size_t count =
@@ -151,7 +160,7 @@ void SowPlants(SurvivorsField& field) {
     const std::optional<FieldPoint> at = TryFramePoint(field, field.field_random);
     if (!at || PlantedOn(field, *at)) continue;
     const std::size_t before = field.plants.size();
-    SowAt(field, PlantWeights(rules), *at);
+    SowAt(field, PlantWeights(field), *at);
     if (field.plants.size() != before) field.plant_kills_mark = field.tally.kills;
     return;
   }

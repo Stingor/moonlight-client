@@ -145,6 +145,30 @@ void DrawTabs(SurvivorsRecordsState& state, const SurvivorsRecordsView& view, co
   }
 }
 
+// La classe montrée, sur une ligne : une case par classe, une classe
+// verrouillée grisée ; seule, elle se nomme.
+void DrawClasses(SurvivorsRecordsState& state, const SurvivorsRecordsView& view,
+                 const SkinArt& art) {
+  if (view.classes.size() == 1) {
+    ImGui::Text(core::Tr("Classe : %s"), view.classes.front().name);
+    return;
+  }
+  if (view.classes.empty()) return;
+  ImGui::AlignTextToFramePadding();
+  ImGui::TextUnformatted(core::Tr("Classe"));
+  for (const SurvivorsClassChoice& choice : view.classes) {
+    ImGui::SameLine();
+    ImGui::PushID(choice.class_id);
+    ImGui::BeginDisabled(choice.locked);
+    const bool chosen = choice.class_id == view.class_id;
+    if (SkinRadio(choice.name, chosen, art) && !chosen && !choice.locked) {
+      state.class_id = choice.class_id;
+    }
+    ImGui::EndDisabled();
+    ImGui::PopID();
+  }
+}
+
 }  // namespace
 
 std::array<char, kSurvivorsWeekTextSize> SurvivorsWeekText(int year, int week) {
@@ -170,7 +194,7 @@ void DrawSurvivorsRecordsWindow(SurvivorsRecordsState& state, const SurvivorsRec
   }
   DrawTabs(state, view, art);
   ImGui::Separator();
-  if (*view.class_name != '\0') ImGui::Text(core::Tr("Classe : %s"), view.class_name);
+  DrawClasses(state, view, art);
   switch (state.tab) {
     case SurvivorsRecordsTab::kFree:
       DrawTable("##free", view.free_runs, {.cursed_water = true});

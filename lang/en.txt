@@ -22825,3 +22825,144 @@ tr: Grand Thief
 
 fr: Obtenir chacun des skills évolués du Voleur, au fil des parties.
 tr: Obtain each of the Thief's evolved skills, across runs.
+
+fr: %s : il guette dans le désert jusqu'à 5:00, en partie libre, seul.
+tr: %s: lurking in the desert until 5:00, in a free run, alone.
+
+fr: Assaut du faucon
+tr: Falcon Assault
+
+fr: Des flèches filent sur le monstre le plus proche.
+tr: Arrows fly at the nearest monster.
+
+fr: Des flèches puissantes filent sur le plus proche.
+tr: Powerful arrows fly at the nearest monster.
+
+fr: Dégâts à distance +%d %%
+tr: Ranged damage +%d %%
+
+fr: Dégâts à distance : vos tirs et vos éclats portent plus.
+tr: Ranged damage: your shots and bursts hit harder.
+
+fr: Flèche fantôme
+tr: Phantom Arrow
+
+fr: Grand archer
+tr: Grand Archer
+
+fr: L'Archer vous a rejoint : sa classe est débloquée.
+tr: The Archer joined you: the class is unlocked.
+
+fr: Le Black Mushroom pousse : sa Yggdrasil Berry rend tous les PV.
+tr: The Black Mushroom grows: its Yggdrasil Berry restores all HP.
+
+fr: Mine de vent
+tr: Wind Mine
+
+fr: Obtenir Beast Strafing dans une partie de Survivants de Midgard.
+tr: Obtain Beast Strafing in a Midgard Survivors run.
+
+fr: Obtenir Blast Mine dans une partie de Survivants de Midgard.
+tr: Obtain Blast Mine in a Midgard Survivors run.
+
+fr: Obtenir Claymore Trap dans une partie de Survivants de Midgard.
+tr: Obtain Claymore Trap in a Midgard Survivors run.
+
+fr: Obtenir Falcon Assault dans une partie de Survivants de Midgard.
+tr: Obtain Falcon Assault in a Midgard Survivors run.
+
+fr: Obtenir Phantasmic Arrow, l'union de Charge Arrow et de Skid Trap.
+tr: Obtain Phantasmic Arrow, the union of Charge Arrow and Skid Trap.
+
+fr: Obtenir Sharp Shooting dans une partie de Survivants de Midgard.
+tr: Obtain Sharp Shooting in a Midgard Survivors run.
+
+fr: Obtenir True Sight dans une partie de Survivants de Midgard.
+tr: Obtain True Sight in a Midgard Survivors run.
+
+fr: Obtenir chacun des skills évolués de l'Archer, au fil des parties.
+tr: Obtain each of the Archer's evolved skills, across runs.
+
+fr: Par moments, vos tirs se pressent : vos skills reviennent plus vite.
+tr: At times, your shots quicken: your skills come back faster.
+
+fr: Par moments, votre œil s'aiguise : vos dégâts explosent.
+tr: At times, your eye sharpens: your damage soars.
+
+fr: Piège Claymore
+tr: Claymore Trap
+
+fr: Plantes rares %d %%
+tr: Rare plants %d %%
+
+fr: Recharge réduite : vos skills reviennent plus vite.
+tr: Reduced cooldown: your skills come back faster.
+
+fr: Rejoindre l'Archer qui guette dans le désert, avant 5:00, seul
+tr: Join the Archer lurking in the desert, before 5:00, alone
+
+fr: Relèves +%d
+tr: Revives +%d
+
+fr: Rend au héros tous ses PV.
+tr: Restores all of the hero's HP.
+
+fr: Rend tous les PV
+tr: Restores all HP
+
+fr: Tir de chasse
+tr: Hunting Shot
+
+fr: Tireur d'élite
+tr: Sharpshooter
+
+fr: Un champignon que seule la carte Willow fait pousser : il lâche une Yggdrasil Berry.
+tr: A mushroom only the Willow card makes grow: it drops a Yggdrasil Berry.
+
+fr: Un piège de feu, posé près de vous, souffle la horde.
+tr: A fire trap, set near you, blasts the horde.
+
+fr: Un piège posé près de vous fige ce qui marche dessus.
+tr: A trap set near you holds whatever steps on it.
+
+fr: Un piège posé près de vous gèle ce qui l'entoure.
+tr: A trap set near you freezes what surrounds it.
+
+fr: Un piège posé près de vous renvoie la horde d'où elle vient.
+tr: A trap set near you sends the horde back where it came from.
+
+fr: Un trait perce la file des monstres de part en part.
+tr: A bolt pierces the line of monsters through and through.
+
+fr: Une flèche lourde renvoie au loin ce qui approche.
+tr: A heavy arrow sends whatever comes close flying back.
+
+fr: Une flèche spectrale traverse la file et la repousse.
+tr: A spectral arrow pierces the line and pushes it back.
+
+fr: Une mine de vent, posée près de vous, éclate sous la horde.
+tr: A wind mine, set near you, bursts under the horde.
+
+fr: Une mine posée près de vous saute sous la horde.
+tr: A mine set near you blows up under the horde.
+
+fr: Une pluie de flèches tombe là où la horde se presse.
+tr: A rain of arrows falls where the horde crowds.
+
+fr: Une vie de plus : abattu, vous vous relevez.
+tr: One more life: struck down, you rise again.
+
+fr: Vol de vie %d %%
+tr: Life steal %d %%
+
+fr: Vol de vie : une part de vos dégâts vous revient en PV.
+tr: Life steal: part of your damage comes back to you as HP.
+
+fr: Votre faucon fond sur le plus fort, d'un seul coup.
+tr: Your falcon swoops on the strongest, in a single strike.
+
+fr: Votre faucon pique, coup après coup, sur le plus proche.
+tr: Your falcon dives, strike after strike, at the nearest.
+
+fr: Œil de lynx
+tr: Lynx Eye

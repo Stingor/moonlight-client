@@ -251,6 +251,8 @@ class SurvivorsMode {
   // Le carnet de l'accueil et les intentions de ses fenêtres de méta.
   SurvivorsMetaDesk desk_;
   SurvivorsMeeting meeting_;
+  // La rencontre de la partie en cours, ou rien.
+  const SurvivorsMeetingRule* meeting_rule_ = nullptr;
   // L'icône que la flèche de la rencontre montre.
   ImTextureID meeting_icon_ = ImTextureID{0};
   // L'apparence du héros posée, et si elle était celle de l'évolution.

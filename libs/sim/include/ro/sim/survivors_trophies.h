@@ -54,6 +54,12 @@ class SurvivorsRun;
 //   Meteor Assault possédé à la fin de la partie.
 // - « Grand voleur » : chacun des skills évolués du Voleur obtenu au moins une fois,
 //   au fil des parties.
+// - « Tir de chasse », « Tireur d'élite », « Assaut du faucon », « Œil de lynx »,
+//   « Piège Claymore », « Mine de vent », « Flèche fantôme » : Beast Strafing, Sharp
+//   Shooting, Falcon Assault, True Sight, Claymore Trap, Blast Mine, Phantasmic Arrow
+//   possédé à la fin de la partie.
+// - « Grand archer » : chacun des skills évolués de l'Archer obtenu au moins une
+//   fois, au fil des parties.
 
 // CE QUE LA PARTIE NE SAIT PAS D'ELLE-MÊME, et qu'`app` dit : la minimap est
 // un affichage, que la simulation ignore.

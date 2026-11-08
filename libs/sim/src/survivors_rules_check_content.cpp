@@ -194,10 +194,13 @@ constexpr std::int64_t kReflexLeastRestMs = 1000;
   if (skill.archetype == SkillArchetype::kStance &&
       (level.stance_bonus == 0 || level.life_ms == 0 || level.cooldown_ms <= level.life_ms ||
        skill.stance_stat == SurvivorsStat::kMaxHp || skill.stance_stat == SurvivorsStat::kCritPct ||
-       skill.stance_stat == SurvivorsStat::kDodgePct)) {
+       skill.stance_stat == SurvivorsStat::kDodgePct ||
+       skill.stance_stat == SurvivorsStat::kLifeStealPct ||
+       skill.stance_stat == SurvivorsStat::kExtraLives ||
+       skill.stance_stat == SurvivorsStat::kSproutPct)) {
     return Refuse(at +
                   "de posture sans bonus, sans durée, plus longue que sa recharge, ou sur "
-                  "les PV max ou une chance");
+                  "les PV max, une chance, le vol de vie, les relèves ou les plantes");
   }
   // Un réflexe rend intouchable un temps, à sa recharge, sous un seuil de PV.
   if (skill.archetype == SkillArchetype::kReflex &&

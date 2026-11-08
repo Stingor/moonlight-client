@@ -22825,3 +22825,144 @@ tr: Gran ladrón
 
 fr: Obtenir chacun des skills évolués du Voleur, au fil des parties.
 tr: Obtén cada una de las habilidades evolucionadas del Ladrón, a lo largo de las partidas.
+
+fr: %s : il guette dans le désert jusqu'à 5:00, en partie libre, seul.
+tr: %s: acecha en el desierto hasta las 5:00, en partida libre, solo.
+
+fr: Assaut du faucon
+tr: Asalto del halcón
+
+fr: Des flèches filent sur le monstre le plus proche.
+tr: Las flechas vuelan hacia el monstruo más cercano.
+
+fr: Des flèches puissantes filent sur le plus proche.
+tr: Flechas poderosas vuelan hacia el más cercano.
+
+fr: Dégâts à distance +%d %%
+tr: Daño a distancia +%d %%
+
+fr: Dégâts à distance : vos tirs et vos éclats portent plus.
+tr: Daño a distancia: tus disparos y estallidos golpean más fuerte.
+
+fr: Flèche fantôme
+tr: Flecha fantasma
+
+fr: Grand archer
+tr: Gran arquero
+
+fr: L'Archer vous a rejoint : sa classe est débloquée.
+tr: El Arquero se unió a ti: su clase está desbloqueada.
+
+fr: Le Black Mushroom pousse : sa Yggdrasil Berry rend tous les PV.
+tr: Crece el Black Mushroom: su Yggdrasil Berry restaura todos los PV.
+
+fr: Mine de vent
+tr: Mina de viento
+
+fr: Obtenir Beast Strafing dans une partie de Survivants de Midgard.
+tr: Obtén Beast Strafing en una partida de Supervivientes de Midgard.
+
+fr: Obtenir Blast Mine dans une partie de Survivants de Midgard.
+tr: Obtén Blast Mine en una partida de Supervivientes de Midgard.
+
+fr: Obtenir Claymore Trap dans une partie de Survivants de Midgard.
+tr: Obtén Claymore Trap en una partida de Supervivientes de Midgard.
+
+fr: Obtenir Falcon Assault dans une partie de Survivants de Midgard.
+tr: Obtén Falcon Assault en una partida de Supervivientes de Midgard.
+
+fr: Obtenir Phantasmic Arrow, l'union de Charge Arrow et de Skid Trap.
+tr: Obtén Phantasmic Arrow, la unión de Charge Arrow y Skid Trap.
+
+fr: Obtenir Sharp Shooting dans une partie de Survivants de Midgard.
+tr: Obtén Sharp Shooting en una partida de Supervivientes de Midgard.
+
+fr: Obtenir True Sight dans une partie de Survivants de Midgard.
+tr: Obtén True Sight en una partida de Supervivientes de Midgard.
+
+fr: Obtenir chacun des skills évolués de l'Archer, au fil des parties.
+tr: Obtén cada una de las habilidades evolucionadas del Arquero, a lo largo de las partidas.
+
+fr: Par moments, vos tirs se pressent : vos skills reviennent plus vite.
+tr: A ratos, tus disparos se aceleran: tus habilidades vuelven antes.
+
+fr: Par moments, votre œil s'aiguise : vos dégâts explosent.
+tr: A ratos, tu vista se afina: tu daño se dispara.
+
+fr: Piège Claymore
+tr: Trampa Claymore
+
+fr: Plantes rares %d %%
+tr: Plantas raras %d %%
+
+fr: Recharge réduite : vos skills reviennent plus vite.
+tr: Recarga reducida: tus habilidades vuelven antes.
+
+fr: Rejoindre l'Archer qui guette dans le désert, avant 5:00, seul
+tr: Reúnete con el Arquero que acecha en el desierto, antes de las 5:00, solo
+
+fr: Relèves +%d
+tr: Resurrecciones +%d
+
+fr: Rend au héros tous ses PV.
+tr: Devuelve al héroe todos sus PV.
+
+fr: Rend tous les PV
+tr: Devuelve todos los PV
+
+fr: Tir de chasse
+tr: Disparo de caza
+
+fr: Tireur d'élite
+tr: Tirador de élite
+
+fr: Un champignon que seule la carte Willow fait pousser : il lâche une Yggdrasil Berry.
+tr: Una seta que solo la carta Willow hace crecer: suelta una Yggdrasil Berry.
+
+fr: Un piège de feu, posé près de vous, souffle la horde.
+tr: Una trampa de fuego, colocada cerca de ti, barre a la horda.
+
+fr: Un piège posé près de vous fige ce qui marche dessus.
+tr: Una trampa colocada cerca de ti inmoviliza lo que la pisa.
+
+fr: Un piège posé près de vous gèle ce qui l'entoure.
+tr: Una trampa colocada cerca de ti congela lo que la rodea.
+
+fr: Un piège posé près de vous renvoie la horde d'où elle vient.
+tr: Una trampa colocada cerca de ti devuelve a la horda por donde vino.
+
+fr: Un trait perce la file des monstres de part en part.
+tr: Un disparo atraviesa la fila de monstruos de lado a lado.
+
+fr: Une flèche lourde renvoie au loin ce qui approche.
+tr: Una flecha pesada aleja lo que se acerca.
+
+fr: Une flèche spectrale traverse la file et la repousse.
+tr: Una flecha espectral atraviesa la fila y la empuja.
+
+fr: Une mine de vent, posée près de vous, éclate sous la horde.
+tr: Una mina de viento, colocada cerca de ti, estalla bajo la horda.
+
+fr: Une mine posée près de vous saute sous la horde.
+tr: Una mina colocada cerca de ti estalla bajo la horda.
+
+fr: Une pluie de flèches tombe là où la horde se presse.
+tr: Una lluvia de flechas cae donde la horda se apiña.
+
+fr: Une vie de plus : abattu, vous vous relevez.
+tr: Una vida más: abatido, te levantas.
+
+fr: Vol de vie %d %%
+tr: Robo de vida %d %%
+
+fr: Vol de vie : une part de vos dégâts vous revient en PV.
+tr: Robo de vida: parte de tu daño vuelve a ti como PV.
+
+fr: Votre faucon fond sur le plus fort, d'un seul coup.
+tr: Tu halcón se lanza sobre el más fuerte, de un solo golpe.
+
+fr: Votre faucon pique, coup après coup, sur le plus proche.
+tr: Tu halcón pica, golpe tras golpe, sobre el más cercano.
+
+fr: Œil de lynx
+tr: Ojo de lince

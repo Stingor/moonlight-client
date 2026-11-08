@@ -60,6 +60,17 @@ constexpr std::array<EvolvedTrophy, survivors::kThiefEvolvedSkillCount> kThiefTr
     {survivors::kMeteorAssaultId, MinigameTrophy::kSurvivorsMeteorAssault},
 }};
 
+// Ceux des évolués de l'Archer.
+constexpr std::array<EvolvedTrophy, survivors::kArcherEvolvedSkillCount> kArcherTrophies{{
+    {survivors::kBeastStrafingId, MinigameTrophy::kSurvivorsBeastStrafing},
+    {survivors::kSharpShootingId, MinigameTrophy::kSurvivorsSharpShooting},
+    {survivors::kFalconAssaultId, MinigameTrophy::kSurvivorsFalconAssault},
+    {survivors::kTrueSightId, MinigameTrophy::kSurvivorsTrueSight},
+    {survivors::kClaymoreTrapId, MinigameTrophy::kSurvivorsClaymoreTrap},
+    {survivors::kBlastMineId, MinigameTrophy::kSurvivorsBlastMine},
+    {survivors::kPhantasmicArrowId, MinigameTrophy::kSurvivorsPhantasmicArrow},
+}};
+
 // Les trophées d'un skill de base porté à son plus haut niveau.
 constexpr std::array<EvolvedTrophy, 3> kTopLevelTrophies{{
     {survivors::kFireBallId, MinigameTrophy::kSurvivorsFireBall},
@@ -190,6 +201,11 @@ std::vector<MinigameTrophy> RecordSurvivors(MinigameRecord& record, const Surviv
   }
   EarnMinigameTrophy(record, MinigameTrophy::kSurvivorsGrandThief,
                      HoldsAllEvolvedOf(record, field, survivors::ThiefClass().skill_pool), fresh);
+  for (const EvolvedTrophy& evolved : kArcherTrophies) {
+    EarnMinigameTrophy(record, evolved.trophy, Owns(field, evolved.skill_id), fresh);
+  }
+  EarnMinigameTrophy(record, MinigameTrophy::kSurvivorsGrandArcher,
+                     HoldsAllEvolvedOf(record, field, survivors::ArcherClass().skill_pool), fresh);
   return fresh;
 }
 

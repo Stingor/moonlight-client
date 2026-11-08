@@ -80,6 +80,9 @@ const char* SurvivorsFeatGoal(std::string_view feat_key) {
   if (feat_key == "thief_met") {
     return core::Tr("Rejoindre le Voleur qui attend sur la prairie, en partie libre, seul");
   }
+  if (feat_key == "archer_met") {
+    return core::Tr("Rejoindre l'Archer qui guette dans le désert, avant 5:00, seul");
+  }
   return "";
 }
 

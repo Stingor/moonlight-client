@@ -289,6 +289,9 @@ struct SurvivorsField {
 [[nodiscard]] const SurvivorsHero& HeroAt(const SurvivorsField& field, std::size_t hero_index);
 // La classe du héros `hero_index`.
 [[nodiscard]] const ClassRule* ClassAt(const SurvivorsField& field, std::size_t hero_index);
+// Les tirs du héros `hero_index`, pour le dessin.
+[[nodiscard]] const std::vector<SurvivorsShot>& ShotsAt(const SurvivorsField& field,
+                                                        std::size_t hero_index);
 // Les coups du héros `hero_index`, pour le dessin.
 [[nodiscard]] const std::vector<SurvivorsZone>& ZonesAt(const SurvivorsField& field,
                                                         std::size_t hero_index);

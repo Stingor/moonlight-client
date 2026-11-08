@@ -17,25 +17,33 @@ constexpr std::int32_t kSearchCacheSideChunks = 4;
 
 }  // namespace
 
+const SurvivorsMeetingRule* MeetingOfClass(std::string_view class_key) noexcept {
+  const auto found =
+      std::ranges::find(kShippedMeetings, class_key, &SurvivorsMeetingRule::class_key);
+  return found != kShippedMeetings.end() ? &*found : nullptr;
+}
+
 const ro::sim::ClassRule* ClassAwaitingMeeting(const ro::sim::SurvivorsRules& rules,
                                                const ro::sim::ArenaRule& arena,
                                                const SurvivorsRunBoard& board,
                                                const SurvivorsSave& save) {
   if (board.kind != SurvivorsBoardKind::kFree || board.coop) return nullptr;
-  if (std::string_view(arena.key) != kMeetingArenaKey) return nullptr;
   const auto awaiting = std::ranges::find_if(rules.classes, [&](const ro::sim::ClassRule& rule) {
-    return ClassUnlockFeat(rule) == kMeetingFeat && !ClassUnlocked(rules, rule, save);
+    const SurvivorsMeetingRule* meeting = MeetingOfClass(rule.key);
+    return meeting != nullptr && std::string_view(arena.key) == meeting->arena_key &&
+           ClassUnlockFeat(rule) == meeting->feat_key && !ClassUnlocked(rules, rule, save);
   });
   return awaiting != rules.classes.end() ? &*awaiting : nullptr;
 }
 
 std::optional<ro::sim::FieldPoint> MeetingPlaceOf(const ro::sim::SurvivorsGround& ground,
-                                                  ro::sim::FieldPoint start) {
+                                                  ro::sim::FieldPoint start,
+                                                  const SurvivorsMeetingRule& meeting) {
   if (ground.rule() == nullptr) return std::nullopt;
   const ro::sim::SurvivorsGround asked = ro::sim::SurvivorsGround::Generated(
       *ground.rule(), ground.run_seed(), kSearchCacheSideChunks);
-  const std::int32_t wanted_x = start.x / ro::sim::kSubunitsPerCell + kMeetingEastCells;
-  const std::int32_t wanted_y = start.y / ro::sim::kSubunitsPerCell + kMeetingNorthCells;
+  const std::int32_t wanted_x = start.x / ro::sim::kSubunitsPerCell + meeting.east_cells;
+  const std::int32_t wanted_y = start.y / ro::sim::kSubunitsPerCell + meeting.north_cells;
   std::optional<ro::sim::FieldPoint> nearest;
   std::int64_t nearest_squared = 0;
   // Par anneaux croissants : un anneau plus loin que la meilleure case trouvée
@@ -56,13 +64,20 @@ std::optional<ro::sim::FieldPoint> MeetingPlaceOf(const ro::sim::SurvivorsGround
   return nearest;
 }
 
-void SurvivorsMeeting::Place(ro::sim::FieldPoint at) noexcept {
+void SurvivorsMeeting::Place(ro::sim::FieldPoint at, std::uint64_t leaves_at_run_ms) noexcept {
   at_ = at;
   met_ms_.reset();
+  left_ms_.reset();
+  leaves_at_run_ms_ = leaves_at_run_ms;
 }
 
-bool SurvivorsMeeting::Follow(ro::sim::FieldPoint hero, std::uint64_t now_ms) noexcept {
-  if (!at_.has_value() || met_ms_.has_value()) return false;
+bool SurvivorsMeeting::Follow(ro::sim::FieldPoint hero, std::uint64_t run_ms,
+                              std::uint64_t now_ms) noexcept {
+  if (!at_.has_value() || met_ms_.has_value() || left_ms_.has_value()) return false;
+  if (leaves_at_run_ms_ != 0 && run_ms >= leaves_at_run_ms_) {
+    left_ms_ = now_ms;
+    return false;
+  }
   if (ro::sim::DistanceSquared(hero, *at_) > Squared(ro::sim::Cells(kMeetingReachCells))) {
     return false;
   }
@@ -71,13 +86,14 @@ bool SurvivorsMeeting::Follow(ro::sim::FieldPoint hero, std::uint64_t now_ms) no
 }
 
 std::optional<ro::sim::FieldPoint> SurvivorsMeeting::waiting_at() const noexcept {
-  return met_ms_.has_value() ? std::nullopt : at_;
+  return met_ms_.has_value() || left_ms_.has_value() ? std::nullopt : at_;
 }
 
 std::optional<SurvivorsMeetingBody> SurvivorsMeeting::BodyAt(std::uint64_t now_ms) const noexcept {
   if (!at_.has_value()) return std::nullopt;
-  if (!met_ms_.has_value()) return SurvivorsMeetingBody{.at = *at_};
-  const std::uint64_t elapsed_ms = now_ms > *met_ms_ ? now_ms - *met_ms_ : 0;
+  const std::optional<std::uint64_t> gone_ms = met_ms_.has_value() ? met_ms_ : left_ms_;
+  if (!gone_ms.has_value()) return SurvivorsMeetingBody{.at = *at_};
+  const std::uint64_t elapsed_ms = now_ms > *gone_ms ? now_ms - *gone_ms : 0;
   if (elapsed_ms >= kMeetingFarewellMs) return std::nullopt;
   return SurvivorsMeetingBody{
       .at = *at_,

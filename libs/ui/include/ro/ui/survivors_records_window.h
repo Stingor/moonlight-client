@@ -6,6 +6,7 @@
 #include <span>
 
 #include "ro/ui/skin_art.h"
+#include "ro/ui/survivors_prepare_window.h"
 #include "ro/ui/survivors_summary_window.h"
 
 namespace ro::ui {
@@ -25,7 +26,8 @@ namespace ro::ui {
 // survol. Le nom `survivors_ranking_window` reste au classement du serveur.
 //
 // La fenêtre se lit seulement : elle ne rend aucune intention. Tab change
-// d'onglet, fenêtre au premier plan.
+// d'onglet, fenêtre au premier plan, et l'en-tête choisit la classe montrée ;
+// l'onglet comme la classe restent dans l'état de la fenêtre.
 
 struct SurvivorsRecordRow {
   std::uint64_t score = 0;
@@ -46,9 +48,11 @@ enum class SurvivorsRecordsTab : std::uint8_t { kFree, kChallenge, kRanked };
 
 struct SurvivorsRecordsView {
   std::span<const SurvivorsRecordRow> free_runs;  // rangées, dix au plus
-  // La classe des parties montrées, celle de l'accueil, dans tous les onglets
-  // (en UTF-8, déjà dans la langue du joueur) ; vide, elle ne se nomme pas.
-  const char* class_name = "";
+  // LA CLASSE DES PARTIES MONTRÉES, dans tous les onglets : l'en-tête la
+  // propose parmi `classes`, une classe verrouillée grisée. Une seule classe ne
+  // se propose pas, elle se nomme.
+  std::span<const SurvivorsClassChoice> classes;
+  std::uint16_t class_id = 0;
   std::span<const SurvivorsRecordRow> week_runs;  // la semaine en cours, rangées
   // L'onglet des parties classées : montré seulement si `ranked_shown`.
   bool ranked_shown = false;
@@ -63,6 +67,8 @@ struct SurvivorsRecordsView {
 struct SurvivorsRecordsState {
   bool open = false;
   SurvivorsRecordsTab tab = SurvivorsRecordsTab::kFree;
+  // La classe que le joueur a choisie dans l'en-tête ; 0 : celle de l'accueil.
+  std::uint16_t class_id = 0;
 };
 
 inline constexpr const char* kSurvivorsRecordsId = "survivors_records";

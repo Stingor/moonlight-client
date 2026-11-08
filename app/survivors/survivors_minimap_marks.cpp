@@ -31,6 +31,7 @@ using ro::ui::SurvivorsMinimapMark;
     case ro::sim::PickupKind::kHaste:
     case ro::sim::PickupKind::kHolyWater:
     case ro::sim::PickupKind::kMagnetAll:
+    case ro::sim::PickupKind::kBerry:
       return SurvivorsMinimapMark::kItem;
   }
   return SurvivorsMinimapMark::kItem;

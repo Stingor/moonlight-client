@@ -27,6 +27,7 @@ using Figure = ro::ui::SurvivorsEffectFigure;
     case ro::sim::PickupKind::kHolyWater:
     case ro::sim::PickupKind::kMagnetAll:
     case ro::sim::PickupKind::kCard:
+    case ro::sim::PickupKind::kBerry:
       return std::nullopt;
   }
   return std::nullopt;
@@ -141,6 +142,14 @@ ro::ui::SurvivorsEffectFigure FigureOfStat(ro::sim::SurvivorsStat stat) noexcept
       return Figure::kCritPct;
     case ro::sim::SurvivorsStat::kDodgePct:
       return Figure::kDodgePct;
+    case ro::sim::SurvivorsStat::kRangedDamagePct:
+      return Figure::kRangedDamagePct;
+    case ro::sim::SurvivorsStat::kLifeStealPct:
+      return Figure::kLifeStealPct;
+    case ro::sim::SurvivorsStat::kExtraLives:
+      return Figure::kExtraLives;
+    case ro::sim::SurvivorsStat::kSproutPct:
+      return Figure::kSproutPct;
   }
   return Figure::kDamagePct;
 }
@@ -160,6 +169,8 @@ std::optional<SurvivorsPickupFigure> PickupFigureOf(const ro::sim::PickupRule& r
                                    .value = CellsOf(rule.reach_units)};
     case ro::sim::PickupKind::kMagnetAll:
       return SurvivorsPickupFigure{.figure = Figure::kGatherGems};
+    case ro::sim::PickupKind::kBerry:
+      return SurvivorsPickupFigure{.figure = Figure::kFullHeal};
     case ro::sim::PickupKind::kChest:
     case ro::sim::PickupKind::kCard:
       return std::nullopt;
@@ -174,6 +185,7 @@ bool NoticedPickup(ro::sim::PickupKind kind) noexcept {
     case ro::sim::PickupKind::kHaste:
     case ro::sim::PickupKind::kHolyWater:
     case ro::sim::PickupKind::kMagnetAll:
+    case ro::sim::PickupKind::kBerry:
       return true;
     case ro::sim::PickupKind::kGold:
     case ro::sim::PickupKind::kChest:

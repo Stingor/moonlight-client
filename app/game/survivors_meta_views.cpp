@@ -69,6 +69,10 @@ void SurvivorsViews::ComposeClassChoices(const ro::sim::SurvivorsRules& rules,
       class_hints_.push_back(
           ro::core::Printed(ro::core::Tr("%s : il attend sur la prairie, en partie libre, seul."),
                             ClassName(class_rule, tables)));
+    } else if (feat == kArcherMeetingFeat) {
+      class_hints_.push_back(ro::core::Printed(
+          ro::core::Tr("%s : il guette dans le désert jusqu'à 5:00, en partie libre, seul."),
+          ClassName(class_rule, tables)));
     } else {
       class_hints_.push_back(
           minutes == 0
@@ -158,14 +162,22 @@ void SurvivorsViews::ComposeMeta(ro::ui::SurvivorsPrepareView& prepare,
     ComposeCodex(windows, save, nullptr, rules, ChosenClassOf(rules, save, book.chosen_class_id()),
                  tables, now_ms);
   }
+  // LES RECORDS S'OUVRENT SUR LA CLASSE DE L'ACCUEIL, puis montrent celle que
+  // le joueur choisit dans leur en-tête, jusqu'à leur fermeture.
+  if (!windows.records.open) windows.records.class_id = 0;
   if (windows.records.open) {
+    const std::uint16_t asked_class_id =
+        windows.records.class_id != 0 ? windows.records.class_id : book.chosen_class_id();
+    const ro::sim::ClassRule* shown_class = ChosenClassOf(rules, save, asked_class_id);
+    windows.records.class_id = shown_class != nullptr ? shown_class->class_id : std::uint16_t{0};
     const std::optional<SurvivorsCredit>& credit = book.credit();
     windows.records_view = RecordsViewOf(
         rules, save, now_utc_s,
         credit.has_value() ? std::optional<std::int64_t>(credit->played_at_utc_s) : std::nullopt,
-        record_rows_, book.free_arena_id(), book.chosen_class_id());
+        record_rows_, book.free_arena_id(), windows.records.class_id);
     windows.records_view.ranked_shown = ranking_open;
-    windows.records_view.class_name = class_name;
+    windows.records_view.classes = class_choices_;
+    windows.records_view.class_id = windows.records.class_id;
   }
 }
 

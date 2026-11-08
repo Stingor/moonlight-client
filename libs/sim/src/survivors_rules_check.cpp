@@ -132,6 +132,17 @@ template <typename Rule, typename IdOf>
         return Refuse(named + "carte de réserve inconnue " + std::to_string(card_item_id));
       }
     }
+    // Une classe ne prête que ses propres cartes.
+    if (auto checked = CheckListUnique(hero_class.lent_cards, named, "les cartes prêtées");
+        !checked) {
+      return checked;
+    }
+    for (const std::uint16_t card_item_id : hero_class.lent_cards) {
+      if (!Contains(hero_class.card_pool, card_item_id)) {
+        return Refuse(named + "carte prêtée " + std::to_string(card_item_id) +
+                      " hors de sa réserve");
+      }
+    }
     for (const std::uint16_t skill_id : hero_class.starter_skills) {
       if (FindSkill(rules, skill_id) == nullptr) {
         return Refuse(named + "skill de départ inconnu " + std::to_string(skill_id));
@@ -191,6 +202,18 @@ template <typename Rule, typename IdOf>
   return stat == SurvivorsStat::kCritPct || stat == SurvivorsStat::kDodgePct;
 }
 
+// LES STATISTIQUES QUI NE SE RETRANCHENT PAS : une carte les porte de 0 à
+// leur plafond. Le vol de vie et les relèves ont le leur, les autres celui des
+// bonus. Aucune valeur pour une statistique qui peut se retrancher.
+[[nodiscard]] std::optional<std::int32_t> MostCardValue(SurvivorsStat stat) noexcept {
+  if (stat == SurvivorsStat::kLifeStealPct) return kMostLifeStealPct;
+  if (stat == SurvivorsStat::kExtraLives) return kMostCardLives;
+  if (stat == SurvivorsStat::kRangedDamagePct || stat == SurvivorsStat::kSproutPct) {
+    return kMostStatBonus;
+  }
+  return std::nullopt;
+}
+
 [[nodiscard]] core::Result<void> CheckCards(const SurvivorsRules& rules) {
   // Toutes les cartes d'esquive au plus haut niveau : le héros reste touchable.
   std::int64_t most_dodge_pct = 0;
@@ -208,6 +231,11 @@ template <typename Rule, typename IdOf>
       if (IsChanceStat(card.stat) && (value < 0 || value > kWholeChancePct)) {
         return Refuse("carte " + std::to_string(card.card_item_id) + " : chance de " +
                       std::to_string(value) + " %, de 0 à " + std::to_string(kWholeChancePct));
+      }
+      if (const std::optional<std::int32_t> most = MostCardValue(card.stat);
+          most.has_value() && (value < 0 || value > *most)) {
+        return Refuse("carte " + std::to_string(card.card_item_id) + " : valeur " +
+                      std::to_string(value) + ", de 0 à " + std::to_string(*most));
       }
     }
     if (card.stat == SurvivorsStat::kDodgePct) {

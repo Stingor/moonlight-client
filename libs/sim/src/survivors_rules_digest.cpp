@@ -103,10 +103,11 @@ void PutContent(FnvDigest& digest, std::span<const WaveRule> waves,
 void PutClass(FnvDigest& digest, const ClassRule& rule) {
   PutAll(digest, rule.class_id, rule.max_hp, rule.walk_ms_per_cell, rule.magnet_units,
          rule.damage_pct_per_level, rule.damage_pct_cap, rule.mount_card_item_id, rule.reborn_level,
-         rule.reborn_damage_pct, rule.melee, rule.final_boss_hp_bonus_pct);
+         rule.reborn_damage_pct, rule.attack_gesture, rule.final_boss_hp_bonus_pct);
   PutNumbers(digest, rule.starter_skills);
   PutNumbers(digest, rule.skill_pool);
   PutNumbers(digest, rule.card_pool);
+  PutNumbers(digest, rule.lent_cards);
 }
 
 void PutFoe(FnvDigest& digest, const FoeRule& rule) {
@@ -162,7 +163,7 @@ void PutTuning(FnvDigest& digest, const SurvivorsTuning& tuning) {
          tuning.plant_kills_per_minute, tuning.plant_start_count, tuning.plant_start_cells,
          tuning.most_live_plants, tuning.plant_forget_units, tuning.pickup_radius_units,
          tuning.final_overtime_ms, tuning.curse_slow_pct, tuning.curse_hurt_pct,
-         tuning.blind_turn_ms, tuning.poison_tick_ms);
+         tuning.blind_turn_ms, tuning.poison_tick_ms, tuning.leech_most_pct_per_second);
   PutNumbers(digest, std::span<const std::int32_t>(tuning.foe_radius_units));
 }
 
@@ -211,8 +212,9 @@ std::uint64_t SurvivorsRulesDigest(const SurvivorsRules& rules) {
   PutEach(digest, rules.evolutions, [&](const EvolutionRule& rule) {
     PutAll(digest, rule.skill_id, rule.card_item_id, rule.evolved_skill_id, rule.partner_skill_id);
   });
-  PutEach(digest, rules.plants,
-          [&](const PlantRule& rule) { PutAll(digest, rule.foe_id, rule.pickup, rule.weight); });
+  PutEach(digest, rules.plants, [&](const PlantRule& rule) {
+    PutAll(digest, rule.foe_id, rule.pickup, rule.weight, rule.sprouted_by_cards);
+  });
   PutEach(digest, rules.pickups, [&](const PickupRule& rule) {
     PutAll(digest, rule.kind, rule.item_id, rule.amount, rule.duration_ms, rule.reach_units);
   });

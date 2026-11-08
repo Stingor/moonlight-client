@@ -83,11 +83,19 @@ enum class MinigameTrophy : std::uint8_t {
   kSurvivorsThrowVenomKnife,
   kSurvivorsMeteorAssault,
   kSurvivorsGrandThief,
+  kSurvivorsBeastStrafing,
+  kSurvivorsSharpShooting,
+  kSurvivorsFalconAssault,
+  kSurvivorsTrueSight,
+  kSurvivorsClaymoreTrap,
+  kSurvivorsBlastMine,
+  kSurvivorsPhantasmicArrow,
+  kSurvivorsGrandArcher,
 };
 
-inline constexpr std::size_t kMinigameTrophyCount = 52;
+inline constexpr std::size_t kMinigameTrophyCount = 60;
 static_assert(kMinigameTrophyCount ==
-                  static_cast<std::size_t>(MinigameTrophy::kSurvivorsGrandThief) + 1,
+                  static_cast<std::size_t>(MinigameTrophy::kSurvivorsGrandArcher) + 1,
               "le compte suit le dernier trophée de l'énumération");
 
 struct MinigameTrophyText {
@@ -120,8 +128,9 @@ struct MinigameRecord {
   std::vector<std::string> foreign_trophy_keys;
   // LES SKILLS ÉVOLUÉS DU MODE SURVIVORS obtenus au moins une fois, croissants
   // et sans doublon : « Grand sorcier » veut tous ceux du Magicien, « Grand
-  // chevalier » tous ceux du Chevalier, « Grand voleur » tous ceux du Voleur. Un Id
-  // que les règles ne connaissent plus se garde.
+  // chevalier » tous ceux du Chevalier, « Grand voleur » tous ceux du Voleur,
+  // « Grand archer » tous ceux de l'Archer. Un Id que les règles ne connaissent
+  // plus se garde.
   std::vector<std::uint16_t> survivors_evolved;
 
   [[nodiscard]] bool operator==(const MinigameRecord&) const = default;

@@ -103,9 +103,14 @@ struct StanceRow {
       return {Label::kStanceMagnet, Unit::kPercent};
     case Stat::kExpPct:
       return {Label::kExpBoost, Unit::kPercent};
+    case Stat::kRangedDamagePct:
+      return {Label::kStanceDamage, Unit::kPercent};
     // Aucune posture ne les majore : seule une carte les porte.
     case Stat::kCritPct:
     case Stat::kDodgePct:
+    case Stat::kLifeStealPct:
+    case Stat::kExtraLives:
+    case Stat::kSproutPct:
       break;
   }
   return {Label::kStanceDamage, Unit::kPercent};
@@ -204,6 +209,7 @@ struct StanceRow {
       case ro::sim::PickupKind::kHolyWater:
       case ro::sim::PickupKind::kMagnetAll:
       case ro::sim::PickupKind::kCard:
+      case ro::sim::PickupKind::kBerry:
         break;
     }
   }

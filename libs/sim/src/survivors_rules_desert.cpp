@@ -130,7 +130,8 @@ constexpr std::array<FoeRule, kDesertFoeCount> kDesertFoes{{
     Common(kRequiemId, 35, kMedium, kDark, 95, 400, 14, 1516, 13),
     Common(kPasanaId, 61, kMedium, kFire, 160, 165, 22, 976, 20),
     // Les mini-boss et le boss final : PV fixes, marche de leur BossRule.
-    Boss(FoeRank::kMiniBoss, kPhreeoniId, 69, kLarge, kNeutral, 900, 200, 12, 1020, 30),
+    WithCard(Boss(FoeRank::kMiniBoss, kPhreeoniId, 69, kLarge, kNeutral, 900, 200, 12, 1020, 30),
+             kPhreeoniCardId),
     Boss(FoeRank::kMiniBoss, kMayaId, 81, kLarge, kEarth, 1200, 100, 12, 864, 40),
     Boss(FoeRank::kBoss, kPharaohId, 93, kLarge, kDark, 11000, 125, 35, 868, 0, kBossImmunities,
          kPharaohArmorPct),

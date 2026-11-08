@@ -81,6 +81,7 @@ constexpr SurvivorsTuning kShippedTuning{
     .curse_hurt_pct = 20,
     .blind_turn_ms = 600,
     .poison_tick_ms = 1000,
+    .leech_most_pct_per_second = 4,
 };
 
 // LA CURSED WATER : par rang, PV de naissance des monstres +20 % et contact

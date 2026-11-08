@@ -142,6 +142,7 @@ add_library(ro_sim STATIC
     src/survivors_rules_mage.cpp
     src/survivors_rules_terrain.cpp
     src/survivors_rules_thief.cpp
+    src/survivors_rules_archer.cpp
     src/survivors_rules_wizard.cpp
     src/survivors_run.cpp
     src/survivors_score.cpp

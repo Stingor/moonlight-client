@@ -67,6 +67,9 @@ class SurvivorsBot {
 // Le profil du Voleur : il tient au bout de ses coups, et lâche prise une fois
 // blessé, plus fragile que le Chevalier.
 [[nodiscard]] const SurvivorsBotProfile& ThiefBotProfile();
+// Le profil de l'Archer : il tient la horde au bout de ses flèches, et la
+// fait marcher sur les pièges qu'il laisse en fuyant.
+[[nodiscard]] const SurvivorsBotProfile& ArcherBotProfile();
 // Le profil de la classe `class_key` ; nullptr pour une clé qu'aucun robot ne
 // sait jouer.
 [[nodiscard]] const SurvivorsBotProfile* BotProfileOf(std::string_view class_key);

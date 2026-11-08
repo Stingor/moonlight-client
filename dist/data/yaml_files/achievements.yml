@@ -6487,3 +6487,123 @@ achievements:
       minor: 1
       objectives:
         - {text: "Tous les évolués du Voleur"}
+  910053:
+    name: "Tir de chasse"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir Beast Strafing dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Beast Strafing obtenu"}
+  910054:
+    name: "Tireur d'elite"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir Sharp Shooting dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Sharp Shooting obtenu"}
+  910055:
+    name: "Assaut du faucon"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir Falcon Assault dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Falcon Assault obtenu"}
+  910056:
+    name: "Oeil de lynx"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir True Sight dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "True Sight obtenu"}
+  910057:
+    name: "Piege Claymore"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir Claymore Trap dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Claymore Trap obtenu"}
+  910058:
+    name: "Mine de vent"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir Blast Mine dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Blast Mine obtenu"}
+  910059:
+    name: "Fleche fantome"
+    score: 30
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir Phantasmic Arrow, l'union de Charge Arrow et de Skid Trap."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Phantasmic Arrow obtenu"}
+  910060:
+    name: "Grand archer"
+    score: 50
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir chacun des skills évolués de l'Archer, au fil des parties."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Tous les évolués de l'Archer"}

@@ -20,7 +20,7 @@ struct ItemKey {
   ro::sim::PickupKind kind;
   const char* key;
 };
-constexpr std::array<ItemKey, 8> kItemKeys{{
+constexpr std::array<ItemKey, 9> kItemKeys{{
     {ro::sim::PickupKind::kChest, "chest"},
     {ro::sim::PickupKind::kMeat, "meat"},
     {ro::sim::PickupKind::kGold, "gold"},
@@ -29,6 +29,7 @@ constexpr std::array<ItemKey, 8> kItemKeys{{
     {ro::sim::PickupKind::kHolyWater, "holy_water"},
     {ro::sim::PickupKind::kMagnetAll, "magnet_all"},
     {ro::sim::PickupKind::kCard, "card"},
+    {ro::sim::PickupKind::kBerry, "berry"},
 }};
 
 struct GemKey {

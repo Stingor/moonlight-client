@@ -509,10 +509,30 @@ const SurvivorsBotProfile& ThiefBotProfile() {
   return kProfile;
 }
 
+const SurvivorsBotProfile& ArcherBotProfile() {
+  // Ses tirs d'abord, le faucon, puis les pièges, qui ne servent qu'en fuyant.
+  // Charge Arrow et Skid Trap font son union.
+  static constexpr std::array<std::uint16_t, 9> kSkillOrder{46,  47,  148, 129, 117,
+                                                            115, 116, 45,  121};
+  // Les cartes qui ouvrent ses évolutions d'abord, la relève de Phreeoni en tête.
+  static constexpr std::array<std::uint16_t, 12> kCardOrder{4121, 4094, 4115, 4051, 4021, 4010,
+                                                            4072, 4003, 4197, 4147, 4016, 4001};
+  static const SurvivorsBotProfile kProfile{.skill_order = kSkillOrder,
+                                            .card_order = kCardOrder,
+                                            .threat_radius_units = Cells(7),
+                                            .panic_radius_units = Cells(3),
+                                            .gem_reach_units = Cells(10),
+                                            .edge_margin_units = Cells(20),
+                                            .heal_below_pct = 50,
+                                            .steady_steps = 5};
+  return kProfile;
+}
+
 const SurvivorsBotProfile* BotProfileOf(std::string_view class_key) {
   if (class_key == "mage") return &MageBotProfile();
   if (class_key == "knight") return &KnightBotProfile();
   if (class_key == "thief") return &ThiefBotProfile();
+  if (class_key == "archer") return &ArcherBotProfile();
   return nullptr;
 }
 

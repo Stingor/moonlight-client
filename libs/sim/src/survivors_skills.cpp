@@ -366,6 +366,28 @@ void TendStance(SurvivorsField& field, std::size_t index, const SurvivorsSkillRu
                                     kWholeChance);
 }
 
+// LE VOL DE VIE : une part du coup revient au héros en scène, sous le plafond
+// d'une seconde. Les tics de poison n'en rendent rien.
+void LeechLife(SurvivorsField& field, std::int32_t dealt) {
+  SurvivorsHero& hero = field.hero;
+  const std::int32_t leech_pct = hero.stats.Of(SurvivorsStat::kLifeStealPct);
+  if (leech_pct <= 0 || dealt <= 0 || hero.down || hero.hp >= hero.max_hp) return;
+  if (field.step >= hero.leech_since_step + kStepsPerSecond) {
+    hero.leech_since_step = field.step;
+    hero.leeched_hp = 0;
+  }
+  const std::int64_t most_hp = std::int64_t{hero.max_hp} *
+                               std::max(field.rules->tuning.leech_most_pct_per_second, 0) /
+                               kPercent;
+  const std::int64_t wanted =
+      std::int64_t{dealt} * std::min(leech_pct, kMostLifeStealPct) / kPercent;
+  const std::int64_t healed =
+      std::min({wanted, most_hp - hero.leeched_hp, std::int64_t{hero.max_hp} - hero.hp});
+  if (healed <= 0) return;
+  hero.hp = SaturatedAdd(hero.hp, healed);
+  hero.leeched_hp = SaturatedAdd(hero.leeched_hp, healed);
+}
+
 // Ce qu'un coup ou un tic retire au monstre, et ce qu'il en dit.
 struct HurtNature {
   bool critical = false;
@@ -576,9 +598,17 @@ SurvivorsDamage DamageAgainst(const SurvivorsField& field, std::int32_t base,
 
 void HurtFoe(SurvivorsField& field, SurvivorsFoe& foe, SurvivorsDamage damage,
              std::uint16_t skill_id, const SurvivorsStatus& status) {
+  const std::int32_t ranged_pct = field.hero.stats.Of(SurvivorsStat::kRangedDamagePct);
+  if (ranged_pct != 0 && damage.amount > 0) {
+    const SurvivorsSkillRule* rule = FindSkill(*field.rules, skill_id);
+    if (rule != nullptr && IsRangedArchetype(rule->archetype)) {
+      damage.amount = std::max(ScaledUnits(damage.amount, ranged_pct), 1);
+    }
+  }
   const bool critical = damage.amount > 0 && RollCritical(field);
   if (critical) damage.amount = SaturatedAdd(damage.amount, damage.amount);
   DealHurt(field, foe, damage, skill_id, status, HurtNature{.critical = critical});
+  LeechLife(field, damage.amount);
 }
 
 void CollectOrbs(const SurvivorsField& field, std::vector<SurvivorsOrb>& out) {

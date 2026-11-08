@@ -19,7 +19,7 @@ namespace {
 
 using core::TrText;
 
-constexpr std::array<SurvivorsCodexPhraseRow, 103> kPhrases{{
+constexpr std::array<SurvivorsCodexPhraseRow, 105> kPhrases{{
     // ── Les monstres communs ──
     {"1063", TrText("Le premier venu : petit, rapide et fragile.")},                 // Lunatic
     {"1007", TrText("Une larve lente, qui vient en nombre dès le départ.")},         // Fabre
@@ -110,6 +110,8 @@ constexpr std::array<SurvivorsCodexPhraseRow, 103> kPhrases{{
     {"1083",
      TrText("Une plante rare qui lâche de quoi attirer toutes les gemmes.")},  // Shining Plant
     {"1082", TrText("La plus rare : elle lâche de l'eau bénite.")},            // White Plant
+    {"1084", TrText("Un champignon que seule la carte Willow fait pousser : il lâche une "
+                    "Yggdrasil Berry.")},  // Black Mushroom
     // ── Les objets ──
     {"chest",
      TrText(
@@ -121,6 +123,7 @@ constexpr std::array<SurvivorsCodexPhraseRow, 103> kPhrases{{
     {"holy_water",
      TrText("Abat d'un coup les monstres communs autour du héros ; les boss y résistent.")},
     {"magnet_all", TrText("Attire au héros toutes les gemmes du terrain.")},
+    {"berry", TrText("Rend au héros tous ses PV.")},
     {"blue_gem", TrText("La plus petite gemme d'expérience.")},
     {"yellow_gem", TrText("Une gemme qui vaut plus d'expérience.")},
     {"red_gem", TrText("Une gemme d'expérience précieuse.")},

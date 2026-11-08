@@ -121,6 +121,41 @@ inline constexpr std::uint16_t kHidingSkill = 51;
 inline constexpr std::uint16_t kSonicBlowSkill = 136;
 inline constexpr std::uint32_t kSonicBlowSoundingEffect = 122;
 
+// L'ARCHER. Ses tirs droits se voient par la flèche de l'arc, qui vole du héros
+// à sa cible (`SkillLook::shoots_arrow`). Ceux de base n'ont pas d'autre effet,
+// et l'étincelle du coup n'est que leur repli écrit ; Sharp Shooting garde le
+// sien, que les tables lui donnent, et Beast Strafing et Phantasmic Arrow le
+// lui empruntent.
+inline constexpr std::uint16_t kDoubleStrafeSkill = 46;
+inline constexpr std::uint16_t kChargeArrowSkill = 148;
+inline constexpr std::uint16_t kBeastStrafingSkill = 499;
+inline constexpr std::uint16_t kSharpShootingSkill = 382;
+inline constexpr std::uint16_t kPhantasmicArrowSkill = 1009;
+inline constexpr std::uint32_t kArrowFallbackEffect = 1;
+// L'arc que la flèche suppose : celui de l'Archer.
+inline constexpr std::uint16_t kArrowShooterJob = 3;
+inline constexpr std::uint16_t kArrowShooterWeapon = 1701;
+// Arrow Shower (kArrowShowerSkill) : la pluie de flèches du jeu, au sol.
+inline constexpr std::uint32_t kArrowShowerEffect = 64;
+// Blitz Beat et Falcon Assault : le piqué du faucon, qui vole jusqu'où il
+// frappe.
+inline constexpr std::uint16_t kBlitzBeatSkill = 129;
+inline constexpr std::uint16_t kFalconAssaultSkill = 381;
+inline constexpr std::uint32_t kFalconDiveEffect = 115;
+// LES PIÈGES : une marque au sol tant qu'ils attendent (`SkillLook::trap`), et
+// l'explosion de leur amorce sur chaque monstre qu'ils frappent. Ankle Snare et
+// Skid Trap n'ont pas d'amorce : l'étoile de coup ordinaire.
+inline constexpr std::uint16_t kSkidTrapSkill = 115;
+inline constexpr std::uint16_t kLandMineSkill = 116;
+inline constexpr std::uint16_t kAnkleSnareSkill = 117;
+inline constexpr std::uint16_t kFreezingTrapSkill = 121;
+inline constexpr std::uint16_t kBlastMineSkill = 122;
+inline constexpr std::uint16_t kClaymoreTrapSkill = 123;
+inline constexpr std::uint32_t kLandMinePrimerEffect = 97;
+inline constexpr std::uint32_t kBlastMinePrimerEffect = 106;
+inline constexpr std::uint32_t kClaymorePrimerEffect = 107;
+inline constexpr std::uint32_t kFreezingTrapPrimerEffect = 108;
+
 // MAGNUM BREAK a deux effets : ses anneaux, à l'annonce, et l'anneau de choc de
 // chaque victime, au coup. Le lancer du mode montre les anneaux.
 inline constexpr std::uint16_t kMagnumBreakSkill = 7;
@@ -191,6 +226,11 @@ struct SkillLook {
   bool storm_sown = false;
   // Le skill dont l'icône se montre : le sien.
   std::uint16_t icon_skill_id = 0;
+  // Ses projectiles se dessinent en flèches d'arc, et un lancer sans effet de
+  // table ne joue rien de plus.
+  bool shoots_arrow = false;
+  // Sa zone est un piège : une marque au sol, sans flamme.
+  bool trap = false;
 };
 
 // L'apparence d'un skill des règles : l'objet que son lancer fait voler, sinon
