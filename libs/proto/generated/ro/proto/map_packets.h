@@ -4559,10 +4559,12 @@ struct CzMoonlightIntegrity {
 struct CzMoonclientIntegrity {
   static constexpr std::uint16_t kOpcode = 0x0f39;
   // Taille sur le fil, en octets.
-  static constexpr std::size_t kWireSize = 44;
+  static constexpr std::size_t kWireSize = 61;
 
   std::string machine_guid;
   std::int32_t patch_index = 0;
+  std::string commit;
+  std::uint8_t tree_modified = 0;
 };
 
 // PACKET_ZC_MOONLIGHT_KICK_NOTICE

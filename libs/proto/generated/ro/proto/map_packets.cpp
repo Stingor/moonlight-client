@@ -10576,6 +10576,8 @@ bool Decode(std::span<const std::uint8_t> frame, CzMoonclientIntegrity& packet) 
   reader.Skip(2);
   packet.machine_guid = reader.FixedString(36);
   packet.patch_index = static_cast<std::int32_t>(reader.I32());
+  packet.commit = reader.FixedString(16);
+  packet.tree_modified = static_cast<std::uint8_t>(reader.U8());
   return reader.ok();
 }
 
@@ -10588,6 +10590,8 @@ std::vector<std::uint8_t> Encode(const CzMoonclientIntegrity& packet) {
   writer.U16(0);
   writer.FixedString(packet.machine_guid, 36);
   writer.I32(static_cast<std::int32_t>(packet.patch_index));
+  writer.FixedString(packet.commit, 16);
+  writer.U8(static_cast<std::uint8_t>(packet.tree_modified));
   if (writer.size() > kMaxFrameSize ||
       !writer.PatchU16(kLengthOffset, static_cast<std::uint16_t>(writer.size()))) {
     return {};

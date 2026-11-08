@@ -471,8 +471,9 @@ void AddStaff(Composer& menu, const EntityMenuFacts& facts) {
     if (facts.admin) {
       menu.Group();
       menu.Add(Tr("Quel client ?"), EntityVerb::kClientInfo,
-               Tr("Dit s'il joue avec moonclient ou avec le client d'origine, et le numéro de "
-                  "patch. La réponse arrive dans la conversation.\n"
+               Tr("Dit s'il joue avec moonclient ou avec le client d'origine, le numéro de "
+                  "patch et, pour moonclient, la révision. La réponse arrive dans la "
+                  "conversation.\n"
                   "Le serveur revérifie le droit avant de répondre."));
     }
     // LE CONFORT : rien de puni ici — c'est ce qu'on fait pendant un event.

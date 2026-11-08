@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <limits>
 
+#include "ro/core/build_stamp.h"
 #include "ro/proto/map_packets.h"
 
 #if defined(_WIN32)
@@ -42,6 +43,8 @@ std::string ReadMachineGuid() {
 ClientIdentity ClientIdentityOf(std::optional<std::uint64_t> last_applied_patch) {
   ClientIdentity identity;
   identity.machine_guid = ReadMachineGuid();
+  identity.commit = std::string(core::kBuildCommit.substr(0, kCommitChars));
+  identity.tree_modified = core::kBuildTree != core::kBuildTreeClean;
   if (last_applied_patch.has_value()) {
     constexpr auto kLargestIndex =
         static_cast<std::uint64_t>(std::numeric_limits<std::int32_t>::max());
@@ -69,6 +72,8 @@ void MoonclientHandshake::Pump(Connection& link, std::uint32_t now_ms) {
   proto::CzMoonclientIntegrity declaration;
   declaration.machine_guid = identity_.machine_guid;
   declaration.patch_index = identity_.patch_index;
+  declaration.commit = identity_.commit;
+  declaration.tree_modified = identity_.tree_modified ? 1 : 0;
   link.Send(proto::Encode(declaration));
 
   last_send_ms_ = now_ms;

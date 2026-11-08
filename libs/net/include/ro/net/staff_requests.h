@@ -50,7 +50,8 @@ enum class PlayerAdminAction : std::uint8_t {
   kBlock = 7,
   // Niveau de groupe 99. Le serveur rejoue `@client` et répond dans la
   // conversation de l'émetteur : moonclient ou le client d'origine, avec le
-  // numéro de patch, ou l'absence de poignée de main.
+  // numéro de patch et, pour moonclient, sa révision ; ou l'absence de poignée
+  // de main.
   kClientInfo = 8,
 };
 

@@ -26,11 +26,13 @@ namespace ro::net {
 // `CZ_MOONCLIENT_INTEGRITY`, qui nomme ce client au serveur. Le serveur
 // l'accepte tant que sa configuration porte `allow_moonclient: 1` (ADR 0105).
 //
-// Deux champs, tous deux LUS sur cette machine :
-//   - le MachineGuid, qui dit la MACHINE et laisse à l'exploitant sa détection
-//     de multi-comptes ;
-//   - le dernier patch appliqué par le patcheur intégré, que le serveur compare
-//     à `moonclient_min_patch_index`.
+// Trois champs :
+//   - le MachineGuid, LU sur cette machine, qui dit la MACHINE et laisse à
+//     l'exploitant sa détection de multi-comptes ;
+//   - le dernier patch appliqué par le patcheur intégré, LU lui aussi, que le
+//     serveur compare à `moonclient_min_patch_index` ;
+//   - la révision gravée dans ce binaire, et si son arbre portait des retouches,
+//     que `@client` rend au staff.
 
 // Le MachineGuid tient sur 36 caractères et n'est PAS terminé par un zéro :
 // c'est ce que le serveur lit, et un octet de moins décalerait le champ suivant.
@@ -45,7 +47,13 @@ struct ClientIdentity {
   // et se contente alors de ne pas faire sa détection de multi-comptes.
   std::string machine_guid;
   std::int32_t patch_index = kNeverPatched;
+  // Au plus `kCommitChars` caractères : le surplus serait tronqué par le paquet.
+  std::string commit;
+  bool tree_modified = false;
 };
+
+// La largeur du champ de révision, complété de zéros quand elle est plus courte.
+inline constexpr std::size_t kCommitChars = 16;
 
 // Le MachineGuid de cette machine, ou une chaîne vide.
 //
