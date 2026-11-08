@@ -91,7 +91,34 @@ constexpr std::array<TerrainPieceRule, 7> kDesertPieces{{
     {.piece_id = 7, .key = "fallen_ruin", .footprint = kFallenRuin, .weight = 1},
 }};
 
-constexpr std::array<TerrainRule, 2> kTerrains{{
+// ── LES NEIGES DE LUTIE : leurs pièces ─────────────────────────────────────
+
+// Un sapin seul : son tronc bloque un carré de 2 × 2 cases.
+constexpr std::array<std::string_view, 2> kFir = {"##", "##"};
+// Un bosquet : trois sapins en L.
+constexpr std::array<std::string_view, 4> kFirGrove = {"##..", "##..", "####", "####"};
+// Un bonhomme de neige, sous tous ses angles.
+constexpr std::array<std::string_view, 2> kSnowman = {"##", "##"};
+// Une clôture : un mur bas en ligne, de six cases.
+constexpr std::array<std::string_view, 1> kFence = {"######"};
+// Des cadeaux, franchissables : la place où ils se dessinent.
+constexpr std::array<std::string_view, 3> kGifts = {"###", "###", "###"};
+// Un traîneau, sous tous ses angles.
+constexpr std::array<std::string_view, 2> kSleigh = {"##", "##"};
+// Le grand sapin décoré, le repère : son tronc et sa guirlande.
+constexpr std::array<std::string_view, 4> kXmasTree = {"####", "####", "####", "####"};
+
+constexpr std::array<TerrainPieceRule, 7> kSnowPieces{{
+    {.piece_id = 1, .key = "fir", .footprint = kFir, .weight = 9},
+    {.piece_id = 2, .key = "fir_grove", .footprint = kFirGrove, .weight = 6},
+    {.piece_id = 3, .key = "snowman", .footprint = kSnowman, .weight = 3},
+    {.piece_id = 4, .key = "fence", .footprint = kFence, .weight = 4},
+    {.piece_id = 5, .key = "gifts", .footprint = kGifts, .weight = 6, .walkable = true},
+    {.piece_id = 6, .key = "sleigh", .footprint = kSleigh, .weight = 1},
+    {.piece_id = 7, .key = "xmas_tree", .footprint = kXmasTree, .weight = 1, .landmark = true},
+}};
+
+constexpr std::array<TerrainRule, 3> kTerrains{{
     {.terrain_id = kPlainsTerrainId,
      .key = "midgard_plains",
      .pieces = kPlainsPieces,
@@ -113,6 +140,20 @@ constexpr std::array<TerrainRule, 2> kTerrains{{
      .density_period_chunks = 3,
      .clearing_cells = 12,
      .landmark_period_chunks = 6},
+    // La neige est entre les deux : de 200 à 500 ‰, une clairière de 12 cases,
+    // un repère par carré de 5 × 5 morceaux, et les chemins de la prairie,
+    // les traces de pas de Lutie.
+    {.terrain_id = kSnowTerrainId,
+     .key = "lutie_snowfield",
+     .pieces = kSnowPieces,
+     .density_min_per_mille = 200,
+     .density_max_per_mille = 500,
+     .density_period_chunks = 3,
+     .clearing_cells = 12,
+     .landmark_period_chunks = 5,
+     .path_period_chunks = 3,
+     .path_width_cells = 4,
+     .path_wiggle_cells = 7},
 }};
 
 }  // namespace

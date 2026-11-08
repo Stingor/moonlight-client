@@ -148,6 +148,7 @@ inline constexpr std::uint32_t kMinuteMs = 60000;
 // générées.
 inline constexpr std::uint16_t kPlainsTerrainId = 1;
 inline constexpr std::uint16_t kDesertTerrainId = 2;
+inline constexpr std::uint16_t kSnowTerrainId = 3;
 
 // survivors_rules_mage.cpp : les classes, les skills et les cartes. Les skills
 // sont ceux de la réserve du Magicien, puis les évolués de
@@ -207,6 +208,13 @@ inline constexpr std::size_t kArcherCardCount = 6;
 inline constexpr std::size_t kDesertFoeCount = 23;
 [[nodiscard]] std::span<const FoeRule> DesertFoes();
 [[nodiscard]] ArenaContent DesertContent();
+
+// survivors_rules_snow.cpp : les monstres propres aux neiges de Lutie, et
+// leurs vagues, leurs boss et leurs événements. ShippedFoes les met après
+// ceux du désert ; l'arène de la neige porte le contenu.
+inline constexpr std::size_t kSnowFoeCount = 19;
+[[nodiscard]] std::span<const FoeRule> SnowFoes();
+[[nodiscard]] ArenaContent SnowContent();
 
 // survivors_rules_bosses.cpp : les mini-boss, le boss final et leurs coups.
 [[nodiscard]] std::span<const BossRule> ShippedBosses();

@@ -5,6 +5,7 @@
 
 #include "ro/core/i18n.h"
 #include "ro/formats/gat.h"
+#include "ro/render/map_weather.h"
 #include "ro/sim/survivors_terrain.h"
 
 #include "survivors/arena_music.h"
@@ -89,6 +90,13 @@ std::string_view ArenaFieldTrackOf(const ro::sim::SurvivorsRules& rules,
                                    const ro::sim::ArenaRule& arena) {
   const BiomeLook* look = ArenaLookOf(rules, arena);
   return look != nullptr && !look->field_track.empty() ? look->field_track : kArenaFieldTrack;
+}
+
+std::vector<std::uint32_t> ArenaWeatherOf(const ro::sim::SurvivorsRules& rules,
+                                          const ro::sim::ArenaRule& arena) {
+  const BiomeLook* look = ArenaLookOf(rules, arena);
+  if (look == nullptr) return {};
+  return ro::render::MapWeatherEffects({}, look->reference_map);
 }
 
 }  // namespace moonclient

@@ -106,6 +106,12 @@ class ArenaEffects {
   // LES PLAFONDS DU BUDGET, que seul le banc change pour les essayer.
   void set_caps(ArenaEffectCaps caps);
 
+  // LA MÉTÉO DE L'ARÈNE (`ArenaWeatherOf`) : posée sur le héros, qu'elle suit,
+  // tant que les effets se montrent. Elle ne compte pas au budget, et une
+  // partie neuve la relève.
+  void set_weather(std::vector<std::uint32_t> effect_ids);
+  [[nodiscard]] bool weather_raised() const noexcept { return weather_raised_; }
+
   // LE HÉROS À SA PLACE DESSINÉE, en cases continues (`HordePose::cell`) : les
   // effets qu'il porte le suivent entre deux pas au lieu de sauter de case en
   // case. À chaque image, après `Advance`, qui le pose au pas de la simulation.
@@ -240,6 +246,8 @@ class ArenaEffects {
   std::size_t launched_total_ = 0;
   std::uint32_t step_ = 0;
   std::vector<std::string> heard_;
+  std::vector<std::uint32_t> weather_;
+  bool weather_raised_ = false;
 };
 
 }  // namespace moonclient

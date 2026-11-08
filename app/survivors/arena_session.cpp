@@ -49,6 +49,7 @@ ro::core::Result<void> ArenaSession::Open(ro::vfs::Vfs& vfs, const ro::sim::Surv
   if (auto opened = scene_.Open(vfs, rules, *arena, start.seed, read); !opened) return opened;
   const GroundWindowOrigin origin = scene_.window_origin();
   effects_.Open(scene_.stage(), glm::ivec2(origin.x_cells, origin.y_cells));
+  effects_.set_weather(ArenaWeatherOf(rules, *arena));
   if (auto digits = numbers_.Open(vfs); !digits) {
     ro::core::LogWarning("arène : chiffres absents — {}", ro::core::Describe(digits.error()));
   }

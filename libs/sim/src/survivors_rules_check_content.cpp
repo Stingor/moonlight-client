@@ -258,6 +258,18 @@ constexpr std::int64_t kReflexLeastRestMs = 1000;
       !checked) {
     return checked;
   }
+  // Le gel : sur un séisme qui blesse, ralenti et durée posés ensemble, aux
+  // bornes du mode. Un héros gelé n'est jamais figé.
+  if (move.slow_pct != 0 || move.slow_ms != 0) {
+    if (move.kind != BossMoveKind::kQuake || move.damage <= 0) {
+      return Refuse(at + "gel hors d'un séisme qui blesse");
+    }
+    if (move.slow_pct <= 0 || move.slow_pct > kMostFrostSlowPct || move.slow_ms == 0 ||
+        move.slow_ms > kMostFrostMs) {
+      return Refuse(at + "gel de " + std::to_string(move.slow_pct) + " % pendant " +
+                    std::to_string(move.slow_ms) + " ms");
+    }
+  }
   return CheckPercents<1>(at, {{{"majoration", move.boost_pct}}});
 }
 

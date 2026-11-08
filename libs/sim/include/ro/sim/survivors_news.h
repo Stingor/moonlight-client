@@ -92,6 +92,8 @@ struct SurvivorsWarning {
   FieldPoint to;
   std::int32_t radius_units = 0;
   std::uint32_t strike_step = 0;
+  // Un séisme qui gèle le héros qu'il blesse.
+  bool freezes = false;
 };
 inline constexpr std::size_t kMostNewsChests = 32;
 inline constexpr std::size_t kMostNewsEvolutions = 16;

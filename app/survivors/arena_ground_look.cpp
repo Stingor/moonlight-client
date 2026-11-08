@@ -237,7 +237,105 @@ constexpr std::array<SeedLook, 2> kDesertSeeds{{
     {.model = "외부소품\\뼈다구04.rsm", .scale = kSmallCactusScale, .weight = 1},
 }};
 
-constexpr std::array<BiomeLook, 2> kBiomes{{
+// ── LES NEIGES DE LUTIE ─────────────────────────────────────────────────────
+// Les modèles du champ de Lutie (xmas_fild01) : sapins, bonshommes de neige,
+// clôtures, cadeaux et traîneau. Les emprises sont celles de
+// `survivors_rules_terrain.cpp` ; un sapin se pose au milieu du carré de 2 × 2
+// cases que bloque son tronc. Il se pose au double de sa taille : plus petit,
+// ses branches basses descendent sous la tête du héros et murent 5 × 5 cases.
+constexpr std::array<GroundModelChoice, 2> kFirs{{
+    {.model = "크리스마스마을\\xmas_나무1.rsm", .scale = 2.0F, .weight = 2, .shade_cells = 3.0F},
+    {.model = "크리스마스마을\\xmas_나무2.rsm", .scale = 2.0F, .weight = 3, .shade_cells = 3.0F},
+}};
+// Les bonshommes de neige suivent le quart de tour de leur pièce : de face,
+// ils tiennent dans leur carré de 2 × 2.
+constexpr std::array<GroundModelChoice, 2> kSnowmen{{
+    {.model = "크리스마스마을\\xmas_눈사람2.rsm", .scale = 0.75F, .weight = 1, .shade_cells = 1.2F},
+    {.model = "크리스마스마을\\xmas_눈사람4.rsm", .scale = 0.6F, .weight = 1, .shade_cells = 1.2F},
+}};
+constexpr std::array<GroundModelChoice, 1> kFenceModel{{
+    {.model = "크리스마스마을\\xmas_울타리.rsm", .scale = 1.0F, .weight = 1, .shade_cells = 1.0F},
+}};
+constexpr std::array<GroundModelChoice, 2> kGiftModels{{
+    {.model = "크리스마스마을\\xmas_상자1.rsm", .scale = 0.6F, .weight = 2, .shade_cells = 0.6F},
+    {.model = "크리스마스마을\\xmas_상자2.rsm", .scale = 0.6F, .weight = 1, .shade_cells = 0.6F},
+}};
+// Les paquets au pied du sapin du repère, en retrait du bord de son emprise.
+constexpr std::array<GroundModelChoice, 1> kGreatGift{{
+    {.model = "크리스마스마을\\xmas_상자1.rsm", .scale = 0.9F, .weight = 1, .shade_cells = 0.8F},
+}};
+constexpr std::array<GroundModelChoice, 1> kSleighModel{{
+    {.model = "크리스마스마을\\xmas_썰매1.rsm", .scale = 0.66F, .weight = 1, .shade_cells = 1.2F},
+}};
+// Le sapin du repère, que ses paquets distinguent.
+constexpr std::array<GroundModelChoice, 1> kGreatFir{{
+    {.model = "크리스마스마을\\xmas_나무1.rsm", .scale = 2.0F, .weight = 1, .shade_cells = 4.0F},
+}};
+
+constexpr std::array<PieceModelSlot, 1> kFirSlots{
+    {{.east_cells = 1.0F, .north_cells = 1.0F, .models = kFirs}}};
+constexpr std::array<PieceModelSlot, 3> kFirGroveSlots{{
+    {.east_cells = 1.0F, .north_cells = 3.0F, .models = kFirs},
+    {.east_cells = 1.0F, .north_cells = 1.0F, .models = kFirs},
+    {.east_cells = 3.0F, .north_cells = 1.0F, .models = kFirs},
+}};
+constexpr std::array<PieceModelSlot, 1> kSnowmanSlots{
+    {{.east_cells = 1.0F, .north_cells = 1.0F, .models = kSnowmen, .any_yaw = false}}};
+// La clôture suit le quart de tour de sa pièce, couchée le long de sa ligne.
+constexpr std::array<PieceModelSlot, 1> kFenceSlots{
+    {{.east_cells = 3.0F, .north_cells = 0.5F, .models = kFenceModel, .any_yaw = false}}};
+// Les cadeaux de 3 × 3 : trois paquets épars, franchissables.
+constexpr std::array<PieceModelSlot, 3> kGiftSlots{{
+    {.east_cells = 0.8F, .north_cells = 0.8F, .models = kGiftModels},
+    {.east_cells = 2.2F, .north_cells = 1.2F, .models = kGiftModels},
+    {.east_cells = 1.3F, .north_cells = 2.3F, .models = kGiftModels},
+}};
+constexpr std::array<PieceModelSlot, 1> kSleighSlots{
+    {{.east_cells = 1.0F, .north_cells = 1.0F, .models = kSleighModel, .any_yaw = false}}};
+// Le repère de 4 × 4 : le grand sapin au milieu, un paquet à chaque coin.
+constexpr std::array<PieceModelSlot, 5> kXmasTreeSlots{{
+    {.east_cells = 2.0F, .north_cells = 2.0F, .models = kGreatFir},
+    {.east_cells = 0.8F, .north_cells = 0.8F, .models = kGreatGift, .any_yaw = false},
+    {.east_cells = 3.2F, .north_cells = 0.8F, .models = kGreatGift, .any_yaw = false},
+    {.east_cells = 0.8F, .north_cells = 3.2F, .models = kGreatGift, .any_yaw = false},
+    {.east_cells = 3.2F, .north_cells = 3.2F, .models = kGreatGift, .any_yaw = false},
+}};
+
+constexpr std::array<PieceLook, 7> kSnowPieces{{
+    {.key = "fir", .slots = kFirSlots},
+    {.key = "fir_grove", .slots = kFirGroveSlots},
+    {.key = "snowman", .slots = kSnowmanSlots},
+    {.key = "fence", .slots = kFenceSlots},
+    {.key = "gifts", .slots = kGiftSlots},
+    {.key = "sleigh", .slots = kSleighSlots},
+    {.key = "xmas_tree", .slots = kXmasTreeSlots},
+}};
+
+// La neige pleine `xmas_눈바닥01` se raccorde à elle-même. `05`, une tache de
+// neige tassée au milieu de son carreau, se pose sous les pièces ; `02`, des
+// traces légères, et `06`, des touffes d'herbe sous la neige, s'éparpillent.
+// `03` est une bande et `04` un bord en biais : posés seuls, ils
+// quadrilleraient le sol. Les chemins sont la neige pleine, comme le sable du
+// désert.
+constexpr std::array<GroundTextureLook, 8> kSnowTextures{{
+    {.texture = "필드바닥\\xmas_눈바닥01.bmp"},
+    {.texture = "필드바닥\\xmas_눈바닥05.bmp", .role = GroundTextureRole::kPatch},
+    {.texture = "필드바닥\\xmas_눈바닥02.bmp", .role = GroundTextureRole::kScatter, .weight = 2},
+    {.texture = "필드바닥\\xmas_눈바닥06.bmp", .role = GroundTextureRole::kScatter},
+    {.texture = "필드바닥\\xmas_눈바닥01.bmp", .role = GroundTextureRole::kPathFull},
+    {.texture = "필드바닥\\xmas_눈바닥01.bmp", .role = GroundTextureRole::kPathEdge},
+    {.texture = "필드바닥\\xmas_눈바닥01.bmp", .role = GroundTextureRole::kPathOuter},
+    {.texture = "필드바닥\\xmas_눈바닥01.bmp", .role = GroundTextureRole::kPathInner},
+}};
+
+// Le semis : l'herbe sous la neige, et quelques boules de Noël tombées.
+constexpr std::array<SeedLook, 3> kSnowSeeds{{
+    {.model = "크리스마스마을\\xmas_풀.rsm", .scale = 0.6F, .weight = 6},
+    {.model = "크리스마스마을\\xmas_구슬2.rsm", .scale = 1.0F, .weight = 1},
+    {.model = "크리스마스마을\\xmas_구슬3.rsm", .scale = 1.0F, .weight = 1},
+}};
+
+constexpr std::array<BiomeLook, 3> kBiomes{{
     {.terrain_key = "midgard_plains",
      .reference_map = "prt_fild08",
      .display_name = ro::core::TrText("Prairie de Midgard"),
@@ -262,6 +360,17 @@ constexpr std::array<BiomeLook, 2> kBiomes{{
      .seeds_per_chunk = 6,
      .patch_per_mille = 0,
      .scatter_per_mille = 20},
+    {.terrain_key = "lutie_snowfield",
+     .reference_map = "xmas_fild01",
+     .display_name = ro::core::TrText("Neiges de Lutie"),
+     .sign_background = "field_s2",
+     .field_track = "bgm\\55.mp3",
+     .textures = kSnowTextures,
+     .pieces = kSnowPieces,
+     .seeds = kSnowSeeds,
+     .seeds_per_chunk = 8,
+     .patch_per_mille = 500,
+     .scatter_per_mille = 40},
 }};
 
 }  // namespace

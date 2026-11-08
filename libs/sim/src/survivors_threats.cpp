@@ -47,6 +47,20 @@ namespace {
   return !hit;
 }
 
+// LE GEL : le héros marche `slow_pct` % moins vite pendant `slow_ms`, aux
+// bornes du contenu. Un gel qui le trouve déjà gelé garde le plus fort et le
+// plus long des deux.
+void Freeze(SurvivorsHero& hero, std::uint32_t step, std::int32_t slow_pct,
+            std::uint32_t slow_ms) noexcept {
+  const std::uint64_t until = std::uint64_t{step} + 1 + StepsOf(std::min(slow_ms, kMostFrostMs));
+  const auto until_step = static_cast<std::uint32_t>(
+      std::min<std::uint64_t>(until, std::numeric_limits<std::uint32_t>::max()));
+  const std::int32_t pct = std::clamp(slow_pct, 0, kMostFrostSlowPct);
+  const bool frozen = step < hero.frost_until_step;
+  hero.frost_slow_pct = frozen ? std::max(hero.frost_slow_pct, pct) : pct;
+  hero.frost_until_step = std::max(frozen ? hero.frost_until_step : 0U, until_step);
+}
+
 // Une menace au sol à ce pas : armée, elle blesse le héros qui la chevauche,
 // puis attend sa période (une seule fois pour une période nulle). Faux quand
 // elle s'éteint.
@@ -62,7 +76,15 @@ namespace {
       return;
     }
     hit = true;
+    // Le gel ne prend que sur un coup qui a porté, et pas sur le héros qui
+    // vient de se relever, invulnérable.
+    const std::int32_t hurt_before = field.news.hurt_by_hero[field.stage];
     (void)HurtHero(field, hazard.damage);
+    const bool landed = field.news.hurt_by_hero[field.stage] != hurt_before;
+    if (landed && hazard.slow_pct > 0 && !field.hero.down &&
+        field.step >= field.hero.invulnerable_until_step) {
+      Freeze(field.hero, field.step, hazard.slow_pct, hazard.slow_ms);
+    }
   });
   if (!hit) return true;
   hazard.next_hurt_step = hazard.period_steps > 0

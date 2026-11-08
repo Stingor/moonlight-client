@@ -80,7 +80,15 @@ struct BossMoveRule {
   std::int32_t radius_units = 0;
   std::int32_t damage = 0;
   std::int32_t boost_pct = 0;
+  // LE GEL, sur un séisme seulement : le héros que le cercle blesse marche
+  // `slow_pct` % moins vite pendant `slow_ms`. Il n'est jamais figé.
+  std::int32_t slow_pct = 0;
+  std::uint32_t slow_ms = 0;
 };
+
+// Les bornes du gel, que CheckSurvivorsRules impose.
+inline constexpr std::int32_t kMostFrostSlowPct = 50;
+inline constexpr std::uint32_t kMostFrostMs = 3000;
 
 // Un coup qui a besoin d'une espèce : celle qu'il invoque ou qu'il presse.
 [[nodiscard]] constexpr bool NamesFoe(BossMoveKind kind) noexcept {

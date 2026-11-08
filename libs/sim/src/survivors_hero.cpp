@@ -20,7 +20,7 @@ namespace {
 // La marche du héros à ce pas : celle de ses statistiques, ou, sous une Speed
 // Potion, celle de sa classe majorée de sa statistique de marche PLUS la
 // majoration de l'objet, sommées avant une seule troncature.
-[[nodiscard]] std::int32_t HeroPace(const SurvivorsField& field) noexcept {
+[[nodiscard]] std::int32_t UnfrozenPace(const SurvivorsField& field) noexcept {
   const SurvivorsHero& hero = field.hero;
   if (field.step >= hero.haste_until_step || field.hero_class == nullptr) {
     return hero.units_per_step;
@@ -29,6 +29,15 @@ namespace {
   if (haste == nullptr) return hero.units_per_step;
   return ScaledUnits(UnitsPerStep(field.hero_class->walk_ms_per_cell),
                      std::int64_t{hero.stats.Of(SurvivorsStat::kWalkPct)} + haste->amount);
+}
+
+// La marche du héros, retranchée de son gel tant qu'il dure.
+[[nodiscard]] std::int32_t HeroPace(const SurvivorsField& field) noexcept {
+  const std::int32_t pace = UnfrozenPace(field);
+  const SurvivorsHero& hero = field.hero;
+  if (field.step >= hero.frost_until_step) return pace;
+  const std::int32_t slow_pct = std::clamp(hero.frost_slow_pct, 0, kMostFrostSlowPct);
+  return static_cast<std::int32_t>(std::int64_t{pace} * (kPercent - slow_pct) / kPercent);
 }
 
 // Le contact d'un monstre : celui de sa règle, à `touch_pct` % pour une élite,

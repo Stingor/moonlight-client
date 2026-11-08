@@ -87,6 +87,9 @@ constexpr std::uint8_t kWarningAlphaLast = 170;
 constexpr std::array<std::uint8_t, 3> kWarningRgb = {255, 32, 32};
 constexpr std::array<std::uint8_t, 4> kPuddleColor = {120, 40, 160, 110};
 constexpr std::array<std::uint8_t, 4> kQuakeColor = {150, 100, 40, 110};
+// Un séisme qui gèle s'annonce et frappe en bleu de glace.
+constexpr std::array<std::uint8_t, 3> kFrostWarningRgb = {60, 150, 255};
+constexpr std::array<std::uint8_t, 4> kFrostColor = {120, 190, 255, 120};
 // Une annonce sans rayon couvre au moins sa case.
 constexpr std::int32_t kLeastMarkRadius = ro::sim::kSubunitsPerCell / 2;
 
@@ -251,6 +254,16 @@ void ArenaEffects::Restart() {
   step_ = 0;
   // Ni la chauffe ni la partie d'avant ne font entendre leurs bruits.
   heard_.clear();
+  // La troupe oubliée, la météo se relève à la prochaine image.
+  weather_raised_ = false;
+}
+
+void ArenaEffects::set_weather(std::vector<std::uint32_t> effect_ids) {
+  if (weather_raised_) {
+    for (const std::uint32_t effect_id : weather_) nodes_.StopEffect(effect_id, kArenaHeroActorId);
+  }
+  weather_ = std::move(effect_ids);
+  weather_raised_ = false;
 }
 
 void ArenaEffects::PlaceActor(std::uint32_t actor_id, glm::vec2 cell) {
@@ -446,6 +459,19 @@ void ArenaEffects::Advance(const ro::sim::SurvivorsNews& news, const ro::sim::Su
                                                       static_cast<float>(field.hero.position.y))));
   // Ce que porte le héros le suit, selon la table de suivi de chaque effet.
   nodes_.FollowActor(kArenaHeroActorId, ground_of(field.hero.position), kArenaBearerFacingDegrees);
+  // LA MÉTÉO suit l'interrupteur des effets : levée quand ils se montrent,
+  // éteinte quand ils se coupent.
+  if (const bool wanted = switches_.shown && !weather_.empty(); wanted != weather_raised_) {
+    for (const std::uint32_t effect_id : weather_) {
+      if (wanted) {
+        static_cast<void>(nodes_.PlayProcedural(effect_id, ground_of(field.hero.position),
+                                                std::nullopt, 0.0F, kArenaHeroActorId));
+      } else {
+        nodes_.StopEffect(effect_id, kArenaHeroActorId);
+      }
+    }
+    weather_raised_ = wanted;
+  }
   lives_.Expire(now_ms);
   KeepOrbs(orbs, ground_of, now_ms);
   KeepRareGlows(field, ground_of, now_ms);
@@ -571,16 +597,20 @@ void ArenaEffects::LayGroundMarks(const ro::sim::SurvivorsField& field) {
     const std::uint32_t done = std::min(field.step - mark.announced_step, span);
     const auto alpha = static_cast<std::uint8_t>(
         kWarningAlphaFirst + (kWarningAlphaLast - kWarningAlphaFirst) * done / span);
-    const std::array<std::uint8_t, 4> color = {kWarningRgb[0], kWarningRgb[1], kWarningRgb[2],
-                                               alpha};
+    const std::array<std::uint8_t, 3>& rgb = warning.freezes ? kFrostWarningRgb : kWarningRgb;
+    const std::array<std::uint8_t, 4> color = {rgb[0], rgb[1], rgb[2], alpha};
     const ro::sim::FieldPoint from =
         warning.kind == ro::sim::WarningKind::kCharge ? warning.from : warning.to;
     LayCells(*stage_, origin_cells_, from, warning.to, warning.radius_units, color, mark_quads_);
   }
   for (const ro::sim::SurvivorsHazard& hazard : field.hazards) {
     if (field.step >= hazard.until_step) continue;
-    LayCells(*stage_, origin_cells_, hazard.center, hazard.center, hazard.radius_units,
-             hazard.kind == ro::sim::HazardKind::kPuddle ? kPuddleColor : kQuakeColor, mark_quads_);
+    const std::array<std::uint8_t, 4>& color = hazard.kind == ro::sim::HazardKind::kPuddle
+                                                   ? kPuddleColor
+                                               : hazard.slow_pct > 0 ? kFrostColor
+                                                                     : kQuakeColor;
+    LayCells(*stage_, origin_cells_, hazard.center, hazard.center, hazard.radius_units, color,
+             mark_quads_);
   }
   // LES PIÈGES QUI ATTENDENT, de toute l'équipe : leur aire, en marque calme.
   if (!switches_.shown) return;

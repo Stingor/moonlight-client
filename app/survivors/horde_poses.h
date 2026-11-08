@@ -116,6 +116,8 @@ inline constexpr float kEliteScale = 1.5F;
 inline constexpr std::array<std::uint8_t, 4> kEliteTint = {255, 210, 90, 255};
 // Glacé, un monstre pâlit vers le bleu ; gelé, il prend le bleu du gel du jeu.
 inline constexpr std::array<std::uint8_t, 4> kChilledTint = {160, 200, 255, 255};
+// Gelé par un boss, le héros prend le même bleu tant qu'il marche ralenti.
+inline constexpr std::array<std::uint8_t, 4> kFrostedHeroTint = kChilledTint;
 
 // La position d'un point de la simulation, en cases continues.
 [[nodiscard]] glm::vec2 CellOfField(glm::vec2 subunits) noexcept;

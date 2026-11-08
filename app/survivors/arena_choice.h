@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -64,5 +65,12 @@ namespace moonclient {
 // champs de Prontera.
 [[nodiscard]] std::string_view ArenaFieldTrackOf(const ro::sim::SurvivorsRules& rules,
                                                  const ro::sim::ArenaRule& arena);
+
+// LA MÉTÉO D'UNE ARÈNE GÉNÉRÉE : celle que le client écrit pour la carte de
+// référence de son biome — la neige de Lutie. La table de l'installation
+// n'entre pas : une arène ne change pas de temps d'une installation à l'autre.
+// Rien pour une carte.
+[[nodiscard]] std::vector<std::uint32_t> ArenaWeatherOf(const ro::sim::SurvivorsRules& rules,
+                                                        const ro::sim::ArenaRule& arena);
 
 }  // namespace moonclient

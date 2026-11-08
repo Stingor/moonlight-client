@@ -206,7 +206,77 @@ constexpr std::array<SolidPoint, 4> kModel19Outline0{
     {{-7.22F, -7.22F}, {7.22F, -7.22F}, {7.23F, 7.22F}, {-7.21F, 7.22F}}};
 constexpr std::array<SolidOutline, 1> kModel19Outlines{{{kModel19Outline0}}};
 
-constexpr std::array<ModelSolid, 20> kSolids{{
+constexpr std::array<SolidPoint, 6> kModel20Outline0{{{-5.54F, -6.04F},
+                                                      {-4.67F, -7.55F},
+                                                      {-2.92F, -7.55F},
+                                                      {-2.04F, -6.04F},
+                                                      {-2.92F, -4.52F},
+                                                      {-4.67F, -4.52F}}};
+constexpr std::array<SolidOutline, 1> kModel20Outlines{{{kModel20Outline0}}};
+
+constexpr std::array<SolidPoint, 6> kModel21Outline0{{{-5.54F, -6.04F},
+                                                      {-4.67F, -7.55F},
+                                                      {-2.92F, -7.55F},
+                                                      {-2.04F, -6.04F},
+                                                      {-2.92F, -4.52F},
+                                                      {-4.67F, -4.52F}}};
+constexpr std::array<SolidOutline, 1> kModel21Outlines{{{kModel21Outline0}}};
+
+constexpr std::array<SolidPoint, 14> kModel22Outline0{{{-6.64F, -10.09F},
+                                                       {-6.11F, -12.05F},
+                                                       {-6.0F, -12.46F},
+                                                       {-4.86F, -13.12F},
+                                                       {4.97F, -11.66F},
+                                                       {5.81F, -10.95F},
+                                                       {6.11F, -9.75F},
+                                                       {5.55F, -7.88F},
+                                                       {4.1F, -3.53F},
+                                                       {2.26F, -1.71F},
+                                                       {-0.27F, -1.05F},
+                                                       {-2.79F, -1.71F},
+                                                       {-4.63F, -3.53F},
+                                                       {-6.43F, -7.15F}}};
+constexpr std::array<SolidOutline, 1> kModel22Outlines{{{kModel22Outline0}}};
+
+constexpr std::array<SolidPoint, 8> kModel23Outline0{{{-7.51F, 0.01F},
+                                                      {-2.92F, -2.92F},
+                                                      {0.0F, -4.12F},
+                                                      {2.92F, -2.92F},
+                                                      {8.14F, 0.01F},
+                                                      {2.92F, 2.92F},
+                                                      {0.0F, 4.12F},
+                                                      {-2.92F, 2.92F}}};
+constexpr std::array<SolidOutline, 1> kModel23Outlines{{{kModel23Outline0}}};
+
+constexpr std::array<SolidPoint, 6> kModel24Outline0{{{-14.62F, 2.42F},
+                                                      {15.0F, 2.42F},
+                                                      {15.0F, 3.18F},
+                                                      {14.99F, 4.52F},
+                                                      {-14.33F, 4.52F},
+                                                      {-14.62F, 3.18F}}};
+constexpr std::array<SolidOutline, 1> kModel24Outlines{{{kModel24Outline0}}};
+
+constexpr std::array<SolidPoint, 4> kModel25Outline0{
+    {{-4.0F, -4.0F}, {4.0F, -4.0F}, {4.0F, 4.0F}, {-4.0F, 4.0F}}};
+constexpr std::array<SolidOutline, 1> kModel25Outlines{{{kModel25Outline0}}};
+
+constexpr std::array<SolidPoint, 4> kModel26Outline0{
+    {{-2.5F, -2.5F}, {2.5F, -2.5F}, {2.5F, 2.5F}, {-2.5F, 2.5F}}};
+constexpr std::array<SolidOutline, 1> kModel26Outlines{{{kModel26Outline0}}};
+
+constexpr std::array<SolidPoint, 6> kModel27Outline0{{{-6.51F, -5.02F},
+                                                      {4.71F, -5.02F},
+                                                      {6.42F, -4.29F},
+                                                      {6.42F, 3.4F},
+                                                      {4.71F, 4.16F},
+                                                      {-6.51F, 4.16F}}};
+constexpr std::array<SolidOutline, 1> kModel27Outlines{{{kModel27Outline0}}};
+
+constexpr std::array<SolidPoint, 4> kModel28Outline0{
+    {{-4.0F, -4.0F}, {4.0F, -4.0F}, {4.0F, 4.0F}, {-4.0F, 4.0F}}};
+constexpr std::array<SolidOutline, 1> kModel28Outlines{{{kModel28Outline0}}};
+
+constexpr std::array<ModelSolid, 29> kSolids{{
     {"나무잡초꽃\\바위01.rsm",
      0.6F,
      0.0F,
@@ -347,6 +417,69 @@ constexpr std::array<ModelSolid, 20> kSolids{{
      {-7.22F, -38.3F, -7.22F},
      {7.23F, 0.0F, 7.22F},
      kModel19Outlines},
+    {"크리스마스마을\\xmas_나무1.rsm",
+     2.0F,
+     0.0F,
+     260,
+     {-15.83F, -33.4F, -18.3F},
+     {8.24F, 0.0F, 6.22F},
+     kModel20Outlines},
+    {"크리스마스마을\\xmas_나무2.rsm",
+     2.0F,
+     0.0F,
+     260,
+     {-15.83F, -33.4F, -18.3F},
+     {8.24F, 0.0F, 6.22F},
+     kModel21Outlines},
+    {"크리스마스마을\\xmas_눈사람2.rsm",
+     0.75F,
+     0.0F,
+     260,
+     {-6.64F, -19.96F, -13.12F},
+     {6.11F, 0.02F, -1.05F},
+     kModel22Outlines},
+    {"크리스마스마을\\xmas_눈사람4.rsm",
+     0.6F,
+     0.0F,
+     260,
+     {-7.51F, -18.49F, -4.12F},
+     {8.14F, -0.0F, 4.12F},
+     kModel23Outlines},
+    {"크리스마스마을\\xmas_울타리.rsm",
+     1.0F,
+     0.0F,
+     260,
+     {-14.62F, -17.0F, 2.42F},
+     {15.0F, 0.0F, 4.52F},
+     kModel24Outlines},
+    {"크리스마스마을\\xmas_상자1.rsm",
+     0.6F,
+     0.0F,
+     260,
+     {-4.0F, -7.56F, -4.0F},
+     {4.0F, 0.0F, 4.0F},
+     kModel25Outlines},
+    {"크리스마스마을\\xmas_상자2.rsm",
+     0.6F,
+     0.0F,
+     260,
+     {-2.5F, -4.5F, -2.5F},
+     {2.5F, 0.0F, 2.5F},
+     kModel26Outlines},
+    {"크리스마스마을\\xmas_썰매1.rsm",
+     0.66F,
+     0.0F,
+     260,
+     {-6.51F, -0.69F, -5.02F},
+     {6.42F, 1.53F, 4.16F},
+     kModel27Outlines},
+    {"크리스마스마을\\xmas_상자1.rsm",
+     0.9F,
+     0.0F,
+     260,
+     {-4.0F, -7.56F, -4.0F},
+     {4.0F, 0.0F, 4.0F},
+     kModel28Outlines},
 }};
 
 }  // namespace

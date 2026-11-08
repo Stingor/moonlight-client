@@ -123,13 +123,16 @@ void Quake(SurvivorsField& field, const SurvivorsFoe& foe, const BossMoveRule& m
                                             .armed_step = strike_step,
                                             .until_step = Later(strike_step, 1),
                                             .period_steps = 0,
-                                            .next_hurt_step = 0});
+                                            .next_hurt_step = 0,
+                                            .slow_pct = move.slow_pct,
+                                            .slow_ms = move.slow_ms});
     PublishWarning(field.news, SurvivorsWarning{.kind = WarningKind::kQuake,
                                                 .source_serial = foe.serial,
                                                 .from = center,
                                                 .to = center,
                                                 .radius_units = move.radius_units,
-                                                .strike_step = strike_step});
+                                                .strike_step = strike_step,
+                                                .freezes = move.slow_pct > 0});
   }
 }
 

@@ -85,7 +85,7 @@ void PutBoss(FnvDigest& digest, const BossRule& boss) {
   PutEach(digest, boss.moves, [&](const BossMoveRule& move) {
     PutAll(digest, move.kind, move.from_hp_pct, move.to_hp_pct, move.first_ms, move.period_ms,
            move.telegraph_ms, move.effect_ms, move.foe_id, move.count, move.reach_units,
-           move.radius_units, move.damage, move.boost_pct);
+           move.radius_units, move.damage, move.boost_pct, move.slow_pct, move.slow_ms);
   });
 }
 

@@ -22969,3 +22969,81 @@ tr: Your falcon dives, strike after strike, at the nearest.
 
 fr: Œil de lynx
 tr: Lynx Eye
+
+fr: Neiges de Lutie
+tr: Lutie Snowfield
+
+fr: Un Poring en bonnet de Noël, le premier venu de la neige.
+tr: A Poring in a Christmas hat, the first to arrive in the snow.
+
+fr: Un Poring d'eau, mou et lent.
+tr: A water Poring, soft and slow.
+
+fr: Un biscuit vif, qui vient en raid.
+tr: A quick cookie that comes in raids.
+
+fr: Un biscuit de Noël, plus solide que ses cousins.
+tr: A Christmas cookie, sturdier than its cousins.
+
+fr: Un petit glaçon vif, qui chasse en meute.
+tr: A quick little icicle that hunts in packs.
+
+fr: Un jouet à roulettes, lent et têtu.
+tr: A wheeled toy, slow and stubborn.
+
+fr: Une bête des neiges qui charge après une annonce.
+tr: A snow beast that charges after a warning.
+
+fr: Se tient à distance et lance des éclats de glace.
+tr: Keeps its distance and throws shards of ice.
+
+fr: Un loup du vent, qui chasse en meute.
+tr: A wind wolf that hunts in packs.
+
+fr: Un bloc de neige massif, aux coups lourds.
+tr: A massive block of snow with heavy blows.
+
+fr: Le petit de Hatii, qui chasse en meute.
+tr: Hatii's cub, hunting in packs.
+
+fr: Un titan de glace que rien ne repousse.
+tr: An ice titan that nothing pushes back.
+
+fr: Un glaçon immobile, qui mure le passage.
+tr: A motionless icicle that walls off the way.
+
+fr: La poupée de la fabrique : elle appelle des biscuits de Noël.
+tr: The factory doll: she calls Christmas cookies.
+
+fr: La boîte à surprises : elle lâche des biscuits.
+tr: The surprise box: it lets cookies loose.
+
+fr: Il lève Storm Gust : ses cercles annoncés gèlent le héros qu'ils touchent.
+tr: He raises Storm Gust: its announced circles freeze the hero they touch.
+
+fr: Son hurlement presse le pas des petits de Hatii.
+tr: Its howl hastens Hatii's cubs.
+
+fr: Il s'enfuit dès qu'on le touche ; rattrapé, il lâche une Old Blue Box.
+tr: He flees as soon as he is hit; caught, he drops an Old Blue Box.
+
+fr: Le seigneur des neiges : charge, appelle ses petits, et son souffle gèle le héros. Sa chute est la victoire.
+tr: The lord of the snows: he charges, calls his cubs, and his breath freezes the hero. His fall is the victory.
+
+fr: Une nuée de Santa Porings dévale la neige.
+tr: A swarm of Santa Porings rushes down the snow.
+
+fr: Des glaçons se dressent en anneau et enferment le héros.
+tr: Icicles rise in a ring and trap the hero.
+
+fr: Un raid de biscuits charge le héros.
+tr: A cookie raid charges the hero.
+
+fr: Une meute de Siromas arrive d'un même côté.
+tr: A pack of Siromas comes from one side.
+
+fr: Les petits de Hatii chargent le héros.
+tr: Hatii's cubs charge the hero.
+
+fr: Des titans de glace referment un anneau autour du héros.
+tr: Ice titans close a ring around the hero.

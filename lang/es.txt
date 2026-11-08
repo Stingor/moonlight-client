@@ -22969,3 +22969,81 @@ tr: Tu halcón pica, golpe tras golpe, sobre el más cercano.
 
 fr: Œil de lynx
 tr: Ojo de lince
+
+fr: Neiges de Lutie
+tr: Nieves de Lutie
+
+fr: Un Poring en bonnet de Noël, le premier venu de la neige.
+tr: Un Poring con gorro navideño, el primero en llegar a la nieve.
+
+fr: Un Poring d'eau, mou et lent.
+tr: Un Poring de agua, blando y lento.
+
+fr: Un biscuit vif, qui vient en raid.
+tr: Una galleta rápida que llega en incursiones.
+
+fr: Un biscuit de Noël, plus solide que ses cousins.
+tr: Una galleta navideña, más resistente que sus primas.
+
+fr: Un petit glaçon vif, qui chasse en meute.
+tr: Un carámbano pequeño y rápido que caza en manada.
+
+fr: Un jouet à roulettes, lent et têtu.
+tr: Un juguete con ruedas, lento y testarudo.
+
+fr: Une bête des neiges qui charge après une annonce.
+tr: Una bestia de las nieves que embiste tras un aviso.
+
+fr: Se tient à distance et lance des éclats de glace.
+tr: Se mantiene a distancia y lanza esquirlas de hielo.
+
+fr: Un loup du vent, qui chasse en meute.
+tr: Un lobo del viento que caza en manada.
+
+fr: Un bloc de neige massif, aux coups lourds.
+tr: Un bloque de nieve macizo, de golpes pesados.
+
+fr: Le petit de Hatii, qui chasse en meute.
+tr: La cría de Hatii, que caza en manada.
+
+fr: Un titan de glace que rien ne repousse.
+tr: Un titán de hielo al que nada hace retroceder.
+
+fr: Un glaçon immobile, qui mure le passage.
+tr: Un carámbano inmóvil que tapia el paso.
+
+fr: La poupée de la fabrique : elle appelle des biscuits de Noël.
+tr: La muñeca de la fábrica: llama a galletas navideñas.
+
+fr: La boîte à surprises : elle lâche des biscuits.
+tr: La caja sorpresa: suelta galletas.
+
+fr: Il lève Storm Gust : ses cercles annoncés gèlent le héros qu'ils touchent.
+tr: Alza Storm Gust: sus círculos anunciados congelan al héroe que tocan.
+
+fr: Son hurlement presse le pas des petits de Hatii.
+tr: Su aullido apresura a las crías de Hatii.
+
+fr: Il s'enfuit dès qu'on le touche ; rattrapé, il lâche une Old Blue Box.
+tr: Huye en cuanto lo tocan; atrapado, suelta una Old Blue Box.
+
+fr: Le seigneur des neiges : charge, appelle ses petits, et son souffle gèle le héros. Sa chute est la victoire.
+tr: El señor de las nieves: embiste, llama a sus crías y su aliento congela al héroe. Su caída es la victoria.
+
+fr: Une nuée de Santa Porings dévale la neige.
+tr: Una nube de Santa Porings baja por la nieve.
+
+fr: Des glaçons se dressent en anneau et enferment le héros.
+tr: Unos carámbanos se alzan en anillo y encierran al héroe.
+
+fr: Un raid de biscuits charge le héros.
+tr: Una incursión de galletas carga contra el héroe.
+
+fr: Une meute de Siromas arrive d'un même côté.
+tr: Una manada de Siromas llega por un mismo lado.
+
+fr: Les petits de Hatii chargent le héros.
+tr: Las crías de Hatii cargan contra el héroe.
+
+fr: Des titans de glace referment un anneau autour du héros.
+tr: Unos titanes de hielo cierran un anillo alrededor del héroe.

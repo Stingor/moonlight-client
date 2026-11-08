@@ -224,6 +224,7 @@ void HordePoses::PoseHero(const ro::sim::SurvivorsField& field, std::uint64_t pr
   }
   PoseSlide(pose, field.stage, presentation_ms);
   pose.direction = DirectionOf(hero.facing, pose.motion != Motion::kDie);
+  if (!hero.down && field.step < hero.frost_until_step) pose.tint = kFrostedHeroTint;
   poses_.push_back(pose);
 }
 
@@ -249,6 +250,7 @@ void HordePoses::PoseAllies(const ro::sim::SurvivorsField& field, std::uint64_t 
     }
     PoseSlide(pose, index, presentation_ms);
     pose.direction = DirectionOf(hero.facing, pose.motion != Motion::kDie);
+    if (!hero.down && field.step < hero.frost_until_step) pose.tint = kFrostedHeroTint;
     poses_.push_back(pose);
   }
 }

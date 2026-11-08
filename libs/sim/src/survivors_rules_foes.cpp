@@ -306,12 +306,16 @@ constexpr std::array<ElementRow, kSurvivorsElementCount> kElements{{
 }  // namespace
 
 std::span<const FoeRule> ShippedFoes() {
-  // Une table IMMUABLE, assemblée au premier appel : la prairie, puis le désert.
-  static const std::array<FoeRule, kPlainsFoeCount + kDesertFoeCount> kAll = [] {
-    std::array<FoeRule, kPlainsFoeCount + kDesertFoeCount> all{};
+  // Une table IMMUABLE, assemblée au premier appel : la prairie, le désert,
+  // puis la neige.
+  constexpr std::size_t kAllFoeCount = kPlainsFoeCount + kDesertFoeCount + kSnowFoeCount;
+  static const std::array<FoeRule, kAllFoeCount> kAll = [] {
+    std::array<FoeRule, kAllFoeCount> all{};
     const std::span<const FoeRule> desert = DesertFoes();
+    const std::span<const FoeRule> snow = SnowFoes();
     auto out = std::copy(kFoes.begin(), kFoes.end(), all.begin());
-    std::copy_n(desert.begin(), std::min(desert.size(), kDesertFoeCount), out);
+    out = std::copy_n(desert.begin(), std::min(desert.size(), kDesertFoeCount), out);
+    std::copy_n(snow.begin(), std::min(snow.size(), kSnowFoeCount), out);
     return all;
   }();
   return kAll;
@@ -325,11 +329,13 @@ std::span<const WaveRule> ShippedWaves() { return kWaves; }
 // équilibrage propre (Q6). midgard_plains : le sol généré de la prairie, sans
 // bord, né au centre du monde, l'arène classée et celle du défi (ADR 0134).
 // morroc_desert : le sol généré du désert, avec son bestiaire, ses boss et ses
-// événements ; partie libre seulement (lot 12, Q2).
+// événements ; partie libre seulement (lot 12, Q2). lutie_snowfield : le sol
+// généré des neiges de Lutie, de même, en partie libre (lot 17, Q1).
 std::span<const ArenaRule> ShippedArenas() {
-  static const std::array<ArenaRule, 3> kArenas = [] {
+  static const std::array<ArenaRule, 4> kArenas = [] {
     const ArenaContent desert = DesertContent();
-    return std::array<ArenaRule, 3>{{
+    const ArenaContent snow = SnowContent();
+    return std::array<ArenaRule, 4>{{
         {.arena_id = 1,
          .key = "prt_fild08",
          .map_name = "prt_fild08",
@@ -350,6 +356,15 @@ std::span<const ArenaRule> ShippedArenas() {
          .waves = desert.waves,
          .bosses = desert.bosses,
          .events = desert.events},
+        {.arena_id = 4,
+         .key = "lutie_snowfield",
+         .map_name = "",
+         .start = std::nullopt,
+         .terrain_id = kSnowTerrainId,
+         .ranked = false,
+         .waves = snow.waves,
+         .bosses = snow.bosses,
+         .events = snow.events},
     }};
   }();
   return kArenas;

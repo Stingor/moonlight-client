@@ -85,6 +85,10 @@ struct SurvivorsHero {
   // ce qu'il a déjà rendu, sous le plafond du réglage.
   std::uint32_t leech_since_step = 0;
   std::int32_t leeched_hp = 0;
+  // GELÉ, tant que `step < frost_until_step` : il marche `frost_slow_pct` %
+  // moins vite. Un second gel garde le plus fort et le plus long.
+  std::uint32_t frost_until_step = 0;
+  std::int32_t frost_slow_pct = 0;
   // En coop : tombé sans vie de réserve. Il ne bouge, ne tire ni ne ramasse
   // plus, et la horde l'ignore. Jamais vrai en solo.
   bool down = false;
@@ -237,6 +241,9 @@ struct SurvivorsHazard {
   std::uint32_t until_step = 0;
   std::uint32_t period_steps = 0;
   std::uint32_t next_hurt_step = 0;
+  // Le gel qu'elle pose sur le héros qu'elle blesse ; 0 : aucun.
+  std::int32_t slow_pct = 0;
+  std::uint32_t slow_ms = 0;
 };
 struct SurvivorsShot {
   std::uint32_t serial = 0;

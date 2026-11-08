@@ -19,7 +19,7 @@ namespace {
 
 using core::TrText;
 
-constexpr std::array<SurvivorsCodexPhraseRow, 105> kPhrases{{
+constexpr std::array<SurvivorsCodexPhraseRow, 130> kPhrases{{
     // ── Les monstres communs ──
     {"1063", TrText("Le premier venu : petit, rapide et fragile.")},                 // Lunatic
     {"1007", TrText("Une larve lente, qui vient en nombre dès le départ.")},         // Fabre
@@ -89,6 +89,20 @@ constexpr std::array<SurvivorsCodexPhraseRow, 105> kPhrases{{
     {"1146", TrText("Chasse en meute dans le noir, et mord vite.")},                  // Matyr
     {"1164", TrText("Un mort lent qui frappe dur.")},                                 // Requiem
     {"1154", TrText("Un guerrier de feu, le plus robuste des communs du désert.")},   // Pasana
+    // ── Les monstres communs de la neige ──
+    {"1062", TrText("Un Poring en bonnet de Noël, le premier venu de la neige.")},  // Santa Poring
+    {"1242", TrText("Un Poring d'eau, mou et lent.")},                              // Marin
+    {"1265", TrText("Un biscuit vif, qui vient en raid.")},                         // Cookie
+    {"1246", TrText("Un biscuit de Noël, plus solide que ses cousins.")},   // Christmas Cookie
+    {"1776", TrText("Un petit glaçon vif, qui chasse en meute.")},          // Siroma
+    {"1248", TrText("Un jouet à roulettes, lent et têtu.")},                // Cruiser
+    {"1243", TrText("Une bête des neiges qui charge après une annonce.")},  // Sasquatch
+    {"1778", TrText("Se tient à distance et lance des éclats de glace.")},  // Gazeti
+    {"1782", TrText("Un loup du vent, qui chasse en meute.")},              // Roween
+    {"1775", TrText("Un bloc de neige massif, aux coups lourds.")},         // Snowier
+    {"1515", TrText("Le petit de Hatii, qui chasse en meute.")},            // Baby Hatii
+    {"1777", TrText("Un titan de glace que rien ne repousse.")},            // Ice Titan
+    {"1789", TrText("Un glaçon immobile, qui mure le passage.")},           // Iceicle
     // ── Les mini-boss et le boss ──
     {"1090", TrText("Le premier mini-boss : il appelle des Porings à la rescousse.")},  // Mastering
     {"1093", TrText("Un lapin qui bondit vers le héros, escorté de Lunatics.")},        // Eclipse
@@ -102,6 +116,17 @@ constexpr std::array<SurvivorsCodexPhraseRow, 105> kPhrases{{
     {"1157",
      TrText("Le seigneur du désert : charge, invoque, fait trembler le sable, et une armure "
             "absorbe une part de chaque coup. Sa chute est la victoire.")},  // Pharaoh
+    // ── Les mini-boss et le boss de la neige ──
+    {"1250", TrText("La poupée de la fabrique : elle appelle des biscuits de Noël.")},  // Chepet
+    {"1249", TrText("La boîte à surprises : elle lâche des biscuits.")},                // Myst Case
+    {"1251", TrText("Il lève Storm Gust : ses cercles annoncés gèlent le héros qu'ils "
+                    "touchent.")},                                         // Stormy Knight
+    {"1319", TrText("Son hurlement presse le pas des petits de Hatii.")},  // Freezer
+    {"1247",
+     TrText("Il s'enfuit dès qu'on le touche ; rattrapé, il lâche une Old Blue Box.")},  // Antonio
+    {"1252",
+     TrText("Le seigneur des neiges : charge, appelle ses petits, et son souffle gèle le héros. "
+            "Sa chute est la victoire.")},  // Hatii
     // ── Les plantes ──
     {"1078", TrText("Une plante qui lâche de la viande, pour reprendre des forces.")},  // Red Plant
     {"1081", TrText("Une plante qui lâche de l'or.")},                // Yellow Plant
@@ -148,6 +173,13 @@ constexpr std::array<SurvivorsCodexPhraseRow, 105> kPhrases{{
     {"raid_1105", TrText("Un raid de Deniros charge le héros.")},
     {"raid_1106", TrText("Une meute de loups du désert charge le héros.")},
     {"ring_1041", TrText("Des momies referment un anneau autour du héros.")},
+    // ── Les événements de la neige ──
+    {"swarm_1062", TrText("Une nuée de Santa Porings dévale la neige.")},
+    {"ring_1789", TrText("Des glaçons se dressent en anneau et enferment le héros.")},
+    {"raid_1265", TrText("Un raid de biscuits charge le héros.")},
+    {"swarm_1776", TrText("Une meute de Siromas arrive d'un même côté.")},
+    {"raid_1515", TrText("Les petits de Hatii chargent le héros.")},
+    {"ring_1777", TrText("Des titans de glace referment un anneau autour du héros.")},
     {"elites", TrText("Un monstre de la vague, bien plus robuste, qui lâche une Old Blue Box.")},
     {"night", TrText("Le ciel s'assombrit jusqu'à minuit, et les morts-vivants se lèvent.")},
 }};
