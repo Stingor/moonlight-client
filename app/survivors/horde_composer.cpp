@@ -154,6 +154,13 @@ void HordeComposer::Compose(std::span<const HordePose> poses, const GroundOf& gr
   }
 }
 
+void HordeComposer::AppendCompanions(std::span<const ro::render::DrawnActor> companions) {
+  for (const ro::render::DrawnActor& companion : companions) {
+    drawn_.push_back(companion);
+    tags_.push_back(HordeTag{.kind = HordeBodyKind::kCart});
+  }
+}
+
 std::span<const ro::render::DrawnActor> HordeComposer::sun_casters() const noexcept {
   return std::span<const ro::render::DrawnActor>(drawn_).first(sun_casting_);
 }

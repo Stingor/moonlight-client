@@ -310,6 +310,7 @@ SkillLook SkillLookOf(const ro::sim::SurvivorsSkillRule& skill) {
   look.ground_effect_id = GroundEffectOf(skill.skill_id);
   look.storm_sown = skill.skill_id == kHeavensDriveSkill;
   look.shoots_arrow = ShootsArrow(skill.skill_id);
+  look.cart_spin = skill.skill_id == kCartRevolutionSkill || skill.skill_id == kCartTornadoSkill;
   if (const std::optional<std::uint32_t> primer = TrapPrimerOf(skill.skill_id)) {
     look.trap = true;
     const bool primed = skill.skill_id != kAnkleSnareSkill && skill.skill_id != kSkidTrapSkill;

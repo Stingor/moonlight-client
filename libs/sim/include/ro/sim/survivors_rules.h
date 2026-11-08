@@ -321,6 +321,8 @@ struct ClassRule {
   std::uint16_t evolved_weapon_item_id = 0;
   // Il lance ses skills d'un geste d'attaque plutôt que d'une incantation, côté app.
   bool attack_gesture = false;
+  // Il traîne un chariot, côté app : ses orbites le font tourner.
+  bool pushes_cart = false;
   // LA MONTURE : le héros qui tient cette carte monte, et montre
   // `mounted_job_id`, puis `reborn_mounted_job_id` une fois rené. 0 : aucune
   // monture.

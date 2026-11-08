@@ -88,6 +88,10 @@ class HordeComposer {
   // héros, ni pour la horde quand l'option U27 l'y fait entrer.
   void Compose(std::span<const HordePose> poses, const GroundOf& ground_of, HordeShadows shadows);
 
+  // AJOUTE LES CHARIOTS, composés ailleurs, après les corps de cette image :
+  // ils se trient avec eux. Ils ne portent pas l'ombre du soleil.
+  void AppendCompanions(std::span<const ro::render::DrawnActor> companions);
+
   [[nodiscard]] std::span<const ro::render::DrawnActor> drawn() const noexcept { return drawn_; }
   [[nodiscard]] std::span<const HordeTag> tags() const noexcept { return tags_; }
   // LES CORPS QUI PORTENT L'OMBRE DU SOLEIL : tous avec l'option U27, le héros

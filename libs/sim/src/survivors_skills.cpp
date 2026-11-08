@@ -621,9 +621,10 @@ void CollectOrbs(const SurvivorsField& field, std::vector<SurvivorsOrb>& out) {
     const std::uint32_t orb_count = AmountOf(field, *level);
     if (!phase.active) continue;
     for (std::uint32_t orb = 0; orb < orb_count; ++orb) {
-      out.push_back(SurvivorsOrb{
-          .skill_id = rule->skill_id,
-          .position = OrbPosition(field, *level, phase.elapsed_steps, orb, orb_count)});
+      out.push_back(
+          SurvivorsOrb{.skill_id = rule->skill_id,
+                       .position = OrbPosition(field, *level, phase.elapsed_steps, orb, orb_count),
+                       .hero_index = field.stage});
     }
   }
 }

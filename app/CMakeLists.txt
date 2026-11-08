@@ -1561,6 +1561,7 @@ target_include_directories(moonclient_lit_stage PUBLIC ${CMAKE_CURRENT_SOURCE_DI
 # lient sans lier l'exécutable : l'arène se prouve hors écran.
 add_library(moonclient_arena STATIC
     survivors/arena_camera.cpp
+    survivors/arena_carts.cpp
     survivors/arena_card_cues.cpp
     survivors/arena_choice.cpp
     survivors/arena_decor_veil.cpp

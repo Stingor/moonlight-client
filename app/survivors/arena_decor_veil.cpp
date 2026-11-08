@@ -25,6 +25,7 @@ namespace {
     case HordeBodyKind::kStranger:
       return 1;
     case HordeBodyKind::kFalling:
+    case HordeBodyKind::kCart:
       return std::nullopt;
   }
   return std::nullopt;

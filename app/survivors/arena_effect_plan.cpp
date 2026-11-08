@@ -77,8 +77,15 @@ void PlanCast(const ro::sim::SurvivorsCast& cast, const SkillLook& look,
             .effect_id = look.effect_id, .kind = ArenaLaunchKind::kOnGround, .at = cast.to});
       }
       return;
-    // Orbites et zones se lisent sur l'état : voir `PlanArenaOrbs`.
+    // Le chariot qui tourne n'a pas d'effet sur son orbe : celui du sort part
+    // une fois du héros, quand le tour commence.
     case ro::sim::CastKind::kOrbitOn:
+      if (look.cart_spin) {
+        out.push_back(ArenaLaunch{
+            .effect_id = look.effect_id, .kind = ArenaLaunchKind::kOnHero, .at = cast.from});
+      }
+      return;
+    // Orbites et zones se lisent sur l'état : voir `PlanArenaOrbs`.
     case ro::sim::CastKind::kOrbitOff:
     case ro::sim::CastKind::kWallOn:
     case ro::sim::CastKind::kRingOn:
@@ -286,7 +293,7 @@ void PlanArenaOrbs(std::span<const ro::sim::SurvivorsOrb> orbs, const ArenaSkill
   out.clear();
   if (!switches.shown || switches.reduced) return;
   for (const ro::sim::SurvivorsOrb& orb : orbs) {
-    if (const SkillLook* look = looks.Find(orb.skill_id)) {
+    if (const SkillLook* look = looks.Find(orb.skill_id); look != nullptr && !look->cart_spin) {
       out.push_back(ArenaOrbLook{.effect_id = look->effect_id, .at = orb.position});
     }
   }

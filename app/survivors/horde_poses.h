@@ -28,6 +28,9 @@ namespace moonclient {
 //
 // `kSummon` : un allié invoqué par un héros, plante ou homoncule, dessiné comme
 // un monstre de sa classe, sous la teinte des alliés.
+//
+// `kCart` : le chariot d'un héros, que `ArenaCarts` dessine ; `HordePoses` ne
+// le pose pas.
 enum class HordeBodyKind : std::uint8_t {
   kHero,
   kFoe,
@@ -36,7 +39,8 @@ enum class HordeBodyKind : std::uint8_t {
   kGem,
   kPickup,
   kStranger,
-  kSummon
+  kSummon,
+  kCart
 };
 
 // LA POSE D'UN CORPS à cette image.

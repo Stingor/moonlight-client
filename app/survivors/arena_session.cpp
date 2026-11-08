@@ -1,6 +1,7 @@
 #include "survivors/arena_session.h"
 
 #include <algorithm>
+#include <array>
 #include <chrono>
 #include <cmath>
 #include <cstdint>
@@ -14,6 +15,7 @@
 #include "survivors/arena_ground_follow.h"
 #include "survivors/arena_ground_relief.h"
 #include "survivors/arena_night_lights.h"
+#include "survivors/survivors_looks.h"
 
 namespace moonclient {
 namespace {
@@ -28,12 +30,17 @@ namespace {
 // la caméra regarderait le sol par la tranche.
 constexpr float kFlatDeterminant = 1e-6F;
 
+// Les orbites dont l'orbe est le chariot du héros.
+constexpr std::array<std::uint16_t, 2> kSpinningCartSkills = {kCartRevolutionSkill,
+                                                              kCartTornadoSkill};
+
 }  // namespace
 
 ArenaSession::ArenaSession(ro::vfs::Vfs& vfs, ro::render::ActorWardrobe& wardrobe,
                            const ro::sim::SurvivorsRules& rules)
     : composer_(wardrobe),
       effects_(vfs, wardrobe.catalog(), rules),
+      carts_(vfs),
       camera_(rules.spawn_frame),
       rules_(rules) {}
 
@@ -78,6 +85,7 @@ bool ArenaSession::Shows(const ro::sim::SurvivorsStart& start) const noexcept {
 
 void ArenaSession::Restart() {
   poses_.Reset();
+  carts_.Reset();
   camera_.Enter();
   effects_.Restart();
   numbers_.Restart();
@@ -139,28 +147,32 @@ void ArenaSession::Compose(const ArenaFrameFacts& facts, const GraphicsOptions& 
   poses_.NoticeFalls(facts.news->falls, facts.presentation_ms);
   poses_.NoticeCasts(facts.news->casts, field, facts.presentation_ms);
   poses_.Pose(field, facts.presentation_ms, facts.blend_per_mille, composer_.TimesSource());
+  // LES CHARIOTS : le héros qui fait tourner le sien le regarde, ce qui
+  // retouche sa pose.
+  faded_.assign(poses_.poses().begin(), poses_.poses().end());
+  const ArenaEffectSwitches switches = effects_.switches();
+  carts_.Compose(
+      field, facts.orbs, kSpinningCartSkills, faded_,
+      [this](glm::vec2 cell) { return scene_.GroundAtCell(cell); },
+      switches.shown && !switches.reduced);
+  std::span<const HordePose> shown;
   // LA VICTOIRE EFFACE LA HORDE RESTANTE (Q7), le boss tombé compris : le
   // héros, le sol et ce qu'il porte restent.
-  std::span<const HordePose> shown = poses_.poses();
   if (facts.victory_ms.has_value()) {
     const float left =
         1.0F - std::min(1.0F, static_cast<float>(*facts.victory_ms) / kVictoryFadeMs);
-    faded_.assign(shown.begin(), shown.end());
     for (HordePose& pose : faded_) {
       if (pose.kind == HordeBodyKind::kFoe || pose.kind == HordeBodyKind::kFalling) {
         pose.tint[3] = static_cast<std::uint8_t>(static_cast<float>(pose.tint[3]) * left);
       }
     }
-    shown = faded_;
   }
-  if (facts.stranger.has_value()) {
-    if (!facts.victory_ms.has_value()) faded_.assign(shown.begin(), shown.end());
-    faded_.push_back(*facts.stranger);
-    shown = faded_;
-  }
+  if (facts.stranger.has_value()) faded_.push_back(*facts.stranger);
+  shown = faded_;
   composer_.Compose(
       shown, [this](const HordePose& pose) { return scene_.GroundAtCell(DrawnCellOf(pose)); },
       scene_.ShadowsOf(frame_));
+  composer_.AppendCompanions(carts_.drawn());
   ArenaVeilTargets(
       shown, rules_, [this](glm::vec2 cell) { return scene_.GroundAtCell(cell); }, veil_targets_);
   if (!poses_.poses().empty() && poses_.poses().front().kind == HordeBodyKind::kHero) {

@@ -23,6 +23,7 @@
 
 #include "options/graphics_options.h"
 #include "survivors/arena_camera.h"
+#include "survivors/arena_carts.h"
 #include "survivors/arena_effects.h"
 #include "survivors/arena_music.h"
 #include "survivors/arena_numbers.h"
@@ -163,6 +164,7 @@ class ArenaSession {
   ArenaScene scene_;
   HordeComposer composer_;
   ArenaEffects effects_;
+  ArenaCarts carts_;
   ArenaNumbers numbers_;
   HordePoses poses_;
   ArenaCamera camera_;

@@ -171,6 +171,9 @@ inline constexpr std::uint16_t kFullChemicalProtectionSkill = 479;
 inline constexpr std::uint16_t kAcidDemonstrationSkill = 490;
 inline constexpr std::uint16_t kPlantCultivationSkill = 491;
 inline constexpr std::uint16_t kCartCannonSkill = 2477;
+// Les deux orbites dont l'orbe est le chariot.
+inline constexpr std::uint16_t kCartRevolutionSkill = 153;
+inline constexpr std::uint16_t kCartTornadoSkill = 2476;
 inline constexpr std::uint16_t kTouchOfHealSkill = 8001;
 inline constexpr std::uint16_t kMentalChangeSkill = 8004;
 inline constexpr std::uint16_t kCastlingSkill = 8005;
@@ -267,6 +270,9 @@ struct SkillLook {
   bool shoots_arrow = false;
   // Sa zone est un piège : une marque au sol, sans flamme.
   bool trap = false;
+  // SON ORBE EST LE CHARIOT du héros, qui tourne : il ne porte aucun effet, et
+  // l'effet du sort part une fois sur le héros, au début du tour.
+  bool cart_spin = false;
 };
 
 // L'apparence d'un skill des règles : l'objet que son lancer fait voler, sinon

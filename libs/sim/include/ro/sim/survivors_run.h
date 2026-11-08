@@ -310,6 +310,7 @@ void SyncTeam(SurvivorsField& field);
 struct SurvivorsOrb {
   std::uint16_t skill_id = 0;
   FieldPoint position;
+  std::uint8_t hero_index = 0;  // le héros dont l'orbite tourne ; 0 en solo
 };
 
 // UNE PARTIE DU MODE SURVIVORS : des pas fixes de 20 ms, sans horloge ni
