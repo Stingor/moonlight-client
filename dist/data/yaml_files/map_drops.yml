@@ -21,6 +21,74 @@ Header:
   Version: 2
 
 Body:
+  - Map: "1@xm_d"
+    Monster: XM_ANTONIO
+    Drops:
+      - {Item: Bloody_Coin, Rate: 15000}
+      - {Item: Bloody_Coin, Rate: 1000}
+      - {Item: Bloody_Coin, Rate: 5000}
+      - {Item: Chrismas_Tree, Rate: 1000}
+  - Map: "1@xm_d"
+    Monster: XM_CELINE_KIMI
+    Drops:
+      - {Item: Bloody_Coin, Rate: 15000}
+      - {Item: Bloody_Coin, Rate: 12500}
+      - {Item: Bloody_Coin, Rate: 10000}
+      - {Item: Bloody_Coin, Rate: 5000}
+      - {Item: Bloody_Coin, Rate: 2500}
+      - {Item: Celine_Brooch_K, Rate: 150}
+      - {Item: Celine_Dress, Rate: 150}
+      - {Item: Celines_Ribbon, Rate: 50}
+      - {Item: Evilspirit_Gloves, Rate: 50}
+  - Map: "1@xm_d"
+    Monster: XM_COOKIE
+    Drops:
+      - {Item: Bloody_Coin, Rate: 5000}
+      - {Item: Bloody_Coin, Rate: 2500}
+      - {Item: Bloody_Coin, Rate: 500}
+      - {Item: Hurt_Mind, Rate: 2500}
+  - Map: "1@xm_d"
+    Monster: XM_HYLOZOIST
+    Drops:
+      - {Item: Bloody_Coin, Rate: 5000}
+      - {Item: Bloody_Coin, Rate: 2500}
+      - {Item: Bloody_Coin, Rate: 500}
+      - {Item: Old_Parasol, Rate: 2500}
+  - Map: "1@xm_d"
+    Monster: XM_LUDE
+    Drops:
+      - {Item: Bloody_Coin, Rate: 5000}
+      - {Item: Bloody_Coin, Rate: 2500}
+      - {Item: Bloody_Coin, Rate: 500}
+      - {Item: Red_Lantern, Rate: 2500}
+  - Map: "1@xm_d"
+    Monster: XM_MARIONETTE
+    Drops:
+      - {Item: Bloody_Coin, Rate: 5000}
+      - {Item: Bloody_Coin, Rate: 2500}
+      - {Item: Bloody_Coin, Rate: 500}
+      - {Item: Shadow_Walk_, Rate: 2500}
+  - Map: "1@xm_d"
+    Monster: XM_MYSTCASE
+    Drops:
+      - {Item: Bloody_Coin, Rate: 5000}
+      - {Item: Bloody_Coin, Rate: 2500}
+      - {Item: Bloody_Coin, Rate: 500}
+      - {Item: Noble_Cross, Rate: 2500}
+  - Map: "1@xm_d"
+    Monster: XM_TEDDY_BEAR
+    Drops:
+      - {Item: Bloody_Coin, Rate: 5000}
+      - {Item: Bloody_Coin, Rate: 2500}
+      - {Item: Bloody_Coin, Rate: 500}
+      - {Item: KindHeart, Rate: 2500}
+  - Map: "1@xm_d"
+    Monster: XM_TREE
+    Drops:
+      - {Item: Bloody_Coin, Rate: 5000}
+      - {Item: Bloody_Coin, Rate: 2500}
+      - {Item: Bloody_Coin, Rate: 500}
+      - {Item: Lush_Rose, Rate: 2500}
   - Map: ant_d02_i
     Monster: ILL_ANDRE
     Drops:
@@ -411,6 +479,67 @@ Body:
       - {Item: Muffler_IL, Rate: 2500}
       - {Item: IllusionStone, Rate: 2000}
       - {Item: Moonlight_Box_IL, Rate: 500}
+  - Map: prt_mz03_i
+    Monster: ILL_BAPHOMET
+    Drops:
+      - {Item: Bazerald_IL, Rate: 5000, RandomOptionGroup: ILL_MAGIC_BOSS}
+      - {Item: Butcher_IL, Rate: 5000, RandomOptionGroup: ILL_PHYSIC_BOSS}
+      - {Item: Gold_Lux_IL, Rate: 5000, RandomOptionGroup: ILL_PHYSIC_BOSS}
+      - {Item: Morpheus_Armlet_IL, Rate: 5000}
+      - {Item: Morpheus_Hood_IL, Rate: 5000}
+      - {Item: Morpheus_Ring_IL, Rate: 5000}
+      - {Item: Morpheus_Shawl_IL, Rate: 5000}
+      - {Item: IllusionStone, Rate: 15000}
+      - {Item: Taegoolyeon_IL, Rate: 5000, RandomOptionGroup: ILL_PHYSIC_BOSS}
+      - {Item: S_Teddy_Labyrinth_IL, Rate: 5000}
+  - Map: prt_mz03_i
+    Monster: ILL_BAPHOMET_J
+    Drops:
+      - {Item: Gold_Lux_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Labyrinth_Box_IL, Rate: 500}
+  - Map: prt_mz03_i
+    Monster: ILL_GHOSTRING
+    Drops:
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Taegoolyeon_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: Labyrinth_Box_IL, Rate: 500}
+  - Map: prt_mz03_i
+    Monster: ILL_HUNTER_FLY
+    Drops:
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Taegoolyeon_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: Labyrinth_Box_IL, Rate: 500}
+  - Map: prt_mz03_i
+    Monster: ILL_KILLER_MANTIS
+    Drops:
+      - {Item: Butcher_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Labyrinth_Box_IL, Rate: 500}
+  - Map: prt_mz03_i
+    Monster: ILL_MANTIS
+    Drops:
+      - {Item: Butcher_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Labyrinth_Box_IL, Rate: 500}
+  - Map: prt_mz03_i
+    Monster: ILL_POPORING
+    Drops:
+      - {Item: Bazerald_IL, Rate: 2500, RandomOptionGroup: ILL_MAGIC_NORMAL}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Labyrinth_Box_IL, Rate: 500}
+  - Map: prt_mz03_i
+    Monster: ILL_SIDE_WINDER
+    Drops:
+      - {Item: Bazerald_IL, Rate: 2500, RandomOptionGroup: ILL_MAGIC_NORMAL}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Labyrinth_Box_IL, Rate: 500}
+  - Map: prt_mz03_i
+    Monster: ILL_STEM_WORM
+    Drops:
+      - {Item: Gold_Lux_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
+      - {Item: IllusionStone, Rate: 2000}
+      - {Item: Labyrinth_Box_IL, Rate: 500}
   - Map: tur_d03_i
     Monster: ILL_ASSULTER
     Drops:

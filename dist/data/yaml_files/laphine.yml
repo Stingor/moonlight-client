@@ -18,6 +18,14 @@ version: 1
 mode: Prerenewal
 synthesis: []
 upgrade:
+  - item: 9785
+    least_refine: 4
+    most_refine: 9
+    least_options: 0
+    cards_allowed: true
+    targets: [
+      1846, 13337, 19223, 20847, 28922
+    ]
   - item: 100003
     least_refine: 0
     most_refine: 10
@@ -39,4 +47,142 @@ upgrade:
       18174, 21050, 26007, 26109, 28022, 28244, 28254, 28612, 28626, 28725,
       28745, 28762, 32005, 32301, 500030, 510034, 530015, 550030, 550031, 570008,
       580008, 600011, 610012, 620010, 630006, 630007
+    ]
+  - item: 100391
+    least_refine: 4
+    most_refine: 9
+    least_options: 0
+    cards_allowed: true
+    targets: [
+      15195, 16063, 19209, 19210, 20838, 22133, 26007, 26109, 28725
+    ]
+  - item: 100392
+    least_refine: 4
+    most_refine: 9
+    least_options: 0
+    cards_allowed: true
+    targets: [
+      15195, 16063, 19209, 19210, 20838, 22133, 26007, 26109, 28725
+    ]
+  - item: 100414
+    least_refine: 4
+    most_refine: 9
+    least_options: 0
+    cards_allowed: true
+    targets: [
+      2039, 18149, 20840, 28022, 28023, 28612
+    ]
+  - item: 100415
+    least_refine: 4
+    most_refine: 9
+    least_options: 0
+    cards_allowed: true
+    targets: [
+      2039, 18149, 20840, 28022, 28023, 28612
+    ]
+  - item: 100416
+    least_refine: 4
+    most_refine: 9
+    least_options: 0
+    cards_allowed: true
+    targets: [
+      1846, 13337, 19223, 20847, 28922
+    ]
+  - item: 100417
+    least_refine: 4
+    most_refine: 9
+    least_options: 0
+    cards_allowed: true
+    targets: [
+      1326, 13338, 13469, 16065, 19247, 32005
+    ]
+  - item: 100418
+    least_refine: 4
+    most_refine: 9
+    least_options: 0
+    cards_allowed: true
+    targets: [
+      1326, 13338, 13469, 16065, 19247, 32005
+    ]
+  - item: 100419
+    least_refine: 4
+    most_refine: 9
+    least_options: 0
+    cards_allowed: true
+    targets: [
+      2051, 19344, 22190, 28244, 28745
+    ]
+  - item: 100420
+    least_refine: 4
+    most_refine: 9
+    least_options: 0
+    cards_allowed: true
+    targets: [
+      2051, 19344, 22190, 28244, 28745
+    ]
+  - item: 100421
+    least_refine: 4
+    most_refine: 9
+    least_options: 0
+    cards_allowed: true
+    targets: [
+      15348, 18174, 19366, 20923, 22192, 28626
+    ]
+  - item: 100422
+    least_refine: 4
+    most_refine: 9
+    least_options: 0
+    cards_allowed: true
+    targets: [
+      15348, 18174, 19366, 20923, 22192, 28626
+    ]
+  - item: 100423
+    least_refine: 4
+    most_refine: 9
+    least_options: 0
+    cards_allowed: true
+    targets: [
+      19428, 20948, 21050, 28254, 28762, 32301
+    ]
+  - item: 100424
+    least_refine: 4
+    most_refine: 9
+    least_options: 0
+    cards_allowed: true
+    targets: [
+      19428, 20948, 21050, 28254, 28762, 32301
+    ]
+  - item: 100425
+    least_refine: 4
+    most_refine: 9
+    least_options: 0
+    cards_allowed: true
+    targets: [
+      400053, 450144, 450145, 450146, 480054, 570008, 580008, 600011, 610012, 630006,
+      630007
+    ]
+  - item: 100426
+    least_refine: 4
+    most_refine: 9
+    least_options: 0
+    cards_allowed: true
+    targets: [
+      400053, 450144, 450145, 450146, 480054, 570008, 580008, 600011, 610012, 630006,
+      630007
+    ]
+  - item: 100699
+    least_refine: 4
+    most_refine: 9
+    least_options: 0
+    cards_allowed: true
+    targets: [
+      450182, 460017, 460018, 470066, 500030, 510034, 530015, 550030, 550031, 620010
+    ]
+  - item: 100700
+    least_refine: 4
+    most_refine: 9
+    least_options: 0
+    cards_allowed: true
+    targets: [
+      450182, 460017, 460018, 470066, 500030, 510034, 530015, 550030, 550031, 620010
     ]

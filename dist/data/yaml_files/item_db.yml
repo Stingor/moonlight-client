@@ -112980,7 +112980,7 @@ Body:
     Type: Usable
     Weight: 10
     Script: |
-      bonus_script "{ bonus bDef,500; bonus bMdef,200; }",600; /* fix me: unknown flag and specialeffect */
+      bonus_script "{ bonus bDef,50; bonus bMdef,20; }",600; /* fix me: unknown flag and specialeffect */
   - Id: 23340
     AegisName: S_Megaphone
     Name: "[Sale] Megaphone"
@@ -113921,6 +113921,87 @@ Body:
     Buy: 5000
     Sell: 2500
     Weight: 20
+    Flags: {BuyingStore: true}
+  - Id: 25772
+    AegisName: Delicious_Juice
+    Name: Delicious Juice
+    Buy: 892
+    Sell: 446
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25773
+    AegisName: Snake_Deadly_Poison
+    Name: Snake's Venom
+    Buy: 952
+    Sell: 476
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25774
+    AegisName: Mantis_Flower
+    Name: Mantis Flower
+    Buy: 884
+    Sell: 442
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25775
+    AegisName: Soft_Scarf
+    Name: Fluffy Cloth Piece
+    Buy: 1062
+    Sell: 531
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25776
+    AegisName: Purple_Solid_Shell
+    Name: Very Solid Purple Shell
+    Buy: 1139
+    Sell: 569
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25777
+    AegisName: Suspicious_Sap
+    Name: Mysterious Sap
+    Buy: 986
+    Sell: 493
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25778
+    AegisName: Brilliant_Jelly
+    Name: Autumn Light Jelly Piece
+    Buy: 969
+    Sell: 484
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25779
+    AegisName: Short_Rope
+    Name: Short Binding Rope
+    Buy: 1156
+    Sell: 578
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25780
+    AegisName: Essence_Of_Demon
+    Name: Demonic Essece
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25781
+    AegisName: Little_Lovely_Candle
+    Name: Pretty Little Candle
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25782
+    AegisName: Medicinal_Stuff
+    Name: Medicinal Bag
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25783
+    AegisName: Cold_Holy_Water
+    Name: Cold Holy Water
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25784
+    AegisName: Small_Flashlight
+    Name: Small Flashlight
+    Weight: 10
     Flags: {BuyingStore: true}
   - Id: 25892
     AegisName: Abysmal_Clam
@@ -115700,7 +115781,7 @@ Body:
     Script: |
       bonus bAspdRate,5;
   - Id: 27334
-    AegisName: Chaotic_Baphomet_Card
+    AegisName: Chaos_Baphomet_Card
     Name: Chaotic Baphomet Card
     Type: Card
     Buy: 20
@@ -115710,7 +115791,7 @@ Body:
     Script: |
       bonus2 bAddClass,Class_All,25; bonus2 bSubRace,RC_Demon,-5;
   - Id: 27335
-    AegisName: Chaotic_Baphomet_Junior_Card
+    AegisName: Chaos_Ba_Jr_Card
     Name: Chaotic Baphomet Junior Card
     Type: Card
     Buy: 20
@@ -115720,7 +115801,7 @@ Body:
     Script: |
       bonus bCritical,readparam(bAgi)/15;
   - Id: 27336
-    AegisName: Chaotic_Sidewinder_Card
+    AegisName: Chaos_S_Winder_Card
     Name: Chaotic Sidewinder Card
     Type: Card
     Buy: 20
@@ -115730,7 +115811,7 @@ Body:
     Script: |
       bonus2 bSubDefEle,Ele_Poison,15; bonus2 bSubRace,RC_Brute,15;
   - Id: 27337
-    AegisName: Chaotic_Hunter_Fly_Card
+    AegisName: Chaos_H_Fly_Card
     Name: Chaotic Hunter Fly Card
     Type: Card
     Buy: 20
@@ -115740,7 +115821,7 @@ Body:
     Script: |
       bonus2 bSubDefEle,Ele_Wind,15; bonus2 bSubRace,RC_Insect,15;
   - Id: 27338
-    AegisName: Chaotic_Mantis_Card
+    AegisName: Chaos_Mantis_Card
     Name: Chaotic Mantis Card
     Type: Card
     Buy: 20
@@ -115750,7 +115831,7 @@ Body:
     Script: |
       bonus bStr,3;
   - Id: 27339
-    AegisName: Chaotic_Ghostring_Card
+    AegisName: Chaos_Goring_Card
     Name: Chaotic Ghostring Card
     Type: Card
     Buy: 20
@@ -115760,7 +115841,7 @@ Body:
     Script: |
       bonus bBaseAtk,20; bonus2 bAddSize,Size_Small,25; bonus2 bAddSize,Size_Large,25;
   - Id: 27340
-    AegisName: Chaotic_Killer_Mantis_Card
+    AegisName: Chaos_K_Mantis_Card
     Name: Chaotic Killer Mantis Card
     Type: Card
     Buy: 20
@@ -115770,7 +115851,7 @@ Body:
     Script: |
       bonus bCritAtkRate,3;
   - Id: 27341
-    AegisName: Chaotic_Poporing_Card
+    AegisName: Chaos_Poporing_Card
     Name: Chaotic Poporing Card
     Type: Card
     Buy: 20
@@ -115780,7 +115861,7 @@ Body:
     Script: |
       bonus2 bSubDefEle,Ele_Water,15; bonus2 bSubRace,RC_Fish,15;
   - Id: 27342
-    AegisName: Chaotic_Stem_Worm_Card
+    AegisName: Chaos_Stem_W_Card
     Name: Chaotic Stem Worm Card
     Type: Card
     Buy: 20
@@ -115790,7 +115871,7 @@ Body:
     Script: |
       bonus bHit,10; bonus2 bSubDefEle,Ele_Earth,20; bonus2 bSubDefEle,Ele_Neutral,10;
   - Id: 27343
-    AegisName: Chaotic_Acolyte_Card
+    AegisName: Chaos_Acolyte_Card
     Name: Chaotic Acolyte Card
     Type: Card
     Buy: 20
@@ -126022,7 +126103,7 @@ Body:
     Script: |
       bonus bLongAtkRate,7;
   - Id: 32237
-    AegisName: Celine's_Brooch
+    AegisName: Celine_Brooch_K
     Name: "Celine's Brooch [1]"
     Type: Armor
     Buy: 5500
@@ -126215,6 +126296,20 @@ Body:
   - Id: 100422
     AegisName: S_Luanda_Box_IL
     Name: Special Luanda Refine Box
+    Type: DelayConsume
+    Weight: 10
+    Script: |
+      laphine_upgrade();
+  - Id: 100423
+    AegisName: Labyrinth_Box_IL
+    Name: Labyrinth Refine Box
+    Type: DelayConsume
+    Weight: 10
+    Script: |
+      laphine_upgrade();
+  - Id: 100424
+    AegisName: S_Teddy_Labyrinth_IL
+    Name: Special Labyrinth Refine Box
     Type: DelayConsume
     Weight: 10
     Script: |
@@ -132589,6 +132684,34 @@ Body:
       }
       if (getallrefine() >= 22) {
          bonus bAspdRate,10;
+      }
+  - Id: 450179
+    AegisName: Celine_Dress
+    Name: "Celine's Dress [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Weight: 500
+    Defense: 12
+    Slots: 1
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 130
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMatk,50;
+      if (.@r>=7) {
+         bonus bVariableCastrate,-10;
+         if (.@r>=9) {
+            bonus2 bMagicAtkEle,Ele_All,10;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-10;
+               if (getallrefine() >= 24) {
+                  bonus bDelayrate,-5;
+               }
+            }
+         }
       }
   - Id: 450182
     AegisName: Sprint_Mail_IL
