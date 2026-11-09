@@ -179,6 +179,33 @@ inline constexpr std::uint32_t kBlastMinePrimerEffect = 106;
 inline constexpr std::uint32_t kClaymorePrimerEffect = 107;
 inline constexpr std::uint32_t kFreezingTrapPrimerEffect = 108;
 
+// L'UNITÉ AU SOL du jeu qu'un piège armé pose, et dont le modèle se tient au
+// milieu de sa zone ; rien pour un piège qui n'en a pas.
+[[nodiscard]] constexpr std::optional<std::uint32_t> TrapUnitOf(std::uint16_t skill_id) noexcept {
+  constexpr std::uint32_t kBlastMineUnit = 143;
+  constexpr std::uint32_t kSkidTrapUnit = 144;
+  constexpr std::uint32_t kAnkleSnareUnit = 145;
+  constexpr std::uint32_t kLandMineUnit = 147;
+  constexpr std::uint32_t kFreezingTrapUnit = 151;
+  constexpr std::uint32_t kClaymoreTrapUnit = 152;
+  switch (skill_id) {
+    case kBlastMineSkill:
+      return kBlastMineUnit;
+    case kSkidTrapSkill:
+      return kSkidTrapUnit;
+    case kAnkleSnareSkill:
+      return kAnkleSnareUnit;
+    case kLandMineSkill:
+      return kLandMineUnit;
+    case kFreezingTrapSkill:
+      return kFreezingTrapUnit;
+    case kClaymoreTrapSkill:
+      return kClaymoreTrapUnit;
+    default:
+      return std::nullopt;
+  }
+}
+
 // UN GEL QUI N'EN EST PAS UN : Ankle Snare retient le monstre, et la mine le
 // secoue un instant. La simulation les compte comme un gel ; le monstre ne
 // bleuit pas pour autant.

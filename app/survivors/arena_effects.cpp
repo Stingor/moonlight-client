@@ -178,7 +178,8 @@ ArenaEffects::ArenaEffects(ro::vfs::Vfs& vfs, const ro::render::SpriteCatalog& s
       looks_(rules),
       catalog_(vfs),
       nodes_(vfs),
-      effects_(catalog_, nodes_, vfs) {
+      effects_(catalog_, nodes_, vfs),
+      trap_models_(vfs) {
   // LES INTERRUPTEURS DE LA PARTIE NE VALENT PAS ICI : l'arène a les siens.
   effects_.SetEffectSwitches(true, false);
   nodes_.SetEffectSwitches(true, false);
@@ -228,6 +229,7 @@ void ArenaEffects::Shift(glm::vec3 world_delta, glm::ivec2 origin_cells) {
     moved.push_back(std::move(shifted));
   }
   for (ro::sim::Actor& actor : moved) world_.Spawn(std::move(actor));
+  trap_models_.Forget(world_);
   // La carte a changé sous la même adresse : le chemin et la dispersion se
   // relisent.
   if (stage_ != nullptr) {
@@ -248,6 +250,7 @@ void ArenaEffects::Restart() {
   warnings_.clear();
   trap_marks_.clear();
   mark_quads_.clear();
+  trap_models_.Forget(world_);
   lives_.Clear();
   ForgetOrbs();
   ForgetRareGlows();
@@ -486,6 +489,7 @@ void ArenaEffects::Advance(const ro::sim::SurvivorsNews& news, const ro::sim::Su
   // budget tranche sur tous les candidats de l'image à la fois.
   CollectArenaLaunches(news, field, looks_, switches_, plan_);
   KeepZones(field, now_ms);
+  if (stage_ != nullptr) trap_models_.Follow(world_, team_zones_, *stage_, origin_cells_, now_ms);
   AdmitArenaLaunches(sight, budget_, plan_);
   for (const ArenaLaunch& launch : plan_) {
     Launch(launch, ground_of, now_ms);
@@ -695,6 +699,7 @@ void ArenaEffects::DrawBehindBodies(const ro::render::Camera& camera, float aspe
   if (marks_.has_value() && !mark_quads_.empty()) {
     marks_->Draw(camera, mark_quads_, aspect_ratio, fog);
   }
+  trap_models_.Draw(world_, camera, aspect_ratio, fog);
   if (!renderer_.has_value()) return;
   if (const std::span<const ro::render::DrawnEffect> behind = effects_.DrawnBehindActors();
       !behind.empty()) {

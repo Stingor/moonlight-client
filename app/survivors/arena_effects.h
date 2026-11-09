@@ -31,6 +31,7 @@
 #include "effects/effect_view.h"
 #include "survivors/arena_card_cues.h"
 #include "survivors/arena_effect_plan.h"
+#include "survivors/arena_trap_models.h"
 #include "survivors/arena_zone_grounds.h"
 #include "world/map_stage.h"
 
@@ -250,6 +251,8 @@ class ArenaEffects {
   std::vector<WarningMark> warnings_;
   std::vector<TrapMark> trap_marks_;
   std::vector<ro::render::GroundQuad> mark_quads_;
+  // Le modèle de chaque piège armé, au milieu de sa marque.
+  ArenaTrapModels trap_models_;
   // L'instant où s'éteint chaque effet lancé.
   ArenaEffectLives lives_;
   std::size_t launched_total_ = 0;
