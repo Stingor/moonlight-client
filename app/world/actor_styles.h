@@ -7,6 +7,7 @@
 #include "ro/render/actor_wardrobe.h"
 #include "ro/render/palette_ramps.h"
 #include "ro/render/sprite_catalog.h"
+#include "ro/render/style_set.h"
 #include "ro/sim/style.h"
 
 namespace moonclient {
@@ -53,10 +54,16 @@ class ActorStyles {
   // ⚠ LA CLÉ DU CORPS SE PREND AVANT, et elle le peut : elle ne dépend que du
   // chemin du `.spr`, que la teinte ne déplace pas.
   //
-  // 🔴 LES PORTEURS D'UNE MÊME RECETTE PARTAGENT UN IDENTIFIANT, donc leurs
-  // palettes et leurs textures. La recette se compare réglage par réglage, sans
-  // condensé, et ses trois numéros n'y entrent pas : la palette d'un style n'en
-  // dépend pas.
+  // 🔴 LE STYLE EST UN ENSEMBLE : la recette du corps, et les teintures de
+  // calques que cette apparence PORTE — celle de sa tête, de ses coiffes, de
+  // sa cape, et sa peau. Une teinture d'un chapeau rangé reste au livre : elle
+  // n'entre pas dans l'ensemble, et deux joueurs qui ne diffèrent que par elle
+  // partagent leur style.
+  //
+  // 🔴 LES PORTEURS D'UN MÊME ENSEMBLE PARTAGENT UN IDENTIFIANT, donc leurs
+  // palettes et leurs textures. L'ensemble se compare réglage par réglage,
+  // sans condensé, et les trois numéros de la recette n'y entrent pas : la
+  // palette d'un style n'en dépend pas.
   //
   // 🔴 UN CHANGEMENT DONNE UN IDENTIFIANT NEUF. La garde-robe refuse de
   // réécrire une recette en place : une tenue déjà composée retient l'ADRESSE
@@ -81,13 +88,13 @@ class ActorStyles {
   // Un identifiant enregistré auprès de la garde-robe, et combien d'acteurs le
   // portent.
   struct Interned {
-    ro::render::PaletteRecipe recipe;
+    ro::render::StyleSet set;
     std::size_t bearers = 0;
   };
 
-  // L'identifiant qui porte cette recette, enregistré s'il n'existe pas ; zéro
+  // L'identifiant qui porte cet ensemble, enregistré s'il n'existe pas ; zéro
   // si la garde-robe le refuse.
-  [[nodiscard]] std::uint32_t Intern(const ro::render::PaletteRecipe& recipe,
+  [[nodiscard]] std::uint32_t Intern(const ro::render::StyleSet& set,
                                      ro::render::ActorWardrobe& wardrobe);
   void Release(std::uint32_t style);
 

@@ -5,7 +5,9 @@
 #include <utility>
 
 #include "ro/render/actor_sprite.h"
+#include "ro/render/portrait_framing.h"
 #include "ro/render/sprite_frame.h"
+#include "ro/render/style_set.h"
 
 namespace moonclient {
 namespace {
@@ -56,6 +58,24 @@ void Lighten(ro::formats::Palette& palette, const ro::render::PaletteRamp& ramp,
   }
 }
 
+// LE DOS, dans le sens du `.act` : zéro est la face, et la moitié du tour le
+// dos. Une cape se règle là où elle se voit.
+constexpr std::size_t kBackDirection = ro::render::kDirectionCount / 2;
+
+// La direction du dessin : celle qu'on a choisie, sauf pour la cape.
+[[nodiscard]] std::size_t DirectionFor(ro::render::StyleLayer focus, std::uint8_t chosen) {
+  return focus == ro::render::StyleLayer::kGarment ? kBackDirection : chosen;
+}
+
+// LE CADRAGE : un portrait pour la tête et les coiffes, qui font quelques
+// pixels sur une silhouette en pied ; le pied pour tout le reste.
+[[nodiscard]] std::optional<ro::render::PortraitAim> AimFor(ro::render::StyleLayer focus) {
+  if (focus == ro::render::StyleLayer::kHead || focus == ro::render::StyleLayer::kHeadgear) {
+    return ro::render::PortraitAim{.head_only = true};
+  }
+  return std::nullopt;
+}
+
 }  // namespace
 
 StyleDoll::StyleDoll(ro::render::ActorWardrobe& wardrobe) : wardrobe_(&wardrobe) {}
@@ -93,8 +113,11 @@ void StyleDoll::ForgetPainted() {
 
 const ro::render::IconTexture* StyleDoll::Draw(const Shot& shot) {
   shown_ = nullptr;
-  if (shot.recipe == nullptr || body_.ramps.empty() || shot.box.width <= 0 ||
-      shot.box.height <= 0) {
+  // ⚠ UN CALQUE SE MONTRE MÊME SUR UN CORPS SANS PIÈCE : seul le regard posé
+  // sur le corps a besoin de ses rampes.
+  const bool on_body = shot.focus == ro::render::StyleLayer::kBody;
+  if (shot.recipe == nullptr || !measured_ || (on_body && body_.ramps.empty()) ||
+      shot.box.width <= 0 || shot.box.height <= 0) {
     return nullptr;
   }
   // ⚠ LES PALETTES PEINTES VALENT POUR UNE MESURE ET UNE RÉVISION : peintes sur
@@ -121,8 +144,16 @@ const ro::render::IconTexture* StyleDoll::Draw(const Shot& shot) {
     // 🔴 UN IDENTIFIANT NEUF : la garde-robe refuse de réécrire une palette en
     // place, parce qu'une tenue déjà composée en retient l'ADRESSE — la
     // repeindre ne se verrait qu'à la prochaine éviction.
+    //
+    // LES TEINTURES DE CALQUES VONT DANS LE MÊME ENSEMBLE : la garde-robe les
+    // pose pièce par pièce, peau comprise, exactement comme sur un acteur du
+    // monde. Le pantin ne refait aucun de ces calculs de son côté.
     painted.style = wardrobe_->NewStyleId();
-    if (!wardrobe_->SetStylePalette(painted.style, std::move(palette))) {
+    ro::render::StyleSet set{.body_palette = std::move(palette)};
+    if (shot.layers != nullptr) {
+      set.layers = *shot.layers;
+    }
+    if (!wardrobe_->SetStyleSet(painted.style, std::move(set))) {
       painted.style = 0;
       return nullptr;
     }
@@ -136,21 +167,22 @@ const ro::render::IconTexture* StyleDoll::Draw(const Shot& shot) {
   pose.look.style = painted.style;
   // Debout, figé : un aperçu de couleur n'a pas à s'agiter.
   pose.animation = ro::render::kAnimationIdle;
-  pose.direction = shot.direction;
+  pose.direction = DirectionFor(shot.focus, shot.direction);
   pose.animated = false;
   pose.box = shot.box;
+  pose.aim = AimFor(shot.focus);
   const ro::render::IconTexture& drawn = painted.vignette->Get(pose);
   if (!drawn.usable()) {
     return nullptr;
   }
   shown_ = &painted;
   shown_look_ = pose.look;
-  shown_direction_ = shot.direction;
+  shown_direction_ = static_cast<std::uint8_t>(pose.direction);
   return &drawn;
 }
 
-std::optional<std::size_t> StyleDoll::RampUnder(glm::vec2 in_box) {
-  if (shown_ == nullptr || !shown_->vignette.has_value() || body_.ramps.empty()) {
+std::optional<ro::render::PalettePick> StyleDoll::PickUnder(glm::vec2 in_box) {
+  if (shown_ == nullptr || !shown_->vignette.has_value()) {
     return std::nullopt;
   }
   // ⚠ LE CADRAGE VIENT DE LA VIGNETTE ELLE-MÊME : le refaire ici le ferait
@@ -172,7 +204,14 @@ std::optional<std::size_t> StyleDoll::RampUnder(glm::vec2 in_box) {
   // l'échelle étant en pixels de la boîte.
   const glm::vec2 at((in_box.x - framing.origin.x) / framing.scale,
                      (in_box.y - framing.origin.y) / framing.scale);
-  const std::optional<ro::render::PalettePick> pick = ro::render::PaletteIndexAt(composed, at);
+  return ro::render::PaletteIndexAt(composed, at);
+}
+
+std::optional<std::size_t> StyleDoll::RampUnder(glm::vec2 in_box) {
+  if (body_.ramps.empty()) {
+    return std::nullopt;
+  }
+  const std::optional<ro::render::PalettePick> pick = PickUnder(in_box);
   if (!pick.has_value() || pick->part != ro::render::ActorPart::kBody) {
     return std::nullopt;
   }

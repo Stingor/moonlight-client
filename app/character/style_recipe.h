@@ -1,7 +1,12 @@
 #pragma once
 
+#include <optional>
+#include <span>
+#include <vector>
+
 #include "ro/render/palette_ramps.h"
 #include "ro/render/sprite_catalog.h"
+#include "ro/render/style_set.h"
 #include "ro/sim/style.h"
 
 namespace moonclient {
@@ -39,6 +44,28 @@ void Impose(const ro::sim::StyleRecipe& recipe, ro::render::ActorLook& look);
 // propriétaire soit complet. Après un passage chez le styliste, celles du lot
 // remettraient l'ancienne coupe.
 void ImposeBodyPalette(const ro::sim::StyleRecipe& recipe, ro::render::ActorLook& look);
+
+// LES TEINTURES DE CALQUES, dans les deux sens. Un calque que le rendu ne
+// connaît pas ne se traduit pas : la teinture est ignorée, et la pièce garde
+// ses couleurs d'origine.
+[[nodiscard]] std::optional<ro::render::LayerDye> FromWire(const ro::sim::StyleLayerRecipe& told);
+[[nodiscard]] ro::sim::StyleLayerRecipe ToWire(const ro::render::LayerDye& dye);
+
+// LES TEINTURES QUE PORTE CETTE APPARENCE, parmi celles du joueur : celle de
+// sa tête, de ses coiffes, de sa cape, et sa peau. Les autres restent au
+// livre et reviendront avec la pièce.
+//
+// 🔴 TRIÉES PAR (CALQUE, CLÉ) : deux joueurs qui portent les mêmes teintures
+// dans un autre ordre partagent ainsi leur style.
+[[nodiscard]] std::vector<ro::render::LayerDye> WornDyes(
+    std::span<const ro::sim::StyleLayerRecipe> told, const ro::render::ActorLook& look);
+
+// ⚠ CHAMP PAR CHAMP : comparer des champs ne collisionne jamais.
+[[nodiscard]] bool SameDye(const ro::render::LayerDye& left, const ro::render::LayerDye& right);
+// Deux ensembles qui peignent pareil : la recette du corps par ses seuls
+// réglages, et les mêmes teintures dans le même ordre. ⚠ UNE PALETTE TOUTE
+// FAITE ne se compare pas : un ensemble qui en porte une n'est jamais le même.
+[[nodiscard]] bool SameSet(const ro::render::StyleSet& left, const ro::render::StyleSet& right);
 
 // ⚠ CHAMP PAR CHAMP : comparer des champs ne collisionne jamais.
 [[nodiscard]] bool SameRecipe(const ro::render::PaletteRecipe& left,

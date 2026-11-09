@@ -4,13 +4,16 @@
 #include <cstddef>
 #include <cstdint>
 #include <optional>
+#include <vector>
 
 #include <glm/glm.hpp>
 
+#include "ro/render/actor_sprite.h"
 #include "ro/render/actor_vignette.h"
 #include "ro/render/actor_wardrobe.h"
 #include "ro/render/icon_texture.h"
 #include "ro/render/palette_ramps.h"
+#include "ro/render/style_set.h"
 
 namespace moonclient {
 
@@ -52,21 +55,29 @@ class StyleDoll {
 
   // CE QU'ON VEUT VOIR.
   struct Shot {
-    // L'apparence mesurée : corps seul, recette imposée.
+    // L'apparence mesurée, recette imposée : le corps seul, ou avec les pièces
+    // dont on veut voir la teinture — tête, coiffes, cape.
     ro::render::ActorLook look;
     const ro::render::PaletteRecipe* recipe = nullptr;
-    // La révision de la recette : sa palette ne se repeint qu'à son
-    // changement.
+    // La révision de la recette ET des teintures : leurs palettes ne se
+    // repeignent qu'à son changement.
     std::uint32_t revision = 0;
-    // La pièce qui PULSE, ou moins un.
+    // La pièce du CORPS qui PULSE, ou moins un.
     int highlight = -1;
     std::uint32_t now_ms = 0;
     std::uint8_t direction = 0;
     ro::render::VignetteBox box;
+    // LES TEINTURES DE CALQUES à peindre avec la recette du corps, ou nulles :
+    // celles que le joueur règle, ou celles reçues d'un code. Chacune se pose
+    // sur la pièce de `look` qui porte sa clé, comme sur un acteur du monde.
+    const std::vector<ro::render::LayerDye>* layers = nullptr;
+    // LE CALQUE QU'ON REGARDE, qui décide du cadrage : la tête et les coiffes
+    // en portrait, la cape de dos, le reste en pied dans `direction`.
+    ro::render::StyleLayer focus = ro::render::StyleLayer::kBody;
   };
 
-  // Le pantin, ou rien tant qu'il n'y a rien à montrer : pas de pièce, pas de
-  // boîte, pas de corps.
+  // Le pantin, ou rien tant qu'il n'y a rien à montrer : pas de boîte, pas de
+  // corps — ni, quand on regarde le corps, de pièce.
   //
   // 🔴 LA PULSATION GARDE SES PALIERS. La pièce survolée s'éclaircit par paliers
   // quantifiés ; chacun a son style et sa vignette, gardés tant que la révision
@@ -80,6 +91,11 @@ class StyleDoll {
   // PARTIE. Un index de la tête cherché dans les pièces du corps allumerait une
   // pièce que le curseur ne désigne pas : seul le corps répond ici.
   [[nodiscard]] std::optional<std::size_t> RampUnder(glm::vec2 in_box);
+
+  // CE QUE LA PIPETTE DÉSIGNE SOUS CE POINT, toutes pièces confondues : la
+  // partie et l'index du pixel source, d'après le dernier dessin. C'est ce que
+  // l'éditeur des calques cherche ensuite dans les rampes de la pièce.
+  [[nodiscard]] std::optional<ro::render::PalettePick> PickUnder(glm::vec2 in_box);
 
   // Rend les styles et les textures. ⚠ ENTRE DEUX IMAGES : oublier un style
   // détruit les tenues qui le portaient, et une composition en cours les lirait

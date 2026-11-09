@@ -1,5 +1,7 @@
 #include "ro/sim/style.h"
 
+#include <utility>
+
 namespace ro::sim {
 
 const StyleRecipe* StyleVariants::For(std::uint32_t body_key) const {
@@ -59,12 +61,31 @@ void StyleBook::Forget(std::uint32_t gid) {
 
 void StyleBook::ForgetDeparted(std::uint32_t gid) {
   styles_.erase(gid);
+  layers_.erase(gid);
   revisions_.erase(gid);
 }
 
 void StyleBook::ForgetDepartedExcept(std::uint32_t kept) {
-  std::erase_if(styles_, [kept](const auto& entry) { return entry.first != kept; });
-  std::erase_if(revisions_, [kept](const auto& entry) { return entry.first != kept; });
+  const auto departed = [kept](const auto& entry) { return entry.first != kept; };
+  std::erase_if(styles_, departed);
+  std::erase_if(layers_, departed);
+  std::erase_if(revisions_, departed);
+}
+
+const std::vector<StyleLayerRecipe>* StyleBook::FindLayers(std::uint32_t gid) const {
+  const auto found = layers_.find(gid);
+  return found != layers_.end() ? &found->second : nullptr;
+}
+
+void StyleBook::RememberLayers(std::uint32_t gid, std::vector<StyleLayerRecipe> layers) {
+  revisions_[gid] = ++last_revision_;
+  // ⚠ UNE LISTE VIDE NE SE GARDE PAS, comme une variante : c'est l'absence de
+  // teinture, pas une teinture.
+  if (layers.empty()) {
+    layers_.erase(gid);
+    return;
+  }
+  layers_[gid] = std::move(layers);
 }
 
 }  // namespace ro::sim

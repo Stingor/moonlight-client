@@ -1,9 +1,11 @@
 #pragma once
 
 #include <array>
+#include <cstddef>
 #include <cstdint>
 #include <map>
 #include <optional>
+#include <vector>
 
 namespace ro::sim {
 
@@ -106,6 +108,31 @@ struct StyleVariants {
   [[nodiscard]] const StyleRecipe* For(std::uint32_t body_key) const;
 };
 
+// ── LES TEINTURES DE CALQUES ────────────────────────────────────────────────
+//
+// À côté de la recette du corps, un joueur teint sa tête, sa peau, ses coiffes
+// et sa cape. Chaque teinture se désigne par une CLÉ que tout observateur
+// reçoit déjà : la coupe et la couleur de cheveux pour la tête, l'apparence
+// affichée pour une coiffe, la robe affichée pour la cape, zéro pour la peau.
+// Le calcul vit dans `ro/render/style_set.h` ; ici, ce que le fil dit.
+
+// Le nombre de réglages d'une teinture : un par classe de teinte au profil 2,
+// dont le profil 1 n'emploie que les huit premiers.
+inline constexpr std::size_t kStyleLayerAdjustCount = 13;
+
+// Le calque, numéroté comme sur le fil.
+enum class StyleLayerKind : std::uint8_t { kHead = 1, kHeadgear = 2, kGarment = 3, kSkin = 4 };
+
+// LA TEINTURE D'UN CALQUE.
+struct StyleLayerRecipe {
+  StyleLayerKind layer = StyleLayerKind::kHead;
+  std::uint32_t key = 0;
+  // Le profil de détection qui l'a découpée. Un profil que le rendu ne connaît
+  // pas laisse le calque dans ses couleurs d'origine.
+  std::uint8_t profile = 0;
+  std::array<StyleAdjust, kStyleLayerAdjustCount> adjusts{};
+};
+
 // CE QUE LE STYLISTE DEMANDE À LA FENÊTRE D'ÉDITION.
 //
 // ⚠ « BASCULER » N'EST PAS « OUVRIR », et le serveur distingue les trois : un
@@ -131,11 +158,13 @@ class StyleBook {
   void BeginBatchFor(std::uint32_t gid);
   void Remember(std::uint32_t gid, std::uint32_t body_key, const StyleRecipe& recipe,
                 bool is_fallback);
-  // Retire ce qu'on sait d'un acteur. ⚠ UN JOUEUR SANS AUCUNE VARIANTE NE SE
+  // Retire les variantes de corps d'un acteur ; ses teintures de calques, qui
+  // voyagent à part, restent. ⚠ UN JOUEUR SANS AUCUNE VARIANTE NE SE
   // GARDE PAS : une entrée vide n'est pas une apparence, c'est son absence.
   void Forget(std::uint32_t gid);
 
-  // OUBLIE UN JOUEUR QUI N'EST PLUS EN VUE : ses variantes, ET sa révision.
+  // OUBLIE UN JOUEUR QUI N'EST PLUS EN VUE : ses variantes, ses teintures de
+  // calques, ET sa révision.
   //
   // 🔴 CE N'EST PAS `Forget`. Un effacement dit « il n'a plus de couleurs » et
   // compte comme un changement ; un départ dit « on ne sait plus », et le livre
@@ -161,6 +190,16 @@ class StyleBook {
     return styles_;
   }
 
+  // ── LES TEINTURES DE CALQUES, par joueur ──────────────────────────────────
+
+  // Ce qu'un acteur porte, ou rien.
+  [[nodiscard]] const std::vector<StyleLayerRecipe>* FindLayers(std::uint32_t gid) const;
+  // 🔴 UN BLOC REDÉFINIT TOUTES LES TEINTURES DE CALQUES D'UN JOUEUR, comme un
+  // lot de corps : le serveur les envoie toujours ensemble. Une liste vide les
+  // efface. Les variantes du corps n'en sont pas touchées : elles voyagent à
+  // part.
+  void RememberLayers(std::uint32_t gid, std::vector<StyleLayerRecipe> layers);
+
   // CE QUE LE STYLISTE A DEMANDÉ, une fois.
   //
   // 🔴 UNE DEMANDE, PAS UN ÉTAT, et elle se CONSOMME : laissée en place, elle
@@ -175,6 +214,7 @@ class StyleBook {
 
  private:
   std::map<std::uint32_t, StyleVariants> styles_;
+  std::map<std::uint32_t, std::vector<StyleLayerRecipe>> layers_;
   // ⚠ SURVIT À `Forget` : un effacement est un changement comme un autre.
   std::map<std::uint32_t, std::uint32_t> revisions_;
   // ⚠ UN SEUL COMPTEUR POUR TOUS : une révision ne revient jamais, pas même
