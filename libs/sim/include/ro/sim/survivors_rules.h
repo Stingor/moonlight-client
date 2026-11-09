@@ -616,6 +616,10 @@ struct SurvivorsRules {
 [[nodiscard]] const FoeRule* FindFoe(const SurvivorsRules& rules, std::uint16_t foe_id);
 [[nodiscard]] const ClassRule* FindClass(const SurvivorsRules& rules, std::uint16_t class_id);
 [[nodiscard]] const ArenaRule* FindArena(const SurvivorsRules& rules, std::uint16_t arena_id);
+// LES CLASSES QUI PEUVENT OBTENIR UNE CARTE, dans l'ordre du catalogue : une
+// carte ne tombe que si la réserve d'une classe de l'équipe la contient.
+[[nodiscard]] std::vector<const ClassRule*> ClassesHoldingCard(const SurvivorsRules& rules,
+                                                               std::uint16_t card_item_id);
 // La première arène classée du catalogue, celle de la partie classée et du
 // défi ; nulle quand aucune ne l'est.
 [[nodiscard]] const ArenaRule* FirstRankedArena(const SurvivorsRules& rules);

@@ -73,6 +73,10 @@ void DrawGrid(SurvivorsAlbumState& state, const SurvivorsAlbumView& view, std::s
     }
     if (card.found > 0) {
       SkinTooltip(card.name);
+    } else if (card.held_by[0] != '\0') {
+      std::snprintf(line.data(), line.size(), core::Tr("Tombe de : %s, pour : %s"), card.dropped_by,
+                    card.held_by);
+      SkinTooltip(line.data());
     } else {
       std::snprintf(line.data(), line.size(), core::Tr("Tombe de : %s"), card.dropped_by);
       SkinTooltip(line.data());
@@ -100,6 +104,10 @@ void DrawDetail(const SurvivorsAlbumEntry& card, const SurvivorsAlbumView& view)
     std::snprintf(line.data(), line.size(), core::Tr("Première trouvaille : %s"),
                   SurvivorsDateOfDay(card.first_found_day).data());
     ImGui::TextUnformatted(line.data());
+  }
+  if (card.held_by[0] != '\0') {
+    std::snprintf(line.data(), line.size(), core::Tr("Ne tombe que pour : %s"), card.held_by);
+    ImGui::TextWrapped("%s", line.data());
   }
   ImGui::EndGroup();
 }

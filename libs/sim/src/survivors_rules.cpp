@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <limits>
 #include <span>
+#include <vector>
 
 #include "survivors_shipped.h"
 
@@ -151,6 +152,17 @@ const SurvivorsSkillRule* FindSkill(const SurvivorsRules& rules, std::uint16_t s
 const CardRule* FindCard(const SurvivorsRules& rules, std::uint16_t card_item_id) {
   return FindById(rules.cards, card_item_id,
                   [](const CardRule& rule) { return rule.card_item_id; });
+}
+
+std::vector<const ClassRule*> ClassesHoldingCard(const SurvivorsRules& rules,
+                                                 std::uint16_t card_item_id) {
+  std::vector<const ClassRule*> holders;
+  for (const ClassRule& hero_class : rules.classes) {
+    if (std::ranges::find(hero_class.card_pool, card_item_id) != hero_class.card_pool.end()) {
+      holders.push_back(&hero_class);
+    }
+  }
+  return holders;
 }
 
 const FoeRule* FindFoe(const SurvivorsRules& rules, std::uint16_t foe_id) {

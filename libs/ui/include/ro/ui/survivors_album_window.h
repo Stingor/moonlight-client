@@ -33,7 +33,9 @@ struct SurvivorsAlbumEntry {
   const char* name = "";  // tiré des tables du jeu
   // L'effet dans le mode. ⚠ EN FRANÇAIS, marqué par `TrText` : traduit ici.
   const char* description = "";
-  const char* dropped_by = "";       // le monstre qui la laisse tomber, tiré des tables du jeu
+  const char* dropped_by = "";  // le monstre qui la laisse tomber, tiré des tables du jeu
+  // Les classes pour qui elle tombe, quand toutes ne le peuvent pas ; "" sinon.
+  const char* held_by = "";
   std::uint32_t found = 0;           // les exemplaires trouvés ; 0 : non trouvée
   std::int64_t first_found_day = 0;  // jours depuis le 1970-01-01 UTC
 };

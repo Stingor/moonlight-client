@@ -275,6 +275,8 @@ class SurvivorsViews {
   std::vector<ro::ui::SurvivorsShopRow> church_rows_;
   std::vector<ro::ui::SurvivorsShopRow> kafra_rows_;
   std::vector<ro::ui::SurvivorsAlbumEntry> album_cards_;
+  // Par carte de l'Album, les classes pour qui elle tombe, que l'entrée désigne.
+  std::vector<std::string> album_holders_;
   std::vector<ro::ui::SurvivorsFeatEntry> album_feats_;
   SurvivorsRecordRowsHeld record_rows_;
   SurvivorsCreditRowsHeld credit_rows_;

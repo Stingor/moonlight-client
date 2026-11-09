@@ -21428,6 +21428,12 @@ tr: Time
 fr: Tombe de : %s
 tr: Dropped by: %s
 
+fr: Tombe de : %s, pour : %s
+tr: Dropped by: %s, for: %s
+
+fr: Ne tombe que pour : %s
+tr: Only drops for: %s
+
 fr: Tout rembourser
 tr: Refund all
 

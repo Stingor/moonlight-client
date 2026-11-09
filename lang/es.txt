@@ -21428,6 +21428,12 @@ tr: Tiempo
 fr: Tombe de : %s
 tr: Cae de: %s
 
+fr: Tombe de : %s, pour : %s
+tr: Cae de: %s, para: %s
+
+fr: Ne tombe que pour : %s
+tr: Solo cae para: %s
+
 fr: Tout rembourser
 tr: Reembolsar todo
 
