@@ -29,6 +29,7 @@
 #include "survivors/arena_music.h"
 #include "survivors/arena_numbers.h"
 #include "survivors/arena_scene.h"
+#include "survivors/hero_frame_sound.h"
 #include "survivors/horde_composer.h"
 #include "survivors/horde_poses.h"
 
@@ -145,8 +146,9 @@ class ArenaSession {
 
   [[nodiscard]] ArenaScene& scene() noexcept { return scene_; }
   [[nodiscard]] const ArenaEffects& effects() const noexcept { return effects_; }
-  // Les bruits des effets de la dernière peinture : voir `ArenaEffects::TakeSounds`.
-  [[nodiscard]] std::vector<std::string> TakeEffectSounds() { return effects_.TakeSounds(); }
+  // Les bruits des effets de la dernière peinture (`ArenaEffects::TakeSounds`),
+  // puis ceux des images du héros (`HeroFrameSound`).
+  [[nodiscard]] std::vector<std::string> TakeEffectSounds();
   [[nodiscard]] const HordeComposer& composer() const noexcept { return composer_; }
   [[nodiscard]] const ro::render::Camera& camera() const noexcept { return camera_.camera(); }
   // Ce qu'ont coûté les effets à la dernière composition, en millisecondes.
@@ -172,6 +174,9 @@ class ArenaSession {
   ArenaCamera camera_;
   // Les poses de l'image, retouchées pour l'effacement de la victoire.
   std::vector<HordePose> faded_;
+  // Le bruit des images du héros, et ceux entendus depuis la dernière prise.
+  HeroFrameSound hero_frame_sound_;
+  std::vector<std::string> hero_sounds_;
   // Les règles de la partie, et ce que le décor ne doit pas cacher à cette
   // image (`ArenaVeilTargets`).
   const ro::sim::SurvivorsRules& rules_;

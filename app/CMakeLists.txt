@@ -1596,6 +1596,7 @@ add_library(moonclient_arena STATIC
     survivors/arena_session.cpp
     survivors/arena_trap_models.cpp
     survivors/arena_zone_grounds.cpp
+    survivors/hero_frame_sound.cpp
     survivors/horde_composer.cpp
     survivors/horde_poses.cpp
     survivors/survivors_looks.cpp)

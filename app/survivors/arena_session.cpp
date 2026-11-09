@@ -5,9 +5,12 @@
 #include <chrono>
 #include <cmath>
 #include <cstdint>
+#include <iterator>
 #include <limits>
 #include <optional>
 #include <string>
+#include <utility>
+#include <vector>
 
 #include "ro/core/log.h"
 #include "ro/render/terrain_mesh.h"
@@ -129,6 +132,13 @@ void ArenaSession::FollowGround() {
   most_mount_ms_ = std::max(most_mount_ms_, moved->mount_ms);
 }
 
+std::vector<std::string> ArenaSession::TakeEffectSounds() {
+  std::vector<std::string> heard = effects_.TakeSounds();
+  std::ranges::move(hero_sounds_, std::back_inserter(heard));
+  hero_sounds_.clear();
+  return heard;
+}
+
 void ArenaSession::Compose(const ArenaFrameFacts& facts, const GraphicsOptions& graphics,
                            std::uint32_t now_ms) {
   const ro::sim::SurvivorsField& field = *facts.field;
@@ -176,6 +186,14 @@ void ArenaSession::Compose(const ArenaFrameFacts& facts, const GraphicsOptions& 
   composer_.Compose(
       shown, [this](const HordePose& pose) { return scene_.GroundAtCell(DrawnCellOf(pose)); },
       scene_.ShadowsOf(frame_));
+  // LE HÉROS DU JOUEUR EST EN TÊTE des corps, quand il est posé.
+  const bool hero_drawn =
+      !composer_.tags().empty() && composer_.tags().front().kind == HordeBodyKind::kHero &&
+      !poses_.poses().empty() && poses_.poses().front().kind == HordeBodyKind::kHero;
+  if (std::optional<std::string> heard =
+          hero_frame_sound_.Hear(hero_drawn ? composer_.drawn().front().actor : nullptr)) {
+    hero_sounds_.push_back(std::move(*heard));
+  }
   composer_.AppendCompanions(carts_.drawn());
   // LES FAUCONS planent au-dessus de leurs héros, et piquent sur leurs coups.
   falcons_.Compose(
