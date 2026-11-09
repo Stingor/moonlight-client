@@ -328,11 +328,14 @@ constexpr std::array<GroundTextureLook, 8> kSnowTextures{{
     {.texture = "필드바닥\\xmas_눈바닥01.bmp", .role = GroundTextureRole::kPathInner},
 }};
 
-// Le semis : l'herbe sous la neige, et quelques boules de Noël tombées.
+// Le semis : l'herbe sous la neige, et quelques boules de Noël tombées. Une
+// boule mesure près de quatre cases à l'échelle 1 : c'est une décoration de
+// sapin, que les cartes de Lutie posent entre 0,04 et 0,24. Tombée au sol,
+// elle garde la taille d'une boule du grand sapin, sous la case.
 constexpr std::array<SeedLook, 3> kSnowSeeds{{
     {.model = "크리스마스마을\\xmas_풀.rsm", .scale = 0.6F, .weight = 6},
-    {.model = "크리스마스마을\\xmas_구슬2.rsm", .scale = 1.0F, .weight = 1},
-    {.model = "크리스마스마을\\xmas_구슬3.rsm", .scale = 1.0F, .weight = 1},
+    {.model = "크리스마스마을\\xmas_구슬2.rsm", .scale = 0.2F, .weight = 1},
+    {.model = "크리스마스마을\\xmas_구슬3.rsm", .scale = 0.24F, .weight = 1},
 }};
 
 constexpr std::array<BiomeLook, 3> kBiomes{{
