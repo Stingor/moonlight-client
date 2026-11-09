@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <map>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include "ro/render/palette_ramps.h"
@@ -39,6 +40,26 @@ enum class StyleSendKind : std::uint8_t {
   kForgetBody,
   // L'effacement de tout.
   kDeleteAll,
+  // La recette du corps porté, qui devient le style principal : le repli des
+  // corps qui n'ont pas le leur.
+  kMakeMain,
+};
+
+// COMBIEN DE CORPS LE SERVEUR HABILLE pour un personnage. Au-delà, valider un
+// corps neuf évince le plus ancien — jamais le style principal.
+inline constexpr int kBodyStyleCap = 4;
+
+// L'ÉCART MINIMAL ENTRE DEUX DEMANDES que le serveur accepte. Il jette sans un
+// mot celle qui arrive plus tôt : l'éditeur grise « Valider » d'ici là.
+inline constexpr std::uint32_t kStyleSendCadenceMs = 1000;
+
+// La profondeur de l'historique d'un corps, en pas.
+inline constexpr std::size_t kStyleHistoryDepth = 64;
+
+// Un réglage de pièce, pour un geste qui en touche plusieurs.
+struct PieceEdit {
+  std::size_t rank = 0;
+  ro::render::RampAdjust adjust;
 };
 
 // LA RECETTE QUE LE JOUEUR COMPOSE, ET SON SEUL ÉCRIVAIN.
@@ -88,8 +109,15 @@ class StyleSession {
   void Observe(const Worn& worn, std::uint32_t now_ms);
 
   // ── LES GESTES, chacun sur le corps porté ───────────────────────────────
+  //
+  // 🔴 UN GESTE, UN PAS D'HISTORIQUE. `stroke` désigne le TRAIT auquel un
+  // réglage appartient : un glissement dans le nuancier en produit un à chaque
+  // image, et tous ceux d'un même trait ne font qu'un pas. Zéro : un pas à lui
+  // seul.
 
-  void SetPiece(std::size_t rank, const ro::render::RampAdjust& adjust);
+  void SetPiece(std::size_t rank, const ro::render::RampAdjust& adjust, std::uint32_t stroke = 0);
+  // Plusieurs pièces d'un coup — des pièces liées, une inspiration : un pas.
+  void SetPieces(std::span<const PieceEdit> edits, std::uint32_t stroke = 0);
   void ChooseHairStyle(std::int16_t hair_style);
   void ChooseHairPalette(std::int16_t hair_palette);
   void ChooseBodyPalette(std::int16_t body_palette);
@@ -100,8 +128,21 @@ class StyleSession {
   // La page blanche : les pièces reviennent à leur état d'origine.
   void BlankSlate();
   // 🔴 ANNULER LES RETOUCHES NE LES PERD PAS : elles partent d'abord au
-  // brouillon, puis la recette revient à ce que le corps porte.
+  // brouillon et à l'historique, puis la recette revient à ce que le corps
+  // porte.
   void BackToWorn();
+
+  // ── L'HISTORIQUE, par corps ─────────────────────────────────────────────
+  //
+  // ⚠ CE QUE LE SERVEUR FAIT N'Y ENTRE PAS : un lot qui change ce qu'on porte
+  // n'est pas un geste du joueur. Charger un préréglage, coller un code,
+  // repartir de zéro, revenir à ce qu'on porte, si : ce sont eux qui
+  // écrasaient le travail sans retour.
+
+  bool Undo();
+  bool Redo();
+  [[nodiscard]] bool can_undo() const;
+  [[nodiscard]] bool can_redo() const;
 
   // ── LES DEMANDES AU SERVEUR ─────────────────────────────────────────────
 
@@ -113,8 +154,12 @@ class StyleSession {
   // serveur range le moins un mais renvoie dans l'écho la coupe RÉELLEMENT
   // portée, si bien que la recette ne coïnciderait jamais avec ce qu'on porte
   // et resterait « modifiée » pour de bon.
+  //
+  // `make_main` : le corps doit AUSSI devenir le style principal. Un corps qui
+  // porte déjà sa recette sans être le principal a donc encore à envoyer.
   [[nodiscard]] std::optional<ro::render::PaletteRecipe> Validate(std::int16_t worn_hair_style,
-                                                                  std::uint32_t now_ms);
+                                                                  std::uint32_t now_ms,
+                                                                  bool make_main = false);
   // Ce qui vient d'être demandé pour le corps porté, et si c'est parti. Rien
   // ne change avant l'écho : un refus laisse le travail en place.
   void Sent(StyleSendKind kind, bool left, std::uint32_t now_ms);
@@ -134,6 +179,22 @@ class StyleSession {
   [[nodiscard]] bool own_style() const noexcept { return own_style_; }
   [[nodiscard]] int style_count() const noexcept { return style_count_; }
   [[nodiscard]] StyleSendState send_state() const noexcept { return send_state_; }
+  // Ce corps est-il le style principal, celui que reprennent les autres ?
+  [[nodiscard]] bool is_main() const noexcept { return main_; }
+
+  // VALIDER CHANGERAIT-IL QUELQUE CHOSE ? Non quand ce corps porte déjà la
+  // recette en propre, ni quand il n'y a rien du tout : une recette vierge sur
+  // un joueur sans style ne ferait qu'occuper une place.
+  [[nodiscard]] bool HasSomethingToSend() const;
+  // UNE DEMANDE PEUT-ELLE PARTIR ? Pas tant que la précédente attend son
+  // écho, ni avant la cadence du serveur, qui jetterait la seconde.
+  [[nodiscard]] bool CanSend(std::uint32_t now_ms) const;
+  // VALIDER ÉVINCERAIT-IL UN AUTRE CORPS ? Oui pour un corps neuf quand le
+  // plafond est atteint : le serveur retire alors le plus ancien après le
+  // principal.
+  [[nodiscard]] bool EvictsOldest() const noexcept {
+    return !own_style_ && style_count_ >= kBodyStyleCap;
+  }
   // Un brouillon de ce corps, autre que ce qu'on voit, attend d'être repris.
   [[nodiscard]] bool OffersDraft() const;
 
@@ -160,6 +221,12 @@ class StyleSession {
     // La révision de son dernier changement : un écho ne lève pas le verrou
     // d'un corps retouché APRÈS la demande.
     std::uint32_t changed_at = 0;
+    // Les recettes d'avant chaque pas, la plus récente au bout, et celles
+    // qu'on a défaites.
+    std::vector<ro::render::PaletteRecipe> undo;
+    std::vector<ro::render::PaletteRecipe> redo;
+    // Le trait du dernier pas ; zéro : aucun trait en cours.
+    std::uint32_t stroke = 0;
   };
 
   // Une demande partie, en attente de son écho.
@@ -180,6 +247,10 @@ class StyleSession {
   [[nodiscard]] Slot& Current();
   // Remplace la recette du corps porté et pose le verrou.
   void Put(const ro::render::PaletteRecipe& recipe);
+  // Le même, comme un pas d'historique.
+  void Gesture(const ro::render::PaletteRecipe& recipe, std::uint32_t stroke);
+  // Range la recette courante comme l'état d'avant un pas.
+  static void Remember(Slot& slot);
   void Changed(Slot& slot);
   // Le corps sans verrou reprend ce qu'il porte.
   void Follow();
@@ -195,6 +266,7 @@ class StyleSession {
 
   ro::render::PaletteRecipe applied_;
   bool own_style_ = false;
+  bool main_ = false;
   int style_count_ = 0;
   std::vector<std::uint32_t> worn_bodies_;
   std::uint32_t book_revision_ = 0;
@@ -202,6 +274,8 @@ class StyleSession {
   std::optional<Pending> pending_;
   StyleSendState send_state_ = StyleSendState::kNone;
   std::uint32_t announced_ms_ = 0;
+  // L'instant de la dernière demande partie ; zéro : aucune.
+  std::uint32_t last_sent_ms_ = 0;
 
   StyleDrafts drafts_;
   bool drafts_changed_ = false;

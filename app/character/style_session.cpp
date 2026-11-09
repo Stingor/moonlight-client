@@ -54,6 +54,15 @@ const ro::render::PaletteRecipe kNoRecipe{};
       const auto own = mine->by_body.find(body_key);
       return own != mine->by_body.end() && Echoes(own->second, sent);
     }
+    case StyleSendKind::kMakeMain: {
+      // ⚠ LA RECETTE NE SUFFIT PAS : elle était peut-être déjà là, et c'est le
+      // rang de principal qu'on demandait.
+      if (mine == nullptr || mine->fallback_body != body_key) {
+        return false;
+      }
+      const auto own = mine->by_body.find(body_key);
+      return own != mine->by_body.end() && Echoes(own->second, sent);
+    }
     case StyleSendKind::kForgetBody:
       return mine == nullptr || !mine->by_body.contains(body_key);
     case StyleSendKind::kDeleteAll:
@@ -97,6 +106,86 @@ void StyleSession::Put(const ro::render::PaletteRecipe& recipe) {
   Changed(slot);
 }
 
+void StyleSession::Gesture(const ro::render::PaletteRecipe& recipe, std::uint32_t stroke) {
+  Slot& slot = Current();
+  slot.touched = true;
+  if (SameRecipe(slot.recipe, recipe)) {
+    return;
+  }
+  // ⚠ UN TRAIT EN COURS PROLONGE SON PAS : seul son point de départ s'est
+  // rangé, au premier réglage.
+  if (stroke == 0 || stroke != slot.stroke) {
+    Remember(slot);
+  }
+  slot.redo.clear();
+  slot.stroke = stroke;
+  slot.recipe = recipe;
+  Changed(slot);
+}
+
+void StyleSession::Remember(Slot& slot) {
+  if (slot.undo.size() >= kStyleHistoryDepth) {
+    slot.undo.erase(slot.undo.begin());
+  }
+  slot.undo.push_back(slot.recipe);
+}
+
+bool StyleSession::can_undo() const {
+  const auto found = slots_.find(body_key_);
+  return found != slots_.end() && !found->second.undo.empty();
+}
+
+bool StyleSession::can_redo() const {
+  const auto found = slots_.find(body_key_);
+  return found != slots_.end() && !found->second.redo.empty();
+}
+
+bool StyleSession::Undo() {
+  Slot& slot = Current();
+  if (slot.undo.empty()) {
+    return false;
+  }
+  slot.redo.push_back(slot.recipe);
+  slot.recipe = slot.undo.back();
+  slot.undo.pop_back();
+  // 🔴 DÉFAIRE EST UN GESTE : le verrou se pose, sans quoi le corps reprendrait
+  // à l'image suivante ce qu'il porte, et défaire n'aurait rien défait.
+  slot.touched = true;
+  slot.stroke = 0;
+  Changed(slot);
+  return true;
+}
+
+bool StyleSession::Redo() {
+  Slot& slot = Current();
+  if (slot.redo.empty()) {
+    return false;
+  }
+  slot.undo.push_back(slot.recipe);
+  slot.recipe = slot.redo.back();
+  slot.redo.pop_back();
+  slot.touched = true;
+  slot.stroke = 0;
+  Changed(slot);
+  return true;
+}
+
+bool StyleSession::HasSomethingToSend() const {
+  if (has_edits()) {
+    return true;
+  }
+  // La recette est ce que le corps porte : la valider ne lui donne sa propre
+  // variante que s'il reprenait celle d'un autre.
+  return !own_style_ && style_count_ > 0;
+}
+
+bool StyleSession::CanSend(std::uint32_t now_ms) const {
+  if (pending_.has_value()) {
+    return false;
+  }
+  return last_sent_ms_ == 0 || now_ms - last_sent_ms_ >= kStyleSendCadenceMs;
+}
+
 void StyleSession::Follow() {
   Slot& slot = Current();
   if (slot.touched || SameRecipe(slot.recipe, applied_)) {
@@ -126,6 +215,7 @@ void StyleSession::Observe(const Worn& worn, std::uint32_t now_ms) {
       mine != nullptr && body_key_ != 0 ? mine->For(body_key_) : nullptr;
   applied_ = wears != nullptr ? FromWire(*wears) : ro::render::PaletteRecipe{};
   own_style_ = mine != nullptr && body_key_ != 0 && mine->by_body.contains(body_key_);
+  main_ = own_style_ && mine->fallback_body == body_key_;
   style_count_ = mine != nullptr ? static_cast<int>(mine->by_body.size()) : 0;
   worn_bodies_.clear();
   if (mine != nullptr) {
@@ -198,60 +288,74 @@ void StyleSession::Announce(StyleSendState state, std::uint32_t now_ms) {
   announced_ms_ = Stamp(now_ms);
 }
 
-void StyleSession::SetPiece(std::size_t rank, const ro::render::RampAdjust& adjust) {
-  if (rank >= ro::render::kMaxRamps) {
-    return;
-  }
+void StyleSession::SetPiece(std::size_t rank, const ro::render::RampAdjust& adjust,
+                            std::uint32_t stroke) {
+  const PieceEdit edit{.rank = rank, .adjust = adjust};
+  SetPieces(std::span<const PieceEdit>(&edit, 1), stroke);
+}
+
+void StyleSession::SetPieces(std::span<const PieceEdit> edits, std::uint32_t stroke) {
   ro::render::PaletteRecipe next = recipe();
-  next.ramps[rank] = adjust;
-  Put(next);
+  for (const PieceEdit& edit : edits) {
+    if (edit.rank < ro::render::kMaxRamps) {
+      next.ramps[edit.rank] = edit.adjust;
+    }
+  }
+  Gesture(next, stroke);
 }
 
 void StyleSession::ChooseHairStyle(std::int16_t hair_style) {
   ro::render::PaletteRecipe next = recipe();
   next.hair_style = hair_style;
-  Put(next);
+  Gesture(next, 0);
 }
 
 void StyleSession::ChooseHairPalette(std::int16_t hair_palette) {
   ro::render::PaletteRecipe next = recipe();
   next.hair_palette = hair_palette;
-  Put(next);
+  Gesture(next, 0);
 }
 
 void StyleSession::ChooseBodyPalette(std::int16_t body_palette) {
   ro::render::PaletteRecipe next = recipe();
   next.body_palette = body_palette;
-  Put(next);
+  Gesture(next, 0);
 }
 
-void StyleSession::Load(const ro::render::PaletteRecipe& recipe) { Put(recipe); }
+void StyleSession::Load(const ro::render::PaletteRecipe& recipe) { Gesture(recipe, 0); }
 
 bool StyleSession::LoadDraft() {
   const ro::sim::StyleRecipe* kept = drafts_.Find(body_key_);
   if (kept == nullptr) {
     return false;
   }
-  Put(FromWire(*kept));
+  Gesture(FromWire(*kept), 0);
   return true;
 }
 
-void StyleSession::BlankSlate() { Put(ro::render::PaletteRecipe{}); }
+void StyleSession::BlankSlate() { Gesture(ro::render::PaletteRecipe{}, 0); }
 
 void StyleSession::BackToWorn() {
   KeepDraft();
-  Current().touched = false;
+  Slot& slot = Current();
+  if (!SameRecipe(slot.recipe, applied_)) {
+    Remember(slot);
+    slot.redo.clear();
+    slot.stroke = 0;
+  }
+  slot.touched = false;
   Follow();
 }
 
 std::optional<ro::render::PaletteRecipe> StyleSession::Validate(std::int16_t worn_hair_style,
-                                                                std::uint32_t now_ms) {
+                                                                std::uint32_t now_ms,
+                                                                bool make_main) {
   ro::render::PaletteRecipe sent = recipe();
   if (sent.hair_style <= 0 && worn_hair_style > 0) {
     sent.hair_style = worn_hair_style;
     Put(sent);
   }
-  if (own_style_ && !has_edits()) {
+  if (own_style_ && !has_edits() && (!make_main || main_)) {
     pending_.reset();
     Current().touched = false;
     drafts_changed_ = drafts_.Forget(body_key_) || drafts_changed_;
@@ -274,6 +378,7 @@ void StyleSession::Sent(StyleSendKind kind, bool left, std::uint32_t now_ms) {
                      .sent = recipe(),
                      .bodies = worn_bodies_,
                      .sent_ms = Stamp(now_ms)};
+  last_sent_ms_ = Stamp(now_ms);
   Announce(StyleSendState::kWaiting, now_ms);
 }
 
