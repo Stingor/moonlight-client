@@ -1431,7 +1431,9 @@ target_include_directories(moonclient_names PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 # réécrit à chaque image.
 add_library(moonclient_styles STATIC
     character/style_recipe.cpp
+    character/style_session.cpp
     character/style_store.cpp
+    character/style_yaml.cpp
     world/actor_styles.cpp)
 
 target_link_libraries(moonclient_styles
@@ -1491,7 +1493,7 @@ add_library(moonclient_settings STATIC
 # ligne qu'une conversation 1:1 a prise au fil.
 target_link_libraries(moonclient_settings
     PUBLIC ro_core ro_sim
-    PRIVATE moonclient_whispers yaml-cpp::yaml-cpp ro_warnings)
+    PRIVATE moonclient_whispers moonclient_styles yaml-cpp::yaml-cpp ro_warnings)
 
 target_include_directories(moonclient_settings PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -2108,6 +2110,7 @@ add_executable(moonclient
     character/grimoire_keys.cpp
     character/skill_description_view.cpp
     character/skill_view.cpp
+    character/style_doll.cpp
     character/style_preview.cpp
     character/style_view.cpp
     game/ui_layouts.cpp

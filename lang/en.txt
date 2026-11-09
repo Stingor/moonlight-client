@@ -9712,8 +9712,8 @@ tr: Save into emblem
 fr: Enregistrer les postes
 tr: Save the positions
 
-fr: Envoyé.
-tr: Sent.
+fr: Envoi…
+tr: Sending…
 
 fr: Estimation indisponible.
 tr: Estimate unavailable.
@@ -10591,6 +10591,9 @@ tr: The server refused the attempt: recast stopped.
 fr: Le serveur calcule per = Rate/100 + (job_level - 50) / 2, puis réussit si per > rnd()%100. Comme le tirage est uniforme sur 0..99, la probabilité vaut exactement per.
 tr: The server computes per = Rate/100 + (job_level - 50) / 2, then succeeds if per > rnd()%100. Since the roll is uniform over 0..99, the probability is exactly per.
 
+fr: Le serveur n'a pas renvoyé ton style : il ne l'a pas retenu. Une demande trop rapprochée de la précédente, ou une liaison coupée, suffit. Attends une seconde, puis réessaie.
+tr: The server did not send your style back: it did not keep it. A request too close to the previous one, or a dropped connection, is enough. Wait a second, then try again.
+
 fr: Le serveur n'a proposé aucun produit. Causes possibles :
 tr: The server offered no product. Possible causes:
 
@@ -10960,6 +10963,9 @@ tr: No
 fr: Non apprise.
 tr: Not learnt.
 
+fr: Non retenu, réessaie.
+tr: Not kept, try again.
+
 fr: Normal
 tr: Normal
 
@@ -11094,6 +11100,9 @@ tr: Palette:
 
 fr: Partager dans le chat
 tr: Share in chat
+
+fr: Partagé.
+tr: Shared.
 
 fr: Partir d'une icône d'item :
 tr: Start from an item icon:

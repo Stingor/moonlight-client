@@ -3,19 +3,15 @@
 #include <exception>
 #include <optional>
 #include <string>
-#include <system_error>
 #include <utility>
 #include <vector>
 
 #include <yaml-cpp/yaml.h>
 
-#include "ro/core/error.h"
-#include "ro/core/file_write.h"
 #include "ro/core/log.h"
 #include "ro/sim/style_code.h"
 
-#include "game/save_folder.h"
-#include "game/yaml_load.h"
+#include "character/style_yaml.h"
 
 namespace moonclient {
 namespace {
@@ -55,22 +51,6 @@ struct Written {
   return written;
 }
 
-[[nodiscard]] YAML::Node ReadWhole(const std::filesystem::path& path) {
-  try {
-    std::error_code missing;
-    if (!std::filesystem::exists(path, missing)) {
-      return YAML::Node(YAML::NodeType::Map);
-    }
-    YAML::Node whole = LoadYamlFile(path);
-    // ⚠ UNE RACINE QUI N'EST PAS UNE TABLE N'A PAS DE CHAMPS : l'indexer lève
-    // chez l'appelant, hors de ce `try`.
-    return whole.IsMap() ? whole : YAML::Node(YAML::NodeType::Map);
-  } catch (const std::exception& trouble) {
-    ro::core::LogWarning("couleurs des personnages : fichier illisible ({})", trouble.what());
-    return YAML::Node(YAML::NodeType::Map);
-  }
-}
-
 // Les couleurs d'une entrée, ou rien si aucune ne se lit.
 [[nodiscard]] std::optional<ro::sim::StyleVariants> VariantsOf(const YAML::Node& entry) {
   if (!entry.IsMap() || !entry[kCodesField] || !entry[kCodesField].IsSequence()) {
@@ -78,11 +58,7 @@ struct Written {
   }
   ro::sim::StyleVariants variants;
   for (const YAML::Node& code : entry[kCodesField]) {
-    if (!code.IsScalar()) {
-      continue;
-    }
-    const std::optional<ro::sim::StyleCode> read =
-        ro::sim::DecodeStyleCode(code.as<std::string>(std::string{}));
+    const std::optional<ro::sim::StyleCode> read = StyleCodeAt(code);
     // ⚠ UN CODE SANS CORPS NE DÉSIGNE AUCUNE VARIANTE : il ne se retrouverait
     // jamais, puisque c'est le corps qui la choisit.
     if (read.has_value() && read->body_key != 0) {
@@ -103,14 +79,18 @@ struct Written {
 }  // namespace
 
 std::filesystem::path CharacterStylesPath(const std::filesystem::path& client_root) {
-  return client_root / kSaveFolder / kCharacterStylesFileName;
+  return StyleFilePath(client_root, kCharacterStylesFileName);
 }
 
 std::map<std::uint32_t, ro::sim::StyleVariants> LoadCharacterStyles(
     const std::filesystem::path& client_root) {
   std::map<std::uint32_t, ro::sim::StyleVariants> kept;
-  const YAML::Node whole = ReadWhole(CharacterStylesPath(client_root));
-  const YAML::Node characters = whole[kCharactersField];
+  const std::optional<YAML::Node> whole =
+      ReadStyleFile(CharacterStylesPath(client_root), "couleurs des personnages");
+  if (!whole.has_value()) {
+    return kept;
+  }
+  const YAML::Node characters = (*whole)[kCharactersField];
   if (!characters || !characters.IsMap()) {
     return kept;
   }
@@ -164,17 +144,8 @@ bool NoteCharacterStyles(const std::filesystem::path& client_root, std::uint32_t
     out << YAML::EndSeq << YAML::EndMap;
   }
   out << YAML::EndMap << YAML::EndMap;
-
-  const std::filesystem::path path = CharacterStylesPath(client_root);
-  std::error_code unused;
-  std::filesystem::create_directories(path.parent_path(), unused);
-  if (const ro::core::Result<void> written =
-          ro::core::WriteFileAtomically(path, std::string(kFileHeader) + out.c_str() + "\n");
-      !written) {
-    ro::core::LogWarning("couleurs des personnages : {}", ro::core::Describe(written.error()));
-    return false;
-  }
-  return true;
+  return WriteStyleFile(CharacterStylesPath(client_root), kFileHeader, out,
+                        "couleurs des personnages");
 }
 
 }  // namespace moonclient

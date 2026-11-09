@@ -60,7 +60,17 @@ constexpr const char* kHairStylePopup = "##coiffures";
 constexpr const char* kHairColorPopup = "##couleurs_cheveux";
 constexpr const char* kBodyPalettePopup = "##palettes_corps";
 
-void DrawHairStylePicker(PaletteEditorState& state, const PaletteEditorView& view) {
+// LE CHOIX D'UNE GRILLE, rendu comme une intention : `app` seul écrit la
+// recette.
+void Choose(const ThumbnailChoice& choice, PaletteEditorPicker grid, PaletteEditorAction& action) {
+  if (choice.picked > 0) {
+    action.chosen_in = grid;
+    action.chosen = choice.picked;
+  }
+}
+
+void DrawHairStylePicker(PaletteEditorState& state, const PaletteEditorView& view,
+                         PaletteEditorAction& action) {
   if (!BeginSkinPopup(kHairStylePopup)) {
     return;
   }
@@ -82,12 +92,10 @@ void DrawHairStylePicker(PaletteEditorState& state, const PaletteEditorView& vie
   // La case allumée porte la coupe CHOISIE, ou celle qu'on porte tant que rien
   // n'est choisi : une grille qui n'allumerait rien laisserait croire que le
   // personnage n'a pas de coiffure.
-  const int chosen = state.recipe.hair_style > 0 ? state.recipe.hair_style : view.worn_hair_style;
+  const int chosen = view.recipe.hair_style > 0 ? view.recipe.hair_style : view.worn_hair_style;
   const ThumbnailChoice choice =
       DrawPickerGrid(view.bounds.first, last, kHairColumns, cell, chosen, view, state.picker);
-  if (choice.picked > 0) {
-    state.recipe.hair_style = static_cast<std::int16_t>(choice.picked);
-  }
+  Choose(choice, PaletteEditorPicker::kHairStyle, action);
   ImGui::EndChild();
   // 🔴 APRÈS `EndChild`, ET JAMAIS DEDANS : la fermeture vise le POPUP, et la
   // demander depuis un enfant reviendrait à parier sur la pile de fenêtres
@@ -98,7 +106,8 @@ void DrawHairStylePicker(PaletteEditorState& state, const PaletteEditorView& vie
   EndSkinPopup();
 }
 
-void DrawHairColorPicker(PaletteEditorState& state, const PaletteEditorView& view) {
+void DrawHairColorPicker(PaletteEditorState& state, const PaletteEditorView& view,
+                         PaletteEditorAction& action) {
   if (!BeginSkinPopup(kHairColorPopup)) {
     return;
   }
@@ -116,10 +125,8 @@ void DrawHairColorPicker(PaletteEditorState& state, const PaletteEditorView& vie
              ThumbnailGridHeight(last, kHairColorColumns, cell, kGridVisibleRows)),
       ImGuiChildFlags_Borders);
   const ThumbnailChoice choice = DrawPickerGrid(view.bounds.first, last, kHairColorColumns, cell,
-                                                state.recipe.hair_palette, view, state.picker);
-  if (choice.picked > 0) {
-    state.recipe.hair_palette = static_cast<std::int16_t>(choice.picked);
-  }
+                                                view.recipe.hair_palette, view, state.picker);
+  Choose(choice, PaletteEditorPicker::kHairColor, action);
   ImGui::EndChild();
   if (choice.close) {
     ImGui::CloseCurrentPopup();
@@ -128,7 +135,7 @@ void DrawHairColorPicker(PaletteEditorState& state, const PaletteEditorView& vie
 }
 
 void DrawBodyPalettePicker(PaletteEditorState& state, const PaletteEditorView& view,
-                           const SkinArt& art) {
+                           const SkinArt& art, PaletteEditorAction& action) {
   if (!BeginSkinPopup(kBodyPalettePopup)) {
     return;
   }
@@ -171,14 +178,12 @@ void DrawBodyPalettePicker(PaletteEditorState& state, const PaletteEditorView& v
                     ImVec2(ThumbnailGridWidth(kBodyColumns, cell, /*with_scrollbar=*/false),
                            ThumbnailGridHeight(kPerPage, kBodyColumns, cell, kBodyRows)),
                     ImGuiChildFlags_Borders);
-  const ThumbnailChoice choice = DrawPickerGrid(first, upto, kBodyColumns, cell,
-                                                state.recipe.body_palette, view, state.picker);
-  if (choice.picked > 0) {
-    // 🔴 `app` RECHARGERA TOUT : la teinte de base change la fusion, donc le
-    // DÉCOUPAGE des rampes. Les réglages en place se ré-appliquent par index,
-    // comme lors d'un changement de corps.
-    state.recipe.body_palette = static_cast<std::int16_t>(choice.picked);
-  }
+  // 🔴 `app` RECHARGERA TOUT au choix : la teinte de base change la fusion,
+  // donc le DÉCOUPAGE des rampes. Les réglages en place se ré-appliquent par
+  // rang.
+  const ThumbnailChoice choice =
+      DrawPickerGrid(first, upto, kBodyColumns, cell, view.recipe.body_palette, view, state.picker);
+  Choose(choice, PaletteEditorPicker::kBodyPalette, action);
   ImGui::EndChild();
   if (choice.close) {
     ImGui::CloseCurrentPopup();
@@ -190,19 +195,19 @@ void DrawBodyPalettePicker(PaletteEditorState& state, const PaletteEditorView& v
 
 }  // namespace
 
-void DrawChoiceButtons(PaletteEditorState& state, const PaletteEditorView& view,
-                       const SkinArt& art) {
+void DrawChoiceButtons(PaletteEditorState& state, const PaletteEditorView& view, const SkinArt& art,
+                       PaletteEditorAction& action) {
   char label[96] = {};
-  const int hair = state.recipe.hair_style > 0 ? state.recipe.hair_style : view.worn_hair_style;
+  const int hair = view.recipe.hair_style > 0 ? view.recipe.hair_style : view.worn_hair_style;
   std::snprintf(label, sizeof(label), "%s (%d)", core::Tr("Coiffure"), hair);
   if (SkinButton(label, art)) {
     ImGui::OpenPopup(kHairStylePopup);
   }
-  DrawHairStylePicker(state, view);
+  DrawHairStylePicker(state, view, action);
 
-  if (state.recipe.hair_palette > 0) {
+  if (view.recipe.hair_palette > 0) {
     std::snprintf(label, sizeof(label), "%s (%d)", core::Tr("Couleur de cheveux"),
-                  state.recipe.hair_palette);
+                  view.recipe.hair_palette);
   } else {
     std::snprintf(label, sizeof(label), "%s (%s)", core::Tr("Couleur de cheveux"),
                   core::Tr("d'origine"));
@@ -210,16 +215,16 @@ void DrawChoiceButtons(PaletteEditorState& state, const PaletteEditorView& view,
   if (SkinButton(label, art)) {
     ImGui::OpenPopup(kHairColorPopup);
   }
-  DrawHairColorPicker(state, view);
+  DrawHairColorPicker(state, view, action);
 
   // 🔴 LE LIBELLÉ PORTE LES NUMÉROS DU SERVEUR. Le joueur et l'administrateur
   // doivent parler de la même palette : « teinte 42 » ici doit être
   // `body_42.pal` là-bas. Et « d'origine » n'est pas la palette zéro — celle-ci
   // n'existe pas pour le jeu, une couleur de vêtement nulle signifiant « aucune
   // palette externe » ; la sentinelle reste moins un.
-  if (state.recipe.body_palette > 0) {
+  if (view.recipe.body_palette > 0) {
     std::snprintf(label, sizeof(label), "%s (%d)", core::Tr("Teinte de base"),
-                  state.recipe.body_palette);
+                  view.recipe.body_palette);
   } else {
     std::snprintf(label, sizeof(label), "%s (%s)", core::Tr("Teinte de base"),
                   core::Tr("d'origine"));
@@ -233,7 +238,7 @@ void DrawChoiceButtons(PaletteEditorState& state, const PaletteEditorView& view,
                  "réglages s'appliquent par-dessus. Changer de teinte de base peut "
                  "redécouper les pièces."));
   }
-  DrawBodyPalettePicker(state, view, art);
+  DrawBodyPalettePicker(state, view, art, action);
 }
 
 bool ThumbnailGridScrolls(int total, int columns, int visible_rows) {

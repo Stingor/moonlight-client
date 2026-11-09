@@ -17,12 +17,13 @@ namespace ro::ui {
 // voit de ces grilles tient dans `PalettePickerState` et les vignettes de la
 // vue.
 
-// Dessine les trois boutons, chacun portant son choix courant, et les grilles
-// qu'ils ouvrent.
+// Dessine les trois boutons, chacun portant le choix de la recette, et les
+// grilles qu'ils ouvrent. Une case choisie part dans `action`, jamais dans la
+// recette : `app` seul l'écrit.
 //
 // ⚠ ELLE ÉCRIT DANS `state.picker` la grille ouverte et la tranche de numéros
 // réellement visible : c'est ce que `app` composera à l'image suivante.
-void DrawChoiceButtons(PaletteEditorState& state, const PaletteEditorView& view,
-                       const SkinArt& art);
+void DrawChoiceButtons(PaletteEditorState& state, const PaletteEditorView& view, const SkinArt& art,
+                       PaletteEditorAction& action);
 
 }  // namespace ro::ui

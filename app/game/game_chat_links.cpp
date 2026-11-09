@@ -521,7 +521,7 @@ void Game::FollowStyleLink(const ChatLinkTarget& aimed, ro::ui::ChatLinkGesture 
       // ⚠ LA FENÊTRE S'OUVRE AVEC : charger un code dans un éditeur fermé
       // serait un geste sans réponse visible.
       windows_.style.open = true;
-      static_cast<void>(style_view_->TryCode(aimed.code, windows_.style, now_ms));
+      static_cast<void>(style_view_->TryCode(aimed.code, now_ms));
       break;
     case ro::ui::ChatLinkGesture::kCopyCode:
       // ⚠ LE CODE TEL QU'IL A VOYAGÉ : ré-encoder perdrait ce qu'une version

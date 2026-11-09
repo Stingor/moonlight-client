@@ -44,18 +44,23 @@ namespace ro::net {
 // `render::BodySpriteKey`. ⚠ ELLE NE VAUT QUE POUR LUI : les index d'une
 // palette n'ont aucune signification commune d'un corps à l'autre.
 //
-// `fallback` marque cette variante comme celle à reprendre pour un corps qui
-// n'a pas la sienne. Un joueur qui n'a teint qu'un corps la veut, sinon il
-// redevient gris dès qu'il monte en selle.
+// `make_main` DEMANDE d'en faire le style PRINCIPAL — le repli, celui que
+// reprend un corps qui n'a pas le sien. ⚠ UNE DEMANDE, PAS UN ORDRE : c'est le
+// serveur qui tient le repli, et il le marque dans ses lots. Sans elle, ou sur
+// un serveur qui ne l'honore pas, le repli reste la première variante rangée.
+//
+// ⚠ PARTIE NE VEUT PAS DIRE RETENUE : le serveur jette sans un mot ce qu'il
+// refuse, et seul l'écho de la zone dit ce qu'il a gardé. L'erreur ne dit que
+// ce qui n'a pas pu partir — une liaison fermée.
 [[nodiscard]] core::Result<void> SendPlayerStyle(Connection& link, const sim::StyleRecipe& recipe,
-                                                 std::uint32_t body_key, bool fallback);
+                                                 std::uint32_t body_key, bool make_main);
 
 // EFFACER : ce corps-ci, ou TOUS.
 //
 // ⚠ DEUX DEMANDES ET NON UNE, parce que ce ne sont pas les mêmes gestes :
 // « rendre ce corps à son apparence d'origine » et « je ne veux plus de
-// couleurs du tout ». Les confondre ferait perdre huit variantes à qui n'en
-// retirait qu'une.
+// couleurs du tout ». Les confondre ferait perdre toutes ses variantes — le
+// serveur en range quatre — à qui n'en retirait qu'une.
 [[nodiscard]] core::Result<void> SendPlayerStyleClear(Connection& link, std::uint32_t body_key);
 [[nodiscard]] core::Result<void> SendPlayerStyleClearAll(Connection& link);
 

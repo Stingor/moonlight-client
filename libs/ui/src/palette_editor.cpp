@@ -2,11 +2,9 @@
 
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <cstdio>
-#include <cstring>
 #include <optional>
-
-#include <imgui_internal.h>  // GetInputTextState : resynchroniser le champ de nom
 
 #include "ro/core/i18n.h"
 #include "ro/ui/bug_report_window.h"
@@ -18,6 +16,7 @@
 
 #include "palette_doll.h"
 #include "palette_pickers.h"
+#include "palette_presets.h"
 
 namespace ro::ui {
 namespace {
@@ -43,13 +42,22 @@ constexpr ImU32 kPipetteColor = IM_COL32(255, 209, 110, 255);
 
 // ── UNE PIÈCE ───────────────────────────────────────────────────────────────
 
-// La couleur désignée sur cette pièce, ou rien. `hovered` repart vrai quand la
-// souris est sur la ligne — pastille ou nom, les deux posent la même question.
-[[nodiscard]] std::optional<std::array<std::uint8_t, 3>> DrawPiece(
-    std::size_t rank, ImU32 color, int ceiling, render::RampAdjust& adjust, const SkinArt& art,
-    bool& hovered, bool& picker_open, bool pointed) {
-  ImGui::PushID(static_cast<int>(rank));
+// Ce qu'une rangée de pièce a relevé.
+struct PieceAnswer {
+  // La couleur désignée dans le nuancier, ou rien.
   std::optional<std::array<std::uint8_t, 3>> picked;
+  // La souris est sur la ligne — pastille ou nom, les deux posent la même
+  // question.
+  bool hovered = false;
+  // Sa croix vient d'être cliquée.
+  bool reset = false;
+};
+
+[[nodiscard]] PieceAnswer DrawPiece(std::size_t rank, ImU32 color, int ceiling,
+                                    const render::RampAdjust& adjust, const SkinArt& art,
+                                    bool& picker_open, bool pointed) {
+  ImGui::PushID(static_cast<int>(rank));
+  PieceAnswer answer;
 
   std::array<float, 3> rgb = {static_cast<float>((color >> IM_COL32_R_SHIFT) & 0xFFU) / 255.0F,
                               static_cast<float>((color >> IM_COL32_G_SHIFT) & 0xFFU) / 255.0F,
@@ -60,10 +68,12 @@ constexpr ImU32 kPipetteColor = IM_COL32(255, 209, 110, 255);
     const auto to_byte = [](float channel) {
       return static_cast<std::uint8_t>(std::clamp(std::lround(channel * 255.0F), 0L, 255L));
     };
-    picked = std::array<std::uint8_t, 3>{to_byte(rgb[0]), to_byte(rgb[1]), to_byte(rgb[2])};
+    answer.picked = std::array<std::uint8_t, 3>{to_byte(rgb[0]), to_byte(rgb[1]), to_byte(rgb[2])};
   }
   picker_open = picker_open || open;
-  hovered = ImGui::IsItemHovered();
+  // ⚠ C'EST LA PASTILLE QUI RÉPOND ICI : sans libellé à montrer, elle est le
+  // dernier élément soumis — voir `SkinColorSwatch`.
+  answer.hovered = ImGui::IsItemHovered();
   // 🔴 SUR LA MÊME LIGNE QUE LA PASTILLE, et c'est ce qui rend la fenêtre
   // compacte : sans cet appel, chaque pièce prend DEUX rangées — huit pièces
   // en font seize —, la liste double de hauteur et le pantin, dont le côté
@@ -94,7 +104,7 @@ constexpr ImU32 kPipetteColor = IM_COL32(255, 209, 110, 255);
     ImGui::TextUnformatted(label);
   }
   if (ImGui::IsItemHovered()) {
-    hovered = true;
+    answer.hovered = true;
     // ⚠ L'EXPLICATION NE S'AFFICHE QUE POUR LES PIÈCES CONCERNÉES : une bulle
     // qui dirait « pas de limite » sur les autres noierait celle qui compte.
     if (in_shadow) {
@@ -121,183 +131,14 @@ constexpr ImU32 kPipetteColor = IM_COL32(255, 209, 110, 255);
   // les icônes, une flèche Unicode n'y serait qu'un rectangle vide.
   if (!adjust.neutral()) {
     ImGui::SameLine();
-    if (SkinSmallButton("x", art)) {
-      // ⚠ CELUI-CI, `ui` PEUT L'ÉCRIRE : remettre un réglage à neutre n'est
-      // pas un calcul, c'est l'absence de réglage.
-      adjust = render::RampAdjust{};
-    }
+    answer.reset = SkinSmallButton("x", art);
     if (ImGui::IsItemHovered()) {
-      hovered = true;
+      answer.hovered = true;
       SkinTooltip(core::Tr("Réinitialiser cette pièce"));
     }
   }
   ImGui::PopID();
-  return picked;
-}
-
-// ── LES PRÉRÉGLAGES, ET LE CODE QUI VOYAGE ──────────────────────────────────
-//
-// ⚠ PUREMENT LOCAUX : le serveur n'en sait rien et n'a pas à en savoir. Un
-// préréglage n'est pas une apparence, c'est un brouillon qu'on reprend.
-
-// La largeur d'un nom dans la liste, et celle du champ de saisie, en largeurs
-// de police. ⚠ EXPLICITES : un `Selectable` auto-dimensionné prend TOUTE la
-// largeur restante et avalerait le clic de la ligne entière.
-constexpr float kPresetRowInFonts = 9.0F;
-constexpr float kPresetFieldInFonts = 10.0F;
-constexpr float kPresetHintWrapInFonts = 22.0F;
-
-void DrawPresets(PaletteEditorState& state, const PaletteEditorView& view, const SkinArt& art,
-                 PaletteEditorAction& action) {
-  ImGui::Separator();
-  // 🔴 LA SECTION S'OUVRE D'ELLE-MÊME QUAND IL Y A UN BROUILLON, et une seule
-  // fois. C'est le seul moment où quelqu'un a besoin de la trouver sans savoir
-  // qu'elle existe : il vient de perdre une session, et un bouton de sauvetage
-  // replié dans un menu ne sauve personne. Le reste du temps, la section reste
-  // comme le joueur l'a laissée.
-  if (view.has_draft) {
-    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-  }
-  if (!ImGui::TreeNode(core::Tr("Préréglages"))) {
-    return;
-  }
-
-  if (view.has_draft) {
-    if (SkinButton(core::Tr("Dernier style non validé"), art)) {
-      action.verb = PaletteEditorVerb::kLoadDraft;
-    }
-    if (ImGui::IsItemHovered()) {
-      // ⛔ « POUR CE CORPS » ET NON « POUR CE PERSONNAGE » : c'est la clé que
-      // ce client emploie vraiment, faute d'identifiant de personnage — voir
-      // `character/style_store.h`. Écrire l'autre serait une phrase fausse.
-      SkinTooltip(
-          core::Tr("Ce que tu composais la dernière fois sans le valider. Gardé sur cet "
-                   "ordinateur, pour ce corps."));
-    }
-    ImGui::Separator();
-  }
-
-  for (std::size_t rank = 0; rank < view.presets.size(); ++rank) {
-    const std::string& name = view.presets[rank];
-    ImGui::PushID(static_cast<int>(rank));
-    // 🔴 LA CROIX EST SOUMISE AVANT LE NOM, et ce n'est pas de la mise en page :
-    // un `Selectable` occupe toute la largeur restante et avalait le clic de
-    // la ligne entière, croix comprise. Soumettre le bouton d'abord lui
-    // réserve son rectangle ; le `Selectable` prend ce qui reste.
-    //
-    // Centrage vertical : un bouton a la hauteur d'un cadre, un `Selectable`
-    // celle d'une ligne de texte. On descend le plus court de la moitié de
-    // l'écart, sinon la croix flotte au-dessus du nom.
-    const float line = ImGui::GetTextLineHeight();
-    const float frame = ImGui::GetFrameHeight();
-    const float top = ImGui::GetCursorPosY();
-    if (frame < line) {
-      ImGui::SetCursorPosY(top + (line - frame) * 0.5F);
-    }
-    const bool erased = SkinSmallButton("x", art);
-    ImGui::SetCursorPosY(top);
-    if (erased) {
-      action.verb = PaletteEditorVerb::kDeletePreset;
-      action.preset = name;
-      ImGui::PopID();
-      break;  // la liste va bouger sous nos pieds
-    }
-    ImGui::SameLine();
-    if (frame > line) {
-      ImGui::SetCursorPosY(top + (frame - line) * 0.5F);
-    }
-    if (ImGui::Selectable(name.c_str(), false, 0,
-                          ImVec2(ImGui::GetFontSize() * kPresetRowInFonts, 0.0F))) {
-      action.preset = name;
-      // 🔴 MAJ + CLIC = POSER LE CODE DANS LE CHAT. C'est la convention de
-      // gestes du projet, la même que sur un objet ou une compétence, et c'est
-      // ce qui la rend utile : le joueur n'a rien de neuf à apprendre.
-      if (ImGui::GetIO().KeyShift) {
-        action.verb = PaletteEditorVerb::kSharePreset;
-        ImGui::PopID();
-        continue;
-      }
-      action.verb = PaletteEditorVerb::kLoadPreset;
-      // Le nom revient dans le champ : charger, retoucher, puis réenregistrer
-      // sous le même nom est le geste le plus courant, et le retaper à chaque
-      // fois n'apporte rien.
-      const std::size_t room = std::min(name.size(), state.preset_name.size() - 1);
-      std::memcpy(state.preset_name.data(), name.data(), room);
-      state.preset_name[room] = '\0';
-      // 🔴 ET ON RESYNCHRONISE LE WIDGET : écrire dans le tampon ne suffit pas
-      // si le champ a le focus — voir `PaletteEditorState::preset_field`.
-      if (state.preset_field != 0) {
-        if (ImGuiInputTextState* typing = ImGui::GetInputTextState(state.preset_field)) {
-          typing->ReloadUserBufAndMoveToEnd();
-        }
-      }
-    }
-    if (ImGui::IsItemHovered()) {
-      SkinTooltip(core::Tr("Clic : charger. Maj+clic : le lien dans le chat."));
-    }
-    ImGui::PopID();
-  }
-
-  ImGui::SetNextItemWidth(ImGui::GetFontSize() * kPresetFieldInFonts);
-  ImGui::InputText("##nom", state.preset_name.data(), state.preset_name.size());
-  // Relevé APRÈS soumission : c'est le seul moment où l'identifiant du widget
-  // est connu. Il servira à l'image suivante.
-  state.preset_field = ImGui::GetItemID();
-  ImGui::SameLine();
-  const bool named = state.preset_name[0] != '\0';
-  const bool known =
-      std::ranges::find(view.presets, state.preset_name.data()) != view.presets.end();
-  // ⚠ GRISÉ PLUTÔT QUE SANS EFFET : sans nom, ou une fois le plafond atteint et
-  // le nom inconnu, « Enregistrer » ne peut rien faire.
-  ImGui::BeginDisabled(!named || (view.presets_full && !known));
-  if (SkinButton(core::Tr("Enregistrer"), art)) {
-    action.verb = PaletteEditorVerb::kSavePreset;
-    action.preset = state.preset_name.data();
-  }
-  ImGui::EndDisabled();
-  if (ImGui::IsItemHovered() && view.presets_full && !known) {
-    SkinTooltip(
-        core::Tr("Tu as rangé autant de styles que la liste en tient. Efface-en un, ou "
-                 "réenregistre sous un nom déjà là."));
-  }
-
-  // ── LE CODE PARTAGEABLE ───────────────────────────────────────────────────
-  //
-  // La même chaîne que celle rangée en base : un joueur la copie et la donne à
-  // un autre. Le PRESSE-PAPIERS plutôt qu'un champ de texte, parce que quatre-
-  // vingt-dix caractères d'hexadécimal ne se lisent ni ne se retapent.
-  ImGui::Separator();
-  if (SkinButton(core::Tr("Copier le code"), art)) {
-    ImGui::SetClipboardText(view.share_code);
-    action.verb = PaletteEditorVerb::kCopyCode;
-  }
-  ImGui::SameLine();
-  // Poser le code dans la barre de chat. ⚠ LE GESTE S'ARRÊTE LÀ : c'est le
-  // joueur qui envoie, comme pour tout autre lien.
-  if (SkinButton(core::Tr("Partager dans le chat"), art)) {
-    action.verb = PaletteEditorVerb::kShareCode;
-  }
-  if (ImGui::IsItemHovered()) {
-    // ⚠ ON DIT CE QUE LE GESTE FAIT, ET OÙ IL S'ARRÊTE : le lien se pose dans
-    // la saisie, c'est le joueur qui envoie. ⛔ Et l'on ne promet rien de plus
-    // que ce que le fil tient — un client sans greffon verra la balise brute,
-    // ce qui reste un code à coller.
-    SkinTooltip(
-        core::Tr("Pose le lien de ton style dans ta saisie — à toi d'envoyer. Qui le "
-                 "reçoit le voit sur lui d'un clic."));
-  }
-  ImGui::SameLine();
-  if (SkinButton(core::Tr("Coller un code"), art)) {
-    const char* clipboard = ImGui::GetClipboardText();
-    action.verb = PaletteEditorVerb::kPasteCode;
-    action.pasted = clipboard != nullptr ? clipboard : "";
-  }
-  if (view.code_refused) {
-    ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + ImGui::GetFontSize() * kPresetHintWrapInFonts);
-    ImGui::TextUnformatted(core::Tr("Code illisible ou d'une version trop ancienne."));
-    ImGui::PopTextWrapPos();
-  }
-  ImGui::TreePop();
+  return answer;
 }
 
 // Une confirmation : le texte, le bouton qui agit, celui qui renonce.
@@ -321,6 +162,112 @@ void DrawPresets(PaletteEditorState& state, const PaletteEditorView& view, const
   }
   EndSkinPopup();
   return done;
+}
+
+// CE QUE LE SERVEUR A FAIT DE LA DEMANDE, à côté du bouton qui l'a faite.
+//
+// ⚠ « PARTAGÉ » SEULEMENT À L'ÉCHO : le serveur jette sans un mot ce qu'il
+// refuse, et dire plus que ce qu'on sait serait un mensonge que le joueur
+// relirait de travers le jour où son style ne parvient pas aux autres.
+void DrawSendStatus(PaletteSendStatus send) {
+  const char* said = nullptr;
+  switch (send) {
+    case PaletteSendStatus::kNone:
+      return;
+    case PaletteSendStatus::kWaiting:
+      said = core::Tr("Envoi…");
+      break;
+    case PaletteSendStatus::kShared:
+      said = core::Tr("Partagé.");
+      break;
+    case PaletteSendStatus::kRefused:
+      said = core::Tr("Non retenu, réessaie.");
+      break;
+  }
+  ImGui::SameLine();
+  ImGui::AlignTextToFramePadding();
+  ImGui::TextUnformatted(said);
+  if (send == PaletteSendStatus::kRefused && ImGui::IsItemHovered()) {
+    SkinTooltip(
+        core::Tr("Le serveur n'a pas renvoyé ton style : il ne l'a pas retenu. Une demande "
+                 "trop rapprochée de la précédente, ou une liaison coupée, suffit. Attends "
+                 "une seconde, puis réessaie."));
+  }
+}
+
+// LES BOUTONS QUI DÉFONT : revenir, repartir de zéro, oublier, supprimer.
+void DrawUndoButtons(const PaletteEditorView& view, const SkinArt& art,
+                     PaletteEditorAction& action) {
+  ImGui::BeginDisabled(!view.has_edits);
+  if (SkinButton(core::Tr("Revenir à mon style"), art)) {
+    action.verb = PaletteEditorVerb::kBackToWorn;
+  }
+  ImGui::EndDisabled();
+  if (ImGui::IsItemHovered()) {
+    SkinTooltip(view.has_edits
+                    ? core::Tr("Annule tes retouches en cours et revient à ce que ton "
+                               "personnage porte.")
+                    : core::Tr("Rien à annuler : l'aperçu montre déjà ce que ton personnage "
+                               "porte."));
+  }
+
+  // 🔴 EMPILÉS, ET NON SUR UNE RANGÉE : quatre libellés côte à côte imposent à
+  // la fenêtre une largeur que rien d'autre ne demande — le double de celle de
+  // son contenu — et cette largeur ENFLE À LA TRADUCTION, où chaque libellé
+  // peut s'allonger. Empilés, ils tiennent dans toutes les langues.
+  if (SkinButton(core::Tr("Repartir de zéro"), art)) {
+    ImGui::OpenPopup("zero");
+  }
+  if (Confirm("zero",
+              core::Tr("Remettre tout l'aperçu à zéro ? Tes réglages en cours seront perdus."),
+              core::Tr("Réinitialiser"), art)) {
+    action.verb = PaletteEditorVerb::kBlankSlate;
+  }
+
+  // 🔴 SANS LIAISON, NI L'UN NI L'AUTRE NE PEUT RIEN : le serveur seul efface,
+  // et un bouton cliquable laisserait croire qu'il a reçu la demande.
+  ImGui::BeginDisabled(!view.connected);
+  // ⚠ LE GESTE FIN N'APPARAÎT QUE QUAND IL DIT AUTRE CHOSE QUE LE SUIVANT :
+  // il faut que CE corps ait son propre style, et qu'il en reste un autre
+  // derrière. Sinon « oublier celui-ci » et « tout supprimer » font la même
+  // chose, sous deux libellés dont le plus obscur laisse croire à un troisième
+  // geste.
+  const bool forgettable = view.body_has_own_style && view.body_style_count > 1;
+  if (forgettable) {
+    if (SkinButton(core::Tr("Oublier le style de ce corps"), art)) {
+      ImGui::OpenPopup("oublier");
+    }
+    if (ImGui::IsItemHovered()) {
+      SkinTooltip(
+          core::Tr("Efface le style de CE corps seulement. Tes autres corps gardent le "
+                   "leur, et celui-ci reprend ton style principal."));
+    }
+    if (Confirm("oublier",
+                core::Tr("Oublier le style de ce corps ? Il reprendra ton style principal, "
+                         "chez toi comme chez les autres. Tes autres corps ne changent pas."),
+                core::Tr("Oublier"), art)) {
+      action.verb = PaletteEditorVerb::kForgetBody;
+    }
+  }
+
+  if (SkinButton(core::Tr("Supprimer mon style"), art)) {
+    ImGui::OpenPopup("supprimer");
+  }
+  if (ImGui::IsItemHovered()) {
+    SkinTooltip(
+        core::Tr("Efface ta palette, chez toi ET sur le serveur. Ton personnage "
+                 "retrouve l'apparence qu'il avait avant, pour toi comme pour les "
+                 "autres. Ce n'est PAS un retour à ta dernière couleur partagée : "
+                 "celle-ci est perdue."));
+  }
+  if (Confirm("supprimer",
+              core::Tr("Supprimer ton style, chez toi ET sur le serveur ? Ton personnage "
+                       "retrouve son apparence d'avant, pour toi comme pour les autres. "
+                       "C'est définitif."),
+              core::Tr("Supprimer"), art)) {
+    action.verb = PaletteEditorVerb::kDeleteAll;
+  }
+  ImGui::EndDisabled();
 }
 
 }  // namespace
@@ -417,14 +364,17 @@ PaletteEditorAction DrawPaletteEditor(PaletteEditorState& state, const PaletteEd
   for (std::size_t rank = 0; rank < view.ramps.size() && rank < render::kMaxRamps; ++rank) {
     const ImU32 color = rank < view.colors.size() ? view.colors[rank] : IM_COL32_WHITE;
     const int ceiling = rank < view.ceilings.size() ? view.ceilings[rank] : kFullValue;
-    bool hovered = false;
     const bool pointed = view.pipette_ramp == static_cast<int>(rank);
-    if (const auto picked = DrawPiece(rank, color, ceiling, state.recipe.ramps[rank], art, hovered,
-                                      picker_open, pointed)) {
+    const PieceAnswer answer =
+        DrawPiece(rank, color, ceiling, view.recipe.ramps[rank], art, picker_open, pointed);
+    if (answer.picked.has_value()) {
       action.picked_ramp = static_cast<int>(rank);
-      action.picked_color = *picked;
+      action.picked_color = *answer.picked;
     }
-    if (hovered) {
+    if (answer.reset) {
+      action.reset_ramp = static_cast<int>(rank);
+    }
+    if (answer.hovered) {
       hovered_ramp = static_cast<int>(rank);
     }
   }
@@ -445,76 +395,11 @@ PaletteEditorAction DrawPaletteEditor(PaletteEditorState& state, const PaletteEd
   }
 
   if (view.bounds.usable()) {
-    DrawChoiceButtons(state, view, art);
+    DrawChoiceButtons(state, view, art, action);
     ImGui::Separator();
   }
 
-  ImGui::BeginDisabled(!view.has_edits);
-  if (SkinButton(core::Tr("Revenir à mon style"), art)) {
-    action.verb = PaletteEditorVerb::kBackToWorn;
-  }
-  ImGui::EndDisabled();
-  if (ImGui::IsItemHovered()) {
-    SkinTooltip(view.has_edits
-                    ? core::Tr("Annule tes retouches en cours et revient à ce que ton "
-                               "personnage porte.")
-                    : core::Tr("Rien à annuler : l'aperçu montre déjà ce que ton personnage "
-                               "porte."));
-  }
-
-  // 🔴 EMPILÉS, ET NON SUR UNE RANGÉE : quatre libellés côte à côte imposent à
-  // la fenêtre une largeur que rien d'autre ne demande — le double de celle de
-  // son contenu — et cette largeur ENFLE À LA TRADUCTION, où chaque libellé
-  // peut s'allonger. Empilés, ils tiennent dans toutes les langues.
-  if (SkinButton(core::Tr("Repartir de zéro"), art)) {
-    ImGui::OpenPopup("zero");
-  }
-  if (Confirm("zero",
-              core::Tr("Remettre tout l'aperçu à zéro ? Tes réglages en cours seront perdus."),
-              core::Tr("Réinitialiser"), art)) {
-    action.verb = PaletteEditorVerb::kBlankSlate;
-  }
-
-  // ⚠ LE GESTE FIN N'APPARAÎT QUE QUAND IL DIT AUTRE CHOSE QUE LE SUIVANT :
-  // il faut que CE corps ait son propre style, et qu'il en reste un autre
-  // derrière. Sinon « oublier celui-ci » et « tout supprimer » font la même
-  // chose, sous deux libellés dont le plus obscur laisse croire à un troisième
-  // geste.
-  const bool forgettable = view.body_has_own_style && view.body_style_count > 1;
-  if (forgettable) {
-    if (SkinButton(core::Tr("Oublier le style de ce corps"), art)) {
-      ImGui::OpenPopup("oublier");
-    }
-    if (ImGui::IsItemHovered()) {
-      SkinTooltip(
-          core::Tr("Efface le style de CE corps seulement. Tes autres corps gardent le "
-                   "leur, et celui-ci reprend ton style principal."));
-    }
-    if (Confirm("oublier",
-                core::Tr("Oublier le style de ce corps ? Il reprendra ton style principal, "
-                         "chez toi comme chez les autres. Tes autres corps ne changent pas."),
-                core::Tr("Oublier"), art)) {
-      action.verb = PaletteEditorVerb::kForgetBody;
-    }
-  }
-
-  if (SkinButton(core::Tr("Supprimer mon style"), art)) {
-    ImGui::OpenPopup("supprimer");
-  }
-  if (ImGui::IsItemHovered()) {
-    SkinTooltip(
-        core::Tr("Efface ta palette, chez toi ET sur le serveur. Ton personnage "
-                 "retrouve l'apparence qu'il avait avant, pour toi comme pour les "
-                 "autres. Ce n'est PAS un retour à ta dernière couleur partagée : "
-                 "celle-ci est perdue."));
-  }
-  if (Confirm("supprimer",
-              core::Tr("Supprimer ton style, chez toi ET sur le serveur ? Ton personnage "
-                       "retrouve son apparence d'avant, pour toi comme pour les autres. "
-                       "C'est définitif."),
-              core::Tr("Supprimer"), art)) {
-    action.verb = PaletteEditorVerb::kDeleteAll;
-  }
+  DrawUndoButtons(view, art, action);
 
   ImGui::Separator();
   // 🔴 SANS LIAISON, VALIDER NE PEUT RIEN : le bouton se grise plutôt que de
@@ -529,15 +414,9 @@ PaletteEditorAction DrawPaletteEditor(PaletteEditorState& state, const PaletteEd
         core::Tr("Applique ce style à ton personnage — jusqu'ici, rien n'a changé hors "
                  "de cet aperçu. Les autres joueurs te verront ainsi."));
   }
-  if (view.just_sent) {
-    ImGui::SameLine();
-    // ⚠ « ENVOYÉ » ET NON « ACCEPTÉ » : le serveur n'accuse rien, et dire plus
-    // que ce qu'on sait serait un mensonge que le joueur relirait de travers
-    // le jour où son style ne parvient pas aux autres.
-    ImGui::TextUnformatted(core::Tr("Envoyé."));
-  }
+  DrawSendStatus(view.send);
 
-  DrawPresets(state, view, art, action);
+  DrawPalettePresets(state, view, art, action);
 
   if (picker_open) {
     ImGui::EndDisabled();

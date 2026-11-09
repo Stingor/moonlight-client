@@ -16,6 +16,11 @@ namespace ro::ui {
 
 // L'ÉDITEUR DE STYLE : le joueur compose ses couleurs, puis les valide.
 //
+// 🔴 LA FENÊTRE N'ÉCRIT PAS LA RECETTE. Elle la reçoit dans sa vue et rend des
+// INTENTIONS — telle pièce vers telle couleur, telle coupe, page blanche —
+// qu'`app` applique : la recette n'a qu'un écrivain, et la fenêtre ne peut pas
+// la mettre dans un état que l'éditeur ne connaît pas.
+//
 // 🔴 RIEN NE TOUCHE AU PERSONNAGE AVANT LA VALIDATION. L'aperçu vit dans le
 // PANTIN de cette fenêtre, et là seulement : chaque geste ne fait que
 // recalculer une palette pour lui. L'acteur en scène, la fiche et les autres
@@ -120,8 +125,26 @@ struct PalettePickerState {
   float cell = 0.0F;
 };
 
+// CE QUE LE SERVEUR A FAIT DE LA DERNIÈRE DEMANDE, d'après son ÉCHO.
+//
+// 🔴 « ENVOYÉ » NE DISAIT RIEN : le serveur jette sans un mot ce qu'il refuse,
+// et seul le retour de notre propre style dit qu'il est partagé. `app` attend
+// cet écho, et la fenêtre dit ce qu'il en est.
+enum class PaletteSendStatus : std::uint8_t {
+  kNone,
+  // Parti, l'écho n'est pas encore revenu.
+  kWaiting,
+  // L'écho porte ce qu'on a demandé.
+  kShared,
+  // Pas d'écho dans le délai, ou rien n'a pu partir.
+  kRefused,
+};
+
 // CE QUE LA FENÊTRE MONTRE, posé par `app` à chaque image.
 struct PaletteEditorView {
+  // LA RECETTE EN COURS, dont `app` est le seul écrivain. Les réglages de
+  // chaque pièce, les trois numéros choisis : la fenêtre les LIT ici.
+  render::PaletteRecipe recipe;
   // Les pièces du corps porté. Vide quand il n'y a rien à régler — et la
   // fenêtre le DIT, plutôt que d'aligner des commandes qui ne commandent rien.
   std::span<const render::PaletteRamp> ramps;
@@ -147,15 +170,14 @@ struct PaletteEditorView {
   // Ce corps a-t-il son propre style, et combien le joueur en a-t-il en tout ?
   bool body_has_own_style = false;
   int body_style_count = 0;
-  // Sans liaison, valider ne peut rien : le bouton se grise plutôt que de
-  // laisser croire que le serveur a reçu quelque chose.
+  // Sans liaison, ni valider ni effacer ne peut rien : les boutons se grisent
+  // plutôt que de laisser croire que le serveur a reçu quelque chose.
   bool connected = false;
   // La recette diffère-t-elle de ce que le personnage PORTE ? C'est ce qui
   // donne son sens à « Revenir à mon style ».
   bool has_edits = false;
-  // Le paquet vient de partir. ⚠ CELA NE DIT PAS QUE LE SERVEUR A ACCEPTÉ —
-  // il n'accuse rien — seulement que la demande est partie.
-  bool just_sent = false;
+  // Ce que le serveur a fait de la dernière demande.
+  PaletteSendStatus send = PaletteSendStatus::kNone;
 
   // ── CE QUE LES GRILLES MONTRENT ─────────────────────────────────────────
 
@@ -258,6 +280,13 @@ struct PaletteEditorAction {
   // appelle `AdjustToReach` et écrit dans la recette.
   int picked_ramp = -1;
   std::array<std::uint8_t, 3> picked_color{};
+  // LA PIÈCE DONT LA CROIX VIENT D'ÊTRE CLIQUÉE — elle revient à neutre —, ou
+  // moins un.
+  int reset_ramp = -1;
+  // LE NUMÉRO QU'UNE GRILLE VIENT DE FAIRE CHOISIR, et laquelle ; aucune quand
+  // rien n'est choisi.
+  PaletteEditorPicker chosen_in = PaletteEditorPicker::kNone;
+  int chosen = 0;
   // Le préréglage que le verbe désigne, quand il en désigne un.
   std::string preset;
   // Ce que le presse-papiers portait, pour `kPasteCode`. ⚠ `ui` LE LIT MAIS NE
@@ -277,9 +306,9 @@ struct PaletteEditorState {
   // LE BOUTON « SIGNALER UN BUG » de sa barre de titre, posé par `app` depuis
   // les réglages.
   bool bug_report = false;
-  // Le BROUILLON : ce que le joueur compose, et qui ne part qu'à la
-  // validation.
-  render::PaletteRecipe recipe;
+  // ⛔ PAS DE RECETTE ICI : elle vient de la vue, et la fenêtre rend des
+  // intentions. Cet état ne garde que ce que la fenêtre relève ou retient
+  // d'une image à l'autre.
   PaletteDollState doll;
   PalettePickerState picker;
   // La pièce que la souris survole, ou moins un.

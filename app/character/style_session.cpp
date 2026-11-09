@@ -1,0 +1,305 @@
+#include "character/style_session.h"
+
+#include <utility>
+
+#include "character/style_recipe.h"
+
+namespace moonclient {
+namespace {
+
+// L'ATTENTE DE L'ÉCHO. ⚠ LARGE : le serveur répond en un aller-retour, mais un
+// réseau chargé en vaut plusieurs, et annoncer refusé ce qui revient une
+// seconde plus tard ferait renvoyer pour rien.
+constexpr std::uint32_t kEchoWaitMs = 5000;
+// Ce que l'annonce reste à l'écran, une fois tranchée. ⚠ LE REFUS PLUS
+// LONGTEMPS : il demande un geste, l'accusé n'en demande aucun.
+constexpr std::uint32_t kSharedNoticeMs = 4000;
+constexpr std::uint32_t kRefusedNoticeMs = 8000;
+// LE DÉLAI D'IMMOBILITÉ AVANT D'ÉCRIRE LE BROUILLON. ⚠ ASSEZ LONG POUR QU'UN
+// GLISSEMENT DANS LE NUANCIER NE PRODUISE QU'UNE ÉCRITURE, assez court pour que
+// ce qui se perd tienne dans une seconde et demie de réglages.
+constexpr std::uint32_t kDraftDelayMs = 1500;
+
+// Une recette vide, pour qui la demande avant tout corps.
+const ro::render::PaletteRecipe kNoRecipe{};
+
+// Un instant qui sert aussi de sentinelle : jamais zéro.
+[[nodiscard]] std::uint32_t Stamp(std::uint32_t now_ms) { return now_ms != 0 ? now_ms : 1; }
+
+// L'ÉCHO PORTE-T-IL CE QU'ON A ENVOYÉ ?
+//
+// ⚠ SAUF LA COUPE : le serveur y met celle que le personnage porte, pas celle
+// qu'il a rangée. ⚠ ET SAUF LA COULEUR DE CHEVEUX QU'ON N'IMPOSAIT PAS : un
+// serveur peut ranger à sa place celle du personnage. La recette reprend les
+// deux juste après l'écho, en suivant ce que le corps porte.
+[[nodiscard]] bool Echoes(const ro::sim::StyleRecipe& echoed,
+                          const ro::render::PaletteRecipe& sent) {
+  ro::render::PaletteRecipe heard = FromWire(echoed);
+  heard.hair_style = sent.hair_style;
+  if (sent.hair_palette <= 0) {
+    heard.hair_palette = sent.hair_palette;
+  }
+  return SameRecipe(heard, sent);
+}
+
+// L'écho de cette demande est-il là ?
+[[nodiscard]] bool Echoed(StyleSendKind kind, std::uint32_t body_key,
+                          const ro::render::PaletteRecipe& sent,
+                          const ro::sim::StyleVariants* mine) {
+  switch (kind) {
+    case StyleSendKind::kApply: {
+      if (mine == nullptr) {
+        return false;
+      }
+      const auto own = mine->by_body.find(body_key);
+      return own != mine->by_body.end() && Echoes(own->second, sent);
+    }
+    case StyleSendKind::kForgetBody:
+      return mine == nullptr || !mine->by_body.contains(body_key);
+    case StyleSendKind::kDeleteAll:
+      return mine == nullptr || mine->empty();
+  }
+  return false;
+}
+
+}  // namespace
+
+StyleSession::StyleSession(StyleDrafts drafts) : drafts_(std::move(drafts)) {
+  slots_.try_emplace(body_key_);
+}
+
+StyleSession::Slot& StyleSession::Current() { return slots_[body_key_]; }
+
+const ro::render::PaletteRecipe& StyleSession::recipe() const {
+  const auto found = slots_.find(body_key_);
+  return found != slots_.end() ? found->second.recipe : kNoRecipe;
+}
+
+bool StyleSession::has_edits() const { return !SameRecipe(recipe(), applied_); }
+
+bool StyleSession::OffersDraft() const {
+  const ro::sim::StyleRecipe* kept = drafts_.Find(body_key_);
+  return kept != nullptr && !SameRecipe(FromWire(*kept), recipe());
+}
+
+void StyleSession::Changed(Slot& slot) {
+  ++revision_;
+  slot.changed_at = revision_;
+}
+
+void StyleSession::Put(const ro::render::PaletteRecipe& recipe) {
+  Slot& slot = Current();
+  slot.touched = true;
+  if (SameRecipe(slot.recipe, recipe)) {
+    return;
+  }
+  slot.recipe = recipe;
+  Changed(slot);
+}
+
+void StyleSession::Follow() {
+  Slot& slot = Current();
+  if (slot.touched || SameRecipe(slot.recipe, applied_)) {
+    return;
+  }
+  slot.recipe = applied_;
+  Changed(slot);
+}
+
+void StyleSession::Observe(const Worn& worn, std::uint32_t now_ms) {
+  // ── LE CORPS ─────────────────────────────────────────────────────────────
+  //
+  // 🔴 LE TRAVAIL DE L'AUTRE CORPS RESTE DE CÔTÉ, il ne se ré-applique pas
+  // ici : ses rangs ne désignent pas les mêmes pièces.
+  if (!observed_ || worn.body_key != body_key_) {
+    observed_ = true;
+    body_key_ = worn.body_key;
+    slots_.try_emplace(body_key_);
+    ++revision_;
+  }
+
+  // ── CE QU'IL PORTE ───────────────────────────────────────────────────────
+  //
+  // ⚠ LA CLÉ NULLE NE DÉSIGNE AUCUNE VARIANTE : un corps inconnu ne porte rien.
+  const ro::sim::StyleVariants* mine = worn.mine;
+  const ro::sim::StyleRecipe* wears =
+      mine != nullptr && body_key_ != 0 ? mine->For(body_key_) : nullptr;
+  applied_ = wears != nullptr ? FromWire(*wears) : ro::render::PaletteRecipe{};
+  own_style_ = mine != nullptr && body_key_ != 0 && mine->by_body.contains(body_key_);
+  style_count_ = mine != nullptr ? static_cast<int>(mine->by_body.size()) : 0;
+  worn_bodies_.clear();
+  if (mine != nullptr) {
+    for (const auto& variant : mine->by_body) {
+      worn_bodies_.push_back(variant.first);
+    }
+  }
+  book_revision_ = worn.book_revision;
+
+  HearEcho(worn, now_ms);
+
+  // ── L'ANNONCE S'EFFACE ───────────────────────────────────────────────────
+  const std::uint32_t shown_ms = now_ms - announced_ms_;
+  if ((send_state_ == StyleSendState::kShared && shown_ms >= kSharedNoticeMs) ||
+      (send_state_ == StyleSendState::kRefused && shown_ms >= kRefusedNoticeMs)) {
+    send_state_ = StyleSendState::kNone;
+  }
+
+  // ⚠ APRÈS L'ÉCHO : c'est lui qui vient de lever le verrou d'une demande
+  // tenue, et le corps reprend dans la même image ce qu'il porte désormais.
+  Follow();
+}
+
+void StyleSession::HearEcho(const Worn& worn, std::uint32_t now_ms) {
+  if (!pending_.has_value()) {
+    return;
+  }
+  const Pending& asked = *pending_;
+  // ⚠ UN LOT QUI NE PORTE PAS CE QU'ON A DEMANDÉ N'EST PAS L'ÉCHO : un autre
+  // lot peut nous nommer entre-temps — une entrée en vue, par exemple.
+  if (worn.book_revision != asked.book_revision &&
+      Echoed(asked.kind, asked.body_key, asked.sent, worn.mine)) {
+    Settle(asked);
+    pending_.reset();
+    Announce(StyleSendState::kShared, now_ms);
+    return;
+  }
+  if (now_ms - asked.sent_ms >= kEchoWaitMs) {
+    pending_.reset();
+    Announce(StyleSendState::kRefused, now_ms);
+  }
+}
+
+void StyleSession::Settle(const Pending& asked) {
+  // 🔴 LE VERROU NE SE LÈVE QUE SUR UN CORPS QU'ON N'A PAS RETOUCHÉ DEPUIS LA
+  // DEMANDE : ce qu'on a composé entre-temps n'est pas ce que le serveur a
+  // retenu, et le suivre l'effacerait.
+  const auto release = [this, &asked](std::uint32_t body_key) {
+    const auto found = slots_.find(body_key);
+    if (found != slots_.end() && found->second.changed_at <= asked.at_revision) {
+      found->second.touched = false;
+    }
+    // Le brouillon ne survit ni à une validation, ni à un effacement.
+    drafts_changed_ = drafts_.Forget(body_key) || drafts_changed_;
+  };
+  if (asked.kind != StyleSendKind::kDeleteAll) {
+    release(asked.body_key);
+    return;
+  }
+  for (const auto& slot : slots_) {
+    release(slot.first);
+  }
+  for (const std::uint32_t body_key : asked.bodies) {
+    release(body_key);
+  }
+}
+
+void StyleSession::Announce(StyleSendState state, std::uint32_t now_ms) {
+  send_state_ = state;
+  announced_ms_ = Stamp(now_ms);
+}
+
+void StyleSession::SetPiece(std::size_t rank, const ro::render::RampAdjust& adjust) {
+  if (rank >= ro::render::kMaxRamps) {
+    return;
+  }
+  ro::render::PaletteRecipe next = recipe();
+  next.ramps[rank] = adjust;
+  Put(next);
+}
+
+void StyleSession::ChooseHairStyle(std::int16_t hair_style) {
+  ro::render::PaletteRecipe next = recipe();
+  next.hair_style = hair_style;
+  Put(next);
+}
+
+void StyleSession::ChooseHairPalette(std::int16_t hair_palette) {
+  ro::render::PaletteRecipe next = recipe();
+  next.hair_palette = hair_palette;
+  Put(next);
+}
+
+void StyleSession::ChooseBodyPalette(std::int16_t body_palette) {
+  ro::render::PaletteRecipe next = recipe();
+  next.body_palette = body_palette;
+  Put(next);
+}
+
+void StyleSession::Load(const ro::render::PaletteRecipe& recipe) { Put(recipe); }
+
+bool StyleSession::LoadDraft() {
+  const ro::sim::StyleRecipe* kept = drafts_.Find(body_key_);
+  if (kept == nullptr) {
+    return false;
+  }
+  Put(FromWire(*kept));
+  return true;
+}
+
+void StyleSession::BlankSlate() { Put(ro::render::PaletteRecipe{}); }
+
+void StyleSession::BackToWorn() {
+  KeepDraft();
+  Current().touched = false;
+  Follow();
+}
+
+std::optional<ro::render::PaletteRecipe> StyleSession::Validate(std::int16_t worn_hair_style,
+                                                                std::uint32_t now_ms) {
+  ro::render::PaletteRecipe sent = recipe();
+  if (sent.hair_style <= 0 && worn_hair_style > 0) {
+    sent.hair_style = worn_hair_style;
+    Put(sent);
+  }
+  if (own_style_ && !has_edits()) {
+    pending_.reset();
+    Current().touched = false;
+    drafts_changed_ = drafts_.Forget(body_key_) || drafts_changed_;
+    Announce(StyleSendState::kShared, now_ms);
+    return std::nullopt;
+  }
+  return sent;
+}
+
+void StyleSession::Sent(StyleSendKind kind, bool left, std::uint32_t now_ms) {
+  if (!left) {
+    pending_.reset();
+    Announce(StyleSendState::kRefused, now_ms);
+    return;
+  }
+  pending_ = Pending{.kind = kind,
+                     .body_key = body_key_,
+                     .at_revision = revision_,
+                     .book_revision = book_revision_,
+                     .sent = recipe(),
+                     .bodies = worn_bodies_,
+                     .sent_ms = Stamp(now_ms)};
+  Announce(StyleSendState::kWaiting, now_ms);
+}
+
+void StyleSession::KeepDraft() {
+  if (body_key_ == 0 || !has_edits()) {
+    return;
+  }
+  drafts_changed_ = drafts_.Put(body_key_, ToWire(recipe())) || drafts_changed_;
+}
+
+void StyleSession::TickDraft(std::uint32_t now_ms) {
+  if (draft_revision_ != revision_) {
+    // ⚠ L'HORLOGE REPART À CHAQUE CHANGEMENT : c'est l'IMMOBILITÉ qu'on attend,
+    // pas un délai depuis le premier geste. Un glissement continu ne doit rien
+    // écrire tant qu'il dure.
+    draft_revision_ = revision_;
+    draft_since_ms_ = Stamp(now_ms);
+    return;
+  }
+  if (draft_since_ms_ == 0 || now_ms - draft_since_ms_ < kDraftDelayMs) {
+    return;
+  }
+  draft_since_ms_ = 0;
+  KeepDraft();
+}
+
+bool StyleSession::TakeDraftsChanged() { return std::exchange(drafts_changed_, false); }
+
+}  // namespace moonclient

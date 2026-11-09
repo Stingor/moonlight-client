@@ -418,7 +418,9 @@ struct ScrollExtent {
 // le nuancier revient à attraper ce qui est resté en dessous.
 //
 // ⚠ LE LIBELLÉ PEUT PORTER UN IDENTIFIANT CACHÉ (`##`) : seul ce qui précède
-// s'affiche, comme le fait ImGui pour tous ses widgets.
+// s'affiche, comme le fait ImGui pour tous ses widgets. Sans rien à montrer, la
+// PASTILLE est le dernier élément soumis : `ImGui::IsItemHovered` après l'appel
+// parle d'elle.
 //
 // Rend vrai sur un changement de couleur.
 [[nodiscard]] bool SkinColorSwatch(const char* label, std::array<float, 3>& rgb, const SkinArt& art,

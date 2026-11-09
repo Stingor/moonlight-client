@@ -97,6 +97,19 @@ std::string_view SoundOfFrame(const formats::ActAnimation& animation, std::size_
   return name;
 }
 
+// Les octets d'un pixel RGBA, et la place de son alpha.
+constexpr std::size_t kRgbaChannels = 4;
+constexpr std::size_t kRgbaAlpha = 3;
+
+// L'ALPHA QUE LA CARTE DU CLIENT REND D'UN OCTET, qui n'en garde que le quartet
+// de poids fort : `alpha / 16 * 17`. 255 reste 255, 240 remonte à 255, 16
+// devient 17, et 15 tombe à ZÉRO.
+[[nodiscard]] std::uint8_t ClientAlpha(std::uint8_t alpha) {
+  constexpr std::uint8_t kAlphaSteps = 16;
+  constexpr std::uint8_t kAlphaStepValue = 17;
+  return static_cast<std::uint8_t>(alpha / kAlphaSteps * kAlphaStepValue);
+}
+
 }  // namespace
 
 std::optional<ActorPieceRequest> ParseActorPieceRequest(std::string_view text,
@@ -240,16 +253,10 @@ bool HasImage(const SpriteImageKey& key) {
 }
 
 formats::Image WithClientAlphaQuartet(formats::Image image) {
-  // `alpha / 16 * 17` est exactement ce que la carte rend d'un quartet :
-  // 255 reste 255, 240 remonte à 255, 16 devient 17, et 15 tombe à ZÉRO.
-  constexpr std::size_t kChannelsPerPixel = 4;
-  constexpr std::size_t kAlphaChannel = 3;
-  constexpr std::uint8_t kAlphaSteps = 16;
-  constexpr std::uint8_t kAlphaStepValue = 17;
-  for (std::size_t pixel = 0; pixel + kChannelsPerPixel <= image.pixels.size();
-       pixel += kChannelsPerPixel) {
-    std::uint8_t& alpha = image.pixels[pixel + kAlphaChannel];
-    alpha = static_cast<std::uint8_t>(alpha / kAlphaSteps * kAlphaStepValue);
+  for (std::size_t pixel = 0; pixel + kRgbaChannels <= image.pixels.size();
+       pixel += kRgbaChannels) {
+    std::uint8_t& alpha = image.pixels[pixel + kRgbaAlpha];
+    alpha = ClientAlpha(alpha);
   }
   return image;
 }
@@ -292,7 +299,55 @@ std::vector<formats::Image> ResolveImages(const ComposedActor& actor) {
   return images;
 }
 
-std::optional<std::uint8_t> PaletteIndexAt(const ComposedActor& actor, glm::vec2 at) {
+namespace {
+
+// LE TEXEL D'UNE IMAGE DE `width` × `height` QUE CE QUAD POSE SOUS LE POINT,
+// rangé en lecture (rangée × largeur + colonne), ou rien hors du quad.
+//
+// ⚠ PAR LES ARÊTES DU QUAD, et non par ses bornes : un calque peut porter une
+// ROTATION, et un rectangle englobant répondrait alors pour des points que le
+// calque ne couvre pas. Les coins sont rangés haut-gauche, haut-droit,
+// bas-droit, bas-gauche : deux vecteurs suffisent.
+[[nodiscard]] std::optional<std::size_t> TexelUnder(const SpriteQuad& quad, glm::vec2 at,
+                                                    std::int32_t width, std::int32_t height) {
+  if (width <= 0 || height <= 0) {
+    return std::nullopt;
+  }
+  const glm::vec2 origin = quad.corners[0];
+  const glm::vec2 across = quad.corners[1] - origin;
+  const glm::vec2 down = quad.corners[3] - origin;
+  const float determinant = across.x * down.y - across.y * down.x;
+  if (determinant == 0.0F) {
+    return std::nullopt;
+  }
+  const glm::vec2 local = at - origin;
+  float u = (local.x * down.y - local.y * down.x) / determinant;
+  const float v = (across.x * local.y - across.y * local.x) / determinant;
+  if (u < 0.0F || u >= 1.0F || v < 0.0F || v >= 1.0F) {
+    return std::nullopt;
+  }
+  // Le miroir échange les abscisses de TEXTURE, il ne retourne pas le quad.
+  if (quad.mirrored) {
+    u = 1.0F - u;
+  }
+  const auto column =
+      std::clamp(static_cast<std::int32_t>(u * static_cast<float>(width)), 0, width - 1);
+  const auto row =
+      std::clamp(static_cast<std::int32_t>(v * static_cast<float>(height)), 0, height - 1);
+  return static_cast<std::size_t>(row) * static_cast<std::size_t>(width) +
+         static_cast<std::size_t>(column);
+}
+
+// UN CALQUE BGRA PEINT-IL CE TEXEL ? Oui si son alpha survit au quartet du
+// client — la même règle qu'au dessin, voir `WithClientAlphaQuartet`.
+[[nodiscard]] bool BgraPaints(const formats::Image& frame, std::size_t texel) {
+  const std::size_t alpha = texel * kRgbaChannels + kRgbaAlpha;
+  return alpha < frame.pixels.size() && ClientAlpha(frame.pixels[alpha]) != 0;
+}
+
+}  // namespace
+
+std::optional<PalettePick> PaletteIndexAt(const ComposedActor& actor, glm::vec2 at) {
   // ⚠ DU DERNIER AU PREMIER : les quads se peignent dans l'ordre, donc le
   // dernier est CELUI DU DESSUS — et c'est lui que le regard désigne.
   for (std::size_t rank = actor.quads.size(); rank-- > 0;) {
@@ -301,53 +356,39 @@ std::optional<std::uint8_t> PaletteIndexAt(const ComposedActor& actor, glm::vec2
     }
     const SpriteQuad& quad = actor.quads[rank];
     const SpriteImageKey& source = actor.sources[rank];
-    // 🔴 SECTION INDEXÉE UNIQUEMENT : une image BGRA porte ses couleurs par
-    // pixel et n'a AUCUN index. Il n'y a rien à y désigner.
-    if (source.sprite == nullptr || quad.section != 0 || quad.image_index < 0) {
+    if (source.sprite == nullptr || quad.image_index < 0) {
       continue;
     }
     const auto image = static_cast<std::size_t>(quad.image_index);
+
+    // 🔴 UNE IMAGE BGRA QUI PEINT LE POINT ARRÊTE LA QUESTION : elle cache le
+    // dessous, et n'a aucun index à désigner.
+    if (quad.section != 0) {
+      if (image >= source.sprite->bgra_frames().size()) {
+        continue;
+      }
+      const formats::Image& frame = source.sprite->bgra_frames()[image];
+      const std::optional<std::size_t> texel = TexelUnder(quad, at, frame.width, frame.height);
+      if (texel.has_value() && BgraPaints(frame, *texel)) {
+        return std::nullopt;
+      }
+      continue;
+    }
+
     if (image >= source.sprite->indexed_frames().size()) {
       continue;
     }
     const formats::SprIndexedFrame& frame = source.sprite->indexed_frames()[image];
-    if (frame.width <= 0 || frame.height <= 0 || frame.indices.empty()) {
+    const std::optional<std::size_t> texel = TexelUnder(quad, at, frame.width, frame.height);
+    if (!texel.has_value() || *texel >= frame.indices.size()) {
       continue;
     }
-
-    // ⚠ PAR LES ARÊTES DU QUAD, et non par ses bornes : un calque peut porter
-    // une ROTATION, et un rectangle englobant répondrait alors pour des points
-    // que le calque ne couvre pas. Les coins sont rangés haut-gauche,
-    // haut-droit, bas-droit, bas-gauche : deux vecteurs suffisent.
-    const glm::vec2 origin = quad.corners[0];
-    const glm::vec2 across = quad.corners[1] - origin;
-    const glm::vec2 down = quad.corners[3] - origin;
-    const float determinant = across.x * down.y - across.y * down.x;
-    if (determinant == 0.0F) {
-      continue;
-    }
-    const glm::vec2 local = at - origin;
-    float u = (local.x * down.y - local.y * down.x) / determinant;
-    const float v = (across.x * local.y - across.y * local.x) / determinant;
-    if (u < 0.0F || u >= 1.0F || v < 0.0F || v >= 1.0F) {
-      continue;
-    }
-    // Le miroir échange les abscisses de TEXTURE, il ne retourne pas le quad.
-    if (quad.mirrored) {
-      u = 1.0F - u;
-    }
-    const auto column = std::clamp(static_cast<std::int32_t>(u * static_cast<float>(frame.width)),
-                                   0, frame.width - 1);
-    const auto row = std::clamp(static_cast<std::int32_t>(v * static_cast<float>(frame.height)), 0,
-                                frame.height - 1);
-    const std::uint8_t index =
-        frame.indices[static_cast<std::size_t>(row) * static_cast<std::size_t>(frame.width) +
-                      static_cast<std::size_t>(column)];
+    const std::uint8_t index = frame.indices[*texel];
     // L'index zéro est le transparent : le calque du dessous répondra.
     if (index == 0) {
       continue;
     }
-    return index;
+    return PalettePick{.part = PartOfQuad(actor, rank), .index = index};
   }
   return std::nullopt;
 }

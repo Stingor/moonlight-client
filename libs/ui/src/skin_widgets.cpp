@@ -683,10 +683,14 @@ bool SkinColorSwatch(const char* label, std::array<float, 3>& rgb, const SkinArt
   ImGui::PushID(label);
   const float side = kSwatchPixels * Scale();
   const ImVec4 shown(rgb[0], rgb[1], rgb[2], 1.0F);
-  if (ImGui::ColorButton("##pastille", shown, ImGuiColorEditFlags_NoAlpha, ImVec2(side, side))) {
+  // 🔴 SANS GLISSER-DÉPOSER : la pastille d'ImGui est une SOURCE par défaut,
+  // qu'aucune cible de ce client ne reçoit — un geste mort, étiqueté « Color »
+  // en anglais pendant qu'on le traîne.
+  if (ImGui::ColorButton("##pastille", shown,
+                         ImGuiColorEditFlags_NoAlpha | ImGuiColorEditFlags_NoDragDrop,
+                         ImVec2(side, side))) {
     ImGui::OpenPopup("nuancier");
   }
-  ImGui::SameLine();
   // Le libellé peut porter un identifiant caché (`##`) : on n'affiche que ce
   // qui précède, comme le fait ImGui pour tous ses widgets. Coupé à la main
   // plutôt qu'avec `FindRenderedTextEnd`, qui vit dans l'en-tête interne — une
@@ -695,7 +699,13 @@ bool SkinColorSwatch(const char* label, std::array<float, 3>& rgb, const SkinArt
   while (*visible_end != '\0' && !(visible_end[0] == '#' && visible_end[1] == '#')) {
     ++visible_end;
   }
-  ImGui::TextUnformatted(label, visible_end);
+  // 🔴 RIEN À MONTRER, RIEN À SOUMETTRE : un libellé vide restait le dernier
+  // élément, de largeur nulle, et le survol que l'appelant interrogeait était
+  // le sien — jamais celui de la pastille.
+  if (visible_end != label) {
+    ImGui::SameLine();
+    ImGui::TextUnformatted(label, visible_end);
+  }
 
   const bool open = BeginSkinPopup("nuancier");
   if (open) {

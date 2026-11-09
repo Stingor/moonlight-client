@@ -7,10 +7,8 @@
 #include "ro/core/log.h"
 #include "ro/net/bug_report.h"
 #include "ro/sim/skill_book.h"
-#include "ro/sim/style_code.h"
 #include "ro/sim/world.h"
 
-#include "character/style_recipe.h"
 #include "game/bug_report_context.h"
 #include "game/card_album_bug_report.h"
 #include "game/cash_shop_bug_report.h"
@@ -59,9 +57,8 @@ void RouteBugReports(const UiStage::Answers& answers, UiStage::Windows& windows,
     const ro::sim::Actor* npc = world.Find(npc_id);
     AskBugReport(box, NpcBugReport(npc_id, npc != nullptr ? npc->name : std::string()));
   }
-  if (answers.style.report_bug) {
-    AskBugReport(box, StyleBugReport(ro::sim::EncodeStyleCode(ToWire(windows.style.recipe))));
-  }
+  // ⚠ L'ÉDITEUR DE STYLE COMPOSE LE SIEN dans son étage : la recette n'est pas
+  // dans l'état de sa fenêtre, mais dans la session qui l'écrit.
   if (answers.companion_ai.report_bug) {
     AskBugReport(box, CompanionAiBugReport(windows.companion_ai_view));
   }

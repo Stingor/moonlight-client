@@ -9712,8 +9712,8 @@ tr: Guardar en el emblema
 fr: Enregistrer les postes
 tr: Guardar los puestos
 
-fr: Envoyé.
-tr: Enviado.
+fr: Envoi…
+tr: Enviando…
 
 fr: Estimation indisponible.
 tr: Estimación no disponible.
@@ -10591,6 +10591,9 @@ tr: El servidor rechazó el intento: relanzamiento detenido.
 fr: Le serveur calcule per = Rate/100 + (job_level - 50) / 2, puis réussit si per > rnd()%100. Comme le tirage est uniforme sur 0..99, la probabilité vaut exactement per.
 tr: El servidor calcula per = Rate/100 + (job_level - 50) / 2, y acierta si per > rnd()%100. Como la tirada es uniforme en 0..99, la probabilidad es exactamente per.
 
+fr: Le serveur n'a pas renvoyé ton style : il ne l'a pas retenu. Une demande trop rapprochée de la précédente, ou une liaison coupée, suffit. Attends une seconde, puis réessaie.
+tr: El servidor no ha devuelto tu estilo: no lo ha guardado. Basta con una petición demasiado seguida de la anterior o una conexión cortada. Espera un segundo y vuelve a intentarlo.
+
 fr: Le serveur n'a proposé aucun produit. Causes possibles :
 tr: El servidor no ofreció ningún producto. Causas posibles:
 
@@ -10960,6 +10963,9 @@ tr: No
 fr: Non apprise.
 tr: No aprendida.
 
+fr: Non retenu, réessaie.
+tr: No se guardó, inténtalo de nuevo.
+
 fr: Normal
 tr: Normal
 
@@ -11094,6 +11100,9 @@ tr: Paleta:
 
 fr: Partager dans le chat
 tr: Compartir en el chat
+
+fr: Partagé.
+tr: Compartido.
 
 fr: Partir d'une icône d'item :
 tr: Partir del icono de un objeto:

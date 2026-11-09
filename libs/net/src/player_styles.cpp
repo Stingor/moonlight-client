@@ -21,7 +21,9 @@ constexpr std::uint8_t kWireVersion = sim::kStyleWireVersion;
 
 // L'entrée ne porte PAS de recette : elle efface ce corps.
 constexpr std::uint8_t kFlagClear = 0x01;
-// Cette variante est celle à reprendre pour un corps qui n'a pas la sienne.
+// LE REPLI : la variante que reprend un corps qui n'a pas la sienne. Dans un
+// lot, il la DÉSIGNE ; dans une demande, il DEMANDE d'en faire le style
+// principal, ce que seul un serveur qui l'honore accorde.
 constexpr std::uint8_t kFlagFallback = 0x04;
 // Tout effacer : le client ÉMET ce bit, et le serveur y répond par un lot.
 // ⚠ IL NE SE LIT PAS À LA RÉCEPTION — une entrée de lot n'efface jamais que le
@@ -82,8 +84,9 @@ void WriteAdjust(std::span<std::uint8_t> into, const sim::StyleAdjust& adjust) {
 // La demande, montée une fois pour les trois portes.
 [[nodiscard]] proto::CzMoonlightStyle Request(std::uint8_t flags, std::uint32_t body_key) {
   proto::CzMoonlightStyle request;
-  // ⚠ LA LONGUEUR S'ÉCRIT : le serveur la LIT, et la laisser à zéro ferait
-  // rejeter la trame sans un mot.
+  // La longueur s'écrit, pour une trame juste. ⚠ LE SERVEUR NE LA LIT PAS : sa
+  // table déclare la demande à taille fixe, et c'est cette taille qui la
+  // découpe.
   request.packetLength = static_cast<std::int16_t>(proto::CzMoonlightStyle::kWireSize);
   request.version = kWireVersion;
   request.flags = flags;
@@ -96,11 +99,22 @@ void WriteAdjust(std::span<std::uint8_t> into, const sim::StyleAdjust& adjust) {
   return request;
 }
 
+// La demande part, si la liaison le permet. ⚠ `Connection::Send` avale un envoi
+// sur une liaison fermée : on le dit ici plutôt que de le laisser croire parti.
+[[nodiscard]] core::Result<void> SendRequest(Connection& link,
+                                             const proto::CzMoonlightStyle& request) {
+  if (!link.is_open()) {
+    return core::Fail(core::ErrorCode::kIoFailure, "style : la liaison est fermée");
+  }
+  link.Send(proto::Encode(request));
+  return {};
+}
+
 }  // namespace
 
 core::Result<void> SendPlayerStyle(Connection& link, const sim::StyleRecipe& recipe,
-                                   std::uint32_t body_key, bool fallback) {
-  proto::CzMoonlightStyle request = Request(fallback ? kFlagFallback : 0, body_key);
+                                   std::uint32_t body_key, bool make_main) {
+  proto::CzMoonlightStyle request = Request(make_main ? kFlagFallback : 0, body_key);
   request.palette_id = recipe.body_palette;
   request.hair_palette_id = recipe.hair_palette;
   request.hair_style = recipe.hair_style;
@@ -108,20 +122,17 @@ core::Result<void> SendPlayerStyle(Connection& link, const sim::StyleRecipe& rec
     WriteAdjust(std::span(request.adjusts).subspan(rank * kRampBytes, kRampBytes),
                 recipe.ramps[rank]);
   }
-  link.Send(proto::Encode(request));
-  return {};
+  return SendRequest(link, request);
 }
 
 core::Result<void> SendPlayerStyleClear(Connection& link, std::uint32_t body_key) {
-  link.Send(proto::Encode(Request(kFlagClear, body_key)));
-  return {};
+  return SendRequest(link, Request(kFlagClear, body_key));
 }
 
 core::Result<void> SendPlayerStyleClearAll(Connection& link) {
   // ⚠ SANS CORPS : la demande ne vise personne en particulier, et y mettre une
   // clé laisserait croire qu'elle n'efface que celui-là.
-  link.Send(proto::Encode(Request(kFlagClearAll, 0)));
-  return {};
+  return SendRequest(link, Request(kFlagClearAll, 0));
 }
 
 FrameOutcome ApplyStyleOpenFrame(const Frame& frame, sim::World& world) {

@@ -5,12 +5,12 @@
 #include <string>
 #include <string_view>
 
-#include "ro/render/actor_vignette.h"
 #include "ro/render/actor_wardrobe.h"
 #include "ro/render/palette_ramps.h"
-#include "ro/sim/bank.h"
 #include "ro/sim/world_fwd.h"
 #include "ro/ui/style_preview.h"
+
+#include "character/style_doll.h"
 
 namespace moonclient {
 
@@ -22,10 +22,10 @@ namespace moonclient {
 // « Ce que ça donnerait sur moi » est donc la seule question à laquelle on
 // puisse répondre, et c'est aussi la seule que se pose celui qui clique.
 //
-// ⚠ IL A SON PROPRE STYLE DANS LA GARDE-ROBE, distinct de celui de l'éditeur :
-// les deux fenêtres peuvent être ouvertes en même temps sur deux recettes
-// différentes, et un identifiant partagé ferait porter à l'une la palette de
-// l'autre.
+// ⚠ IL A SON PROPRE PANTIN, donc ses propres styles dans la garde-robe : les
+// deux fenêtres peuvent être ouvertes en même temps sur deux recettes
+// différentes, et un style partagé ferait porter à l'une la palette de l'autre.
+// Le dessin, lui, est celui de l'éditeur — voir `StyleDoll`.
 class StylePreview {
  public:
   // La garde-robe peut manquer : une installation sans sprites n'a pas de
@@ -49,33 +49,19 @@ class StylePreview {
   // Le code que la fenêtre montre, pour qui veut l'essayer dans l'éditeur.
   [[nodiscard]] const std::string& code() const noexcept { return code_; }
 
-  // Rend l'identifiant d'aperçu à la garde-robe. ⚠ À LA FERMETURE : un style
+  // Rend les styles d'aperçu à la garde-robe. ⚠ À LA FERMETURE : un style
   // qu'on oublie détruit les tenues qui le portaient, et une composition en
   // cours les lirait mortes.
   void Close();
 
  private:
   ro::render::ActorWardrobe* wardrobe_ = nullptr;
-  std::optional<ro::render::ActorVignette> doll_;
+  std::optional<StyleDoll> doll_;
 
   ro::render::PaletteRecipe recipe_;
+  // Avance à chaque code ouvert : le pantin se repeint avec.
+  std::uint32_t revision_ = 0;
   std::string code_;
-
-  // Les pièces du corps porté, et la base sur laquelle la recette s'applique.
-  //
-  // 🔴 LA BASE SE FUSIONNE AVEC LA TEINTE DU STYLE REÇU, pas avec la nôtre :
-  // c'est elle qui décide de la fusion, donc du découpage des rampes.
-  // Réutiliser notre base appliquerait les réglages reçus à côté.
-  ro::render::ActorWardrobe::BodyRamps body_;
-  bool measured_valid_ = false;
-  std::uint32_t body_key_ = 0;
-  std::int16_t measured_palette_ = -1;
-
-  // L'identifiant du style d'aperçu. ⚠ UN NEUF À CHAQUE CHANGEMENT : la
-  // garde-robe refuse de réécrire une palette en place, parce qu'une tenue
-  // déjà composée en retient l'adresse.
-  std::uint32_t preview_style_ = 0;
-  bool painted_ = false;
 
   ro::ui::StylePreviewView view_;
 };

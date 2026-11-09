@@ -2,17 +2,13 @@
 
 #include <algorithm>
 #include <optional>
-#include <system_error>
 #include <utility>
 
 #include <yaml-cpp/yaml.h>
 
-#include "ro/core/error.h"
-#include "ro/core/file_write.h"
-#include "ro/core/log.h"
 #include "ro/sim/style_code.h"
 
-#include "game/yaml_load.h"
+#include "character/style_yaml.h"
 
 namespace moonclient {
 namespace {
@@ -50,46 +46,11 @@ constexpr const char* kDraftsHeader =
     "# index n'ont aucune signification commune d'un corps à l'autre.\n";
 
 [[nodiscard]] std::optional<ro::sim::StyleRecipe> ReadCode(const YAML::Node& node) {
-  if (!node || !node.IsScalar()) {
-    return std::nullopt;
-  }
-  const std::optional<ro::sim::StyleCode> read =
-      ro::sim::DecodeStyleCode(node.as<std::string>(std::string{}));
+  const std::optional<ro::sim::StyleCode> read = StyleCodeAt(node);
   if (!read.has_value()) {
     return std::nullopt;
   }
   return read->recipe;
-}
-
-// La seule exception qu'on attrape, et pour la même raison qu'ailleurs : un
-// fichier abîmé ne doit pas empêcher de jouer.
-[[nodiscard]] std::optional<YAML::Node> ReadFile(const std::filesystem::path& path,
-                                                 const char* what) {
-  std::error_code missing;
-  if (!std::filesystem::exists(path, missing)) {
-    return std::nullopt;  // première partie : rien n'a encore été rangé
-  }
-  try {
-    YAML::Node whole = LoadYamlFile(path);
-    // ⚠ UNE RACINE QUI N'EST PAS UNE TABLE N'A PAS DE CHAMPS : l'indexer lève
-    // chez l'appelant, hors de ce `try`.
-    if (!whole.IsMap()) {
-      return std::nullopt;
-    }
-    return whole;
-  } catch (const YAML::Exception& broken) {
-    ro::core::LogWarning("{} : {}", what, broken.what());
-    return std::nullopt;
-  }
-}
-
-[[nodiscard]] bool WriteFile(const std::filesystem::path& path, const std::string& text,
-                             const char* what) {
-  if (const ro::core::Result<void> written = ro::core::WriteFileAtomically(path, text); !written) {
-    ro::core::LogWarning("{} : {}", what, ro::core::Describe(written.error()));
-    return false;
-  }
-  return true;
 }
 
 }  // namespace
@@ -144,16 +105,16 @@ const ro::sim::StyleRecipe* StyleDrafts::Find(std::uint32_t body_key) const {
 }
 
 std::filesystem::path StylePresetsPath(const std::filesystem::path& client_root) {
-  return client_root / kSaveFolder / kStylePresetsFileName;
+  return StyleFilePath(client_root, kStylePresetsFileName);
 }
 
 std::filesystem::path StyleDraftsPath(const std::filesystem::path& client_root) {
-  return client_root / kSaveFolder / kStyleDraftsFileName;
+  return StyleFilePath(client_root, kStyleDraftsFileName);
 }
 
 void LoadStylePresets(const std::filesystem::path& client_root, StylePresets& into) {
   const std::optional<YAML::Node> whole =
-      ReadFile(StylePresetsPath(client_root), "préréglages de style");
+      ReadStyleFile(StylePresetsPath(client_root), "préréglages de style");
   if (!whole.has_value()) {
     return;
   }
@@ -177,7 +138,7 @@ void LoadStylePresets(const std::filesystem::path& client_root, StylePresets& in
 
 void LoadStyleDrafts(const std::filesystem::path& client_root, StyleDrafts& into) {
   const std::optional<YAML::Node> whole =
-      ReadFile(StyleDraftsPath(client_root), "brouillon de style");
+      ReadStyleFile(StyleDraftsPath(client_root), "brouillon de style");
   if (!whole.has_value()) {
     return;
   }
@@ -202,8 +163,7 @@ bool SaveStylePresets(const std::filesystem::path& client_root, const StylePrese
         << YAML::EndMap;
   }
   out << YAML::EndSeq << YAML::EndMap;
-  return WriteFile(StylePresetsPath(client_root), std::string(kPresetsHeader) + out.c_str() + "\n",
-                   "préréglages de style");
+  return WriteStyleFile(StylePresetsPath(client_root), kPresetsHeader, out, "préréglages de style");
 }
 
 bool SaveStyleDrafts(const std::filesystem::path& client_root, const StyleDrafts& from) {
@@ -213,8 +173,7 @@ bool SaveStyleDrafts(const std::filesystem::path& client_root, const StyleDrafts
     out << YAML::Key << body_key << YAML::Value << ro::sim::EncodeStyleCode(recipe);
   }
   out << YAML::EndMap << YAML::EndMap;
-  return WriteFile(StyleDraftsPath(client_root), std::string(kDraftsHeader) + out.c_str() + "\n",
-                   "brouillon de style");
+  return WriteStyleFile(StyleDraftsPath(client_root), kDraftsHeader, out, "brouillon de style");
 }
 
 }  // namespace moonclient

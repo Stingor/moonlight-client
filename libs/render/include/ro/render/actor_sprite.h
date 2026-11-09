@@ -381,8 +381,21 @@ struct ActorPieceRequest {
 // résout par la clé et ne redécode que ce qu'il n'a pas déjà.
 [[nodiscard]] std::vector<formats::Image> ResolveImages(const ComposedActor& actor);
 
-// L'INDEX DE PALETTE SOUS UN POINT, en unités de l'acteur composé — l'origine
-// étant celle du `.act`, c'est-à-dire les PIEDS.
+// CE QUE LA PIPETTE DÉSIGNE SOUS UN POINT : la partie de l'acteur qui peint ce
+// point, et l'index de palette du pixel.
+//
+// 🔴 LA PARTIE VA AVEC L'INDEX : un index ne veut rien dire sans le calque qui
+// le porte. Le 42 des cheveux n'est pas le 42 du corps, et chercher le premier
+// dans les pièces du second allume une pièce que le curseur ne désigne pas.
+struct PalettePick {
+  ActorPart part = ActorPart::kBody;
+  std::uint8_t index = 0;
+
+  [[nodiscard]] friend bool operator==(const PalettePick&, const PalettePick&) = default;
+};
+
+// L'INDEX DE PALETTE SOUS UN POINT, et sa partie, en unités de l'acteur composé
+// — l'origine étant celle du `.act`, c'est-à-dire les PIEDS.
 //
 // 🔴 UN INDEX, ET SURTOUT PAS UNE COULEUR. C'est ce qui permet de répondre
 // « quelle pièce du costume est-ce là ? » sans jamais rien comparer : deux
@@ -390,16 +403,19 @@ struct ActorPieceRequest {
 // couleurs les confondrait. L'index, lui, est exact par construction — le
 // parseur le conserve précisément pour cela.
 //
-// ⚠ DU DESSUS VERS LE DESSOUS, comme à l'écran : le premier calque OPAQUE
-// répond. Un pixel transparent laisse passer la question au calque suivant,
-// sans quoi une manche translucide masquerait le torse.
+// ⚠ DU DESSUS VERS LE DESSOUS, comme à l'écran : le premier calque qui PEINT le
+// point répond. Un pixel transparent laisse passer la question au calque
+// suivant, sans quoi une manche translucide masquerait le torse.
 //
-// ⚠ LES CALQUES BGRA SONT SAUTÉS : ils portent leurs couleurs par pixel et
-// n'ont AUCUN index — il n'y a rien à désigner dessus.
+// ⚠ UN CALQUE BGRA QUI PEINT LE POINT ARRÊTE LA QUESTION. Il cache ce qui est
+// dessous, et il n'a AUCUN index à désigner : laisser répondre le corps qu'il
+// recouvre désignerait une pièce que le joueur ne voit pas. Son pixel peint si
+// son alpha survit au quartet du client — voir `WithClientAlphaQuartet` —,
+// exactement comme au dessin.
 //
-// Rien hors de l'acteur, sur un pixel transparent, ou sur un calque sans
-// index.
-[[nodiscard]] std::optional<std::uint8_t> PaletteIndexAt(const ComposedActor& actor, glm::vec2 at);
+// Rien hors de l'acteur, sur un pixel que rien ne peint, ou sous un calque
+// BGRA.
+[[nodiscard]] std::optional<PalettePick> PaletteIndexAt(const ComposedActor& actor, glm::vec2 at);
 
 // ⚠ ÉCRASER TOUTES LES COUCHES EN UNE IMAGE se demande à `sprite_vignette.h`,
 // qui sait AUSSI la cadrer. Une couche seule ne veut rien dire — une émoticone

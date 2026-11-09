@@ -18,6 +18,7 @@
 #include "character/equip_slot_map.h"
 #include "character/staff_view.h"
 #include "character/status_window_view.h"
+#include "game/bug_report_context.h"
 #include "game/game.h"
 #include "world/actor_view.h"
 
@@ -158,12 +159,13 @@ void Game::StageStyle(std::uint32_t now_ms) {
 
   // L'ÉDITEUR DE STYLE : son pantin et ses pièces. ⚠ SEULEMENT FENÊTRE
   // OUVERTE — composer une silhouette que personne ne regarde coûte une
-  // palette et une texture à chaque pulsation.
+  // palette et une texture par palier de pulsation.
   if (windows_.style.open) {
     style_view_->Refresh(world_, windows_.style, link_.is_open(), now_ms);
   } else {
-    // ⚠ RENDU ENTRE DEUX IMAGES : oublier un style détruit les tenues qui le
-    // portaient, et une composition en cours les lirait mortes.
+    // ⚠ RENDU ENTRE DEUX IMAGES, et une fois, au passage d'ouverte à fermée :
+    // oublier un style détruit les tenues qui le portaient, et une
+    // composition en cours les lirait mortes.
     style_view_->Close();
   }
   // L'APERÇU D'UN STYLE REÇU, sous la même règle et pour la même raison : son
@@ -174,11 +176,10 @@ void Game::StageStyle(std::uint32_t now_ms) {
   } else {
     style_preview_->Close();
   }
-  // 🔴 LE BROUILLON S'ÉCRIT MÊME FENÊTRE FERMÉE, et c'est ce qui le rend
-  // utile : l'accident visé — plantage, coupure, client tué — ne passe pas
-  // par une fermeture propre. Refermer la fenêtre juste après un réglage
-  // doit quand même laisser au délai le temps d'expirer.
-  style_view_->TickDraft(windows_.style, now_ms);
+  // 🔴 L'ÉCHO ET LE BROUILLON, MÊME FENÊTRE FERMÉE : le serveur répond quand il
+  // répond, et l'accident que le brouillon rattrape — plantage, coupure,
+  // client tué — ne passe pas par une fermeture propre.
+  style_view_->Tick(world_, now_ms);
 }
 
 void Game::ApplySheetAnswers(const UiStage::Answers& answers) {
@@ -219,9 +220,14 @@ void Game::ApplySheetAnswers(const UiStage::Answers& answers) {
 }
 
 void Game::ApplyStyleAnswers(const UiStage::Answers& answers, std::uint32_t now_ms) {
+  // LE RAPPORT DE BUG porte la recette que la fenêtre montrait : composé AVANT
+  // que les gestes de cette image ne la changent.
+  if (answers.style.report_bug) {
+    AskBugReport(windows_.bug_report, StyleBugReport(style_view_->ReportCode()));
+  }
   // ⚠ APRÈS LE DESSIN : le joueur vient de désigner une couleur, et c'est ici
   // qu'elle devient un réglage.
-  style_view_->Apply(answers.style, link_, windows_.style, world_, now_ms);
+  style_view_->Apply(answers.style, link_, world_, now_ms);
   // ⚠ CONSOMMÉ : laissé en place, le même code se reposerait à chaque image et
   // la saisie se remplirait toute seule.
   if (const StyleView::StyleToShare shared = style_view_->TakeStyleToShare(); !shared.empty()) {
@@ -233,7 +239,7 @@ void Game::ApplyStyleAnswers(const UiStage::Answers& answers, std::uint32_t now_
   // comme l'éditeur. Il ne reste que l'essai.
   if (answers.style_preview == ro::ui::StylePreviewVerb::kTry) {
     windows_.style.open = true;
-    static_cast<void>(style_view_->TryCode(style_preview_->code(), windows_.style, now_ms));
+    static_cast<void>(style_view_->TryCode(style_preview_->code(), now_ms));
   }
 }
 

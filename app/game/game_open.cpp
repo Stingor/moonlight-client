@@ -427,6 +427,11 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   title_view_.emplace(
       pieces_.achievement_titles.has_value() ? &*pieces_.achievement_titles : nullptr,
       pieces_.titles.has_value() ? &*pieces_.titles : nullptr);
+  // 🔴 L'ÉDITEUR DE STYLE REPART À NEUF : l'état de sa fenêtre appartient à la
+  // coquille et survit à la partie, et ce qu'il gardait — grille, pantin,
+  // pièce survolée — désignait le personnage d'avant. Sa recette, elle, vit
+  // dans la session, qui renaît ici avec la partie.
+  windows_.style = ro::ui::PaletteEditorState{};
   style_view_.emplace(pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr, client_root_);
   style_preview_.emplace(pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr);
   cart_.emplace(pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr,
