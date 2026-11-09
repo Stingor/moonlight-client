@@ -60,6 +60,8 @@ class ArenaCarts {
 
   // Une partie neuve : aucun chariot.
   void Reset();
+  // Le lacet de la caméra de l'arène, que les faces suivent.
+  void set_camera_yaw_degrees(float yaw_degrees) noexcept { camera_yaw_degrees_ = yaw_degrees; }
 
  private:
   // Un .spr et son .act, lus une fois ; vides s'ils ne se lisent pas.
@@ -96,6 +98,7 @@ class ArenaCarts {
   // Les images composées de cette image : stables tant que `drawn_` les nomme.
   std::vector<std::unique_ptr<ro::render::ComposedActor>> composed_;
   std::vector<ro::render::DrawnActor> drawn_;
+  float camera_yaw_degrees_ = 0.0F;
 };
 
 }  // namespace moonclient

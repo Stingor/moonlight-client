@@ -10,8 +10,15 @@
 #include "ro/render/terrain_mesh.h"
 #include "ro/sim/survivors_geometry.h"
 
+#include "input/camera_rules.h"
+
 namespace moonclient {
 namespace {
+
+// Un tour entier, où le lacet tenu se ramène.
+constexpr float kFullTurnDegrees = 360.0F;
+// Le déterminant sous lequel le rayon de la souris longe le plan du sol.
+constexpr float kGrazingDeterminant = 1e-6F;
 
 // Les coins de l'image en coordonnées normalisées, et les profondeurs du plan
 // proche et du plan lointain.
@@ -39,11 +46,12 @@ constexpr float kDescentSlackCells = 0.1F;
 // La caméra de l'arène à ce recul, sans descente ni secousse, voit-elle le sol
 // dans `bounds` ? L'emprise ne dépend que du recul, de l'élévation et du champ.
 [[nodiscard]] bool FootprintWithin(float distance, float aspect_ratio,
-                                   const GroundFootprint& bounds, float ground_below_units = 0.0F) {
+                                   const GroundFootprint& bounds, float ground_below_units = 0.0F,
+                                   float yaw_degrees = kArenaNorthYawDegrees) {
   ro::render::Camera camera;
   camera.distance = distance;
   camera.pitch_degrees = kArenaElevationDegrees;
-  camera.yaw_degrees = kArenaYawDegrees;
+  camera.yaw_degrees = yaw_degrees;
   camera.fov_degrees = ArenaFovDegrees(aspect_ratio);
   const std::optional<GroundFootprint> seen =
       GroundFootprintOf(camera, aspect_ratio, ground_below_units);
@@ -53,12 +61,13 @@ constexpr float kDescentSlackCells = 0.1F;
 }
 
 [[nodiscard]] bool FitsSpawnFrame(float distance, float aspect_ratio,
-                                  const ro::sim::SpawnFrame& frame) {
+                                  const ro::sim::SpawnFrame& frame, float yaw_degrees) {
   return FootprintWithin(distance, aspect_ratio,
                          GroundFootprint{.west_cells = CellsOf(frame.half_width_units),
                                          .east_cells = CellsOf(frame.half_width_units),
                                          .north_cells = CellsOf(frame.north_units),
-                                         .south_cells = CellsOf(frame.south_units)});
+                                         .south_cells = CellsOf(frame.south_units)},
+                         0.0F, yaw_degrees);
 }
 
 // Le plus grand recul de [fits, overflows] qui tient encore, `fits` tenant et
@@ -136,7 +145,7 @@ float ArenaShallowestSightTangent(float aspect_ratio) {
   ro::render::Camera camera;
   camera.distance = kArenaEntryDistance;
   camera.pitch_degrees = kArenaElevationDegrees;
-  camera.yaw_degrees = kArenaYawDegrees;
+  camera.yaw_degrees = kArenaNorthYawDegrees;
   camera.fov_degrees = ArenaFovDegrees(aspect_ratio);
   const glm::mat4 unproject =
       glm::inverse(camera.ProjectionMatrix(aspect_ratio) * camera.ViewMatrix());
@@ -152,15 +161,39 @@ float ArenaShallowestSightTangent(float aspect_ratio) {
   return shallowest;
 }
 
-float ArenaFarthestDistance(float aspect_ratio, const ro::sim::SpawnFrame& frame) {
-  if (FitsSpawnFrame(kArenaFarthestReachDistance, aspect_ratio, frame)) {
-    return kArenaFarthestReachDistance;
-  }
-  if (!FitsSpawnFrame(kArenaEntryDistance, aspect_ratio, frame)) return kArenaEntryDistance;
-  return LargestFitting(kArenaEntryDistance, kArenaFarthestReachDistance,
-                        [aspect_ratio, &frame](float distance) {
-                          return FitsSpawnFrame(distance, aspect_ratio, frame);
-                        });
+float ArenaFarthestDistance(float aspect_ratio, const ro::sim::SpawnFrame& frame,
+                            float yaw_degrees) {
+  const auto fitting = [aspect_ratio, &frame, yaw_degrees](float distance) {
+    return FitsSpawnFrame(distance, aspect_ratio, frame, yaw_degrees);
+  };
+  if (fitting(kArenaFarthestReachDistance)) return kArenaFarthestReachDistance;
+  if (!fitting(kArenaEntryDistance)) return kArenaEntryDistance;
+  return LargestFitting(kArenaEntryDistance, kArenaFarthestReachDistance, fitting);
+}
+
+std::optional<glm::vec2> GroundCellsUnder(const ro::render::Camera& camera, glm::vec2 screen,
+                                          float viewport_width, float viewport_height,
+                                          glm::vec3 origin, glm::vec3 east, glm::vec3 north) {
+  if (viewport_width <= 0.0F || viewport_height <= 0.0F) return std::nullopt;
+  // L'écran a son origine en haut à gauche, l'axe des y vers le bas.
+  const glm::vec2 ndc(screen.x / viewport_width * 2.0F - 1.0F,
+                      1.0F - screen.y / viewport_height * 2.0F);
+  // 🔴 LE RAYON PART DE L'ŒIL, tiré dans le repère de la caméra puis tourné
+  // dans le monde : dé-projeter jusqu'au plan lointain, à cent mille unités,
+  // coûterait un centième de case en flottants.
+  const float half_tangent = std::tan(glm::radians(camera.fov_degrees) * 0.5F);
+  const glm::vec3 view_ray(ndc.x * half_tangent * viewport_width / viewport_height,
+                           ndc.y * half_tangent, -1.0F);
+  const glm::mat3 view_to_world = glm::transpose(glm::mat3(camera.ViewMatrix()));
+  const glm::vec3 ray = view_to_world * view_ray;
+  const glm::vec3 eye = camera.Position();
+  // œil + t·rayon = origine + a·(est − origine) + b·(nord − origine), résolu
+  // en (a, b, t) par les colonnes (est, nord, −rayon).
+  const glm::mat3 axes(east - origin, north - origin, -ray);
+  if (std::abs(glm::determinant(axes)) < kGrazingDeterminant) return std::nullopt;
+  const glm::vec3 solved = glm::inverse(axes) * (eye - origin);
+  if (solved.z < 0.0F) return std::nullopt;
+  return glm::vec2(solved.x, solved.y);
 }
 
 float ArenaDescentCeiling(float aspect_ratio, float reach_cells, float ground_below_units) {
@@ -194,14 +227,32 @@ void ArenaCamera::BoundDescent(std::optional<float> reach_cells,
 ArenaCamera::ArenaCamera(const ro::sim::SpawnFrame& frame) : frame_(frame) {
   camera_.fov_degrees = kArenaFovDegrees;
   camera_.pitch_degrees = kArenaElevationDegrees;
-  camera_.yaw_degrees = kArenaYawDegrees;
+  camera_.yaw_degrees = yaw_degrees_;
   camera_.distance = wheel_distance_;
   // 🔴 SUIVI RIGIDE : le héros marche plus vite que le seuil du rattrapage, et
   // une caméra qui traîne laisserait la horde entrer par un bord.
   aim_.tracking.fixed = true;
 }
 
-void ArenaCamera::Enter() noexcept { aim_.tracking.Reset(); }
+void ArenaCamera::Enter() noexcept {
+  aim_.tracking.Reset();
+  yaw_degrees_ = kArenaNorthYawDegrees;
+}
+
+void ArenaCamera::Orbit(float dx_px) noexcept {
+  if (descending_) return;
+  // LA RÈGLE DU JEU, hors des bornes d'une carte : l'arène n'a ni intérieur ni
+  // vue imposée.
+  ro::render::Camera turned;
+  turned.yaw_degrees = yaw_degrees_;
+  DragCamera(turned, CameraDrag{.dx_px = dx_px, .orbit = true}, CameraLimits{.bounded = false},
+             /*ctrl_held=*/false);
+  TurnTo(turned.yaw_degrees);
+}
+
+void ArenaCamera::TurnTo(float yaw_degrees) noexcept {
+  yaw_degrees_ = std::remainder(yaw_degrees, kFullTurnDegrees);
+}
 
 void ArenaCamera::Shift(glm::vec3 world_delta) noexcept {
   camera_.look_at += world_delta;
@@ -229,13 +280,21 @@ const ro::render::Camera& ArenaCamera::Pose(const glm::vec3& hero_ground, std::u
             ? ArenaDescentCeiling(aspect_ratio, *descent_reach_cells_, descent_ground_below_units_)
             : kArenaDescentUnbounded;
     SetDistance(wheel_distance_);
+    turned_yaw_.reset();
+  }
+  descending_ = arrival_ms < kArenaDescentMs;
+  if (descending_) yaw_degrees_ = kArenaNorthYawDegrees;
+  if (turned_yaw_ != yaw_degrees_) {
+    turned_yaw_ = yaw_degrees_;
+    turned_farthest_distance_ = ArenaFarthestDistance(aspect_ratio, frame_, yaw_degrees_);
   }
   aim_.shake.Undo(camera_);
   // Le recul, l'élévation, le lacet et le champ se reposent entiers à chaque
-  // image : rien de la précédente n'y survit, et le lacet reste celui du nord.
-  camera_.distance = ArenaDescentDistance(wheel_distance_, arrival_ms, descent_ceiling_);
+  // image : rien de la précédente n'y survit.
+  const float rest_distance = std::min(wheel_distance_, turned_farthest_distance_);
+  camera_.distance = ArenaDescentDistance(rest_distance, arrival_ms, descent_ceiling_);
   camera_.pitch_degrees = kArenaElevationDegrees;
-  camera_.yaw_degrees = kArenaYawDegrees;
+  camera_.yaw_degrees = yaw_degrees_;
   camera_.fov_degrees = ArenaFovDegrees(aspect_ratio);
   aim_.tracking.Follow(camera_, hero_ground, now_ms);
   aim_.shake.Apply(camera_, effects_world, now_ms);

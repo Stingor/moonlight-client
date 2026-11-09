@@ -359,7 +359,7 @@ struct ExpSegment {
   std::uint32_t base = 0;
   std::uint32_t per_level = 0;
 };
-// Rectangle autour du héros, aligné sur la caméra figée au nord : les monstres
+// Rectangle autour du héros, aligné sur le nord : les monstres
 // naissent sur son périmètre, plus une marge tirée de 0 à margin_units.
 struct SpawnFrame {
   std::int32_t half_width_units = 0;

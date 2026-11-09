@@ -36,6 +36,7 @@
 #include "survivors/arena_choice.h"
 #include "survivors/survivors_route.h"
 #include "voice/voice_keys.h"
+#include "world/click_rules.h"
 
 namespace moonclient {
 namespace {
@@ -76,6 +77,7 @@ constexpr std::array<float, 4> kNoArenaClearColor = {0.0F, 0.0F, 0.0F, 1.0F};
       routed.kind = SurvivorsEventKind::kMouseMove;
       routed.x = event.motion.x;
       routed.y = event.motion.y;
+      routed.dx_px = event.motion.xrel;
       break;
     case SDL_EVENT_MOUSE_WHEEL:
       routed.kind = SurvivorsEventKind::kWheel;
@@ -125,7 +127,17 @@ bool Game::SurvivorsTakes(const SDL_Event& event, std::uint32_t now_ms) {
   // La souris au-dessus d'une fenêtre, telle que l'interface l'a vue avant la
   // route : la molette y fait défiler la fenêtre, pas reculer la caméra.
   const ro::ui::InputGate gate = interface_->gate();
-  const SurvivorsEvent routed = SurvivorsEventOf(event, gate.mouse_to_ui);
+  SurvivorsEvent routed = SurvivorsEventOf(event, gate.mouse_to_ui);
+  // LE DOUBLE CLIC SE JUGE À L'HORLOGE DU JEU, que la partie avance à sa place
+  // puisque l'événement ne lui parviendra pas : un mouvement la défait, et
+  // chaque appui gauche ou droit la fait avancer.
+  if (event.type == SDL_EVENT_MOUSE_MOTION) {
+    world_mouse_.double_click.NoteMotion();
+  } else if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN &&
+             (event.button.button == SDL_BUTTON_LEFT || event.button.button == SDL_BUTTON_RIGHT)) {
+    routed.second_of_double = world_mouse_.double_click.NotePress(
+        event.button.button == SDL_BUTTON_LEFT ? ClickButton::kLeft : ClickButton::kRight, now_ms);
+  }
   // 🔴 LE CLAVIER SE PARTAGE AVEC LA CONVERSATION ET LA VOIX. L'interface a
   // déjà vu la frappe ; reste à dire si l'arène la voit aussi.
   ro::ui::ChatInputState& input = windows_.chat.main.input;

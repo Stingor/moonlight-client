@@ -17,8 +17,8 @@
 namespace moonclient {
 namespace {
 
-// LA CHAUFFE SE PEINT À CETTE DISTANCE DU HÉROS, en cases : hors du cadre de
-// la caméra figée au nord à son plus grand recul, d'un côté comme de l'autre.
+// LA CHAUFFE SE PEINT À CETTE DISTANCE DU HÉROS, en cases : hors de ce que la
+// caméra voit à son plus grand recul, à tout lacet.
 constexpr float kWarmAwayCells = 60.0F;
 
 // L'horloge de présentation, ramenée à celle des renderers. Une partie ne dure

@@ -48,11 +48,12 @@ constexpr float kFullTurnDegrees = 360.0F;
   return CellOfField(glm::vec2(static_cast<float>(point.x), static_cast<float>(point.y)));
 }
 
-// La face d'un sprite au cap `heading`, sous la caméra figée au nord. Le client
-// arrondit l'angle pour un joueur au repos ou en marche, et le tronque pour
-// tout le reste.
-[[nodiscard]] std::size_t DirectionOf(std::uint8_t heading, bool rounded) noexcept {
-  return ro::render::SpriteDirectionOfDegrees(ClientDegreesOfHeading(heading), kArenaYawDegrees,
+// La face d'un sprite au cap `heading`, sous une caméra tournée de
+// `camera_yaw_degrees`. Le client arrondit l'angle pour un joueur au repos ou
+// en marche, et le tronque pour tout le reste.
+[[nodiscard]] std::size_t DirectionOf(std::uint8_t heading, bool rounded,
+                                      float camera_yaw_degrees) noexcept {
+  return ro::render::SpriteDirectionOfDegrees(ClientDegreesOfHeading(heading), camera_yaw_degrees,
                                               rounded);
 }
 
@@ -112,12 +113,11 @@ void HordePoses::NoticeFalls(std::span<const ro::sim::SurvivorsFall> falls,
     FallingBody body{.serial = fall.foe_serial,
                      .foe_id = fall.foe_id,
                      .cell = CellOfPoint(fall.at),
-                     .direction = 0,
                      .elite = false,
                      .fell_ms = presentation_ms};
     const auto known = std::ranges::lower_bound(memory_, fall.foe_serial, {}, &FoeMemory::serial);
     if (known != memory_.end() && known->serial == fall.foe_serial) {
-      body.direction = DirectionOf(known->facing, /*rounded=*/false);
+      body.facing = known->facing;
       body.elite = known->elite;
     }
     falling_.push_back(body);
@@ -244,7 +244,7 @@ void HordePoses::PoseHero(const ro::sim::SurvivorsField& field, std::uint64_t pr
     PoseGesture(pose, field, field.stage, presentation_ms, times_of);
   }
   PoseSlide(pose, field.stage, presentation_ms);
-  pose.direction = DirectionOf(hero.facing, pose.motion != Motion::kDie);
+  pose.direction = DirectionOf(hero.facing, pose.motion != Motion::kDie, camera_yaw_degrees_);
   if (!hero.down && field.step < hero.frost_until_step) pose.tint = kFrostedHeroTint;
   poses_.push_back(pose);
 }
@@ -270,7 +270,7 @@ void HordePoses::PoseAllies(const ro::sim::SurvivorsField& field, std::uint64_t 
       if (!moving) PoseGesture(pose, field, index, presentation_ms, times_of);
     }
     PoseSlide(pose, index, presentation_ms);
-    pose.direction = DirectionOf(hero.facing, pose.motion != Motion::kDie);
+    pose.direction = DirectionOf(hero.facing, pose.motion != Motion::kDie, camera_yaw_degrees_);
     if (!hero.down && field.step < hero.frost_until_step) pose.tint = kFrostedHeroTint;
     poses_.push_back(pose);
   }
@@ -308,7 +308,7 @@ void HordePoses::PoseFoes(const ro::sim::SurvivorsField& field, std::uint64_t pr
     HordePose pose{.kind = HordeBodyKind::kFoe,
                    .sim_id = foe.serial,
                    .look_id = foe.foe_id,
-                   .direction = DirectionOf(foe.facing, /*rounded=*/false),
+                   .direction = DirectionOf(foe.facing, /*rounded=*/false, camera_yaw_degrees_),
                    .cell = Interpolated(foe.previous_position, foe.position, blend_per_mille)};
     if (foe.elite) {
       pose.scale = kEliteScale;
@@ -379,13 +379,16 @@ void HordePoses::PoseFalling(std::uint64_t presentation_ms, const HordeTimesOf& 
     return fade_ms(body) >= static_cast<float>(kFallFadeMs);
   });
   for (const FallingBody& body : falling_) {
-    HordePose pose{.kind = HordeBodyKind::kFalling,
-                   .sim_id = body.serial,
-                   .look_id = body.foe_id,
-                   .motion = Motion::kDie,
-                   .motion_ms = ElapsedSince(presentation_ms, body.fell_ms),
-                   .direction = body.direction,
-                   .cell = body.cell};
+    HordePose pose{
+        .kind = HordeBodyKind::kFalling,
+        .sim_id = body.serial,
+        .look_id = body.foe_id,
+        .motion = Motion::kDie,
+        .motion_ms = ElapsedSince(presentation_ms, body.fell_ms),
+        .direction = body.facing.has_value()
+                         ? DirectionOf(*body.facing, /*rounded=*/false, camera_yaw_degrees_)
+                         : 0,
+        .cell = body.cell};
     if (body.elite) {
       pose.scale = kEliteScale;
       pose.tint = kEliteTint;
@@ -451,7 +454,7 @@ void HordePoses::PoseSummons(const ro::sim::SurvivorsField& field, std::uint64_t
           .sim_id = summon.serial,
           .look_id = summon.summon_class,
           .motion_ms = static_cast<float>(presentation_ms),
-          .direction = DirectionOf(summon.facing, /*rounded=*/false),
+          .direction = DirectionOf(summon.facing, /*rounded=*/false, camera_yaw_degrees_),
           .cell = Interpolated(summon.previous_position, summon.position, blend_per_mille),
           .tint = kAlliedTint};
       const auto strike = std::ranges::find(summon_strikes_, summon.serial, &SummonStrike::serial);

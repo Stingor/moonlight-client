@@ -112,7 +112,8 @@ SurvivorsIntent SurvivorsMode::IntentOf(const SurvivorsStage& stage,
       aim.target = *target;
     }
   }
-  intent.heading = HeadingOf(route_.keys(), aim);
+  intent.heading =
+      HeadingOf(route_.keys(), aim, arena_.has_value() ? arena_->camera().yaw_degrees : 0.0F);
   intent.escape = gestures.escape;
   intent.focus_lost = gestures.focus_lost;
   intent.world_alert = report.pauses();
@@ -227,6 +228,8 @@ SurvivorsPainted SurvivorsMode::Frame(SurvivorsStage& stage, const SurvivorsCont
     if (shown) gestures.wheel_notches = 0.0F;
   }
   if (arena_.has_value() && gestures.wheel_notches != 0.0F) arena_->Wheel(gestures.wheel_notches);
+  if (arena_.has_value() && gestures.orbit_px != 0.0F) arena_->Orbit(gestures.orbit_px);
+  if (arena_.has_value() && gestures.reset_yaw) arena_->ResetYaw();
   const SurvivorsIntent intent = IntentOf(stage, context, gestures, report);
   ApplyOptions(ask_.pause, context);
   // LE VOLUME DE LA MUSIQUE CHANGÉ DANS LES OPTIONS DE LA PAUSE, déjà posé par

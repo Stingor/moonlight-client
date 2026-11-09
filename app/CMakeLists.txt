@@ -1603,7 +1603,8 @@ add_library(moonclient_arena STATIC
 
 target_link_libraries(moonclient_arena
     PUBLIC moonclient_effects moonclient_graphics moonclient_ground_units moonclient_lit_stage
-           moonclient_stage moonclient_survivors ro_core ro_render ro_render_gl ro_sim ro_vfs
+           moonclient_stage moonclient_survivors moonclient_camera_rules ro_core ro_render
+           ro_render_gl ro_sim ro_vfs
     PRIVATE ro_warnings)
 
 target_include_directories(moonclient_arena PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

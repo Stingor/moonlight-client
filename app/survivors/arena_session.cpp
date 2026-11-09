@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <array>
 #include <chrono>
-#include <cmath>
 #include <cstdint>
 #include <iterator>
 #include <limits>
@@ -29,10 +28,6 @@ namespace {
   return static_cast<std::uint32_t>(
       std::min<std::uint64_t>(presentation_ms, std::numeric_limits<std::uint32_t>::max()));
 }
-
-// Le déterminant sous lequel deux axes de l'écran se tiennent pour parallèles :
-// la caméra regarderait le sol par la tranche.
-constexpr float kFlatDeterminant = 1e-6F;
 
 // Les orbites dont l'orbe est le chariot du héros.
 constexpr std::array<std::uint16_t, 2> kSpinningCartSkills = {kCartRevolutionSkill,
@@ -157,6 +152,11 @@ void ArenaSession::Compose(const ArenaFrameFacts& facts, const GraphicsOptions& 
   numbers_.Notice(*facts.news, field, facts.presentation_ms);
 
   frame_ = scene_.Begin(graphics, facts.presentation_ms);
+  // LES FACES SUIVENT LE LACET que la caméra prendra à la fin de l'image.
+  const float yaw_degrees = camera_.yaw_degrees();
+  poses_.set_camera_yaw_degrees(yaw_degrees);
+  carts_.set_camera_yaw_degrees(yaw_degrees);
+  falcons_.set_camera_yaw_degrees(yaw_degrees);
   poses_.NoticeFalls(facts.news->falls, facts.presentation_ms);
   poses_.NoticeHits(facts.news->hits);
   poses_.NoticeCasts(facts.news->casts, field, facts.presentation_ms);
@@ -249,27 +249,16 @@ std::optional<ro::sim::FieldPoint> ArenaSession::FieldPointUnder(glm::vec2 scree
                                                                  ro::sim::FieldPoint hero,
                                                                  float viewport_width,
                                                                  float viewport_height) const {
-  // L'écran d'une case de plus vers l'est et vers le nord donne les deux axes
-  // du sol vus de la caméra ; le décalage de la souris s'y décompose.
   const glm::vec2 hero_cell =
       CellOfField(glm::vec2(static_cast<float>(hero.x), static_cast<float>(hero.y)));
-  const std::optional<glm::vec2> origin =
-      ScreenOf(scene_.GroundAtCell(hero_cell), viewport_width, viewport_height);
-  const std::optional<glm::vec2> east = ScreenOf(
-      scene_.GroundAtCell(hero_cell + glm::vec2(1.0F, 0.0F)), viewport_width, viewport_height);
-  const std::optional<glm::vec2> north = ScreenOf(
-      scene_.GroundAtCell(hero_cell + glm::vec2(0.0F, 1.0F)), viewport_width, viewport_height);
-  if (!origin || !east || !north) return std::nullopt;
-  const glm::vec2 axis_east = *east - *origin;
-  const glm::vec2 axis_north = *north - *origin;
-  const float determinant = axis_east.x * axis_north.y - axis_east.y * axis_north.x;
-  if (std::abs(determinant) < kFlatDeterminant) return std::nullopt;
-  const glm::vec2 offset = screen - *origin;
-  const float cells_east = (offset.x * axis_north.y - offset.y * axis_north.x) / determinant;
-  const float cells_north = (axis_east.x * offset.y - axis_east.y * offset.x) / determinant;
+  const std::optional<glm::vec2> cells = GroundCellsUnder(
+      camera_.camera(), screen, viewport_width, viewport_height, scene_.GroundAtCell(hero_cell),
+      scene_.GroundAtCell(hero_cell + glm::vec2(1.0F, 0.0F)),
+      scene_.GroundAtCell(hero_cell + glm::vec2(0.0F, 1.0F)));
+  if (!cells.has_value()) return std::nullopt;
   const auto subunits = static_cast<float>(ro::sim::kSubunitsPerCell);
-  return ro::sim::FieldPoint{hero.x + static_cast<std::int32_t>(cells_east * subunits),
-                             hero.y + static_cast<std::int32_t>(cells_north * subunits)};
+  return ro::sim::FieldPoint{hero.x + static_cast<std::int32_t>(cells->x * subunits),
+                             hero.y + static_cast<std::int32_t>(cells->y * subunits)};
 }
 
 std::optional<glm::vec2> ArenaSession::hero_cell() const noexcept {

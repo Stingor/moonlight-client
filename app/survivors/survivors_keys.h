@@ -33,7 +33,8 @@ class MoveKeys {
   // La fenêtre a perdu le focus : aucune touche ne reste tenue, car son
   // relâchement n'arrivera pas.
   void ReleaseAll() noexcept { held_ = 0; }
-  // Le cap sur 64 valeurs (0 au nord, sens trigonométrique), ou kNoHeading.
+  // Le cap sur 64 valeurs (0 au nord, sens trigonométrique), ou kNoHeading,
+  // sous une caméra face au nord : « haut » y est le nord.
   [[nodiscard]] std::uint8_t Heading() const noexcept;
 
  private:
@@ -52,8 +53,11 @@ struct MouseAim {
 };
 
 // Le cap de l'image : la souris prime tant qu'elle est tenue (kNoHeading si
-// elle vise le héros lui-même), sinon les touches.
-[[nodiscard]] std::uint8_t HeadingOf(const MoveKeys& keys, const MouseAim& mouse) noexcept;
+// elle vise le héros lui-même), sinon les touches. 🔴 LES TOUCHES SUIVENT
+// L'ÉCRAN : sous une caméra tournée de `camera_yaw_degrees`, « haut » marche
+// vers le haut de l'image, au cap le plus proche.
+[[nodiscard]] std::uint8_t HeadingOf(const MoveKeys& keys, const MouseAim& mouse,
+                                     float camera_yaw_degrees) noexcept;
 
 // LES LETTRES À AFFICHER dans l'aide des contrôles : celles que le clavier du
 // joueur porte aux places de W A S D. Le nommeur est injecté, parce que SDL

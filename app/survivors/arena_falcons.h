@@ -54,6 +54,8 @@ class ArenaFalcons {
 
   // Une partie neuve : aucun faucon.
   void Reset();
+  // Le lacet de la caméra de l'arène, que les faces suivent.
+  void set_camera_yaw_degrees(float yaw_degrees) noexcept { camera_yaw_degrees_ = yaw_degrees; }
 
  private:
   struct Art {
@@ -73,6 +75,7 @@ class ArenaFalcons {
   std::map<std::string, std::unique_ptr<Art>> arts_;
   std::array<std::optional<Kept>, ro::sim::kMostHeroes> falcons_;
   std::vector<ro::render::DrawnActor> drawn_;
+  float camera_yaw_degrees_ = 0.0F;
   std::optional<std::uint32_t> last_tick_ms_;
 };
 

@@ -65,10 +65,16 @@ bool SurvivorsRoute::Take(const SurvivorsEvent& event) {
           !(event.kind == SurvivorsEventKind::kMouseDown && event.over_interface)) {
         mouse_held_ = event.kind == SurvivorsEventKind::kMouseDown;
       }
+      if (event.button == kRightMouseButton &&
+          !(event.kind == SurvivorsEventKind::kMouseDown && event.over_interface)) {
+        orbiting_ = event.kind == SurvivorsEventKind::kMouseDown;
+        if (orbiting_ && event.second_of_double) gestures_.reset_yaw = true;
+      }
       return true;
     case SurvivorsEventKind::kMouseMove:
       mouse_x_ = event.x;
       mouse_y_ = event.y;
+      if (orbiting_) gestures_.orbit_px += event.dx_px;
       return true;
     case SurvivorsEventKind::kWheel:
       // Prise dans les deux cas — elle ne parvient pas au jeu —, mais la
@@ -82,6 +88,7 @@ bool SurvivorsRoute::Take(const SurvivorsEvent& event) {
       // Le relâchement des touches et du bouton n'arrivera pas.
       keys_.ReleaseAll();
       mouse_held_ = false;
+      orbiting_ = false;
       gestures_.focus_lost = true;
       return false;
     case SurvivorsEventKind::kOther:
@@ -97,6 +104,7 @@ void SurvivorsRoute::Reset() noexcept { *this = SurvivorsRoute(); }
 void SurvivorsRoute::ReleaseHeld() noexcept {
   keys_.ReleaseAll();
   mouse_held_ = false;
+  orbiting_ = false;
 }
 
 }  // namespace moonclient

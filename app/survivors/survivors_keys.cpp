@@ -1,12 +1,16 @@
 #include "survivors/survivors_keys.h"
 
 #include <array>
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <optional>
 
 namespace moonclient {
 namespace {
+
+// Un tour entier, en degrés.
+constexpr float kFullTurnDegrees = 360.0F;
 
 enum class Toward : std::uint8_t { kNorth, kWest, kSouth, kEast };
 
@@ -71,9 +75,17 @@ std::uint8_t MoveKeys::Heading() const noexcept {
   return ro::sim::HeadingOf(delta, ro::sim::kNoHeading);
 }
 
-std::uint8_t HeadingOf(const MoveKeys& keys, const MouseAim& mouse) noexcept {
+std::uint8_t HeadingOf(const MoveKeys& keys, const MouseAim& mouse,
+                       float camera_yaw_degrees) noexcept {
   if (mouse.held) return ro::sim::HeadingOf(mouse.target - mouse.hero, ro::sim::kNoHeading);
-  return keys.Heading();
+  const std::uint8_t screen_heading = keys.Heading();
+  if (screen_heading == ro::sim::kNoHeading) return screen_heading;
+  // Le lacet tourne l'image dans le sens trigonométrique, comme le cap : le
+  // haut de l'écran est le nord tourné du lacet.
+  const auto turned_steps = static_cast<std::int32_t>(std::lround(
+      camera_yaw_degrees / kFullTurnDegrees * static_cast<float>(ro::sim::kHeadingSteps)));
+  const std::int32_t steps = ro::sim::kHeadingSteps;
+  return static_cast<std::uint8_t>(((screen_heading + turned_steps) % steps + steps) % steps);
 }
 
 MoveKeyLabels LabelsOf(const ScancodeNamer& name_of) {

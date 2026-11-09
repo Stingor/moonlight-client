@@ -40,9 +40,10 @@ constexpr std::size_t kHistoryFrames = kArenaCartTrailFrames.back() + 1;
       fallback);
 }
 
-// La direction d'écran d'un cap de la simulation, tronquée comme un monstre.
-[[nodiscard]] std::size_t ScreenDirectionOf(std::uint8_t heading) {
-  return ro::render::SpriteDirectionOfDegrees(ClientDegreesOfHeading(heading), kArenaYawDegrees,
+// La direction d'écran d'un cap de la simulation sous une caméra tournée de
+// `camera_yaw_degrees`, tronquée comme un monstre.
+[[nodiscard]] std::size_t ScreenDirectionOf(std::uint8_t heading, float camera_yaw_degrees) {
+  return ro::render::SpriteDirectionOfDegrees(ClientDegreesOfHeading(heading), camera_yaw_degrees,
                                               /*rounded=*/false);
 }
 
@@ -154,7 +155,8 @@ void ArenaCarts::Compose(const ro::sim::SurvivorsField& field,
           glm::vec2(static_cast<float>(orb->position.x), static_cast<float>(orb->position.y)));
       cart.heading = HeadingBetween(before, cart.cell, cart.heading);
       // Le héros le regarde : c'est lui qui le fait tournoyer.
-      pose.direction = ScreenDirectionOf(HeadingBetween(pose.cell, cart.cell, hero.facing));
+      pose.direction =
+          ScreenDirectionOf(HeadingBetween(pose.cell, cart.cell, hero.facing), camera_yaw_degrees_);
     } else {
       // IL SUIT, au bout de sa longe, tourné vers son héros.
       const glm::vec2 apart = cart.cell - pose.cell;
@@ -166,7 +168,7 @@ void ArenaCarts::Compose(const ro::sim::SurvivorsField& field,
     }
     cart.travelled_cells += glm::length(cart.cell - before);
     if (art == nullptr || !art->sprite.has_value()) continue;
-    const std::size_t action = ScreenDirectionOf(cart.heading);
+    const std::size_t action = ScreenDirectionOf(cart.heading, camera_yaw_degrees_);
     cart.history.insert(cart.history.begin(),
                         Shown{.cell = cart.cell, .action = action, .frame = FrameOf(cart, action)});
     if (cart.history.size() > kHistoryFrames) cart.history.resize(kHistoryFrames);

@@ -19,14 +19,19 @@ namespace moonclient {
 //
 // Celle de RO, champ 15° et élévation 50°, au recul d'entrée de 400. La
 // molette rapproche jusqu'à 300 et recule jusqu'où le cadre d'apparition le
-// permet pour le format de l'image (`ArenaFarthestDistance`). 🔴 LE LACET EST
-// FIGÉ AU NORD : le cadre d'apparition de la simulation est aligné sur lui, et
-// « haut » reste « haut » pour les touches. Ni la molette, ni la secousse, ni
-// la descente n'y touchent.
+// permet pour le format de l'image (`ArenaFarthestDistance`).
+//
+// LE LACET TOURNE COMME EN JEU : clic droit glissé, double clic droit pour
+// revenir face au nord (`DragCamera`, `ResetCameraYaw`). Il part du nord à
+// chaque entrée et ne bouge pas pendant la descente ; « haut » reste le haut
+// de l'écran pour les touches. 🔴 LE CADRE D'APPARITION DE LA SIMULATION RESTE
+// ALIGNÉ SUR LE NORD : une caméra tournée recule moins loin, pour que son
+// emprise y tienne encore (`ArenaFarthestDistance`).
 
 inline constexpr float kArenaFovDegrees = ro::render::kGameFovDegrees;
 inline constexpr float kArenaElevationDegrees = ro::render::kGameElevationDegrees;
-inline constexpr float kArenaYawDegrees = 0.0F;
+// Le lacet de l'entrée et de la remise : face au nord.
+inline constexpr float kArenaNorthYawDegrees = 0.0F;
 // Les reculs de la molette, en unités du monde : celui d'entrée, le plus
 // proche, et la borne du plus lointain, une fois et demie celui d'entrée.
 inline constexpr float kArenaEntryDistance = 400.0F;
@@ -81,13 +86,25 @@ struct GroundFootprint {
 // en dessous ne cache jamais le sol plus loin (`kGroundSlopeCap`).
 [[nodiscard]] float ArenaShallowestSightTangent(float aspect_ratio);
 
-// LE RECUL LE PLUS LOINTAIN pour une image de ce rapport : le plus grand, borné
-// à `kArenaFarthestReachDistance`, dont l'emprise au sol tient encore dans le
-// cadre d'apparition `frame` — la horde naît donc les pieds hors de l'image.
-// Un grand monstre né au sud peut y montrer la tête : il paraît en fondu
-// (`kHordeBirthFadeMs`), sans surgir.
-// Jamais moins que le recul d'entrée : le contenu est réglé pour lui.
-[[nodiscard]] float ArenaFarthestDistance(float aspect_ratio, const ro::sim::SpawnFrame& frame);
+// LE RECUL LE PLUS LOINTAIN pour une image de ce rapport, sous ce lacet : le
+// plus grand, borné à `kArenaFarthestReachDistance`, dont l'emprise au sol
+// tient encore dans le cadre d'apparition `frame` — la horde naît donc les
+// pieds hors de l'image. Un grand monstre né au sud peut y montrer la tête : il
+// paraît en fondu (`kHordeBirthFadeMs`), sans surgir.
+// Jamais moins que le recul d'entrée : le contenu est réglé pour lui. Tournée
+// en biais, la caméra y voit donc un coin du cadre, où la horde naît en fondu.
+[[nodiscard]] float ArenaFarthestDistance(float aspect_ratio, const ro::sim::SpawnFrame& frame,
+                                          float yaw_degrees = kArenaNorthYawDegrees);
+
+// LE POINT DU SOL SOUS UN POINT DE L'ÉCRAN, en points depuis le haut à gauche
+// d'une image `viewport_width` × `viewport_height` : le rayon de la caméra
+// coupe le plan qui passe par `origin`, `east` (une case à l'est) et `north`
+// (une case au nord). Rend l'écart à `origin` en cases vers l'est et le nord,
+// à tout lacet ; rien si le rayon longe le plan ou le coupe derrière l'œil.
+[[nodiscard]] std::optional<glm::vec2> GroundCellsUnder(const ro::render::Camera& camera,
+                                                        glm::vec2 screen, float viewport_width,
+                                                        float viewport_height, glm::vec3 origin,
+                                                        glm::vec3 east, glm::vec3 north);
 
 // LE PLUS HAUT DÉPART DE LA DESCENTE dont l'emprise au sol reste à
 // `reach_cells` au plus du point visé, de chaque côté, pour une image de ce
@@ -98,7 +115,9 @@ struct GroundFootprint {
 [[nodiscard]] float ArenaDescentCeiling(float aspect_ratio, float reach_cells,
                                         float ground_below_units = 0.0F);
 
-// LA CAMÉRA DE L'ARÈNE : suivi rigide du héros, molette, secousse et descente.
+// LA CAMÉRA DE L'ARÈNE : suivi rigide du héros, molette, lacet, secousse et
+// descente. Le recul posé est celui de la molette, ramené au plus lointain du
+// lacet tenu : revenir au nord rend celui de la molette.
 //
 // ⚠ LA SECOUSSE SE RETIRE AVANT CHAQUE POSE (`ScreenShake::Undo`) : posée par
 // dessus la précédente, elle dériverait.
@@ -107,8 +126,15 @@ class ArenaCamera {
   // `frame` : le cadre d'apparition des règles, qui borne le recul.
   explicit ArenaCamera(const ro::sim::SpawnFrame& frame);
 
-  // L'ENTRÉE DANS L'ARÈNE : le suivi repart du héros.
+  // L'ENTRÉE DANS L'ARÈNE : le suivi repart du héros, face au nord.
   void Enter() noexcept;
+  // LE CLIC DROIT GLISSÉ de `dx_px` points vers la droite tourne la caméra
+  // autour du héros, à la règle du jeu ; rien pendant la descente.
+  void Orbit(float dx_px) noexcept;
+  // LE DOUBLE CLIC DROIT : la caméra revient face au nord.
+  void ResetYaw() noexcept { yaw_degrees_ = kArenaNorthYawDegrees; }
+  // Le lacet posé d'emblée, ramené dans un tour : ce que le banc demande.
+  void TurnTo(float yaw_degrees) noexcept;
   // Des crans de molette : positifs, la caméra se rapproche ; le recul reste
   // entre `kArenaNearestDistance` et le plus lointain du format de la
   // dernière pose (`farthest_distance`).
@@ -136,6 +162,9 @@ class ArenaCamera {
 
   [[nodiscard]] const ro::render::Camera& camera() const noexcept { return camera_; }
   [[nodiscard]] float wheel_distance() const noexcept { return wheel_distance_; }
+  // Le lacet que la prochaine pose prendra : les faces des sprites le suivent
+  // dès cette image.
+  [[nodiscard]] float yaw_degrees() const noexcept { return yaw_degrees_; }
   // Le recul le plus lointain du format de la dernière pose ; la borne entière
   // avant la première.
   [[nodiscard]] float farthest_distance() const noexcept { return farthest_distance_; }
@@ -146,6 +175,12 @@ class ArenaCamera {
   ro::sim::SpawnFrame frame_;
   float wheel_distance_ = kArenaEntryDistance;
   float farthest_distance_ = kArenaFarthestReachDistance;
+  float yaw_degrees_ = kArenaNorthYawDegrees;
+  // La descente en cours à la dernière pose : le lacet n'y bouge pas.
+  bool descending_ = false;
+  // Le recul le plus lointain sous `turned_yaw_`, pour `farthest_aspect_`.
+  std::optional<float> turned_yaw_;
+  float turned_farthest_distance_ = kArenaFarthestReachDistance;
   // Le rapport pour lequel `farthest_distance_` a été cherché.
   std::optional<float> farthest_aspect_;
   // La borne de la descente, et son plus haut départ pour `farthest_aspect_`.

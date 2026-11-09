@@ -131,14 +131,14 @@ void ArenaFalcons::Compose(const ro::sim::SurvivorsField& field,
         if (animation == nullptr || action >= animation->actions().size()) return std::size_t{0};
         return animation->actions()[action].frames.size();
       };
-      ro::render::StepFalcon(slot->falcon, slot->master, ground, frame_count, kArenaYawDegrees);
+      ro::render::StepFalcon(slot->falcon, slot->master, ground, frame_count, camera_yaw_degrees_);
     }
   }
   const float weight = ro::render::TickBlendWeight(now_ms - *last_tick_ms_, tick_ms, true);
   for (std::optional<Kept>& slot : falcons_) {
     if (!slot.has_value() || slot->art == nullptr || !slot->art->sprite.has_value()) continue;
     const ro::formats::ActAnimation& animation = *slot->art->animation;
-    const std::size_t action = ro::render::FalconAction(slot->falcon, kArenaYawDegrees);
+    const std::size_t action = ro::render::FalconAction(slot->falcon, camera_yaw_degrees_);
     if (action >= animation.actions().size() ||
         slot->falcon.frame >= animation.actions()[action].frames.size()) {
       continue;

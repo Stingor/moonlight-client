@@ -183,6 +183,8 @@ class HordePoses {
 
   // Une partie neuve n'a rien vu.
   void Reset();
+  // Le lacet de la caméra de l'arène, que les faces des corps suivent.
+  void set_camera_yaw_degrees(float yaw_degrees) noexcept { camera_yaw_degrees_ = yaw_degrees; }
 
  private:
   // Ce qu'une image retient d'un monstre vivant, par serial croissant.
@@ -202,7 +204,9 @@ class HordePoses {
     std::uint32_t serial = 0;
     std::uint16_t foe_id = 0;
     glm::vec2 cell{0.0F};
-    std::size_t direction = 0;
+    // Son cap à la mort ; rien s'il n'avait pas été vu vivant : il tombe
+    // alors face à la caméra.
+    std::optional<std::uint8_t> facing;
     bool elite = false;
     std::uint64_t fell_ms = 0;
   };
@@ -238,6 +242,7 @@ class HordePoses {
   std::vector<FoeMemory> next_memory_;
   std::vector<FallingBody> falling_;
   std::vector<HordePose> poses_;
+  float camera_yaw_degrees_ = 0.0F;
   // Le début du dernier geste de chaque héros, s'il en a fait un.
   std::array<std::optional<std::uint64_t>, ro::sim::kMostHeroes> gesture_started_ms_;
   // La dernière glissade de chaque héros : son début, et l'arrière de son cap.

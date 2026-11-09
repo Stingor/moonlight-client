@@ -31,8 +31,9 @@ inline constexpr std::uint32_t kScancodeKeypadEnter = 88;
 // Ctrl+Tab montre ou masque la minimap, comme en partie.
 inline constexpr std::uint32_t kScancodeTab = 43;
 
-// Le bouton gauche, par son numéro SDL.
+// Les boutons gauche et droit, par leur numéro SDL.
 inline constexpr std::uint8_t kLeftMouseButton = 1;
+inline constexpr std::uint8_t kRightMouseButton = 3;
 
 enum class SurvivorsEventKind : std::uint8_t {
   kKeyDown,
@@ -56,9 +57,14 @@ struct SurvivorsEvent {
   // Ctrl tenu avec la touche.
   bool ctrl = false;
   std::uint8_t button = 0;
-  // La souris, en points de la fenêtre.
+  // La souris, en points de la fenêtre, et ce qu'elle a parcouru vers la
+  // droite depuis le mouvement précédent.
   float x = 0.0F;
   float y = 0.0F;
+  float dx_px = 0.0F;
+  // L'appui complète un double clic, à la règle du jeu (`DoubleClickClocks`),
+  // que l'exécutable tient.
+  bool second_of_double = false;
   // Les crans de molette, positifs vers l'avant.
   float wheel_notches = 0.0F;
   // La souris au-dessus d'une fenêtre de l'interface : la molette y fait
@@ -77,6 +83,10 @@ struct SurvivorsGestures {
   bool confirm = false;
   // Ctrl+Tab : la minimap se montre ou se masque.
   bool toggle_minimap = false;
+  // LE CLIC DROIT GLISSÉ, en points vers la droite : la caméra tourne.
+  float orbit_px = 0.0F;
+  // LE DOUBLE CLIC DROIT, à la règle du jeu : la caméra revient face au nord.
+  bool reset_yaw = false;
 };
 
 [[nodiscard]] bool IsConfirmKey(std::uint32_t scancode) noexcept;
@@ -145,6 +155,8 @@ class SurvivorsRoute {
   bool mouse_held_ = false;
   float mouse_x_ = 0.0F;
   float mouse_y_ = 0.0F;
+  // Le bouton droit tenu hors des fenêtres : ses mouvements tournent la caméra.
+  bool orbiting_ = false;
 };
 
 }  // namespace moonclient

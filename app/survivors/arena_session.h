@@ -113,6 +113,9 @@ class ArenaSession {
   void SetSwitches(ArenaEffectSwitches switches) { effects_.set_switches(switches); }
   void SetHordeSunShadows(bool shown) { scene_.set_horde_sun_shadows(shown); }
   void Wheel(float notches) noexcept { camera_.Wheel(notches); }
+  // Le clic droit glissé et le double clic droit : voir `ArenaCamera::Orbit`.
+  void Orbit(float dx_px) noexcept { camera_.Orbit(dx_px); }
+  void ResetYaw() noexcept { camera_.ResetYaw(); }
   void SetQuake(bool enabled) noexcept { camera_.set_quake_enabled(enabled); }
 
   // LA CHAUFFE derrière l'écran de chargement : voir `ArenaScene::Warm`.
@@ -130,7 +133,8 @@ class ArenaSession {
   [[nodiscard]] std::optional<glm::vec2> ScreenOf(glm::vec3 world, float viewport_width,
                                                   float viewport_height) const;
   // LE POINT DU SOL VISÉ PAR LA SOURIS, en sous-unités de la simulation, sur
-  // le sol plat du héros : seul le cap compte, et la caméra est figée au nord.
+  // le plan du sol sous le héros et ses voisines de l'est et du nord, à tout
+  // lacet (`GroundCellsUnder`).
   [[nodiscard]] std::optional<ro::sim::FieldPoint> FieldPointUnder(glm::vec2 screen,
                                                                    ro::sim::FieldPoint hero,
                                                                    float viewport_width,
