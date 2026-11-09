@@ -6150,13 +6150,13 @@ achievements:
     dependents: []
     window:
       summary: "Roggle"
-      details: "Déclencher trois pouvoirs dans une partie de Roggle."
+      details: "Déclencher les deux pouvoirs d'un plateau de Roggle."
       gauge: bullets
       group: "ADVENTURE"
       major: 6
       minor: 1
       objectives:
-        - {text: "Trois pouvoirs"}
+        - {text: "Deux pouvoirs"}
   910031:
     name: "Defi releve"
     score: 20

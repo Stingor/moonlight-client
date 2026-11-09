@@ -60,7 +60,7 @@ enum class MinigameTrophy : std::uint8_t {
   kSurvivorsIceWall,
   kSurvivorsCrimsonRock,
   kSurvivorsJackFrost,
-  kRoggleThreePowers,
+  kRoggleBothPowers,
   kRoggleDailyWon,
   kRoggleBigShot,
   kRoggleFreeBall,

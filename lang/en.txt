@@ -488,8 +488,8 @@ tr: Spirit bursts strike where monsters crowd together.
 fr: Du sable jeté devant vous aveugle la horde.
 tr: Sand thrown ahead of you blinds the horde.
 
-fr: Déclencher trois pouvoirs dans une partie de Roggle.
-tr: Trigger three powers in a game of Roggle.
+fr: Déclencher les deux pouvoirs d'un plateau de Roggle.
+tr: Trigger both powers of a Roggle board.
 
 fr: Défi du jour
 tr: Daily challenge

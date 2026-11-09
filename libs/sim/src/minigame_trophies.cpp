@@ -18,7 +18,7 @@ constexpr int kRojeweledLongCombo = 4;
 constexpr int kRoggleCatches = 3;
 constexpr int kRoggleSpareBalls = 5;
 constexpr int kRoggleHighScore = 20000;
-constexpr int kRogglePowers = 3;
+constexpr int kRogglePowers = 2;
 constexpr int kRoggleBigShot = 10000;
 constexpr std::size_t kRoggleManyItems = 10;
 constexpr std::size_t kRoggleMostItems = 25;
@@ -87,8 +87,8 @@ constexpr std::array<MinigameTrophyText, kMinigameTrophyCount> kTrophies = {{
      core::TrText("Obtenir Crimson Rock dans une partie de Survivants de Midgard.")},
     {MinigameTrophy::kSurvivorsJackFrost, "survivors_jack_frost", core::TrText("Givre"),
      core::TrText("Obtenir Jack Frost, l'union de Water Ball et de Cold Bolt.")},
-    {MinigameTrophy::kRoggleThreePowers, "roggle_three_powers", core::TrText("Arsenal"),
-     core::TrText("Déclencher trois pouvoirs dans une partie de Roggle.")},
+    {MinigameTrophy::kRoggleBothPowers, "roggle_both_powers", core::TrText("Arsenal"),
+     core::TrText("Déclencher les deux pouvoirs d'un plateau de Roggle.")},
     {MinigameTrophy::kRoggleDailyWon, "roggle_daily_won", core::TrText("Défi relevé"),
      core::TrText("Gagner le défi du jour de Roggle.")},
     {MinigameTrophy::kRoggleBigShot, "roggle_big_shot", core::TrText("Coup d'éclat"),
@@ -224,8 +224,8 @@ std::vector<MinigameTrophy> RecordRoggle(MinigameRecord& record, const PegGame& 
                      fresh);
   EarnMinigameTrophy(record, MinigameTrophy::kRoggleScore20000, game.score() >= kRoggleHighScore,
                      fresh);
-  EarnMinigameTrophy(record, MinigameTrophy::kRoggleThreePowers,
-                     game.powers_used() >= kRogglePowers, fresh);
+  EarnMinigameTrophy(record, MinigameTrophy::kRoggleBothPowers, game.powers_used() >= kRogglePowers,
+                     fresh);
   EarnMinigameTrophy(record, MinigameTrophy::kRoggleDailyWon, won && game.daily(), fresh);
   EarnMinigameTrophy(record, MinigameTrophy::kRoggleBigShot, game.best_shot() >= kRoggleBigShot,
                      fresh);

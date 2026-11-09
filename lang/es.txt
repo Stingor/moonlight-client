@@ -488,8 +488,8 @@ tr: Estallidos de espíritu golpean donde se agolpan los monstruos.
 fr: Du sable jeté devant vous aveugle la horde.
 tr: Arena lanzada ante ti ciega a la horda.
 
-fr: Déclencher trois pouvoirs dans une partie de Roggle.
-tr: Activa tres poderes en una partida de Roggle.
+fr: Déclencher les deux pouvoirs d'un plateau de Roggle.
+tr: Activa los dos poderes de un tablero de Roggle.
 
 fr: Défi du jour
 tr: Reto del día
