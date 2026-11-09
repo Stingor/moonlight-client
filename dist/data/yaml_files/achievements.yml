@@ -2904,7 +2904,7 @@ achievements:
   128032:
     name: "Haggard sucker"
     score: 10
-    targets: []
+    targets: [[0, 1]]
     reward: {item: 0, title: 0, script: false}
     dependents: []
     window:
@@ -2919,7 +2919,7 @@ achievements:
   128033:
     name: "Hope of the Knight"
     score: 20
-    targets: []
+    targets: [[0, 10]]
     reward: {item: 0, title: 0, script: false}
     dependents: []
     window:
@@ -2934,7 +2934,7 @@ achievements:
   128034:
     name: "Guardian of the Dawn"
     score: 50
-    targets: []
+    targets: [[0, 50]]
     reward: {item: 0, title: 0, script: false}
     dependents: []
     window:
