@@ -114696,6 +114696,12 @@ Body:
     Sell: 2500
     Weight: 20
     Flags: {BuyingStore: true}
+  - Id: 25739
+    AegisName: GH_Cursed_Crystal
+    Name: Curse Eroded Crystal
+  - Id: 25740
+    AegisName: GH_Cursed_Gemstone
+    Name: Curse Eroded Gemstone
   - Id: 25759
     AegisName: Dragenergy_Green
     Name: Green Dragon Orb
@@ -120648,6 +120654,62 @@ Body:
     SubType: Enchant
     Script: |
       bonus bCritical,10;
+  - Id: 29302
+    AegisName: Armor_Water
+    Name: Water Element(Armor)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDefEle,Ele_Water;
+  - Id: 29303
+    AegisName: Armor_Wind
+    Name: Wind Element(Armor)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDefEle,Ele_Wind;
+  - Id: 29304
+    AegisName: Armor_Ground
+    Name: Earth Element(Armor)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDefEle,Ele_Earth;
+  - Id: 29305
+    AegisName: Armor_Fire
+    Name: Fire Element(Armor)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDefEle,Ele_Fire;
+  - Id: 29306
+    AegisName: Armor_Darkness
+    Name: Shadow Element(Armor)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDefEle,Ele_Dark;
+  - Id: 29307
+    AegisName: Armor_Saint
+    Name: Holy Element(Armor)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDefEle,Ele_Holy;
+  - Id: 29308
+    AegisName: Armor_Undead
+    Name: Undead Element(Armor)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDefEle,Ele_Undead;
+  - Id: 29309
+    AegisName: Armor_Poison
+    Name: Poison Element(Armor)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDefEle,Ele_Poison;
   - Id: 29310
     AegisName: Racing_RK_1
     Name: Racing(Rune Knight) 1Lv
@@ -121321,6 +121383,36 @@ Body:
     SubType: Enchant
     Buy: 20
     Sell: 10
+  - Id: 29587
+    AegisName: Gh_md_agi
+    Name: Flash
+    Type: Card
+    SubType: Enchant
+  - Id: 29588
+    AegisName: Gh_md_str
+    Name: Power
+    Type: Card
+    SubType: Enchant
+  - Id: 29589
+    AegisName: Gh_md_dex
+    Name: Celestial
+    Type: Card
+    SubType: Enchant
+  - Id: 29590
+    AegisName: Gh_md_int
+    Name: Divine Power
+    Type: Card
+    SubType: Enchant
+  - Id: 29591
+    AegisName: Gh_md_vit
+    Name: Rigid Body
+    Type: Card
+    SubType: Enchant
+  - Id: 29592
+    AegisName: Gh_md_luk
+    Name: Hundred Lucks
+    Type: Card
+    SubType: Enchant
   - Id: 29594
     AegisName: Seyren_Memory
     Name: Seyren's Memory
