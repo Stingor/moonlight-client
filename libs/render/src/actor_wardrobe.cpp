@@ -327,23 +327,14 @@ ActorOutfit* ActorWardrobe::OutfitFor(const ActorLook& look) {
 std::vector<ActorPiece> ActorWardrobe::Dress(const ActorLook& look) {
   std::vector<ActorPiece> pieces;
   for (const ActorPieceFiles& files : ActorFiles(catalog_, look)) {
-    const LoadedActorSprite* loaded = nullptr;
-    for (std::size_t rank = 0; rank < files.candidates.size() && loaded == nullptr; ++rank) {
-      const std::string& sprite_path = files.candidates[rank];
-      const std::string& animation_path =
-          files.animation_path.empty() ? sprite_path : files.animation_path;
-      // Une pièce facultative — ce que les mains tiennent, la cape — manque
-      // sans un mot, comme chez le client, qui la sonde.
-      loaded = Sprite(sprite_path, animation_path,
-                      !files.optional && rank + 1 == files.candidates.size());
-    }
+    // Une pièce facultative — ce que les mains tiennent, la cape — manque sans
+    // un mot, comme chez le client, qui la sonde.
+    const LoadedActorSprite* loaded =
+        FirstLoaded(files.candidates, files.animation_path, !files.optional).loaded;
     // UN .ACT DE REMPLACEMENT ABSENT NE COÛTE PAS LE CORPS : il reprend son
     // propre .act. L'accessoire d'un pet disparaît, pas le pet.
     if (loaded == nullptr && files.part == ActorPart::kBody && !files.animation_path.empty()) {
-      for (std::size_t rank = 0; rank < files.candidates.size() && loaded == nullptr; ++rank) {
-        loaded = Sprite(files.candidates[rank], files.candidates[rank],
-                        rank + 1 == files.candidates.size());
-      }
+      loaded = FirstLoaded(files.candidates, {}, true).loaded;
     }
     if (loaded == nullptr) {
       // Sans corps, rien ne s'ancre : l'acteur ne se montre pas. Une pièce
@@ -360,19 +351,18 @@ std::vector<ActorPiece> ActorWardrobe::Dress(const ActorLook& look) {
     // et les index n'ont aucune signification commune d'une pièce à l'autre.
     // Pas davantage d'un corps à l'autre : l'habit du GM garde ses couleurs.
     if (files.part == ActorPart::kBody && look.style != 0 && !(look.player && look.gm_outfit)) {
-      if (const StyledPalette* styled = StylePalette(look, *loaded, palette)) {
+      if (const ActorPalettes::StyledPalette* styled =
+              actor_palettes_.StyledFor(look.style, loaded->sprite, palette)) {
         palette = &styled->palette;
         palette_serial = styled->serial;
       }
     }
-    // LE CORPS GARDE LES COULEURS QUE SA PALETTE NE DÉFINIT PAS : un corps peut employer des
-    // index qu'elle laisse vides, et il sortirait noir (`MergeServerPalette`).
-    if (files.part == ActorPart::kBody && palette != nullptr && palette_serial == 0 &&
-        loaded->sprite.palette().has_value()) {
-      palette = &merged_body_palettes_
-                     .try_emplace(std::pair{loaded, palette},
-                                  MergeServerPalette(*loaded->sprite.palette(), palette))
-                     .first->second;
+    // UNE PIÈCE GARDE LES COULEURS QUE SA PALETTE OFFICIELLE NE DÉFINIT PAS, le
+    // corps sous sa teinte de vêtement comme la tête sous sa couleur de
+    // cheveux : l'une et l'autre laissent vides des index que certains sprites
+    // emploient, et qui sortiraient noirs (`MergeServerPalette`).
+    if (palette != nullptr && palette_serial == 0 && loaded->sprite.palette().has_value()) {
+      palette = &actor_palettes_.Base(loaded->sprite, palette);
     }
     pieces.push_back(DescribeActorPiece(*loaded, files.part, palette));
     pieces.back().palette_serial = palette_serial;
@@ -388,15 +378,8 @@ void ActorWardrobe::SplitDualWield(const ActorLook& look, std::vector<ActorPiece
   }
   // Le premier candidat qui se charge, comme pour toute pièce tenue : une arme
   // absente de l'installation manque sans un mot.
-  const auto first_loaded = [this](const std::vector<std::string>& candidates) {
-    const LoadedActorSprite* loaded = nullptr;
-    for (std::size_t rank = 0; rank < candidates.size() && loaded == nullptr; ++rank) {
-      loaded = Sprite(candidates[rank], candidates[rank], false);
-    }
-    return loaded;
-  };
-  const LoadedActorSprite* off_hand = first_loaded(dual->off_hand);
-  const LoadedActorSprite* main_hand = first_loaded(dual->main_hand);
+  const LoadedActorSprite* off_hand = FirstLoaded(dual->off_hand, {}, false).loaded;
+  const LoadedActorSprite* main_hand = FirstLoaded(dual->main_hand, {}, false).loaded;
   // DEUX MAINS SOUS LE MÊME SPRITE se dessineraient l'une sur l'autre, au même
   // ancrage : on n'en verrait qu'une. La pièce du couple, qui place chaque
   // main, vaut mieux, et reste.
@@ -447,80 +430,77 @@ const LoadedActorSprite* ActorWardrobe::Sprite(const std::string& sprite_path,
   return &inserted.first->second;
 }
 
-std::uint32_t ActorWardrobe::BodyKeyFor(const ActorLook& look) {
-  // ⚠ LA MÊME RÈGLE QUE `Dress` : le premier candidat qui se charge gagne, et
-  // le corps n'a pas d'animation à part. Les deux boucles doivent rester
-  // d'accord, sans quoi la clé désignerait un autre corps que celui qu'on
-  // dessine.
-  for (const std::string& path : BodySpritePaths(catalog_, look)) {
-    if (Sprite(path, path, false) != nullptr) {
-      return BodySpriteKey(path);
+ActorWardrobe::FirstFound ActorWardrobe::FirstLoaded(std::span<const std::string> candidates,
+                                                     const std::string& animation_path,
+                                                     bool note_absence) {
+  for (std::size_t rank = 0; rank < candidates.size(); ++rank) {
+    const std::string& sprite_path = candidates[rank];
+    if (const LoadedActorSprite* loaded =
+            Sprite(sprite_path, animation_path.empty() ? sprite_path : animation_path,
+                   note_absence && rank + 1 == candidates.size())) {
+      return FirstFound{loaded, rank};
     }
   }
-  return 0;
+  return {};
+}
+
+ActorWardrobe::LoadedBodySprite ActorWardrobe::LoadedBody(const ActorLook& look) {
+  // Le corps n'a pas d'animation à part : un `.act` de remplacement est
+  // l'affaire de `Dress`, et il ne change pas quel `.spr` se charge.
+  std::vector<std::string> candidates = BodySpritePaths(catalog_, look);
+  const FirstFound found = FirstLoaded(candidates, {}, false);
+  if (found.loaded == nullptr) {
+    return {};
+  }
+  return LoadedBodySprite{found.loaded, std::move(candidates[found.rank])};
+}
+
+std::uint32_t ActorWardrobe::BodyKeyFor(const ActorLook& look) {
+  const LoadedBodySprite body = LoadedBody(look);
+  if (body.loaded == nullptr) {
+    return 0;
+  }
+  const auto [found, fresh] = body_keys_.try_emplace(body.loaded, 0U);
+  if (fresh) {
+    found->second = BodySpriteKey(body.path);
+  }
+  return found->second;
 }
 
 bool ActorWardrobe::SetStyle(std::uint32_t style, const PaletteRecipe& recipe) {
-  // ⚠ NI UN IDENTIFIANT TENU PAR UNE PALETTE TOUTE FAITE : elles passent avant
-  // les recettes, et l'acteur porterait celle d'un autre.
-  if (style == 0 || raw_styles_.contains(style)) {
-    return false;
-  }
   // ⚠ REFUSÉ PLUTÔT QUE REMPLACÉ : voir l'en-tête. Ce qui est déjà dessiné
   // retient l'adresse de sa palette, et la réécrire sous le même pointeur
   // laisserait des textures d'hier jusqu'à la prochaine éviction.
-  return styles_.emplace(style, recipe).second;
+  return actor_palettes_.SetRecipe(style, recipe);
 }
 
 bool ActorWardrobe::SetStylePalette(std::uint32_t style, formats::Palette palette) {
-  if (style == 0 || styles_.contains(style)) {
-    return false;
-  }
-  return raw_styles_.emplace(style, StyledPalette{std::move(palette), ++last_palette_serial_})
-      .second;
+  return actor_palettes_.SetPalette(style, std::move(palette));
 }
 
 void ActorWardrobe::ForgetStyle(std::uint32_t style) {
-  // ⚠ LES DEUX TABLES, SANS COURT-CIRCUIT : un `||` s'arrêterait à la première.
-  const bool recipe_known = styles_.erase(style) != 0;
-  const bool palette_known = raw_styles_.erase(style) != 0;
-  if (!recipe_known && !palette_known) {
+  if (!actor_palettes_.Knows(style)) {
     return;
   }
   // Les tenues D'ABORD : elles pointent dans les palettes, et l'ordre inverse
   // laisserait une tenue vivante sur une palette détruite le temps d'une ligne.
   std::erase_if(outfits_, [style](const auto& entry) { return entry.first.style == style; });
-  std::erase_if(style_palettes_, [style](const auto& entry) { return entry.first.style == style; });
+  actor_palettes_.Forget(style);
 }
 
 ActorWardrobe::BodyRamps ActorWardrobe::BodyRampsFor(const ActorLook& look) {
   BodyRamps found;
-  // ⚠ LA MÊME RÈGLE QUE `Dress` : le premier candidat qui se charge gagne.
-  const LoadedActorSprite* body = nullptr;
-  for (const std::string& path : BodySpritePaths(catalog_, look)) {
-    body = Sprite(path, path, false);
-    if (body != nullptr) {
-      break;
-    }
-  }
-  if (body == nullptr || !body->sprite.palette().has_value()) {
+  const LoadedBodySprite body = LoadedBody(look);
+  if (body.loaded == nullptr || !body.loaded->sprite.palette().has_value()) {
     return found;
   }
   const std::string palette_path = BodyPalettePath(look);
   const formats::Palette* official = palette_path.empty() ? nullptr : Palette(palette_path);
-  found.base = MergeServerPalette(*body->sprite.palette(), official);
-  const std::array<int, formats::kPaletteEntryCount> usage = CountIndexUsage(body->sprite);
-  found.ramps = DetectRamps(found.base, usage);
-  for (const int used : usage) {
-    found.pixels_total += used;
-  }
-  for (const PaletteRamp& ramp : found.ramps) {
-    const std::size_t end = std::min<std::size_t>(
-        static_cast<std::size_t>(ramp.start) + ramp.length, formats::kPaletteEntryCount);
-    for (std::size_t index = ramp.start; index < end; ++index) {
-      found.pixels_covered += usage[index];
-    }
-  }
+  const ActorPalettes::Analysis& analysis = actor_palettes_.Analyze(body.loaded->sprite, official);
+  found.base = *analysis.base;
+  found.ramps = analysis.ramps;
+  found.pixels_total = analysis.pixels_total;
+  found.pixels_covered = analysis.pixels_covered;
   return found;
 }
 
@@ -547,26 +527,20 @@ ActorOutfit* ActorWardrobe::HeadOnly(const ActorLook& look) {
   }
   const std::string palette_path = HairPalettePath(key);
   const formats::Palette* palette = palette_path.empty() ? nullptr : Palette(palette_path);
+  if (palette != nullptr && head->sprite.palette().has_value()) {
+    palette = &sample_palettes_.Base(head->sprite, palette);
+  }
   std::vector<ActorPiece> pieces;
   pieces.push_back(DescribeActorPiece(*head, ActorPart::kHead, palette));
   return &heads_.emplace(key, ActorOutfit(std::move(pieces))).first->second;
 }
 
 ActorOutfit* ActorWardrobe::BodySwatch(const ActorLook& look, std::int16_t palette) {
-  // ⚠ LA MÊME RÈGLE QUE `Dress` : le premier candidat qui se charge gagne.
-  const LoadedActorSprite* body = nullptr;
-  std::string path;
-  for (const std::string& candidate : BodySpritePaths(catalog_, look)) {
-    body = Sprite(candidate, candidate, false);
-    if (body != nullptr) {
-      path = candidate;
-      break;
-    }
-  }
-  if (body == nullptr || !body->sprite.palette().has_value()) {
+  const LoadedBodySprite body = LoadedBody(look);
+  if (body.loaded == nullptr || !body.loaded->sprite.palette().has_value()) {
     return nullptr;
   }
-  const std::pair<std::string, std::int16_t> key{path, palette};
+  const std::pair<std::string, std::int16_t> key{body.path, palette};
   if (const auto found = swatches_.find(key); found != swatches_.end()) {
     return &found->second;
   }
@@ -584,42 +558,17 @@ ActorOutfit* ActorWardrobe::BodySwatch(const ActorLook& look, std::int16_t palet
     // dit la vérité.
     return nullptr;
   }
-  const formats::Palette& merged =
-      swatch_palettes_.emplace(key, MergeServerPalette(*body->sprite.palette(), official))
-          .first->second;
   std::vector<ActorPiece> pieces;
-  pieces.push_back(DescribeActorPiece(*body, ActorPart::kBody, &merged));
+  pieces.push_back(DescribeActorPiece(*body.loaded, ActorPart::kBody,
+                                      &sample_palettes_.Base(body.loaded->sprite, official)));
   return &swatches_.emplace(key, ActorOutfit(std::move(pieces))).first->second;
 }
 
-const ActorWardrobe::StyledPalette* ActorWardrobe::StylePalette(const ActorLook& look,
-                                                                const LoadedActorSprite& body,
-                                                                const formats::Palette* official) {
-  // ⚠ LES PALETTES TOUTES FAITES D'ABORD : l'appelant a déjà fusionné et peint,
-  // et rien de ce qui suit n'aurait de sens sur elles.
-  if (const auto raw = raw_styles_.find(look.style); raw != raw_styles_.end()) {
-    return &raw->second;
-  }
-  if (const auto found = style_palettes_.find(look); found != style_palettes_.end()) {
-    return &found->second;
-  }
-  const auto recipe = styles_.find(look.style);
-  // Un style qu'on ne connaît pas laisse l'apparence NATIVE. Cela arrive pour
-  // de bon : le lot du serveur peut décrire un joueur dont le corps n'est pas
-  // encore chargé, et la recette arrive alors avant ce qu'elle repeint.
-  if (recipe == styles_.end() || !body.sprite.palette().has_value()) {
-    return nullptr;
-  }
-  // ⚠ LA DÉTECTION SE FAIT SUR LA BASE FUSIONNÉE, jamais sur le sprite nu :
-  // c'est l'ordre de la référence, et les frontières des rampes ne sont pas les
-  // mêmes des deux côtés de la fusion. Voir l'ADR 0050.
-  const formats::Palette base = MergeServerPalette(*body.sprite.palette(), official);
-  const std::array<int, formats::kPaletteEntryCount> usage = CountIndexUsage(body.sprite);
-  const std::vector<PaletteRamp> ramps = DetectRamps(base, usage);
-  return &style_palettes_
-              .emplace(look, StyledPalette{ApplyRecipe(base, ramps, recipe->second),
-                                           ++last_palette_serial_})
-              .first->second;
+void ActorWardrobe::ForgetSamples() {
+  // Les tenues D'ABORD : elles pointent dans les palettes.
+  heads_.clear();
+  swatches_.clear();
+  sample_palettes_ = ActorPalettes();
 }
 
 const formats::Palette* ActorWardrobe::Palette(const std::string& path) {

@@ -13,6 +13,7 @@
 
 #include "ro/formats/palette.h"
 #include "ro/render/actor_layers.h"
+#include "ro/render/actor_palettes.h"
 #include "ro/render/actor_sprite.h"
 #include "ro/render/palette_ramps.h"
 #include "ro/render/sprite_catalog.h"
@@ -189,18 +190,9 @@ class ActorWardrobe {
   //
   // Une recette ne dit que des décalages par rampe ; la garde-robe la
   // transforme en palette, parce qu'elle seule tient le sprite du corps et la
-  // palette de vêtement sur lesquels elle s'applique. Voir
-  // `ro/render/palette_ramps.h`.
+  // palette de vêtement sur lesquels elle s'applique. Le calcul vit dans
+  // `ro/render/palette_ramps.h`, et ses caches dans `ro/render/actor_palettes.h`.
 
-  // Enregistre une recette sous cet identifiant, que `ActorLook::style`
-  // reprendra. Rend faux si l'identifiant est nul ou DÉJÀ PRIS.
-  //
-  // 🔴 UNE RECETTE NE SE REMPLACE JAMAIS EN PLACE, et le refus est la règle
-  // elle-même. Une tenue déjà composée retient l'ADRESSE de sa palette dans la
-  // provenance de chacun de ses calques, et c'est cette provenance qui sert de
-  // clé aux textures : repeindre les octets sous le même pointeur ne se
-  // verrait pas, puis la couleur basculerait toute seule à la première
-  // éviction. Chaque version d'une recette prend donc un identifiant NEUF.
   // LA CLÉ DU CORPS de cette apparence : celle du `.spr` réellement CHARGÉ.
   //
   // 🔴 CELLE DU CHEMIN PRÉVU NE SUFFIRAIT PAS. Une tenue alternative absente de
@@ -214,6 +206,9 @@ class ActorWardrobe {
   // ⚠ ELLE NE DÉPEND PAS DU STYLE, et c'est ce qui permet de la demander
   // AVANT d'en choisir un : la recette change la palette du corps, jamais quel
   // corps on porte.
+  //
+  // ⚠ ELLE SE DEMANDE À CHAQUE IMAGE pour chaque joueur stylé, et se calcule
+  // donc une fois par sprite : le condensé passe par le CP949 du chemin.
   [[nodiscard]] std::uint32_t BodyKeyFor(const ActorLook& look);
 
   // CE QU'IL Y A À RÉGLER SUR CE CORPS : sa base, et ses rampes.
@@ -242,6 +237,19 @@ class ActorWardrobe {
   };
   [[nodiscard]] BodyRamps BodyRampsFor(const ActorLook& look);
 
+  // Enregistre une recette sous cet identifiant, que `ActorLook::style`
+  // reprendra. Rend faux si l'identifiant est nul ou DÉJÀ PRIS.
+  //
+  // 🔴 UNE RECETTE NE SE REMPLACE JAMAIS EN PLACE, et le refus est la règle
+  // elle-même. Une tenue déjà composée retient l'ADRESSE de sa palette dans la
+  // provenance de chacun de ses calques, et c'est cette provenance qui sert de
+  // clé aux textures : repeindre les octets sous le même pointeur ne se
+  // verrait pas, puis la couleur basculerait toute seule à la première
+  // éviction. Chaque version d'une recette prend donc un identifiant NEUF.
+  //
+  // ⚠ LA PALETTE QU'ELLE PEINT DÉPEND DU STYLE, DU CORPS ET DE SA TEINTE, et
+  // de rien d'autre : deux apparences qui ne diffèrent que par l'équipement la
+  // partagent, et les images du corps gardent leurs textures.
   bool SetStyle(std::uint32_t style, const PaletteRecipe& recipe);
 
   // UN IDENTIFIANT DE STYLE NEUF, jamais distribué ni réemployé : un identifiant
@@ -252,7 +260,7 @@ class ActorWardrobe {
   // d'un style reçu et les styles des joueurs y posent tous les leurs : trois
   // compteurs partis de zéro se rencontreraient, et un joueur porterait la
   // palette de l'éditeur.
-  [[nodiscard]] std::uint32_t NewStyleId() noexcept { return ++last_style_id_; }
+  [[nodiscard]] std::uint32_t NewStyleId() noexcept { return actor_palettes_.NewStyleId(); }
 
   // LA MÊME CHOSE, MAIS LA PALETTE TOUTE FAITE.
   //
@@ -272,6 +280,17 @@ class ActorWardrobe {
   // entre deux images, jamais au milieu d'une composition.
   void ForgetStyle(std::uint32_t style);
 
+  // LES NUMÉROS DE SÉRIE DES PALETTES QUE `ForgetStyle` A DÉTRUITES depuis le
+  // dernier appel.
+  //
+  // 🔴 À EFFACER DES CACHES DE TEXTURES qui dessinent les acteurs. Leurs clés
+  // portent l'adresse d'une palette morte, que plus rien ne redemandera : sans
+  // cela, chaque style changé laisserait ses textures en mémoire vidéo jusqu'au
+  // changement de carte.
+  [[nodiscard]] std::vector<std::uint32_t> TakeRetiredPaletteSerials() {
+    return actor_palettes_.TakeRetiredSerials();
+  }
+
   // ── LES VIGNETTES D'UN CHOIX : UNE SEULE PIÈCE, EN GRAND ────────────────
   //
   // 🔴 UNE SILHOUETTE ENTIÈRE NE RÉPOND PAS À LA QUESTION POSÉE. Une case de
@@ -279,13 +298,17 @@ class ActorWardrobe {
   // et l'on choisit alors une coiffure qu'on ne voit pas. Le client lui-même
   // ne montre que la TÊTE dans sa fenêtre de guilde, pour cette raison.
   //
-  // ⚠ ELLES SE DEMANDENT PAR APPARENCE, comme une tenue, et vivent aussi
-  // longtemps que la garde-robe : une grille en ouvre quelques dizaines, pas
-  // des milliers.
+  // ⚠ ELLES SE DEMANDENT PAR APPARENCE, comme une tenue, et vivent jusqu'à
+  // `ForgetSamples` : une grille ouverte en compose des centaines, chacune
+  // avec sa palette fusionnée.
 
   // LA TÊTE SEULE : la coupe de `look.hair`, dans la teinte de
   // `look.hair_palette`. Nulle si l'installation n'a pas ce sprite — et une
   // case vide est la bonne réponse : tous les numéros n'existent pas.
+  //
+  // ⚠ FUSIONNÉE COMME CELLE D'UN ACTEUR : une palette de cheveux laisse vides
+  // des index que certaines têtes emploient, et la vignette montrerait sinon
+  // des cheveux troués de noir.
   [[nodiscard]] ActorOutfit* HeadOnly(const ActorLook& look);
 
   // LE CORPS SEUL, peint de la teinte de vêtement officielle demandée.
@@ -299,6 +322,17 @@ class ActorWardrobe {
   // ⚠ ELLE IGNORE `look.body_palette` ET `look.style` : c'est `palette`
   // qu'elle montre, et une vignette n'est pas ce qu'on porte.
   [[nodiscard]] ActorOutfit* BodySwatch(const ActorLook& look, std::int16_t palette);
+
+  // Rend les vignettes, leurs tenues et leurs palettes fusionnées.
+  //
+  // ⚠ ELLE INVALIDE LES `ActorOutfit*` QUE `HeadOnly` ET `BodySwatch` ONT
+  // RENDUS : à appeler à la fermeture d'une grille, entre deux images. Une
+  // vignette déjà composée n'en dépend plus, elle.
+  void ForgetSamples();
+  // Combien de vignettes la garde-robe tient en ce moment, têtes et corps.
+  [[nodiscard]] std::size_t sample_count() const noexcept {
+    return heads_.size() + swatches_.size();
+  }
 
   [[nodiscard]] const SpriteCatalog& catalog() const noexcept { return catalog_; }
   // LA TAILLE ET LES EFFETS QUE L'INSTALLATION DONNE D'OFFICE à certaines
@@ -324,18 +358,27 @@ class ActorWardrobe {
                                                 const std::string& animation_path,
                                                 bool note_absence);
   [[nodiscard]] const formats::Palette* Palette(const std::string& path);
-  // Une palette de style et son numéro de série : voir
-  // `SpriteImageKey::palette_serial`.
-  struct StyledPalette {
-    formats::Palette palette;
-    std::uint32_t serial = 0;
+
+  // LE PREMIER CANDIDAT QUI SE CHARGE GAGNE, et son rang dans la liste. Une
+  // `animation_path` vide donne à chaque candidat son propre `.act`.
+  //
+  // ⚠ L'ABSENCE NE SE NOTE QU'AU DERNIER, et seulement si l'appelant le
+  // demande : un chemin essayé avant un autre n'en est pas une.
+  struct FirstFound {
+    const LoadedActorSprite* loaded = nullptr;
+    std::size_t rank = 0;
   };
-  // La palette d'un corps STYLÉ, calculée une fois par apparence. Nulle quand
-  // le style est inconnu — l'acteur garde alors son apparence native, ce qui
-  // vaut mieux qu'un personnage qui disparaît.
-  [[nodiscard]] const StyledPalette* StylePalette(const ActorLook& look,
-                                                  const LoadedActorSprite& body,
-                                                  const formats::Palette* official);
+  [[nodiscard]] FirstFound FirstLoaded(std::span<const std::string> candidates,
+                                       const std::string& animation_path, bool note_absence);
+  // LE CORPS QU'UNE APPARENCE PORTE VRAIMENT, et le chemin qui l'a chargé.
+  //
+  // 🔴 LA MÊME RÈGLE QUE `Dress`, et ici seulement : la clé du corps, ses
+  // rampes et ses vignettes doivent désigner le corps qu'on dessine.
+  struct LoadedBodySprite {
+    const LoadedActorSprite* loaded = nullptr;
+    std::string path;
+  };
+  [[nodiscard]] LoadedBodySprite LoadedBody(const ActorLook& look);
   [[nodiscard]] std::vector<ActorPiece> Dress(const ActorLook& look);
   // Rend à chaque arme d'un ambidextre le sprite de son objet, à la place de
   // la pièce unique du couple. Voir DualWieldSpritePaths.
@@ -350,31 +393,18 @@ class ActorWardrobe {
   std::map<ActorLook, ActorOutfit, ActorLookOrder> outfits_;
   std::set<SpritePaths> failed_sprites_;
   std::set<std::string> failed_palettes_;
-  // Les recettes connues, et les palettes qu'elles ont produites. ⚠ DES
-  // `std::map` COMME LES AUTRES : leurs nœuds ne bougent pas, et les pièces
-  // pointent dedans.
-  std::map<std::uint32_t, PaletteRecipe> styles_;
-  // Les palettes toutes faites, par identifiant. ⚠ CONSULTÉES AVANT les
-  // recettes : une palette posée par l'appelant n'a rien à recalculer.
-  std::map<std::uint32_t, StyledPalette> raw_styles_;
-  std::map<ActorLook, StyledPalette, ActorLookOrder> style_palettes_;
-  // Le dernier numéro de série donné à une palette de style. Il ne fait que
-  // croître : c'est ce qui le rend sûr là où l'adresse ne l'est pas.
-  std::uint32_t last_palette_serial_ = 0;
-  // Le dernier identifiant de style distribué — voir `NewStyleId`.
-  std::uint32_t last_style_id_ = 0;
+  // La clé de chaque corps déjà demandée, par sprite chargé : voir `BodyKeyFor`.
+  std::map<const LoadedActorSprite*, std::uint32_t> body_keys_;
+  // Les palettes des acteurs : fusions, analyses, et ce que les styles peignent.
+  ActorPalettes actor_palettes_;
   // Les vignettes d'un choix. ⚠ À PART DES TENUES : ce ne sont pas des
   // apparences mais des ÉCHANTILLONS, et les mêler ferait qu'oublier un style
   // emporterait des vignettes qui ne portent aucun style.
   std::map<ActorLook, ActorOutfit, ActorLookOrder> heads_;
   std::map<std::pair<std::string, std::int16_t>, ActorOutfit> swatches_;
-  // La fusion d'une teinte officielle sur un corps, gardée ici parce que les
-  // pièces des vignettes en retiennent l'ADRESSE.
-  std::map<std::pair<std::string, std::int16_t>, formats::Palette> swatch_palettes_;
-  // La palette d'un corps, complétée par celle de son sprite ; ses adresses sont stables, et
-  // celles de ses clés aussi, le sprite et la palette de serveur restant chargés.
-  std::map<std::pair<const LoadedActorSprite*, const formats::Palette*>, formats::Palette>
-      merged_body_palettes_;
+  // Leurs palettes fusionnées, À PART de celles des acteurs pour s'en aller
+  // avec elles : une grille de couleurs en fusionne deux cent cinquante.
+  ActorPalettes sample_palettes_;
   std::vector<std::string> missing_;
 };
 

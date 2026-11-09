@@ -340,6 +340,18 @@ void SpriteRenderer::ForgetUnusedTextures() {
   }
 }
 
+void SpriteRenderer::ForgetPaletteSerials(std::span<const std::uint32_t> serials) {
+  if (serials.empty()) {
+    return;
+  }
+  // ⚠ ZÉRO N'EST LA SÉRIE D'AUCUNE PALETTE DE STYLE : c'est celle des palettes
+  // qui vivent aussi longtemps que la garde-robe.
+  std::erase_if(textures_, [serials](const auto& entry) {
+    const std::uint32_t serial = entry.first.palette_serial;
+    return serial != 0 && std::ranges::find(serials, serial) != serials.end();
+  });
+}
+
 void SpriteRenderer::Draw(const Camera& camera, std::span<const DrawnActor> actors,
                           float aspect_ratio, Blending blending, DepthWrite depth_write,
                           DepthTest depth_test, const SceneFog& fog, DrawOrder order,

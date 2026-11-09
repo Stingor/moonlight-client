@@ -303,6 +303,11 @@ class SpriteRenderer {
   // tout seul : il ne sait pas ce que l'appelant dessinera à la frame suivante.
   void ForgetUnusedTextures();
 
+  // Oublie les textures peintes par ces palettes de style, que la garde-robe a
+  // détruites : voir `ActorWardrobe::TakeRetiredPaletteSerials`. Leurs clés
+  // portent une adresse morte, et rien ne les redemandera.
+  void ForgetPaletteSerials(std::span<const std::uint32_t> serials);
+
   [[nodiscard]] std::size_t cached_texture_count() const noexcept { return textures_.size(); }
 
   // LE COMPTE DES LOTS, cumulé depuis la dernière remise à zéro, `Draw` et

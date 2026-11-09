@@ -67,9 +67,13 @@ class ActorThumbnails {
   //   * la composition n'a rien donné.
   [[nodiscard]] const IconTexture& Get(const Cell& cell);
 
-  // Jette tout. ⚠ À LA FERMETURE DE LA GRILLE : les textures d'une grille
-  // refermée ne servent plus à rien, et trois grilles gardées en même temps
-  // tiendraient huit cent quatre-vingt-quatre images.
+  // Jette tout, et rend à la garde-robe les vignettes qu'elle composait : leurs
+  // tenues et leurs palettes fusionnées (`ActorWardrobe::ForgetSamples`).
+  //
+  // ⚠ À LA FERMETURE DE LA GRILLE : les textures d'une grille refermée ne
+  // servent plus à rien, et trois grilles gardées en même temps tiendraient
+  // huit cent quatre-vingt-quatre images. Une autre grille encore ouverte garde
+  // les siennes : une case déjà composée ne dépend plus de la garde-robe.
   //
   // ⚠ ENTRE DEUX IMAGES, jamais au milieu d'un dessin : l'interface tient les
   // identifiants de texture rendus.

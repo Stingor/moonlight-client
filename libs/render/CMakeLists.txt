@@ -79,6 +79,7 @@ add_library(ro_render STATIC
     src/actor_model_motion.cpp
     src/actor_model_pose.cpp
     src/actor_model_scene.cpp
+    src/actor_palettes.cpp
     src/actor_pick.cpp
     src/actor_scale.cpp
     src/actor_sprite.cpp

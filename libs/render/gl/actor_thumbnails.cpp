@@ -88,6 +88,11 @@ const IconTexture& ActorThumbnails::Get(const Cell& cell) {
   return drawn_.emplace(cell, std::move(made)).first->second;
 }
 
-void ActorThumbnails::Clear() { drawn_.clear(); }
+void ActorThumbnails::Clear() {
+  drawn_.clear();
+  if (wardrobe_ != nullptr) {
+    wardrobe_->ForgetSamples();
+  }
+}
 
 }  // namespace ro::render
