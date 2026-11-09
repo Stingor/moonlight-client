@@ -74,8 +74,10 @@ inline constexpr std::uint8_t kEntryRefusalCount = 9;
 // croître pendant une partie ; les drapeaux disent un état en cours, et c'est
 // leur passage à vrai qui alerte.
 struct RealWorldFacts {
-  std::int32_t hp = 0;
-  std::int32_t max_hp = 0;  // le plafond, qui baisse à la fin d'un bonus
+  // Les coups qu'un autre a portés au personnage. Les PV ne disent pas un
+  // coup : un équipement qui draine, un saignement ou la fin d'un bonus les
+  // baissent sans que personne ne frappe.
+  std::uint32_t strikes_taken = 0;
   bool dead = false;
   std::uint32_t map_entries = 0;  // entrées en carte depuis la connexion
   bool trade_offered = false;     // un échange proposé, en attente de réponse
@@ -122,9 +124,7 @@ struct RealWorldReport {
 // LA VEILLE D'UNE PARTIE : le relevé précédent, comparé à chaque image.
 class RealWorldWatch {
  public:
-  // Ce qui a changé de `previous` à `now`. Deux relevés égaux ne disent rien ;
-  // une hausse de PV (régénération, soin) non plus, ni une baisse que celle du
-  // plafond explique.
+  // Ce qui a changé de `previous` à `now`. Deux relevés égaux ne disent rien.
   [[nodiscard]] static RealWorldReport Compare(const RealWorldFacts& previous,
                                                const RealWorldFacts& now);
   // L'entrée dans la partie : le relevé de départ, sans alerte.

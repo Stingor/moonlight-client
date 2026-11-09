@@ -544,7 +544,9 @@ bool World::RecordStrike(const Strike& arrived) {
   // LE COMPTEUR SE NOURRIT ICI, et d'un seul endroit : trois paquets amènent
   // un coup ; une unité au sol est créditée à son lanceur — voir `DamageMeter`.
   damage_meter_.SetSelf(player_id_);
-  const auto author = actors_.find(by_unit ? striking_unit->second.creator_id : strike.attacker);
+  const std::uint32_t author_id = by_unit ? striking_unit->second.creator_id : strike.attacker;
+  if (strike.target == player_id_ && author_id != player_id_) ++strikes_on_player_;
+  const auto author = actors_.find(author_id);
   damage_meter_.NoteStrike(strike, by_unit ? striking_unit->second.creator_id : strike.attacker,
                            by_unit, author != actors_.end() ? &author->second : nullptr,
                            target != actors_.end() ? &target->second : nullptr);

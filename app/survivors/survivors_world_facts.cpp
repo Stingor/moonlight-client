@@ -47,10 +47,7 @@ EntryGuardFacts EntryFactsOf(const ro::sim::World& world, const WorldAside& asid
 RealWorldFacts RealFactsOf(const ro::sim::World& world, const WorldAside& aside,
                            std::uint32_t whispers) {
   RealWorldFacts facts;
-  if (const ro::sim::Actor* player = world.player(); player != nullptr) {
-    facts.hp = player->health;
-    facts.max_hp = player->max_health;
-  }
+  facts.strikes_taken = world.strikes_on_player();
   facts.dead = IsDead(world.player());
   facts.map_entries = world.map_entries();
   facts.trade_offered = aside.trade_offered;

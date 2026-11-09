@@ -233,6 +233,10 @@ class World : public WorldHoldings, public WorldNpcDialog {
   // l'annonce par aucun paquet : voir SetWalkMap.
   bool RecordStrike(const Strike& strike);
   [[nodiscard]] const StrikeLog& strikes() const noexcept { return strikes_; }
+  // Les coups qu'un AUTRE a portés au joueur depuis la connexion, ratés
+  // compris ; ce compteur ne fait que croître. Une perte de PV sans coup
+  // (saignement, équipement qui draine) n'y entre pas.
+  [[nodiscard]] std::uint32_t strikes_on_player() const noexcept { return strikes_on_player_; }
 
   // Note qu'un acteur se baisse pour ramasser. Faux pour un inconnu.
   bool RecordPickup(std::uint32_t id, std::uint32_t since_ms);
@@ -645,6 +649,7 @@ class World : public WorldHoldings, public WorldNpcDialog {
   std::uint32_t devotion_serial_ = 0;
   DamageMeter damage_meter_;
   StrikeLog strikes_;
+  std::uint32_t strikes_on_player_ = 0;
   SupportLog supports_;
   StateArrivalLog state_arrivals_;
   UnseenGroundSkillLog unseen_ground_skills_;

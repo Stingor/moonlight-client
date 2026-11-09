@@ -115,13 +115,8 @@ RealWorldReport RealWorldWatch::Compare(const RealWorldFacts& previous, const Re
   };
   raise_if(previous.link_open && !now.link_open, RealWorldAlert::kLinkLost);
   raise_if(Rose(previous.dead, now.dead), RealWorldAlert::kDied);
-  // Un coup reçu se lit à la BAISSE des PV d'un personnage vivant ; leur
-  // remontée (régénération, soin) ne dit rien. Un plafond qui baisse (fin d'un
-  // bonus de PV max) ramène les PV jusqu'à lui sans que personne ne frappe :
-  // seule une baisse sous le nouveau plafond compte alors.
-  const std::int32_t unhurt_hp =
-      now.max_hp < previous.max_hp ? std::min(previous.hp, now.max_hp) : previous.hp;
-  raise_if(!now.dead && now.hp < unhurt_hp, RealWorldAlert::kHit);
+  // Le coup qui tue ne se dit qu'une fois, par la mort.
+  raise_if(!now.dead && now.strikes_taken > previous.strikes_taken, RealWorldAlert::kHit);
   raise_if(now.map_entries > previous.map_entries, RealWorldAlert::kMoved);
   raise_if(Rose(previous.trade_offered, now.trade_offered), RealWorldAlert::kTrade);
   raise_if(Rose(previous.party_invited, now.party_invited) ||
