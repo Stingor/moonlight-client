@@ -28,7 +28,7 @@ std::uint32_t StyleBook::RevisionOf(std::uint32_t gid) const {
 }
 
 void StyleBook::BeginBatchFor(std::uint32_t gid) {
-  ++revisions_[gid];
+  revisions_[gid] = ++last_revision_;
   StyleVariants& variants = styles_[gid];
   variants.by_body.clear();
   variants.fallback_body = 0;
@@ -42,7 +42,7 @@ void StyleBook::Remember(std::uint32_t gid, std::uint32_t body_key, const StyleR
   if (body_key == 0) {
     return;
   }
-  ++revisions_[gid];
+  revisions_[gid] = ++last_revision_;
   StyleVariants& variants = styles_[gid];
   variants.by_body[body_key] = recipe;
   // La PREMIÈRE variante sert de repli tant qu'aucune n'est marquée : un
@@ -53,8 +53,18 @@ void StyleBook::Remember(std::uint32_t gid, std::uint32_t body_key, const StyleR
 }
 
 void StyleBook::Forget(std::uint32_t gid) {
-  ++revisions_[gid];
+  revisions_[gid] = ++last_revision_;
   styles_.erase(gid);
+}
+
+void StyleBook::ForgetDeparted(std::uint32_t gid) {
+  styles_.erase(gid);
+  revisions_.erase(gid);
+}
+
+void StyleBook::ForgetDepartedExcept(std::uint32_t kept) {
+  std::erase_if(styles_, [kept](const auto& entry) { return entry.first != kept; });
+  std::erase_if(revisions_, [kept](const auto& entry) { return entry.first != kept; });
 }
 
 }  // namespace ro::sim

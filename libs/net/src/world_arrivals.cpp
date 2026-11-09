@@ -28,6 +28,15 @@ constexpr std::uint32_t kAppearedPlayerEffect = 344;  // EF_ENTRY2
   return (actor.option & sim::kOptionInvisible) != 0;
 }
 
+// LES DÉPARTS QUI EMPORTENT LES COULEURS D'UN JOUEUR : sortir de vue, se
+// déconnecter, se téléporter. Le serveur les redit s'il réapparaît ou rentre
+// en vue. Ni la mort, où le corps reste là, ni le rafraîchissement, que le
+// serveur fait suivre d'une réapparition.
+[[nodiscard]] bool TakesColorsAway(std::uint8_t vanish_type) {
+  return vanish_type == kVanishOutOfSight || vanish_type == kVanishLoggedOut ||
+         vanish_type == kVanishTeleported;
+}
+
 void NoteVanishEffect(sim::World& world, std::uint32_t actor_id, std::uint8_t vanish_type,
                       std::uint32_t now_ms) {
   const sim::Actor* leaving = world.Find(actor_id);
@@ -81,6 +90,10 @@ bool ApplyVanish(sim::World& world, std::uint32_t actor_id, std::uint8_t vanish_
   }
   if (vanish_type != kVanishRefreshed) {
     NoteVanishEffect(world, actor_id, vanish_type, now_ms);
+  }
+  // 🔴 JAMAIS LES NÔTRES : le serveur ne les redit pas.
+  if (TakesColorsAway(vanish_type) && actor_id != world.player_id()) {
+    world.styles().ForgetDeparted(actor_id);
   }
   // Retirer un inconnu n'est pas une erreur : il a pu partir avant d'arriver.
   world.Remove(actor_id);

@@ -135,8 +135,22 @@ class StyleBook {
   // GARDE PAS : une entrée vide n'est pas une apparence, c'est son absence.
   void Forget(std::uint32_t gid);
 
-  // Combien de fois ce qu'on sait d'un joueur a changé : zéro tant qu'aucun
-  // lot ne l'a nommé.
+  // OUBLIE UN JOUEUR QUI N'EST PLUS EN VUE : ses variantes, ET sa révision.
+  //
+  // 🔴 CE N'EST PAS `Forget`. Un effacement dit « il n'a plus de couleurs » et
+  // compte comme un changement ; un départ dit « on ne sait plus », et le livre
+  // redevient ce qu'il était avant le premier lot de ce joueur. Le serveur redit
+  // ses couleurs quand il réapparaît ou rentre en vue : c'est ce qui borne la
+  // mémoire, et ce qui efface les couleurs d'un joueur qui les a supprimées hors
+  // de notre vue — le serveur ne dit rien d'un joueur sans style.
+  void ForgetDeparted(std::uint32_t gid);
+  // TOUS SONT PARTIS SAUF `kept`, à l'entrée sur une carte. Le joueur garde les
+  // siennes : le serveur ne redit jamais à un joueur ses propres couleurs.
+  void ForgetDepartedExcept(std::uint32_t kept);
+
+  // Le numéro du dernier changement de ce qu'on sait d'un joueur : il change à
+  // chaque lot qui le nomme, et à chaque effacement. Zéro tant qu'aucun lot ne
+  // l'a nommé, ou depuis son départ.
   //
   // 🔴 C'EST CE QUI DISTINGUE « PAS ENCORE REÇU » DE « PLUS RIEN ». Les deux
   // rendent `Find` vide ; seul le second doit effacer ce qu'on a gardé ailleurs
@@ -163,6 +177,11 @@ class StyleBook {
   std::map<std::uint32_t, StyleVariants> styles_;
   // ⚠ SURVIT À `Forget` : un effacement est un changement comme un autre.
   std::map<std::uint32_t, std::uint32_t> revisions_;
+  // ⚠ UN SEUL COMPTEUR POUR TOUS : une révision ne revient jamais, pas même
+  // celle d'un joueur parti puis revenu. Comparée à une valeur gardée d'avant
+  // son départ, une révision recomptée depuis un dirait sinon « rien n'a
+  // changé ».
+  std::uint32_t last_revision_ = 0;
   std::optional<StyleEditorRequest> asked_;
 };
 

@@ -40,6 +40,9 @@ void World::EnterMap(std::string map_name, std::uint16_t x, std::uint16_t y) {
   // LES UNITÉS DE COMPÉTENCE AU SOL restent sur la carte quittée : le serveur
   // n'envoie aucune disparition pour celles qu'on laisse derrière soi.
   skill_units_.clear();
+  // LES COULEURS DES AUTRES JOUEURS aussi : le serveur redit celles des joueurs
+  // qu'on retrouve en vue. Le joueur garde les siennes, qu'il ne redit pas.
+  styles_.ForgetDepartedExcept(player_id_);
   strikes_.Clear();
   supports_.Clear();
   state_arrivals_.Clear();
