@@ -294,4 +294,22 @@ ro::ui::ZoneCaptureView ZoneRecorder::view(bool show_zone) const {
   return shown;
 }
 
+void PlayRecorderVerb(RecorderVerb verb, ZoneRecorder& recorder, ScreenShooter& screenshot,
+                      std::uint32_t now_ms) {
+  switch (verb) {
+    case RecorderVerb::kRecord:
+      recorder.ToggleRecording(now_ms);
+      return;
+    case RecorderVerb::kPicture:
+      recorder.AskPicture();
+      return;
+    case RecorderVerb::kZone:
+      recorder.AskZone();
+      return;
+    case RecorderVerb::kScreenshot:
+      screenshot.Ask();
+      return;
+  }
+}
+
 }  // namespace moonclient

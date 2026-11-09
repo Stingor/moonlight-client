@@ -18,6 +18,7 @@
 #include "ro/ui/survivors_shop.h"
 #include "ro/ui/survivors_summary_window.h"
 #include "ro/ui/voice_overlay.h"
+#include "ro/ui/zone_capture.h"
 
 #include "chat/chat_tab_view.h"
 
@@ -76,6 +77,9 @@ struct SurvivorsFrameView {
   ro::ui::SurvivorsAlbumState* album_state = nullptr;
   // Posée par app après la vue du mode, qui ne la connaît pas.
   SurvivorsTalkView talk;
+  // L'ENREGISTREUR DE ZONE, comme en jeu : le tracé, le décompte, le témoin du
+  // film et son dernier mot. Posé par app, comme la conversation.
+  ro::ui::ZoneCaptureView capture;
 };
 
 // CE QUE LES FENÊTRES DE L'IMAGE ONT DEMANDÉ : app en fait l'intention de
@@ -93,6 +97,8 @@ struct SurvivorsAsk {
   ro::ui::SurvivorsCodexAsk codex;
   // Ce que la fenêtre de conversation a demandé, appliqué comme en jeu.
   std::optional<ro::ui::ChatWindowAction> chat;
+  // La zone que le tracé a rendue, ou son annulation.
+  ro::ui::ZoneCaptureAsk capture;
 };
 
 // LES FENÊTRES DE LA MÉTA (Q1) : l'Église, la Kafra, le Codex et les records,

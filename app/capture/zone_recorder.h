@@ -11,6 +11,9 @@
 #include "ro/render/screen_grab.h"
 #include "ro/ui/zone_capture.h"
 
+#include "capture/recorder_verb.h"
+#include "capture/screenshot.h"
+
 namespace moonclient {
 
 // LES DEUX TAILLES D'UNE MÊME IMAGE.
@@ -119,5 +122,9 @@ class ZoneRecorder {
   std::string message_;
   std::uint32_t message_ms_ = 0;
 };
+
+// LE GESTE JOUÉ : l'enregistreur de zone, ou la capture de l'écran entier.
+void PlayRecorderVerb(RecorderVerb verb, ZoneRecorder& recorder, ScreenShooter& screenshot,
+                      std::uint32_t now_ms);
 
 }  // namespace moonclient

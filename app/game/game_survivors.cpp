@@ -27,10 +27,12 @@
 #include "ro/sim/survivors_rules.h"
 #include "ro/ui/chat_bar.h"
 
+#include "capture/recorder_verb.h"
 #include "game/game.h"
 #include "game/survivors_mode.h"
 #include "game/survivors_presence_mode.h"
 #include "input/hotkeys.h"
+#include "options/option_sections.h"
 #include "survivors/arena_choice.h"
 #include "survivors/survivors_route.h"
 #include "voice/voice_keys.h"
@@ -102,27 +104,24 @@ bool Game::SurvivorsTakes(const SDL_Event& event, std::uint32_t now_ms) {
   } else if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN || event.type == SDL_EVENT_MOUSE_BUTTON_UP) {
     mouse_ = glm::vec2{event.button.x, event.button.y};
   }
-  // L'ENREGISTREUR GARDE SES TOUCHES, hors de celles que la partie lit : un GIF
-  // se lance et s'arrête, une image fixe se prend. Tracer la zone attend le
-  // jeu, dont l'interface dessine le tracé.
+  // L'ENREGISTREUR ET LA CAPTURE D'ÉCRAN GARDENT LEURS TOUCHES, hors de celles
+  // que la partie lit : un GIF se lance et s'arrête, une image fixe se prend,
+  // la zone se retrace, l'écran entier s'enregistre. Même aiguillage qu'en jeu.
   if (event.type == SDL_EVENT_KEY_DOWN && !event.key.repeat &&
       !SurvivorsReadsKey(static_cast<std::uint32_t>(event.key.scancode))) {
-    const std::optional<ActionRef> action = settings_->bindings().ActionFor(
+    const std::optional<RecorderVerb> verb = RecorderVerbOfAction(settings_->bindings().ActionFor(
         event.key.key, (event.key.mod & SDL_KMOD_CTRL) != 0, (event.key.mod & SDL_KMOD_SHIFT) != 0,
-        (event.key.mod & SDL_KMOD_ALT) != 0);
-    if (action == ActionRef(GameAction::kCaptureRecord)) {
-      recorder_.ToggleRecording(now_ms);
-      return true;
-    }
-    if (action == ActionRef(GameAction::kCapturePicture)) {
-      recorder_.AskPicture();
-      return true;
-    }
-    if (action == ActionRef(GameAction::kScreenshot)) {
-      screenshot_.Ask();
+        (event.key.mod & SDL_KMOD_ALT) != 0));
+    if (verb.has_value()) {
+      PlayRecorderVerb(*verb, recorder_, screenshot_, now_ms);
+      if (recorder_.selecting()) survivors_mode_->ReleaseHeld();
       return true;
     }
   }
+  // 🔴 LE TRACÉ DE LA ZONE PREND TOUT : sa toile a vu l'événement, et un clic
+  // qui commence le rectangle ne doit pas aussi viser dans l'arène, ni Échap
+  // qui l'annule mettre la partie en pause.
+  if (recorder_.selecting()) return true;
   // La souris au-dessus d'une fenêtre, telle que l'interface l'a vue avant la
   // route : la molette y fait défiler la fenêtre, pas reculer la caméra.
   const ro::ui::InputGate gate = interface_->gate();
@@ -169,9 +168,22 @@ void Game::DrawSurvivorsInterface(std::uint32_t now_ms) {
       .emojis = emojis_,
       .meter = windows_.damage_meter_view.look.shown ? &windows_.damage_meter_view : nullptr,
       .voice = &windows_.voice};
+  // Le cadre de repérage ne se montre que sur la section Capture, comme en jeu.
+  view.capture =
+      recorder_.view(windows_.options.open &&
+                     windows_.options.section == static_cast<int>(Rank(OptionSection::kCapture)));
   SurvivorsAsk asked = interface_->DrawSurvivorsOnly(view);
   // LES OPTIONS DU JEU OUVERTES SUR LA PAUSE agissent tout de suite.
   settings_->ApplyOptionsAside(asked.options, windows_.options, OptionsTargets(), now_ms);
+  // L'ENREGISTREUR, comme en jeu : la zone tracée s'écrit sur-le-champ, et les
+  // boutons de la section Capture agissent.
+  if (const std::optional<ro::ui::ZoneRect> drawn = recorder_.Note(asked.capture);
+      drawn.has_value() && settings_->options().NoteCaptureZone(*drawn)) {
+    settings_->file().Touch();
+  }
+  if (const std::optional<RecorderVerb> verb = RecorderVerbOfOption(asked.options.changed)) {
+    PlayRecorderVerb(*verb, recorder_, screenshot_, now_ms);
+  }
   // LA CONVERSATION PAR LE MÊME CHEMIN QU'EN JEU : la ligne part, puis les
   // gestes de la fenêtre s'appliquent.
   if (asked.chat.has_value()) {

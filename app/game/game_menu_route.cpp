@@ -193,20 +193,16 @@ void Game::ApplyCaptureGesture(const UiStage::Answers& answers, std::uint32_t no
                                          .custom_held = &page.alert_sound_held(),
                                          .trouble = &page.alert_trouble()}));
   }
+  // LES BOUTONS DE LA CAPTURE : le même aiguillage que l'arène de survivors.
+  if (const std::optional<RecorderVerb> verb = RecorderVerbOfOption(answers.options.changed)) {
+    PlayRecorderVerb(*verb, recorder_, screenshot_, now_ms);
+    return;
+  }
   const std::optional<GameOption> named = NamedOption(answers.options.changed);
   if (!named.has_value()) {
     return;
   }
   switch (*named) {
-    case GameOption::kCaptureZone:
-      recorder_.AskZone();
-      break;
-    case GameOption::kCaptureRecord:
-      recorder_.ToggleRecording(now_ms);
-      break;
-    case GameOption::kCapturePicture:
-      recorder_.AskPicture();
-      break;
     case GameOption::kStorageResetColumns:
       // ⚠ UNE DEMANDE POSÉE DANS LA FENÊTRE, que sa table consommera : elle
       // seule peut défaire un ordre qu'ImGui garde pour elle, et le joueur peut
@@ -220,7 +216,7 @@ void Game::ApplyCaptureGesture(const UiStage::Answers& answers, std::uint32_t no
       break;
     default:
       // ⚠ UN CAS PAR DÉFAUT ICI, À REBOURS DU RESTE DU DÉPÔT : ce n'est pas un
-      // aiguillage sur toutes les options, c'est un FILTRE sur trois d'entre
+      // aiguillage sur toutes les options, c'est un FILTRE sur deux d'entre
       // elles. Les énumérer toutes pour ne rien en faire ferait cent lignes
       // qu'il faudrait rallonger à chaque réglage ajouté ailleurs.
       break;

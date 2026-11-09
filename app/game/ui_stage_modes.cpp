@@ -88,6 +88,10 @@ SurvivorsAsk UiStage::DrawSurvivorsOnly(const SurvivorsFrameView& view) {
   if (view.ranking != nullptr && view.ranking_state != nullptr) {
     ask.ranking = ro::ui::DrawSurvivorsRankingWindow(*view.ranking_state, *view.ranking, skin_);
   }
+  // L'ENREGISTREUR APRÈS LES FENÊTRES DE LA PARTIE, comme en jeu : sa toile de
+  // tracé passe devant elles, son témoin reste hors de la zone filmée.
+  ro::ui::DrawZoneSelection(view.capture, skin_, zone_trace_, &ask.capture);
+  ro::ui::DrawCaptureBadge(view.capture, skin_);
   // QUI PARLE, par-dessus tout, comme dans le jeu.
   if (talk.voice != nullptr) ro::ui::DrawVoiceOverlay(*talk.voice);
   ui_->EndFrame();
