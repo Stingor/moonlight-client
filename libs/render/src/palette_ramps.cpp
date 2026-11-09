@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <cstdlib>
 
 namespace ro::render {
 namespace {
@@ -236,6 +237,101 @@ void HsvToRgb(double hue, double saturation, double value, std::uint8_t* out) {
   return static_cast<std::int64_t>(pixels) * (kScoreNeutralWeight + mean);
 }
 
+// ── Le profil 1 : les mêmes coupes, en fractions exactes ────────────────────
+
+constexpr int kWholePercent = 100;
+constexpr int kChannelTop = 255;
+constexpr int kHueSectorCount = 6;
+constexpr int kDegreesPerSector = 60;
+constexpr int kDegreesInTurn = 360;
+
+// Une couleur vue par les coupes du profil 1. La saturation vaut
+// `spread / high` et la teinte `hue_steps / (6 × spread)` de tour : deux
+// fractions exactes, qui se comparent par produits croisés.
+struct ExactHsv {
+  int high = 0;
+  int spread = 0;
+  int hue_steps = 0;
+};
+
+// Le découpage en secteurs de `RgbToHsv`, dans le même ordre de tests.
+[[nodiscard]] ExactHsv ExactEntryHsv(const formats::Palette& palette, std::size_t index) {
+  const auto& entry = palette.entries[index];
+  const int red = entry[0];
+  const int green = entry[1];
+  const int blue = entry[2];
+  ExactHsv color;
+  color.high = std::max({red, green, blue});
+  color.spread = color.high - std::min({red, green, blue});
+  if (color.spread == 0) {
+    return color;
+  }
+  if (red == color.high) {
+    color.hue_steps = green - blue;
+  } else if (green == color.high) {
+    color.hue_steps = 2 * color.spread + blue - red;
+  } else {
+    color.hue_steps = 4 * color.spread + red - green;
+  }
+  if (color.hue_steps < 0) {
+    color.hue_steps += kHueSectorCount * color.spread;
+  }
+  return color;
+}
+
+[[nodiscard]] bool ExactSaturated(const ExactHsv& color) {
+  return color.spread != 0 &&
+         kWholePercent * color.spread >= kLayerNeutralSaturationPercent * color.high;
+}
+
+// `left` est-elle strictement plus saturée que `right` ? Un noir a une
+// saturation nulle.
+[[nodiscard]] bool MoreSaturated(const ExactHsv& left, const ExactHsv& right) {
+  const std::int64_t left_high = std::max(left.high, 1);
+  const std::int64_t right_high = std::max(right.high, 1);
+  return left.spread * right_high > right.spread * left_high;
+}
+
+[[nodiscard]] bool ExactRebound(int high, int previous_high) {
+  return kWholePercent * (high - previous_high) > kLayerValueReboundPercent * kChannelTop;
+}
+
+// L'écart circulaire entre deux teintes saturées dépasse-t-il la tolérance ?
+// Les deux fractions de tour se ramènent à leur dénominateur commun.
+[[nodiscard]] bool ExactHueGapExceeds(const ExactHsv& left, const ExactHsv& right) {
+  const std::int64_t left_turn = static_cast<std::int64_t>(kHueSectorCount) * left.spread;
+  const std::int64_t right_turn = static_cast<std::int64_t>(kHueSectorCount) * right.spread;
+  const std::int64_t turn = left_turn * right_turn;
+  std::int64_t gap = left.hue_steps * right_turn - right.hue_steps * left_turn;
+  gap = std::abs(gap);
+  gap = std::min(gap, turn - gap);
+  return gap * kDegreesInTurn > static_cast<std::int64_t>(kLayerHueToleranceDegrees) * turn;
+}
+
+// La règle de `DominantHue` : la teinte de l'index le plus saturé, en degrés
+// arrondis au plus proche, la moitié vers le haut.
+[[nodiscard]] std::optional<int> ExactDominantHue(const formats::Palette& palette,
+                                                  std::span<const int> usage, std::size_t begin,
+                                                  std::size_t end) {
+  std::optional<ExactHsv> best;
+  for (std::size_t index = begin; index < end; ++index) {
+    if (usage[index] == 0) {
+      continue;
+    }
+    const ExactHsv color = ExactEntryHsv(palette, index);
+    if (!best.has_value() || MoreSaturated(color, *best)) {
+      best = color;
+    }
+  }
+  if (!best.has_value() || !ExactSaturated(*best)) {
+    return std::nullopt;
+  }
+  const int degrees = (2 * kDegreesPerSector * best->hue_steps + best->spread) / (2 * best->spread);
+  return degrees >= kDegreesInTurn ? degrees - kDegreesInTurn : degrees;
+}
+
+constexpr std::array<std::uint8_t, 7> kHumanSkin = {129, 130, 131, 132, 133, 134, 135};
+
 }  // namespace
 
 std::array<int, formats::kPaletteEntryCount> CountIndexUsage(const formats::SprSprite& sprite) {
@@ -371,6 +467,120 @@ std::vector<PaletteRamp> DetectRamps(const formats::Palette& palette, std::span<
   // couper les rampes anecdotiques, pas la tunique.
   // ⚠ TRI STABLE SUR UNE CLÉ ENTIÈRE : voir l'en-tête. Deux ex æquo doivent se
   // départager par leur ordre d'apparition, ici comme dans la référence.
+  std::stable_sort(found.begin(), found.end(), [](const Scored& left, const Scored& right) {
+    return left.score > right.score;
+  });
+
+  std::vector<PaletteRamp> ramps;
+  ramps.reserve(std::min(found.size(), kMaxRamps));
+  for (std::size_t rank = 0; rank < found.size() && rank < kMaxRamps; ++rank) {
+    ramps.push_back(found[rank].ramp);
+  }
+  return ramps;
+}
+
+std::span<const std::uint8_t> SkinIndices(SkinRace race) {
+  return race == SkinRace::kHuman ? std::span<const std::uint8_t>(kHumanSkin)
+                                  : std::span<const std::uint8_t>();
+}
+
+std::optional<LayerRampProfile> LayerProfile(std::uint8_t profile_number, RampLayer layer,
+                                             SkinRace race) {
+  if (profile_number != kLayerProfileNumber) {
+    return std::nullopt;
+  }
+  switch (layer) {
+    case RampLayer::kHead:
+      return LayerRampProfile{.min_pixels = kHeadRampMinPixels, .excluded = SkinIndices(race)};
+    case RampLayer::kHeadgear:
+    case RampLayer::kGarment:
+      return LayerRampProfile{.min_pixels = kAccessoryRampMinPixels, .excluded = {}};
+  }
+  return std::nullopt;
+}
+
+std::vector<PaletteRamp> DetectLayerRamps(const formats::Palette& palette,
+                                          std::span<const int> usage,
+                                          const LayerRampProfile& profile) {
+  if (usage.size() < formats::kPaletteEntryCount) {
+    return {};
+  }
+  // Un index exclu compte comme jamais peint : il coupe la rampe qui le touche.
+  std::array<int, formats::kPaletteEntryCount> kept{};
+  std::copy_n(usage.begin(), formats::kPaletteEntryCount, kept.begin());
+  for (const std::uint8_t index : profile.excluded) {
+    kept[index] = 0;
+  }
+
+  struct Scored {
+    PaletteRamp ramp;
+    std::int64_t score = 0;
+  };
+  std::vector<Scored> found;
+
+  bool open = false;
+  std::size_t begin = 0;
+  // Vide tant que la rampe n'a pas de teinte : elle a pu démarrer en gris.
+  std::optional<ExactHsv> reference;
+  int previous_high = 0;
+
+  const auto close = [&](std::size_t end) {
+    if (!open || end - begin < static_cast<std::size_t>(kRampMinLength)) {
+      return;
+    }
+    int pixels = 0;
+    for (std::size_t index = begin; index < end; ++index) {
+      pixels += kept[index];
+    }
+    if (pixels < profile.min_pixels) {
+      return;
+    }
+    Scored scored;
+    scored.ramp.start = static_cast<std::uint8_t>(begin);
+    scored.ramp.length = static_cast<std::uint8_t>(end - begin);
+    scored.ramp.pixels = pixels;
+    scored.ramp.hue = ExactDominantHue(palette, kept, begin, end);
+    scored.ramp.ref = RepresentativeIndex(palette, kept, begin, end);
+    scored.score = RampScore(palette, kept, begin, end, pixels);
+    found.push_back(scored);
+  };
+
+  for (std::size_t index = 1; index < formats::kPaletteEntryCount; ++index) {
+    if (kept[index] == 0) {
+      close(index);
+      open = false;
+      reference.reset();
+      continue;
+    }
+    const ExactHsv color = ExactEntryHsv(palette, index);
+    const bool saturated = ExactSaturated(color);
+    if (!open) {
+      open = true;
+      begin = index;
+      previous_high = color.high;
+      reference = saturated ? std::optional<ExactHsv>(color) : std::nullopt;
+      continue;
+    }
+    bool cut = false;
+    if (saturated) {
+      if (!reference.has_value()) {
+        reference = color;
+      } else if (ExactHueGapExceeds(color, *reference)) {
+        cut = true;
+      }
+    }
+    if (ExactRebound(color.high, previous_high)) {
+      cut = true;
+    }
+    if (cut) {
+      close(index);
+      begin = index;
+      reference = saturated ? std::optional<ExactHsv>(color) : std::nullopt;
+    }
+    previous_high = color.high;
+  }
+  close(formats::kPaletteEntryCount);
+
   std::stable_sort(found.begin(), found.end(), [](const Scored& left, const Scored& right) {
     return left.score > right.score;
   });

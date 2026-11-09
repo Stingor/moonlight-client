@@ -194,6 +194,58 @@ struct PaletteRecipe {
 [[nodiscard]] std::vector<PaletteRamp> DetectRamps(const formats::Palette& palette,
                                                    std::span<const int> usage);
 
+// ── LE PROFIL 1 : LA TÊTE, LES COIFFES ET LA CAPE ──────────────────────────
+//
+// Ces calques se découpent par la chaîne du corps, à trois différences près :
+// un seuil de surface par calque, la peau tenue hors des rampes de la tête, et
+// des coupes comparées en entiers exacts, sans aucun flottant. Une teinture de
+// calque porte le numéro de son profil ; le corps garde `DetectRamps`.
+
+// Le numéro que porte une teinture de calque découpée par ce profil.
+inline constexpr std::uint8_t kLayerProfileNumber = 1;
+
+// Les calques que le profil découpe. La peau n'en est pas un : elle n'a pas de
+// rampes, un seul réglage teint tout son ensemble d'index.
+enum class RampLayer : std::uint8_t { kHead, kHeadgear, kGarment };
+
+// La race du porteur : elle fixe l'ensemble de peau.
+enum class SkinRace : std::uint8_t { kHuman, kDoram };
+
+inline constexpr int kHeadRampMinPixels = 200;
+// Les coiffes et les capes sont petites : à 200, une sur douze n'aurait aucune
+// pièce réglable.
+inline constexpr int kAccessoryRampMinPixels = 50;
+
+// Les seuils des coupes du corps, exprimés en entiers.
+inline constexpr int kLayerHueToleranceDegrees = 40;
+inline constexpr int kLayerNeutralSaturationPercent = 12;
+inline constexpr int kLayerValueReboundPercent = 8;
+
+struct LayerRampProfile {
+  int min_pixels = kRampMinPixels;
+  // Les index qu'aucune rampe ne prend, et qui coupent celle qui les touche.
+  std::span<const std::uint8_t> excluded;
+};
+
+// Le profil d'un calque, ou rien quand le numéro est inconnu : la teinture
+// s'ignore alors, et le calque garde ses couleurs d'origine.
+[[nodiscard]] std::optional<LayerRampProfile> LayerProfile(std::uint8_t profile_number,
+                                                           RampLayer layer, SkinRace race);
+
+// L'ENSEMBLE DE PEAU d'une race : les index du dégradé chair, les mêmes sur la
+// tête et sur le corps, montures comprises. Le calque Peau les règle d'un seul
+// réglage ; les rampes de la tête ne les prennent pas.
+//
+// Celui du Doram est vide : chaque coiffure peint son visage d'un dégradé à
+// elle, et son corps prête les mêmes couleurs aux galons et aux robes. Son
+// visage reste une pièce de sa tête.
+[[nodiscard]] std::span<const std::uint8_t> SkinIndices(SkinRace race);
+
+// La détection d'un calque : celle de `DetectRamps`, réglée par `profile`.
+[[nodiscard]] std::vector<PaletteRamp> DetectLayerRamps(const formats::Palette& palette,
+                                                        std::span<const int> usage,
+                                                        const LayerRampProfile& profile);
+
 // ── CE QUE L'ÉDITEUR MANIPULE ───────────────────────────────────────────────
 
 // LA PIÈCE À LAQUELLE UN INDEX APPARTIENT, par son rang ; rien s'il n'est
