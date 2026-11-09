@@ -110182,6 +110182,30 @@ Body:
     Refineable: true
     Script: |
       .@bStr = readparam(bStr); .@r = getrefine(); bonus bBaseAtk,(min(120,.@bStr)); if (.@bStr > 119) bonus bBaseAtk,160; else if (.@bStr > 107) bonus bBaseAtk,80; else if (.@bStr > 94) bonus bBaseAtk,40; if (.@r > 6) bonus bUnbreakableWeapon; bonus4 bAutoSpell,"NPC_WIDECURSE",4,100,0; if (.@r > 8) bonus4 bAutoSpellOnSkill,"LK_BERSERK","BS_OVERTHRUST",5,100;
+  - Id: 21039
+    AegisName: T_Sword_Of_Kingdom
+    Name: "Royal Knight's Broadsword [2]"
+    Type: Weapon
+    SubType: 2hSword
+    Buy: 11100000
+    Sell: 111000
+    Weight: 4000
+    Attack: 280
+    Range: 1
+    Slots: 2
+    Jobs: {Crusader: true, Knight: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 175
+    Refineable: true
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,20*(.@r/2);
+      if (.@r>=7)
+         bonus bCritAtkRate,10;
+      if (.@r>=9)
+         bonus bUnbreakableWeapon;
   - Id: 21047
     AegisName: Beam_Claymore_OS
     Name: "Beam Claymor-OS [2]"
@@ -114907,6 +114931,30 @@ Body:
     Refineable: true
     Script: |
       .@r = getrefine(); .@val = 3*(.@r/2); bonus2 bAddEle,Ele_Dark,(20+.@val); bonus2 bAddRace,RC_Demon,(20+.@val); bonus2 bAddRace,RC_Undead,(20+.@val); bonus2 bSubRace,RC_Demon,(10+.@val); bonus2 bSubEle,Ele_Undead,(10+.@val); bonus2 bSubEle,Ele_Dark,(10+.@val); bonus bHPGainValue,50; bonus bSPGainValue,(.@r/2); bonus2 bAddEff2,Eff_Confusion,1000;
+  - Id: 26016
+    AegisName: T_Lance_Of_Kingdom
+    Name: "Royal Knight's Lance [2]"
+    Type: Weapon
+    SubType: 2hSpear
+    Buy: 10350000
+    Sell: 103500
+    Weight: 1000
+    Attack: 205
+    Range: 3
+    Slots: 2
+    Jobs: {Crusader: true, Knight: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 175
+    Refineable: true
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      .@r = getrefine();
+      bonus bLongAtkRate,3*(.@r/2);
+      if (.@r>=7)
+         bonus2 bAddClass,Class_All,5;
+      if (.@r>=9)
+         bonus2 bAddRace,RC_All,15;
   - Id: 26100
     AegisName: Paradise_Foxtail_Staff_II
     Name: Eden Group Foxtail Staff II
@@ -114992,6 +115040,62 @@ Body:
     Refineable: true
     Script: |
       bonus bMatk,140; bonus bInt,2; bonus bFlee,2*getrefine(); if(getrefine()>= 10) { bonus bFlee2,10; }
+  - Id: 26138
+    AegisName: Wand_Of_Flame
+    Name: "Hellfire Staff [2]"
+    Type: Weapon
+    SubType: 2hStaff
+    Buy: 9400000
+    Sell: 94000
+    Weight: 800
+    Attack: 110
+    Range: 1
+    Slots: 2
+    Jobs: {Acolyte: true, Mage: true, Monk: true, Priest: true, Sage: true, SoulLinker: true, Wizard: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 175
+    Refineable: true
+    Script: |
+      bonus bMatk,180;
+      .@r = getrefine();
+      bonus bInt,5;
+      bonus bMatk,15*(.@r/2);
+      bonus bUnbreakableWeapon;
+      if (.@r>=9)
+         .@val = 15;
+      else if (.@r>=7)
+         .@val = 5;
+      bonus2 bMagicAtkEle,Ele_Fire,.@val;
+      bonus2 bMagicAtkEle,Ele_Earth,.@val;
+  - Id: 26139
+    AegisName: Wand_Of_Ice
+    Name: "Icicle Staff [2]"
+    Type: Weapon
+    SubType: 2hStaff
+    Buy: 9400000
+    Sell: 94000
+    Weight: 800
+    Attack: 110
+    Range: 1
+    Slots: 2
+    Jobs: {Acolyte: true, Mage: true, Monk: true, Priest: true, Sage: true, SoulLinker: true, Wizard: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 175
+    Refineable: true
+    Script: |
+      bonus bMatk,180;
+      .@r = getrefine();
+      bonus bInt,5;
+      bonus bMatk,15*(.@r/2);
+      bonus bUnbreakableWeapon;
+      if (.@r>=9)
+         .@val = 15;
+      else if (.@r>=7)
+         .@val = 5;
+      bonus2 bMagicAtkEle,Ele_Water,.@val;
+      bonus2 bMagicAtkEle,Ele_Holy,.@val;
   - Id: 26151
     AegisName: Rutilus_Stick_OS
     Name: "Rutilus Stick-OS [2]"
@@ -116879,6 +116983,93 @@ Body:
     Script: |
       bonus2 bSubRace,RC_Demon,15;
       bonus2 bSubEle,Ele_Neutral,15;
+  - Id: 27354
+    AegisName: Polluted_Raydric_Card
+    Name: Polluted Raydric Card
+    Type: Card
+    Buy: 20
+    Sell: 10
+    Weight: 10
+    Locations: {Armor: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus2 bAddClass,Class_All,5;
+  - Id: 27355
+    AegisName: Polluted_Ray_A_Card
+    Name: Polluted Raydric Archer Card
+    Type: Card
+    Buy: 20
+    Sell: 10
+    Weight: 10
+    Locations: {Right_Hand: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bLongAtkRate,10;
+  - Id: 27356
+    AegisName: Frozen_Gargoyle_Card
+    Name: Frozen Gargoyle Card
+    Type: Card
+    Buy: 20
+    Sell: 10
+    Weight: 10
+    Locations: {Left_Hand: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus2 bSubSize,Size_Medium,25;
+      bonus2 bSubSize,Size_Large,25;
+      bonus2 bSubSize,Size_Small,-5;
+      bonus bDef,2;
+  - Id: 27357
+    AegisName: Polluted_Sting_Card
+    Name: Polluted Sting Card
+    Type: Card
+    Buy: 20
+    Sell: 10
+    Weight: 10
+    Locations: {Armor: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bDef,(100+25*(getrefine()/3))/10;
+  - Id: 27358
+    AegisName: Prison_Breaker_Card
+    Name: Prison Breaker Card
+    Type: Card
+    Buy: 20
+    Sell: 10
+    Weight: 10
+    Locations: {Garment: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus2 bSubEle,Ele_Wind,30;
+      bonus2 bSubEle,Ele_Poison,30;
+      bonus2 bSubEle,Ele_Dark,30;
+      bonus2 bSubEle,Ele_Earth,30;
+      bonus2 bSubEle,Ele_Undead,30;
+      bonus2 bSubEle,Ele_Holy,-100;
+      bonus2 bSubEle,Ele_Ghost,-100;
+      bonus2 bSubEle,Ele_Fire,-100;
+  - Id: 27359
+    AegisName: Ice_Ghost_Card
+    Name: Ice Ghost Card
+    Type: Card
+    Buy: 20
+    Sell: 10
+    Weight: 10
+    Locations: {Right_Hand: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus2 bMagicAddEle,Ele_Water,15;
+  - Id: 27360
+    AegisName: Flame_Ghost_Card
+    Name: Flame Ghost Card
+    Type: Card
+    Buy: 20
+    Sell: 10
+    Weight: 10
+    Locations: {Right_Hand: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus2 bMagicAddEle,Ele_Fire,15;
   - Id: 27361
     AegisName: Polluted_W_Man_Card
     Name: Polluted Wanderer Card
@@ -116891,6 +117082,30 @@ Body:
     Script: |
       bonus2 bAddSize,Size_Large,30;
       bonus2 bAddSize,Size_Medium,30;
+  - Id: 27362
+    AegisName: Polluted_Spi_Q_Card
+    Name: Polluted Queen Spider Card
+    Type: Card
+    Buy: 20
+    Sell: 10
+    Weight: 10
+    Locations: {Garment: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus2 bSubEle,Ele_All,-30;
+      bonus2 bMagicAtkEle,Ele_Earth,100;
+      bonus2 bMagicAtkEle,Ele_Water,100;
+  - Id: 27363
+    AegisName: Polluted_Dark_L_Card
+    Name: Polluted Dark Lord Card
+    Type: Card
+    Buy: 20
+    Sell: 10
+    Weight: 10
+    Locations: {Right_Accessory: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bAspd,1;
   - Id: 28000
     AegisName: Thanos_Katar
     Name: "Thanos Katar [1]"
@@ -118921,6 +119136,41 @@ Body:
     Refineable: true
     Script: |
       .@val = 10 + 10*(min(getrefine(),10)/3); bonus2 bAddEle,Ele_Water,.@val; bonus2 bAddEle,Ele_Earth,.@val; bonus2 bAddEle,Ele_Fire,.@val; bonus2 bAddEle,Ele_Wind,.@val; bonus2 bSubDefEle,Ele_Holy,-30;
+  - Id: 28619
+    AegisName: Prisoner_Dairy
+    Name: "Prisoner's Diary [2]"
+    Type: Weapon
+    SubType: Book
+    Buy: 10400000
+    Sell: 104000
+    Weight: 800
+    Attack: 210
+    Range: 1
+    Slots: 2
+    Jobs: {Priest: true, Sage: true, StarGladiator: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 175
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHPrate,5;
+      bonus bMaxSPrate,5;
+      bonus bBaseAtk,20*(.@r/2);
+      if (.@r>=9)
+         .@val = 25;
+      else if (.@r>=7)
+         .@val = 10;
+      if (getallrefine() >= 22) {
+         bonus2 bAddEle,Ele_Dark,15;
+         bonus2 bMagicAddEle,Ele_Dark,15;
+         bonus2 bAddEle,Ele_Undead,15;
+         bonus2 bMagicAddEle,Ele_Undead,15;
+      }
+      bonus2 bAddRace,RC_Demon,.@val;
+      bonus2 bAddRace,RC_Undead,.@val;
+      bonus2 bMagicAddRace,RC_Demon,.@val;
+      bonus2 bMagicAddRace,RC_Undead,.@val;
   - Id: 28626
     AegisName: Tablet_IL
     Name: "Illusion Tablet [2]"
