@@ -86255,6 +86255,166 @@ Body:
     Refineable: true
     Script: |
       .@r = getrefine(); bonus2 bAddEle,Ele_Fire,(.@r/3)*2; bonus2 bAddEle,Ele_Dark,(.@r/3)*2; bonus2 bMagicAddEle,Ele_Fire,(.@r/3)*2; bonus2 bMagicAddEle,Ele_Dark,(.@r/3)*2; if(.@r > 6){ bonus2 bSubRace,RC_Dragon,5; bonus2 bSubRace,RC_Formless,5; } if(getallrefine() >= 22){ bonus2 bAddRace,RC_Dragon,15; bonus2 bAddRace,RC_Formless,15; bonus2 bMagicAddRace,RC_Dragon,15; bonus2 bMagicAddRace,RC_Formless,15; }
+  - Id: 15391
+    AegisName: DragonA_Red
+    Name: "Red Dragon Plate [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Weight: 1200
+    Defense: 12
+    Slots: 1
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHPrate,15;
+      bonus bMaxSPrate,10;
+      bonus bStr,12;
+      bonus2 bAddClass,Class_All,2*(.@r/2);
+      bonus2 bAddRace,RC_Dragon,7*(.@r/3);
+      if (getallrefine() >= 22) {
+         bonus bFixedCast,-200;
+         bonus2 bAddSize,Size_Medium,10;
+         bonus2 bAddSize,Size_Large,10;
+      }
+  - Id: 15392
+    AegisName: DragonA_Green
+    Name: "Green Dragon Plate [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Weight: 1200
+    Defense: 12
+    Slots: 1
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHPrate,10;
+      bonus bMaxSPrate,10;
+      bonus bAgi,12;
+      bonus bLongAtkRate,2*(.@r/2);
+      bonus2 bAddRace,RC_Dragon,7*(.@r/3);
+      if (getallrefine() >= 22) {
+         bonus bFixedCast,-200;
+         bonus2 bAddSize,Size_Medium,10;
+         bonus2 bAddSize,Size_Large,10;
+      }
+  - Id: 15393
+    AegisName: DragonA_Gold
+    Name: "Gold Dragon Plate [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Weight: 1200
+    Defense: 12
+    Slots: 1
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHPrate,20;
+      bonus bMaxSPrate,5;
+      bonus bVit,12;
+      bonus bAspdRate,3*(.@r/2);
+      bonus bVariableCastrate,-3*(.@r/2);
+      bonus2 bAddRace,RC_Dragon,7*(.@r/3);
+      bonus2 bMagicAddRace,RC_Dragon,7*(.@r/3);
+      if (getallrefine() >= 22) {
+         bonus bFixedCast,-200;
+         bonus2 bAddSize,Size_Medium,6;
+         bonus2 bMagicAddSize,Size_Medium,6;
+         bonus2 bAddSize,Size_Large,6;
+         bonus2 bMagicAddSize,Size_Large,6;
+      }
+  - Id: 15394
+    AegisName: DragonA_Purple
+    Name: "Purple Dragon Plate [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Weight: 1200
+    Defense: 12
+    Slots: 1
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHPrate,15;
+      bonus bMaxSPrate,10;
+      bonus bDex,12;
+      bonus bAspdRate,4*(.@r/2);
+      bonus bVariableCastrate,-4*(.@r/2);
+      bonus2 bAddRace,RC_Dragon,8*(.@r/3);
+      bonus2 bMagicAddRace,RC_Dragon,8*(.@r/3);
+      if (getallrefine() >= 22) {
+         bonus bFixedCast,-200;
+         bonus2 bAddSize,Size_Medium,8;
+         bonus2 bMagicAddSize,Size_Medium,8;
+         bonus2 bAddSize,Size_Large,8;
+         bonus2 bMagicAddSize,Size_Large,8;
+      }
+  - Id: 15395
+    AegisName: DragonA_Blue
+    Name: "Blue Dragon Plate [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Weight: 1200
+    Defense: 12
+    Slots: 1
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHPrate,5;
+      bonus bMaxSPrate,20;
+      bonus bInt,12;
+      bonus bMatkRate,2*(.@r/2);
+      bonus bHealPower,4*(.@r/2);
+      bonus2 bMagicAddRace,RC_Dragon,7*(.@r/3);
+      if (getallrefine() >= 22) {
+         bonus bFixedCast,-200;
+         bonus2 bMagicAddSize,Size_Medium,10;
+         bonus2 bMagicAddSize,Size_Large,10;
+      }
+  - Id: 15396
+    AegisName: DragonA_Silver
+    Name: "Silver Dragon Plate [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Weight: 1200
+    Defense: 12
+    Slots: 1
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHPrate,15;
+      bonus bMaxSPrate,15;
+      bonus bLuk,12;
+      bonus bCritAtkRate,4*(.@r/2);
+      bonus bCritical,2*(.@r/2);
+      bonus2 bAddRace,RC_Dragon,7*(.@r/3);
+      if (getallrefine() >= 22) {
+         bonus bFixedCast,-200;
+         bonus2 bAddSize,Size_Medium,10;
+         bonus2 bAddSize,Size_Large,10;
+      }
   - Id: 15825
     AegisName: C_Black_Musang_J
     Name: Costume Black Musang Hat
@@ -109392,6 +109552,33 @@ Body:
     Refineable: true
     Script: |
       .@r = getrefine(); bonus bMaxHP,(300+(100*(.@r/2))); bonus bMaxHPRate,(2*(.@r/3)); if (.@r >= 7) { bonus2 bAddClass,Class_All,7; } if (.@r >= 9) { bonus bVariableCastrate,-10; }
+  - Id: 20946
+    AegisName: Drag_Manteau
+    Name: "Dragon Scale Hood [1]"
+    Type: Armor
+    Buy: 57000
+    Sell: 14250
+    Weight: 500
+    Defense: 6
+    Slots: 1
+    Locations: {Garment: true}
+    ArmorLevel: 1
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMdef,2;
+      bonus bDef,2;
+      bonus bHealPower2,15;
+      if (.@r>=7) {
+         bonus2 bSubRace,RC_Dragon,2;
+      }
+      if (.@r>=9) {
+         autobonus2 "{ bonus2 bHPRegenRate,2000,1000; }",1,3000,BF_MAGIC|BF_WEAPON;
+      }
+      if (getallrefine() >= 22) {
+         bonus2 bSubRace,RC_Dragon,3;
+      }
   - Id: 20948
     AegisName: Morpheus_Shawl_IL
     Name: "Illusion Morpheus's Shawl [1]"
@@ -110973,6 +111160,33 @@ Body:
          bonus bMatkRate,8;
       if (.@r>=9)
          bonus bMatkRate,4;
+  - Id: 22208
+    AegisName: Dragon_Boots
+    Name: "Dragon Scale Boots [1]"
+    Type: Armor
+    Buy: 45000
+    Sell: 11250
+    Weight: 600
+    Defense: 6
+    Slots: 1
+    Locations: {Shoes: true}
+    ArmorLevel: 1
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMaxSP,500;
+      bonus bAspdRate,7;
+      bonus bVariableCastrate,-7;
+      if (.@r>=7) {
+         bonus2 bSubRace,RC_Dragon,2;
+      }
+      if (.@r>=9) {
+         autobonus2 "{ bonus2 bSPRegenRate,500,1000; }",1,3000,BF_MAGIC|BF_WEAPON;
+      }
+      if (getallrefine() >= 22) {
+         bonus2 bSubRace,RC_Dragon,3;
+      }
   - Id: 22507
     AegisName: ShabbyOldScroll
     Name: Old Scroll
@@ -113253,6 +113467,22 @@ Body:
     Weight: 50
     Script: |
       laphine_upgrade();
+  - Id: 23981
+    AegisName: Abyss_Ddbox
+    Name: Turbulence Dragon's Power
+    Type: DelayConsume
+    Weight: 10
+    Script: |
+      laphine_upgrade();
+  - Id: 23985
+    AegisName: Abyss_itembox
+    Name: Dragon Treasure
+    Type: Usable
+    Weight: 100
+    Flags: {Container: true}
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      getgroupitem(IG_ABYSS_ITEMBOX);
   - Id: 25043
     AegisName: Thorny_Vine_Flute
     Name: Thorny Vine Flute
@@ -114199,6 +114429,46 @@ Body:
     Sell: 2500
     Weight: 20
     Flags: {BuyingStore: true}
+  - Id: 25759
+    AegisName: Dragenergy_Green
+    Name: Green Dragon Orb
+    Weight: 10
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 25760
+    AegisName: Dragenergy_Blue
+    Name: Blue Dragon Orb
+    Weight: 10
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 25761
+    AegisName: Dragenergy_Red
+    Name: Red Dragon Orb
+    Weight: 10
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 25762
+    AegisName: Dragenergy_Gold
+    Name: Gold Dragon Orb
+    Weight: 10
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 25763
+    AegisName: Dragenergy_Purple
+    Name: Purple Dragon Orb
+    Weight: 10
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 25764
+    AegisName: Dragenergy_Silver
+    Name: Silver Dragon Orb
+    Weight: 10
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 25765
+    AegisName: Drabone_L
+    Name: Large Dragon Bone
+    Weight: 200
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 25766
+    AegisName: Drabone_S
+    Name: Small Dragon Bone
+    Weight: 100
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
   - Id: 25772
     AegisName: Delicious_Juice
     Name: Delicious Juice
@@ -120195,11 +120465,11 @@ Body:
     SubType: Enchant
     Script: |
       .@r = getrefine();
-      bonus bDef,25;
+      bonus bDef,3;
       if (.@r>=7) {
-         bonus bDef,10;
+         bonus bDef,1;
          if (.@r>=9) {
-            bonus bDef,10;
+            bonus bDef,1;
          }
       }
   - Id: 29528
@@ -127308,6 +127578,28 @@ Body:
     Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
     Script: |
       laphine_upgrade();
+  - Id: 100142
+    AegisName: Abyss_Ddbox2
+    Name: Stable Dragon's Power
+    Type: DelayConsume
+    Weight: 10
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      laphine_upgrade();
+  - Id: 100144
+    AegisName: Abyss_Ddbox3
+    Name: Burning Dragon's Power
+    Type: DelayConsume
+    Weight: 10
+    Script: |
+      laphine_upgrade();
+  - Id: 100145
+    AegisName: Abyss_Ddbox4
+    Name: Hot Dragon's Power
+    Type: DelayConsume
+    Weight: 10
+    Script: |
+      laphine_upgrade();
   - Id: 100391
     AegisName: Moonlight_Box_IL
     Name: Moonlight Refine Box
@@ -127502,6 +127794,76 @@ Body:
       bonus2 bAddEle,Ele_Water,40;
       bonus2 bAddRace,RC_Formless,40;
       bonus2 bAddRace,RC_Plant,40;
+  - Id: 300015
+    AegisName: Ferus_P_Card
+    Name: Purple Ferus Card
+    Type: Card
+    Weight: 10
+    Locations: {Head_Top: true, Head_Mid: true, Head_Low: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bAddClass,Class_All,3;
+      bonus bMaxHPrate,-5;
+      bonus bMaxSPrate,-5;
+      bonus2 bAddClass,Class_All,(getrefine()/4);
+  - Id: 300016
+    AegisName: Treasure_Mimic_Card
+    Name: Treasure Mimic Card
+    Type: Card
+    Weight: 10
+    Locations: {Garment: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bCritical,5;
+      bonus bFlee,30;
+  - Id: 300017
+    AegisName: Acidus_B_Card
+    Name: Black Acidus Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Hand: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bAddEle,Ele_Dark,25;
+  - Id: 300018
+    AegisName: Acidus_S_Card
+    Name: Silver Acidus Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Hand: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bAddEle,Ele_Holy,25;
+  - Id: 300019
+    AegisName: Bone_Ferus_Card
+    Name: Bone Ferus Card
+    Type: Card
+    Weight: 10
+    Locations: {Left_Accessory: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bAddRace,RC_Dragon,5;
+  - Id: 300020
+    AegisName: Bone_Acidus_Card
+    Name: Bone Acidus Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Accessory: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bAddRace,RC_Brute,5;
+  - Id: 300021
+    AegisName: Bone_Detale_Card
+    Name: Bone Detardeurus Card
+    Type: Card
+    Weight: 10
+    Locations: {Armor: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bAddRace,RC_Undead,40;
+      bonus2 bAddRace,RC_Dragon,40;
+      bonus2 bAddEle,Ele_Ghost,40;
+      bonus2 bAddEle,Ele_Undead,40;
   - Id: 300076
     AegisName: Beta_Guards_Ng_Card
     Name: Broken Beta Guards Card

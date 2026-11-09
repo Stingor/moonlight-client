@@ -72427,6 +72427,60 @@ Body:
     DamageMotion: 800
     Ai: 21
     Class: Boss
+  - Id: 20516
+    AegisName: G_BONE_FERUS
+    Name: Bone Ferus
+    Level: 206
+    Hp: 501246
+    Attack: 6732
+    Attack2: 868
+    Defense: 45
+    MagicDefense: 30
+    Str: 242
+    Agi: 173
+    Vit: 75
+    Int: 122
+    Dex: 173
+    Luk: 67
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    Race: Undead
+    Element: Undead
+    ElementLevel: 4
+    WalkSpeed: 120
+    AttackDelay: 108
+    AttackMotion: 576
+    DamageMotion: 432
+    Ai: 21
+  - Id: 20517
+    AegisName: G_BONE_ACIDUS
+    Name: Bone Acidus
+    Level: 207
+    Hp: 501215
+    Attack: 6917
+    Attack2: 870
+    Defense: 45
+    MagicDefense: 30
+    Str: 248
+    Agi: 175
+    Vit: 78
+    Int: 120
+    Dex: 175
+    Luk: 68
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    Race: Undead
+    Element: Undead
+    ElementLevel: 4
+    WalkSpeed: 180
+    AttackDelay: 168
+    AttackMotion: 768
+    DamageMotion: 360
+    Ai: 21
   - Id: 20520
     AegisName: ILL_BAPHOMET
     Name: Chaos Baphomet
@@ -73638,100 +73692,273 @@ Body:
     Ai: 21
     Class: Boss
     Modes: {Mvp: true}
+  - Id: 20612
+    AegisName: FERUS_P
+    Name: Purple Ferus
+    Level: 202
+    Hp: 501370
+    BaseExp: 802192
+    JobExp: 521425
+    Attack: 6055
+    Attack2: 821
+    Defense: 45
+    MagicDefense: 29
+    Str: 220
+    Agi: 163
+    Vit: 95
+    Int: 111
+    Dex: 155
+    Luk: 83
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    Race: Dragon
+    Element: Poison
+    ElementLevel: 4
+    WalkSpeed: 120
+    AttackDelay: 108
+    AttackMotion: 576
+    DamageMotion: 432
+    Ai: 04
+    Drops:
+      - {Item: Shadowdecon, Rate: 6}
+      - {Item: Dragon's_Skin, Rate: 750}
+      - {Item: Dragon_Train, Rate: 500}
+      - {Item: Posionous_Canine, Rate: 500}
+      - {Item: Abyss_itembox, Rate: 5}
+      - {Item: Dragenergy_Purple, Rate: 30}
+      - {Item: Dragenergy_Gold, Rate: 30}
+      - {Item: Ferus_P_Card, Rate: 1, StealProtected: true}
+  - Id: 20613
+    AegisName: TREASURE_MIMIC
+    Name: Treasure Mimic
+    Level: 204
+    Hp: 501299
+    BaseExp: 802078
+    JobExp: 521351
+    Attack: 5983
+    Attack2: 734
+    Defense: 45
+    MagicDefense: 29
+    Str: 215
+    Agi: 196
+    Vit: 83
+    Int: 110
+    Dex: 213
+    Luk: 96
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    ElementLevel: 4
+    WalkSpeed: 100
+    AttackDelay: 168
+    AttackMotion: 480
+    DamageMotion: 360
+    Ai: 04
+    Drops:
+      - {Item: Old_Blue_Box, Rate: 15}
+      - {Item: Old_Violet_Box, Rate: 1}
+      - {Item: Gift_Box, Rate: 25}
+      - {Item: Treasure_Box, Rate: 50}
+      - {Item: Abyss_itembox, Rate: 50}
+      - {Item: Crystal_Jewel__, Rate: 50}
+      - {Item: Zelunium, Rate: 6}
+      - {Item: Treasure_Mimic_Card, Rate: 1, StealProtected: true}
+  - Id: 20614
+    AegisName: ACIDUS_B
+    Name: Black Acidus
+    Level: 205
+    Hp: 501272
+    BaseExp: 802035
+    JobExp: 521323
+    Attack: 6266
+    Attack2: 843
+    Defense: 45
+    MagicDefense: 29
+    Str: 225
+    Agi: 169
+    Vit: 73
+    Int: 122
+    Dex: 166
+    Luk: 73
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    Race: Dragon
+    Element: Dark
+    ElementLevel: 4
+    WalkSpeed: 180
+    AttackDelay: 168
+    AttackMotion: 768
+    DamageMotion: 360
+    Ai: 04
+    Drops:
+      - {Item: Dragon_Canine, Rate: 1200}
+      - {Item: Dragon_Train, Rate: 500}
+      - {Item: Dragenergy_Green, Rate: 30}
+      - {Item: Dragenergy_Purple, Rate: 30}
+      - {Item: Abyss_itembox, Rate: 5}
+      - {Item: Dragon_Scale, Rate: 750}
+      - {Item: Shadowdecon, Rate: 6}
+      - {Item: Acidus_B_Card, Rate: 1, StealProtected: true}
+  - Id: 20615
+    AegisName: ACIDUS_S
+    Name: Silver Acidus
+    Level: 205
+    Hp: 501274
+    BaseExp: 802038
+    JobExp: 521325
+    Attack: 6240
+    Attack2: 877
+    Defense: 45
+    MagicDefense: 30
+    Str: 224
+    Agi: 163
+    Vit: 75
+    Int: 125
+    Dex: 157
+    Luk: 80
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    Race: Dragon
+    Element: Ghost
+    ElementLevel: 4
+    WalkSpeed: 180
+    AttackDelay: 168
+    AttackMotion: 768
+    DamageMotion: 360
+    Ai: 04
+    Drops:
+      - {Item: Dragon_Canine, Rate: 1000}
+      - {Item: Dragon_Train, Rate: 500}
+      - {Item: Dragenergy_Silver, Rate: 30}
+      - {Item: Dragenergy_Gold, Rate: 30}
+      - {Item: Abyss_itembox, Rate: 5}
+      - {Item: Dragon_Scale, Rate: 750}
+      - {Item: Zelunium, Rate: 6}
+      - {Item: Acidus_S_Card, Rate: 1, StealProtected: true}
   - Id: 20616
     AegisName: BONE_FERUS
     Name: Bone Ferus
     Level: 206
-    Hp: 3474420
-    Sp: 10000
-    BaseExp: 2000000
-    JobExp: 100000
-    Attack: 15000
-    Attack2: 40000
-    Defense: 35
-    MagicDefense: 53
-    Str: 598
-    Agi: 165
-    Vit: 149
-    Int: 172
-    Dex: 857
-    Luk: 173
-    AttackRange: 1
+    Hp: 501246
+    BaseExp: 801994
+    JobExp: 521296
+    Attack: 6732
+    Attack2: 868
+    Defense: 45
+    MagicDefense: 30
+    Str: 242
+    Agi: 173
+    Vit: 75
+    Int: 122
+    Dex: 173
+    Luk: 67
+    AttackRange: 2
     SkillRange: 10
     ChaseRange: 12
-    Size: Medium
+    Size: Large
     Race: Undead
     Element: Undead
     ElementLevel: 4
-    WalkSpeed: 175
-    AttackDelay: 1024
-    AttackMotion: 624
-    DamageMotion: 336
+    WalkSpeed: 120
+    AttackDelay: 108
+    AttackMotion: 576
+    DamageMotion: 432
     Ai: 21
-    Class: Boss
+    Drops:
+      - {Item: Drabone_S, Rate: 1250}
+      - {Item: Drabone_L, Rate: 15}
+      - {Item: Skel_Bone, Rate: 3000}
+      - {Item: Dragenergy_Blue, Rate: 40}
+      - {Item: Dragenergy_Green, Rate: 30}
+      - {Item: Abyss_itembox, Rate: 10}
+      - {Item: Shadowdecon, Rate: 6}
+      - {Item: Bone_Ferus_Card, Rate: 1, StealProtected: true}
   - Id: 20617
     AegisName: BONE_ACIDUS
     Name: Bone Acidus
     Level: 207
-    Hp: 3491700
-    Sp: 10000
-    BaseExp: 16777215
-    JobExp: 100000
-    Attack: 15000
-    Attack2: 40000
-    Defense: 35
-    MagicDefense: 53
-    Str: 598
-    Agi: 165
-    Vit: 149
-    Int: 172
-    Dex: 857
-    Luk: 173
-    AttackRange: 1
+    Hp: 501215
+    BaseExp: 801944
+    JobExp: 521264
+    Attack: 6917
+    Attack2: 870
+    Defense: 45
+    MagicDefense: 30
+    Str: 248
+    Agi: 175
+    Vit: 78
+    Int: 120
+    Dex: 175
+    Luk: 68
+    AttackRange: 2
     SkillRange: 10
     ChaseRange: 12
-    Size: Medium
+    Size: Large
     Race: Undead
     Element: Undead
     ElementLevel: 4
-    WalkSpeed: 175
-    AttackDelay: 1024
-    AttackMotion: 624
-    DamageMotion: 336
+    WalkSpeed: 180
+    AttackDelay: 168
+    AttackMotion: 768
+    DamageMotion: 360
     Ai: 21
-    Class: Boss
+    Drops:
+      - {Item: Drabone_S, Rate: 1250}
+      - {Item: Drabone_L, Rate: 15}
+      - {Item: Skel_Bone, Rate: 3000}
+      - {Item: Dragenergy_Red, Rate: 40}
+      - {Item: Dragenergy_Silver, Rate: 30}
+      - {Item: Abyss_itembox, Rate: 10}
+      - {Item: Zelunium, Rate: 6}
+      - {Item: Bone_Acidus_Card, Rate: 1, StealProtected: true}
   - Id: 20618
     AegisName: BONE_DETALE
     Name: Bone Detardeurus
     Level: 209
-    Hp: 88466828
-    Sp: 10000
-    BaseExp: 16777215
-    JobExp: 100000
-    Attack: 50000
-    Attack2: 65535
-    Defense: 35
-    MagicDefense: 53
-    Str: 598
-    Agi: 165
-    Vit: 149
-    Int: 172
-    Dex: 857
-    Luk: 173
-    AttackRange: 1
+    Hp: 4701362
+    BaseExp: 7522179
+    JobExp: 4889416
+    Attack: 11752
+    Attack2: 2006
+    Defense: 60
+    MagicDefense: 44
+    Str: 335
+    Agi: 194
+    Vit: 173
+    Int: 288
+    Dex: 203
+    Luk: 55
+    AttackRange: 3
     SkillRange: 10
     ChaseRange: 12
-    Size: Medium
+    Size: Large
     Race: Undead
     Element: Undead
     ElementLevel: 4
-    WalkSpeed: 175
-    AttackDelay: 1024
-    AttackMotion: 624
-    DamageMotion: 336
+    WalkSpeed: 200
+    AttackDelay: 432
+    AttackMotion: 936
+    DamageMotion: 360
+    DamageTaken: 10
     Ai: 21
     Class: Boss
     Modes: {Mvp: true}
+    Drops:
+      - {Item: Drabone_L, Rate: 8000}
+      - {Item: Shadowdecon, Rate: 50}
+      - {Item: Zelunium, Rate: 50}
+      - {Item: Dragenergy_Green, Rate: 10000}
+      - {Item: Dragenergy_Silver, Rate: 10000}
+      - {Item: Dragenergy_Red, Rate: 10000}
+      - {Item: Dragenergy_Blue, Rate: 10000}
+      - {Item: Bone_Detale_Card, Rate: 1, StealProtected: true}
   - Id: 20630
     AegisName: EP17_2_BETA_BASIC_NG
     Name: Broken Beta

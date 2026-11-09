@@ -106,6 +106,14 @@ upgrade:
     targets: [
       15378, 15379, 15380
     ]
+  - item: 23981
+    least_refine: 0
+    most_refine: 10
+    least_options: 0
+    cards_allowed: false
+    targets: [
+      15391, 15392, 15393, 15394, 15395, 15396
+    ]
   - item: 100003
     least_refine: 0
     most_refine: 10
@@ -176,6 +184,30 @@ upgrade:
       450096, 450097, 450098, 450099, 450100, 450101, 450102, 450103, 450104, 450105,
       450108, 450109, 450110, 450111, 450112, 450113, 450114, 450115, 450116, 450117,
       450118, 450119, 450125, 450126
+    ]
+  - item: 100142
+    least_refine: 0
+    most_refine: 10
+    least_options: 0
+    cards_allowed: false
+    targets: [
+      15391, 15392, 15393, 15394, 15395, 15396
+    ]
+  - item: 100144
+    least_refine: 0
+    most_refine: 10
+    least_options: 0
+    cards_allowed: false
+    targets: [
+      20946
+    ]
+  - item: 100145
+    least_refine: 0
+    most_refine: 10
+    least_options: 0
+    cards_allowed: false
+    targets: [
+      22208
     ]
   - item: 100391
     least_refine: 4

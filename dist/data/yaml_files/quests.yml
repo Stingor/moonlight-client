@@ -11790,6 +11790,46 @@ quests:
     icon: dq
     summary: "Wait for the reset time"
     description: "Mineworm Research - Standby."
+  7893:
+    title: "A unique color of Ferus"
+    icon: lq
+    summary: "Purple Ferus x20"
+    description: "A unique color of Ferus."
+  7894:
+    title: "A unique color of Ferus - Waiting"
+    icon: dq
+    summary: "A unique color of Ferus - Waiting"
+    description: "A unique color of Ferus - Waiting."
+  7895:
+    title: "New Mimic Investigation"
+    icon: lq
+    summary: "Treasure Mimic x10"
+    description: "New Mimic Investigation."
+  7896:
+    title: "New Mimic Investigation - Waiting"
+    icon: dq
+    summary: "New Mimic Investigation - Waiting"
+    description: "New Mimic Investigation - Waiting."
+  7897:
+    title: "Acidus Attribute Research"
+    icon: lq
+    summary: "Black Acidus x20, Silver Acidus x20"
+    description: "Acidus Attribute Research."
+  7898:
+    title: "Acidus Attribute Research - Standby"
+    icon: dq
+    summary: "Wait for the reset time"
+    description: "Acidus Attribute Research - Standby."
+  7899:
+    title: "Going against Providence"
+    icon: lq
+    summary: "Bone Ferus x30, Bone Acidus x30"
+    description: "Going against Providence."
+  7900:
+    title: "Going against providence - Waiting"
+    icon: dq
+    summary: "Going against providence - Waiting"
+    description: "Going against providence - Waiting."
   7997:
     title: 고양이캔의 참맛
     summary: 04:00 reset time
