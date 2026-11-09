@@ -113738,7 +113738,7 @@ Body:
     Type: Usable
     Weight: 100
     Flags: {Container: true}
-    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
     Script: |
       getgroupitem(IG_ABYSS_ITEMBOX);
   - Id: 23986
@@ -113747,7 +113747,7 @@ Body:
     Type: Usable
     Weight: 100
     Flags: {Container: true}
-    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
     Script: |
       getgroupitem(IG_ODIN_ITEMBOX);
   - Id: 25043
