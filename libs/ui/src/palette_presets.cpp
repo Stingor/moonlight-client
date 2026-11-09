@@ -3,10 +3,12 @@
 #include <algorithm>
 #include <cstring>
 #include <string>
+#include <string_view>
 
 #include <imgui_internal.h>  // GetInputTextState : resynchroniser le champ de nom
 
 #include "ro/core/i18n.h"
+#include "ro/ui/skin_popup.h"
 #include "ro/ui/skin_widgets.h"
 
 namespace ro::ui {
@@ -19,10 +21,53 @@ constexpr float kPresetRowInFonts = 9.0F;
 constexpr float kPresetFieldInFonts = 10.0F;
 constexpr float kPresetHintWrapInFonts = 22.0F;
 
+// LE NOM SANS SES ESPACES DE BORD : « soirée » et « soirée  » sont le même
+// préréglage pour qui les lit.
+[[nodiscard]] std::string_view Trimmed(std::string_view name) {
+  constexpr std::string_view kBlank = " \t";
+  const std::size_t first = name.find_first_not_of(kBlank);
+  if (first == std::string_view::npos) {
+    return {};
+  }
+  const std::size_t last = name.find_last_not_of(kBlank);
+  return name.substr(first, last - first + 1);
+}
+
+// LE MENU D'UN PRÉRÉGLAGE, au clic droit : charger une partie, renommer.
+void DrawPresetMenu(const PaletteEditorState& state, const PaletteEditorView& view,
+                    const std::string& name, PaletteEditorAction& action) {
+  if (!BeginSkinPopupContextItem("menu")) {
+    return;
+  }
+  const auto load = [&action, &name](const char* label, PresetPart part) {
+    if (ImGui::MenuItem(label)) {
+      action.verb = PaletteEditorVerb::kLoadPreset;
+      action.preset = name;
+      action.preset_part = part;
+    }
+  };
+  load(core::Tr("Tout charger"), PresetPart::kAll);
+  load(core::Tr("Les couleurs seules"), PresetPart::kColors);
+  load(core::Tr("Les cheveux seuls"), PresetPart::kHair);
+  ImGui::Separator();
+  // ⚠ LE NOUVEAU NOM EST CELUI DU CHAMP : un second champ, dans un menu, se
+  // refermerait au premier clic dedans.
+  const std::string_view typed = Trimmed(state.preset_name.data());
+  const bool free = !typed.empty() && typed != name &&
+                    std::ranges::find(view.presets, typed) == view.presets.end();
+  if (ImGui::MenuItem(core::Tr("Renommer avec le nom saisi"), nullptr, false, free)) {
+    action.verb = PaletteEditorVerb::kRenamePreset;
+    action.preset = name;
+    action.renamed = std::string(typed);
+  }
+  EndSkinPopup();
+}
+
 // UNE LIGNE DE LA LISTE : la croix qui l'efface, puis son nom. Rend vrai quand
 // la liste va bouger sous nos pieds — une ligne effacée.
-[[nodiscard]] bool DrawPresetRow(PaletteEditorState& state, const std::string& name,
+[[nodiscard]] bool DrawPresetRow(PaletteEditorState& state, const PaletteEditorView& view, int rank,
                                  const SkinArt& art, PaletteEditorAction& action) {
+  const std::string& name = view.presets[static_cast<std::size_t>(rank)];
   // 🔴 LA CROIX EST SOUMISE AVANT LE NOM, et ce n'est pas de la mise en page :
   // un `Selectable` occupe toute la largeur restante et avalait le clic de la
   // ligne entière, croix comprise. Soumettre le bouton d'abord lui réserve son
@@ -74,8 +119,14 @@ constexpr float kPresetHintWrapInFonts = 22.0F;
     }
   }
   if (ImGui::IsItemHovered()) {
-    SkinTooltip(core::Tr("Clic : charger. Maj+clic : le lien dans le chat."));
+    // 🔴 LE SURVOL MONTRE LE PRÉRÉGLAGE SUR LE PANTIN : on choisit en voyant,
+    // sans rien charger.
+    state.hovered_preset = rank;
+    SkinTooltip(
+        core::Tr("Clic : charger. Maj+clic : le lien dans le chat. Clic droit : charger une "
+                 "partie, renommer."));
   }
+  DrawPresetMenu(state, view, name, action);
   return false;
 }
 
@@ -151,7 +202,7 @@ void DrawPalettePresets(PaletteEditorState& state, const PaletteEditorView& view
 
   for (std::size_t rank = 0; rank < view.presets.size(); ++rank) {
     ImGui::PushID(static_cast<int>(rank));
-    const bool erased = DrawPresetRow(state, view.presets[rank], art, action);
+    const bool erased = DrawPresetRow(state, view, static_cast<int>(rank), art, action);
     ImGui::PopID();
     if (erased) {
       break;  // la liste va bouger sous nos pieds
@@ -164,15 +215,15 @@ void DrawPalettePresets(PaletteEditorState& state, const PaletteEditorView& view
   // est connu. Il servira à l'image suivante.
   state.preset_field = ImGui::GetItemID();
   ImGui::SameLine();
-  const bool named = state.preset_name[0] != '\0';
-  const bool known =
-      std::ranges::find(view.presets, state.preset_name.data()) != view.presets.end();
+  const std::string_view typed = Trimmed(state.preset_name.data());
+  const bool named = !typed.empty();
+  const bool known = std::ranges::find(view.presets, typed) != view.presets.end();
   // ⚠ GRISÉ PLUTÔT QUE SANS EFFET : sans nom, ou une fois le plafond atteint et
   // le nom inconnu, « Enregistrer » ne peut rien faire.
   ImGui::BeginDisabled(!named || (view.presets_full && !known));
   if (SkinButton(core::Tr("Enregistrer"), art)) {
     action.verb = PaletteEditorVerb::kSavePreset;
-    action.preset = state.preset_name.data();
+    action.preset = std::string(typed);
   }
   ImGui::EndDisabled();
   if (ImGui::IsItemHovered() && view.presets_full && !known) {

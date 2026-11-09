@@ -165,10 +165,15 @@ const ro::render::IconTexture* StyleDoll::Draw(const Shot& shot) {
   ro::render::ActorVignette::Pose pose;
   pose.look = shot.look;
   pose.look.style = painted.style;
-  // Debout, figé : un aperçu de couleur n'a pas à s'agiter.
-  pose.animation = ro::render::kAnimationIdle;
+  // Figé par défaut : un aperçu de couleur n'a pas à s'agiter, sauf si le
+  // joueur veut voir la pièce bouger.
+  pose.animation = shot.animation;
   pose.direction = DirectionFor(shot.focus, shot.direction);
-  pose.animated = false;
+  pose.animated = shot.animated;
+  pose.elapsed_ms = static_cast<float>(shot.now_ms);
+  if (!shot.animated) {
+    pose.held_frame = kHeldFrame;
+  }
   pose.box = shot.box;
   pose.aim = AimFor(shot.focus);
   const ro::render::IconTexture& drawn = painted.vignette->Get(pose);
@@ -178,6 +183,9 @@ const ro::render::IconTexture* StyleDoll::Draw(const Shot& shot) {
   shown_ = &painted;
   shown_look_ = pose.look;
   shown_direction_ = static_cast<std::uint8_t>(pose.direction);
+  shown_animation_ = shot.animation;
+  shown_held_ = pose.held_frame;
+  shown_elapsed_ms_ = pose.elapsed_ms;
   return &drawn;
 }
 
@@ -199,7 +207,7 @@ std::optional<ro::render::PalettePick> StyleDoll::PickUnder(glm::vec2 in_box) {
     return std::nullopt;
   }
   const ro::render::ComposedActor& composed = outfit->Composed(
-      ro::render::kAnimationIdle, shown_direction_, 0.0F, /*loop=*/true, kHeldFrame);
+      shown_animation_, shown_direction_, shown_elapsed_ms_, /*loop=*/true, shown_held_);
   // L'INVERSE DU CADRAGE : une soustraction et une division, l'origine et
   // l'échelle étant en pixels de la boîte.
   const glm::vec2 at((in_box.x - framing.origin.x) / framing.scale,

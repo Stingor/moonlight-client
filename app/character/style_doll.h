@@ -66,6 +66,9 @@ class StyleDoll {
     int highlight = -1;
     std::uint32_t now_ms = 0;
     std::uint8_t direction = 0;
+    // La pose, en rang du .act d'un joueur, et si elle défile.
+    std::size_t animation = 0;
+    bool animated = false;
     ro::render::VignetteBox box;
     // LES TEINTURES DE CALQUES à peindre avec la recette du corps, ou nulles :
     // celles que le joueur règle, ou celles reçues d'un code. Chacune se pose
@@ -139,6 +142,10 @@ class StyleDoll {
   Painted* shown_ = nullptr;
   ro::render::ActorLook shown_look_;
   std::uint8_t shown_direction_ = 0;
+  // La pose dessinée : la pipette interroge la même image.
+  std::size_t shown_animation_ = 0;
+  std::optional<std::size_t> shown_held_;
+  float shown_elapsed_ms_ = 0.0F;
 };
 
 }  // namespace moonclient

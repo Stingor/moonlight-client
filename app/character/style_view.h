@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <filesystem>
+#include <map>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -14,10 +15,27 @@
 #include "ro/ui/palette_editor.h"
 
 #include "character/style_doll.h"
+#include "character/style_pieces.h"
 #include "character/style_session.h"
 #include "character/style_store.h"
 
 namespace moonclient {
+
+// LA RECETTE TELLE QU'ELLE DOIT VOYAGER SANS SON PORTEUR : code copié,
+// préréglage rangé.
+//
+// 🔴 CE QUE LA RECETTE LAISSE OUVERT CHANGE DE SENS EN QUITTANT SON
+// PERSONNAGE. Sur un joueur EN VUE, moins un est exactement juste : son acteur
+// porte déjà la couleur que le serveur lui a donnée. Dans un CODE, le même
+// moins un devient « la tienne » chez celui qui le colle : le style arrive dans
+// les cheveux du destinataire, qui se croit copié à tort. Un code voyage sans
+// son porteur, il doit donc être COMPLET.
+//
+// ⛔ LA TEINTE DE BASE N'EST PAS COMBLÉE, elle. C'est la couleur de vêtement
+// que le serveur assigne au destinataire : la lui imposer changerait la BASE
+// sur laquelle ses rampes se détectent, donc le découpage de ses pièces.
+[[nodiscard]] ro::render::PaletteRecipe Shareable(const ro::render::PaletteRecipe& recipe,
+                                                  const ro::render::ActorLook& worn);
 
 // L'ÉDITEUR DE STYLE, VU DE LA PARTIE.
 //
@@ -42,7 +60,10 @@ class StyleView {
   // et le brouillon — voir `character/style_store.h`. Ils se LISENT ici, à la
   // construction : ce sont deux petits fichiers, et les relire à l'ouverture
   // de la fenêtre ferait un accès disque par ouverture.
-  StyleView(ro::render::ActorWardrobe* wardrobe, std::filesystem::path client_root);
+  //
+  // ⚠ `character_id` RANGE LE BROUILLON : chaque personnage a le sien.
+  StyleView(ro::render::ActorWardrobe* wardrobe, std::filesystem::path client_root,
+            std::uint32_t character_id);
 
   // Refait l'aperçu et la vue. À appeler une fois par image, AVANT le dessin,
   // et seulement fenêtre ouverte : composer un pantin que personne ne regarde
@@ -67,6 +88,13 @@ class StyleView {
   // ⚠ SEULEMENT APRÈS UN LOT QUI NOUS NOMME : avant, un livre vide dit « pas
   // encore reçu », et l'écrire effacerait des couleurs bien réelles.
   void KeepForSelection(const ro::sim::World& world, std::uint32_t character_id);
+
+  // POSE NOS COULEURS DÈS L'ENTRÉE EN JEU, depuis ce que la tablée a gardé :
+  // sans elles, le personnage s'affiche nu jusqu'au premier lot du serveur.
+  //
+  // ⚠ UNE FOIS, ET SEULEMENT TANT QUE LE LIVRE NE SAIT RIEN DE NOUS : le lot du
+  // serveur, quand il arrive, redéfinit tout, et c'est lui qui fait foi.
+  void SeedFromSelection(ro::sim::World& world, std::uint32_t character_id);
 
   // Fait ce que le joueur a demandé. ⚠ ÉMET ET S'ARRÊTE LÀ, comme les verbes
   // du sac : le serveur décide, et son écho dit ce qu'il a retenu.
@@ -102,6 +130,9 @@ class StyleView {
 
   // LE CODE DE LA RECETTE EN COURS, tel quel, pour un rapport de bug.
   [[nodiscard]] std::string ReportCode() const;
+  // CE QUI ACCOMPAGNE LE CODE dans le rapport : le corps — sa clé, son sprite —,
+  // ses pièces, et la part qu'elles couvrent. Des champs JSON, sans accolades.
+  [[nodiscard]] std::string ReportFields() const;
 
   // Rend les styles d'aperçu et les vignettes à la garde-robe, au passage de la
   // fenêtre d'ouverte à fermée. ⚠ ENTRE DEUX IMAGES : un style qu'on oublie
@@ -113,9 +144,23 @@ class StyleView {
   // code. Refait à leur changement seulement.
   void RefreshPieces(const ro::render::ActorWardrobe::BodyRamps& body,
                      const ro::render::ActorLook& worn);
-  // Compose le pantin, pulsation comprise.
-  void RefreshDoll(const ro::render::ActorLook& look, ro::ui::PaletteEditorState& state,
-                   std::uint32_t now_ms);
+  // Compose le pantin, pulsation comprise, sous la recette `shown`.
+  void RefreshDoll(const ro::render::ActorLook& look, const ro::render::PaletteRecipe& shown,
+                   ro::ui::PaletteEditorState& state, std::uint32_t now_ms);
+  // Les corps réglables d'ici, refaits quand le corps porté change.
+  void RefreshBodies(const ro::render::ActorLook& worn_body, std::uint32_t worn_key);
+  // CE QUE LE PANTIN MONTRE : ce qu'on compose, ce qu'on porte (avant/après),
+  // ou le préréglage survolé.
+  [[nodiscard]] const ro::render::PaletteRecipe& Shown(const ro::ui::PaletteEditorState& state);
+  // Les pièces liées et gardées du corps réglé.
+  [[nodiscard]] PieceMarks& Marks() { return marks_[session_.body_key()]; }
+  // Les intentions qui touchent aux pièces.
+  void ApplyPieces(const ro::ui::PaletteEditorAction& asked, std::uint32_t now_ms);
+  // Charge un préréglage, en tout ou en partie.
+  void LoadPreset(const ro::ui::PaletteEditorAction& asked);
+  // Valide, et fait au besoin de ce corps le style principal.
+  void Validate(ro::net::Connection& link, const ro::sim::World& world, std::uint32_t now_ms,
+                bool make_main);
   // Compose les vignettes de la grille ouverte, et rend les autres.
   //
   // ⚠ SEULEMENT CELLES QUE LA FENÊTRE A DIT VOIR, et avec un BUDGET : une
@@ -147,6 +192,7 @@ class StyleView {
   };
   PiecesKey pieces_key_;
   std::vector<ImU32> colors_;
+  std::vector<ImU32> base_colors_;
   std::vector<int> ceilings_;
   // Le code du style courant, prêt à copier.
   std::string share_code_;
@@ -159,10 +205,48 @@ class StyleView {
   // La fenêtre a-t-elle été montrée depuis la dernière fermeture ?
   bool shown_ = false;
 
+  // ── LES CORPS RÉGLABLES D'ICI ───────────────────────────────────────────
+  struct BodyChoice {
+    // Une clé du catalogue, en français.
+    const char* name = nullptr;
+    ro::render::ActorLook look;
+    std::uint32_t key = 0;
+  };
+  std::vector<BodyChoice> bodies_;
+  std::vector<const char*> body_names_;
+  // Le corps porté pour lequel la liste a été faite.
+  std::uint32_t bodies_for_ = 0;
+  // Le rang du corps réglé ; zéro : le corps porté.
+  int edited_body_ = 0;
+
+  // ── CE QUE LE PANTIN MONTRE ─────────────────────────────────────────────
+  //
+  // 🔴 SON TÉMOIN N'EST PAS LA RÉVISION DE LA RECETTE quand il montre autre
+  // chose qu'elle : il avance à chaque changement de ce qui est montré, et le
+  // pantin se repeint alors.
+  struct ShownKey {
+    int source = 0;
+    std::uint32_t revision = 0;
+    int preset = -1;
+
+    [[nodiscard]] bool operator==(const ShownKey&) const = default;
+  };
+  ShownKey shown_key_;
+  std::uint32_t shown_serial_ = 1;
+  ro::render::PaletteRecipe preview_;
+
+  // Les pièces liées et gardées, par corps.
+  std::map<std::uint32_t, PieceMarks> marks_;
+  // Le nombre de tirages : chaque inspiration en tire un autre.
+  std::uint32_t inspirations_ = 0;
+
   // ── CE QUI EST RANGÉ SUR LE DISQUE ──────────────────────────────────────
   std::filesystem::path client_root_;
+  std::uint32_t character_id_ = 0;
   // La révision du livre pour le joueur déjà rangée ; zéro : rien encore.
   std::uint32_t kept_revision_ = 0;
+  // Nos couleurs gardées ont-elles été posées, ou n'y avait-il rien à poser ?
+  bool seeded_ = false;
   StylePresets presets_;
   // Les noms, à plat, pour que la fenêtre les parcoure sans connaître le
   // magasin.

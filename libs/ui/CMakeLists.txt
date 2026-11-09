@@ -321,6 +321,7 @@ add_library(ro_ui STATIC
     src/status_cell.cpp
     src/palette_editor.cpp
     src/palette_pickers.cpp
+    src/palette_pieces.cpp
     src/palette_presets.cpp
     src/thumbnail_grid.cpp
     src/palette_doll.cpp

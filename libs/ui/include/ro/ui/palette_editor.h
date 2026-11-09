@@ -69,7 +69,28 @@ struct PaletteDollState {
   bool hovered = false;
   float hover_x = 0.0F;
   float hover_y = 0.0F;
+  // Un clic sur le pantin à cette image : la pipette choisit la pièce et
+  // ouvre son nuancier.
+  bool clicked = false;
+
+  // ── AVANT / APRÈS ───────────────────────────────────────────────────────
+  //
+  // Tant que le bouton est tenu, le pantin montre ce que le personnage PORTE,
+  // et non ce qu'on compose.
+  bool before = false;
+
+  // ── LA POSE ─────────────────────────────────────────────────────────────
+  //
+  // Le rang de la pose dans `kPaletteDollPoses`, et si elle défile.
+  int pose = 0;
+  bool animated = false;
+  // Le fond du pantin, clair ou sombre : une couleur se juge sur les deux.
+  bool light_background = false;
 };
+
+// LES POSES QUE LE PANTIN PREND : repos, marche, assis, attaque — rangs du
+// .act d'un joueur.
+inline constexpr std::array<std::size_t, 4> kPaletteDollPoses = {0, 1, 2, 10};
 
 // ── LES TROIS GRILLES DE VIGNETTES ──────────────────────────────────────────
 //
@@ -178,6 +199,35 @@ struct PaletteEditorView {
   bool has_edits = false;
   // Ce que le serveur a fait de la dernière demande.
   PaletteSendStatus send = PaletteSendStatus::kNone;
+  // « Valider » changerait-il quelque chose ? Grisé sinon.
+  bool has_something_to_send = false;
+  // Une demande peut-elle partir ? Non tant que la précédente attend, ni dans
+  // la seconde qui la suit : le serveur la jetterait.
+  bool can_send = false;
+  // Valider ce corps évincerait-il le plus ancien ? On prévient avant.
+  bool evicts_oldest = false;
+  // Ce corps est-il déjà le style principal ?
+  bool is_main = false;
+  // L'historique a-t-il un pas à défaire, à refaire ?
+  bool can_undo = false;
+  bool can_redo = false;
+
+  // ── LES PIÈCES ──────────────────────────────────────────────────────────
+
+  // La couleur D'ORIGINE de chaque pièce, sur la base : c'est d'elle que la
+  // pièce tire son nom, qui ne change pas quand on la repeint.
+  std::span<const ImU32> base_colors;
+  // Le lien de chaque pièce : zéro pour une pièce libre, le même numéro pour
+  // des pièces liées — régler l'une règle les autres.
+  std::span<const std::uint8_t> links;
+  // Les pièces que l'inspiration ne touche pas, une par bit.
+  std::uint32_t locked = 0;
+  // LES CORPS QU'ON PEUT RÉGLER D'ICI, sans en changer : le corps porté en
+  // tête, puis ses variantes — à pied, monté, en tenue. Des clés du
+  // catalogue, en français. Vide ou seul : rien à choisir.
+  std::span<const char* const> bodies;
+  // Le rang de celui qu'on règle.
+  int edited_body = 0;
 
   // ── CE QUE LES GRILLES MONTRENT ─────────────────────────────────────────
 
@@ -264,7 +314,32 @@ enum class PaletteEditorVerb : std::uint8_t {
   // d'un autre joueur, et il ne doit pas pouvoir changer une apparence d'un
   // simple clic. Il faudra valider, comme pour tout le reste.
   kPasteCode,
+  // Renommer le préréglage `preset` en `renamed`.
+  kRenamePreset,
+
+  // ── LES AUTRES GESTES ───────────────────────────────────────────────────
+
+  // Valider, et faire de ce corps le style principal.
+  kMakeMain,
+  // Défaire, refaire le dernier pas.
+  kUndo,
+  kRedo,
+  // Tirer des couleurs en harmonie sur les pièces non verrouillées.
+  kInspire,
 };
+
+// CE QU'UN PRÉRÉGLAGE APPORTE QUAND ON LE CHARGE.
+enum class PresetPart : std::uint8_t {
+  // Tout : pièces, teinte de base, coupe et couleur de cheveux.
+  kAll,
+  // Les pièces et la teinte de base, sans toucher aux cheveux.
+  kColors,
+  // La coupe et la couleur de cheveux seules.
+  kHair,
+};
+
+// L'HARMONIE QUE L'INSPIRATION TIRE.
+enum class PaletteHarmony : std::uint8_t { kAnalogous, kComplementary, kTriadic };
 
 struct PaletteEditorAction {
   PaletteEditorVerb verb = PaletteEditorVerb::kNothing;
@@ -280,6 +355,26 @@ struct PaletteEditorAction {
   // appelle `AdjustToReach` et écrit dans la recette.
   int picked_ramp = -1;
   std::array<std::uint8_t, 3> picked_color{};
+  // LE TRAIT auquel ce choix appartient : tous les choix d'un même glissement
+  // ne font qu'un pas d'historique. Zéro : un pas à lui seul.
+  std::uint32_t stroke = 0;
+  // LE RÉGLAGE DIRECT d'une pièce, par le mode avancé : une rotation de
+  // teinte relative, ou absolue. Moins un quand rien n'est réglé.
+  int adjusted_ramp = -1;
+  render::RampAdjust adjust;
+  // LIER deux pièces, ou délier une pièce ; moins un sinon.
+  int link_from = -1;
+  int link_to = -1;
+  int unlink = -1;
+  // La pièce dont le verrou d'inspiration bascule, ou moins un.
+  int toggle_lock = -1;
+  PaletteHarmony harmony = PaletteHarmony::kAnalogous;
+  // Ce que le chargement d'un préréglage apporte, et le nouveau nom d'un
+  // préréglage renommé.
+  PresetPart preset_part = PresetPart::kAll;
+  std::string renamed;
+  // Le corps à régler, en rang : zéro pour le corps porté. Moins un : rien.
+  int edit_body = -1;
   // LA PIÈCE DONT LA CROIX VIENT D'ÊTRE CLIQUÉE — elle revient à neutre —, ou
   // moins un.
   int reset_ramp = -1;
@@ -318,6 +413,16 @@ struct PaletteEditorState {
   // de l'image PRÉCÉDENTE. Sur une pulsation qui bat deux fois par seconde, un
   // retard d'une image ne se voit pas.
   int hovered_ramp = -1;
+  // Le préréglage que la souris survole, ou moins un : `app` le montre sur le
+  // pantin, le temps du survol.
+  int hovered_preset = -1;
+  // LE TRAIT EN COURS : il avance à chaque appui du bouton gauche. Tous les
+  // choix faits bouton tenu appartiennent au même trait.
+  std::uint32_t stroke = 0;
+  // La pièce dont la pipette demande d'ouvrir le nuancier, ou moins un.
+  int open_piece = -1;
+  // Le mode avancé du nuancier est-il déplié ?
+  bool advanced = false;
 
   // Le nom en cours de saisie pour un nouveau préréglage.
   std::array<char, kPresetNameSize> preset_name{};
@@ -357,7 +462,11 @@ struct PaletteEditorState {
 // La hauteur qu'il faut lui donner, bornée à `visible_rows` lignes.
 [[nodiscard]] float ThumbnailGridHeight(int total, int columns, float cell, int visible_rows);
 
-inline constexpr const char* kPaletteEditorTitle = core::TrText("Style du personnage");
+// LE NOM D'UNE COULEUR, tel qu'une pièce le porte : « rouge », « bleu »,
+// « gris »…, DÉJÀ TRADUIT dans la langue du joueur.
+[[nodiscard]] const char* PieceColorName(ImU32 color);
+
+inline constexpr const char* kPaletteEditorTitle = core::TrText("Couleurs du personnage");
 inline constexpr const char* kPaletteEditorId = "style";
 
 }  // namespace ro::ui

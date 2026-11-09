@@ -224,6 +224,12 @@ tr: %s has been removed from the Swap Equipment window.
 fr: 1 h / min
 tr: 1 h / min
 
+fr: (fixe)
+tr: (kept)
+
+fr: (liée)
+tr: (linked)
+
 fr: 1 jour / min
 tr: 1 day / min
 
@@ -244,6 +250,9 @@ tr: 5 days / min
 
 fr: 5 min / min
 tr: 5 min / min
+
+fr: Absolu
+tr: Absolute
 
 fr: Accepte les invitations de groupe.
 tr: Accepts party invitations.
@@ -278,6 +287,9 @@ tr: Lightens or restores the effects.
 fr: Aléatoires
 tr: Random
 
+fr: Animé
+tr: Animated
+
 fr: Anneaux
 tr: Rings
 
@@ -292,6 +304,9 @@ tr: Announces to the whole server, without your name.
 
 fr: Annonce à tout le serveur, ton nom en tête.
 tr: Announces to the whole server, your name first.
+
+fr: Annule tes retouches en cours et revient à ce que ton personnage porte. Ctrl+Z les rend.
+tr: Discards your current edits and goes back to what your character wears. Ctrl+Z brings them back.
 
 fr: Arsenal
 tr: Arsenal
@@ -316,6 +331,9 @@ tr: Allows their whispers again.
 
 fr: Autorise de nouveau tous les chuchotements.
 tr: Allows all whispers again.
+
+fr: Avant
+tr: Before
 
 fr: Balayage (°)
 tr: Sweep (°)
@@ -365,6 +383,9 @@ tr: Roggle notebook
 fr: Cascade ×%d
 tr: Cascade ×%d
 
+fr: Ce corps porte ton style principal.
+tr: This body wears your main style.
+
 fr: Celle de l'enseigne entière, cadre et titre. Le client les peint pleines ; plus transparentes, une rue de marchands couvre moins la carte.
 tr: Applies to the whole signboard, frame and title. The client paints them solid; more transparent, a street of merchants hides less of the map.
 
@@ -386,11 +407,29 @@ tr: Chance of a fourth offer on level up.
 fr: Chance de critique : certains coups comptent double.
 tr: Critical chance: some blows count double.
 
+fr: Choisis une pièce, puis règle sa couleur.
+tr: Pick a part, then set its color.
+
 fr: Chuchote à un joueur ; seule, compte les joueurs connectés.
 tr: Whispers to a player; alone, counts the players online.
 
 fr: Ciel
 tr: Sky
+
+fr: Clarté : %+d %%
+tr: Brightness: %+d %%
+
+fr: Clarté : %d %%
+tr: Brightness: %d %%
+
+fr: Clic : charger. Maj+clic : le lien dans le chat. Clic droit : charger une partie, renommer.
+tr: Click: load. Shift+click: link in chat. Right-click: load part of it, rename.
+
+fr: Clic : régler la pièce visée. Molette : tourner.
+tr: Click: edit the part under the cursor. Wheel: turn.
+
+fr: Clic droit : verrouiller, délier.
+tr: Right-click: keep, unlink.
 
 fr: Cliquez deux monstres voisins pour les échanger.
 tr: Click two neighbouring monsters to swap them.
@@ -407,6 +446,9 @@ tr: Collector
 fr: Commandes du client
 tr: Client commands
 
+fr: Complémentaires
+tr: Complementary
+
 fr: Compte les joueurs connectés.
 tr: Counts the players online.
 
@@ -421,6 +463,12 @@ tr: %s (%s, %s): ready
 
 fr: %s (%s, %s) : en attente
 tr: %s (%s, %s): waiting
+
+fr: Corps porté
+tr: Worn body
+
+fr: Corps réglé :
+tr: Body being edited:
 
 fr: Coucher (h)
 tr: Sunset (h)
@@ -461,6 +509,9 @@ tr: Creates a guild.
 fr: Cycle jour/nuit
 tr: Day/night cycle
 
+fr: D'origine
+tr: Original
+
 fr: Demande le classement des alchimistes.
 tr: Asks for the alchemist ranking.
 
@@ -491,6 +542,15 @@ tr: Sand thrown ahead of you blinds the horde.
 fr: Déclencher les deux pouvoirs d'un plateau de Roggle.
 tr: Trigger both powers of a Roggle board.
 
+fr: Décoché : la teinte tourne, et la pièce garde sa matière — ses reflets, ses ombres colorées. Coché : une teinte et une saturation uniques.
+tr: Unticked: the hue turns and the part keeps its material — its highlights, its colored shadows. Ticked: a single hue and saturation.
+
+fr: Défaire
+tr: Undo
+
+fr: Défait ton dernier geste (Ctrl+Z).
+tr: Undoes your last action (Ctrl+Z).
+
 fr: Défi du jour
 tr: Daily challenge
 
@@ -499,6 +559,9 @@ tr: Daily challenge:
 
 fr: Défi relevé
 tr: Challenge met
+
+fr: Délier cette pièce
+tr: Unlink this part
 
 fr: Dévoiler 10 items différents dans Roggle.
 tr: Reveal 10 different items in Roggle.
@@ -509,11 +572,17 @@ tr: Reveal 25 different items in Roggle.
 fr: Dévoiler un item dans Roggle.
 tr: Reveal an item in Roggle.
 
+fr: Efface les couleurs de tous tes corps, chez toi ET sur le serveur. Ta coupe et ta couleur de cheveux restent celles que tu portes.
+tr: Erases the colors of all your bodies, here AND on the server. Your hairstyle and hair color stay as they are.
+
 fr: En attente des autres joueurs…
 tr: Waiting for the other players…
 
 fr: En coop, relever un allié à terre, au prix d'une montée de niveau.
 tr: In co-op, revive a fallen ally, at the cost of a level-up.
+
+fr: En faire mon style principal
+tr: Make it my main style
 
 fr: En plus du butin, sur cette map. Les taux du serveur ne les changent pas.
 tr: On top of the regular loot, on this map. Server drop rates do not change them.
@@ -527,14 +596,23 @@ tr: Dodge +%d %%
 fr: Feuilles restantes : %d
 tr: Leaves left: %d
 
+fr: Fond clair
+tr: Light background
+
 fr: Gagner le défi du jour de Roggle.
 tr: Win the Roggle daily challenge.
 
 fr: Gagner une bille par un tir de Roggle.
 tr: Earn a ball from a single Roggle shot.
 
+fr: Garder pendant l'inspiration
+tr: Keep during inspiration
+
 fr: Grille éparse
 tr: Scattered grid
+
+fr: Hors ligne : rien ne peut partir.
+tr: Offline: nothing can be sent.
 
 fr: Huit coups s'abattent presque ensemble sur le plus proche.
 tr: Eight blows fall almost together on the nearest monster.
@@ -547,6 +625,9 @@ tr: You must be in a town or indoors.
 
 fr: Il rejoint le carnet.
 tr: It joins the notebook.
+
+fr: Inspiration
+tr: Inspiration
 
 fr: Item dévoilé !
 tr: Item revealed!
@@ -581,8 +662,26 @@ tr: The storage is open.
 fr: La liaison avec le serveur est perdue.
 tr: The connection to the server is lost.
 
+fr: Les cheveux seuls
+tr: Hair only
+
 fr: Les clients du groupe n'ont pas la même version : la partie ne peut pas commencer.
 tr: The party's clients are not on the same version: the game cannot start.
+
+fr: Les couleurs seules
+tr: Colors only
+
+fr: Libérer pour l'inspiration
+tr: Release for inspiration
+
+fr: Loup
+tr: Wolf
+
+fr: Lâche sur une pièce pour copier. Maj : lier.
+tr: Drop on a part to copy. Shift: link.
+
+fr: Madogear
+tr: Madogear
 
 fr: Map Drops
 tr: Map Drops
@@ -595,6 +694,15 @@ tr: Score 10,000 points in a single Roggle shot.
 
 fr: Meilleur du jour :
 tr: Today's best:
+
+fr: Mode avancé
+tr: Advanced mode
+
+fr: Monture de boutique
+tr: Shop mount
+
+fr: Monté
+tr: Mounted
 
 fr: On vous propose un échange.
 tr: Someone is offering you a trade.
@@ -635,20 +743,86 @@ tr: Leave the lobby
 fr: Rafale ! +%d
 tr: Volley! +%d
 
+fr: Refaire
+tr: Redo
+
+fr: Refait le geste défait (Ctrl+Y).
+tr: Redoes the undone action (Ctrl+Y).
+
 fr: Relever %s (%d voix)
 tr: Revive %s (%d votes)
 
 fr: Relever %s (%d voix, dont la vôtre)
 tr: Revive %s (%d votes, including yours)
 
+fr: Remet toutes les pièces à leur couleur d'origine, dans l'aperçu seulement. Ta coupe et ta couleur de cheveux ne bougent pas.
+tr: Puts every part back to its original color, in the preview only. Your hairstyle and hair color don't change.
+
+fr: Remettre tout l'aperçu à zéro ? Ctrl+Z le défait si tu changes d'avis.
+tr: Reset the whole preview? Ctrl+Z undoes it if you change your mind.
+
+fr: Renommer avec le nom saisi
+tr: Rename to the typed name
+
+fr: Revient à ce que ton personnage a de lui-même, sans toucher aux pièces.
+tr: Goes back to what your character has on its own, without touching the parts.
+
+fr: Rien à valider : ton personnage porte déjà ce style.
+tr: Nothing to confirm: your character already wears this style.
+
+fr: Rotation : %+d°
+tr: Rotation: %+d°
+
+fr: Règle une monture ou une tenue sans la porter. Valider ne change que le corps choisi.
+tr: Edit a mount or an outfit without wearing it. Confirming only changes the chosen body.
+
 fr: Salon du groupe
 tr: Party lobby
+
+fr: Sans monture de boutique
+tr: Without shop mount
+
+fr: Saturation : %+d %%
+tr: Saturation: %+d %%
+
+fr: Saturation : %d %%
+tr: Saturation: %d %%
+
+fr: Supprimer ton style, chez toi ET sur le serveur ? Tes corps retrouvent leurs couleurs d'origine, pour toi comme pour les autres ; ta coupe et ta couleur de cheveux restent. C'est définitif.
+tr: Delete your style, here AND on the server? Your bodies get their original colors back, for you and for others; your hairstyle and hair color stay. This is permanent.
+
+fr: Teinte : %d°
+tr: Hue: %d°
+
+fr: Teintes voisines
+tr: Neighboring hues
+
+fr: Tenue alternative
+tr: Alternate outfit
+
+fr: Tenue ordinaire
+tr: Regular outfit
+
+fr: Tiens le bouton : le pantin montre ce que tu portes.
+tr: Hold the button: the doll shows what you wear.
 
 fr: Tir lointain ! +%d
 tr: Long shot! +%d
 
+fr: Tire des couleurs qui vont ensemble. Clic droit sur une pièce pour la garder telle quelle.
+tr: Draws colors that go together. Right-click a part to keep it as it is.
+
 fr: Tous les monstres
 tr: All monsters
+
+fr: Tout charger
+tr: Load everything
+
+fr: Triade
+tr: Triad
+
+fr: Tu as déjà habillé autant de corps que le serveur en garde. Valider celui-ci effacera le style du plus ancien — jamais ton style principal.
+tr: You have already styled as many bodies as the server keeps. Confirming this one will erase the oldest one's style — never your main style.
 
 fr: Un bond en arrière blesse et repousse ce qui vous talonne.
 tr: A leap backward wounds and pushes away what is on your heels.
@@ -658,6 +832,9 @@ tr: A short, straight strike pierces the line of monsters.
 
 fr: Un coup empoisonné : le monstre perd ses PV peu à peu.
 tr: A poisoned strike: the monster loses HP little by little.
+
+fr: Un instant : le serveur n'accepte qu'une demande par seconde.
+tr: One moment: the server accepts only one request per second.
 
 fr: Un membre du groupe est hors ligne.
 tr: A party member is offline.
@@ -1898,6 +2075,9 @@ tr: A shop is open.
 fr: Vagues
 tr: Waves
 
+fr: Valide ce style et le donne à tous tes corps qui n'ont pas le leur, chez toi comme chez les autres.
+tr: Confirms this style and gives it to all your bodies that don't have their own, for you and for others.
+
 fr: Vaut pour l'heure forcée ci-dessus comme pour le « Cycle jour/nuit » de Graphics. Seul ce client le voit.
 tr: Applies to the forced hour above as well as to the “Day/night cycle” in Graphics. Only this client sees it.
 
@@ -2065,9 +2245,6 @@ tr: Anisotropic 4×
 
 fr: Anisotrope 8×
 tr: Anisotropic 8×
-
-fr: Annule tes retouches en cours et revient à ce que ton personnage porte.
-tr: Discards your pending edits and goes back to what your character wears.
 
 fr: Annuler l'inscription
 tr: Leave the queue
@@ -4005,8 +4182,23 @@ tr: Locked, the gauges, portrait and labels freeze and let clicks through to the
 fr: Zoom
 tr: Zoom
 
+fr: blanc
+tr: white
+
+fr: bleu
+tr: blue
+
+fr: brun
+tr: brown
+
 fr: ce compte n'a pas l'âge requis
 tr: this account does not meet the age requirement
+
+fr: gris
+tr: grey
+
+fr: jaune
+tr: yellow
 
 fr: le serveur a mis fin à la session
 tr: the server ended the session
@@ -4029,8 +4221,20 @@ tr: the paid play time for this account has run out
 fr: lune
 tr: moon
 
+fr: noir
+tr: black
+
+fr: orange
+tr: orange
+
 fr: quelqu'un vient de se connecter avec ce compte
 tr: someone just logged in with this account
+
+fr: rose
+tr: pink
+
+fr: rouge
+tr: red
 
 fr: soleil
 tr: sun
@@ -4038,14 +4242,26 @@ tr: sun
 fr: trop de connexions depuis cette adresse
 tr: too many connections from this address
 
+fr: turquoise
+tr: turquoise
+
 fr: un membre de l'équipe a déconnecté ce compte
 tr: a staff member disconnected this account
 
 fr: Le soleil se lève et se couche aux heures que règle la course des astres ; la lune prend la nuit, plus faible et bleutée.
 tr: The sun rises and sets at the hours the celestial course sets; the moon takes the night, dimmer and bluish.
 
+fr: vert
+tr: green
+
+fr: violet
+tr: purple
+
 fr: « Nouvelle partie » pour rejouer.
 tr: “New game” to play again.
+
+fr: À pied
+tr: On foot
 
 fr: Échec du GIF
 tr: GIF failed
@@ -8941,9 +9157,6 @@ tr: What you were putting together last time without applying it. Kept on this c
 fr: Changer de poste
 tr: Change position
 
-fr: Choisissez une pièce, puis réglez sa couleur.
-tr: Pick a part, then adjust its colour.
-
 fr: Cible : %.*s (n° %u)
 tr: Target: %.*s (no. %u)
 
@@ -8958,9 +9171,6 @@ tr: Target: neutral, no defence (raw damage)
 
 fr: Classes étendues
 tr: Expanded classes
-
-fr: Clic : charger. Maj+clic : le lien dans le chat.
-tr: Click: load. Shift+click: the link in the chat.
 
 fr: Clic droit : menu - Ctrl + clic droit : description
 tr: Right click: menu - Ctrl + right click: description
@@ -9672,9 +9882,6 @@ tr: Launch offset
 
 fr: Efface le style de CE corps seulement. Tes autres corps gardent le leur, et celui-ci reprend ton style principal.
 tr: Clears the style of THIS body only. Your other bodies keep theirs, and this one falls back to your main style.
-
-fr: Efface ta palette, chez toi ET sur le serveur. Ton personnage retrouve l'apparence qu'il avait avant, pour toi comme pour les autres. Ce n'est PAS un retour à ta dernière couleur partagée : celle-ci est perdue.
-tr: Deletes your palette, on your client AND on the server. Your character goes back to the look it had before, for you and for everyone else. This is NOT a return to your last shared colour: that one is lost.
 
 fr: Emplacement visé par le raffinage. « Toutes les pièces » couvre tout ce qui est porté.
 tr: Slot the refining targets. « Toutes les pièces » covers everything worn.
@@ -11359,9 +11566,6 @@ tr: Reset this part
 fr: Remet les six caractéristiques à leur base et rend tous les points dépensés.
 tr: Resets the six attributes to their base and gives back every point spent.
 
-fr: Remettre tout l'aperçu à zéro ? Tes réglages en cours seront perdus.
-tr: Reset the whole preview? Your current settings will be lost.
-
 fr: Remplace le dessin par l'icône de l'item (annulable).
 tr: Replaces the drawing with the item's icon (undoable).
 
@@ -11866,9 +12070,6 @@ tr: Storage open: cannot move to the cart
 fr: Style
 tr: Style
 
-fr: Style du personnage
-tr: Character Style
-
 fr: Succès ({})
 tr: Achievements ({})
 
@@ -11886,9 +12087,6 @@ tr: Delete
 
 fr: Supprimer mon style
 tr: Delete my style
-
-fr: Supprimer ton style, chez toi ET sur le serveur ? Ton personnage retrouve son apparence d'avant, pour toi comme pour les autres. C'est définitif.
-tr: Delete your style, on your client AND on the server? Your character goes back to its previous look, for you and for everyone else. This cannot be undone.
 
 fr: Sur moi
 tr: On me
@@ -15147,9 +15345,6 @@ tr: A button in the title bar of descriptions, of the NPC dialog and of the styl
 
 fr: Échec de l'envoi
 tr: Upload failed
-
-fr: Éditeur de style
-tr: Style editor
 
 fr: Destination : %s (%d, %d)
 tr: Destination: %s (%d, %d)
@@ -19719,7 +19914,6 @@ tr: The fix of model %zu has no reason.
 
 fr: Modèle désigné
 tr: Selected model
-
 
 fr: Placer le modèle %zu
 tr: Place model %zu

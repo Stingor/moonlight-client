@@ -54,6 +54,9 @@ class StylePresets {
 
   [[nodiscard]] const ro::sim::StyleRecipe* Find(std::string_view name) const;
   void Erase(std::string_view name);
+  // Renomme À SA PLACE. Faux si le nouveau nom est vide ou déjà pris, ou si
+  // l'ancien n'existe pas.
+  bool Rename(std::string_view from, std::string_view to);
 
   // ⚠ DANS L'ORDRE OÙ ILS ONT ÉTÉ POSÉS, et c'est l'ordre du fichier : une
   // liste qui se réordonne à chaque écriture est illisible en diff, et
@@ -71,18 +74,14 @@ class StylePresets {
 // c'est un FILET, et un filet à plusieurs mailles demanderait au joueur de
 // choisir entre des états qu'il ne sait plus distinguer.
 //
-// 🔴 PAR CORPS, ET NON PAR PERSONNAGE — parce que ce client n'a pas
-// d'identifiant de personnage : ce que le serveur lui donne est l'identifiant
-// de COMPTE, qui vaut pour tous les personnages de ce joueur. Rendre un
-// brouillon sur cette clé-là le poserait indifféremment sur un Chevalier et sur
-// un Forgeron.
+// 🔴 PAR PERSONNAGE, PUIS PAR CORPS. Le personnage, parce que deux
+// personnages de même classe ne composent pas la même chose : l'essai de l'un
+// n'a pas à se proposer à l'autre. Le corps, parce qu'une recette ne désigne
+// ses pièces que par des index de palette, qui n'ont aucune signification
+// commune d'un corps à l'autre.
 //
-// ⚠ ET LA CLÉ DE CORPS EST CELLE QUI A UN SENS : une recette ne désigne ses
-// pièces que par des index de palette, et les index n'ont aucune signification
-// commune d'un corps à l'autre. Un brouillon retrouvé sur le même corps est
-// exactement celui qu'on composait ; retrouvé sur un autre, il ne voudrait
-// rien dire. Deux personnages de même classe partagent donc leur brouillon —
-// et sur le même corps, c'est la bonne réponse.
+// ⚠ CETTE CLASSE NE TIENT QU'UN PERSONNAGE, celui de la partie : c'est le
+// fichier qui les range tous — voir `LoadStyleDrafts`.
 class StyleDrafts {
  public:
   // Rend vrai si quelque chose a CHANGÉ — donc s'il faut écrire. Un brouillon
@@ -118,12 +117,15 @@ inline constexpr std::string_view kStyleDraftsFileName = "style_brouillon.yml";
 // dessus, ce qui se lit comme une panne. L'argument vaut pour un brouillon
 // comme pour un préréglage, dont le nom seul ne vaut rien sans son style.
 void LoadStylePresets(const std::filesystem::path& client_root, StylePresets& into);
-void LoadStyleDrafts(const std::filesystem::path& client_root, StyleDrafts& into);
+// ⚠ LES BROUILLONS SONT RANGÉS PAR PERSONNAGE : on ne lit et n'écrit que ceux
+// de `character_id`, et l'écriture garde ceux des autres.
+void LoadStyleDrafts(const std::filesystem::path& client_root, std::uint32_t character_id,
+                     StyleDrafts& into);
 
 // Écrivent. Rendent faux si le fichier n'a pas pu être écrit.
 [[nodiscard]] bool SaveStylePresets(const std::filesystem::path& client_root,
                                     const StylePresets& from);
 [[nodiscard]] bool SaveStyleDrafts(const std::filesystem::path& client_root,
-                                   const StyleDrafts& from);
+                                   std::uint32_t character_id, const StyleDrafts& from);
 
 }  // namespace moonclient

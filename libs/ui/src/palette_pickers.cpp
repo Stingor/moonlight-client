@@ -191,7 +191,26 @@ void DrawBodyPalettePicker(PaletteEditorState& state, const PaletteEditorView& v
   EndSkinPopup();
 }
 
-// LES TROIS SÉLECTEURS, EN BOUTONS. Le libellé porte le choix courant.
+// « D'ORIGINE », à côté d'un sélecteur dont la recette impose un numéro.
+//
+// 🔴 IL NE DÉFAIT QUE CE SÉLECTEUR : la coupe revient à celle qu'on porte, la
+// couleur à celle du personnage, la teinte de base à celle du sprite — les
+// pièces restent réglées comme elles l'étaient.
+void DrawOrigin(const char* id, PaletteEditorPicker grid, const SkinArt& art,
+                PaletteEditorAction& action) {
+  ImGui::SameLine();
+  ImGui::PushID(id);
+  if (SkinSmallButton(core::Tr("D'origine"), art)) {
+    action.chosen_in = grid;
+    action.chosen = -1;
+  }
+  if (ImGui::IsItemHovered()) {
+    SkinTooltip(
+        core::Tr("Revient à ce que ton personnage a de lui-même, sans toucher aux "
+                 "pièces."));
+  }
+  ImGui::PopID();
+}
 
 }  // namespace
 
@@ -202,6 +221,11 @@ void DrawChoiceButtons(PaletteEditorState& state, const PaletteEditorView& view,
   std::snprintf(label, sizeof(label), "%s (%d)", core::Tr("Coiffure"), hair);
   if (SkinButton(label, art)) {
     ImGui::OpenPopup(kHairStylePopup);
+  }
+  // ⚠ UNE COUPE QUI EST CELLE QU'ON PORTE N'A RIEN À DÉFAIRE : valider fige
+  // la coupe portée dans la recette.
+  if (view.recipe.hair_style > 0 && view.recipe.hair_style != view.worn_hair_style) {
+    DrawOrigin("coupe", PaletteEditorPicker::kHairStyle, art, action);
   }
   DrawHairStylePicker(state, view, action);
 
@@ -214,6 +238,9 @@ void DrawChoiceButtons(PaletteEditorState& state, const PaletteEditorView& view,
   }
   if (SkinButton(label, art)) {
     ImGui::OpenPopup(kHairColorPopup);
+  }
+  if (view.recipe.hair_palette > 0) {
+    DrawOrigin("couleur", PaletteEditorPicker::kHairColor, art, action);
   }
   DrawHairColorPicker(state, view, action);
 
@@ -237,6 +264,9 @@ void DrawChoiceButtons(PaletteEditorState& state, const PaletteEditorView& view,
         core::Tr("Les couleurs officielles du styliste servent de point de départ ; tes "
                  "réglages s'appliquent par-dessus. Changer de teinte de base peut "
                  "redécouper les pièces."));
+  }
+  if (view.recipe.body_palette > 0) {
+    DrawOrigin("teinte", PaletteEditorPicker::kBodyPalette, art, action);
   }
   DrawBodyPalettePicker(state, view, art, action);
 }

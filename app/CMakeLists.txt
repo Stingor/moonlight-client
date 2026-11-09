@@ -1430,6 +1430,7 @@ target_include_directories(moonclient_names PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 # la liste, un préréglage mis à jour qui saute en fin de liste, un brouillon
 # réécrit à chaque image.
 add_library(moonclient_styles STATIC
+    character/style_pieces.cpp
     character/style_recipe.cpp
     character/style_session.cpp
     character/style_store.cpp
@@ -2113,6 +2114,7 @@ add_executable(moonclient
     character/style_doll.cpp
     character/style_preview.cpp
     character/style_view.cpp
+    character/style_view_apply.cpp
     game/ui_layouts.cpp
     game/ui_layout_factory.cpp
     game/layout_windows.cpp

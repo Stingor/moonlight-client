@@ -121,11 +121,12 @@ BugReportContext MonsterBugReport(const MonsterBugScene& scene) {
                 extra);
 }
 
-BugReportContext StyleBugReport(std::string_view style_code) {
+BugReportContext StyleBugReport(std::string_view style_code, std::string_view fields) {
   return BugReportContext{
       .category = static_cast<std::uint8_t>(BugReportCategory::kStyle),
-      .label = std::string(ro::core::Tr("Éditeur de style")),
-      .json = std::format(R"({{"style_code":"{}",{}}})", JsonEscaped(style_code), Revision())};
+      .label = std::string(ro::core::Tr("Couleurs du personnage")),
+      .json = std::format(R"({{"style_code":"{}",{}{}{}}})", JsonEscaped(style_code), fields,
+                          fields.empty() ? "" : ",", Revision())};
 }
 
 BugReportContext GenericBugReport() {

@@ -224,6 +224,12 @@ tr: %s se ha retirado de la ventana de intercambio de equipo.
 fr: 1 h / min
 tr: 1 h / min
 
+fr: (fixe)
+tr: (fija)
+
+fr: (liée)
+tr: (enlazada)
+
 fr: 1 jour / min
 tr: 1 día / min
 
@@ -244,6 +250,9 @@ tr: 5 días / min
 
 fr: 5 min / min
 tr: 5 min / min
+
+fr: Absolu
+tr: Absoluto
 
 fr: Accepte les invitations de groupe.
 tr: Acepta las invitaciones de grupo.
@@ -278,6 +287,9 @@ tr: Aligera o restablece los efectos.
 fr: Aléatoires
 tr: Aleatorias
 
+fr: Animé
+tr: Animado
+
 fr: Anneaux
 tr: Anillos
 
@@ -292,6 +304,9 @@ tr: Anuncia a todo el servidor, sin tu nombre.
 
 fr: Annonce à tout le serveur, ton nom en tête.
 tr: Anuncia a todo el servidor, con tu nombre delante.
+
+fr: Annule tes retouches en cours et revient à ce que ton personnage porte. Ctrl+Z les rend.
+tr: Descarta tus retoques y vuelve a lo que lleva tu personaje. Ctrl+Z los recupera.
 
 fr: Arsenal
 tr: Arsenal
@@ -316,6 +331,9 @@ tr: Vuelve a permitir sus susurros.
 
 fr: Autorise de nouveau tous les chuchotements.
 tr: Vuelve a permitir todos los susurros.
+
+fr: Avant
+tr: Antes
 
 fr: Balayage (°)
 tr: Barrido (°)
@@ -365,6 +383,9 @@ tr: Cuaderno de Roggle
 fr: Cascade ×%d
 tr: Cascada ×%d
 
+fr: Ce corps porte ton style principal.
+tr: Este cuerpo lleva tu estilo principal.
+
 fr: Celle de l'enseigne entière, cadre et titre. Le client les peint pleines ; plus transparentes, une rue de marchands couvre moins la carte.
 tr: Se aplica a todo el letrero, marco y título. El cliente los pinta opacos; más transparentes, una calle de mercaderes tapa menos el mapa.
 
@@ -386,11 +407,29 @@ tr: Probabilidad de una cuarta oferta al subir de nivel.
 fr: Chance de critique : certains coups comptent double.
 tr: Probabilidad de crítico: algunos golpes cuentan el doble.
 
+fr: Choisis une pièce, puis règle sa couleur.
+tr: Elige una pieza y ajusta su color.
+
 fr: Chuchote à un joueur ; seule, compte les joueurs connectés.
 tr: Susurra a un jugador; sola, cuenta los jugadores conectados.
 
 fr: Ciel
 tr: Cielo
+
+fr: Clarté : %+d %%
+tr: Claridad: %+d %%
+
+fr: Clarté : %d %%
+tr: Claridad: %d %%
+
+fr: Clic : charger. Maj+clic : le lien dans le chat. Clic droit : charger une partie, renommer.
+tr: Clic: cargar. Mayús+clic: enlace en el chat. Clic derecho: cargar una parte, renombrar.
+
+fr: Clic : régler la pièce visée. Molette : tourner.
+tr: Clic: ajustar la pieza señalada. Rueda: girar.
+
+fr: Clic droit : verrouiller, délier.
+tr: Clic derecho: fijar, desenlazar.
 
 fr: Cliquez deux monstres voisins pour les échanger.
 tr: Haz clic en dos monstruos vecinos para intercambiarlos.
@@ -407,6 +446,9 @@ tr: Coleccionista
 fr: Commandes du client
 tr: Comandos del cliente
 
+fr: Complémentaires
+tr: Complementarios
+
 fr: Compte les joueurs connectés.
 tr: Cuenta los jugadores conectados.
 
@@ -421,6 +463,12 @@ tr: %s (%s, %s): listo
 
 fr: %s (%s, %s) : en attente
 tr: %s (%s, %s): en espera
+
+fr: Corps porté
+tr: Cuerpo actual
+
+fr: Corps réglé :
+tr: Cuerpo ajustado:
 
 fr: Coucher (h)
 tr: Ocaso (h)
@@ -461,6 +509,9 @@ tr: Crea una guild.
 fr: Cycle jour/nuit
 tr: Ciclo día/noche
 
+fr: D'origine
+tr: Original
+
 fr: Demande le classement des alchimistes.
 tr: Pide la clasificación de alquimistas.
 
@@ -491,6 +542,15 @@ tr: Arena lanzada ante ti ciega a la horda.
 fr: Déclencher les deux pouvoirs d'un plateau de Roggle.
 tr: Activa los dos poderes de un tablero de Roggle.
 
+fr: Décoché : la teinte tourne, et la pièce garde sa matière — ses reflets, ses ombres colorées. Coché : une teinte et une saturation uniques.
+tr: Sin marcar: el tono gira y la pieza conserva su material — sus brillos, sus sombras de color. Marcado: un único tono y una única saturación.
+
+fr: Défaire
+tr: Deshacer
+
+fr: Défait ton dernier geste (Ctrl+Z).
+tr: Deshace tu último gesto (Ctrl+Z).
+
 fr: Défi du jour
 tr: Reto del día
 
@@ -499,6 +559,9 @@ tr: Reto del día:
 
 fr: Défi relevé
 tr: Reto superado
+
+fr: Délier cette pièce
+tr: Desenlazar esta pieza
 
 fr: Dévoiler 10 items différents dans Roggle.
 tr: Revela 10 objetos distintos en Roggle.
@@ -509,11 +572,17 @@ tr: Revela 25 objetos distintos en Roggle.
 fr: Dévoiler un item dans Roggle.
 tr: Revela un objeto en Roggle.
 
+fr: Efface les couleurs de tous tes corps, chez toi ET sur le serveur. Ta coupe et ta couleur de cheveux restent celles que tu portes.
+tr: Borra los colores de todos tus cuerpos, aquí Y en el servidor. Tu peinado y tu color de pelo se quedan como están.
+
 fr: En attente des autres joueurs…
 tr: Esperando a los demás jugadores…
 
 fr: En coop, relever un allié à terre, au prix d'une montée de niveau.
 tr: En cooperativo, levanta a un aliado caído, a costa de una subida de nivel.
+
+fr: En faire mon style principal
+tr: Hacerlo mi estilo principal
 
 fr: En plus du butin, sur cette map. Les taux du serveur ne les changent pas.
 tr: Además del botín, en este mapa. Las tasas del servidor no los cambian.
@@ -527,14 +596,23 @@ tr: Esquiva +%d %%
 fr: Feuilles restantes : %d
 tr: Hojas restantes: %d
 
+fr: Fond clair
+tr: Fondo claro
+
 fr: Gagner le défi du jour de Roggle.
 tr: Gana el reto del día de Roggle.
 
 fr: Gagner une bille par un tir de Roggle.
 tr: Gana una bola con un tiro de Roggle.
 
+fr: Garder pendant l'inspiration
+tr: Conservar durante la inspiración
+
 fr: Grille éparse
 tr: Rejilla dispersa
+
+fr: Hors ligne : rien ne peut partir.
+tr: Sin conexión: no se puede enviar nada.
 
 fr: Huit coups s'abattent presque ensemble sur le plus proche.
 tr: Ocho golpes caen casi a la vez sobre el más cercano.
@@ -547,6 +625,9 @@ tr: Debes estar en una ciudad o en un interior.
 
 fr: Il rejoint le carnet.
 tr: Pasa al cuaderno.
+
+fr: Inspiration
+tr: Inspiración
 
 fr: Item dévoilé !
 tr: ¡Objeto revelado!
@@ -581,8 +662,26 @@ tr: El storage está abierto.
 fr: La liaison avec le serveur est perdue.
 tr: Se perdió la conexión con el servidor.
 
+fr: Les cheveux seuls
+tr: Solo el pelo
+
 fr: Les clients du groupe n'ont pas la même version : la partie ne peut pas commencer.
 tr: Los clientes del grupo no tienen la misma versión: la partida no puede empezar.
+
+fr: Les couleurs seules
+tr: Solo los colores
+
+fr: Libérer pour l'inspiration
+tr: Liberar para la inspiración
+
+fr: Loup
+tr: Lobo
+
+fr: Lâche sur une pièce pour copier. Maj : lier.
+tr: Suelta sobre una pieza para copiar. Mayús: enlazar.
+
+fr: Madogear
+tr: Madogear
 
 fr: Map Drops
 tr: Drops de mapa
@@ -595,6 +694,15 @@ tr: Consigue 10 000 puntos en un solo tiro de Roggle.
 
 fr: Meilleur du jour :
 tr: Mejor del día:
+
+fr: Mode avancé
+tr: Modo avanzado
+
+fr: Monture de boutique
+tr: Montura de tienda
+
+fr: Monté
+tr: Montado
 
 fr: On vous propose un échange.
 tr: Alguien te propone un intercambio.
@@ -635,20 +743,86 @@ tr: Salir de la sala
 fr: Rafale ! +%d
 tr: ¡Ráfaga! +%d
 
+fr: Refaire
+tr: Rehacer
+
+fr: Refait le geste défait (Ctrl+Y).
+tr: Rehace el gesto deshecho (Ctrl+Y).
+
 fr: Relever %s (%d voix)
 tr: Levantar a %s (%d votos)
 
 fr: Relever %s (%d voix, dont la vôtre)
 tr: Levantar a %s (%d votos, incluido el tuyo)
 
+fr: Remet toutes les pièces à leur couleur d'origine, dans l'aperçu seulement. Ta coupe et ta couleur de cheveux ne bougent pas.
+tr: Devuelve todas las piezas a su color original, solo en la vista previa. Tu peinado y tu color de pelo no cambian.
+
+fr: Remettre tout l'aperçu à zéro ? Ctrl+Z le défait si tu changes d'avis.
+tr: ¿Reiniciar toda la vista previa? Ctrl+Z lo deshace si cambias de opinión.
+
+fr: Renommer avec le nom saisi
+tr: Renombrar con el nombre escrito
+
+fr: Revient à ce que ton personnage a de lui-même, sans toucher aux pièces.
+tr: Vuelve a lo que tu personaje tiene de por sí, sin tocar las piezas.
+
+fr: Rien à valider : ton personnage porte déjà ce style.
+tr: Nada que validar: tu personaje ya lleva este estilo.
+
+fr: Rotation : %+d°
+tr: Rotación: %+d°
+
+fr: Règle une monture ou une tenue sans la porter. Valider ne change que le corps choisi.
+tr: Ajusta una montura o un atuendo sin llevarlo. Validar solo cambia el cuerpo elegido.
+
 fr: Salon du groupe
 tr: Sala del grupo
+
+fr: Sans monture de boutique
+tr: Sin montura de tienda
+
+fr: Saturation : %+d %%
+tr: Saturación: %+d %%
+
+fr: Saturation : %d %%
+tr: Saturación: %d %%
+
+fr: Supprimer ton style, chez toi ET sur le serveur ? Tes corps retrouvent leurs couleurs d'origine, pour toi comme pour les autres ; ta coupe et ta couleur de cheveux restent. C'est définitif.
+tr: ¿Borrar tu estilo, aquí Y en el servidor? Tus cuerpos recuperan sus colores originales, para ti y para los demás; tu peinado y tu color de pelo se quedan. Es definitivo.
+
+fr: Teinte : %d°
+tr: Tono: %d°
+
+fr: Teintes voisines
+tr: Tonos vecinos
+
+fr: Tenue alternative
+tr: Atuendo alternativo
+
+fr: Tenue ordinaire
+tr: Atuendo normal
+
+fr: Tiens le bouton : le pantin montre ce que tu portes.
+tr: Mantén el botón: el maniquí muestra lo que llevas.
 
 fr: Tir lointain ! +%d
 tr: ¡Tiro lejano! +%d
 
+fr: Tire des couleurs qui vont ensemble. Clic droit sur une pièce pour la garder telle quelle.
+tr: Sortea colores que combinan. Clic derecho sobre una pieza para conservarla tal cual.
+
 fr: Tous les monstres
 tr: Todos los monstruos
+
+fr: Tout charger
+tr: Cargar todo
+
+fr: Triade
+tr: Tríada
+
+fr: Tu as déjà habillé autant de corps que le serveur en garde. Valider celui-ci effacera le style du plus ancien — jamais ton style principal.
+tr: Ya has vestido tantos cuerpos como guarda el servidor. Validar este borrará el estilo del más antiguo — nunca tu estilo principal.
 
 fr: Un bond en arrière blesse et repousse ce qui vous talonne.
 tr: Un salto atrás hiere y repele lo que te pisa los talones.
@@ -658,6 +832,9 @@ tr: Un golpe recto y corto atraviesa la fila de monstruos.
 
 fr: Un coup empoisonné : le monstre perd ses PV peu à peu.
 tr: Un golpe envenenado: el monstruo pierde PV poco a poco.
+
+fr: Un instant : le serveur n'accepte qu'une demande par seconde.
+tr: Un momento: el servidor solo acepta una petición por segundo.
 
 fr: Un membre du groupe est hors ligne.
 tr: Un miembro del grupo está desconectado.
@@ -1898,6 +2075,9 @@ tr: Hay una tienda abierta.
 fr: Vagues
 tr: Olas
 
+fr: Valide ce style et le donne à tous tes corps qui n'ont pas le leur, chez toi comme chez les autres.
+tr: Valida este estilo y lo da a todos tus cuerpos que no tienen el suyo, para ti y para los demás.
+
 fr: Vaut pour l'heure forcée ci-dessus comme pour le « Cycle jour/nuit » de Graphics. Seul ce client le voit.
 tr: Vale para la hora forzada de arriba y para el «Ciclo día/noche» de Graphics. Solo este cliente lo ve.
 
@@ -2065,9 +2245,6 @@ tr: Anisotrópico 4×
 
 fr: Anisotrope 8×
 tr: Anisotrópico 8×
-
-fr: Annule tes retouches en cours et revient à ce que ton personnage porte.
-tr: Descarta tus retoques en curso y vuelve a lo que lleva tu personaje.
 
 fr: Annuler l'inscription
 tr: Cancelar la inscripción
@@ -4005,8 +4182,23 @@ tr: Bloqueados, las barras, el retrato y las etiquetas se congelan y dejan pasar
 fr: Zoom
 tr: Zoom
 
+fr: blanc
+tr: blanco
+
+fr: bleu
+tr: azul
+
+fr: brun
+tr: marrón
+
 fr: ce compte n'a pas l'âge requis
 tr: esta cuenta no tiene la edad requerida
+
+fr: gris
+tr: gris
+
+fr: jaune
+tr: amarillo
 
 fr: le serveur a mis fin à la session
 tr: el servidor terminó la sesión
@@ -4029,8 +4221,20 @@ tr: el tiempo de juego pagado de esta cuenta se ha agotado
 fr: lune
 tr: luna
 
+fr: noir
+tr: negro
+
+fr: orange
+tr: naranja
+
 fr: quelqu'un vient de se connecter avec ce compte
 tr: alguien acaba de conectarse con esta cuenta
+
+fr: rose
+tr: rosa
+
+fr: rouge
+tr: rojo
 
 fr: soleil
 tr: sol
@@ -4038,14 +4242,26 @@ tr: sol
 fr: trop de connexions depuis cette adresse
 tr: demasiadas conexiones desde esta dirección
 
+fr: turquoise
+tr: turquesa
+
 fr: un membre de l'équipe a déconnecté ce compte
 tr: un miembro del equipo desconectó esta cuenta
 
 fr: Le soleil se lève et se couche aux heures que règle la course des astres ; la lune prend la nuit, plus faible et bleutée.
 tr: El sol sale y se pone a las horas que fija el recorrido de los astros; la luna toma la noche, más tenue y azulada.
 
+fr: vert
+tr: verde
+
+fr: violet
+tr: violeta
+
 fr: « Nouvelle partie » pour rejouer.
 tr: «Nueva partida» para volver a jugar.
+
+fr: À pied
+tr: A pie
 
 fr: Échec du GIF
 tr: Error al crear el GIF
@@ -8941,9 +9157,6 @@ tr: Lo que estabas componiendo la última vez sin aplicarlo. Guardado en este or
 fr: Changer de poste
 tr: Cambiar de puesto
 
-fr: Choisissez une pièce, puis réglez sa couleur.
-tr: Elige una pieza y ajusta su color.
-
 fr: Cible : %.*s (n° %u)
 tr: Objetivo: %.*s (n.º %u)
 
@@ -8958,9 +9171,6 @@ tr: Objetivo: neutro sin defensa (daño bruto)
 
 fr: Classes étendues
 tr: Clases ampliadas
-
-fr: Clic : charger. Maj+clic : le lien dans le chat.
-tr: Clic: cargar. Mayús+clic: el código en el chat.
 
 fr: Clic droit : menu - Ctrl + clic droit : description
 tr: Clic derecho: menú - Ctrl + clic derecho: descripción
@@ -9672,9 +9882,6 @@ tr: Desfase de salida
 
 fr: Efface le style de CE corps seulement. Tes autres corps gardent le leur, et celui-ci reprend ton style principal.
 tr: Borra el estilo de ESTE cuerpo solamente. Tus otros cuerpos conservan el suyo, y este vuelve a tu estilo principal.
-
-fr: Efface ta palette, chez toi ET sur le serveur. Ton personnage retrouve l'apparence qu'il avait avant, pour toi comme pour les autres. Ce n'est PAS un retour à ta dernière couleur partagée : celle-ci est perdue.
-tr: Borra tu paleta, en tu cliente Y en el servidor. Tu personaje recupera el aspecto que tenía antes, para ti y para los demás. NO es una vuelta a tu último color compartido: ese se pierde.
 
 fr: Emplacement visé par le raffinage. « Toutes les pièces » couvre tout ce qui est porté.
 tr: Ranura a la que apunta el refinado. "Todas las piezas" cubre todo lo que llevas puesto.
@@ -11359,9 +11566,6 @@ tr: Restablecer esta pieza
 fr: Remet les six caractéristiques à leur base et rend tous les points dépensés.
 tr: Devuelve las seis características a su base y reembolsa todos los puntos gastados.
 
-fr: Remettre tout l'aperçu à zéro ? Tes réglages en cours seront perdus.
-tr: ¿Restablecer toda la vista previa? Se perderán tus ajustes actuales.
-
 fr: Remplace le dessin par l'icône de l'item (annulable).
 tr: Sustituye el dibujo por el icono del objeto (se puede deshacer).
 
@@ -11866,9 +12070,6 @@ tr: Storage abierto: no se puede mover al cart
 fr: Style
 tr: Estilo
 
-fr: Style du personnage
-tr: Estilo del personaje
-
 fr: Succès ({})
 tr: Logros ({})
 
@@ -11886,9 +12087,6 @@ tr: Borrar
 
 fr: Supprimer mon style
 tr: Eliminar mi estilo
-
-fr: Supprimer ton style, chez toi ET sur le serveur ? Ton personnage retrouve son apparence d'avant, pour toi comme pour les autres. C'est définitif.
-tr: ¿Eliminar tu estilo, en tu cliente Y en el servidor? Tu personaje recupera su aspecto anterior, para ti y para los demás. Es definitivo.
 
 fr: Sur moi
 tr: Sobre mí
@@ -15147,9 +15345,6 @@ tr: Un botón en la barra de título de las descripciones, del diálogo de NPC y
 
 fr: Échec de l'envoi
 tr: Envío fallido
-
-fr: Éditeur de style
-tr: Editor de estilo
 
 fr: Destination : %s (%d, %d)
 tr: Destino: %s (%d, %d)
@@ -19719,7 +19914,6 @@ tr: El retoque del modelo %zu no tiene motivo.
 
 fr: Modèle désigné
 tr: Modelo designado
-
 
 fr: Placer le modèle %zu
 tr: Colocar el modelo %zu

@@ -154,6 +154,9 @@ void Game::StageStyle(std::uint32_t now_ms) {
     }
   }
 
+  // NOS COULEURS DÈS L'ENTRÉE, tirées de ce que la tablée a gardé, avant que le
+  // premier lot du serveur ne les confirme.
+  style_view_->SeedFromSelection(world_, ticket_.character_id);
   // NOS COULEURS, GARDÉES POUR LA TABLÉE, qui ne les recevra pas du serveur.
   style_view_->KeepForSelection(world_, ticket_.character_id);
 
@@ -223,7 +226,8 @@ void Game::ApplyStyleAnswers(const UiStage::Answers& answers, std::uint32_t now_
   // LE RAPPORT DE BUG porte la recette que la fenêtre montrait : composé AVANT
   // que les gestes de cette image ne la changent.
   if (answers.style.report_bug) {
-    AskBugReport(windows_.bug_report, StyleBugReport(style_view_->ReportCode()));
+    AskBugReport(windows_.bug_report,
+                 StyleBugReport(style_view_->ReportCode(), style_view_->ReportFields()));
   }
   // ⚠ APRÈS LE DESSIN : le joueur vient de désigner une couleur, et c'est ici
   // qu'elle devient un réglage.

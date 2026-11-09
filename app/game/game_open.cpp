@@ -432,7 +432,8 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   // pièce survolée — désignait le personnage d'avant. Sa recette, elle, vit
   // dans la session, qui renaît ici avec la partie.
   windows_.style = ro::ui::PaletteEditorState{};
-  style_view_.emplace(pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr, client_root_);
+  style_view_.emplace(pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr, client_root_,
+                      ticket_.character_id);
   style_preview_.emplace(pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr);
   cart_.emplace(pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr,
                 &pieces_.item_words,

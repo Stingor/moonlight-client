@@ -51,7 +51,8 @@ struct MonsterBugScene {
   std::string_view seen_map;
 };
 [[nodiscard]] BugReportContext MonsterBugReport(const MonsterBugScene& scene);
-[[nodiscard]] BugReportContext StyleBugReport(std::string_view style_code);
+// `fields` : des champs JSON de plus, sans accolades, déjà échappés.
+[[nodiscard]] BugReportContext StyleBugReport(std::string_view style_code, std::string_view fields);
 [[nodiscard]] BugReportContext GenericBugReport();
 // Un rapport sans catégorie propre au serveur, mais avec SES champs :
 // `fields_json` est une suite de membres JSON (`"clé":valeur,…`), que la

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ro/ui/palette_editor.h"
+#include "ro/ui/skin_art.h"
 
 namespace ro::ui {
 
@@ -15,6 +16,12 @@ namespace ro::ui {
 // 🔴 ET LA BOÎTE EST MESURÉE ICI, LUE PAR `app` À L'IMAGE SUIVANTE : c'est
 // elle qui dit à quelle taille composer, et elle dépend d'une mise en page
 // qu'on ne connaît qu'au dessin.
-void DrawPaletteDoll(PaletteDollState& doll, float side, const SkinLook& look);
+// `pipette` : un clic y choisit une pièce, et la bulle le dit.
+void DrawPaletteDoll(PaletteDollState& doll, float side, const SkinLook& look,
+                     bool pipette = false);
+
+// SES COMMANDES, sous lui dans l'éditeur : avant/après, rotation, pose,
+// animation, fond.
+void DrawPaletteDollControls(PaletteDollState& doll, const SkinArt& art);
 
 }  // namespace ro::ui

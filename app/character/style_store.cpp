@@ -36,14 +36,16 @@ constexpr const char* kPresetsHeader =
     "# disparaît à la prochaine écriture.\n";
 
 constexpr const char* kDraftsHeader =
-    "# Ce que tu composais sans le valider, par CORPS.\n"
+    "# Ce que tu composais sans le valider, par PERSONNAGE puis par CORPS.\n"
     "#\n"
     "# Un FILET, pas un historique : il s'écrase sans prévenir et disparaît\n"
     "# dès que tu valides.\n"
     "#\n"
-    "# La clé est celle du sprite de corps — à pied, en selle, en costume :\n"
-    "# une recette ne désigne ses pièces que par des index de palette, et les\n"
-    "# index n'ont aucune signification commune d'un corps à l'autre.\n";
+    "# La première clé est le numéro du personnage : deux personnages de même\n"
+    "# classe ne partagent pas leurs essais. La seconde est celle du sprite de\n"
+    "# corps — à pied, en selle, en costume : une recette ne désigne ses pièces\n"
+    "# que par des index de palette, et les index n'ont aucune signification\n"
+    "# commune d'un corps à l'autre.\n";
 
 [[nodiscard]] std::optional<ro::sim::StyleRecipe> ReadCode(const YAML::Node& node) {
   const std::optional<ro::sim::StyleCode> read = StyleCodeAt(node);
@@ -76,6 +78,19 @@ bool StylePresets::Save(std::string_view name, const ro::sim::StyleRecipe& recip
 const ro::sim::StyleRecipe* StylePresets::Find(std::string_view name) const {
   const auto found = std::ranges::find(kept_, name, &Named::name);
   return found == kept_.end() ? nullptr : &found->recipe;
+}
+
+bool StylePresets::Rename(std::string_view from, std::string_view to) {
+  if (to.empty() || Find(to) != nullptr) {
+    return false;
+  }
+  const auto found = std::ranges::find(kept_, from, &Named::name);
+  if (found == kept_.end()) {
+    return false;
+  }
+  // ⚠ À SA PLACE, comme une mise à jour.
+  found->name = std::string(to);
+  return true;
 }
 
 void StylePresets::Erase(std::string_view name) {
@@ -136,7 +151,22 @@ void LoadStylePresets(const std::filesystem::path& client_root, StylePresets& in
   }
 }
 
-void LoadStyleDrafts(const std::filesystem::path& client_root, StyleDrafts& into) {
+namespace {
+
+// Les brouillons d'un personnage, lus dans sa section.
+void ReadDrafts(const YAML::Node& listed, StyleDrafts& into) {
+  for (const auto& entry : listed) {
+    const auto body_key = entry.first.as<std::uint32_t>(0U);
+    if (const std::optional<ro::sim::StyleRecipe> recipe = ReadCode(entry.second)) {
+      static_cast<void>(into.Put(body_key, *recipe));
+    }
+  }
+}
+
+}  // namespace
+
+void LoadStyleDrafts(const std::filesystem::path& client_root, std::uint32_t character_id,
+                     StyleDrafts& into) {
   const std::optional<YAML::Node> whole =
       ReadStyleFile(StyleDraftsPath(client_root), "brouillon de style");
   if (!whole.has_value()) {
@@ -147,9 +177,16 @@ void LoadStyleDrafts(const std::filesystem::path& client_root, StyleDrafts& into
     return;
   }
   for (const auto& entry : listed) {
-    const auto body_key = entry.first.as<std::uint32_t>(0U);
-    if (const std::optional<ro::sim::StyleRecipe> recipe = ReadCode(entry.second)) {
-      static_cast<void>(into.Put(body_key, *recipe));
+    // ⚠ L'ANCIENNE FORME, un code par corps sans personnage : le premier
+    // personnage qui ouvre l'éditeur la reprend, plutôt que de la perdre.
+    if (entry.second.IsScalar()) {
+      if (const std::optional<ro::sim::StyleRecipe> recipe = ReadCode(entry.second)) {
+        static_cast<void>(into.Put(entry.first.as<std::uint32_t>(0U), *recipe));
+      }
+      continue;
+    }
+    if (entry.second.IsMap() && entry.first.as<std::uint32_t>(0U) == character_id) {
+      ReadDrafts(entry.second, into);
     }
   }
 }
@@ -166,11 +203,43 @@ bool SaveStylePresets(const std::filesystem::path& client_root, const StylePrese
   return WriteStyleFile(StylePresetsPath(client_root), kPresetsHeader, out, "préréglages de style");
 }
 
-bool SaveStyleDrafts(const std::filesystem::path& client_root, const StyleDrafts& from) {
+bool SaveStyleDrafts(const std::filesystem::path& client_root, std::uint32_t character_id,
+                     const StyleDrafts& from) {
+  // 🔴 LES AUTRES PERSONNAGES SE RELISENT ET SE RÉÉCRIVENT TELS QUELS : le
+  // fichier est commun, et l'écrire depuis ce seul personnage effacerait les
+  // brouillons des autres.
+  std::map<std::uint32_t, std::map<std::uint32_t, std::string>> everyone;
+  if (const std::optional<YAML::Node> whole =
+          ReadStyleFile(StyleDraftsPath(client_root), "brouillon de style")) {
+    const YAML::Node listed = (*whole)[kDraftsField];
+    if (listed && listed.IsMap()) {
+      for (const auto& entry : listed) {
+        const auto owner = entry.first.as<std::uint32_t>(0U);
+        if (!entry.second.IsMap() || owner == character_id) {
+          continue;
+        }
+        for (const auto& kept : entry.second) {
+          everyone[owner][kept.first.as<std::uint32_t>(0U)] = kept.second.as<std::string>("");
+        }
+      }
+    }
+  }
+  everyone.erase(character_id);
+  for (const auto& [body_key, recipe] : from.all()) {
+    everyone[character_id][body_key] = ro::sim::EncodeStyleCode(recipe);
+  }
+
   YAML::Emitter out;
   out << YAML::BeginMap << YAML::Key << kDraftsField << YAML::Value << YAML::BeginMap;
-  for (const auto& [body_key, recipe] : from.all()) {
-    out << YAML::Key << body_key << YAML::Value << ro::sim::EncodeStyleCode(recipe);
+  for (const auto& [owner, drafts] : everyone) {
+    if (drafts.empty()) {
+      continue;
+    }
+    out << YAML::Key << owner << YAML::Value << YAML::BeginMap;
+    for (const auto& [body_key, code] : drafts) {
+      out << YAML::Key << body_key << YAML::Value << code;
+    }
+    out << YAML::EndMap;
   }
   out << YAML::EndMap << YAML::EndMap;
   return WriteStyleFile(StyleDraftsPath(client_root), kDraftsHeader, out, "brouillon de style");
