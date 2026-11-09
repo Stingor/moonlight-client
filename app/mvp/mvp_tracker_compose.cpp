@@ -47,8 +47,9 @@ constexpr std::array<std::uint16_t, 1> kDeepSeaWitchMobIds = {20843};
 constexpr std::array<std::uint16_t, 1> kTurtleGeneralMobIds = {3804};
 constexpr std::array<std::uint16_t, 2> kLuandaMobIds = {20273, 20277};
 constexpr std::array<std::uint16_t, 1> kMayaMobIds = {21395};
+constexpr std::array<std::uint16_t, 1> kChaosBaphometMobIds = {20520};
 
-constexpr std::array<ScriptedSlotArt, 12> kScriptedSlotArt = {{
+constexpr std::array<ScriptedSlotArt, 13> kScriptedSlotArt = {{
     {"lhz_dun03", "MVP BioLab 3", kBioLab3MobIds},
     {"lhz_dun04", "MVP BioLab 4", kBioLab4MobIds},
     {"niflheim", "Lord of Death", kLordOfDeathMobIds},
@@ -61,6 +62,7 @@ constexpr std::array<ScriptedSlotArt, 12> kScriptedSlotArt = {{
     {"tur_d04_i", "Ominous Turtle General", kTurtleGeneralMobIds},
     {"com_d02_i", "Tao Gunka / Wootan Defender", kLuandaMobIds},
     {"ant_d02_i", "Silent Maya", kMayaMobIds},
+    {"prt_mz03_i", "Chaos Baphomet", kChaosBaphometMobIds},
 }};
 
 [[nodiscard]] const ScriptedSlotArt* ScriptedArtOf(std::string_view map) {

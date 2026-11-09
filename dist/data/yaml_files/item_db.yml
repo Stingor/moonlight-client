@@ -101139,6 +101139,18 @@ Body:
       hateffect(HAT_EF_RESONATETAEGO,true);
     UnEquipScript: |
       hateffect(HAT_EF_RESONATETAEGO,false);
+  - Id: 19439
+    AegisName: Subject_Aura
+    Name: Vicious Mind Aura
+    Type: Armor
+    Buy: 1100
+    Sell: 550
+    Weight: 100
+    Defense: 1
+    Locations: {Head_Low: true}
+    ArmorLevel: 1
+    EquipLevelMin: 170
+    View: 1267
   - Id: 19459
     AegisName: C_Luna_On_Shoulder
     Name: Costume Lunatic on Shoulder
@@ -113750,6 +113762,22 @@ Body:
     Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
     Script: |
       getgroupitem(IG_ODIN_ITEMBOX);
+  - Id: 23993
+    AegisName: Bio_Docu_Box
+    Name: Bio Lab Material Box
+    Type: Usable
+    Weight: 10
+    Flags: {Container: true}
+    Script: |
+      getgroupitem(IG_BIO_DOCU_BOX);
+  - Id: 23994
+    AegisName: Bio_Reactant_Box
+    Name: Bio Reactor Box
+    Type: Usable
+    Weight: 10
+    Flags: {Container: true}
+    Script: |
+      getgroupitem(IG_BIO_REACTANT_BOX);
   - Id: 25043
     AegisName: Thorny_Vine_Flute
     Name: Thorny Vine Flute
@@ -114831,6 +114859,14 @@ Body:
     AegisName: Small_Flashlight
     Name: Small Flashlight
     Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25786
+    AegisName: Bio_Reseearch_Docu
+    Name: Somatology Research Document
+    Flags: {BuyingStore: true}
+  - Id: 25787
+    AegisName: Bio_Test_Fragment
+    Name: Somatology Experimental Fragment
     Flags: {BuyingStore: true}
   - Id: 25809
     AegisName: Ein_REDIUM

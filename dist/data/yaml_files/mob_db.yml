@@ -74164,6 +74164,250 @@ Body:
     Ai: 21
     Class: Boss
     Modes: {NoRandomWalk: true}
+  - Id: 20536
+    AegisName: MD_ED_B_YGNIZEM
+    Name: Nameless Swordsman
+    Level: 180
+    Hp: 4052484
+    Attack: 5030
+    Attack2: 7451
+    Defense: 59
+    MagicDefense: 37
+    Str: 290
+    Agi: 227
+    Vit: 254
+    Int: 219
+    Dex: 429
+    Luk: 196
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Demihuman
+    Element: Fire
+    ElementLevel: 2
+    WalkSpeed: 120
+    AttackDelay: 421
+    AttackMotion: 432
+    DamageMotion: 288
+    Ai: 09
+    Class: Boss
+    Modes: {Assist: true, FixedItemDrop: true, Mvp: true}
+    Drops:
+      - {Item: Bio_Docu_Box, Rate: 2000}
+      - {Item: Bio_Reactant_Box, Rate: 2000}
+      - {Item: Subject_Aura, Rate: 10}
+  - Id: 20537
+    AegisName: MD_ED_YGNIZEM
+    Name: Nameless Swordsman
+    Level: 176
+    Hp: 316392
+    Attack: 4422
+    Attack2: 6573
+    Defense: 46
+    MagicDefense: 29
+    Str: 246
+    Agi: 207
+    Vit: 216
+    Int: 186
+    Dex: 364
+    Luk: 81
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Demihuman
+    Element: Fire
+    ElementLevel: 2
+    WalkSpeed: 120
+    AttackDelay: 576
+    AttackMotion: 432
+    DamageMotion: 288
+    Ai: 09
+    Modes: {Assist: true}
+    Drops:
+      - {Item: Silent_Energy_Particle, Rate: 100}
+  - Id: 20538
+    AegisName: MD_ED_EREND
+    Name: Nameless Acolyte
+    Level: 176
+    Hp: 312379
+    Attack: 3085
+    Attack2: 4485
+    Defense: 42
+    MagicDefense: 29
+    Str: 109
+    Agi: 81
+    Vit: 127
+    Int: 205
+    Dex: 185
+    Luk: 81
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Demihuman
+    Element: Holy
+    ElementLevel: 2
+    WalkSpeed: 120
+    AttackDelay: 532
+    AttackMotion: 400
+    DamageMotion: 288
+    Ai: 09
+    Modes: {Assist: true}
+    Drops:
+      - {Item: Silent_Energy_Particle, Rate: 100}
+  - Id: 20539
+    AegisName: MD_ED_ARMAIA
+    Name: Nameless Merchant
+    Level: 175
+    Hp: 316785
+    Attack: 3951
+    Attack2: 5751
+    Defense: 41
+    MagicDefense: 25
+    Str: 176
+    Agi: 73
+    Vit: 121
+    Int: 93
+    Dex: 206
+    Luk: 81
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Demihuman
+    Element: Earth
+    ElementLevel: 2
+    WalkSpeed: 120
+    AttackDelay: 576
+    AttackMotion: 400
+    DamageMotion: 288
+    Ai: 09
+    Modes: {Assist: true}
+    Drops:
+      - {Item: Silent_Energy_Particle, Rate: 100}
+  - Id: 20540
+    AegisName: MD_ED_EREMES
+    Name: Eremes Guile
+    Level: 178
+    Hp: 310450
+    Attack: 3156
+    Attack2: 4567
+    Defense: 39
+    MagicDefense: 25
+    Str: 189
+    Agi: 160
+    Vit: 77
+    Int: 87
+    Dex: 249
+    Luk: 93
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Demihuman
+    Element: Poison
+    ElementLevel: 4
+    WalkSpeed: 120
+    AttackDelay: 86
+    AttackMotion: 384
+    DamageMotion: 288
+    Ai: 09
+    Modes: {Assist: true}
+    Drops:
+      - {Item: Silent_Energy_Particle, Rate: 100}
+  - Id: 20541
+    AegisName: MD_ED_LGTHIGHGUARD
+    Name: Senior Rekenber Guard
+    Level: 174
+    Hp: 315020
+    Attack: 3161
+    Attack2: 4561
+    Defense: 39
+    MagicDefense: 25
+    Str: 187
+    Agi: 217
+    Vit: 87
+    Int: 110
+    Dex: 251
+    Luk: 106
+    AttackRange: 9
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Demihuman
+    ElementLevel: 2
+    WalkSpeed: 120
+    AttackDelay: 854
+    AttackMotion: 276
+    DamageMotion: 264
+    Ai: 09
+    Modes: {Assist: true}
+    Drops:
+      - {Item: Yggdrasilberry, Rate: 25}
+      - {Item: Seed_Of_Yggdrasil, Rate: 50}
+  - Id: 20542
+    AegisName: MD_ED_LGTGUARD
+    Name: Rekenber Guard
+    Level: 176
+    Hp: 307174
+    Attack: 3069
+    Attack2: 4509
+    Defense: 39
+    MagicDefense: 26
+    Str: 207
+    Agi: 100
+    Vit: 75
+    Int: 110
+    Dex: 251
+    Luk: 88
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Demihuman
+    ElementLevel: 2
+    WalkSpeed: 120
+    AttackDelay: 851
+    AttackMotion: 360
+    DamageMotion: 140
+    Ai: 09
+    Modes: {Assist: true}
+    Drops:
+      - {Item: Yggdrasilberry, Rate: 25}
+      - {Item: Seed_Of_Yggdrasil, Rate: 50}
+  - Id: 20543
+    AegisName: MD_ED_M_SCIENCE
+    Name: Regenschirm Scientist
+    Level: 172
+    Hp: 317306
+    Attack: 2950
+    Attack2: 4292
+    Defense: 39
+    MagicDefense: 32
+    Str: 94
+    Agi: 96
+    Vit: 91
+    Int: 277
+    Dex: 246
+    Luk: 94
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Demihuman
+    ElementLevel: 2
+    WalkSpeed: 120
+    AttackDelay: 864
+    AttackMotion: 267
+    DamageMotion: 146
+    Ai: 09
+    Modes: {Assist: true}
+    Drops:
+      - {Item: Yggdrasilberry, Rate: 25}
+      - {Item: Seed_Of_Yggdrasil, Rate: 50}
+      - {Item: Lab_Staff_Record, Rate: 1000}
   - Id: 20560
     AegisName: G_MINERAL_G
     Name: Green Mineral
