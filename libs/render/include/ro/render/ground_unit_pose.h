@@ -42,4 +42,18 @@ struct GroundUnitPlay {
 void StepGroundUnit(const ModelRig& rig, bool sprung, std::uint32_t built_ms, std::uint32_t now_ms,
                     GroundUnitPlay& play);
 
+// LE PIÈGE QUI SE TIENT DÉPLIÉ : Ankle Snare. Son animation part des mâchoires
+// dressées l'une contre l'autre et finit sur les mâchoires ouvertes à plat.
+// Armé, il se tient OUVERT, sur sa dernière image ; déclenché, il se referme
+// sur son image de pose.
+inline constexpr std::uint32_t kAnkleSnareUnit = 145;
+
+[[nodiscard]] bool GroundUnitRestsDeployed(std::uint32_t unit_id) noexcept;
+
+// Le piège déplié tout juste bâti : sur la dernière image de son animation.
+[[nodiscard]] GroundUnitPlay GroundUnitDeployed(const ModelRig& rig);
+
+// Un pas logique du piège déplié : refermé dès qu'il a sauté, ouvert sinon.
+void StepDeployedGroundUnit(const ModelRig& rig, bool sprung, GroundUnitPlay& play);
+
 }  // namespace ro::render

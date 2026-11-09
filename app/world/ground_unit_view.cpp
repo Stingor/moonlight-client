@@ -125,7 +125,9 @@ void GroundUnits::Follow(const ro::sim::World& world) {
     Built fresh{.model_unit_id = unit.unit_id,
                 .look_seen_ms = unit.look_since_ms,
                 .built_ms = unit.look_since_ms,
-                .play = ro::render::GroundUnitAtRest(model->rig),
+                .play = ro::render::GroundUnitRestsDeployed(unit.unit_id)
+                            ? ro::render::GroundUnitDeployed(model->rig)
+                            : ro::render::GroundUnitAtRest(model->rig),
                 .group = std::nullopt};
     // Le même modèle garde sa place dans les lots : rien ne se retéléverse.
     if (known != built_.end() && known->second.model_unit_id == unit.unit_id) {
@@ -246,8 +248,12 @@ const ro::render::ModelClock& GroundUnits::Advance(const ro::sim::World& world,
     if (stepped) {
       const auto unit = world.skill_units().find(id);
       const bool sprung = unit != world.skill_units().end() && unit->second.sprung_ms.has_value();
-      ro::render::StepGroundUnit(ModelFor(built.model_unit_id)->rig, sprung, built.built_ms, now_ms,
-                                 built.play);
+      const ro::render::ModelRig& rig = ModelFor(built.model_unit_id)->rig;
+      if (ro::render::GroundUnitRestsDeployed(built.model_unit_id)) {
+        ro::render::StepDeployedGroundUnit(rig, sprung, built.play);
+      } else {
+        ro::render::StepGroundUnit(rig, sprung, built.built_ms, now_ms, built.play);
+      }
     }
     clock_.Hold(instances_, built.group->first, built.group->second, built.play.frame);
   }

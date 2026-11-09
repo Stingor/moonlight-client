@@ -43,4 +43,21 @@ void StepGroundUnit(const ModelRig& rig, bool sprung, std::uint32_t built_ms, st
   play.frame = SecondFamilyFrameAt(played.played_ms, rig.frame_rate);
 }
 
+bool GroundUnitRestsDeployed(std::uint32_t unit_id) noexcept { return unit_id == kAnkleSnareUnit; }
+
+GroundUnitPlay GroundUnitDeployed(const ModelRig& rig) {
+  if (!rig.second_family()) {
+    const std::int32_t last_frame = rig.animation_length > 0 ? rig.animation_length - 1 : 0;
+    return GroundUnitPlay{.counted_frame = last_frame, .frame = static_cast<float>(last_frame)};
+  }
+  // La dernière milliseconde jouée, comme un piège joué jusqu'au bout.
+  const double duration_ms = SecondFamilyDurationMs(rig.animation_length, rig.frame_rate);
+  const auto last_ms = duration_ms > 1.0 ? static_cast<std::uint32_t>(duration_ms - 1.0) : 0U;
+  return GroundUnitPlay{.counted_frame = 0, .frame = SecondFamilyFrameAt(last_ms, rig.frame_rate)};
+}
+
+void StepDeployedGroundUnit(const ModelRig& rig, bool sprung, GroundUnitPlay& play) {
+  play = sprung ? GroundUnitAtRest(rig) : GroundUnitDeployed(rig);
+}
+
 }  // namespace ro::render
