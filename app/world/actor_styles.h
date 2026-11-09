@@ -1,10 +1,11 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <map>
-#include <vector>
 
 #include "ro/render/actor_wardrobe.h"
+#include "ro/render/palette_ramps.h"
 #include "ro/render/sprite_catalog.h"
 #include "ro/sim/style.h"
 
@@ -23,10 +24,11 @@ namespace moonclient {
 //
 // ⚠ IL VIT DANS `app`, comme toute traduction entre `sim` et `render` : le
 // rendu ne connaît pas la simulation, et l'éditeur de liens le dit.
-// LES SEULS NUMÉROS D'UNE RECETTE — teinte de base, couleur de cheveux,
-// coiffure — posés sur cette apparence, pour qui n'a que faire des rampes : une
-// tête de groupe n'a ni costume à teindre ni identifiant de style à tenir.
-// Sans recette pour ce corps, l'apparence ressort telle quelle.
+
+// LES TROIS NUMÉROS D'UNE RECETTE — teinte de base, couleur de cheveux,
+// coiffure — posés sur cette apparence, pour une tête de groupe ou de guilde :
+// elle n'a ni costume à teindre ni identifiant de style à tenir. Sans recette
+// pour ce corps, l'apparence ressort telle quelle.
 //
 // ⚠ PAS DE REGISTRE ICI, et c'est voulu : rien n'est enregistré auprès de la
 // garde-robe, donc rien n'est à lui rendre.
@@ -37,56 +39,63 @@ class ActorStyles {
  public:
   // HABILLE CETTE APPARENCE DES COULEURS DE SON PORTEUR.
   //
-  // `look` entre SANS style et en ressort avec tout ce que la recette impose :
-  // l'identifiant que la garde-robe connaît, et les TROIS NUMÉROS — teinte de
-  // base, couleur de cheveux, coiffure. Le registre enregistre la recette
-  // auprès de la garde-robe la première fois qu'il la voit, et rend ensuite le
-  // même identifiant tant que rien ne change.
+  // `look` entre SANS style et en ressort avec ce que la recette pose sur un
+  // acteur du monde : l'identifiant que la garde-robe connaît, et la TEINTE DE
+  // VÊTEMENT. Celle-ci désigne le fichier de palette sur lequel la base est
+  // fusionnée, donc le découpage des rampes : un appelant qui l'oublierait
+  // verrait ce joueur autrement que les autres le voient.
   //
-  // 🔴 UN SEUL POINT D'ENTRÉE POUR LES QUATRE, ET CE N'EST PAS DU CONFORT. Les
-  // trois numéros ne décorent pas l'identifiant : la teinte de base désigne le
-  // fichier de palette sur lequel la base est fusionnée, donc le découpage des
-  // rampes, donc ce que les réglages eux-mêmes produisent. Les distribuer par
-  // un second appel laisserait un appelant les oublier — et ce joueur se
-  // verrait alors autrement qu'on le voit, sans que rien ne le signale.
+  // 🔴 NI LA COIFFURE NI LA COULEUR DE CHEVEUX, et c'est le contrat du serveur :
+  // il les a déjà posées par son propre changement d'apparence, et l'acteur les
+  // porte. Celles du lot datent de la dernière validation ; après un passage
+  // chez le styliste, elles remettraient l'ancienne coupe.
   //
   // ⚠ LA CLÉ DU CORPS SE PREND AVANT, et elle le peut : elle ne dépend que du
-  // chemin du `.spr`, qu'aucun de ces numéros ne déplace.
+  // chemin du `.spr`, que la teinte ne déplace pas.
   //
-  // 🔴 UN CHANGEMENT DONNE UN IDENTIFIANT NEUF, et l'ancien est oublié. La
-  // garde-robe refuse de réécrire une recette en place — une tenue déjà
-  // composée retient l'ADRESSE de sa palette, et la repeindre sous le même
-  // pointeur ne se verrait qu'à la prochaine éviction. Le registre prend donc
-  // le refus au sérieux au lieu de le contourner.
+  // 🔴 LES PORTEURS D'UNE MÊME RECETTE PARTAGENT UN IDENTIFIANT, donc leurs
+  // palettes et leurs textures. La recette se compare réglage par réglage, sans
+  // condensé, et ses trois numéros n'y entrent pas : la palette d'un style n'en
+  // dépend pas.
   //
-  // 🔴 ET L'ANCIEN NE MEURT QU'AU BALAYAGE. `Dress` s'appelle n'importe quand
-  // dans l'image — le portrait, le cadre de la cible, la fiche —, alors que la
-  // scène de l'image précédente désigne encore les tenues de cet identifiant, et
-  // que la désignation à la souris la lit avant la composition suivante.
+  // 🔴 UN CHANGEMENT DONNE UN IDENTIFIANT NEUF. La garde-robe refuse de
+  // réécrire une recette en place : une tenue déjà composée retient l'ADRESSE
+  // de sa palette, et la repeindre sous le même pointeur ne se verrait qu'à la
+  // prochaine éviction.
+  //
+  // 🔴 ET UN IDENTIFIANT QUE PLUS PERSONNE NE PORTE NE MEURT QU'AU BALAYAGE.
+  // `Dress` s'appelle n'importe quand dans l'image — le portrait, le cadre de
+  // la cible, la fiche —, alors que la scène de l'image précédente désigne
+  // encore ses tenues, et que la désignation à la souris la lit avant la
+  // composition suivante.
   void Dress(std::uint32_t gid, ro::render::ActorLook& look, ro::render::ActorWardrobe& wardrobe,
              const ro::sim::StyleBook& book);
 
-  // Oublie les acteurs dont le livre ne parle plus, et rend à la garde-robe ce
-  // qu'ils tenaient, avec les identifiants que `Dress` a remplacés. ⚠ APRÈS LA
-  // COMPOSITION : `ForgetStyle` invalide les tenues du style, et une composition
-  // en cours, comme la scène qu'elle remplace, les lirait détruites.
+  // Oublie les acteurs dont le livre ne parle plus, et rend à la garde-robe les
+  // identifiants que plus personne ne porte. ⚠ APRÈS LA COMPOSITION :
+  // `ForgetStyle` invalide les tenues du style, et une composition en cours,
+  // comme la scène qu'elle remplace, les lirait détruites.
   void Sweep(ro::render::ActorWardrobe& wardrobe, const ro::sim::StyleBook& book);
 
  private:
-  // Ce qu'un acteur porte en ce moment, et sur quoi cela a été décidé.
-  struct Applied {
-    std::uint32_t style = 0;
-    std::uint32_t body_key = 0;
-    // ⚠ LA RECETTE ELLE-MÊME, et on la COMPARE champ par champ : c'est le seul
-    // moyen de savoir qu'un lot a changé quelque chose. Un condensé
-    // collisionnerait un jour, et deux couleurs échangées en silence sont
-    // exactement ce que ce chantier doit éviter.
-    ro::sim::StyleRecipe recipe;
+  // Un identifiant enregistré auprès de la garde-robe, et combien d'acteurs le
+  // portent.
+  struct Interned {
+    ro::render::PaletteRecipe recipe;
+    std::size_t bearers = 0;
   };
 
-  std::map<std::uint32_t, Applied> applied_;
-  // Les identifiants remplacés, que le prochain `Sweep` rend à la garde-robe.
-  std::vector<std::uint32_t> retired_;
+  // L'identifiant qui porte cette recette, enregistré s'il n'existe pas ; zéro
+  // si la garde-robe le refuse.
+  [[nodiscard]] std::uint32_t Intern(const ro::render::PaletteRecipe& recipe,
+                                     ro::render::ActorWardrobe& wardrobe);
+  void Release(std::uint32_t style);
+
+  // Ce que chaque acteur porte en ce moment, par son identifiant.
+  std::map<std::uint32_t, std::uint32_t> applied_;
+  // ⚠ UN STYLE SANS PORTEUR Y RESTE JUSQU'AU BALAYAGE : un acteur qui reprend
+  // la même recette avant retrouve le même identifiant.
+  std::map<std::uint32_t, Interned> interned_;
 };
 
 }  // namespace moonclient

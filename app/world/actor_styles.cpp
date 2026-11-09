@@ -1,50 +1,8 @@
 #include "world/actor_styles.h"
 
-#include <vector>
-
 #include "character/style_recipe.h"
 
 namespace moonclient {
-namespace {
-
-// La recette de `sim`, traduite pour le calcul de `render`.
-//
-// ⚠ DEUX TYPES POUR LA MÊME CHOSE, ET C'EST LE GRAPHE QUI L'IMPOSE : `render`
-// ne dépend pas de `sim`, et `net` ne dépend pas de `render`. La même
-// frontière que `sim::Actor` face à `render::ActorLook`.
-[[nodiscard]] ro::render::PaletteRecipe Translate(const ro::sim::StyleRecipe& told) {
-  ro::render::PaletteRecipe recipe;
-  for (std::size_t rank = 0; rank < ro::sim::kStyleRampCount && rank < ro::render::kMaxRamps;
-       ++rank) {
-    const ro::sim::StyleAdjust& adjust = told.ramps[rank];
-    recipe.ramps[rank] = ro::render::RampAdjust{.hue = adjust.hue,
-                                                .saturation = adjust.saturation,
-                                                .value = adjust.value,
-                                                .absolute = adjust.absolute};
-  }
-  return recipe;
-}
-
-[[nodiscard]] bool Same(const ro::sim::StyleAdjust& left, const ro::sim::StyleAdjust& right) {
-  return left.hue == right.hue && left.saturation == right.saturation &&
-         left.value == right.value && left.absolute == right.absolute;
-}
-
-// ⚠ CHAMP PAR CHAMP : comparer des champs ne collisionne jamais.
-[[nodiscard]] bool Same(const ro::sim::StyleRecipe& left, const ro::sim::StyleRecipe& right) {
-  if (left.body_palette != right.body_palette || left.hair_palette != right.hair_palette ||
-      left.hair_style != right.hair_style) {
-    return false;
-  }
-  for (std::size_t rank = 0; rank < ro::sim::kStyleRampCount; ++rank) {
-    if (!Same(left.ramps[rank], right.ramps[rank])) {
-      return false;
-    }
-  }
-  return true;
-}
-
-}  // namespace
 
 void ImposeStyleNumbers(std::uint32_t gid, ro::render::ActorLook& look,
                         ro::render::ActorWardrobe& wardrobe, const ro::sim::StyleBook& book) {
@@ -62,7 +20,6 @@ void ActorStyles::Dress(std::uint32_t gid, ro::render::ActorLook& look,
                         ro::render::ActorWardrobe& wardrobe, const ro::sim::StyleBook& book) {
   look.style = 0;
   const ro::sim::StyleVariants* variants = book.Find(gid);
-  const auto known = applied_.find(gid);
   // ⚠ LA CLÉ NE SE DEMANDE QUE POUR QUI A DES COULEURS : elle charge le sprite
   // du corps pour savoir lequel se charge vraiment, et le faire pour tous les
   // acteurs d'une carte peuplée paierait ce chargement sans rien en tirer.
@@ -73,58 +30,83 @@ void ActorStyles::Dress(std::uint32_t gid, ro::render::ActorLook& look,
   const std::uint32_t body_key = variants != nullptr ? wardrobe.BodyKeyFor(look) : 0;
   const ro::sim::StyleRecipe* wanted =
       variants != nullptr && body_key != 0 ? variants->For(body_key) : nullptr;
+  const auto known = applied_.find(gid);
 
   if (wanted == nullptr) {
-    // Plus de couleurs : on rend l'acteur à son apparence native, et on rend
-    // aussi son identifiant.
+    // Plus de couleurs : l'acteur reprend son apparence native, et lâche son
+    // identifiant.
     if (known != applied_.end()) {
-      retired_.push_back(known->second.style);
+      Release(known->second);
       applied_.erase(known);
     }
     return;
   }
-  // 🔴 LES TROIS NUMÉROS D'ABORD, ET QUOI QU'IL ARRIVE ENSUITE. Ils tiennent
-  // debout sans l'identifiant — ce sont des fichiers officiels, que le jeu
-  // sait poser seul —, et un refus de la garde-robe plus bas ne doit pas
-  // emporter la coiffure avec les réglages.
-  Impose(*wanted, look);
+  // 🔴 LA TEINTE D'ABORD, ET QUOI QU'IL ARRIVE ENSUITE. Elle tient debout sans
+  // l'identifiant — c'est un fichier officiel, que le jeu sait poser seul —, et
+  // un refus de la garde-robe plus bas ne doit pas l'emporter avec les réglages.
+  ImposeBodyPalette(*wanted, look);
 
-  if (known != applied_.end() && known->second.body_key == body_key &&
-      Same(known->second.recipe, *wanted)) {
-    look.style = known->second.style;
-    return;
-  }
-
-  // 🔴 UN IDENTIFIANT NEUF, JAMAIS UNE RÉÉCRITURE : voir l'en-tête.
+  const ro::render::PaletteRecipe recipe = FromWire(*wanted);
   if (known != applied_.end()) {
-    retired_.push_back(known->second.style);
+    if (const auto worn = interned_.find(known->second);
+        worn != interned_.end() && SameRamps(worn->second.recipe, recipe)) {
+      look.style = known->second;
+      return;
+    }
+    Release(known->second);
+    applied_.erase(known);
   }
-  const std::uint32_t style = wardrobe.NewStyleId();
-  if (!wardrobe.SetStyle(style, Translate(*wanted))) {
+  const std::uint32_t style = Intern(recipe, wardrobe);
+  if (style == 0) {
     // La garde-robe a refusé : on ne prétend pas qu'un style existe. L'acteur
     // garde son apparence native plutôt que d'en porter une qu'on ne sait pas
     // nommer.
-    applied_.erase(gid);
     return;
   }
-  applied_[gid] = Applied{.style = style, .body_key = body_key, .recipe = *wanted};
+  applied_[gid] = style;
   look.style = style;
 }
 
-void ActorStyles::Sweep(ro::render::ActorWardrobe& wardrobe, const ro::sim::StyleBook& book) {
-  for (const std::uint32_t style : retired_) {
-    wardrobe.ForgetStyle(style);
-  }
-  retired_.clear();
-  std::vector<std::uint32_t> gone;
-  for (const auto& [gid, applied] : applied_) {
-    if (book.Find(gid) == nullptr) {
-      gone.push_back(gid);
+std::uint32_t ActorStyles::Intern(const ro::render::PaletteRecipe& recipe,
+                                  ro::render::ActorWardrobe& wardrobe) {
+  for (auto& [style, interned] : interned_) {
+    if (SameRamps(interned.recipe, recipe)) {
+      ++interned.bearers;
+      return style;
     }
   }
-  for (const std::uint32_t gid : gone) {
-    wardrobe.ForgetStyle(applied_[gid].style);
-    applied_.erase(gid);
+  // 🔴 UN IDENTIFIANT NEUF, JAMAIS UNE RÉÉCRITURE : voir l'en-tête.
+  const std::uint32_t style = wardrobe.NewStyleId();
+  if (!wardrobe.SetStyle(style, recipe)) {
+    return 0;
+  }
+  interned_.emplace(style, Interned{.recipe = recipe, .bearers = 1});
+  return style;
+}
+
+void ActorStyles::Release(std::uint32_t style) {
+  if (const auto found = interned_.find(style);
+      found != interned_.end() && found->second.bearers > 0) {
+    --found->second.bearers;
+  }
+}
+
+void ActorStyles::Sweep(ro::render::ActorWardrobe& wardrobe, const ro::sim::StyleBook& book) {
+  for (auto applied = applied_.begin(); applied != applied_.end();) {
+    if (book.Find(applied->first) != nullptr) {
+      ++applied;
+      continue;
+    }
+    Release(applied->second);
+    applied = applied_.erase(applied);
+  }
+  for (auto interned = interned_.begin(); interned != interned_.end();) {
+    if (interned->second.bearers != 0) {
+      ++interned;
+      continue;
+    }
+    wardrobe.ForgetStyle(interned->first);
+    interned = interned_.erase(interned);
   }
 }
 

@@ -677,6 +677,10 @@ void Game::ComposeActors(std::uint32_t now_ms, const ro::ui::PickTuning& pick_tu
     // les tenues qui le portaient, et le parcours les lirait mortes, comme la scène
     // d'avant que la désignation à la souris relit jusqu'ici.
     styles_.Sweep(*pieces_.wardrobe, world_.styles());
+    // LES TEXTURES DES PALETTES OUBLIÉES s'en vont avec elles, éditeur compris :
+    // sans cela, chaque style changé resterait en mémoire vidéo jusqu'au
+    // changement de carte.
+    sprites_.ForgetPaletteSerials(pieces_.wardrobe->TakeRetiredPaletteSerials());
     ReportCensus(census, reported_census_);
     // LA MARCHE QU'UN GESTE RETENAIT part dès que la motion a changé, d'après ce
     // que cette image vient de composer : voir `DeferredWalk`.

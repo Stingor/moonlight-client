@@ -14,25 +14,38 @@ namespace moonclient {
 // traduit dans les deux sens — comme il traduit déjà `sim::Actor` en
 // `render::ActorLook`.
 //
-// ⚠ ET CES TROIS-LÀ SONT PARTAGÉS, parce que deux fenêtres les emploient :
-// l'éditeur et l'aperçu d'un style reçu. Deux copies divergeraient au premier
+// ⚠ ET CES FONCTIONS-LÀ SONT PARTAGÉES, parce que plusieurs fenêtres et le
+// registre des acteurs les emploient. Deux copies divergeraient au premier
 // champ ajouté à la recette, et la moitié des styles arriverait tronquée sans
 // que rien ne le dise.
 
 [[nodiscard]] ro::render::PaletteRecipe FromWire(const ro::sim::StyleRecipe& told);
 [[nodiscard]] ro::sim::StyleRecipe ToWire(const ro::render::PaletteRecipe& recipe);
 
-// CE QUE LA RECETTE IMPOSE, posé sur l'apparence.
+// CE QUE LA RECETTE IMPOSE, posé sur l'apparence : ses trois numéros.
 //
-// ⚠ LA MÊME RÈGLE QUE POUR N'IMPORTE QUEL AUTRE ACTEUR — voir
-// `world/actor_styles.h` : moins un veut dire « rien d'imposé », et le champ
-// du personnage reste alors en place. Un pantin doit montrer la coupe qu'on
-// ESSAIE, sans revendiquer un choix qu'on n'a pas fait.
+// ⚠ POUR CE QUI NE VIENT PAS DU MONDE : le pantin de l'éditeur, l'aperçu d'un
+// code, la tête d'un membre de groupe ou de guilde. Moins un veut dire « rien
+// d'imposé », et le champ du personnage reste alors en place. Un pantin doit
+// montrer la coupe qu'on ESSAIE, sans revendiquer un choix qu'on n'a pas fait.
 void Impose(const ro::render::PaletteRecipe& recipe, ro::render::ActorLook& look);
 void Impose(const ro::sim::StyleRecipe& recipe, ro::render::ActorLook& look);
+
+// LA SEULE TEINTE DE VÊTEMENT, pour un acteur du monde.
+//
+// 🔴 LA COIFFURE ET LA COULEUR DE CHEVEUX NE SE POSENT PAS SUR UN ACTEUR DU
+// MONDE : le serveur les a déjà appliquées par son propre changement
+// d'apparence, et le lot ne les porte que pour que l'écho rendu au
+// propriétaire soit complet. Après un passage chez le styliste, celles du lot
+// remettraient l'ancienne coupe.
+void ImposeBodyPalette(const ro::sim::StyleRecipe& recipe, ro::render::ActorLook& look);
 
 // ⚠ CHAMP PAR CHAMP : comparer des champs ne collisionne jamais.
 [[nodiscard]] bool SameRecipe(const ro::render::PaletteRecipe& left,
                               const ro::render::PaletteRecipe& right);
+// Les seuls réglages des rampes : c'est tout ce que la palette d'un style en
+// tire, ses trois numéros agissant avant elle.
+[[nodiscard]] bool SameRamps(const ro::render::PaletteRecipe& left,
+                             const ro::render::PaletteRecipe& right);
 
 }  // namespace moonclient

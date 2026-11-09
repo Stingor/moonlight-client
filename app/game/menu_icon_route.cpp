@@ -10,7 +10,6 @@
 #include "game/battleground_stage.h"
 #include "game/skin_image_of.h"
 #include "input/key_action.h"
-#include "world/actor_styles.h"
 #include "world/actor_view.h"
 
 namespace moonclient {
@@ -18,14 +17,12 @@ namespace moonclient {
 using ro::ui::MenuCommand;
 
 std::optional<ro::render::StatusHeadKey> StatusHeadKeyOf(const ro::sim::World& world,
-                                                         ro::render::ActorWardrobe& wardrobe,
                                                          std::uint32_t character_id) {
   const ro::sim::Actor* self = world.player();
   if (self == nullptr) {
     return std::nullopt;
   }
-  ro::render::ActorLook look = LookOf(*self);
-  ImposeStyleNumbers(world.player_id(), look, wardrobe, world.styles());
+  const ro::render::ActorLook look = LookOf(*self);
   return ro::render::StatusHeadKey{.character_id = character_id,
                                    .job = look.job,
                                    .sex = look.sex,
@@ -88,7 +85,7 @@ MenuIconFacts MenuIconFactsOf(const ro::sim::World& world, const UiStage::Window
   // LA TÊTE DU STATUT : refaite ici quand elle change, montrée tant qu'elle est
   // rendue. Sans garde-robe, le Statut garde son art.
   if (pieces.status_head.has_value() && pieces.wardrobe.has_value()) {
-    pieces.status_head->Refresh(StatusHeadKeyOf(world, *pieces.wardrobe, character_id));
+    pieces.status_head->Refresh(StatusHeadKeyOf(world, character_id));
     facts.status_head = SkinImageOf(pieces.status_head->normal());
     facts.status_head_pressed = SkinImageOf(pieces.status_head->pressed());
   }

@@ -42,10 +42,14 @@ class MvpTrackerStage;
                                             std::uint32_t character_id);
 
 // CE QUI DÉCIDE DE LA TÊTE DU STATUT : celle du personnage du joueur, avec la
-// coiffure et la couleur que sa recette de style impose, comme sur la carte.
-// Rien tant qu'aucun personnage n'est chargé.
-[[nodiscard]] std::optional<ro::render::StatusHeadKey> StatusHeadKeyOf(
-    const ro::sim::World& world, ro::render::ActorWardrobe& wardrobe, std::uint32_t character_id);
+// coiffure et la couleur que son acteur porte, comme sur la carte. Rien tant
+// qu'aucun personnage n'est chargé.
+//
+// ⚠ PAS CELLES DE SA RECETTE : le serveur a posé lui-même la coupe et la
+// couleur choisies, et celles du lot datent de la dernière validation — après
+// un passage chez le styliste, elles remettraient l'ancienne coupe.
+[[nodiscard]] std::optional<ro::render::StatusHeadKey> StatusHeadKeyOf(const ro::sim::World& world,
+                                                                       std::uint32_t character_id);
 
 // Ce qu'un clic peut toucher.
 struct MenuIconTargets {
