@@ -61736,6 +61736,50 @@ Body:
     Sell: 210
     Weight: 10
     Flags: {BuyingStore: true}
+  - Id: 11621
+    AegisName: High_RedPotion
+    Name: Red Syrup
+    Type: Healing
+    Buy: 800
+    Sell: 400
+    Weight: 70
+    EquipLevelMin: 60
+    Delay: {Duration: 1000}
+    Script: |
+      itemheal 325,0;
+  - Id: 11622
+    AegisName: High_YelloPotion
+    Name: Yellow Syrup
+    Type: Healing
+    Buy: 1200
+    Sell: 600
+    Weight: 100
+    EquipLevelMin: 60
+    Delay: {Duration: 1000}
+    Script: |
+      itemheal 900,0;
+  - Id: 11623
+    AegisName: High_WhitePotion
+    Name: White Syrup
+    Type: Healing
+    Buy: 1500
+    Sell: 750
+    Weight: 140
+    EquipLevelMin: 60
+    Delay: {Duration: 1000}
+    Script: |
+      itemheal 1800,0;
+  - Id: 11624
+    AegisName: High_BluePotion
+    Name: Blue Syrup
+    Type: Healing
+    Buy: 7000
+    Sell: 3500
+    Weight: 100
+    EquipLevelMin: 60
+    Delay: {Duration: 10000}
+    Script: |
+      itemheal 0,180;
   - Id: 11701
     AegisName: Girl_Bunch_Of_Flower
     Name: Girl's Bouquet
