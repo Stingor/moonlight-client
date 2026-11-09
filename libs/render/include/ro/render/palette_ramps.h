@@ -299,6 +299,14 @@ struct LayerRampProfile {
 [[nodiscard]] RampAdjust AdjustToReach(const formats::Palette& palette, const PaletteRamp& ramp,
                                        std::array<std::uint8_t, 3> target);
 
+// UNE COULEUR RÉGLÉE : les trois octets rouge, vert, bleu de `rgb`, réglés
+// par `adjust` et écrits dans `out`. C'est l'opération que `ApplyRecipe` fait
+// sur chaque index d'une rampe, et que les classes de teinte font pixel par
+// pixel : une seule écriture, pour que les deux ne divergent jamais.
+//
+// ⚠ ELLE NE SAUTE PAS UN RÉGLAGE NEUTRE : c'est à l'appelant de le faire.
+void AdjustColor(const std::uint8_t* rgb, const RampAdjust& adjust, std::uint8_t* out);
+
 // Applique une recette sur une base. Les rampes sont celles que `DetectRamps` a
 // rendues, dans son ordre : c'est le RANG qui voyage.
 //

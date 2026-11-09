@@ -652,6 +652,28 @@ RampAdjust AdjustToReach(const formats::Palette& palette, const PaletteRamp& ram
   return adjust;
 }
 
+void AdjustColor(const std::uint8_t* rgb, const RampAdjust& adjust, std::uint8_t* out) {
+  const Hsv color = RgbToHsv(rgb[0], rgb[1], rgb[2]);
+  double hue = 0.0;
+  double saturation = 0.0;
+  if (adjust.absolute) {
+    hue = std::fmod(static_cast<double>(adjust.hue), kDegreesPerTurn);
+    saturation = static_cast<double>(adjust.saturation) / kPercent;
+  } else {
+    hue = std::fmod(color.h * kDegreesPerTurn + static_cast<double>(adjust.hue), kDegreesPerTurn);
+    saturation = color.s * (1.0 + static_cast<double>(adjust.saturation) / kPercent);
+  }
+  // ⚠ LE MODULO DU C++ GARDE LE SIGNE DU DIVIDENDE, celui de Python celui du
+  // diviseur : une teinte pivotée vers le bas sortirait négative, et la
+  // conversion la placerait dans un tout autre secteur.
+  if (hue < 0.0) {
+    hue += kDegreesPerTurn;
+  }
+  const double value = color.v * (1.0 + static_cast<double>(adjust.value) / kPercent);
+  HsvToRgb(hue / kDegreesPerTurn, std::clamp(saturation, 0.0, 1.0), std::clamp(value, 0.0, 1.0),
+           out);
+}
+
 formats::Palette ApplyRecipe(const formats::Palette& base, std::span<const PaletteRamp> ramps,
                              const PaletteRecipe& recipe) {
   formats::Palette painted = base;
@@ -667,26 +689,7 @@ formats::Palette ApplyRecipe(const formats::Palette& base, std::span<const Palet
     const std::size_t end = std::min<std::size_t>(
         static_cast<std::size_t>(ramp.start) + ramp.length, formats::kPaletteEntryCount);
     for (std::size_t index = ramp.start; index < end; ++index) {
-      const Hsv color = EntryHsv(base, index);
-      double hue = 0.0;
-      double saturation = 0.0;
-      if (adjust.absolute) {
-        hue = std::fmod(static_cast<double>(adjust.hue), kDegreesPerTurn);
-        saturation = static_cast<double>(adjust.saturation) / kPercent;
-      } else {
-        hue =
-            std::fmod(color.h * kDegreesPerTurn + static_cast<double>(adjust.hue), kDegreesPerTurn);
-        saturation = color.s * (1.0 + static_cast<double>(adjust.saturation) / kPercent);
-      }
-      // ⚠ LE MODULO DU C++ GARDE LE SIGNE DU DIVIDENDE, celui de Python celui
-      // du diviseur : une teinte pivotée vers le bas sortirait négative, et la
-      // conversion la placerait dans un tout autre secteur.
-      if (hue < 0.0) {
-        hue += kDegreesPerTurn;
-      }
-      const double value = color.v * (1.0 + static_cast<double>(adjust.value) / kPercent);
-      HsvToRgb(hue / kDegreesPerTurn, std::clamp(saturation, 0.0, 1.0), std::clamp(value, 0.0, 1.0),
-               painted.entries[index].data());
+      AdjustColor(base.entries[index].data(), adjust, painted.entries[index].data());
     }
   }
   return painted;

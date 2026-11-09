@@ -84,6 +84,7 @@ add_library(ro_render STATIC
     src/actor_scale.cpp
     src/actor_sprite.cpp
     src/actor_wardrobe.cpp
+    src/actor_wardrobe_style.cpp
     src/armed_skill.cpp
     src/attack_animation.cpp
     src/attack_sound.cpp
@@ -181,6 +182,8 @@ add_library(ro_render STATIC
     src/sprite_billboard.cpp
     src/body_sprite_key.cpp
     src/palette_ramps.cpp
+    src/hue_classes.cpp
+    src/style_set.cpp
     src/post_fx.cpp
     src/post_fx_reference.cpp
     src/spin_blur.cpp

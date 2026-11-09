@@ -5,6 +5,18 @@
 #include <utility>
 
 namespace ro::render {
+namespace {
+
+// Une teinture qu'on sait appliquer : un profil connu, et pour les rampes un
+// calque que le profil 1 découpe.
+[[nodiscard]] bool Applicable(const LayerDye& dye) {
+  if (dye.profile == kHueClassProfileNumber) {
+    return true;
+  }
+  return dye.profile == kLayerProfileNumber && RampLayerOf(dye.layer).has_value();
+}
+
+}  // namespace
 
 const formats::Palette& ActorPalettes::Base(const formats::SprSprite& sprite,
                                             const formats::Palette* official) {
@@ -30,19 +42,12 @@ const std::array<int, formats::kPaletteEntryCount>& ActorPalettes::Usage(
   return usage_.emplace(&sprite, CountIndexUsage(sprite)).first->second;
 }
 
-const ActorPalettes::Analysis& ActorPalettes::Analyze(const formats::SprSprite& sprite,
-                                                      const formats::Palette* official) {
-  const Source source{&sprite, official};
-  if (const auto found = analyses_.find(source); found != analyses_.end()) {
-    return found->second;
-  }
+ActorPalettes::Analysis ActorPalettes::Measured(
+    const formats::Palette& base, std::vector<PaletteRamp> ramps,
+    const std::array<int, formats::kPaletteEntryCount>& usage) const {
   Analysis analysis;
-  // ⚠ LA DÉTECTION SE FAIT SUR LA BASE FUSIONNÉE, jamais sur le sprite nu : les
-  // frontières des rampes ne sont pas les mêmes des deux côtés de la fusion.
-  // Voir l'ADR 0050.
-  analysis.base = &Base(sprite, official);
-  const std::array<int, formats::kPaletteEntryCount>& usage = Usage(sprite);
-  analysis.ramps = DetectRamps(*analysis.base, usage);
+  analysis.base = &base;
+  analysis.ramps = std::move(ramps);
   for (const int used : usage) {
     analysis.pixels_total += used;
   }
@@ -53,31 +58,64 @@ const ActorPalettes::Analysis& ActorPalettes::Analyze(const formats::SprSprite& 
       analysis.pixels_covered += usage[index];
     }
   }
-  return analyses_.emplace(source, std::move(analysis)).first->second;
+  return analysis;
 }
 
-bool ActorPalettes::Knows(std::uint32_t style) const {
-  return recipes_.contains(style) || ready_made_.contains(style);
-}
-
-bool ActorPalettes::SetRecipe(std::uint32_t style, const PaletteRecipe& recipe) {
-  // ⚠ NI UN IDENTIFIANT TENU PAR UNE PALETTE TOUTE FAITE : elles passent avant
-  // les recettes, et l'acteur porterait celle d'un autre.
-  if (style == 0 || ready_made_.contains(style)) {
-    return false;
+const ActorPalettes::Analysis& ActorPalettes::Analyze(const formats::SprSprite& sprite,
+                                                      const formats::Palette* official) {
+  const Source source{&sprite, official};
+  if (const auto found = analyses_.find(source); found != analyses_.end()) {
+    return found->second;
   }
-  return recipes_.emplace(style, recipe).second;
+  // ⚠ LA DÉTECTION SE FAIT SUR LA BASE FUSIONNÉE, jamais sur le sprite nu : les
+  // frontières des rampes ne sont pas les mêmes des deux côtés de la fusion.
+  // Voir l'ADR 0050.
+  const formats::Palette& base = Base(sprite, official);
+  const std::array<int, formats::kPaletteEntryCount>& usage = Usage(sprite);
+  return analyses_.emplace(source, Measured(base, DetectRamps(base, usage), usage)).first->second;
 }
 
-bool ActorPalettes::SetPalette(std::uint32_t style, formats::Palette palette) {
+const ActorPalettes::Analysis& ActorPalettes::AnalyzeLayer(const formats::SprSprite& sprite,
+                                                           const formats::Palette* official,
+                                                           RampLayer layer, SkinRace race) {
+  const LayerSource source{Source{&sprite, official}, layer, race};
+  if (const auto found = layer_analyses_.find(source); found != layer_analyses_.end()) {
+    return found->second;
+  }
+  const formats::Palette& base = Base(sprite, official);
+  const std::array<int, formats::kPaletteEntryCount>& usage = Usage(sprite);
+  // Le profil 1 existe pour chaque calque qu'il découpe : la teinture qui le
+  // demande l'a déjà vérifié.
+  const std::optional<LayerRampProfile> profile = LayerProfile(kLayerProfileNumber, layer, race);
+  std::vector<PaletteRamp> ramps =
+      profile.has_value() ? DetectLayerRamps(base, usage, *profile) : std::vector<PaletteRamp>();
+  return layer_analyses_.emplace(source, Measured(base, std::move(ramps), usage)).first->second;
+}
+
+bool ActorPalettes::Knows(std::uint32_t style) const { return sets_.contains(style); }
+
+bool ActorPalettes::SetStyle(std::uint32_t style, StyleSet set) {
   if (style == 0 || Knows(style)) {
     return false;
   }
-  return ready_made_.emplace(style, StyledPalette{std::move(palette), ++last_serial_}).second;
+  if (set.body_palette.has_value()) {
+    ready_made_.emplace(style, StyledPalette{std::move(*set.body_palette), {}, ++last_serial_});
+    set.body_palette.reset();
+  }
+  sets_.emplace(style, std::move(set));
+  return true;
+}
+
+bool ActorPalettes::SetRecipe(std::uint32_t style, const PaletteRecipe& recipe) {
+  return SetStyle(style, StyleSet{.body = recipe});
+}
+
+bool ActorPalettes::SetPalette(std::uint32_t style, formats::Palette palette) {
+  return SetStyle(style, StyleSet{.body_palette = std::move(palette)});
 }
 
 void ActorPalettes::Forget(std::uint32_t style) {
-  recipes_.erase(style);
+  sets_.erase(style);
   if (const auto ready = ready_made_.find(style); ready != ready_made_.end()) {
     retired_serials_.push_back(ready->second.serial);
     ready_made_.erase(ready);
@@ -87,34 +125,94 @@ void ActorPalettes::Forget(std::uint32_t style) {
       ++painted;
       continue;
     }
-    retired_serials_.push_back(painted->second.serial);
+    if (painted->second.has_value()) {
+      retired_serials_.push_back(painted->second->serial);
+    }
     painted = painted_.erase(painted);
   }
 }
 
+std::optional<ActorPalettes::StyledPalette> ActorPalettes::Paint(const StyleSet& set,
+                                                                 const formats::SprSprite& sprite,
+                                                                 const formats::Palette* official,
+                                                                 const formats::Palette* ready,
+                                                                 const Piece& piece) {
+  const PaletteRecipe* body =
+      piece.layer == StyleLayer::kBody && set.body.has_value() ? &*set.body : nullptr;
+  const LayerDye* dye =
+      RampLayerOf(piece.layer).has_value() ? set.Find(piece.layer, piece.key) : nullptr;
+  if (dye != nullptr && !Applicable(*dye)) {
+    dye = nullptr;
+  }
+  const LayerDye* skin = piece.skin ? set.Find(StyleLayer::kSkin, 0) : nullptr;
+  if (skin != nullptr && skin->profile != kLayerProfileNumber) {
+    skin = nullptr;
+  }
+  const bool by_classes = dye != nullptr && dye->profile == kHueClassProfileNumber;
+
+  StyledPalette styled;
+  if (by_classes) {
+    styled.tint = LayerHueClasses(*dye);
+  }
+  // Un sprite sans palette n'a que des images en couleurs vraies : seules les
+  // classes de teinte les atteignent.
+  if (!sprite.palette().has_value()) {
+    return by_classes ? std::optional<StyledPalette>(std::move(styled)) : std::nullopt;
+  }
+  if (ready == nullptr && body == nullptr && dye == nullptr && skin == nullptr) {
+    return std::nullopt;
+  }
+  const formats::Palette& base = Base(sprite, official);
+  if (ready != nullptr) {
+    styled.palette = *ready;
+  } else if (body != nullptr) {
+    styled.palette = ApplyRecipe(base, Analyze(sprite, official).ramps, *body);
+  } else if (by_classes) {
+    styled.palette = ApplyHueClasses(base, *styled.tint);
+  } else if (dye != nullptr) {
+    const Analysis& layer = AnalyzeLayer(sprite, official, *RampLayerOf(dye->layer), piece.race);
+    styled.palette = ApplyRecipe(base, layer.ramps, LayerRecipe(*dye));
+  } else {
+    styled.palette = base;
+  }
+  // 🔴 LA PEAU EN DERNIER : elle l'emporte sur ce qui précède.
+  if (skin != nullptr) {
+    ApplySkin(styled.palette, base, piece.race, skin->adjusts.front());
+  }
+  return styled;
+}
+
 const ActorPalettes::StyledPalette* ActorPalettes::StyledFor(std::uint32_t style,
                                                              const formats::SprSprite& sprite,
-                                                             const formats::Palette* official) {
-  if (const auto ready = ready_made_.find(style); ready != ready_made_.end()) {
-    return &ready->second;
-  }
-  const Painted key{style, Source{&sprite, official}};
-  if (const auto found = painted_.find(key); found != painted_.end()) {
-    return &found->second;
-  }
-  const auto recipe = recipes_.find(style);
+                                                             const formats::Palette* official,
+                                                             const Piece& piece) {
   // Un style qu'on ne connaît pas laisse l'apparence NATIVE. Cela arrive pour
   // de bon : le lot du serveur peut décrire un joueur dont le corps n'est pas
   // encore chargé, et la recette arrive alors avant ce qu'elle repeint.
-  if (recipe == recipes_.end() || !sprite.palette().has_value()) {
+  const auto set = sets_.find(style);
+  if (set == sets_.end()) {
     return nullptr;
   }
-  const Analysis& analysis = Analyze(sprite, official);
-  return &painted_
-              .emplace(key,
-                       StyledPalette{ApplyRecipe(*analysis.base, analysis.ramps, recipe->second),
-                                     ++last_serial_})
-              .first->second;
+  const auto ready = piece.layer == StyleLayer::kBody ? ready_made_.find(style) : ready_made_.end();
+  const bool skinned = piece.skin && set->second.Find(StyleLayer::kSkin, 0) != nullptr;
+  // La palette toute faite vaut pour tous les sprites, tant qu'aucune peau ne
+  // s'y pose.
+  if (ready != ready_made_.end() && !skinned) {
+    return &ready->second;
+  }
+  const Painted key{style,     Source{&sprite, official}, piece.layer, piece.key, piece.race,
+                    piece.skin};
+  auto found = painted_.find(key);
+  if (found == painted_.end()) {
+    std::optional<StyledPalette> painted =
+        Paint(set->second, sprite, official,
+              ready != ready_made_.end() ? &ready->second.palette : nullptr, piece);
+    if (painted.has_value()) {
+      painted->serial = ++last_serial_;
+    }
+    found = painted_.emplace(key, std::move(painted)).first;
+  }
+  return found->second.has_value() ? &*found->second : nullptr;
 }
 
 std::vector<std::uint32_t> ActorPalettes::TakeRetiredSerials() {

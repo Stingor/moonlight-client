@@ -15,6 +15,7 @@
 #include "ro/formats/palette.h"
 #include "ro/formats/spr.h"
 #include "ro/render/actor_layers.h"
+#include "ro/render/hue_classes.h"
 #include "ro/render/sprite_frame.h"
 #include "ro/vfs/vfs.h"
 
@@ -42,6 +43,11 @@ struct ActorPiece {
   // remplacée à la même adresse — celle d'un style —, zéro sinon. Voir
   // `SpriteImageKey::palette_serial`.
   std::uint32_t palette_serial = 0;
+  // LA TEINTURE DE SES IMAGES EN COULEURS VRAIES, classe par classe, ou nulle.
+  // Aucune palette ne les atteint : elles se teignent au téléversement, voir
+  // `SpriteImageKey::tint`. Elle vit avec la palette de son style, sous le
+  // même numéro de série.
+  const HueClassAdjusts* tint = nullptr;
   // Quelle partie de l'acteur cette pièce représente. C'est elle qui décide de
   // son rang de dessin, lequel dépend de la direction.
   ActorPart part = ActorPart::kBody;
@@ -75,12 +81,17 @@ struct SpriteImageKey {
   // PRÉCÉDENTE. Le numéro de série, jamais réutilisé, les sépare. Zéro pour
   // une palette qui vit aussi longtemps que la garde-robe.
   std::uint32_t palette_serial = 0;
+  // LA TEINTURE D'UNE IMAGE EN COULEURS VRAIES, ou nulle : elle s'applique
+  // pixel par pixel quand l'image se résout. Elle meurt avec son style, sous
+  // `palette_serial`, et c'est encore lui qui la sépare d'une suivante née à
+  // la même adresse.
+  const HueClassAdjusts* tint = nullptr;
 
   [[nodiscard]] friend bool operator==(const SpriteImageKey& left,
                                        const SpriteImageKey& right) noexcept {
     return left.sprite == right.sprite && left.palette == right.palette &&
            left.section == right.section && left.image_index == right.image_index &&
-           left.palette_serial == right.palette_serial;
+           left.palette_serial == right.palette_serial && left.tint == right.tint;
   }
 
   // Ordre total pour servir de clé de cache. std::less sur des pointeurs est
@@ -101,7 +112,10 @@ struct SpriteImageKey {
     if (left.image_index != right.image_index) {
       return left.image_index < right.image_index;
     }
-    return left.palette_serial < right.palette_serial;
+    if (left.palette_serial != right.palette_serial) {
+      return left.palette_serial < right.palette_serial;
+    }
+    return before(left.tint, right.tint);
   }
 };
 

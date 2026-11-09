@@ -272,9 +272,14 @@ formats::Image ResolveImage(const SpriteImageKey& key) {
       return {};
     }
     // Une image BGRA porte ses couleurs en propre : aucune palette ne s'y
-    // applique, pas même une palette externe. Son ALPHA, lui, se ramène aux
+    // applique, pas même une palette externe. Une teinture de classes de
+    // teinte, elle, s'y applique pixel par pixel. Son ALPHA se ramène aux
     // quatre bits du client — voir `WithClientAlphaQuartet`.
-    return WithClientAlphaQuartet(key.sprite->bgra_frames()[index]);
+    formats::Image image = key.sprite->bgra_frames()[index];
+    if (key.tint != nullptr) {
+      TintImage(image, *key.tint);
+    }
+    return WithClientAlphaQuartet(std::move(image));
   }
 
   if (index >= key.sprite->indexed_frames().size()) {
@@ -578,7 +583,7 @@ ComposedActor ComposeActor(const ActorPiece& body, std::span<const ActorPiece> a
       for (const SpriteQuad& quad : entry.quads) {
         composed.sources.push_back(SpriteImageKey{entry.piece->sprite, entry.piece->palette,
                                                   quad.section, quad.image_index,
-                                                  entry.piece->palette_serial});
+                                                  entry.piece->palette_serial, entry.piece->tint});
         composed.quads.push_back(quad);
         composed.parts.push_back(part);
       }

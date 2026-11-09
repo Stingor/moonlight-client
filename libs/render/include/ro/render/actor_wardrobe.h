@@ -17,6 +17,7 @@
 #include "ro/render/actor_sprite.h"
 #include "ro/render/palette_ramps.h"
 #include "ro/render/sprite_catalog.h"
+#include "ro/render/style_set.h"
 #include "ro/vfs/monster_size_effects.h"
 #include "ro/vfs/vfs.h"
 
@@ -237,6 +238,27 @@ class ActorWardrobe {
   };
   [[nodiscard]] BodyRamps BodyRampsFor(const ActorLook& look);
 
+  // LA MÊME CHOSE POUR UN CALQUE : la pièce `part` que cette apparence porte —
+  // la tête, une coiffe, la cape —, découpée par le profil 1. La tête se mesure
+  // sans sa peau, que le calque Peau règle seul.
+  //
+  // Rampes vides quand l'apparence ne porte pas cette pièce, que son sprite n'a
+  // pas de palette — une image en couleurs vraies —, ou que le profil n'y
+  // trouve aucune pièce assez grande : seules les classes de teinte l'atteignent
+  // alors.
+  [[nodiscard]] BodyRamps LayerRampsFor(const ActorLook& look, ActorPart part);
+
+  // UN ENSEMBLE sous cet identifiant : la recette du corps et les teintures de
+  // calques, chacune cherchée par sa clé quand la garde-robe habille une pièce
+  // — voir `ro/render/style_set.h`. Mêmes règles que `SetStyle`.
+  //
+  // 🔴 CE QUI NE SE TEINT PAS : l'habit du GM, corps et tête, garde les
+  // couleurs de ses `.spr` ; la tête d'orc aussi. La peau ne se pose ni sur un
+  // Doram, ni sous l'habit du GM, ni sur les montures où elle peint l'animal
+  // (`SkinAdjustable`) — et alors ni sur le corps ni sur la tête, pour que
+  // les deux ne se désassortissent pas.
+  bool SetStyleSet(std::uint32_t style, StyleSet set);
+
   // Enregistre une recette sous cet identifiant, que `ActorLook::style`
   // reprendra. Rend faux si l'identifiant est nul ou DÉJÀ PRIS.
   //
@@ -380,6 +402,11 @@ class ActorWardrobe {
   };
   [[nodiscard]] LoadedBodySprite LoadedBody(const ActorLook& look);
   [[nodiscard]] std::vector<ActorPiece> Dress(const ActorLook& look);
+  // Pose sur une pièce habillée ce que le style de l'apparence y peint.
+  // `official` est la palette officielle de la pièce, avant fusion ; `skin`
+  // dit si la peau de cet acteur se règle.
+  void Tint(const ActorLook& look, ActorPart part, const formats::Palette* official, bool skin,
+            const LoadedActorSprite& loaded, ActorPiece& piece);
   // Rend à chaque arme d'un ambidextre le sprite de son objet, à la place de
   // la pièce unique du couple. Voir DualWieldSpritePaths.
   void SplitDualWield(const ActorLook& look, std::vector<ActorPiece>& pieces);
