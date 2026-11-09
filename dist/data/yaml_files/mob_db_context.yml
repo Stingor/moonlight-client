@@ -141,11 +141,11 @@ spawns:
   1076: {pay_dun00: 35}
   1077: {mjolnir_06: 140, gef_dun00: 25, prt_sewb3: 15, treasure01: 12}
   1078: {ein_fild10: 20, pay_dun03: 16, gef_fild05: 15, pay_dun00: 15, yggdrasil01: 15, yuno_fild01: 15, yuno_fild03: 15, gef_dun00: 12, ein_fild04: 10, ein_fild06: 10, ein_fild07: 10, ein_fild08: 10, ein_fild09: 10, lhz_fild01: 10, lhz_fild03: 10, mjolnir_05: 10, pay_dun01: 10, pay_dun04: 10, ve_fild01: 10, ve_fild02: 10, ve_fild03: 10, yuno_fild02: 10, yuno_fild04: 10, yuno_fild06: 10, yuno_fild07: 10, yuno_fild08: 10, yuno_fild09: 10, yuno_fild11: 10, pay_dun02: 8, mjolnir_02: 6, gon_dun01: 5, lasa_fild01: 5, prt_maze01: 5, prt_maze03: 5, ra_fild11: 5, ra_fild12: 5, um_fild02: 5, um_fild04: 5}
-  1079: {ein_fild10: 20, odin_tem03: 15, yggdrasil01: 15, odin_tem02: 10, mjolnir_05: 9, gef_fild08: 8, cmd_fild01: 6, gef_fild10: 6, hu_fild04: 6, mjolnir_02: 6, mjolnir_01: 5, odin_tem01: 5, prt_maze03: 5, um_fild03: 5, gef_fild02: 4, ve_fild01: 4, yuno_fild03: 4, gef_fild09: 3, pay_fild10: 3, prt_maze01: 3, ve_fild04: 3, gef_d01_i: 2, gef_fild00: 2, glast_01: 2, mjolnir_06: 2, mjolnir_07: 2, mjolnir_08: 2, mjolnir_11: 2, prt_fild03: 2, yuno_fild01: 2, gef_dun01: 1, gef_fild07: 1, moc_fild17: 1, pay_d03_i: 1, pay_dun03: 1, prt_fild01: 1, prt_fild05: 1}
+  1079: {ein_fild10: 20, odin_tem03: 15, yggdrasil01: 15, odin_tem02: 10, mjolnir_05: 9, gef_fild08: 8, cmd_fild01: 6, gef_fild10: 6, hu_fild04: 6, mjolnir_02: 6, mjolnir_01: 5, odin_past: 5, odin_tem01: 5, prt_maze03: 5, um_fild03: 5, gef_fild02: 4, ve_fild01: 4, yuno_fild03: 4, gef_fild09: 3, pay_fild10: 3, prt_maze01: 3, ve_fild04: 3, gef_d01_i: 2, gef_fild00: 2, glast_01: 2, mjolnir_06: 2, mjolnir_07: 2, mjolnir_08: 2, mjolnir_11: 2, prt_fild03: 2, yuno_fild01: 2, gef_dun01: 1, gef_fild07: 1, moc_fild17: 1, pay_d03_i: 1, pay_dun03: 1, prt_fild01: 1, prt_fild05: 1}
   1080: {yggdrasil01: 26, mjolnir_02: 23, gef_fild03: 21, prt_fild03: 20, yuno_fild01: 20, mjolnir_04: 17, glast_01: 16, ein_fild03: 15, lhz_fild02: 15, pay_fild10: 15, prt_fild06: 15, yuno_fild03: 15, moc_fild03: 14, mjolnir_03: 13, mjolnir_11: 11, ayo_fild01: 10, ein_fild04: 10, hu_fild04: 10, hu_fild06: 10, lhz_fild01: 10, lhz_fild03: 10, mjolnir_01: 10, mjolnir_10: 10, pay_fild06: 10, pay_fild08: 10, pay_fild09: 10, um_fild01: 10, um_fild03: 10, yuno_fild02: 10, yuno_fild04: 10, yuno_fild06: 10, yuno_fild07: 10, yuno_fild08: 10, yuno_fild09: 10, yuno_fild11: 10, gef_fild02: 8, pay_fild07: 8, rockrdg1: 8, mjolnir_07: 7, moc_fild02: 7, gef_fild00: 6, gef_fild04: 6, gef_fild07: 6, mjolnir_08: 6, prt_fild05: 6, cmd_fild01: 5, cmd_fild05: 5, gef_fild01: 5, gon_fild01: 5, odin_tem01: 5, pay_fild01: 5, pay_fild04: 5, prt_fild00: 5, prt_fild04: 5, rockrdg2: 5, pay_fild02: 4, pay_fild03: 4, gef_fild10: 3, prt_fild01: 3, gef_dun00: 1, pay_d03_i: 1, pay_dun03: 1}
   1081: {yuno_fild01: 23, ein_fild10: 20, ein_fild03: 15, lhz_fild02: 15, moc_fild13: 15, ra_fild11: 15, ra_fild12: 15, yuno_fild03: 15, ayo_fild02: 10, ein_fild04: 10, ein_fild06: 10, ein_fild07: 10, ein_fild08: 10, ein_fild09: 10, gon_dun01: 10, gon_dun02: 10, hu_fild04: 10, hu_fild06: 10, lhz_fild01: 10, lou_fild01: 10, moc_fild01: 10, moc_fild12: 10, mosk_dun03: 10, um_fild01: 10, ve_fild01: 10, ve_fild02: 10, ve_fild03: 10, ve_fild04: 10, yuno_fild02: 10, yuno_fild04: 10, yuno_fild06: 10, yuno_fild07: 10, yuno_fild08: 10, yuno_fild09: 10, yuno_fild11: 10, cmd_fild08: 8, moc_fild18: 8, moc_fild02: 7, cmd_fild05: 6, moc_fild17: 6, cmd_fild06: 5, moc_fild07: 5, mosk_fild02: 5, odin_tem01: 5, um_fild02: 5, um_fild04: 5, yggdrasil01: 5, rockrdg1: 4, rockrdg2: 4, prt_fild09: 3, prt_maze01: 2, gef_dun00: 1, pay_d03_i: 1, pay_dun03: 1, prt_maze03: 1}
   1082: {gef_dun03: 20, gef_d01_i: 12, gef_dun02: 12, gef_dun01: 10, gon_dun01: 10, gon_dun03: 10, mosk_dun03: 10, ve_fild07: 10, pay_dun02: 6, pay_dun04: 6, mosk_fild02: 5, orcsdun01: 5, orcsdun02: 5, pay_d03_i: 5, pay_dun03: 5, rockrdg2: 5, yggdrasil01: 5, prt_maze01: 3}
-  1083: {yggdrasil01: 26, odin_tem03: 15, gef_dun03: 6, lou_dun01: 5, mosk_dun03: 5, prt_maze03: 5, um_fild01: 5, gef_fild06: 4, rockrdg2: 4, cmd_fild03: 3, mjolnir_04: 3, prt_fild02: 3, yuno_fild01: 3, bra_dun02: 2, gef_dun02: 2, mjolnir_01: 2, mjolnir_03: 2, pay_dun04: 2, prt_maze01: 2, um_fild03: 2, "1@md_gef": 1, cmd_fild01: 1, cmd_fild05: 1, gef_dun00: 1, gef_fild02: 1, gef_fild07: 1, glast_01: 1, gon_fild01: 1, mjolnir_05: 1, mjolnir_10: 1, pay_fild04: 1, pay_fild06: 1, pay_fild08: 1, pay_fild09: 1, prt_fild00: 1, prt_fild10: 1, ve_fild01: 1, yuno_fild03: 1}
+  1083: {yggdrasil01: 26, odin_tem03: 15, gef_dun03: 6, lou_dun01: 5, mosk_dun03: 5, prt_maze03: 5, um_fild01: 5, gef_fild06: 4, rockrdg2: 4, cmd_fild03: 3, mjolnir_04: 3, prt_fild02: 3, yuno_fild01: 3, bra_dun02: 2, gef_dun02: 2, mjolnir_01: 2, mjolnir_03: 2, odin_past: 2, pay_dun04: 2, prt_maze01: 2, um_fild03: 2, "1@md_gef": 1, cmd_fild01: 1, cmd_fild05: 1, gef_dun00: 1, gef_fild02: 1, gef_fild07: 1, glast_01: 1, gon_fild01: 1, mjolnir_05: 1, mjolnir_10: 1, pay_fild04: 1, pay_fild06: 1, pay_fild08: 1, pay_fild09: 1, prt_fild00: 1, prt_fild10: 1, ve_fild01: 1, yuno_fild03: 1}
   1084: {gef_fild11: 21, harboro2: 19, iz_dun02: 15, pay_fild01: 15, gl_knt01: 12, iz_dun01: 10, orcsdun01: 10, pay_dun02: 8, rockrdg1: 8, pay_dun01: 7, gef_dun00: 6, prt_maze03: 6, bra_dun01: 5, bra_dun02: 5, ein_fild06: 5, gef_dun01: 5, iz_dun00: 5, lou_dun01: 5, lou_fild01: 5, orcsdun02: 5, prt_maze01: 5, jawaii_in: 3, pay_dun00: 3, prt_fild07: 3, un_bunker: 1}
   1085: {prt_fild10: 15, moc_fild13: 13, mjolnir_09: 11, ein_fild07: 10, ein_fild08: 10, ein_fild09: 10, gef_fild09: 10, prt_fild11: 10, mjolnir_06: 8, pay_fild06: 8, pay_fild03: 6, bra_fild01: 5, gef_fild02: 5, prt_maze01: 5, prt_maze03: 5, pay_fild02: 4, mjolnir_07: 2, jawaii_in: 1, lhz_in01: 1}
   1086: {prt_sewb4: 1}
@@ -1186,6 +1186,14 @@ spawns:
   20601: {ein_dun03: 1}
   20602: {ein_dun03: 22}
   20603: {ein_dun03: 20}
+  20604: {odin_past: 40}
+  20605: {odin_past: 60}
+  20606: {odin_past: 45}
+  20607: {odin_past: 45}
+  20608: {odin_past: 5}
+  20609: {odin_past: 5}
+  20610: {odin_past: 1}
+  20611: {odin_past: 1}
   20612: {abyss_04: 25}
   20613: {abyss_04: 15}
   20614: {abyss_04: 35}
@@ -3519,6 +3527,8 @@ monsters:
   20531: [3, 5, 3, 1, 0, 131]
   20532: [3, 4, 1, 1, 0, 14469]
   20533: [0, 7, 1, 0, 0, 161]
+  20534: [8, 3, 4, 1, 1, 102774453]
+  20535: [8, 1, 4, 1, 1, 102774453]
   20560: [0, 0, 4, 2, 0, 145]
   20570: [3, 5, 1, 1, 1, 102774421]
   20591: [3, 5, 1, 1, 1, 102774421]
@@ -3534,12 +3544,14 @@ monsters:
   20601: [4, 0, 4, 2, 2, 103298709]
   20602: [4, 2, 4, 0, 0, 33554563]
   20603: [2, 0, 4, 2, 0, 14469]
-  20606: [8, 6, 4, 1, 1, 102774421]
-  20607: [8, 6, 4, 1, 1, 102774421]
-  20608: [0, 6, 4, 1, 1, 102774421]
-  20609: [0, 8, 4, 1, 1, 102774421]
-  20610: [8, 3, 4, 1, 2, 103298709]
-  20611: [8, 1, 4, 1, 2, 103298709]
+  20604: [8, 6, 4, 0, 0, 13973]
+  20605: [8, 6, 4, 0, 0, 13973]
+  20606: [8, 6, 4, 1, 0, 12949]
+  20607: [8, 6, 4, 1, 0, 12949]
+  20608: [0, 6, 4, 0, 0, 14469]
+  20609: [0, 8, 4, 0, 0, 14469]
+  20610: [8, 3, 4, 1, 2, 103298741]
+  20611: [8, 1, 4, 1, 2, 103298741]
   20612: [9, 5, 4, 2, 0, 14469]
   20613: [0, 0, 4, 2, 0, 14469]
   20614: [9, 7, 4, 2, 0, 14469]

@@ -72977,6 +72977,64 @@ Body:
     AttackMotion: 481
     DamageMotion: 120
     Ai: 24
+  - Id: 20534
+    AegisName: G_REGINLEIF
+    Name: Valkyrie
+    Level: 207
+    Hp: 2002620
+    Attack: 7261
+    Attack2: 10661
+    Defense: 54
+    MagicDefense: 40
+    Str: 281
+    Agi: 183
+    Vit: 147
+    Int: 298
+    Dex: 201
+    Luk: 101
+    AttackRange: 3
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Angel
+    Element: Fire
+    ElementLevel: 4
+    WalkSpeed: 60
+    AttackDelay: 587
+    AttackMotion: 576
+    DamageMotion: 480
+    Ai: 21
+    Class: Boss
+    Modes: {NoRandomWalk: true}
+  - Id: 20535
+    AegisName: G_INGRID
+    Name: Valkyrie
+    Level: 141
+    Hp: 311001
+    Attack: 7261
+    Attack2: 10661
+    Defense: 40
+    MagicDefense: 31
+    Str: 297
+    Agi: 185
+    Vit: 135
+    Int: 273
+    Dex: 205
+    Luk: 99
+    AttackRange: 3
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Angel
+    Element: Water
+    ElementLevel: 4
+    WalkSpeed: 130
+    AttackDelay: 584
+    AttackMotion: 576
+    DamageMotion: 480
+    Ai: 21
+    Class: Boss
+    Modes: {NoRandomWalk: true}
   - Id: 20560
     AegisName: G_MINERAL_G
     Name: Green Mineral
@@ -73506,192 +73564,287 @@ Body:
       - {Item: Lantern, Rate: 500}
       - {Item: Headlamp, Rate: 40}
       - {Item: Abyss_Man_Card, Rate: 1, StealProtected: true}
+  - Id: 20604
+    AegisName: ANGELGOLT
+    Name: Angelgolt
+    Level: 196
+    Hp: 461785
+    BaseExp: 738856
+    JobExp: 480256
+    Attack: 1102
+    Attack2: 1542
+    Defense: 44
+    MagicDefense: 31
+    Str: 143
+    Agi: 117
+    Vit: 102
+    Int: 186
+    Dex: 231
+    Luk: 106
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Race: Angel
+    Element: Holy
+    ElementLevel: 4
+    WalkSpeed: 250
+    AttackDelay: 678
+    AttackMotion: 780
+    DamageMotion: 480
+    Ai: 21
+    Drops:
+      - {Item: Angel_Dream, Rate: 1500}
+      - {Item: Rune_Of_Darkness, Rate: 3000}
+      - {Item: Odin_itembox, Rate: 5}
+      - {Item: Stone_Of_Intelligence_, Rate: 100}
+      - {Item: Soft_Feather, Rate: 2000}
+      - {Item: Angelgolt_Card, Rate: 1, StealProtected: true}
+  - Id: 20605
+    AegisName: ANGELGOLT2
+    Name: Angelgolt
+    Level: 196
+    Hp: 461695
+    BaseExp: 738712
+    JobExp: 480163
+    Attack: 1142
+    Attack2: 1603
+    Defense: 43
+    MagicDefense: 26
+    Str: 155
+    Agi: 158
+    Vit: 74
+    Int: 63
+    Dex: 166
+    Luk: 41
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Race: Angel
+    Element: Holy
+    ElementLevel: 4
+    WalkSpeed: 250
+    AttackDelay: 781
+    AttackMotion: 780
+    DamageMotion: 480
+    Ai: 21
+    Drops:
+      - {Item: Angel_Dream, Rate: 1500}
+      - {Item: Odin_itembox, Rate: 5}
+      - {Item: Rune_Of_Darkness, Rate: 3000}
+      - {Item: Soft_Feather, Rate: 2000}
+      - {Item: Angelgolt_Card, Rate: 1, StealProtected: true}
   - Id: 20606
     AegisName: HOLY_FRUS
     Name: Holy Frus
     Level: 201
-    Hp: 10708020
-    Sp: 10000
-    BaseExp: 2000000
-    JobExp: 100000
-    Attack: 15000
-    Attack2: 40000
-    Defense: 35
-    MagicDefense: 53
-    Str: 598
-    Agi: 165
-    Vit: 149
-    Int: 172
-    Dex: 857
-    Luk: 173
-    AttackRange: 1
+    Hp: 454621
+    BaseExp: 727394
+    JobExp: 472806
+    Attack: 1437
+    Attack2: 2034
+    Defense: 44
+    MagicDefense: 29
+    Str: 176
+    Agi: 148
+    Vit: 69
+    Int: 111
+    Dex: 144
+    Luk: 87
+    AttackRange: 2
     SkillRange: 10
     ChaseRange: 12
     Size: Medium
     Race: Angel
     Element: Holy
     ElementLevel: 4
-    WalkSpeed: 175
-    AttackDelay: 1024
-    AttackMotion: 624
-    DamageMotion: 336
-    Ai: 21
-    Class: Boss
+    WalkSpeed: 130
+    AttackDelay: 581
+    AttackMotion: 576
+    DamageMotion: 432
+    Ai: 20
+    Drops:
+      - {Item: Angel_Dream, Rate: 350}
+      - {Item: Rune_Of_Darkness, Rate: 5000}
+      - {Item: Odin_itembox, Rate: 5}
+      - {Item: Soft_Feather, Rate: 7000}
+      - {Item: Brigan, Rate: 10000}
+      - {Item: Holy_Frus_Card, Rate: 1, StealProtected: true}
   - Id: 20607
     AegisName: HOLY_SKOGUL
     Name: Holy Skogul
     Level: 202
-    Hp: 10717947
-    Sp: 10000
-    BaseExp: 2000000
-    JobExp: 100000
-    Attack: 15000
-    Attack2: 40000
-    Defense: 35
-    MagicDefense: 53
-    Str: 598
-    Agi: 165
-    Vit: 149
-    Int: 172
-    Dex: 857
-    Luk: 173
-    AttackRange: 1
+    Hp: 453387
+    BaseExp: 725419
+    JobExp: 471522
+    Attack: 1031
+    Attack2: 1434
+    Defense: 44
+    MagicDefense: 29
+    Str: 179
+    Agi: 149
+    Vit: 73
+    Int: 114
+    Dex: 146
+    Luk: 88
+    AttackRange: 2
     SkillRange: 10
     ChaseRange: 12
     Size: Medium
     Race: Angel
     Element: Holy
     ElementLevel: 4
-    WalkSpeed: 175
-    AttackDelay: 1024
-    AttackMotion: 624
-    DamageMotion: 336
-    Ai: 21
-    Class: Boss
+    AttackDelay: 1256
+    AttackMotion: 1254
+    DamageMotion: 480
+    Ai: 20
+    Drops:
+      - {Item: Rune_Of_Darkness, Rate: 500}
+      - {Item: Brigan, Rate: 10000}
+      - {Item: Angel_Dream, Rate: 1500}
+      - {Item: Odin_itembox, Rate: 5}
+      - {Item: Soft_Feather, Rate: 2000}
+      - {Item: Shard_Blue, Rate: 100}
+      - {Item: Holy_Skogul_Card, Rate: 1, StealProtected: true}
   - Id: 20608
     AegisName: PLASMA_ARCH
     Name: Arch Plasma
     Level: 198
-    Hp: 7588702
-    Sp: 10000
-    BaseExp: 2000000
-    JobExp: 100000
-    Attack: 5000
-    Attack2: 10000
-    Defense: 35
-    MagicDefense: 53
-    Str: 598
-    Agi: 165
-    Vit: 149
-    Int: 172
-    Dex: 857
-    Luk: 173
+    Hp: 516170
+    BaseExp: 825872
+    JobExp: 536817
+    Attack: 1115
+    Attack2: 1542
+    Defense: 43
+    MagicDefense: 28
+    Str: 145
+    Agi: 133
+    Vit: 65
+    Int: 108
+    Dex: 151
+    Luk: 79
     AttackRange: 1
     SkillRange: 10
     ChaseRange: 12
-    Size: Medium
     Element: Holy
     ElementLevel: 4
-    WalkSpeed: 175
-    AttackDelay: 1024
-    AttackMotion: 624
-    DamageMotion: 336
-    Ai: 21
-    Class: Boss
+    WalkSpeed: 250
+    AttackDelay: 1447
+    AttackMotion: 1440
+    DamageMotion: 576
+    Ai: 04
+    Drops:
+      - {Item: Scell, Rate: 10000}
+      - {Item: Soft_Feather, Rate: 10000}
+      - {Item: Light_Granule, Rate: 10000}
+      - {Item: Old_Violet_Box, Rate: 2500}
+      - {Item: Crystal_Jewel_, Rate: 1000}
+      - {Item: Odin_itembox, Rate: 5}
+      - {Item: Plasma_Arch_Card, Rate: 1, StealProtected: true}
   - Id: 20609
     AegisName: PLASMA_SPT
     Name: Spectral Plasma
     Level: 197
-    Hp: 7549720
-    Sp: 10000
-    BaseExp: 2000000
-    JobExp: 100000
-    Attack: 5000
-    Attack2: 10000
-    Defense: 35
-    MagicDefense: 53
-    Str: 598
-    Agi: 165
-    Vit: 149
-    Int: 172
-    Dex: 857
-    Luk: 173
+    Hp: 516247
+    BaseExp: 825995
+    JobExp: 536897
+    Attack: 948
+    Attack2: 1293
+    Defense: 43
+    MagicDefense: 28
+    Str: 149
+    Agi: 133
+    Vit: 63
+    Int: 99
+    Dex: 148
+    Luk: 78
     AttackRange: 1
     SkillRange: 10
     ChaseRange: 12
-    Size: Medium
     Element: Ghost
     ElementLevel: 4
-    WalkSpeed: 175
-    AttackDelay: 1024
-    AttackMotion: 624
-    DamageMotion: 336
-    Ai: 21
-    Class: Boss
+    WalkSpeed: 250
+    AttackDelay: 1057
+    AttackMotion: 1056
+    DamageMotion: 576
+    Ai: 04
+    Drops:
+      - {Item: Scell, Rate: 10000}
+      - {Item: Soft_Feather, Rate: 10000}
+      - {Item: Light_Granule, Rate: 10000}
+      - {Item: Old_Violet_Box, Rate: 2500}
+      - {Item: Crystal_Jewel_, Rate: 1000}
+      - {Item: Odin_itembox, Rate: 5}
+      - {Item: Plasma_Spt_Card, Rate: 1, StealProtected: true}
   - Id: 20610
     AegisName: REGINLEIF
-    Name: Reginleif
+    Name: Valkryie Reginleif
     Level: 207
-    Hp: 79249813
-    Sp: 10000
-    BaseExp: 16777215
-    JobExp: 100000
-    Attack: 50000
-    Attack2: 65535
-    Defense: 35
-    MagicDefense: 53
-    Str: 598
-    Agi: 165
-    Vit: 149
-    Int: 172
-    Dex: 857
-    Luk: 173
-    AttackRange: 1
+    Hp: 4619955
+    BaseExp: 7391928
+    JobExp: 4804753
+    MvpExp: 5700403
+    Attack: 10218
+    Attack2: 14233
+    Defense: 59
+    MagicDefense: 44
+    Str: 281
+    Agi: 183
+    Vit: 147
+    Int: 298
+    Dex: 201
+    Luk: 101
+    AttackRange: 3
     SkillRange: 10
     ChaseRange: 12
     Size: Medium
     Race: Angel
     Element: Fire
     ElementLevel: 4
-    WalkSpeed: 175
-    AttackDelay: 1024
-    AttackMotion: 624
-    DamageMotion: 336
+    WalkSpeed: 60
+    AttackDelay: 188
+    AttackMotion: 173
+    DamageMotion: 480
+    DamageTaken: 10
     Ai: 21
     Class: Boss
-    Modes: {Mvp: true}
+    Modes: {NoRandomWalk: true, Detector: true, Mvp: true}
+    Drops:
+      - {Item: Reginleif_Card, Rate: 1, StealProtected: true}
   - Id: 20611
     AegisName: INGRID
-    Name: Ingrid
+    Name: Valkryie Ingrid
     Level: 207
-    Hp: 75393148
-    Sp: 10000
-    BaseExp: 16777215
-    JobExp: 100000
-    Attack: 50000
-    Attack2: 65535
-    Defense: 35
-    MagicDefense: 53
-    Str: 598
-    Agi: 165
-    Vit: 149
-    Int: 172
-    Dex: 857
-    Luk: 173
-    AttackRange: 1
+    Hp: 4585892
+    BaseExp: 7337427
+    JobExp: 4769328
+    MvpExp: 5684138
+    Attack: 9418
+    Attack2: 13210
+    Defense: 58
+    MagicDefense: 43
+    Str: 297
+    Agi: 185
+    Vit: 135
+    Int: 273
+    Dex: 205
+    Luk: 99
+    AttackRange: 3
     SkillRange: 10
     ChaseRange: 12
     Size: Medium
     Race: Angel
     Element: Water
     ElementLevel: 4
-    WalkSpeed: 175
-    AttackDelay: 1024
-    AttackMotion: 624
-    DamageMotion: 336
+    WalkSpeed: 100
+    AttackDelay: 576
+    AttackMotion: 576
+    DamageMotion: 480
+    DamageTaken: 10
     Ai: 21
     Class: Boss
-    Modes: {Mvp: true}
+    Modes: {NoRandomWalk: true, Detector: true, Mvp: true}
+    Drops:
+      - {Item: Ingrid_Card, Rate: 1, StealProtected: true}
   - Id: 20612
     AegisName: FERUS_P
     Name: Purple Ferus

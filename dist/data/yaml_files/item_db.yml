@@ -86415,6 +86415,146 @@ Body:
          bonus2 bAddSize,Size_Medium,10;
          bonus2 bAddSize,Size_Large,10;
       }
+  - Id: 15397
+    AegisName: CassockA_STR
+    Name: "STR Soutane [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Weight: 800
+    Defense: 12
+    Slots: 1
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHPrate,10;
+      bonus bMaxSPrate,10;
+      bonus bAspdRate,10;
+      bonus2 bAddClass,Class_All,3*(.@r/2);
+      bonus bStr,5*(.@r/3);
+      bonus2 bAddRace,RC_Angel,8*(.@r/4);
+      bonus2 bAddRace,RC_Demon,8*(.@r/4);
+  - Id: 15398
+    AegisName: CassockA_AGI
+    Name: "AGI Soutane [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Weight: 800
+    Defense: 12
+    Slots: 1
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHPrate,10;
+      bonus bMaxSPrate,10;
+      bonus bAspdRate,10;
+      bonus bLongAtkRate,3*(.@r/2);
+      bonus bAgi,5*(.@r/3);
+      bonus2 bAddRace,RC_Angel,8*(.@r/4);
+      bonus2 bAddRace,RC_Demon,8*(.@r/4);
+  - Id: 15399
+    AegisName: CassockA_VIT
+    Name: "VIT Soutane [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Weight: 800
+    Defense: 12
+    Slots: 1
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHPrate,15;
+      bonus bMaxSPrate,5;
+      bonus bAspdRate,7;
+      bonus bVariableCastrate,-7;
+      bonus bMaxHPrate,2*(.@r/2);
+      bonus bVit,5*(.@r/3);
+      bonus2 bAddRace,RC_Angel,10*(.@r/4);
+      bonus2 bMagicAddRace,RC_Angel,10*(.@r/4);
+      bonus2 bAddRace,RC_Demon,10*(.@r/4);
+      bonus2 bMagicAddRace,RC_Demon,10*(.@r/4);
+  - Id: 15400
+    AegisName: CassockA_DEX
+    Name: "DEX Soutane [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Weight: 800
+    Defense: 12
+    Slots: 1
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHPrate,10;
+      bonus bMaxSPrate,10;
+      bonus bAspdRate,10;
+      bonus bVariableCastrate,-10;
+      bonus bMatkRate,(.@r/2);
+      bonus2 bAddClass,Class_All,(.@r/2);
+      bonus bDex,5*(.@r/3);
+      bonus2 bAddRace,RC_Angel,6*(.@r/4);
+      bonus2 bMagicAddRace,RC_Angel,6*(.@r/4);
+      bonus2 bAddRace,RC_Demon,6*(.@r/4);
+      bonus2 bMagicAddRace,RC_Demon,6*(.@r/4);
+  - Id: 15401
+    AegisName: CassockA_INT
+    Name: "INT Soutane [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Weight: 800
+    Defense: 12
+    Slots: 1
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHPrate,5;
+      bonus bMaxSPrate,15;
+      bonus bVariableCastrate,-10;
+      bonus bMatkRate,3*(.@r/2);
+      bonus bInt,5*(.@r/3);
+      bonus2 bMagicAddRace,RC_Angel,8*(.@r/4);
+      bonus2 bMagicAddRace,RC_Demon,8*(.@r/4);
+  - Id: 15402
+    AegisName: CassockA_LUK
+    Name: "LUK Soutane [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Weight: 800
+    Defense: 12
+    Slots: 1
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHPrate,10;
+      bonus bMaxSPrate,10;
+      bonus bAspdRate,10;
+      bonus bCritAtkRate,4*(.@r/2);
+      bonus bCritical,3*(.@r/2);
+      bonus bLuk,5*(.@r/3);
+      bonus2 bAddRace,RC_Angel,8*(.@r/4);
+      bonus2 bAddRace,RC_Demon,8*(.@r/4);
   - Id: 15825
     AegisName: C_Black_Musang_J
     Name: Costume Black Musang Hat
@@ -109579,6 +109719,31 @@ Body:
       if (getallrefine() >= 22) {
          bonus2 bSubRace,RC_Dragon,3;
       }
+  - Id: 20947
+    AegisName: Cassock_Manteau
+    Name: "Clergy's Manteau [1]"
+    Type: Armor
+    Buy: 57000
+    Sell: 14250
+    Weight: 450
+    Defense: 6
+    Slots: 1
+    Locations: {Garment: true}
+    ArmorLevel: 1
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMaxSPrate,5;
+      bonus bMdef,10;
+      bonus bVariableCastrate,-10;
+      bonus2 bMagicAddRace,RC_Angel,(.@r/2);
+      bonus2 bMagicAddRace,RC_Demon,(.@r/2);
+      bonus2 bSubRace,RC_Angel,(.@r/3);
+      bonus2 bSubRace,RC_Demon,(.@r/3);
+      if (.@r>=7) {
+         bonus bVariableCastrate,-10;
+      }
   - Id: 20948
     AegisName: Morpheus_Shawl_IL
     Name: "Illusion Morpheus's Shawl [1]"
@@ -111186,6 +111351,31 @@ Body:
       }
       if (getallrefine() >= 22) {
          bonus2 bSubRace,RC_Dragon,3;
+      }
+  - Id: 22209
+    AegisName: Cassock_Boots
+    Name: "Clergy's Boots [1]"
+    Type: Armor
+    Buy: 45000
+    Sell: 11250
+    Weight: 400
+    Defense: 6
+    Slots: 1
+    Locations: {Shoes: true}
+    ArmorLevel: 1
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHPrate,5;
+      bonus bDef,3;
+      bonus bAspdRate,10;
+      bonus2 bAddRace,RC_Angel,(.@r/2);
+      bonus2 bAddRace,RC_Demon,(.@r/2);
+      bonus2 bSubRace,RC_Angel,(.@r/3);
+      bonus2 bSubRace,RC_Demon,(.@r/3);
+      if (.@r>=7) {
+         bonus bAspdRate,10;
       }
   - Id: 22507
     AegisName: ShabbyOldScroll
@@ -113483,6 +113673,15 @@ Body:
     Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
     Script: |
       getgroupitem(IG_ABYSS_ITEMBOX);
+  - Id: 23986
+    AegisName: Odin_itembox
+    Name: Odin Relic
+    Type: Usable
+    Weight: 100
+    Flags: {Container: true}
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      getgroupitem(IG_ODIN_ITEMBOX);
   - Id: 25043
     AegisName: Thorny_Vine_Flute
     Name: Thorny Vine Flute
@@ -114469,6 +114668,15 @@ Body:
     Name: Small Dragon Bone
     Weight: 100
     Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 25767
+    AegisName: Angel_Dream
+    Name: Angel's Dream
+    Weight: 10
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 25768
+    AegisName: Shard_Blue
+    Name: Valkyrie Ingrid's Armor Fragment
+    Weight: 30
   - Id: 25772
     AegisName: Delicious_Juice
     Name: Delicious Juice
@@ -118915,6 +119123,7 @@ Body:
     Locations: {Right_Hand: true}
     WeaponLevel: 4
     EquipLevelMin: 120
+    Refineable: true
     Script: |
       .@r = getrefine(); bonus bCritical,90; bonus bCritAtkRate,(3*(.@r/2)); if (.@r >= 7) { bonus2 bAddClass,Class_All,5; if (.@r >= 9) { bonus2 bAddSize,Size_All,20; if (getallrefine() >= 22) { bonus2 bAddEle,Ele_All,20; } } }
   - Id: 28755
@@ -119475,6 +119684,15 @@ Body:
     Sell: 10
     Script: |
       if (getrefine()>=7) { bonus bVit,7; } if (getallrefine()>=24) { bonus bVit,1; bonus bMaxHPrate,8; } if (getallrefine()>=26) { bonus bVit,1; bonus bMaxHPrate,2; }
+  - Id: 29026
+    AegisName: Def20
+    Name: DEF+20
+    Type: Card
+    SubType: Enchant
+    Buy: 10
+    Sell: 5
+    Script: |
+      bonus bDef,20;
   - Id: 29047
     AegisName: Fatal0
     Name: Fatal
@@ -120122,6 +120340,20 @@ Body:
     SubType: Enchant
     Script: |
       skill "AL_TELEPORT",1;
+  - Id: 29238
+    AegisName: Evasion10
+    Name: Flee+10
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bFlee,10;
+  - Id: 29241
+    AegisName: Critical10
+    Name: Cri+10
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bCritical,10;
   - Id: 29310
     AegisName: Racing_RK_1
     Name: Racing(Rune Knight) 1Lv
@@ -127794,6 +128026,110 @@ Body:
       bonus2 bAddEle,Ele_Water,40;
       bonus2 bAddRace,RC_Formless,40;
       bonus2 bAddRace,RC_Plant,40;
+  - Id: 300008
+    AegisName: Angelgolt_Card
+    Name: Angelgolt Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Hand: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bMagicAddRace,RC_Demon,10;
+  - Id: 300009
+    AegisName: Plasma_Spt_Card
+    Name: Spectrum Plasma Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Hand: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      .@r = getequiprefinerycnt(EQI_HAND_R);
+      if (getiteminfo(getequipid(EQI_HAND_R), ITEMINFO_VIEW) == W_STAFF || getiteminfo(getequipid(EQI_HAND_R), ITEMINFO_VIEW) == W_2HSTAFF) {
+         bonus2 bMagicAtkEle,Ele_Ghost,10;
+      }
+      if (.@r>=10) {
+         bonus2 bMagicAtkEle,Ele_Ghost,10;
+      }
+      if (getallrefine() >= 28) {
+         bonus2 bMagicAtkEle,Ele_Ghost,10;
+      }
+  - Id: 300010
+    AegisName: Plasma_Arch_Card
+    Name: Arch Plasma Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Hand: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      .@r = getequiprefinerycnt(EQI_HAND_R);
+      if (getiteminfo(getequipid(EQI_HAND_R), ITEMINFO_VIEW) == W_STAFF || getiteminfo(getequipid(EQI_HAND_R), ITEMINFO_VIEW) == W_2HSTAFF) {
+         bonus2 bMagicAtkEle,Ele_Wind,10;
+      }
+      if (.@r>=10) {
+         bonus2 bMagicAtkEle,Ele_Wind,10;
+      }
+      if (getallrefine() >= 28) {
+         bonus2 bMagicAtkEle,Ele_Wind,10;
+      }
+  - Id: 300011
+    AegisName: Holy_Frus_Card
+    Name: Holy Frus Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Hand: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      .@r = getequiprefinerycnt(EQI_HAND_R);
+      if (getiteminfo(getequipid(EQI_HAND_R), ITEMINFO_VIEW) == W_STAFF || getiteminfo(getequipid(EQI_HAND_R), ITEMINFO_VIEW) == W_2HSTAFF) {
+         bonus2 bMagicAtkEle,Ele_Holy,10;
+      }
+      if (.@r>=10) {
+         bonus2 bMagicAtkEle,Ele_Holy,10;
+      }
+      if (getallrefine() >= 28) {
+         bonus2 bMagicAtkEle,Ele_Holy,10;
+      }
+  - Id: 300012
+    AegisName: Holy_Skogul_Card
+    Name: Holy Skogul Card
+    Type: Card
+    Weight: 10
+    Locations: {Shoes: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      .@r = getrefine();
+      bonus bHealPower,5;
+      if (.@r>=7) {
+         bonus bHealPower,3;
+      }
+      if (.@r>=9) {
+         bonus bHealPower,2;
+      }
+  - Id: 300013
+    AegisName: Reginleif_Card
+    Name: Reginleif Card
+    Type: Card
+    Weight: 10
+    Locations: {Armor: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bUnbreakableArmor;
+      bonus2 bAddClass,Class_All,30;
+      bonus bMaxHPrate,-15;
+  - Id: 300014
+    AegisName: Ingrid_Card
+    Name: Ingrid Card
+    Type: Card
+    Weight: 10
+    Locations: {Armor: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bUnbreakableArmor;
+      bonus2 bAddClass,Class_All,-15;
+      bonus bMaxHPrate,40;
+      bonus2 bHPLossRate,1000,4000;
+    UnEquipScript: |
+      heal -10000,0;
   - Id: 300015
     AegisName: Ferus_P_Card
     Name: Purple Ferus Card
@@ -128519,6 +128855,68 @@ Body:
       bonus bMatkRate,25;
       bonus2 bMagicAddRace,RC_Undead,50;
       bonus2 bMagicAddRace,RC_Dragon,50;
+  - Id: 310076
+    AegisName: Cassock_Str
+    Name: STR Blessing
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bStr,10;
+      bonus bMdef,3;
+      bonus bDef,2;
+      bonus2 bAddClass,Class_All,10;
+  - Id: 310077
+    AegisName: Cassock_Agi
+    Name: AGI Blessing
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bAgi,10;
+      bonus bMdef,3;
+      bonus bDef,2;
+      bonus bLongAtkRate,10;
+  - Id: 310078
+    AegisName: Cassock_Vit
+    Name: VIT Blessing
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bVit,10;
+      bonus bMdef,3;
+      bonus bDef,2;
+      bonus bMaxHPrate,10;
+      bonus bMaxSPrate,10;
+  - Id: 310079
+    AegisName: Cassock_Dex
+    Name: DEX Blessing
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDex,10;
+      bonus bMdef,3;
+      bonus bDef,2;
+      bonus bAspdRate,10;
+      bonus bVariableCastrate,-10;
+  - Id: 310080
+    AegisName: Cassock_Int
+    Name: INT Blessing
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bInt,10;
+      bonus bMdef,3;
+      bonus bDef,2;
+      bonus bMatkRate,10;
+  - Id: 310081
+    AegisName: Cassock_Luk
+    Name: LUK Blessing
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bLuk,10;
+      bonus bMdef,3;
+      bonus bDef,2;
+      bonus bCritAtkRate,15;
   - Id: 400020
     AegisName: C_BeachBall
     Name: Costume Beachball
