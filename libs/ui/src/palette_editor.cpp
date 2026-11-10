@@ -12,6 +12,7 @@
 #include "ro/ui/window_name.h"
 
 #include "palette_doll.h"
+#include "palette_layers.h"
 #include "palette_pickers.h"
 #include "palette_pieces.h"
 #include "palette_presets.h"
@@ -65,7 +66,7 @@ void Explain(const char* text) {
 // ⚠ « PARTAGÉ » SEULEMENT À L'ÉCHO : le serveur jette sans un mot ce qu'il
 // refuse, et dire plus que ce qu'on sait serait un mensonge que le joueur
 // relirait de travers le jour où son style ne parvient pas aux autres.
-void DrawSendStatus(PaletteSendStatus send) {
+void DrawSendStatus(PaletteSendStatus send, const char* refusal = nullptr) {
   const char* said = nullptr;
   switch (send) {
     case PaletteSendStatus::kNone:
@@ -82,7 +83,9 @@ void DrawSendStatus(PaletteSendStatus send) {
   }
   ImGui::AlignTextToFramePadding();
   ImGui::TextUnformatted(said);
-  if (send == PaletteSendStatus::kRefused && ImGui::IsItemHovered()) {
+  if (send == PaletteSendStatus::kRefused && refusal != nullptr && ImGui::IsItemHovered()) {
+    SkinTooltip(refusal);
+  } else if (send == PaletteSendStatus::kRefused && ImGui::IsItemHovered()) {
     SkinTooltip(
         core::Tr("Le serveur n'a pas renvoyé ton style : il ne l'a pas retenu. Une demande "
                  "trop rapprochée de la précédente, ou une liaison coupée, suffit. Attends "
@@ -149,6 +152,7 @@ void DrawInspiration(const SkinArt& art, PaletteEditorAction& action) {
 // LES BOUTONS QUI DÉFONT : revenir, repartir de zéro, oublier, supprimer.
 void DrawUndoButtons(const PaletteEditorView& view, const SkinArt& art,
                      PaletteEditorAction& action) {
+  const bool on_body = view.tab == PaletteTabKind::kBody;
   ImGui::BeginDisabled(!view.has_edits);
   if (SkinButton(core::Tr("Revenir à mon style"), art)) {
     action.verb = PaletteEditorVerb::kBackToWorn;
@@ -165,9 +169,10 @@ void DrawUndoButtons(const PaletteEditorView& view, const SkinArt& art,
   if (SkinButton(core::Tr("Repartir de zéro"), art)) {
     ImGui::OpenPopup("zero");
   }
-  Explain(
-      core::Tr("Remet toutes les pièces à leur couleur d'origine, dans l'aperçu seulement. Ta "
-               "coupe et ta couleur de cheveux ne bougent pas."));
+  Explain(on_body ? core::Tr("Remet toutes les pièces à leur couleur d'origine, dans l'aperçu "
+                             "seulement. Ta coupe et ta couleur de cheveux ne bougent pas.")
+                  : core::Tr("Remet toutes les pièces de ce calque à leur couleur d'origine, "
+                             "dans l'aperçu seulement."));
   if (Confirm("zero",
               core::Tr("Remettre tout l'aperçu à zéro ? Ctrl+Z le défait si tu changes d'avis."),
               core::Tr("Réinitialiser"), art)) {
@@ -179,7 +184,7 @@ void DrawUndoButtons(const PaletteEditorView& view, const SkinArt& art,
   // ⚠ LE GESTE FIN N'APPARAÎT QUE QUAND IL DIT AUTRE CHOSE QUE LE SUIVANT :
   // il faut que CE corps ait son propre style, et qu'il en reste un autre
   // derrière.
-  const bool forgettable = view.body_has_own_style && view.body_style_count > 1;
+  const bool forgettable = on_body && view.body_has_own_style && view.body_style_count > 1;
   if (forgettable) {
     if (SkinButton(core::Tr("Oublier le style de ce corps"), art)) {
       ImGui::OpenPopup("oublier");
@@ -199,12 +204,14 @@ void DrawUndoButtons(const PaletteEditorView& view, const SkinArt& art,
     ImGui::OpenPopup("supprimer");
   }
   Explain(
-      core::Tr("Efface les couleurs de tous tes corps, chez toi ET sur le serveur. Ta coupe "
-               "et ta couleur de cheveux restent celles que tu portes."));
+      core::Tr("Efface les couleurs de tous tes corps, de tes cheveux et de ta peau, chez toi "
+               "ET sur le serveur. Ta coupe et ta couleur de cheveux restent celles que tu "
+               "portes ; les teintures de tes items leur appartiennent et restent."));
   if (Confirm("supprimer",
-              core::Tr("Supprimer ton style, chez toi ET sur le serveur ? Tes corps retrouvent "
-                       "leurs couleurs d'origine, pour toi comme pour les autres ; ta coupe et "
-                       "ta couleur de cheveux restent. C'est définitif."),
+              core::Tr("Supprimer ton style, chez toi ET sur le serveur ? Tes corps, tes "
+                       "cheveux et ta peau retrouvent leurs couleurs d'origine, pour toi comme "
+                       "pour les autres ; ta coupe et ta couleur de cheveux restent, et tes "
+                       "items gardent leur teinture. C'est définitif."),
               core::Tr("Supprimer"), art)) {
     action.verb = PaletteEditorVerb::kDeleteAll;
   }
@@ -215,6 +222,9 @@ void DrawUndoButtons(const PaletteEditorView& view, const SkinArt& art,
 [[nodiscard]] const char* SendExplanation(const PaletteEditorView& view) {
   if (!view.connected) {
     return core::Tr("Hors ligne : rien ne peut partir.");
+  }
+  if (view.items_wait_atelier) {
+    return core::Tr("Une teinture d'item se valide auprès du styliste.");
   }
   if (!view.has_something_to_send) {
     return core::Tr("Rien à valider : ton personnage porte déjà ce style.");
@@ -246,10 +256,20 @@ void DrawSendButtons(const PaletteEditorView& view, const SkinArt& art,
   Explain(SendExplanation(view));
   ImGui::SameLine();
   DrawSendStatus(view.send);
+  // ⚠ LES CALQUES ONT LEUR PROPRE VERDICT : le corps peut être partagé et un
+  // chapeau refusé hors de l'atelier, et le joueur doit lire les deux.
+  if (view.layers_send != PaletteSendStatus::kNone) {
+    ImGui::AlignTextToFramePadding();
+    ImGui::TextUnformatted(core::Tr("Calques :"));
+    ImGui::SameLine();
+    DrawSendStatus(view.layers_send, view.layers_refusal);
+  }
 
   // ⚠ SEULEMENT QUAND IL Y A UN AUTRE STYLE QUE CELUI-CI : le premier corps
-  // validé devient le principal de lui-même.
-  const bool may_lead = view.body_style_count > 0 && !view.is_main;
+  // validé devient le principal de lui-même. Et seulement sur le corps : un
+  // chapeau n'est pas un style principal.
+  const bool may_lead =
+      view.tab == PaletteTabKind::kBody && view.body_style_count > 0 && !view.is_main;
   if (may_lead) {
     ImGui::BeginDisabled(!view.connected || !view.can_send);
     if (SkinButton(core::Tr("En faire mon style principal"), art)) {
@@ -312,6 +332,18 @@ void DrawBodyLines(const PaletteEditorView& view, const SkinArt& art, PaletteEdi
   }
 }
 
+// CE QUE DIT UN ONGLET SANS PIÈCE : la raison du calque, s'il en a une.
+[[nodiscard]] const char* EmptyTabText(const PaletteEditorView& view) {
+  if (view.tab == PaletteTabKind::kBody) {
+    return core::Tr("Aucune pièce de ce corps ne se règle.");
+  }
+  const PaletteTab* tab = OpenTab(view);
+  if (tab != nullptr && tab->blocked != PaletteTabBlock::kNone) {
+    return TabBlockReason(tab->blocked);
+  }
+  return core::Tr("Aucune pièce de ce calque ne se règle.");
+}
+
 // LE PANTIN, LA LISTE ET LEURS COMMANDES. Rend vrai quand un nuancier est
 // ouvert.
 [[nodiscard]] bool DrawPiecesBlock(PaletteEditorState& state, const PaletteEditorView& view,
@@ -330,9 +362,17 @@ void DrawBodyLines(const PaletteEditorView& view, const SkinArt& art, PaletteEdi
   ImGui::EndGroup();
   // 🔴 LA PIPETTE CLIQUÉE OUVRE LE NUANCIER de la pièce visée, dans la même
   // image : la liste se dessine juste après.
-  if (state.doll.clicked && view.pipette_ramp >= 0) {
+  //
+  // ⚠ UN CLIC SUR UN AUTRE CALQUE OUVRE D'ABORD SON ONGLET : la pièce attend
+  // l'image où la liste sera la sienne.
+  if (state.doll.clicked && view.pipette.found && view.pipette.tab != view.tab) {
+    state.tab = view.pipette.tab;
+    state.tab_asked = true;
+    state.open_piece = view.pipette.piece;
+  } else if (state.doll.clicked && view.pipette_ramp >= 0) {
     state.open_piece = view.pipette_ramp;
   }
+
   ImGui::SameLine();
   const PiecesAnswer pieces = DrawPalettePieces(state, view, art, action);
   // CE QUI PULSE SUR LE PANTIN : la ligne survolée si le curseur est dans la
@@ -386,14 +426,27 @@ PaletteEditorAction DrawPaletteEditor(PaletteEditorState& state, const PaletteEd
   ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + ImGui::GetFontSize() * kWrapInFonts);
   ImGui::TextUnformatted(core::Tr("Choisis une pièce, puis règle sa couleur."));
   ImGui::PopTextWrapPos();
+  DrawLayerTabs(state, view, art);
+  const bool on_body = view.tab == PaletteTabKind::kBody;
 
   // ── CE QUE LES RÉGLAGES ATTEIGNENT VRAIMENT ───────────────────────────────
   if (view.coverage_percent >= 0) {
     char line[128] = {};
-    std::snprintf(line, sizeof(line), core::Tr("Réglable : %d%% du corps"), view.coverage_percent);
+    std::snprintf(line, sizeof(line),
+                  on_body ? core::Tr("Réglable : %d%% du corps") : core::Tr("Réglable : %d%%"),
+                  view.coverage_percent);
     ImGui::TextUnformatted(line);
   }
-  DrawBodyLines(view, art, action);
+  if (view.hue_classes) {
+    ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + ImGui::GetFontSize() * kWrapInFonts);
+    ImGui::TextUnformatted(
+        core::Tr("Cet item se règle par familles de teinte : chaque pastille teint toutes "
+                 "ses couleurs de cette famille."));
+    ImGui::PopTextWrapPos();
+  }
+  if (on_body) {
+    DrawBodyLines(view, art, action);
+  }
   ImGui::Separator();
 
   // 🔴 SANS PIÈCE, ON LE DIT — ET LE RESTE DEMEURE : la coupe, la couleur de
@@ -401,10 +454,11 @@ PaletteEditorAction DrawPaletteEditor(PaletteEditorState& state, const PaletteEd
   // et « Supprimer » doit rester atteignable.
   bool picker_open = false;
   if (view.ramps.empty()) {
-    ImGui::TextDisabled("%s", core::Tr("Aucune pièce de ce corps ne se règle."));
+    ImGui::TextDisabled("%s", EmptyTabText(view));
   } else {
     picker_open = DrawPiecesBlock(state, view, art, action);
   }
+  DrawLayerNotes(view, art, action);
 
   DrawHistory(view, art, action);
   if (!view.ramps.empty()) {
@@ -418,14 +472,24 @@ PaletteEditorAction DrawPaletteEditor(PaletteEditorState& state, const PaletteEd
     ImGui::BeginDisabled();
   }
 
-  if (view.bounds.usable()) {
-    DrawChoiceButtons(state, view, art, action);
+  // 🔴 LA COUPE ET LA COULEUR VONT AVEC LES CHEVEUX, la teinte de base avec le
+  // corps ; sans onglet des cheveux, le corps reprend les trois.
+  const bool hair_tab = std::ranges::any_of(
+      view.tabs, [](const PaletteTab& tab) { return tab.kind == PaletteTabKind::kHair; });
+  const ChoiceButtons choices{.hair = view.tab == PaletteTabKind::kHair || (on_body && !hair_tab),
+                              .body_palette = on_body};
+  if (view.bounds.usable() && (choices.hair || choices.body_palette)) {
+    DrawChoiceButtons(state, view, art, action, choices);
     ImGui::Separator();
   }
   DrawUndoButtons(view, art, action);
   ImGui::Separator();
   DrawSendButtons(view, art, action);
-  DrawPalettePresets(state, view, art, action);
+  if (on_body) {
+    DrawPalettePresets(state, view, art, action);
+  } else {
+    DrawLayerCode(view, art, action);
+  }
 
   if (picker_open) {
     ImGui::EndDisabled();

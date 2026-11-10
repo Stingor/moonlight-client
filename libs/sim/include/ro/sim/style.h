@@ -270,11 +270,24 @@ class StyleBook {
   // 🔴 UNE DEMANDE, PAS UN ÉTAT, et elle se CONSOMME : laissée en place, elle
   // rouvrirait la fenêtre à chaque image et le joueur ne pourrait plus la
   // fermer.
-  void Ask(StyleEditorRequest asked) { asked_ = asked; }
+  //
+  // `tab` : l'onglet sur lequel ouvrir, compté depuis un, ou zéro pour garder
+  // celui que le joueur avait. Il se consomme avec la demande.
+  void Ask(StyleEditorRequest asked, std::uint8_t tab = 0) {
+    asked_ = asked;
+    asked_tab_ = tab;
+  }
   [[nodiscard]] std::optional<StyleEditorRequest> TakeRequest() {
     const std::optional<StyleEditorRequest> asked = asked_;
     asked_.reset();
     return asked;
+  }
+  // L'onglet de la dernière demande, compté depuis un, ou zéro ; à lire avec
+  // elle, et une seule fois.
+  [[nodiscard]] std::uint8_t TakeTab() noexcept {
+    const std::uint8_t tab = asked_tab_;
+    asked_tab_ = 0;
+    return tab;
   }
 
   // ── LES VERDICTS ET L'ATELIER ─────────────────────────────────────────────
@@ -299,6 +312,8 @@ class StyleBook {
   // changé ».
   std::uint32_t last_revision_ = 0;
   std::optional<StyleEditorRequest> asked_;
+  std::uint8_t asked_tab_ = 0;
+
   StyleVerdict body_verdict_{.subject = StyleSubject::kBody};
   StyleVerdict layers_verdict_{.subject = StyleSubject::kLayers};
   std::uint32_t last_verdict_ = 0;

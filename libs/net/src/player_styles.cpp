@@ -19,6 +19,11 @@ namespace {
 // un jour le fil et le disque ne plus parler de la même chose.
 constexpr std::uint8_t kWireVersion = sim::kStyleWireVersion;
 
+// LE MODE D'OUVERTURE DE LA FENÊTRE : le geste dans le quartet bas, l'onglet
+// demandé par le styliste dans le quartet haut.
+constexpr unsigned kStyleOpenVerbMask = 0x0FU;
+constexpr unsigned kStyleOpenTabShift = 4;
+
 // L'entrée ne porte PAS de recette : elle efface ce corps.
 constexpr std::uint8_t kFlagClear = 0x01;
 // LE REPLI : la variante que reprend un corps qui n'a pas la sienne. Dans un
@@ -146,17 +151,24 @@ FrameOutcome ApplyStyleOpenFrame(const Frame& frame, sim::World& world) {
   // ⚠ TOUT AUTRE MODE BASCULE, comme chez la référence : un serveur plus
   // récent pourrait en ajouter un, et refuser vaudrait moins que le geste le
   // plus proche.
-  switch (packet.mode) {
+  //
+  // 🔴 LE QUARTET HAUT EST L'ONGLET, compté depuis un : le serveur ne l'y pose
+  // que pour une session qui a annoncé les calques, et un autre client ne voit
+  // jamais qu'un mode de 0 à 2.
+  const auto verb = static_cast<std::uint8_t>(packet.mode & kStyleOpenVerbMask);
+  const auto tab = static_cast<std::uint8_t>(packet.mode >> kStyleOpenTabShift);
+  switch (verb) {
     case 0:
-      world.styles().Ask(sim::StyleEditorRequest::kClose);
+      world.styles().Ask(sim::StyleEditorRequest::kClose, tab);
       break;
     case 1:
-      world.styles().Ask(sim::StyleEditorRequest::kOpen);
+      world.styles().Ask(sim::StyleEditorRequest::kOpen, tab);
       break;
     default:
-      world.styles().Ask(sim::StyleEditorRequest::kToggle);
+      world.styles().Ask(sim::StyleEditorRequest::kToggle, tab);
       break;
   }
+
   return FrameOutcome::kApplied;
 }
 

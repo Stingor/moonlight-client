@@ -49,7 +49,16 @@ constexpr unsigned char kLastAscii = 0x7E;
 
 void StyleView::Apply(const ro::ui::PaletteEditorAction& asked, ro::net::Connection& link,
                       const ro::sim::World& world, std::uint32_t now_ms) {
-  ApplyPieces(asked, now_ms);
+  // 🔴 LES PIÈCES SONT CELLES DE L'ONGLET DONT LA VUE EST FAITE, pas de celui
+  // que la barre vient de choisir : c'est sur elles que le joueur a cliqué.
+  if (const LayerTab* tab = OpenLayer()) {
+    ApplyLayerPieces(asked, *tab, ToHarmony(asked.harmony), now_ms);
+    if (asked.clear_item_dye && tab->shown.item) {
+      ClearItemDye(*tab, link, now_ms);
+    }
+  } else {
+    ApplyPieces(asked, now_ms);
+  }
   switch (asked.chosen_in) {
     case ro::ui::PaletteEditorPicker::kNone:
       break;
@@ -207,7 +216,13 @@ void StyleView::ApplyVerb(const ro::ui::PaletteEditorAction& asked, ro::net::Con
     case ro::ui::PaletteEditorVerb::kApply:
       // ⛔ VALIDER NE FAIT PAS LE STYLE PRINCIPAL : le serveur garde pour
       // repli la première variante rangée. En changer est un geste à part.
-      Validate(link, world, now_ms, /*make_main=*/false);
+      //
+      // 🔴 LE CORPS ET LES CALQUES DU MÊME CLIC, chacun sur sa cadence et
+      // jugé par son verdict.
+      if (session_.HasSomethingToSend()) {
+        Validate(link, world, now_ms, /*make_main=*/false);
+      }
+      ValidateLayers(link, now_ms);
       break;
     case ro::ui::PaletteEditorVerb::kMakeMain:
       Validate(link, world, now_ms, /*make_main=*/true);
@@ -223,18 +238,37 @@ void StyleView::ApplyVerb(const ro::ui::PaletteEditorAction& asked, ro::net::Con
       // D17 : la tête et la peau partent avec le corps. Les teintures d'objets
       // appartiennent aux objets, et ne se retirent qu'une à une.
       static_cast<void>(SendLayers(link, {}, /*clear_character=*/true, now_ms));
+      for (const LayerTab& tab : tabs_) {
+        if (!tab.shown.item) {
+          layers_.BackToWorn(tab.at);
+        }
+      }
       break;
+    // ⚠ CES GESTES-LÀ VALENT POUR L'ONGLET OUVERT : le corps a son
+    // historique, les calques le leur.
     case ro::ui::PaletteEditorVerb::kBackToWorn:
-      session_.BackToWorn();
+      if (const LayerTab* tab = OpenLayer()) {
+        layers_.BackToWorn(tab->at);
+      } else {
+        session_.BackToWorn();
+      }
       break;
     case ro::ui::PaletteEditorVerb::kBlankSlate:
-      session_.BlankSlate();
+      if (const LayerTab* tab = OpenLayer()) {
+        std::vector<LayerEdit> neutral(tab->ramps.size());
+        for (std::size_t rank = 0; rank < neutral.size(); ++rank) {
+          neutral[rank].rank = rank;
+        }
+        layers_.Set(tab->at, tab->profile, neutral);
+      } else {
+        session_.BlankSlate();
+      }
       break;
     case ro::ui::PaletteEditorVerb::kUndo:
-      static_cast<void>(session_.Undo());
+      static_cast<void>(OpenLayer() != nullptr ? layers_.Undo() : session_.Undo());
       break;
     case ro::ui::PaletteEditorVerb::kRedo:
-      static_cast<void>(session_.Redo());
+      static_cast<void>(OpenLayer() != nullptr ? layers_.Redo() : session_.Redo());
       break;
 
     // ── LES PRÉRÉGLAGES ET LES CODES ────────────────────────────────────
@@ -285,6 +319,12 @@ void StyleView::ApplyVerb(const ro::ui::PaletteEditorAction& asked, ro::net::Con
 }
 
 bool StyleView::TryCode(std::string_view code, std::uint32_t now_ms) {
+  // UN CODE DE CALQUE se pose sur l'onglet ouvert, s'il en est un du même
+  // calque : le code d'un chapeau va au chapeau qu'on porte.
+  if (TryLayerCode(code)) {
+    refused_ms_ = 0;
+    return true;
+  }
   const std::optional<ro::sim::StyleCode> read = ro::sim::DecodeStyleCode(code);
   if (!read.has_value()) {
     // ⚠ ET ON LE DIT. ⚠ JAMAIS ZÉRO, qui est la sentinelle.

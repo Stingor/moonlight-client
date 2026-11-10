@@ -8,14 +8,19 @@
 #include <vector>
 
 #include "ro/render/palette_ramps.h"
+#include "ro/render/style_set.h"
 
 namespace moonclient {
+
+// LE PLUS DE PIÈCES QU'ON MARQUE : les huit rampes d'un corps, ou les treize
+// classes de teinte d'un chapeau.
+inline constexpr std::size_t kPieceMarksMost = ro::render::kLayerAdjustCount;
 
 // CE QUE LE JOUEUR DIT DE SES PIÈCES, en dehors de leurs couleurs : celles
 // qu'il a LIÉES — régler l'une règle les autres — et celles qu'il GARDE quand
 // l'inspiration tire de nouvelles couleurs.
 //
-// ⚠ PROPRE À UN CORPS, comme la recette : un rang ne désigne pas la même pièce
+// ⚠ PROPRE À UN CORPS OU À UN CALQUE, comme la recette : un rang ne désigne pas la même pièce
 // d'un corps à l'autre. ⚠ ET LOCAL À LA PARTIE : ni la recette ni le code ne le
 // portent, c'est une aide à composer, pas une apparence.
 class PieceMarks {
@@ -33,12 +38,12 @@ class PieceMarks {
   // Une pièce gardée par bit.
   [[nodiscard]] std::uint32_t locked() const noexcept { return locked_; }
   [[nodiscard]] bool Locked(std::size_t rank) const noexcept {
-    return rank < ro::render::kMaxRamps && (locked_ & (1U << rank)) != 0;
+    return rank < kPieceMarksMost && (locked_ & (1U << rank)) != 0;
   }
 
  private:
   // Le groupe de chaque pièce ; zéro : libre.
-  std::array<std::uint8_t, ro::render::kMaxRamps> links_{};
+  std::array<std::uint8_t, kPieceMarksMost> links_{};
   std::uint32_t locked_ = 0;
 };
 

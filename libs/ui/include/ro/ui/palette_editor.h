@@ -39,9 +39,10 @@ namespace ro::ui {
 
 // Le pantin d'aperçu : ce que `app` y pose, et ce qu'il en repart.
 //
-// ⚠ NI COIFFE NI CAPE NI ARME, et c'est un choix : on règle la palette du
-// CORPS, et un chapeau volumineux rétrécirait le personnage tout en masquant
-// les pièces qu'on cherche justement à voir.
+// ⚠ IL NE PORTE QUE LE CALQUE QU'ON RÈGLE : le corps seul sur l'onglet du
+// corps — un chapeau volumineux rétrécirait le personnage tout en masquant les
+// pièces qu'on cherche justement à voir —, la coiffe cadrée sur la tête, la
+// cape vue de dos, la peau sur le visage et les bras ensemble.
 struct PaletteDollState {
   // La silhouette composée, posée par `app`.
   SkinImage image;
@@ -91,6 +92,65 @@ struct PaletteDollState {
 // LES POSES QUE LE PANTIN PREND : repos, marche, assis, attaque — rangs du
 // .act d'un joueur.
 inline constexpr std::array<std::size_t, 4> kPaletteDollPoses = {0, 1, 2, 10};
+
+// ── LES ONGLETS DE CALQUE ────────────────────────────────────────────────────
+//
+// 🔴 UN ONGLET PAR CALQUE PORTÉ, ET SEULEMENT PORTÉ : un chapeau qu'on n'a pas
+// sur la tête n'a rien à montrer, et son onglet serait une case vide. L'onglet
+// d'un objet porte le nom de l'objet, pas celui de l'emplacement : c'est ce
+// chapeau-là qu'on teint, et la teinture lui appartient.
+//
+// ⚠ LES NUMÉROS VOYAGENT : le styliste ouvre l'éditeur sur un onglet par son
+// numéro, voir `ro/sim/style.h`. On en ajoute en queue, jamais au milieu.
+enum class PaletteTabKind : std::uint8_t {
+  kBody = 0,
+  kSkin = 1,
+  kHair = 2,
+  kHeadgearTop = 3,
+  kHeadgearMiddle = 4,
+  kHeadgearLow = 5,
+  kGarment = 6,
+};
+inline constexpr std::size_t kPaletteTabKinds = 7;
+
+// POURQUOI UN CALQUE NE SE RÈGLE PAS, dit dans son onglet grisé.
+enum class PaletteTabBlock : std::uint8_t {
+  kNone,
+  // Le profil n'y trouve aucune pièce assez grande.
+  kNoPiece,
+  // L'habit du GM garde les couleurs de ses sprites.
+  kGmOutfit,
+  // La tête d'orc est un visage d'effet, sans palette de cheveux.
+  kOrcHead,
+  // Sur cette monture, la peau peint aussi l'animal.
+  kSkinOnMount,
+  // L'apparence affichée ne correspond à aucun objet de l'équipement.
+  kNotFound,
+};
+
+struct PaletteTab {
+  PaletteTabKind kind = PaletteTabKind::kBody;
+  // Le nom de l'objet porté, prêt à l'affichage ; vide pour le corps, la peau
+  // et les cheveux, que la fenêtre nomme elle-même.
+  std::string name;
+  PaletteTabBlock blocked = PaletteTabBlock::kNone;
+  // La part du calque qu'un réglage atteint, en pour-cent, ou moins un.
+  int coverage_percent = -1;
+  // Une retouche attend d'être validée.
+  bool edited = false;
+  // Le calque porte une teinture, validée.
+  bool dyed = false;
+  // UN OBJET : la teinture appartient à l'exemplaire équipé.
+  bool item = false;
+};
+
+// LA RÉPONSE DE LA PIPETTE, toutes pièces confondues : l'onglet du calque sous
+// le curseur, et la pièce de cet onglet — moins un hors de toute pièce.
+struct PalettePipette {
+  bool found = false;
+  PaletteTabKind tab = PaletteTabKind::kBody;
+  int piece = -1;
+};
 
 // ── LES TROIS GRILLES DE VIGNETTES ──────────────────────────────────────────
 //
@@ -240,9 +300,51 @@ struct PaletteEditorView {
   // Ce que le personnage porte VRAIMENT, pour la case allumée de la grille des
   // coiffures quand la recette n'en impose aucune.
   int worn_hair_style = 0;
-  // LA PIÈCE QUE LA PIPETTE DÉSIGNE, ou moins un — la réponse de `app` au
-  // point relevé à l'image précédente. Voir `PaletteDollState`.
+  // LA PIÈCE QUE LA PIPETTE DÉSIGNE dans l'onglet ouvert, ou moins un — la
+  // réponse de `app` au point relevé à l'image précédente. Voir
+  // `PaletteDollState`.
   int pipette_ramp = -1;
+  // CE QU'ELLE DÉSIGNE TOUS CALQUES CONFONDUS : un clic sur un chapeau ouvre
+  // l'onglet du chapeau, et la pièce sous le curseur.
+  PalettePipette pipette;
+
+  // ── LES CALQUES ─────────────────────────────────────────────────────────
+
+  // Les onglets des calques portés, le corps en tête.
+  std::span<const PaletteTab> tabs;
+  // L'ONGLET DONT CETTE VUE EST FAITE. ⚠ PAS FORCÉMENT `state.tab` : un clic
+  // sur la barre change celui-ci pendant le dessin, et la vue ne suivra qu'à
+  // l'image suivante. Ce que la fenêtre montre, et ce que `app` fait des
+  // intentions, se rapportent à celui-là.
+  PaletteTabKind tab = PaletteTabKind::kBody;
+  // LES RÉGLAGES DES PIÈCES DE L'ONGLET OUVERT, quand ce n'est pas le corps :
+  // un par pièce, dans l'ordre de `ramps`. Vide sur le corps, dont les
+  // réglages sont ceux de `recipe`.
+  //
+  // ⚠ UN CHAPEAU PEUT EN AVOIR TREIZE : sans pièce assez grande, ou en couleurs
+  // vraies, il se règle par CLASSES DE TEINTE — les rouges, les oranges… — et
+  // non par pièces.
+  std::span<const render::RampAdjust> adjusts;
+  // Les pièces de l'onglet ouvert sont des classes de teinte.
+  bool hue_classes = false;
+  // L'ATELIER DU STYLISTE EST-IL OUVERT ? Une teinture d'objet ne se valide
+  // que là ; hors de l'atelier, l'onglet d'un objet n'est qu'un aperçu.
+  bool atelier_open = false;
+  // Rien d'autre à valider que des teintures d'objets, hors de l'atelier :
+  // c'est ce que « Valider » grisé doit dire.
+  bool items_wait_atelier = false;
+  // Une tête teinte d'une autre coupe existe : sa teinture peut s'adapter à
+  // la coupe portée.
+  bool can_adapt_cut = false;
+  // LES TEINTS PROPOSÉS sur l'onglet Peau, du plus clair au plus foncé.
+  std::span<const ImU32> skin_tones;
+  // Ce que le serveur a fait des teintures de calques envoyées, et la raison
+  // d'un refus, déjà traduite, ou nulle.
+  PaletteSendStatus layers_send = PaletteSendStatus::kNone;
+  const char* layers_refusal = nullptr;
+  // Le code de l'onglet ouvert peut-il partir dans le chat ? Seul le style du
+  // corps a une balise que les autres clients lisent.
+  bool code_shares_in_chat = true;
 
   // ── CE QUE LE JOUEUR A RANGÉ ────────────────────────────────────────────
 
@@ -387,6 +489,19 @@ struct PaletteEditorAction {
   // Ce que le presse-papiers portait, pour `kPasteCode`. ⚠ `ui` LE LIT MAIS NE
   // LE COMPREND PAS : décoder un style demande `sim`, qu'elle ne voit pas.
   std::string pasted;
+
+  // ── LES CALQUES ─────────────────────────────────────────────────────────
+
+  // Une seule couleur pour toutes les pièces des cheveux, en un geste : elles
+  // se lient, et prennent la couleur de la première.
+  bool one_hair_color = false;
+  // Reprendre la teinture d'une autre coupe sur la coupe portée, pièce par
+  // pièce, appariées par teinte.
+  bool adapt_cut = false;
+  // Retirer la teinture de l'objet de l'onglet ouvert.
+  bool clear_item_dye = false;
+  // Le teint proposé que le joueur vient de choisir, en rang, ou moins un.
+  int skin_tone = -1;
 };
 
 // Ce que la fenêtre garde d'une image à l'autre.
@@ -423,6 +538,14 @@ struct PaletteEditorState {
   int open_piece = -1;
   // Le mode avancé du nuancier est-il déplié ?
   bool advanced = false;
+
+  // L'ONGLET OUVERT. ⚠ `app` LE LIT pour composer la vue de cet onglet, et
+  // retombe sur le corps quand le calque n'est plus porté.
+  PaletteTabKind tab = PaletteTabKind::kBody;
+  // Un onglet à ouvrir de force à la prochaine image — la pipette, le
+  // styliste —, puis remis à faux : un clic du joueur sur la barre l'emporte
+  // ensuite.
+  bool tab_asked = false;
 
   // Le nom en cours de saisie pour un nouveau préréglage.
   std::array<char, kPresetNameSize> preset_name{};

@@ -152,6 +152,13 @@ void Game::StageStyle(std::uint32_t now_ms) {
         windows_.style.open = !windows_.style.open;
         break;
     }
+    // U17 : LE STYLISTE OUVRE SUR UN ONGLET. Un onglet que le joueur ne porte
+    // pas retombe sur le corps.
+    if (const std::uint8_t tab = world_.styles().TakeTab();
+        tab != 0 && tab <= ro::ui::kPaletteTabKinds) {
+      windows_.style.tab = static_cast<ro::ui::PaletteTabKind>(tab - 1);
+      windows_.style.tab_asked = true;
+    }
   }
 
   // NOS COULEURS DÈS L'ENTRÉE, tirées de ce que la tablée a gardé, avant que le

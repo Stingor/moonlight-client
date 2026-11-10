@@ -143,10 +143,14 @@ void DrawShareCode(const PaletteEditorView& view, const SkinArt& art, PaletteEdi
   ImGui::SameLine();
   // Poser le code dans la barre de chat. ⚠ LE GESTE S'ARRÊTE LÀ : c'est le
   // joueur qui envoie, comme pour tout autre lien.
-  if (SkinButton(core::Tr("Partager dans le chat"), art)) {
+  //
+  // ⚠ LE CODE D'UN CALQUE NE PART PAS DANS LE CHAT : la balise d'un style est
+  // celle que les autres clients du serveur lisent, et elle ne porte que le
+  // corps. Il se copie et se colle.
+  if (view.code_shares_in_chat && SkinButton(core::Tr("Partager dans le chat"), art)) {
     action.verb = PaletteEditorVerb::kShareCode;
   }
-  if (ImGui::IsItemHovered()) {
+  if (view.code_shares_in_chat && ImGui::IsItemHovered()) {
     // ⚠ ON DIT CE QUE LE GESTE FAIT, ET OÙ IL S'ARRÊTE : le lien se pose dans
     // la saisie, c'est le joueur qui envoie. ⛔ Et l'on ne promet rien de plus
     // que ce que le fil tient — un client sans greffon verra la balise brute,
@@ -233,6 +237,20 @@ void DrawPalettePresets(PaletteEditorState& state, const PaletteEditorView& view
   }
 
   ImGui::Separator();
+  DrawShareCode(view, art, action);
+  ImGui::TreePop();
+}
+
+void DrawLayerCode(const PaletteEditorView& view, const SkinArt& art, PaletteEditorAction& action) {
+  ImGui::Separator();
+  if (!ImGui::TreeNode(core::Tr("Code de ce calque"))) {
+    return;
+  }
+  if (ImGui::IsItemHovered()) {
+    SkinTooltip(
+        core::Tr("Un code par calque, à côté de celui du corps. Coller le code d'un "
+                 "chapeau teint l'applique au chapeau que tu portes."));
+  }
   DrawShareCode(view, art, action);
   ImGui::TreePop();
 }

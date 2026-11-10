@@ -1431,6 +1431,7 @@ target_include_directories(moonclient_names PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 # réécrit à chaque image.
 add_library(moonclient_styles STATIC
     character/style_outfits.cpp
+    character/style_layers.cpp
     character/style_pieces.cpp
     character/style_recipe.cpp
     character/style_session.cpp
@@ -2116,6 +2117,7 @@ add_executable(moonclient
     character/style_preview.cpp
     character/style_view.cpp
     character/style_view_apply.cpp
+    character/style_view_layers.cpp
     game/ui_layouts.cpp
     game/ui_layout_factory.cpp
     game/layout_windows.cpp

@@ -198,7 +198,9 @@ void StyleView::RefreshBodies(const ro::render::ActorLook& worn_body, std::uint3
 }
 
 const ro::render::PaletteRecipe& StyleView::Shown(const ro::ui::PaletteEditorState& state) {
-  ShownKey key{.source = kShowsRecipe, .revision = session_.revision()};
+  ShownKey key{.source = kShowsRecipe,
+               .revision = session_.revision(),
+               .layers_revision = layers_.revision()};
   const ro::render::PaletteRecipe* shown = &session_.recipe();
   if (state.doll.before) {
     key.source = kShowsWorn;
@@ -223,22 +225,33 @@ void StyleView::RefreshDoll(const ro::render::ActorLook& look,
   state.doll.image = ro::ui::SkinImage{};
   const std::size_t pose = ro::ui::kPaletteDollPoses[static_cast<std::size_t>(
       std::clamp(state.doll.pose, 0, static_cast<int>(ro::ui::kPaletteDollPoses.size()) - 1))];
+  // LES TEINTURES DE CALQUES : ce qu'on compose, ou ce qu'on porte tant que
+  // « avant / après » est tenu.
+  if (shown_key_.source == kShowsWorn) {
+    composed_.assign(layers_.worn().begin(), layers_.worn().end());
+  } else {
+    composed_ = layers_.Composed();
+  }
+  const LayerTab* tab = OpenLayer();
   const StyleDoll::Shot shot{
       .look = look,
       .recipe = &shown,
       .revision = shown_serial_,
       // ⚠ LA PULSATION NE VAUT QUE SUR CE QU'ON COMPOSE : sur ce qu'on porte ou
       // sur un préréglage survolé, elle désignerait des pièces qu'on ne règle
-      // pas.
-      .highlight = shown_key_.source == kShowsRecipe ? state.hovered_ramp : -1,
+      // pas. Et seulement sur le corps, le seul dont le pantin peint les pièces
+      // lui-même.
+      .highlight = shown_key_.source == kShowsRecipe && tab == nullptr ? state.hovered_ramp : -1,
       .now_ms = now_ms,
       .direction = state.doll.direction,
       .animation = pose,
       .animated = state.doll.animated,
-      .box = ro::render::VignetteBox{
-          .width = static_cast<std::int32_t>(state.doll.box_width),
-          .height = static_cast<std::int32_t>(state.doll.box_height),
-          .min_body_height = state.doll.box_height * ro::ui::kCharacterAvatarBodyFloor}};
+      .box = ro::render::VignetteBox{.width = static_cast<std::int32_t>(state.doll.box_width),
+                                     .height = static_cast<std::int32_t>(state.doll.box_height),
+                                     .min_body_height =
+                                         state.doll.box_height * ro::ui::kCharacterAvatarBodyFloor},
+      .layers = &composed_,
+      .focus = tab != nullptr ? tab->at.layer : ro::render::StyleLayer::kBody};
   const ro::render::IconTexture* drawn = doll_->Draw(shot);
   if (drawn == nullptr) {
     return;
@@ -367,11 +380,29 @@ void StyleView::Refresh(const ro::sim::World& world, ro::ui::PaletteEditorState&
   // mesurer d'abord donnerait une fenêtre où les pastilles annoncent la bonne
   // palette pendant que le pantin porte encore les couleurs nues du sprite.
   session_.Observe(WornOf(world, edited.key), now_ms);
+  RefreshLayerState(world, now_ms);
   ro::render::ActorLook look = edited.look;
   const ro::render::PaletteRecipe& shown = Shown(state);
   Impose(shown, look);
   const ro::render::ActorWardrobe::BodyRamps& body = doll_->Measure(look, session_.body_key());
   RefreshPieces(body, worn);
+
+  // ── LES CALQUES PORTÉS ───────────────────────────────────────────────────
+  //
+  // ⚠ SUR L'APPARENCE ENTIÈRE, coupe et couleur essayées comprises : la
+  // teinture des cheveux se range sous la coupe qu'on montre.
+  ro::render::ActorLook full = worn;
+  full.job = look.job;
+  full.cash_mount = look.cash_mount;
+  full.body_style = look.body_style;
+  Impose(shown, full);
+  RefreshTabs(full, world);
+  // 🔴 L'ONGLET DEMANDÉ, S'IL EST LÀ ET RÉGLABLE : un chapeau ôté ramène au
+  // corps.
+  const LayerTab* asked_tab = TabOf(state.tab);
+  view_tab_ = asked_tab != nullptr && asked_tab->shown.blocked == ro::ui::PaletteTabBlock::kNone
+                  ? state.tab
+                  : ro::ui::PaletteTabKind::kBody;
 
   view_.recipe = session_.recipe();
   view_.ramps = body.ramps;
@@ -398,6 +429,21 @@ void StyleView::Refresh(const ro::sim::World& world, ro::ui::PaletteEditorState&
   view_.send = ToView(session_.send_state());
   view_.bodies = body_names_;
   view_.edited_body = edited_body_;
+  view_.tabs = tab_views_;
+  view_.tab = view_tab_;
+  view_.atelier_open = atelier_open_;
+  // 🔴 « VALIDER » ENVOIE LE CORPS ET LES CALQUES DU MÊME CLIC : il a quelque
+  // chose à faire si l'un des deux en a, et peut partir si chacun de ceux qui
+  // ont à faire le peut.
+  const bool body_pending = session_.HasSomethingToSend();
+  const bool layers_pending = !LayerOrders(atelier_open_).empty();
+  view_.has_something_to_send = body_pending || layers_pending;
+  view_.can_send = (!body_pending || session_.CanSend(now_ms)) &&
+                   (!layers_pending || session_.CanSendLayers(now_ms));
+  view_.items_wait_atelier = !atelier_open_ && !LayerOrders(/*atelier_open=*/true).empty() &&
+                             !layers_pending && !body_pending;
+  view_.layers_send = ToView(session_.layers_send_state());
+  view_.layers_refusal = LayersRefusal();
 
   // ── CE QUI EST RANGÉ ─────────────────────────────────────────────────────
   preset_names_.clear();
@@ -413,17 +459,20 @@ void StyleView::Refresh(const ro::sim::World& world, ro::ui::PaletteEditorState&
   view_.share_code = share_code_.c_str();
   view_.code_refused = refused_ms_ != 0 && now_ms - refused_ms_ < kCodeRefusedNoticeMs;
 
-  RefreshDoll(look, shown, state, now_ms);
+  // ⚠ APRÈS CE QUI EST RANGÉ : un onglet de calque montre SON code.
+  if (const LayerTab* tab = OpenLayer()) {
+    RefreshLayerPieces(*tab);
+  }
+  RefreshDoll(DollLook(look, full), shown, state, now_ms);
+
   // ⚠ LA PIPETTE APRÈS LE PANTIN, sur le point relevé à l'image précédente :
   // c'est lui qui vient de poser le cadrage dont elle est l'inverse. Et
   // seulement sur ce qu'on compose : les pièces de ce qu'on porte peuvent être
   // découpées autrement.
-  if (state.doll.hovered && shown_key_.source == kShowsRecipe) {
-    if (const std::optional<std::size_t> rank =
-            doll_->RampUnder(glm::vec2(state.doll.hover_x, state.doll.hover_y))) {
-      view_.pipette_ramp = static_cast<int>(*rank);
-    }
+  if (shown_key_.source == kShowsRecipe) {
+    ReadPipette(state);
   }
+
   // ⚠ LES VIGNETTES EN DERNIER : elles se composent sur l'apparence du pantin,
   // teinte et coupe choisies comprises.
   RefreshThumbnails(look, state);

@@ -201,8 +201,10 @@ bool DrawSwatch(const PieceShown& piece, PaletteEditorState& state, const Palett
   }
   const bool hovered = ImGui::IsItemHovered();
   // 🔴 LA PIPETTE OUVRE LE NUANCIER DE LA PIÈCE QU'ELLE DÉSIGNE : un clic sur
-  // la manche du pantin vaut un clic sur sa pastille.
-  if (state.open_piece == static_cast<int>(piece.rank)) {
+  // la manche du pantin vaut un clic sur sa pastille. ⚠ PAS AVANT QUE LA LISTE
+  // SOIT CELLE DE SON ONGLET : un clic sur un chapeau depuis le corps ouvre
+  // d'abord l'onglet du chapeau.
+  if (state.open_piece == static_cast<int>(piece.rank) && state.tab == view.tab) {
     ImGui::OpenPopup("nuancier");
     state.open_piece = -1;
   }
@@ -419,13 +421,18 @@ PiecesAnswer DrawPalettePieces(PaletteEditorState& state, const PaletteEditorVie
                                const SkinArt& art, PaletteEditorAction& action) {
   PiecesAnswer answer;
   ImGui::BeginGroup();
-  for (std::size_t rank = 0; rank < view.ramps.size() && rank < render::kMaxRamps; ++rank) {
+  // 🔴 UN CALQUE PORTE SES RÉGLAGES À PART, et peut en avoir treize : ceux du
+  // corps sont ceux de la recette v7, huit au plus.
+  const bool layer = !view.adjusts.empty();
+  const std::size_t count = layer ? std::min(view.ramps.size(), view.adjusts.size())
+                                  : std::min(view.ramps.size(), render::kMaxRamps);
+  for (std::size_t rank = 0; rank < count; ++rank) {
     PieceShown piece;
     piece.rank = rank;
     piece.color = rank < view.colors.size() ? view.colors[rank] : IM_COL32_WHITE;
     piece.base_color = rank < view.base_colors.size() ? view.base_colors[rank] : piece.color;
     piece.ceiling = rank < view.ceilings.size() ? view.ceilings[rank] : kFullValue;
-    piece.adjust = view.recipe.ramps[rank];
+    piece.adjust = layer ? view.adjusts[rank] : view.recipe.ramps[rank];
     piece.link = rank < view.links.size() ? view.links[rank] : 0;
     piece.locked = (view.locked & (1U << rank)) != 0;
     piece.pointed = view.pipette_ramp == static_cast<int>(rank);

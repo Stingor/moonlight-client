@@ -116,7 +116,7 @@ void PieceMarks::Link(std::size_t from, std::size_t to) {
   }
   std::uint8_t group = links_[from] != 0 ? links_[from] : links_[to];
   if (group == 0) {
-    // Le plus petit numéro libre : il y a au plus quatre groupes de deux.
+    // Le plus petit numéro libre : il y a au plus six groupes de deux.
     group = 1;
     while (std::ranges::find(links_, group) != links_.end()) {
       ++group;
@@ -146,7 +146,7 @@ void PieceMarks::Unlink(std::size_t rank) {
 }
 
 void PieceMarks::ToggleLock(std::size_t rank) {
-  if (rank < ro::render::kMaxRamps) {
+  if (rank < kPieceMarksMost) {
     locked_ ^= 1U << rank;
   }
 }
@@ -173,9 +173,9 @@ std::vector<std::optional<std::array<std::uint8_t, 3>>> Inspire(
   const std::vector<float> hues = Hues(harmony, turn(draw));
   // 🔴 DES PIÈCES LIÉES PRENNENT LA MÊME TEINTE : c'est ce que le lien dit.
   // ⚠ UN DE PLUS QUE DE PIÈCES : les numéros de groupe partent de un.
-  std::array<std::optional<float>, ro::render::kMaxRamps + 1> group_hue{};
+  std::array<std::optional<float>, kPieceMarksMost + 1> group_hue{};
   std::size_t next = 0;
-  for (std::size_t rank = 0; rank < origin.size() && rank < ro::render::kMaxRamps; ++rank) {
+  for (std::size_t rank = 0; rank < origin.size() && rank < kPieceMarksMost; ++rank) {
     const Hsv from = ToHsv(origin[rank]);
     if (marks.Locked(rank) || from.saturation < kNeutralSaturation || from.value < kNeutralValue) {
       continue;

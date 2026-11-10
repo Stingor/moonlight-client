@@ -21,4 +21,8 @@ namespace ro::ui {
 void DrawPalettePresets(PaletteEditorState& state, const PaletteEditorView& view,
                         const SkinArt& art, PaletteEditorAction& action);
 
+// LE CODE D'UN CALQUE, seul : les préréglages sont des recettes du corps, et
+// n'ont rien à faire sur l'onglet d'un chapeau.
+void DrawLayerCode(const PaletteEditorView& view, const SkinArt& art, PaletteEditorAction& action);
+
 }  // namespace ro::ui

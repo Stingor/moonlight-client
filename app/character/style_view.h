@@ -17,6 +17,7 @@
 #include "ro/ui/palette_editor.h"
 
 #include "character/style_doll.h"
+#include "character/style_layers.h"
 #include "character/style_pieces.h"
 #include "character/style_session.h"
 #include "character/style_store.h"
@@ -178,6 +179,61 @@ class StyleView {
   void ApplyVerb(const ro::ui::PaletteEditorAction& asked, ro::net::Connection& link,
                  const ro::sim::World& world, std::uint32_t now_ms);
 
+  // ── LES CALQUES — voir `style_view_layers.cpp` ──────────────────────────
+
+  // UN ONGLET DE CALQUE, et ce qu'il faut pour le régler.
+  struct LayerTab {
+    ro::ui::PaletteTab shown;
+    LayerAt at;
+    // La partie de l'acteur qui peint ce calque, et le profil qui le découpe.
+    ro::render::ActorPart part = ro::render::ActorPart::kBody;
+    std::uint8_t profile = ro::render::kLayerProfileNumber;
+    // Un objet : l'emplacement qu'on désigne au serveur, et l'objet attendu.
+    std::optional<ro::net::StyleSlot> slot;
+    std::uint32_t item_id = 0;
+    // La base et les pièces : celles du sprite au profil 1, une couleur
+    // représentative par classe au profil 2, l'ensemble de peau pour la peau.
+    ro::formats::Palette base;
+    std::vector<ro::render::PaletteRamp> ramps;
+    // La palette du sprite lui-même : c'est elle que la pipette lit.
+    ro::formats::Palette sprite_base;
+  };
+  // Les onglets des calques que `look` porte, refaits quand il change.
+  void RefreshTabs(const ro::render::ActorLook& look, const ro::sim::World& world);
+  // L'onglet ouvert, ou nul sur le corps.
+  [[nodiscard]] const LayerTab* OpenLayer() const;
+  [[nodiscard]] const LayerTab* TabOf(ro::ui::PaletteTabKind kind) const;
+  // Ce que la vue montre d'un onglet de calque : pièces, pastilles, code.
+  void RefreshLayerPieces(const LayerTab& tab);
+  // Ce que le serveur dit de nos calques, et ce que la vue en tire.
+  void RefreshLayerState(const ro::sim::World& world, std::uint32_t now_ms);
+  // L'apparence du pantin pour l'onglet ouvert.
+  [[nodiscard]] ro::render::ActorLook DollLook(const ro::render::ActorLook& body_look,
+                                               const ro::render::ActorLook& full_look) const;
+  // La pipette, tous calques confondus.
+  void ReadPipette(const ro::ui::PaletteEditorState& state);
+  // Les intentions sur les pièces d'un calque.
+  void ApplyLayerPieces(const ro::ui::PaletteEditorAction& asked, const LayerTab& tab,
+                        Harmony harmony, std::uint32_t now_ms);
+  // La raison du dernier refus des calques, déjà traduite, ou nulle.
+  [[nodiscard]] const char* LayersRefusal() const;
+
+  // Les réglages que la session des calques reprend d'une couleur désignée.
+  [[nodiscard]] std::vector<LayerEdit> Reach(const LayerTab& tab,
+                                             std::span<const std::size_t> ranks,
+                                             std::array<std::uint8_t, 3> target) const;
+  // « Adapter à ma nouvelle coupe ».
+  void AdaptCut(const LayerTab& tab);
+  // Les teintures à valider, en ordres du fil. Les objets n'y entrent qu'à
+  // l'atelier.
+  [[nodiscard]] std::vector<ro::net::StyleLayerOrder> LayerOrders(bool atelier_open) const;
+  // Valide les calques, s'il y a lieu.
+  void ValidateLayers(ro::net::Connection& link, std::uint32_t now_ms);
+  // Retire la teinture de l'objet de l'onglet.
+  void ClearItemDye(const LayerTab& tab, ro::net::Connection& link, std::uint32_t now_ms);
+  // Lit un code de calque sur l'onglet ouvert. Faux s'il n'y va pas.
+  bool TryLayerCode(std::string_view code);
+
   ro::render::ActorWardrobe* wardrobe_ = nullptr;
   std::optional<StyleDoll> doll_;
   std::optional<ro::render::ActorThumbnails> thumbnails_;
@@ -233,6 +289,8 @@ class StyleView {
   struct ShownKey {
     int source = 0;
     std::uint32_t revision = 0;
+    // La révision des calques composés : leurs teintures se peignent aussi.
+    std::uint32_t layers_revision = 0;
     int preset = -1;
 
     [[nodiscard]] bool operator==(const ShownKey&) const = default;
@@ -263,6 +321,29 @@ class StyleView {
   // L'instant du dernier collage REFUSÉ : le message ne reste que quelques
   // secondes.
   std::uint32_t refused_ms_ = 0;
+
+  // ── LES CALQUES ─────────────────────────────────────────────────────────
+  StyleLayers layers_;
+  std::vector<LayerTab> tabs_;
+  std::vector<ro::ui::PaletteTab> tab_views_;
+  // L'apparence pour laquelle les onglets ont été faits, et la mesure du corps.
+  std::optional<ro::render::ActorLook> tabs_look_;
+  std::uint32_t tabs_generation_ = 0;
+  // L'onglet de la vue, et ce qui s'y lit.
+  ro::ui::PaletteTabKind view_tab_ = ro::ui::PaletteTabKind::kBody;
+  std::vector<ro::render::RampAdjust> layer_adjusts_;
+  std::vector<ImU32> layer_colors_;
+  std::vector<ImU32> layer_base_colors_;
+  std::vector<int> layer_ceilings_;
+  std::string layer_code_;
+
+  std::vector<std::array<std::uint8_t, 3>> layer_painted_;
+  std::vector<ro::render::LayerDye> composed_;
+  std::vector<ImU32> skin_tones_;
+  // Les pièces liées et gardées, par calque.
+  std::map<LayerAt, PieceMarks> layer_marks_;
+  // L'atelier du styliste est-il ouvert, à cette image ?
+  bool atelier_open_ = false;
 };
 
 }  // namespace moonclient

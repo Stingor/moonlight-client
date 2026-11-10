@@ -212,10 +212,52 @@ void DrawOrigin(const char* id, PaletteEditorPicker grid, const SkinArt& art,
   ImGui::PopID();
 }
 
+// LA TEINTE DE BASE DU CORPS.
+//
+// 🔴 LE LIBELLÉ PORTE LES NUMÉROS DU SERVEUR. Le joueur et l'administrateur
+// doivent parler de la même palette : « teinte 42 » ici doit être
+// `body_42.pal` là-bas. Et « d'origine » n'est pas la palette zéro — celle-ci
+// n'existe pas pour le jeu, une couleur de vêtement nulle signifiant « aucune
+// palette externe » ; la sentinelle reste moins un.
+void DrawBodyPaletteChoice(PaletteEditorState& state, const PaletteEditorView& view,
+                           const SkinArt& art, PaletteEditorAction& action) {
+  char label[96] = {};
+  if (view.recipe.body_palette > 0) {
+    std::snprintf(label, sizeof(label), "%s (%d)", core::Tr("Teinte de base"),
+                  view.recipe.body_palette);
+  } else {
+    std::snprintf(label, sizeof(label), "%s (%s)", core::Tr("Teinte de base"),
+                  core::Tr("d'origine"));
+  }
+  if (SkinButton(label, art)) {
+    ImGui::OpenPopup(kBodyPalettePopup);
+  }
+  if (ImGui::IsItemHovered()) {
+    SkinTooltip(
+        core::Tr("Les couleurs officielles du styliste servent de point de départ ; tes "
+                 "réglages s'appliquent par-dessus. Changer de teinte de base peut "
+                 "redécouper les pièces."));
+  }
+  if (view.recipe.body_palette > 0) {
+    DrawOrigin("teinte", PaletteEditorPicker::kBodyPalette, art, action);
+  }
+  DrawBodyPalettePicker(state, view, art, action);
+}
+
 }  // namespace
 
 void DrawChoiceButtons(PaletteEditorState& state, const PaletteEditorView& view, const SkinArt& art,
-                       PaletteEditorAction& action) {
+                       PaletteEditorAction& action, ChoiceButtons shown) {
+  if (shown.hair) {
+    DrawHairChoices(state, view, art, action);
+  }
+  if (shown.body_palette) {
+    DrawBodyPaletteChoice(state, view, art, action);
+  }
+}
+
+void DrawHairChoices(PaletteEditorState& state, const PaletteEditorView& view, const SkinArt& art,
+                     PaletteEditorAction& action) {
   char label[96] = {};
   const int hair = view.recipe.hair_style > 0 ? view.recipe.hair_style : view.worn_hair_style;
   std::snprintf(label, sizeof(label), "%s (%d)", core::Tr("Coiffure"), hair);
@@ -243,32 +285,6 @@ void DrawChoiceButtons(PaletteEditorState& state, const PaletteEditorView& view,
     DrawOrigin("couleur", PaletteEditorPicker::kHairColor, art, action);
   }
   DrawHairColorPicker(state, view, action);
-
-  // 🔴 LE LIBELLÉ PORTE LES NUMÉROS DU SERVEUR. Le joueur et l'administrateur
-  // doivent parler de la même palette : « teinte 42 » ici doit être
-  // `body_42.pal` là-bas. Et « d'origine » n'est pas la palette zéro — celle-ci
-  // n'existe pas pour le jeu, une couleur de vêtement nulle signifiant « aucune
-  // palette externe » ; la sentinelle reste moins un.
-  if (view.recipe.body_palette > 0) {
-    std::snprintf(label, sizeof(label), "%s (%d)", core::Tr("Teinte de base"),
-                  view.recipe.body_palette);
-  } else {
-    std::snprintf(label, sizeof(label), "%s (%s)", core::Tr("Teinte de base"),
-                  core::Tr("d'origine"));
-  }
-  if (SkinButton(label, art)) {
-    ImGui::OpenPopup(kBodyPalettePopup);
-  }
-  if (ImGui::IsItemHovered()) {
-    SkinTooltip(
-        core::Tr("Les couleurs officielles du styliste servent de point de départ ; tes "
-                 "réglages s'appliquent par-dessus. Changer de teinte de base peut "
-                 "redécouper les pièces."));
-  }
-  if (view.recipe.body_palette > 0) {
-    DrawOrigin("teinte", PaletteEditorPicker::kBodyPalette, art, action);
-  }
-  DrawBodyPalettePicker(state, view, art, action);
 }
 
 bool ThumbnailGridScrolls(int total, int columns, int visible_rows) {

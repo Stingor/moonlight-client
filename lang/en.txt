@@ -572,9 +572,6 @@ tr: Reveal 25 different items in Roggle.
 fr: Dévoiler un item dans Roggle.
 tr: Reveal an item in Roggle.
 
-fr: Efface les couleurs de tous tes corps, chez toi ET sur le serveur. Ta coupe et ta couleur de cheveux restent celles que tu portes.
-tr: Erases the colors of all your bodies, here AND on the server. Your hairstyle and hair color stay as they are.
-
 fr: En attente des autres joueurs…
 tr: Waiting for the other players…
 
@@ -787,9 +784,6 @@ tr: Saturation: %+d %%
 
 fr: Saturation : %d %%
 tr: Saturation: %d %%
-
-fr: Supprimer ton style, chez toi ET sur le serveur ? Tes corps retrouvent leurs couleurs d'origine, pour toi comme pour les autres ; ta coupe et ta couleur de cheveux restent. C'est définitif.
-tr: Delete your style, here AND on the server? Your bodies get their original colors back, for you and for others; your hairstyle and hair color stay. This is permanent.
 
 fr: Teinte : %d°
 tr: Hue: %d°
@@ -23364,3 +23358,126 @@ tr: Your cart spins like a tornado and sweeps the horde away.
 
 fr: Zeny ramassés +%d %%
 tr: Zeny picked up +%d %%
+
+fr: Adapter à ma nouvelle coupe
+tr: Adapt to my new haircut
+
+fr: Aucune pièce assez grande pour se régler.
+tr: No piece is large enough to adjust.
+
+fr: Aucune pièce de ce calque ne se règle.
+tr: No piece of this layer can be adjusted.
+
+fr: Calques :
+tr: Layers:
+
+fr: Cet item n'est pas dans ton équipement.
+tr: This item is not in your equipment.
+
+fr: Cet item se règle par familles de teinte : chaque pastille teint toutes ses couleurs de cette famille.
+tr: This item is adjusted by hue families: each swatch dyes all of its colors in that family.
+
+fr: Cette teinture appartient à cet item : elle le suit à l'échange, à la vente, au storage et au courrier.
+tr: This dye belongs to this item: it follows it through trade, sale, storage and mail.
+
+fr: Cheveux
+tr: Hair
+
+fr: Code de ce calque
+tr: Code of this layer
+
+fr: Coiffe basse
+tr: Lower headgear
+
+fr: Coiffe du milieu
+tr: Middle headgear
+
+fr: Coiffe haute
+tr: Upper headgear
+
+fr: Efface les couleurs de tous tes corps, de tes cheveux et de ta peau, chez toi ET sur le serveur. Ta coupe et ta couleur de cheveux restent celles que tu portes ; les teintures de tes items leur appartiennent et restent.
+tr: Erases the colors of all your bodies, your hair and your skin, on your side AND on the server. Your haircut and hair color stay the ones you wear; your items' dyes belong to them and stay.
+
+fr: Impossible pendant un échange, une boutique, un storage ou un dialogue, ni une fois à terre.
+tr: Not possible during a trade, a shop, storage or a dialogue, nor while knocked down.
+
+fr: L'aperçu est libre partout. Pour teindre ou déteindre l'item pour de bon, parle au styliste : il t'ouvre son atelier pour quelques minutes.
+tr: The preview is free everywhere. To dye or undye the item for good, talk to the stylist: they open their workshop for you for a few minutes.
+
+fr: L'habit du GM garde ses couleurs.
+tr: The GM outfit keeps its colors.
+
+fr: L'item n'est plus porté à sa place.
+tr: The item is no longer worn in its slot.
+
+fr: L'item retrouve ses couleurs d'origine, pour toi comme pour les autres.
+tr: The item gets its original colors back, for you and for others.
+
+fr: La teinture de cet onglet appartient à l'item porté.
+tr: This tab's dye belongs to the worn item.
+
+fr: La tête d'orc garde ses couleurs.
+tr: The orc head keeps its colors.
+
+fr: Le serveur n'a pas compris la demande.
+tr: The server did not understand the request.
+
+fr: Le serveur ne peut pas ranger les teintures pour l'instant.
+tr: The server cannot store dyes right now.
+
+fr: Le serveur refuse cette coupe, cette couleur ou cet item.
+tr: The server refuses this haircut, this color or this item.
+
+fr: Le visage et les bras se teignent ensemble : la pastille règle les deux.
+tr: The face and arms are dyed together: the swatch adjusts both.
+
+fr: Lie toutes les pièces des cheveux et leur donne la couleur de la première : régler l'une règle ensuite toutes les autres.
+tr: Links all hair pieces and gives them the color of the first: adjusting one then adjusts all the others.
+
+fr: Peau
+tr: Skin
+
+fr: Peau non réglable sur cette monture : elle peint aussi l'animal.
+tr: Skin cannot be adjusted on this mount: it also paints the animal.
+
+fr: Remet toutes les pièces de ce calque à leur couleur d'origine, dans l'aperçu seulement.
+tr: Resets all pieces of this layer to their original color, in the preview only.
+
+fr: Reprend la teinture de ta coupe précédente sur celle-ci, pièce par pièce, en rapprochant les teintes. Une teinture reste rangée sous sa coupe et sa couleur : elle revient si tu les retrouves.
+tr: Carries your previous haircut's dye over to this one, piece by piece, matching hues. A dye stays stored under its haircut and color: it comes back if you return to them.
+
+fr: Retirer la teinture de cet item
+tr: Remove this item's dye
+
+fr: Retirer la teinture de cet item ? Il retrouve ses couleurs d'origine, où qu'il aille ensuite.
+tr: Remove this item's dye? It gets its original colors back, wherever it goes next.
+
+fr: Réglable : %d%%
+tr: Adjustable: %d%%
+
+fr: Seulement à l'atelier du styliste.
+tr: Only at the stylist's workshop.
+
+fr: Supprimer ton style, chez toi ET sur le serveur ? Tes corps, tes cheveux et ta peau retrouvent leurs couleurs d'origine, pour toi comme pour les autres ; ta coupe et ta couleur de cheveux restent, et tes items gardent leur teinture. C'est définitif.
+tr: Delete your style, on your side AND on the server? Your bodies, hair and skin get their original colors back, for you and for others; your haircut and hair color stay, and your items keep their dye. This is final.
+
+fr: Teints :
+tr: Skin tones:
+
+fr: Trop de teintures pour le serveur.
+tr: Too many dyes for the server.
+
+fr: Trop rapproché de la demande précédente : attends une seconde.
+tr: Too close to the previous request: wait a second.
+
+fr: Un code par calque, à côté de celui du corps. Coller le code d'un chapeau teint l'applique au chapeau que tu portes.
+tr: One code per layer, next to the body's. Pasting a dyed hat's code applies it to the hat you wear.
+
+fr: Un costume et un chapeau ordinaire de même apparence ont chacun la leur, et deux exemplaires du même chapeau peuvent porter deux couleurs.
+tr: A costume and an ordinary hat with the same look each have their own, and two copies of the same hat can wear two colors.
+
+fr: Une couleur pour tous les cheveux
+tr: One color for all the hair
+
+fr: Une teinture d'item se valide auprès du styliste.
+tr: An item dye is confirmed at the stylist.
