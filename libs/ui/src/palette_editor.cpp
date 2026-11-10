@@ -16,6 +16,7 @@
 #include "palette_pickers.h"
 #include "palette_pieces.h"
 #include "palette_presets.h"
+#include "palette_retouches.h"
 #include "ui_scale.h"
 
 namespace ro::ui {
@@ -351,7 +352,8 @@ void DrawBodyLines(const PaletteEditorView& view, const SkinArt& art, PaletteEdi
   // La hauteur de la liste se CALCULE au lieu de se mesurer après coup : le
   // pantin vient en premier, et il lui faut cette hauteur pour être carré.
   const float row = ImGui::GetFrameHeight();
-  const auto rows = static_cast<float>(view.ramps.size());
+  // L'intitulé du reste prend une rangée de plus.
+  const auto rows = static_cast<float>(view.ramps.size() + (view.rest_first >= 0 ? 1U : 0U));
   const float list_height = rows * row + (rows - 1.0F) * ImGui::GetStyle().ItemSpacing.y;
   // Le pantin est carré, à GAUCHE de la liste — et pas l'inverse. Un nuancier
   // s'ouvre SOUS sa pastille : avec les pièces à gauche, il retomberait pile
@@ -365,7 +367,14 @@ void DrawBodyLines(const PaletteEditorView& view, const SkinArt& art, PaletteEdi
   //
   // ⚠ UN CLIC SUR UN AUTRE CALQUE OUVRE D'ABORD SON ONGLET : la pièce attend
   // l'image où la liste sera la sienne.
-  if (state.doll.clicked && view.pipette.found && view.pipette.tab != view.tab) {
+  // 🔴 EN RETOUCHE EXACTE, LE CLIC VISE UNE COULEUR DE LA PALETTE, et non la
+  // pièce qui la contient.
+  if (state.retouch_mode && state.doll.clicked) {
+    if (view.pick_index > 0) {
+      state.retouch_index = view.pick_index;
+      state.retouch_opening = true;
+    }
+  } else if (state.doll.clicked && view.pipette.found && view.pipette.tab != view.tab) {
     state.tab = view.pipette.tab;
     state.tab_asked = true;
     state.open_piece = view.pipette.piece;
@@ -458,6 +467,7 @@ PaletteEditorAction DrawPaletteEditor(PaletteEditorState& state, const PaletteEd
   } else {
     picker_open = DrawPiecesBlock(state, view, art, action);
   }
+  picker_open = DrawPaletteRetouches(state, view, art, action) || picker_open;
   DrawLayerNotes(view, art, action);
 
   DrawHistory(view, art, action);
@@ -489,6 +499,11 @@ PaletteEditorAction DrawPaletteEditor(PaletteEditorState& state, const PaletteEd
     DrawPalettePresets(state, view, art, action);
   } else {
     DrawLayerCode(view, art, action);
+    if (view.code_note != nullptr) {
+      ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + ImGui::GetFontSize() * kWrapInFonts);
+      ImGui::TextDisabled("%s", view.code_note);
+      ImGui::PopTextWrapPos();
+    }
   }
 
   if (picker_open) {

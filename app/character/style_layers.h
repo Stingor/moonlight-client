@@ -23,11 +23,19 @@ struct LayerAt {
   [[nodiscard]] friend auto operator<=>(const LayerAt&, const LayerAt&) = default;
 };
 
+// LE PREMIER RANG DU RESTE, dans un geste : en deçà, le rang désigne une pièce ;
+// à partir de lui, la classe de teinte `rank - kRestRankFirst` du reste.
+inline constexpr std::size_t kRestRankFirst = 16;
+static_assert(kRestRankFirst >= ro::render::kLayerAdjustCount);
+
 // Un réglage de teinture, pour un geste qui en touche plusieurs.
 struct LayerEdit {
   std::size_t rank = 0;
   ro::render::RampAdjust adjust;
 };
+
+// Les retouches qu'un calque porte au plus : celles que le fil admet.
+inline constexpr std::size_t kLayerRetouchesMost = 32;
 
 // La profondeur de l'historique des calques, en pas.
 inline constexpr std::size_t kLayerHistoryDepth = 64;
@@ -71,6 +79,12 @@ class StyleLayers {
 
   void Set(LayerAt at, std::uint8_t profile, std::span<const LayerEdit> edits,
            std::uint32_t stroke = 0);
+  // UNE RETOUCHE : la couleur exacte d'un index, qui remplace celle qu'il avait.
+  // Refusée pour l'index zéro, le magenta pur, ou un calque déjà plein.
+  bool Retouch(LayerAt at, std::uint8_t profile, const ro::render::PaletteRetouch& retouch,
+               std::uint32_t stroke = 0);
+  // Retire la retouche de cet index.
+  void Unretouch(LayerAt at, std::uint8_t profile, std::uint8_t index);
   // Une teinture entière : un code collé, une coupe adaptée.
   void Put(const ro::render::LayerDye& dye);
   // Revenir à ce que ce calque porte.
@@ -108,6 +122,8 @@ class StyleLayers {
   // Range `before` comme l'état d'avant un pas, sauf si rien n'a changé ou si
   // le geste prolonge le trait en cours.
   void Step(const Edits& before, std::uint32_t stroke);
+  // Range `dye` comme la retouche de `at`, en un pas.
+  void Replace(LayerAt at, ro::render::LayerDye dye, std::uint32_t stroke);
   void Changed();
   // Retire les retouches qui ne diffèrent plus de ce qu'on porte.
   void Settle();

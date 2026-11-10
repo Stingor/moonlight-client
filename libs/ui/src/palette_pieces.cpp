@@ -107,18 +107,19 @@ constexpr float kPinkUpTo = 340.0F;
   return changed;
 }
 
-// LE MODE AVANCÉ : le réglage lui-même, plutôt qu'une couleur à atteindre.
+// LE RÉGLAGE ABSOLU, à portée de main sous le nuancier : c'est lui qui colore
+// un gris ou un blanc, qu'une rotation de teinte laisse gris.
 //
 // 🔴 LA ROTATION RELATIVE GARDE LA MATIÈRE : elle tourne les teintes de la
 // pièce sans les écraser sur une seule, si bien qu'un tissu à reflets garde
 // ses reflets. Le mode absolu, lui, pose une teinte et une saturation
 // uniques. Rend le réglage changé, ou rien.
-[[nodiscard]] std::optional<render::RampAdjust> DrawAdvanced(const render::RampAdjust& current,
-                                                             ImU32 base_color, const SkinArt& art) {
+[[nodiscard]] std::optional<render::RampAdjust> DrawAbsoluteToggle(
+    const render::RampAdjust& current, ImU32 base_color, const SkinArt& art) {
   render::RampAdjust next = current;
   bool changed = false;
   bool absolute = current.absolute;
-  if (SkinCheckBox(core::Tr("Absolu"), &absolute, art)) {
+  if (SkinCheckBox(core::Tr("Couleur unique (absolu)"), &absolute, art)) {
     next.absolute = absolute;
     if (absolute) {
       // On part de la couleur d'origine : basculer ne doit rien repeindre.
@@ -139,8 +140,21 @@ constexpr float kPinkUpTo = 340.0F;
   if (ImGui::IsItemHovered()) {
     SkinTooltip(
         core::Tr("Décoché : la teinte tourne, et la pièce garde sa matière — ses reflets, "
-                 "ses ombres colorées. Coché : une teinte et une saturation uniques."));
+                 "ses ombres colorées. Coché : une teinte et une saturation uniques, qui "
+                 "colorent aussi les gris et les blancs."));
   }
+  if (!changed) {
+    return std::nullopt;
+  }
+  return next;
+}
+
+// LE MODE AVANCÉ : le réglage lui-même, plutôt qu'une couleur à atteindre.
+// Rend le réglage changé, ou rien.
+[[nodiscard]] std::optional<render::RampAdjust> DrawAdvanced(const render::RampAdjust& current,
+                                                             const SkinArt& art) {
+  render::RampAdjust next = current;
+  bool changed = false;
   int hue = next.hue;
   int saturation = next.saturation;
   int value = next.value;
@@ -183,6 +197,8 @@ struct PieceShown {
   std::uint8_t link = 0;
   bool locked = false;
   bool pointed = false;
+  // Une classe de teinte du reste, et non une pièce.
+  bool rest = false;
 };
 
 // LA PASTILLE : elle ouvre le nuancier, se glisse sur une autre, reçoit une
@@ -247,8 +263,10 @@ bool DrawSwatch(const PieceShown& piece, PaletteEditorState& state, const Palett
 // joueur reconnaît sa manche.
 bool DrawName(const PieceShown& piece) {
   char label[128] = {};
-  int written = std::snprintf(label, sizeof(label), "%s %zu — %s", core::Tr("Pièce"),
-                              piece.rank + 1, PieceColorName(piece.base_color));
+  int written = piece.rest ? std::snprintf(label, sizeof(label), "%s — %s", core::Tr("Reste"),
+                                           PieceColorName(piece.base_color))
+                           : std::snprintf(label, sizeof(label), "%s %zu — %s", core::Tr("Pièce"),
+                                           piece.rank + 1, PieceColorName(piece.base_color));
   const auto append = [&label, &written](const char* tail) {
     if (written >= 0 && static_cast<std::size_t>(written) < sizeof(label)) {
       written += std::snprintf(label + written, sizeof(label) - static_cast<std::size_t>(written),
@@ -323,16 +341,20 @@ bool DrawPiecePopup(const PieceShown& piece, PaletteEditorState& state, const Sk
     return false;
   }
   std::array<float, 3> rgb = Channels(piece.color);
-  if (DrawPicker(rgb, art)) {
+  if (DrawPaletteColorPicker(rgb, art)) {
     action.picked_ramp = static_cast<int>(piece.rank);
     action.picked_color = {ToByte(rgb[0]), ToByte(rgb[1]), ToByte(rgb[2])};
+  }
+  if (const std::optional<render::RampAdjust> adjust =
+          DrawAbsoluteToggle(piece.adjust, piece.base_color, art)) {
+    action.adjusted_ramp = static_cast<int>(piece.rank);
+    action.adjust = *adjust;
   }
   // D13 : replié par défaut, il ne s'adresse qu'à qui le cherche.
   ImGui::SetNextItemOpen(state.advanced);
   state.advanced = ImGui::TreeNode(core::Tr("Mode avancé"));
   if (state.advanced) {
-    if (const std::optional<render::RampAdjust> adjust =
-            DrawAdvanced(piece.adjust, piece.base_color, art)) {
+    if (const std::optional<render::RampAdjust> adjust = DrawAdvanced(piece.adjust, art)) {
       action.adjusted_ramp = static_cast<int>(piece.rank);
       action.adjust = *adjust;
     }
@@ -376,6 +398,10 @@ bool DrawPiece(const PieceShown& piece, PaletteEditorState& state, const Palette
 }
 
 }  // namespace
+
+bool DrawPaletteColorPicker(std::array<float, 3>& rgb, const SkinArt& art) {
+  return DrawPicker(rgb, art);
+}
 
 const char* PieceColorName(ImU32 color) {
   const std::array<float, 3> rgb = Channels(color);
@@ -431,7 +457,19 @@ PiecesAnswer DrawPalettePieces(PaletteEditorState& state, const PaletteEditorVie
   // pièce 1 du corps si l'onglet change sous lui. Il disparaît avec sa liste.
   ImGui::PushID(static_cast<int>(view.tab));
   for (std::size_t rank = 0; rank < count; ++rank) {
+    // 🔴 LE RESTE SOUS SON INTITULÉ : ce ne sont pas des pièces, mais chaque
+    // couleur qu'aucune pièce ne couvre, réglée par sa famille de teinte.
+    if (static_cast<int>(rank) == view.rest_first) {
+      ImGui::AlignTextToFramePadding();
+      ImGui::TextDisabled("%s", core::Tr("Le reste"));
+      if (ImGui::IsItemHovered()) {
+        SkinTooltip(
+            core::Tr("Les couleurs qu'aucune pièce ne règle, par famille de teinte : chaque "
+                     "pastille teint toutes celles de sa famille, et aucune pièce."));
+      }
+    }
     PieceShown piece;
+    piece.rest = view.rest_first >= 0 && static_cast<int>(rank) >= view.rest_first;
     piece.rank = rank;
     piece.color = rank < view.colors.size() ? view.colors[rank] : IM_COL32_WHITE;
     piece.base_color = rank < view.base_colors.size() ? view.base_colors[rank] : piece.color;

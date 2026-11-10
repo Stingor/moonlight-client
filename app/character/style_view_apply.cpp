@@ -114,16 +114,18 @@ void StyleView::ApplyPieces(const ro::ui::PaletteEditorAction& asked, std::uint3
   }
   // ⚠ REMETTRE UNE PIÈCE À NEUTRE N'EST PAS UN CALCUL : c'est l'absence de
   // réglage.
-  if (asked.reset_ramp >= 0) {
+  // ⚠ AU-DELÀ DES PIÈCES V7, la suite et le reste : voir `ApplyBodyMore`.
+  const std::size_t v7 = body.ramps.size();
+  if (InRange(asked.reset_ramp, v7)) {
     session_.SetPiece(static_cast<std::size_t>(asked.reset_ramp), ro::render::RampAdjust{});
   }
-  if (asked.link_from >= 0 && asked.link_to >= 0) {
+  if (InRange(asked.link_from, v7) && InRange(asked.link_to, v7)) {
     marks.Link(static_cast<std::size_t>(asked.link_from), static_cast<std::size_t>(asked.link_to));
   }
-  if (asked.unlink >= 0) {
+  if (InRange(asked.unlink, v7)) {
     marks.Unlink(static_cast<std::size_t>(asked.unlink));
   }
-  if (asked.toggle_lock >= 0) {
+  if (InRange(asked.toggle_lock, v7)) {
     marks.ToggleLock(static_cast<std::size_t>(asked.toggle_lock));
   }
   if (asked.verb == ro::ui::PaletteEditorVerb::kInspire && !body.ramps.empty()) {
@@ -146,6 +148,7 @@ void StyleView::ApplyPieces(const ro::ui::PaletteEditorAction& asked, std::uint3
     // ⚠ UN TIRAGE, UN PAS : Ctrl+Z rend la tenue d'avant d'un coup.
     session_.SetPieces(edits);
   }
+  ApplyBodyMore(asked, ToHarmony(asked.harmony), now_ms);
 }
 
 void StyleView::LoadPreset(const ro::ui::PaletteEditorAction& asked) {

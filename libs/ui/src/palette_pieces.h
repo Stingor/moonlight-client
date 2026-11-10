@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+
 #include "ro/ui/palette_editor.h"
 #include "ro/ui/skin_art.h"
 
@@ -21,5 +23,9 @@ struct PiecesAnswer {
 [[nodiscard]] PiecesAnswer DrawPalettePieces(PaletteEditorState& state,
                                              const PaletteEditorView& view, const SkinArt& art,
                                              PaletteEditorAction& action);
+
+// LE NUANCIER : le carré et la barre de teinte, puis la teinte, la saturation et
+// la clarté en curseurs. Rend vrai quand la couleur a changé.
+[[nodiscard]] bool DrawPaletteColorPicker(std::array<float, 3>& rgb, const SkinArt& art);
 
 }  // namespace ro::ui

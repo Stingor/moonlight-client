@@ -26,8 +26,9 @@ constexpr std::size_t kHeadsKept = 8;
 }  // namespace
 
 bool NeutralDye(const ro::render::LayerDye& dye) {
-  return std::ranges::all_of(dye.adjusts,
-                             [](const ro::render::RampAdjust& adjust) { return adjust.neutral(); });
+  const auto neutral = [](const ro::render::RampAdjust& adjust) { return adjust.neutral(); };
+  return std::ranges::all_of(dye.adjusts, neutral) && std::ranges::all_of(dye.rest, neutral) &&
+         dye.retouches.empty();
 }
 
 void StyleLayers::Observe(std::span<const ro::render::LayerDye> worn, std::uint32_t revision) {
@@ -73,13 +74,50 @@ void StyleLayers::Set(LayerAt at, std::uint8_t profile, std::span<const LayerEdi
   for (const LayerEdit& edit : edits) {
     if (edit.rank < dye.adjusts.size()) {
       dye.adjusts[edit.rank] = edit.adjust;
+    } else if (edit.rank >= kRestRankFirst && edit.rank - kRestRankFirst < dye.rest.size()) {
+      dye.rest[edit.rank - kRestRankFirst] = edit.adjust;
     }
   }
+  Replace(at, std::move(dye), stroke);
+}
+
+bool StyleLayers::Retouch(LayerAt at, std::uint8_t profile,
+                          const ro::render::PaletteRetouch& retouch, std::uint32_t stroke) {
+  if (!ro::render::RetouchAllowed(retouch)) {
+    return false;
+  }
+  ro::render::LayerDye dye = Current(at, profile);
+  // 🔴 TRIÉES PAR INDEX, UNE PAR INDEX : c'est la forme que le fil exige.
+  const auto place = std::ranges::lower_bound(dye.retouches, retouch.index, {},
+                                              &ro::render::PaletteRetouch::index);
+  if (place != dye.retouches.end() && place->index == retouch.index) {
+    *place = retouch;
+  } else if (dye.retouches.size() >= kLayerRetouchesMost) {
+    return false;
+  } else {
+    dye.retouches.insert(place, retouch);
+  }
+  Replace(at, std::move(dye), stroke);
+  return true;
+}
+
+void StyleLayers::Unretouch(LayerAt at, std::uint8_t profile, std::uint8_t index) {
+  ro::render::LayerDye dye = Current(at, profile);
+  if (std::erase_if(dye.retouches, [index](const ro::render::PaletteRetouch& retouch) {
+        return retouch.index == index;
+      }) == 0) {
+    return;
+  }
+  Replace(at, std::move(dye), 0);
+}
+
+void StyleLayers::Replace(LayerAt at, ro::render::LayerDye dye, std::uint32_t stroke) {
   const Edits before = edits_;
-  edits_[at] = dye;
-  if (at.layer == ro::render::StyleLayer::kHead && !NeutralDye(dye)) {
+  const bool head = at.layer == ro::render::StyleLayer::kHead && !NeutralDye(dye);
+  if (head) {
     RememberHead(dye);
   }
+  edits_[at] = std::move(dye);
   Settle();
   Step(before, stroke);
 }

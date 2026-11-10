@@ -129,6 +129,12 @@ std::optional<ro::render::LayerDye> FromWire(const ro::sim::StyleLayerRecipe& to
   dye.profile = told.profile;
   for (std::size_t rank = 0; rank < ro::render::kLayerAdjustCount; ++rank) {
     dye.adjusts[rank] = ToAdjust(told.adjusts[rank]);
+    dye.rest[rank] = ToAdjust(told.rest[rank]);
+  }
+  dye.retouches.reserve(told.retouches.size());
+  for (const ro::sim::StyleRetouch& retouch : told.retouches) {
+    dye.retouches.push_back(ro::render::PaletteRetouch{
+        .index = retouch.index, .rgb = {retouch.red, retouch.green, retouch.blue}});
   }
   return dye;
 }
@@ -142,6 +148,14 @@ ro::sim::StyleLayerRecipe ToWire(const ro::render::LayerDye& dye) {
   told.profile = dye.profile;
   for (std::size_t rank = 0; rank < ro::sim::kStyleLayerAdjustCount; ++rank) {
     told.adjusts[rank] = ToWireAdjust(dye.adjusts[rank]);
+    told.rest[rank] = ToWireAdjust(dye.rest[rank]);
+  }
+  told.retouches.reserve(dye.retouches.size());
+  for (const ro::render::PaletteRetouch& retouch : dye.retouches) {
+    told.retouches.push_back(ro::sim::StyleRetouch{.index = retouch.index,
+                                                   .red = retouch.rgb[0],
+                                                   .green = retouch.rgb[1],
+                                                   .blue = retouch.rgb[2]});
   }
   return told;
 }
@@ -193,11 +207,12 @@ bool SameDye(const ro::render::LayerDye& left, const ro::render::LayerDye& right
     return false;
   }
   for (std::size_t rank = 0; rank < ro::render::kLayerAdjustCount; ++rank) {
-    if (!SameAdjust(left.adjusts[rank], right.adjusts[rank])) {
+    if (!SameAdjust(left.adjusts[rank], right.adjusts[rank]) ||
+        !SameAdjust(left.rest[rank], right.rest[rank])) {
       return false;
     }
   }
-  return true;
+  return left.retouches == right.retouches;
 }
 
 bool SameSet(const ro::render::StyleSet& left, const ro::render::StyleSet& right) {

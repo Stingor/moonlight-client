@@ -417,6 +417,10 @@ void StyleView::Refresh(const ro::sim::World& world, ro::ui::PaletteEditorState&
         (static_cast<long long>(body.pixels_covered) * kPercent + body.pixels_total / 2) /
         body.pixels_total);
   }
+  // La suite et le reste se rangent sous les huit pièces v7 ; un onglet de
+  // calque ouvert remplace ensuite ces rangées par les siennes, mais la pipette
+  // lit encore celles du corps.
+  RefreshBodyMore(body);
   view_.body_style_count = session_.style_count();
   view_.body_has_own_style = session_.own_style();
   view_.is_main = session_.is_main();

@@ -2118,6 +2118,7 @@ add_executable(moonclient
     character/style_view.cpp
     character/style_view_apply.cpp
     character/style_view_layers.cpp
+    character/style_view_rest.cpp
     game/ui_layouts.cpp
     game/ui_layout_factory.cpp
     game/layout_windows.cpp

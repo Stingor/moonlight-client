@@ -251,9 +251,6 @@ tr: 5 días / min
 fr: 5 min / min
 tr: 5 min / min
 
-fr: Absolu
-tr: Absoluto
-
 fr: Accepte les invitations de groupe.
 tr: Acepta las invitaciones de grupo.
 
@@ -383,6 +380,9 @@ tr: Cuaderno de Roggle
 fr: Cascade ×%d
 tr: Cascada ×%d
 
+fr: Ce code vient d'un autre sprite : ses pièces et son reste sont appliqués, pas ses retouches exactes.
+tr: Este código viene de otro sprite: se aplican sus piezas y su resto, no sus retoques exactos.
+
 fr: Ce corps porte ton style principal.
 tr: Este cuerpo lleva tu estilo principal.
 
@@ -431,6 +431,9 @@ tr: Clic: ajustar la pieza señalada. Rueda: girar.
 fr: Clic droit : verrouiller, délier.
 tr: Clic derecho: fijar, desenlazar.
 
+fr: Clique une couleur sur le pantin : elle se repeint exactement, et seule, par-dessus les pièces et le reste. Pour un détail qu'aucune pièce ne sépare.
+tr: Haz clic en un color del maniquí: se repinta exactamente, y solo, por encima de las piezas y del resto. Para un detalle que ninguna pieza separa.
+
 fr: Cliquez deux monstres voisins pour les échanger.
 tr: Haz clic en dos monstruos vecinos para intercambiarlos.
 
@@ -475,6 +478,12 @@ tr: Ocaso (h)
 
 fr: Couleur du titre
 tr: Color del título
+
+fr: Couleur n° %d
+tr: Color n.º %d
+
+fr: Couleur unique (absolu)
+tr: Color único (absoluto)
 
 fr: Coup d'éclat
 tr: Golpe maestro
@@ -542,8 +551,8 @@ tr: Arena lanzada ante ti ciega a la horda.
 fr: Déclencher les deux pouvoirs d'un plateau de Roggle.
 tr: Activa los dos poderes de un tablero de Roggle.
 
-fr: Décoché : la teinte tourne, et la pièce garde sa matière — ses reflets, ses ombres colorées. Coché : une teinte et une saturation uniques.
-tr: Sin marcar: el tono gira y la pieza conserva su material — sus brillos, sus sombras de color. Marcado: un único tono y una única saturación.
+fr: Décoché : la teinte tourne, et la pièce garde sa matière — ses reflets, ses ombres colorées. Coché : une teinte et une saturation uniques, qui colorent aussi les gris et les blancs.
+tr: Sin marcar: el tono gira y la pieza conserva su material — sus brillos, sus sombras de color. Marcado: un único tono y una única saturación, que también colorean los grises y los blancos.
 
 fr: Défaire
 tr: Deshacer
@@ -653,6 +662,9 @@ tr: Tu personaje está muerto.
 fr: Le poison éclate là où les monstres se pressent.
 tr: El veneno estalla donde los monstruos se agolpan.
 
+fr: Le serveur ne connaît pas le reste ni les retouches : seules les pièces du code sont appliquées.
+tr: El servidor no conoce el resto ni los retoques: solo se aplican las piezas del código.
+
 fr: Le storage est ouvert.
 tr: El storage está abierto.
 
@@ -664,6 +676,9 @@ tr: Solo el pelo
 
 fr: Les clients du groupe n'ont pas la même version : la partie ne peut pas commencer.
 tr: Los clientes del grupo no tienen la misma versión: la partida no puede empezar.
+
+fr: Les couleurs qu'aucune pièce ne règle, par famille de teinte : chaque pastille teint toutes celles de sa famille, et aucune pièce.
+tr: Los colores que ninguna pieza ajusta, por familia de tono: cada muestra tiñe todos los de su familia, y ninguna pieza.
 
 fr: Les couleurs seules
 tr: Solo los colores
@@ -760,6 +775,12 @@ tr: ¿Reiniciar toda la vista previa? Ctrl+Z lo deshace si cambias de opinión.
 
 fr: Renommer avec le nom saisi
 tr: Renombrar con el nombre escrito
+
+fr: Retirer cette retouche
+tr: Quitar este retoque
+
+fr: Retouche exacte
+tr: Retoque exacto
 
 fr: Revient à ce que ton personnage a de lui-même, sans toucher aux pièces.
 tr: Vuelve a lo que tu personaje tiene de por sí, sin tocar las piezas.

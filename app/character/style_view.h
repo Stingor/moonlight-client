@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+#include <cstddef>
 #include <cstdint>
 #include <filesystem>
 #include <map>
@@ -197,7 +199,53 @@ class StyleView {
     std::vector<ro::render::PaletteRamp> ramps;
     // La palette du sprite lui-même : c'est elle que la pipette lit.
     ro::formats::Palette sprite_base;
+    // LE RESTE DU PROFIL MIXTE : les classes de teinte présentes hors des
+    // pièces, dans l'ordre des classes, et leur couleur moyenne. Vides quand il
+    // ne s'offre pas : la peau, le profil 2, un serveur qui ne le connaît pas.
+    std::vector<std::size_t> rest_classes;
+    std::vector<std::array<std::uint8_t, 3>> rest_means;
+    // Les retouches exactes s'y permettent : un sprite palettisé, hors de la
+    // peau, et un serveur qui les accepte.
+    bool retouchable = false;
+    // La race du porteur : la peau d'une tête se tient hors de son reste.
+    ro::render::SkinRace race = ro::render::SkinRace::kHuman;
   };
+  // ── LE PROFIL MIXTE : voir style_view_rest.cpp ───────────────────────────
+  // Le reste d'un onglet, tiré de sa mesure.
+  void FillRest(LayerTab& tab, const ro::render::RestMeasure& rest) const;
+  // Les rangées d'un onglet : ses pièces, puis les classes de son reste.
+  [[nodiscard]] static std::size_t RowCount(const LayerTab& tab);
+  // Le rang de réglage d'une rangée : une pièce, ou `kRestRankFirst` + classe.
+  [[nodiscard]] static std::size_t EditRank(const LayerTab& tab, std::size_t row);
+  // La couleur d'origine d'une rangée.
+  [[nodiscard]] static std::array<std::uint8_t, 3> RowBaseColor(const LayerTab& tab,
+                                                                std::size_t row);
+  // LES RANGÉES D'UN ONGLET, pastille par pastille : pièces, puis reste.
+  struct Rows {
+    std::vector<ro::render::PaletteRamp>* ramps;
+    std::vector<ro::render::RampAdjust>* adjusts;
+    std::vector<ImU32>* colors;
+    std::vector<ImU32>* base_colors;
+    std::vector<int>* ceilings;
+    std::vector<std::array<std::uint8_t, 3>>* painted;
+  };
+  static void AppendRows(const LayerTab& tab, const ro::render::LayerDye& dye, const Rows& rows);
+  // La palette du calque, telle que le joueur la verra : pièces, reste,
+  // retouches.
+  [[nodiscard]] static ro::formats::Palette PaintedPalette(const LayerTab& tab,
+                                                           const ro::render::LayerDye& dye);
+  // Les retouches de l'onglet ouvert, et la palette dont elles partent.
+  void RefreshRetouchView(const LayerTab& tab, const ro::render::LayerDye& dye);
+  // Une retouche posée ou retirée.
+  void ApplyRetouch(const ro::ui::PaletteEditorAction& asked, const LayerTab& tab);
+  // La suite et le reste du corps, sous les huit pièces v7 de l'onglet Corps.
+  void RefreshBodyMore(const ro::render::ActorWardrobe::BodyRamps& body);
+  // Les gestes de l'onglet Corps qui visent ses rangées au-delà des huit.
+  void ApplyBodyMore(const ro::ui::PaletteEditorAction& asked, Harmony harmony,
+                     std::uint32_t now_ms);
+  // La rangée que la pipette désigne dans les rangées d'un onglet, à partir de
+  // `first`, ou -1.
+  [[nodiscard]] static int RowAt(const LayerTab& tab, std::uint8_t index, std::size_t first);
   // Les onglets des calques que `look` porte, refaits quand il change.
   void RefreshTabs(const ro::render::ActorLook& look, const ro::sim::World& world);
   // L'onglet ouvert, ou nul sur le corps.
@@ -328,6 +376,8 @@ class StyleView {
   std::vector<ro::ui::PaletteTab> tab_views_;
   // L'apparence pour laquelle les onglets ont été faits, et la mesure du corps.
   std::optional<ro::render::ActorLook> tabs_look_;
+  // Le profil mixte permis au moment de la mesure des onglets.
+  bool tabs_mixed_ = false;
   std::uint32_t tabs_generation_ = 0;
   // L'onglet de la vue, et ce qui s'y lit.
   ro::ui::PaletteTabKind view_tab_ = ro::ui::PaletteTabKind::kBody;
@@ -345,6 +395,25 @@ class StyleView {
   // Une teinture d'objet peut-elle se valider, à cette image ? Vrai quand le
   // serveur n'exige pas l'atelier du styliste, ou quand celui-ci est ouvert.
   bool atelier_open_ = false;
+  // 🔴 LE PROFIL MIXTE N'EXISTE QUE SI LE SERVEUR L'ANNONCE (règle 24) : sans
+  // elle, ni reste ni retouche ne s'offrent, ni ne partent.
+  bool mixed_allowed_ = false;
+  int retouches_most_ = 0;
+  // La suite et le reste du corps, comme un onglet de calque caché sous Corps.
+  LayerTab body_more_;
+  // Les rangées de la vue : pièces puis reste, pour un calque comme pour le
+  // corps.
+  std::vector<ro::render::PaletteRamp> layer_rows_;
+  std::vector<ro::render::PaletteRamp> body_rows_;
+  std::vector<ro::render::RampAdjust> body_adjusts_;
+  std::vector<ImU32> body_colors_;
+  std::vector<ImU32> body_base_colors_;
+  std::vector<int> body_ceilings_;
+  std::vector<std::array<std::uint8_t, 3>> body_painted_;
+  std::vector<ImU32> palette_colors_;
+  std::vector<ro::render::PaletteRetouch> view_retouches_;
+  // Ce que le dernier code de calque collé n'a pas apporté, ou rien.
+  const char* code_note_ = nullptr;
 };
 
 }  // namespace moonclient

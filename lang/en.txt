@@ -251,9 +251,6 @@ tr: 5 days / min
 fr: 5 min / min
 tr: 5 min / min
 
-fr: Absolu
-tr: Absolute
-
 fr: Accepte les invitations de groupe.
 tr: Accepts party invitations.
 
@@ -383,6 +380,9 @@ tr: Roggle notebook
 fr: Cascade ×%d
 tr: Cascade ×%d
 
+fr: Ce code vient d'un autre sprite : ses pièces et son reste sont appliqués, pas ses retouches exactes.
+tr: This code comes from another sprite: its parts and its rest are applied, not its exact touch-ups.
+
 fr: Ce corps porte ton style principal.
 tr: This body wears your main style.
 
@@ -431,6 +431,9 @@ tr: Click: edit the part under the cursor. Wheel: turn.
 fr: Clic droit : verrouiller, délier.
 tr: Right-click: keep, unlink.
 
+fr: Clique une couleur sur le pantin : elle se repeint exactement, et seule, par-dessus les pièces et le reste. Pour un détail qu'aucune pièce ne sépare.
+tr: Click a colour on the doll: it is repainted exactly, and alone, over the parts and the rest. For a detail no part separates.
+
 fr: Cliquez deux monstres voisins pour les échanger.
 tr: Click two neighbouring monsters to swap them.
 
@@ -475,6 +478,12 @@ tr: Sunset (h)
 
 fr: Couleur du titre
 tr: Title color
+
+fr: Couleur n° %d
+tr: Colour #%d
+
+fr: Couleur unique (absolu)
+tr: Single colour (absolute)
 
 fr: Coup d'éclat
 tr: Masterstroke
@@ -542,8 +551,8 @@ tr: Sand thrown ahead of you blinds the horde.
 fr: Déclencher les deux pouvoirs d'un plateau de Roggle.
 tr: Trigger both powers of a Roggle board.
 
-fr: Décoché : la teinte tourne, et la pièce garde sa matière — ses reflets, ses ombres colorées. Coché : une teinte et une saturation uniques.
-tr: Unticked: the hue turns and the part keeps its material — its highlights, its colored shadows. Ticked: a single hue and saturation.
+fr: Décoché : la teinte tourne, et la pièce garde sa matière — ses reflets, ses ombres colorées. Coché : une teinte et une saturation uniques, qui colorent aussi les gris et les blancs.
+tr: Unticked: the hue turns and the part keeps its material — its highlights, its colored shadows. Ticked: a single hue and saturation, which also colour greys and whites.
 
 fr: Défaire
 tr: Undo
@@ -653,6 +662,9 @@ tr: Your character is dead.
 fr: Le poison éclate là où les monstres se pressent.
 tr: Poison bursts where the monsters crowd together.
 
+fr: Le serveur ne connaît pas le reste ni les retouches : seules les pièces du code sont appliquées.
+tr: The server does not know the rest or touch-ups: only the code's parts are applied.
+
 fr: Le storage est ouvert.
 tr: The storage is open.
 
@@ -664,6 +676,9 @@ tr: Hair only
 
 fr: Les clients du groupe n'ont pas la même version : la partie ne peut pas commencer.
 tr: The party's clients are not on the same version: the game cannot start.
+
+fr: Les couleurs qu'aucune pièce ne règle, par famille de teinte : chaque pastille teint toutes celles de sa famille, et aucune pièce.
+tr: The colours no part adjusts, by hue family: each swatch dyes all of its family, and no part.
 
 fr: Les couleurs seules
 tr: Colors only
@@ -760,6 +775,12 @@ tr: Reset the whole preview? Ctrl+Z undoes it if you change your mind.
 
 fr: Renommer avec le nom saisi
 tr: Rename to the typed name
+
+fr: Retirer cette retouche
+tr: Remove this touch-up
+
+fr: Retouche exacte
+tr: Exact touch-up
 
 fr: Revient à ce que ton personnage a de lui-même, sans toucher aux pièces.
 tr: Goes back to what your character has on its own, without touching the parts.

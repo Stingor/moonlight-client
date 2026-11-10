@@ -9,6 +9,7 @@
 
 #include "ro/core/i18n.h"
 #include "ro/render/palette_ramps.h"
+#include "ro/render/palette_rest.h"
 #include "ro/ui/skin_art.h"
 #include "ro/ui/wheel_gate.h"
 
@@ -327,6 +328,24 @@ struct PaletteEditorView {
   std::span<const render::RampAdjust> adjusts;
   // Les pièces de l'onglet ouvert sont des classes de teinte.
   bool hue_classes = false;
+  // LE RESTE DU PROFIL MIXTE : la première rangée de `ramps` qui désigne une
+  // classe de teinte du reste plutôt qu'une pièce, ou -1. Les rangées qui
+  // suivent se nomment par leur classe, sous l'intitulé « Le reste ».
+  int rest_first = -1;
+  // LES RETOUCHES EXACTES de l'onglet ouvert, permises ou non (la peau, une
+  // image en couleurs vraies, un serveur qui ne les connaît pas), au plus
+  // `retouches_most`.
+  bool retouches_allowed = false;
+  int retouches_most = 0;
+  std::span<const render::PaletteRetouch> retouches;
+  // La palette PEINTE du calque ouvert, index par index : la couleur que la
+  // retouche part de. Vide sans retouche permise.
+  std::span<const ImU32> palette_colors;
+  // L'index de palette sous le curseur sur le pantin, dans le calque ouvert, ou
+  // -1 : celui qu'une retouche viserait.
+  int pick_index = -1;
+  // Ce que le dernier code collé n'a pas apporté, ou rien.
+  const char* code_note = nullptr;
   // L'ATELIER DU STYLISTE EST-IL OUVERT ? Une teinture d'objet ne se valide
   // que là ; hors de l'atelier, l'onglet d'un objet n'est qu'un aperçu.
   bool atelier_open = false;
@@ -502,6 +521,11 @@ struct PaletteEditorAction {
   bool clear_item_dye = false;
   // Le teint proposé que le joueur vient de choisir, en rang, ou moins un.
   int skin_tone = -1;
+  // UNE RETOUCHE : l'index visé et sa couleur exacte ; -1 sans retouche. Et
+  // l'index dont on retire la retouche.
+  int retouch_index = -1;
+  std::array<std::uint8_t, 3> retouch_color{};
+  int remove_retouch = -1;
 };
 
 // Ce que la fenêtre garde d'une image à l'autre.
@@ -546,6 +570,11 @@ struct PaletteEditorState {
   // styliste —, puis remis à faux : un clic du joueur sur la barre l'emporte
   // ensuite.
   bool tab_asked = false;
+  // LE MODE « RETOUCHE EXACTE » : un clic sur le pantin vise une couleur de la
+  // palette plutôt qu'une pièce. Et l'index dont le nuancier est ouvert, ou -1.
+  bool retouch_mode = false;
+  int retouch_index = -1;
+  bool retouch_opening = false;
 
   // Le nom en cours de saisie pour un nouveau préréglage.
   std::array<char, kPresetNameSize> preset_name{};
