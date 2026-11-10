@@ -24,6 +24,7 @@ add_library(ro_net STATIC
     src/card_album.cpp
     src/moonclient_handshake.cpp
     src/area_damage.cpp
+    src/player_style_layers.cpp
     src/player_styles.cpp
     src/player_settings.cpp
     src/bug_report.cpp

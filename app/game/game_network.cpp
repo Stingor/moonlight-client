@@ -23,6 +23,7 @@
 #include "ro/net/link_loss.h"
 #include "ro/net/movement.h"
 #include "ro/net/npc_dialog.h"
+#include "ro/net/player_style_layers.h"
 #include "ro/net/progress_bar.h"
 #include "ro/net/refusal_text.h"
 #include "ro/net/world_notice.h"
@@ -262,12 +263,12 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
   // LA POIGNÉE DE MAIN D'INTÉGRITÉ, aussitôt la liaison ouverte, et ce qu'elle
   // débloque : voir `PumpHandshake`.
   if (link_.is_open()) {
-    // Les bits du classement survivors et de la voix n'y entrent que si la
+    // Les bits du classement survivors, de la voix et des calques n'y entrent que si la
     // table des longueurs connaît leurs ZC.
     PumpHandshake(link_, handshake_, reported_handshake_, pieces_,
                   settings_->options().pages().mvp_tracker.settings().enabled,
                   survivors_ranking_.caps() | survivors_presence_->mode.caps() |
-                      survivors_presence_->coop.caps() | voice_.caps(),
+                      survivors_presence_->coop.caps() | voice_.caps() | ro::net::StyleLayerCaps(),
                   now_ms);
   }
 

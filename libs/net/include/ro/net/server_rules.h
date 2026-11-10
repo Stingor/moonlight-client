@@ -42,6 +42,19 @@ enum class ServerRuleKey : std::uint16_t {
   // plafond qui ne serait pas strictement positif, est ignoré.
   kBankZenyMaxLow = 9,
   kBankZenyMaxHigh = 10,
+  // LES COULEURS DU PERSONNAGE. La cadence des calques est la preuve que le
+  // serveur sait recevoir leurs teintures.
+  kStyleLayersCadenceMs = 11,
+  kStyleBodyVariantsMax = 12,
+  kStyleLayersMax = 13,
+  kHairStyleMin = 14,
+  kHairStyleMax = 15,
+  kHairColorMin = 16,
+  kHairColorMax = 17,
+  kClothColorMin = 18,
+  kClothColorMax = 19,
+  kStyleLayersBytesPerMinute = 20,
+  kStyleAtelierCells = 21,
 };
 
 [[nodiscard]] FrameOutcome ApplyServerRulesFrame(const Frame& frame, sim::World& world);

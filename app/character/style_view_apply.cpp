@@ -8,6 +8,7 @@
 #include <utility>
 #include <vector>
 
+#include "ro/net/player_style_layers.h"
 #include "ro/net/player_styles.h"
 #include "ro/render/palette_ramps.h"
 #include "ro/render/sprite_catalog.h"
@@ -182,6 +183,18 @@ void StyleView::Validate(ro::net::Connection& link, const ro::sim::World& world,
   }
 }
 
+bool StyleView::SendLayers(ro::net::Connection& link,
+                           std::span<const ro::net::StyleLayerOrder> orders, bool clear_character,
+                           std::uint32_t now_ms) {
+  // ⚠ UN SERVEUR QUI N'A PAS DIT SA CADENCE ne sait pas lire la trame.
+  if (!session_.CanSendLayers(now_ms)) {
+    return false;
+  }
+  const bool left = ro::net::SendStyleLayers(link, orders, clear_character).has_value();
+  session_.SentLayers(left, now_ms);
+  return left;
+}
+
 void StyleView::ApplyVerb(const ro::ui::PaletteEditorAction& asked, ro::net::Connection& link,
                           const ro::sim::World& world, std::uint32_t now_ms) {
   const std::uint32_t body_key = session_.body_key();
@@ -207,6 +220,9 @@ void StyleView::ApplyVerb(const ro::ui::PaletteEditorAction& asked, ro::net::Con
     case ro::ui::PaletteEditorVerb::kDeleteAll:
       session_.Sent(StyleSendKind::kDeleteAll, ro::net::SendPlayerStyleClearAll(link).has_value(),
                     now_ms);
+      // D17 : la tête et la peau partent avec le corps. Les teintures d'objets
+      // appartiennent aux objets, et ne se retirent qu'une à une.
+      static_cast<void>(SendLayers(link, {}, /*clear_character=*/true, now_ms));
       break;
     case ro::ui::PaletteEditorVerb::kBackToWorn:
       session_.BackToWorn();

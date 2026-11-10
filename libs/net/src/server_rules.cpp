@@ -48,6 +48,13 @@ void KeepBankZenyMax(sim::SessionSettings& session, const BankZenyMaxHalves& hal
          (static_cast<std::size_t>(frame.bytes[kLengthOffset + 1]) << kBitsPerByte);
 }
 
+// Une valeur qui n'a de sens que strictement positive ; une autre est ignorée.
+void KeepPositive(int& field, std::int32_t value) {
+  if (value > 0) {
+    field = value;
+  }
+}
+
 void Keep(sim::SessionSettings& session, BankZenyMaxHalves& bank_halves,
           const proto::ZcMoonlightServerRulesEntry& rule) {
   switch (static_cast<ServerRuleKey>(rule.key)) {
@@ -96,6 +103,41 @@ void Keep(sim::SessionSettings& session, BankZenyMaxHalves& bank_halves,
       return;
     case ServerRuleKey::kBankZenyMaxHigh:
       bank_halves.high = static_cast<std::uint32_t>(rule.value);
+      return;
+    case ServerRuleKey::kStyleLayersCadenceMs:
+      if (rule.value > 0) {
+        session.style_layers_cadence_ms = static_cast<std::uint32_t>(rule.value);
+      }
+      return;
+    case ServerRuleKey::kStyleBodyVariantsMax:
+      KeepPositive(session.style_body_variants_max, rule.value);
+      return;
+    case ServerRuleKey::kStyleLayersMax:
+      KeepPositive(session.style_layers_max, rule.value);
+      return;
+    case ServerRuleKey::kHairStyleMin:
+      KeepPositive(session.hair_style_min, rule.value);
+      return;
+    case ServerRuleKey::kHairStyleMax:
+      KeepPositive(session.hair_style_max, rule.value);
+      return;
+    case ServerRuleKey::kHairColorMin:
+      KeepPositive(session.hair_color_min, rule.value);
+      return;
+    case ServerRuleKey::kHairColorMax:
+      KeepPositive(session.hair_color_max, rule.value);
+      return;
+    case ServerRuleKey::kClothColorMin:
+      KeepPositive(session.cloth_color_min, rule.value);
+      return;
+    case ServerRuleKey::kClothColorMax:
+      KeepPositive(session.cloth_color_max, rule.value);
+      return;
+    case ServerRuleKey::kStyleLayersBytesPerMinute:
+      KeepPositive(session.style_layers_bytes_per_minute, rule.value);
+      return;
+    case ServerRuleKey::kStyleAtelierCells:
+      KeepPositive(session.style_atelier_cells, rule.value);
       return;
   }
   // Une clé que ce client ne connaît pas : le serveur en a ajouté une.

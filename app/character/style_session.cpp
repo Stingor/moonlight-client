@@ -225,7 +225,13 @@ void StyleSession::Observe(const Worn& worn, std::uint32_t now_ms) {
   }
   book_revision_ = worn.book_revision;
 
+  // ⚠ LE VERDICT AVANT L'ÉCHO : un refus n'aura pas d'écho, et dit pourquoi.
+  if (worn.body_verdict.sequence != body_verdict_seen_) {
+    body_verdict_seen_ = worn.body_verdict.sequence;
+    HearBodyVerdict(worn.body_verdict, now_ms);
+  }
   HearEcho(worn, now_ms);
+  HearLayers(worn, now_ms);
 
   // ── L'ANNONCE S'EFFACE ───────────────────────────────────────────────────
   const std::uint32_t shown_ms = now_ms - announced_ms_;
@@ -257,6 +263,79 @@ void StyleSession::HearEcho(const Worn& worn, std::uint32_t now_ms) {
     pending_.reset();
     Announce(StyleSendState::kRefused, now_ms);
   }
+}
+
+void StyleSession::HearBodyVerdict(const ro::sim::StyleVerdict& verdict, std::uint32_t now_ms) {
+  // ⚠ UN VERDICT VENU AVANT NOTRE DEMANDE N'EST PAS LE SIEN.
+  if (!pending_.has_value() || verdict.sequence <= pending_->verdict_floor) {
+    return;
+  }
+  switch (verdict.result) {
+    case ro::sim::StyleVerdictResult::kAccepted:
+      // Retenu : l'écho, qui suit, dit ce qui est porté.
+      return;
+    case ro::sim::StyleVerdictResult::kSame:
+      // Rien n'a changé, et aucun écho ne viendra : c'est déjà partagé.
+      Settle(*pending_);
+      pending_.reset();
+      body_refusal_.reset();
+      Announce(StyleSendState::kShared, now_ms);
+      return;
+    default:
+      pending_.reset();
+      body_refusal_ = verdict.result;
+      Announce(StyleSendState::kRefused, now_ms);
+      return;
+  }
+}
+
+void StyleSession::HearLayers(const Worn& worn, std::uint32_t now_ms) {
+  layers_.cadence_ms = worn.layers_cadence_ms;
+  const ro::sim::StyleVerdict& verdict = worn.layers_verdict;
+  if (verdict.sequence != layers_.last_verdict) {
+    layers_.last_verdict = verdict.sequence;
+    if (layers_.pending && verdict.sequence > layers_.verdict_floor) {
+      layers_.pending = false;
+      const bool kept = verdict.result == ro::sim::StyleVerdictResult::kAccepted ||
+                        verdict.result == ro::sim::StyleVerdictResult::kSame;
+      layers_.refusal =
+          kept ? std::nullopt : std::optional<ro::sim::StyleVerdictResult>(verdict.result);
+      layers_.state = kept ? StyleSendState::kShared : StyleSendState::kRefused;
+      layers_.announced_ms = Stamp(now_ms);
+    }
+  }
+  if (layers_.pending && now_ms - layers_.sent_ms >= kEchoWaitMs) {
+    layers_.pending = false;
+    layers_.refusal.reset();
+    layers_.state = StyleSendState::kRefused;
+    layers_.announced_ms = Stamp(now_ms);
+  }
+  const std::uint32_t shown_ms = now_ms - layers_.announced_ms;
+  if ((layers_.state == StyleSendState::kShared && shown_ms >= kSharedNoticeMs) ||
+      (layers_.state == StyleSendState::kRefused && shown_ms >= kRefusedNoticeMs)) {
+    layers_.state = StyleSendState::kNone;
+  }
+}
+
+bool StyleSession::CanSendLayers(std::uint32_t now_ms) const {
+  if (layers_.cadence_ms == 0 || layers_.pending) {
+    return false;
+  }
+  return layers_.sent_ms == 0 || now_ms - layers_.sent_ms >= layers_.cadence_ms;
+}
+
+void StyleSession::SentLayers(bool left, std::uint32_t now_ms) {
+  layers_.refusal.reset();
+  layers_.announced_ms = Stamp(now_ms);
+  if (!left) {
+    layers_.pending = false;
+    layers_.state = StyleSendState::kRefused;
+    return;
+  }
+  layers_.pending = true;
+  layers_.sent_ms = Stamp(now_ms);
+  layers_.verdict_floor = layers_.last_verdict;
+  layers_.state = StyleSendState::kWaiting;
 }
 
 void StyleSession::Settle(const Pending& asked) {
@@ -377,7 +456,9 @@ void StyleSession::Sent(StyleSendKind kind, bool left, std::uint32_t now_ms) {
                      .book_revision = book_revision_,
                      .sent = recipe(),
                      .bodies = worn_bodies_,
-                     .sent_ms = Stamp(now_ms)};
+                     .sent_ms = Stamp(now_ms),
+                     .verdict_floor = body_verdict_seen_};
+  body_refusal_.reset();
   last_sent_ms_ = Stamp(now_ms);
   Announce(StyleSendState::kWaiting, now_ms);
 }

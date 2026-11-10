@@ -99,6 +99,11 @@ inline constexpr std::uint32_t kUiCapSurvivorsCoop = 0x00400000;
 // du tampon de chat du serveur. Sans elle, le serveur la découpe en lignes de 243
 // octets ; avec elle, il l'envoie entière, jusqu'à 1024 octets.
 inline constexpr std::uint32_t kUiCapLongNpcTalk = 0x00800000;
+// 🔴 UNE CAPACITÉ DE LECTURE : ce client lit les teintures de calques des joueurs
+// (`ZC 0x0F5F`) et les verdicts du serveur (`ZC 0x0F60`), voir
+// `player_style_layers.h`. Elle n'entre dans le masque que si la table des
+// longueurs connaît ces deux ZC.
+inline constexpr std::uint32_t kUiCapStyleLayers = 0x01000000;
 
 [[nodiscard]] core::Result<void> AnnounceUiCaps(Connection& link, std::uint32_t caps);
 

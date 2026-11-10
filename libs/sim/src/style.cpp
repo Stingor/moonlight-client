@@ -88,4 +88,22 @@ void StyleBook::RememberLayers(std::uint32_t gid, std::vector<StyleLayerRecipe> 
   layers_[gid] = std::move(layers);
 }
 
+void StyleBook::HearVerdict(StyleVerdict verdict) {
+  verdict.sequence = ++last_verdict_;
+  switch (verdict.subject) {
+    case StyleSubject::kBody:
+      body_verdict_ = verdict;
+      return;
+    case StyleSubject::kLayers:
+      layers_verdict_ = verdict;
+      return;
+    case StyleSubject::kAtelier:
+      return;
+  }
+}
+
+const StyleVerdict& StyleBook::LastVerdict(StyleSubject subject) const noexcept {
+  return subject == StyleSubject::kBody ? body_verdict_ : layers_verdict_;
+}
+
 }  // namespace ro::sim

@@ -55,9 +55,13 @@ constexpr std::array<MountOption, 4> kMounts = {{
 
 // Ce que la partie dit de nous, pour la session.
 [[nodiscard]] StyleSession::Worn WornOf(const ro::sim::World& world, std::uint32_t body_key) {
-  return StyleSession::Worn{.body_key = body_key,
-                            .mine = world.styles().Find(world.player_id()),
-                            .book_revision = world.styles().RevisionOf(world.player_id())};
+  return StyleSession::Worn{
+      .body_key = body_key,
+      .mine = world.styles().Find(world.player_id()),
+      .book_revision = world.styles().RevisionOf(world.player_id()),
+      .body_verdict = world.styles().LastVerdict(ro::sim::StyleSubject::kBody),
+      .layers_verdict = world.styles().LastVerdict(ro::sim::StyleSubject::kLayers),
+      .layers_cadence_ms = world.session().style_layers_cadence_ms};
 }
 
 [[nodiscard]] ro::ui::PaletteSendStatus ToView(StyleSendState state) {

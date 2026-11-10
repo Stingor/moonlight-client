@@ -102,6 +102,13 @@ class StyleSession {
     // `StyleBook::RevisionOf` pour nous : il avance à chaque lot qui nous
     // nomme, et c'est ce qui distingue un écho de ce qu'on savait déjà.
     std::uint32_t book_revision = 0;
+    // Les derniers verdicts du serveur, pour le corps et pour les calques. Un
+    // numéro nul : aucun n'est venu.
+    ro::sim::StyleVerdict body_verdict;
+    ro::sim::StyleVerdict layers_verdict;
+    // La cadence des calques que le serveur a annoncée ; zéro tant qu'il ne
+    // l'a pas dite, et les calques ne partent pas.
+    std::uint32_t layers_cadence_ms = 0;
   };
 
   // À chaque image, fenêtre ouverte ou non : l'écho peut revenir fenêtre
@@ -163,6 +170,29 @@ class StyleSession {
   // Ce qui vient d'être demandé pour le corps porté, et si c'est parti. Rien
   // ne change avant l'écho : un refus laisse le travail en place.
   void Sent(StyleSendKind kind, bool left, std::uint32_t now_ms);
+
+  // ── LES TEINTURES DE CALQUES ────────────────────────────────────────────
+  //
+  // 🔴 LEUR CADENCE EST LA LEUR, et ne se partage pas avec celle du corps :
+  // « Valider » envoie le corps et les calques du même clic. Seul leur verdict
+  // dit ce qu'il en est, et sans verdict dans le délai, la demande est tenue
+  // pour refusée.
+
+  // Une trame de calques peut-elle partir ? Pas avant que le serveur ait dit
+  // sa cadence, preuve qu'il sait la recevoir, ni tant que la précédente attend
+  // son verdict.
+  [[nodiscard]] bool CanSendLayers(std::uint32_t now_ms) const;
+  void SentLayers(bool left, std::uint32_t now_ms);
+  [[nodiscard]] StyleSendState layers_send_state() const noexcept { return layers_.state; }
+
+  // LA RAISON DU DERNIER REFUS, telle que le verdict l'a dite, ou rien : un
+  // refus sans verdict (délai, liaison fermée) n'en a pas.
+  [[nodiscard]] std::optional<ro::sim::StyleVerdictResult> refusal() const noexcept {
+    return body_refusal_;
+  }
+  [[nodiscard]] std::optional<ro::sim::StyleVerdictResult> layers_refusal() const noexcept {
+    return layers_.refusal;
+  }
 
   // ── CE QU'ON EN LIT ─────────────────────────────────────────────────────
 
@@ -242,6 +272,20 @@ class StyleSession {
     // brouillons.
     std::vector<std::uint32_t> bodies;
     std::uint32_t sent_ms = 0;
+    // Le numéro du dernier verdict du corps au départ : le sien vient APRÈS.
+    std::uint32_t verdict_floor = 0;
+  };
+
+  // Les calques : une demande à la fois, jugée par son verdict.
+  struct Layers {
+    StyleSendState state = StyleSendState::kNone;
+    std::optional<ro::sim::StyleVerdictResult> refusal;
+    bool pending = false;
+    std::uint32_t sent_ms = 0;
+    std::uint32_t verdict_floor = 0;
+    std::uint32_t announced_ms = 0;
+    std::uint32_t cadence_ms = 0;
+    std::uint32_t last_verdict = 0;
   };
 
   [[nodiscard]] Slot& Current();
@@ -256,6 +300,8 @@ class StyleSession {
   void Follow();
   void KeepDraft();
   void HearEcho(const Worn& worn, std::uint32_t now_ms);
+  void HearBodyVerdict(const ro::sim::StyleVerdict& verdict, std::uint32_t now_ms);
+  void HearLayers(const Worn& worn, std::uint32_t now_ms);
   void Settle(const Pending& asked);
   void Announce(StyleSendState state, std::uint32_t now_ms);
 
@@ -276,6 +322,9 @@ class StyleSession {
   std::uint32_t announced_ms_ = 0;
   // L'instant de la dernière demande partie ; zéro : aucune.
   std::uint32_t last_sent_ms_ = 0;
+  std::optional<ro::sim::StyleVerdictResult> body_refusal_;
+  std::uint32_t body_verdict_seen_ = 0;
+  Layers layers_;
 
   StyleDrafts drafts_;
   bool drafts_changed_ = false;

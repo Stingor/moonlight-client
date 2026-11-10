@@ -79,6 +79,29 @@ struct SessionSettings {
   // soixante-quatre bits.
   std::int64_t bank_zeny_max = kDefaultBankZenyMax;
 
+  // LES COULEURS DU PERSONNAGE.
+  //
+  // 🔴 LA CADENCE DES CALQUES EST LA PREUVE que le serveur sait recevoir leurs
+  // teintures : zéro tant qu'il ne l'a pas dite, et ce client n'envoie alors
+  // aucune trame de calques.
+  std::uint32_t style_layers_cadence_ms = 0;
+  // Ce que le serveur range : variantes de corps, teintures de tête et de peau.
+  // Zéro : non dit.
+  int style_body_variants_max = 0;
+  int style_layers_max = 0;
+  // Les octets de trames de calques que le serveur reçoit par minute, au plus.
+  int style_layers_bytes_per_minute = 0;
+  // La distance au styliste, en cases, pour qu'une teinture d'objet soit reçue.
+  int style_atelier_cells = 0;
+  // Les bornes des numéros officiels, telles que le serveur les applique. Zéro :
+  // non dites.
+  int hair_style_min = 0;
+  int hair_style_max = 0;
+  int hair_color_min = 0;
+  int hair_color_max = 0;
+  int cloth_color_min = 0;
+  int cloth_color_max = 0;
+
   static constexpr int kDefaultViewCells = 14;
   static constexpr int kDefaultMaxWalkPathSteps = 17;
   static constexpr int kDefaultHomunculusMaxLevel = 99;

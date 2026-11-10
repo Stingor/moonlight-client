@@ -4,11 +4,13 @@
 #include <filesystem>
 #include <map>
 #include <optional>
+#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
 
 #include "ro/net/connection.h"
+#include "ro/net/player_style_layers.h"
 #include "ro/render/actor_thumbnails.h"
 #include "ro/render/actor_wardrobe.h"
 #include "ro/sim/world_fwd.h"
@@ -168,6 +170,10 @@ class StyleView {
   // soixante dans la même image se verrait. Voir `PalettePickerState`.
   void RefreshThumbnails(const ro::render::ActorLook& look,
                          const ro::ui::PaletteEditorState& state);
+  // LES TEINTURES DE CALQUES, en une trame, si leur cadence le permet. Vrai si
+  // elle est partie ; le verdict dira si elle est retenue.
+  bool SendLayers(ro::net::Connection& link, std::span<const ro::net::StyleLayerOrder> orders,
+                  bool clear_character, std::uint32_t now_ms);
   // Les verbes de la fenêtre, une fois les réglages posés.
   void ApplyVerb(const ro::ui::PaletteEditorAction& asked, ro::net::Connection& link,
                  const ro::sim::World& world, std::uint32_t now_ms);

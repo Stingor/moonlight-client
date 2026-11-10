@@ -13043,6 +13043,103 @@ std::vector<std::uint8_t> Encode(const ZcMoonlightSurvivorsCoopLeft& packet) {
   return out;
 }
 
+bool Decode(std::span<const std::uint8_t> frame, CzMoonclientStyleLayers& packet) {
+  if (frame.size() < CzMoonclientStyleLayers::kWireSize) {
+    return false;
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != CzMoonclientStyleLayers::kOpcode) {
+    return false;
+  }
+  // La longueur est déjà connue : c'est celle de la trame.
+  reader.Skip(2);
+  packet.flags = static_cast<std::uint8_t>(reader.U8());
+  packet.count = static_cast<std::uint8_t>(reader.U8());
+  return reader.ok();
+}
+
+std::vector<std::uint8_t> Encode(const CzMoonclientStyleLayers& packet) {
+  std::vector<std::uint8_t> out;
+  out.reserve(CzMoonclientStyleLayers::kWireSize);
+  ByteWriter writer(out);
+  writer.U16(CzMoonclientStyleLayers::kOpcode);
+  // Réservée : la longueur ne sera connue qu'une fois la queue écrite.
+  writer.U16(0);
+  writer.U8(static_cast<std::uint8_t>(packet.flags));
+  writer.U8(static_cast<std::uint8_t>(packet.count));
+  if (writer.size() > kMaxFrameSize ||
+      !writer.PatchU16(kLengthOffset, static_cast<std::uint16_t>(writer.size()))) {
+    return {};
+  }
+  return out;
+}
+
+bool Decode(std::span<const std::uint8_t> frame, ZcMoonclientStyleLayers& packet) {
+  if (frame.size() < ZcMoonclientStyleLayers::kWireSize) {
+    return false;
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != ZcMoonclientStyleLayers::kOpcode) {
+    return false;
+  }
+  // La longueur est déjà connue : c'est celle de la trame.
+  reader.Skip(2);
+  packet.flags = static_cast<std::uint8_t>(reader.U8());
+  packet.raw_size = static_cast<std::uint16_t>(reader.U16());
+  return reader.ok();
+}
+
+std::vector<std::uint8_t> Encode(const ZcMoonclientStyleLayers& packet) {
+  std::vector<std::uint8_t> out;
+  out.reserve(ZcMoonclientStyleLayers::kWireSize);
+  ByteWriter writer(out);
+  writer.U16(ZcMoonclientStyleLayers::kOpcode);
+  // Réservée : la longueur ne sera connue qu'une fois la queue écrite.
+  writer.U16(0);
+  writer.U8(static_cast<std::uint8_t>(packet.flags));
+  writer.U16(static_cast<std::uint16_t>(packet.raw_size));
+  if (writer.size() > kMaxFrameSize ||
+      !writer.PatchU16(kLengthOffset, static_cast<std::uint16_t>(writer.size()))) {
+    return {};
+  }
+  return out;
+}
+
+bool Decode(std::span<const std::uint8_t> frame, ZcMoonclientStyleVerdict& packet) {
+  if (frame.size() < ZcMoonclientStyleVerdict::kWireSize) {
+    return false;
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != ZcMoonclientStyleVerdict::kOpcode) {
+    return false;
+  }
+  // La longueur est déjà connue : c'est celle de la trame.
+  reader.Skip(2);
+  packet.subject = static_cast<std::uint8_t>(reader.U8());
+  packet.result = static_cast<std::uint8_t>(reader.U8());
+  packet.wait_ms = static_cast<std::uint16_t>(reader.U16());
+  packet.detail = static_cast<std::uint32_t>(reader.U32());
+  return reader.ok();
+}
+
+std::vector<std::uint8_t> Encode(const ZcMoonclientStyleVerdict& packet) {
+  std::vector<std::uint8_t> out;
+  out.reserve(ZcMoonclientStyleVerdict::kWireSize);
+  ByteWriter writer(out);
+  writer.U16(ZcMoonclientStyleVerdict::kOpcode);
+  // Réservée : la longueur ne sera connue qu'une fois la queue écrite.
+  writer.U16(0);
+  writer.U8(static_cast<std::uint8_t>(packet.subject));
+  writer.U8(static_cast<std::uint8_t>(packet.result));
+  writer.U16(static_cast<std::uint16_t>(packet.wait_ms));
+  writer.U32(static_cast<std::uint32_t>(packet.detail));
+  if (writer.size() > kMaxFrameSize ||
+      !writer.PatchU16(kLengthOffset, static_cast<std::uint16_t>(writer.size()))) {
+    return {};
+  }
+  return out;
+}
+
 bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightCardAlbum& packet) {
   if (frame.size() < ZcMoonlightCardAlbum::kWireSize) {
     return false;

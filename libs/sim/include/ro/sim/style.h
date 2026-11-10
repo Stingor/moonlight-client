@@ -133,6 +133,60 @@ struct StyleLayerRecipe {
   std::array<StyleAdjust, kStyleLayerAdjustCount> adjusts{};
 };
 
+// Le plus de teintures qu'un bloc du serveur décrit pour un joueur : sa tête, sa
+// peau, et ses quatre exemplaires visibles. Au-delà, l'entrée est ignorée.
+inline constexpr std::size_t kStyleLayersShownMax = 6;
+
+// CE QUE LE SERVEUR DIT D'UNE DEMANDE, par le verdict qui suit chaque envoi.
+enum class StyleSubject : std::uint8_t { kBody = 0, kLayers = 1, kAtelier = 2 };
+enum class StyleVerdictResult : std::uint8_t {
+  kAccepted = 0,
+  // Le même envoi que ce qui est rangé : rien n'a changé.
+  kSame = 1,
+  kTooSoon = 2,
+  kMalformed = 3,
+  kCap = 4,
+  kKeyRefused = 5,
+  // Une teinture d'objet hors de l'atelier du styliste.
+  kNoAtelier = 6,
+  // L'objet n'est plus porté à son emplacement.
+  kNotWorn = 7,
+  // Mort, échange, boutique, storage ou dialogue en cours.
+  kBusy = 8,
+  kUnavailable = 9,
+};
+// Le dernier résultat que ce client sait nommer : au-delà, il le lit comme un refus.
+inline constexpr std::uint8_t kStyleVerdictLastKnown =
+    static_cast<std::uint8_t>(StyleVerdictResult::kUnavailable);
+
+struct StyleVerdict {
+  StyleSubject subject = StyleSubject::kBody;
+  // Un résultat que ce client ne connaît pas reste dans `raw_result`, et
+  // `result` vaut alors `kUnavailable`.
+  StyleVerdictResult result = StyleVerdictResult::kAccepted;
+  std::uint8_t raw_result = 0;
+  // Pour « trop tôt » : quand revenir.
+  std::uint16_t wait_ms = 0;
+  // Le corps évincé par la validation d'un corps neuf, zéro sinon.
+  std::uint32_t evicted_body_key = 0;
+  // Le numéro de ce verdict : il avance à chacun, et c'est ce qui dit à un
+  // lecteur qu'un verdict est neuf. Zéro : aucun verdict reçu.
+  std::uint32_t sequence = 0;
+};
+
+// L'ATELIER DU STYLISTE, tel que le serveur l'a annoncé : une teinture d'objet ne
+// se valide que pendant qu'il est ouvert. Le serveur en juge seul ; ce client ne
+// s'en sert que pour savoir quand proposer « Valider » sur un objet.
+struct StyleAtelier {
+  bool open = false;
+  // L'instant, sur l'horloge du client, où le serveur le fermera.
+  std::uint32_t closes_at_ms = 0;
+
+  [[nodiscard]] bool OpenAt(std::uint32_t now_ms) const noexcept {
+    return open && static_cast<std::int32_t>(closes_at_ms - now_ms) > 0;
+  }
+};
+
 // CE QUE LE STYLISTE DEMANDE À LA FENÊTRE D'ÉDITION.
 //
 // ⚠ « BASCULER » N'EST PAS « OUVRIR », et le serveur distingue les trois : un
@@ -212,6 +266,17 @@ class StyleBook {
     return asked;
   }
 
+  // ── LES VERDICTS ET L'ATELIER ─────────────────────────────────────────────
+
+  // LE DERNIER VERDICT du serveur, par objet : le corps et les calques partent du
+  // même clic, et leurs deux verdicts arrivent dans la même image. Il se lit sans
+  // se consommer : son numéro dit s'il est neuf.
+  void HearVerdict(StyleVerdict verdict);
+  // Celui du corps ou des calques ; son numéro est nul tant qu'aucun n'est venu.
+  [[nodiscard]] const StyleVerdict& LastVerdict(StyleSubject subject) const noexcept;
+  void SetAtelier(const StyleAtelier& atelier) noexcept { atelier_ = atelier; }
+  [[nodiscard]] const StyleAtelier& atelier() const noexcept { return atelier_; }
+
  private:
   std::map<std::uint32_t, StyleVariants> styles_;
   std::map<std::uint32_t, std::vector<StyleLayerRecipe>> layers_;
@@ -223,6 +288,10 @@ class StyleBook {
   // changé ».
   std::uint32_t last_revision_ = 0;
   std::optional<StyleEditorRequest> asked_;
+  StyleVerdict body_verdict_{.subject = StyleSubject::kBody};
+  StyleVerdict layers_verdict_{.subject = StyleSubject::kLayers};
+  std::uint32_t last_verdict_ = 0;
+  StyleAtelier atelier_;
 };
 
 }  // namespace ro::sim

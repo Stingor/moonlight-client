@@ -21,6 +21,7 @@
 #include "ro/net/map_mode.h"
 #include "ro/net/player_bonuses.h"
 #include "ro/net/player_settings.h"
+#include "ro/net/player_style_layers.h"
 #include "ro/net/player_styles.h"
 #include "ro/net/pvp_rank.h"
 #include "ro/net/recovery.h"
@@ -198,6 +199,16 @@ FrameOutcome RelayFrame(const Frame& frame, sim::World& world, std::uint32_t now
   // décrire un joueur qui n'est pas encore paru, et c'est `app` qui croise les
   // deux au moment de l'habiller.
   if (const FrameOutcome outcome = ApplyPlayerStylesFrame(frame, world);
+      outcome != FrameOutcome::kUnhandled) {
+    return outcome;
+  }
+  // LES TEINTURES DE CALQUES, et le verdict de nos demandes — voir
+  // ro/net/player_style_layers.h. Elles se rangent au même livre.
+  if (const FrameOutcome outcome = ApplyStyleLayersFrame(frame, world);
+      outcome != FrameOutcome::kUnhandled) {
+    return outcome;
+  }
+  if (const FrameOutcome outcome = ApplyStyleVerdictFrame(frame, world, now_ms);
       outcome != FrameOutcome::kUnhandled) {
     return outcome;
   }
