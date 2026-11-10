@@ -30,6 +30,7 @@
 #include "ro/render/skill_hit_effect.h"
 #include "ro/render/skill_lua_effect.h"
 #include "ro/render/sprite_billboard.h"
+#include "ro/render/sprite_effect_table.h"
 #include "ro/render/str_effect_setup.h"
 #include "ro/sim/movement.h"
 #include "ro/sim/status_effects.h"
@@ -105,6 +106,18 @@ void EffectsInPlay::Notice(const ro::sim::World& world, const MapStage& stage,
       // LES SPHÈRES DES QUATRIÈMES MÉTIERS ET LES SPHÈRES ÉLÉMENTAIRES naissent
       // par leur classe, qui tient son nombre de la valeur ; chaque nouvelle
       // valeur le lui redit.
+      // LES EFFETS PAR SPRITE n'ont ni fichier ni nœuds : leur classe est tout
+      // ce qu'ils montrent. Annoncés sur un acteur, ils naissent sur lui et le
+      // suivent ; sans ce passage, rien ne se verrait.
+      if (ro::render::SpriteEffectRecipeFor(played.id) != nullptr) {
+        if (classes_.Spawn({.effect_id = played.id,
+                            .owner_id = id,
+                            .ground_position = glm::vec3(ground[0], ground[1], ground[2])},
+                           played.since_ms)) {
+          NoteLaunched(played.id, ground, id);
+        }
+        continue;
+      }
       if (ro::render::EffectClassCountsFromValue(played.id) || played.born_of_class) {
         static_cast<void>(
             classes_.Spawn({.effect_id = played.id,
