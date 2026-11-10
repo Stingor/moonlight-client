@@ -30,6 +30,7 @@
 #include "ro/sim/status_effects.h"
 #include "ro/sim/strike_log.h"
 #include "ro/sim/style.h"
+#include "ro/sim/style_outfit.h"
 #include "ro/sim/target_detail.h"
 #include "ro/sim/walk_map.h"
 #include "ro/sim/world_holdings.h"
@@ -352,6 +353,10 @@ class World : public WorldHoldings, public WorldNpcDialog {
   // l'acteur n'existe pas encore chez nous. Voir `ro/sim/style.h`.
   [[nodiscard]] const StyleBook& styles() const noexcept { return styles_; }
   [[nodiscard]] StyleBook& styles() noexcept { return styles_; }
+  // CE QUE LE SERVEUR A RÉPONDU DE NOS TENUES : code court et garde-robe. Voir
+  // `ro/sim/style_outfit.h`.
+  [[nodiscard]] const StyleOutfitDesk& outfits() const noexcept { return outfits_; }
+  [[nodiscard]] StyleOutfitDesk& outfits() noexcept { return outfits_; }
 
   // Pose une unité au sol, ou remplace celle qui portait cet identifiant.
   void PlaceSkillUnit(const SkillUnit& unit);
@@ -633,6 +638,7 @@ class World : public WorldHoldings, public WorldNpcDialog {
   std::vector<ChatLine> chat_waiting_;
   int kept_per_kind_ = kChatLinesKeptPerKind;
   StyleBook styles_;
+  StyleOutfitDesk outfits_;
   QuestMarkers quest_markers_;
   Battlefield battlefield_;
   BalloonNews balloon_news_;

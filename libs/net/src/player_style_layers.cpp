@@ -33,8 +33,7 @@ constexpr std::uint8_t kPayloadZipped = 0x01;
 
 // Le calque d'une entrée, tel que le fil le numérote.
 constexpr std::uint8_t kWireHead = static_cast<std::uint8_t>(sim::StyleLayerKind::kHead);
-constexpr std::uint8_t kWireSkin = static_cast<std::uint8_t>(sim::StyleLayerKind::kSkin);
-constexpr std::uint8_t kWireLayerLast = kWireSkin;
+constexpr std::uint8_t kWireLayerLast = static_cast<std::uint8_t>(sim::StyleLayerKind::kBodyMore);
 
 static_assert(proto::CzMoonclientStyleLayers::kWireSize == 6,
               "l'en-tête du CZ des calques ne vaut plus ce que le serveur déclare");
@@ -68,6 +67,8 @@ static_assert(kStyleLayerEntryHead + sim::kStyleLayerAdjustCount * kStyleLayerAd
       return profile == kStyleLayerRampProfile ? kStyleLayerRampRanks : 0;
     case sim::StyleLayerKind::kSkin:
       return profile == kStyleLayerRampProfile ? 1 : 0;
+    case sim::StyleLayerKind::kBodyMore:
+      return profile == kStyleLayerBodyMoreProfile ? kStyleLayerBodyMoreRanks : 0;
     case sim::StyleLayerKind::kHeadgear:
     case sim::StyleLayerKind::kGarment:
       return RanksOf(profile);
@@ -92,6 +93,9 @@ void WriteAdjust(core::ByteWriter& writer, const sim::StyleAdjust& adjust) {
   writer.U8(adjust.absolute ? 1 : 0);
 }
 
+[[nodiscard]] core::Result<void> WriteEntry(core::ByteWriter& writer, std::uint8_t wire_layer,
+                                            const sim::StyleLayerRecipe& recipe, bool clear);
+
 // Une entrée du CZ, ou la raison de la refuser.
 [[nodiscard]] core::Result<void> WriteOrder(core::ByteWriter& writer,
                                             const StyleLayerOrder& order) {
@@ -104,17 +108,24 @@ void WriteAdjust(core::ByteWriter& writer, const sim::StyleAdjust& adjust) {
     }
     wire_layer = static_cast<std::uint8_t>(*order.slot);
   } else if (recipe.layer == sim::StyleLayerKind::kHead ||
-             recipe.layer == sim::StyleLayerKind::kSkin) {
+             recipe.layer == sim::StyleLayerKind::kSkin ||
+             recipe.layer == sim::StyleLayerKind::kBodyMore) {
     wire_layer = static_cast<std::uint8_t>(recipe.layer);
   } else {
     return core::Fail(core::ErrorCode::kInvalidArgument,
                       "calques : une teinture d'objet se désigne par son emplacement");
   }
+  return WriteEntry(writer, wire_layer, recipe, order.clear);
+}
+
+// Une entrée, sous ce numéro de calque, ou la raison de la refuser.
+[[nodiscard]] core::Result<void> WriteEntry(core::ByteWriter& writer, std::uint8_t wire_layer,
+                                            const sim::StyleLayerRecipe& recipe, bool clear) {
   const bool skin = recipe.layer == sim::StyleLayerKind::kSkin;
   if (skin ? recipe.key != 0 : recipe.key == 0) {
     return core::Fail(core::ErrorCode::kInvalidArgument, "calques : clé hors de son calque");
   }
-  const std::uint16_t mask = order.clear ? std::uint16_t{0} : MaskOf(recipe);
+  const std::uint16_t mask = clear ? std::uint16_t{0} : MaskOf(recipe);
   const std::size_t ranks = RanksFor(recipe.layer, recipe.profile);
   if (ranks == 0 || (mask >> ranks) != 0) {
     return core::Fail(core::ErrorCode::kInvalidArgument,
@@ -125,7 +136,7 @@ void WriteAdjust(core::ByteWriter& writer, const sim::StyleAdjust& adjust) {
   writer.U8(wire_layer);
   writer.U32(recipe.key);
   writer.U8(recipe.profile);
-  writer.U8(order.clear ? kEntryClear : std::uint8_t{0});
+  writer.U8(clear ? kEntryClear : std::uint8_t{0});
   writer.U16(mask);
   for (std::size_t rank = 0; rank < sim::kStyleLayerAdjustCount; ++rank) {
     if ((mask & (1U << rank)) != 0) {
@@ -367,9 +378,27 @@ FrameOutcome ApplyStyleVerdictFrame(const Frame& frame, sim::World& world, std::
   return FrameOutcome::kIgnored;
 }
 
+core::Result<void> WriteShownStyleLayer(core::ByteWriter& writer,
+                                        const sim::StyleLayerRecipe& recipe) {
+  return WriteEntry(writer, static_cast<std::uint8_t>(recipe.layer), recipe, false);
+}
+
+core::Result<std::optional<sim::StyleLayerRecipe>> ReadShownStyleLayer(core::ByteReader& reader) {
+  if (reader.remaining() < kStyleLayerEntryHead) {
+    return core::Fail(core::ErrorCode::kCorruptData, "calques : entrée tronquée");
+  }
+  const ReadEntry entry = ReadOne(reader);
+  if (!entry.ok) {
+    return core::Fail(core::ErrorCode::kCorruptData, "calques : entrée tronquée");
+  }
+  return entry.recipe;
+}
+
 std::uint32_t StyleLayerCaps() {
+  // ⚠ LES TENUES VOYAGENT SOUS LE MÊME BIT : leur réponse doit être connue aussi.
   const bool known = proto::PacketLength(proto::ZcMoonclientStyleLayers::kOpcode).has_value() &&
-                     proto::PacketLength(proto::ZcMoonclientStyleVerdict::kOpcode).has_value();
+                     proto::PacketLength(proto::ZcMoonclientStyleVerdict::kOpcode).has_value() &&
+                     proto::PacketLength(proto::ZcMoonclientOutfit::kOpcode).has_value();
   return known ? kUiCapStyleLayers : 0U;
 }
 

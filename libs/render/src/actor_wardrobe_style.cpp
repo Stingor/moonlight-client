@@ -68,6 +68,9 @@ void ActorWardrobe::ForgetStyle(std::uint32_t style) {
   // Les tenues D'ABORD : elles pointent dans les palettes, et l'ordre inverse
   // laisserait une tenue vivante sur une palette détruite le temps d'une ligne.
   std::erase_if(outfits_, [style](const auto& entry) { return entry.first.style == style; });
+  // Les têtes de groupe et d'amis aussi : celles d'un style pointent dans ses
+  // palettes.
+  std::erase_if(heads_, [style](const auto& entry) { return entry.first.style == style; });
   actor_palettes_.Forget(style);
 }
 
@@ -84,6 +87,8 @@ ActorWardrobe::BodyRamps ActorWardrobe::BodyRampsFor(const ActorLook& look) {
   found.ramps = analysis.ramps;
   found.pixels_total = analysis.pixels_total;
   found.pixels_covered = analysis.pixels_covered;
+  found.continuation = analysis.continuation;
+  found.continuation_pixels = analysis.continuation_pixels;
   return found;
 }
 
@@ -131,6 +136,8 @@ void ActorWardrobe::Tint(const ActorLook& look, ActorPart part, const formats::P
         return;
       }
       wanted.layer = StyleLayer::kBody;
+      // La clé du corps désigne sa suite ; la recette v7, elle, ne la lit pas.
+      wanted.key = BodyKeyFor(look);
       break;
     case ActorPart::kHead:
       // La tête d'orc est un visage d'effet, sans palette de cheveux.

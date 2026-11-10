@@ -22,7 +22,8 @@ namespace ro::render {
 //   * coiffe : l'apparence affichée ; la teinture appartient à l'exemplaire,
 //     mais le serveur la remet sous l'apparence avant de l'envoyer ;
 //   * cape : la robe affichée, de même ;
-//   * peau : zéro, une seule par personnage.
+//   * peau : zéro, une seule par personnage ;
+//   * corps, suite : la clé du corps, celle de la recette v7.
 // La garde-robe cherche ainsi la teinture de chaque pièce qu'elle habille, et
 // une pièce sans teinture garde ses couleurs.
 //
@@ -36,7 +37,11 @@ enum class StyleLayer : std::uint8_t {
   kHead = 1,
   kHeadgear = 2,
   kGarment = 3,
-  kSkin = 4
+  kSkin = 4,
+  // LES RAMPES 9 À 12 DU CORPS, que la v7 ne porte pas : voir
+  // `DetectBodyContinuation`. Moonclient seul les lit ; un autre client voit
+  // ces pièces dans leurs couleurs.
+  kBodyMore = 5
 };
 
 // Le nombre de réglages d'une teinture : un par classe de teinte au profil 2,
@@ -65,6 +70,11 @@ struct LayerDye {
   // profil 2, un par classe de teinte. La peau n'emploie que le premier.
   std::array<RampAdjust, kLayerAdjustCount> adjusts{};
 };
+
+// LA RECETTE DE LA SUITE DU CORPS : ses `kBodyContinuationRamps` premiers
+// réglages, aux premiers rangs d'une recette à appliquer sur les rampes de
+// `DetectBodyContinuation`.
+[[nodiscard]] PaletteRecipe BodyContinuationRecipe(const LayerDye& dye);
 
 // LA RECETTE DE RAMPES D'UNE TEINTURE au profil 1 : ses `kMaxRamps` premiers
 // réglages, que `ApplyRecipe` applique comme ceux d'un corps.

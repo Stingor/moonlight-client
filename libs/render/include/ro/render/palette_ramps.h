@@ -194,6 +194,25 @@ struct PaletteRecipe {
 [[nodiscard]] std::vector<PaletteRamp> DetectRamps(const formats::Palette& palette,
                                                    std::span<const int> usage);
 
+// ── LA SUITE DU CORPS : LES RAMPES 9 À 12, POUR MOONCLIENT SEUL ─────────────
+//
+// La recette v7 s'arrête à `kMaxRamps`, et c'est le fil qui l'impose. Les
+// quatre rampes suivantes du MÊME classement se teignent par un calque à part,
+// « corps, suite », que seul moonclient lit : 86 % des pixels couverts en
+// moyenne passent à 89 %, et bien davantage sur les montures.
+//
+// 🔴 LE MÊME CLASSEMENT, PROLONGÉ : les huit premières rampes sont exactement
+// celles de `DetectRamps`, les quatre suivantes viennent après elles. Rien de
+// la v7 ne bouge, et un client qui ignore la suite voit un corps juste.
+inline constexpr std::size_t kBodyContinuationRamps = 4;
+// Le numéro de profil que porte une teinture « corps, suite ».
+inline constexpr std::uint8_t kBodyContinuationProfileNumber = 3;
+
+// Les rampes de rang `kMaxRamps` à `kMaxRamps + kBodyContinuationRamps - 1` du
+// découpage de `DetectRamps`, dans leur ordre ; moins s'il n'y en a pas assez.
+[[nodiscard]] std::vector<PaletteRamp> DetectBodyContinuation(const formats::Palette& palette,
+                                                              std::span<const int> usage);
+
 // ── LE PROFIL 1 : LA TÊTE, LES COIFFES ET LA CAPE ──────────────────────────
 //
 // Ces calques se découpent par la chaîne du corps, à trois différences près :

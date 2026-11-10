@@ -462,6 +462,11 @@ ActorOutfit* ActorWardrobe::HeadOnly(const ActorLook& look) {
   key.sex = look.sex;
   key.hair = look.hair;
   key.hair_palette = look.hair_palette;
+  // Le style du porteur, et ce qui l'empêche de teindre la tête : sa teinture
+  // de cheveux et sa peau se posent comme sur la carte.
+  key.style = look.style;
+  key.gm_outfit = look.gm_outfit;
+  key.orc_head = look.orc_head;
   if (const auto found = heads_.find(key); found != heads_.end()) {
     return &found->second;
   }
@@ -474,12 +479,17 @@ ActorOutfit* ActorWardrobe::HeadOnly(const ActorLook& look) {
     return nullptr;
   }
   const std::string palette_path = HairPalettePath(key);
-  const formats::Palette* palette = palette_path.empty() ? nullptr : Palette(palette_path);
+  const formats::Palette* official = palette_path.empty() ? nullptr : Palette(palette_path);
+  const formats::Palette* palette = official;
   if (palette != nullptr && head->sprite.palette().has_value()) {
     palette = &sample_palettes_.Base(head->sprite, palette);
   }
   std::vector<ActorPiece> pieces;
   pieces.push_back(DescribeActorPiece(*head, ActorPart::kHead, palette));
+  // ⚠ LA TEINTURE PREND LA PALETTE OFFICIELLE BRUTE : elle fusionne sa base
+  // elle-même, sous le cache du style. Un style que la garde-robe ne connaît
+  // pas laisse la tête d'origine.
+  Tint(key, ActorPart::kHead, official, /*skin=*/true, *head, pieces.back());
   return &heads_.emplace(key, ActorOutfit(std::move(pieces))).first->second;
 }
 

@@ -121,7 +121,14 @@ struct StyleVariants {
 inline constexpr std::size_t kStyleLayerAdjustCount = 13;
 
 // Le calque, numéroté comme sur le fil.
-enum class StyleLayerKind : std::uint8_t { kHead = 1, kHeadgear = 2, kGarment = 3, kSkin = 4 };
+// `kBodyMore` est la suite du corps : les rampes 9 à 12, sous la clé du corps.
+enum class StyleLayerKind : std::uint8_t {
+  kHead = 1,
+  kHeadgear = 2,
+  kGarment = 3,
+  kSkin = 4,
+  kBodyMore = 5
+};
 
 // LA TEINTURE D'UN CALQUE.
 struct StyleLayerRecipe {
@@ -134,8 +141,12 @@ struct StyleLayerRecipe {
 };
 
 // Le plus de teintures qu'un bloc du serveur décrit pour un joueur : sa tête, sa
-// peau, et ses quatre exemplaires visibles. Au-delà, l'entrée est ignorée.
-inline constexpr std::size_t kStyleLayersShownMax = 6;
+// peau, ses quatre exemplaires visibles, et la suite de ses quatre corps au
+// plus. Au-delà, l'entrée est ignorée.
+inline constexpr std::size_t kStyleShownItemsMost = 4;
+inline constexpr std::size_t kStyleBodyVariantsMost = 4;
+inline constexpr std::size_t kStyleLayersShownMax =
+    1 + 1 + kStyleShownItemsMost + kStyleBodyVariantsMost;
 
 // CE QUE LE SERVEUR DIT D'UNE DEMANDE, par le verdict qui suit chaque envoi.
 enum class StyleSubject : std::uint8_t { kBody = 0, kLayers = 1, kAtelier = 2 };

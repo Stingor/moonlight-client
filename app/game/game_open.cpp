@@ -738,6 +738,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
       .jobs = &pieces_.job_names,
       .map_names = pieces_.map_display_names.has_value() ? &*pieces_.map_display_names : nullptr,
       .wardrobe = pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr,
+      .styles = &styles_,
       .status_table = &pieces_.status_table,
       .status_icons = pieces_.status_icons.has_value() ? &*pieces_.status_icons : nullptr});
   // L'onglet retrouvé du fichier, une fois par partie : ensuite, c'est la

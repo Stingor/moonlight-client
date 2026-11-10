@@ -139,6 +139,14 @@ void Keep(sim::SessionSettings& session, BankZenyMaxHalves& bank_halves,
     case ServerRuleKey::kStyleAtelierCells:
       KeepPositive(session.style_atelier_cells, rule.value);
       return;
+    case ServerRuleKey::kStyleOutfitCadenceMs:
+      if (rule.value > 0) {
+        session.style_outfit_cadence_ms = static_cast<std::uint32_t>(rule.value);
+      }
+      return;
+    case ServerRuleKey::kStyleWardrobeSlots:
+      KeepPositive(session.style_wardrobe_slots, rule.value);
+      return;
   }
   // Une clé que ce client ne connaît pas : le serveur en a ajouté une.
 }

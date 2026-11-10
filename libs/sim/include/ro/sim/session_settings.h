@@ -93,6 +93,11 @@ struct SessionSettings {
   int style_layers_bytes_per_minute = 0;
   // La distance au styliste, en cases, pour qu'une teinture d'objet soit reçue.
   int style_atelier_cells = 0;
+  // 🔴 LA CADENCE DES TENUES EST LA PREUVE que le serveur sait recevoir les
+  // demandes de code court et de garde-robe : zéro, aucune ne part.
+  std::uint32_t style_outfit_cadence_ms = 0;
+  // Les rangements de la garde-robe du compte. Zéro : non dit.
+  int style_wardrobe_slots = 0;
   // Les bornes des numéros officiels, telles que le serveur les applique. Zéro :
   // non dites.
   int hair_style_min = 0;

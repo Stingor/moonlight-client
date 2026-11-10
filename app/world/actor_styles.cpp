@@ -100,6 +100,11 @@ void ActorStyles::Release(std::uint32_t style) {
   }
 }
 
+std::uint32_t ActorStyles::Worn(std::uint32_t gid) const {
+  const auto found = applied_.find(gid);
+  return found != applied_.end() ? found->second : 0;
+}
+
 void ActorStyles::Sweep(ro::render::ActorWardrobe& wardrobe, const ro::sim::StyleBook& book) {
   for (auto applied = applied_.begin(); applied != applied_.end();) {
     if (book.Find(applied->first) != nullptr || book.FindLayers(applied->first) != nullptr) {

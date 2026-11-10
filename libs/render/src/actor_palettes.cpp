@@ -10,6 +10,9 @@ namespace {
 // Une teinture qu'on sait appliquer : un profil connu, et pour les rampes un
 // calque que le profil 1 découpe.
 [[nodiscard]] bool Applicable(const LayerDye& dye) {
+  if (dye.layer == StyleLayer::kBodyMore) {
+    return dye.profile == kBodyContinuationProfileNumber;
+  }
   if (dye.profile == kHueClassProfileNumber) {
     return true;
   }
@@ -72,7 +75,12 @@ const ActorPalettes::Analysis& ActorPalettes::Analyze(const formats::SprSprite& 
   // Voir l'ADR 0050.
   const formats::Palette& base = Base(sprite, official);
   const std::array<int, formats::kPaletteEntryCount>& usage = Usage(sprite);
-  return analyses_.emplace(source, Measured(base, DetectRamps(base, usage), usage)).first->second;
+  Analysis analysis = Measured(base, DetectRamps(base, usage), usage);
+  analysis.continuation = DetectBodyContinuation(base, usage);
+  for (const PaletteRamp& ramp : analysis.continuation) {
+    analysis.continuation_pixels += ramp.pixels;
+  }
+  return analyses_.emplace(source, std::move(analysis)).first->second;
 }
 
 const ActorPalettes::Analysis& ActorPalettes::AnalyzeLayer(const formats::SprSprite& sprite,
@@ -144,6 +152,12 @@ std::optional<ActorPalettes::StyledPalette> ActorPalettes::Paint(const StyleSet&
   if (dye != nullptr && !Applicable(*dye)) {
     dye = nullptr;
   }
+  // La suite du corps, sous la clé du corps que porte la pièce.
+  const LayerDye* more =
+      piece.layer == StyleLayer::kBody ? set.Find(StyleLayer::kBodyMore, piece.key) : nullptr;
+  if (more != nullptr && !Applicable(*more)) {
+    more = nullptr;
+  }
   const LayerDye* skin = piece.skin ? set.Find(StyleLayer::kSkin, 0) : nullptr;
   if (skin != nullptr && skin->profile != kLayerProfileNumber) {
     skin = nullptr;
@@ -159,7 +173,7 @@ std::optional<ActorPalettes::StyledPalette> ActorPalettes::Paint(const StyleSet&
   if (!sprite.palette().has_value()) {
     return by_classes ? std::optional<StyledPalette>(std::move(styled)) : std::nullopt;
   }
-  if (ready == nullptr && body == nullptr && dye == nullptr && skin == nullptr) {
+  if (ready == nullptr && body == nullptr && more == nullptr && dye == nullptr && skin == nullptr) {
     return std::nullopt;
   }
   const formats::Palette& base = Base(sprite, official);
@@ -174,6 +188,21 @@ std::optional<ActorPalettes::StyledPalette> ActorPalettes::Paint(const StyleSet&
     styled.palette = ApplyRecipe(base, layer.ramps, LayerRecipe(*dye));
   } else {
     styled.palette = base;
+  }
+  // ⚠ LA SUITE PART DE LA BASE, comme la recette : ses rampes ne recouvrent
+  // aucune des huit premières, et chacune se calcule sur ses propres index. La
+  // palette toute faite de l'aperçu la porte déjà.
+  if (more != nullptr && ready == nullptr) {
+    const Analysis& analysis = Analyze(sprite, official);
+    const formats::Palette continued =
+        ApplyRecipe(base, analysis.continuation, BodyContinuationRecipe(*more));
+    for (const PaletteRamp& ramp : analysis.continuation) {
+      const std::size_t end = std::min<std::size_t>(
+          static_cast<std::size_t>(ramp.start) + ramp.length, formats::kPaletteEntryCount);
+      for (std::size_t index = ramp.start; index < end; ++index) {
+        styled.palette.entries[index] = continued.entries[index];
+      }
+    }
   }
   // 🔴 LA PEAU EN DERNIER : elle l'emporte sur ce qui précède.
   if (skin != nullptr) {

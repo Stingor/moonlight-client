@@ -5547,6 +5547,31 @@ struct ZcMoonclientStyleVerdict {
   std::uint32_t detail = 0;
 };
 
+// PACKET_CZ_MOONCLIENT_OUTFIT
+struct CzMoonclientOutfit {
+  static constexpr std::uint16_t kOpcode = 0x0f61;
+  // Taille sur le fil, en octets.
+  static constexpr std::size_t kWireSize = 15;
+
+  std::uint8_t action = 0;
+  std::uint8_t slot = 0;
+  std::string code;
+  std::uint8_t name_length = 0;
+};
+
+// PACKET_ZC_MOONCLIENT_OUTFIT
+struct ZcMoonclientOutfit {
+  static constexpr std::uint16_t kOpcode = 0x0f62;
+  // Taille sur le fil, en octets.
+  static constexpr std::size_t kWireSize = 17;
+
+  std::uint8_t action = 0;
+  std::uint8_t result = 0;
+  std::uint16_t wait_ms = 0;
+  std::uint8_t slot = 0;
+  std::string code;
+};
+
 // PACKET_ZC_MOONLIGHT_CARD_ALBUM
 struct ZcMoonlightCardAlbum {
   static constexpr std::uint16_t kOpcode = 0x0f33;
@@ -8731,6 +8756,8 @@ struct CzMoveItemToPersonal {
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzMoonclientStyleLayers& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonclientStyleLayers& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonclientStyleVerdict& packet);
+[[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzMoonclientOutfit& packet);
+[[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonclientOutfit& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightCardAlbum& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzMoonlightCardAlbumCmd& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzMoonlightReqStatusList& packet);
@@ -9362,6 +9389,8 @@ struct CzMoveItemToPersonal {
 [[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonclientStyleLayers& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonclientStyleLayers& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonclientStyleVerdict& packet);
+[[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonclientOutfit& packet);
+[[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonclientOutfit& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightCardAlbum& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonlightCardAlbumCmd& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonlightReqStatusList& packet);

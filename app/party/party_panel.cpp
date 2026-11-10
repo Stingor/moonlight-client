@@ -265,6 +265,15 @@ ro::ui::SkinImage PartyPanel::Head(std::uint32_t account_id) {
   cell.look.sex = look.sex;
   cell.look.hair = look.hair;
   cell.look.hair_palette = look.hair_palette;
+  // 🔴 LE STYLE QUE LA CARTE LUI A POSÉ, et rien d'autre : sa teinture de
+  // cheveux suit la coupe et la couleur qu'il porte, et sa peau le suit
+  // partout. Hors de vue, la carte ne l'habille plus, et sa tête reprend ses
+  // couleurs d'origine.
+  if (pieces_.styles != nullptr) {
+    cell.look.style = pieces_.styles->Worn(account_id);
+    cell.look.gm_outfit = look.gm_outfit;
+    cell.look.orc_head = look.orc_head;
+  }
   cell.box.width = kHeadBoxPixels;
   cell.box.height = kHeadBoxPixels;
   return SkinImageOf(thumbnails_->Get(cell));

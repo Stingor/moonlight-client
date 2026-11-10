@@ -379,7 +379,12 @@ formats::Palette MergeServerPalette(const formats::Palette& sprite,
   return merged;
 }
 
-std::vector<PaletteRamp> DetectRamps(const formats::Palette& palette, std::span<const int> usage) {
+namespace {
+
+// Le découpage du corps, classé, du rang `first` inclus au rang `last` exclu.
+[[nodiscard]] std::vector<PaletteRamp> RankedBodyRamps(const formats::Palette& palette,
+                                                       std::span<const int> usage,
+                                                       std::size_t first, std::size_t last) {
   if (usage.size() < formats::kPaletteEntryCount) {
     return {};
   }
@@ -472,11 +477,21 @@ std::vector<PaletteRamp> DetectRamps(const formats::Palette& palette, std::span<
   });
 
   std::vector<PaletteRamp> ramps;
-  ramps.reserve(std::min(found.size(), kMaxRamps));
-  for (std::size_t rank = 0; rank < found.size() && rank < kMaxRamps; ++rank) {
+  for (std::size_t rank = first; rank < found.size() && rank < last; ++rank) {
     ramps.push_back(found[rank].ramp);
   }
   return ramps;
+}
+
+}  // namespace
+
+std::vector<PaletteRamp> DetectRamps(const formats::Palette& palette, std::span<const int> usage) {
+  return RankedBodyRamps(palette, usage, 0, kMaxRamps);
+}
+
+std::vector<PaletteRamp> DetectBodyContinuation(const formats::Palette& palette,
+                                                std::span<const int> usage) {
+  return RankedBodyRamps(palette, usage, kMaxRamps, kMaxRamps + kBodyContinuationRamps);
 }
 
 std::span<const std::uint8_t> SkinIndices(SkinRace race) {

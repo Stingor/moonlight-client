@@ -30,6 +30,7 @@
 #include "ro/net/snap.h"
 #include "ro/net/storage_facts.h"
 #include "ro/net/storage_list.h"
+#include "ro/net/style_outfits.h"
 #include "ro/net/talkbox.h"
 #include "ro/net/target_info.h"
 #include "ro/net/unit_master.h"
@@ -209,6 +210,11 @@ FrameOutcome RelayFrame(const Frame& frame, sim::World& world, std::uint32_t now
     return outcome;
   }
   if (const FrameOutcome outcome = ApplyStyleVerdictFrame(frame, world, now_ms);
+      outcome != FrameOutcome::kUnhandled) {
+    return outcome;
+  }
+  // LES TENUES : code court et garde-robe — voir ro/net/style_outfits.h.
+  if (const FrameOutcome outcome = ApplyOutfitFrame(frame, world);
       outcome != FrameOutcome::kUnhandled) {
     return outcome;
   }

@@ -235,6 +235,10 @@ class ActorWardrobe {
     // qui commande une zone que rien ne commande.
     int pixels_total = 0;
     int pixels_covered = 0;
+    // Pour un corps : les rampes 9 à 12, que règle le calque « corps, suite »,
+    // et les pixels qu'elles couvrent en plus. Vides pour un calque.
+    std::vector<PaletteRamp> continuation;
+    int continuation_pixels = 0;
   };
   [[nodiscard]] BodyRamps BodyRampsFor(const ActorLook& look);
 

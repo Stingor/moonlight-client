@@ -46,6 +46,10 @@ class ActorPalettes {
     // qu'aucun réglage n'atteint.
     int pixels_total = 0;
     int pixels_covered = 0;
+    // Pour un corps : les rampes 9 à 12, que la suite du corps règle, et les
+    // pixels qu'elles couvrent EN PLUS de `pixels_covered`.
+    std::vector<PaletteRamp> continuation;
+    int continuation_pixels = 0;
   };
 
   // Ce qu'un style peint sur une pièce, et son numéro de série.

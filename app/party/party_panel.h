@@ -41,11 +41,16 @@ class SurvivorsPresenceLabels;
 
 // CE QUE LA VUE EMPRUNTE À LA PARTIE. ⚠ TOUT PEUT MANQUER : une installation
 // incomplète donne des lignes plus pauvres, jamais une fenêtre qui plante.
+class ActorStyles;
+
 struct PartyPanelPieces {
   ro::render::GameImages* images = nullptr;
   const ro::vfs::JobNames* jobs = nullptr;
   const ro::vfs::MapDisplayNames* map_names = nullptr;
   ro::render::ActorWardrobe* wardrobe = nullptr;
+  // Les styles que la carte a posés : une tête de groupe ou d'amis porte la
+  // teinture de cheveux et la peau de son joueur quand il est en vue.
+  const ActorStyles* styles = nullptr;
   const ro::vfs::StatusTable* status_table = nullptr;
   ro::render::StatusIcons* status_icons = nullptr;
 };

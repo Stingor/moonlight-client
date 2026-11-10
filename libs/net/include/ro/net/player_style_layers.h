@@ -6,6 +6,8 @@
 #include <span>
 #include <vector>
 
+#include "ro/core/byte_reader.h"
+#include "ro/core/byte_writer.h"
 #include "ro/core/error.h"
 #include "ro/net/connection.h"
 #include "ro/net/world_update.h"
@@ -47,6 +49,9 @@ inline constexpr std::size_t kStyleLayersRawMost = 16384;
 inline constexpr std::uint8_t kStyleLayerRampProfile = 1;
 inline constexpr std::uint8_t kStyleLayerHueClassProfile = 2;
 inline constexpr std::size_t kStyleLayerRampRanks = 8;
+// La suite du corps : les rampes 9 à 12, aux rangs 0 à 3, sous la clé du corps.
+inline constexpr std::uint8_t kStyleLayerBodyMoreProfile = 3;
+inline constexpr std::size_t kStyleLayerBodyMoreRanks = 4;
 
 // L'EMPLACEMENT D'ÉQUIPEMENT de l'émetteur qu'une teinture d'objet vise.
 enum class StyleSlot : std::uint8_t {
@@ -106,7 +111,16 @@ struct StyleLayerBlock {
 [[nodiscard]] FrameOutcome ApplyStyleVerdictFrame(const Frame& frame, sim::World& world,
                                                   std::uint32_t now_ms);
 
-// Le bit d'annonce des calques si la table des longueurs connaît leurs deux ZC,
+// UNE ENTRÉE À LA FORME DU ZC : le calque tel qu'il se peint (1 à 5), la clé
+// affichée, aucun drapeau. C'est ainsi qu'une tenue range ses teintures.
+[[nodiscard]] core::Result<void> WriteShownStyleLayer(core::ByteWriter& writer,
+                                                      const sim::StyleLayerRecipe& recipe);
+// Une entrée lue : la teinture, ou rien si ce client ne sait pas la lire (calque
+// ou profil inconnus, enjambés) ; une erreur si elle déborde.
+[[nodiscard]] core::Result<std::optional<sim::StyleLayerRecipe>> ReadShownStyleLayer(
+    core::ByteReader& reader);
+
+// Le bit d'annonce des calques si la table des longueurs connaît leurs ZC,
 // zéro sinon : un opcode inconnu couperait la liaison.
 [[nodiscard]] std::uint32_t StyleLayerCaps();
 

@@ -26,6 +26,12 @@ PaletteRecipe LayerRecipe(const LayerDye& dye) {
   return recipe;
 }
 
+PaletteRecipe BodyContinuationRecipe(const LayerDye& dye) {
+  PaletteRecipe recipe;
+  std::copy_n(dye.adjusts.begin(), kBodyContinuationRamps, recipe.ramps.begin());
+  return recipe;
+}
+
 HueClassAdjusts LayerHueClasses(const LayerDye& dye) {
   HueClassAdjusts adjusts{};
   std::copy_n(dye.adjusts.begin(), kHueClassCount, adjusts.begin());
@@ -42,6 +48,7 @@ std::optional<RampLayer> RampLayerOf(StyleLayer layer) noexcept {
       return RampLayer::kGarment;
     case StyleLayer::kBody:
     case StyleLayer::kSkin:
+    case StyleLayer::kBodyMore:
       break;
   }
   return std::nullopt;

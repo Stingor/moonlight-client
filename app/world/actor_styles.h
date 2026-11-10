@@ -84,6 +84,12 @@ class ActorStyles {
   // comme la scène qu'elle remplace, les lirait détruites.
   void Sweep(ro::render::ActorWardrobe& wardrobe, const ro::sim::StyleBook& book);
 
+  // L'identifiant que cet acteur porte sur la carte, ou zéro : c'est ce qu'une
+  // tête de groupe ou d'amis emprunte pour porter sa teinture de cheveux et sa
+  // peau. ⚠ RIEN N'EST ENREGISTRÉ : un acteur que la carte n'a pas habillé
+  // garde la tête d'origine.
+  [[nodiscard]] std::uint32_t Worn(std::uint32_t gid) const;
+
  private:
   // Un identifiant enregistré auprès de la garde-robe, et combien d'acteurs le
   // portent.

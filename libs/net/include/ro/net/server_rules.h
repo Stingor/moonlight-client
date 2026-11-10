@@ -55,6 +55,9 @@ enum class ServerRuleKey : std::uint16_t {
   kClothColorMax = 19,
   kStyleLayersBytesPerMinute = 20,
   kStyleAtelierCells = 21,
+  // LES TENUES. La cadence est la preuve que le serveur sait les recevoir.
+  kStyleOutfitCadenceMs = 22,
+  kStyleWardrobeSlots = 23,
 };
 
 [[nodiscard]] FrameOutcome ApplyServerRulesFrame(const Frame& frame, sim::World& world);
