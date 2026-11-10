@@ -74464,6 +74464,464 @@ Body:
     DamageMotion: 336
     Ai: 21
     Class: Boss
+  - Id: 20572
+    AegisName: MD_C_HEMEL
+    Name: Phantom of Himmelmez
+    Level: 195
+    Hp: 9219358
+    BaseExp: 14750973
+    JobExp: 9588132
+    MvpExp: 2685785
+    Attack: 15502
+    Attack2: 4265
+    Defense: 59
+    MagicDefense: 44
+    Str: 636
+    Agi: 280
+    Vit: 208
+    Int: 328
+    Dex: 380
+    Luk: 66
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Angel
+    Element: Holy
+    ElementLevel: 3
+    AttackDelay: 1351
+    AttackMotion: 1351
+    DamageMotion: 432
+    Ai: 26
+    Class: Boss
+    Modes: {Mvp: true}
+    MvpDrops:
+      - {Item: Magic_Card_Album, Rate: 5000}
+      - {Item: Old_Violet_Box, Rate: 2500}
+    Drops:
+      - {Item: S_Circlet_Of_Time, Rate: 10000}
+      - {Item: S_Circlet_Of_Time, Rate: 5000}
+      - {Item: S_Circlet_Of_Time, Rate: 1000}
+      - {Item: Spell_Of_Time, Rate: 1000}
+      - {Item: Old_Card_Album, Rate: 5000}
+      - {Item: Old_Violet_Box, Rate: 5000}
+      - {Item: Silver_Paper, Rate: 5}
+      - {Item: C_Himel_Card, Rate: 1, StealProtected: true}
+  - Id: 20573
+    AegisName: MD_C_AMDARAIS
+    Name: Phantom of Amdarais
+    Level: 192
+    Hp: 9219358
+    BaseExp: 14750973
+    JobExp: 9588132
+    MvpExp: 2640693
+    Attack: 8760
+    Attack2: 2702
+    Defense: 57
+    MagicDefense: 38
+    Str: 365
+    Agi: 328
+    Vit: 175
+    Int: 211
+    Dex: 437
+    Luk: 168
+    AttackRange: 3
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    Race: Demon
+    Element: Dark
+    ElementLevel: 3
+    WalkSpeed: 120
+    AttackDelay: 1205
+    AttackMotion: 1205
+    DamageMotion: 432
+    Ai: 26
+    Class: Boss
+    Modes: {Mvp: true}
+    MvpDrops:
+      - {Item: Old_Violet_Box, Rate: 1000}
+      - {Item: Magic_Card_Album, Rate: 3000}
+    Drops:
+      - {Item: Old_Card_Album, Rate: 5000}
+      - {Item: Old_Violet_Box, Rate: 5000}
+      - {Item: Patriotism_Marks, Rate: 10000}
+      - {Item: Spell_Of_Time, Rate: 500}
+      - {Item: S_Circlet_Of_Time, Rate: 3000}
+      - {Item: S_Circlet_Of_Time, Rate: 500}
+      - {Item: Silver_Paper, Rate: 3}
+      - {Item: C_Amdarais_Card, Rate: 1, StealProtected: true}
+  - Id: 20574
+    AegisName: MD_C_WHITEKNIGHT
+    Name: Mutating White Knight
+    Level: 188
+    Hp: 459060
+    BaseExp: 734496
+    JobExp: 477422
+    Attack: 8578
+    Attack2: 2205
+    Defense: 55
+    MagicDefense: 30
+    Str: 365
+    Agi: 229
+    Vit: 354
+    Int: 176
+    Dex: 346
+    Luk: 109
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    Race: Undead
+    Element: Dark
+    ElementLevel: 3
+    WalkSpeed: 300
+    AttackDelay: 1754
+    AttackMotion: 1754
+    DamageMotion: 1000
+    Ai: 04
+    Drops:
+      - {Item: Fragment_Of_Time, Rate: 500}
+      - {Item: Reins, Rate: 5000}
+      - {Item: Glast_Decayed_Nail, Rate: 3000}
+      - {Item: Glast_Horrendous_Mouth, Rate: 1500}
+      - {Item: Patriotism_Marks, Rate: 30}
+      - {Item: C_White_Knight_Card, Rate: 1, StealProtected: true}
+  - Id: 20575
+    AegisName: MD_C_CORRUPTION_ROOT
+    Name: Prime Corruption Root
+    Level: 190
+    Hp: 2095417
+    BaseExp: 3352667
+    JobExp: 2179234
+    Attack: 7008
+    Attack2: 5332
+    Defense: 57
+    MagicDefense: 43
+    Str: 295
+    Agi: 187
+    Vit: 286
+    Int: 421
+    Dex: 654
+    Luk: 66
+    AttackRange: 5
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    Race: Demon
+    Element: Earth
+    ElementLevel: 3
+    WalkSpeed: 300
+    AttackDelay: 769
+    AttackMotion: 769
+    DamageMotion: 480
+    Ai: 10
+    Class: Boss
+    Drops:
+      - {Item: Jewel_Of_Time_Ore, Rate: 10000}
+      - {Item: Fragment_Of_Time, Rate: 2500}
+      - {Item: Jewel_Of_Time_Ore, Rate: 750}
+      - {Item: Fragment_Of_Time, Rate: 200}
+      - {Item: Fragment_Of_Time, Rate: 50}
+      - {Item: Jewel_Of_Time_Ore, Rate: 25}
+      - {Item: Fragment_Of_Time, Rate: 500}
+      - {Item: C_CorruptionRoot_Card, Rate: 1, StealProtected: true}
+  - Id: 20576
+    AegisName: MD_C_KHALITZBURG
+    Name: Mutating Khalitzburg
+    Level: 185
+    Hp: 461586
+    BaseExp: 738538
+    JobExp: 480050
+    Attack: 9990
+    Attack2: 5452
+    Defense: 51
+    MagicDefense: 33
+    Str: 432
+    Agi: 389
+    Vit: 289
+    Int: 280
+    Dex: 311
+    Luk: 97
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Undead
+    Element: Dark
+    ElementLevel: 3
+    WalkSpeed: 200
+    AttackDelay: 1538
+    AttackMotion: 1538
+    DamageMotion: 396
+    Ai: 04
+    Drops:
+      - {Item: Fragment_Of_Time, Rate: 500}
+      - {Item: Glast_Decayed_Nail, Rate: 3000}
+      - {Item: Glast_Horrendous_Mouth, Rate: 1500}
+      - {Item: Patriotism_Marks, Rate: 30}
+      - {Item: C_Khaliz_Knight_Card, Rate: 1, StealProtected: true}
+  - Id: 20577
+    AegisName: MD_C_RAYDRIC
+    Name: Cursed Raydric
+    Level: 182
+    Hp: 466076
+    BaseExp: 745722
+    JobExp: 484719
+    Attack: 8552
+    Attack2: 3342
+    Defense: 51
+    MagicDefense: 30
+    Str: 288
+    Agi: 359
+    Vit: 287
+    Int: 193
+    Dex: 391
+    Luk: 132
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Demihuman
+    Element: Dark
+    ElementLevel: 2
+    AttackDelay: 824
+    AttackMotion: 781
+    DamageMotion: 420
+    Ai: 21
+    Drops:
+      - {Item: Glast_Decayed_Nail, Rate: 2000}
+      - {Item: Glast_Horrendous_Mouth, Rate: 2000}
+      - {Item: Fragment_Of_Time, Rate: 500}
+      - {Item: Brigan, Rate: 5000}
+      - {Item: C_Raydric_Card, Rate: 1, StealProtected: true}
+  - Id: 20578
+    AegisName: MD_C_RAYDRIC_ARCHER
+    Name: Cursed Raydric Archer
+    Level: 186
+    Hp: 456344
+    BaseExp: 730150
+    JobExp: 474598
+    Attack: 7232
+    Attack2: 5558
+    Defense: 45
+    MagicDefense: 34
+    Str: 311
+    Agi: 481
+    Vit: 162
+    Int: 287
+    Dex: 576
+    Luk: 77
+    AttackRange: 9
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Demihuman
+    Element: Dark
+    ElementLevel: 2
+    WalkSpeed: 200
+    AttackDelay: 1250
+    AttackMotion: 1250
+    DamageMotion: 480
+    Ai: 05
+    Drops:
+      - {Item: Glast_Decayed_Nail, Rate: 2000}
+      - {Item: Glast_Horrendous_Mouth, Rate: 2000}
+      - {Item: Fragment_Of_Time, Rate: 500}
+      - {Item: Brigan, Rate: 5000}
+      - {Item: C_Raydric_Archer_Card, Rate: 1, StealProtected: true}
+  - Id: 20579
+    AegisName: MD_C_ZOMBIE
+    Name: Cursed Butler
+    Level: 180
+    Hp: 463242
+    BaseExp: 741187
+    JobExp: 481772
+    Attack: 4680
+    Attack2: 2255
+    Defense: 40
+    MagicDefense: 29
+    Str: 208
+    Agi: 221
+    Vit: 90
+    Int: 188
+    Dex: 321
+    Luk: 66
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Undead
+    Element: Undead
+    ElementLevel: 2
+    WalkSpeed: 300
+    AttackDelay: 2612
+    AttackMotion: 909
+    DamageMotion: 288
+    Ai: 04
+    Drops:
+      - {Item: Glast_Decayed_Nail, Rate: 1000}
+      - {Item: Glast_Horrendous_Mouth, Rate: 1000}
+      - {Item: Old_White_Cloth, Rate: 1000}
+      - {Item: Fragment_Of_Time, Rate: 250}
+      - {Item: C_Cursed_Butler, Rate: 1, StealProtected: true}
+  - Id: 20580
+    AegisName: MD_C_GHOUL
+    Name: Cursed Servant
+    Level: 184
+    Hp: 457708
+    BaseExp: 732333
+    JobExp: 476016
+    Attack: 5865
+    Attack2: 2158
+    Defense: 42
+    MagicDefense: 29
+    Str: 255
+    Agi: 267
+    Vit: 108
+    Int: 176
+    Dex: 380
+    Luk: 66
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Undead
+    Element: Undead
+    ElementLevel: 2
+    WalkSpeed: 300
+    AttackDelay: 2456
+    AttackMotion: 813
+    DamageMotion: 504
+    Ai: 04
+    Drops:
+      - {Item: Glast_Decayed_Nail, Rate: 1000}
+      - {Item: Glast_Horrendous_Mouth, Rate: 1000}
+      - {Item: Old_White_Cloth, Rate: 1000}
+      - {Item: Fragment_Of_Time, Rate: 250}
+      - {Item: C_Cursed_Butler, Rate: 1, StealProtected: true}
+  - Id: 20581
+    AegisName: MD_C_THORN
+    Name: Thorn
+    Level: 185
+    Hp: 10
+    Attack: 2
+    Attack2: 2
+    Defense: 42
+    MagicDefense: 25
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Element: Fire
+    ElementLevel: 3
+    WalkSpeed: 1000
+    AttackDelay: 288
+    AttackMotion: 288
+    DamageMotion: 288
+    Ai: 10
+    Class: Boss
+    Modes: {IgnoreMagic: true, IgnoreMelee: true, IgnoreMisc: true, IgnoreRanged: true, TeleportBlock: true, NoRandomWalk: true}
+  - Id: 20582
+    AegisName: MD_MANHOLE4
+    Name: Manhole
+    Level: 175
+    Hp: 2101
+    Attack: 2
+    Attack2: 2
+    Defense: 40
+    MagicDefense: 24
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    WalkSpeed: 1000
+    AttackDelay: 385
+    AttackMotion: 385
+    DamageMotion: 288
+    Ai: 10
+    Class: Boss
+    Modes: {IgnoreMagic: true, IgnoreMelee: true, IgnoreMisc: true, IgnoreRanged: true, TeleportBlock: true, NoRandomWalk: true}
+  - Id: 20583
+    AegisName: MD_C_WHITEKNIGHT_G
+    Name: Mutated White Knight
+    Level: 188
+    Hp: 459060
+    Attack: 8578
+    Attack2: 2205
+    Defense: 55
+    MagicDefense: 30
+    Str: 365
+    Agi: 229
+    Vit: 354
+    Int: 176
+    Dex: 346
+    Luk: 109
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    Race: Undead
+    Element: Dark
+    ElementLevel: 3
+    WalkSpeed: 300
+    AttackDelay: 1754
+    AttackMotion: 1754
+    DamageMotion: 1000
+    Ai: 04
+  - Id: 20584
+    AegisName: MD_C_KHALITZBURG_G
+    Name: Mutated Khalitzburg
+    Level: 185
+    Hp: 461586
+    Attack: 9990
+    Attack2: 3452
+    Defense: 51
+    MagicDefense: 33
+    Str: 432
+    Agi: 389
+    Vit: 289
+    Int: 280
+    Dex: 311
+    Luk: 97
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Undead
+    Element: Dark
+    ElementLevel: 3
+    WalkSpeed: 200
+    AttackDelay: 1538
+    AttackMotion: 1538
+    DamageMotion: 396
+    Ai: 04
+  - Id: 20585
+    AegisName: MD_C_RAY_ARCHER_G
+    Name: Cursed Raydric Archer
+    Level: 186
+    Hp: 456344
+    Attack: 7232
+    Attack2: 3558
+    Defense: 45
+    MagicDefense: 34
+    Str: 311
+    Agi: 481
+    Vit: 162
+    Int: 287
+    Dex: 576
+    Luk: 77
+    AttackRange: 9
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Demihuman
+    Element: Dark
+    ElementLevel: 2
+    WalkSpeed: 200
+    AttackDelay: 1250
+    AttackMotion: 1250
+    DamageMotion: 480
+    Ai: 05
   - Id: 20591
     AegisName: PAPARE
     Name: Papare

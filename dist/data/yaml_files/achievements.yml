@@ -3596,7 +3596,7 @@ achievements:
   129021:
     name: "Glastheim Challenge Mode"
     score: 10
-    targets: []
+    targets: [[0, 100]]
     reward: {item: 0, title: 1045, script: false}
     dependents: []
     window:

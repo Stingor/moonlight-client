@@ -114904,6 +114904,25 @@ Body:
     AegisName: Ein_EYEROCK
     Name: Bizarre Stone Carvings
     Weight: 50
+  - Id: 25864
+    AegisName: S_Circlet_Of_Time
+    Name: Sealed Temporal Circlet
+    Weight: 100
+    Flags: {BuyingStore: true}
+  - Id: 25865
+    AegisName: Jewel_Of_Time_Ore
+    Name: Temporal Gemstone
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25866
+    AegisName: Spell_Of_Time
+    Name: Temporal Spell
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 25867
+    AegisName: Fragment_Of_Time
+    Name: Temporal Fragment
+    Flags: {BuyingStore: true}
   - Id: 25892
     AegisName: Abysmal_Clam
     Name: Deep Sea Shell
@@ -117148,6 +117167,86 @@ Body:
     Flags: {DropEffect: CLIENT}
     Script: |
       bonus bAspd,1;
+  - Id: 27381
+    AegisName: C_Himel_Card
+    Name: Himmelmez's Phantom Card
+    Type: Card
+    Weight: 10
+    Locations: {Garment: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus2 bMagicAtkEle,Ele_Neutral,100;
+      bonus2 bMagicAtkEle,Ele_Holy,100;
+      bonus2 bSubEle,Ele_All,-30;
+  - Id: 27382
+    AegisName: C_CorruptionRoot_Card
+    Name: Prime Corruption Root Card
+    Type: Card
+    Weight: 10
+    Locations: {Garment: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bMatk,30;
+      bonus bBaseAtk,30;
+  - Id: 27383
+    AegisName: C_Amdarais_Card
+    Name: Amdarais's Phantom Card
+    Type: Card
+    Weight: 10
+    Locations: {Shoes: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bMaxHPrate,10;
+      bonus bMaxSPrate,5;
+  - Id: 27384
+    AegisName: C_White_Knight_Card
+    Name: Mutated White Knight Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Hand: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bMatk,15;
+      bonus2 bMagicAddSize,Size_Medium,20;
+      bonus2 bMagicAddSize,Size_Large,20;
+  - Id: 27385
+    AegisName: C_Khaliz_Knight_Card
+    Name: Mutated Khalitzburg Card
+    Type: Card
+    Weight: 10
+    Locations: {Left_Hand: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bMdef,10;
+      bonus2 bSubSize,Size_Medium,25;
+      bonus2 bSubSize,Size_Large,25;
+  - Id: 27386
+    AegisName: C_Raydric_Card
+    Name: Cursed Raydric Card
+    Type: Card
+    Weight: 10
+    Locations: {Left_Accessory: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus2 bAddRace,RC_Undead,5;
+  - Id: 27387
+    AegisName: C_Raydric_Archer_Card
+    Name: Cursed Raydric Archer Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Accessory: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus2 bAddRace,RC_Demon,5;
+  - Id: 27388
+    AegisName: C_Cursed_Butler
+    Name: Cursed Servant Card
+    Type: Card
+    Weight: 10
+    Locations: {Both_Accessory: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bHPrecovRate,50;  /* note: 30% from the description */
   - Id: 28000
     AegisName: Thanos_Katar
     Name: "Thanos Katar [1]"

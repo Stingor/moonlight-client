@@ -20385,6 +20385,11 @@ quests:
     title: 에스메랄다
     summary: 대화마치기
     description: 에스메랄다와 conversation하여 뒷 이야기 듣기
+  12494:
+    title: Aftermath of the challenge
+    icon: dq
+    summary: Contaminated dimension sealed
+    description: Oscar needs time to gather the dimensional energy again. The Contaminated Dimension of Old Glast Heim is sealed for 23 hours.
   13000:
     title: RWC 2011Card Gathering
     description: Defeat the Gold Porings that are randomly around Rune Midgard and collect enough Blue Cards to spell out "RWC 2011"
