@@ -50,6 +50,7 @@ ActorPalettes::Analysis ActorPalettes::Measured(
     const std::array<int, formats::kPaletteEntryCount>& usage) const {
   Analysis analysis;
   analysis.base = &base;
+  analysis.usage = &usage;
   analysis.ramps = std::move(ramps);
   for (const int used : usage) {
     analysis.pixels_total += used;
@@ -186,27 +187,25 @@ std::optional<ActorPalettes::StyledPalette> ActorPalettes::Paint(const StyleSet&
   } else if (dye != nullptr) {
     const Analysis& layer = AnalyzeLayer(sprite, official, *RampLayerOf(dye->layer), piece.race);
     styled.palette = ApplyRecipe(base, layer.ramps, LayerRecipe(*dye));
+    ApplyLayerRest(styled.palette, base, layer.ramps, piece.race, *dye);
   } else {
     styled.palette = base;
   }
-  // ⚠ LA SUITE PART DE LA BASE, comme la recette : ses rampes ne recouvrent
-  // aucune des huit premières, et chacune se calcule sur ses propres index. La
-  // palette toute faite de l'aperçu la porte déjà.
-  if (more != nullptr && ready == nullptr) {
+  // ⚠ LA SUITE ET LE RESTE se posent aussi sur la palette toute faite de
+  // l'aperçu, qui ne peint que les huit premières : ni l'une ni l'autre n'y
+  // touchent une pièce v7.
+  if (more != nullptr) {
     const Analysis& analysis = Analyze(sprite, official);
-    const formats::Palette continued =
-        ApplyRecipe(base, analysis.continuation, BodyContinuationRecipe(*more));
-    for (const PaletteRamp& ramp : analysis.continuation) {
-      const std::size_t end = std::min<std::size_t>(
-          static_cast<std::size_t>(ramp.start) + ramp.length, formats::kPaletteEntryCount);
-      for (std::size_t index = ramp.start; index < end; ++index) {
-        styled.palette.entries[index] = continued.entries[index];
-      }
-    }
+    ApplyBodyMore(styled.palette, base, analysis.ramps, analysis.continuation, piece.race, *more);
   }
-  // 🔴 LA PEAU EN DERNIER : elle l'emporte sur ce qui précède.
+  // 🔴 LA PEAU APRÈS LES PIÈCES ET LE RESTE : elle l'emporte sur eux.
   if (skin != nullptr) {
     ApplySkin(styled.palette, base, piece.race, skin->adjusts.front());
+  }
+  // 🔴 LES RETOUCHES EN TOUT DERNIER : une couleur exacte, que rien ne repeint.
+  const LayerDye* touched = dye != nullptr ? dye : more;
+  if (touched != nullptr && LayerTakesRetouches(*touched)) {
+    ApplyRetouches(styled.palette, touched->retouches);
   }
   return styled;
 }
@@ -224,9 +223,11 @@ const ActorPalettes::StyledPalette* ActorPalettes::StyledFor(std::uint32_t style
   }
   const auto ready = piece.layer == StyleLayer::kBody ? ready_made_.find(style) : ready_made_.end();
   const bool skinned = piece.skin && set->second.Find(StyleLayer::kSkin, 0) != nullptr;
-  // La palette toute faite vaut pour tous les sprites, tant qu'aucune peau ne
-  // s'y pose.
-  if (ready != ready_made_.end() && !skinned) {
+  const bool continued = piece.layer == StyleLayer::kBody &&
+                         set->second.Find(StyleLayer::kBodyMore, piece.key) != nullptr;
+  // La palette toute faite vaut pour tous les sprites, tant qu'aucune peau ni
+  // aucune suite du corps ne s'y pose.
+  if (ready != ready_made_.end() && !skinned && !continued) {
     return &ready->second;
   }
   const Painted key{style,     Source{&sprite, official}, piece.layer, piece.key, piece.race,

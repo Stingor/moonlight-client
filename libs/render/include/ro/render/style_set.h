@@ -4,12 +4,14 @@
 #include <cstddef>
 #include <cstdint>
 #include <optional>
+#include <span>
 #include <string_view>
 #include <vector>
 
 #include "ro/formats/palette.h"
 #include "ro/render/hue_classes.h"
 #include "ro/render/palette_ramps.h"
+#include "ro/render/palette_rest.h"
 
 namespace ro::render {
 
@@ -69,7 +71,21 @@ struct LayerDye {
   // Au profil 1, un réglage par rampe, dans l'ordre de `DetectLayerRamps` ; au
   // profil 2, un par classe de teinte. La peau n'emploie que le premier.
   std::array<RampAdjust, kLayerAdjustCount> adjusts{};
+  // LE RESTE (profil mixte) : un réglage par classe de teinte, pour chaque index
+  // qu'aucune pièce ni la peau ne couvre. Aux profils 1 et 3 seulement ; au
+  // profil 2, les classes couvrent déjà tout.
+  HueClassAdjusts rest{};
+  // LES RETOUCHES, appliquées en dernier, peau comprise : la couleur exacte
+  // d'un index. Triées par index, une par index. Jamais sur la peau.
+  std::vector<PaletteRetouch> retouches;
 };
+
+// Le reste ne s'applique qu'à une teinture de pièces palettisées : la tête,
+// une coiffe ou une cape au profil 1, la suite du corps au profil 3.
+[[nodiscard]] bool LayerTakesRest(const LayerDye& dye) noexcept;
+// Les retouches, à ces mêmes teintures et à celles du profil 2 ; jamais à la
+// peau.
+[[nodiscard]] bool LayerTakesRetouches(const LayerDye& dye) noexcept;
 
 // LA RECETTE DE LA SUITE DU CORPS : ses `kBodyContinuationRamps` premiers
 // réglages, aux premiers rangs d'une recette à appliquer sur les rampes de
@@ -81,6 +97,20 @@ struct LayerDye {
 [[nodiscard]] PaletteRecipe LayerRecipe(const LayerDye& dye);
 // Les réglages d'une teinture au profil 2, un par classe.
 [[nodiscard]] HueClassAdjusts LayerHueClasses(const LayerDye& dye);
+
+// LA SUITE ET LE RESTE DU CORPS, posés sur `painted` : les rampes de
+// `continuation` reprennent la base réglée par la suite, puis chaque index hors
+// des pièces v7, de la suite et de la peau reçoit le réglage de sa classe. La
+// peau et les retouches viennent après, à l'appelant.
+void ApplyBodyMore(formats::Palette& painted, const formats::Palette& base,
+                   std::span<const PaletteRamp> v7, std::span<const PaletteRamp> continuation,
+                   SkinRace race, const LayerDye& more);
+
+// LE RESTE D'UN CALQUE au profil 1, posé sur `painted` : hors de ses pièces et,
+// pour une tête, hors de la peau. Sans effet pour une teinture qui n'en prend
+// pas.
+void ApplyLayerRest(formats::Palette& painted, const formats::Palette& base,
+                    std::span<const PaletteRamp> ramps, SkinRace race, const LayerDye& dye);
 
 // Le calque que le profil 1 découpe pour ce calque de style, ou rien pour la
 // peau et le corps, qui n'en ont pas.

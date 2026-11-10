@@ -50,6 +50,9 @@ class ActorPalettes {
     // pixels qu'elles couvrent EN PLUS de `pixels_covered`.
     std::vector<PaletteRamp> continuation;
     int continuation_pixels = 0;
+    // L'emploi des index du sprite, que garde le cache : de quoi mesurer le
+    // reste.
+    const std::array<int, formats::kPaletteEntryCount>* usage = nullptr;
   };
 
   // Ce qu'un style peint sur une pièce, et son numéro de série.

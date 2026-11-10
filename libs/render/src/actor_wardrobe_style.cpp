@@ -89,6 +89,11 @@ ActorWardrobe::BodyRamps ActorWardrobe::BodyRampsFor(const ActorLook& look) {
   found.pixels_covered = analysis.pixels_covered;
   found.continuation = analysis.continuation;
   found.continuation_pixels = analysis.continuation_pixels;
+  PaletteCover cover{};
+  Cover(cover, analysis.ramps);
+  Cover(cover, analysis.continuation);
+  Cover(cover, SkinIndices(RaceOf(look)));
+  found.rest = MeasureRest(*analysis.base, *analysis.usage, cover);
   return found;
 }
 
@@ -115,6 +120,12 @@ ActorWardrobe::BodyRamps ActorWardrobe::LayerRampsFor(const ActorLook& look, Act
     found.ramps = analysis.ramps;
     found.pixels_total = analysis.pixels_total;
     found.pixels_covered = analysis.pixels_covered;
+    PaletteCover cover{};
+    Cover(cover, analysis.ramps);
+    if (part == ActorPart::kHead) {
+      Cover(cover, SkinIndices(RaceOf(look)));
+    }
+    found.rest = MeasureRest(*analysis.base, *analysis.usage, cover);
     return found;
   }
   return found;

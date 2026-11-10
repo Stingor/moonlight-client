@@ -38,6 +38,51 @@ HueClassAdjusts LayerHueClasses(const LayerDye& dye) {
   return adjusts;
 }
 
+void ApplyBodyMore(formats::Palette& painted, const formats::Palette& base,
+                   std::span<const PaletteRamp> v7, std::span<const PaletteRamp> continuation,
+                   SkinRace race, const LayerDye& more) {
+  // ⚠ LA SUITE PART DE LA BASE, comme la recette : ses rampes ne recouvrent
+  // aucune des huit premières, et chacune se calcule sur ses propres index.
+  const formats::Palette continued = ApplyRecipe(base, continuation, BodyContinuationRecipe(more));
+  PaletteCover cover{};
+  Cover(cover, v7);
+  for (const PaletteRamp& ramp : continuation) {
+    const std::size_t end = std::min<std::size_t>(
+        static_cast<std::size_t>(ramp.start) + ramp.length, formats::kPaletteEntryCount);
+    for (std::size_t index = ramp.start; index < end; ++index) {
+      painted.entries[index] = continued.entries[index];
+      cover[index] = true;
+    }
+  }
+  Cover(cover, SkinIndices(race));
+  ApplyRest(painted, base, cover, more.rest);
+}
+
+void ApplyLayerRest(formats::Palette& painted, const formats::Palette& base,
+                    std::span<const PaletteRamp> ramps, SkinRace race, const LayerDye& dye) {
+  if (!LayerTakesRest(dye)) {
+    return;
+  }
+  PaletteCover cover{};
+  Cover(cover, ramps);
+  if (dye.layer == StyleLayer::kHead) {
+    Cover(cover, SkinIndices(race));
+  }
+  ApplyRest(painted, base, cover, dye.rest);
+}
+
+bool LayerTakesRest(const LayerDye& dye) noexcept {
+  if (dye.layer == StyleLayer::kBodyMore) {
+    return dye.profile == kBodyContinuationProfileNumber;
+  }
+  return dye.profile == kLayerProfileNumber && RampLayerOf(dye.layer).has_value();
+}
+
+bool LayerTakesRetouches(const LayerDye& dye) noexcept {
+  return LayerTakesRest(dye) ||
+         (dye.profile == kHueClassProfileNumber && RampLayerOf(dye.layer).has_value());
+}
+
 std::optional<RampLayer> RampLayerOf(StyleLayer layer) noexcept {
   switch (layer) {
     case StyleLayer::kHead:

@@ -16,6 +16,7 @@
 #include "ro/render/actor_palettes.h"
 #include "ro/render/actor_sprite.h"
 #include "ro/render/palette_ramps.h"
+#include "ro/render/palette_rest.h"
 #include "ro/render/sprite_catalog.h"
 #include "ro/render/style_set.h"
 #include "ro/vfs/monster_size_effects.h"
@@ -239,6 +240,10 @@ class ActorWardrobe {
     // et les pixels qu'elles couvrent en plus. Vides pour un calque.
     std::vector<PaletteRamp> continuation;
     int continuation_pixels = 0;
+    // LE RESTE DU PROFIL MIXTE : ce qu'aucune pièce ni la peau ne couvre, par
+    // classe de teinte. Pour un corps, les pièces sont les huit de la v7 et la
+    // suite ; pour une tête, la peau est hors du reste.
+    RestMeasure rest;
   };
   [[nodiscard]] BodyRamps BodyRampsFor(const ActorLook& look);
 

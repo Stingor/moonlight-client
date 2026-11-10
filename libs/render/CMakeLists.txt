@@ -183,6 +183,7 @@ add_library(ro_render STATIC
     src/body_sprite_key.cpp
     src/palette_ramps.cpp
     src/hue_classes.cpp
+    src/palette_rest.cpp
     src/style_set.cpp
     src/post_fx.cpp
     src/post_fx_reference.cpp
