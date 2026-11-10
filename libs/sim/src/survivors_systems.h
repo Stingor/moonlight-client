@@ -297,7 +297,8 @@ struct SurvivorsSplash {
 };
 // survivors_blasts.cpp.
 void SplashAround(SurvivorsField& field, const SurvivorsSplash& splash);
-// survivors_blasts.cpp : le cône devant le héros.
+// survivors_blasts.cpp : le cône devant le héros ; tourné vers l'arrière, il
+// lance le bond de Back Slide (`kBackSlideLeapCells`).
 [[nodiscard]] bool FireCone(SurvivorsField& field, const SurvivorsSkillRule& rule,
                             const SkillLevel& level);
 // survivors_barriers.cpp : la barrière.

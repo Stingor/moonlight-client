@@ -45,8 +45,8 @@ inline constexpr float kArenaLanternHeightWorld = 10.0F;
                                                                  glm::vec3 hero_feet_world);
 
 // LA CASE DU HÉROS, en tête des poses : sa `cell`, que suivent la caméra, le sol
-// et ce qu'il porte, lanterne comprise, et non le corps qui glisse
-// (`DrawnCellOf`). Rien quand la première pose n'est pas la sienne.
+// et ce qu'il porte, lanterne comprise. Rien quand la première pose n'est pas
+// la sienne.
 [[nodiscard]] std::optional<glm::vec2> ArenaHeroCell(std::span<const HordePose> poses) noexcept;
 
 // LA LUEUR D'UN OBJET AU SOL — gemme, objet, coffre, carte — : son sprite peint

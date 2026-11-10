@@ -148,8 +148,8 @@ bool FireNova(SurvivorsField& field, const SurvivorsSkillRule& rule, const Skill
 // `cone_half_steps` caps de part et d'autre. Chaque monstre vivant dont le centre
 // y tombe (à la portée près de son rayon), par index croissant, prend son coup au
 // pas du lancer, un recul qui l'écarte du héros, et l'aveuglement du niveau. Il
-// casse les plantes le long de son axe. Il attend un monstre dans le cône. Le
-// héros ne bouge pas.
+// casse les plantes le long de son axe. Il attend un monstre dans le cône.
+// Tourné vers l'arrière, il lance le bond du héros (voir `kBackSlideLeapCells`).
 bool FireCone(SurvivorsField& field, const SurvivorsSkillRule& rule, const SkillLevel& level) {
   const std::int32_t length = AreaUnits(field, level.reach_units);
   if (length <= 0 || level.cone_half_steps == 0) return false;
@@ -184,6 +184,11 @@ bool FireCone(SurvivorsField& field, const SurvivorsSkillRule& rule, const Skill
                                  .blind_ms = level.blind_ms};
     HurtFoe(field, foe, DamageAgainst(field, level.damage, rule.element, foe), rule.skill_id,
             status);
+  }
+  if (rule.cone_behind) {
+    field.hero.leap_heading = field.hero.facing;
+    field.hero.leap_steps_left = kBackSlideLeapSteps;
+    field.hero.facing = facing;
   }
   PublishCast(field.news,
               SurvivorsCast{.skill_id = rule.skill_id,

@@ -62,18 +62,10 @@ struct HordePose {
   // La position interpolée, en cases continues : le centre de la case (x, y)
   // est en (x, y).
   glm::vec2 cell{0.0F};
-  // CE QUE LE CORPS SEUL S'ÉCARTE DE `cell`, en cases : la caméra, le sol et ce
-  // que le héros porte suivent `cell`. Voir `kBackSlideReachCells`.
-  glm::vec2 slide_cells{0.0F};
   std::array<std::uint8_t, 4> tint = {255, 255, 255, 255};
   float scale = 1.0F;
   [[nodiscard]] bool operator==(const HordePose&) const = default;
 };
-
-// Là où le corps de cette pose se dessine, en cases continues.
-[[nodiscard]] inline glm::vec2 DrawnCellOf(const HordePose& pose) noexcept {
-  return pose.cell + pose.slide_cells;
-}
 
 // LES DURÉES DES MOTIONS d'une apparence, en millisecondes : un tour de
 // marche, et une attaque, une blessure, une mort jouées une fois. Zéro pour
@@ -111,14 +103,6 @@ inline constexpr std::uint32_t kHordeBirthFadeMs = 333;
 // mais pas plus d'une fois par cette durée, comptée depuis le geste précédent.
 // Ses skills partent bien plus souvent, et un geste à chacun le ferait trembler.
 inline constexpr std::uint32_t kHeroGestureEveryMs = 2000;
-// BACK SLIDE EST UN GESTE, UN ALLER-RETOUR : le corps glisse de tant de cases
-// vers l'arrière de son cap, puis revient, en tout pendant cette durée. Pour la
-// simulation le héros n'a pas bougé, et la caméra qui suit sa position non plus.
-inline constexpr float kBackSlideReachCells = 4.0F;
-inline constexpr std::uint32_t kBackSlideMs = 300;
-// La part de la glissade atteinte à `elapsed_ms` : de 0 à 1 à mi-course, puis
-// retour à 0.
-[[nodiscard]] float BackSlideShareAt(float elapsed_ms) noexcept;
 // L'incantation tient sa première image pendant cette durée.
 inline constexpr std::uint32_t kHeroCastHoldMs = 600;
 // Un héros à terre reste à la dernière image de sa chute : ce temps la dépasse.
@@ -161,8 +145,7 @@ class HordePoses {
   // souvenir de l'image précédente, que `Pose` remplace.
   void NoticeFalls(std::span<const ro::sim::SurvivorsFall> falls, std::uint64_t presentation_ms);
   // LES LANCERS DES DERNIERS PAS peuvent commencer un geste de leur héros à
-  // `presentation_ms` (voir `kHeroGestureEveryMs`), allié compris ; un Back Slide
-  // commence toujours sa glissade, héros en marche compris.
+  // `presentation_ms` (voir `kHeroGestureEveryMs`), allié compris.
   void NoticeCasts(std::span<const ro::sim::SurvivorsCast> casts,
                    const ro::sim::SurvivorsField& field, std::uint64_t presentation_ms);
   // LES COUPS DES DERNIERS PAS : un monstre qu'un piège retient (`FreezeHolds`)
@@ -220,8 +203,6 @@ class HordePoses {
   // autres incantent. `pose.look_id` doit déjà nommer sa tenue.
   void PoseGesture(HordePose& pose, const ro::sim::SurvivorsField& field, std::size_t hero_index,
                    std::uint64_t presentation_ms, const HordeTimesOf& times_of) const;
-  // La glissade en cours du héros `hero_index`, sur un corps debout.
-  void PoseSlide(HordePose& pose, std::size_t hero_index, std::uint64_t presentation_ms) const;
   void PoseFoes(const ro::sim::SurvivorsField& field, std::uint64_t presentation_ms,
                 std::uint32_t blend_per_mille, const HordeTimesOf& times_of);
   void PoseFalling(std::uint64_t presentation_ms, const HordeTimesOf& times_of);
@@ -245,12 +226,6 @@ class HordePoses {
   float camera_yaw_degrees_ = 0.0F;
   // Le début du dernier geste de chaque héros, s'il en a fait un.
   std::array<std::optional<std::uint64_t>, ro::sim::kMostHeroes> gesture_started_ms_;
-  // La dernière glissade de chaque héros : son début, et l'arrière de son cap.
-  struct HeroSlide {
-    std::uint64_t started_ms = 0;
-    glm::vec2 rear{0.0F};
-  };
-  std::array<std::optional<HeroSlide>, ro::sim::kMostHeroes> slides_;
 };
 
 }  // namespace moonclient

@@ -184,7 +184,7 @@ void ArenaSession::Compose(const ArenaFrameFacts& facts, const GraphicsOptions& 
   if (facts.stranger.has_value()) faded_.push_back(*facts.stranger);
   shown = faded_;
   composer_.Compose(
-      shown, [this](const HordePose& pose) { return scene_.GroundAtCell(DrawnCellOf(pose)); },
+      shown, [this](const HordePose& pose) { return scene_.GroundAtCell(pose.cell); },
       scene_.ShadowsOf(frame_));
   // LE HÉROS DU JOUEUR EST EN TÊTE des corps, quand il est posé.
   const bool hero_drawn =

@@ -48,10 +48,19 @@ struct SurvivorsStats {
   }
   [[nodiscard]] bool operator==(const SurvivorsStats&) const = default;
 };
+// LE BOND DE BACK SLIDE : le héros glisse de tant de cases dans le sens de sa
+// marche, en tant de pas, le regard tourné vers ce qu'il a frappé.
+inline constexpr std::int32_t kBackSlideLeapCells = 4;
+inline constexpr std::uint8_t kBackSlideLeapSteps = 15;
+
 struct SurvivorsHero {
   FieldPoint position;
   FieldPoint previous_position;
   std::uint8_t facing = 0;  // cap 0..63
+  // LE BOND DE BACK SLIDE en cours : les pas qui restent, et le cap où il
+  // emporte le héros, qui regarde à l'opposé ce qu'il vient de frapper.
+  std::uint8_t leap_steps_left = 0;
+  std::uint8_t leap_heading = 0;
   std::int32_t hp = 0;
   std::int32_t max_hp = 0;
   std::uint16_t level = 1;

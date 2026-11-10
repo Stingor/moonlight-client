@@ -62,6 +62,8 @@ namespace {
 void Rise(SurvivorsField& field) {
   const ReviveRule& revive = field.rules->revive;
   SurvivorsHero& hero = field.hero;
+  // Un bond que la chute a coupé ne reprend pas au relèvement.
+  hero.leap_steps_left = 0;
   hero.hp = static_cast<std::int32_t>(std::clamp<std::int64_t>(
       std::int64_t{hero.max_hp} * std::clamp<std::int64_t>(revive.hp_pct, 0, kPercent) / kPercent,
       1, hero.max_hp));
@@ -101,6 +103,15 @@ void RaiseHero(SurvivorsField& field) {
 void MoveHero(SurvivorsField& field, SurvivorsInput input) {
   SurvivorsHero& hero = field.hero;
   hero.previous_position = hero.position;
+  // LE BOND DE BACK SLIDE l'emporte sur la marche : le héros glisse, regard
+  // tenu vers ce qu'il a frappé, et ne reprend la main qu'au bout.
+  if (hero.leap_steps_left > 0) {
+    --hero.leap_steps_left;
+    hero.position = Slide(field.ground, hero.position,
+                          TurnVector(hero.leap_heading, Cells(kBackSlideLeapCells) /
+                                                            std::int32_t{kBackSlideLeapSteps}));
+    return;
+  }
   if (input.heading == kNoHeading) return;
   const auto heading = static_cast<std::uint8_t>(input.heading % kHeadingSteps);
   hero.facing = heading;
