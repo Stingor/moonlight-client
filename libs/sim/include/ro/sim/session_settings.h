@@ -92,6 +92,8 @@ struct SessionSettings {
   // Les octets de trames de calques que le serveur reçoit par minute, au plus.
   int style_layers_bytes_per_minute = 0;
   // La distance au styliste, en cases, pour qu'une teinture d'objet soit reçue.
+  // ZÉRO : le serveur n'exige pas l'atelier, une teinture d'objet se valide de
+  // partout.
   int style_atelier_cells = 0;
   // 🔴 LA CADENCE DES TENUES EST LA PREUVE que le serveur sait recevoir les
   // demandes de code court et de garde-robe : zéro, aucune ne part.

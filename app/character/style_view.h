@@ -342,7 +342,8 @@ class StyleView {
   std::vector<ImU32> skin_tones_;
   // Les pièces liées et gardées, par calque.
   std::map<LayerAt, PieceMarks> layer_marks_;
-  // L'atelier du styliste est-il ouvert, à cette image ?
+  // Une teinture d'objet peut-elle se valider, à cette image ? Vrai quand le
+  // serveur n'exige pas l'atelier du styliste, ou quand celui-ci est ouvert.
   bool atelier_open_ = false;
 };
 

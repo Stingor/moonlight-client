@@ -425,7 +425,10 @@ void StyleView::RefreshLayerState(const ro::sim::World& world, std::uint32_t now
     }
   }
   layers_.Observe(worn, world.styles().RevisionOf(world.player_id()));
-  atelier_open_ = world.styles().atelier().OpenAt(now_ms);
+  // 🔴 SANS DISTANCE ANNONCÉE, LE SERVEUR N'EXIGE PAS L'ATELIER : une teinture
+  // d'objet se valide alors de partout, sur l'objet porté.
+  atelier_open_ =
+      world.session().style_atelier_cells == 0 || world.styles().atelier().OpenAt(now_ms);
 }
 
 ro::render::ActorLook StyleView::DollLook(const ro::render::ActorLook& body_look,

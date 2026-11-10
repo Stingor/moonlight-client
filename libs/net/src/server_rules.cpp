@@ -2,6 +2,7 @@
 
 #include "ro/net/server_rules.h"
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <optional>
@@ -137,7 +138,8 @@ void Keep(sim::SessionSettings& session, BankZenyMaxHalves& bank_halves,
       KeepPositive(session.style_layers_bytes_per_minute, rule.value);
       return;
     case ServerRuleKey::kStyleAtelierCells:
-      KeepPositive(session.style_atelier_cells, rule.value);
+      // ⚠ ZÉRO SE GARDE : il dit que l'atelier n'est plus exigé.
+      session.style_atelier_cells = std::max(0, static_cast<int>(rule.value));
       return;
     case ServerRuleKey::kStyleOutfitCadenceMs:
       if (rule.value > 0) {
