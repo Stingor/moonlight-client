@@ -247,6 +247,9 @@ void ShortcutBarView::Cast(std::size_t slot, SkillBookPanel& book, ro::net::Conn
       }
       return;
     }
+    if (use_gate_ && !use_gate_(*held, link)) {
+      return;
+    }
     if (auto sent = ro::net::RequestUseItem(link, held->client_slot, world.player_id()); !sent) {
       ro::core::LogWarning("barre : demande non émise — {}", ro::core::Describe(sent.error()));
       return;
@@ -339,6 +342,9 @@ bool ShortcutBarView::RepeatItemSlot(std::size_t slot, std::uint32_t item_id,
   }
   const ro::sim::InventoryItem* held = ShortcutTargetIn(world.inventory(), item_id);
   if (held == nullptr || ShortcutGestureOf(*held).act != ShortcutItemAct::kUse) {
+    return false;
+  }
+  if (use_gate_ && !use_gate_(*held, link)) {
     return false;
   }
   if (auto sent = ro::net::RequestUseItem(link, held->client_slot, world.player_id()); !sent) {

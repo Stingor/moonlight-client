@@ -154,6 +154,14 @@ std::optional<LaphineKind> Laphine::TakeFarewell() noexcept {
   return std::nullopt;
 }
 
+bool Laphine::GiveWayToTrigger() {
+  if (waiting_) {
+    return false;
+  }
+  Close();
+  return true;
+}
+
 LaphineCheck CheckLaphineRequest(const Laphine& laphine, const LaphineRecipe& recipe,
                                  const Inventory& inventory) {
   if (!laphine.open()) {

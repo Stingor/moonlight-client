@@ -227,10 +227,15 @@ void InventoryView::Apply(const ro::ui::InventoryWindowAction& asked, ro::net::C
       }
       // LE MÊME GESTE, DEUX PAQUETS. C'est ce que fait le client : le type de
       // l'objet décide, et le joueur ne connaît qu'un double-clic.
-      sent = item->wearable_at != 0
-                 ? ro::net::RequestEquip(link, item->client_slot,
-                                         WearAt(item->wearable_at, asked.alternate))
-                 : ro::net::RequestUseItem(link, item->client_slot, world.player_id());
+      if (item->wearable_at != 0) {
+        sent = ro::net::RequestEquip(link, item->client_slot,
+                                     WearAt(item->wearable_at, asked.alternate));
+        break;
+      }
+      if (use_gate_ && !use_gate_(*item, link)) {
+        return;
+      }
+      sent = ro::net::RequestUseItem(link, item->client_slot, world.player_id());
       break;
     case ro::ui::ItemVerb::kTakeOff:
       sent = ro::net::RequestUnequip(link, item->client_slot);

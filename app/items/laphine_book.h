@@ -30,6 +30,8 @@ class LaphineBook {
   // La recette de ce déclencheur, nulle si le livre ne la porte pas.
   [[nodiscard]] const ro::sim::LaphineRecipe* Find(ro::sim::LaphineKind kind,
                                                    std::uint32_t trigger_item_id) const noexcept;
+  // Cet objet ouvre-t-il un Laphine, de l'une ou l'autre espèce ?
+  [[nodiscard]] bool Triggers(std::uint32_t item_id) const noexcept;
 
   [[nodiscard]] const std::vector<ro::sim::LaphineRecipe>& synthesis() const noexcept {
     return synthesis_;

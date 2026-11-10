@@ -146,6 +146,12 @@ class Laphine {
   // La prochaine espèce dont la fermeture est due, une fois chacune.
   [[nodiscard]] std::optional<LaphineKind> TakeFarewell() noexcept;
 
+  // UN AUTRE DÉCLENCHEUR VA S'UTILISER. Le serveur refuse d'ouvrir une
+  // amélioration tant que la précédente n'est pas fermée chez lui : la fenêtre
+  // ouverte se ferme donc d'abord, et sa fermeture devient due — à dire AVANT
+  // l'usage. Faux quand une demande attend sa réponse : l'usage se retient.
+  [[nodiscard]] bool GiveWayToTrigger();
+
  private:
   bool open_ = false;
   LaphineKind kind_ = LaphineKind::kSynthesis;

@@ -24,6 +24,7 @@
 #include "game/trade_items.h"
 #include "game/trade_windows.h"
 #include "game/vending_stage.h"
+#include "items/item_use_gate.h"
 #include "world/signboard_pick.h"
 
 namespace moonclient {
@@ -93,6 +94,15 @@ class TradeStages {
   // client d'origine, et c'est ce qui évite qu'un clic à côté d'une ligne
   // envoie le personnage au loin, boutique ouverte.
   [[nodiscard]] bool HoldsWorld() const noexcept;
+
+  // LE JUGE DE L'USAGE D'UN OBJET, que le sac et la barre consultent avant
+  // d'émettre : un déclencheur Laphine ferme d'abord la fenêtre ouverte. Faux :
+  // l'usage se retient. Voir `LaphineStage::YieldItemUse`.
+  [[nodiscard]] ItemUseGate UseGate() {
+    return [this](const ro::sim::InventoryItem& item, ro::net::Connection& link) {
+      return laphine_.YieldItemUse(item.item_id, laphine_book_, link);
+    };
+  }
 
   [[nodiscard]] NpcShopStage& npc_shop() noexcept { return npc_shop_; }
   [[nodiscard]] BarterStage& barter() noexcept { return barter_; }

@@ -39,6 +39,13 @@ class LaphineStage {
   [[nodiscard]] TradeItemFocus hovered() const noexcept { return hovered_; }
   [[nodiscard]] std::optional<TradeItemFocus> TakeDescribed() noexcept;
 
+  // LE JOUEUR VA UTILISER `item_id`. Si c'est un déclencheur que `book` connaît
+  // et qu'un Laphine est ouvert, la fenêtre se ferme et sa fermeture part
+  // aussitôt, devant l'usage : le serveur ouvre alors celle du nouvel objet. Faux
+  // quand l'usage doit se retenir, une demande attendant sa réponse.
+  [[nodiscard]] bool YieldItemUse(std::uint32_t item_id, const LaphineBook* book,
+                                  ro::net::Connection& link);
+
  private:
   void Follow(ro::ui::LaphineWindowState& state, const ro::ui::LaphineWindowAction& answer,
               const TradeContext& context);

@@ -422,6 +422,9 @@ void Game::DrawInterface(std::uint32_t now_ms) {
   // aussi son métier, qui change en jeu.
   shortcuts_->FollowCharacter(world_);
   shortcuts_->UseCompanions(&pieces_.homunculus, &pieces_.mercenary);
+  // Le sac et la barre consultent les commerces avant d'émettre un usage.
+  shortcuts_->UseItemGate(pieces_.trade.UseGate());
+  bag_->SeeUseGate(pieces_.trade.UseGate());
   pieces_.grimoire_keys.Advance(windows_.character, *shortcuts_, settings_->bindings(), now_ms);
   shortcuts_->Highlight(GrimoireKeys::Highlighted(windows_.character));
   shortcuts_->Refresh(world_, settings_->bindings(), now_ms);

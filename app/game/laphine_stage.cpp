@@ -26,6 +26,18 @@ std::optional<TradeItemFocus> LaphineStage::TakeDescribed() noexcept {
   return std::exchange(described_, std::nullopt);
 }
 
+bool LaphineStage::YieldItemUse(std::uint32_t item_id, const LaphineBook* book,
+                                ro::net::Connection& link) {
+  if (!laphine_.open() || book == nullptr || !book->Triggers(item_id)) {
+    return true;
+  }
+  if (!laphine_.GiveWayToTrigger()) {
+    return false;
+  }
+  ro::net::SayLaphineFarewells(link, laphine_);
+  return true;
+}
+
 const ro::sim::LaphineRecipe* LaphineStage::RecipeOf(const TradeContext& context) const {
   return context.laphine_book == nullptr
              ? nullptr

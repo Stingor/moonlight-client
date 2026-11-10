@@ -109,6 +109,11 @@ const ro::sim::LaphineRecipe* LaphineBook::Find(ro::sim::LaphineKind kind,
   return found == recipes.end() ? nullptr : &*found;
 }
 
+bool LaphineBook::Triggers(std::uint32_t item_id) const noexcept {
+  return Find(ro::sim::LaphineKind::kSynthesis, item_id) != nullptr ||
+         Find(ro::sim::LaphineKind::kUpgrade, item_id) != nullptr;
+}
+
 LaphineBook ReadLaphineBook(ro::vfs::Vfs& vfs) {
   auto bytes = vfs.Read(std::string(kLaphineBookPath));
   if (!bytes) {

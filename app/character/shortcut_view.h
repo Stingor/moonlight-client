@@ -5,6 +5,7 @@
 #include <optional>
 #include <span>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "ro/render/item_icons.h"
@@ -18,6 +19,7 @@
 
 #include "character/skill_book_view.h"
 #include "input/hotkeys.h"
+#include "items/item_use_gate.h"
 
 namespace moonclient {
 
@@ -64,6 +66,10 @@ class ShortcutBarView {
     homunculus_ = homunculus;
     mercenary_ = mercenary;
   }
+
+  // LE JUGE DE L'USAGE, consulté juste avant d'émettre l'usage d'un objet
+  // d'une case — touche comme répétition. Facultatif.
+  void UseItemGate(ItemUseGate gate) { use_gate_ = std::move(gate); }
 
   [[nodiscard]] ro::sim::ShortcutBars& bar() noexcept { return bar_; }
 
@@ -186,6 +192,7 @@ class ShortcutBarView {
   // chargent avec les accessoires, après l'arbre des compétences.
   const ro::vfs::ItemTable* item_table_ = nullptr;
   ro::render::ItemIcons* item_icons_ = nullptr;
+  ItemUseGate use_gate_;
   ro::sim::ShortcutBars bar_;
   // Le personnage dont la barre est chargée. Vide tant que le serveur n'a pas
   // nommé le nôtre.

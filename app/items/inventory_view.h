@@ -21,6 +21,7 @@
 
 #include "items/creator_names.h"
 #include "items/item_layout.h"
+#include "items/item_use_gate.h"
 #include "items/storage_favorites.h"
 
 namespace moonclient {
@@ -74,6 +75,10 @@ class InventoryView {
   // pièce, et part vers lui.
   void SeePetDesk(InventoryPetDesk desk) { pet_ = std::move(desk); }
 
+  // LE JUGE DE L'USAGE, consulté juste avant d'émettre l'usage d'un objet.
+  // Facultatif.
+  void SeeUseGate(ItemUseGate gate) { use_gate_ = std::move(gate); }
+
   InventoryView(const ro::vfs::ItemTable* items, const ro::vfs::ItemWords* words,
                 ro::render::ItemIcons* icons);
 
@@ -126,6 +131,7 @@ class InventoryView {
   std::function<bool()> deal_holds_items_;
   InventoryMailDesk mail_;
   InventoryPetDesk pet_;
+  ItemUseGate use_gate_;
 
   // L'item se propose-t-il au pet ?
   [[nodiscard]] bool OffersToPet(const ro::sim::InventoryItem& item) const {
