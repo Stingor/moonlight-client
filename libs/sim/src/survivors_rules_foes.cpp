@@ -325,24 +325,18 @@ std::span<const FoeRule> ShippedFoes() {
 
 std::span<const WaveRule> ShippedWaves() { return kWaves; }
 
-// prt_fild08 : le départ est le centre de la carte, la case (200, 200),
-// praticable, dont la fenêtre de 40 × 40 l'est à 99 % (`roc-cli survivors
-// arena-openness`, ADR 0133) ; partie libre seulement, hors classement et sans
-// équilibrage propre (Q6). midgard_plains : le sol généré de la prairie, sans
-// bord, né au centre du monde, l'arène classée et celle du défi (ADR 0134).
-// morroc_desert : le sol généré du désert, avec son bestiaire, ses boss et ses
-// événements ; partie libre seulement (lot 12, Q2). lutie_snowfield : le sol
-// généré des neiges de Lutie, de même, en partie libre (lot 17, Q1).
+// LES ARÈNES SONT DES BIOMES GÉNÉRÉS, sans carte. midgard_plains : le sol
+// généré de la prairie, sans bord, né au centre du monde, l'arène classée et
+// celle du défi (ADR 0134). morroc_desert : le sol généré du désert, avec son
+// bestiaire, ses boss et ses événements ; partie libre seulement (lot 12, Q2).
+// lutie_snowfield : le sol généré des neiges de Lutie, de même, en partie
+// libre (lot 17, Q1). Le numéro 1, celui de l'ancienne arène sur carte, ne se
+// redonne pas : un carnet ou une trame qui le nomme n'en trouve plus.
 std::span<const ArenaRule> ShippedArenas() {
-  static const std::array<ArenaRule, 4> kArenas = [] {
+  static const std::array<ArenaRule, 3> kArenas = [] {
     const ArenaContent desert = DesertContent();
     const ArenaContent snow = SnowContent();
-    return std::array<ArenaRule, 4>{{
-        {.arena_id = 1,
-         .key = "prt_fild08",
-         .map_name = "prt_fild08",
-         .start = std::nullopt,
-         .ranked = false},
+    return std::array<ArenaRule, 3>{{
         {.arena_id = 2,
          .key = "midgard_plains",
          .map_name = "",
