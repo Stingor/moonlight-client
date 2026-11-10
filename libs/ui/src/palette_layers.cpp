@@ -41,8 +41,12 @@ constexpr float kChannelMost = 255.0F;
 }
 
 // Le libellé d'un onglet : « Coiffe haute : Valkyrie », une étoile tant qu'une
-// retouche attend d'être validée. L'identifiant ImGui est le numéro du calque :
-// le nom de l'objet change quand on en change, l'onglet reste le même.
+// retouche attend d'être validée.
+//
+// 🔴 L'IDENTIFIANT IMGUI EST LE NUMÉRO DU CALQUE, ET LUI SEUL : `###`, pas
+// `##`. Avec `##`, le texte affiché entre dans l'identifiant ; l'étoile d'une
+// retouche ou un autre objet porté en font alors un NOUVEL onglet, l'ancien
+// disparaît, et la barre retombe sur le dernier onglet visité.
 [[nodiscard]] std::string TabLabel(const PaletteTab& tab) {
   std::string label = KindName(tab.kind);
   if (!tab.name.empty()) {
@@ -52,7 +56,7 @@ constexpr float kChannelMost = 255.0F;
   if (tab.edited) {
     label += " *";
   }
-  label += "##";
+  label += "###";
   label += std::to_string(static_cast<unsigned>(tab.kind));
   return label;
 }
@@ -200,7 +204,14 @@ void DrawLayerTabs(PaletteEditorState& state, const PaletteEditorView& view, con
     ImGui::BeginDisabled(blocked);
     const std::string label = TabLabel(tab);
     if (ImGui::BeginTabItem(label.c_str(), nullptr, flags)) {
-      if (!forced) {
+      if (blocked && !forced) {
+        // ⚠ UN ONGLET OUVERT QUI DEVIENT NON RÉGLABLE — on monte en selle sur
+        // l'onglet de la peau — REND LA MAIN À CELUI QUE LA VUE MONTRE : la
+        // barre ne doit pas désigner un calque pendant que la liste est celle
+        // d'un autre.
+        state.tab = view.tab;
+        state.tab_asked = true;
+      } else if (!forced) {
         state.tab = tab.kind;
       }
       ImGui::EndTabItem();

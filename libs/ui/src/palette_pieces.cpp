@@ -426,6 +426,10 @@ PiecesAnswer DrawPalettePieces(PaletteEditorState& state, const PaletteEditorVie
   const bool layer = !view.adjusts.empty();
   const std::size_t count = layer ? std::min(view.ramps.size(), view.adjusts.size())
                                   : std::min(view.ramps.size(), render::kMaxRamps);
+  // 🔴 LES PIÈCES SONT CELLES DE LEUR ONGLET, jusque dans leur identifiant : un
+  // nuancier ouvert sur la pièce 1 d'un chapeau ne doit pas devenir celui de la
+  // pièce 1 du corps si l'onglet change sous lui. Il disparaît avec sa liste.
+  ImGui::PushID(static_cast<int>(view.tab));
   for (std::size_t rank = 0; rank < count; ++rank) {
     PieceShown piece;
     piece.rank = rank;
@@ -440,6 +444,7 @@ PiecesAnswer DrawPalettePieces(PaletteEditorState& state, const PaletteEditorVie
       answer.hovered = static_cast<int>(rank);
     }
   }
+  ImGui::PopID();
   ImGui::EndGroup();
   return answer;
 }
