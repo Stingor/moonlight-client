@@ -26,6 +26,8 @@ constexpr std::size_t kBlockHead = 4 + 1;
 
 // Une entrée du CZ : retire cette teinture.
 constexpr std::uint8_t kEntryClear = 0x01;
+// Une entrée, dans les deux sens : la queue du profil mixte suit les réglages.
+constexpr std::uint8_t kEntryTail = 0x02;
 // CZ : retire d'abord la tête et la peau.
 constexpr std::uint8_t kRequestClearCharacter = 0x01;
 // ZC : la charge est compressée.
@@ -39,9 +41,15 @@ static_assert(proto::CzMoonclientStyleLayers::kWireSize == 6,
               "l'en-tête du CZ des calques ne vaut plus ce que le serveur déclare");
 static_assert(proto::ZcMoonclientStyleLayers::kWireSize == 7,
               "l'en-tête du ZC des calques ne vaut plus ce que le serveur déclare");
-static_assert(kStyleLayerEntryHead + sim::kStyleLayerAdjustCount * kStyleLayerAdjustBytes <=
-                  UINT8_MAX,
-              "une entrée doit tenir sa taille sur un octet");
+static_assert(kStyleLayerEntryMost <= UINT8_MAX, "une entrée doit tenir sa taille sur un octet");
+// Le pire CZ : tête, peau, quatre suites, huit emplacements.
+constexpr std::size_t kRequestEntriesWorst = 1 + 1 + sim::kStyleBodyVariantsMost +
+                                             (static_cast<std::size_t>(StyleSlot::kCostumeGarment) -
+                                              static_cast<std::size_t>(StyleSlot::kHeadTop) + 1);
+static_assert(proto::CzMoonclientStyleLayers::kWireSize +
+                      kRequestEntriesWorst * kStyleLayerEntryMost <=
+                  kStyleLayersRequestMost,
+              "le pire CZ doit tenir sous le plafond du serveur");
 
 [[nodiscard]] bool Neutral(const sim::StyleAdjust& adjust) noexcept {
   return adjust.hue == 0 && adjust.saturation == 0 && adjust.value == 0 && !adjust.absolute;
@@ -76,14 +84,44 @@ static_assert(kStyleLayerEntryHead + sim::kStyleLayerAdjustCount * kStyleLayerAd
   return 0;
 }
 
-[[nodiscard]] std::uint16_t MaskOf(const sim::StyleLayerRecipe& recipe) noexcept {
+[[nodiscard]] std::uint16_t MaskOf(
+    const std::array<sim::StyleAdjust, sim::kStyleLayerAdjustCount>& adjusts) noexcept {
   std::uint16_t mask = 0;
   for (std::size_t rank = 0; rank < sim::kStyleLayerAdjustCount; ++rank) {
-    if (!Neutral(recipe.adjusts[rank])) {
+    if (!Neutral(adjusts[rank])) {
       mask = static_cast<std::uint16_t>(mask | (1U << rank));
     }
   }
   return mask;
+}
+
+// Le reste se règle sur les pièces palettisées : tête, coiffe et cape au profil
+// 1, suite du corps au profil 3.
+[[nodiscard]] bool TakesRest(sim::StyleLayerKind layer, std::uint8_t profile) noexcept {
+  if (layer == sim::StyleLayerKind::kBodyMore) {
+    return profile == kStyleLayerBodyMoreProfile;
+  }
+  return layer != sim::StyleLayerKind::kSkin && profile == kStyleLayerRampProfile;
+}
+
+// Les retouches : partout sauf sur la peau.
+[[nodiscard]] bool TakesRetouches(sim::StyleLayerKind layer) noexcept {
+  return layer != sim::StyleLayerKind::kSkin;
+}
+
+// Des retouches au plus `kStyleRetouchesMost`, permises, d'index strictement
+// croissants.
+[[nodiscard]] bool RetouchesValid(std::span<const sim::StyleRetouch> retouches) noexcept {
+  if (retouches.size() > sim::kStyleRetouchesMost) {
+    return false;
+  }
+  for (std::size_t at = 0; at < retouches.size(); ++at) {
+    if (!sim::StyleRetouchAllowed(retouches[at]) ||
+        (at > 0 && retouches[at - 1].index >= retouches[at].index)) {
+      return false;
+    }
+  }
+  return true;
 }
 
 void WriteAdjust(core::ByteWriter& writer, const sim::StyleAdjust& adjust) {
@@ -125,23 +163,55 @@ void WriteAdjust(core::ByteWriter& writer, const sim::StyleAdjust& adjust) {
   if (skin ? recipe.key != 0 : recipe.key == 0) {
     return core::Fail(core::ErrorCode::kInvalidArgument, "calques : clé hors de son calque");
   }
-  const std::uint16_t mask = clear ? std::uint16_t{0} : MaskOf(recipe);
+  const std::uint16_t mask = clear ? std::uint16_t{0} : MaskOf(recipe.adjusts);
   const std::size_t ranks = RanksFor(recipe.layer, recipe.profile);
   if (ranks == 0 || (mask >> ranks) != 0) {
     return core::Fail(core::ErrorCode::kInvalidArgument,
                       std::format("calques : profil {} ou rang hors de ce calque", recipe.profile));
   }
+  // LA QUEUE, seulement si elle porte quelque chose : une queue vide ne part pas,
+  // et deux envois du même style restent identiques à l'octet.
+  const std::uint16_t rest_mask = clear ? std::uint16_t{0} : MaskOf(recipe.rest);
+  const std::size_t retouches = clear ? 0 : recipe.retouches.size();
+  if ((rest_mask != 0 && !TakesRest(recipe.layer, recipe.profile)) ||
+      (retouches != 0 && !TakesRetouches(recipe.layer)) ||
+      (!clear && !RetouchesValid(recipe.retouches))) {
+    return core::Fail(core::ErrorCode::kInvalidArgument,
+                      "calques : reste ou retouches hors de ce calque");
+  }
+  const bool tail = rest_mask != 0 || retouches != 0;
   const auto adjusts = static_cast<std::size_t>(std::popcount(mask));
-  writer.U8(static_cast<std::uint8_t>(kStyleLayerEntryHead + adjusts * kStyleLayerAdjustBytes));
+  const auto rest_adjusts = static_cast<std::size_t>(std::popcount(rest_mask));
+  const std::size_t size = kStyleLayerEntryHead + adjusts * kStyleLayerAdjustBytes +
+                           (tail ? kStyleLayerTailHead + rest_adjusts * kStyleLayerAdjustBytes +
+                                       retouches * kStyleLayerRetouchBytes
+                                 : 0);
+  writer.U8(static_cast<std::uint8_t>(size));
   writer.U8(wire_layer);
   writer.U32(recipe.key);
   writer.U8(recipe.profile);
-  writer.U8(clear ? kEntryClear : std::uint8_t{0});
+  writer.U8(static_cast<std::uint8_t>((clear ? kEntryClear : 0) | (tail ? kEntryTail : 0)));
   writer.U16(mask);
   for (std::size_t rank = 0; rank < sim::kStyleLayerAdjustCount; ++rank) {
     if ((mask & (1U << rank)) != 0) {
       WriteAdjust(writer, recipe.adjusts[rank]);
     }
+  }
+  if (!tail) {
+    return {};
+  }
+  writer.U16(rest_mask);
+  for (std::size_t rank = 0; rank < sim::kStyleLayerAdjustCount; ++rank) {
+    if ((rest_mask & (1U << rank)) != 0) {
+      WriteAdjust(writer, recipe.rest[rank]);
+    }
+  }
+  writer.U8(static_cast<std::uint8_t>(retouches));
+  for (const sim::StyleRetouch& retouch : recipe.retouches) {
+    writer.U8(retouch.index);
+    writer.U8(retouch.red);
+    writer.U8(retouch.green);
+    writer.U8(retouch.blue);
   }
   return {};
 }
@@ -152,13 +222,60 @@ struct ReadEntry {
   bool ok = false;
 };
 
+void ReadAdjust(core::ByteReader& reader, sim::StyleAdjust& adjust) {
+  adjust.hue = reader.I16();
+  adjust.saturation = reader.I8();
+  adjust.value = reader.I8();
+  // ⚠ TOUT NON-ZÉRO VAUT « ABSOLU », comme dans la recette du corps.
+  adjust.absolute = reader.U8() != 0;
+}
+
+// LA QUEUE d'une entrée lue, de `end` exclu. Tout ou rien : une queue qui
+// déborde, un reste hors de son profil, une retouche interdite ou en désordre
+// la font ignorer, et les pièces restent.
+void ReadTail(core::ByteReader& reader, std::size_t end, sim::StyleLayerRecipe& recipe) {
+  if (reader.offset() + kStyleLayerTailHead > end) {
+    return;
+  }
+  sim::StyleLayerRecipe read = recipe;
+  const std::uint16_t rest_mask = reader.U16();
+  const auto rest_adjusts = static_cast<std::size_t>(std::popcount(rest_mask));
+  if ((rest_mask >> sim::kStyleLayerAdjustCount) != 0 ||
+      (rest_mask != 0 && !TakesRest(recipe.layer, recipe.profile)) ||
+      reader.offset() + rest_adjusts * kStyleLayerAdjustBytes + 1 > end) {
+    return;
+  }
+  for (std::size_t rank = 0; rank < sim::kStyleLayerAdjustCount; ++rank) {
+    if ((rest_mask & (1U << rank)) != 0) {
+      ReadAdjust(reader, read.rest[rank]);
+    }
+  }
+  const std::size_t count = reader.U8();
+  if ((count != 0 && !TakesRetouches(recipe.layer)) || count > sim::kStyleRetouchesMost ||
+      reader.offset() + count * kStyleLayerRetouchBytes > end) {
+    return;
+  }
+  for (std::size_t at = 0; at < count; ++at) {
+    sim::StyleRetouch retouch;
+    retouch.index = reader.U8();
+    retouch.red = reader.U8();
+    retouch.green = reader.U8();
+    retouch.blue = reader.U8();
+    read.retouches.push_back(retouch);
+  }
+  if (reader.ok() && RetouchesValid(read.retouches)) {
+    recipe = std::move(read);
+  }
+}
+
 [[nodiscard]] ReadEntry ReadOne(core::ByteReader& reader) {
   const std::size_t start = reader.offset();
   const std::size_t size = reader.U8();
   const std::uint8_t wire_layer = reader.U8();
   const std::uint32_t key = reader.U32();
   const std::uint8_t profile = reader.U8();
-  static_cast<void>(reader.U8());  // drapeaux : aucun ne vaut dans un lot
+  // Seul le drapeau de queue vaut dans un lot.
+  const std::uint8_t flags = reader.U8();
   const std::uint16_t mask = reader.U16();
   const auto adjusts = static_cast<std::size_t>(std::popcount(mask));
   // 🔴 LA TAILLE NE SE CROIT PAS SUR PAROLE : elle doit couvrir le masque, et
@@ -180,14 +297,12 @@ struct ReadEntry {
         if ((mask & (1U << rank)) == 0) {
           continue;
         }
-        sim::StyleAdjust& adjust = recipe.adjusts[rank];
-        adjust.hue = reader.I16();
-        adjust.saturation = reader.I8();
-        adjust.value = reader.I8();
-        // ⚠ TOUT NON-ZÉRO VAUT « ABSOLU », comme dans la recette du corps.
-        adjust.absolute = reader.U8() != 0;
+        ReadAdjust(reader, recipe.adjusts[rank]);
       }
-      read.recipe = recipe;
+      if ((flags & kEntryTail) != 0) {
+        ReadTail(reader, start + size, recipe);
+      }
+      read.recipe = std::move(recipe);
     }
   }
   // Ce qui suit les réglages, ou toute l'entrée qu'on ne lit pas : enjambé.

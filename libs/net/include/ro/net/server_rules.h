@@ -58,6 +58,9 @@ enum class ServerRuleKey : std::uint16_t {
   // LES TENUES. La cadence est la preuve que le serveur sait les recevoir.
   kStyleOutfitCadenceMs = 22,
   kStyleWardrobeSlots = 23,
+  // LE PROFIL MIXTE : les retouches qu'un calque porte au plus. Sa présence est
+  // la preuve que le serveur accepte le reste et les retouches d'une entrée.
+  kStyleLayerRetouchesMost = 24,
 };
 
 [[nodiscard]] FrameOutcome ApplyServerRulesFrame(const Frame& frame, sim::World& world);

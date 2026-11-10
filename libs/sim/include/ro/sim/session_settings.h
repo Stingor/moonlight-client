@@ -100,6 +100,9 @@ struct SessionSettings {
   std::uint32_t style_outfit_cadence_ms = 0;
   // Les rangements de la garde-robe du compte. Zéro : non dit.
   int style_wardrobe_slots = 0;
+  // 🔴 LES RETOUCHES QU'UN CALQUE PORTE AU PLUS, PREUVE que le serveur accepte
+  // le profil mixte (le reste et les retouches) : zéro, aucune entrée n'en part.
+  int style_layer_retouches_most = 0;
   // Les bornes des numéros officiels, telles que le serveur les applique. Zéro :
   // non dites.
   int hair_style_min = 0;

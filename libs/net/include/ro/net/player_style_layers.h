@@ -30,6 +30,13 @@ namespace ro::net {
 // Le masque ne porte que les réglages non neutres, et la taille permet
 // d'enjamber un champ qu'un serveur plus récent ajouterait en queue.
 //
+// LA QUEUE DU PROFIL MIXTE, annoncée par le drapeau 0x02, suit les réglages :
+//   [masque_reste:2] puis 5 octets par classe de teinte réglée (rangs 0 à 12),
+//   [nombre:1] puis nombre × [index:1][rouge:1][vert:1][bleu:1]
+// Le reste ne vaut qu'aux profils 1 et 3 ; les retouches, triées par index,
+// jamais sur la peau, ni à l'index zéro, ni en magenta pur. Un lecteur plus
+// ancien enjambe la queue par la taille, et voit les pièces seules.
+//
 // 🔴 UN OBJET SE DÉSIGNE PAR SON EMPLACEMENT, jamais par un identifiant global.
 // Le serveur trouve l'exemplaire dans l'équipement de la session émettrice, et
 // refuse s'il n'y est pas porté, de l'identifiant attendu.
@@ -37,10 +44,10 @@ namespace ro::net {
 // L'en-tête d'une entrée, et la taille d'un réglage.
 inline constexpr std::size_t kStyleLayerEntryHead = 10;
 inline constexpr std::size_t kStyleLayerAdjustBytes = 5;
-inline constexpr std::size_t kStyleLayerEntryMost =
-    kStyleLayerEntryHead + sim::kStyleLayerAdjustCount * kStyleLayerAdjustBytes;
-// Le plus gros CZ que le serveur accepte.
-inline constexpr std::size_t kStyleLayersRequestMost = 2048;
+// La queue : le masque du reste et le nombre de retouches, puis 4 octets par
+// retouche.
+inline constexpr std::size_t kStyleLayerTailHead = 3;
+inline constexpr std::size_t kStyleLayerRetouchBytes = 4;
 // La plus grosse charge brute d'un ZC : un joueur n'est jamais coupé entre deux
 // trames, et la décompression s'arrête là.
 inline constexpr std::size_t kStyleLayersRawMost = 16384;
@@ -52,6 +59,17 @@ inline constexpr std::size_t kStyleLayerRampRanks = 8;
 // La suite du corps : les rampes 9 à 12, aux rangs 0 à 3, sous la clé du corps.
 inline constexpr std::uint8_t kStyleLayerBodyMoreProfile = 3;
 inline constexpr std::size_t kStyleLayerBodyMoreRanks = 4;
+
+// La plus grosse entrée : huit pièces, le reste en treize classes, et toutes
+// les retouches. Elle tient sa taille sur un octet.
+inline constexpr std::size_t kStyleLayerEntryMost =
+    kStyleLayerEntryHead +
+    (kStyleLayerRampRanks + sim::kStyleLayerAdjustCount) * kStyleLayerAdjustBytes +
+    kStyleLayerTailHead + sim::kStyleRetouchesMost * kStyleLayerRetouchBytes;
+// LE PLUS GROS CZ que le serveur accepte : la tête, la peau, les quatre suites
+// du corps et les huit emplacements, chacun à sa plus grosse entrée, tiennent
+// dans 4 Kio.
+inline constexpr std::size_t kStyleLayersRequestMost = 4096;
 
 // L'EMPLACEMENT D'ÉQUIPEMENT de l'émetteur qu'une teinture d'objet vise.
 enum class StyleSlot : std::uint8_t {

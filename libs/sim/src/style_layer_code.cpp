@@ -1,5 +1,6 @@
 #include "ro/sim/style_layer_code.h"
 
+#include <algorithm>
 #include <array>
 #include <charconv>
 #include <cstddef>
@@ -9,6 +10,12 @@ namespace ro::sim {
 namespace {
 
 constexpr std::string_view kPrefix = "L1:";
+constexpr std::string_view kMixedPrefix = "L2:";
+// Une clé : quatre octets ; un nombre de retouches : un octet.
+constexpr std::size_t kKeyDigits = 8;
+constexpr unsigned kKeyBits = 32;
+// Une retouche : l'index, puis rouge, vert, bleu.
+constexpr std::size_t kRetouchDigits = 4 * 2;
 constexpr char kSeparator = ':';
 // Les chiffres qu'on écrit, en minuscules comme le code v7 : un même style doit
 // toujours s'écrire de la même façon.
@@ -113,6 +120,80 @@ void AppendByte(std::string& out, unsigned value) {
   return field;
 }
 
+void AppendAdjusts(std::string& out, const std::array<StyleAdjust, kStyleLayerAdjustCount>& adjusts,
+                   std::size_t ranks) {
+  unsigned mask = 0;
+  for (std::size_t rank = 0; rank < ranks; ++rank) {
+    if (!Neutral(adjusts[rank])) {
+      mask |= 1U << rank;
+    }
+  }
+  AppendByte(out, (mask >> kByteBits) & kByteMask);
+  AppendByte(out, mask & kByteMask);
+  out.push_back(kSeparator);
+  for (std::size_t rank = 0; rank < ranks; ++rank) {
+    if ((mask & (1U << rank)) == 0) {
+      continue;
+    }
+    const StyleAdjust& adjust = adjusts[rank];
+    const auto hue = static_cast<std::uint16_t>(adjust.hue);
+    AppendByte(out, (hue >> kByteBits) & kByteMask);
+    AppendByte(out, hue & kByteMask);
+    AppendByte(out, static_cast<std::uint8_t>(adjust.saturation));
+    AppendByte(out, static_cast<std::uint8_t>(adjust.value));
+    AppendByte(out, adjust.absolute ? 1U : 0U);
+  }
+}
+
+// Le masque puis ses réglages, dans `ranks` rangs au plus ; faux si illisibles.
+[[nodiscard]] bool ReadAdjusts(std::string_view& text,
+                               std::array<StyleAdjust, kStyleLayerAdjustCount>& adjusts,
+                               std::size_t ranks) {
+  const std::optional<std::string_view> mask_field = TakeField(text);
+  if (!mask_field || mask_field->size() != kMaskDigits) {
+    return false;
+  }
+  const std::optional<unsigned> mask = ReadHex(*mask_field, kMaskDigits);
+  if (!mask || (*mask >> ranks) != 0) {
+    return false;
+  }
+  for (std::size_t rank = 0; rank < ranks; ++rank) {
+    if ((*mask & (1U << rank)) == 0) {
+      continue;
+    }
+    if (text.size() < kAdjustDigits) {
+      return false;
+    }
+    const std::optional<unsigned> hue = ReadHex(text, kHueDigits);
+    const std::optional<unsigned> saturation = ReadHex(text.substr(kSaturationAt), kByteDigits);
+    const std::optional<unsigned> value = ReadHex(text.substr(kValueAt), kByteDigits);
+    const std::optional<unsigned> absolute = ReadHex(text.substr(kAbsoluteAt), kByteDigits);
+    if (!hue || !saturation || !value || !absolute || *absolute > 1) {
+      return false;
+    }
+    StyleAdjust& adjust = adjusts[rank];
+    adjust.hue = static_cast<std::int16_t>(static_cast<std::uint16_t>(*hue));
+    adjust.saturation = static_cast<std::int8_t>(static_cast<std::uint8_t>(*saturation));
+    adjust.value = static_cast<std::int8_t>(static_cast<std::uint8_t>(*value));
+    adjust.absolute = *absolute == 1;
+    if (!InBounds(adjust)) {
+      return false;
+    }
+    text.remove_prefix(kAdjustDigits);
+  }
+  return true;
+}
+
+// Le profil mixte s'applique-t-il à ce calque, à ce profil ? Le reste aux
+// rampes, les retouches aussi aux classes ; jamais à la peau.
+[[nodiscard]] bool TakesRest(StyleLayerKind layer, std::uint8_t profile) {
+  return layer != StyleLayerKind::kSkin && profile == kStyleLayerCodeRampProfile;
+}
+
+[[nodiscard]] bool HasMixed(const StyleLayerCode& code) {
+  return !code.retouches.empty() || !std::ranges::all_of(code.rest, Neutral);
+}
+
 }  // namespace
 
 std::size_t StyleLayerRanks(StyleLayerKind layer, std::uint8_t profile) noexcept {
@@ -136,51 +217,52 @@ std::size_t StyleLayerRanks(StyleLayerKind layer, std::uint8_t profile) noexcept
 
 std::string EncodeStyleLayerCode(const StyleLayerCode& code) {
   const std::size_t ranks = StyleLayerRanks(code.layer, code.profile);
-  unsigned mask = 0;
-  for (std::size_t rank = 0; rank < ranks; ++rank) {
-    if (!Neutral(code.adjusts[rank])) {
-      mask |= 1U << rank;
-    }
-  }
-  std::string out(kPrefix);
+  const bool mixed = HasMixed(code);
+  std::string out(mixed ? kMixedPrefix : kPrefix);
   out += std::to_string(static_cast<unsigned>(code.layer));
   out.push_back(kSeparator);
   out += std::to_string(static_cast<unsigned>(code.profile));
   out.push_back(kSeparator);
-  AppendByte(out, (mask >> kByteBits) & kByteMask);
-  AppendByte(out, mask & kByteMask);
-  out.push_back(kSeparator);
-  for (std::size_t rank = 0; rank < ranks; ++rank) {
-    if ((mask & (1U << rank)) == 0) {
-      continue;
+  if (mixed) {
+    for (unsigned shift = kKeyBits; shift > 0; shift -= kByteBits) {
+      AppendByte(out, (code.key >> (shift - kByteBits)) & kByteMask);
     }
-    const StyleAdjust& adjust = code.adjusts[rank];
-    const auto hue = static_cast<std::uint16_t>(adjust.hue);
-    AppendByte(out, (hue >> kByteBits) & kByteMask);
-    AppendByte(out, hue & kByteMask);
-    AppendByte(out, static_cast<std::uint8_t>(adjust.saturation));
-    AppendByte(out, static_cast<std::uint8_t>(adjust.value));
-    AppendByte(out, adjust.absolute ? 1U : 0U);
+    out.push_back(kSeparator);
+  }
+  AppendAdjusts(out, code.adjusts, ranks);
+  if (!mixed) {
+    return out;
+  }
+  out.push_back(kSeparator);
+  AppendAdjusts(out, code.rest,
+                TakesRest(code.layer, code.profile) ? kStyleLayerAdjustCount : std::size_t{0});
+  out.push_back(kSeparator);
+  AppendByte(out, static_cast<unsigned>(code.retouches.size()));
+  out.push_back(kSeparator);
+  for (const StyleRetouch& retouch : code.retouches) {
+    AppendByte(out, retouch.index);
+    AppendByte(out, retouch.red);
+    AppendByte(out, retouch.green);
+    AppendByte(out, retouch.blue);
   }
   return out;
 }
 
 std::optional<StyleLayerCode> DecodeStyleLayerCode(std::string_view text) {
   text = Trimmed(text);
-  if (!text.starts_with(kPrefix)) {
+  const bool mixed = text.starts_with(kMixedPrefix);
+  if (!mixed && !text.starts_with(kPrefix)) {
     return std::nullopt;
   }
   text.remove_prefix(kPrefix.size());
   const std::optional<std::string_view> layer_field = TakeField(text);
   const std::optional<std::string_view> profile_field = TakeField(text);
-  const std::optional<std::string_view> mask_field = TakeField(text);
-  if (!layer_field || !profile_field || !mask_field || mask_field->size() != kMaskDigits) {
+  if (!layer_field || !profile_field) {
     return std::nullopt;
   }
   const std::optional<int> layer = ReadNumber(*layer_field);
   const std::optional<int> profile = ReadNumber(*profile_field);
-  const std::optional<unsigned> mask = ReadHex(*mask_field, kMaskDigits);
-  if (!layer || !profile || !mask || *profile < 0 || *profile > static_cast<int>(kByteMask)) {
+  if (!layer || !profile || *profile < 0 || *profile > static_cast<int>(kByteMask)) {
     return std::nullopt;
   }
   if (*layer < static_cast<int>(StyleLayerKind::kHead) ||
@@ -191,35 +273,62 @@ std::optional<StyleLayerCode> DecodeStyleLayerCode(std::string_view text) {
   code.layer = static_cast<StyleLayerKind>(*layer);
   code.profile = static_cast<std::uint8_t>(*profile);
   const std::size_t ranks = StyleLayerRanks(code.layer, code.profile);
-  if (ranks == 0 || (*mask >> ranks) != 0) {
+  if (ranks == 0) {
     return std::nullopt;
   }
-  for (std::size_t rank = 0; rank < ranks; ++rank) {
-    if ((*mask & (1U << rank)) == 0) {
-      continue;
-    }
-    if (text.size() < kAdjustDigits) {
+  if (mixed) {
+    const std::optional<std::string_view> key_field = TakeField(text);
+    const std::optional<unsigned> key = key_field && key_field->size() == kKeyDigits
+                                            ? ReadHex(*key_field, kKeyDigits)
+                                            : std::nullopt;
+    if (!key || code.layer == StyleLayerKind::kSkin) {
       return std::nullopt;
     }
-    const std::optional<unsigned> hue = ReadHex(text, kHueDigits);
-    const std::optional<unsigned> saturation = ReadHex(text.substr(kSaturationAt), kByteDigits);
-    const std::optional<unsigned> value = ReadHex(text.substr(kValueAt), kByteDigits);
-    const std::optional<unsigned> absolute = ReadHex(text.substr(kAbsoluteAt), kByteDigits);
-    if (!hue || !saturation || !value || !absolute || *absolute > 1) {
-      return std::nullopt;
-    }
-    StyleAdjust& adjust = code.adjusts[rank];
-    adjust.hue = static_cast<std::int16_t>(static_cast<std::uint16_t>(*hue));
-    adjust.saturation = static_cast<std::int8_t>(static_cast<std::uint8_t>(*saturation));
-    adjust.value = static_cast<std::int8_t>(static_cast<std::uint8_t>(*value));
-    adjust.absolute = *absolute == 1;
-    if (!InBounds(adjust)) {
-      return std::nullopt;
-    }
-    text.remove_prefix(kAdjustDigits);
+    code.key = *key;
   }
-  if (!text.empty()) {
+  if (!ReadAdjusts(text, code.adjusts, ranks)) {
     return std::nullopt;
+  }
+  if (!mixed) {
+    return text.empty() ? std::optional(code) : std::nullopt;
+  }
+  // Le séparateur qui clôt les réglages des pièces, puis le reste.
+  if (!text.starts_with(kSeparator)) {
+    return std::nullopt;
+  }
+  text.remove_prefix(1);
+  if (!ReadAdjusts(text, code.rest,
+                   TakesRest(code.layer, code.profile) ? kStyleLayerAdjustCount : 0) ||
+      !text.starts_with(kSeparator)) {
+    return std::nullopt;
+  }
+  text.remove_prefix(1);
+  const std::optional<std::string_view> count_field = TakeField(text);
+  const std::optional<unsigned> count = count_field && count_field->size() == kByteDigits
+                                            ? ReadHex(*count_field, kByteDigits)
+                                            : std::nullopt;
+  if (!count || *count > kStyleRetouchesMost || text.size() != *count * kRetouchDigits) {
+    return std::nullopt;
+  }
+  for (unsigned at = 0; at < *count; ++at) {
+    const std::string_view digits = text.substr(at * kRetouchDigits, kRetouchDigits);
+    const std::optional<unsigned> index = ReadHex(digits, kByteDigits);
+    const std::optional<unsigned> red = ReadHex(digits.substr(kByteDigits), kByteDigits);
+    const std::optional<unsigned> green = ReadHex(digits.substr(2 * kByteDigits), kByteDigits);
+    const std::optional<unsigned> blue = ReadHex(digits.substr(3 * kByteDigits), kByteDigits);
+    if (!index || !red || !green || !blue) {
+      return std::nullopt;
+    }
+    const StyleRetouch retouch{.index = static_cast<std::uint8_t>(*index),
+                               .red = static_cast<std::uint8_t>(*red),
+                               .green = static_cast<std::uint8_t>(*green),
+                               .blue = static_cast<std::uint8_t>(*blue)};
+    // 🔴 COMME SUR LE FIL : permises, triées, une par index.
+    if (!StyleRetouchAllowed(retouch) ||
+        (!code.retouches.empty() && code.retouches.back().index >= retouch.index)) {
+      return std::nullopt;
+    }
+    code.retouches.push_back(retouch);
   }
   return code;
 }

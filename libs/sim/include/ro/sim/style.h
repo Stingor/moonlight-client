@@ -130,6 +130,24 @@ enum class StyleLayerKind : std::uint8_t {
   kBodyMore = 5
 };
 
+// UNE RETOUCHE : la couleur exacte d'un index de la palette du calque.
+struct StyleRetouch {
+  std::uint8_t index = 0;
+  std::uint8_t red = 0;
+  std::uint8_t green = 0;
+  std::uint8_t blue = 0;
+
+  [[nodiscard]] friend bool operator==(const StyleRetouch&, const StyleRetouch&) = default;
+};
+
+// LES RETOUCHES D'UN CALQUE, au plus. C'est ce que l'octet de taille d'une
+// entrée permet : 13 octets d'en-tête et de queue, 21 réglages de 5 octets,
+// 32 retouches de 4 octets, 246 octets sur 255.
+inline constexpr std::size_t kStyleRetouchesMost = 32;
+
+// Ni l'index zéro, le transparent, ni le magenta pur.
+[[nodiscard]] bool StyleRetouchAllowed(const StyleRetouch& retouch) noexcept;
+
 // LA TEINTURE D'UN CALQUE.
 struct StyleLayerRecipe {
   StyleLayerKind layer = StyleLayerKind::kHead;
@@ -138,6 +156,11 @@ struct StyleLayerRecipe {
   // pas laisse le calque dans ses couleurs d'origine.
   std::uint8_t profile = 0;
   std::array<StyleAdjust, kStyleLayerAdjustCount> adjusts{};
+  // LE PROFIL MIXTE, propre à moonclient : un réglage par classe de teinte pour
+  // ce qu'aucune pièce ne couvre (profils 1 et 3), puis les retouches, triées
+  // par index. Un lecteur qui ne les connaît pas les enjambe.
+  std::array<StyleAdjust, kStyleLayerAdjustCount> rest{};
+  std::vector<StyleRetouch> retouches;
 };
 
 // Le plus de teintures qu'un bloc du serveur décrit pour un joueur : sa tête, sa

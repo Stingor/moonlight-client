@@ -1,8 +1,11 @@
 #pragma once
 
+#include <array>
+#include <cstdint>
 #include <optional>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include "ro/sim/style.h"
 
@@ -25,12 +28,26 @@ namespace ro::sim {
 // ⚠ À CÔTÉ DU CODE V7, ET JAMAIS À SA PLACE : le corps garde son code, que les
 // autres clients du serveur lisent. Le préfixe `L` ne peut pas commencer un
 // code v7, dont le premier champ est un nombre : les deux ne se confondent pas.
+//
+// LE PROFIL MIXTE S'ÉCRIT `L2:`, et seulement quand le calque a un reste ou des
+// retouches : `L2:<calque>:<profil>:<clé>:<masque>:<réglages>:<masque du
+// reste>:<réglages du reste>:<nombre>:<retouches>`. La clé tient sur huit
+// chiffres, le nombre sur deux, une retouche sur huit (l'index, puis rouge,
+// vert, bleu).
+//
+// 🔴 CE CODE-LÀ PORTE LA CLÉ, parce qu'une retouche désigne un index : elle ne
+// vaut que pour le sprite de cette clé. Collé ailleurs, le code n'apporte que
+// ses pièces et son reste, et l'éditeur le dit.
 
 // Ce qu'un code de calque porte.
 struct StyleLayerCode {
   StyleLayerKind layer = StyleLayerKind::kHead;
   std::uint8_t profile = 0;
   std::array<StyleAdjust, kStyleLayerAdjustCount> adjusts{};
+  // Le profil mixte. La clé vaut zéro dans un code `L1:`.
+  std::uint32_t key = 0;
+  std::array<StyleAdjust, kStyleLayerAdjustCount> rest{};
+  std::vector<StyleRetouch> retouches;
 };
 
 // Les profils qu'un code sait écrire, et les rangs que chacun emploie.

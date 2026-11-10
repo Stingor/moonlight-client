@@ -3,6 +3,18 @@
 #include <utility>
 
 namespace ro::sim {
+namespace {
+
+// Le magenta pur, qu'un lecteur prendrait pour un transparent.
+constexpr std::uint8_t kChannelFull = 255;
+
+}  // namespace
+
+bool StyleRetouchAllowed(const StyleRetouch& retouch) noexcept {
+  const bool magenta =
+      retouch.red == kChannelFull && retouch.green == 0 && retouch.blue == kChannelFull;
+  return retouch.index != 0 && !magenta;
+}
 
 const StyleRecipe* StyleVariants::For(std::uint32_t body_key) const {
   if (const auto found = by_body.find(body_key); found != by_body.end()) {

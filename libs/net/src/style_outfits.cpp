@@ -62,9 +62,43 @@ void WriteAdjust(core::ByteWriter& writer, const sim::StyleAdjust& adjust) {
   });
 }
 
+// Ce qu'une tenue trop grosse abandonne, dans l'ordre : ses retouches, puis le
+// reste de ses calques. Les pièces restent toujours.
+enum class OutfitTrim : std::uint8_t { kNothing, kRetouches, kRest };
+
+[[nodiscard]] sim::StyleOutfit Trimmed(const sim::StyleOutfit& outfit, OutfitTrim trim) {
+  sim::StyleOutfit trimmed = outfit;
+  for (sim::StyleLayerRecipe& layer : trimmed.layers) {
+    if (trim != OutfitTrim::kNothing) {
+      layer.retouches.clear();
+    }
+    if (trim == OutfitTrim::kRest) {
+      layer.rest = {};
+    }
+  }
+  return trimmed;
+}
+
+[[nodiscard]] core::Result<std::vector<std::uint8_t>> EncodeWhole(const sim::StyleOutfit& outfit);
+
 }  // namespace
 
 core::Result<std::vector<std::uint8_t>> EncodeOutfit(const sim::StyleOutfit& outfit) {
+  // 🔴 UNE TENUE TIENT DANS SON PLAFOND : trop grosse, elle perd d'abord les
+  // retouches de ses calques, puis leur reste.
+  for (const OutfitTrim trim : {OutfitTrim::kNothing, OutfitTrim::kRetouches, OutfitTrim::kRest}) {
+    core::Result<std::vector<std::uint8_t>> raw = EncodeWhole(Trimmed(outfit, trim));
+    if (!raw || raw->size() <= kOutfitBytesMost) {
+      return raw;
+    }
+  }
+  return core::Fail(core::ErrorCode::kInvalidArgument,
+                    std::format("tenue : au-delà de {} octets", kOutfitBytesMost));
+}
+
+namespace {
+
+core::Result<std::vector<std::uint8_t>> EncodeWhole(const sim::StyleOutfit& outfit) {
   if (outfit.empty() || outfit.bodies.size() > sim::kStyleBodyVariantsMost ||
       outfit.layers.size() > kOutfitEntriesMost) {
     return core::Fail(core::ErrorCode::kInvalidArgument, "tenue : nombre de corps ou d'entrées");
@@ -102,13 +136,10 @@ core::Result<std::vector<std::uint8_t>> EncodeOutfit(const sim::StyleOutfit& out
       return std::unexpected(written.error());
     }
   }
-  if (raw.size() > kOutfitBytesMost) {
-    return core::Fail(
-        core::ErrorCode::kInvalidArgument,
-        std::format("tenue : {} octets, au-delà de {}", raw.size(), kOutfitBytesMost));
-  }
   return raw;
 }
+
+}  // namespace
 
 core::Result<sim::StyleOutfit> DecodeOutfit(std::span<const std::uint8_t> raw) {
   if (raw.size() < kOutfitHead || raw.size() > kOutfitBytesMost) {
