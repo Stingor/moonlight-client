@@ -24,7 +24,6 @@ constexpr std::uint16_t kWizardJobId = 9;         // l'apparence après une évo
 constexpr std::uint16_t kHighWizardJobId = 4010;  // rené
 constexpr std::uint16_t kMageRebornLevel = 50;
 constexpr std::int32_t kMageRebornDamagePct = 5;
-constexpr std::uint16_t kMageWeaponItemId = 1601;  // Rod
 constexpr std::int32_t kMageMaxHp = 340;
 constexpr std::uint32_t kMageWalkMsPerCell = 150;
 constexpr std::int32_t kMageMagnetCells = 3;
@@ -564,23 +563,25 @@ constexpr std::array<std::uint16_t, 13> kMageSkillPool{
     kFireBoltId,   kColdBoltId,  kLightningBoltId, kSoulStrikeId, kSightId,
     kNapalmBeatId, kFireWallId,  kFrostDiverId,    kEarthSpikeId, kThunderstormId,
     kFireBallId,   kWaterBallId, kIceWallId};
-// Les douze cartes, celles des boss comprises : la réserve livrée est
+// Les seize cartes, celles des boss et de l'arme comprises : la réserve livrée est
 // entière, celle du départ neutre ; une partie libre en retire par ses Id
 // verrouillés ce que le carnet n'a pas débloqué.
-constexpr std::array<std::uint16_t, 12> kMageCardPool{
+constexpr std::array<std::uint16_t, 16> kMageCardPool{
     kHornetCardId,  kPupaCardId,      kChonchonCardId,     kPoringCardId,
     kSporeCardId,   kThiefBugCardId,  kGolemCardId,        kMasteringCardId,
-    kEclipseCardId, kDragonFlyCardId, kVagabondWolfCardId, kBaphometCardId};
+    kEclipseCardId, kDragonFlyCardId, kVagabondWolfCardId, kBaphometCardId,
+    kSmokieCardId,  kMantisCardId,    kOrcSkeletonCardId,  kNightmareCardId};
 
 constexpr ClassRule kMage{.class_id = kMageClassId,
                           .key = "mage",
                           .job_id = kMageJobId,
-                          .weapon_item_id = kMageWeaponItemId,
+                          .weapon_item_id = kRodItemId,
                           .max_hp = kMageMaxHp,
                           .walk_ms_per_cell = kMageWalkMsPerCell,
                           .magnet_units = Cells(kMageMagnetCells),
                           .damage_pct_per_level = kMageDamagePctPerLevel,
                           .damage_pct_cap = kMageDamagePctCap,
+                          .weapon_skill_id = kRodShotSkillId,
                           .starter_skills = kMageStarterSkills,
                           .skill_pool = kMageSkillPool,
                           .card_pool = kMageCardPool,
@@ -595,7 +596,7 @@ constexpr std::size_t kArcherSkillCount = kArcherPoolSkillCount + kArcherEvolved
 constexpr std::size_t kMerchantSkillCount = kMerchantPoolSkillCount + kMerchantEvolvedSkillCount;
 constexpr std::size_t kSkillCount = kPoolSkills.size() + kShippedEvolvedSkillCount +
                                     kKnightSkillCount + kThiefSkillCount + kArcherSkillCount +
-                                    kMerchantSkillCount;
+                                    kMerchantSkillCount + kWeaponSkillCount;
 
 }  // namespace
 
@@ -610,7 +611,8 @@ std::span<const ClassRule> ShippedClasses() {
 std::span<const SurvivorsSkillRule> ShippedSkills() {
   // Une table IMMUABLE, assemblée au premier appel : la réserve du Magicien,
   // ses évolués, puis les skills du Chevalier, du Voleur, de l'Archer et du
-  // Marchand, puis les homoncules du Marchand, dans cet ordre.
+  // Marchand, puis les homoncules du Marchand, puis les coups de l'arme, dans
+  // cet ordre.
   static const std::array<SurvivorsSkillRule, kSkillCount> kSkills = [] {
     std::array<SurvivorsSkillRule, kSkillCount> skills{};
     const std::span<const SurvivorsSkillRule> evolved = ShippedEvolvedSkills();
@@ -619,6 +621,7 @@ std::span<const SurvivorsSkillRule> ShippedSkills() {
     const std::span<const SurvivorsSkillRule> archer = ArcherSkills();
     const std::span<const SurvivorsSkillRule> merchant = MerchantSkills();
     const std::span<const SurvivorsSkillRule> homunculi = HomunculusSkills();
+    const std::span<const SurvivorsSkillRule> weapons = WeaponSkills();
     auto out = std::copy(kPoolSkills.begin(), kPoolSkills.end(), skills.begin());
     out = std::copy_n(evolved.begin(), std::min(evolved.size(), kShippedEvolvedSkillCount), out);
     out = std::copy_n(knight.begin(), std::min(knight.size(), kKnightSkillCount), out);
@@ -626,7 +629,8 @@ std::span<const SurvivorsSkillRule> ShippedSkills() {
     out = std::copy_n(archer.begin(), std::min(archer.size(), kArcherSkillCount), out);
     out = std::copy_n(merchant.begin(),
                       std::min(merchant.size(), kMerchantSkillCount - kHomunculusSkillCount), out);
-    std::copy_n(homunculi.begin(), std::min(homunculi.size(), kHomunculusSkillCount), out);
+    out = std::copy_n(homunculi.begin(), std::min(homunculi.size(), kHomunculusSkillCount), out);
+    std::copy_n(weapons.begin(), std::min(weapons.size(), kWeaponSkillCount), out);
     return skills;
   }();
   return kSkills;
@@ -634,20 +638,23 @@ std::span<const SurvivorsSkillRule> ShippedSkills() {
 
 std::span<const CardRule> ShippedCards() {
   // Une table IMMUABLE, assemblée au premier appel : les cartes du Magicien,
-  // puis celles du Chevalier, du Voleur, de l'Archer et du Marchand.
-  constexpr std::size_t kAllCount =
-      kCards.size() + kKnightCardCount + kThiefCardCount + kArcherCardCount + kMerchantCardCount;
+  // puis celles du Chevalier, du Voleur, de l'Archer et du Marchand, puis
+  // celles de l'arme.
+  constexpr std::size_t kAllCount = kCards.size() + kKnightCardCount + kThiefCardCount +
+                                    kArcherCardCount + kMerchantCardCount + kWeaponCardCount;
   static const std::array<CardRule, kAllCount> kAllCards = [] {
     std::array<CardRule, kAllCount> cards{};
     const std::span<const CardRule> knight = KnightCards();
     const std::span<const CardRule> thief = ThiefCards();
     const std::span<const CardRule> archer = ArcherCards();
     const std::span<const CardRule> merchant = MerchantCards();
+    const std::span<const CardRule> weapon = WeaponCards();
     auto out = std::copy(kCards.begin(), kCards.end(), cards.begin());
     out = std::copy_n(knight.begin(), std::min(knight.size(), kKnightCardCount), out);
     out = std::copy_n(thief.begin(), std::min(thief.size(), kThiefCardCount), out);
     out = std::copy_n(archer.begin(), std::min(archer.size(), kArcherCardCount), out);
-    std::copy_n(merchant.begin(), std::min(merchant.size(), kMerchantCardCount), out);
+    out = std::copy_n(merchant.begin(), std::min(merchant.size(), kMerchantCardCount), out);
+    std::copy_n(weapon.begin(), std::min(weapon.size(), kWeaponCardCount), out);
     return cards;
   }();
   return kAllCards;

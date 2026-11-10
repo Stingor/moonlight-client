@@ -224,8 +224,11 @@ class HordePoses {
   std::vector<FallingBody> falling_;
   std::vector<HordePose> poses_;
   float camera_yaw_degrees_ = 0.0F;
-  // Le début du dernier geste de chaque héros, s'il en a fait un.
+  // Le début du dernier geste de chaque héros, s'il en a fait un, et s'il ne
+  // lançait que le coup de son arme : un coup d'arme se fait du geste
+  // d'attaque, quelle que soit la classe.
   std::array<std::optional<std::uint64_t>, ro::sim::kMostHeroes> gesture_started_ms_;
+  std::array<bool, ro::sim::kMostHeroes> gesture_weapon_only_ = {};
 };
 
 }  // namespace moonclient

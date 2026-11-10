@@ -146,6 +146,7 @@ void HordePoses::Reset() {
   poses_.clear();
   summon_strikes_.clear();
   gesture_started_ms_ = {};
+  gesture_weapon_only_ = {};
 }
 
 void HordePoses::NoticeHits(std::span<const ro::sim::SurvivorsHit> hits) {
@@ -177,11 +178,19 @@ void HordePoses::NoticeCasts(std::span<const ro::sim::SurvivorsCast> casts,
     std::optional<std::uint64_t>& started_ms = gesture_started_ms_[index];
     if (started_ms.has_value() && presentation_ms < *started_ms + kHeroGestureEveryMs) continue;
     // Une orbite qui se replie et une zone qui s'éteint ne sont pas des lancers.
-    const bool launched = std::ranges::any_of(casts, [index](const ro::sim::SurvivorsCast& cast) {
+    const auto launches = [index](const ro::sim::SurvivorsCast& cast) {
       return cast.hero_index == index && cast.kind != ro::sim::CastKind::kOrbitOff &&
              cast.kind != ro::sim::CastKind::kZoneOff;
-    });
-    if (launched) started_ms = presentation_ms;
+    };
+    if (!std::ranges::any_of(casts, launches)) continue;
+    started_ms = presentation_ms;
+    gesture_weapon_only_[index] =
+        field.rules != nullptr &&
+        std::ranges::all_of(casts, [&](const ro::sim::SurvivorsCast& cast) {
+          if (!launches(cast)) return true;
+          const ro::sim::SurvivorsSkillRule* rule = ro::sim::FindSkill(*field.rules, cast.skill_id);
+          return rule != nullptr && ro::sim::IsWeaponSkill(*rule);
+        });
   }
 }
 
@@ -192,7 +201,8 @@ void HordePoses::PoseGesture(HordePose& pose, const ro::sim::SurvivorsField& fie
     return;
   }
   const ro::sim::ClassRule* hero_class = ro::sim::ClassAt(field, hero_index);
-  const bool strikes = hero_class != nullptr && hero_class->attack_gesture;
+  const bool strikes =
+      gesture_weapon_only_[hero_index] || (hero_class != nullptr && hero_class->attack_gesture);
   const float gesture_ms = ElapsedSince(presentation_ms, *gesture_started_ms_[hero_index]);
   const float attack_ms = times_of(HordeBodyKind::kHero, pose.look_id).attack_ms;
   if (strikes && gesture_ms < attack_ms) {

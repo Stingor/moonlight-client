@@ -19,11 +19,9 @@ namespace {
 // évolution, et Sniper à sa renaissance.
 
 constexpr std::uint16_t kArcherClassId = 4;
-constexpr std::uint16_t kArcherJobId = 3;            // l'apparence du départ
-constexpr std::uint16_t kHunterJobId = 11;           // après une évolution
-constexpr std::uint16_t kSniperJobId = 4012;         // rené
-constexpr std::uint16_t kArcherWeaponItemId = 1701;  // Bow
-constexpr std::uint16_t kHunterWeaponItemId = 1718;  // Hunter Bow
+constexpr std::uint16_t kArcherJobId = 3;     // l'apparence du départ
+constexpr std::uint16_t kHunterJobId = 11;    // après une évolution
+constexpr std::uint16_t kSniperJobId = 4012;  // rené
 constexpr std::int32_t kArcherMaxHp = 350;
 constexpr std::uint32_t kArcherWalkMsPerCell = 145;
 constexpr std::int32_t kArcherMagnetTenths = 30;
@@ -496,10 +494,11 @@ constexpr std::array<CardRule, kArcherCardCount> kArcherCards{{
 
 // Les cartes du Magicien qui n'ouvrent rien chez lui, puis les siennes, qu'il
 // prête à ses coéquipiers.
-constexpr std::array<std::uint16_t, 12> kArcherCardPool{
-    kArcherSkeletonCardId, kPupaCardId,     kYoyoCardId,   kPoringCardId,
-    kHunterFlyCardId,      kThiefBugCardId, kGolemCardId,  kMasteringCardId,
-    kRockerCardId,         kPhreeoniCardId, kWillowCardId, kBaphometCardId};
+constexpr std::array<std::uint16_t, 16> kArcherCardPool{
+    kArcherSkeletonCardId, kPupaCardId,     kYoyoCardId,        kPoringCardId,
+    kHunterFlyCardId,      kThiefBugCardId, kGolemCardId,       kMasteringCardId,
+    kRockerCardId,         kPhreeoniCardId, kWillowCardId,      kBaphometCardId,
+    kSmokieCardId,         kMantisCardId,   kOrcSkeletonCardId, kNightmareCardId};
 constexpr std::array<std::uint16_t, kArcherCardCount> kArcherLentCards{
     kArcherSkeletonCardId, kHunterFlyCardId, kPhreeoniCardId,
     kWillowCardId,         kRockerCardId,    kYoyoCardId};
@@ -507,17 +506,18 @@ constexpr std::array<std::uint16_t, kArcherCardCount> kArcherLentCards{
 constexpr ClassRule kArcher{.class_id = kArcherClassId,
                             .key = "archer",
                             .job_id = kArcherJobId,
-                            .weapon_item_id = kArcherWeaponItemId,
+                            .weapon_item_id = kBowItemId,
                             .max_hp = kArcherMaxHp,
                             .walk_ms_per_cell = kArcherWalkMsPerCell,
                             .magnet_units = CellTenths(kArcherMagnetTenths),
                             .damage_pct_per_level = kArcherDamagePctPerLevel,
                             .damage_pct_cap = kArcherDamagePctCap,
+                            .weapon_skill_id = kBowShotSkillId,
                             .starter_skills = kArcherStarterSkills,
                             .skill_pool = kArcherSkillPool,
                             .card_pool = kArcherCardPool,
                             .evolved_job_id = kHunterJobId,
-                            .evolved_weapon_item_id = kHunterWeaponItemId,
+                            .evolved_weapon_item_id = kHunterBowItemId,
                             .attack_gesture = true,
                             .reborn_level = kArcherRebornLevel,
                             .reborn_job_id = kSniperJobId,

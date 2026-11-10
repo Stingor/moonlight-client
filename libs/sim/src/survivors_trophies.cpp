@@ -142,13 +142,19 @@ void RememberEvolved(MinigameRecord& record, const SurvivorsField& field) {
   });
 }
 
-// Chaque skill possédé est de l'élément Fire, et il y en a au moins un.
+// Chaque skill possédé est de l'élément Fire, et il y en a au moins un. Le coup
+// de l'arme, que tout héros porte sans l'avoir choisi, ne compte pas.
 [[nodiscard]] bool OnlyFireSkills(const SurvivorsField& field) {
-  if (field.rules == nullptr || field.hero.skills.empty()) return false;
-  return std::ranges::all_of(field.hero.skills, [&field](const OwnedSkill& owned) {
+  if (field.rules == nullptr) return false;
+  bool any_fire = false;
+  for (const OwnedSkill& owned : field.hero.skills) {
     const SurvivorsSkillRule* rule = FindSkill(*field.rules, owned.skill_id);
-    return rule != nullptr && rule->element == SurvivorsElement::kFire;
-  });
+    if (rule == nullptr) return false;
+    if (IsWeaponSkill(*rule)) continue;
+    if (rule->element != SurvivorsElement::kFire) return false;
+    any_fire = true;
+  }
+  return any_fire;
 }
 
 }  // namespace

@@ -447,12 +447,17 @@ SurvivorsAnswer SurvivorsBot::Choose(const SurvivorsField& field) const {
   return answer;
 }
 
+// LES CARTES DU COUP DE L'ARME (Mantis, Orc Skeleton, Nightmare) et Smokie, que
+// toutes les classes tirent, ferment chaque ordre de cartes : le robot garde ses
+// préférences, et ne les prend qu'en dernier.
+
 const SurvivorsBotProfile& MageBotProfile() {
   // Les skills et les cartes dans l'ordre de préférence du Magicien (robot).
   static constexpr std::array<std::uint16_t, 13> kSkillOrder{19, 13, 10, 11, 18, 15, 14,
                                                              20, 90, 21, 86, 17, 87};
-  static constexpr std::array<std::uint16_t, 12> kCardOrder{4019, 4072, 4003, 4197, 4009, 4022,
-                                                            4266, 4179, 4183, 4147, 4016, 4001};
+  static constexpr std::array<std::uint16_t, 16> kCardOrder{4019, 4072, 4003, 4197, 4009, 4022,
+                                                            4266, 4179, 4183, 4147, 4016, 4001,
+                                                            4079, 4085, 4127, 4044};
   static const SurvivorsBotProfile kProfile{.skill_order = kSkillOrder,
                                             .card_order = kCardOrder,
                                             .threat_radius_units = Cells(8),
@@ -472,8 +477,9 @@ const SurvivorsBotProfile& KnightBotProfile() {
   // Les cartes qui ouvrent les évolutions de ces skills d'abord : les
   // emplacements sont comptés, et une carte prise tard n'y trouverait plus de
   // place.
-  static constexpr std::array<std::uint16_t, 12> kCardOrder{4072, 4019, 4179, 4003, 4183, 4031,
-                                                            4022, 4266, 4197, 4147, 4016, 4001};
+  static constexpr std::array<std::uint16_t, 16> kCardOrder{4072, 4019, 4179, 4003, 4183, 4031,
+                                                            4022, 4266, 4197, 4147, 4016, 4001,
+                                                            4079, 4085, 4127, 4044};
   static const SurvivorsBotProfile kProfile{.skill_order = kSkillOrder,
                                             .card_order = kCardOrder,
                                             .threat_radius_units = Cells(3),
@@ -494,8 +500,9 @@ const SurvivorsBotProfile& ThiefBotProfile() {
                                                              138, 51, 137, 152, 49};
   // L'esquive d'abord : c'est elle qui le fait tenir devant le boss final. Puis les
   // cartes qui ouvrent les évolutions de ces skills, puis le critique.
-  static constexpr std::array<std::uint16_t, 14> kCardOrder{
-      4102, 4019, 4022, 4183, 4266, 4072, 4044, 4003, 4009, 4197, 4179, 4147, 4016, 4001};
+  static constexpr std::array<std::uint16_t, 17> kCardOrder{4102, 4019, 4022, 4183, 4266, 4072,
+                                                            4044, 4003, 4009, 4197, 4179, 4147,
+                                                            4016, 4001, 4079, 4085, 4127};
   static const SurvivorsBotProfile kProfile{.skill_order = kSkillOrder,
                                             .card_order = kCardOrder,
                                             .threat_radius_units = Cells(4),
@@ -515,8 +522,9 @@ const SurvivorsBotProfile& ArcherBotProfile() {
   static constexpr std::array<std::uint16_t, 9> kSkillOrder{46,  47,  148, 129, 117,
                                                             115, 116, 45,  121};
   // Les cartes qui ouvrent ses évolutions d'abord, la relève de Phreeoni en tête.
-  static constexpr std::array<std::uint16_t, 12> kCardOrder{4121, 4094, 4115, 4051, 4021, 4010,
-                                                            4072, 4003, 4197, 4147, 4016, 4001};
+  static constexpr std::array<std::uint16_t, 16> kCardOrder{4121, 4094, 4115, 4051, 4021, 4010,
+                                                            4072, 4003, 4197, 4147, 4016, 4001,
+                                                            4079, 4085, 4127, 4044};
   static const SurvivorsBotProfile kProfile{.skill_order = kSkillOrder,
                                             .card_order = kCardOrder,
                                             .threat_radius_units = Cells(7),
@@ -536,8 +544,9 @@ const SurvivorsBotProfile& MerchantBotProfile() {
                                                              233, 155, 236,  8013, 8001, 8005};
   // La carte des homoncules et celle des plantes d'abord, puis celles qui
   // ouvrent ses autres évolutions.
-  static constexpr std::array<std::uint16_t, 12> kCardOrder{4216, 4293, 4043, 4196, 4036, 4417,
-                                                            4072, 4003, 4197, 4147, 4016, 4001};
+  static constexpr std::array<std::uint16_t, 16> kCardOrder{4216, 4293, 4043, 4196, 4036, 4417,
+                                                            4072, 4003, 4197, 4147, 4016, 4001,
+                                                            4079, 4085, 4127, 4044};
   static const SurvivorsBotProfile kProfile{.skill_order = kSkillOrder,
                                             .card_order = kCardOrder,
                                             .threat_radius_units = Cells(4),

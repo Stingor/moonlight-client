@@ -15,6 +15,7 @@
 
 #include "survivors_space.h"
 #include "survivors_systems.h"
+#include "survivors_weapon.h"
 
 namespace ro::sim {
 
@@ -349,6 +350,7 @@ core::Result<SurvivorsRun> SurvivorsRun::Start(const SurvivorsRules& rules, Surv
   field.hero.position = CellCenter(start_cell->x, start_cell->y);
   field.hero.previous_position = field.hero.position;
   field.hero.skills.push_back(OwnedSkill{.skill_id = start.first_skill_id, .level = 1});
+  survivors::ArmHero(rules, *hero_class, field.hero);
   field.rerolls_left = start.loadout.rerolls;
   field.skips_left = start.loadout.skips;
   field.banishes_left = start.loadout.banishes;
@@ -366,6 +368,7 @@ core::Result<SurvivorsRun> SurvivorsRun::Start(const SurvivorsRules& rules, Surv
       kit.lives_left = ally.lives;
       kit.start = ally;
       kit.hero.skills.push_back(OwnedSkill{.skill_id = ally.first_skill_id, .level = 1});
+      if (kit.hero_class != nullptr) survivors::ArmHero(rules, *kit.hero_class, kit.hero);
       std::optional<CellPosition> cell;
       for (std::int32_t ring = 1; ring <= kStartSearchRings * rules.tuning.spawn_search_ring;
            ++ring) {

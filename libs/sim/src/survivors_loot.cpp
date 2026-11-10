@@ -15,6 +15,7 @@
 #include "survivors_space.h"
 #include "survivors_systems.h"
 #include "survivors_volley.h"
+#include "survivors_weapon.h"
 
 namespace ro::sim::survivors {
 
@@ -147,6 +148,7 @@ std::optional<std::size_t> Evolve(SurvivorsField& field, std::size_t slot,
                      .phase_step = field.step + 1};
   CountOne(field.hero.evolutions);
   CountOne(field.tally.evolutions);
+  RaiseWeapon(field);
   if (field.news.evolutions.size() < kMostNewsEvolutions) {
     field.news.evolutions.push_back(
         SurvivorsEvolutionNews{.slot = static_cast<std::uint8_t>(slot),
@@ -181,7 +183,8 @@ void GrowthCandidates(const SurvivorsField& field, std::vector<Growth>& candidat
   for (std::size_t slot = 0; slot < hero.skills.size(); ++slot) {
     const OwnedSkill& owned = hero.skills[slot];
     const SurvivorsSkillRule* rule = FindSkill(rules, owned.skill_id);
-    if (rule == nullptr || Banished(field, owned.skill_id)) continue;
+    // Le coup de l'arme ne monte qu'à l'évolution.
+    if (rule == nullptr || IsWeaponSkill(*rule) || Banished(field, owned.skill_id)) continue;
     if (std::size_t{owned.level} < rule->levels.size()) candidates.push_back({false, slot});
   }
   for (std::size_t index = 0; index < hero.cards.size(); ++index) {

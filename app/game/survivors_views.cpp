@@ -263,10 +263,15 @@ void SurvivorsViews::ComposeHud(const SurvivorsField& field, const ro::sim::Surv
   skill_slots_.clear();
   for (const ro::sim::OwnedSkill& skill : field.hero.skills) {
     const ro::sim::SurvivorsSkillRule* rule = ro::sim::FindSkill(rules, skill.skill_id);
-    skill_slots_.push_back({.icon = SurvivorsSkillIcon(skill.skill_id, tables),
+    // Le coup de l'arme se montre par l'arme que le héros tient : son icône et
+    // son nom d'objet.
+    const std::uint16_t weapon_item = rule != nullptr ? WeaponItemShown(*rule, field.hero) : 0;
+    skill_slots_.push_back({.icon = weapon_item != 0 ? SurvivorsItemIcon(weapon_item, tables)
+                                                     : SurvivorsSkillIcon(skill.skill_id, tables),
                             .level = skill.level,
                             .active = field.step < skill.stance_until_step,
-                            .name = SkillName(skill.skill_id, tables),
+                            .name = weapon_item != 0 ? CardName(weapon_item, tables)
+                                                     : SkillName(skill.skill_id, tables),
                             .description = rule != nullptr ? rule->description : ""});
   }
   card_slots_.clear();

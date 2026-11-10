@@ -105,7 +105,7 @@ void PutClass(FnvDigest& digest, const ClassRule& rule) {
   PutAll(digest, rule.class_id, rule.max_hp, rule.walk_ms_per_cell, rule.magnet_units,
          rule.damage_pct_per_level, rule.damage_pct_cap, rule.mount_card_item_id, rule.reborn_level,
          rule.reborn_damage_pct, rule.attack_gesture, rule.final_boss_hp_bonus_pct,
-         rule.free_play_only);
+         rule.free_play_only, rule.weapon_skill_id);
   PutNumbers(digest, rule.starter_skills);
   PutNumbers(digest, rule.skill_pool);
   PutNumbers(digest, rule.card_pool);
@@ -194,6 +194,7 @@ std::uint64_t SurvivorsRulesDigest(const SurvivorsRules& rules) {
     PutAll(digest, rule.skill_id, rule.archetype, rule.target, rule.element, rule.stance_stat,
            rule.cone_behind, rule.exclusive_group);
     PutEach(digest, rule.levels, [&](const SkillLevel& level) { PutSkillLevel(digest, level); });
+    PutNumbers(digest, rule.weapon_item_ids);
   });
   PutEach(digest, rules.cards, [&](const CardRule& rule) {
     PutAll(digest, rule.card_item_id, rule.stat);

@@ -18,7 +18,7 @@ namespace ro::sim {
 // LES RÈGLES DU MODE SURVIVORS : des données, injectées dans une partie.
 // Si l'essai de rejeu en or change, montez kSurvivorsRulesetVersion : un journal
 // ne se rejoue que contre la version de règles qui l'a produit.
-inline constexpr std::uint16_t kSurvivorsRulesetVersion = 5;
+inline constexpr std::uint16_t kSurvivorsRulesetVersion = 6;
 inline constexpr std::size_t kMostSkillLevels = 8;
 inline constexpr std::size_t kMostCardLevels = 5;
 inline constexpr std::uint8_t kMostOffers = 4;
@@ -26,8 +26,9 @@ inline constexpr std::uint8_t kMostOffers = 4;
 inline constexpr std::size_t kMostHeroes = 4;
 inline constexpr std::int32_t kMostArenaSideCells = 512;
 // Les emplacements de skill qu'un monstre suit un à un (`rehit_ready_step`) :
-// CheckSurvivorsRules refuse un `caps.skill_slots` plus grand.
-inline constexpr std::size_t kMostSkillSlots = 6;
+// CheckSurvivorsRules refuse un `caps.skill_slots` plus grand. Le coup de
+// l'arme en occupe un, le premier.
+inline constexpr std::size_t kMostSkillSlots = 7;
 // Les monstres qu'un tir retient avoir touchés (`hit_serials`), pour n'en
 // toucher aucun deux fois : CheckSurvivorsRules refuse un niveau dont
 // `pierce + 1` dépasse ce compte.
@@ -127,12 +128,31 @@ enum class SurvivorsStat : std::uint8_t {
   kFreezeRiposteChancePct,
   // Les dégâts en plus, en %, des coups des invocations.
   kSummonDamagePct,
+  // LES STATISTIQUES DU COUP DE L'ARME (IsWeaponSkill), et de lui seul : sa
+  // recharge raccourcie, en %, sous le plafond `most_cooldown_pct` du réglage ;
+  // les monstres en plus qu'il traverse ; la chance, en %, qu'un de ses coups
+  // rebondisse sur un monstre proche.
+  kWeaponDelayCutPct,
+  kWeaponPierce,
+  kWeaponSplitChancePct,
 };
-inline constexpr std::size_t kSurvivorsStatCount = 21;
-static_assert(static_cast<std::size_t>(SurvivorsStat::kSummonDamagePct) + 1 == kSurvivorsStatCount);
+inline constexpr std::size_t kSurvivorsStatCount = 24;
+static_assert(static_cast<std::size_t>(SurvivorsStat::kWeaponSplitChancePct) + 1 ==
+              kSurvivorsStatCount);
 // Une chance se tire sur 100. CheckSurvivorsRules refuse une carte qui en sortirait, une
 // posture qui la majorerait, et des cartes d'esquive qui rendraient un héros intouchable.
 inline constexpr std::int32_t kWholeChancePct = 100;
+// LE REBOND DU COUP DE L'ARME : sur le monstre le plus proche du touché, à
+// kWeaponSplitReachCells cases au plus, pour kWeaponSplitDamagePct % des
+// dégâts de base ; un seul saut par coup.
+inline constexpr std::int32_t kWeaponSplitReachCells = 3;
+inline constexpr std::int32_t kWeaponSplitDamagePct = 60;
+// LA PERFORATION D'UNE FRAPPE de l'arme : chaque monstre traversé en plus est
+// frappé aussi, parmi les plus proches de la cible, à cette distance d'elle.
+inline constexpr std::int32_t kWeaponCleaveReachCells = 1;
+// Celle d'un cône de l'arme le fait porter d'autant de cases plus loin par
+// monstre en plus ; celle d'un éclat élargit son rayon d'autant de dixièmes.
+inline constexpr std::int32_t kWeaponSpreadTenths = 5;
 // Le vol de vie d'une carte, et les relèves qu'elle donne, au plus.
 inline constexpr std::int32_t kMostLifeStealPct = 25;
 inline constexpr std::int32_t kMostCardLives = 3;
@@ -227,7 +247,24 @@ struct SurvivorsSkillRule {
   // LE GROUPE EXCLUSIF : un héros n'en tient qu'un skill ; dès qu'il en tient
   // un, les offres ne proposent plus les autres. 0 : aucun groupe.
   std::uint8_t exclusive_group = 0;
+  // LE COUP DE L'ARME : l'objet RO de chaque niveau, niveau 1 en tête, aussi
+  // long que `levels`. Non vide, le skill est le coup de l'arme d'une classe :
+  // donné au départ au premier emplacement, jamais offert, il prend son niveau
+  // 2 à la première évolution du héros. Son nom et son icône sont ceux de
+  // l'objet, côté app.
+  std::span<const std::uint16_t> weapon_item_ids;
 };
+
+// Vrai pour le coup de l'arme d'une classe.
+[[nodiscard]] constexpr bool IsWeaponSkill(const SurvivorsSkillRule& rule) noexcept {
+  return !rule.weapon_item_ids.empty();
+}
+// Vrai pour un skill qui frappe de loin (IsRangedArchetype) : l'éclat d'une
+// arme, hache ou marteau, frappe au contact.
+[[nodiscard]] constexpr bool IsRangedSkill(const SurvivorsSkillRule& rule) noexcept {
+  if (IsWeaponSkill(rule) && rule.archetype == SkillArchetype::kClusterBlast) return false;
+  return IsRangedArchetype(rule.archetype);
+}
 
 struct CardRule {
   std::uint16_t card_item_id = 0;  // identifiant d'objet RO : nom, icône, illustration côté app
@@ -313,6 +350,9 @@ struct ClassRule {
   std::int32_t magnet_units = 0;
   std::int32_t damage_pct_per_level = 0;
   std::int32_t damage_pct_cap = 0;
+  // Le coup de l'arme (IsWeaponSkill), que tout héros de la classe porte ; 0 :
+  // aucun. Toute classe livrée en a un.
+  std::uint16_t weapon_skill_id = 0;
   std::span<const std::uint16_t> starter_skills;
   std::span<const std::uint16_t> skill_pool;
   std::span<const std::uint16_t> card_pool;

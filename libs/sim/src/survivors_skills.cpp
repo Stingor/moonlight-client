@@ -14,6 +14,7 @@
 #include "survivors_space.h"
 #include "survivors_systems.h"
 #include "survivors_volley.h"
+#include "survivors_weapon.h"
 
 namespace ro::sim::survivors {
 
@@ -482,8 +483,12 @@ void FireSkills(SurvivorsField& field) {
     const OwnedSkill& owned = field.hero.skills[index];
     const SurvivorsSkillRule* rule = FindSkill(*field.rules, owned.skill_id);
     if (rule == nullptr) continue;
-    const SkillLevel* level = LevelOf(*rule, owned);
-    if (level == nullptr || level->amount == 0) continue;
+    const SkillLevel* rule_level = LevelOf(*rule, owned);
+    if (rule_level == nullptr || rule_level->amount == 0) continue;
+    // Le coup de l'arme joue ce que ses cartes lui ajoutent.
+    const bool weapon = IsWeaponSkill(*rule);
+    const SkillLevel played = weapon ? WeaponLevelOf(field, *rule, *rule_level) : *rule_level;
+    const SkillLevel* level = &played;
     // Un réflexe part d'un coup reçu ; une posture se tient même sans frapper.
     if (rule->archetype == SkillArchetype::kReflex) continue;
     if (rule->archetype == SkillArchetype::kStance) {
@@ -541,7 +546,10 @@ void FireSkills(SurvivorsField& field) {
         break;
     }
     // Sans salve, le skill attend : il tire au premier pas où il le peut.
-    if (fired) field.hero.skills[index].ready_step = ReadyAfter(field, *level);
+    if (fired) {
+      field.hero.skills[index].ready_step =
+          weapon ? WeaponReadyAfter(field, *level) : ReadyAfter(field, *level);
+    }
   }
 }
 
@@ -562,6 +570,7 @@ void LandStrikes(SurvivorsField& field) {
             strike.skill_id, StrikeStatus(field, strike, *foe));
     Chill(field, *foe, strike.chill_ms);
     Bounce(field, strike, *foe);
+    SplitWeaponHit(field, strike.skill_id, strike.base_damage, strike.element, *foe);
   }
   std::erase_if(field.strikes,
                 [&](const SurvivorsStrike& strike) { return strike.land_step <= field.step; });
@@ -598,7 +607,7 @@ void HurtFoe(SurvivorsField& field, SurvivorsFoe& foe, SurvivorsDamage damage,
   const std::int32_t ranged_pct = field.hero.stats.Of(SurvivorsStat::kRangedDamagePct);
   if (ranged_pct != 0 && damage.amount > 0) {
     const SurvivorsSkillRule* rule = FindSkill(*field.rules, skill_id);
-    if (rule != nullptr && IsRangedArchetype(rule->archetype)) {
+    if (rule != nullptr && IsRangedSkill(*rule)) {
       damage.amount = std::max(ScaledUnits(damage.amount, ranged_pct), 1);
     }
   }

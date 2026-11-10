@@ -29,7 +29,7 @@ constexpr SurvivorsCaps kShippedCaps{
     .most_shots = 256,
     .most_strikes = 512,
     .most_gems = 400,
-    .skill_slots = 6,
+    .skill_slots = 7,
     .card_slots = 6,
     .offers = 3,
 };

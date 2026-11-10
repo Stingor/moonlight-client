@@ -190,7 +190,10 @@ class SurvivorsMode {
   // puis attend que le héros le rejoigne. Voir `survivors_meeting.h`.
   void PoseMeeting(const SurvivorsStage& stage, const SurvivorsContext& context);
   void FollowMeeting(const SurvivorsStage& stage, const SurvivorsContext& context);
-  void PlaySounds(const ro::sim::SurvivorsNews& news, const SurvivorsContext& context);
+  // `field` : la partie en cours, dont le héros dit l'arme d'un coup de l'arme ;
+  // nulle, il sonne de l'arme du départ.
+  void PlaySounds(const ro::sim::SurvivorsNews& news, const ro::sim::SurvivorsField* field,
+                  const SurvivorsContext& context);
   void PlaySound(std::string_view name, ArenaSoundRank rank, const SurvivorsContext& context);
   void FollowMusic(const SurvivorsStage& stage, const SurvivorsContext& context);
   void LogMeasures() const;

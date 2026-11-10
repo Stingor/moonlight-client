@@ -156,6 +156,12 @@ ro::ui::SurvivorsEffectFigure FigureOfStat(ro::sim::SurvivorsStat stat) noexcept
       return Figure::kFreezeRiposteChancePct;
     case ro::sim::SurvivorsStat::kSummonDamagePct:
       return Figure::kSummonDamagePct;
+    case ro::sim::SurvivorsStat::kWeaponDelayCutPct:
+      return Figure::kWeaponDelayCutPct;
+    case ro::sim::SurvivorsStat::kWeaponPierce:
+      return Figure::kWeaponPierce;
+    case ro::sim::SurvivorsStat::kWeaponSplitChancePct:
+      return Figure::kWeaponSplitChancePct;
   }
   return Figure::kDamagePct;
 }

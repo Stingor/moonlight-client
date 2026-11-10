@@ -73,6 +73,38 @@ template <typename Rule, typename IdOf>
   return {};
 }
 
+// LE COUP DE L'ARME d'une classe, si elle en a un : un skill d'arme, hors de
+// ses offres, un objet par niveau, dont le premier est l'arme du départ et le
+// second, s'il existe, celle de l'évolution.
+[[nodiscard]] core::Result<void> CheckWeapon(const SurvivorsRules& rules,
+                                             const ClassRule& hero_class,
+                                             const std::string& named) {
+  if (hero_class.weapon_skill_id == 0) return {};
+  const SurvivorsSkillRule* weapon = FindSkill(rules, hero_class.weapon_skill_id);
+  if (weapon == nullptr || !IsWeaponSkill(*weapon)) {
+    return Refuse(named + "sans coup de l'arme (" + std::to_string(hero_class.weapon_skill_id) +
+                  ")");
+  }
+  if (Contains(hero_class.skill_pool, weapon->skill_id)) {
+    return Refuse(named + "coup de l'arme " + std::to_string(weapon->skill_id) +
+                  " dans la réserve de skills");
+  }
+  if (weapon->weapon_item_ids.size() != weapon->levels.size()) {
+    return Refuse(named + std::to_string(weapon->weapon_item_ids.size()) + " armes pour " +
+                  std::to_string(weapon->levels.size()) + " niveaux du coup de l'arme");
+  }
+  const std::uint16_t evolved_item = hero_class.evolved_weapon_item_id != 0
+                                         ? hero_class.evolved_weapon_item_id
+                                         : hero_class.weapon_item_id;
+  const bool starts_right = weapon->weapon_item_ids.front() == hero_class.weapon_item_id;
+  const bool evolves_right =
+      weapon->weapon_item_ids.size() < 2 || weapon->weapon_item_ids[1] == evolved_item;
+  if (!starts_right || !evolves_right) {
+    return Refuse(named + "le coup de l'arme ne porte pas les armes de la classe");
+  }
+  return {};
+}
+
 // Les réserves et les skills de départ de chaque classe.
 [[nodiscard]] core::Result<void> CheckClasses(const SurvivorsRules& rules) {
   for (const ClassRule& hero_class : rules.classes) {
@@ -152,6 +184,7 @@ template <typename Rule, typename IdOf>
                       " hors de la réserve");
       }
     }
+    if (auto checked = CheckWeapon(rules, hero_class, named); !checked) return checked;
   }
   return {};
 }
@@ -200,7 +233,8 @@ template <typename Rule, typename IdOf>
 
 [[nodiscard]] bool IsChanceStat(SurvivorsStat stat) noexcept {
   return stat == SurvivorsStat::kCritPct || stat == SurvivorsStat::kDodgePct ||
-         stat == SurvivorsStat::kFreezeRiposteChancePct;
+         stat == SurvivorsStat::kFreezeRiposteChancePct ||
+         stat == SurvivorsStat::kWeaponSplitChancePct;
 }
 
 // LES STATISTIQUES QUI NE SE RETRANCHENT PAS : une carte les porte de 0 à
@@ -209,6 +243,10 @@ template <typename Rule, typename IdOf>
 [[nodiscard]] std::optional<std::int32_t> MostCardValue(SurvivorsStat stat) noexcept {
   if (stat == SurvivorsStat::kLifeStealPct) return kMostLifeStealPct;
   if (stat == SurvivorsStat::kExtraLives) return kMostCardLives;
+  // Un tir retient chaque monstre touché : sa perforation tient dans sa mémoire.
+  if (stat == SurvivorsStat::kWeaponPierce) return static_cast<std::int32_t>(kMostShotHits - 1);
+  // Une recharge ne se raccourcit pas de plus que toute sa durée.
+  if (stat == SurvivorsStat::kWeaponDelayCutPct) return kWholeChancePct;
   if (stat == SurvivorsStat::kRangedDamagePct || stat == SurvivorsStat::kSproutPct ||
       stat == SurvivorsStat::kZenyPct || stat == SurvivorsStat::kSummonDamagePct) {
     return kMostStatBonus;

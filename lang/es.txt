@@ -23502,3 +23502,36 @@ tr: Un color para todo el pelo
 
 fr: Une teinture d'item se valide auprès du styliste.
 tr: Un tinte de item se valida con el estilista.
+
+fr: Votre baguette tire une bille qui poursuit le plus proche.
+tr: Tu vara dispara una esfera que persigue al más cercano.
+
+fr: Un coup de lame vif au plus proche ; au katar, deux.
+tr: Un golpe rápido de hoja al más cercano; con katar, dos.
+
+fr: Une taille d'épée devant vous ; à la lance, un long estoc.
+tr: Un tajo de espada frente a ti; con lanza, una larga estocada.
+
+fr: Un lourd coup de hache ; au marteau, il éclate alentour.
+tr: Un hachazo pesado; con martillo, estalla alrededor.
+
+fr: Une flèche droite vers le plus proche.
+tr: Una flecha recta hacia el más cercano.
+
+fr: Le coup de votre arme revient plus vite.
+tr: El golpe de tu arma vuelve antes.
+
+fr: Le coup de votre arme transperce : il touche des monstres de plus.
+tr: El golpe de tu arma atraviesa: alcanza a más monstruos.
+
+fr: Le coup de votre arme peut rebondir sur un monstre proche.
+tr: El golpe de tu arma puede rebotar en un monstruo cercano.
+
+fr: Recharge de l'arme -%d %%
+tr: Recarga del arma -%d %%
+
+fr: Perforation de l'arme +%d
+tr: Perforación del arma +%d
+
+fr: Rebond de l'arme %d %%
+tr: Rebote del arma %d %%

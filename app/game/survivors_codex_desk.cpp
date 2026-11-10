@@ -114,6 +114,9 @@ struct StanceRow {
     case Stat::kZenyPct:
     case Stat::kFreezeRiposteChancePct:
     case Stat::kSummonDamagePct:
+    case Stat::kWeaponDelayCutPct:
+    case Stat::kWeaponPierce:
+    case Stat::kWeaponSplitChancePct:
       break;
   }
   return {Label::kStanceDamage, Unit::kPercent};
@@ -168,14 +171,15 @@ struct StanceRow {
   return found != rules.evolutions.end() ? &*found : nullptr;
 }
 
-// LA CLASSE QU'UN SORT SERT : celle qui l'a dans sa réserve ou à son départ, et
-// pour un évolué, celle du sort dont il vient ; 0 pour aucune.
+// LA CLASSE QU'UN SORT SERT : celle qui l'a dans sa réserve, à son départ ou pour
+// coup de l'arme, et pour un évolué, celle du sort dont il vient ; 0 pour aucune.
 [[nodiscard]] std::uint16_t ClassServedBy(const ro::sim::SurvivorsRules& rules,
                                           std::uint16_t skill_id) {
   const ro::sim::EvolutionRule* origin = ro::sim::FindEvolutionTo(rules, skill_id);
   const std::uint16_t base_id = origin != nullptr ? origin->skill_id : skill_id;
   for (const ro::sim::ClassRule& hero_class : rules.classes) {
-    if (std::ranges::find(hero_class.skill_pool, base_id) != hero_class.skill_pool.end() ||
+    if (hero_class.weapon_skill_id == base_id ||
+        std::ranges::find(hero_class.skill_pool, base_id) != hero_class.skill_pool.end() ||
         std::ranges::find(hero_class.starter_skills, base_id) != hero_class.starter_skills.end()) {
       return hero_class.class_id;
     }

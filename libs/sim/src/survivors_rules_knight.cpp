@@ -19,13 +19,11 @@ namespace {
 // première évolution, et Lord Knight à sa renaissance.
 
 constexpr std::uint16_t kKnightClassId = 2;
-constexpr std::uint16_t kSwordmanJobId = 1;            // l'apparence du départ
-constexpr std::uint16_t kKnightJobId = 7;              // après une évolution
-constexpr std::uint16_t kLordKnightJobId = 4008;       // rené
-constexpr std::uint16_t kKnightPecoJobId = 13;         // monté sur son Peco Peco
-constexpr std::uint16_t kLordKnightPecoJobId = 4014;   // monté, rené
-constexpr std::uint16_t kSwordmanWeaponItemId = 1101;  // Sword, au départ
-constexpr std::uint16_t kKnightWeaponItemId = 1401;    // Javelin, évolué et rené
+constexpr std::uint16_t kSwordmanJobId = 1;           // l'apparence du départ
+constexpr std::uint16_t kKnightJobId = 7;             // après une évolution
+constexpr std::uint16_t kLordKnightJobId = 4008;      // rené
+constexpr std::uint16_t kKnightPecoJobId = 13;        // monté sur son Peco Peco
+constexpr std::uint16_t kLordKnightPecoJobId = 4014;  // monté, rené
 constexpr std::int32_t kKnightMaxHp = 900;
 constexpr std::uint32_t kKnightWalkMsPerCell = 165;
 constexpr std::int32_t kKnightMagnetTenths = 24;
@@ -470,25 +468,27 @@ constexpr std::array<CardRule, kKnightCardCount> kKnightCards{{
 
 // Les cartes sont les passifs du Magicien, sauf la marche : le Peco Peco
 // tient la place de Chonchon.
-constexpr std::array<std::uint16_t, 12> kKnightCardPool{
+constexpr std::array<std::uint16_t, 16> kKnightCardPool{
     kHornetCardId,  kPupaCardId,      kPecoPecoCardId,     kPoringCardId,
     kSporeCardId,   kThiefBugCardId,  kGolemCardId,        kMasteringCardId,
-    kEclipseCardId, kDragonFlyCardId, kVagabondWolfCardId, kBaphometCardId};
+    kEclipseCardId, kDragonFlyCardId, kVagabondWolfCardId, kBaphometCardId,
+    kSmokieCardId,  kMantisCardId,    kOrcSkeletonCardId,  kNightmareCardId};
 
 constexpr ClassRule kKnight{.class_id = kKnightClassId,
                             .key = "knight",
                             .job_id = kSwordmanJobId,
-                            .weapon_item_id = kSwordmanWeaponItemId,
+                            .weapon_item_id = kSwordItemId,
                             .max_hp = kKnightMaxHp,
                             .walk_ms_per_cell = kKnightWalkMsPerCell,
                             .magnet_units = CellTenths(kKnightMagnetTenths),
                             .damage_pct_per_level = kKnightDamagePctPerLevel,
                             .damage_pct_cap = kKnightDamagePctCap,
+                            .weapon_skill_id = kSwordSlashSkillId,
                             .starter_skills = kKnightStarterSkills,
                             .skill_pool = kKnightSkillPool,
                             .card_pool = kKnightCardPool,
                             .evolved_job_id = kKnightJobId,
-                            .evolved_weapon_item_id = kKnightWeaponItemId,
+                            .evolved_weapon_item_id = kJavelinItemId,
                             .attack_gesture = true,
                             .mount_card_item_id = kPecoPecoCardId,
                             .mounted_job_id = kKnightPecoJobId,

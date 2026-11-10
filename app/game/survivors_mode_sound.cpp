@@ -28,6 +28,7 @@ constexpr float kArenaSoundPan = 0.0F;
 }  // namespace
 
 void SurvivorsMode::PlaySounds(const ro::sim::SurvivorsNews& news,
+                               const ro::sim::SurvivorsField* field,
                                const SurvivorsContext& context) {
   // Les bruits des effets se prennent même sous un son coupé : ils ne valent
   // que pour l'image qui les a fait naître.
@@ -55,7 +56,8 @@ void SurvivorsMode::PlaySounds(const ro::sim::SurvivorsNews& news,
     const ro::sim::SurvivorsSkillRule* rule = ro::sim::FindSkill(Rules(), cast.skill_id);
     if (rule == nullptr) continue;
     const SkillLook look = SkillLookOf(*rule);
-    if (look.trap) continue;
+    // Un piège sonne quand il saute ; le coup de l'arme, quand il touche.
+    if (look.trap || ro::sim::IsWeaponSkill(*rule)) continue;
     for (const std::string& file : SkillSoundFilesOf(look, draw++)) {
       PlaySound(file, ArenaSoundRank::kSkill, context);
     }
@@ -68,7 +70,17 @@ void SurvivorsMode::PlaySounds(const ro::sim::SurvivorsNews& news,
     if (hit.skill_id == 0 || hit.poison_tick || !thudded.insert(hit.skill_id).second) continue;
     const ro::sim::SurvivorsSkillRule* rule = ro::sim::FindSkill(Rules(), hit.skill_id);
     if (rule == nullptr) continue;
-    PlaySound(SkillHitSoundOf(SkillLookOf(*rule), draw++), ArenaSoundRank::kSkill, context);
+    const SkillLook look = SkillLookOf(*rule);
+    // LE COUP DE L'ARME SONNE DE L'ARME, comme un coup ordinaire du jeu ; la
+    // flèche, de l'arc qui touche.
+    if (ro::sim::IsWeaponSkill(*rule) && !look.shoots_arrow && context.wardrobe != nullptr) {
+      const std::uint16_t item =
+          field != nullptr ? WeaponItemShown(*rule, field->hero) : rule->weapon_item_ids.front();
+      PlaySound(ro::render::WeaponHitSound(context.wardrobe->catalog(), item, draw++),
+                ArenaSoundRank::kSkill, context);
+      continue;
+    }
+    PlaySound(SkillHitSoundOf(look, draw++), ArenaSoundRank::kSkill, context);
   }
   for (const std::string& file : effect_sounds) PlaySound(file, ArenaSoundRank::kSkill, context);
 }

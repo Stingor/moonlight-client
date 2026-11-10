@@ -20,11 +20,9 @@ namespace {
 // renaissance.
 
 constexpr std::uint16_t kMerchantClassId = 5;
-constexpr std::uint16_t kMerchantJobId = 5;             // l'apparence du départ
-constexpr std::uint16_t kAlchemistJobId = 18;           // après une évolution
-constexpr std::uint16_t kCreatorJobId = 4019;           // rené
-constexpr std::uint16_t kMerchantWeaponItemId = 1301;   // Axe
-constexpr std::uint16_t kAlchemistWeaponItemId = 1305;  // Cleaver
+constexpr std::uint16_t kMerchantJobId = 5;    // l'apparence du départ
+constexpr std::uint16_t kAlchemistJobId = 18;  // après une évolution
+constexpr std::uint16_t kCreatorJobId = 4019;  // rené
 constexpr std::int32_t kMerchantMaxHp = 650;
 constexpr std::uint32_t kMerchantWalkMsPerCell = 155;
 // C'est un marchand : il ramasse le plus loin du mode.
@@ -537,27 +535,29 @@ constexpr std::array<CardRule, kMerchantCardCount> kMerchantCards{{
 
 // Les cartes du Magicien qui n'ouvrent rien chez lui, puis les siennes, qu'il
 // prête à ses coéquipiers.
-constexpr std::array<std::uint16_t, 12> kMerchantCardPool{
-    kAndreCardId,     kPupaCardId,     kMukaCardId,   kPoringCardId,
-    kIceTitanCardId,  kThiefBugCardId, kMarinCardId,  kMasteringCardId,
-    kSasquatchCardId, kGolemCardId,    kCookieCardId, kBaphometCardId};
+constexpr std::array<std::uint16_t, 16> kMerchantCardPool{
+    kAndreCardId,     kPupaCardId,     kMukaCardId,        kPoringCardId,
+    kIceTitanCardId,  kThiefBugCardId, kMarinCardId,       kMasteringCardId,
+    kSasquatchCardId, kGolemCardId,    kCookieCardId,      kBaphometCardId,
+    kSmokieCardId,    kMantisCardId,   kOrcSkeletonCardId, kNightmareCardId};
 constexpr std::array<std::uint16_t, kMerchantCardCount> kMerchantLentCards{
     kAndreCardId, kMukaCardId, kIceTitanCardId, kMarinCardId, kSasquatchCardId, kCookieCardId};
 
 constexpr ClassRule kMerchant{.class_id = kMerchantClassId,
                               .key = "merchant",
                               .job_id = kMerchantJobId,
-                              .weapon_item_id = kMerchantWeaponItemId,
+                              .weapon_item_id = kAxeItemId,
                               .max_hp = kMerchantMaxHp,
                               .walk_ms_per_cell = kMerchantWalkMsPerCell,
                               .magnet_units = CellTenths(kMerchantMagnetTenths),
                               .damage_pct_per_level = kMerchantDamagePctPerLevel,
                               .damage_pct_cap = kMerchantDamagePctCap,
+                              .weapon_skill_id = kAxeBlowSkillId,
                               .starter_skills = kMerchantStarterSkills,
                               .skill_pool = kMerchantSkillPool,
                               .card_pool = kMerchantCardPool,
                               .evolved_job_id = kAlchemistJobId,
-                              .evolved_weapon_item_id = kAlchemistWeaponItemId,
+                              .evolved_weapon_item_id = kHollgrehennHammerItemId,
                               .attack_gesture = true,
                               .pushes_cart = true,
                               .reborn_level = kMerchantRebornLevel,

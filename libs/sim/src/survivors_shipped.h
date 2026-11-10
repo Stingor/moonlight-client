@@ -148,6 +148,29 @@ inline constexpr std::uint16_t kIceTitanCardId = 4417;
 inline constexpr std::uint16_t kMarinCardId = 4196;
 inline constexpr std::uint16_t kSasquatchCardId = 4216;
 inline constexpr std::uint16_t kCookieCardId = 4293;
+// Les cartes du coup de l'arme, dans la réserve de toutes les classes.
+inline constexpr std::uint16_t kMantisCardId = 4079;
+inline constexpr std::uint16_t kOrcSkeletonCardId = 4085;
+inline constexpr std::uint16_t kNightmareCardId = 4127;
+
+// LES ARMES DES CLASSES, objets RO : au départ, puis dès la première évolution.
+inline constexpr std::uint16_t kRodItemId = 1601;
+inline constexpr std::uint16_t kKnifeItemId = 1201;
+inline constexpr std::uint16_t kJurItemId = 1250;  // un katar
+inline constexpr std::uint16_t kSwordItemId = 1101;
+inline constexpr std::uint16_t kJavelinItemId = 1401;
+inline constexpr std::uint16_t kAxeItemId = 1301;
+inline constexpr std::uint16_t kHollgrehennHammerItemId = 1535;  // une masse
+inline constexpr std::uint16_t kBowItemId = 1701;
+inline constexpr std::uint16_t kHunterBowItemId = 1718;
+
+// LES COUPS DE L'ARME : des identifiants hors des compétences RO, qu'aucun
+// arbre de compétences ne nomme.
+inline constexpr std::uint16_t kRodShotSkillId = 60001;
+inline constexpr std::uint16_t kDaggerStabSkillId = 60002;
+inline constexpr std::uint16_t kSwordSlashSkillId = 60003;
+inline constexpr std::uint16_t kAxeBlowSkillId = 60004;
+inline constexpr std::uint16_t kBowShotSkillId = 60005;
 
 inline constexpr std::uint16_t kLunaticId = 1063;
 inline constexpr std::uint16_t kPoringId = 1002;
@@ -237,6 +260,14 @@ inline constexpr std::size_t kMerchantCardCount = 6;
 // ses autres skills, qui en sont d'autant moins nombreux.
 inline constexpr std::size_t kHomunculusSkillCount = 8;
 [[nodiscard]] std::span<const SurvivorsSkillRule> HomunculusSkills();
+
+// survivors_rules_weapons.cpp : le coup de l'arme de chaque classe, et les
+// cartes qui ne touchent que lui. ShippedSkills et ShippedCards les mettent en
+// dernier.
+inline constexpr std::size_t kWeaponSkillCount = 5;
+inline constexpr std::size_t kWeaponCardCount = 3;
+[[nodiscard]] std::span<const SurvivorsSkillRule> WeaponSkills();
+[[nodiscard]] std::span<const CardRule> WeaponCards();
 
 // survivors_rules_foes.cpp : les monstres, leurs vagues, les arènes, la courbe
 // d'XP et la table des éléments.

@@ -148,6 +148,7 @@ add_library(ro_sim STATIC
     src/survivors_rules_archer.cpp
     src/survivors_rules_merchant.cpp
     src/survivors_rules_homunculi.cpp
+    src/survivors_rules_weapons.cpp
     src/survivors_rules_wizard.cpp
     src/survivors_run.cpp
     src/survivors_score.cpp
@@ -158,6 +159,7 @@ add_library(ro_sim STATIC
     src/survivors_terrain.cpp
     src/survivors_threats.cpp
     src/survivors_trophies.cpp
+    src/survivors_weapon.cpp
     src/survivors_week.cpp
     src/survivors_zones.cpp
     src/title_book.cpp

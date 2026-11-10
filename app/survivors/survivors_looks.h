@@ -332,6 +332,11 @@ struct SkillLook {
   bool cart_spin = false;
 };
 
+// L'ARME QUE LE COUP DE L'ARME DU HÉROS MONTRE : l'objet de son niveau, celui
+// que le héros tient ; 0 pour un skill qui n'est pas un coup de l'arme.
+[[nodiscard]] std::uint16_t WeaponItemShown(const ro::sim::SurvivorsSkillRule& skill,
+                                            const ro::sim::SurvivorsHero& hero) noexcept;
+
 // L'apparence d'un skill des règles : l'objet que son lancer fait voler, sinon
 // le repli écrit d'un skill que le jeu fait naître sur sa cible, sinon l'effet du
 // coup, celui de la table ordinaire, celui de l'annonce, et le repli écrit de ce
@@ -339,6 +344,10 @@ struct SkillLook {
 // sur l'archétype : une orbite, un projectile qui part du héros et une nova
 // sont portés par lui, tout le reste se pose au sol. L'effet au sol d'une zone
 // est celui que la table des unités entretient pour l'unité du skill.
+//
+// LE COUP DE L'ARME n'a pas de compétence au jeu : la bille de baguette se
+// montre par l'effet de Soul Strike, la flèche par la flèche d'arc, le balayage
+// de lame par l'effet de Spear Stab, et une frappe par l'étincelle du coup.
 [[nodiscard]] SkillLook SkillLookOf(const ro::sim::SurvivorsSkillRule& skill);
 
 // LES FICHIERS QU'UN LANCER FAIT ENTENDRE, variantes tirées de `draw` : ceux de

@@ -18,11 +18,9 @@ namespace {
 // sa première évolution, et Assassin Cross à sa renaissance.
 
 constexpr std::uint16_t kThiefClassId = 3;
-constexpr std::uint16_t kThiefJobId = 6;               // l'apparence du départ
-constexpr std::uint16_t kAssassinJobId = 12;           // après une évolution
-constexpr std::uint16_t kAssassinCrossJobId = 4013;    // rené
-constexpr std::uint16_t kThiefWeaponItemId = 1201;     // Knife
-constexpr std::uint16_t kAssassinWeaponItemId = 1250;  // Jur, un katar
+constexpr std::uint16_t kThiefJobId = 6;             // l'apparence du départ
+constexpr std::uint16_t kAssassinJobId = 12;         // après une évolution
+constexpr std::uint16_t kAssassinCrossJobId = 4013;  // rené
 constexpr std::int32_t kThiefMaxHp = 560;
 constexpr std::uint32_t kThiefWalkMsPerCell = 135;
 constexpr std::int32_t kThiefMagnetTenths = 27;
@@ -533,25 +531,27 @@ constexpr std::array<CardRule, kThiefCardCount> kThiefCards{{
 }};
 
 // Les cartes sont celles du Magicien, Chonchon comprise, plus les siennes.
-constexpr std::array<std::uint16_t, 14> kThiefCardPool{
+constexpr std::array<std::uint16_t, 17> kThiefCardPool{
     kHornetCardId,       kPupaCardId,     kChonchonCardId,  kPoringCardId,  kSporeCardId,
     kThiefBugCardId,     kGolemCardId,    kMasteringCardId, kEclipseCardId, kDragonFlyCardId,
-    kVagabondWolfCardId, kBaphometCardId, kSmokieCardId,    kWhisperCardId};
+    kVagabondWolfCardId, kBaphometCardId, kSmokieCardId,    kWhisperCardId, kMantisCardId,
+    kOrcSkeletonCardId,  kNightmareCardId};
 
 constexpr ClassRule kThief{.class_id = kThiefClassId,
                            .key = "thief",
                            .job_id = kThiefJobId,
-                           .weapon_item_id = kThiefWeaponItemId,
+                           .weapon_item_id = kKnifeItemId,
                            .max_hp = kThiefMaxHp,
                            .walk_ms_per_cell = kThiefWalkMsPerCell,
                            .magnet_units = CellTenths(kThiefMagnetTenths),
                            .damage_pct_per_level = kThiefDamagePctPerLevel,
                            .damage_pct_cap = kThiefDamagePctCap,
+                           .weapon_skill_id = kDaggerStabSkillId,
                            .starter_skills = kThiefStarterSkills,
                            .skill_pool = kThiefSkillPool,
                            .card_pool = kThiefCardPool,
                            .evolved_job_id = kAssassinJobId,
-                           .evolved_weapon_item_id = kAssassinWeaponItemId,
+                           .evolved_weapon_item_id = kJurItemId,
                            .attack_gesture = true,
                            .reborn_level = kThiefRebornLevel,
                            .reborn_job_id = kAssassinCrossJobId,

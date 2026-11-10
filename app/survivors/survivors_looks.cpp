@@ -1,5 +1,7 @@
 #include "survivors/survivors_looks.h"
 
+#include <algorithm>
+#include <cstddef>
 #include <optional>
 #include <span>
 #include <string>
@@ -234,6 +236,33 @@ namespace {
   return sounds;
 }
 
+// Le coup de l'arme, selon sa forme : voir SkillLookOf.
+[[nodiscard]] SkillLook WeaponLookOf(ro::sim::SkillArchetype archetype, SkillLook look) {
+  look.hit_effect_id = kPlainHitEffect;
+  switch (archetype) {
+    case ro::sim::SkillArchetype::kHoming:
+      look.effect_skill_id = kSoulStrikeSkill;
+      look.effect_id = TabledEffectOf(kSoulStrikeSkill).value_or(kStrikeSparkFallbackEffect);
+      break;
+    case ro::sim::SkillArchetype::kLinear:
+      look.effect_skill_id = look.skill_id;
+      look.effect_id = kArrowFallbackEffect;
+      look.fallback = true;
+      look.shoots_arrow = true;
+      break;
+    case ro::sim::SkillArchetype::kCone:
+      look.effect_skill_id = kSpearStabSkill;
+      look.effect_id = TabledEffectOf(kSpearStabSkill).value_or(kStrikeSparkFallbackEffect);
+      break;
+    default:
+      look.effect_skill_id = look.skill_id;
+      look.effect_id = kStrikeSparkFallbackEffect;
+      look.fallback = true;
+      break;
+  }
+  return look;
+}
+
 }  // namespace
 
 ro::render::ActorLook FoeLook(std::uint16_t foe_id) noexcept {
@@ -303,10 +332,22 @@ std::size_t HeroAttackAnimation(const ro::render::SpriteCatalog& catalog,
   return ro::render::AttackAnimation(catalog, look, kNoDraw);
 }
 
+std::uint16_t WeaponItemShown(const ro::sim::SurvivorsSkillRule& skill,
+                              const ro::sim::SurvivorsHero& hero) noexcept {
+  if (!ro::sim::IsWeaponSkill(skill)) return 0;
+  std::size_t level = 1;
+  for (const ro::sim::OwnedSkill& owned : hero.skills) {
+    if (owned.skill_id == skill.skill_id) level = owned.level;
+  }
+  const std::size_t index = std::clamp<std::size_t>(level, 1, skill.weapon_item_ids.size()) - 1;
+  return skill.weapon_item_ids[index];
+}
+
 SkillLook SkillLookOf(const ro::sim::SurvivorsSkillRule& skill) {
   SkillLook look{.skill_id = skill.skill_id,
                  .bearer = BearerOf(skill.archetype),
                  .icon_skill_id = skill.skill_id};
+  if (ro::sim::IsWeaponSkill(skill)) return WeaponLookOf(skill.archetype, look);
   const std::uint16_t shown = ShownSkillOf(skill.skill_id);
   look.effect_skill_id = shown;
   if (const std::optional<std::uint32_t> thrown = ThrownEffectOf(shown)) {

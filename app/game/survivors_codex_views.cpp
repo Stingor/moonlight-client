@@ -59,6 +59,13 @@ void SurvivorsViews::ComposeCodex(SurvivorsMetaWindows& windows, const Survivors
   for (ro::ui::SurvivorsCodexEntry& entry :
        codex_rows_.entries[static_cast<std::size_t>(ro::ui::SurvivorsCodexTab::kSkills)]) {
     entry.class_name = ShownClassName(rules, entry.class_id, tables);
+    // Le coup de l'arme se montre par l'arme du départ : son nom et son icône.
+    const ro::sim::SurvivorsSkillRule* skill = ro::sim::FindSkill(rules, entry.ro_id);
+    if (skill != nullptr && ro::sim::IsWeaponSkill(*skill)) {
+      const std::uint16_t weapon_item = skill->weapon_item_ids.front();
+      entry.name = CardName(weapon_item, tables);
+      entry.icon = ItemIconImage(weapon_item, tables);
+    }
   }
   for (std::vector<ro::ui::SurvivorsCodexSource>& sources : codex_rows_.sources) {
     for (ro::ui::SurvivorsCodexSource& source : sources) {

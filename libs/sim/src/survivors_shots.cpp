@@ -12,6 +12,7 @@
 #include "survivors_space.h"
 #include "survivors_systems.h"
 #include "survivors_volley.h"
+#include "survivors_weapon.h"
 
 namespace ro::sim::survivors {
 
@@ -137,6 +138,7 @@ namespace {
   const FieldPoint struck_at = touched->position;
   HurtFoe(field, *touched, DamageAgainst(field, shot.damage, element, *touched), shot.skill_id,
           status);
+  SplitWeaponHit(field, shot.skill_id, shot.damage, element, *touched);
   if (shot.splash_radius_units > 0 && shot.splash_pct > 0) {
     SplashAround(field, SurvivorsSplash{.center = struck_at,
                                         .spared_serial = touched->serial,

@@ -23502,3 +23502,36 @@ tr: One color for all the hair
 
 fr: Une teinture d'item se valide auprès du styliste.
 tr: An item dye is confirmed at the stylist.
+
+fr: Votre baguette tire une bille qui poursuit le plus proche.
+tr: Your rod fires an orb that chases the nearest foe.
+
+fr: Un coup de lame vif au plus proche ; au katar, deux.
+tr: A quick blade strike on the nearest foe; two with a katar.
+
+fr: Une taille d'épée devant vous ; à la lance, un long estoc.
+tr: A sword slash in front of you; with a spear, a long thrust.
+
+fr: Un lourd coup de hache ; au marteau, il éclate alentour.
+tr: A heavy axe blow; with a hammer, it bursts all around.
+
+fr: Une flèche droite vers le plus proche.
+tr: A straight arrow at the nearest foe.
+
+fr: Le coup de votre arme revient plus vite.
+tr: Your weapon strikes again sooner.
+
+fr: Le coup de votre arme transperce : il touche des monstres de plus.
+tr: Your weapon pierces: it hits more monsters.
+
+fr: Le coup de votre arme peut rebondir sur un monstre proche.
+tr: Your weapon strike may bounce to a nearby monster.
+
+fr: Recharge de l'arme -%d %%
+tr: Weapon cooldown -%d %%
+
+fr: Perforation de l'arme +%d
+tr: Weapon pierce +%d
+
+fr: Rebond de l'arme %d %%
+tr: Weapon bounce %d %%

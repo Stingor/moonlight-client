@@ -308,7 +308,8 @@ SurvivorsPainted SurvivorsMode::Frame(SurvivorsStage& stage, const SurvivorsCont
           },
           *context.damage_meter, context.now_ms);
     }
-    PlaySounds(stage.news(), context);
+    PlaySounds(stage.news(), stage.play() != nullptr ? &stage.play()->run().field() : nullptr,
+               context);
     FollowMusic(stage, context);
   }
   return painted;

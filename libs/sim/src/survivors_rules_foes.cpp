@@ -163,8 +163,9 @@ constexpr std::array<FoeRule, kPlainsFoeCount> kFoes{{
     Common(kOrcWarriorId, 24, kMedium, kEarth, 50, 200, 7, 1864, 6),
     Common(kSavageId, 26, kLarge, kEarth, 100, 150, 7, 1960, 10, kCharger),
     Common(kGoblinId, 25, kMedium, kWind, 60, 100, 12, 1120, 6),
-    Common(kMantisId, 26, kMedium, kEarth, 65, 200, 8, 1528, 8),
-    Common(kOrcSkeletonId, 28, kMedium, kUndead, 45, 200, 12, 2420, 7),
+    WithCard(Common(kMantisId, 26, kMedium, kEarth, 65, 200, 8, 1528, 8), kMantisCardId),
+    WithCard(Common(kOrcSkeletonId, 28, kMedium, kUndead, 45, 200, 12, 2420, 7),
+             kOrcSkeletonCardId),
     // Sa flèche est son attaque : il ne touche pas au contact.
     WithCard(Common(kArcherSkeletonId, 31, kMedium, kUndead, 40, 300, kNoTouchDamage, kNoTouchMs, 8,
                     kArcher),
@@ -180,7 +181,8 @@ constexpr std::array<FoeRule, kPlainsFoeCount> kFoes{{
     Common(kSoheeId, 33, kMedium, kWater, 75, 250, 12, 2112, 12),
     WithCard(Common(kWhisperId, 34, kSmall, kGhost, 40, 150, 12, 1960, 10, kGhostFlyer),
              kWhisperCardId),
-    Common(kNightmareId, 49, kLarge, kGhost, 125, 150, 11, 1816, 18, kCharger),
+    WithCard(Common(kNightmareId, 49, kLarge, kGhost, 125, 150, 11, 1816, 18, kCharger),
+             kNightmareCardId),
     Common(kWraithId, 53, kLarge, kUndead, 150, 300, 22, 1816, 20),
     Common(kEvilDruidId, 58, kLarge, kUndead, 170, 300, 24, 2276, 22),
     // Baphomet Jr. ne naît que des invocations de Baphomet.

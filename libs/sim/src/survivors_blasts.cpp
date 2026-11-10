@@ -13,6 +13,7 @@
 #include "survivors_space.h"
 #include "survivors_systems.h"
 #include "survivors_volley.h"
+#include "survivors_weapon.h"
 
 namespace ro::sim::survivors {
 
@@ -58,6 +59,12 @@ void LandBlast(SurvivorsField& field, const SurvivorsBlast& blast) {
         .knockback_units = blast.knockback_units,
         .knock_heading = HeadingAway(blast.center, foe, field.hero.facing)};
     HurtFoe(field, foe, DamageAgainst(field, base, blast.element, foe), blast.skill_id, status);
+  }
+  // Le coup de l'arme rebondit depuis le monstre visé, une fois par éclat :
+  // après la boucle, qui parcourt `field.nearby` que le rebond réécrit.
+  if (blast.center_serial == 0) return;
+  if (const SurvivorsFoe* center = FoeBySerial(field, blast.center_serial)) {
+    SplitWeaponHit(field, blast.skill_id, blast.damage, blast.element, *center);
   }
 }
 
@@ -176,6 +183,9 @@ bool FireCone(SurvivorsField& field, const SurvivorsSkillRule& rule, const Skill
           TurnVector(static_cast<std::uint8_t>((facing + level.cone_half_steps) % kHeadingSteps),
                      length / 2)))));
   BreakPlantsWithin(field, hero, tip, half_width);
+  // Le coup de l'arme rebondit depuis le premier monstre du cône, une fois par
+  // coup : après la boucle, qui parcourt `field.nearby` que le rebond réécrit.
+  const std::uint32_t first_struck = field.foes[field.nearby.front()].serial;
   for (const std::uint32_t index : field.nearby) {
     SurvivorsFoe& foe = field.foes[index];
     const SurvivorsStatus status{.freeze_ms = level.freeze_ms,
@@ -184,6 +194,9 @@ bool FireCone(SurvivorsField& field, const SurvivorsSkillRule& rule, const Skill
                                  .blind_ms = level.blind_ms};
     HurtFoe(field, foe, DamageAgainst(field, level.damage, rule.element, foe), rule.skill_id,
             status);
+  }
+  if (const SurvivorsFoe* first = FoeBySerial(field, first_struck)) {
+    SplitWeaponHit(field, rule.skill_id, level.damage, rule.element, *first);
   }
   if (rule.cone_behind) {
     field.hero.leap_heading = field.hero.facing;

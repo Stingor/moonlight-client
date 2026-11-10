@@ -181,6 +181,15 @@ SurvivorsFigureText SurvivorsEffectFigureText(SurvivorsEffectFigure figure, std:
     case SurvivorsEffectFigure::kSummonDamagePct:
       std::snprintf(out, size, core::Tr("Dégâts des invocations +%d %%"), shown);
       break;
+    case SurvivorsEffectFigure::kWeaponDelayCutPct:
+      std::snprintf(out, size, core::Tr("Recharge de l'arme -%d %%"), shown);
+      break;
+    case SurvivorsEffectFigure::kWeaponPierce:
+      std::snprintf(out, size, core::Tr("Perforation de l'arme +%d"), shown);
+      break;
+    case SurvivorsEffectFigure::kWeaponSplitChancePct:
+      std::snprintf(out, size, core::Tr("Rebond de l'arme %d %%"), shown);
+      break;
   }
   return text;
 }
