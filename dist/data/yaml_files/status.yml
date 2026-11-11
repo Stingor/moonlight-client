@@ -22,6 +22,16 @@ Header:
   Version: 4
 
 Body:
+  - Status: 2011rwc_Scroll
+    Script: |
+      .@level = max(3, getskilllv("AC_CONCENTRATION"));
+      bonus bBaseAtk,30;
+      bonus bMatk,30;
+      bonus bAspdRate,5;
+      bonus bVariableCastrate,-5;
+      bonus bMaxHPrate,-10;
+      bonus bMaxSPrate,-10;
+      bonus3 bAutoSpell,"AC_CONCENTRATION",.@level,10;   /* TODO: unknown rate */
   - Status: Acaraje
     Script: |
       bonus bAspdRate, getstatus(SC_ACARAJE, 1);
@@ -102,6 +112,11 @@ Body:
       bonus2 bResEff,Eff_Sleep,.@val1;
       bonus2 bResEff,Eff_Bleeding,.@val1;
       bonus2 bResEff,Eff_Confusion,.@val1;
+  - Status: Crifood
+    Script: |
+      bonus bCritical, getstatus(SC_CRIFOOD, 1);
+    Bonuses:
+      - {Bonus: bCritical, Type: 52, Val: 1}
   - Status: Dexfood
     Script: |
       bonus bDex, getstatus(SC_DEXFOOD, 1);
@@ -183,6 +198,45 @@ Body:
       .@val1 = getstatus(SC_GEFFEN_MAGIC3, 1);
       bonus2 bSubRace,RC_Player_Human, .@val1;
       bonus2 bSubRace,RC_DemiHuman, .@val1;
+  - Status: Glastheim_Atk
+    Script: |
+      .@val1 = getstatus(SC_GLASTHEIM_ATK, 1);
+      bonus2 bAddRace2,RC2_OGH_ATK_DEF, .@val1;
+      bonus2 bMagicAddRace2,RC2_OGH_ATK_DEF, .@val1;
+      bonus2 bIgnoreDefRaceRate,RC_Undead, .@val1;
+      bonus2 bIgnoreDefRaceRate,RC_Demon, .@val1;
+  - Status: Glastheim_Def
+    Script: |
+      bonus2 bSubRace2,RC2_OGH_ATK_DEF, getstatus(SC_GLASTHEIM_DEF, 1);
+  - Status: Glastheim_Heal
+    Script: |
+      bonus bHealPower, getstatus(SC_GLASTHEIM_HEAL, 1);
+      bonus bHealPower2, getstatus(SC_GLASTHEIM_HEAL, 2);
+    Bonuses:
+      - {Bonus: bHealPower, Type: 1090, Val: 1}
+      - {Bonus: bHealPower2, Type: 1091, Val: 2}
+  - Status: Glastheim_Hidden
+    Script: |
+      bonus2 bSubRace2,RC2_OGH_HIDDEN, getstatus(SC_GLASTHEIM_HIDDEN, 1);
+  - Status: Glastheim_Hpsp
+    Script: |
+      bonus bMaxHP, getstatus(SC_GLASTHEIM_HPSP, 1);
+      bonus bMaxSP, getstatus(SC_GLASTHEIM_HPSP, 2);
+    Bonuses:
+      - {Bonus: bMaxHP, Type: 6, Val: 1}
+      - {Bonus: bMaxSP, Type: 8, Val: 2}
+  - Status: Glastheim_Itemdef
+    Script: |
+      bonus bDef, getstatus(SC_GLASTHEIM_ITEMDEF, 1);
+      bonus bMdef, getstatus(SC_GLASTHEIM_ITEMDEF, 2);
+    Bonuses:
+      - {Bonus: bDef, Type: 45, Val: 1}
+      - {Bonus: bMdef, Type: 47, Val: 2}
+  - Status: Glastheim_State
+    Script: |
+      bonus bAllStats, getstatus(SC_GLASTHEIM_STATE, 1);
+    Bonuses:
+      - {Bonus: bAllStats, Type: 1073, Val: 1}
   - Status: Hitfood
     Script: |
       bonus bHit, getstatus(SC_HITFOOD, 1);
@@ -247,6 +301,9 @@ Body:
       bonus bInt, getstatus(SC_INTFOOD, 1);
     Bonuses:
       - {Bonus: bInt, Type: 16, Val: 1}
+  - Status: Jp_Event04
+    Script: |
+      bonus2 bExpAddRace,RC_Fish, getstatus(SC_JP_EVENT04, 1);
   - Status: Lhz_Dun_N1
     Script: |
       .@val1 = getstatus(SC_LHZ_DUN_N1, 1);
@@ -321,6 +378,70 @@ Body:
       bonus bVit, getstatus(SC_MINOR_BBQ, 1);
     Bonuses:
       - {Bonus: bVit, Type: 15, Val: 1}
+  - Status: Mtf_Aspd
+    Script: |
+      bonus bAspd, getstatus(SC_MTF_ASPD, 1);
+      bonus bHit, getstatus(SC_MTF_ASPD, 2);
+    Bonuses:
+      - {Bonus: bAspd, Type: 53, Val: 1}
+      - {Bonus: bHit, Type: 49, Val: 2}
+  - Status: Mtf_Aspd2
+    Script: |
+      bonus bAspd, getstatus(SC_MTF_ASPD2, 1);
+      bonus bHit, getstatus(SC_MTF_ASPD2, 2);
+  - Status: Mtf_Cridamage
+    Script: |
+      bonus bCritAtkRate, getstatus(SC_MTF_CRIDAMAGE, 1);
+    Bonuses:
+      - {Bonus: bCritAtkRate, Type: 2013, Val: 1}
+  - Status: Mtf_Hitflee
+    Script: |
+      .@val1 = getstatus(SC_MTF_HITFLEE, 1);
+      .@val2 = getstatus(SC_MTF_HITFLEE, 2);
+      bonus bHit, .@val1;
+      bonus bCritical, .@val1;
+      bonus bFlee, .@val2;
+  - Status: Mtf_Matk
+    Script: |
+      bonus bMatk, getstatus(SC_MTF_MATK, 1);
+    Bonuses:
+      - {Bonus: bMatk, Type: 2046, Val: 1}
+  - Status: Mtf_Matk2
+    Script: |
+      bonus bMatk, getstatus(SC_MTF_MATK2, 1);
+    Bonuses:
+      - {Bonus: bMatk, Type: 2046, Val: 1}
+  - Status: Mtf_Mhp
+    Script: |
+      bonus bMaxHPrate, getstatus(SC_MTF_MHP, 1);
+    Bonuses:
+      - {Bonus: bMaxHPrate, Type: 1004, Val: 1}
+  - Status: Mtf_Mleatked
+    Script: |
+      .@val1 = getstatus(SC_MTF_MLEATKED, 1);
+      .@val2 = getstatus(SC_MTF_MLEATKED, 2);
+      .@val3 = getstatus(SC_MTF_MLEATKED, 3);
+      bonus4 bAutoSpellWhenHit,"SM_ENDURE",.@val1,.@val2,0;
+      bonus2 bSubEle,Ele_Neutral, .@val3;
+  - Status: Mtf_Msp
+    Script: |
+      bonus bMaxSPrate, getstatus(SC_MTF_MSP, 1);
+    Bonuses:
+      - {Bonus: bMaxSPrate, Type: 1005, Val: 1}
+  - Status: Mtf_Pumpkin
+    Script: |
+      bonus2 bAddItemHealRate,535,2000;
+      bonus2 bAddItemHealRate,11605, getstatus(SC_MTF_PUMPKIN, 1);
+  - Status: Mtf_Rangeatk
+    Script: |
+      bonus bLongAtkRate, getstatus(SC_MTF_RANGEATK, 1);
+    Bonuses:
+      - {Bonus: bLongAtkRate, Type: 2012, Val: 1}
+  - Status: Mtf_Rangeatk2
+    Script: |
+      bonus bLongAtkRate, getstatus(SC_MTF_RANGEATK2, 1);
+    Bonuses:
+      - {Bonus: bLongAtkRate, Type: 2012, Val: 1}
   - Status: Mustle_M
     Script: |
       bonus bMaxHPrate, getstatus(SC_MUSTLE_M, 1);

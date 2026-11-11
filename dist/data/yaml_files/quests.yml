@@ -13593,6 +13593,55 @@ quests:
     icon: dq
     summary: 굳은 익스플로젼, 굳은 블레이저 처치
     description: <NAVI>릴리 블랑<INFO>yuno_fild03,38,146,0,101,0</INFO></NAVI>은 굳은 익스플로젼 10마리, 굳은 블레이저 10마리를 처치하고 종족 차이를 보고해 달라고 한다.
+  8639:
+    title: "Great banquet hall in the depths of the underworld"
+  8640:
+    title: "Both the dead and the living are in high spirits"
+  8641:
+    title: "He looks cute"
+    summary: "Hunt 15 Ghost Cube, Hunt 15 Lude Gal"
+  8642:
+    title: "He looks cute - Standby"
+    icon: dq
+  8644:
+    title: "That's not an instrument"
+    summary: "Hunt 10 Brutal Murderer, Hunt 10 Gan Ceann"
+  8645:
+    title: "That's not an instrument - Standby"
+    icon: dq
+  8647:
+    title: "Playing the piano"
+  8648:
+    title: "Playing the piano - Standby"
+    icon: dq
+  8649:
+    title: "It was a great performance"
+  8650:
+    title: "Guys with messy hair"
+    summary: "Hunt 15 Disguiser, Hunt 15 Blue Moon Loli Ruri"
+  8651:
+    title: "Guys with messy hair - Standby"
+    icon: dq
+  8652:
+    title: "Guys with messy hair"
+    summary: "Hunt 15 Disguiser, Hunt 15 Blue Moon Loli Ruri"
+  8653:
+    title: "The ones with dolls"
+    summary: "Hunt 10 Grote, Hunt 10 Pierrotzoist"
+  8654:
+    title: "The ones with dolls - Standby"
+    icon: dq
+  8655:
+    title: "The ones with dolls"
+  8656:
+    title: "Wake them up"
+  8657:
+    title: "Wake them up - Standby"
+    icon: dq
+  8658:
+    title: "Sorry for being sleepy (1)"
+  8659:
+    title: "Sorry for being sleepy (2)"
   8719:
     title: "A new area somewhere in the anthill"
     icon: lq
@@ -25690,6 +25739,29 @@ quests:
     icon: ev
     summary: 두 번째 산책
     description: 두 번째 산책을 마쳤다.
+  16521:
+    title: "4th floor of Rudus, an organic field for waste specimens"
+  16522:
+    title: "4th floor of Rudus, an organic field for waste specimens"
+  16523:
+    title: "Abyssal Solitude - Standby"
+    icon: dq
+  16524:
+    title: "Abyssal Solitude"
+    summary: "Hunt 10 Deadre, Hunt 10 Dolorian, Hunt 10 Plagarion"
+  16525:
+    title: "Transformation and Evolution - Standby"
+    icon: dq
+  16526:
+    title: "Transformation and Evolution"
+    summary: "Hunt 15 Giant Caput, Hunt 15 Venedi"
+  16527:
+    title: "Data backup - Waiting"
+    icon: dq
+  16528:
+    title: "Data Backup"
+  16540:
+    title: "Data Backup"
   17000:
     title: Meet with Father Bamph
     icon: ep

@@ -431,6 +431,98 @@ Body:
     Drops:
       - {Item: IllusionStone, Rate: 2000}
       - {Item: Underwater_Box_IL, Rate: 500}
+  - Map: nif_dun01
+    Monster: BRUTAL_MURDERER
+    Drops:
+      - {Item: Etel_Dust, Rate: 2000}
+      - {Item: Fourth_Bh_Axe, Rate: 2500}
+      - {Item: Fourth_1h_Sword, Rate: 2500}
+      - {Item: Fourth_1h_Mace, Rate: 2500}
+      - {Item: Fourth_1h_Dagger, Rate: 2500}
+      - {Item: Fourth_Bh_Katar, Rate: 2500}
+  - Map: nif_dun01
+    Monster: GAN_CEANN
+    Drops:
+      - {Item: Etel_Dust, Rate: 2000}
+      - {Item: Fourth_Bh_Axe, Rate: 2500}
+      - {Item: Fourth_1h_Sword, Rate: 2500}
+      - {Item: Fourth_1h_Mace, Rate: 2500}
+      - {Item: Fourth_1h_Dagger, Rate: 2500}
+      - {Item: Fourth_Bh_Katar, Rate: 2500}
+  - Map: nif_dun01
+    Monster: GHOST_CUBE
+    Drops:
+      - {Item: Etel_Dust, Rate: 2000}
+      - {Item: Fourth_Bh_Axe, Rate: 2500}
+      - {Item: Fourth_1h_Sword, Rate: 2500}
+      - {Item: Fourth_1h_Mace, Rate: 2500}
+      - {Item: Fourth_1h_Dagger, Rate: 2500}
+      - {Item: Fourth_Bh_Katar, Rate: 2500}
+  - Map: nif_dun01
+    Monster: LUDE_GAL
+    Drops:
+      - {Item: Etel_Dust, Rate: 2000}
+      - {Item: Fourth_Bh_Axe, Rate: 2500}
+      - {Item: Fourth_1h_Sword, Rate: 2500}
+      - {Item: Fourth_1h_Mace, Rate: 2500}
+      - {Item: Fourth_1h_Dagger, Rate: 2500}
+      - {Item: Fourth_Bh_Katar, Rate: 2500}
+  - Map: nif_dun02
+    Monster: BLUEMOON_LOLI_RURI
+    Drops:
+      - {Item: Etel_Dust, Rate: 2000}
+      - {Item: Fourth_Bh_Axe, Rate: 1000}
+      - {Item: Fourth_1h_Sword, Rate: 1000}
+      - {Item: Fourth_1h_Manual, Rate: 1000}
+      - {Item: Fourth_1h_Mace, Rate: 1000}
+      - {Item: Fourth_1h_Dagger, Rate: 1000}
+      - {Item: Fourth_1h_Nindo2, Rate: 1000}
+      - {Item: Fourth_Bh_Katar, Rate: 1000}
+  - Map: nif_dun02
+    Monster: DEATH_WITCH
+    Drops:
+      - {Item: Etel_Dust, Rate: 25000}
+      - {Item: Etel_Stone, Rate: 5000}
+      - {Item: Fourth_Bh_Axe, Rate: 750}
+      - {Item: Fourth_1h_Sword, Rate: 750}
+      - {Item: Fourth_1h_Manual, Rate: 750}
+      - {Item: Fourth_1h_Mace, Rate: 750}
+      - {Item: Fourth_1h_Dagger, Rate: 750}
+      - {Item: Fourth_1h_Nindo2, Rate: 750}
+      - {Item: Fourth_Bh_Katar, Rate: 750}
+  - Map: nif_dun02
+    Monster: DISGUISER
+    Drops:
+      - {Item: Etel_Dust, Rate: 2000}
+      - {Item: Fourth_Bh_Axe, Rate: 1000}
+      - {Item: Fourth_1h_Sword, Rate: 1000}
+      - {Item: Fourth_1h_Manual, Rate: 1000}
+      - {Item: Fourth_1h_Mace, Rate: 1000}
+      - {Item: Fourth_1h_Dagger, Rate: 1000}
+      - {Item: Fourth_1h_Nindo2, Rate: 1000}
+      - {Item: Fourth_Bh_Katar, Rate: 1000}
+  - Map: nif_dun02
+    Monster: GROTE
+    Drops:
+      - {Item: Etel_Dust, Rate: 2000}
+      - {Item: Fourth_Bh_Axe, Rate: 1000}
+      - {Item: Fourth_1h_Sword, Rate: 1000}
+      - {Item: Fourth_1h_Manual, Rate: 1000}
+      - {Item: Fourth_1h_Mace, Rate: 1000}
+      - {Item: Fourth_1h_Dagger, Rate: 1000}
+      - {Item: Fourth_1h_Nindo2, Rate: 1000}
+      - {Item: Fourth_Bh_Katar, Rate: 1000}
+  - Map: nif_dun02
+    Monster: PIERROTZOIST
+    Drops:
+      - {Item: Etel_Dust, Rate: 2000}
+      - {Item: Fourth_Bh_Axe, Rate: 1000}
+      - {Item: Fourth_1h_Sword, Rate: 1000}
+      - {Item: Fourth_1h_Manual, Rate: 1000}
+      - {Item: Fourth_1h_Mace, Rate: 1000}
+      - {Item: Fourth_1h_Dagger, Rate: 1000}
+      - {Item: Fourth_1h_Nindo2, Rate: 1000}
+      - {Item: Fourth_Bh_Katar, Rate: 1000}
   - Map: pay_d03_i
     Monster: ILL_ARCHER_SKELETON
     Drops:
@@ -540,6 +632,91 @@ Body:
       - {Item: Gold_Lux_IL, Rate: 2500, RandomOptionGroup: ILL_PHYSIC_NORMAL}
       - {Item: IllusionStone, Rate: 2000}
       - {Item: Labyrinth_Box_IL, Rate: 500}
+  - Map: sp_rudus4
+    Monster: DEADRE
+    Drops:
+      - {Item: Etel_Dust, Rate: 2000}
+      - {Item: Fourth_Grenade, Rate: 1000}
+      - {Item: Fourth_Bh_Bow, Rate: 1000}
+      - {Item: Fourth_1h_Knuckle, Rate: 1000}
+      - {Item: Fourth_Bh_Lute, Rate: 1000}
+      - {Item: Fourth_Rifle, Rate: 1000}
+      - {Item: Fourth_Revolver, Rate: 1000}
+      - {Item: Fourth_Shotgun, Rate: 1000}
+      - {Item: Fourth_Bh_Fuuma, Rate: 1000}
+      - {Item: Fourth_Gatling, Rate: 1000}
+      - {Item: Fourth_1h_Whip, Rate: 1000}
+  - Map: sp_rudus4
+    Monster: DOLORIAN
+    Drops:
+      - {Item: Etel_Dust, Rate: 2000}
+      - {Item: Fourth_Grenade, Rate: 1000}
+      - {Item: Fourth_Bh_Bow, Rate: 1000}
+      - {Item: Fourth_1h_Knuckle, Rate: 1000}
+      - {Item: Fourth_Bh_Lute, Rate: 1000}
+      - {Item: Fourth_Rifle, Rate: 1000}
+      - {Item: Fourth_Revolver, Rate: 1000}
+      - {Item: Fourth_Shotgun, Rate: 1000}
+      - {Item: Fourth_Bh_Fuuma, Rate: 1000}
+      - {Item: Fourth_Gatling, Rate: 1000}
+      - {Item: Fourth_1h_Whip, Rate: 1000}
+  - Map: sp_rudus4
+    Monster: GIANT_CAPUT
+    Drops:
+      - {Item: Etel_Dust, Rate: 2000}
+      - {Item: Fourth_Grenade, Rate: 1000}
+      - {Item: Fourth_Bh_Bow, Rate: 1000}
+      - {Item: Fourth_1h_Knuckle, Rate: 1000}
+      - {Item: Fourth_Bh_Lute, Rate: 1000}
+      - {Item: Fourth_Rifle, Rate: 1000}
+      - {Item: Fourth_Revolver, Rate: 1000}
+      - {Item: Fourth_Shotgun, Rate: 1000}
+      - {Item: Fourth_Bh_Fuuma, Rate: 1000}
+      - {Item: Fourth_Gatling, Rate: 1000}
+      - {Item: Fourth_1h_Whip, Rate: 1000}
+  - Map: sp_rudus4
+    Monster: PLAGARION
+    Drops:
+      - {Item: Etel_Dust, Rate: 2000}
+      - {Item: Fourth_Grenade, Rate: 1000}
+      - {Item: Fourth_Bh_Bow, Rate: 1000}
+      - {Item: Fourth_1h_Knuckle, Rate: 1000}
+      - {Item: Fourth_Bh_Lute, Rate: 1000}
+      - {Item: Fourth_Rifle, Rate: 1000}
+      - {Item: Fourth_Revolver, Rate: 1000}
+      - {Item: Fourth_Shotgun, Rate: 1000}
+      - {Item: Fourth_Bh_Fuuma, Rate: 1000}
+      - {Item: Fourth_Gatling, Rate: 1000}
+      - {Item: Fourth_1h_Whip, Rate: 1000}
+  - Map: sp_rudus4
+    Monster: R001_BESTIA
+    Drops:
+      - {Item: Etel_Dust, Rate: 25000}
+      - {Item: Etel_Stone, Rate: 5000}
+      - {Item: Fourth_Grenade, Rate: 750}
+      - {Item: Fourth_Bh_Bow, Rate: 750}
+      - {Item: Fourth_1h_Knuckle, Rate: 750}
+      - {Item: Fourth_Bh_Lute, Rate: 750}
+      - {Item: Fourth_Rifle, Rate: 750}
+      - {Item: Fourth_Revolver, Rate: 750}
+      - {Item: Fourth_Shotgun, Rate: 750}
+      - {Item: Fourth_Bh_Fuuma, Rate: 750}
+      - {Item: Fourth_Gatling, Rate: 750}
+      - {Item: Fourth_1h_Whip, Rate: 750}
+  - Map: sp_rudus4
+    Monster: VENEDI
+    Drops:
+      - {Item: Etel_Dust, Rate: 2000}
+      - {Item: Fourth_Grenade, Rate: 1000}
+      - {Item: Fourth_Bh_Bow, Rate: 1000}
+      - {Item: Fourth_1h_Knuckle, Rate: 1000}
+      - {Item: Fourth_Bh_Lute, Rate: 1000}
+      - {Item: Fourth_Rifle, Rate: 1000}
+      - {Item: Fourth_Revolver, Rate: 1000}
+      - {Item: Fourth_Shotgun, Rate: 1000}
+      - {Item: Fourth_Bh_Fuuma, Rate: 1000}
+      - {Item: Fourth_Gatling, Rate: 1000}
+      - {Item: Fourth_1h_Whip, Rate: 1000}
   - Map: tur_d03_i
     Monster: ILL_ASSULTER
     Drops:

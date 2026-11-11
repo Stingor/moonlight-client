@@ -129725,6 +129725,190 @@ Body:
       bonus2 bMagicAddRace,RC_Player_Doram,50;
       bonus2 bMagicAddRace,RC_Plant,50;
       bonus bUseSPrate,50;
+  - Id: 300240
+    AegisName: Gan_Ceann_Card
+    Name: Gan Ceann Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Hand: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bBaseAtk,15;
+      bonus2 bAddSize,Size_Large,15;
+      if (BaseLevel>=200) {
+         bonus2 bAddSize,Size_Large,25;
+      }
+  - Id: 300241
+    AegisName: Brutal_Murderer_Card
+    Name: Brutal Murderer Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Hand: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bBaseAtk,15;
+      bonus2 bAddSize,Size_Medium,15;
+      if (BaseLevel>=200) {
+         bonus2 bAddSize,Size_Medium,25;
+      }
+  - Id: 300242
+    AegisName: Ghost_Cube_Card
+    Name: Ghost Cube Card
+    Type: Card
+    Weight: 10
+    Locations: {Both_Accessory: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      if (BaseJob == JOB_NOVICE) {
+         bonus2 bAddClass,Class_All,10;
+         bonus bMaxHP,1500;
+      }
+  - Id: 300243
+    AegisName: Lude_Gal_Card
+    Name: Lude Gal Card
+    Type: Card
+    Weight: 10
+    Locations: {Both_Accessory: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      if (BaseJob == JOB_NOVICE) {
+         bonus bMatkRate,10;
+         bonus bMaxSP,500;
+      }
+  - Id: 300244
+    AegisName: Disguiser_Card
+    Name: Disguiser Card
+    Type: Card
+    Weight: 10
+    Locations: {Head_Top: true, Head_Mid: true, Head_Low: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      .@r = getrefine();
+      bonus bVariableCastrate,5-.@r;
+      if (.@r>=9) {
+         bonus bLongAtkRate,1;
+         if (getallrefine() >= 22) {
+            bonus bLongAtkRate,2;
+         }
+      }
+  - Id: 300245
+    AegisName: Bluemoon_Loli_Ruri_Card
+    Name: Blue Moon Loli Ruri Card
+    Type: Card
+    Weight: 10
+    Locations: {Head_Top: true, Head_Mid: true, Head_Low: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      .@r = getrefine();
+      bonus bVariableCastrate,5-.@r;
+      if (.@r>=9) {
+         bonus bHealPower,3;
+         if (getallrefine() >= 22) {
+            bonus bHealPower,5;
+         }
+      }
+  - Id: 300246
+    AegisName: Grote_Card
+    Name: Grote Card
+    Type: Card
+    Weight: 10
+    Locations: {Head_Top: true, Head_Mid: true, Head_Low: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      .@r = getrefine();
+      bonus bVariableCastrate,5-.@r;
+      if (.@r>=9) {
+         bonus2 bMagicSubSize,Size_Small,1;
+         bonus bMdef,8;
+         if (getallrefine() >= 22) {
+            bonus2 bMagicSubSize,Size_Small,2;
+         }
+      }
+  - Id: 300247
+    AegisName: Pierrotzoist_Card
+    Name: Pierrotzoist Card
+    Type: Card
+    Weight: 10
+    Locations: {Head_Top: true, Head_Mid: true, Head_Low: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      .@r = getrefine();
+      bonus bVariableCastrate,5-.@r;
+      if (.@r>=9) {
+         bonus2 bMagicAtkEle,Ele_Ghost,1;
+         if (getallrefine() >= 22) {
+            bonus2 bMagicAtkEle,Ele_Ghost,2;
+         }
+      }
+  - Id: 300248
+    AegisName: Death_Witch_Card
+    Name: Death Witch Card
+    Type: Card
+    Weight: 10
+    Locations: {Shoes: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bUseSPrate,50;
+      bonus bMatkRate,10;
+      bonus2 bMagicAddRace,RC_Demon,50;
+      bonus2 bMagicAddRace,RC_Formless,50;
+  - Id: 300249
+    AegisName: Giant_Caput_Card
+    Name: Giant Caput Card
+    Type: Card
+    Weight: 10
+    Locations: {Both_Accessory: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bAddRace,RC_Formless,5;
+      if (BaseLevel>=200) {
+         bonus2 bAddRace,RC_Formless,15;
+      }
+  - Id: 300250
+    AegisName: Dolorian_Card
+    Name: Dolorian Card
+    Type: Card
+    Weight: 10
+    Locations: {Both_Accessory: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bAddRace,RC_Demon,5;
+      if (BaseLevel>=200) {
+         bonus2 bAddRace,RC_Demon,15;
+      }
+  - Id: 300251
+    AegisName: Plagarion_Card
+    Name: Plagarion Card
+    Type: Card
+    Weight: 10
+    Locations: {Head_Top: true, Head_Mid: true, Head_Low: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bMatk,15;
+      bonus2 bMagicAtkEle,Ele_Neutral,7;
+      bonus bUseSPrate,5;
+  - Id: 300252
+    AegisName: Deadre_Card
+    Name: Deadre Card
+    Type: Card
+    Weight: 10
+    Locations: {Head_Top: true, Head_Mid: true, Head_Low: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bMatk,15;
+      bonus2 bMagicAtkEle,Ele_Holy,7;
+      bonus bUseSPrate,5;
+  - Id: 300253
+    AegisName: Venedi_Card
+    Name: Venedi Card
+    Type: Card
+    Weight: 10
+    Locations: {Head_Top: true, Head_Mid: true, Head_Low: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bMatk,15;
+      bonus2 bMagicAtkEle,Ele_Poison,7;
+      bonus bUseSPrate,5;
   - Id: 300254
     AegisName: Amitera_Card
     Name: Amitera Card
@@ -129828,6 +130012,18 @@ Body:
       bonus bMatkRate,25;
       bonus2 bMagicAddRace,RC_Undead,50;
       bonus2 bMagicAddRace,RC_Dragon,50;
+  - Id: 300281
+    AegisName: R001_Bestia_Card
+    Name: R001-Bestia Card
+    Type: Card
+    Weight: 10
+    Locations: {Shoes: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bUseSPrate,50;
+      bonus bMatkRate,10;
+      bonus2 bMagicAddRace,RC_Fish,50;
+      bonus2 bMagicAddRace,RC_Insect,50;
   - Id: 310076
     AegisName: Cassock_Str
     Name: STR Blessing
@@ -137906,6 +138102,26 @@ Body:
       if (.@r>=9) {
          bonus bAspdRate,10;
       }
+  - Id: 500018
+    AegisName: Fourth_1h_Sword
+    Name: "Relapse Blade [2]"
+    Type: Weapon
+    SubType: 1hSword
+    Buy: 10300000
+    Sell: 103000
+    Weight: 1850
+    Attack: 200
+    Range: 1
+    Slots: 2
+    Jobs: {Alchemist: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 200
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"AM_ACIDTERROR",5*(.@r/2);
+      bonus2 bAddClass,Class_All,3*(.@r/4);
   - Id: 500030
     AegisName: Excalibur_IL
     Name: "Illusion Excalibur [2]"
@@ -137986,6 +138202,27 @@ Body:
       if (.@r>=10) {
          bonus bDelayrate,-10;
       }
+  - Id: 510026
+    AegisName: Fourth_1h_Dagger
+    Name: "Relapse Dagger [2]"
+    Type: Weapon
+    SubType: Dagger
+    Buy: 10100000
+    Sell: 101000
+    Weight: 1400
+    Attack: 180
+    Range: 1
+    Slots: 2
+    Jobs: {Rogue: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 200
+    Refineable: true
+    Script: |
+      bonus bMatk,215;
+      .@r = getrefine();
+      bonus2 bSkillAtk,"RG_RAID",5*(.@r/2);
+      bonus2 bMagicAtkEle,Ele_All,2*(.@r/4);
   - Id: 510034
     AegisName: Ancient_Dagger_IL
     Name: "Illusion Ancient Dagger [2]"
@@ -138018,6 +138255,26 @@ Body:
             }
          }
       }
+  - Id: 510055
+    AegisName: Fourth_1h_Nindo2
+    Name: "Relapse Edge [2]"
+    Type: Weapon
+    SubType: Dagger
+    Buy: 10100000
+    Sell: 101000
+    Weight: 1200
+    Attack: 180
+    Range: 1
+    Slots: 2
+    Jobs: {Ninja: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 200
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"NJ_KASUMIKIRI",4*(.@r/2);
+      bonus bShortAtkRate,2*(.@r/4);
   - Id: 520002
     AegisName: Ep172_1h_Axe
     Name: Pride Steel
@@ -138147,6 +138404,27 @@ Body:
          bonus2 bSkillAtk,"MG_LIGHTNINGBOLT",30;
          bonus2 bSkillAtk,"MG_FIREBOLT",30;
       }
+  - Id: 540043
+    AegisName: Fourth_1h_Manual
+    Name: "Relapse Book [2]"
+    Type: Weapon
+    SubType: Book
+    Buy: 10200000
+    Sell: 102000
+    Weight: 1300
+    Attack: 190
+    Range: 1
+    Slots: 2
+    Jobs: {StarGladiator: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 200
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus bShortAtkRate,3*(.@r/4);
+      bonus2 bSkillAtk,"TK_STORMKICK",5*(.@r/2);
   - Id: 550008
     AegisName: Ep172_1h_Wand
     Name: Greed Wand
@@ -138264,6 +138542,27 @@ Body:
     Script: |
       .@r = getrefine();
       bonus bBaseAtk,30*.@r;
+  - Id: 560011
+    AegisName: Fourth_1h_Knuckle
+    Name: "Scrap Fist [2]"
+    Type: Weapon
+    SubType: Knuckle
+    Buy: 10400000
+    Sell: 104000
+    Weight: 1300
+    Attack: 210
+    Range: 1
+    Slots: 2
+    Jobs: {Monk: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 200
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"MO_INVESTIGATE",5*(.@r/2);
+      bonus2 bSkillAtk,"MO_FINGEROFFENSIVE",5*(.@r/2);
+      bonus bShortAtkRate,2*(.@r/4);
   - Id: 570005
     AegisName: Ep172_1h_Inst
     Name: Pigritia Wave
@@ -138321,6 +138620,27 @@ Body:
          bonus2 bMagicAddEle,Ele_Water,10;
          bonus bDelayrate,-5;
       }
+  - Id: 570012
+    AegisName: Fourth_Bh_Lute
+    Name: "Scrap Lute [2]"
+    Type: Weapon
+    SubType: Musical
+    Buy: 10350000
+    Sell: 103500
+    Weight: 1250
+    Attack: 205
+    Range: 1
+    Slots: 2
+    Jobs: {BardDancer: true}
+    Gender: Male
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 200
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"BA_MUSICALSTRIKE",5*(.@r/2);
+      bonus bLongAtkRate,2*(.@r/4);
   - Id: 580005
     AegisName: Ep172_1h_Whip
     Name: Pigritia Spark
@@ -138378,6 +138698,27 @@ Body:
          bonus2 bMagicAddEle,Ele_Water,10;
          bonus bDelayrate,-5;
       }
+  - Id: 580012
+    AegisName: Fourth_1h_Whip
+    Name: "Scrap Whip [2]"
+    Type: Weapon
+    SubType: Whip
+    Buy: 10350000
+    Sell: 103500
+    Weight: 1250
+    Attack: 205
+    Range: 2
+    Slots: 2
+    Jobs: {BardDancer: true}
+    Gender: Female
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 200
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"DC_THROWARROW",5*(.@r/2);
+      bonus bLongAtkRate,2*(.@r/4);
   - Id: 590006
     AegisName: Ep172_1h_Hammer
     Name: Envy Blunt
@@ -138401,6 +138742,29 @@ Body:
       if (.@r>=9) {
          bonus bAspdRate,20;
       }
+  - Id: 590015
+    AegisName: Fourth_1h_Mace
+    Name: "Relapse Cross [2]"
+    Type: Weapon
+    SubType: Mace
+    Buy: 10200000
+    Sell: 102000
+    Weight: 1300
+    Attack: 190
+    Range: 1
+    Slots: 2
+    Jobs: {Priest: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 200
+    Refineable: true
+    Script: |
+      bonus bMatk,210;
+      bonus bUnbreakableWeapon;
+      .@r = getrefine();
+      bonus2 bSkillAtk,"PR_MAGNUS",5*(.@r/2);
+      bonus bHealPower,5*(.@r/2);
+      bonus2 bMagicAtkEle,Ele_All,2*(.@r/4);
   - Id: 600008
     AegisName: Ep172_Bh_Sword
     Name: Hypocrisy Edge
@@ -138504,6 +138868,47 @@ Body:
          bonus2 bAddEle,Ele_Fire,10;
          bonus bCritical,15;
       }
+  - Id: 610015
+    AegisName: Fourth_Bh_Katar
+    Name: "Relapse Katar [2]"
+    Type: Weapon
+    SubType: Katar
+    Buy: 10900000
+    Sell: 109000
+    Weight: 1800
+    Attack: 260
+    Range: 1
+    Slots: 2
+    Jobs: {Assassin: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 200
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"ASC_METEORASSAULT",5*(.@r/2);
+      bonus bShortAtkRate,2*(.@r/4);
+  - Id: 620005
+    AegisName: Fourth_Bh_Axe
+    Name: "Relapse Axe [2]"
+    Type: Weapon
+    SubType: 2hAxe
+    Buy: 11100000
+    Sell: 111000
+    Weight: 3000
+    Attack: 280
+    Range: 1
+    Slots: 2
+    Jobs: {Blacksmith: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 200
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bSkillAtk,"MC_CARTREVOLUTION",5*(.@r/2);
+      bonus bShortAtkRate,2*(.@r/4);
   - Id: 620010
     AegisName: Doom_Slayer_IL
     Name: "Illusion Doom Slayer [2]"
@@ -138661,6 +139066,27 @@ Body:
       bonus bUnbreakableWeapon;
       bonus bVariableCastrate,-2*(.@r/3);
       bonus bBaseAtk,30*.@r;
+  - Id: 650020
+    AegisName: Fourth_Bh_Fuuma
+    Name: "Scrap Slasher [2]"
+    Type: Weapon
+    SubType: Huuma
+    Buy: 11700000
+    Sell: 117000
+    Weight: 2200
+    Attack: 340
+    Range: 1
+    Slots: 2
+    Jobs: {Ninja: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 200
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bSkillAtk,"NJ_HUUMA",5*(.@r/2);
+      bonus bLongAtkRate,3*(.@r/4);
   - Id: 700007
     AegisName: Ep172_Bh_Bow
     Name: Superbia String
@@ -138721,6 +139147,46 @@ Body:
     Script: |
       .@r = getrefine();
       bonus bBaseAtk,30*.@r;
+  - Id: 700021
+    AegisName: Fourth_Bh_Bow
+    Name: "Scrap Bow [2]"
+    Type: Weapon
+    SubType: Bow
+    Buy: 10400000
+    Sell: 104000
+    Weight: 1700
+    Attack: 210
+    Range: 5
+    Slots: 2
+    Jobs: {Hunter: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 200
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"AC_SHOWER",5*(.@r/2);
+      bonus bLongAtkRate,2*(.@r/4);
+  - Id: 800010
+    AegisName: Fourth_Revolver
+    Name: "Scrap Pistol [2]"
+    Type: Weapon
+    SubType: Revolver
+    Buy: 10600000
+    Sell: 106000
+    Weight: 1300
+    Attack: 230
+    Range: 7
+    Slots: 2
+    Jobs: {Gunslinger: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 200
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"GS_TRACKING",6*(.@r/2);
+      bonus bLongAtkRate,3*(.@r/4);
   - Id: 810000
     AegisName: Ep172_1h_Rifle
     Name: Lust Pointer
@@ -138740,6 +139206,26 @@ Body:
       .@r = getrefine();
       bonus bAspdRate,3*.@r;
       bonus bBaseAtk,20*.@r;
+  - Id: 810006
+    AegisName: Fourth_Rifle
+    Name: "Scrap Piercer [2]"
+    Type: Weapon
+    SubType: Rifle
+    Buy: 11100000
+    Sell: 111000
+    Weight: 1600
+    Attack: 280
+    Range: 9
+    Slots: 2
+    Jobs: {Gunslinger: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 200
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"GS_PIERCINGSHOT",6*(.@r/2);
+      bonus bLongAtkRate,3*(.@r/4);
   - Id: 820000
     AegisName: Ep172_1h_Shotgun
     Name: Lust Shatter
@@ -138760,6 +139246,27 @@ Body:
       bonus bSplashRange,1;
       bonus bAspdRate,3*.@r;
       bonus bBaseAtk,15*.@r;
+  - Id: 820005
+    AegisName: Fourth_Shotgun
+    Name: "Scrap Shatter [2]"
+    Type: Weapon
+    SubType: Shotgun
+    Buy: 11400000
+    Sell: 114000
+    Weight: 2000
+    Attack: 310
+    Range: 9
+    Slots: 2
+    Jobs: {Gunslinger: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 200
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bSplashRange,1;
+      bonus bLongAtkRate,3*(getrefine()/4);
+      bonus2 bSkillAtk,"GS_SPREADATTACK",6*(.@r/2);
   - Id: 830001
     AegisName: Ep172_1h_Gatling
     Name: Lust Crusher
@@ -138779,6 +139286,26 @@ Body:
       .@r = getrefine();
       bonus bAspdRate,6*.@r;
       bonus bBaseAtk,15*.@r;
+  - Id: 830009
+    AegisName: Fourth_Gatling
+    Name: "Scrap Splatter [2]"
+    Type: Weapon
+    SubType: Gatling
+    Buy: 11000000
+    Sell: 110000
+    Weight: 2400
+    Attack: 270
+    Range: 9
+    Slots: 2
+    Jobs: {Gunslinger: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 200
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"GS_RAPIDSHOWER",6*(.@r/2);
+      bonus bLongAtkRate,3*(.@r/4);
   - Id: 840000
     AegisName: Ep172_1h_Grenade
     Name: Lust Boom
@@ -138798,12 +139325,42 @@ Body:
       .@r = getrefine();
       bonus bAspdRate,3*.@r;
       bonus bBaseAtk,20*.@r;
+  - Id: 840005
+    AegisName: Fourth_Grenade
+    Name: "Scrap Bomber [2]"
+    Type: Weapon
+    SubType: Grenade
+    Buy: 11800000
+    Sell: 118000
+    Weight: 3200
+    Attack: 350
+    Range: 9
+    Slots: 2
+    Jobs: {Gunslinger: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 200
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"GS_GROUNDDRIFT",6*(.@r/2);
+      bonus bLongAtkRate,3*(.@r/4);
   - Id: 1000225
     AegisName: GAMJammingChip
     Name: Potato Chips
     Buy: 250
     Sell: 125
     Weight: 10
+  - Id: 1000322
+    AegisName: Etel_Dust
+    Name: Etel Dust
+    Weight: 1
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1000323
+    AegisName: Etel_Stone
+    Name: Etel Stone
+    Weight: 10
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
   - Id: 1000504
     AegisName: Dry_Sand
     Name: Dry Sand
@@ -138874,6 +139431,72 @@ Body:
     Name: Maya's Crown
     Weight: 10
     Flags: {BuyingStore: true}
+  - Id: 1001072
+    AegisName: Evil_Black_Bid
+    Name: Evil Orb
+    Buy: 1480
+    Sell: 740
+    Weight: 10
+  - Id: 1001073
+    AegisName: Ectoplasmic_Stone
+    Name: Ectoplasmic Stone
+    Buy: 1460
+    Sell: 730
+    Weight: 10
+  - Id: 1001074
+    AegisName: Heavy_Chain
+    Name: Heavy Chain
+    Buy: 1480
+    Sell: 740
+    Weight: 10
+  - Id: 1001075
+    AegisName: Evil_Minded_Ruby
+    Name: Evil Minded Ruby
+    Buy: 1500
+    Sell: 750
+    Weight: 10
+  - Id: 1001076
+    AegisName: Small_Sewing_Box
+    Name: Small Sewing Kit
+    Buy: 1640
+    Sell: 820
+    Weight: 10
+  - Id: 1001077
+    AegisName: Whittling
+    Name: Wood Block
+    Buy: 1600
+    Sell: 800
+    Weight: 10
+  - Id: 1001078
+    AegisName: Blue_Moon_Stone
+    Name: Fragments of the Blue Moon
+    Buy: 1720
+    Sell: 860
+    Weight: 10
+  - Id: 1001079
+    AegisName: Weird_Tentacle
+    Name: Monstrous Tentacles
+    Buy: 1520
+    Sell: 760
+    Weight: 10
+  - Id: 1001080
+    AegisName: Congealed_Poison
+    Name: Congealed Poison
+    Buy: 1600
+    Sell: 800
+    Weight: 10
+  - Id: 1001081
+    AegisName: Slicky_Fluid
+    Name: Slimy Fluid
+    Buy: 1560
+    Sell: 780
+    Weight: 10
+  - Id: 1001082
+    AegisName: Reptile_Stone
+    Name: Monster's Stone
+    Buy: 1720
+    Sell: 860
+    Weight: 10
   - Id: 1001083
     AegisName: Turn_Yellow_Leaf
     Name: Maple Leaves

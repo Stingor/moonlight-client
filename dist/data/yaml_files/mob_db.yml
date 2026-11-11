@@ -72890,7 +72890,6 @@ Body:
     AttackMotion: 144
     ClientAttackMotion: 528
     DamageMotion: 288
-    DamageTaken: 10
     Ai: 21
     Class: Boss
     Modes: {Mvp: true}
@@ -73291,7 +73290,6 @@ Body:
     AttackMotion: 500
     ClientAttackMotion: 1056
     DamageMotion: 768
-    DamageTaken: 10
     Ai: 21
     Class: Boss
     Modes: {Mvp: true}
@@ -73336,7 +73334,6 @@ Body:
     AttackMotion: 768
     ClientAttackMotion: 408
     DamageMotion: 480
-    DamageTaken: 10
     Ai: 21
     Class: Boss
     Modes: {Mvp: true}
@@ -75303,7 +75300,6 @@ Body:
     AttackMotion: 576
     ClientAttackMotion: 240
     DamageMotion: 420
-    DamageTaken: 10
     Ai: 21
     Class: Boss
     Modes: {Mvp: true}
@@ -75635,7 +75631,6 @@ Body:
     AttackDelay: 188
     AttackMotion: 173
     DamageMotion: 480
-    DamageTaken: 10
     Ai: 21
     Class: Boss
     Modes: {NoRandomWalk: true, Detector: true, Mvp: true}
@@ -75670,7 +75665,6 @@ Body:
     AttackDelay: 576
     AttackMotion: 576
     DamageMotion: 480
-    DamageTaken: 10
     Ai: 21
     Class: Boss
     Modes: {NoRandomWalk: true, Detector: true, Mvp: true}
@@ -75930,7 +75924,6 @@ Body:
     AttackDelay: 432
     AttackMotion: 936
     DamageMotion: 360
-    DamageTaken: 10
     Ai: 21
     Class: Boss
     Modes: {Mvp: true}
@@ -78361,6 +78354,616 @@ Body:
       - {Item: Shadowdecon, Rate: 1000}
       - {Item: Zelunium, Rate: 1000}
       - {Item: The_One_Card, Rate: 1, StealProtected: true}
+  - Id: 20929
+    AegisName: GIANT_CAPUT
+    Name: Giant Caput
+    Level: 213
+    Hp: 528063
+    BaseExp: 844901
+    JobExp: 549186
+    Attack: 6930
+    Attack2: 1719
+    Defense: 48
+    MagicDefense: 30
+    Resistance: 221
+    MagicResistance: 130
+    Str: 85
+    Agi: 81
+    Vit: 115
+    Int: 99
+    Dex: 102
+    Luk: 95
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    ElementLevel: 2
+    WalkSpeed: 200
+    AttackDelay: 924
+    AttackMotion: 1848
+    ClientAttackMotion: 1176
+    DamageMotion: 480
+    Ai: 04
+    Drops:
+      - {Item: Tooth_Of_, Rate: 1600}
+      - {Item: Tendon, Rate: 2000}
+      - {Item: Slicky_Fluid, Rate: 1680}
+      - {Item: Piece_Of_Darkness, Rate: 2000}
+      - {Item: Shadowdecon_Ore, Rate: 150}
+      - {Item: Zelunium_Ore, Rate: 150}
+      - {Item: Shadowdecon, Rate: 12}
+      - {Item: Giant_Caput_Card, Rate: 1, StealProtected: true}
+  - Id: 20930
+    AegisName: DOLORIAN
+    Name: Dolorian
+    Level: 214
+    Hp: 525823
+    BaseExp: 841317
+    JobExp: 546856
+    Attack: 6853
+    Attack2: 2449
+    Defense: 46
+    MagicDefense: 29
+    Resistance: 98
+    MagicResistance: 143
+    Str: 59
+    Agi: 63
+    Vit: 66
+    Int: 90
+    Dex: 79
+    Luk: 90
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Demihuman
+    Element: Poison
+    ElementLevel: 3
+    WalkSpeed: 125
+    AttackDelay: 674
+    AttackMotion: 1248
+    ClientAttackMotion: 672
+    DamageMotion: 480
+    Ai: 04
+    Drops:
+      - {Item: Weird_Tentacle, Rate: 1840}
+      - {Item: Sticky_Poison, Rate: 2000}
+      - {Item: Tendon, Rate: 2000}
+      - {Item: Shadowdecon_Ore, Rate: 150}
+      - {Item: Zelunium_Ore, Rate: 150}
+      - {Item: Zelunium, Rate: 12}
+      - {Item: Shadowdecon, Rate: 12}
+      - {Item: Dolorian_Card, Rate: 1, StealProtected: true}
+  - Id: 20931
+    AegisName: PLAGARION
+    Name: Plagarion
+    Level: 215
+    Hp: 529868
+    BaseExp: 847789
+    JobExp: 551063
+    Attack: 7490
+    Attack2: 1803
+    Defense: 48
+    MagicDefense: 30
+    Resistance: 212
+    MagicResistance: 125
+    Str: 79
+    Agi: 76
+    Vit: 107
+    Int: 93
+    Dex: 95
+    Luk: 88
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    Race: Dragon
+    ElementLevel: 2
+    AttackDelay: 1332
+    AttackMotion: 2664
+    ClientAttackMotion: 936
+    DamageMotion: 480
+    Ai: 04
+    Drops:
+      - {Item: Dragon's_Skin, Rate: 2000}
+      - {Item: Reptile_Stone, Rate: 1600}
+      - {Item: Dragon_Train, Rate: 2000}
+      - {Item: Shadowdecon_Ore, Rate: 150}
+      - {Item: Zelunium_Ore, Rate: 150}
+      - {Item: Zelunium, Rate: 12}
+      - {Item: Shadowdecon, Rate: 12}
+      - {Item: Plagarion_Card, Rate: 1, StealProtected: true}
+  - Id: 20932
+    AegisName: DEADRE
+    Name: Deadre
+    Level: 214
+    Hp: 527870
+    BaseExp: 844592
+    JobExp: 548985
+    Attack: 10627
+    Attack2: 1697
+    Defense: 47
+    MagicDefense: 28
+    Resistance: 165
+    MagicResistance: 78
+    Str: 103
+    Agi: 86
+    Vit: 82
+    Int: 66
+    Dex: 89
+    Luk: 86
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Demihuman
+    Element: Dark
+    ElementLevel: 2
+    AttackDelay: 576
+    AttackMotion: 1152
+    ClientAttackMotion: 672
+    DamageMotion: 720
+    Ai: 04
+    Drops:
+      - {Item: Heart_Hunter_Seal, Rate: 1500}
+      - {Item: Shadowdecon_Ore, Rate: 150}
+      - {Item: Zelunium_Ore, Rate: 150}
+      - {Item: Long_Hair, Rate: 1500}
+      - {Item: Zelunium, Rate: 12}
+      - {Item: Shadowdecon, Rate: 12}
+      - {Item: Evil_Minded_Ruby, Rate: 1680}
+      - {Item: Deadre_Card, Rate: 1, StealProtected: true}
+  - Id: 20933
+    AegisName: VENEDI
+    Name: Venedi
+    Level: 213
+    Hp: 526177
+    BaseExp: 841883
+    JobExp: 547224
+    Attack: 7652
+    Attack2: 1888
+    Defense: 46
+    MagicDefense: 29
+    Resistance: 144
+    MagicResistance: 109
+    Str: 80
+    Agi: 65
+    Vit: 76
+    Int: 80
+    Dex: 77
+    Luk: 76
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Brute
+    Element: Poison
+    ElementLevel: 3
+    AttackDelay: 768
+    AttackMotion: 1536
+    ClientAttackMotion: 960
+    DamageMotion: 960
+    Ai: 04
+    Drops:
+      - {Item: Sticky_Poison, Rate: 2400}
+      - {Item: Sticky_Mucus, Rate: 2400}
+      - {Item: Shadowdecon_Ore, Rate: 150}
+      - {Item: Zelunium_Ore, Rate: 150}
+      - {Item: Shadowdecon, Rate: 12}
+      - {Item: Zelunium, Rate: 12}
+      - {Item: Congealed_Poison, Rate: 1600}
+      - {Item: Venedi_Card, Rate: 1, StealProtected: true}
+  - Id: 20934
+    AegisName: R001_BESTIA
+    Name: R001-Bestia
+    Level: 215
+    Hp: 5105110
+    BaseExp: 8168176
+    JobExp: 5309314
+    Attack: 12871
+    Attack2: 2187
+    Defense: 66
+    MagicDefense: 44
+    Resistance: 278
+    MagicResistance: 367
+    Str: 347
+    Agi: 124
+    Vit: 259
+    Int: 341
+    Dex: 167
+    Luk: 110
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    Race: Brute
+    Element: Dark
+    ElementLevel: 2
+    AttackDelay: 672
+    AttackMotion: 1344
+    ClientAttackMotion: 1056
+    DamageMotion: 768
+    Ai: 21
+    Class: Boss
+    Modes: {Mvp: true}
+    MvpDrops:
+      - {Item: Shadowdecon, Rate: 4000}
+      - {Item: Yggdrasilberry, Rate: 4000}
+      - {Item: Zelunium, Rate: 4000}
+    Drops:
+      - {Item: Piece_Of_Bone_Armor, Rate: 4000}
+      - {Item: Old_Violet_Box, Rate: 4000}
+      - {Item: Shadowdecon, Rate: 4000}
+      - {Item: Zelunium, Rate: 4000}
+      - {Item: R001_Bestia_Card, Rate: 1, StealProtected: true}
+  - Id: 20935
+    AegisName: GAN_CEANN
+    Name: Gan Ceann
+    Level: 215
+    Hp: 525625
+    BaseExp: 841000
+    JobExp: 546650
+    Attack: 10250
+    Attack2: 1757
+    Defense: 48
+    MagicDefense: 29
+    Resistance: 190
+    MagicResistance: 89
+    Str: 130
+    Agi: 109
+    Vit: 103
+    Int: 83
+    Dex: 112
+    Luk: 109
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    WalkSpeed: 155
+    AttackDelay: 238
+    AttackMotion: 576
+    ClientAttackMotion: 384
+    DamageMotion: 360
+    Ai: 04
+    Drops:
+      - {Item: Broken_Armor_Piece, Rate: 2040}
+      - {Item: Evil_Minded_Ruby, Rate: 1575}
+      - {Item: Shadowdecon_Ore, Rate: 150}
+      - {Item: Zelunium_Ore, Rate: 150}
+      - {Item: Shadowdecon, Rate: 12}
+      - {Item: Zelunium, Rate: 12}
+      - {Item: Gan_Ceann_Card, Rate: 1, StealProtected: true}
+  - Id: 20936
+    AegisName: DISGUISER
+    Name: Disguiser
+    Level: 254
+    Hp: 587305
+    BaseExp: 939688
+    JobExp: 610797
+    Attack: 13744
+    Attack2: 3282
+    Defense: 57
+    MagicDefense: 36
+    Resistance: 209
+    MagicResistance: 170
+    Str: 175
+    Agi: 260
+    Vit: 114
+    Int: 147
+    Dex: 187
+    Luk: 180
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Demon
+    Element: Undead
+    ElementLevel: 2
+    AttackDelay: 384
+    AttackMotion: 768
+    ClientAttackMotion: 480
+    DamageMotion: 384
+    Ai: 04
+    Modes: {Detector: true}
+    Drops:
+      - {Item: Red_Scarf, Rate: 2500}
+      - {Item: Tangled_Chain, Rate: 1800}
+      - {Item: Heavy_Chain, Rate: 2300}
+      - {Item: Shadowdecon_Ore, Rate: 150}
+      - {Item: Zelunium_Ore, Rate: 150}
+      - {Item: Zelunium, Rate: 25}
+      - {Item: Shadowdecon, Rate: 25}
+      - {Item: Disguiser_Card, Rate: 1, StealProtected: true}
+  - Id: 20937
+    AegisName: BRUTAL_MURDERER
+    Name: Brutal Murderer
+    Level: 214
+    Hp: 532359
+    BaseExp: 851774
+    JobExp: 553653
+    Attack: 6917
+    Attack2: 1620
+    Defense: 48
+    MagicDefense: 29
+    Resistance: 201
+    MagicResistance: 119
+    Str: 73
+    Agi: 70
+    Vit: 100
+    Int: 86
+    Dex: 88
+    Luk: 82
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    Race: Demihuman
+    ElementLevel: 2
+    WalkSpeed: 175
+    AttackDelay: 336
+    AttackMotion: 672
+    ClientAttackMotion: 480
+    DamageMotion: 288
+    Ai: 04
+    Drops:
+      - {Item: Heavy_Chain, Rate: 1725}
+      - {Item: Rusty_Cleaver, Rate: 1360}
+      - {Item: Mr_Scream, Rate: 20}
+      - {Item: Shadowdecon_Ore, Rate: 150}
+      - {Item: Zelunium_Ore, Rate: 150}
+      - {Item: Shadowdecon, Rate: 12}
+      - {Item: Zelunium, Rate: 12}
+      - {Item: Brutal_Murderer_Card, Rate: 1, StealProtected: true}
+  - Id: 20938
+    AegisName: GHOST_CUBE
+    Name: Ghost Cube
+    Level: 213
+    Hp: 529075
+    BaseExp: 846520
+    JobExp: 550238
+    Attack: 6705
+    Attack2: 1690
+    Defense: 47
+    MagicDefense: 29
+    Resistance: 149
+    MagicResistance: 113
+    Str: 85
+    Agi: 69
+    Vit: 81
+    Int: 85
+    Dex: 82
+    Luk: 81
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Race: Undead
+    Element: Undead
+    WalkSpeed: 130
+    AttackDelay: 624
+    AttackMotion: 1248
+    ClientAttackMotion: 672
+    DamageMotion: 576
+    Ai: 04
+    Drops:
+      - {Item: Piece_Of_Black_Cloth, Rate: 2040}
+      - {Item: Evil_Black_Bid, Rate: 1575}
+      - {Item: Black_Powder, Rate: 250}
+      - {Item: Shadowdecon_Ore, Rate: 150}
+      - {Item: Zelunium_Ore, Rate: 150}
+      - {Item: Shadowdecon, Rate: 12}
+      - {Item: Zelunium, Rate: 12}
+      - {Item: Ghost_Cube_Card, Rate: 1, StealProtected: true}
+  - Id: 20939
+    AegisName: LUDE_GAL
+    Name: Lude Gal
+    Level: 213
+    Hp: 529399
+    BaseExp: 847038
+    JobExp: 550575
+    Attack: 9101
+    Attack2: 1448
+    Defense: 47
+    MagicDefense: 28
+    Resistance: 163
+    MagicResistance: 76
+    Str: 102
+    Agi: 85
+    Vit: 81
+    Int: 65
+    Dex: 87
+    Luk: 85
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Race: Undead
+    Element: Undead
+    ElementLevel: 2
+    WalkSpeed: 130
+    AttackDelay: 480
+    AttackMotion: 960
+    ClientAttackMotion: 288
+    DamageMotion: 480
+    Ai: 04
+    Drops:
+      - {Item: Pumpkin_Bucket, Rate: 2125}
+      - {Item: Ectoplasmic_Stone, Rate: 1800}
+      - {Item: Transparent_Cloth, Rate: 500}
+      - {Item: Shadowdecon_Ore, Rate: 150}
+      - {Item: Zelunium_Ore, Rate: 150}
+      - {Item: Shadowdecon, Rate: 12}
+      - {Item: Zelunium, Rate: 12}
+      - {Item: Lude_Gal_Card, Rate: 1, StealProtected: true}
+  - Id: 20940
+    AegisName: BLUEMOON_LOLI_RURI
+    Name: Blue Moon Loli Ruri
+    Level: 255
+    Hp: 596605
+    BaseExp: 954568
+    JobExp: 620469
+    Attack: 14716
+    Attack2: 2795
+    Defense: 60
+    MagicDefense: 36
+    Resistance: 405
+    MagicResistance: 191
+    Str: 220
+    Agi: 185
+    Vit: 175
+    Int: 141
+    Dex: 190
+    Luk: 184
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    Race: Demon
+    Element: Water
+    ElementLevel: 3
+    WalkSpeed: 125
+    AttackDelay: 510
+    AttackMotion: 1020
+    ClientAttackMotion: 720
+    DamageMotion: 576
+    Ai: 04
+    Modes: {Detector: true}
+    Drops:
+      - {Item: Black_Kitty_Doll, Rate: 500}
+      - {Item: Striped_Socks, Rate: 2400}
+      - {Item: Bat_Cage, Rate: 2000}
+      - {Item: Blue_Moon_Stone, Rate: 2300}
+      - {Item: Shadowdecon_Ore, Rate: 150}
+      - {Item: Zelunium_Ore, Rate: 150}
+      - {Item: Shadowdecon, Rate: 25}
+      - {Item: Bluemoon_Loli_Ruri_Card, Rate: 1, StealProtected: true}
+  - Id: 20941
+    AegisName: GROTE
+    Name: Grote
+    Level: 253
+    Hp: 601461
+    BaseExp: 962338
+    JobExp: 625520
+    Attack: 10230
+    Attack2: 2896
+    Defense: 60
+    MagicDefense: 37
+    Resistance: 476
+    MagicResistance: 282
+    Str: 144
+    Agi: 139
+    Vit: 196
+    Int: 169
+    Dex: 174
+    Luk: 161
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    Race: Demon
+    Element: Earth
+    ElementLevel: 2
+    WalkSpeed: 180
+    AttackDelay: 792
+    AttackMotion: 1584
+    ClientAttackMotion: 1152
+    DamageMotion: 576
+    Ai: 04
+    Modes: {Detector: true}
+    Drops:
+      - {Item: Hanging_Doll, Rate: 1000}
+      - {Item: Rotten_Rope, Rate: 2500}
+      - {Item: Tree_Knot, Rate: 2000}
+      - {Item: Branch_Of_Dead_Tree, Rate: 5}
+      - {Item: Whittling, Rate: 2200}
+      - {Item: Shadowdecon, Rate: 25}
+      - {Item: Zelunium, Rate: 25}
+      - {Item: Grote_Card, Rate: 1, StealProtected: true}
+  - Id: 20942
+    AegisName: PIERROTZOIST
+    Name: Pierrotzoist
+    Level: 255
+    Hp: 578587
+    BaseExp: 925739
+    JobExp: 601730
+    Attack: 11253
+    Attack2: 5182
+    Defense: 58
+    MagicDefense: 39
+    Resistance: 243
+    MagicResistance: 379
+    Str: 133
+    Agi: 144
+    Vit: 150
+    Int: 202
+    Dex: 180
+    Luk: 202
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Demon
+    Element: Dark
+    ElementLevel: 2
+    WalkSpeed: 155
+    AttackDelay: 768
+    AttackMotion: 1536
+    ClientAttackMotion: 768
+    DamageMotion: 480
+    Ai: 04
+    Modes: {Detector: true}
+    Drops:
+      - {Item: Broken_Needle, Rate: 2400}
+      - {Item: Needle_Pouch, Rate: 2000}
+      - {Item: Stuffed_Doll, Rate: 40}
+      - {Item: Small_Sewing_Box, Rate: 2100}
+      - {Item: Shadowdecon_Ore, Rate: 150}
+      - {Item: Zelunium_Ore, Rate: 150}
+      - {Item: Zelunium, Rate: 25}
+      - {Item: Pierrotzoist_Card, Rate: 1, StealProtected: true}
+  - Id: 20943
+    AegisName: DEATH_WITCH
+    Name: Death Witch
+    Level: 255
+    Hp: 7442803
+    BaseExp: 11908485
+    JobExp: 7740515
+    Attack: 14658
+    Attack2: 2687
+    Defense: 72
+    MagicDefense: 44
+    Resistance: 273
+    MagicResistance: 539
+    Str: 424
+    Agi: 236
+    Vit: 214
+    Int: 423
+    Dex: 241
+    Luk: 174
+    AttackRange: 3
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Demihuman
+    Element: Dark
+    ElementLevel: 2
+    AttackDelay: 517
+    AttackMotion: 1134
+    ClientAttackMotion: 864
+    DamageMotion: 480
+    Ai: 21
+    Class: Boss
+    Modes: {Mvp: true}
+    MvpDrops:
+      - {Item: Shadowdecon, Rate: 4000}
+      - {Item: Zelunium, Rate: 4000}
+      - {Item: Old_Violet_Box, Rate: 4000}
+    Drops:
+      - {Item: Ectoplasm, Rate: 200}
+      - {Item: Yggdrasilberry, Rate: 1500}
+      - {Item: Seed_Of_Yggdrasil, Rate: 1500}
+      - {Item: Leaf_Of_Yggdrasil, Rate: 1500}
+      - {Item: Shadowdecon, Rate: 1000}
+      - {Item: Zelunium, Rate: 1000}
+      - {Item: Death_Witch_Card, Rate: 1, StealProtected: true}
   - Id: 21386
     AegisName: ILL_ANDRE
     Name: Diligent Andre
