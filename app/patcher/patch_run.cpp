@@ -183,6 +183,7 @@ Result<PatchRunOutcome> RunPatches(const PatchRunSettings& settings, PatchFetche
       return fail(applied.error());
     }
     ++outcome.applied_patches;
+    outcome.restart_needed = outcome.restart_needed || applied->in_use_file_replaced;
     if (applied->executable_replaced) {
       outcome.restart_needed = true;
       // L'exécutable qui tourne porte désormais le suffixe : sous son ancien

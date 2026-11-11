@@ -19,6 +19,9 @@ struct PatchTarget {
 
 struct PatchApplied {
   bool executable_replaced = false;
+  // Un fichier que le client tient ouvert a été remplacé : il n'emploiera le
+  // nouveau qu'une fois relancé.
+  bool in_use_file_replaced = false;
 };
 
 // APPLIQUE UNE ARCHIVE À L'INSTALLATION : fusion dans sa GRF, ou fichiers du
@@ -33,6 +36,11 @@ struct PatchApplied {
 // ⚠ L'EXÉCUTABLE QUI TOURNE NE S'ÉCRASE PAS : Windows le refuse. Il se
 // renomme d'abord (`.old`), et le nouveau prend sa place ; il sera effacé au
 // lancement suivant.
+//
+// ⚠ UN FICHIER EN USAGE NON PLUS — une bibliothèque chargée : il s'écarte sous
+// `kInUseSetAsideSuffix`, s'inscrit au journal, et le lancement suivant
+// l'efface. Sans cela, rejouer la chaîne depuis le début — l'état a disparu —
+// s'arrêterait sur la première DLL qu'elle livre.
 [[nodiscard]] ro::core::Result<PatchApplied> ApplyPatchArchive(ro::formats::ThorArchive& archive,
                                                                const PatchTarget& target);
 

@@ -12,11 +12,6 @@
 
 namespace moonclient::patcher {
 
-// Le suffixe d'un fichier en usage que le miroir remplace — une bibliothèque
-// chargée par le client — : écarté sous ce nom, il s'efface à la
-// synchronisation suivante.
-inline constexpr std::string_view kMirrorSetAsideSuffix = ".moonclient-old";
-
 struct MirrorSyncOutcome {
   std::size_t written_files = 0;
   // Vrai : un fichier en usage a été remplacé, et le client doit se relancer

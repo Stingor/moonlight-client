@@ -65,7 +65,7 @@ constexpr std::string_view kMirrorDownloadName = "mirror.download";
                                                 : character;
   });
   return first_segment.starts_with(kPatcherFilePrefix) ||
-         relative_path.ends_with(kMirrorSetAsideSuffix);
+         relative_path.ends_with(kInUseSetAsideSuffix);
 }
 
 [[nodiscard]] std::optional<std::int64_t> WriteTicksOf(const std::filesystem::path& path) {
@@ -110,7 +110,8 @@ constexpr std::string_view kMirrorDownloadName = "mirror.download";
 
 // Déplace le fichier reçu à sa place. Rend vrai quand il a fallu écarter un
 // fichier en usage, ce qui demande une relance.
-[[nodiscard]] Result<bool> PutInPlace(const std::filesystem::path& received,
+[[nodiscard]] Result<bool> PutInPlace(const std::filesystem::path& install_root,
+                                      const std::filesystem::path& received,
                                       const std::filesystem::path& disk_path,
                                       const std::filesystem::path& running_executable) {
   std::error_code failed;
@@ -140,20 +141,17 @@ constexpr std::string_view kMirrorDownloadName = "mirror.download";
     return false;
   }
   // Un fichier en usage ne se remplace pas, mais se renomme.
-  std::filesystem::path aside = disk_path;
-  aside += kMirrorSetAsideSuffix;
-  std::error_code aside_failed;
-  std::filesystem::remove(aside, aside_failed);
-  std::filesystem::rename(disk_path, aside, aside_failed);
-  if (aside_failed) {
+  auto aside = SetInUseFileAside(install_root, disk_path);
+  if (!aside) {
     return Fail(
         ErrorCode::kIoFailure,
         "impossible de remplacer " + ro::core::Utf8FromPath(disk_path) + " : " + failed.message());
   }
+  failed.clear();
   std::filesystem::rename(received, disk_path, failed);
   if (failed) {
     std::error_code ignored;
-    std::filesystem::rename(aside, disk_path, ignored);
+    std::filesystem::rename(*aside, disk_path, ignored);
     return Fail(ErrorCode::kIoFailure, "impossible de poser " + ro::core::Utf8FromPath(disk_path) +
                                            " : " + failed.message());
   }
@@ -203,7 +201,7 @@ Result<MirrorSyncOutcome> SyncMirror(const PatchRunSettings& settings,
       return Fail(ErrorCode::kIoFailure, "vérification interrompue");
     }
     std::filesystem::path set_aside = disk_paths[file_index];
-    set_aside += kMirrorSetAsideSuffix;
+    set_aside += kInUseSetAsideSuffix;
     std::error_code ignored;
     std::filesystem::remove(set_aside, ignored);
     if (!IsUpToDate((*files)[file_index], disk_paths[file_index], known_cache, fresh_cache)) {
@@ -274,7 +272,7 @@ Result<MirrorSyncOutcome> SyncMirror(const PatchRunSettings& settings,
     progress.phase = PatchPhase::kApplying;
     board.Publish(progress);
     const bool replaces_running = IsRunningExecutable(disk_path, running);
-    auto placed = PutInPlace(received_path, disk_path, running);
+    auto placed = PutInPlace(settings.install_root, received_path, disk_path, running);
     if (!placed) {
       return Fail(placed.error().code, file.relative_path + " : " + placed.error().detail);
     }

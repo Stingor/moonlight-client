@@ -25,6 +25,7 @@
 #include "game/skin_image_of.h"
 #include "patcher/http_patch_fetcher.h"
 #include "patcher/install_lock.h"
+#include "patcher/install_path.h"
 #include "patcher/patcher_state.h"
 #include "patcher/relaunch.h"
 #include "shell/skin_folder.h"
@@ -131,6 +132,7 @@ struct PatchScreenText {
 ro::core::Result<PatchStageEnd> RunPatchStage(ClientShell& shell,
                                               const PatchRunSettings& settings) {
   RemoveReplacedExecutable(settings.running_executable);
+  RemoveSetAsideFiles(settings.install_root);
   // ⚠ LUE AVANT LE FIL, et sur le disque : aucune archive n'est ouverte
   // pendant qu'on les réécrit.
   const ro::render::IconTexture backdrop =

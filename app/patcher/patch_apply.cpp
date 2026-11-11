@@ -91,9 +91,13 @@ using ro::core::Result;
         !applied.executable_replaced && IsRunningExecutable(disk_path, target.running_executable);
     if (entry.is_removed) {
       // L'exécutable qui tourne ne se retire pas : il sera remplacé ou gardé.
-      std::error_code ignored;
-      if (!replaces_running) {
-        std::filesystem::remove(disk_path, ignored);
+      // Un fichier en usage ne s'efface pas, mais s'écarte.
+      std::error_code failed;
+      if (!replaces_running && !std::filesystem::remove(disk_path, failed) && failed &&
+          std::filesystem::exists(disk_path, failed)) {
+        if (auto aside = SetInUseFileAside(target.install_root, disk_path); !aside) {
+          return std::unexpected(aside.error());
+        }
       }
       continue;
     }
@@ -109,13 +113,25 @@ using ro::core::Result;
       }
       set_aside = std::move(*aside);
     }
-    auto written = ro::core::WriteFileAtomically(
-        disk_path,
-        std::string_view(reinterpret_cast<const char*>(content->data()), content->size()));
+    const std::string_view bytes(reinterpret_cast<const char*>(content->data()), content->size());
+    auto written = ro::core::WriteFileAtomically(disk_path, bytes);
+    // Un fichier en usage — une bibliothèque que le client a chargée — ne
+    // s'écrase pas, mais se renomme : il s'écarte, et le nouveau prend sa place.
+    std::optional<std::filesystem::path> in_use_aside;
+    std::error_code probe_error;
+    if (!written && !set_aside.has_value() && std::filesystem::exists(disk_path, probe_error)) {
+      if (auto aside = SetInUseFileAside(target.install_root, disk_path); aside) {
+        in_use_aside = std::move(*aside);
+        written = ro::core::WriteFileAtomically(disk_path, bytes);
+      }
+    }
     if (!written) {
+      std::error_code ignored;
       if (set_aside.has_value()) {
-        std::error_code ignored;
         std::filesystem::rename(*set_aside, target.running_executable, ignored);
+      }
+      if (in_use_aside.has_value()) {
+        std::filesystem::rename(*in_use_aside, disk_path, ignored);
       }
       return std::unexpected(written.error());
     }
@@ -123,6 +139,7 @@ using ro::core::Result;
       KeepExecutablePermissions(*set_aside, target.running_executable);
     }
     applied.executable_replaced = applied.executable_replaced || replaces_running;
+    applied.in_use_file_replaced = applied.in_use_file_replaced || in_use_aside.has_value();
   }
   return applied;
 }
