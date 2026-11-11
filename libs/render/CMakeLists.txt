@@ -109,6 +109,7 @@ add_library(ro_render STATIC
     src/ground_cursor.cpp
     src/ground_light.cpp
     src/ground_pick.cpp
+    src/ground_scope.cpp
     src/ground_quad.cpp
     src/graffiti.cpp
     src/grey_world.cpp

@@ -36,6 +36,7 @@
 #include "effects/drawn_ground_cells.h"
 #include "effects/effect_clock.h"
 #include "effects/effect_draw_gate.h"
+#include "effects/effect_ground_scope.h"
 #include "effects/effect_node_command.h"
 #include "effects/effect_node_placements.h"
 #include "effects/effect_node_sowing.h"
@@ -62,7 +63,7 @@ namespace moonclient {
 // Une troupe de nœuds en train de jouer.
 class EffectNodesInPlay {
  public:
-  explicit EffectNodesInPlay(ro::vfs::Vfs& vfs) : vfs_(&vfs) {}
+  explicit EffectNodesInPlay(ro::vfs::Vfs& vfs) : vfs_(&vfs), scopes_(vfs) {}
 
   // Sème une troupe du sprite nommé. Faux si le couple .spr/.act ne se lit
   // pas : c'est à l'appelant de le dire, lui seul sait à qui.
@@ -298,6 +299,8 @@ class EffectNodesInPlay {
   [[nodiscard]] std::span<const DrawnGroundCells> GroundCells() const noexcept {
     return ground_cells_;
   }
+  // Les cercles de visée, qui se peignent avec ces cases.
+  [[nodiscard]] GroundScopes& Scopes() noexcept { return scopes_; }
 
   // CE QUE LA CARTE DIT À LA TROUPE : l'altitude du sol sous un point — sans
   // elle, un nœud qui REBONDIT traverse le sol —, et si elle élargit les
@@ -702,6 +705,7 @@ class EffectNodesInPlay {
                             std::size_t& sans_quad);
 
   ro::vfs::Vfs* vfs_ = nullptr;
+  GroundScopes scopes_;
   // Les sprites déjà lus, par chemin. Une troupe en sème des dizaines : les
   // relire à chaque semis ferait un à-coup à chaque lancement.
   //

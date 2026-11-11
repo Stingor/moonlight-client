@@ -149,6 +149,7 @@ add_library(moonclient_effects STATIC
     effects/effect_cast_skill_cases.cpp
     effects/effect_class_view.cpp
     effects/effect_devotion_view.cpp
+    effects/effect_ground_scope.cpp
     effects/effect_ground_skill_view.cpp
     effects/effect_hat.cpp
     effects/effect_looping.cpp

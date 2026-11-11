@@ -411,30 +411,19 @@ void EffectsInPlay::NoticeSkills(const ro::sim::World& world, const MapStage& st
           // L'ÉTAT D'INCANTATION, posé avec la barre : ce qu'il fait naître.
           play_state_effects(actor, ro::render::SkillImplFor(cast.skill_id).CastState(),
                              cast.skill_id, cast.started_ms, SkillMoment::kAnnounced);
-          // 🔴 LA GRILLE DE VISÉE SOUS UN SORT LANCÉ AU SOL : c'est elle, le
-          // cercle qu'on voit se poser pendant l'incantation d'un Storm Gust —
-          // `magic_target.tga`, sept cases sur sept peintes à même le terrain.
+          // 🔴 LE CERCLE DE VISÉE SOUS UN SORT LANCÉ AU SOL : le carré que le
+          // client peint à même le terrain autour de la case visée, de la taille
+          // de la zone du sort, et qui vit jusqu'à la fin annoncée. Voir
+          // `ro/render/ground_scope.h`.
           //
-          // ⚠ ELLE N'A RIEN À VOIR AVEC L'AURA ÉLÉMENTAIRE. Celle-ci naît sous
-          // le LANCEUR et dit l'élément du sort ; la grille se pose sur la CASE
-          // VISÉE et dit où le sort tombera. Les confondre fait chercher un
-          // cercle absent dans la table des auras, qui répondait pourtant.
-          //
-          // ⚠ ET SA VIE SUFFIT À LA FAIRE DURER, là où l'aura demande une
-          // relance : son dessinateur n'utilise AUCUN alpha de piste — les deux
-          // teintes sont écrites en dur —, si bien qu'elle apparaît et disparaît
-          // avec son nœud au lieu de s'éteindre en chemin.
+          // ⚠ IL N'A RIEN À VOIR AVEC L'AURA ÉLÉMENTAIRE. Celle-ci naît sous le
+          // LANCEUR et dit l'élément du sort ; le cercle se pose sur la CASE
+          // VISÉE et dit où le sort tombera.
           if (cast.target_id == 0 && (cast.target_cell.x != 0 || cast.target_cell.y != 0)) {
             const std::array<float, 3> visee =
                 GroundPositionAt(stage, cast.target_cell.x, cast.target_cell.y);
-            // ⚠ UNE ÉCHÉANCE, ET NON UN PLANCHER. La grille déclare TROIS MILLE
-            // tics — quarante-huit secondes —, et un plancher la laisse les
-            // vivre : elle restait sur la carte longtemps après l incantation.
-            // Le client lui donne une heure de mort, timeGetTime() + durée.
-            PlayById(ro::render::kGroundSampleEffect, glm::vec3(visee[0], visee[1], visee[2]),
-                     cast.started_ms, /*owner_id=*/0, /*endless=*/false,
-                     /*life_floor_ticks=*/0, /*announce_sound=*/true,
-                     static_cast<std::int32_t>(cast.duration_ms / ro::render::kEffectTickMs));
+            nodes_->Scopes().Place(cast.skill_id, glm::vec3(visee[0], visee[1], visee[2]),
+                                   cast.started_ms, cast.duration_ms, minimal_effects_);
           }
           // 🔴 LE RÉTICULE SUR LA CIBLE, et il ne dépend d'AUCUNE compétence :
           // le client l'envoie à la cible avant tout cas particulier, dès que

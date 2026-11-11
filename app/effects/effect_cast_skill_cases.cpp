@@ -8,9 +8,9 @@
 // compétences : sans ce fichier, ces incantations ne montraient que leur effet
 // générique.
 //
-// ⚠ CE QUE CE PORTAGE NE FAIT PAS : le cercle de portée de CD_COMPETENTIA, que
-// le client pose au sol à côté de son effet. Les cercles de portée sont une
-// autre affaire, que le chantier des effets de monstres range à part.
+// CD_COMPETENTIA pose en plus un cercle de visée sous son lanceur, celui que le
+// client peint autour de la case visée d'un sort au sol : voir
+// `ro/render/ground_scope.h`.
 
 #include <algorithm>
 #include <array>
@@ -24,6 +24,7 @@
 #include "ro/sim/movement.h"
 #include "ro/sim/world.h"
 
+#include "effects/effect_node_view.h"
 #include "effects/effect_own_skill_cases.h"
 #include "effects/effect_view.h"
 #include "world/actor_sounds.h"
@@ -188,6 +189,7 @@ constexpr std::uint16_t kMechanicArmsCannon = 2261;
 constexpr std::uint16_t kAgDestructiveHurricane = 5215;
 constexpr std::uint16_t kAgStormCannon = 5234;
 constexpr std::uint16_t kAgClimax = 5232;
+constexpr std::uint16_t kCdCompetentia = 5278;
 
 // Sur la case visée, sans porteur : Diamond Dust et les deux Psychic Wave.
 constexpr std::uint16_t kDiamondDustFull = 1284;
@@ -360,6 +362,9 @@ bool OwnSkillCases::OnCast(EffectsInPlay& effects, const MapStage& stage,
   if (cast.skill_id == kAgDestructiveHurricane || cast.skill_id == kAgStormCannon) {
     effects.per_map_.just_sown_named_sounds.push_back(
         SownNamedSound{kBeginSpellSound, caster.position});
+  }
+  if (cast.skill_id == kCdCompetentia) {
+    effects.nodes_->Scopes().Place(cast.skill_id, feet, now_ms, cast.duration_ms, minimal);
   }
   if (cast.skill_id == kAgClimax) {
     const std::uint32_t rest_ms =

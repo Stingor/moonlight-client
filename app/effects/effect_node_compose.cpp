@@ -659,6 +659,11 @@ std::span<const ro::render::DrawnActor> EffectNodesInPlay::Drawn(std::uint32_t n
   for (std::size_t index = 0; index < ground_cells_.size(); ++index) {
     ground_cells_[index].cells = ground_cell_lots_[index];
   }
+  // LES CERCLES DE VISÉE se peignent avec les cases des nœuds : leurs lots
+  // vivent dans `scopes_` jusqu'à l'image suivante.
+  for (const DrawnGroundCells& scope : scopes_.Compose(now_ms)) {
+    ground_cells_.push_back(scope);
+  }
   // ⚠ CE COMPTE NE SE REMET JAMAIS À ZÉRO, et c'est ce qui le rend utile : à
   // zéro, AUCUN lot n'a jamais été composé depuis le lancement, et la panne
   // n'est pas celle d'un effet mais de toute la voie des quads du monde.

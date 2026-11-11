@@ -39,6 +39,7 @@ void EffectNodesInPlay::Forget() {
   world_quads_.clear();
   ground_cell_lots_.clear();
   ground_cells_.clear();
+  scopes_.Forget();
   // Les bruits de semis et les effets demandés pas encore emportés
   // appartenaient à la troupe oubliée.
   sowing_sounds_.clear();
