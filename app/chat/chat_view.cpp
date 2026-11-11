@@ -99,11 +99,10 @@ std::vector<ro::ui::ChatBubbleView> ChatBubblesOnScreen(
                 ro::render::ActorSpeakerScreenBounds(camera, aspect_ratio, drawn[index],
                                                      viewport_width, viewport_height);
             bounds.has_value()) {
-          scripts.push_back(
-              {.head = ImVec2((bounds->min.x + bounds->max.x) * 0.5F, bounds->min.y),
-               .text = actor->script_text,
-               .elapsed_ms = script_elapsed_ms,
-               .speaker_id = ids[index]});
+          scripts.push_back({.head = ImVec2((bounds->min.x + bounds->max.x) * 0.5F, bounds->min.y),
+                             .text = actor->script_text,
+                             .elapsed_ms = script_elapsed_ms,
+                             .speaker_id = ids[index]});
         }
       }
     }

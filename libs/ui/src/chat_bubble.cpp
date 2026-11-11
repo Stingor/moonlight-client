@@ -148,8 +148,8 @@ void PaintChatBubbles(ImDrawList& into_list, std::span<const ChatBubbleView> bub
                            ? stacked_tops.end()
                            : std::ranges::find(stacked_tops, bubble.speaker_id,
                                                &std::pair<std::uint32_t, float>::first);
-    const float bottom = below != stacked_tops.end() ? below->second - stack_gap
-                                                     : bubble.head.y - rise;
+    const float bottom =
+        below != stacked_tops.end() ? below->second - stack_gap : bubble.head.y - rise;
     const ImVec2 top_left(bubble.head.x - widest * 0.5F - padding_x,
                           bottom - tall - padding_y * 2.0F);
     const ImVec2 bottom_right(bubble.head.x + widest * 0.5F + padding_x, bottom);
