@@ -33,6 +33,7 @@
 #include "ro/render/skill_unit_primer.h"
 #include "ro/render/skill_use_motion.h"
 #include "ro/render/sprite_billboard.h"
+#include "ro/render/str_effect_setup.h"
 #include "ro/sim/ground_skill_log.h"
 #include "ro/sim/inventory.h"
 #include "ro/sim/movement.h"
@@ -73,6 +74,9 @@ constexpr std::uint8_t kCastRingOverlapTicks = 6;
 
 // L'EFFET qu'une incantation interrompue retire en plus, sur un autre que soi.
 constexpr std::uint32_t kInterruptedCastMarkEffect = 1114;
+
+// L'UNITÉ D'EARTH STRAIN, sous laquelle l'écran tremble tant qu'elle vit.
+constexpr std::uint16_t kEarthStrainUnit = 203;
 
 }  // namespace
 
@@ -299,6 +303,14 @@ void EffectsInPlay::NoticeSkills(const ro::sim::World& world, const MapStage& st
     const std::uint32_t owner_id = ro::render::ClientRegistersEffectClass(primer) ? 0 : unit_id;
     static_cast<void>(PlayById(primer, position, unit.look_since_ms, owner_id, false, 0, true, 0,
                                0.0F, 0.0F, position));
+  }
+  // L'ÉCRAN TREMBLE SOUS EARTH STRAIN, d'un tremblement ordinaire que le client
+  // redemande à chaque image tant que l'unité vit.
+  for (const auto& entry : world.skill_units()) {
+    if (entry.second.unit_id == kEarthStrainUnit) {
+      screen_quake_until_ms_ =
+          std::max(screen_quake_until_ms_.value_or(0U), now_ms + ro::render::kEffectQueuedQuakeMs);
+    }
   }
   // 🔴 LE LANCEUR QUI BRONCHE ÉTEINT LE RÉTICULE POSÉ SUR SA CIBLE — voir
   // `EffectMapMemory::lock_on_reticles`. Un coup qui le frappe en pleine
