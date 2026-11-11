@@ -182,6 +182,7 @@ add_library(ro_render STATIC
     src/sprite_billboard.cpp
     src/body_sprite_key.cpp
     src/palette_ramps.cpp
+    src/skin_islands.cpp
     src/hue_classes.cpp
     src/palette_rest.cpp
     src/style_set.cpp

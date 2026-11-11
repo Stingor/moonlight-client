@@ -55,6 +55,11 @@ class SprSprite {
   [[nodiscard]] const std::vector<SprIndexedFrame>& indexed_frames() const noexcept {
     return indexed_frames_;
   }
+  // LES MÊMES, À RETOUCHER : un lecteur qui corrige des index après coup —
+  // les reflets d'un visage, voir `ro/render/skin_islands.h` — passe par ici.
+  [[nodiscard]] std::vector<SprIndexedFrame>& edited_indexed_frames() noexcept {
+    return indexed_frames_;
+  }
   // Déjà converties en RGBA8, rangée 0 en haut : le format les range à
   // l'envers, et c'est au lecteur de format de le corriger.
   [[nodiscard]] const std::vector<Image>& bgra_frames() const noexcept { return bgra_frames_; }

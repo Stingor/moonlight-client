@@ -13,14 +13,29 @@
 #include "ro/formats/act.h"
 #include "ro/formats/spr.h"
 #include "ro/render/actor_scale.h"
+#include "ro/render/palette_ramps.h"
+#include "ro/render/skin_islands.h"
 #include "ro/render/sprite_frame.h"
 #include "ro/render/vanish_fade.h"
+
+#include "sprite_catalog_internal.h"
 
 namespace ro::render {
 namespace {
 
 constexpr std::string_view kSpriteExtension = ".spr";
 constexpr std::string_view kAnimationExtension = ".act";
+
+// Une tête humaine : un sprite rangé sous le dossier des têtes de la race
+// humaine. Le Doram n'a pas d'ensemble de peau, ses têtes restent telles quelles.
+[[nodiscard]] bool IsHumanHeadSprite(std::string_view sprite_path) {
+  std::string prefix(catalog_internal::kSpriteRoot);
+  prefix += catalog_internal::kHumanRace;
+  prefix += '\\';
+  prefix += catalog_internal::kHeadFolder;
+  prefix += '\\';
+  return sprite_path.starts_with(prefix);
+}
 
 // Le nombre d'animations d'un .act : ses actions vont par huit, une par
 // direction. Zéro sans corps ; un pour un .act qui n'en porte pas huit — un
@@ -421,6 +436,11 @@ const LoadedActorSprite* ActorWardrobe::Sprite(const std::string& sprite_path,
       missing_.push_back(sprite ? animation_path : sprite_path);
     }
     return nullptr;
+  }
+  // 🔴 UNE TÊTE HUMAINE REPREND SES REFLETS ÉGARÉS avant d'entrer au cache :
+  // la pipette et le rendu liront les mêmes index. Voir `skin_islands.h`.
+  if (IsHumanHeadSprite(sprite_path)) {
+    static_cast<void>(FoldSkinIslands(*sprite, SkinIndices(SkinRace::kHuman)));
   }
   const auto inserted =
       sprites_.emplace(paths, LoadedActorSprite{std::move(*sprite), std::move(*animation)});
