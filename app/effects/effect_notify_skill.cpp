@@ -34,6 +34,7 @@ namespace moonclient {
 namespace {
 
 // Les compétences, par leur numéro du serveur.
+constexpr std::uint16_t kAssassinVenomSplasher = 141;
 constexpr std::uint16_t kNpcHellJudgement = 662;
 constexpr std::uint16_t kNpcComet = 708;
 constexpr std::uint16_t kNpcWideCriticalWound = 749;
@@ -88,6 +89,10 @@ const TargetCase* TargetCaseOf(std::uint16_t skill_id) {
   const auto found = std::ranges::find(kTargetCases, skill_id, &TargetCase::skill_id);
   return found == kTargetCases.end() ? nullptr : &*found;
 }
+
+// Le niveau que le serveur annonce pour les victimes qu'éclabousse Venom
+// Splasher autour de sa cible.
+constexpr std::int16_t kSplasherBurstLevel = -1;
 
 // Le délai que Fallen Empire donne à son effet.
 constexpr std::uint32_t kFallenEmpireDelayMs = 100;
@@ -166,6 +171,13 @@ void EffectsInPlay::PlayNotifySkillCases(const ro::sim::World& world, const MapS
 
   // LES CAS QUI NE DEMANDENT QUE LA CIBLE.
   switch (strike.skill_id) {
+    case kAssassinVenomSplasher:
+      // Seules les victimes alentour reçoivent l'éclat ; la cible centrale
+      // arrive sous un autre niveau.
+      if (strike.announced_level == kSplasherBurstLevel) {
+        on_target({129});
+      }
+      return;
     case kRuneKnightWindCutter:
       // Le lanceur hors de vue compte comme distinct de la cible.
       if (caster == nullptr || caster->id != target->id) {
