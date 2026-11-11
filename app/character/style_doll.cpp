@@ -185,11 +185,12 @@ const ro::render::IconTexture* StyleDoll::Draw(const Shot& shot) {
   shown_direction_ = static_cast<std::uint8_t>(pose.direction);
   shown_animation_ = shot.animation;
   shown_held_ = pose.held_frame;
+  shown_box_ = pose.box;
   shown_elapsed_ms_ = pose.elapsed_ms;
   return &drawn;
 }
 
-std::optional<ro::render::PalettePick> StyleDoll::PickUnder(glm::vec2 in_box) {
+std::optional<ro::render::PalettePick> StyleDoll::PickUnder(glm::vec2 in_box, glm::vec2 shown) {
   if (shown_ == nullptr || !shown_->vignette.has_value()) {
     return std::nullopt;
   }
@@ -208,18 +209,19 @@ std::optional<ro::render::PalettePick> StyleDoll::PickUnder(glm::vec2 in_box) {
   }
   const ro::render::ComposedActor& composed = outfit->Composed(
       shown_animation_, shown_direction_, shown_elapsed_ms_, /*loop=*/true, shown_held_);
-  // L'INVERSE DU CADRAGE : une soustraction et une division, l'origine et
-  // l'échelle étant en pixels de la boîte.
-  const glm::vec2 at((in_box.x - framing.origin.x) / framing.scale,
-                     (in_box.y - framing.origin.y) / framing.scale);
-  return ro::render::PaletteIndexAt(composed, at);
+  const std::optional<glm::vec2> at =
+      ro::render::VignetteSampleUnder(shown_box_, framing, shown, in_box);
+  if (!at.has_value()) {
+    return std::nullopt;
+  }
+  return ro::render::PaletteIndexAt(composed, *at);
 }
 
-std::optional<std::size_t> StyleDoll::RampUnder(glm::vec2 in_box) {
+std::optional<std::size_t> StyleDoll::RampUnder(glm::vec2 in_box, glm::vec2 shown) {
   if (body_.ramps.empty()) {
     return std::nullopt;
   }
-  const std::optional<ro::render::PalettePick> pick = PickUnder(in_box);
+  const std::optional<ro::render::PalettePick> pick = PickUnder(in_box, shown);
   if (!pick.has_value() || pick->part != ro::render::ActorPart::kBody) {
     return std::nullopt;
   }

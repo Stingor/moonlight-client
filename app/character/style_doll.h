@@ -93,12 +93,15 @@ class StyleDoll {
   // 🔴 ELLE NE COMPARE AUCUNE COULEUR : elle lit l'INDEX du pixel source, et sa
   // PARTIE. Un index de la tête cherché dans les pièces du corps allumerait une
   // pièce que le curseur ne désigne pas : seul le corps répond ici.
-  [[nodiscard]] std::optional<std::size_t> RampUnder(glm::vec2 in_box);
+  [[nodiscard]] std::optional<std::size_t> RampUnder(glm::vec2 in_box, glm::vec2 shown);
 
   // CE QUE LA PIPETTE DÉSIGNE SOUS CE POINT, toutes pièces confondues : la
   // partie et l'index du pixel source, d'après le dernier dessin. C'est ce que
   // l'éditeur des calques cherche ensuite dans les rampes de la pièce.
-  [[nodiscard]] std::optional<ro::render::PalettePick> PickUnder(glm::vec2 in_box);
+  //
+  // `shown` : la taille sur laquelle l'interface étire l'image du pantin. Voir
+  // `VignetteSampleUnder` : la pipette lit le pixel AFFICHÉ.
+  [[nodiscard]] std::optional<ro::render::PalettePick> PickUnder(glm::vec2 in_box, glm::vec2 shown);
 
   // Rend les styles et les textures. ⚠ ENTRE DEUX IMAGES : oublier un style
   // détruit les tenues qui le portaient, et une composition en cours les lirait
@@ -145,6 +148,7 @@ class StyleDoll {
   // La pose dessinée : la pipette interroge la même image.
   std::size_t shown_animation_ = 0;
   std::optional<std::size_t> shown_held_;
+  ro::render::VignetteBox shown_box_;
   float shown_elapsed_ms_ = 0.0F;
 };
 

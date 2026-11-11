@@ -185,11 +185,19 @@ VignetteFraming FrameVignette(const OutfitSpan& span, const VignetteBox& box) {
   return framing;
 }
 
-formats::Image DrawVignette(const ComposedActor& actor, const VignetteBox& box,
-                            const VignetteFraming& framing) {
-  if (!framing.usable() || box.width <= 0 || box.height <= 0 || actor.quads.empty()) {
-    return {};
-  }
+namespace {
+
+// LE CANEVAS D'UNE VIGNETTE : sa taille, son échelle et ce dont les quads
+// rétrécissent. ⚠ UNE SEULE FONCTION LE CALCULE, pour le dessin comme pour la
+// pipette : deux calculs finiraient par viser deux pixels.
+struct VignetteCanvas {
+  std::int32_t width = 0;
+  std::int32_t height = 0;
+  float scale = 0.0F;
+  float shrink = 1.0F;
+};
+
+[[nodiscard]] VignetteCanvas CanvasOf(const VignetteBox& box, const VignetteFraming& framing) {
   // LA BOÎTE, RAMENÉE EN PIXELS DE SPRITE. Les quads ne sont donc pas mis à
   // l'échelle : ils se dessinent tels qu'ils sont, et c'est la carte qui
   // agrandira l'image entière. ⚠ AU MOINS UN PIXEL DE CÔTÉ : une boîte plus
@@ -203,24 +211,56 @@ formats::Image DrawVignette(const ComposedActor& actor, const VignetteBox& box,
   // seulement rendue plus grossièrement.
   const auto box_width = static_cast<float>(box.width);
   const auto box_height = static_cast<float>(box.height);
-  const float canvas_scale =
+  VignetteCanvas canvas;
+  canvas.scale =
       std::max(framing.scale, std::max(box_width, box_height) / kVignetteLargestCanvasPx);
-  const float shrink = framing.scale / canvas_scale;
-  const auto width = std::clamp(static_cast<std::int32_t>(std::lround(box_width / canvas_scale)), 1,
-                                static_cast<std::int32_t>(kVignetteLargestCanvasPx));
-  const auto height = std::clamp(static_cast<std::int32_t>(std::lround(box_height / canvas_scale)),
-                                 1, static_cast<std::int32_t>(kVignetteLargestCanvasPx));
+  canvas.shrink = std::min(framing.scale / canvas.scale, 1.0F);
+  canvas.width = std::clamp(static_cast<std::int32_t>(std::lround(box_width / canvas.scale)), 1,
+                            static_cast<std::int32_t>(kVignetteLargestCanvasPx));
+  canvas.height = std::clamp(static_cast<std::int32_t>(std::lround(box_height / canvas.scale)), 1,
+                             static_cast<std::int32_t>(kVignetteLargestCanvasPx));
+  return canvas;
+}
+
+}  // namespace
+
+formats::Image DrawVignette(const ComposedActor& actor, const VignetteBox& box,
+                            const VignetteFraming& framing) {
+  if (!framing.usable() || box.width <= 0 || box.height <= 0 || actor.quads.empty()) {
+    return {};
+  }
+  const VignetteCanvas geometry = CanvasOf(box, framing);
   std::vector<SpriteQuad> quads = actor.quads;
-  if (shrink < 1.0F) {
+  if (geometry.shrink < 1.0F) {
     for (SpriteQuad& quad : quads) {
       for (glm::vec2& corner : quad.corners) {
-        corner *= shrink;
+        corner *= geometry.shrink;
       }
     }
   }
-  SpriteCanvas canvas(width, height);
-  canvas.Draw(quads, ResolveImages(actor), framing.origin / canvas_scale);
+  SpriteCanvas canvas(geometry.width, geometry.height);
+  canvas.Draw(quads, ResolveImages(actor), framing.origin / geometry.scale);
   return canvas.image();
+}
+
+std::optional<glm::vec2> VignetteSampleUnder(const VignetteBox& box, const VignetteFraming& framing,
+                                             glm::vec2 shown, glm::vec2 in_box) {
+  if (!framing.usable() || box.width <= 0 || box.height <= 0 || shown.x <= 0.0F ||
+      shown.y <= 0.0F) {
+    return std::nullopt;
+  }
+  const VignetteCanvas geometry = CanvasOf(box, framing);
+  // Le pixel du canevas que l'interface montre sous ce point.
+  const auto column = static_cast<std::int32_t>(
+      std::floor(in_box.x / shown.x * static_cast<float>(geometry.width)));
+  const auto row = static_cast<std::int32_t>(
+      std::floor(in_box.y / shown.y * static_cast<float>(geometry.height)));
+  if (column < 0 || row < 0 || column >= geometry.width || row >= geometry.height) {
+    return std::nullopt;
+  }
+  // Son centre, là où `SpriteCanvas` l'a lu, ramené dans le repère des quads.
+  const glm::vec2 center(static_cast<float>(column) + kHalf, static_cast<float>(row) + kHalf);
+  return (center - framing.origin / geometry.scale) / geometry.shrink;
 }
 
 }  // namespace ro::render

@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <optional>
 
 #include <glm/glm.hpp>
 
@@ -178,5 +179,19 @@ inline constexpr float kVignetteLargestCanvasPx = 1024.0F;
 // Rend une image vide quand la boîte ou le cadrage ne tiennent pas debout.
 [[nodiscard]] formats::Image DrawVignette(const ComposedActor& actor, const VignetteBox& box,
                                           const VignetteFraming& framing);
+
+// LE POINT DU SPRITE QUE LE CANEVAS A LU pour le pixel affiché sous ce point
+// de la boîte, ou rien hors de l'image.
+//
+// 🔴 C'EST CE POINT QU'UNE PIPETTE INTERROGE, et non l'inverse brut du
+// cadrage. Le canevas lit chaque pixel en son CENTRE, et son origine tombe
+// rarement sur un entier : l'inverse brut changeait de texel au milieu d'un
+// pixel affiché, et la pipette visait alors le voisin de celui qu'on voit.
+//
+// `shown` : la taille, en pixels de la boîte, sur laquelle l'interface étire
+// l'image. `box` et `framing` sont ceux du dessin.
+[[nodiscard]] std::optional<glm::vec2> VignetteSampleUnder(const VignetteBox& box,
+                                                           const VignetteFraming& framing,
+                                                           glm::vec2 shown, glm::vec2 in_box);
 
 }  // namespace ro::render

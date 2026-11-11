@@ -439,7 +439,8 @@ void StyleView::ReadPipette(const ro::ui::PaletteEditorState& state) {
     return;
   }
   const std::optional<ro::render::PalettePick> pick =
-      doll_->PickUnder(glm::vec2(state.doll.hover_x, state.doll.hover_y));
+      doll_->PickUnder(glm::vec2(state.doll.hover_x, state.doll.hover_y),
+                       glm::vec2(state.doll.box_width, state.doll.box_height));
   if (!pick.has_value()) {
     return;
   }
