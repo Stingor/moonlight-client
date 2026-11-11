@@ -737,6 +737,8 @@ void EffectsInPlay::NoticeSkills(const ro::sim::World& world, const MapStage& st
         stage, planner, strike.skill_id, ro::render::kSkillNamedOnDamagePacket,
         world.Find(strike.attacker), struck, strike.started_ms, strike.attack_motion_ms,
         struck == nullptr && repli != world.skill_units().end() ? &repli->second : nullptr);
+    // PUIS LES CAS QUE LE PAQUET TRAITE SEUL, par-dessus ce qui précède.
+    PlayNotifySkillCases(world, stage, planner, strike);
   }
   // 🔴 EN PLUS, ET NON AU DÉFAUT : le client interroge son Lua par des chemins
   // qui lui sont propres, et qui ne remplacent aucun des switches ci-dessus.

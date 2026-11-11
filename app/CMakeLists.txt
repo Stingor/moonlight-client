@@ -156,6 +156,7 @@ add_library(moonclient_effects STATIC
     effects/effect_named_look.cpp
     effects/effect_named_skill.cpp
     effects/effect_named_sounds.cpp
+    effects/effect_notify_skill.cpp
     effects/effect_paint.cpp
     effects/effect_shift.cpp
     effects/effect_skill_step.cpp

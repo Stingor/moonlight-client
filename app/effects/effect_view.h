@@ -156,6 +156,8 @@ class EffectsInPlay {
   // laquelle rien ne signalait le manque. Voir `ro/render/skill_lua_effect.h`.
   void NoticeLuaEffects(const ro::sim::World& world, const MapStage& stage,
                         ro::sim::WalkPlanner& planner);
+  void PlayNotifySkillCases(const ro::sim::World& world, const MapStage& stage,
+                            ro::sim::WalkPlanner& planner, const ro::sim::Strike& strike);
 
   // Les effets que les ÉTATS entretiennent : Sight et les siens. Le client
   // resème l'effet ENTIER sur l'acteur tous les « durée déclarée » tics tant que
