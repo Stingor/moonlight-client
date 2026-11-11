@@ -111,7 +111,8 @@ void EffectsInPlay::NoticeLuaEffects(const ro::sim::World& world, const MapStage
     const ro::sim::Strike& strike = taken.strike;
     const std::uint32_t id = strike.target;
     const ro::sim::Actor* const struck = world.Find(id);
-    if (struck == nullptr || strike.skill_id == 0 || StrikeByGroundUnit(world, strike)) {
+    // ⚠ CE LUA SE LIT EN TÊTE DE LA SUITE D'IMPACT, et en partage les portes.
+    if (struck == nullptr || strike.skill_id == 0 || !StrikeShowsSkillHitVisual(world, strike)) {
       continue;
     }
     const ro::sim::Actor& actor = *struck;

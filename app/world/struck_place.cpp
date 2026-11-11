@@ -1,5 +1,6 @@
 #include "world/struck_place.h"
 
+#include "ro/render/skill_use_motion.h"
 #include "ro/sim/world.h"
 
 #include "world/hit_popup_rules.h"
@@ -35,6 +36,11 @@ StrikeSides SidesOfStrike(const ro::sim::World& world, const ro::sim::Strike& st
 
 bool StrikeByGroundUnit(const ro::sim::World& world, const ro::sim::Strike& strike) {
   return strike.by_ground_unit || world.skill_units().contains(strike.attacker);
+}
+
+bool StrikeShowsSkillHitVisual(const ro::sim::World& world, const ro::sim::Strike& strike) {
+  return !StrikeByGroundUnit(world, strike) && world.Find(strike.attacker) != nullptr &&
+         ro::render::ShowsSkillHitVisual(strike.type);
 }
 
 const ro::sim::SkillUnit* StruckUnit(const ro::sim::World& world, std::uint32_t struck_id) {

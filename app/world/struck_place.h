@@ -29,6 +29,15 @@ namespace moonclient {
 // du chiffre, du son et de l'impact. Voir `Strike::by_ground_unit`.
 [[nodiscard]] bool StrikeByGroundUnit(const ro::sim::World& world, const ro::sim::Strike& strike);
 
+// VRAI QUAND CE COUP DE COMPÉTENCE MONTRE SON VISUEL D'IMPACT — sa suite, ses
+// sons, les effets de cible de son Lua.
+//
+// Le client envoie ce message à l'acteur du lanceur : sans lanceur à l'écran,
+// ou d'une unité au sol, il n'y en a pas. Et le visuel ne connaît que
+// certaines sortes de coup — voir `ro::render::ShowsSkillHitVisual`.
+[[nodiscard]] bool StrikeShowsSkillHitVisual(const ro::sim::World& world,
+                                             const ro::sim::Strike& strike);
+
 // CE QU'UN COUP FRAPPE N'EST PAS TOUJOURS UN ACTEUR.
 //
 // Un bloc d'Ice Wall, un piège : le serveur met l'identifiant de l'UNITÉ POSÉE

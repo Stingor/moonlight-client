@@ -118,6 +118,14 @@ inline constexpr std::array<std::uint16_t, 26> kSkillsWithoutUseEffectOnHit = {
 // Les sortes de coup que ce visuel connaît ; les autres ne montrent rien.
 inline constexpr std::array<std::uint8_t, 7> kDamageTypesOfSkillHitVisual = {4, 5, 6, 8, 9, 13, 14};
 
+// SI UN COUP DE CETTE SORTE MONTRE LE VISUEL DE SA COMPÉTENCE : la suite
+// d'impact, ses sons et les effets de cible du Lua n'existent que pour ces
+// sortes-là.
+[[nodiscard]] constexpr bool ShowsSkillHitVisual(std::uint8_t damage_type) {
+  return std::ranges::find(kDamageTypesOfSkillHitVisual, damage_type) !=
+         kDamageTypesOfSkillHitVisual.end();
+}
+
 // L'ÉCLABOUSSURE et sa variante encaissée : leur message repart AVANT l'effet
 // d'emploi quand la cible est connue, sauf pour les compétences ci-dessous.
 inline constexpr std::uint8_t kSplashDamageType = 5;

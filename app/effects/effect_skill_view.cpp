@@ -730,7 +730,10 @@ void EffectsInPlay::NoticeSkills(const ro::sim::World& world, const MapStage& st
     //
     // L'ARGUMENT DU COUP est le nombre de coups que le client passe à son
     // répartiteur — le même que le paramètre d'instance.
-    if (struck != nullptr && !StrikeByGroundUnit(world, strike)) {
+    //
+    // ⚠ ET IL LUI FAUT LES DEUX ACTEURS : la suite repart sans rien poser quand
+    // la cible lui manque. Voir `StrikeShowsSkillHitVisual` pour le reste.
+    if (struck != nullptr && StrikeShowsSkillHitVisual(world, strike)) {
       PlaySkillOn(world, stage, planner, *struck, strike.skill_id, strike.attacker,
                   strike.started_ms, EffectParamOfStrike(strike), SkillMoment::kImpact,
                   EffectParamOfStrike(strike), strike.type);

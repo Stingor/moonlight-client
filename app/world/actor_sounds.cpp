@@ -387,9 +387,8 @@ void ActorSounds::PlaySkills(const SoundStage& scene, const Listener& listener) 
     if (StrikeByGroundUnit(*scene.world, strike)) {
       continue;
     }
-    // ⚠ NI SANS LANCEUR CONNU : l'impact est un message que le client envoie à
-    // l'acteur du lanceur, et il n'a personne à qui l'envoyer.
-    if (strike.skill_id != 0 && scene.world->Find(strike.attacker) == nullptr) {
+    // ⚠ LES SONS D'UNE COMPÉTENCE PARTENT AVEC SON VISUEL D'IMPACT, ou pas du tout.
+    if (strike.skill_id != 0 && !StrikeShowsSkillHitVisual(*scene.world, strike)) {
       continue;
     }
     PlaySkillSound(scene, listener, strike.target,
