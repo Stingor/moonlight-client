@@ -65,6 +65,8 @@ void Game::RefreshParty(std::uint32_t now_ms) {
                                         .now_ms = now_ms});
   if (link_.is_open()) {
     party_panel_->Poll(link_, party_, page, window, world_.player_id(), now_ms);
+    // Les têtes hors de vue que la guilde, le groupe et les amis ont voulues.
+    absent_styles_.Pump(link_, world_, now_ms);
   }
   windows_.party.view = &party_panel_->window();
   windows_.party.look = &page.window();

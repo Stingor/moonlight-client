@@ -317,9 +317,10 @@ void ReadTail(core::ByteReader& reader, std::size_t end, sim::StyleLayerRecipe& 
   return read;
 }
 
-// La charge d'un ZC, décompressée si elle l'est.
-[[nodiscard]] core::Result<std::vector<std::uint8_t>> RawPayload(
-    std::uint8_t flags, std::size_t raw_size, std::span<const std::uint8_t> body) {
+}  // namespace
+
+core::Result<std::vector<std::uint8_t>> StylePayloadOf(std::uint8_t flags, std::size_t raw_size,
+                                                       std::span<const std::uint8_t> body) {
   if (raw_size > kStyleLayersRawMost) {
     return core::Fail(core::ErrorCode::kCorruptData, "calques : charge annoncée trop grosse");
   }
@@ -341,8 +342,6 @@ void ReadTail(core::ByteReader& reader, std::size_t end, sim::StyleLayerRecipe& 
   }
   return raw;
 }
-
-}  // namespace
 
 sim::StyleLayerKind LayerOfSlot(StyleSlot slot) noexcept {
   switch (slot) {
@@ -452,7 +451,7 @@ FrameOutcome ApplyStyleLayersFrame(const Frame& frame, sim::World& world) {
   }
   const std::span<const std::uint8_t> body =
       std::span(frame.bytes).subspan(proto::ZcMoonclientStyleLayers::kWireSize);
-  core::Result<std::vector<std::uint8_t>> raw = RawPayload(header.flags, header.raw_size, body);
+  core::Result<std::vector<std::uint8_t>> raw = StylePayloadOf(header.flags, header.raw_size, body);
   if (!raw) {
     return FrameOutcome::kUndecodable;
   }
@@ -517,10 +516,12 @@ core::Result<std::optional<sim::StyleLayerRecipe>> ReadShownStyleLayer(core::Byt
 }
 
 std::uint32_t StyleLayerCaps() {
-  // ⚠ LES TENUES VOYAGENT SOUS LE MÊME BIT : leur réponse doit être connue aussi.
+  // ⚠ LES TENUES ET LES STYLES HORS DE VUE VOYAGENT SOUS LE MÊME BIT : leurs
+  // réponses doivent être connues aussi.
   const bool known = proto::PacketLength(proto::ZcMoonclientStyleLayers::kOpcode).has_value() &&
                      proto::PacketLength(proto::ZcMoonclientStyleVerdict::kOpcode).has_value() &&
-                     proto::PacketLength(proto::ZcMoonclientOutfit::kOpcode).has_value();
+                     proto::PacketLength(proto::ZcMoonclientOutfit::kOpcode).has_value() &&
+                     proto::PacketLength(proto::ZcMoonclientStyleAbsent::kOpcode).has_value();
   return known ? kUiCapStyleLayers : 0U;
 }
 

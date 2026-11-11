@@ -89,8 +89,9 @@ ro::ui::PartyMemberView PartyViews::MemberRow(const ro::sim::PartyMember& member
   row.base_level = member.base_level;
   row.job_icon = lens.JobIcon(member.job);
   row.actor_present = !member.offline && lens.ActorPresent(member.account_id);
-  if ((input.head_mode & ro::ui::kPartyHeadInParty) != 0 && row.actor_present) {
-    row.head = lens.Head(member.account_id);
+  // Un membre connecté a sa tête, en vue ou non : hors de vue, elle se demande.
+  if ((input.head_mode & ro::ui::kPartyHeadInParty) != 0 && !member.offline) {
+    row.head = lens.Head(member.account_id, member.char_id);
   }
   row.is_friend =
       input.friends != nullptr && input.friends->Find(member.account_id, member.char_id) != nullptr;
@@ -185,8 +186,8 @@ void PartyViews::ComposeFriends(const PartyComposeInput& input, PartyLens& lens)
     row.name = chum.name;
     row.online = chum.online;
     row.actor_present = chum.online && lens.ActorPresent(chum.account_id);
-    if (heads && row.actor_present) {
-      row.head = lens.Head(chum.account_id);
+    if (heads && chum.online) {
+      row.head = lens.Head(chum.account_id, chum.char_id);
     }
     const ro::sim::PartyMember* member = input.party->Find(chum.account_id);
     row.in_my_party = member != nullptr && member->char_id == chum.char_id;

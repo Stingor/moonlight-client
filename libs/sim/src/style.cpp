@@ -1,5 +1,6 @@
 #include "ro/sim/style.h"
 
+#include <algorithm>
 #include <utility>
 
 namespace ro::sim {
@@ -98,6 +99,32 @@ void StyleBook::RememberLayers(std::uint32_t gid, std::vector<StyleLayerRecipe> 
     return;
   }
   layers_[gid] = std::move(layers);
+}
+
+const AbsentStyle* StyleBook::FindAbsent(std::uint32_t char_id) const {
+  const auto found = absent_.find(char_id);
+  return found != absent_.end() ? &found->second : nullptr;
+}
+
+void StyleBook::RememberAbsent(std::uint32_t char_id, AbsentStyle style) {
+  if (char_id == 0) {
+    return;
+  }
+  style.revision = ++last_revision_;
+  // ⚠ LE PLUS ANCIEN PART, et pas le dernier venu : celui qu'on vient de
+  // demander est affiché en ce moment.
+  if (!absent_.contains(char_id) && absent_.size() >= kAbsentStylesMost) {
+    const auto oldest = std::ranges::min_element(absent_, [](const auto& left, const auto& right) {
+      return left.second.revision < right.second.revision;
+    });
+    absent_.erase(oldest);
+  }
+  absent_[char_id] = std::move(style);
+}
+
+void StyleBook::HearAbsentRefusal(AbsentRefusal refusal) {
+  refusal.sequence = ++last_absent_refusal_;
+  absent_refusal_ = refusal;
 }
 
 void StyleBook::HearVerdict(StyleVerdict verdict) {

@@ -5,6 +5,7 @@
 #include "party/party_panel.h"
 
 #include <algorithm>
+#include <optional>
 #include <span>
 #include <string>
 #include <utility>
@@ -22,6 +23,7 @@
 #include "world/actor_view.h"
 #include "world/click_action.h"
 #include "world/map_sign_stage.h"
+#include "world/member_head.h"
 
 namespace moonclient {
 namespace {
@@ -247,33 +249,25 @@ PartyMinimap PartyPanel::Minimap(std::string_view map_raw) {
                       .height_cells = facts_.map_height_cells};
 }
 
-ro::ui::SkinImage PartyPanel::Head(std::uint32_t account_id) {
-  const ro::sim::Actor* actor = world_ != nullptr ? world_->Find(account_id) : nullptr;
-  if (actor == nullptr || !thumbnails_.has_value()) {
+ro::ui::SkinImage PartyPanel::Head(std::uint32_t account_id, std::uint32_t char_id) {
+  if (!thumbnails_.has_value()) {
     return {};
   }
-  ro::render::ActorLook look = LookOf(*actor);
-  // 🔴 LA COIFFURE ET LA COULEUR QUE SA RECETTE IMPOSE, comme sur la carte : la
-  // tête montrait sinon celles du serveur, que la recette remplace.
-  if (pieces_.wardrobe != nullptr) {
-    ImposeStyleNumbers(account_id, look, *pieces_.wardrobe, world_->styles());
+  // 🔴 SA RECETTE ENTIÈRE : celle que la carte lui a posée s'il est en vue,
+  // sinon celle que le serveur dit sous son char_id. Les listes du groupe et
+  // des amis ne portent aucune apparence : sans réponse, pas de tête.
+  const std::optional<ro::render::ActorLook> look =
+      MemberHeadLook(MemberHeadPieces{.world = world_,
+                                      .styles = pieces_.styles,
+                                      .wardrobe = pieces_.wardrobe,
+                                      .absent = pieces_.absent_styles},
+                     account_id, char_id, std::nullopt, facts_.now_ms);
+  if (!look.has_value()) {
+    return {};
   }
   ro::render::ActorThumbnails::Cell cell;
   cell.subject = ro::render::ActorThumbnails::Subject::kHead;
-  cell.look.player = true;
-  cell.look.job = look.job;
-  cell.look.sex = look.sex;
-  cell.look.hair = look.hair;
-  cell.look.hair_palette = look.hair_palette;
-  // 🔴 LE STYLE QUE LA CARTE LUI A POSÉ, et rien d'autre : sa teinture de
-  // cheveux suit la coupe et la couleur qu'il porte, et sa peau le suit
-  // partout. Hors de vue, la carte ne l'habille plus, et sa tête reprend ses
-  // couleurs d'origine.
-  if (pieces_.styles != nullptr) {
-    cell.look.style = pieces_.styles->Worn(account_id);
-    cell.look.gm_outfit = look.gm_outfit;
-    cell.look.orc_head = look.orc_head;
-  }
+  cell.look = *look;
   cell.box.width = kHeadBoxPixels;
   cell.box.height = kHeadBoxPixels;
   return SkinImageOf(thumbnails_->Get(cell));

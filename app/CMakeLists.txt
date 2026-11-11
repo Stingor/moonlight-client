@@ -1438,6 +1438,7 @@ add_library(moonclient_styles STATIC
     character/style_skin.cpp
     character/style_store.cpp
     character/style_yaml.cpp
+    world/absent_styles.cpp
     world/actor_styles.cpp)
 
 target_link_libraries(moonclient_styles
@@ -1874,6 +1875,7 @@ add_executable(moonclient
     world/sound_zone_view.cpp
     world/actor_talk.cpp
     world/actor_view.cpp
+    world/member_head.cpp
     world/battle_log.cpp
     world/swing_replay.cpp
     input/camera_rig.cpp

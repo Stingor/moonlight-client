@@ -1,5 +1,6 @@
 #include "world_relay.h"
 
+#include "ro/net/absent_styles.h"
 #include "ro/net/actor_guild.h"
 #include "ro/net/actor_name.h"
 #include "ro/net/area_damage.h"
@@ -210,6 +211,12 @@ FrameOutcome RelayFrame(const Frame& frame, sim::World& world, std::uint32_t now
     return outcome;
   }
   if (const FrameOutcome outcome = ApplyStyleVerdictFrame(frame, world, now_ms);
+      outcome != FrameOutcome::kUnhandled) {
+    return outcome;
+  }
+  // LES STYLES HORS DE VUE de la guilde, du groupe et des amis — voir
+  // ro/net/absent_styles.h. Ils se rangent au même livre, sous le char_id.
+  if (const FrameOutcome outcome = ApplyAbsentStylesFrame(frame, world, now_ms);
       outcome != FrameOutcome::kUnhandled) {
     return outcome;
   }

@@ -107,6 +107,11 @@ struct SessionSettings {
   // calques jusque-là : zéro, aucun calque au-delà de la suite du corps ne part.
   // Un serveur qui la tait refuserait la trame entière.
   int style_layer_last = 0;
+  // 🔴 LA CADENCE DES DEMANDES HORS DE VUE EST LA PREUVE que le serveur sert le
+  // CZ 0x0F63 : zéro, aucune ne part.
+  std::uint32_t style_absent_cadence_ms = 0;
+  // Les char_id d'une demande hors de vue, au plus. Zéro : non dit.
+  int style_absent_ids_most = 0;
   // Les bornes des numéros officiels, telles que le serveur les applique. Zéro :
   // non dites.
   int hair_style_min = 0;

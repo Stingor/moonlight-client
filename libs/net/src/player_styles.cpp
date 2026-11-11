@@ -232,4 +232,25 @@ FrameOutcome ApplyPlayerStylesFrame(const Frame& frame, sim::World& world) {
   return FrameOutcome::kApplied;
 }
 
+std::optional<StyleBodyEntry> ReadStyleBodyEntry(core::ByteReader& reader) {
+  static_assert(kStyleBodyEntryBytes == kEntrySize - sizeof(std::uint32_t),
+                "une variante sans gid ne vaut plus une entrée du lot moins son gid");
+  constexpr std::size_t kEntryHead = 1 + 1 + 4;
+  const std::uint8_t version = reader.U8();
+  const std::uint8_t flags = reader.U8();
+  const std::uint32_t body_key = reader.U32();
+  if (version != kWireVersion || (flags & kFlagClear) != 0 || body_key == 0) {
+    reader.Skip(kStyleBodyEntryBytes - kEntryHead);
+    return std::nullopt;
+  }
+  StyleBodyEntry entry;
+  entry.body_key = body_key;
+  entry.recipe = ReadRecipe(reader);
+  entry.fallback = (flags & kFlagFallback) != 0;
+  if (!reader.ok()) {
+    return std::nullopt;
+  }
+  return entry;
+}
+
 }  // namespace ro::net

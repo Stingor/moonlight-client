@@ -32,6 +32,8 @@ namespace moonclient {
 
 // La table des joueurs en arène : voir `game/survivors_presence_labels.h`.
 class SurvivorsPresenceLabels;
+class ActorStyles;
+class AbsentStyles;
 
 // L'ONGLET GUILDE, VU DE LA PARTIE : ce qu'il montre, et ce qu'on fait de ce
 // qu'il demande.
@@ -50,6 +52,10 @@ struct GuildPanelPieces {
   const ro::sim::SkillTree* skills = nullptr;
   ro::render::SkillIcons* skill_icons = nullptr;
   ro::render::ActorWardrobe* wardrobe = nullptr;
+  // Les styles de la carte et ceux qu'on demande hors de vue : la tête d'un
+  // membre porte sa recette entière, qu'il soit en vue ou non.
+  ActorStyles* styles = nullptr;
+  AbsentStyles* absent_styles = nullptr;
   // Le dossier de l'installation, où vit `emblem\`.
   std::filesystem::path client_root;
 };
@@ -120,8 +126,8 @@ class GuildPanel {
               ro::net::Connection& link);
 
  private:
-  void RefreshMembers(const ro::sim::GuildBook& book, const ro::sim::StyleBook& styles,
-                      GuildPlayer player, bool shown);
+  void RefreshMembers(const ro::sim::GuildBook& book, const ro::sim::World& world,
+                      GuildPlayer player, bool shown, std::uint32_t now_ms);
   void RefreshRights(const ro::sim::GuildBook& book, GuildPlayer player);
   void RefreshSkills(const ro::sim::GuildBook& book, const ro::sim::World& world,
                      GuildPlayer player, std::uint32_t now_ms);

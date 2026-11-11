@@ -739,10 +739,10 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
       .map_names = pieces_.map_display_names.has_value() ? &*pieces_.map_display_names : nullptr,
       .wardrobe = pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr,
       .styles = &styles_,
+      .absent_styles = &absent_styles_,
       .status_table = &pieces_.status_table,
       .status_icons = pieces_.status_icons.has_value() ? &*pieces_.status_icons : nullptr});
-  // L'onglet retrouvé du fichier, une fois par partie : ensuite, c'est la
-  // fenêtre qui le tient.
+  // L'onglet retrouvé du fichier, une fois par partie ; la fenêtre le tient ensuite.
   windows_.party.window.tab = settings_->options().pages().party.tab();
 
   // ⚠ EN DERNIER : il garde l'adresse de presque tout ce qui précède, et rien de

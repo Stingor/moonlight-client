@@ -155,6 +155,14 @@ void Keep(sim::SessionSettings& session, BankZenyMaxHalves& bank_halves,
     case ServerRuleKey::kStyleLayerLast:
       KeepPositive(session.style_layer_last, rule.value);
       return;
+    case ServerRuleKey::kStyleAbsentCadenceMs:
+      if (rule.value > 0) {
+        session.style_absent_cadence_ms = static_cast<std::uint32_t>(rule.value);
+      }
+      return;
+    case ServerRuleKey::kStyleAbsentIdsMost:
+      KeepPositive(session.style_absent_ids_most, rule.value);
+      return;
   }
   // Une clé que ce client ne connaît pas : le serveur en a ajouté une.
 }

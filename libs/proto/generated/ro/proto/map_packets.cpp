@@ -13212,6 +13212,70 @@ std::vector<std::uint8_t> Encode(const ZcMoonclientOutfit& packet) {
   return out;
 }
 
+bool Decode(std::span<const std::uint8_t> frame, CzMoonclientStyleAbsent& packet) {
+  if (frame.size() < CzMoonclientStyleAbsent::kWireSize) {
+    return false;
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != CzMoonclientStyleAbsent::kOpcode) {
+    return false;
+  }
+  // La longueur est déjà connue : c'est celle de la trame.
+  reader.Skip(2);
+  packet.count = static_cast<std::uint8_t>(reader.U8());
+  return reader.ok();
+}
+
+std::vector<std::uint8_t> Encode(const CzMoonclientStyleAbsent& packet) {
+  std::vector<std::uint8_t> out;
+  out.reserve(CzMoonclientStyleAbsent::kWireSize);
+  ByteWriter writer(out);
+  writer.U16(CzMoonclientStyleAbsent::kOpcode);
+  // Réservée : la longueur ne sera connue qu'une fois la queue écrite.
+  writer.U16(0);
+  writer.U8(static_cast<std::uint8_t>(packet.count));
+  if (writer.size() > kMaxFrameSize ||
+      !writer.PatchU16(kLengthOffset, static_cast<std::uint16_t>(writer.size()))) {
+    return {};
+  }
+  return out;
+}
+
+bool Decode(std::span<const std::uint8_t> frame, ZcMoonclientStyleAbsent& packet) {
+  if (frame.size() < ZcMoonclientStyleAbsent::kWireSize) {
+    return false;
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != ZcMoonclientStyleAbsent::kOpcode) {
+    return false;
+  }
+  // La longueur est déjà connue : c'est celle de la trame.
+  reader.Skip(2);
+  packet.result = static_cast<std::uint8_t>(reader.U8());
+  packet.wait_ms = static_cast<std::uint16_t>(reader.U16());
+  packet.flags = static_cast<std::uint8_t>(reader.U8());
+  packet.raw_size = static_cast<std::uint16_t>(reader.U16());
+  return reader.ok();
+}
+
+std::vector<std::uint8_t> Encode(const ZcMoonclientStyleAbsent& packet) {
+  std::vector<std::uint8_t> out;
+  out.reserve(ZcMoonclientStyleAbsent::kWireSize);
+  ByteWriter writer(out);
+  writer.U16(ZcMoonclientStyleAbsent::kOpcode);
+  // Réservée : la longueur ne sera connue qu'une fois la queue écrite.
+  writer.U16(0);
+  writer.U8(static_cast<std::uint8_t>(packet.result));
+  writer.U16(static_cast<std::uint16_t>(packet.wait_ms));
+  writer.U8(static_cast<std::uint8_t>(packet.flags));
+  writer.U16(static_cast<std::uint16_t>(packet.raw_size));
+  if (writer.size() > kMaxFrameSize ||
+      !writer.PatchU16(kLengthOffset, static_cast<std::uint16_t>(writer.size()))) {
+    return {};
+  }
+  return out;
+}
+
 bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightCardAlbum& packet) {
   if (frame.size() < ZcMoonlightCardAlbum::kWireSize) {
     return false;

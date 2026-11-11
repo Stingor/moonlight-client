@@ -5,6 +5,7 @@
 #include "guild/guild_panel.h"
 
 #include <ctime>
+#include <optional>
 #include <utility>
 
 #include "ro/core/i18n.h"
@@ -18,7 +19,7 @@
 
 #include "game/skin_image_of.h"
 #include "game/survivors_presence_labels.h"
-#include "world/actor_styles.h"
+#include "world/member_head.h"
 
 namespace moonclient {
 namespace {
@@ -95,8 +96,12 @@ GuildPanel::GuildPanel(GuildPanelPieces pieces) : pieces_(std::move(pieces)) {
   }
 }
 
-void GuildPanel::RefreshMembers(const ro::sim::GuildBook& book, const ro::sim::StyleBook& styles,
-                                GuildPlayer player, bool shown) {
+void GuildPanel::RefreshMembers(const ro::sim::GuildBook& book, const ro::sim::World& world,
+                                GuildPlayer player, bool shown, std::uint32_t now_ms) {
+  const MemberHeadPieces heads{.world = &world,
+                               .styles = pieces_.styles,
+                               .wardrobe = pieces_.wardrobe,
+                               .absent = pieces_.absent_styles};
   const std::span<const ro::sim::GuildMember> members = book.members();
   members_.clear();
   members_.reserve(members.size());
@@ -134,19 +139,20 @@ void GuildPanel::RefreshMembers(const ro::sim::GuildBook& book, const ro::sim::S
     view.mvp_refusal =
         mvp_judge_ ? mvp_judge_(member.name, member.account_id == player.account_id) : nullptr;
     // LA TÊTE, pour un membre CONNECTÉ seulement, comme le client.
-    if (member.online && shown && thumbnails_.has_value()) {
+    // 🔴 SA RECETTE ENTIÈRE, en vue comme hors de vue : la liste de guilde ne
+    // porte que la coupe et la couleur d'avant, que la recette remplace.
+    const ro::sim::AbsentLook listed{.job = static_cast<std::uint16_t>(member.job),
+                                     .sex = static_cast<std::uint8_t>(member.sex),
+                                     .hair = static_cast<std::uint16_t>(member.hair),
+                                     .hair_color = static_cast<std::uint16_t>(member.hair_palette)};
+    const std::optional<ro::render::ActorLook> head_look =
+        member.online && shown && thumbnails_.has_value()
+            ? MemberHeadLook(heads, member.account_id, member.char_id, listed, now_ms)
+            : std::nullopt;
+    if (head_look.has_value()) {
       ro::render::ActorThumbnails::Cell cell;
       cell.subject = ro::render::ActorThumbnails::Subject::kHead;
-      cell.look.player = true;
-      cell.look.job = static_cast<std::uint32_t>(member.job);
-      cell.look.sex = static_cast<std::uint8_t>(member.sex);
-      cell.look.hair = static_cast<std::uint16_t>(member.hair);
-      cell.look.hair_palette = member.hair_palette;
-      // 🔴 CE QUE SA RECETTE IMPOSE, s'il est en vue et en a une : la liste de
-      // guilde porte la couleur d'avant, que la recette remplace.
-      if (pieces_.wardrobe != nullptr) {
-        ImposeStyleNumbers(member.account_id, cell.look, *pieces_.wardrobe, styles);
-      }
+      cell.look = *head_look;
       cell.box.width = kHeadBoxPixels;
       cell.box.height = kHeadBoxPixels;
       const ro::render::IconTexture& head = thumbnails_->Get(cell);
@@ -222,7 +228,7 @@ void GuildPanel::Refresh(const ro::sim::GuildBook& book, const ro::sim::World& w
   view_.notice_subject = book.notice_subject();
   view_.notice_body = book.notice_body();
 
-  RefreshMembers(book, world.styles(), player, shown);
+  RefreshMembers(book, world, player, shown, now_ms);
   RefreshRights(book, player);
 
   for (std::size_t index = 0; index < positions_.size(); ++index) {

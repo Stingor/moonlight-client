@@ -20,8 +20,23 @@ void ImposeStyleNumbers(std::uint32_t gid, ro::render::ActorLook& look,
 
 void ActorStyles::Dress(std::uint32_t gid, ro::render::ActorLook& look,
                         ro::render::ActorWardrobe& wardrobe, const ro::sim::StyleBook& book) {
+  DressFrom(applied_, gid, book.Find(gid), book.FindLayers(gid), look, wardrobe);
+}
+
+void ActorStyles::DressAbsent(std::uint32_t char_id, ro::render::ActorLook& look,
+                              ro::render::ActorWardrobe& wardrobe, const ro::sim::StyleBook& book) {
+  const ro::sim::AbsentStyle* absent = book.FindAbsent(char_id);
+  const bool shown = absent != nullptr && absent->shown;
+  DressFrom(absent_applied_, char_id,
+            shown && !absent->variants.empty() ? &absent->variants : nullptr,
+            shown && !absent->layers.empty() ? &absent->layers : nullptr, look, wardrobe);
+}
+
+void ActorStyles::DressFrom(std::map<std::uint32_t, std::uint32_t>& applied, std::uint32_t holder,
+                            const ro::sim::StyleVariants* variants,
+                            const std::vector<ro::sim::StyleLayerRecipe>* layers,
+                            ro::render::ActorLook& look, ro::render::ActorWardrobe& wardrobe) {
   look.style = 0;
-  const ro::sim::StyleVariants* variants = book.Find(gid);
   // ⚠ LA CLÉ NE SE DEMANDE QUE POUR QUI A DES COULEURS : elle charge le sprite
   // du corps pour savoir lequel se charge vraiment, et le faire pour tous les
   // acteurs d'une carte peuplée paierait ce chargement sans rien en tirer.
@@ -32,8 +47,7 @@ void ActorStyles::Dress(std::uint32_t gid, ro::render::ActorLook& look,
   const std::uint32_t body_key = variants != nullptr ? wardrobe.BodyKeyFor(look) : 0;
   const ro::sim::StyleRecipe* wanted =
       variants != nullptr && body_key != 0 ? variants->For(body_key) : nullptr;
-  const std::vector<ro::sim::StyleLayerRecipe>* layers = book.FindLayers(gid);
-  const auto known = applied_.find(gid);
+  const auto known = applied.find(holder);
 
   ro::render::StyleSet set;
   if (wanted != nullptr) {
@@ -50,20 +64,20 @@ void ActorStyles::Dress(std::uint32_t gid, ro::render::ActorLook& look,
   if (!set.body.has_value() && set.layers.empty()) {
     // Plus de couleurs : l'acteur reprend son apparence native, et lâche son
     // identifiant.
-    if (known != applied_.end()) {
+    if (known != applied.end()) {
       Release(known->second);
-      applied_.erase(known);
+      applied.erase(known);
     }
     return;
   }
-  if (known != applied_.end()) {
+  if (known != applied.end()) {
     if (const auto worn = interned_.find(known->second);
         worn != interned_.end() && SameSet(worn->second.set, set)) {
       look.style = known->second;
       return;
     }
     Release(known->second);
-    applied_.erase(known);
+    applied.erase(known);
   }
   const std::uint32_t style = Intern(set, wardrobe);
   if (style == 0) {
@@ -72,7 +86,7 @@ void ActorStyles::Dress(std::uint32_t gid, ro::render::ActorLook& look,
     // nommer.
     return;
   }
-  applied_[gid] = style;
+  applied[holder] = style;
   look.style = style;
 }
 
@@ -113,6 +127,17 @@ void ActorStyles::Sweep(ro::render::ActorWardrobe& wardrobe, const ro::sim::Styl
     }
     Release(applied->second);
     applied = applied_.erase(applied);
+  }
+  // Une tête hors de vue rend son identifiant quand le livre oublie son
+  // personnage, ou n'a plus rien à en montrer.
+  for (auto applied = absent_applied_.begin(); applied != absent_applied_.end();) {
+    const ro::sim::AbsentStyle* absent = book.FindAbsent(applied->first);
+    if (absent != nullptr && absent->shown) {
+      ++applied;
+      continue;
+    }
+    Release(applied->second);
+    applied = absent_applied_.erase(applied);
   }
   for (auto interned = interned_.begin(); interned != interned_.end();) {
     if (interned->second.bearers != 0) {

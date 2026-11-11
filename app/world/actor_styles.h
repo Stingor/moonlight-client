@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <map>
+#include <vector>
 
 #include "ro/render/actor_wardrobe.h"
 #include "ro/render/palette_ramps.h"
@@ -78,6 +79,15 @@ class ActorStyles {
   void Dress(std::uint32_t gid, ro::render::ActorLook& look, ro::render::ActorWardrobe& wardrobe,
              const ro::sim::StyleBook& book);
 
+  // HABILLE LA TÊTE D'UN MEMBRE HORS DE VUE de ce que le serveur a dit sous son
+  // char_id (`StyleBook::FindAbsent`), par le même chemin que `Dress`.
+  //
+  // ⚠ UN AUTRE ESPACE QUE LES ACTEURS : un char_id n'est pas un gid, et ses
+  // identifiants se tiennent à part. Le balayage les rend quand le livre oublie
+  // le personnage, ou n'a plus rien à en montrer.
+  void DressAbsent(std::uint32_t char_id, ro::render::ActorLook& look,
+                   ro::render::ActorWardrobe& wardrobe, const ro::sim::StyleBook& book);
+
   // Oublie les acteurs dont le livre ne parle plus, et rend à la garde-robe les
   // identifiants que plus personne ne porte. ⚠ APRÈS LA COMPOSITION :
   // `ForgetStyle` invalide les tenues du style, et une composition en cours,
@@ -104,8 +114,16 @@ class ActorStyles {
                                      ro::render::ActorWardrobe& wardrobe);
   void Release(std::uint32_t style);
 
+  // L'habillage commun : `holder` se range dans `applied`, l'une des deux tables.
+  void DressFrom(std::map<std::uint32_t, std::uint32_t>& applied, std::uint32_t holder,
+                 const ro::sim::StyleVariants* variants,
+                 const std::vector<ro::sim::StyleLayerRecipe>* layers, ro::render::ActorLook& look,
+                 ro::render::ActorWardrobe& wardrobe);
+
   // Ce que chaque acteur porte en ce moment, par son identifiant.
   std::map<std::uint32_t, std::uint32_t> applied_;
+  // Ce que chaque tête hors de vue porte, par char_id.
+  std::map<std::uint32_t, std::uint32_t> absent_applied_;
   // ⚠ UN STYLE SANS PORTEUR Y RESTE JUSQU'AU BALAYAGE : un acteur qui reprend
   // la même recette avant retrouve le même identifiant.
   std::map<std::uint32_t, Interned> interned_;

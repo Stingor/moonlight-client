@@ -79,6 +79,7 @@
 #include "items/storage_view.h"
 #include "items/view_equip_view.h"
 #include "party/party_panel.h"
+#include "world/absent_styles.h"
 #include "world/actor_footprints.h"
 #include "world/actor_ghosts.h"
 #include "world/actor_sounds.h"
@@ -621,15 +622,14 @@ class Game : public Screen,
   // LES ÉTATS DU JOUEUR, CROISÉS. Elle désigne la table des statuts et leurs
   // icônes, qui vivent dans les accessoires : elle se construit donc après eux.
   std::optional<StatusView> status_view_;
-  // LE SAC, CROISÉ. Il désigne la table des objets, les mots et les icônes,
-  // qui vivent tous dans les accessoires : il se construit donc APRÈS eux.
+  // LE SAC, CROISÉ avec la table des objets, les mots et les icônes : bâti APRÈS eux.
   std::optional<InventoryView> bag_;
   // LE SERTISSAGE, croisé avec les mêmes accessoires que le sac.
   std::optional<CardInsertView> card_insert_;
-  // LES COULEURS COMPOSÉES, du fil à la garde-robe — voir `world/actor_styles.h`.
+  // LES COULEURS COMPOSÉES, en vue et hors de vue : `world/actor_styles.h`, `absent_styles.h`.
   ActorStyles styles_;
-  // LA FICHE, CROISÉE. Elle désigne les mêmes accessoires que le sac — la
-  // table des objets, les mots, les icônes — et se construit donc après eux.
+  AbsentStyles absent_styles_;
+  // LA FICHE, CROISÉE avec les mêmes accessoires que le sac : bâtie après eux.
   std::optional<CharacterView> character_;
   // L'APPARENCE QUE SON PANTIN MONTRE, habillée avant le dessin : c'est elle que
   // le GIF photographie, au clic qui suit.

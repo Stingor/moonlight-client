@@ -91,8 +91,10 @@ class PartyLens {
   [[nodiscard]] virtual std::string_view MapName(std::string_view map_raw) const = 0;
   // Vide quand l'installation ne la dessine pas.
   [[nodiscard]] virtual PartyMinimap Minimap(std::string_view map_raw) = 0;
-  // La tête de l'acteur qui représente ce compte ; vide sans acteur.
-  [[nodiscard]] virtual ro::ui::SkinImage Head(std::uint32_t account_id) = 0;
+  // La tête de ce personnage connecté, habillée de sa recette : celle de son
+  // acteur s'il est en vue, sinon ce que le serveur dit sous son char_id. Vide
+  // tant qu'on ne sait pas à quoi il ressemble.
+  [[nodiscard]] virtual ro::ui::SkinImage Head(std::uint32_t account_id, std::uint32_t char_id) = 0;
   [[nodiscard]] virtual ro::ui::SkinImage Crown() = 0;
   [[nodiscard]] virtual PartyStatuses Statuses(std::uint32_t account_id, bool is_me) = 0;
   // Pourquoi « Inviter dans mon carnet MVP » est refusé à ce joueur, DÉJÀ

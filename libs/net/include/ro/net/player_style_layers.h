@@ -130,6 +130,12 @@ struct StyleLayerBlock {
 [[nodiscard]] core::Result<std::vector<StyleLayerBlock>> ReadStyleLayerPayload(
     std::span<const std::uint8_t> raw);
 
+// LA CHARGE BRUTE d'une trame de styles : telle quelle, ou décompressée si le
+// drapeau 0x01 est posé. 🔴 À LA TAILLE EXACTE ANNONCÉE, plafonnée à
+// `kStyleLayersRawMost` : une bombe zlib s'arrête au tampon.
+[[nodiscard]] core::Result<std::vector<std::uint8_t>> StylePayloadOf(
+    std::uint8_t flags, std::size_t raw_size, std::span<const std::uint8_t> body);
+
 // `ZC 0x0F5F` : chaque bloc REDÉFINIT les teintures de son joueur, un bloc vide
 // les efface. La décompression se fait à la taille exacte annoncée, plafonnée.
 [[nodiscard]] FrameOutcome ApplyStyleLayersFrame(const Frame& frame, sim::World& world);

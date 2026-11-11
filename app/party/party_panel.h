@@ -42,15 +42,17 @@ class SurvivorsPresenceLabels;
 // CE QUE LA VUE EMPRUNTE À LA PARTIE. ⚠ TOUT PEUT MANQUER : une installation
 // incomplète donne des lignes plus pauvres, jamais une fenêtre qui plante.
 class ActorStyles;
+class AbsentStyles;
 
 struct PartyPanelPieces {
   ro::render::GameImages* images = nullptr;
   const ro::vfs::JobNames* jobs = nullptr;
   const ro::vfs::MapDisplayNames* map_names = nullptr;
   ro::render::ActorWardrobe* wardrobe = nullptr;
-  // Les styles que la carte a posés : une tête de groupe ou d'amis porte la
-  // teinture de cheveux et la peau de son joueur quand il est en vue.
-  const ActorStyles* styles = nullptr;
+  // Les styles que la carte a posés, et ceux qu'on demande hors de vue : une
+  // tête de groupe ou d'amis porte la recette entière de son joueur.
+  ActorStyles* styles = nullptr;
+  AbsentStyles* absent_styles = nullptr;
   const ro::vfs::StatusTable* status_table = nullptr;
   ro::render::StatusIcons* status_icons = nullptr;
 };
@@ -112,7 +114,7 @@ class PartyPanel final : private PartyLens {
   [[nodiscard]] std::string_view JobName(std::uint16_t job) const override;
   [[nodiscard]] std::string_view MapName(std::string_view map_raw) const override;
   [[nodiscard]] PartyMinimap Minimap(std::string_view map_raw) override;
-  [[nodiscard]] ro::ui::SkinImage Head(std::uint32_t account_id) override;
+  [[nodiscard]] ro::ui::SkinImage Head(std::uint32_t account_id, std::uint32_t char_id) override;
   [[nodiscard]] ro::ui::SkinImage Crown() override;
   [[nodiscard]] PartyStatuses Statuses(std::uint32_t account_id, bool is_me) override;
   [[nodiscard]] const char* MvpInviteRefusal(std::string_view name,

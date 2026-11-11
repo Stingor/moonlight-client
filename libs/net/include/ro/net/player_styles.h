@@ -1,7 +1,10 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
+#include <optional>
 
+#include "ro/core/byte_reader.h"
 #include "ro/core/error.h"
 #include "ro/net/connection.h"
 #include "ro/net/world_update.h"
@@ -63,5 +66,21 @@ namespace ro::net {
 // serveur en range quatre — à qui n'en retirait qu'une.
 [[nodiscard]] core::Result<void> SendPlayerStyleClear(Connection& link, std::uint32_t body_key);
 [[nodiscard]] core::Result<void> SendPlayerStyleClearAll(Connection& link);
+
+// UNE VARIANTE DU LOT 0x0F27 SANS SON GID : version, drapeaux, clé du corps,
+// trois numéros, huit réglages. C'est ainsi qu'un style hors de vue porte ses
+// corps (`ro/net/absent_styles.h`).
+inline constexpr std::size_t kStyleBodyEntryBytes = 52;
+
+struct StyleBodyEntry {
+  std::uint32_t body_key = 0;
+  sim::StyleRecipe recipe;
+  // La variante de repli, que reprend un corps qui n'a pas la sienne.
+  bool fallback = false;
+};
+
+// Lit une variante, et avance toujours de `kStyleBodyEntryBytes`. Rien si elle
+// est d'une autre version, si elle efface, ou si sa clé est nulle.
+[[nodiscard]] std::optional<StyleBodyEntry> ReadStyleBodyEntry(core::ByteReader& reader);
 
 }  // namespace ro::net

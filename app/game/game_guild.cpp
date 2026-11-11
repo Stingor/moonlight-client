@@ -35,6 +35,8 @@ void Game::OpenGuild() {
       .skills = pieces_.skill_tree.has_value() ? &*pieces_.skill_tree : nullptr,
       .skill_icons = pieces_.skill_icons.has_value() ? &*pieces_.skill_icons : nullptr,
       .wardrobe = pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr,
+      .styles = &styles_,
+      .absent_styles = &absent_styles_,
       .client_root = client_root_,
   });
   // 🔴 SANS ADRESSE, PAS DE SERVICE : l'onglet se dessine, mais aucun emblème ne

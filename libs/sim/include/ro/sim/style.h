@@ -225,6 +225,47 @@ struct StyleAtelier {
   }
 };
 
+// ── HORS DE VUE ─────────────────────────────────────────────────────────────
+//
+// La guilde, le groupe et les amis demandent les styles d'un membre connecté
+// que la carte ne montre pas ; le serveur les rend sous son char_id.
+
+// De quoi composer sa tête : les listes du groupe et des amis n'en portent rien.
+struct AbsentLook {
+  std::uint16_t job = 0;
+  std::uint8_t sex = 0;
+  std::uint16_t hair = 0;
+  std::uint16_t hair_color = 0;
+};
+
+// CE QUE LE SERVEUR A DIT D'UN PERSONNAGE HORS DE VUE.
+struct AbsentStyle {
+  // Faux : rien à montrer — hors ligne, hors des listes, ou caché. Le reste est
+  // alors vide.
+  bool shown = false;
+  AbsentLook look;
+  StyleVariants variants;
+  std::vector<StyleLayerRecipe> layers;
+  // L'instant de la réponse, sur l'horloge du client.
+  std::uint32_t heard_at_ms = 0;
+  // Tirée du même compteur que les révisions des acteurs : elle ne revient
+  // jamais.
+  std::uint32_t revision = 0;
+};
+
+// Les personnages hors de vue que le livre garde, au plus : une guilde pleine,
+// un groupe et une liste d'amis tiennent dessous. Au-delà, le plus ancien part.
+inline constexpr std::size_t kAbsentStylesMost = 256;
+
+// LE DERNIER REFUS d'une demande hors de vue : quand revenir.
+struct AbsentRefusal {
+  std::uint8_t result = 0;
+  std::uint16_t wait_ms = 0;
+  std::uint32_t heard_at_ms = 0;
+  // Avance à chaque refus. Zéro : aucun refus reçu.
+  std::uint32_t sequence = 0;
+};
+
 // CE QUE LE STYLISTE DEMANDE À LA FENÊTRE D'ÉDITION.
 //
 // ⚠ « BASCULER » N'EST PAS « OUVRIR », et le serveur distingue les trois : un
@@ -292,6 +333,22 @@ class StyleBook {
   // part.
   void RememberLayers(std::uint32_t gid, std::vector<StyleLayerRecipe> layers);
 
+  // ── HORS DE VUE, par char_id ──────────────────────────────────────────────
+  //
+  // ⚠ UN AUTRE ESPACE QUE CELUI DES ACTEURS : un acteur se nomme par son gid,
+  // un personnage hors de vue par son char_id. Les départs et les changements de
+  // carte n'y touchent pas : ces styles ne viennent pas de la vue.
+
+  // Ce que le serveur a dit de ce personnage, ou rien.
+  [[nodiscard]] const AbsentStyle* FindAbsent(std::uint32_t char_id) const;
+  // Remplace ce qu'on en savait, et lui donne une révision neuve.
+  void RememberAbsent(std::uint32_t char_id, AbsentStyle style);
+  [[nodiscard]] const std::map<std::uint32_t, AbsentStyle>& absent() const noexcept {
+    return absent_;
+  }
+  void HearAbsentRefusal(AbsentRefusal refusal);
+  [[nodiscard]] const AbsentRefusal& absent_refusal() const noexcept { return absent_refusal_; }
+
   // CE QUE LE STYLISTE A DEMANDÉ, une fois.
   //
   // 🔴 UNE DEMANDE, PAS UN ÉTAT, et elle se CONSOMME : laissée en place, elle
@@ -340,6 +397,9 @@ class StyleBook {
   std::uint32_t last_revision_ = 0;
   std::optional<StyleEditorRequest> asked_;
   std::uint8_t asked_tab_ = 0;
+  std::map<std::uint32_t, AbsentStyle> absent_;
+  AbsentRefusal absent_refusal_;
+  std::uint32_t last_absent_refusal_ = 0;
 
   StyleVerdict body_verdict_{.subject = StyleSubject::kBody};
   StyleVerdict layers_verdict_{.subject = StyleSubject::kLayers};

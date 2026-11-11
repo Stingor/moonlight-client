@@ -64,6 +64,10 @@ enum class ServerRuleKey : std::uint16_t {
   // LE DERNIER NUMÉRO DE CALQUE que le serveur accepte. Sa présence, à 6 au
   // moins, est la preuve qu'il range la peau du corps.
   kStyleLayerLast = 25,
+  // LES STYLES HORS DE VUE. La cadence est la preuve que le serveur sert leur
+  // demande.
+  kStyleAbsentCadenceMs = 26,
+  kStyleAbsentIdsMost = 27,
 };
 
 [[nodiscard]] FrameOutcome ApplyServerRulesFrame(const Frame& frame, sim::World& world);
