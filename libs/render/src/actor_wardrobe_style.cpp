@@ -99,7 +99,10 @@ ActorWardrobe::BodyRamps ActorWardrobe::BodyRampsFor(const ActorLook& look) {
 
 ActorWardrobe::BodyRamps ActorWardrobe::LayerRampsFor(const ActorLook& look, ActorPart part) {
   BodyRamps found;
-  const std::optional<RampLayer> layer = RampLayerOfPart(part);
+  // LE CORPS D'UN COMPAGNON se mesure comme une coiffe : voir `Tint`.
+  const bool companion = !look.player && !look.item && part == ActorPart::kBody;
+  const std::optional<RampLayer> layer =
+      companion ? std::optional(RampLayer::kHeadgear) : RampLayerOfPart(part);
   if (!layer.has_value()) {
     return found;
   }

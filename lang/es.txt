@@ -23748,3 +23748,42 @@ tr: Rotura de cubas
 
 fr: Pièce non affichée : montrée sans sa teinture.
 tr: Pieza no mostrada: se ve sin su tinte.
+
+fr: Familier
+tr: Mascota
+
+fr: La teinture de cet onglet appartient à ce compagnon.
+tr: El tinte de esta pestaña pertenece a este compañero.
+
+fr: Cette teinture appartient à ce compagnon, et vaut pour sa forme d'aujourd'hui.
+tr: Este tinte pertenece a este compañero y vale para su forma actual.
+
+fr: Une évolution change son sprite : la teinture s'endort alors, et il retrouve ses couleurs d'origine. Elle revient s'il reprend cette forme.
+tr: Una evolución cambia su sprite: el tinte queda dormido y recupera sus colores originales. Vuelve si retoma esta forma.
+
+fr: Ce compagnon est presque gris : coche « Couleur unique (absolu) » sur une pièce pour la colorer.
+tr: Este compañero es casi gris: marca « Color único (absoluto) » en una pieza para colorearla.
+
+fr: Tourner la teinte ne change pas un gris. Le réglage absolu impose une teinte et une saturation : c'est lui qui colore un Lunatic blanc.
+tr: Girar el tono no cambia un gris. El ajuste absoluto impone un tono y una saturación: es lo que colorea a un Lunatic blanco.
+
+fr: Une teinture de compagnon se valide auprès du styliste.
+tr: Un tinte de compañero se confirma con el estilista.
+
+fr: Retirer la teinture de ce compagnon
+tr: Quitar el tinte de este compañero
+
+fr: Il retrouve ses couleurs d'origine, pour toi comme pour les autres.
+tr: Recupera sus colores originales, para ti y para los demás.
+
+fr: Retirer la teinture de ce compagnon ?
+tr: ¿Quitar el tinte de este compañero?
+
+fr: Teindre l'homoncule dans l'éditeur de style.
+tr: Teñir al homúnculo en el editor de estilo.
+
+fr: Teindre le familier dans l'éditeur de style.
+tr: Teñir a la mascota en el editor de estilo.
+
+fr: Le serveur ne range pas encore la teinture des compagnons.
+tr: El servidor todavía no guarda el tinte de los compañeros.

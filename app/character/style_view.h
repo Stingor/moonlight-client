@@ -232,7 +232,24 @@ class StyleView {
     bool retouchable = false;
     // La race du porteur : la peau d'une tête se tient hors de son reste.
     ro::render::SkinRace race = ro::render::SkinRace::kHuman;
+    // UN COMPAGNON : l'apparence que le pantin montre à la place du joueur.
+    std::optional<ro::render::ActorLook> companion_look;
   };
+  // UN COMPAGNON SORTI : son gid, sa classe, l'onglet qui le règle.
+  struct SeenCompanion {
+    std::uint32_t gid = 0;
+    std::uint32_t job = 0;
+    ro::ui::PaletteTabKind tab = ro::ui::PaletteTabKind::kBody;
+
+    [[nodiscard]] friend bool operator==(const SeenCompanion&, const SeenCompanion&) = default;
+  };
+  // Nos compagnons sortis : l'homoncule, puis le familier.
+  [[nodiscard]] static std::vector<SeenCompanion> CompanionsOf(const ro::sim::World& world);
+  // ── LES COMPAGNONS — voir `style_view_companions.cpp` ───────────────────
+  // Un onglet par compagnon sorti, mesuré sur son sprite.
+  void AppendCompanionTabs(std::span<const SeenCompanion> companions, const ro::sim::World& world);
+  // Ce que le livre dit que nous portons, nous et nos compagnons.
+  void ObserveWorn(const ro::sim::World& world);
   // ── LE PROFIL MIXTE : voir style_view_rest.cpp ───────────────────────────
   // Le reste d'un onglet, tiré de sa mesure.
   void FillRest(LayerTab& tab, const ro::render::RestMeasure& rest) const;
@@ -300,7 +317,7 @@ class StyleView {
   [[nodiscard]] std::vector<ro::net::StyleLayerOrder> LayerOrders(bool atelier_open) const;
   // Valide les calques, s'il y a lieu.
   void ValidateLayers(ro::net::Connection& link, std::uint32_t now_ms);
-  // Retire la teinture de l'objet de l'onglet.
+  // Retire la teinture de l'objet, ou du compagnon, de l'onglet.
   void ClearItemDye(const LayerTab& tab, ro::net::Connection& link, std::uint32_t now_ms);
   // Lit un code de calque sur l'onglet ouvert. Faux s'il n'y va pas.
   bool TryLayerCode(std::string_view code);
@@ -426,6 +443,12 @@ class StyleView {
   // Le profil mixte permis au moment de la mesure des onglets.
   bool tabs_mixed_ = false;
   std::uint32_t tabs_generation_ = 0;
+  // Les compagnons pour lesquels les onglets ont été faits.
+  std::vector<SeenCompanion> tabs_companions_;
+  // Ce que le livre disait de nos teintures, joueur et compagnons, à la dernière
+  // image, et le numéro qui avance quand cela change.
+  std::vector<std::pair<std::uint32_t, std::uint32_t>> worn_revisions_;
+  std::uint32_t worn_serial_ = 0;
   // L'onglet de la vue, et ce qui s'y lit.
   ro::ui::PaletteTabKind view_tab_ = ro::ui::PaletteTabKind::kBody;
   std::vector<ro::render::RampAdjust> layer_adjusts_;

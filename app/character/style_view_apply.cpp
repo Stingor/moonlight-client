@@ -56,7 +56,7 @@ void StyleView::Apply(const ro::ui::PaletteEditorAction& asked, ro::net::Connect
   // que la barre vient de choisir : c'est sur elles que le joueur a cliqué.
   if (const LayerTab* tab = OpenLayer()) {
     ApplyLayerPieces(asked, *tab, ToHarmony(asked.harmony), now_ms);
-    if (asked.clear_item_dye && tab->shown.item) {
+    if (asked.clear_item_dye && (tab->shown.item || tab->shown.companion)) {
       ClearItemDye(*tab, link, now_ms);
     }
   } else {

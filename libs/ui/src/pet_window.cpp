@@ -293,6 +293,13 @@ void DrawFeed(PetWindowState& state, const PetWindowView& view, const SkinArt& a
   SkinTooltip(
       core::Tr("Nourrir un pet qui n'a pas faim lui fait PERDRE de l'intimité. Sans "
                "nourriture dans l'inventory, le client refuse sans rien envoyer."));
+  // SES COULEURS : l'éditeur de style, ouvert sur son onglet.
+  ImGui::SameLine();
+  if (SkinSmallButton(SuffixedLabel(core::Tr("Couleurs"), "##pet_colors").c_str(), art,
+                      ImVec2(Px(kOrderButtonPixels), 0.0F))) {
+    action.colors_asked = true;
+  }
+  SkinTooltip(core::Tr("Teindre le familier dans l'éditeur de style."));
 }
 
 void DrawFeedConfirmation(PetWindowState& state, const PetWindowView& view, const SkinArt& art,

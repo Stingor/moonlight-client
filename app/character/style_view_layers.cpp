@@ -48,6 +48,10 @@ constexpr std::int8_t kClassSaturation = 65;
 constexpr int kHueClassDegrees = 30;
 constexpr std::array<std::uint8_t, 3> kGreySeed = {178, 178, 178};
 
+// Le calque des compagnons sur le fil : un serveur qui annonce un dernier calque
+// plus petit (règle 25) ne le connaît pas, et refuserait la trame entière.
+constexpr int kCompanionWireLayer = static_cast<int>(ro::sim::StyleLayerKind::kCompanion);
+
 // Le mot bas d'une clé de tête : la couleur de cheveux.
 constexpr std::uint32_t kHairPaletteMask = 0xFFFFU;
 constexpr unsigned kHairStyleShift = 16;
@@ -189,12 +193,16 @@ void StyleView::RefreshTabs(const ro::render::ActorLook& look, const ro::sim::Wo
   // 🔴 LA MESURE SE REFAIT AU CHANGEMENT D'APPARENCE, les objets à chaque
   // image : un chapeau échangé pour un autre de même apparence ne change pas
   // l'apparence, mais change l'exemplaire qu'on teint.
+  // Un compagnon qui sort, rentre ou évolue refait aussi les onglets.
+  const std::vector<SeenCompanion> companions = CompanionsOf(world);
   const bool measured = tabs_look_.has_value() && SameLook(*tabs_look_, look) &&
-                        tabs_generation_ == doll_->generation() && tabs_mixed_ == mixed_allowed_;
+                        tabs_generation_ == doll_->generation() && tabs_mixed_ == mixed_allowed_ &&
+                        tabs_companions_ == companions;
   if (!measured) {
     tabs_look_ = look;
     tabs_generation_ = doll_->generation();
     tabs_mixed_ = mixed_allowed_;
+    tabs_companions_ = companions;
     tabs_.clear();
     const bool doram = ro::render::IsDoramJob(look.job);
     const bool gm_outfit = look.player && look.gm_outfit;
@@ -276,6 +284,9 @@ void StyleView::RefreshTabs(const ro::render::ActorLook& look, const ro::sim::Wo
       item.retouchable = mixed_allowed_ && measure.pixels_total > 0;
       tabs_.push_back(std::move(item));
     }
+
+    // ── LES COMPAGNONS SORTIS : l'homoncule, puis le familier ──────────────
+    AppendCompanionTabs(companions, world);
   }
 
   // ── CE QUI CHANGE SANS L'APPARENCE : l'exemplaire, les teintures ──────────
@@ -299,6 +310,12 @@ void StyleView::RefreshTabs(const ro::render::ActorLook& look, const ro::sim::Wo
                              ? entry->name
                              : (tab.item_id != 0 ? "#" + std::to_string(tab.item_id) : "");
       }
+    }
+    // Un serveur qui ne connaît pas le calque 7 refuserait la trame entière.
+    if (tab.shown.companion && !tab.ramps.empty()) {
+      tab.shown.blocked = server_layer_last_ >= kCompanionWireLayer
+                              ? PaletteTabBlock::kNone
+                              : PaletteTabBlock::kCompanionNotServed;
     }
     const ro::render::LayerDye* worn = layers_.Worn(tab.at);
     tab.shown.dyed = worn != nullptr && !NeutralDye(*worn);
@@ -380,16 +397,7 @@ void StyleView::RefreshLayerPieces(const LayerTab& tab) {
 }
 
 void StyleView::RefreshLayerState(const ro::sim::World& world, std::uint32_t now_ms) {
-  std::vector<ro::render::LayerDye> worn;
-  if (const std::vector<ro::sim::StyleLayerRecipe>* told =
-          world.styles().FindLayers(world.player_id())) {
-    for (const ro::sim::StyleLayerRecipe& recipe : *told) {
-      if (const std::optional<ro::render::LayerDye> dye = FromWire(recipe)) {
-        worn.push_back(*dye);
-      }
-    }
-  }
-  layers_.Observe(worn, world.styles().RevisionOf(world.player_id()));
+  ObserveWorn(world);
   retouches_most_ =
       std::min(world.session().style_layer_retouches_most, static_cast<int>(kLayerRetouchesMost));
   mixed_allowed_ = retouches_most_ > 0;
@@ -406,6 +414,10 @@ ro::render::ActorLook StyleView::DollLook(const ro::render::ActorLook& body_look
   const LayerTab* tab = OpenLayer();
   if (tab == nullptr) {
     return look;
+  }
+  // UN COMPAGNON SE MONTRE À LA PLACE DU JOUEUR.
+  if (tab->companion_look.has_value()) {
+    return *tab->companion_look;
   }
   // ⚠ LE CALQUE RÉGLÉ SEUL, sur le corps qu'on règle : une autre coiffe
   // masquerait celle qu'on regarde.
@@ -434,6 +446,15 @@ void StyleView::ReadPipette(const ro::ui::PaletteEditorState& state) {
   ro::ui::PalettePipette found;
   // 🔴 LA PEAU OUVRE LA LIGNE DE SON ONGLET : le visage celle de la Tête, les
   // bras celle du Corps.
+  // 🔴 SOUS UN COMPAGNON, LE PANTIN EST LE COMPAGNON : son corps n'est pas celui
+  // du joueur, et sa pièce se lit sur son propre découpage.
+  if (const LayerTab* open = OpenLayer();
+      open != nullptr && open->companion_look.has_value() && pick->part == ActorPart::kBody) {
+    view_.pick_index = pick->index;
+    view_.pipette = {.found = true, .tab = open->shown.kind, .piece = RowAt(*open, pick->index, 0)};
+    view_.pipette_ramp = view_.pipette.piece;
+    return;
+  }
   const std::optional<SkinLine> skin = SkinLineUnder(pick->part, pick->index);
   if (skin.has_value() && SkinAdjustable(*skin)) {
     found = {.found = true,
@@ -650,6 +671,15 @@ std::vector<ro::net::StyleLayerOrder> StyleView::LayerOrders(bool atelier_open) 
       orders.push_back(order);
       continue;
     }
+    // 🔴 UN COMPAGNON NE SE DÉSIGNE PAS : la clé est sa classe, et le serveur lit
+    // lui-même le compagnon de la session. Comme un item, seulement à l'atelier
+    // quand le serveur l'exige.
+    if (tab->shown.companion) {
+      if (atelier_open) {
+        orders.push_back(order);
+      }
+      continue;
+    }
     if (tab->shown.item) {
       // 🔴 UN OBJET SE DÉSIGNE PAR SA PLACE ET L'OBJET ATTENDU, jamais par son
       // apparence : c'est le serveur qui trouve l'exemplaire. Et seulement à
@@ -674,11 +704,17 @@ void StyleView::ValidateLayers(ro::net::Connection& link, std::uint32_t now_ms) 
 
 void StyleView::ClearItemDye(const LayerTab& tab, ro::net::Connection& link, std::uint32_t now_ms) {
   const ro::render::LayerDye* worn = layers_.Worn(tab.at);
-  if (!atelier_open_ || worn == nullptr || !tab.slot.has_value() || tab.item_id == 0) {
+  if (!atelier_open_ || worn == nullptr) {
     return;
   }
-  ro::net::StyleLayerOrder order{.recipe = ToWire(*worn), .slot = tab.slot, .clear = true};
-  order.recipe.key = tab.item_id;
+  ro::net::StyleLayerOrder order{.recipe = ToWire(*worn), .clear = true};
+  if (!tab.shown.companion) {
+    if (!tab.slot.has_value() || tab.item_id == 0) {
+      return;
+    }
+    order.slot = tab.slot;
+    order.recipe.key = tab.item_id;
+  }
   const std::array<ro::net::StyleLayerOrder, 1> one{order};
   if (SendLayers(link, one, /*clear_character=*/false, now_ms)) {
     layers_.BackToWorn(tab.at);

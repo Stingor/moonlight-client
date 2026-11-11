@@ -123,8 +123,12 @@ enum class PaletteTabKind : std::uint8_t {
   kHeadgearMiddle = 4,
   kHeadgearLow = 5,
   kGarment = 6,
+  // LES COMPAGNONS SORTIS : l'homoncule et le familier, chacun sous son nom. La
+  // teinture appartient au compagnon, et vaut pour sa forme d'aujourd'hui.
+  kHomunculus = 7,
+  kPet = 8,
 };
-inline constexpr std::size_t kPaletteTabKinds = 7;
+inline constexpr std::size_t kPaletteTabKinds = 9;
 
 // L'ONGLET QU'UN NUMÉRO DU STYLISTE DÉSIGNE : un de plus que `PaletteTabKind`,
 // zéro pour aucun. Le numéro de l'ancien onglet de la peau ouvre la Tête.
@@ -148,6 +152,8 @@ enum class PaletteTabBlock : std::uint8_t {
   kNotFound,
   // Le serveur ne range pas la peau du corps : le corps suit le visage.
   kBodySkinNotServed,
+  // Le serveur ne connaît pas le calque des compagnons (règle 25 sous 7).
+  kCompanionNotServed,
 };
 
 struct PaletteTab {
@@ -164,6 +170,10 @@ struct PaletteTab {
   bool dyed = false;
   // UN OBJET : la teinture appartient à l'exemplaire équipé.
   bool item = false;
+  // UN COMPAGNON : la teinture lui appartient, pour sa forme d'aujourd'hui.
+  bool companion = false;
+  // Le compagnon est surtout gris : seul le réglage absolu le colore.
+  bool mostly_grey = false;
 };
 
 // LA RÉPONSE DE LA PIPETTE, toutes pièces confondues : l'onglet du calque sous
@@ -612,7 +622,7 @@ struct PaletteEditorAction {
   // Reprendre la teinture d'une autre coupe sur la coupe portée, pièce par
   // pièce, appariées par teinte.
   bool adapt_cut = false;
-  // Retirer la teinture de l'objet de l'onglet ouvert.
+  // Retirer la teinture de l'objet, ou du compagnon, de l'onglet ouvert.
   bool clear_item_dye = false;
   // LA LIGNE DE PEAU de l'onglet ouvert : le teint proposé choisi, en rang, ou
   // moins un ; une couleur désignée au nuancier ; le retour à la peau du dessin,
@@ -703,6 +713,11 @@ struct PaletteEditorState {
   // La garde-robe a-t-elle été demandée depuis l'ouverture de la section ?
   bool wardrobe_asked = false;
 };
+
+// OUVRE L'ÉDITEUR SUR UN ONGLET quand `asked` : un bouton « Couleurs » d'une
+// autre fenêtre. Un onglet absent (le compagnon est rentré) retombe sur le
+// corps.
+void OpenPaletteTab(PaletteEditorState& state, bool asked, PaletteTabKind tab);
 
 [[nodiscard]] PaletteEditorAction DrawPaletteEditor(PaletteEditorState& state,
                                                     const PaletteEditorView& view,

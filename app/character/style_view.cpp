@@ -223,8 +223,16 @@ void StyleView::RefreshDoll(const ro::render::ActorLook& look,
                             const ro::render::PaletteRecipe& shown,
                             ro::ui::PaletteEditorState& state, std::uint32_t now_ms) {
   state.doll.image = ro::ui::SkinImage{};
-  const std::size_t pose = ro::ui::kPaletteDollPoses[static_cast<std::size_t>(
-      std::clamp(state.doll.pose, 0, static_cast<int>(ro::ui::kPaletteDollPoses.size()) - 1))];
+  const LayerTab* tab = OpenLayer();
+  // LES POSES D'UN COMPAGNON sont celles du .act d'un monstre : repos, marche,
+  // attaque. Il ne s'assoit pas : sa pose « assis » est le repos.
+  constexpr std::array<std::size_t, ro::ui::kPaletteDollPoses.size()> kCompanionPoses = {0, 1, 0,
+                                                                                         2};
+  const auto pose_rank = static_cast<std::size_t>(
+      std::clamp(state.doll.pose, 0, static_cast<int>(ro::ui::kPaletteDollPoses.size()) - 1));
+  const std::size_t pose = tab != nullptr && tab->companion_look.has_value()
+                               ? kCompanionPoses[pose_rank]
+                               : ro::ui::kPaletteDollPoses[pose_rank];
   // LES TEINTURES DE CALQUES : ce qu'on compose, ou ce qu'on porte tant que
   // « avant / après » est tenu.
   if (shown_key_.source == kShowsWorn) {
@@ -232,7 +240,6 @@ void StyleView::RefreshDoll(const ro::render::ActorLook& look,
   } else {
     composed_ = layers_.Composed();
   }
-  const LayerTab* tab = OpenLayer();
   const StyleDoll::Shot shot{
       .look = look,
       .recipe = &shown,

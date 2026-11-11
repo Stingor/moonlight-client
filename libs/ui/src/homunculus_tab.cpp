@@ -275,6 +275,15 @@ void DrawActions(HomunculusTabState& state, const HomunculusTabView& view, const
   }
   ImGui::EndDisabled();
   SkinTooltip(core::Tr("L'homoncule reçoit le dixième de l'expérience du maître."));
+  // SES COULEURS : l'éditeur de style, ouvert sur son onglet. Il n'a rien à
+  // montrer d'un homoncule qui n'est pas sorti.
+  ImGui::SameLine();
+  ImGui::BeginDisabled(!view.active());
+  if (SkinSmallButton(core::Tr("Couleurs"), art)) {
+    action.colors_asked = true;
+  }
+  ImGui::EndDisabled();
+  SkinTooltip(core::Tr("Teindre l'homoncule dans l'éditeur de style."));
 
   if (state.delete_asked) {
     ImGui::Spacing();

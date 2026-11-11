@@ -667,6 +667,10 @@ void Game::DrawInterface(std::uint32_t now_ms) {
     GameSettings::OpenOptionsAt(windows_, OptionSection::kInterface,
                                 PetRowId(PetRow::kConfirmReturnToEgg));
   }
+  // « Couleurs » d'une fiche de compagnon : l'éditeur de style, sur son onglet.
+  ro::ui::OpenPaletteTab(windows_.style, answers.pet.colors_asked, ro::ui::PaletteTabKind::kPet);
+  ro::ui::OpenPaletteTab(windows_.style, answers.character.homunculus.colors_asked,
+                         ro::ui::PaletteTabKind::kHomunculus);
   // Les matériaux et les espèces du panneau d'évolution, les œufs de l'éclosion :
   // des items de catalogue, avec les gestes de partout.
   FollowCatalogItem(answers.pet.link, now_ms);

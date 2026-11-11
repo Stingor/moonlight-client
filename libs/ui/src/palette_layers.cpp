@@ -104,6 +104,51 @@ void DrawItemNotes(const PaletteTab& tab, const PaletteEditorView& view, const S
   }
 }
 
+// LE COMPAGNON TEINT : la teinture lui appartient, pour sa forme d'aujourd'hui.
+void DrawCompanionNotes(const PaletteTab& tab, const PaletteEditorView& view, const SkinArt& art,
+                        PaletteEditorAction& action) {
+  Wrapped(
+      core::Tr("Cette teinture appartient à ce compagnon, et vaut pour sa forme "
+               "d'aujourd'hui."));
+  Explain(
+      core::Tr("Une évolution change son sprite : la teinture s'endort alors, et il "
+               "retrouve ses couleurs d'origine. Elle revient s'il reprend cette forme."));
+  // 🔴 UN GRIS NE SE COLORE PAS PAR UNE ROTATION : sans le dire, les curseurs de
+  // teinte auraient l'air cassés.
+  if (tab.mostly_grey) {
+    Wrapped(
+        core::Tr("Ce compagnon est presque gris : coche « Couleur unique (absolu) » sur une "
+                 "pièce pour la colorer."));
+    Explain(
+        core::Tr("Tourner la teinte ne change pas un gris. Le réglage absolu impose une "
+                 "teinte et une saturation : c'est lui qui colore un Lunatic blanc."));
+  }
+  if (!view.atelier_open) {
+    ImGui::TextDisabled("%s", core::Tr("Une teinture de compagnon se valide auprès du styliste."));
+  }
+  if (!tab.dyed) {
+    return;
+  }
+  ImGui::BeginDisabled(!view.connected || !view.atelier_open);
+  if (SkinSmallButton(core::Tr("Retirer la teinture de ce compagnon"), art)) {
+    ImGui::OpenPopup("retirer_compagnon");
+  }
+  ImGui::EndDisabled();
+  Explain(core::Tr("Il retrouve ses couleurs d'origine, pour toi comme pour les autres."));
+  if (BeginSkinPopup("retirer_compagnon")) {
+    Wrapped(core::Tr("Retirer la teinture de ce compagnon ?"));
+    if (SkinButton(core::Tr("Retirer"), art)) {
+      action.clear_item_dye = true;
+      ImGui::CloseCurrentPopup();
+    }
+    ImGui::SameLine();
+    if (SkinButton(core::Tr("Annuler"), art)) {
+      ImGui::CloseCurrentPopup();
+    }
+    EndSkinPopup();
+  }
+}
+
 // LES CHEVEUX : une couleur pour toutes les pièces, et la coupe neuve.
 void DrawHairTools(const PaletteEditorView& view, const SkinArt& art, PaletteEditorAction& action) {
   if (view.ramps.size() > 1) {
@@ -215,6 +260,15 @@ std::optional<PaletteTabKind> PaletteTabOfNumber(std::uint8_t number) noexcept {
   return static_cast<PaletteTabKind>(rank);
 }
 
+void OpenPaletteTab(PaletteEditorState& state, bool asked, PaletteTabKind tab) {
+  if (!asked) {
+    return;
+  }
+  state.open = true;
+  state.tab = tab;
+  state.tab_asked = true;
+}
+
 const char* PaletteTabName(PaletteTabKind kind) {
   switch (kind) {
     case PaletteTabKind::kBody:
@@ -229,6 +283,10 @@ const char* PaletteTabName(PaletteTabKind kind) {
       return core::Tr("Coiffe basse");
     case PaletteTabKind::kGarment:
       return core::Tr("Cape");
+    case PaletteTabKind::kHomunculus:
+      return core::Tr("Homoncule");
+    case PaletteTabKind::kPet:
+      return core::Tr("Familier");
   }
   return "";
 }
@@ -296,6 +354,8 @@ const char* TabBlockReason(PaletteTabBlock blocked) {
       return core::Tr("Cet item n'est pas dans ton équipement.");
     case PaletteTabBlock::kBodySkinNotServed:
       return core::Tr("Le serveur ne range pas encore la peau du corps : il suit celle du visage.");
+    case PaletteTabBlock::kCompanionNotServed:
+      return core::Tr("Le serveur ne range pas encore la teinture des compagnons.");
   }
   return "";
 }
@@ -339,6 +399,8 @@ void DrawLayerTabs(PaletteEditorState& state, const PaletteEditorView& view, con
       Explain(TabBlockReason(tab.blocked));
     } else if (tab.item) {
       Explain(core::Tr("La teinture de cet onglet appartient à l'item porté."));
+    } else if (tab.companion) {
+      Explain(core::Tr("La teinture de cet onglet appartient à ce compagnon."));
     }
   }
   EndSkinTabBar();
@@ -352,6 +414,9 @@ void DrawLayerNotes(const PaletteEditorView& view, const SkinArt& art,
   }
   if (tab->item) {
     DrawItemNotes(*tab, view, art, action);
+  }
+  if (tab->companion) {
+    DrawCompanionNotes(*tab, view, art, action);
   }
   if (tab->kind == PaletteTabKind::kHair) {
     DrawHairTools(view, art, action);

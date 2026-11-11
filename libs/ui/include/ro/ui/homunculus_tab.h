@@ -226,6 +226,8 @@ struct HomunculusTabAction {
   int staff_amount = 0;
   std::uint16_t staff_job = 0;
   std::string staff_text;
+  // « Couleurs » : ouvrir l'éditeur de style sur l'onglet de l'homoncule.
+  bool colors_asked = false;
 };
 
 [[nodiscard]] HomunculusTabAction DrawHomunculusTab(HomunculusTabState& state,

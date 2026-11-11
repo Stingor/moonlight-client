@@ -249,7 +249,8 @@ class ActorWardrobe {
 
   // LA MÊME CHOSE POUR UN CALQUE : la pièce `part` que cette apparence porte —
   // la tête, une coiffe, la cape —, découpée par le profil 1. La tête se mesure
-  // sans sa peau, que le calque Peau règle seul.
+  // sans sa peau, que le calque Peau règle seul. Le corps d'un compagnon (un
+  // acteur non joueur) se mesure comme une coiffe.
   //
   // Rampes vides quand l'apparence ne porte pas cette pièce, que son sprite n'a
   // pas de palette — une image en couleurs vraies —, ou que le profil n'y

@@ -227,6 +227,8 @@ struct PetWindowAction {
   ChatLinkAsk link;
   // La puce de la barre de titre : ouvrir la page de réglages de la fiche.
   bool settings_asked = false;
+  // « Couleurs » : ouvrir l'éditeur de style sur l'onglet du familier.
+  bool colors_asked = false;
   // Ce que le staff veut poser sur le serveur.
   std::optional<int> staff_hunger;
   std::optional<int> staff_intimacy;

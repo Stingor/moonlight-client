@@ -23748,3 +23748,42 @@ tr: Vat rupture
 
 fr: Pièce non affichée : montrée sans sa teinture.
 tr: Not displayed: shown without its dye.
+
+fr: Familier
+tr: Pet
+
+fr: La teinture de cet onglet appartient à ce compagnon.
+tr: The dye on this tab belongs to this companion.
+
+fr: Cette teinture appartient à ce compagnon, et vaut pour sa forme d'aujourd'hui.
+tr: This dye belongs to this companion, and applies to its current form.
+
+fr: Une évolution change son sprite : la teinture s'endort alors, et il retrouve ses couleurs d'origine. Elle revient s'il reprend cette forme.
+tr: Evolving changes its sprite: the dye then goes dormant, and it gets its original colors back. The dye returns if it takes this form again.
+
+fr: Ce compagnon est presque gris : coche « Couleur unique (absolu) » sur une pièce pour la colorer.
+tr: This companion is almost grey: tick « Single color (absolute) » on a piece to color it.
+
+fr: Tourner la teinte ne change pas un gris. Le réglage absolu impose une teinte et une saturation : c'est lui qui colore un Lunatic blanc.
+tr: Turning the hue does not change a grey. The absolute setting imposes a hue and a saturation: that is what colors a white Lunatic.
+
+fr: Une teinture de compagnon se valide auprès du styliste.
+tr: A companion dye is confirmed at the stylist.
+
+fr: Retirer la teinture de ce compagnon
+tr: Remove this companion's dye
+
+fr: Il retrouve ses couleurs d'origine, pour toi comme pour les autres.
+tr: It gets its original colors back, for you and for everyone else.
+
+fr: Retirer la teinture de ce compagnon ?
+tr: Remove this companion's dye?
+
+fr: Teindre l'homoncule dans l'éditeur de style.
+tr: Dye the homunculus in the style editor.
+
+fr: Teindre le familier dans l'éditeur de style.
+tr: Dye the pet in the style editor.
+
+fr: Le serveur ne range pas encore la teinture des compagnons.
+tr: The server does not store companion dyes yet.
