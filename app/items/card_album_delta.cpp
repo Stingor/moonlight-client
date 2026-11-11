@@ -35,13 +35,15 @@ constexpr const char* kHeader =
     "# ajouter (action: add, avec son poids de tirage) ou en retirer (remove).\n"
     "#\n"
     "# La vérité est serveur : moonlight/db/import/item_group_db.yml, groupes\n"
-    "# CARDALBUM (album 616) et MAGICCARDALBUM (album 12246). Le fichier client\n"
-    "# packageitem.lub en est ENGENDRÉ — ne jamais l'éditer à la main.\n"
+    "# CARDALBUM (album 616) et MAGICCARDALBUM (album 12246). La table que lit\n"
+    "# moonclient, data/yaml_files/item_groups.yml, en est EXPORTÉE — ne jamais\n"
+    "# l'éditer à la main.\n"
     "#\n"
-    "# À appliquer par :  python apply_card_album_delta.py\n"
-    "#   (dépôt des données du client, data/luafiles514/lua files/probabilityinfo/,\n"
-    "#   auprès de gen_packageitem.py)\n"
-    "# Il patche le YAML serveur, régénère le lub, puis vide ce fichier.\n";
+    "# À appliquer, depuis le dépôt moonclient :\n"
+    "#   python scripts/yaml_tables/apply_card_album_delta.py\n"
+    "#       --serveur <moonlight> --installation <ce jeu> [--apply]\n"
+    "# Il patche le YAML serveur, vérifie la base rechargée, réexporte\n"
+    "# item_groups.yml, puis vide ce fichier. Ensuite : @reloaditemdb.\n";
 
 }  // namespace
 
