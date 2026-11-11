@@ -125,6 +125,9 @@ std::optional<ro::render::LayerDye> FromWire(const ro::sim::StyleLayerRecipe& to
     case ro::sim::StyleLayerKind::kBodySkin:
       dye.layer = ro::render::StyleLayer::kBodySkin;
       break;
+    case ro::sim::StyleLayerKind::kCompanion:
+      dye.layer = ro::render::StyleLayer::kCompanion;
+      break;
     default:
       return std::nullopt;
   }
@@ -181,6 +184,10 @@ std::vector<ro::render::LayerDye> WornDyes(std::span<const ro::sim::StyleLayerRe
       case ro::render::StyleLayer::kBodyMore:
       case ro::render::StyleLayer::kBodySkin:
         return dye.key != 0;
+      // 🔴 UN COMPAGNON, ET DE CETTE CLASSE : un joueur ne porte jamais ce calque,
+      // et une teinture faite pour une autre classe peindrait d'autres rampes.
+      case ro::render::StyleLayer::kCompanion:
+        return !look.player && !look.item && dye.key != 0 && dye.key == look.job;
       case ro::render::StyleLayer::kBody:
         break;
     }

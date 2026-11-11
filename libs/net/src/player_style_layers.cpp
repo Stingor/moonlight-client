@@ -35,7 +35,7 @@ constexpr std::uint8_t kPayloadZipped = 0x01;
 
 // Le calque d'une entrée, tel que le fil le numérote.
 constexpr std::uint8_t kWireHead = static_cast<std::uint8_t>(sim::StyleLayerKind::kHead);
-constexpr std::uint8_t kWireLayerLast = static_cast<std::uint8_t>(sim::StyleLayerKind::kBodySkin);
+constexpr std::uint8_t kWireLayerLast = static_cast<std::uint8_t>(sim::StyleLayerKind::kCompanion);
 
 static_assert(proto::CzMoonclientStyleLayers::kWireSize == 6,
               "l'en-tête du CZ des calques ne vaut plus ce que le serveur déclare");
@@ -87,6 +87,8 @@ static_assert(proto::CzMoonclientStyleLayers::kWireSize +
       return profile == kStyleLayerBodyMoreProfile ? kStyleLayerBodyMoreRanks : 0;
     case sim::StyleLayerKind::kHeadgear:
     case sim::StyleLayerKind::kGarment:
+    // Un compagnon se découpe comme une coiffe.
+    case sim::StyleLayerKind::kCompanion:
       return RanksOf(profile);
   }
   return 0;
@@ -152,7 +154,10 @@ void WriteAdjust(core::ByteWriter& writer, const sim::StyleAdjust& adjust) {
     }
     wire_layer = static_cast<std::uint8_t>(*order.slot);
   } else if (recipe.layer == sim::StyleLayerKind::kHead || IsSkin(recipe.layer) ||
-             recipe.layer == sim::StyleLayerKind::kBodyMore) {
+             recipe.layer == sim::StyleLayerKind::kBodyMore ||
+             recipe.layer == sim::StyleLayerKind::kCompanion) {
+    // 🔴 UN COMPAGNON NE SE DÉSIGNE PAS : la clé est la classe ATTENDUE, et le
+    // serveur lit lui-même le compagnon actif de la session.
     wire_layer = static_cast<std::uint8_t>(recipe.layer);
   } else {
     return core::Fail(core::ErrorCode::kInvalidArgument,

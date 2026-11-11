@@ -125,13 +125,16 @@ inline constexpr std::size_t kStyleLayerAdjustCount = 13;
 // `kBodyMore` est la suite du corps : les rampes 9 à 12, sous la clé du corps.
 // `kSkin` est la peau du visage ; `kBodySkin`, celle d'un corps, sous sa clé.
 // Un corps sans la sienne prend celle du visage.
+// `kCompanion` est le corps d'un compagnon (homoncule, familier), sous la clé de
+// sa classe ; dans le ZC, il voyage dans le bloc du gid du compagnon.
 enum class StyleLayerKind : std::uint8_t {
   kHead = 1,
   kHeadgear = 2,
   kGarment = 3,
   kSkin = 4,
   kBodyMore = 5,
-  kBodySkin = 6
+  kBodySkin = 6,
+  kCompanion = 7
 };
 
 // UNE RETOUCHE : la couleur exacte d'un index de la palette du calque.
