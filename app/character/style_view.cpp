@@ -485,6 +485,9 @@ void StyleView::Refresh(const ro::sim::World& world, ro::ui::PaletteEditorState&
   // ⚠ LES VIGNETTES EN DERNIER : elles se composent sur l'apparence du pantin,
   // teinte et coupe choisies comprises.
   RefreshThumbnails(look, state);
+  // Les tenues : la section de la vue, et une tenue reprise versée en
+  // brouillon, que l'image suivante montrera.
+  RefreshOutfits(world, now_ms);
 }
 
 void StyleView::Tick(const ro::sim::World& world, std::uint32_t now_ms) {

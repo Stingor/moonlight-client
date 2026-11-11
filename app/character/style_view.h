@@ -21,6 +21,7 @@
 
 #include "character/style_doll.h"
 #include "character/style_layers.h"
+#include "character/style_outfits.h"
 #include "character/style_pieces.h"
 #include "character/style_session.h"
 #include "character/style_skin.h"
@@ -167,6 +168,21 @@ class StyleView {
   void LoadPreset(const ro::ui::PaletteEditorAction& asked, const ro::sim::World& world);
   // Les calques du personnage qu'un préréglage range : voir `StylePresets`.
   [[nodiscard]] std::vector<ro::sim::StyleLayerRecipe> PresetLayersNow() const;
+  // Les clés sous lesquelles poser une tête et un corps, une fois `next` montré.
+  [[nodiscard]] PresetKeys KeysAfter(const ro::render::PaletteRecipe& next,
+                                     const ro::sim::World& world) const;
+
+  // ── LES TENUES ──────────────────────────────────────────────────────────
+  // Lit les réponses du serveur, verse une tenue reprise dans l'éditeur, et
+  // remplit la section de la vue.
+  void RefreshOutfits(const ro::sim::World& world, std::uint32_t now_ms);
+  // Les demandes de la section, et la liste redemandée après un rangement.
+  void ApplyOutfits(const ro::ui::PaletteEditorAction& asked, ro::net::Connection& link,
+                    const ro::sim::World& world, std::uint32_t now_ms);
+  // UNE TENUE REPRISE, en brouillon : le corps réglé, les calques du
+  // personnage reportés sur ce qu'on porte, les teintures d'objets sur les
+  // objets de même apparence.
+  void ProposeOutfit(const ro::sim::StyleOutfit& outfit, const ro::sim::World& world);
   // Valide, et fait au besoin de ce corps le style principal.
   void Validate(ro::net::Connection& link, const ro::sim::World& world, std::uint32_t now_ms,
                 bool make_main);
@@ -447,6 +463,16 @@ class StyleView {
   std::vector<ro::render::PaletteRetouch> view_retouches_;
   // Ce que le dernier code de calque collé n'a pas apporté, ou rien.
   const char* code_note_ = nullptr;
+
+  // ── LES TENUES : voir `style_view_outfits.cpp` ───────────────────────────
+  StyleOutfits outfits_;
+  // La dernière réponse du serveur déjà lue, pour en tirer l'état et le refus.
+  std::uint32_t outfit_heard_ = 0;
+  const char* outfit_status_ = nullptr;
+  // Un rangement a changé : la liste se redemande dès que la cadence le permet.
+  bool wardrobe_stale_ = false;
+  std::string outfit_code_shown_;
+  std::vector<ro::ui::PaletteWardrobeSlot> wardrobe_view_;
 };
 
 }  // namespace moonclient

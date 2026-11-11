@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "ro/sim/style.h"
+#include "ro/sim/style_outfit.h"
 
 #include "game/save_folder.h"
 
@@ -107,6 +108,27 @@ struct PresetKeys {
 // reste, réglés par rang et par classe de teinte, se reportent tels quels.
 [[nodiscard]] std::vector<ro::sim::StyleLayerRecipe> RekeyPresetLayers(
     std::span<const ro::sim::StyleLayerRecipe> kept, PresetKeys now, PresetLayers part);
+
+// ── UNE TENUE REPRISE ───────────────────────────────────────────────────────
+
+// LE CORPS D'UNE TENUE pour le corps qu'on règle : le sien s'il y est, sinon
+// celui du repli, sinon le premier ; nul pour une tenue sans corps.
+[[nodiscard]] const ro::sim::StyleRecipe* OutfitBodyFor(const ro::sim::StyleOutfit& outfit,
+                                                        std::uint32_t body_key);
+
+// Un objet porté : son calque et son apparence affichée.
+struct WornItem {
+  ro::sim::StyleLayerKind layer = ro::sim::StyleLayerKind::kHeadgear;
+  std::uint32_t view = 0;
+};
+
+// LES CALQUES D'UNE TENUE À POSER EN BROUILLON : ceux du personnage reportés
+// comme pour un préréglage, et les teintures d'objets seulement sur un objet
+// porté de MÊME apparence — un chapeau d'une autre apparence n'a pas les mêmes
+// pièces, et la teinture n'aurait pas de sens sur lui.
+[[nodiscard]] std::vector<ro::sim::StyleLayerRecipe> OutfitLayersNow(
+    std::span<const ro::sim::StyleLayerRecipe> layers, PresetKeys now,
+    std::span<const WornItem> worn);
 
 // ── LE BROUILLON ────────────────────────────────────────────────────────────
 

@@ -13,6 +13,7 @@
 
 #include "palette_doll.h"
 #include "palette_layers.h"
+#include "palette_outfits.h"
 #include "palette_pickers.h"
 #include "palette_pieces.h"
 #include "palette_presets.h"
@@ -510,6 +511,7 @@ PaletteEditorAction DrawPaletteEditor(PaletteEditorState& state, const PaletteEd
   const bool on_head = view.tab == PaletteTabKind::kHair;
   if (on_body || on_head) {
     DrawPalettePresets(state, view, art, action);
+    DrawPaletteOutfits(state, view, art, action);
   }
   if (!on_body) {
     DrawLayerCode(view, art, action);

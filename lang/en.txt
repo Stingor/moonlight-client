@@ -23553,3 +23553,75 @@ tr: Weapon pierce +%d
 
 fr: Rebond de l'arme %d %%
 tr: Weapon bounce %d %%
+
+fr: Tenues
+tr: Outfits
+
+fr: Ce serveur ne garde pas les tenues.
+tr: This server does not keep outfits.
+
+fr: Publier ma tenue
+tr: Publish my outfit
+
+fr: Le serveur donne un code court à ta tenue validée : le corps et toutes tes teintures portées. Qui le colle la voit dans son éditeur.
+tr: The server gives your validated outfit a short code: your body and every dye you wear. Whoever pastes it sees it in their editor.
+
+fr: Valide d'abord un style : seul ce que tu portes se publie.
+tr: Validate a style first: only what you wear can be published.
+
+fr: Code :
+tr: Code:
+
+fr: Code court
+tr: Short code
+
+fr: Voir cette tenue
+tr: See this outfit
+
+fr: La tenue s'ouvre dans l'éditeur comme un aperçu. Rien ne change sur toi tant que tu ne valides pas.
+tr: The outfit opens in the editor as a preview. Nothing changes on you until you validate.
+
+fr: La garde-robe arrive…
+tr: The wardrobe is coming…
+
+fr: Rangement %d
+tr: Slot %d
+
+fr: Ranger ici
+tr: Store here
+
+fr: Range ta tenue validée sous le nom saisi dans les préréglages. Tous les personnages du compte la retrouvent.
+tr: Stores your validated outfit under the name typed in the presets. Every character on the account will find it.
+
+fr: Vider ce rangement
+tr: Empty this slot
+
+fr: Une tenue reprise ne fait qu'une proposition : valide pour la porter. Les teintures d'items ne s'appliquent qu'aux items de même apparence que tu portes.
+tr: A recalled outfit is only a proposal: validate to wear it. Item dyes only apply to worn items with the same look.
+
+fr: Le serveur demande d'attendre un peu entre deux demandes de tenue.
+tr: The server asks you to wait a little between two outfit requests.
+
+fr: Le serveur n'a pas pu lire cette tenue.
+tr: The server could not read this outfit.
+
+fr: La garde-robe du compte est pleine.
+tr: The account wardrobe is full.
+
+fr: Le serveur ne peut pas ranger les tenues pour l'instant.
+tr: The server cannot store outfits right now.
+
+fr: Aucune tenue ne porte ce code.
+tr: No outfit has this code.
+
+fr: Ce rangement est vide.
+tr: This slot is empty.
+
+fr: Le serveur a refusé la demande de tenue.
+tr: The server refused the outfit request.
+
+fr: La demande de tenue n'a pas pu partir.
+tr: The outfit request could not be sent.
+
+fr: Ce code court n'est pas bien formé.
+tr: This short code is malformed.

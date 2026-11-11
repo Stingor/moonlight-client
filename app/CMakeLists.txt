@@ -2118,6 +2118,7 @@ add_executable(moonclient
     character/style_preview.cpp
     character/style_view.cpp
     character/style_view_apply.cpp
+    character/style_view_outfits.cpp
     character/style_view_layers.cpp
     character/style_view_rest.cpp
     character/style_view_skin.cpp

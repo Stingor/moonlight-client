@@ -200,6 +200,45 @@ std::vector<ro::sim::StyleLayerRecipe> RekeyPresetLayers(
   return out;
 }
 
+const ro::sim::StyleRecipe* OutfitBodyFor(const ro::sim::StyleOutfit& outfit,
+                                          std::uint32_t body_key) {
+  const ro::sim::StyleRecipe* fallback = nullptr;
+  for (const auto& [key, recipe] : outfit.bodies) {
+    if (key == body_key) {
+      return &recipe;
+    }
+    if (key == outfit.fallback_body) {
+      fallback = &recipe;
+    }
+  }
+  if (fallback != nullptr) {
+    return fallback;
+  }
+  return outfit.bodies.empty() ? nullptr : &outfit.bodies.front().second;
+}
+
+std::vector<ro::sim::StyleLayerRecipe> OutfitLayersNow(
+    std::span<const ro::sim::StyleLayerRecipe> layers, PresetKeys now,
+    std::span<const WornItem> worn) {
+  std::vector<ro::sim::StyleLayerRecipe> own;
+  std::vector<ro::sim::StyleLayerRecipe> items;
+  for (const ro::sim::StyleLayerRecipe& layer : layers) {
+    if (PresetKeepsLayer(layer.layer)) {
+      own.push_back(layer);
+      continue;
+    }
+    const bool on_worn = std::ranges::any_of(worn, [&layer](const WornItem& item) {
+      return item.layer == layer.layer && item.view == layer.key;
+    });
+    if (on_worn) {
+      items.push_back(layer);
+    }
+  }
+  std::vector<ro::sim::StyleLayerRecipe> out = RekeyPresetLayers(own, now, PresetLayers::kAll);
+  out.insert(out.end(), items.begin(), items.end());
+  return out;
+}
+
 bool StylePresets::Rename(std::string_view from, std::string_view to) {
   if (to.empty() || Find(to) != nullptr) {
     return false;

@@ -262,6 +262,13 @@ enum class PaletteSendStatus : std::uint8_t {
 };
 
 // CE QUE LA FENÊTRE MONTRE, posé par `app` à chaque image.
+// UN RANGEMENT DE LA GARDE-ROBE DU COMPTE, compté depuis zéro.
+struct PaletteWardrobeSlot {
+  int slot = 0;
+  // Tel que le joueur l'a tapé.
+  std::string name;
+};
+
 struct PaletteEditorView {
   // LA RECETTE EN COURS, dont `app` est le seul écrivain. Les réglages de
   // chaque pièce, les trois numéros choisis : la fenêtre les LIT ici.
@@ -427,6 +434,29 @@ struct PaletteEditorView {
   // Le dernier collage a été refusé, et on le dit quelques secondes : un
   // collage raté qui ne dit rien laisse croire à un défaut de l'éditeur.
   bool code_refused = false;
+
+  // ── LES TENUES : LE CODE COURT ET LA GARDE-ROBE DU COMPTE ───────────────
+  //
+  // 🔴 CE QUE LE SERVEUR A VALIDÉ, et rien d'autre : une tenue se publie ou se
+  // range telle que le personnage la porte. Une tenue reprise ne fait qu'une
+  // proposition dans l'éditeur, qu'il faudra valider.
+
+  // Le serveur reçoit-il les tenues ? Sans lui, la section le dit et s'arrête.
+  bool outfits_served = false;
+  // Une demande peut-elle partir maintenant ? Non dans la cadence du serveur.
+  bool outfits_can_send = false;
+  // Le personnage porte-t-il quelque chose de validé à publier ou à ranger ?
+  bool has_outfit = false;
+  // Le dernier code publié, prêt à montrer (« K7QM-3XPA ») ; vide sinon.
+  const char* outfit_code = "";
+  // Ce que le serveur a répondu de travers, déjà traduit, ou nul.
+  const char* outfit_status = nullptr;
+  // Les rangements de la garde-robe, tels que le serveur les a listés, et leur
+  // nombre. Un rangement absent de la liste est vide.
+  std::span<const PaletteWardrobeSlot> wardrobe;
+  int wardrobe_slots = 0;
+  // La garde-robe a-t-elle été listée depuis l'ouverture ?
+  bool wardrobe_listed = false;
 };
 
 // CE QUE LE JOUEUR A DEMANDÉ.
@@ -478,6 +508,22 @@ enum class PaletteEditorVerb : std::uint8_t {
   kPasteCode,
   // Renommer le préréglage `preset` en `renamed`.
   kRenamePreset,
+
+  // ── LES TENUES ──────────────────────────────────────────────────────────
+  //
+  // ⚠ DES DEMANDES AU SERVEUR, mais aucune ne change l'apparence : une tenue
+  // reprise n'est qu'une proposition, à valider.
+
+  // Publier la tenue portée, et en recevoir le code court.
+  kPublishOutfit,
+  // Demander la tenue du code court que `pasted` porte.
+  kFetchOutfit,
+  // Lister la garde-robe du compte.
+  kListWardrobe,
+  // Reprendre, ranger sous le nom `preset`, ou vider le rangement `outfit_slot`.
+  kWearOutfit,
+  kStoreOutfit,
+  kClearOutfit,
 
   // ── LES AUTRES GESTES ───────────────────────────────────────────────────
 
@@ -549,6 +595,8 @@ struct PaletteEditorAction {
   // Ce que le presse-papiers portait, pour `kPasteCode`. ⚠ `ui` LE LIT MAIS NE
   // LE COMPREND PAS : décoder un style demande `sim`, qu'elle ne voit pas.
   std::string pasted;
+  // Le rangement de la garde-robe que le verbe désigne, ou moins un.
+  int outfit_slot = -1;
 
   // ── LES CALQUES ─────────────────────────────────────────────────────────
 
@@ -579,6 +627,9 @@ struct PaletteEditorAction {
 // nommer une allure — « soirée », « ma monture » — sans
 // qu'une liste devienne une colonne de phrases.
 inline constexpr std::size_t kPresetNameSize = 32;
+// Un code court se tape en deux groupes de quatre, avec son tiret, et les
+// espaces qu'un collage traîne : seize signes suffisent.
+inline constexpr std::size_t kOutfitCodeFieldSize = 16;
 
 struct PaletteEditorState {
   bool open = false;
@@ -640,6 +691,11 @@ struct PaletteEditorState {
   // de mettre à jour. Il faut resynchroniser le widget par son état, d'où cet
   // identifiant, qui n'est connu qu'APRÈS sa soumission.
   unsigned int preset_field = 0;
+
+  // Le code court en cours de saisie, tirets et minuscules permis.
+  std::array<char, kOutfitCodeFieldSize> outfit_code{};
+  // La garde-robe a-t-elle été demandée depuis l'ouverture de la section ?
+  bool wardrobe_asked = false;
 };
 
 [[nodiscard]] PaletteEditorAction DrawPaletteEditor(PaletteEditorState& state,

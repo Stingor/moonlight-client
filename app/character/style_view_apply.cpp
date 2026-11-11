@@ -86,6 +86,7 @@ void StyleView::Apply(const ro::ui::PaletteEditorAction& asked, ro::net::Connect
     edited_body_ = asked.edit_body;
   }
   ApplyVerb(asked, link, world, now_ms);
+  ApplyOutfits(asked, link, world, now_ms);
 }
 
 void StyleView::ApplyPieces(const ro::ui::PaletteEditorAction& asked, std::uint32_t now_ms) {
@@ -184,18 +185,27 @@ void StyleView::LoadPreset(const ro::ui::PaletteEditorAction& asked, const ro::s
   }
   session_.Load(next);
 
-  // 🔴 LA TÊTE SE RANGE SOUS LA COUPE ET LA COULEUR QU'ON VA MONTRER, celles
-  // que le chargement vient de poser ou, à défaut, celles du personnage.
-  const ro::render::ActorLook look = LookOf(*me);
-  const auto hair = static_cast<std::uint16_t>(next.hair_style >= 0 ? next.hair_style : look.hair);
-  const std::int16_t hair_palette = next.hair_palette >= 0 ? next.hair_palette : look.hair_palette;
-  const PresetKeys keys{.head = ro::render::HeadDyeKey(hair, hair_palette),
-                        .body = session_.body_key()};
-  for (const ro::sim::StyleLayerRecipe& layer : RekeyPresetLayers(kept->layers, keys, part)) {
+  for (const ro::sim::StyleLayerRecipe& layer :
+       RekeyPresetLayers(kept->layers, KeysAfter(next, world), part)) {
     if (const std::optional<ro::render::LayerDye> dye = FromWire(layer)) {
       layers_.Put(*dye);
     }
   }
+}
+
+PresetKeys StyleView::KeysAfter(const ro::render::PaletteRecipe& next,
+                                const ro::sim::World& world) const {
+  // 🔴 LA TÊTE SE RANGE SOUS LA COUPE ET LA COULEUR QU'ON VA MONTRER, celles
+  // que le chargement vient de poser ou, à défaut, celles du personnage.
+  const ro::sim::Actor* me = world.player();
+  if (me == nullptr) {
+    return PresetKeys{.body = session_.body_key()};
+  }
+  const ro::render::ActorLook look = LookOf(*me);
+  const auto hair = static_cast<std::uint16_t>(next.hair_style >= 0 ? next.hair_style : look.hair);
+  const std::int16_t hair_palette = next.hair_palette >= 0 ? next.hair_palette : look.hair_palette;
+  return PresetKeys{.head = ro::render::HeadDyeKey(hair, hair_palette),
+                    .body = session_.body_key()};
 }
 
 std::vector<ro::sim::StyleLayerRecipe> StyleView::PresetLayersNow() const {
@@ -260,6 +270,14 @@ void StyleView::ApplyVerb(const ro::ui::PaletteEditorAction& asked, ro::net::Con
     case ro::ui::PaletteEditorVerb::kCopyCode:
     case ro::ui::PaletteEditorVerb::kInspire:
       // Le presse-papiers est déjà rempli ; l'inspiration est une pièce.
+      break;
+    case ro::ui::PaletteEditorVerb::kPublishOutfit:
+    case ro::ui::PaletteEditorVerb::kFetchOutfit:
+    case ro::ui::PaletteEditorVerb::kListWardrobe:
+    case ro::ui::PaletteEditorVerb::kWearOutfit:
+    case ro::ui::PaletteEditorVerb::kStoreOutfit:
+    case ro::ui::PaletteEditorVerb::kClearOutfit:
+      // Les tenues ont leur propre guichet : voir `ApplyOutfits`.
       break;
     case ro::ui::PaletteEditorVerb::kApply:
       // ⛔ VALIDER NE FAIT PAS LE STYLE PRINCIPAL : le serveur garde pour

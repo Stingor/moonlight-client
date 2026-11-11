@@ -23553,3 +23553,75 @@ tr: Perforación del arma +%d
 
 fr: Rebond de l'arme %d %%
 tr: Rebote del arma %d %%
+
+fr: Tenues
+tr: Atuendos
+
+fr: Ce serveur ne garde pas les tenues.
+tr: Este servidor no guarda atuendos.
+
+fr: Publier ma tenue
+tr: Publicar mi atuendo
+
+fr: Le serveur donne un code court à ta tenue validée : le corps et toutes tes teintures portées. Qui le colle la voit dans son éditeur.
+tr: El servidor da un código corto a tu atuendo validado: el cuerpo y todos los tintes que llevas. Quien lo pegue lo verá en su editor.
+
+fr: Valide d'abord un style : seul ce que tu portes se publie.
+tr: Valida primero un estilo: solo se publica lo que llevas.
+
+fr: Code :
+tr: Código:
+
+fr: Code court
+tr: Código corto
+
+fr: Voir cette tenue
+tr: Ver este atuendo
+
+fr: La tenue s'ouvre dans l'éditeur comme un aperçu. Rien ne change sur toi tant que tu ne valides pas.
+tr: El atuendo se abre en el editor como vista previa. Nada cambia en ti hasta que valides.
+
+fr: La garde-robe arrive…
+tr: El guardarropa está llegando…
+
+fr: Rangement %d
+tr: Espacio %d
+
+fr: Ranger ici
+tr: Guardar aquí
+
+fr: Range ta tenue validée sous le nom saisi dans les préréglages. Tous les personnages du compte la retrouvent.
+tr: Guarda tu atuendo validado con el nombre escrito en los preajustes. Todos los personajes de la cuenta lo encontrarán.
+
+fr: Vider ce rangement
+tr: Vaciar este espacio
+
+fr: Une tenue reprise ne fait qu'une proposition : valide pour la porter. Les teintures d'items ne s'appliquent qu'aux items de même apparence que tu portes.
+tr: Un atuendo recuperado es solo una propuesta: valida para llevarlo. Los tintes de objetos solo se aplican a los objetos de la misma apariencia que llevas.
+
+fr: Le serveur demande d'attendre un peu entre deux demandes de tenue.
+tr: El servidor pide esperar un poco entre dos peticiones de atuendo.
+
+fr: Le serveur n'a pas pu lire cette tenue.
+tr: El servidor no pudo leer este atuendo.
+
+fr: La garde-robe du compte est pleine.
+tr: El guardarropa de la cuenta está lleno.
+
+fr: Le serveur ne peut pas ranger les tenues pour l'instant.
+tr: El servidor no puede guardar atuendos por ahora.
+
+fr: Aucune tenue ne porte ce code.
+tr: Ningún atuendo tiene este código.
+
+fr: Ce rangement est vide.
+tr: Este espacio está vacío.
+
+fr: Le serveur a refusé la demande de tenue.
+tr: El servidor rechazó la petición de atuendo.
+
+fr: La demande de tenue n'a pas pu partir.
+tr: La petición de atuendo no pudo enviarse.
+
+fr: Ce code court n'est pas bien formé.
+tr: Este código corto está mal formado.

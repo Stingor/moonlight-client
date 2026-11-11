@@ -324,6 +324,7 @@ add_library(ro_ui STATIC
     src/palette_layers.cpp
     src/palette_pieces.cpp
     src/palette_retouches.cpp
+    src/palette_outfits.cpp
     src/palette_presets.cpp
     src/thumbnail_grid.cpp
     src/palette_doll.cpp
