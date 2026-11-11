@@ -64,6 +64,19 @@ bool WalkMap::Passable(std::int32_t x, std::int32_t y) const noexcept {
                    static_cast<std::size_t>(x)] != 0;
 }
 
+void WalkMap::SetServerCell(std::int32_t x, std::int32_t y, std::uint8_t server_cell) {
+  if (x < 0 || x >= width_ || y < 0 || y >= height_) {
+    return;
+  }
+  std::uint8_t& passable = passable_[static_cast<std::size_t>(y) * static_cast<std::size_t>(width_) +
+                                     static_cast<std::size_t>(x)];
+  const std::uint8_t now_passable = Blocks(server_cell) ? 0U : 1U;
+  if (passable != now_passable) {
+    passable = now_passable;
+    region_of_cell_.clear();
+  }
+}
+
 bool WalkMap::Connected(std::int32_t from_x, std::int32_t from_y, std::int32_t to_x,
                         std::int32_t to_y) const {
   if (!Passable(from_x, from_y) || !Passable(to_x, to_y)) {

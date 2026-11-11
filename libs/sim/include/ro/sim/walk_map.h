@@ -50,11 +50,16 @@ class WalkMap {
   // ne l'est pas. Une diagonale exige ses deux côtés : relier en quatre
   // directions revient donc à relier en huit.
   //
-  // Le premier appel découpe la carte en régions, une fois pour toutes puisque
-  // la grille ne change plus ; les suivants coûtent une comparaison. Ce découpage
-  // n'est pas protégé entre fils : réservé au fil de la simulation.
+  // Le premier appel découpe la carte en régions, gardées tant que la grille ne
+  // change pas ; les suivants coûtent une comparaison. Ce découpage n'est pas
+  // protégé entre fils : réservé au fil de la simulation.
   [[nodiscard]] bool Connected(std::int32_t from_x, std::int32_t from_y, std::int32_t to_x,
                                std::int32_t to_y) const;
+
+  // UNE CASE QUE LE SERVEUR CHANGE en cours de partie — un mur de script qui
+  // se lève ou tombe —, donnée par son type de cellule serveur. Le découpage
+  // en régions est refait au prochain `Connected`. Sans effet hors de la carte.
+  void SetServerCell(std::int32_t x, std::int32_t y, std::uint8_t server_cell);
 
  private:
   void LabelRegions() const;

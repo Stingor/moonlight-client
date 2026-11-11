@@ -46,6 +46,7 @@
 #include "ro/net/user_count.h"
 #include "ro/net/warp_memo.h"
 #include "ro/net/world_update.h"
+#include "ro/proto/map_packets.h"
 #include "ro/sim/world.h"
 #include "ro/vfs/warp_memo_words.h"
 
@@ -59,6 +60,20 @@ namespace moonclient {
 ro::net::FrameOutcome Game::ApplyFrameBeyondWorld(const ro::net::Frame& received,
                                                   ro::net::FrameOutcome outcome,
                                                   std::uint32_t now_ms) {
+  // UNE CASE QU'UN SCRIPT CHANGE (`setwall`, `setcell`) : la grille de marche
+  // vit dans la carte, hors du monde. Le nom de carte du paquet ne compte pas :
+  // le serveur ne l'envoie qu'à ceux qui sont dessus.
+  if (received.opcode == ro::proto::ZcUpdateMapinfo::kOpcode) {
+    ro::proto::ZcUpdateMapinfo changed;
+    if (!ro::proto::Decode(received.bytes, changed)) {
+      return outcome == ro::net::FrameOutcome::kUnhandled ? ro::net::FrameOutcome::kUndecodable
+                                                          : outcome;
+    }
+    if (stage_.has_value()) {
+      stage_->walk_map.SetServerCell(changed.x, changed.y, static_cast<std::uint8_t>(changed.type));
+    }
+    return ro::net::FrameOutcome::kApplied;
+  }
   const ro::sim::BannedWords* banned = &pieces_.banned_words;
   // LES TITRES VIVENT HORS DU MONDE, et leur traducteur passe APRÈS lui : la
   // carte de nom du joueur intéresse les deux, et chacun y lit sa part.

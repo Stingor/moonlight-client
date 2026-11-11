@@ -36,6 +36,7 @@ add_library(ro_proto STATIC
     src/mercenary_packets.cpp
     src/pet_packets.cpp
     src/quest_marker_packets.cpp
+    src/show_script_packets.cpp
     src/hat_effect_packets.cpp
     src/ledger_packets.cpp
     src/quest_packets.cpp

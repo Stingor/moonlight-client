@@ -17,6 +17,7 @@
 #include "ro/proto/manual_packets.h"
 #include "ro/proto/map_packets.h"
 #include "ro/proto/quest_marker_packets.h"
+#include "ro/proto/show_script_packets.h"
 #include "ro/sim/chat_line.h"
 #include "ro/sim/quest_markers.h"
 #include "ro/sim/server_clock.h"
@@ -405,6 +406,17 @@ FrameOutcome ApplyNoticeFrame(const Frame& frame, sim::World& world, std::uint32
                                                                    .cell_y = packet.y,
                                                                    .effect = packet.effect,
                                                                    .color = packet.color});
+        return FrameOutcome::kApplied;
+      });
+
+    case proto::ShowScriptNotice::kOpcode:
+      return Decoded<proto::ShowScriptNotice>(frame, [&world, now_ms](const auto& packet) {
+        // UNE BULLE, ET RIEN DANS LE FIL : le texte s'affiche tel quel au-dessus
+        // de son porteur, joueur compris. Un message vide ne montre rien.
+        if (packet.message.empty()) {
+          return FrameOutcome::kIgnored;
+        }
+        world.ShowSpeech(packet.actor_id, core::Utf8FromWire(packet.message), now_ms);
         return FrameOutcome::kApplied;
       });
 
