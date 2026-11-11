@@ -10,14 +10,12 @@
 // l'écran, et ceux qui ne demandent que la cible : une unité au sol ou un
 // lanceur hors de vue suffisent alors.
 //
-// ⚠ CE QUE CE PORTAGE NE FAIT PAS ENCORE, et qui reste à faire :
-//  - l'état que certains cas donnent au lanceur (NPC_COMET, WL_COMET,
-//    RK_DEATHBOUND, WL_FROSTMISTY) ;
-//  - MH_GLANZEN_SPIES, dont l'effet est un fichier d'écran que le client
-//    tourne d'un angle calculé, ce que nous ne savons pas encore faire.
+// L'état que quatre cas donnent ensuite au lanceur n'est pas ici : il relève de
+// la posture, voir `ro::render::NotifySkillCasterStateOf`.
 
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <initializer_list>
@@ -151,6 +149,11 @@ constexpr std::uint16_t kRoyalGuardRayOfGenesis = 2321;
 constexpr std::uint16_t kMinstrelMetallicSound = 2413;
 constexpr float kRayDelayPerCadenceStepMs = 100.0F;
 constexpr float kRayDelayFloorMs = 100.0F;
+
+// LES LAMES DE GLANZEN SPIES : un fichier sur le lanceur, tourné dans le plan de
+// l'écran vers sa cible, la vue comprise.
+constexpr std::uint16_t kHomunculusGlanzenSpies = 8056;
+constexpr std::uint32_t kGlanzenSpiesEffect = 2335;
 
 // LA FLÈCHE D'UNLUCKY RUSH, une classe qui vole du lanceur à sa cible.
 constexpr std::uint16_t kAbyssUnluckyRush = 5315;
@@ -314,6 +317,30 @@ void OwnSkillCases::OnNotifySkill(EffectsInPlay& effects, const ro::sim::World& 
         spawn_on(*target,
                  Spawn{.effect_id = strike.skill_id == kMinstrelMetallicSound ? 1583U : 1427U,
                        .delay_ms = delay_ms});
+        return;
+      }
+      case kHomunculusGlanzenSpies: {
+        // DANS LE REPÈRE DU CLIENT : le cap du lanceur vers sa cible, en degrés,
+        // plus le lacet de la vue, retranchés d'un tour.
+        const auto client_of = [&](const ro::sim::Actor& actor) {
+          const ro::sim::FractionalCell cell =
+              ro::sim::InterpolatedCell(actor, planner.PathFor(actor), now_ms);
+          const std::array<float, 3> ground = GroundPositionAt(stage, cell.x, cell.y);
+          return glm::vec3(ground[0], ground[1], ground[2]);
+        };
+        const glm::vec3 feet = client_of(*caster);
+        const glm::vec3 from = client_frame.ToNative(feet);
+        const glm::vec3 to = client_frame.ToNative(client_of(*target));
+        const float heading_degrees =
+            (std::atan2(to.z - from.z, to.x - from.x) / kClientPi) * kHalfTurnDegrees;
+        const float view_yaw_degrees = ro::render::GroundSkillViewAngleDegrees(
+            effects.camera_ ? effects.camera_->yaw_degrees : 0.0F, 0.0F);
+        const float angle = kFullTurnDegrees - (heading_degrees + view_yaw_degrees);
+        const std::size_t before = effects.per_map_.playing.size();
+        static_cast<void>(effects.PlayById(kGlanzenSpiesEffect, feet, now_ms, caster->id));
+        for (std::size_t rank = before; rank < effects.per_map_.playing.size(); ++rank) {
+          effects.per_map_.playing[rank].turn_degrees = angle;
+        }
         return;
       }
       case kAbyssUnluckyRush: {
