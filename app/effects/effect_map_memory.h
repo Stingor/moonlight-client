@@ -145,6 +145,9 @@ struct EffectMapMemory {
     // qui brise un bloc touche après que le serveur l'a retiré. Vide pour un
     // acteur. Voir `world/struck_place.h`.
     std::optional<ro::sim::CellPosition> unit_cell;
+    // LE POINT DU SOL où l'effet naît sans porteur, dans notre repère : un
+    // éclat que le client sème autour d'une cible. Il prime sur `target_id`.
+    std::optional<glm::vec3> ground_point;
   };
 
   // Le dernier semis de l'effet ENTRETENU d'une unité posée, et l'attente avant

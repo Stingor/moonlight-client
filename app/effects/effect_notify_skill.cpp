@@ -13,11 +13,8 @@
 // ⚠ CE QUE CE PORTAGE NE FAIT PAS ENCORE, et qui reste à faire :
 //  - l'état que certains cas donnent au lanceur (NPC_COMET, WL_COMET,
 //    RK_DEATHBOUND, WL_FROSTMISTY) ;
-//  - les sons propres de RA_ELECTRICSHOCKER, RA_FIRINGTRAP et NC_FLAMELAUNCHER ;
-//  - les cas qui calculent : les éclats éparpillés de WL_JACKFROST et
-//    NC_ARMSCANNON, la rotation de
-//    MH_GLANZEN_SPIES, le délai tiré de la cadence du lanceur des rayons de
-//    genèse, et le canon de GN_CARTCANNON.
+//  - MH_GLANZEN_SPIES, dont l'effet est un fichier d'écran que le client
+//    tourne d'un angle calculé, ce que nous ne savons pas encore faire.
 
 #include <algorithm>
 #include <array>
@@ -26,11 +23,14 @@
 #include <initializer_list>
 #include <string_view>
 
+#include "ro/render/effect_class.h"
+#include "ro/render/effect_node.h"
 #include "ro/render/ground_skill_visual.h"
 #include "ro/render/map_effect_math.h"
 #include "ro/sim/movement.h"
 #include "ro/sim/world.h"
 
+#include "effects/effect_class_view.h"
 #include "effects/effect_view.h"
 #include "world/actor_sounds.h"
 #include "world/actor_view.h"
@@ -133,9 +133,62 @@ constexpr std::uint16_t kRuneKnightDragonBreathWater = 5004;
 constexpr std::uint32_t kBreathMouthDelayMs = 200;
 constexpr std::uint32_t kBreathBlastDelayMs = 350;
 
-// Le bruit du souffle, poussé au centre de la carte comme tous ceux de ce
-// paquet : il s'entend d'où l'on est, pas de la cible.
-constexpr std::string_view kBreathSound = "effect\\폭염룡.wav";
+// LES BRUITS DE CE PAQUET sont poussés au centre de la carte : ils s'entendent
+// d'où l'on est, pas de la cible. Le souffle, les pièges et le canon partagent
+// le premier.
+constexpr std::string_view kBlastSound = "effect\\폭염룡.wav";
+constexpr std::string_view kShockwaveTrapSound = "effect\\hunter_shockwavetrap.wav";
+
+constexpr std::uint16_t kRangerElectricShocker = 2238;
+constexpr std::uint16_t kRangerFiringTrap = 2253;
+constexpr std::uint16_t kMechanicFlameLauncher = 2259;
+
+// LES RAYONS DE GENÈSE attendent que le lanceur ait passé une image de son
+// geste : cent millisecondes par pas de sa cadence, et cent de plus.
+constexpr std::uint16_t kNpcRayOfGenesis = 737;
+constexpr std::uint16_t kRoyalGuardRayOfGenesis = 2321;
+constexpr std::uint16_t kMinstrelMetallicSound = 2413;
+constexpr float kRayDelayPerCadenceStepMs = 100.0F;
+constexpr float kRayDelayFloorMs = 100.0F;
+
+// LA FLÈCHE D'UNLUCKY RUSH, une classe qui vole du lanceur à sa cible.
+constexpr std::uint16_t kAbyssUnluckyRush = 5315;
+constexpr std::uint32_t kCrimsonArrow = 2154;
+
+// LE CANON DE CHARIOT : deux effets sur le lanceur, puis deux sur la cible.
+constexpr std::uint16_t kGeneticCartCannon = 2477;
+constexpr std::uint32_t kCannonCasterDelayMs = 200;
+constexpr std::uint32_t kCannonTargetDelayMs = 400;
+
+// LES ÉCLATS DE JACK FROST : trois, à un rayon de cinq à quatorze unités du
+// client autour de la cible, l'un après l'autre d'un pas de quatre-vingts à
+// cent vingt degrés.
+constexpr std::uint16_t kWarlockJackFrost = 2204;
+constexpr std::int32_t kFrostShards = 3;
+constexpr std::uint32_t kFrostStepDraws = 5;
+constexpr std::uint32_t kFrostStepBase = 8;
+constexpr float kFrostStepDegreesPerUnit = 10.0F;
+constexpr std::uint32_t kFrostRadiusDraws = 10;
+constexpr float kFrostRadiusBase = 5.0F;
+constexpr std::uint32_t kFrostShardKinds = 3;
+constexpr std::uint32_t kFrostFirstShard = 1443;
+constexpr std::uint32_t kFrostMinimalShift = 97;
+
+// LES OBUS D'ARMS CANNON : une paire tombe à quatre-vingt-dix millisecondes
+// d'intervalle sur une case voisine de la cible, jusqu'à quatre cent cinquante,
+// où la dernière frappe la cible même.
+constexpr std::uint16_t kMechanicArmsCannon = 2261;
+constexpr std::uint32_t kShellStepMs = 90;
+constexpr std::uint32_t kShellLastMs = 450;
+constexpr std::uint32_t kShellOffsetDraws = 3;
+constexpr float kShellOffsetUnit = 5.0F;
+constexpr float kShellFarOffset = 10.0F;
+constexpr std::uint32_t kShellQuarterDraws = 4;
+constexpr std::array<std::uint32_t, 2> kFullShell = {1355, 1356};
+constexpr std::array<std::uint32_t, 2> kMinimalShell = {1490, 1491};
+
+// Le pi du client, tel qu'il l'écrit.
+constexpr float kClientPi = 3.141592F;
 
 constexpr float kQuarterDegrees = 90.0F;
 constexpr float kHalfTurnDegrees = 180.0F;
@@ -188,6 +241,26 @@ void EffectsInPlay::PlayNotifySkillCases(const ro::sim::World& world, const MapS
       spawn_on(*target, Spawn{.effect_id = effect_id});
     }
   };
+  const ro::render::MapEffectFrame client_frame{stage.scene.gnd.width(), stage.scene.gnd.height()};
+  const auto play_centre_sound = [&](std::string_view sound) {
+    const glm::vec3 centre = client_frame.ToWorld(glm::vec3(0.0F));
+    SownNamedSound heard{sound, target->position};
+    heard.point = std::array<float, 3>{centre.x, centre.y, centre.z};
+    per_map_.just_sown_named_sounds.push_back(heard);
+  };
+  // LA CIBLE DANS LE REPÈRE DU CLIENT, où les éclats se calculent.
+  const auto target_in_client = [&] {
+    const ro::sim::FractionalCell cell =
+        ro::sim::InterpolatedCell(*target, planner.PathFor(*target), now_ms);
+    const std::array<float, 3> ground = GroundPositionAt(stage, cell.x, cell.y);
+    return client_frame.ToNative(glm::vec3(ground[0], ground[1], ground[2]));
+  };
+  // Les tirages viennent de l'instant et de la cible, comme les autres tirages
+  // du client : un paquet rejoué se rejoue à l'identique.
+  std::uint32_t draws = now_ms ^ target->id;
+  const auto draw = [&draws](std::uint32_t range) {
+    return ro::render::NextEffectNodeDraw(draws) % range;
+  };
 
   // LES CAS QUI DEMANDENT LES DEUX ACTEURS.
   if (caster != nullptr) {
@@ -222,6 +295,54 @@ void EffectsInPlay::PlayNotifySkillCases(const ro::sim::World& world, const MapS
         return;
       case kSorcererVaretyrSpear:
         on_target({1561, 1562});
+        return;
+      case kNpcRayOfGenesis:
+      case kRoyalGuardRayOfGenesis:
+      case kMinstrelMetallicSound: {
+        // La cadence du geste que le coup vient de donner au lanceur ; sans vue
+        // des acteurs, aucune, et le délai se réduit à son plancher.
+        float cadence_steps = 0.0F;
+        if (actor_view_.pace_of) {
+          if (const auto pace =
+                  actor_view_.pace_of(*caster, strike.skill_id, strike.attack_motion_ms)) {
+            cadence_steps = pace->cadence_steps;
+          }
+        }
+        const auto delay_ms = static_cast<std::uint32_t>(
+            (cadence_steps * kRayDelayPerCadenceStepMs) + kRayDelayFloorMs);
+        spawn_on(*target,
+                 Spawn{.effect_id = strike.skill_id == kMinstrelMetallicSound ? 1583U : 1427U,
+                       .delay_ms = delay_ms});
+        return;
+      }
+      case kAbyssUnluckyRush: {
+        // La flèche part du lanceur, liée à la cible qu'elle rejoint.
+        const auto ground_of = [&](const ro::sim::Actor& actor) {
+          const ro::sim::FractionalCell cell =
+              ro::sim::InterpolatedCell(actor, planner.PathFor(actor), now_ms);
+          const std::array<float, 3> ground = GroundPositionAt(stage, cell.x, cell.y);
+          return glm::vec3(ground[0], ground[1], ground[2]);
+        };
+        EffectClassesInPlay::Birth birth;
+        birth.effect_id = kCrimsonArrow;
+        birth.owner_id = caster->id;
+        birth.ground_position = ground_of(*caster);
+        birth.bound_id = target->id;
+        birth.bound_ground_position = ground_of(*target);
+        static_cast<void>(classes_.Spawn(birth, now_ms));
+        return;
+      }
+      case kGeneticCartCannon:
+        if (minimal_effects_) {
+          spawn_on(*caster, Spawn{.effect_id = 1498, .delay_ms = kCannonCasterDelayMs});
+          spawn_on(*target, Spawn{.effect_id = 1496, .delay_ms = kCannonTargetDelayMs});
+          spawn_on(*target, Spawn{.effect_id = 1497, .delay_ms = kCannonTargetDelayMs});
+        } else {
+          spawn_on(*caster, Spawn{.effect_id = 1360, .delay_ms = kCannonCasterDelayMs});
+          spawn_on(*caster, Spawn{.effect_id = 1361, .delay_ms = kCannonCasterDelayMs});
+          spawn_on(*target, Spawn{.effect_id = 1358, .delay_ms = kCannonTargetDelayMs});
+          spawn_on(*target, Spawn{.effect_id = 1359, .delay_ms = kCannonTargetDelayMs});
+        }
         return;
       default:
         break;
@@ -288,12 +409,59 @@ void EffectsInPlay::PlayNotifySkillCases(const ro::sim::World& world, const MapS
           spawn_on(*target, Spawn{.effect_id = blast, .delay_ms = kBreathBlastDelayMs});
         }
       }
-      const ro::render::MapEffectFrame client_frame{stage.scene.gnd.width(),
-                                                    stage.scene.gnd.height()};
-      const glm::vec3 centre = client_frame.ToWorld(glm::vec3(0.0F));
-      SownNamedSound heard{kBreathSound, target->position};
-      heard.point = std::array<float, 3>{centre.x, centre.y, centre.z};
-      per_map_.just_sown_named_sounds.push_back(heard);
+      play_centre_sound(kBlastSound);
+      return;
+    }
+    case kWarlockJackFrost: {
+      const glm::vec3 centre = target_in_client();
+      const float step_degrees =
+          static_cast<float>(draw(kFrostStepDraws) + kFrostStepBase) * kFrostStepDegreesPerUnit;
+      for (std::int32_t shard = 0; shard < kFrostShards; ++shard) {
+        const float radius = static_cast<float>(draw(kFrostRadiusDraws)) + kFrostRadiusBase;
+        ro::render::NativeMatrix turn = ro::render::kNativeIdentity;
+        ro::render::MultiplyRotationY(
+            turn, ((static_cast<float>(shard) * step_degrees) / kHalfTurnDegrees) * kClientPi);
+        const glm::vec3 point = centre + ro::render::Transform(glm::vec3(radius, 0.0F, 0.0F), turn);
+        std::uint32_t effect_id = kFrostFirstShard + draw(kFrostShardKinds);
+        if (minimal_effects_) {
+          effect_id += kFrostMinimalShift;
+        }
+        static_cast<void>(PlayById(effect_id, client_frame.ToWorld(point), now_ms));
+      }
+      return;
+    }
+    case kMechanicArmsCannon: {
+      const std::array<std::uint32_t, 2>& shell = minimal_effects_ ? kMinimalShell : kFullShell;
+      const glm::vec3 centre = target_in_client();
+      for (std::uint32_t delay_ms = kShellStepMs;; delay_ms += kShellStepMs) {
+        float across = kShellOffsetUnit * static_cast<float>(draw(kShellOffsetDraws));
+        float along = kShellOffsetUnit * static_cast<float>(draw(kShellOffsetDraws));
+        const std::uint32_t quarter = draw(kShellQuarterDraws);
+        // Jamais dans le coin le plus éloigné : l'un des deux écarts s'y réduit.
+        if (across == kShellFarOffset && along == kShellFarOffset) {
+          if (draw(2) == 0) {
+            across = kShellOffsetUnit;
+          } else {
+            along = kShellOffsetUnit;
+          }
+        }
+        if (quarter == 0 || quarter == 2) {
+          across = -across;
+        }
+        if (quarter == 1 || quarter == 2) {
+          along = -along;
+        }
+        const glm::vec3 point = client_frame.ToWorld(centre + glm::vec3(across, 0.0F, along));
+        for (const std::uint32_t effect_id : shell) {
+          per_map_.pending_hits.push_back(PendingHit{
+              .effect_id = effect_id, .due_ms = now_ms + delay_ms, .ground_point = point});
+        }
+        if (delay_ms + kShellStepMs >= kShellLastMs) {
+          break;
+        }
+      }
+      on_target({shell[0], shell[1]});
+      play_centre_sound(kBlastSound);
       return;
     }
     default:
@@ -305,6 +473,11 @@ void EffectsInPlay::PlayNotifySkillCases(const ro::sim::World& world, const MapS
         spawn_on(*target, Spawn{.effect_id = effect_id});
       }
     }
+  }
+  if (strike.skill_id == kRangerElectricShocker) {
+    play_centre_sound(kShockwaveTrapSound);
+  } else if (strike.skill_id == kRangerFiringTrap || strike.skill_id == kMechanicFlameLauncher) {
+    play_centre_sound(kBlastSound);
   }
 }
 

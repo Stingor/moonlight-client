@@ -50,6 +50,10 @@ void EffectsInPlay::NoticeHitEffects(const SoundStage& scene) {
     if (scene.now_ms < pending.due_ms) {
       return false;
     }
+    if (pending.ground_point.has_value()) {
+      static_cast<void>(PlayById(pending.effect_id, *pending.ground_point, scene.now_ms));
+      return true;
+    }
     // LE PORTEUR TEL QU'IL EST ALORS : un acteur, ou une unité au sol — celle
     // que le serveur a retirée entre-temps garde la case relevée au coup.
     std::optional<ro::sim::FractionalCell> bearer_cell =
