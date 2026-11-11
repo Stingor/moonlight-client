@@ -11,6 +11,7 @@
 #include "ro/core/log.h"
 #include "ro/sim/survivors_terrain.h"
 
+#include "survivors/arena_blackout.h"
 #include "survivors/arena_night.h"
 #include "survivors/arena_night_lights.h"
 
@@ -45,6 +46,8 @@ ro::core::Result<void> ArenaScene::Open(ro::vfs::Vfs& vfs, const ro::sim::ArenaR
   ++mounts_;
   follow_.reset();
   ground_.reset();
+  lamps_.reset();
+  window_lamps_.clear();
   origin_ = GroundWindowOrigin();
   ro::core::LogInfo("arène : {} montée", lit_.stage().name);
   return {};
@@ -101,6 +104,8 @@ ro::core::Result<void> ArenaScene::MountGround(ro::vfs::Vfs& vfs, GroundWindowOr
   }
   lit_.set_sky_hour_imposed(true);
   ++mounts_;
+  lamps_ = std::make_unique<WallLampField>(*ground_->rule, ground_->run_seed, *ground_->look);
+  ReadWindowLamps();
   // 🔴 UN FIL DE TRAVAIL NE LIT AUCUN FICHIER : une fenêtre ne cite que ce que
   // la bibliothèque a lu (`OpenGroundSources`). Une texture du sol absente de
   // l'installation se relirait à chaque fenêtre, sur le VFS que le fil
@@ -206,6 +211,7 @@ ro::core::Result<GroundRecentre> ArenaScene::MountPrepared() {
                                 .world_delta = GroundWorldShift(origin_, prepared_origin_),
                                 .mount_ms = mount_ms};
   origin_ = prepared_origin_;
+  ReadWindowLamps();
   return recentre;
 }
 
@@ -220,7 +226,8 @@ void ArenaScene::Paint(LitFrame& frame, const ro::render::Camera& camera, float 
                        std::uint32_t now_ms, const HordeComposer& horde,
                        const ArenaOverlays& overlays) {
   // LA NUIT RESTE LISIBLE : la lanterne suit le héros, et chaque objet au sol
-  // luit.
+  // luit. Dans un biome en panne, les lampes des murs qui luisent encore
+  // s'y ajoutent.
   carried_lights_.clear();
   if (overlays.hero_feet.has_value()) {
     if (const std::optional<ro::render::PointLight> lantern =
@@ -228,6 +235,7 @@ void ArenaScene::Paint(LitFrame& frame, const ro::render::Camera& camera, float 
       carried_lights_.push_back(*lantern);
     }
   }
+  LightWindowLamps(presentation_ms);
   ArenaItemHalos(horde.drawn(), horde.tags(), presentation_ms, item_halos_);
   const LitActors actors{.bodies = horde.drawn(),
                          .halos = item_halos_,
@@ -242,7 +250,9 @@ void ArenaScene::Paint(LitFrame& frame, const ro::render::Camera& camera, float 
                                .targets = overlays.veil_targets,
                                .now_ms = now_ms});
   painting_effects_ = overlays.effects;
-  lit_.Paint(frame, camera, aspect_ratio, graphics, ArenaSkyHour(presentation_ms),
+  const ArenaDarkness darkness =
+      ground_ != nullptr ? ground_->look->darkness : ArenaDarkness::kNightfall;
+  lit_.Paint(frame, camera, aspect_ratio, graphics, ArenaSkyHourOf(darkness, presentation_ms),
              RendererMs(presentation_ms), now_ms, actors, *this, veil_.decor());
   painting_effects_ = nullptr;
   if (overlays.effects != nullptr) {
@@ -298,6 +308,23 @@ void ArenaScene::DrawBehindBodies(const ro::render::Camera& camera, float aspect
                                   const LitFrame& frame) {
   if (painting_effects_ != nullptr) {
     painting_effects_->DrawBehindBodies(camera, aspect_ratio, frame.fog, lit_.sprites());
+  }
+}
+
+void ArenaScene::ReadWindowLamps() {
+  window_lamps_.clear();
+  if (lamps_ != nullptr) lamps_->LampsOfWindow(origin_, window_lamps_);
+}
+
+void ArenaScene::LightWindowLamps(std::uint64_t presentation_ms) {
+  if (window_lamps_.empty() || lamps_ == nullptr) return;
+  const std::span<const WallLampLook> looks = lamps_->looks();
+  for (const WallLamp& lamp : window_lamps_) {
+    if (const std::optional<ro::render::PointLight> light =
+            WallLampLight(lamp, GroundAtCell(WallLampCell(lamp)),
+                          looks[lamp.look].light_height_world, presentation_ms)) {
+      carried_lights_.push_back(*light);
+    }
   }
 }
 

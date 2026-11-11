@@ -27,6 +27,7 @@
 #include "survivors/arena_ground_plan.h"
 #include "survivors/arena_ground_window.h"
 #include "survivors/arena_numbers.h"
+#include "survivors/arena_wall_lamps.h"
 #include "survivors/horde_composer.h"
 #include "world/lit_stage.h"
 #include "world/map_stage.h"
@@ -69,7 +70,9 @@ struct GroundRecentre {
 // règle pour elle s'y montre comme en partie. L'heure, elle, est celle de la
 // partie (`ArenaSkyHour`), cycle jour/nuit coché ou non : la nuit qui tombe
 // fait partie du jeu. Avec elle viennent la lanterne du héros et la lueur des
-// objets au sol (`arena_night_lights.h`), qui la gardent lisible.
+// objets au sol (`arena_night_lights.h`), qui la gardent lisible. Un biome
+// sans ciel garde la lumière de sa carte : c'est le courant qui se coupe, et
+// les lampes de ses murs qui s'éteignent (`arena_blackout.h`).
 //
 // 🔴 L'OMBRE DU SOLEIL SUIT AUSSI « GRAPHICS » : éteinte, personne n'en porte ;
 // allumée, le héros en porte une, et l'option U27 (`horde_sun_shadows`) y
@@ -202,6 +205,10 @@ class ArenaScene : private LitLayers {
   [[nodiscard]] ro::core::Result<void> MountGround(ro::vfs::Vfs& vfs, GroundWindowOrigin origin,
                                                    std::string name, const MapStageRead& read,
                                                    GroundBuildThread thread);
+  // Relit les lampes de la fenêtre montée.
+  void ReadWindowLamps();
+  // Ajoute à `carried_lights_` la lumière de chaque lampe qui luit encore.
+  void LightWindowLamps(std::uint64_t presentation_ms);
 
   LitStage lit_;
   // Le sol généré : ses ressources, lues une fois, et la fenêtre montée.
@@ -227,6 +234,10 @@ class ArenaScene : private LitLayers {
   // dans des listes réutilisées : voir `ArenaLantern` et `ArenaItemHalos`.
   std::vector<ro::render::PointLight> carried_lights_;
   std::vector<ro::render::DrawnActor> item_halos_;
+  // LES LAMPES DES MURS d'un biome en panne, et celles de la fenêtre montée,
+  // relues à chaque montage ; nulles hors d'un tel biome.
+  std::unique_ptr<WallLampField> lamps_;
+  std::vector<WallLamp> window_lamps_;
 };
 
 }  // namespace moonclient

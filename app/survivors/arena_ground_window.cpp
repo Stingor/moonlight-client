@@ -17,6 +17,7 @@
 #include "ro/vfs/encoding.h"
 
 #include "survivors/arena_piece_solids.h"
+#include "survivors/arena_wall_lamps.h"
 
 namespace moonclient {
 namespace {
@@ -310,6 +311,7 @@ std::vector<std::string_view> ModelsCited(const BiomeLook& look) {
   }
   for (const SeedLook& seed : look.seeds) cited.push_back(seed.model);
   for (const SeedLook& seed : look.verge_seeds) cited.push_back(seed.model);
+  for (const WallLampLook& lamp : WallLampLooksOf(look)) cited.push_back(lamp.model);
   std::ranges::sort(cited);
   const auto [first, last] = std::ranges::unique(cited);
   cited.erase(first, last);

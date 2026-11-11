@@ -119,6 +119,12 @@ struct SeedLook {
   std::uint32_t weight = 1;
 };
 
+// LA NUIT D'UN BIOME : le ciel qui tombe, ou le courant qui se coupe.
+enum class ArenaDarkness : std::uint8_t {
+  kNightfall,
+  kBlackout,
+};
+
 // UN BIOME : le sol, les pièces, le semis, la carte dont il prend la lumière,
 // le brouillard et le ciel, et ce que l'arène montre et joue à l'entrée.
 struct BiomeLook {
@@ -152,6 +158,12 @@ struct BiomeLook {
   bool square_paths = false;
   // La hauteur d'un mur de salle, en unités du GND (une case : cinq).
   float wall_height_units = 0.0F;
+  // CE QUI TOMBE DE 7:00 À 15:00 (`ArenaNightShare`) : le ciel des champs
+  // (`kNightfall`), ou, dans un intérieur sans ciel, le courant
+  // (`kBlackout`) : des lampes posées sur ses murs (`arena_wall_lamps.h`)
+  // s'éteignent par paliers, et celles qui restent sonnent l'alarme au boss
+  // final (`arena_blackout.h`).
+  ArenaDarkness darkness = ArenaDarkness::kNightfall;
 };
 
 // L'aspect du terrain de clé `terrain_key`, ou nullptr.

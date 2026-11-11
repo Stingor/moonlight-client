@@ -493,7 +493,8 @@ constexpr std::array<BiomeLook, 4> kBiomes{{
      .patch_per_mille = 400,
      .scatter_per_mille = 60,
      .square_paths = true,
-     .wall_height_units = 20.0F},
+     .wall_height_units = 20.0F,
+     .darkness = ArenaDarkness::kBlackout},
 }};
 
 }  // namespace

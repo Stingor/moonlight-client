@@ -12,6 +12,7 @@
 #include "ro/core/pcg32.h"
 
 #include "survivors/arena_ground_paths.h"
+#include "survivors/arena_wall_lamps.h"
 
 namespace moonclient {
 namespace {
@@ -109,7 +110,12 @@ class Planner {
  public:
   Planner(const ro::sim::TerrainRule& rule, std::uint64_t run_seed, const BiomeLook& biome,
           GroundWindowOrigin origin, const GroundPlanLight& light)
-      : rule_(rule), run_seed_(run_seed), biome_(biome), origin_(origin), light_(light) {
+      : rule_(rule),
+        run_seed_(run_seed),
+        biome_(biome),
+        origin_(origin),
+        light_(light),
+        lamps_(rule, run_seed, biome) {
     const glm::vec2 away(-light.toward_sun.x, light.toward_sun.z);
     if (glm::length(away) > kLeastHorizontalSun) shade_direction_ = glm::normalize(away);
     plan_.origin = origin;
@@ -117,6 +123,7 @@ class Planner {
 
   GroundPlan Build() {
     ReadChunks();
+    AppendWallLampPoses(lamps_, origin_, plan_.poses);
     SowVerges();
     RaiseRelief();
     PaintCubes();
@@ -141,6 +148,7 @@ class Planner {
       for (std::int32_t column = -kRingChunks; column < kWindowChunks + kRingChunks; ++column) {
         const ro::sim::TerrainChunk chunk =
             ro::sim::GenerateTerrainChunk(rule_, run_seed_, first_x + column, first_y + row);
+        lamps_.Remember(chunk);
         const bool shown = row >= 0 && column >= 0 && row < kWindowChunks && column < kWindowChunks;
         const ChunkCover cover = CoverOf(chunk);
         CopyCells(chunk, cover, column, row, shown);
@@ -748,6 +756,8 @@ class Planner {
   // emprise), de chemin.
   std::vector<std::uint8_t> ring_free_;
   std::vector<std::uint8_t> ring_path_;
+  // Les lampes d'un biome en panne, sur les murs des morceaux lus.
+  WallLampField lamps_;
   GroundPlan plan_;
 };
 
