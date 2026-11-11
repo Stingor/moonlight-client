@@ -760,6 +760,15 @@ void EffectsInPlay::NoticeSkills(const ro::sim::World& world, const MapStage& st
         struck == nullptr && repli != world.skill_units().end() ? &repli->second : nullptr);
     // PUIS LES CAS QUE LE PAQUET TRAITE SEUL, par-dessus ce qui précède.
     OwnSkillCases::OnNotifySkill(*this, world, stage, planner, strike);
+    // ET L'ÉTAT QUE LE PAQUET DONNE ENSUITE AU LANCEUR, avec ce qu'il fait naître.
+    if (const auto later = ro::render::NotifySkillCasterStateOf(strike.skill_id);
+        later.has_value() && !StrikeByGroundUnit(world, strike) &&
+        (struck != nullptr || !later->needs_target)) {
+      if (const ro::sim::Actor* caster = world.Find(strike.attacker); caster != nullptr) {
+        play_state_effects(*caster, later->state, strike.skill_id, strike.started_ms,
+                           SkillMoment::kImpact);
+      }
+    }
   }
   // 🔴 EN PLUS, ET NON AU DÉFAUT : le client interroge son Lua par des chemins
   // qui lui sont propres, et qui ne remplacent aucun des switches ci-dessus.

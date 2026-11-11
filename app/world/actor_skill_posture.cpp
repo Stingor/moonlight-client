@@ -196,6 +196,12 @@ std::optional<std::int8_t> StrikeState(const ro::sim::Strike& strike) {
   if (strike.skill_id == 0) {
     return kAttackState;
   }
+  // L'ÉTAT QUE LE PAQUET DONNE ENSUITE AU LANCEUR prend la place de celui du
+  // coup à l'écran. ⚠ Sans le monde, la cible est supposée à l'écran.
+  if (const auto later = ro::render::NotifySkillCasterStateOf(strike.skill_id);
+      later.has_value() && !strike.by_ground_unit) {
+    return later->state;
+  }
   return ro::render::SkillHitMotionState(strike.skill_id, strike.type);
 }
 

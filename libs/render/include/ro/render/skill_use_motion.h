@@ -206,6 +206,31 @@ inline constexpr std::uint8_t kMultiHitDamageType = 8;
   return std::ranges::find(kSkillsKeepingMotionOnHit, skill_id) != kSkillsKeepingMotionOnHit.end();
 }
 
+// L'ÉTAT QUE LE PAQUET DES DÉGÂTS DONNE ENSUITE AU LANCEUR, pour quatre
+// compétences : il succède à celui du coup, dont l'impact garde la cadence.
+// Trois le demandent avec la cible à l'écran ; Frost Misty avec le seul lanceur.
+struct NotifySkillCasterState {
+  std::uint16_t skill_id = 0;
+  std::int8_t state = 0;
+  bool needs_target = true;
+};
+inline constexpr std::array<NotifySkillCasterState, 4> kNotifySkillCasterStates = {{
+    {708, 7, true},    // NPC_COMET
+    {2003, 2, true},   // RK_DEATHBOUND
+    {2203, 7, false},  // WL_FROSTMISTY
+    {2213, 7, true},   // WL_COMET
+}};
+
+[[nodiscard]] constexpr std::optional<NotifySkillCasterState> NotifySkillCasterStateOf(
+    std::uint32_t skill_id) {
+  for (const NotifySkillCasterState& entry : kNotifySkillCasterStates) {
+    if (entry.skill_id == skill_id) {
+      return entry;
+    }
+  }
+  return std::nullopt;
+}
+
 // L'ÉTAT D'ACTION QUE LE COUP POSE — celui de l'emploi —, ou rien quand il
 // laisse la motion.
 [[nodiscard]] inline std::optional<std::int8_t> SkillHitMotionState(std::uint32_t skill_id,
