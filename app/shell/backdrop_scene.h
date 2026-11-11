@@ -19,6 +19,7 @@
 #include "shell/backdrop_effects.h"
 #include "world/actor_ghosts.h"
 #include "world/actor_sounds.h"
+#include "world/actor_styles.h"
 #include "world/actor_view.h"
 #include "world/frozen_poses.h"
 #include "world/item_drops.h"
@@ -75,7 +76,9 @@ class BackdropScene : private LitLayers {
   BackdropScene& operator=(const BackdropScene&) = delete;
   BackdropScene(BackdropScene&&) = delete;
   BackdropScene& operator=(BackdropScene&&) = delete;
-  ~BackdropScene() override = default;
+  // ⚠ REND À LA GARDE-ROBE LES STYLES DES PASSANTS : elle est partagée avec le
+  // jeu qui suit, et ces identifiants-là n'y désigneraient plus personne.
+  ~BackdropScene() override;
 
   // Charge la carte et téléverse sa géométrie.
   //
@@ -197,10 +200,14 @@ class BackdropScene : private LitLayers {
   // chose, et c'est le décor qui se tromperait — celui que personne ne
   // regarde d'assez près pour s'en apercevoir.
   //
-  // ⚠ MAIS SANS STYLES : les recettes de couleur que le serveur diffuse
-  // arrivent par des paquets de JEU, qu'une session spectateur ne reçoit pas.
-  // Chacun garde donc son apparence native, ce qui est déjà ce que
-  // `ComposeScene` fait d'un style nul.
+  // 🔴 ET AVEC LEURS COULEURS : la session spectateur reçoit la v7 et les
+  // calques des joueurs qu'elle montre, comme une session de jeu, et les range
+  // au livre de son monde. Un registre à part de celui de la partie, pour la
+  // garde-robe qu'ils partagent. Un serveur qui ne les sert pas au spectateur
+  // laisse le livre vide, et chacun garde son apparence native.
+  ActorStyles styles_;
+  // La garde-robe qui porte ces styles, pour les lui rendre.
+  ro::render::ActorWardrobe* styled_wardrobe_ = nullptr;
   // ⚠ SANS CARTE TANT QU'IL N'Y EN A PAS : il en prend une à chaque montage,
   // et un planificateur qui garderait celle de la ville précédente enverrait
   // les passants marcher dans des murs qui ne sont plus là.

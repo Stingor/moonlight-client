@@ -56,6 +56,12 @@ void BackdropScene::Settle(ro::sim::World& world, std::uint32_t now_ms) {
   }
 }
 
+BackdropScene::~BackdropScene() {
+  if (styled_wardrobe_ != nullptr) {
+    styles_.Sweep(*styled_wardrobe_, ro::sim::StyleBook{});
+  }
+}
+
 void BackdropScene::Draw(float aspect_ratio, std::uint32_t elapsed_ms,
                          ro::render::ActorWardrobe* wardrobe, const ro::sim::World* world,
                          std::string_view world_map, std::uint32_t now_ms,
@@ -82,6 +88,13 @@ void BackdropScene::Draw(float aspect_ratio, std::uint32_t elapsed_ms,
   lit_.Paint(frame, camera, aspect_ratio, graphics, sky_hour, elapsed_ms, now_ms,
              LitActors{.bodies = actors_.drawn, .halos = actors_.behind, .veils = actors_.front},
              *this);
+  // ⚠ LE BALAYAGE APRÈS LE DESSIN DES CORPS, jamais pendant : oublier un style
+  // détruit les tenues qui le portaient. Les textures de leurs palettes partent
+  // avec elles.
+  if (peopled) {
+    styles_.Sweep(*wardrobe, world->styles());
+    lit_.sprites().ForgetPaletteSerials(wardrobe->TakeRetiredPaletteSerials());
+  }
 
   // LES EFFETS APRÈS LES PASSANTS, comme dans la partie : ceux de la ville
   // toujours, ceux des passants quand ils sont sur cette carte.
@@ -136,15 +149,15 @@ void BackdropScene::ComposePassersby(const ro::render::Camera& camera, std::uint
                                      const ro::sim::World& world, std::uint32_t now_ms,
                                      ro::audio::AudioEngine* audio, const GraphicsOptions& graphics,
                                      bool sun_shadows) {
-  // ⚠ LA MÊME PORTE QUE LA PARTIE, et sans styles : les recettes de couleur
-  // arrivent par des paquets de JEU, qu'une session spectateur ne reçoit pas.
-  // Fondus, geste lisible et lumière de la carte suivent la page « Graphics »,
-  // comme en partie ; les altérations n'ont pas de teinte ici.
+  // ⚠ LA MÊME PORTE QUE LA PARTIE, couleurs comprises : ce que la session
+  // spectateur a reçu, habillé par `ActorStyles::Dress`. Fondus, geste lisible et
+  // lumière de la carte suivent la page « Graphics », comme en partie ; les
+  // altérations n'ont pas de teinte ici.
+  styled_wardrobe_ = &wardrobe;
   TimeComposedScene(graphics, actors_);
   static_cast<void>(ComposeScene(
       &wardrobe, world, planner_, lit_.stage(), camera.yaw_degrees, now_ms,
-      static_cast<float>(elapsed_ms),
-      /*styles=*/nullptr, actors_, ghosts_, drops_, frozen_poses_,
+      static_cast<float>(elapsed_ms), &styles_, actors_, ghosts_, drops_, frozen_poses_,
       ActorLightingOf(graphics,
                       sun_shadows ? &lit_.stage().ground_laid_light : &lit_.stage().ground_light,
                       /*ailment_tints=*/nullptr)));

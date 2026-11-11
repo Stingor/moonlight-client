@@ -4,6 +4,8 @@
 #include <utility>
 
 #include "ro/core/log.h"
+#include "ro/net/player_style_layers.h"
+#include "ro/net/ui_caps.h"
 #include "ro/net/world_update.h"
 #include "ro/sim/world.h"
 
@@ -157,6 +159,8 @@ void BackdropSession::Advance(std::uint32_t now_ms) {
           spawn_ = drive_.spawn();
           link_ = drive_.TakeLink();
           live_since_ms_ = now_ms;
+          handshake_.emplace(ro::net::ClientIdentity{});
+          caps_announced_ = false;
           state_ = BackdropState::kLive;
           // ⚠ LA RELANCE EST FINIE : ce qui arrivera à CETTE session — une
           // perte, un refus plus tard — n'a pas à se retenter tout seul.
@@ -206,6 +210,18 @@ void BackdropSession::Advance(std::uint32_t now_ms) {
             kBackdropLifetimeMs / 1000, DescribePopulation(world_));
         Release();
         return;
+      }
+      // LA POIGNÉE DE MAIN, PUIS L'ANNONCE, dans cet ordre sur le fil : le serveur
+      // ne reçoit l'annonce d'un spectateur qu'une fois qu'il s'est nommé. Elle
+      // ne dit que le bit des calques, et seulement si la table connaît leurs ZC.
+      if (handshake_.has_value()) {
+        handshake_->Pump(link_, now_ms);
+        if (!caps_announced_ && handshake_->attempts() > 0) {
+          caps_announced_ = true;
+          if (const std::uint32_t caps = ro::net::StyleLayerCaps(); caps != 0) {
+            static_cast<void>(ro::net::AnnounceUiCaps(link_, caps));
+          }
+        }
       }
       ro::net::Connection::Polled polled = link_.Poll();
       for (const ro::net::Frame& frame : polled.frames) {

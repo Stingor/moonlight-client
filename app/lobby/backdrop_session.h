@@ -1,10 +1,12 @@
 #pragma once
 
 #include <cstdint>
+#include <optional>
 #include <string>
 #include <string_view>
 
 #include "ro/net/connection.h"
+#include "ro/net/moonclient_handshake.h"
 #include "ro/net/session.h"
 #include "ro/sim/world.h"
 
@@ -212,6 +214,12 @@ class BackdropSession {
   ro::net::MapPhase::Spawn spawn_;
   ro::net::Connection link_;
   ro::sim::World world_;
+  // 🔴 LE DÉCOR SE NOMME, pour VOIR les couleurs des joueurs : la poignée de
+  // main de moonclient, SANS MachineGuid — ce n'est pas le joueur —, puis
+  // l'annonce du seul bit des calques. Le serveur ne donne au spectateur que le
+  // droit de recevoir. Un serveur plus ancien ignore les deux.
+  std::optional<ro::net::MoonclientHandshake> handshake_;
+  bool caps_announced_ = false;
 };
 
 }  // namespace moonclient::lobby
