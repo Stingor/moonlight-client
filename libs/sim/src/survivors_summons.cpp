@@ -228,7 +228,9 @@ void Strike(SurvivorsField& field, SurvivorsSummon& summon, const SurvivorsSkill
 
 bool FireSummon(SurvivorsField& field, std::uint8_t slot, const SurvivorsSkillRule& rule,
                 const SkillLevel& level) {
-  const std::uint32_t wanted = AmountOf(field, level);
+  // Un allié d'un groupe exclusif (l'homoncule) reste seul : le bonus de
+  // quantité ne le double pas.
+  const std::uint32_t wanted = rule.exclusive_group != 0 ? level.amount : AmountOf(field, level);
   const auto live = static_cast<std::uint32_t>(
       std::ranges::count_if(field.summons, [&](const SurvivorsSummon& summon) {
         return summon.skill_slot == slot && summon.skill_id == rule.skill_id;

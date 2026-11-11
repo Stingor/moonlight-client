@@ -222,6 +222,8 @@ inline constexpr std::uint16_t kAcidTerrorSkill = 230;
 inline constexpr std::uint16_t kPotionPitcherSkill = 231;
 inline constexpr std::uint16_t kBioCannibalizeSkill = 232;
 inline constexpr std::uint16_t kSphereMineSkill = 233;
+// La classe du monstre Marine Sphere, que Sphere Mine pose sur sa mine.
+inline constexpr std::uint16_t kMarineSphereClass = 1142;
 inline constexpr std::uint16_t kChemicalProtectionArmorSkill = 236;
 inline constexpr std::uint16_t kSlimPotionPitcherSkill = 478;
 inline constexpr std::uint16_t kFullChemicalProtectionSkill = 479;
@@ -238,18 +240,19 @@ inline constexpr std::uint16_t kMoonlightSkill = 8009;
 inline constexpr std::uint16_t kSbr44Skill = 8012;
 inline constexpr std::uint16_t kCapriceSkill = 8013;
 inline constexpr std::uint16_t kBioExplosionSkill = 8016;
-// Les skills dont ils empruntent l'effet : le soin, Endure, Concentration, la
-// boule de feu, l'éclair de feu, Venom Splasher, Earth Spike et Sonic Blow.
+// Les skills dont ils empruntent l'effet : le soin, la boule de feu, l'éclair
+// de feu, Earth Spike et Sonic Blow. Les protections chimiques gardent le
+// leur, que les tables donnent à l'annonce.
 inline constexpr std::uint16_t kHealBorrowed = 28;
-inline constexpr std::uint16_t kEndureBorrowed = 8;
-inline constexpr std::uint16_t kConcentrationBorrowed = 357;
 inline constexpr std::uint16_t kFireBallBorrowed = 17;
 inline constexpr std::uint16_t kFireBoltBorrowed = 19;
-inline constexpr std::uint16_t kVenomSplasherBorrowed = 141;
 inline constexpr std::uint16_t kEarthSpikeBorrowed = 90;
-// La bombe de Demonstration brûle comme Fire Wall ; la fiole d'Acid Terror vole
-// comme la pierre de Throw Stone.
-inline constexpr std::uint32_t kDemonstrationFallbackEffect = 25;
+// La bombe de Demonstration brûle de son propre feu ; la fiole d'Acid Terror
+// vole comme la pierre de Throw Stone.
+inline constexpr std::uint32_t kDemonstrationFallbackEffect = 302;
+// Acid Demonstration : les anneaux d'acide que le jeu fait naître sur la cible,
+// hors des tables que lit le mode.
+inline constexpr std::uint32_t kAcidDemonstrationEffect = 537;
 inline constexpr std::uint32_t kStrikeSparkFallbackEffect = 1;
 
 // MAGNUM BREAK a deux effets : ses anneaux, à l'annonce, et l'anneau de choc de
@@ -276,6 +279,9 @@ inline constexpr std::uint32_t kIceWallFallbackEffect = 74;
 inline constexpr std::uint16_t kVenomDustSkill = 140;
 inline constexpr std::uint32_t kVenomDustUnit = 146;
 inline constexpr std::uint32_t kVenomDustFallbackEffect = 171;
+// Demonstration : le feu de l'unité du jeu, tant que sa zone dure ; son lancer
+// est ce même feu.
+inline constexpr std::uint32_t kDemonstrationUnit = 177;
 
 // HEAVEN'S DRIVE pose un orage sans unité au sol : son champ de pointes se joue
 // à sa naissance, au point de l'orage, pour que la horde voie où il blesse.

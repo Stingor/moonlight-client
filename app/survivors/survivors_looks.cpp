@@ -150,12 +150,6 @@ namespace {
     case kTouchOfHealSkill:
     case kMentalChangeSkill:
       return kHealBorrowed;
-    case kChemicalProtectionArmorSkill:
-      return kEndureBorrowed;
-    case kFullChemicalProtectionSkill:
-      return kConcentrationBorrowed;
-    case kAcidDemonstrationSkill:
-      return kVenomSplasherBorrowed;
     case kCartCannonSkill:
     case kBioExplosionSkill:
       return kFireBallBorrowed;
@@ -180,6 +174,7 @@ namespace {
   if (skill_id == kFirePillarSkill) return kFirePillarWaitingUnit;
   if (skill_id == kIceWallSkill) return kIceWallUnit;
   if (skill_id == kVenomDustSkill) return kVenomDustUnit;
+  if (skill_id == kDemonstrationSkill) return kDemonstrationUnit;
   return std::nullopt;
 }
 
@@ -357,6 +352,8 @@ SkillLook SkillLookOf(const ro::sim::SurvivorsSkillRule& skill) {
   } else if (const std::optional<std::uint32_t> borne = HeroBorneFallbackOf(shown)) {
     look.effect_id = *borne;
     look.fallback = true;
+  } else if (shown == kAcidDemonstrationSkill) {
+    look.effect_id = kAcidDemonstrationEffect;
   } else if (const std::optional<std::uint32_t> tabled = TabledEffectOf(shown)) {
     look.effect_id = *tabled;
   } else if (const std::optional<std::uint32_t> fallback = FallbackEffectOf(shown)) {

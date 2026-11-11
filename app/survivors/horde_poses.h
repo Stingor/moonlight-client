@@ -181,7 +181,17 @@ class HordePoses {
     bool elite = false;
     // Gelé par un piège qui retient : il ne bleuit pas.
     bool held = false;
+    // Son dernier tir vu, par son pas d'extinction, et l'instant où son geste
+    // a commencé ; aucun au départ.
+    std::uint32_t seen_shot_expires_step = 0;
+    std::optional<std::uint64_t> shot_started_ms;
   };
+  // Le dernier tir de chaque tireur, par serial croissant.
+  struct LatestShot {
+    std::uint32_t from_serial = 0;
+    std::uint32_t expires_step = 0;
+  };
+  std::vector<LatestShot> latest_shots_;
   // Un mort qui joue sa chute puis s'efface.
   struct FallingBody {
     std::uint32_t serial = 0;

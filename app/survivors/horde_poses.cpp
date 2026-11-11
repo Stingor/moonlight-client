@@ -21,6 +21,9 @@ constexpr float kHalfCell = 0.5F;
 constexpr std::uint32_t kPerMille = 1000;
 constexpr std::uint8_t kOpaque = 255;
 constexpr std::size_t kAlpha = 3;
+// Les numéros des sphères de Sphere Mine : celui de la zone, au-delà de ceux
+// des invocations, pour qu'une sphère ne prenne pas l'étiquette d'un allié.
+constexpr std::uint32_t kFirstSphereMineSerial = 0x40000000U;
 // Le nord du client, et un tour.
 constexpr float kClientNorthDegrees = 180.0F;
 constexpr float kFullTurnDegrees = 360.0F;
@@ -270,6 +273,16 @@ void HordePoses::PoseAllies(const ro::sim::SurvivorsField& field, std::uint64_t 
 void HordePoses::PoseFoes(const ro::sim::SurvivorsField& field, std::uint64_t presentation_ms,
                           std::uint32_t blend_per_mille, const HordeTimesOf& times_of) {
   next_memory_.clear();
+  latest_shots_.clear();
+  for (const ro::sim::SurvivorsFoeShot& shot : field.foe_shots) {
+    const auto known = std::ranges::find(latest_shots_, shot.from_serial, &LatestShot::from_serial);
+    if (known == latest_shots_.end()) {
+      latest_shots_.push_back(
+          LatestShot{.from_serial = shot.from_serial, .expires_step = shot.expires_step});
+    } else {
+      known->expires_step = std::max(known->expires_step, shot.expires_step);
+    }
+  }
   std::size_t remembered = 0;
   for (const ro::sim::SurvivorsFoe& foe : field.foes) {
     // Les monstres et le souvenir vont tous deux par serial croissant : l'ordre
@@ -290,6 +303,12 @@ void HordePoses::PoseFoes(const ro::sim::SurvivorsField& field, std::uint64_t pr
         memory.hurting = true;
       }
       memory.seen_hurt_step = foe.hurt_step;
+    }
+    // UN TIR NEUF lance le geste d'attaque du tireur.
+    const auto shot = std::ranges::find(latest_shots_, foe.serial, &LatestShot::from_serial);
+    if (shot != latest_shots_.end() && shot->expires_step > memory.seen_shot_expires_step) {
+      memory.seen_shot_expires_step = shot->expires_step;
+      memory.shot_started_ms = presentation_ms;
     }
     next_memory_.push_back(memory);
 
@@ -329,6 +348,9 @@ void HordePoses::PoseFoes(const ro::sim::SurvivorsField& field, std::uint64_t pr
         touched ? ElapsedSince(presentation_ms, MsOfStep(foe.touch_ready_step -
                                                          ro::sim::StepsOf(rule->touch_interval_ms)))
                 : 0.0F;
+    const float shooting_ms = memory.shot_started_ms.has_value()
+                                  ? ElapsedSince(presentation_ms, *memory.shot_started_ms)
+                                  : times.attack_ms;
     const float hurt_ms =
         memory.hurting ? ElapsedSince(presentation_ms, memory.hurt_started_ms) : 0.0F;
     if (frozen) {
@@ -338,6 +360,9 @@ void HordePoses::PoseFoes(const ro::sim::SurvivorsField& field, std::uint64_t pr
     } else if (touched && attack_ms < times.attack_ms) {
       pose.motion = Motion::kAttack;
       pose.motion_ms = attack_ms;
+    } else if (shooting_ms < times.attack_ms) {
+      pose.motion = Motion::kAttack;
+      pose.motion_ms = shooting_ms;
     } else if (memory.hurting && hurt_ms < times.hurt_ms) {
       pose.motion = Motion::kHurt;
       pose.motion_ms = hurt_ms;
@@ -460,6 +485,16 @@ void HordePoses::PoseSummons(const ro::sim::SurvivorsField& field, std::uint64_t
         pose.motion_ms = WalkingMs(presentation_ms, times.walk_ms, summon.serial);
       }
       poses_.push_back(pose);
+    }
+    // La Marine Sphere de Sphere Mine se tient sur sa mine jusqu'à sauter.
+    for (const ro::sim::SurvivorsZone& zone : ro::sim::ZonesAt(field, index)) {
+      if (zone.skill_id != kSphereMineSkill) continue;
+      poses_.push_back(HordePose{.kind = HordeBodyKind::kSummon,
+                                 .sim_id = kFirstSphereMineSerial + zone.serial,
+                                 .look_id = kMarineSphereClass,
+                                 .motion_ms = static_cast<float>(presentation_ms),
+                                 .cell = CellOfPoint(zone.from),
+                                 .tint = kAlliedTint});
     }
   }
 }
