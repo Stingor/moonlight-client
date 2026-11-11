@@ -31,6 +31,7 @@
 #include "ro/sim/world.h"
 
 #include "effects/effect_class_view.h"
+#include "effects/effect_own_skill_cases.h"
 #include "effects/effect_view.h"
 #include "world/actor_sounds.h"
 #include "world/actor_view.h"
@@ -211,9 +212,9 @@ std::size_t QuarterOf(float view_degrees) {
 
 }  // namespace
 
-void EffectsInPlay::PlayNotifySkillCases(const ro::sim::World& world, const MapStage& stage,
-                                         ro::sim::WalkPlanner& planner,
-                                         const ro::sim::Strike& strike) {
+void OwnSkillCases::OnNotifySkill(EffectsInPlay& effects, const ro::sim::World& world,
+                                  const MapStage& stage, ro::sim::WalkPlanner& planner,
+                                  const ro::sim::Strike& strike) {
   const ro::sim::Actor* const target = world.Find(strike.target);
   if (target == nullptr) {
     return;
@@ -226,15 +227,15 @@ void EffectsInPlay::PlayNotifySkillCases(const ro::sim::World& world, const MapS
 
   const auto spawn_on = [&](const ro::sim::Actor& bearer, Spawn spawn) {
     if (spawn.delay_ms != 0) {
-      per_map_.pending_hits.push_back(PendingHit{
+      effects.per_map_.pending_hits.push_back(EffectMapMemory::PendingHit{
           .effect_id = spawn.effect_id, .target_id = bearer.id, .due_ms = now_ms + spawn.delay_ms});
       return;
     }
     const ro::sim::FractionalCell cell =
         ro::sim::InterpolatedCell(bearer, planner.PathFor(bearer), now_ms);
     const std::array<float, 3> ground = GroundPositionAt(stage, cell.x, cell.y);
-    static_cast<void>(
-        PlayById(spawn.effect_id, glm::vec3(ground[0], ground[1], ground[2]), now_ms, bearer.id));
+    static_cast<void>(effects.PlayById(spawn.effect_id, glm::vec3(ground[0], ground[1], ground[2]),
+                                       now_ms, bearer.id));
   };
   const auto on_target = [&](std::initializer_list<std::uint32_t> effect_ids) {
     for (const std::uint32_t effect_id : effect_ids) {
@@ -246,7 +247,7 @@ void EffectsInPlay::PlayNotifySkillCases(const ro::sim::World& world, const MapS
     const glm::vec3 centre = client_frame.ToWorld(glm::vec3(0.0F));
     SownNamedSound heard{sound, target->position};
     heard.point = std::array<float, 3>{centre.x, centre.y, centre.z};
-    per_map_.just_sown_named_sounds.push_back(heard);
+    effects.per_map_.just_sown_named_sounds.push_back(heard);
   };
   // LA CIBLE DANS LE REPÈRE DU CLIENT, où les éclats se calculent.
   const auto target_in_client = [&] {
@@ -276,10 +277,10 @@ void EffectsInPlay::PlayNotifySkillCases(const ro::sim::World& world, const MapS
         return;
       case kNpcWideCriticalWound:
         // Seul le joueur de ce client voit la blessure, de chaque côté.
-        if (caster->id == player_id_) {
+        if (caster->id == effects.player_id_) {
           spawn_on(*caster, Spawn{.effect_id = 1121});
         }
-        if (target->id == player_id_) {
+        if (target->id == effects.player_id_) {
           on_target({1121});
         }
         return;
@@ -287,7 +288,7 @@ void EffectsInPlay::PlayNotifySkillCases(const ro::sim::World& world, const MapS
         on_target({183});
         return;
       case kWarlockComet:
-        if (minimal_effects_) {
+        if (effects.minimal_effects_) {
           on_target({1534, 1535});
         } else {
           on_target({1413, 1414});
@@ -302,9 +303,9 @@ void EffectsInPlay::PlayNotifySkillCases(const ro::sim::World& world, const MapS
         // La cadence du geste que le coup vient de donner au lanceur ; sans vue
         // des acteurs, aucune, et le délai se réduit à son plancher.
         float cadence_steps = 0.0F;
-        if (actor_view_.pace_of) {
+        if (effects.actor_view_.pace_of) {
           if (const auto pace =
-                  actor_view_.pace_of(*caster, strike.skill_id, strike.attack_motion_ms)) {
+                  effects.actor_view_.pace_of(*caster, strike.skill_id, strike.attack_motion_ms)) {
             cadence_steps = pace->cadence_steps;
           }
         }
@@ -329,11 +330,11 @@ void EffectsInPlay::PlayNotifySkillCases(const ro::sim::World& world, const MapS
         birth.ground_position = ground_of(*caster);
         birth.bound_id = target->id;
         birth.bound_ground_position = ground_of(*target);
-        static_cast<void>(classes_.Spawn(birth, now_ms));
+        static_cast<void>(effects.classes_.Spawn(birth, now_ms));
         return;
       }
       case kGeneticCartCannon:
-        if (minimal_effects_) {
+        if (effects.minimal_effects_) {
           spawn_on(*caster, Spawn{.effect_id = 1498, .delay_ms = kCannonCasterDelayMs});
           spawn_on(*target, Spawn{.effect_id = 1496, .delay_ms = kCannonTargetDelayMs});
           spawn_on(*target, Spawn{.effect_id = 1497, .delay_ms = kCannonTargetDelayMs});
@@ -365,7 +366,7 @@ void EffectsInPlay::PlayNotifySkillCases(const ro::sim::World& world, const MapS
       }
       return;
     case kShadowChaserFeintBomb:
-      if (minimal_effects_) {
+      if (effects.minimal_effects_) {
         on_target({1463, 1464});
       } else {
         on_target({1312, 1313});
@@ -386,22 +387,23 @@ void EffectsInPlay::PlayNotifySkillCases(const ro::sim::World& world, const MapS
       const float body_degrees =
           ClientBodyDegrees(*caster, ro::sim::FacingAt(*caster, planner.PathFor(*caster), now_ms));
       float view_degrees = ro::render::GroundSkillViewAngleDegrees(
-          camera_ ? camera_->yaw_degrees : 0.0F, body_degrees);
+          effects.camera_ ? effects.camera_->yaw_degrees : 0.0F, body_degrees);
       if (view_degrees >= kFullTurnDegrees) {
         view_degrees -= kFullTurnDegrees;
       }
       std::uint32_t mouth = breath.mouth_by_quarter[QuarterOf(view_degrees)];
-      if (minimal_effects_) {
+      if (effects.minimal_effects_) {
         mouth += breath.minimal_mouth_shift;
       }
       // UNE SEULE GUEULE À LA FOIS sur le lanceur, même attendue.
-      const bool awaited = std::ranges::any_of(per_map_.pending_hits, [&](const PendingHit& due) {
-        return due.effect_id == mouth && due.target_id == caster->id;
-      });
-      if (!awaited && !Carries(mouth, caster->id)) {
+      const bool awaited = std::ranges::any_of(
+          effects.per_map_.pending_hits, [&](const EffectMapMemory::PendingHit& due) {
+            return due.effect_id == mouth && due.target_id == caster->id;
+          });
+      if (!awaited && !effects.Carries(mouth, caster->id)) {
         spawn_on(*caster, Spawn{.effect_id = mouth, .delay_ms = kBreathMouthDelayMs});
       }
-      if (minimal_effects_) {
+      if (effects.minimal_effects_) {
         spawn_on(*target,
                  Spawn{.effect_id = breath.minimal_blast, .delay_ms = kBreathBlastDelayMs});
       } else {
@@ -423,15 +425,16 @@ void EffectsInPlay::PlayNotifySkillCases(const ro::sim::World& world, const MapS
             turn, ((static_cast<float>(shard) * step_degrees) / kHalfTurnDegrees) * kClientPi);
         const glm::vec3 point = centre + ro::render::Transform(glm::vec3(radius, 0.0F, 0.0F), turn);
         std::uint32_t effect_id = kFrostFirstShard + draw(kFrostShardKinds);
-        if (minimal_effects_) {
+        if (effects.minimal_effects_) {
           effect_id += kFrostMinimalShift;
         }
-        static_cast<void>(PlayById(effect_id, client_frame.ToWorld(point), now_ms));
+        static_cast<void>(effects.PlayById(effect_id, client_frame.ToWorld(point), now_ms));
       }
       return;
     }
     case kMechanicArmsCannon: {
-      const std::array<std::uint32_t, 2>& shell = minimal_effects_ ? kMinimalShell : kFullShell;
+      const std::array<std::uint32_t, 2>& shell =
+          effects.minimal_effects_ ? kMinimalShell : kFullShell;
       const glm::vec3 centre = target_in_client();
       for (std::uint32_t delay_ms = kShellStepMs;; delay_ms += kShellStepMs) {
         float across = kShellOffsetUnit * static_cast<float>(draw(kShellOffsetDraws));
@@ -453,7 +456,7 @@ void EffectsInPlay::PlayNotifySkillCases(const ro::sim::World& world, const MapS
         }
         const glm::vec3 point = client_frame.ToWorld(centre + glm::vec3(across, 0.0F, along));
         for (const std::uint32_t effect_id : shell) {
-          per_map_.pending_hits.push_back(PendingHit{
+          effects.per_map_.pending_hits.push_back(EffectMapMemory::PendingHit{
               .effect_id = effect_id, .due_ms = now_ms + delay_ms, .ground_point = point});
         }
         if (delay_ms + kShellStepMs >= kShellLastMs) {

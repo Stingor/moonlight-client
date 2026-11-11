@@ -148,6 +148,8 @@ struct EffectMapMemory {
     // LE POINT DU SOL où l'effet naît sans porteur, dans notre repère : un
     // éclat que le client sème autour d'une cible. Il prime sur `target_id`.
     std::optional<glm::vec3> ground_point;
+    // LA VIE QUE LE CLIENT LUI DONNE, en tics ; zéro, la sienne.
+    std::int32_t life_exact_ticks = 0;
   };
 
   // Le dernier semis de l'effet ENTRETENU d'une unité posée, et l'attente avant

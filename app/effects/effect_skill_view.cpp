@@ -41,6 +41,7 @@
 #include "ro/sim/world.h"
 
 #include "effects/effect_node_view.h"
+#include "effects/effect_own_skill_cases.h"
 #include "effects/effect_param.h"
 #include "effects/effect_requests.h"
 #include "effects/effect_str_look.h"
@@ -343,9 +344,17 @@ void EffectsInPlay::NoticeSkills(const ro::sim::World& world, const MapStage& st
         // `CastOutlivesInstantExit`.
         const bool resolves =
             cast.duration_ms > 0 || ro::render::CastOutlivesInstantExit(cast.skill_id);
+        // L'AIGUILLAGE PAR COMPÉTENCE D'ABORD : une compétence qui y a son cas
+        // ne consulte ni le registre des actions, ni les tables par défaut.
+        const bool by_own_case =
+            resolves && OwnSkillCases::OnCast(*this, stage, planner, actor, cast);
         const bool par_le_semeur =
-            resolves && PlayNamedSkill(stage, planner, id, actor, cast.skill_id,
-                                       ro::render::kSkillNamedOnCastSpawn, cast.started_ms);
+            resolves && !by_own_case &&
+            PlayNamedSkill(stage, planner, id, actor, cast.skill_id,
+                           ro::render::kSkillNamedOnCastSpawn, cast.started_ms);
+        if (resolves && !by_own_case && !par_le_semeur) {
+          OwnSkillCases::OnCastByDefault(*this, stage, planner, actor, cast);
+        }
         const bool plays_own = PlayNamedSkill(stage, planner, id, actor, cast.skill_id,
                                               ro::render::kSkillNamedOnCast, cast.started_ms);
         // ⚠ UNE FOIS PAR COMPÉTENCE, à l'ENTRÉE du chemin et non à sa sortie :
@@ -738,7 +747,7 @@ void EffectsInPlay::NoticeSkills(const ro::sim::World& world, const MapStage& st
         world.Find(strike.attacker), struck, strike.started_ms, strike.attack_motion_ms,
         struck == nullptr && repli != world.skill_units().end() ? &repli->second : nullptr);
     // PUIS LES CAS QUE LE PAQUET TRAITE SEUL, par-dessus ce qui précède.
-    PlayNotifySkillCases(world, stage, planner, strike);
+    OwnSkillCases::OnNotifySkill(*this, world, stage, planner, strike);
   }
   // 🔴 EN PLUS, ET NON AU DÉFAUT : le client interroge son Lua par des chemins
   // qui lui sont propres, et qui ne remplacent aucun des switches ci-dessus.

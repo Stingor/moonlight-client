@@ -51,7 +51,8 @@ void EffectsInPlay::NoticeHitEffects(const SoundStage& scene) {
       return false;
     }
     if (pending.ground_point.has_value()) {
-      static_cast<void>(PlayById(pending.effect_id, *pending.ground_point, scene.now_ms));
+      static_cast<void>(PlayById(pending.effect_id, *pending.ground_point, scene.now_ms, 0, false,
+                                 0, true, pending.life_exact_ticks));
       return true;
     }
     // LE PORTEUR TEL QU'IL EST ALORS : un acteur, ou une unité au sol — celle
@@ -86,7 +87,7 @@ void EffectsInPlay::NoticeHitEffects(const SoundStage& scene) {
       // retour laissait le dernier maillon du seul chemin de Bash sans témoin :
       // toutes les tables répondaient, et l'écran restait vide.
       if (!PlayById(pending.effect_id, glm::vec3(ground[0], ground[1], ground[2]), scene.now_ms,
-                    pending.target_id, false, 0, true, 0, 0.0F, 0.0F, aim) &&
+                    pending.target_id, false, 0, true, pending.life_exact_ticks, 0.0F, 0.0F, aim) &&
           reported_hit_effects_.insert(pending.effect_id).second) {
         ro::core::LogWarning("impact : effet {} ni fichier ni patron, rien montré ni entendu",
                              pending.effect_id);

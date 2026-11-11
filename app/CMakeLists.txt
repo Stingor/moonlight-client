@@ -146,6 +146,7 @@ add_library(moonclient_effects STATIC
     effects/doll_camera.cpp
     effects/effect_arrow_shower.cpp
     effects/effect_bearer_gate.cpp
+    effects/effect_cast_skill_cases.cpp
     effects/effect_class_view.cpp
     effects/effect_devotion_view.cpp
     effects/effect_ground_skill_view.cpp
