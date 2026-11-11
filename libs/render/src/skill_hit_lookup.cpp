@@ -6,6 +6,7 @@
 #include "ro/render/plain_hit_effect_table.h"
 #include "ro/render/skill_effect_table.h"
 #include "ro/render/skill_hit_effect.h"
+#include "ro/render/skill_use_motion.h"
 
 namespace ro::render {
 namespace {
@@ -68,6 +69,13 @@ bool DamageTypeShowsHitEffect(std::uint8_t damage_type) {
 
 bool DamageTypeShowsHitEffect(std::uint8_t damage_type, std::uint16_t skill_id) {
   if (DamageTypeShowsHitEffect(damage_type)) {
+    return true;
+  }
+  // LES COMPÉTENCES QUI NE LAISSENT PAS L'ÉCLABOUSSURE À LA VOIE COURTE : leurs
+  // victimes alentour suivent le chemin ordinaire, et reçoivent leur impact.
+  if (skill_id != 0 &&
+      (damage_type == kSplashDamageType || damage_type == kSplashEnduredDamageType) &&
+      !SplashHitKeepsAction(skill_id, damage_type)) {
     return true;
   }
   constexpr std::uint8_t kDamageTypeBits = 16;

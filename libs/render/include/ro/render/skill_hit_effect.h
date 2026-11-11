@@ -131,7 +131,9 @@ struct SplashHitSkill {
 };
 [[nodiscard]] std::span<const SplashHitSkill> SplashHitSkillTable();
 
-// Si un coup de cette compétence, de cette sorte, montre un impact.
+// Si un coup de cette compétence, de cette sorte, montre un impact : par la
+// table ci-dessus, ou parce que la compétence laisse ses éclaboussures au
+// chemin ordinaire — voir `SplashHitKeepsAction`.
 [[nodiscard]] bool DamageTypeShowsHitEffect(std::uint8_t damage_type, std::uint16_t skill_id);
 
 // CE QU'UNE UNITÉ AU SOL POSE, et c'est une AUTRE table.
