@@ -34,8 +34,12 @@ namespace ro::net {
 //   [masque_reste:2] puis 5 octets par classe de teinte réglée (rangs 0 à 12),
 //   [nombre:1] puis nombre × [index:1][rouge:1][vert:1][bleu:1]
 // Le reste ne vaut qu'aux profils 1 et 3 ; les retouches, triées par index,
-// jamais sur la peau, ni à l'index zéro, ni en magenta pur. Un lecteur plus
+// jamais sur une peau, ni à l'index zéro, ni en magenta pur. Un lecteur plus
 // ancien enjambe la queue par la taille, et voit les pièces seules.
+//
+// LES DEUX PEAUX : celle du visage (calque 4, clé zéro) et celle d'un corps
+// (calque 6, sous la clé du corps), un seul réglage chacune, au profil 1. Un
+// lecteur plus ancien enjambe le calque 6 par la taille, sans le compter.
 //
 // 🔴 UN OBJET SE DÉSIGNE PAR SON EMPLACEMENT, jamais par un identifiant global.
 // Le serveur trouve l'exemplaire dans l'équipement de la session émettrice, et
@@ -66,8 +70,11 @@ inline constexpr std::size_t kStyleLayerEntryMost =
     kStyleLayerEntryHead +
     (kStyleLayerRampRanks + sim::kStyleLayerAdjustCount) * kStyleLayerAdjustBytes +
     kStyleLayerTailHead + sim::kStyleRetouchesMost * kStyleLayerRetouchBytes;
-// LE PLUS GROS CZ que le serveur accepte : la tête, la peau, les quatre suites
-// du corps et les huit emplacements, chacun à sa plus grosse entrée, tiennent
+// La plus grosse entrée d'une peau : un seul réglage, sans queue.
+inline constexpr std::size_t kStyleSkinEntryMost = kStyleLayerEntryHead + kStyleLayerAdjustBytes;
+// LE PLUS GROS CZ que le serveur accepte : la tête, la peau du visage, les
+// quatre suites du corps et les huit emplacements, chacun à sa plus grosse
+// entrée, et les peaux des quatre corps, tiennent
 // dans 4 Kio.
 inline constexpr std::size_t kStyleLayersRequestMost = 4096;
 
@@ -88,7 +95,8 @@ enum class StyleSlot : std::uint8_t {
 
 // UNE TEINTURE À VALIDER.
 //
-// La tête et la peau s'appliquent toujours au personnage : `slot` reste vide.
+// La tête, les peaux et la suite du corps s'appliquent toujours au
+// personnage : `slot` reste vide.
 // Une coiffe ou une cape se désigne par `slot`, et la clé de `recipe` est alors
 // l'identifiant de l'objet ATTENDU à cet emplacement.
 struct StyleLayerOrder {

@@ -61,6 +61,9 @@ enum class ServerRuleKey : std::uint16_t {
   // LE PROFIL MIXTE : les retouches qu'un calque porte au plus. Sa présence est
   // la preuve que le serveur accepte le reste et les retouches d'une entrée.
   kStyleLayerRetouchesMost = 24,
+  // LE DERNIER NUMÉRO DE CALQUE que le serveur accepte. Sa présence, à 6 au
+  // moins, est la preuve qu'il range la peau du corps.
+  kStyleLayerLast = 25,
 };
 
 [[nodiscard]] FrameOutcome ApplyServerRulesFrame(const Frame& frame, sim::World& world);

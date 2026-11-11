@@ -94,6 +94,7 @@ std::optional<RampLayer> RampLayerOf(StyleLayer layer) noexcept {
     case StyleLayer::kBody:
     case StyleLayer::kSkin:
     case StyleLayer::kBodyMore:
+    case StyleLayer::kBodySkin:
       break;
   }
   return std::nullopt;
@@ -103,6 +104,18 @@ const LayerDye* StyleSet::Find(StyleLayer layer, std::uint32_t key) const {
   const auto found = std::ranges::find_if(
       layers, [layer, key](const LayerDye& dye) { return dye.layer == layer && dye.key == key; });
   return found != layers.end() ? &*found : nullptr;
+}
+
+const LayerDye* StyleSet::SkinOf(StyleLayer piece, std::uint32_t body_key) const {
+  const auto usable = [](const LayerDye* dye) {
+    return dye != nullptr && dye->profile == kLayerProfileNumber ? dye : nullptr;
+  };
+  if (piece == StyleLayer::kBody) {
+    if (const LayerDye* own = usable(Find(StyleLayer::kBodySkin, body_key))) {
+      return own;
+    }
+  }
+  return usable(Find(StyleLayer::kSkin, 0));
 }
 
 bool SkinAdjustable(std::string_view body_sprite_path) {

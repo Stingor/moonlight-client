@@ -24,8 +24,8 @@ namespace ro::render {
 //   * coiffe : l'apparence affichée ; la teinture appartient à l'exemplaire,
 //     mais le serveur la remet sous l'apparence avant de l'envoyer ;
 //   * cape : la robe affichée, de même ;
-//   * peau : zéro, une seule par personnage ;
-//   * corps, suite : la clé du corps, celle de la recette v7.
+//   * peau du visage : zéro, une seule par personnage ;
+//   * peau du corps, corps, suite : la clé du corps, celle de la recette v7.
 // La garde-robe cherche ainsi la teinture de chaque pièce qu'elle habille, et
 // une pièce sans teinture garde ses couleurs.
 //
@@ -43,7 +43,11 @@ enum class StyleLayer : std::uint8_t {
   // LES RAMPES 9 À 12 DU CORPS, que la v7 ne porte pas : voir
   // `DetectBodyContinuation`. Moonclient seul les lit ; un autre client voit
   // ces pièces dans leurs couleurs.
-  kBodyMore = 5
+  kBodyMore = 5,
+  // LA PEAU DU CORPS, propre à moonclient : les bras et les jambes d'un corps,
+  // sous la clé de ce corps, comme un vêtement porté par-dessus. Un corps sans
+  // la sienne prend la peau du visage (`kSkin`) : voir `StyleSet::SkinOf`.
+  kBodySkin = 6
 };
 
 // Le nombre de réglages d'une teinture : un par classe de teinte au profil 2,
@@ -129,6 +133,14 @@ struct StyleSet {
 
   // La teinture de ce calque sous cette clé, ou nulle.
   [[nodiscard]] const LayerDye* Find(StyleLayer layer, std::uint32_t key) const;
+
+  // LA PEAU QUI S'APPLIQUE À UNE PIÈCE, ou nulle : la tête prend la peau du
+  // visage ; un corps prend la sienne, rangée sous `body_key`, et À DÉFAUT celle
+  // du visage. Une peau d'un profil inconnu ne compte pas.
+  //
+  // 🔴 LE REPLI REND LA SÉPARATION GRATUITE : qui ne règle que le visage voit
+  // ses bras le suivre.
+  [[nodiscard]] const LayerDye* SkinOf(StyleLayer piece, std::uint32_t body_key) const;
 };
 
 // UN CORPS DONT LA PEAU NE SE RÈGLE PAS, par le chemin de son `.spr`.
@@ -138,16 +150,16 @@ struct StyleSet {
 // de la crinière du lion de la Royal Guard en tenue alternative. Rien dans les
 // données ne sépare ces pixels de la peau du cavalier ; seul l'œil le fait.
 // Teindre la peau y teindrait l'animal, et le visage seul se désassortirait du
-// corps : ces corps gardent la peau du dessin, tête comprise.
+// corps : ces corps gardent la peau du dessin, tête comprise, et aucune des
+// deux peaux ne s'y règle.
 [[nodiscard]] bool SkinAdjustable(std::string_view body_sprite_path);
 
 // LA PEAU, appliquée EN DERNIER : les index de `SkinIndices(race)` de
 // `painted` reprennent la couleur de `base` réglée par `adjust`.
 //
 // 🔴 ELLE L'EMPORTE SUR TOUT CE QUI A ÉTÉ PEINT AVANT, recette du corps ou
-// rampes de la tête : c'est le seul réglage de ces index, et le visage et les
-// bras ne peuvent pas se désassortir. Un réglage neutre rend donc la peau du
-// dessin.
+// rampes de la tête : c'est le seul réglage de ces index. Un réglage neutre
+// rend donc la peau du dessin.
 void ApplySkin(formats::Palette& painted, const formats::Palette& base, SkinRace race,
                const RampAdjust& adjust);
 

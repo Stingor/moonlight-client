@@ -103,6 +103,10 @@ struct SessionSettings {
   // 🔴 LES RETOUCHES QU'UN CALQUE PORTE AU PLUS, PREUVE que le serveur accepte
   // le profil mixte (le reste et les retouches) : zéro, aucune entrée n'en part.
   int style_layer_retouches_most = 0;
+  // 🔴 LE DERNIER NUMÉRO DE CALQUE QUE LE SERVEUR ACCEPTE, preuve qu'il range les
+  // calques jusque-là : zéro, aucun calque au-delà de la suite du corps ne part.
+  // Un serveur qui la tait refuserait la trame entière.
+  int style_layer_last = 0;
   // Les bornes des numéros officiels, telles que le serveur les applique. Zéro :
   // non dites.
   int hair_style_min = 0;

@@ -159,10 +159,9 @@ std::optional<ActorPalettes::StyledPalette> ActorPalettes::Paint(const StyleSet&
   if (more != nullptr && !Applicable(*more)) {
     more = nullptr;
   }
-  const LayerDye* skin = piece.skin ? set.Find(StyleLayer::kSkin, 0) : nullptr;
-  if (skin != nullptr && skin->profile != kLayerProfileNumber) {
-    skin = nullptr;
-  }
+  // La peau du visage sur la tête ; celle du corps sur le corps, ou à défaut
+  // celle du visage.
+  const LayerDye* skin = piece.skin ? set.SkinOf(piece.layer, piece.key) : nullptr;
   const bool by_classes = dye != nullptr && dye->profile == kHueClassProfileNumber;
 
   StyledPalette styled;
@@ -222,7 +221,7 @@ const ActorPalettes::StyledPalette* ActorPalettes::StyledFor(std::uint32_t style
     return nullptr;
   }
   const auto ready = piece.layer == StyleLayer::kBody ? ready_made_.find(style) : ready_made_.end();
-  const bool skinned = piece.skin && set->second.Find(StyleLayer::kSkin, 0) != nullptr;
+  const bool skinned = piece.skin && set->second.SkinOf(piece.layer, piece.key) != nullptr;
   const bool continued = piece.layer == StyleLayer::kBody &&
                          set->second.Find(StyleLayer::kBodyMore, piece.key) != nullptr;
   // La palette toute faite vaut pour tous les sprites, tant qu'aucune peau ni

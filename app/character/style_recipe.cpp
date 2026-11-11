@@ -122,6 +122,9 @@ std::optional<ro::render::LayerDye> FromWire(const ro::sim::StyleLayerRecipe& to
     case ro::sim::StyleLayerKind::kBodyMore:
       dye.layer = ro::render::StyleLayer::kBodyMore;
       break;
+    case ro::sim::StyleLayerKind::kBodySkin:
+      dye.layer = ro::render::StyleLayer::kBodySkin;
+      break;
     default:
       return std::nullopt;
   }
@@ -174,8 +177,9 @@ std::vector<ro::render::LayerDye> WornDyes(std::span<const ro::sim::StyleLayerRe
         return dye.key == 0;
       // ⚠ TOUTES LES SUITES, une par corps habillé au plus : l'apparence ne dit
       // pas quel corps se charge, et la garde-robe choisit la suite par la clé
-      // du corps qu'elle peint.
+      // du corps qu'elle peint. De même pour la peau de chaque corps.
       case ro::render::StyleLayer::kBodyMore:
+      case ro::render::StyleLayer::kBodySkin:
         return dye.key != 0;
       case ro::render::StyleLayer::kBody:
         break;

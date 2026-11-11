@@ -35,21 +35,28 @@ constexpr std::uint8_t kPayloadZipped = 0x01;
 
 // Le calque d'une entrée, tel que le fil le numérote.
 constexpr std::uint8_t kWireHead = static_cast<std::uint8_t>(sim::StyleLayerKind::kHead);
-constexpr std::uint8_t kWireLayerLast = static_cast<std::uint8_t>(sim::StyleLayerKind::kBodyMore);
+constexpr std::uint8_t kWireLayerLast = static_cast<std::uint8_t>(sim::StyleLayerKind::kBodySkin);
 
 static_assert(proto::CzMoonclientStyleLayers::kWireSize == 6,
               "l'en-tête du CZ des calques ne vaut plus ce que le serveur déclare");
 static_assert(proto::ZcMoonclientStyleLayers::kWireSize == 7,
               "l'en-tête du ZC des calques ne vaut plus ce que le serveur déclare");
 static_assert(kStyleLayerEntryMost <= UINT8_MAX, "une entrée doit tenir sa taille sur un octet");
-// Le pire CZ : tête, peau, quatre suites, huit emplacements.
+// Le pire CZ : tête, peau du visage, quatre suites, huit emplacements, plus la
+// peau de chacun des quatre corps.
 constexpr std::size_t kRequestEntriesWorst = 1 + 1 + sim::kStyleBodyVariantsMost +
                                              (static_cast<std::size_t>(StyleSlot::kCostumeGarment) -
                                               static_cast<std::size_t>(StyleSlot::kHeadTop) + 1);
 static_assert(proto::CzMoonclientStyleLayers::kWireSize +
-                      kRequestEntriesWorst * kStyleLayerEntryMost <=
+                      kRequestEntriesWorst * kStyleLayerEntryMost +
+                      sim::kStyleBodyVariantsMost * kStyleSkinEntryMost <=
                   kStyleLayersRequestMost,
               "le pire CZ doit tenir sous le plafond du serveur");
+
+// Une peau, du visage ou d'un corps : un seul réglage, ni reste ni retouche.
+[[nodiscard]] bool IsSkin(sim::StyleLayerKind layer) noexcept {
+  return layer == sim::StyleLayerKind::kSkin || layer == sim::StyleLayerKind::kBodySkin;
+}
 
 [[nodiscard]] bool Neutral(const sim::StyleAdjust& adjust) noexcept {
   return adjust.hue == 0 && adjust.saturation == 0 && adjust.value == 0 && !adjust.absolute;
@@ -68,12 +75,13 @@ static_assert(proto::CzMoonclientStyleLayers::kWireSize +
 }
 
 // Les rangs qu'un calque admet sous un profil. La tête est palettisée, donc au
-// profil 1 ; la peau n'a qu'un réglage.
+// profil 1 ; une peau n'a qu'un réglage.
 [[nodiscard]] std::size_t RanksFor(sim::StyleLayerKind layer, std::uint8_t profile) noexcept {
   switch (layer) {
     case sim::StyleLayerKind::kHead:
       return profile == kStyleLayerRampProfile ? kStyleLayerRampRanks : 0;
     case sim::StyleLayerKind::kSkin:
+    case sim::StyleLayerKind::kBodySkin:
       return profile == kStyleLayerRampProfile ? 1 : 0;
     case sim::StyleLayerKind::kBodyMore:
       return profile == kStyleLayerBodyMoreProfile ? kStyleLayerBodyMoreRanks : 0;
@@ -101,13 +109,11 @@ static_assert(proto::CzMoonclientStyleLayers::kWireSize +
   if (layer == sim::StyleLayerKind::kBodyMore) {
     return profile == kStyleLayerBodyMoreProfile;
   }
-  return layer != sim::StyleLayerKind::kSkin && profile == kStyleLayerRampProfile;
+  return !IsSkin(layer) && profile == kStyleLayerRampProfile;
 }
 
-// Les retouches : partout sauf sur la peau.
-[[nodiscard]] bool TakesRetouches(sim::StyleLayerKind layer) noexcept {
-  return layer != sim::StyleLayerKind::kSkin;
-}
+// Les retouches : partout sauf sur une peau.
+[[nodiscard]] bool TakesRetouches(sim::StyleLayerKind layer) noexcept { return !IsSkin(layer); }
 
 // Des retouches au plus `kStyleRetouchesMost`, permises, d'index strictement
 // croissants.
@@ -145,8 +151,7 @@ void WriteAdjust(core::ByteWriter& writer, const sim::StyleAdjust& adjust) {
                         "calques : l'emplacement ne porte pas ce calque");
     }
     wire_layer = static_cast<std::uint8_t>(*order.slot);
-  } else if (recipe.layer == sim::StyleLayerKind::kHead ||
-             recipe.layer == sim::StyleLayerKind::kSkin ||
+  } else if (recipe.layer == sim::StyleLayerKind::kHead || IsSkin(recipe.layer) ||
              recipe.layer == sim::StyleLayerKind::kBodyMore) {
     wire_layer = static_cast<std::uint8_t>(recipe.layer);
   } else {
@@ -159,8 +164,10 @@ void WriteAdjust(core::ByteWriter& writer, const sim::StyleAdjust& adjust) {
 // Une entrée, sous ce numéro de calque, ou la raison de la refuser.
 [[nodiscard]] core::Result<void> WriteEntry(core::ByteWriter& writer, std::uint8_t wire_layer,
                                             const sim::StyleLayerRecipe& recipe, bool clear) {
-  const bool skin = recipe.layer == sim::StyleLayerKind::kSkin;
-  if (skin ? recipe.key != 0 : recipe.key == 0) {
+  // La peau du visage sous la clé zéro ; tout autre calque, peau du corps
+  // comprise, sous une clé non nulle.
+  const bool face_skin = recipe.layer == sim::StyleLayerKind::kSkin;
+  if (face_skin ? recipe.key != 0 : recipe.key == 0) {
     return core::Fail(core::ErrorCode::kInvalidArgument, "calques : clé hors de son calque");
   }
   const std::uint16_t mask = clear ? std::uint16_t{0} : MaskOf(recipe.adjusts);

@@ -113,7 +113,8 @@ struct StyleVariants {
 // À côté de la recette du corps, un joueur teint sa tête, sa peau, ses coiffes
 // et sa cape. Chaque teinture se désigne par une CLÉ que tout observateur
 // reçoit déjà : la coupe et la couleur de cheveux pour la tête, l'apparence
-// affichée pour une coiffe, la robe affichée pour la cape, zéro pour la peau.
+// affichée pour une coiffe, la robe affichée pour la cape, zéro pour la peau
+// du visage, la clé du corps pour la suite et la peau du corps.
 // Le calcul vit dans `ro/render/style_set.h` ; ici, ce que le fil dit.
 
 // Le nombre de réglages d'une teinture : un par classe de teinte au profil 2,
@@ -122,12 +123,15 @@ inline constexpr std::size_t kStyleLayerAdjustCount = 13;
 
 // Le calque, numéroté comme sur le fil.
 // `kBodyMore` est la suite du corps : les rampes 9 à 12, sous la clé du corps.
+// `kSkin` est la peau du visage ; `kBodySkin`, celle d'un corps, sous sa clé.
+// Un corps sans la sienne prend celle du visage.
 enum class StyleLayerKind : std::uint8_t {
   kHead = 1,
   kHeadgear = 2,
   kGarment = 3,
   kSkin = 4,
-  kBodyMore = 5
+  kBodyMore = 5,
+  kBodySkin = 6
 };
 
 // UNE RETOUCHE : la couleur exacte d'un index de la palette du calque.
@@ -163,13 +167,13 @@ struct StyleLayerRecipe {
   std::vector<StyleRetouch> retouches;
 };
 
-// Le plus de teintures qu'un bloc du serveur décrit pour un joueur : sa tête, sa
-// peau, ses quatre exemplaires visibles, et la suite de ses quatre corps au
-// plus. Au-delà, l'entrée est ignorée.
+// Le plus de teintures qu'un bloc du serveur décrit pour un joueur : sa tête, la
+// peau du visage, ses quatre exemplaires visibles, et la suite et la peau de
+// ses quatre corps au plus. Au-delà, l'entrée est ignorée.
 inline constexpr std::size_t kStyleShownItemsMost = 4;
 inline constexpr std::size_t kStyleBodyVariantsMost = 4;
 inline constexpr std::size_t kStyleLayersShownMax =
-    1 + 1 + kStyleShownItemsMost + kStyleBodyVariantsMost;
+    1 + 1 + kStyleShownItemsMost + 2 * kStyleBodyVariantsMost;
 
 // CE QUE LE SERVEUR DIT D'UNE DEMANDE, par le verdict qui suit chaque envoi.
 enum class StyleSubject : std::uint8_t { kBody = 0, kLayers = 1, kAtelier = 2 };
