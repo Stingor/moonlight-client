@@ -152,6 +152,11 @@ struct EffectMapMemory {
     std::int32_t life_exact_ticks = 0;
   };
 
+  // LE DERNIER TIC où le tirage d'une unité a été fait, par unité : les bulles
+  // de Poison Smoke se tirent une fois par tic, quelle que soit la cadence des
+  // images.
+  std::map<std::uint32_t, std::uint32_t> unit_rolled_tick;
+
   // Le dernier semis de l'effet ENTRETENU d'une unité posée, et l'attente avant
   // le suivant.
   struct SownUnit {

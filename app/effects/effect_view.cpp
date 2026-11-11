@@ -18,6 +18,7 @@
 #include "ro/render/effect_frame.h"
 #include "ro/render/effect_launch.h"
 #include "ro/render/effect_life_table.h"
+#include "ro/render/effect_node.h"
 #include "ro/render/effect_node_pattern_table.h"
 #include "ro/render/effect_table.h"
 #include "ro/render/effect_visibility.h"
@@ -60,6 +61,44 @@ namespace {
 float OwnerFacingDegrees(const ro::sim::Actor& actor, const ro::sim::WalkPath& path,
                          std::uint32_t at_ms) {
   return ro::render::EffectOwnerFacingDegrees(ro::sim::FacingAt(actor, path, at_ms));
+}
+
+// CE QUE LE TIC DE DEUX UNITÉS AJOUTE À LEUR VISUEL ENTRETENU.
+constexpr std::uint32_t kEpiclesisUnit = 202;
+constexpr std::uint32_t kEpiclesisCompanion = 1654;
+constexpr std::uint32_t kPoisonSmokeUnit = 225;
+constexpr std::uint32_t kPoisonBubbleOdds = 100;
+constexpr std::array<std::uint32_t, 2> kPoisonBubbles = {1546, 1547};
+
+// Epiclesis pose son second effet avec le premier, une fois. Poison Smoke tire,
+// à chaque tic, une bulle sur cent pour chacune de ses deux tailles.
+void PlayUnitTickExtras(EffectsInPlay& effects, EffectMapMemory& memory, const MapStage& stage,
+                        std::uint32_t id, const ro::sim::SkillUnit& unit, std::uint32_t now_ms) {
+  if (unit.unit_id != kEpiclesisUnit && unit.unit_id != kPoisonSmokeUnit) {
+    return;
+  }
+  const std::array<float, 3> ground = GroundPositionAt(stage, unit.cell.x, unit.cell.y);
+  const glm::vec3 feet(ground[0], ground[1], ground[2]);
+  if (unit.unit_id == kEpiclesisUnit) {
+    if (!memory.sown_units.contains(id)) {
+      static_cast<void>(effects.PlayById(kEpiclesisCompanion, feet, now_ms, id));
+    }
+    return;
+  }
+  // UN TIRAGE PAR TIC AU PLUS, et jamais de rattrapage : après une pause, le
+  // client ne tire qu'une fois, à l'image qu'il traite.
+  const auto tick = now_ms / static_cast<std::uint32_t>(ro::render::kEffectTickMs);
+  const auto [rolled, first] = memory.unit_rolled_tick.try_emplace(id, tick);
+  if (!first && rolled->second == tick) {
+    return;
+  }
+  rolled->second = tick;
+  // Le tirage vient du tic et de l'unité : un monde rejoué se rejoue à l'identique.
+  std::uint32_t draws = tick ^ id;
+  const std::uint32_t roll = ro::render::NextEffectNodeDraw(draws) % kPoisonBubbleOdds;
+  if (roll >= 1 && roll <= kPoisonBubbles.size()) {
+    static_cast<void>(effects.PlayById(kPoisonBubbles[roll - 1], feet, now_ms, id));
+  }
 }
 
 }  // namespace
@@ -500,6 +539,7 @@ void EffectsInPlay::NoticeSkillUnitVisuals(const ro::sim::World& world, const Ma
     const std::uint32_t instance_id = kept->first;
     const SownUnit gone = kept->second;
     kept = per_map_.sown_units.erase(kept);
+    per_map_.unit_rolled_tick.erase(instance_id);
     // Ce que la pose avait inscrit cesse : la levée réinscrit ce qu'elle veut.
     std::erase_if(per_map_.pending_named, [instance_id](const PendingNamed& waiting) {
       return waiting.owner_id == instance_id && waiting.from_unit && !waiting.after_vanish;
@@ -525,6 +565,7 @@ void EffectsInPlay::NoticeSkillUnitVisuals(const ro::sim::World& world, const Ma
       const std::array<float, 3> moved = GroundPositionAt(stage, unit.cell.x, unit.cell.y);
       nodes_->FollowActor(id, glm::vec3(moved[0], moved[1], moved[2]), 0.0F);
     }
+    PlayUnitTickExtras(*this, per_map_, stage, id, unit, now_ms);
     // LA FABRIQUE D'ABORD, et elle exclut les deux autres chemins : une unité
     // qu'elle sert n'a ni effet d'apparition ni effet d'entretien.
     const std::span<const ro::render::SkillUnitNamedEffectEntry> named =
