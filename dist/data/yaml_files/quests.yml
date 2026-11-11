@@ -3722,6 +3722,15 @@ quests:
     icon: ev
     summary: 04:00 reset time
     description: 해당 이벤트 퀘스트는 대기시간 종료 후, 프론테라의 <NAVI>[쇼콜라]<INFO>prontera,163,98,0,101,0</INFO></NAVI>를 통해 반복 수행이 가능합니다.
+  3389:
+    title: "Removing Biomagnetic Jamming Chips"
+  3390:
+    title: "Eorpa, The Manager of the Second Power Plant"
+  3391:
+    title: "Illusion Sprinkled Potato Chips - Standby"
+    icon: dq
+  3392:
+    title: "Plated Chip Spread by Illusion"
   3407:
     title: "The Fishing Rod of the Missing Person"
     icon: lq
@@ -7888,6 +7897,32 @@ quests:
         count: 5
       - id: 25723
         count: 1
+  5892:
+    title: "Cleaning Robot Omega"
+  5893:
+    title: "Cleaning the Sewage Treatment Plant I"
+    summary: "Hunt 44 Sewage Venenum"
+  5894:
+    title: "Cleaning the Sewage Treatment Plant II"
+    summary: "Hunt 44 Sewage Cramp"
+  5895:
+    title: "Cleaning the Sewage Treatment Plant III"
+    summary: "Hunt 44 Sewage Waterfall"
+  5896:
+    title: "[Waiting] Cleaning the sewage treatment plant."
+    icon: dq
+  5897:
+    title: "Cleaning the First Power Plant I"
+    summary: "Hunt 44 Elite Bellare"
+  5898:
+    title: "Cleaning the First Power Plant II"
+    summary: "Hunt 44 Spell Addicted Dolor"
+  5899:
+    title: "Cleaning the First Power Plant III"
+    summary: "Hunt 44 Released Spell"
+  5900:
+    title: "[Waiting] Cleaning the first power plant."
+    icon: dq
   6000:
     title: Job Change to Taekwon
     description: You've chosen your path to become a Taekwon. You must increase your base level and talk with Phoenix.
@@ -13593,6 +13628,33 @@ quests:
     icon: dq
     summary: 굳은 익스플로젼, 굳은 블레이저 처치
     description: <NAVI>릴리 블랑<INFO>yuno_fild03,38,146,0,101,0</INFO></NAVI>은 굳은 익스플로젼 10마리, 굳은 블레이저 10마리를 처치하고 종족 차이를 보고해 달라고 한다.
+  8586:
+    title: "Keeping Breeding Ground"
+  8587:
+    title: "Daily farm experience - Standby"
+    icon: dq
+  8588:
+    title: "Tail Collection"
+  8589:
+    title: "It's Boss Meow!"
+  8590:
+    title: "Play with the Red Pitaya"
+    summary: "Hunt 20 Red Pitaya"
+  8591:
+    title: "Play with the Yellow Pitaya"
+    summary: "Hunt 20 Yellow Pitaya"
+  8592:
+    title: "Play with the Blue Pitaya"
+    summary: "Hunt 20 Blue Pitaya"
+  8593:
+    title: "Play with the Purple Pitaya"
+    summary: "Hunt 20 Violet Pitaya"
+  8594:
+    title: "Play with the Green Pitaya"
+    summary: "Hunt 20 Green Pitaya"
+  8595:
+    title: "Playing with Pitaya - Standby"
+    icon: dq
   8639:
     title: "Great banquet hall in the depths of the underworld"
   8640:
@@ -13642,6 +13704,8 @@ quests:
     title: "Sorry for being sleepy (1)"
   8659:
     title: "Sorry for being sleepy (2)"
+  8681:
+    title: "Towards Rachel (1)"
   8719:
     title: "A new area somewhere in the anthill"
     icon: lq
@@ -18269,6 +18333,60 @@ quests:
     icon: ev
     summary: 04:00 reset time
     description: 길 잃은 옥토피그를 찾느라 피로가 쌓였다. 내일 다시 방문하자.
+  11615:
+    title: "Sewer Pipe Straggler"
+  11616:
+    title: "Sewer Pipe Straggler"
+  11617:
+    title: "Sewer Pipe Straggler"
+  11618:
+    title: "Sewer Pipe Straggler"
+  11620:
+    title: "Sewer Pipe Straggler"
+  11621:
+    title: "Be quiet in the Library!"
+  11622:
+    title: "Be quiet in the Library!"
+  11623:
+    title: "Be quiet in the Library!"
+  11624:
+    title: "Be quiet in the Library!"
+  11625:
+    title: "Be quiet in the Library!"
+  11626:
+    title: "Be quiet in the Library!"
+  11627:
+    title: "Be quiet in the Library!"
+  11628:
+    title: "Be quiet in the Library!"
+  11629:
+    title: "Be quiet in the Library!"
+  11630:
+    title: "Be quiet in the Library!"
+  11631:
+    title: "Be quiet in the Library!"
+  11632:
+    title: "Be quiet in the Library!"
+  11633:
+    title: "Be quiet in the Library!"
+  11634:
+    title: "Hunting Bookworm"
+    summary: "Hunt 20 Bookworm"
+  11635:
+    title: "Hunting Bookworm - Waiting"
+    icon: dq
+  11636:
+    title: "Hunting Roaming Spellbook"
+    summary: "Hunt 20 Roaming Spellbook"
+  11637:
+    title: "Hunting Roaming Spellbook - Waiting"
+    icon: dq
+  11638:
+    title: "Ultimate Scrap Metal Collection"
+    summary: "Hunt 20 Guardian Parts"
+  11639:
+    title: "The ultimate collection of scrap metal"
+    icon: dq
   12000:
     title: An old friend
     description: Find Maku's old friend and talk with him.
@@ -20439,6 +20557,17 @@ quests:
     icon: dq
     summary: Contaminated dimension sealed
     description: Oscar needs time to gather the dimensional energy again. The Contaminated Dimension of Old Glast Heim is sealed for 23 hours.
+  12497:
+    title: "Security Clearance"
+  12498:
+    title: "Security Clearance - Waiting"
+    icon: dq
+  12499:
+    title: "Red Pepper - Kappa Suppression"
+    summary: "Hunt 1 Red Pepper"
+  12500:
+    title: "Red Pepper - Lambda Suppression"
+    summary: "Hunt 1 Senior Red Pepper"
   13000:
     title: RWC 2011Card Gathering
     description: Defeat the Gold Porings that are randomly around Rune Midgard and collect enough Blue Cards to spell out "RWC 2011"
@@ -25739,6 +25868,67 @@ quests:
     icon: ev
     summary: 두 번째 산책
     description: 두 번째 산책을 마쳤다.
+  16427:
+    title: "Poisoning"
+  16428:
+    title: "Making the Antidote"
+  16429:
+    title: "Silva Papila"
+    summary: "Hunt 1 Silva Papilia"
+  16430:
+    title: "Completion of the Antidote"
+  16431:
+    title: "Hunting Silva Papila"
+    summary: "Hunt 1 Silva Papilia"
+  16432:
+    title: "Hunting Silva Papila - Waiting"
+    icon: dq
+  16433:
+    title: "Hunting Senior Papila"
+    summary: "Hunt 1 MD_GRAN_PAPILIA"
+  16434:
+    title: "Hunting Senior Papila - Waiting"
+    icon: dq
+  16435:
+    title: "Searching for Gardener"
+  16436:
+    title: "Searching for Gardener - Waiting"
+    icon: dq
+  16437:
+    title: "Water Garden"
+  16438:
+    title: "Water Garden Hard"
+  16439:
+    title: "Water Garden - Waiting"
+    icon: dq
+  16440:
+    title: "I would like to know what it is"
+  16441:
+    title: "I would like to know what it is"
+  16442:
+    title: "The story of the managers"
+  16443:
+    title: "The story of the managers"
+  16444:
+    title: "The story of the managers"
+  16445:
+    title: "The story of the managers"
+  16446:
+    title: "I would like to know what it is"
+  16447:
+    title: "I would like to know what it is"
+  16448:
+    title: "I would like to know what it is"
+  16449:
+    title: "I would like to know what it is"
+  16450:
+    title: "I would like to know what it is"
+  16451:
+    title: "I would like to know what it is"
+  16452:
+    title: "I would like to know what it is"
+  16453:
+    title: "I would like to know what it is"
   16521:
     title: "4th floor of Rudus, an organic field for waste specimens"
   16522:
@@ -26096,6 +26286,106 @@ quests:
     icon: ev
     summary: 04:00 reset time
     description: 가져다 주신 성수로 마력의 눈꽃을 키울 수 있어요. 새벽이 지난 후에 다시 찾아주세요. - <NAVI>[유진]<INFO>aldebaran,108,166,0,101,0</INFO></NAVI>
+  17333:
+    title: "Mansion's Guest"
+  17334:
+    title: "Repeater Confirmed: Restaurant"
+  17335:
+    title: "Parts of the repeater"
+  17336:
+    title: "Repeater Confirmed: Riverbank"
+  17337:
+    title: "Repeater Confirmed: Central Garden"
+  17338:
+    title: "Repeater confirmation complete"
+  17340:
+    title: "Supply the spare parts"
+  17341:
+    title: "No Signal - Waiting"
+    icon: dq
+  17342:
+    title: "I don't like it"
+    summary: "Hunt 5 Broken Cleaning Robot"
+  17343:
+    title: "I am scared"
+  17344:
+    title: "I do not have a key"
+  17345:
+    title: "Staircase Key 1"
+  17346:
+    title: "Staircase Key 2"
+  17347:
+    title: "Staircase Key 3"
+  17348:
+    title: "Secure the key"
+  17349:
+    title: "The door opened"
+  17350:
+    title: "Head body arms legs"
+  17351:
+    title: "Head body arms legs"
+  17352:
+    title: "Head body arms legs"
+  17353:
+    title: "Head body arms legs"
+  17355:
+    title: "Head body arms legs"
+  17358:
+    title: "Basement status check completed"
+  17359:
+    title: "Ground warehouse clearance"
+    summary: "Hunt 20 Heart Hunter Skirmisher"
+  17360:
+    title: "Ground warehouse clearance - Waiting"
+    icon: dq
+  17361:
+    title: "Basement warehouse clearance"
+    summary: "Hunt 20 Broken Warehouse Manager"
+  17362:
+    title: "Basement warehouse clearance - Waiting"
+    icon: dq
+  17363:
+    title: "Exploring bathhouse"
+  17364:
+    title: "Request to shut down the boiler"
+  17365:
+    title: "Is it already stopped?"
+  17366:
+    title: "All of a sudden?"
+  17367:
+    title: "Countermeasure preparations"
+  17368:
+    title: "Trap installation 1"
+  17369:
+    title: "Trap installation 2"
+  17370:
+    title: "Trap installation 3"
+  17371:
+    title: "Trap installation 4"
+  17372:
+    title: "Trap installation complete"
+  17373:
+    title: "Anyway, let's talk"
+  17374:
+    title: "Why on earth did you do that?"
+  17375:
+    title: "Boiler's request"
+  17376:
+    title: "Between hot and cold baths"
+    summary: "Hunt 10 Broken Cleaner, Hunt 10 Broken Cleaner"
+  17377:
+    title: "Between hot and cold baths - Waiting"
+    icon: dq
+  17378:
+    title: "Sweepy's request"
+  17379:
+    title: "I'm cleaning the bathhouse"
+    summary: "Hunt 15 Boiled Water Marc, Hunt 15 Boiled Water Piranha"
+  17380:
+    title: "Cleaning the bathhouse - Waiting"
+    icon: dq
+  17381:
+    title: "Joining the company"
   18000:
     title: "Ready to enter"
     icon: lq
@@ -26188,6 +26478,11 @@ quests:
     title: Vitre the Spy
     summary: Lasda Midar
     description: The Secret Service have taken Vitre away for Espionage. You should probably go back to Lasda and let him know what happened to Vitre.
+  18024:
+    title: "Core collection"
+  18025:
+    title: "Core collection - Waiting"
+    icon: dq
   18030:
     title: Geoborg Family Curse
     summary: Mr. Karlomoff

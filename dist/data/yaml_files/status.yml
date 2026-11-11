@@ -84,6 +84,21 @@ Body:
       bonus bAspdRate, getstatus(SC_ATTHASTE_CASH, 1);
     Bonuses:
       - {Bonus: bAspdRate, Type: 1015, Val: 1}
+  - Status: Bath_foam_a
+    Script: |
+      .@val1 = getstatus(SC_BATH_FOAM_A, 1);
+      bonus2 bAddRace2, RC2_EP172BATH, .@val1;
+      bonus2 bMagicAddRace2, RC2_EP172BATH, .@val1;
+  - Status: Bath_foam_b
+    Script: |
+      .@val1 = getstatus(SC_BATH_FOAM_B, 1);
+      bonus2 bAddRace2, RC2_EP172BATH, .@val1;
+      bonus2 bMagicAddRace2, RC2_EP172BATH, .@val1;
+  - Status: Bath_foam_c
+    Script: |
+      .@val1 = getstatus(SC_BATH_FOAM_C, 1);
+      bonus2 bAddRace2, RC2_EP172BATH, .@val1;
+      bonus2 bMagicAddRace2, RC2_EP172BATH, .@val1;
   - Status: Batkfood
     Script: |
       bonus bBaseAtk, getstatus(SC_BATKFOOD, 1);

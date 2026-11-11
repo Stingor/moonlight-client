@@ -48995,6 +48995,22 @@ Body:
     View: 1109
     Script: |
       bonus bAllStats,1; bonus2 bAddClass,Class_All,2; bonus bMatkRate,2;
+  - Id: 5896
+    AegisName: EGGTART_HAT
+    Name: Egg Tart Hat
+    Type: Armor
+    Buy: 6500
+    Sell: 2166
+    Weight: 300
+    Defense: 2
+    Locations: {Head_Top: true}
+    ArmorLevel: 1
+    Refineable: true
+    View: 1114
+    Script: |
+      bonus bDex,2;
+      bonus bLuk,1;
+      bonus bMdef,3;
   - Id: 5897
     AegisName: Ascendant_Crown
     Name: Ascendant Crown
@@ -49011,6 +49027,50 @@ Body:
     View: 1118
     Script: |
       bonus2 bAddClass,Class_All,15; bonus bMatkRate,15; bonus bHit,20; bonus bFlee,20; bonus bCritical,20; bonus bFlee2,10; bonus bVariableCastrate,-20; bonus2 bSubEle,Ele_Neutral,5; if( getrefine() >= 9 ) { bonus bAllStats,10; bonus bMaxHPrate,15; bonus bMaxSPrate,15; }
+  - Id: 5898
+    AegisName: Autumn_Headband
+    Name: Autumn Headband
+    Type: Armor
+    Buy: 34500
+    Sell: 11500
+    Weight: 200
+    Defense: 8
+    Slots: 1
+    Jobs: {Hunter: true}
+    Locations: {Head_Top: true}
+    ArmorLevel: 1
+    EquipLevelMin: 100
+    Refineable: true
+    View: 1119
+    Script: |
+      bonus bBaseAtk,2*(readparam(bDex)/5);
+      bonus2 bVariableCastrate,"AC_SHOWER",-100;
+      bonus2 bSPDrainRate,40,1;
+      if (getrefine()>=9)
+         bonus2 bSkillAtk,"AC_SHOWER",BaseLevel/5;
+  - Id: 5899
+    AegisName: Black_Ribbon_
+    Name: Black Ribbon
+    Type: Armor
+    Buy: 34500
+    Sell: 11500
+    Weight: 200
+    Defense: 8
+    Slots: 1
+    Jobs: {Knight: true}
+    Locations: {Head_Top: true}
+    ArmorLevel: 1
+    EquipLevelMin: 100
+    Refineable: true
+    View: 1120
+    Script: |
+      bonus bBaseAtk,2*(readparam(bStr)/5);
+      bonus bDelayrate,-9;
+      bonus2 bSkillUseSP,"KN_BOWLINGBASH",16;
+      if (getrefine()>=9) {
+         bonus2 bSkillAtk,"LK_SPIRALPIERCE",50;
+         bonus2 bSkillAtk,"KN_BOWLINGBASH",50;
+      }
   - Id: 5900
     AegisName: Divine_Guard_Hat
     Name: "Divine Guard Hat [1]"
@@ -61780,6 +61840,39 @@ Body:
     Delay: {Duration: 10000}
     Script: |
       itemheal 0,180;
+  - Id: 11634
+    AegisName: 2401_ev_Yugwa
+    Name: New Year Yugwa
+    Type: Healing
+    Weight: 1
+    EquipLevelMin: 60
+    Trade: {NoDrop: true, NoTrade: true, NoSell: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      itemheal 0,140; /* average value */
+  - Id: 11635
+    AegisName: 2401_ev_RedLin
+    Name: Red Inverse Scale
+    Type: Healing
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 11636
+    AegisName: 24_S_Ev_Lime_Soda
+    Name: Lime Soda
+    Type: Healing
+    Weight: 1
+    EquipLevelMin: 90
+    Trade: {NoDrop: true, NoTrade: true, NoSell: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      itemheal 1800,0; /* average value */
+  - Id: 11637
+    AegisName: 24_S_Ev_Berry_Soda
+    Name: Berry Soda
+    Type: Healing
+    Weight: 1
+    EquipLevelMin: 90
+    Trade: {NoDrop: true, NoTrade: true, NoSell: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      itemheal 0,180; /* average value */
   - Id: 11701
     AegisName: Girl_Bunch_Of_Flower
     Name: Girl's Bouquet
@@ -128805,6 +128898,22 @@ Body:
     Weight: 10
     Script: |
       laphine_upgrade();
+  - Id: 100147
+    AegisName: Bath_Foam_A
+    Name: Bath Foam A
+    Type: Usable
+    Weight: 10
+    Trade: {NoDrop: true, NoTrade: true, NoStorage: true, NoCart: true, NoMail: true, NoAuction: true, NoGuildStorage: true}
+    Script: |
+      sc_start SC_BATH_FOAM_A,900000,5;
+  - Id: 100149
+    AegisName: Bath_Foam_C
+    Name: Bath Foam C
+    Type: Usable
+    Weight: 10
+    Trade: {NoDrop: true, NoTrade: true, NoStorage: true, NoCart: true, NoMail: true, NoAuction: true, NoGuildStorage: true}
+    Script: |
+      sc_start SC_BATH_FOAM_C,900000,15;
   - Id: 100391
     AegisName: Moonlight_Box_IL
     Name: Moonlight Refine Box
@@ -129194,6 +129303,286 @@ Body:
       bonus bVit,1;
       bonus bDex,2;
       bonus bMaxHPrate,10;
+  - Id: 300078
+    AegisName: Sweety_Card
+    Name: Sweety Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Hand: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bSkillAtk,"GS_RAPIDSHOWER",60;
+      bonus2 bSkillUseSPrate,"GS_RAPIDSHOWER",-25;
+  - Id: 300079
+    AegisName: Redpepper_Card
+    Name: Red Pepper Card
+    Type: Card
+    Weight: 10
+    Locations: {Armor: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bMagicAddRace,RC_Fish,30;
+      bonus2 bMagicAddRace,RC_Formless,30;
+      bonus2 bMagicAddEle,Ele_Holy,30;
+      bonus2 bMagicAddEle,Ele_Water,30;
+  - Id: 300080
+    AegisName: Redpepper_H_Card
+    Name: Senior Red Pepper Card
+    Type: Card
+    Weight: 10
+    Locations: {Armor: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bMagicAddRace,RC_Fish,50;
+      bonus2 bMagicAddRace,RC_Formless,50;
+      bonus2 bMagicAddEle,Ele_Holy,50;
+      bonus2 bMagicAddEle,Ele_Water,50;
+  - Id: 300081
+    AegisName: Assistant_Card
+    Name: Research Assistant Bot Card
+    Type: Card
+    Weight: 10
+    Locations: {Shoes: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bInt,2;
+      bonus bMaxHPrate,10;
+      bonus bMaxSPrate,10;
+      bonus2 bSkillAtk,"MG_FIREBALL",25;
+  - Id: 300082
+    AegisName: Assistant_H_Card
+    Name: Senior Assistant Bot Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Hand: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      if (getiteminfo(getequipid(EQI_HAND_R), ITEMINFO_VIEW) == W_1HSPEAR || getiteminfo(getequipid(EQI_HAND_R), ITEMINFO_VIEW) == W_2HSPEAR) {
+         bonus bLongAtkRate,10;
+      }
+      bonus bLongAtkRate,2*(getrefine()/2);
+  - Id: 300083
+    AegisName: Dry_Rafflesia_Card
+    Name: Dry Rafflesia Card
+    Type: Card
+    Weight: 10
+    Locations: {Shoes: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bAgi,2;
+      bonus bMaxHPrate,10;
+      bonus bMaxSPrate,10;
+      bonus2 bSkillAtk,"NJ_KUNAI",15;
+      bonus2 bSkillAtk,"NJ_HYOUSENSOU",15;
+  - Id: 300084
+    AegisName: Dry_Rafflesia_H_Card
+    Name: Senior Dry Rafflesia Card
+    Type: Card
+    Weight: 10
+    Locations: {Garment: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bSubEle,Ele_Holy,30;
+      bonus bFlee,5;
+  - Id: 300085
+    AegisName: Alnoldi_Ex_Card
+    Name: Special Alnoldi Card
+    Type: Card
+    Weight: 10
+    Locations: {Shoes: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bStr,2;
+      bonus bMaxHPrate,10;
+      bonus bMaxSPrate,10;
+      bonus bBaseAtk,getskilllv("TK_POWER")*7;
+  - Id: 300086
+    AegisName: Alnoldi_Ex_H_Card
+    Name: Senior Special Alnoldi Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Hand: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      .@r = getrefine();
+      if (getiteminfo(getequipid(EQI_HAND_R), ITEMINFO_VIEW) == W_2HSWORD) {
+         bonus bShortAtkRate,10;
+      }
+      bonus bShortAtkRate,.@r;
+      if (getallrefine() >= 22) {
+         bonus bUnbreakableWeapon;
+      }
+  - Id: 300088
+    AegisName: B_Scissore_Ng_H_Card
+    Name: Senior Broken Gardener Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Hand: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      .@r = getrefine();
+      if (getiteminfo(getequipid(EQI_HAND_R), ITEMINFO_VIEW) == W_BOOK) {
+         bonus2 bAddClass,Class_All,5;
+         bonus bHit,20;
+      }
+      bonus bShortAtkRate,.@r;
+      if (.@r>=10) {
+         bonus2 bSkillAtk,"TK_COUNTER",15;
+         bonus2 bSkillAtk,"TK_TURNKICK",15;
+      }
+  - Id: 300089
+    AegisName: Verporta_Card
+    Name: Verporta Card
+    Type: Card
+    Weight: 10
+    Locations: {Shoes: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bStr,2;
+      bonus bMaxHPrate,10;
+      bonus bMaxSPrate,10;
+      bonus2 bSkillAtk,"SM_MAGNUM",25;
+  - Id: 300090
+    AegisName: Verporte_H_Card
+    Name: Verporte Card
+    Type: Card
+    Weight: 10
+    Locations: {Shoes: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bMagicAtkEle,Ele_Earth,10;
+      bonus bUseSPrate,5;
+      if (getrefine()>=9) {
+         bonus2 bMagicAtkEle,Ele_Earth,10;
+      }
+  - Id: 300091
+    AegisName: Papila_Card
+    Name: Papila Card
+    Type: Card
+    Weight: 10
+    Locations: {Shoes: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bDex,2;
+      bonus bMaxHPrate,10;
+      bonus bMaxSPrate,10;
+      bonus2 bSkillAtk,"GS_SPREADATTACK",10;
+      bonus2 bSkillAtk,"GS_DESPERADO",10;
+      bonus2 bSkillAtk,"GS_FULLBUSTER",10;
+  - Id: 300092
+    AegisName: Papila_H_Card
+    Name: Senior Papila Card
+    Type: Card
+    Weight: 10
+    Locations: {Shoes: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bLuk,2;
+      bonus bMaxHPrate,10;
+      bonus bMaxSPrate,10;
+      bonus2 bSkillAtk,"MC_CARTREVOLUTION",50;
+  - Id: 300093
+    AegisName: Papila_Ruba_Card
+    Name: Papila Ruba Card
+    Type: Card
+    Weight: 10
+    Locations: {Shoes: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bInt,2;
+      bonus bMaxHPrate,10;
+      bonus bMaxSPrate,10;
+      bonus2 bSkillAtk,"AL_HOLYLIGHT",50;
+  - Id: 300094
+    AegisName: Papila_Ruba_H_Card
+    Name: Senior Papila Ruba Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Hand: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      if (getiteminfo(getequipid(EQI_HAND_R), ITEMINFO_VIEW) == W_2HSWORD) {
+         bonus bCritAtkRate,20;
+      }
+      bonus bCritAtkRate,2*(getrefine()/2);
+  - Id: 300095
+    AegisName: Papila_Cae_Card
+    Name: Papila Cae Card
+    Type: Card
+    Weight: 10
+    Locations: {Shoes: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bDex,2;
+      bonus bMaxHPrate,10;
+      bonus bMaxSPrate,10;
+      bonus2 bSkillAtk,"AC_SHOWER",25;
+  - Id: 300096
+    AegisName: Papila_Cae_H_Card
+    Name: Senior Papila Cae Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Hand: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      .@r = getrefine();
+      if (getiteminfo(getequipid(EQI_HAND_R), ITEMINFO_VIEW) == W_MUSICAL || getiteminfo(getequipid(EQI_HAND_R), ITEMINFO_VIEW) == W_WHIP) {
+         bonus bMatk,20;
+      }
+      if (.@r>=10) {
+         bonus bVariableCastrate,-10;
+         bonus bMatk,20;
+      }
+      if (getallrefine() >= 26) {
+         bonus bMatk,20;
+      }
+  - Id: 300097
+    AegisName: Aries_Card
+    Name: Aries Card
+    Type: Card
+    Weight: 10
+    Locations: {Shoes: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bAgi,2;
+      bonus bMaxHPrate,10;
+      bonus bMaxSPrate,10;
+      bonus2 bSkillAtk,"TF_POISON",25;
+  - Id: 300098
+    AegisName: Aries_H_Card
+    Name: Senior Aries Card
+    Type: Card
+    Weight: 10
+    Locations: {Garment: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bMatk,5;
+      bonus2 bSkillAtk,"NJ_KOUENKA",10;
+      bonus2 bSkillAtk,"NJ_HYOUSENSOU",10;
+      bonus2 bSkillAtk,"NJ_HUUJIN",10;
+      if (getrefine()>=7) {
+         bonus bVariableCastrate,-5;
+      }
+  - Id: 300099
+    AegisName: Silva_Papilia_Card
+    Name: Silva Papilia Card
+    Type: Card
+    Weight: 10
+    Locations: {Left_Hand: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bSubClass,Class_Normal,20;
+      bonus bHealPower2,15;
+  - Id: 300100
+    AegisName: Gran_Papilia_Card
+    Name: Gran Papilia Card
+    Type: Card
+    Weight: 10
+    Locations: {Left_Hand: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bSubClass,Class_Boss,25;
+      bonus bHealPower2,30;
   - Id: 300101
     AegisName: Beta_Cleaner_Card
     Name: Broken Cleaner Card
@@ -130248,6 +130637,17 @@ Body:
     Type: Armor
     Locations: {Costume_Head: true}
     View: 2021
+  - Id: 400127
+    AegisName: Ep18_Mini_Elly
+    Name: Mini Elly
+    Type: Armor
+    Buy: 500
+    Sell: 166
+    Locations: {Head_Top: true}
+    ArmorLevel: 1
+    Refineable: true
+    View: 2077
+    Trade: {NoDrop: true, NoTrade: true, NoSell: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
   - Id: 400128
     AegisName: C_Ep18_Mini_Elly
     Name: Costume Dropping Elly
@@ -139345,12 +139745,87 @@ Body:
       .@r = getrefine();
       bonus2 bSkillAtk,"GS_GROUNDDRIFT",6*(.@r/2);
       bonus bLongAtkRate,3*(.@r/4);
+  - Id: 1000092
+    AegisName: ELYUMINA_RADAR
+    Name: Elyumina Radar
+    Weight: 10
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+  - Id: 1000093
+    AegisName: PITAYA_TAIL_R
+    Name: Red Pitaya Tail
+    Weight: 10
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+  - Id: 1000094
+    AegisName: PITAYA_TAIL_Y
+    Name: Yellow Pitaya Tail
+    Weight: 10
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+  - Id: 1000095
+    AegisName: PITAYA_TAIL_B
+    Name: Blue Pitaya Tail
+    Weight: 10
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+  - Id: 1000096
+    AegisName: PITAYA_TAIL_G
+    Name: Green Pitaya Tail
+    Weight: 10
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+  - Id: 1000097
+    AegisName: PITAYA_TAIL_P
+    Name: Purple Pitaya Tail
+    Weight: 10
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+  - Id: 1000098
+    AegisName: PITAYA_TAIL_BOSS
+    Name: Boss Pitaya Tail
+    Weight: 10
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+  - Id: 1000099
+    AegisName: GARDENERS_COOKIE
+    Name: Gardener's Cookie
+    Weight: 10
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+  - Id: 1000100
+    AegisName: FREEZING_TRAP
+    Name: Freezing Trap
+    Weight: 10
+    Trade: {NoDrop: true, NoTrade: true, NoSell: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+  - Id: 1000101
+    AegisName: AUTODOLL_PARTS
+    Name: Autodoll Parts
+    Weight: 10
+    Trade: {NoDrop: true, NoTrade: true, NoSell: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+  - Id: 1000102
+    AegisName: EMERGENCY_KEY
+    Name: Emergency Key
+    Weight: 10
+    Trade: {NoDrop: true, NoTrade: true, NoSell: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+  - Id: 1000103
+    AegisName: BarMealTicket
+    Name: Barmil Ticket
+    Flags: {BuyingStore: true}
+  - Id: 1000104
+    AegisName: Magical_Igni_Stone
+    Name: Magical Soapstone
+    Trade: {NoDrop: true, NoTrade: true, NoSell: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
   - Id: 1000225
     AegisName: GAMJammingChip
     Name: Potato Chips
     Buy: 250
     Sell: 125
     Weight: 10
+  - Id: 1000226
+    AegisName: Broken_Dollcore
+    Name: Core of a Broken Doll
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+  - Id: 1000231
+    AegisName: Broken_AutoDoll_Parts
+    Name: Parts of Broken Automatic Doll
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+  - Id: 1000232
+    AegisName: Autodoll_Communicator
+    Name: Communication Chip of Automatic Doll
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
   - Id: 1000322
     AegisName: Etel_Dust
     Name: Etel Dust
