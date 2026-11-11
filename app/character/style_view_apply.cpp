@@ -328,13 +328,14 @@ void StyleView::ApplyVerb(const ro::ui::PaletteEditorAction& asked, ro::net::Con
       break;
     case ro::ui::PaletteEditorVerb::kBlankSlate:
       if (const LayerTab* tab = OpenLayer()) {
-        std::vector<LayerEdit> neutral(tab->ramps.size());
-        for (std::size_t rank = 0; rank < neutral.size(); ++rank) {
-          neutral[rank].rank = rank;
-        }
-        layers_.Set(tab->at, tab->profile, neutral);
+        layers_.Blank(tab->at, tab->profile);
       } else {
         session_.BlankSlate();
+        // ⚠ LE CORPS MONTRE AUSSI SA SUITE ET SON RESTE : ils repartent de zéro
+        // avec ses pièces.
+        if (body_more_.at.key != 0) {
+          layers_.Blank(body_more_.at, body_more_.profile);
+        }
       }
       break;
     case ro::ui::PaletteEditorVerb::kUndo:

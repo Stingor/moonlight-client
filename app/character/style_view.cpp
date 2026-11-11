@@ -388,7 +388,20 @@ void StyleView::Refresh(const ro::sim::World& world, ro::ui::PaletteEditorState&
   ro::render::ActorLook look = edited.look;
   const ro::render::PaletteRecipe& shown = Shown(state);
   Impose(shown, look);
-  const ro::render::ActorWardrobe::BodyRamps& body = doll_->Measure(look, session_.body_key());
+  // Le pantin peint sur cette mesure-ci : celle de ce qu'il montre.
+  const ro::render::ActorWardrobe::BodyRamps& measured = doll_->Measure(look, session_.body_key());
+  // 🔴 UN PRÉRÉGLAGE SURVOLÉ NE CHANGE QUE LE PANTIN. Sa teinte de base
+  // redécouperait les pièces ; la liste changerait de hauteur, la fenêtre de
+  // taille, la ligne survolée glisserait sous la souris, et l'aperçu
+  // s'éteindrait pour se rallumer à l'image suivante, sans fin. La liste et les
+  // onglets restent donc sur la recette qu'on règle.
+  const bool previewing = shown_key_.source == kShowsPreset;
+  ro::render::ActorLook settled_look = edited.look;
+  if (previewing) {
+    Impose(session_.recipe(), settled_look);
+    listed_body_ = wardrobe_->BodyRampsFor(settled_look);
+  }
+  const ro::render::ActorWardrobe::BodyRamps& body = previewing ? listed_body_ : measured;
   RefreshPieces(body, worn);
 
   // ── LES CALQUES PORTÉS ───────────────────────────────────────────────────
@@ -400,7 +413,16 @@ void StyleView::Refresh(const ro::sim::World& world, ro::ui::PaletteEditorState&
   full.cash_mount = look.cash_mount;
   full.body_style = look.body_style;
   Impose(shown, full);
-  RefreshTabs(full, world);
+  // Les onglets, eux aussi, sur la recette qu'on règle : une coupe essayée par
+  // un préréglage survolé changerait la clé de la tête.
+  ro::render::ActorLook settled_full = full;
+  if (previewing) {
+    settled_full.job = settled_look.job;
+    settled_full.cash_mount = settled_look.cash_mount;
+    settled_full.body_style = settled_look.body_style;
+    Impose(session_.recipe(), settled_full);
+  }
+  RefreshTabs(previewing ? settled_full : full, world);
   // 🔴 L'ONGLET DEMANDÉ, S'IL EST LÀ ET RÉGLABLE : un chapeau ôté ramène au
   // corps.
   const LayerTab* asked_tab = TabOf(state.tab);

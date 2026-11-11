@@ -450,6 +450,9 @@ class StyleView {
   int retouches_most_ = 0;
   // La suite et le reste du corps, comme un onglet de calque caché sous Corps.
   LayerTab body_more_;
+  // Les pièces de la recette qu'on règle, mesurées à part pendant qu'un
+  // préréglage survolé occupe le pantin : la vue en lit les rampes.
+  ro::render::ActorWardrobe::BodyRamps listed_body_;
   // Les rangées de la vue : pièces puis reste, pour un calque comme pour le
   // corps.
   std::vector<ro::render::PaletteRamp> layer_rows_;

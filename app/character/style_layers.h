@@ -89,6 +89,9 @@ class StyleLayers {
   void Put(const ro::render::LayerDye& dye);
   // Revenir à ce que ce calque porte.
   void BackToWorn(LayerAt at);
+  // REPARTIR DE ZÉRO sur ce calque, en un pas : les pièces, le reste et les
+  // retouches à neutre, ce que le sprite montre sans teinture.
+  void Blank(LayerAt at, std::uint8_t profile);
   // Revenir à ce que TOUS les calques portent, en un pas.
   void BackToWornAll();
 

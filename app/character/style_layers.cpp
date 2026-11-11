@@ -122,6 +122,16 @@ void StyleLayers::Replace(LayerAt at, ro::render::LayerDye dye, std::uint32_t st
   Step(before, stroke);
 }
 
+void StyleLayers::Blank(LayerAt at, std::uint8_t profile) {
+  // 🔴 TOUT CE QUE LA TEINTURE PORTE, et pas seulement les pièces : le reste
+  // et les retouches resteraient sinon sur un calque qui se dit remis à zéro.
+  ro::render::LayerDye dye = Current(at, profile);
+  dye.adjusts = {};
+  dye.rest = {};
+  dye.retouches.clear();
+  Replace(at, std::move(dye), 0);
+}
+
 void StyleLayers::Put(const ro::render::LayerDye& dye) {
   const Edits before = edits_;
   edits_[AtOf(dye)] = dye;
