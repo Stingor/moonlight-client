@@ -14,21 +14,27 @@
 //  - l'état que certains cas donnent au lanceur (NPC_COMET, WL_COMET,
 //    RK_DEATHBOUND, WL_FROSTMISTY) ;
 //  - les sons propres de RA_ELECTRICSHOCKER, RA_FIRINGTRAP et NC_FLAMELAUNCHER ;
-//  - les cas qui calculent : le souffle des dragons par quart de vue, les
-//    éclats éparpillés de WL_JACKFROST et NC_ARMSCANNON, la rotation de
+//  - les cas qui calculent : les éclats éparpillés de WL_JACKFROST et
+//    NC_ARMSCANNON, la rotation de
 //    MH_GLANZEN_SPIES, le délai tiré de la cadence du lanceur des rayons de
 //    genèse, et le canon de GN_CARTCANNON.
 
 #include <algorithm>
 #include <array>
+#include <cstddef>
 #include <cstdint>
 #include <initializer_list>
+#include <string_view>
 
+#include "ro/render/ground_skill_visual.h"
+#include "ro/render/map_effect_math.h"
 #include "ro/sim/movement.h"
 #include "ro/sim/world.h"
 
 #include "effects/effect_view.h"
+#include "world/actor_sounds.h"
 #include "world/actor_view.h"
+#include "world/hit_popup_rules.h"
 
 namespace moonclient {
 namespace {
@@ -96,6 +102,59 @@ constexpr std::int16_t kSplasherBurstLevel = -1;
 
 // Le délai que Fallen Empire donne à son effet.
 constexpr std::uint32_t kFallenEmpireDelayMs = 100;
+
+// LE SOUFFLE D'UN DRAGON : une gueule sur le lanceur, tournée selon l'angle sous
+// lequel la vue le montre, puis le souffle sur la cible.
+struct Breath {
+  // La gueule pour chaque quart de vue : ]0, 90[, [90, 180[, [180, 270[, puis le
+  // reste du tour.
+  std::array<std::uint32_t, 4> mouth_by_quarter{};
+  // Ce qui s'ajoute au numéro de la gueule sous `/mineffect`.
+  std::uint32_t minimal_mouth_shift = 0;
+  // Le souffle sur la cible, complet puis allégé.
+  std::array<std::uint32_t, 2> full_blast{};
+  std::uint32_t minimal_blast = 0;
+};
+
+constexpr Breath kFireBreath{.mouth_by_quarter = {1381, 1380, 1383, 1382},
+                             .minimal_mouth_shift = 141,
+                             .full_blast = {1378, 1379},
+                             .minimal_blast = 1520};
+constexpr Breath kWaterBreath{.mouth_by_quarter = {1389, 1388, 1391, 1390},
+                              .minimal_mouth_shift = 139,
+                              .full_blast = {1386, 1387},
+                              .minimal_blast = 1526};
+
+constexpr std::uint16_t kNpcDragonBreath = 731;
+constexpr std::uint16_t kRuneKnightDragonBreath = 2008;
+constexpr std::uint16_t kRuneKnightDragonBreathWater = 5004;
+
+// La gueule attend le lanceur, le souffle un peu plus.
+constexpr std::uint32_t kBreathMouthDelayMs = 200;
+constexpr std::uint32_t kBreathBlastDelayMs = 350;
+
+// Le bruit du souffle, poussé au centre de la carte comme tous ceux de ce
+// paquet : il s'entend d'où l'on est, pas de la cible.
+constexpr std::string_view kBreathSound = "effect\\폭염룡.wav";
+
+constexpr float kQuarterDegrees = 90.0F;
+constexpr float kHalfTurnDegrees = 180.0F;
+constexpr float kThreeQuartersDegrees = 270.0F;
+constexpr float kFullTurnDegrees = 360.0F;
+
+// Le quart de vue d'un angle déjà ramené une fois dans le tour.
+std::size_t QuarterOf(float view_degrees) {
+  if (view_degrees > 0.0F && view_degrees < kQuarterDegrees) {
+    return 0;
+  }
+  if (view_degrees >= kQuarterDegrees && view_degrees < kHalfTurnDegrees) {
+    return 1;
+  }
+  if (view_degrees >= kHalfTurnDegrees && view_degrees < kThreeQuartersDegrees) {
+    return 2;
+  }
+  return 3;
+}
 
 }  // namespace
 
@@ -194,6 +253,49 @@ void EffectsInPlay::PlayNotifySkillCases(const ro::sim::World& world, const MapS
     case kSuraFallenEmpire:
       spawn_on(*target, Spawn{.effect_id = 1572, .delay_ms = kFallenEmpireDelayMs});
       return;
+    case kNpcDragonBreath:
+    case kRuneKnightDragonBreath:
+    case kRuneKnightDragonBreathWater: {
+      // Sans lanceur à l'écran, ni gueule ni souffle.
+      if (caster == nullptr) {
+        return;
+      }
+      const Breath& breath =
+          strike.skill_id == kRuneKnightDragonBreathWater ? kWaterBreath : kFireBreath;
+      const float body_degrees =
+          ClientBodyDegrees(*caster, ro::sim::FacingAt(*caster, planner.PathFor(*caster), now_ms));
+      float view_degrees = ro::render::GroundSkillViewAngleDegrees(
+          camera_ ? camera_->yaw_degrees : 0.0F, body_degrees);
+      if (view_degrees >= kFullTurnDegrees) {
+        view_degrees -= kFullTurnDegrees;
+      }
+      std::uint32_t mouth = breath.mouth_by_quarter[QuarterOf(view_degrees)];
+      if (minimal_effects_) {
+        mouth += breath.minimal_mouth_shift;
+      }
+      // UNE SEULE GUEULE À LA FOIS sur le lanceur, même attendue.
+      const bool awaited = std::ranges::any_of(per_map_.pending_hits, [&](const PendingHit& due) {
+        return due.effect_id == mouth && due.target_id == caster->id;
+      });
+      if (!awaited && !Carries(mouth, caster->id)) {
+        spawn_on(*caster, Spawn{.effect_id = mouth, .delay_ms = kBreathMouthDelayMs});
+      }
+      if (minimal_effects_) {
+        spawn_on(*target,
+                 Spawn{.effect_id = breath.minimal_blast, .delay_ms = kBreathBlastDelayMs});
+      } else {
+        for (const std::uint32_t blast : breath.full_blast) {
+          spawn_on(*target, Spawn{.effect_id = blast, .delay_ms = kBreathBlastDelayMs});
+        }
+      }
+      const ro::render::MapEffectFrame client_frame{stage.scene.gnd.width(),
+                                                    stage.scene.gnd.height()};
+      const glm::vec3 centre = client_frame.ToWorld(glm::vec3(0.0F));
+      SownNamedSound heard{kBreathSound, target->position};
+      heard.point = std::array<float, 3>{centre.x, centre.y, centre.z};
+      per_map_.just_sown_named_sounds.push_back(heard);
+      return;
+    }
     default:
       break;
   }
