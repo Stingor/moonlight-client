@@ -30,6 +30,9 @@ class SpriteEffect final : public EffectClassInstance {
     if (recipe.life == SpriteEffectLife::kFixedTicks) {
       duration_ticks_ = kSpriteEffectFixedLifeTicks;
     }
+    // Un sprite qui vit tant que son porteur est là ne s'empile pas : le
+    // redemander sur le même porteur rend celui qui boucle déjà.
+    reused_on_same_owner_ = recipe.life == SpriteEffectLife::kWhileBearer;
   }
   [[nodiscard]] bool Alive(const EffectClassTick& tick) const override {
     switch (recipe_.life) {
