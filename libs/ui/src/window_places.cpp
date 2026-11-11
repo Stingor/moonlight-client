@@ -329,6 +329,20 @@ void WindowPlacer::Place(float interface_scale) {
       }
     }
 
+    // 🔴 UNE FENÊTRE À LA TAILLE DE SON CONTENU S'ANCRE PAR SA BARRE DE TITRE :
+    // ancrée au bas ou au centre, elle bougerait sous la souris à chaque ligne
+    // qui paraît ou disparaît — un onglet changé, une section dépliée. La place
+    // passe une fois au coin haut-gauche, là où la fenêtre se trouve à l'instant.
+    if (!size_follows && (wanted->second.across != AnchorSide::kStart ||
+                          wanted->second.down != AnchorSide::kStart)) {
+      const Shown now =
+          ShownOf(wanted->second, screen, scale, &window->SizeFull, capped, window->TitleBarHeight);
+      wanted->second.across = AnchorSide::kStart;
+      wanted->second.down = AnchorSide::kStart;
+      wanted->second.offset_x = now.at.x / scale;
+      wanted->second.offset_y = now.at.y / scale;
+      ++revision_;
+    }
     const Shown shown =
         ShownOf(wanted->second, screen, scale, size_follows ? nullptr : &window->SizeFull, capped,
                 window->TitleBarHeight);
