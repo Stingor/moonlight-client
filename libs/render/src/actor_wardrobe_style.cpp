@@ -143,6 +143,17 @@ void ActorWardrobe::Tint(const ActorLook& look, ActorPart part, const formats::P
   ActorPalettes::Piece wanted{.race = RaceOf(look), .skin = skin};
   switch (part) {
     case ActorPart::kBody:
+      // UN CORPS NON JOUEUR se teint sous la clé de sa classe : c'est un
+      // compagnon. Un objet au sol n'a pas de style.
+      if (!look.player) {
+        if (look.item) {
+          return;
+        }
+        wanted.layer = StyleLayer::kCompanion;
+        wanted.key = look.job;
+        wanted.skin = false;
+        break;
+      }
       if (gm_outfit) {
         return;
       }

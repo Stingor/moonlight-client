@@ -47,7 +47,17 @@ enum class StyleLayer : std::uint8_t {
   // LA PEAU DU CORPS, propre à moonclient : les bras et les jambes d'un corps,
   // sous la clé de ce corps, comme un vêtement porté par-dessus. Un corps sans
   // la sienne prend la peau du visage (`kSkin`) : voir `StyleSet::SkinOf`.
-  kBodySkin = 6
+  kBodySkin = 6,
+  // LE CORPS D'UN COMPAGNON — homoncule ou familier —, sous la clé de sa CLASSE.
+  // Il se découpe comme une coiffe, sur la palette embarquée de son sprite :
+  // aucun compagnon n'a de palette officielle ni de peau. La clé rend la
+  // teinture inerte sur un autre sprite : un compagnon qui évolue change de
+  // classe et garde ses couleurs d'origine.
+  //
+  // ⚠ LA TEINTURE APPARTIENT À L'ACTEUR, jamais au fichier : un familier
+  // porte le sprite de son monstre, et seul l'acteur qui reçoit ce style est
+  // teint.
+  kCompanion = 7
 };
 
 // Le nombre de réglages d'une teinture : un par classe de teinte au profil 2,
