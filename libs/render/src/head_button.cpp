@@ -305,6 +305,9 @@ ActorLook HeadLookOf(const StatusHeadKey& key) {
   look.sex = key.sex;
   look.hair = key.hair;
   look.hair_palette = key.hair_palette;
+  look.style = key.style;
+  look.gm_outfit = key.gm_outfit;
+  look.orc_head = key.orc_head;
   return look;
 }
 

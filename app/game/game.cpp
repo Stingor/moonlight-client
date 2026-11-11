@@ -506,9 +506,10 @@ void Game::DrawInterface(std::uint32_t now_ms) {
                 pieces_.game_images.has_value() ? &*pieces_.game_images : nullptr, now_ms)
           : std::nullopt;
   AdvanceHoveredDollEffect(now_ms);
-  ComposeMenuIcons(
-      windows_.menu_icons.icons, pieces_.game_images.has_value() ? &*pieces_.game_images : nullptr,
-      settings_->bindings(), MenuIconFactsOf(world_, windows_, pieces_, ticket_.character_id));
+  ComposeMenuIcons(windows_.menu_icons.icons,
+                   pieces_.game_images.has_value() ? &*pieces_.game_images : nullptr,
+                   settings_->bindings(),
+                   MenuIconFactsOf(world_, windows_, pieces_, styles_, ticket_.character_id));
   ComposeOptionSamples(now_ms);
   // LA PAGE « COMMANDS SETTINGS », seulement quand elle est sous les yeux : sa
   // liste nomme chaque item par la table.

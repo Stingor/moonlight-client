@@ -10,6 +10,7 @@
 #include "game/battleground_stage.h"
 #include "game/skin_image_of.h"
 #include "input/key_action.h"
+#include "world/actor_styles.h"
 #include "world/actor_view.h"
 
 namespace moonclient {
@@ -17,6 +18,7 @@ namespace moonclient {
 using ro::ui::MenuCommand;
 
 std::optional<ro::render::StatusHeadKey> StatusHeadKeyOf(const ro::sim::World& world,
+                                                         const ActorStyles& styles,
                                                          std::uint32_t character_id) {
   const ro::sim::Actor* self = world.player();
   if (self == nullptr) {
@@ -27,11 +29,15 @@ std::optional<ro::render::StatusHeadKey> StatusHeadKeyOf(const ro::sim::World& w
                                    .job = look.job,
                                    .sex = look.sex,
                                    .hair = look.hair,
-                                   .hair_palette = look.hair_palette};
+                                   .hair_palette = look.hair_palette,
+                                   .style = styles.Worn(self->id),
+                                   .gm_outfit = look.gm_outfit,
+                                   .orc_head = look.orc_head};
 }
 
 MenuIconFacts MenuIconFactsOf(const ro::sim::World& world, const UiStage::Windows& windows,
-                              GamePieces& pieces, std::uint32_t character_id) {
+                              GamePieces& pieces, const ActorStyles& styles,
+                              std::uint32_t character_id) {
   const std::string_view cash_shop_name = ro::vfs::CashShopName(pieces.item_words);
   const ro::sim::Actor* self = world.player();
   MenuIconFacts facts{
@@ -85,7 +91,7 @@ MenuIconFacts MenuIconFactsOf(const ro::sim::World& world, const UiStage::Window
   // LA TÊTE DU STATUT : refaite ici quand elle change, montrée tant qu'elle est
   // rendue. Sans garde-robe, le Statut garde son art.
   if (pieces.status_head.has_value() && pieces.wardrobe.has_value()) {
-    pieces.status_head->Refresh(StatusHeadKeyOf(world, character_id));
+    pieces.status_head->Refresh(StatusHeadKeyOf(world, styles, character_id));
     facts.status_head = SkinImageOf(pieces.status_head->normal());
     facts.status_head_pressed = SkinImageOf(pieces.status_head->pressed());
   }

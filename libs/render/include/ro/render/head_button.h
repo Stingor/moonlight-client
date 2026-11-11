@@ -132,6 +132,13 @@ struct StatusHeadKey {
   std::uint8_t sex = 0;
   std::uint16_t hair = 0;
   std::int16_t hair_palette = 0;
+  // 🔴 LE STYLE QUE LA CARTE LUI A POSÉ : sa teinture de cheveux et la peau de
+  // son visage. Un style validé prend un identifiant NEUF, donc refait l'image.
+  // Zéro tant que la carte ne l'a pas habillé : la tête d'origine.
+  std::uint32_t style = 0;
+  // Ce qui empêche le style de teindre la tête, comme sur la carte.
+  bool gm_outfit = false;
+  bool orc_head = false;
 
   [[nodiscard]] bool operator==(const StatusHeadKey&) const = default;
 };

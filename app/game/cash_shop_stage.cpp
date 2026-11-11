@@ -376,7 +376,8 @@ void CashShopStage::Advance(ro::ui::CashShopWindowState& state,
   // LE PANTIN DE L'APERÇU, composé pour la pièce que la fenêtre survolait.
   if (doll_.has_value()) {
     doll_->Refresh(world, state.doll_view, state.doll_location,
-                   hat_effects_.OrdinalOf(state.doll_item) != 0, state.doll, dressing, now_ms);
+                   hat_effects_.OrdinalOf(state.doll_item) != 0, DollDye::kNone, state.doll,
+                   dressing, now_ms);
   }
 
   if (shop_.open()) {

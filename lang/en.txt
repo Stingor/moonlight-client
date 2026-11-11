@@ -23745,3 +23745,6 @@ tr: Assassin guardians close a ring around the hero.
 
 fr: Rupture des cuves
 tr: Vat rupture
+
+fr: Pièce non affichée : montrée sans sa teinture.
+tr: Not displayed: shown without its dye.

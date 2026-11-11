@@ -85,6 +85,9 @@ struct DescriptionDollState {
   WheelGateState wheel;
   // La ligne est survolée à cette image : `app` compose le pantin.
   bool wanted = false;
+  // UN EXEMPLAIRE DU JOUEUR QUE LA CARTE NE MONTRE PAS : sa teinture n'est pas
+  // connue, la pièce se montre nue, et la bulle le dit. Posé par `app`.
+  bool dye_hidden = false;
 };
 
 // LA BULLE DU PANTIN, au-dessus du curseur : ni fond ni bord, seul le

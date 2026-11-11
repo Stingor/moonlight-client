@@ -67,6 +67,26 @@ namespace {
   return item;
 }
 
+// LA TEINTURE QUE LE PANTIN DONNE À LA PIÈCE DÉCRITE, selon d'où elle vient.
+// Un lien, la base de données ou l'équipement d'un autre ne sont pas des
+// exemplaires du joueur.
+[[nodiscard]] DollDye DollDyeOf(const ro::sim::World& world, const ro::sim::InventoryItem& held,
+                                ro::ui::ItemHolder from) {
+  switch (from) {
+    case ro::ui::ItemHolder::kInventory:
+    case ro::ui::ItemHolder::kEquipment:
+      return ShownByPlayer(world.inventory(), held) ? DollDye::kShown : DollDye::kHidden;
+    case ro::ui::ItemHolder::kCart:
+    case ro::ui::ItemHolder::kStorage:
+      return DollDye::kHidden;
+    case ro::ui::ItemHolder::kViewedEquipment:
+    case ro::ui::ItemHolder::kCardAlbum:
+    case ro::ui::ItemHolder::kChatLink:
+      break;
+  }
+  return DollDye::kNone;
+}
+
 }  // namespace
 
 void DescriptionView::Refresh(const ro::sim::World& world, std::uint32_t item_id,
@@ -156,12 +176,14 @@ void DescriptionView::Refresh(const ro::sim::World& world, std::uint32_t item_id
   held_cards_ = {};
   held_view_ = 0;
   held_wearable_ = 0;
+  held_dye_ = DollDye::kNone;
   if (held != nullptr && held->item_id == item_id) {
     ComposeInstance(*held);
     held_refine_ = held->refine_level;
     held_cards_ = held->cards;
     held_view_ = held->view_id;
     held_wearable_ = held->wearable_at;
+    held_dye_ = DollDyeOf(world, *held, from);
   }
   view_.readable_book = books_.Readable(world, item_id);
   view_.view_id = held_view_;
@@ -213,7 +235,8 @@ void DescriptionView::RefreshDoll(const ro::sim::World& world, ro::ui::Descripti
     state.image = ro::ui::SkinImage{};
     return;
   }
-  doll_->Refresh(world, held_view_, held_wearable_, with_effect, state, dressing, now_ms);
+  doll_->Refresh(world, held_view_, held_wearable_, with_effect, held_dye_, state, dressing,
+                 now_ms);
 }
 
 void DescriptionView::EnableComparison() {

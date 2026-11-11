@@ -235,6 +235,24 @@ void DrawDescriptionPanels(DescriptionWindowState& state, const DescriptionView&
   }
 }
 
+namespace {
+
+// LA BULLE N'A PAS DE FOND : la ligne porte le sien, sinon elle se lirait sur
+// le décor.
+void DrawDollDyeHidden() {
+  constexpr ImU32 kNoteBackground = IM_COL32(0, 0, 0, 170);
+  const char* note = core::Tr("Pièce non affichée : montrée sans sa teinture.");
+  const ImVec2 at = ImGui::GetCursorScreenPos();
+  const ImVec2 size = ImGui::CalcTextSize(note);
+  const ImVec2 pad = ImGui::GetStyle().FramePadding;
+  ImGui::GetWindowDrawList()->AddRectFilled(ImVec2(at.x - pad.x, at.y - pad.y),
+                                            ImVec2(at.x + size.x + pad.x, at.y + size.y + pad.y),
+                                            kNoteBackground);
+  ImGui::TextUnformatted(note);
+}
+
+}  // namespace
+
 void DrawItemDollTooltip(const DescriptionDollState& doll) {
   // Juste au-dessus du curseur, un peu à gauche : le pantin se tient au bas
   // de sa boîte, ses pieds près du curseur.
@@ -269,6 +287,9 @@ void DrawItemDollTooltip(const DescriptionDollState& doll) {
     if (overlaid) {
       call.pass = DollOverlayPass::kFront;
       PaintDollOverlay(doll.overlay, call);
+    }
+    if (doll.dye_hidden) {
+      DrawDollDyeHidden();
     }
     ImGui::EndTooltip();
   }

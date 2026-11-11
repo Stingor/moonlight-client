@@ -262,6 +262,8 @@ class DescriptionView {
   int held_refine_ = -1;
   std::uint16_t held_view_ = 0;
   std::uint32_t held_wearable_ = 0;
+  // La teinture que le pantin donne à la pièce décrite : voir `DollDye`.
+  DollDye held_dye_ = DollDye::kNone;
   std::optional<ItemDoll> doll_;
   BookReader books_;
   std::array<std::uint32_t, 4> held_cards_{};

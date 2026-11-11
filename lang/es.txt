@@ -23745,3 +23745,6 @@ tr: Unos guardianes asesinos cierran un anillo alrededor del héroe.
 
 fr: Rupture des cuves
 tr: Rotura de cubas
+
+fr: Pièce non affichée : montrée sans sa teinture.
+tr: Pieza no mostrada: se ve sin su tinte.

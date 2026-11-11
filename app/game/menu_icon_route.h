@@ -17,6 +17,7 @@
 
 namespace moonclient {
 
+class ActorStyles;
 class CashShopStage;
 class AchievementStage;
 class QuestStage;
@@ -39,7 +40,7 @@ class MvpTrackerStage;
 // — voir `StatusHeadKeyOf` —, et seulement alors.
 [[nodiscard]] MenuIconFacts MenuIconFactsOf(const ro::sim::World& world,
                                             const UiStage::Windows& windows, GamePieces& pieces,
-                                            std::uint32_t character_id);
+                                            const ActorStyles& styles, std::uint32_t character_id);
 
 // CE QUI DÉCIDE DE LA TÊTE DU STATUT : celle du personnage du joueur, avec la
 // coiffure et la couleur que son acteur porte, comme sur la carte. Rien tant
@@ -48,7 +49,11 @@ class MvpTrackerStage;
 // ⚠ PAS CELLES DE SA RECETTE : le serveur a posé lui-même la coupe et la
 // couleur choisies, et celles du lot datent de la dernière validation — après
 // un passage chez le styliste, elles remettraient l'ancienne coupe.
+//
+// 🔴 MAIS LE STYLE QUE LA CARTE LUI PORTE, par `ActorStyles::Worn` : la tête du
+// bouton a la teinture de cheveux et la peau du visage qu'il a en jeu.
 [[nodiscard]] std::optional<ro::render::StatusHeadKey> StatusHeadKeyOf(const ro::sim::World& world,
+                                                                       const ActorStyles& styles,
                                                                        std::uint32_t character_id);
 
 // Ce qu'un clic peut toucher.

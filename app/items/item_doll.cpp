@@ -4,6 +4,7 @@
 
 #include "ro/render/sprite_frame.h"
 #include "ro/sim/equip_location.h"
+#include "ro/sim/inventory.h"
 #include "ro/sim/world.h"
 
 #include "world/actor_view.h"
@@ -51,7 +52,58 @@ constexpr std::size_t kLowRank = 0;
 constexpr std::size_t kMidRank = 1;
 constexpr std::size_t kTopRank = 2;
 
+// LE BIT DE COSTUME QUI COUVRE CHAQUE PLACE QUI SE VOIT.
+struct CostumeCover {
+  std::uint32_t worn = 0;
+  std::uint32_t costume = 0;
+};
+constexpr std::array<CostumeCover, 4> kCostumeCovers = {
+    CostumeCover{.worn = ro::sim::kEquipHeadTop, .costume = ro::sim::kEquipCostumeHeadTop},
+    CostumeCover{.worn = ro::sim::kEquipHeadMid, .costume = ro::sim::kEquipCostumeHeadMid},
+    CostumeCover{.worn = ro::sim::kEquipHeadLow, .costume = ro::sim::kEquipCostumeHeadLow},
+    CostumeCover{.worn = ro::sim::kEquipGarment, .costume = ro::sim::kEquipCostumeGarment}};
+
+// Ôte de l'apparence la pièce qui donne cette apparence : son style ne
+// portera pas sa teinture.
+void TakeOffView(ro::render::ActorLook& look, std::uint16_t view_id, DollLayer layer) {
+  if (layer == DollLayer::kGarment) {
+    if (look.robe == view_id) {
+      look.robe = 0;
+    }
+    return;
+  }
+  for (auto& headgear : look.headgears) {
+    if (headgear == view_id) {
+      headgear = 0;
+    }
+  }
+}
+
 }  // namespace
+
+bool ShownByPlayer(const ro::sim::Inventory& inventory, const ro::sim::InventoryItem& held) {
+  if (held.worn_at == 0 || held.view_id == 0) {
+    return false;
+  }
+  if (ro::sim::IsCostumeLocation(held.worn_at)) {
+    return true;
+  }
+  // 🔴 UN COSTUME QUI DONNE UNE APPARENCE COUVRE LA PIÈCE DESSOUS : c'est la
+  // sienne que le serveur envoie, et la teinture de la pièce couverte reste à
+  // la base.
+  std::uint32_t covers = 0;
+  for (const CostumeCover& cover : kCostumeCovers) {
+    if ((held.worn_at & cover.worn) != 0) {
+      covers |= cover.costume;
+    }
+  }
+  for (const ro::sim::InventoryItem& other : inventory.items()) {
+    if ((other.worn_at & covers) != 0 && other.view_id != 0) {
+      return false;
+    }
+  }
+  return true;
+}
 
 ItemDoll::ItemDoll(ro::render::ActorWardrobe* wardrobe) : wardrobe_(wardrobe) {
   if (wardrobe_ != nullptr) {
@@ -68,12 +120,13 @@ ro::render::VignetteFraming ItemDoll::framing() const noexcept {
 }
 
 void ItemDoll::Refresh(const ro::sim::World& world, std::uint16_t view_id,
-                       std::uint32_t wearable_at, bool with_effect,
+                       std::uint32_t wearable_at, bool with_effect, DollDye dye,
                        ro::ui::DescriptionDollState& state, ActorStyles& dressing,
                        std::uint32_t now_ms) {
   state.image = ro::ui::SkinImage{};
   state.overlay = ro::ui::DollOverlay{};
   state.body_overlaid = false;
+  state.dye_hidden = false;
   body_.reset();
   // Une pièce sans place sur le corps ne se porte pas : nu, sauf son effet.
   const DollLayer layer = view_id == 0 ? DollLayer::kNone : LayerOf(wearable_at);
@@ -84,6 +137,13 @@ void ItemDoll::Refresh(const ro::sim::World& world, std::uint16_t view_id,
   }
   ro::render::ActorVignette::Pose pose;
   pose.look = LookOf(*player);
+  // 🔴 LA PIÈCE ESSAYÉE N'EMPRUNTE PAS LA TEINTURE D'UNE AUTRE : une teinture
+  // se range sous l'apparence, et un chapeau du sac pareil à celui qu'on porte
+  // prendrait sinon la couleur de celui-ci.
+  if (dye != DollDye::kShown && layer != DollLayer::kNone) {
+    TakeOffView(pose.look, view_id, layer);
+  }
+  state.dye_hidden = dye == DollDye::kHidden && layer != DollLayer::kNone;
   // SES COULEURS AVANT DE LE DÉSHABILLER : c'est le corps qui choisit la
   // variante, et aucune des pièces retirées ci-dessous ne le change.
   if (wardrobe_ != nullptr) {

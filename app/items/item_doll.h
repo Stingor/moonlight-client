@@ -5,6 +5,7 @@
 
 #include "ro/render/actor_vignette.h"
 #include "ro/render/actor_wardrobe.h"
+#include "ro/sim/inventory.h"
 #include "ro/sim/world_fwd.h"
 #include "ro/ui/description_window.h"
 
@@ -12,6 +13,22 @@
 #include "world/actor_styles.h"
 
 namespace moonclient {
+
+// LA TEINTURE QUE LE PANTIN DONNE À LA PIÈCE ESSAYÉE.
+enum class DollDye : std::uint8_t {
+  // Celle que le joueur porte et montre : sa teinture d'exemplaire.
+  kShown,
+  // Un de ses exemplaires que la carte ne montre pas : nu, faute de teinture
+  // connue, et la bulle le dit.
+  kHidden,
+  // Une pièce qui n'est pas à lui, ou pas un exemplaire : nue.
+  kNone
+};
+
+// LA PIÈCE EST-ELLE CELLE QUE LE JOUEUR MONTRE ? Portée par lui, et pas
+// couverte par un costume qui donne une apparence à la même place.
+[[nodiscard]] bool ShownByPlayer(const ro::sim::Inventory& inventory,
+                                 const ro::sim::InventoryItem& held);
 
 // LE PERSONNAGE DU JOUEUR QUI PORTE UNE PIÈCE, pour l'aperçu du « ViewID ».
 //
@@ -41,9 +58,15 @@ class ItemDoll {
   // `dressing` : le registre des couleurs de la carte, pour que le pantin porte
   // celles du joueur. ⚠ LE MÊME QUE LA CARTE, et non un à lui : deux registres
   // donneraient deux identifiants pour une recette, donc deux tenues.
+  //
+  // 🔴 `dye` DIT D'OÙ VIENT LA PIÈCE. Une teinture appartient à l'EXEMPLAIRE,
+  // et le serveur ne l'envoie que pour ce qui est affiché, sous l'apparence.
+  // La pièce que le joueur porte et montre garde donc la sienne ; toute autre —
+  // une du sac, de la boutique, d'un lien ou d'un autre joueur — se montre NUE,
+  // même quand le joueur affiche la même apparence teinte.
   void Refresh(const ro::sim::World& world, std::uint16_t view_id, std::uint32_t wearable_at,
-               bool with_effect, ro::ui::DescriptionDollState& state, ActorStyles& dressing,
-               std::uint32_t now_ms);
+               bool with_effect, DollDye dye, ro::ui::DescriptionDollState& state,
+               ActorStyles& dressing, std::uint32_t now_ms);
 
   // OÙ LE PANTIN EST TOMBÉ DANS SA BOÎTE : c'est ce que l'effet de chapeau suit.
   // Inutilisable tant que rien n'a été dessiné.
