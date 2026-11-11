@@ -163,10 +163,6 @@ add_subdirectory(libs/ui)
 if(MOONCLIENT_PLATFORM_LAYERS)
   add_subdirectory(libs/audio)
   add_subdirectory(app)
-  # L'outil hors-jeu produit des images : il passe par le renderer OpenGL.
-  if(EXISTS "${CMAKE_SOURCE_DIR}/tools/roc-cli/CMakeLists.txt")
-    add_subdirectory(tools/roc-cli)
-  endif()
   # Le décor de l'écran de connexion peint hors écran : la preuve d'image de
   # qui retouche sa scène.
   if(EXISTS "${CMAKE_SOURCE_DIR}/tools/backdrop-bench/CMakeLists.txt")
@@ -176,6 +172,13 @@ if(MOONCLIENT_PLATFORM_LAYERS)
   if(EXISTS "${CMAKE_SOURCE_DIR}/tools/table-editor/CMakeLists.txt")
     add_subdirectory(tools/table-editor)
   endif()
+endif()
+
+# L'outil hors-jeu. Avec les couches de plateforme, il produit ses images par le
+# renderer OpenGL ; sans elles, il n'est que l'avatar du site, composé en
+# mémoire, pour un serveur web sans écran.
+if(EXISTS "${CMAKE_SOURCE_DIR}/tools/roc-cli/CMakeLists.txt")
+  add_subdirectory(tools/roc-cli)
 endif()
 
 # Les sources publiées (`scripts/publish_mirror.py`) ne portent ni `tools/` ni

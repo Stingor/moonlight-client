@@ -92,6 +92,22 @@
         "VCPKG_MANIFEST_NO_DEFAULT_FEATURES": "ON",
         "VCPKG_MANIFEST_FEATURES": "render;audio;ui;ui-gl"
       }
+    },
+    {
+      "name": "linux-site",
+      "displayName": "Linux / g++-14 Release, roc-cli du site",
+      "description": "roc-cli SANS PLATEFORME, pour le serveur web : la seule famille avatar, sans SDL ni OpenGL. Triplet x64-linux-release : les bibliotheques de vcpkg sont liees en statique, et le binaire se copie seul. Sans essais. VCPKG_ROOT doit etre pose.",
+      "inherits": "linux-gcc",
+      "binaryDir": "${sourceDir}/build/linux-site",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "MOONCLIENT_BUILD_TESTS": "OFF",
+        "MOONCLIENT_PLATFORM_LAYERS": "OFF",
+        "VCPKG_TARGET_TRIPLET": "x64-linux-release",
+        "VCPKG_HOST_TRIPLET": "x64-linux-release",
+        "VCPKG_MANIFEST_NO_DEFAULT_FEATURES": "ON",
+        "VCPKG_MANIFEST_FEATURES": "ui"
+      }
     }
   ],
   "buildPresets": [
@@ -154,6 +170,14 @@
     {
       "name": "linux-release",
       "configurePreset": "linux-release",
+      "jobs": 0
+    },
+    {
+      "name": "linux-site",
+      "configurePreset": "linux-site",
+      "targets": [
+        "roc-cli"
+      ],
       "jobs": 0
     }
   ],
