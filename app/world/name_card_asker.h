@@ -6,6 +6,13 @@
 
 namespace moonclient {
 
+// UN OBJET AU SOL ET UNE UNITÉ DE COMPÉTENCE N'ONT PAS DE CARTE : le serveur
+// ne sait pas les nommer, et une demande n'y obtient qu'une ligne d'erreur
+// dans son journal (« clif_name: bad type 32 » pour un butin). Le nom d'un
+// butin se compose chez nous. Vaut pour TOUTE demande de carte : le survol
+// comme la cible désignée.
+[[nodiscard]] bool HasNameCard(ro::sim::ActorKind kind);
+
 // « QUI EST-CE ? » : QUAND RÉCLAMER LA CARTE DE NOM DE CE QUE LA SOURIS DÉSIGNE.
 //
 // 🔴 LA CARTE D'UN JOUEUR NE VIENT QUE SUR DEMANDE, ET ELLE PART AVEC L'ACTEUR.

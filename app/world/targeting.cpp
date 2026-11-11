@@ -6,6 +6,7 @@
 
 #include "ro/sim/world.h"
 
+#include "world/name_card_asker.h"
 #include "world/versus_gate.h"
 
 namespace moonclient {
@@ -337,7 +338,9 @@ TargetRequests Targeting::Poll(const ro::sim::World& world, std::uint32_t now_ms
   }
 
   // Le nom : tant que la carte du serveur manque, on la redemande.
-  if ((actor->name.empty() || !actor->card.has_value()) &&
+  // ⚠ SAUF À CE QUI N'EN A PAS : un butin désigné n'en recevra jamais, et la
+  // demande repartirait toutes les `kNamePollMs` (cf. `HasNameCard`).
+  if (HasNameCard(actor->kind) && (actor->name.empty() || !actor->card.has_value()) &&
       Elapsed(name_polled_ms_, now_ms, kNamePollMs)) {
     name_polled_ms_ = now_ms;
     asked.name_id = actor->id;
