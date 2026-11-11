@@ -284,13 +284,7 @@ constexpr std::array<SolidPoint, 6> kModel29Outline0{{{-8.55F, -3.63F},
                                                       {-8.55F, 6.14F}}};
 constexpr std::array<SolidOutline, 1> kModel29Outlines{{{kModel29Outline0}}};
 
-constexpr std::array<SolidPoint, 6> kModel30Outline0{{{-5.28F, -1.22F},
-                                                      {-0.08F, -4.22F},
-                                                      {5.11F, -1.22F},
-                                                      {5.11F, 4.78F},
-                                                      {-0.08F, 7.78F},
-                                                      {-5.28F, 4.78F}}};
-constexpr std::array<SolidOutline, 1> kModel30Outlines{{{kModel30Outline0}}};
+constexpr std::array<SolidOutline, 0> kModel30Outlines{{}};
 
 constexpr std::array<SolidPoint, 4> kModel31Outline0{
     {{-8.66F, 24.79F}, {8.83F, 24.79F}, {8.83F, 42.29F}, {-8.66F, 42.29F}}};
@@ -574,8 +568,8 @@ constexpr std::array<ModelSolid, 41> kSolids{{
      {8.38F, -0.01F, 11.03F},
      kModel29Outlines},
     {"유노추가\\유노_실험관유리2.rsm",
-     0.8F,
-     0.0F,
+     1.0F,
+     -5.0F,
      260,
      {-5.28F, -21.46F, -4.22F},
      {5.11F, -5.46F, 7.78F},

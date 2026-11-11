@@ -122,10 +122,8 @@ constexpr std::array<TerrainPieceRule, 7> kSnowPieces{{
 // Les modèles des quatre étages du labo (lhz_dun01..04). Les emprises sont le
 // solide de leurs modèles (`roc-cli survivors emprises`).
 
-// Une cuve à monstre, sous tous ses angles.
+// Une cuve à monstre : la machine et sa cloche de verre, sous tous ses angles.
 constexpr std::array<std::string_view, 4> kTank = {"####", "####", "####", "####"};
-// Un tube de verre.
-constexpr std::array<std::string_view, 2> kGlassTube = {"##", "##"};
 // Des caisses : trois caisses en L.
 constexpr std::array<std::string_view, 4> kCrates = {"##..", "##..", "####", "####"};
 // Une cuve brisée et ses éclats.
@@ -140,9 +138,8 @@ constexpr std::array<std::string_view, 3> kBeakers = {"###", "###", "###"};
 constexpr std::array<std::string_view, 6> kPump = {"##...", "###..", "####.",
                                                    "#####", "#####", "#####"};
 
-constexpr std::array<TerrainPieceRule, 8> kLabPieces{{
-    {.piece_id = 1, .key = "tank", .footprint = kTank, .weight = 6},
-    {.piece_id = 2, .key = "glass_tube", .footprint = kGlassTube, .weight = 6},
+constexpr std::array<TerrainPieceRule, 7> kLabPieces{{
+    {.piece_id = 1, .key = "tank", .footprint = kTank, .weight = 10},
     {.piece_id = 3, .key = "crates", .footprint = kCrates, .weight = 6},
     {.piece_id = 4, .key = "broken_tube", .footprint = kBrokenTube, .weight = 4},
     {.piece_id = 5, .key = "pipe", .footprint = kPipe, .weight = 4},

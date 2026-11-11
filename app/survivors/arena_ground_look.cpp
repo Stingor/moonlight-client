@@ -350,8 +350,15 @@ constexpr std::array<GroundModelChoice, 1> kTankModel{{
      .shade_cells = 2.0F,
      .centre_north_cells = 0.34F},
 }};
-constexpr std::array<GroundModelChoice, 1> kGlassTubeModel{{
-    {.model = "유노추가\\유노_실험관유리2.rsm", .scale = 0.8F, .weight = 1, .shade_cells = 1.0F},
+// LA CLOCHE DE VERRE d'une cuve, comme les cartes du labo la posent : à sa
+// taille, au milieu du solide de la machine, son pied cinq unités au-dessus du
+// sien. Seule, sans sa machine, elle ne se pose pas.
+constexpr std::array<GroundModelChoice, 1> kVatGlassModel{{
+    {.model = "유노추가\\유노_실험관유리2.rsm",
+     .scale = 1.0F,
+     .weight = 1,
+     .shade_cells = 0.0F,
+     .sink_units = -5.0F},
 }};
 // Une caisse mesure 3,5 cases de côté à sa taille : à 0,55, elle tient dans
 // son carré de 2 × 2.
@@ -378,10 +385,11 @@ constexpr std::array<GroundModelChoice, 1> kPumpModel{{
     {.model = "내부소품\\도구점펌프01.rsm", .scale = 1.0F, .weight = 1, .shade_cells = 3.0F},
 }};
 
-constexpr std::array<PieceModelSlot, 1> kTankSlots{
-    {{.east_cells = 2.0F, .north_cells = 2.0F, .models = kTankModel, .any_yaw = false}}};
-constexpr std::array<PieceModelSlot, 1> kGlassTubeSlots{
-    {{.east_cells = 1.0F, .north_cells = 1.0F, .models = kGlassTubeModel, .any_yaw = false}}};
+// La cuve de 4 × 4 : la machine, et sa cloche de verre sur le même milieu.
+constexpr std::array<PieceModelSlot, 2> kTankSlots{{
+    {.east_cells = 2.0F, .north_cells = 2.0F, .models = kTankModel, .any_yaw = false},
+    {.east_cells = 2.0F, .north_cells = 2.0F, .models = kVatGlassModel, .any_yaw = false},
+}};
 // Les caisses en L : une sur chacun de ses trois carrés de 2 × 2.
 constexpr std::array<PieceModelSlot, 3> kCrateSlots{{
     {.east_cells = 1.0F, .north_cells = 3.0F, .models = kCrateModels, .any_yaw = false},
@@ -404,9 +412,8 @@ constexpr std::array<PieceModelSlot, 3> kBeakerSlots{{
 constexpr std::array<PieceModelSlot, 1> kPumpSlots{
     {{.east_cells = 2.5F, .north_cells = 3.0F, .models = kPumpModel, .any_yaw = false}}};
 
-constexpr std::array<PieceLook, 8> kLabPieces{{
+constexpr std::array<PieceLook, 7> kLabPieces{{
     {.key = "tank", .slots = kTankSlots},
-    {.key = "glass_tube", .slots = kGlassTubeSlots},
     {.key = "crates", .slots = kCrateSlots},
     {.key = "broken_tube", .slots = kBrokenTubeSlots},
     {.key = "pipe", .slots = kPipeSlots},
