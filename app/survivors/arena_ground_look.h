@@ -90,6 +90,10 @@ enum class GroundTextureRole : std::uint8_t {
   kPathEdge,
   kPathOuter,
   kPathInner,
+  // LES MURS D'UN TERRAIN À SALLES : la face verticale d'un mur, dont chaque
+  // cube lit un quart de la largeur, et son dessus.
+  kWall,
+  kWallTop,
 };
 
 struct GroundTextureLook {
@@ -142,6 +146,12 @@ struct BiomeLook {
   // qu'un emplacement vide en porte une éparse.
   std::uint32_t patch_per_mille = 0;
   std::uint32_t scatter_per_mille = 0;
+  // LES CHEMINS CARRÉS : un cube tout de chemin prend le carreau de chemin
+  // plein, les autres gardent le fond, sans lisière ni terre composée. Les
+  // portes et les couloirs d'un terrain à salles suivent les cubes du sol.
+  bool square_paths = false;
+  // La hauteur d'un mur de salle, en unités du GND (une case : cinq).
+  float wall_height_units = 0.0F;
 };
 
 // L'aspect du terrain de clé `terrain_key`, ou nullptr.

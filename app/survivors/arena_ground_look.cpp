@@ -338,7 +338,107 @@ constexpr std::array<SeedLook, 3> kSnowSeeds{{
     {.model = "크리스마스마을\\xmas_구슬3.rsm", .scale = 0.24F, .weight = 1},
 }};
 
-constexpr std::array<BiomeLook, 3> kBiomes{{
+// ── LE LABORATOIRE DE LIGHTHALZEN ───────────────────────────────────────────
+// Les modèles des quatre étages du labo (lhz_dun01..04). Les emprises sont
+// celles de `survivors_rules_terrain.cpp`, et chaque modèle suit le quart de
+// tour de sa pièce : de biais, les caisses, la barricade et le tuyau
+// sortiraient de leur emprise.
+constexpr std::array<GroundModelChoice, 1> kTankModel{{
+    {.model = "유노추가\\유노_몬실험관1.rsm",
+     .scale = 1.0F,
+     .weight = 1,
+     .shade_cells = 2.0F,
+     .centre_north_cells = 0.34F},
+}};
+constexpr std::array<GroundModelChoice, 1> kGlassTubeModel{{
+    {.model = "유노추가\\유노_실험관유리2.rsm", .scale = 0.8F, .weight = 1, .shade_cells = 1.0F},
+}};
+// Une caisse mesure 3,5 cases de côté à sa taille : à 0,55, elle tient dans
+// son carré de 2 × 2.
+constexpr std::array<GroundModelChoice, 2> kCrateModels{{
+    {.model = "아인브로크\\박스02.rsm", .scale = 0.55F, .weight = 1, .shade_cells = 1.0F},
+    {.model = "아인브로크\\박스04.rsm", .scale = 0.55F, .weight = 1, .shade_cells = 1.0F},
+}};
+constexpr std::array<GroundModelChoice, 3> kBrokenTubeModels{{
+    {.model = "리히타르젠\\깨진시험관07.rsm", .scale = 0.8F, .weight = 1, .shade_cells = 1.5F},
+    {.model = "리히타르젠\\깨진시험관02.rsm", .scale = 0.8F, .weight = 1, .shade_cells = 1.5F},
+    {.model = "리히타르젠\\깨진시험관01.rsm", .scale = 0.8F, .weight = 1, .shade_cells = 1.5F},
+}};
+constexpr std::array<GroundModelChoice, 1> kPipeModel{{
+    {.model = "리히타르젠\\파이프B02.rsm", .scale = 0.75F, .weight = 1, .shade_cells = 0.6F},
+}};
+constexpr std::array<GroundModelChoice, 1> kBarricadeModel{{
+    {.model = "아인브로크\\바리케이트.rsm", .scale = 1.0F, .weight = 1, .shade_cells = 1.0F},
+}};
+constexpr std::array<GroundModelChoice, 2> kBeakerModels{{
+    {.model = "흑마법사방\\비이커1.rsm", .scale = 1.0F, .weight = 1, .shade_cells = 0.3F},
+    {.model = "흑마법사방\\비이커2.rsm", .scale = 1.0F, .weight = 1, .shade_cells = 0.3F},
+}};
+constexpr std::array<GroundModelChoice, 1> kPumpModel{{
+    {.model = "내부소품\\도구점펌프01.rsm", .scale = 1.0F, .weight = 1, .shade_cells = 3.0F},
+}};
+
+constexpr std::array<PieceModelSlot, 1> kTankSlots{
+    {{.east_cells = 2.0F, .north_cells = 2.0F, .models = kTankModel, .any_yaw = false}}};
+constexpr std::array<PieceModelSlot, 1> kGlassTubeSlots{
+    {{.east_cells = 1.0F, .north_cells = 1.0F, .models = kGlassTubeModel, .any_yaw = false}}};
+// Les caisses en L : une sur chacun de ses trois carrés de 2 × 2.
+constexpr std::array<PieceModelSlot, 3> kCrateSlots{{
+    {.east_cells = 1.0F, .north_cells = 3.0F, .models = kCrateModels, .any_yaw = false},
+    {.east_cells = 1.0F, .north_cells = 1.0F, .models = kCrateModels, .any_yaw = false},
+    {.east_cells = 3.0F, .north_cells = 1.0F, .models = kCrateModels, .any_yaw = false},
+}};
+constexpr std::array<PieceModelSlot, 1> kBrokenTubeSlots{
+    {{.east_cells = 2.0F, .north_cells = 2.0F, .models = kBrokenTubeModels}}};
+constexpr std::array<PieceModelSlot, 1> kPipeSlots{
+    {{.east_cells = 1.5F, .north_cells = 0.5F, .models = kPipeModel, .any_yaw = false}}};
+constexpr std::array<PieceModelSlot, 1> kBarricadeSlots{
+    {{.east_cells = 1.5F, .north_cells = 1.0F, .models = kBarricadeModel, .any_yaw = false}}};
+// Les béchers de 3 × 3 : trois flacons épars, franchissables.
+constexpr std::array<PieceModelSlot, 3> kBeakerSlots{{
+    {.east_cells = 0.8F, .north_cells = 0.8F, .models = kBeakerModels},
+    {.east_cells = 2.2F, .north_cells = 1.2F, .models = kBeakerModels},
+    {.east_cells = 1.3F, .north_cells = 2.3F, .models = kBeakerModels},
+}};
+// La pompe, le repère, au milieu de son socle de 5 × 6.
+constexpr std::array<PieceModelSlot, 1> kPumpSlots{
+    {{.east_cells = 2.5F, .north_cells = 3.0F, .models = kPumpModel, .any_yaw = false}}};
+
+constexpr std::array<PieceLook, 8> kLabPieces{{
+    {.key = "tank", .slots = kTankSlots},
+    {.key = "glass_tube", .slots = kGlassTubeSlots},
+    {.key = "crates", .slots = kCrateSlots},
+    {.key = "broken_tube", .slots = kBrokenTubeSlots},
+    {.key = "pipe", .slots = kPipeSlots},
+    {.key = "barricade", .slots = kBarricadeSlots},
+    {.key = "beakers", .slots = kBeakerSlots},
+    {.key = "pump", .slots = kPumpSlots},
+}};
+
+// Les dalles grises `dun-Lin011` se raccordent à elles-mêmes ; les dalles
+// brisées et moussues `lhz_dun_b02` se posent sous les pièces, l'acide
+// `lhz_dun_b01` et les dalles claires `dun-Lin019` s'éparpillent. Les portes et
+// les couloirs sont de tôle rivetée, `dun-Lin012`, à bord franc. Les murs
+// montrent la pierre aux étagères de `dun-Lin003`, et leur dessus le noir des
+// cartes du labo.
+constexpr std::array<GroundTextureLook, 7> kLabTextures{{
+    {.texture = "필드바닥\\dun-Lin011.bmp"},
+    {.texture = "lighthalzen\\lhz_dun_b02.bmp", .role = GroundTextureRole::kPatch},
+    {.texture = "lighthalzen\\lhz_dun_b01.bmp", .role = GroundTextureRole::kScatter},
+    {.texture = "필드바닥\\dun-Lin019.bmp", .role = GroundTextureRole::kScatter, .weight = 2},
+    {.texture = "필드바닥\\dun-Lin012.bmp", .role = GroundTextureRole::kPathFull},
+    {.texture = "필드바닥\\dun-Lin003.bmp", .role = GroundTextureRole::kWall},
+    {.texture = "BLACK.BMP", .role = GroundTextureRole::kWallTop},
+}};
+
+// Le semis : des béchers, des feuillets, un os.
+constexpr std::array<SeedLook, 3> kLabSeeds{{
+    {.model = "흑마법사방\\비이커1.rsm", .scale = 0.8F, .weight = 3},
+    {.model = "외부소품\\해골_팔.rsm", .scale = 0.8F, .weight = 1},
+    {.model = "흑마법사방\\마법방_책종이1.rsm", .scale = 1.0F, .weight = 2},
+}};
+
+constexpr std::array<BiomeLook, 4> kBiomes{{
     {.terrain_key = "midgard_plains",
      .reference_map = "prt_fild08",
      .display_name = ro::core::TrText("Prairie de Midgard"),
@@ -374,6 +474,19 @@ constexpr std::array<BiomeLook, 3> kBiomes{{
      .seeds_per_chunk = 8,
      .patch_per_mille = 500,
      .scatter_per_mille = 40},
+    {.terrain_key = "lighthalzen_biolab",
+     .reference_map = "lhz_dun01",
+     .display_name = ro::core::TrText("Laboratoire de Lighthalzen"),
+     .sign_background = "dungeon_s2",
+     .field_track = "bgm\\92.mp3",
+     .textures = kLabTextures,
+     .pieces = kLabPieces,
+     .seeds = kLabSeeds,
+     .seeds_per_chunk = 6,
+     .patch_per_mille = 400,
+     .scatter_per_mille = 60,
+     .square_paths = true,
+     .wall_height_units = 20.0F},
 }};
 
 }  // namespace

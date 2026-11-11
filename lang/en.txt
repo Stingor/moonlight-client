@@ -23197,6 +23197,9 @@ tr: Lynx Eye
 fr: Neiges de Lutie
 tr: Lutie Snowfield
 
+fr: Laboratoire de Lighthalzen
+tr: Lighthalzen Bio Lab
+
 fr: Un Poring en bonnet de Noël, le premier venu de la neige.
 tr: A Poring in a Christmas hat, the first to arrive in the snow.
 

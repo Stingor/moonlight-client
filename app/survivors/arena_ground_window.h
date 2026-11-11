@@ -61,6 +61,9 @@ struct GroundSources {
   // de la texture que prend son bord sur chaque côté, nulle pour une texture
   // lue telle quelle.
   std::vector<float> motif_borders;
+  // Le rang, dans `texture_paths`, de la face des murs de salle ; rien sans
+  // murs.
+  std::optional<std::size_t> wall_texture;
 };
 
 // LIT LES RESSOURCES DU BIOME `look` dans l'installation, derrière l'écran de

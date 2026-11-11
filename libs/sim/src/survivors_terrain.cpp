@@ -10,8 +10,22 @@
 
 #include "ro/core/pcg32.h"
 
+#include "survivors_terrain_detail.h"
+
 namespace ro::sim {
 namespace {
+
+using terrain_detail::CarriesLandmark;
+using terrain_detail::Component;
+using terrain_detail::DistanceFromStart;
+using terrain_detail::FloorDivide;
+using terrain_detail::HasRooms;
+using terrain_detail::IsCorridorBlock;
+using terrain_detail::kHalfWordBits;
+using terrain_detail::LocalCell;
+using terrain_detail::Mix;
+using terrain_detail::MixStep;
+using terrain_detail::PaintRooms;
 
 // Les sels des mélanges, en ASCII : « SURVTERR » pour la graine d'un morceau,
 // « SURVDENS » pour les nœuds de densité, « SURVMARK » pour le morceau à
@@ -29,57 +43,9 @@ constexpr std::uint64_t kSiteNorthBit = 2;
 // Le coude d'un chemin se mélange à la direction de son chemin.
 constexpr std::uint64_t kEastward = 0;
 constexpr std::uint64_t kNorthward = 1;
-// Les constantes publiées de SplitMix64 : l'incrément (partie fractionnaire du
-// nombre d'or) et les deux multiplicateurs du finaliseur.
-constexpr std::uint64_t kSplitMixGamma = 0x9E37'79B9'7F4A'7C15ULL;
-constexpr std::uint64_t kSplitMixFirstMultiplier = 0xBF58'476D'1CE4'E5B9ULL;
-constexpr std::uint64_t kSplitMixSecondMultiplier = 0x94D0'49BB'1331'11EBULL;
-constexpr unsigned kSplitMixFirstShift = 30;
-constexpr unsigned kSplitMixSecondShift = 27;
-constexpr unsigned kSplitMixLastShift = 31;
-// Un mélange donne deux décalages, le morceau à repère comme le carrefour : x
-// est le reste du mot entier de 64 bits, y celui de sa seule moitié haute.
-constexpr unsigned kHalfWordBits = 32;
 constexpr char kBlockedCell = '#';
 
 constexpr std::int32_t kSlotCentreCells = kTerrainSlotCells / 2;
-
-// Un composant entier signé entre dans le mélange par sa valeur modulo 2^64 :
-// une conversion définie, et aucun décalage de signé.
-[[nodiscard]] constexpr std::uint64_t Component(std::int64_t value) noexcept {
-  return static_cast<std::uint64_t>(value);
-}
-
-// Un pas de SplitMix64 : l'état avance d'un composant et de l'incrément, puis
-// passe par le finaliseur.
-[[nodiscard]] constexpr std::uint64_t MixStep(std::uint64_t state,
-                                              std::uint64_t component) noexcept {
-  std::uint64_t mixed = state + component + kSplitMixGamma;
-  mixed = (mixed ^ (mixed >> kSplitMixFirstShift)) * kSplitMixFirstMultiplier;
-  mixed = (mixed ^ (mixed >> kSplitMixSecondShift)) * kSplitMixSecondMultiplier;
-  return mixed ^ (mixed >> kSplitMixLastShift);
-}
-
-[[nodiscard]] constexpr std::uint64_t Mix(std::uint64_t run_seed, std::uint64_t salt,
-                                          std::int64_t x, std::int64_t y) noexcept {
-  return MixStep(MixStep(MixStep(run_seed, salt), Component(x)), Component(y));
-}
-
-[[nodiscard]] constexpr std::int64_t FloorDivide(std::int64_t value, std::int64_t by) noexcept {
-  const std::int64_t quotient = value / by;
-  return (value % by != 0 && (value < 0) != (by < 0)) ? quotient - 1 : quotient;
-}
-
-// La distance de Tchebychev du départ à la case la plus proche d'un rectangle
-// [west, east] × [south, north], bornes comprises.
-[[nodiscard]] std::int64_t DistanceFromStart(std::int64_t west, std::int64_t south,
-                                             std::int64_t east, std::int64_t north) noexcept {
-  const std::int64_t dx =
-      std::max({west - kTerrainStartCell, std::int64_t{0}, std::int64_t{kTerrainStartCell} - east});
-  const std::int64_t dy = std::max(
-      {south - kTerrainStartCell, std::int64_t{0}, std::int64_t{kTerrainStartCell} - north});
-  return std::max(dx, dy);
-}
 
 // La valeur d'un nœud de densité, dans [min, max] ; min seul si la règle les
 // inverse.
@@ -143,11 +109,6 @@ struct Draw {
   return draw;
 }
 
-[[nodiscard]] std::size_t LocalCell(std::int32_t local_x, std::int32_t local_y) noexcept {
-  return static_cast<std::size_t>(local_y) * static_cast<std::size_t>(kTerrainChunkCells) +
-         static_cast<std::size_t>(local_x);
-}
-
 // Vrai si une case du rectangle [west, west + width) × [south, south + height),
 // en coordonnées locales du morceau, est une case de chemin.
 [[nodiscard]] bool TouchesPath(const TerrainChunk& chunk, std::int32_t west, std::int32_t south,
@@ -171,6 +132,17 @@ void Place(TerrainChunk& chunk, std::span<const TerrainPieceRule> pieces, const 
   const std::int32_t west = slot_east + draw.corner.east;
   const std::int32_t south = slot_north + draw.corner.north;
   if (!piece.landmark && TouchesPath(chunk, west, south, size)) return;
+  // Une pièce garde une case libre entre elle et tout mur de salle : le mur
+  // prend la place de la bordure libre, et le creux d'une emprise calé dans un
+  // coin de murs serait enclavé.
+  for (std::int32_t north = -1; north <= size.height; ++north) {
+    for (std::int32_t east = -1; east <= size.width; ++east) {
+      const std::int32_t x = west + east;
+      const std::int32_t y = south + north;
+      if (x < 0 || y < 0 || x >= kTerrainChunkCells || y >= kTerrainChunkCells) continue;
+      if (chunk.wall[LocalCell(x, y)] != 0U) return;
+    }
+  }
   for (std::int32_t north = 0; north < size.height && !piece.walkable; ++north) {
     for (std::int32_t east = 0; east < size.width; ++east) {
       if (!FootprintCovers(piece, draw.quarter, east, north)) continue;
@@ -243,17 +215,6 @@ struct PlazaChunk {
     }
   }
   return PlazaChunk{};
-}
-
-// Vrai si ce morceau porte un repère : l'élu de son carré, hors de la
-// clairière ; avec des chemins, le seul morceau de place de sa cellule.
-[[nodiscard]] bool CarriesLandmark(const TerrainRule& rule, std::uint64_t run_seed,
-                                   std::int64_t chunk_x, std::int64_t chunk_y) noexcept {
-  if (!ElectedOutsideClearing(rule, run_seed, chunk_x, chunk_y)) return false;
-  if (!HasPaths(rule)) return true;
-  const PlazaChunk plaza = PlazaChunkOf(rule, run_seed, TerrainPathCellOf(rule, chunk_x),
-                                        TerrainPathCellOf(rule, chunk_y));
-  return plaza.exists && plaza.chunk.x == chunk_x && plaza.chunk.y == chunk_y;
 }
 
 // La place qu'un morceau de place porte en son centre, et le quart de son site.
@@ -489,6 +450,15 @@ static_assert(TerrainPlazaGateCells(kMostPlazaPathWidthCells + 1) >= kTerrainChu
 
 }  // namespace
 
+bool terrain_detail::CarriesLandmark(const TerrainRule& rule, std::uint64_t run_seed,
+                                     std::int64_t chunk_x, std::int64_t chunk_y) noexcept {
+  if (!ElectedOutsideClearing(rule, run_seed, chunk_x, chunk_y)) return false;
+  if (!HasPaths(rule)) return true;
+  const PlazaChunk plaza = PlazaChunkOf(rule, run_seed, TerrainPathCellOf(rule, chunk_x),
+                                        TerrainPathCellOf(rule, chunk_y));
+  return plaza.exists && plaza.chunk.x == chunk_x && plaza.chunk.y == chunk_y;
+}
+
 std::int64_t TerrainPathCellOf(const TerrainRule& rule, std::int64_t chunk) noexcept {
   if (rule.path_period_chunks <= 0) return 0;
   return FloorDivide(chunk, rule.path_period_chunks);
@@ -602,6 +572,8 @@ TerrainChunk GenerateTerrainChunk(const TerrainRule& rule, std::uint64_t run_see
   const bool landmark_chunk = CarriesLandmark(rule, run_seed, chunk_x, chunk_y);
   // Les chemins d'abord : ils décident où une pièce ordinaire ne se pose pas.
   PaintPaths(rule, run_seed, chunk);
+  PaintRooms(rule, run_seed, chunk);
+  const bool corridor_block = HasRooms(rule) && IsCorridorBlock(rule, run_seed, chunk_x, chunk_y);
   const std::vector<std::uint32_t> ordinary = WeightsOf(rule.pieces, false);
   const std::vector<std::uint32_t> landmarks = WeightsOf(rule.pieces, true);
   core::Pcg32 random(TerrainChunkSeed(run_seed, chunk_x, chunk_y), kTerrainStream);
@@ -617,7 +589,7 @@ TerrainChunk GenerateTerrainChunk(const TerrainRule& rule, std::uint64_t run_see
       const Draw draw = DrawPiece(random, rule.pieces, ordinary, kTerrainSlotCells);
       const bool cleared = DistanceFromStart(west, south, west + kTerrainSlotCells - 1,
                                              south + kTerrainSlotCells - 1) < rule.clearing_cells;
-      if (occupied && !cleared && !landmark_chunk) {
+      if (occupied && !cleared && !landmark_chunk && !corridor_block) {
         Place(chunk, rule.pieces, draw, slot_east, slot_north);
       }
     }
@@ -629,6 +601,17 @@ TerrainChunk GenerateTerrainChunk(const TerrainRule& rule, std::uint64_t run_see
     if (landmark_chunk) {
       PlaceBesidePlaza(chunk, rule.pieces, landmark,
                        PlazaIn(run_seed, TerrainCell{.x = chunk_x, .y = chunk_y}));
+    }
+    return chunk;
+  }
+  // Avec des salles, le repère se tient au milieu de la sienne, entre les
+  // parvis de ses portes.
+  if (HasRooms(rule)) {
+    const Draw landmark = DrawPiece(random, rule.pieces, landmarks,
+                                    kMostRoomLandmarkSideCells + 2 * kTerrainBorderCells);
+    if (landmark_chunk) {
+      Place(chunk, rule.pieces, landmark, kTerrainApronCells - kTerrainBorderCells,
+            kTerrainApronCells - kTerrainBorderCells);
     }
     return chunk;
   }

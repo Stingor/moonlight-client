@@ -23197,6 +23197,9 @@ tr: Ojo de lince
 fr: Neiges de Lutie
 tr: Nieves de Lutie
 
+fr: Laboratoire de Lighthalzen
+tr: Laboratorio de Lighthalzen
+
 fr: Un Poring en bonnet de Noël, le premier venu de la neige.
 tr: Un Poring con gorro navideño, el primero en llegar a la nieve.
 

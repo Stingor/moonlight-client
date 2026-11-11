@@ -129,7 +129,8 @@ void PutArena(FnvDigest& digest, const ArenaRule& arena) {
 void PutTerrain(FnvDigest& digest, const TerrainRule& terrain) {
   PutAll(digest, terrain.terrain_id, terrain.density_min_per_mille, terrain.density_max_per_mille,
          terrain.density_period_chunks, terrain.clearing_cells, terrain.landmark_period_chunks,
-         terrain.path_period_chunks, terrain.path_width_cells, terrain.path_wiggle_cells);
+         terrain.path_period_chunks, terrain.path_width_cells, terrain.path_wiggle_cells,
+         terrain.rooms, terrain.door_cells, terrain.corridor_per_mille, terrain.hall_per_mille);
   PutEach(digest, terrain.pieces, [&](const TerrainPieceRule& piece) {
     PutAll(digest, piece.piece_id, piece.weight, piece.landmark, piece.walkable);
     PutEach(digest, piece.footprint, [&](std::string_view row) { PutText(digest, row); });

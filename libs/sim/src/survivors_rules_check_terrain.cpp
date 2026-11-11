@@ -116,9 +116,11 @@ template <typename Rule>
   if (const std::string_view key = RepeatedKey(terrain.pieces); !key.empty()) {
     return Refuse(named + "clé de pièce « " + std::string(key) + " » en double");
   }
-  // Avec des chemins, un repère se dresse dans le site qui borde sa place.
-  const std::int32_t most_landmark_side_cells =
+  // Avec des chemins, un repère se dresse dans le site qui borde sa place ;
+  // avec des salles, entre les parvis de la sienne.
+  std::int32_t most_landmark_side_cells =
       terrain.path_period_chunks > 0 ? kTerrainLandmarkSiteCells : kMostLandmarkSideCells;
+  if (terrain.rooms) most_landmark_side_cells = kMostRoomLandmarkSideCells;
   bool has_landmark = false;
   for (const TerrainPieceRule& piece : terrain.pieces) {
     has_landmark = has_landmark || piece.landmark;
@@ -185,6 +187,28 @@ template <typename Rule>
                   " cases de large, écartés de " + std::to_string(terrain.path_wiggle_cells) +
                   " cases : hors de [1, " + std::to_string(kTerrainPathMarginCells) +
                   "] à eux deux");
+  }
+  // Les salles : des portes paires (les murs et les portes suivent les cubes
+  // du sol), ni trop étroites ni trop larges, et aucun chemin, qui passerait
+  // les murs.
+  if (terrain.rooms &&
+      (terrain.door_cells < kLeastTerrainDoorCells || terrain.door_cells > kMostTerrainDoorCells ||
+       terrain.door_cells % kTerrainWallCells != 0)) {
+    return Refuse(named + "portes de " + std::to_string(terrain.door_cells) + " cases : hors de [" +
+                  std::to_string(kLeastTerrainDoorCells) + ", " +
+                  std::to_string(kMostTerrainDoorCells) + "], ou impaires");
+  }
+  if (terrain.rooms && terrain.path_period_chunks != 0) {
+    return Refuse(named + "des salles et des chemins à la fois");
+  }
+  if (terrain.corridor_per_mille > kTerrainPerMille || terrain.hall_per_mille > kTerrainPerMille) {
+    return Refuse(named + "couloirs à " + std::to_string(terrain.corridor_per_mille) +
+                  " et halls à " + std::to_string(terrain.hall_per_mille) +
+                  " pour mille, hors de [0, 1000]");
+  }
+  if (!terrain.rooms &&
+      (terrain.door_cells != 0 || terrain.corridor_per_mille != 0 || terrain.hall_per_mille != 0)) {
+    return Refuse(named + "des portes, des couloirs ou des halls sans salles");
   }
   if (CellsOutOfBounds(terrain.clearing_cells)) {
     return Refuse(named + "clairière de " + std::to_string(terrain.clearing_cells) +

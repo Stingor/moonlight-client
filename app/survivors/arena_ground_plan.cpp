@@ -50,7 +50,6 @@ constexpr float kLeastHorizontalSun = 1.0e-3F;
 
 // ── LES POSES.
 constexpr std::uint32_t kFullTurnDegrees = 360;
-constexpr float kQuarterTurnDegrees = 90.0F;
 constexpr float kUnitFromDraw = 1.0F / 4294967296.0F;  // 2^-32
 // Un semis se pose dans sa case, loin de son bord.
 constexpr float kSeedInset = 0.2F;
@@ -131,6 +130,7 @@ class Planner {
   void ReadChunks() {
     plan_.passable.assign(kCellCount, 0);
     plan_.path.assign(kCellCount, 0);
+    plan_.wall.assign(kCellCount, 0);
     const auto ring_area =
         static_cast<std::size_t>(kRingSide) * static_cast<std::size_t>(kRingSide);
     ring_free_.assign(ring_area, 0);
@@ -191,6 +191,8 @@ class Planner {
         if (!shown) continue;
         plan_.passable[CellIndex(x, y)] = passable;
         plan_.path[CellIndex(x, y)] = path;
+        plan_.wall[CellIndex(x, y)] =
+            chunk.wall[static_cast<std::size_t>(north * kTerrainChunkCells + east)];
       }
     }
   }
@@ -357,6 +359,9 @@ class Planner {
   // chaque coin de case, celles des cases et des cubes, lues sur la même
   // grille : le sol dessiné et le sol foulé se rejoignent à chaque coin de
   // cube. Puis la lumière que la pente laisse au centre de chaque case.
+  // Un intérieur n'a pas de collines : son sol est plat.
+  static constexpr float kFlatFloor = 0.0F;
+
   void RaiseRelief() {
     constexpr std::int32_t kLastCorner = kCornerSide - 1 + kCornerMargin;
     plan_.relief_pads = GroundReliefPadsAround(rule_, run_seed_,
@@ -371,8 +376,10 @@ class Planner {
     for (std::int32_t y = -kCornerMargin; y < kCornerSide + kCornerMargin; ++y) {
       for (std::int32_t x = -kCornerMargin; x < kCornerSide + kCornerMargin; ++x) {
         corners_[CornerIndex(x, y)] =
-            GroundReliefAt(run_seed_, static_cast<double>(origin_.x_cells + x),
-                           static_cast<double>(origin_.y_cells + y), plan_.relief_pads);
+            rule_.rooms
+                ? kFlatFloor
+                : GroundReliefAt(run_seed_, static_cast<double>(origin_.x_cells + x),
+                                 static_cast<double>(origin_.y_cells + y), plan_.relief_pads);
       }
     }
     plan_.cell_heights.resize(kCellCount);
@@ -436,9 +443,21 @@ class Planner {
         cube.turn = turn;
         cube.quarter_east = static_cast<std::uint8_t>(world_cube_x - slot_x * kGroundTextureCubes);
         cube.quarter_north = static_cast<std::uint8_t>(world_cube_y - slot_y * kGroundTextureCubes);
-        PaintPathTile(cube, dirt[CubeIndex(i, j)]);
+        if (biome_.square_paths) {
+          PaintSquarePath(cube, i, j);
+        } else {
+          PaintPathTile(cube, dirt[CubeIndex(i, j)]);
+        }
         cube.corner_height =
             CornersOf(i * kGroundCellsPerCube, j * kGroundCellsPerCube, kGroundCellsPerCube);
+        // Un mur suit les cubes du sol (`kTerrainWallCells`) : sa case sud-ouest
+        // dit le cube entier.
+        cube.wall = plan_.wall[CellIndex(i * kGroundCellsPerCube, j * kGroundCellsPerCube)] != 0U;
+        if (cube.wall) {
+          for (float& corner : cube.corner_height) corner -= biome_.wall_height_units;
+          const std::uint8_t top = TextureOfRole(GroundTextureRole::kWallTop);
+          if (top != kNoTexture) cube.texture = top;
+        }
         const double east = static_cast<double>(origin_.x_cells + i * kGroundCellsPerCube + 1);
         const double north = static_cast<double>(origin_.y_cells + j * kGroundCellsPerCube + 1);
         const double tint =
@@ -509,6 +528,14 @@ class Planner {
       }
     }
     return cubes;
+  }
+
+  // LE CHEMIN CARRÉ : un cube dont la case sud-ouest est un chemin l'est tout
+  // entier ; il prend le carreau plein à sa place dans le motif.
+  void PaintSquarePath(PlannedCube& cube, std::int32_t i, std::int32_t j) const {
+    if (plan_.path[CellIndex(i * kGroundCellsPerCube, j * kGroundCellsPerCube)] == 0U) return;
+    const std::uint8_t rank = TextureOfRole(GroundTextureRole::kPathFull);
+    if (rank != kNoTexture) cube.texture = rank;
   }
 
   // LE CARREAU DE CHEMIN d'un cube qui a des coins de terre. La terre pleine
@@ -731,52 +758,6 @@ GroundWindowOrigin GroundWindowAround(std::int32_t x_cells, std::int32_t y_cells
   return GroundWindowOrigin{
       .x_cells = (ro::sim::TerrainChunkOf(x_cells) - kChunksBeside) * kTerrainChunkCells,
       .y_cells = (ro::sim::TerrainChunkOf(y_cells) - kChunksBeside) * kTerrainChunkCells};
-}
-
-float PieceModelYawDegrees(std::uint8_t quarter, float slot_yaw_degrees) {
-  const auto full_turn = static_cast<float>(kFullTurnDegrees);
-  const float turned =
-      std::fmod(slot_yaw_degrees - static_cast<float>(quarter % ro::sim::kTerrainQuarterTurns) *
-                                       kQuarterTurnDegrees,
-                full_turn);
-  return turned < 0.0F ? turned + full_turn : turned;
-}
-
-PlannedPose PieceSlotPose(const PieceModelSlot& slot, const GroundModelChoice& choice,
-                          ro::sim::FootprintSize drawn, std::uint8_t quarter,
-                          float drawn_yaw_degrees, float jitter) {
-  const glm::vec2 at = PieceSlotPoint({slot.east_cells, slot.north_cells}, drawn, quarter);
-  const float yaw =
-      slot.any_yaw ? drawn_yaw_degrees : PieceModelYawDegrees(quarter, slot.yaw_degrees);
-  const float grown = slot.any_yaw ? jitter : 1.0F;
-  // L'angle du RSW tourne le modèle dans le sens des aiguilles d'une montre vu
-  // du ciel : (est, nord) → (est cos θ + nord sin θ, nord cos θ − est sin θ).
-  const float radians = glm::radians(yaw);
-  const glm::vec2 centre(choice.centre_east_cells * grown, choice.centre_north_cells * grown);
-  const glm::vec2 turned(centre.x * std::cos(radians) + centre.y * std::sin(radians),
-                         centre.y * std::cos(radians) - centre.x * std::sin(radians));
-  return PlannedPose{.model = choice.model,
-                     .east = at.x - turned.x,
-                     .north = at.y - turned.y,
-                     .yaw_degrees = yaw,
-                     .scale = choice.scale * grown,
-                     .sink_units = choice.sink_units * choice.scale * grown};
-}
-
-glm::vec2 PieceSlotPoint(glm::vec2 point, ro::sim::FootprintSize drawn,
-                         std::uint8_t quarter) noexcept {
-  const auto width = static_cast<float>(drawn.width);
-  const auto height = static_cast<float>(drawn.height);
-  switch (quarter % ro::sim::kTerrainQuarterTurns) {
-    case 1:
-      return {height - point.y, point.x};
-    case 2:
-      return {width - point.x, height - point.y};
-    case 3:
-      return {point.y, width - point.x};
-    default:
-      return point;
-  }
 }
 
 GroundPlan PlanGroundWindow(const ro::sim::TerrainRule& rule, std::uint64_t run_seed,

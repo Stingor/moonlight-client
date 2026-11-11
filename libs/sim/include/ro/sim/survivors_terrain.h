@@ -105,6 +105,47 @@ inline constexpr std::int32_t kTerrainSiteOffsetCells = 4;
 inline constexpr std::int32_t kMostPlazaPathWidthCells =
     2 * (kTerrainChunkCells / 2 - kTerrainSiteOffsetCells - kTerrainLandmarkSiteCells) - 1;
 
+// LES SALLES ET LES COULOIRS d'un terrain `rooms`, qui n'a pas de chemins.
+// Chaque morceau est une SALLE ou, `corridor_per_mille` fois sur mille, un
+// BLOC DE COULOIRS ; un morceau à repère et ceux qu'atteint la clairière
+// (à un morceau près) sont des salles.
+//
+// - Un morceau possède le MUR de ses bords ouest et sud : ses
+//   kTerrainWallCells premières colonnes et rangées. Le mur d'un bord a
+//   l'épaisseur d'un cube du sol ; ses bords est et nord sont les murs de ses
+//   voisins. Une case de mur est bloquée, et une pièce garde une case
+//   libre entre elle et tout mur : le mur tient la place de la bordure libre.
+// - Chaque bord porte une PORTE de `door_cells` cases, à un rang pair que tire
+//   un mélange de la graine propre au bord (sel « SURVDOOR »), d'au moins
+//   kTerrainWallCells du coin : les deux morceaux qu'il sépare la calculent
+//   sans se générer l'un l'autre.
+// - Un bord entre deux salles s'OUVRE tout entier `hall_per_mille` fois sur
+//   mille (sel « SURVHALL ») : les deux salles font un hall. Le coin sud-ouest
+//   d'une salle dont les deux bords s'ouvrent reste un pilier.
+// - Une salle peint de chaque porte de son pourtour un PARVIS de chemin,
+//   profond de kTerrainApronCells : aucune pièce ordinaire ne bouche une
+//   porte, et le parvis joint la bordure libre des emplacements.
+// - Un bloc de couloirs est un mur plein, percé d'un COULOIR de chemin de
+//   chacune de ses quatre portes à son CARREFOUR (sel « SURVHUB ») : chaque
+//   couloir file droit jusqu'à l'axe du carrefour, et deux couloirs en croix
+//   par le carrefour les joignent tous. Il ne porte aucune pièce.
+// - Aucun mur ne se tient dans la clairière.
+//
+// LA CONNEXITÉ tient par construction : une porte relie chaque paire de
+// morceaux voisins, un bloc relie ses portes, et une salle relie ses parvis
+// par le réseau des bordures. Les murs, les portes et les couloirs sont
+// alignés sur les cubes du sol (deux cases), ce qui les dessine d'un bloc.
+inline constexpr std::int32_t kTerrainWallCells = 2;
+inline constexpr std::int32_t kTerrainApronCells = kTerrainSlotCells;
+// La porte la plus étroite et la plus large : une porte étroite tient la
+// horde en file, une porte large ne laisse plus de mur.
+inline constexpr std::int32_t kLeastTerrainDoorCells = 4;
+inline constexpr std::int32_t kMostTerrainDoorCells =
+    kTerrainChunkCells - 4 * kTerrainWallCells - 2 * kTerrainWallCells;
+// Le plus grand repère d'un terrain à salles : il tient entre les parvis.
+inline constexpr std::int32_t kMostRoomLandmarkSideCells =
+    kTerrainChunkCells - 2 * kTerrainApronCells;
+
 // UNE PIÈCE : une règle de jeu, sans aucun fichier. `app` associe sa clé à des
 // modèles. L'emprise est un dessin de lignes de même largeur, « # » couvert,
 // « . » libre, la PREMIÈRE ligne au nord ; d'au plus kMostPieceSideCells de
@@ -149,6 +190,15 @@ struct TerrainRule {
   std::int32_t path_period_chunks = 0;
   std::int32_t path_width_cells = 0;
   std::int32_t path_wiggle_cells = 0;
+  // LES SALLES (voir kTerrainWallCells) : sans chemins, chaque morceau est une
+  // salle ou un bloc de couloirs, une porte de `door_cells` cases perce chaque
+  // bord entre deux morceaux, `hall_per_mille` bords sur mille s'ouvrent
+  // entre deux salles, `corridor_per_mille` morceaux sur mille sont des
+  // blocs de couloirs.
+  bool rooms = false;
+  std::int32_t door_cells = 0;
+  std::uint32_t corridor_per_mille = 0;
+  std::uint32_t hall_per_mille = 0;
 };
 
 // Une pièce posée : `x` et `y` sont la case du monde du coin sud-ouest de son
@@ -170,6 +220,8 @@ struct TerrainChunk {
   // Un octet par case, 1 sur un chemin, dans le même ordre ; une case de
   // chemin est toujours praticable.
   std::array<std::uint8_t, kTerrainChunkArea> path{};
+  // Un octet par case, 1 sur un mur de salle (toujours bloqué).
+  std::array<std::uint8_t, kTerrainChunkArea> wall{};
   // Dans l'ordre des emplacements ; un repère seul dans un morceau à repère.
   std::vector<PlacedPiece> pieces;
 

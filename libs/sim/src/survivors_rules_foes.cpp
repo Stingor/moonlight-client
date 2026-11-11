@@ -330,13 +330,16 @@ std::span<const WaveRule> ShippedWaves() { return kWaves; }
 // celle du défi (ADR 0134). morroc_desert : le sol généré du désert, avec son
 // bestiaire, ses boss et ses événements ; partie libre seulement (lot 12, Q2).
 // lutie_snowfield : le sol généré des neiges de Lutie, de même, en partie
-// libre (lot 17, Q1). Le numéro 1, celui de l'ancienne arène sur carte, ne se
+// libre (lot 17, Q1). lighthalzen_biolab : le laboratoire de Lighthalzen, le
+// premier intérieur, en salles, couloirs et halls ; partie libre, avec le
+// bestiaire de la prairie tant qu'il n'a pas le sien (lot 20). Le numéro 1,
+// celui de l'ancienne arène sur carte, ne se
 // redonne pas : un carnet ou une trame qui le nomme n'en trouve plus.
 std::span<const ArenaRule> ShippedArenas() {
-  static const std::array<ArenaRule, 3> kArenas = [] {
+  static const std::array<ArenaRule, 4> kArenas = [] {
     const ArenaContent desert = DesertContent();
     const ArenaContent snow = SnowContent();
-    return std::array<ArenaRule, 3>{{
+    return std::array<ArenaRule, 4>{{
         {.arena_id = 2,
          .key = "midgard_plains",
          .map_name = "",
@@ -361,6 +364,12 @@ std::span<const ArenaRule> ShippedArenas() {
          .waves = snow.waves,
          .bosses = snow.bosses,
          .events = snow.events},
+        {.arena_id = 5,
+         .key = "lighthalzen_biolab",
+         .map_name = "",
+         .start = std::nullopt,
+         .terrain_id = kLabTerrainId,
+         .ranked = false},
     }};
   }();
   return kArenas;

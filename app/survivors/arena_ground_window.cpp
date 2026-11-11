@@ -104,6 +104,45 @@ void InsetTile(ro::formats::GndTile& tile) {
   inward(tile.v);
 }
 
+// LES FACES DES MURS : entre un cube de mur et son voisin qui n'en est pas un,
+// au nord et à l'est, une face de la texture des murs (`GroundTextureRole::
+// kWall`). Chaque cube lit le quart de la largeur que donne sa colonne (ou sa
+// rangée) du monde, et le haut de la texture est en haut du mur, de quelque
+// côté qu'il regarde.
+constexpr std::int32_t kWallQuarters = 4;
+constexpr std::array<std::uint8_t, 4> kWallFaceColor{255, 255, 255, 255};
+void AddWallFaces(ro::formats::GndParts& parts, const GroundPlan& plan, std::size_t wall_texture) {
+  const auto add_face = [&](std::int32_t world_column, bool top_first) {
+    const float low =
+        static_cast<float>(((world_column % kWallQuarters) + kWallQuarters) % kWallQuarters) /
+        static_cast<float>(kWallQuarters);
+    const float high = low + 1.0F / static_cast<float>(kWallQuarters);
+    const float near = top_first ? 0.0F : 1.0F;
+    const float far = top_first ? 1.0F : 0.0F;
+    parts.tiles.push_back(
+        ro::formats::GndTile{.u = {low, high, low, high},
+                             .v = {near, near, far, far},
+                             .texture_index = static_cast<std::int16_t>(wall_texture),
+                             .lightmap_index = 0,
+                             .color = kWallFaceColor});
+    return static_cast<std::int32_t>(parts.tiles.size() - 1);
+  };
+  const std::int32_t first_column = plan.origin.x_cells / kGroundCellsPerCube;
+  const std::int32_t first_row = plan.origin.y_cells / kGroundCellsPerCube;
+  for (std::int32_t j = 0; j < kGroundWindowCubes; ++j) {
+    for (std::int32_t i = 0; i < kGroundWindowCubes; ++i) {
+      const auto rank = static_cast<std::size_t>(j * kGroundWindowCubes + i);
+      const bool here = plan.cubes[rank].wall;
+      if (j + 1 < kGroundWindowCubes && plan.cubes[rank + kGroundWindowCubes].wall != here) {
+        parts.cubes[rank].tile_front = add_face(first_column + i, here);
+      }
+      if (i + 1 < kGroundWindowCubes && plan.cubes[rank + 1].wall != here) {
+        parts.cubes[rank].tile_side = add_face(first_row + j, here);
+      }
+    }
+  }
+}
+
 // LE SOL DU PLAN, en pièces de GND : une tuile par cube, sa lightmap, le quart
 // de sa texture — ou sa tuile composée, quand il en a une.
 ro::formats::GndParts GroundOf(const GroundSources& sources, const GroundPlan& plan,
@@ -173,6 +212,7 @@ ro::formats::GndParts GroundOf(const GroundSources& sources, const GroundPlan& p
         ro::formats::GndCube{.corner_height = cube.corner_height,
                              .tile_up = static_cast<std::int32_t>(parts.tiles.size() - 1)});
   }
+  if (sources.wall_texture.has_value()) AddWallFaces(parts, plan, *sources.wall_texture);
   return parts;
 }
 
@@ -344,7 +384,8 @@ Result<GroundSources> OpenGroundSources(ro::vfs::Vfs& vfs, const ro::sim::Terrai
   std::optional<GroundComposeSources> compose;
   const std::optional<std::size_t> grass = RankOfRole(look, GroundTextureRole::kGrass);
   const std::optional<std::size_t> dirt = RankOfRole(look, GroundTextureRole::kPathFull);
-  if (grass.has_value() && dirt.has_value()) {
+  const std::optional<std::size_t> wall = RankOfRole(look, GroundTextureRole::kWall);
+  if (grass.has_value() && dirt.has_value() && !look.square_paths) {
     compose =
         MakeGroundComposeSources(library.terrain_textures[*grass], library.terrain_textures[*dirt]);
   }
@@ -405,7 +446,8 @@ Result<GroundSources> OpenGroundSources(ro::vfs::Vfs& vfs, const ro::sim::Terrai
                        .compose = std::move(compose),
                        .first_composed_page = first_composed_page,
                        .recomposed_patches = std::move(recomposed_patches),
-                       .motif_borders = std::move(motif_borders)};
+                       .motif_borders = std::move(motif_borders),
+                       .wall_texture = wall};
 }
 
 Result<MapStage> AssembleGroundWindow(ro::vfs::Vfs& vfs, const GroundSources& sources,

@@ -1591,6 +1591,7 @@ add_library(moonclient_arena STATIC
     survivors/arena_ground_look.cpp
     survivors/arena_ground_paths.cpp
     survivors/arena_ground_plan.cpp
+    survivors/arena_piece_pose.cpp
     survivors/arena_ground_relief.cpp
     survivors/arena_ground_window.cpp
     survivors/arena_meter.cpp

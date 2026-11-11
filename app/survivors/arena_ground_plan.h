@@ -75,6 +75,8 @@ struct PlannedCube {
   // de texture, pour que le filtrage n'y mêle pas un cube voisin qui ne se
   // raccorde pas (un coin de chemin).
   bool inset = false;
+  // Un cube de mur, relevé de `BiomeLook::wall_height_units`.
+  bool wall = false;
   [[nodiscard]] bool operator==(const PlannedCube&) const = default;
 };
 // Le retrait d'un cube `inset`, en part de la texture entière.
@@ -124,6 +126,8 @@ struct GroundPlan {
   std::vector<std::uint8_t> passable;
   // kGroundWindowCells² cases : 1 sur un chemin, comme `sim` le dit.
   std::vector<std::uint8_t> path;
+  // kGroundWindowCells² cases : 1 sur un mur de salle.
+  std::vector<std::uint8_t> wall;
   // LE BLOC DE CHAQUE CUBE, dans l'ordre de `cubes` : ses quatre cases et
   // l'anneau d'une case autour, lu jusque dans le tour de la fenêtre, un bit
   // par case de chemin (voir `kPathBlockSide`). Un emplacement dont un cube a

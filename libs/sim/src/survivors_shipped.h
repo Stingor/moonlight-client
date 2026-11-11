@@ -202,6 +202,7 @@ inline constexpr std::uint32_t kMinuteMs = 60000;
 inline constexpr std::uint16_t kPlainsTerrainId = 1;
 inline constexpr std::uint16_t kDesertTerrainId = 2;
 inline constexpr std::uint16_t kSnowTerrainId = 3;
+inline constexpr std::uint16_t kLabTerrainId = 4;
 
 // survivors_rules_mage.cpp : les classes, les skills et les cartes. Les skills
 // sont ceux de la réserve du Magicien, puis les évolués de

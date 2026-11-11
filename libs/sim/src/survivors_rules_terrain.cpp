@@ -118,7 +118,40 @@ constexpr std::array<TerrainPieceRule, 7> kSnowPieces{{
     {.piece_id = 7, .key = "xmas_tree", .footprint = kXmasTree, .weight = 1, .landmark = true},
 }};
 
-constexpr std::array<TerrainRule, 3> kTerrains{{
+// ── LE LABORATOIRE DE LIGHTHALZEN : ses pièces ─────────────────────────────
+// Les modèles des quatre étages du labo (lhz_dun01..04). Les emprises sont le
+// solide de leurs modèles (`roc-cli survivors emprises`).
+
+// Une cuve à monstre, sous tous ses angles.
+constexpr std::array<std::string_view, 4> kTank = {"####", "####", "####", "####"};
+// Un tube de verre.
+constexpr std::array<std::string_view, 2> kGlassTube = {"##", "##"};
+// Des caisses : trois caisses en L.
+constexpr std::array<std::string_view, 4> kCrates = {"##..", "##..", "####", "####"};
+// Une cuve brisée et ses éclats.
+constexpr std::array<std::string_view, 4> kBrokenTube = {"####", "####", "####", "####"};
+// Un tuyau couché, en ligne.
+constexpr std::array<std::string_view, 1> kPipe = {"###"};
+// Une barricade aux bandes jaunes et noires.
+constexpr std::array<std::string_view, 2> kBarricade = {"###", "###"};
+// Des béchers, franchissables : la place où ils se dessinent.
+constexpr std::array<std::string_view, 3> kBeakers = {"###", "###", "###"};
+// La pompe, le repère : son socle, et sa cuve qui s'amincit vers le nord-est.
+constexpr std::array<std::string_view, 6> kPump = {"##...", "###..", "####.",
+                                                   "#####", "#####", "#####"};
+
+constexpr std::array<TerrainPieceRule, 8> kLabPieces{{
+    {.piece_id = 1, .key = "tank", .footprint = kTank, .weight = 6},
+    {.piece_id = 2, .key = "glass_tube", .footprint = kGlassTube, .weight = 6},
+    {.piece_id = 3, .key = "crates", .footprint = kCrates, .weight = 6},
+    {.piece_id = 4, .key = "broken_tube", .footprint = kBrokenTube, .weight = 4},
+    {.piece_id = 5, .key = "pipe", .footprint = kPipe, .weight = 4},
+    {.piece_id = 6, .key = "barricade", .footprint = kBarricade, .weight = 3},
+    {.piece_id = 7, .key = "beakers", .footprint = kBeakers, .weight = 6, .walkable = true},
+    {.piece_id = 8, .key = "pump", .footprint = kPump, .weight = 1, .landmark = true},
+}};
+
+constexpr std::array<TerrainRule, 4> kTerrains{{
     {.terrain_id = kPlainsTerrainId,
      .key = "midgard_plains",
      .pieces = kPlainsPieces,
@@ -154,6 +187,22 @@ constexpr std::array<TerrainRule, 3> kTerrains{{
      .path_period_chunks = 3,
      .path_width_cells = 4,
      .path_wiggle_cells = 7},
+    // Le labo est un intérieur : des salles et des blocs de couloirs, des
+    // portes de huit cases, un tiers des bords ouverts en halls, un bloc de
+    // couloirs pour trois morceaux environ ; de 300 à 600 ‰ de pièces dans
+    // les salles, un repère par carré de 5 × 5 morceaux.
+    {.terrain_id = kLabTerrainId,
+     .key = "lighthalzen_biolab",
+     .pieces = kLabPieces,
+     .density_min_per_mille = 300,
+     .density_max_per_mille = 600,
+     .density_period_chunks = 3,
+     .clearing_cells = 12,
+     .landmark_period_chunks = 5,
+     .rooms = true,
+     .door_cells = 8,
+     .corridor_per_mille = 350,
+     .hall_per_mille = 350},
 }};
 
 }  // namespace

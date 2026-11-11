@@ -157,6 +157,7 @@ add_library(ro_sim STATIC
     src/survivors_summons.cpp
     src/survivors_spawner.cpp
     src/survivors_terrain.cpp
+    src/survivors_terrain_rooms.cpp
     src/survivors_threats.cpp
     src/survivors_trophies.cpp
     src/survivors_weapon.cpp
