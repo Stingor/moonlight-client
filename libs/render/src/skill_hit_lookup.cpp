@@ -20,15 +20,26 @@ namespace {
 // autres le font.
 constexpr std::array<std::uint8_t, 5> kDamageTypesWithHit = {4, 6, 8, 9, 13};
 
+// LE PREMIER COUP D'UNE SÉRIE DE COMBO, EF_COMBOATTACK1, et les niveaux qui le
+// remplacent par les coups suivants, EF_COMBOATTACK2 à 5.
+constexpr std::int32_t kFirstComboHitEffect = 186;
+constexpr std::int32_t kFirstFollowingComboLevel = 2;
+constexpr std::int32_t kLastFollowingComboLevel = 5;
+
 }  // namespace
 
-std::int32_t SkillDamageMsgEffect(std::uint16_t skill_id) {
+std::int32_t SkillDamageMsgEffect(std::uint16_t skill_id, std::int32_t announced_level) {
   // ⚠ AUCUNE RÈGLE PAR DÉFAUT : l'absence vaut « rien à poser », et c'est ce que
   // fait le client — sa carte rend −1 pour un identifiant qu'elle ne nomme pas
   // comme pour un identifiant qu'elle met à −1.
   const SkillHitEffectEntry* found =
       core::RowWithKey(SkillDamageMsgEffectTable(), skill_id, &SkillHitEffectEntry::skill_id);
-  return found != nullptr ? found->effect_id : -1;
+  const std::int32_t effect_id = found != nullptr ? found->effect_id : -1;
+  if (effect_id == kFirstComboHitEffect && announced_level >= kFirstFollowingComboLevel &&
+      announced_level <= kLastFollowingComboLevel) {
+    return kFirstComboHitEffect + announced_level - 1;
+  }
+  return effect_id;
 }
 
 std::int32_t SkillHitEffect(std::uint16_t skill_id, bool any_damage, bool cast_by_me) {

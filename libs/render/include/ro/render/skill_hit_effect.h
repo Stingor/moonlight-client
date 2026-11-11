@@ -92,7 +92,12 @@ struct SkillHitEffectWhen {
 // ⚠ PAS DE RÈGLE PAR DÉFAUT ICI, à la différence de l'effet de frappe : un
 // identifiant absent ne pose rien, et la carte met elle-même −1 pour 97 des 302
 // identifiants qu'elle nomme. Les deux se valent.
-[[nodiscard]] std::int32_t SkillDamageMsgEffect(std::uint16_t skill_id);
+//
+// 🔴 ET LE NIVEAU CHANGE LE PREMIER COUP DE COMBO : quand la carte rend 186, le
+// niveau annoncé de deux à cinq le remplace par 187 à 190 — les coups suivants
+// de la même série.
+[[nodiscard]] std::int32_t SkillDamageMsgEffect(std::uint16_t skill_id,
+                                                std::int32_t announced_level = 0);
 
 // ── L'IMPACT D'UN COUP ORDINAIRE ────────────────────────────────────────────
 //

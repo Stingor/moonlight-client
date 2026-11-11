@@ -162,7 +162,7 @@ void EffectsInPlay::NoticeHitEffects(const SoundStage& scene) {
         : has_no_skill ? ro::render::PlainHitMsgEffect(attacker_job, strike.attacker == id)
         : StrikeByGroundUnit(*scene.world, strike)
             ? -1
-            : ro::render::SkillDamageMsgEffect(strike.skill_id);
+            : ro::render::SkillDamageMsgEffect(strike.skill_id, strike.announced_level);
     // ⚠ L'EFFET D'EMPLOI N'EST PAS ICI : il naît sur le lanceur à l'arrivée du
     // paquet, sans attendre l'image de frappe — voir `NoticeSkills`. Cette
     // sortie ne pose que ce que la cible reçoit quand le coup touche.
