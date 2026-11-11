@@ -68,8 +68,9 @@ void WalkMap::SetServerCell(std::int32_t x, std::int32_t y, std::uint8_t server_
   if (x < 0 || x >= width_ || y < 0 || y >= height_) {
     return;
   }
-  std::uint8_t& passable = passable_[static_cast<std::size_t>(y) * static_cast<std::size_t>(width_) +
-                                     static_cast<std::size_t>(x)];
+  std::uint8_t& passable =
+      passable_[static_cast<std::size_t>(y) * static_cast<std::size_t>(width_) +
+                static_cast<std::size_t>(x)];
   const std::uint8_t now_passable = Blocks(server_cell) ? 0U : 1U;
   if (passable != now_passable) {
     passable = now_passable;
