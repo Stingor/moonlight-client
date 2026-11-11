@@ -27,6 +27,7 @@ add_library(ro_net STATIC
     src/player_style_layers.cpp
     src/style_outfits.cpp
     src/absent_styles.cpp
+    src/char_select_styles.cpp
     src/player_styles.cpp
     src/player_settings.cpp
     src/bug_report.cpp

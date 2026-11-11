@@ -95,6 +95,9 @@ class StyleView {
   //
   // ⚠ SEULEMENT APRÈS UN LOT QUI NOUS NOMME : avant, un livre vide dit « pas
   // encore reçu », et l'écrire effacerait des couleurs bien réelles.
+  //
+  // Il retient aussi la preuve que le serveur de personnages sert la tablée
+  // (règle 28), une fois qu'elle est dite.
   void KeepForSelection(const ro::sim::World& world, std::uint32_t character_id);
 
   // POSE NOS COULEURS DÈS L'ENTRÉE EN JEU, depuis ce que la tablée a gardé :
@@ -400,6 +403,7 @@ class StyleView {
   std::uint32_t character_id_ = 0;
   // La révision du livre pour le joueur déjà rangée ; zéro : rien encore.
   std::uint32_t kept_revision_ = 0;
+  bool served_kept_ = false;
   // Nos couleurs gardées ont-elles été posées, ou n'y avait-il rien à poser ?
   bool seeded_ = false;
   StylePresets presets_;

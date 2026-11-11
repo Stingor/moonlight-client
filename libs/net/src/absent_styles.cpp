@@ -78,6 +78,11 @@ static_assert(proto::ZcMoonclientStyleAbsent::kWireSize == 10,
 
 }  // namespace
 
+bool ReadShownStyle(core::ByteReader& reader, sim::StyleVariants& variants,
+                    std::vector<sim::StyleLayerRecipe>& layers) {
+  return ReadBodies(reader, variants) && ReadLayers(reader, layers);
+}
+
 core::Result<std::vector<std::uint8_t>> EncodeAbsentStylesRequest(
     std::span<const std::uint32_t> char_ids) {
   if (char_ids.empty() || char_ids.size() > kAbsentStyleIdsMost) {

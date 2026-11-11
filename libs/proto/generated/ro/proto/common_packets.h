@@ -491,6 +491,25 @@ struct HcAcceptEnter2 {
   std::string extension;
 };
 
+// PACKET_CH_MOONCLIENT_CHAR_STYLES
+struct ChMoonclientCharStyles {
+  static constexpr std::uint16_t kOpcode = 0x0f65;
+  // Taille sur le fil, en octets.
+  static constexpr std::size_t kWireSize = 6;
+
+  std::uint32_t caps = 0;
+};
+
+// PACKET_HC_MOONCLIENT_CHAR_STYLES
+struct HcMoonclientCharStyles {
+  static constexpr std::uint16_t kOpcode = 0x0f66;
+  // Taille sur le fil, en octets.
+  static constexpr std::size_t kWireSize = 7;
+
+  std::uint8_t flags = 0;
+  std::uint16_t raw_size = 0;
+};
+
 // PACKET_HC_NOTIFY_ACCESSIBLE_MAPNAME_sub
 struct HcNotifyAccessibleMapnameSub {
   // Taille sur le fil, en octets.
@@ -676,6 +695,8 @@ struct TcResult {
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ChDeleteChar3Cancel& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, HcDeleteChar3Cancel& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, HcAcceptEnter2& packet);
+[[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ChMoonclientCharStyles& packet);
+[[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, HcMoonclientCharStyles& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, HcNotifyAccessibleMapname& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ChSelectAccessibleMapname& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ChSecondPasswdAck& packet);
@@ -730,6 +751,8 @@ struct TcResult {
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ChDeleteChar3Cancel& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const HcDeleteChar3Cancel& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const HcAcceptEnter2& packet);
+[[nodiscard]] std::vector<std::uint8_t> Encode(const ChMoonclientCharStyles& packet);
+[[nodiscard]] std::vector<std::uint8_t> Encode(const HcMoonclientCharStyles& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const HcNotifyAccessibleMapname& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ChSelectAccessibleMapname& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ChSecondPasswdAck& packet);

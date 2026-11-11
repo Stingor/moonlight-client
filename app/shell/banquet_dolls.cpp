@@ -9,6 +9,7 @@
 #include "ro/render/sprite_vignette.h"
 #include "ro/sim/actor.h"
 
+#include "character/character_styles.h"
 #include "game/connected_session.h"
 #include "world/actor_view.h"
 
@@ -77,13 +78,20 @@ float BanquetDolls::StandardSpanUnits(int animation) {
 
 BanquetDolls::~BanquetDolls() { dressing_.Sweep(*wardrobe_, ro::sim::StyleBook{}); }
 
-void BanquetDolls::UseStyles(const std::map<std::uint32_t, ro::sim::StyleVariants>& kept) {
-  for (const auto& [character_id, variants] : kept) {
-    styles_.BeginBatchFor(character_id);
+void BanquetDolls::UseStyles(const std::map<std::uint32_t, ro::sim::StyleOutfit>& outfits) {
+  for (const auto& [character_id, outfit] : outfits) {
+    const ro::sim::StyleVariants variants = VariantsOfOutfit(outfit);
+    styles_.Forget(character_id);
     for (const auto& [body_key, recipe] : variants.by_body) {
       styles_.Remember(character_id, body_key, recipe, body_key == variants.fallback_body);
     }
+    styles_.RememberLayers(character_id, outfit.layers);
   }
+}
+
+void BanquetDolls::ForgetStyles(std::uint32_t character_id) {
+  styles_.Forget(character_id);
+  styles_.RememberLayers(character_id, {});
 }
 
 BanquetDolls::Seated BanquetDolls::Seat(int seat, const ro::proto::CharacterInfo& character,
@@ -114,9 +122,9 @@ BanquetDolls::Seated BanquetDolls::Seat(int seat, const ro::proto::CharacterInfo
 
   ro::render::ActorVignette::Pose pose;
   pose.look = LookOf(seated);
-  // 🔴 ET LES COULEURS QUE LE SERVEUR LUI DONNE EN JEU, qu'il ne donne pas ici :
-  // celles que le jeu a gardées. Sans elles, chaque convive paraîtrait dans
-  // ses couleurs natives. Le même registre que la carte, pour le même rendu.
+  // 🔴 ET SA RECETTE ENTIÈRE, v7 et calques : celle que le serveur de
+  // personnages a dite, sinon celle que le cache a gardée. Le même registre que
+  // la carte, pour le même rendu.
   dressing_.Dress(static_cast<std::uint32_t>(character.GID), pose.look, *wardrobe_, styles_);
   // ⚠ AUCUNE SCÈNE NE RETIENT LES TENUES D'ICI : l'identifiant remplacé se rend aussitôt.
   dressing_.Sweep(*wardrobe_, styles_);

@@ -9,6 +9,7 @@
 #include "ro/render/actor_vignette.h"
 #include "ro/render/actor_wardrobe.h"
 #include "ro/sim/style.h"
+#include "ro/sim/style_outfit.h"
 #include "ro/ui/character_seats.h"
 #include "ro/ui/character_select_window.h"
 #include "ro/ui/seat_layout.h"
@@ -37,9 +38,13 @@ class BanquetDolls {
   BanquetDolls(const BanquetDolls&) = delete;
   BanquetDolls& operator=(const BanquetDolls&) = delete;
 
-  // LES COULEURS DES CONVIVES, par identifiant de personnage — celles que le
-  // jeu a gardées pour la tablée, voir `character/character_styles.h`.
-  void UseStyles(const std::map<std::uint32_t, ro::sim::StyleVariants>& kept);
+  // LES COULEURS DES CONVIVES, par identifiant de personnage : la tenue de
+  // chacun, v7 et teintures de calques, que le serveur de personnages vient de
+  // dire ou que le cache a gardée — voir `character/character_styles.h`. Chaque
+  // tenue REDÉFINIT celles de son personnage.
+  void UseStyles(const std::map<std::uint32_t, ro::sim::StyleOutfit>& outfits);
+  // Ce personnage ne montre plus rien : il reprend ses couleurs d'origine.
+  void ForgetStyles(std::uint32_t character_id);
 
   // UN CONVIVE DESSINÉ : son image, et le nombre d'images de l'action qu'il
   // joue — le menu de pose ne propose que celles qui existent.

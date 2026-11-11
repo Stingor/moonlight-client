@@ -5,6 +5,7 @@
 #include <span>
 #include <vector>
 
+#include "ro/core/byte_reader.h"
 #include "ro/core/error.h"
 #include "ro/net/connection.h"
 #include "ro/net/world_update.h"
@@ -48,6 +49,13 @@ struct AbsentStyleBlock {
   std::uint32_t char_id = 0;
   sim::AbsentStyle style;
 };
+
+// CE QU'UN PERSONNAGE MONTRE, tel que le 0x0F64 et la tablée (`HC 0x0F66`) le
+// portent : [corps:1] puis corps × une variante du 0x0F27 sans son gid,
+// [nombre:1] puis nombre × une entrée de calque du 0x0F5F. Faux si cela déborde ;
+// les variantes et entrées illisibles, ou au-delà des plafonds, sont enjambées.
+[[nodiscard]] bool ReadShownStyle(core::ByteReader& reader, sim::StyleVariants& variants,
+                                  std::vector<sim::StyleLayerRecipe>& layers);
 
 // 🔴 TOUT OU RIEN : un bloc qui déborde, ou un état inconnu, rend une erreur.
 // Une entrée de calque ou une variante qu'on ne sait pas lire est enjambée, et

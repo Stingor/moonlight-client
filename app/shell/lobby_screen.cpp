@@ -556,6 +556,7 @@ ro::core::Result<void> LobbyScreen::Frame(std::uint32_t now_ms) {
   // demande. Sans effet aux images suivantes.
   if (flow_.screen() == lobby::LobbyScreenKind::kCharacters) {
     OpenBanquet();
+    HearCharacterStyles();
   }
 
   // LE VOILE DE L'ENTRÉE EN JEU suit l'écran de la machine à états. La main,

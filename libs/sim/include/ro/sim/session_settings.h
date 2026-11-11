@@ -112,6 +112,9 @@ struct SessionSettings {
   std::uint32_t style_absent_cadence_ms = 0;
   // Les char_id d'une demande hors de vue, au plus. Zéro : non dit.
   int style_absent_ids_most = 0;
+  // 🔴 LE SERVEUR DE PERSONNAGES SERT LES RECETTES DE LA TABLÉE (CH 0x0F65) :
+  // faux, aucune demande ne part, puisqu'un paquet inconnu y coupe la liaison.
+  bool style_char_select_served = false;
   // Les bornes des numéros officiels, telles que le serveur les applique. Zéro :
   // non dites.
   int hair_style_min = 0;

@@ -323,13 +323,20 @@ void StyleView::RefreshThumbnails(const ro::render::ActorLook& look,
 }
 
 void StyleView::KeepForSelection(const ro::sim::World& world, std::uint32_t character_id) {
+  if (!served_kept_ && world.session().style_char_select_served) {
+    served_kept_ = true;
+    static_cast<void>(NoteCharacterStylesServed(client_root_));
+  }
   const std::uint32_t revision = world.styles().RevisionOf(world.player_id());
   if (revision == 0 || revision == kept_revision_ || character_id == 0) {
     return;
   }
   kept_revision_ = revision;
-  static_cast<void>(
-      NoteCharacterStyles(client_root_, character_id, world.styles().Find(world.player_id())));
+  // La tenue de ce que le serveur dit que nous montrons : nos corps, et les
+  // teintures que notre bloc porte.
+  const ro::sim::StyleOutfit shown = OutfitOf(world.styles().Find(world.player_id()),
+                                              world.styles().FindLayers(world.player_id()));
+  static_cast<void>(NoteCharacterStyles(client_root_, character_id, &shown));
 }
 
 void StyleView::SeedFromSelection(ro::sim::World& world, std::uint32_t character_id) {
@@ -342,14 +349,20 @@ void StyleView::SeedFromSelection(ro::sim::World& world, std::uint32_t character
   if (world.styles().RevisionOf(player_id) != 0) {
     return;
   }
-  const std::map<std::uint32_t, ro::sim::StyleVariants> kept = LoadCharacterStyles(client_root_);
-  const auto found = kept.find(character_id);
-  if (found == kept.end() || found->second.empty()) {
+  const KeptCharacterStyles kept = LoadCharacterStyles(client_root_);
+  const auto found = kept.characters.find(character_id);
+  if (found == kept.characters.end()) {
+    return;
+  }
+  // ⚠ LA V7 SEULE : les teintures de calques arrivent avec le premier bloc du
+  // serveur, à l'entrée sur la carte.
+  const ro::sim::StyleVariants variants = VariantsOfOutfit(found->second);
+  if (variants.empty()) {
     return;
   }
   world.styles().BeginBatchFor(player_id);
-  for (const auto& [body_key, recipe] : found->second.by_body) {
-    world.styles().Remember(player_id, body_key, recipe, body_key == found->second.fallback_body);
+  for (const auto& [body_key, recipe] : variants.by_body) {
+    world.styles().Remember(player_id, body_key, recipe, body_key == variants.fallback_body);
   }
 }
 

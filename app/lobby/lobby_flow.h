@@ -180,6 +180,11 @@ class LobbyFlow {
   [[nodiscard]] std::vector<ro::proto::CharacterInfo> characters() const {
     return player_.characters();
   }
+  // Les recettes de la tablée : voir `SessionDrive::RequestCharacterStyles`.
+  void RequestCharacterStyles() { player_.RequestCharacterStyles(); }
+  [[nodiscard]] std::vector<ro::net::CharSelectStylesAnswer> TakeCharacterStyles() {
+    return player_.TakeCharacterStyles();
+  }
   [[nodiscard]] std::uint8_t chosen_slot() const noexcept { return player_.chosen_slot(); }
   // ⚠ PAS `characters()[chosen_slot()]` : la liste est dense, les emplacements
   // ne le sont pas. Voir `ro::net::IndexOfSlot`.

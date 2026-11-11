@@ -184,6 +184,11 @@ class SessionDrive {
   // `list_received_` de `ro::net::CharacterPhase`.
   [[nodiscard]] std::vector<ro::proto::CharacterInfo> characters() const;
 
+  // LES RECETTES DE LA TABLÉE : voir `ro::net::CharacterPhase::RequestStyles`.
+  // Sans effet, et rien à prendre, hors de la phase des personnages.
+  void RequestCharacterStyles();
+  [[nodiscard]] std::vector<ro::net::CharSelectStylesAnswer> TakeCharacterStyles();
+
   // L'EMPLACEMENT choisi, une fois `Choose` appelé.
   //
   // 🔴 UN EMPLACEMENT, PAS UN RANG DE LISTE, et ce n'est pas une nuance : la

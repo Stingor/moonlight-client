@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "ro/core/error.h"
+#include "ro/net/char_select_styles.h"
 #include "ro/net/connection.h"
 #include "ro/proto/common_packets.h"
 
@@ -389,6 +390,16 @@ class CharacterPhase {
   // celui-là est faux » : le serveur emploie le même paquet pour les deux.
   [[nodiscard]] bool pincode_refused() const noexcept { return pincode_refused_; }
 
+  // ── LES RECETTES DE LA TABLÉE — voir `ro/net/char_select_styles.h` ─────────
+  //
+  // Demande au serveur de personnages celles du compte. 🔴 L'APPELANT S'EST
+  // ASSURÉ QUE CE SERVEUR LES SERT (règle 28) : sinon il coupe la liaison. Sans
+  // effet hors du choix, ou si la table ignore la réponse ; UNE FOIS par phase,
+  // et l'appelant peut donc la redemander à chaque image.
+  void RequestStyles();
+  // Les trames de réponse reçues depuis le dernier appel, dans l'ordre.
+  [[nodiscard]] std::vector<CharSelectStylesAnswer> TakeStyles();
+
   // LE SERVEUR DIT QU'AUCUNE CARTE N'EST ENCORE SERVIE : il démarre. Il répond
   // alors à la demande d'entrée par la liste des cartes accessibles, toutes
   // indisponibles, et attend que le joueur redemande. La phase revient à
@@ -443,6 +454,8 @@ class CharacterPhase {
   // Lit l'accusé d'une retouche. Rend faux si la trame n'en est pas un ; une
   // trame illisible pose `kFailed`, que l'appelant relit.
   [[nodiscard]] bool TookAmendAnswer(const Frame& frame);
+  // Range une réponse de la tablée. Rend faux si la trame n'en est pas une.
+  bool TookStyles(const Frame& frame);
 
   Connection link_;
   Step step_ = Step::kAwaitingAccountId;
@@ -480,6 +493,8 @@ class CharacterPhase {
   // armée. Voir `Beat`.
   std::optional<std::uint32_t> last_beat_ms_;
   std::vector<proto::CharacterInfo> characters_;
+  std::vector<CharSelectStylesAnswer> styles_;
+  bool styles_asked_ = false;
   Handoff handoff_;
   std::uint32_t refusal_code_ = 0;
   std::string refusal_text_;

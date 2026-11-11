@@ -1171,6 +1171,58 @@ std::vector<std::uint8_t> Encode(const HcAcceptEnter2& packet) {
   return out;
 }
 
+bool Decode(std::span<const std::uint8_t> frame, ChMoonclientCharStyles& packet) {
+  if (frame.size() != ChMoonclientCharStyles::kWireSize) {
+    return false;
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != ChMoonclientCharStyles::kOpcode) {
+    return false;
+  }
+  packet.caps = static_cast<std::uint32_t>(reader.U32());
+  return reader.ok();
+}
+
+std::vector<std::uint8_t> Encode(const ChMoonclientCharStyles& packet) {
+  std::vector<std::uint8_t> out;
+  out.reserve(ChMoonclientCharStyles::kWireSize);
+  ByteWriter writer(out);
+  writer.U16(ChMoonclientCharStyles::kOpcode);
+  writer.U32(static_cast<std::uint32_t>(packet.caps));
+  return out;
+}
+
+bool Decode(std::span<const std::uint8_t> frame, HcMoonclientCharStyles& packet) {
+  if (frame.size() < HcMoonclientCharStyles::kWireSize) {
+    return false;
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != HcMoonclientCharStyles::kOpcode) {
+    return false;
+  }
+  // La longueur est déjà connue : c'est celle de la trame.
+  reader.Skip(2);
+  packet.flags = static_cast<std::uint8_t>(reader.U8());
+  packet.raw_size = static_cast<std::uint16_t>(reader.U16());
+  return reader.ok();
+}
+
+std::vector<std::uint8_t> Encode(const HcMoonclientCharStyles& packet) {
+  std::vector<std::uint8_t> out;
+  out.reserve(HcMoonclientCharStyles::kWireSize);
+  ByteWriter writer(out);
+  writer.U16(HcMoonclientCharStyles::kOpcode);
+  // Réservée : la longueur ne sera connue qu'une fois la queue écrite.
+  writer.U16(0);
+  writer.U8(static_cast<std::uint8_t>(packet.flags));
+  writer.U16(static_cast<std::uint16_t>(packet.raw_size));
+  if (writer.size() > kMaxFrameSize ||
+      !writer.PatchU16(kLengthOffset, static_cast<std::uint16_t>(writer.size()))) {
+    return {};
+  }
+  return out;
+}
+
 bool Decode(std::span<const std::uint8_t> frame, HcNotifyAccessibleMapname& packet) {
   if (frame.size() < HcNotifyAccessibleMapname::kWireSize) {
     return false;

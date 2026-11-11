@@ -68,6 +68,9 @@ enum class ServerRuleKey : std::uint16_t {
   // demande.
   kStyleAbsentCadenceMs = 26,
   kStyleAbsentIdsMost = 27,
+  // LA TABLÉE : le serveur de PERSONNAGES sert le CH 0x0F65. Elle ne se dit
+  // qu'en jeu, et le cache de la tablée la garde pour la sélection suivante.
+  kStyleCharSelect = 28,
 };
 
 [[nodiscard]] FrameOutcome ApplyServerRulesFrame(const Frame& frame, sim::World& world);

@@ -644,8 +644,8 @@ PhaseState CharacterPhase::Advance() {
       }
       continue;
     }
-    // Le reste est ignoré : la notification de liste et les paquets d'agrément
-    // n'apprennent rien à cette phase.
+    // Les recettes de la tablée ; le reste n'apprend rien à cette phase.
+    TookStyles(frame);
   }
 
   state_ = LinkVerdict(polled.status, link_, error_);

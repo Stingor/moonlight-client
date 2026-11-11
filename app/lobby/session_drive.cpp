@@ -353,6 +353,17 @@ std::uint8_t SessionDrive::producible_slots() const noexcept {
   return characters_.has_value() ? characters_->producible_slots() : 0;
 }
 
+void SessionDrive::RequestCharacterStyles() {
+  if (characters_.has_value()) {
+    characters_->RequestStyles();
+  }
+}
+
+std::vector<ro::net::CharSelectStylesAnswer> SessionDrive::TakeCharacterStyles() {
+  return characters_.has_value() ? characters_->TakeStyles()
+                                 : std::vector<ro::net::CharSelectStylesAnswer>();
+}
+
 std::vector<ro::proto::CharacterInfo> SessionDrive::characters() const {
   return characters_.has_value() ? characters_->characters()
                                  : std::vector<ro::proto::CharacterInfo>();

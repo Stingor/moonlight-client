@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <map>
 #include <optional>
 #include <string>
 #include <utility>
@@ -222,6 +223,10 @@ class LobbyScreen : public Screen {
   // ⚠ À L'ARRIVÉE DE LA LISTE ET NON AU DÉMARRAGE : c'est le plus long
   // chargement du client, et le formulaire doit paraître tout de suite.
   void OpenBanquet();
+  // LES RECETTES DU SERVEUR DE PERSONNAGES : demandées une fois la liste là, si
+  // le cache garde la preuve qu'il les sert, puis rangées dans la tablée et dans
+  // le cache à mesure que les réponses arrivent. Voir `character_styles.h`.
+  void HearCharacterStyles();
   // Désigne le dernier personnage joué, s'il est là. Voir `recent_characters.h`.
   void PreferLastPlayed();
   // ── LA MISE EN PAGE DE LA TABLÉE ── vit dans `lobby_layout.cpp`.
@@ -290,6 +295,10 @@ class LobbyScreen : public Screen {
   // Les pantins, montés en même temps que la garde-robe. ⚠ VIDE TANT QUE LA
   // LISTE N'EST PAS ARRIVÉE : voir `OpenBanquet`.
   std::optional<BanquetDolls> dolls_;
+  // La preuve, lue du cache à l'ouverture de la tablée, et les tenues d'une
+  // réponse en plusieurs trames, jusqu'à la dernière.
+  bool character_styles_served_ = false;
+  std::map<std::uint32_t, ro::sim::StyleOutfit> character_styles_told_;
   std::optional<NewcomerPreview> newcomer_dolls_;
   // LES MISES EN PAGE ENREGISTRÉES. La mise en page courante, elle, est dans
   // `seats_.layout` : c'est la scène qui l'édite.

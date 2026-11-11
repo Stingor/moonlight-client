@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <ctime>
+#include <map>
 #include <optional>
 #include <string>
 #include <vector>
@@ -95,7 +96,9 @@ void LobbyScreen::OpenBanquet() {
     return;
   }
   dolls_.emplace(*shell_.pieces().wardrobe);
-  dolls_->UseStyles(LoadCharacterStyles(shell_.client_root()));
+  const KeptCharacterStyles kept = LoadCharacterStyles(shell_.client_root());
+  dolls_->UseStyles(kept.characters);
+  character_styles_served_ = kept.served;
   newcomer_dolls_.emplace(*shell_.pieces().wardrobe);
   PreferLastPlayed();
 }
@@ -108,6 +111,41 @@ void LobbyScreen::OpenBanquet() {
 // ⚠ PAR L'EMPLACEMENT, PAS PAR LE RANG : `seats_.selected` est un emplacement,
 // et la liste est dense. Les deux coïncident tant qu'aucun personnage n'a été
 // supprimé, c'est-à-dire sur tous les comptes d'essai.
+void LobbyScreen::HearCharacterStyles() {
+  if (!dolls_.has_value()) {
+    return;
+  }
+  if (character_styles_served_) {
+    flow_.RequestCharacterStyles();
+  }
+  for (const ro::net::CharSelectStylesAnswer& answer : flow_.TakeCharacterStyles()) {
+    for (const ro::net::CharSelectStyle& block : answer.blocks) {
+      character_styles_told_[block.char_id] = OutfitOf(&block.variants, &block.layers);
+    }
+    if (answer.more) {
+      continue;
+    }
+    // 🔴 LA RÉPONSE EST COMPLÈTE : elle fait foi pour tous les personnages de la
+    // liste, et pour eux seuls. Un personnage sans recette ne montre rien.
+    std::vector<std::uint32_t> listed;
+    for (const ro::proto::CharacterInfo& who : flow_.characters()) {
+      listed.push_back(static_cast<std::uint32_t>(who.GID));
+    }
+    std::map<std::uint32_t, ro::sim::StyleOutfit> told;
+    for (const std::uint32_t character_id : listed) {
+      if (const auto found = character_styles_told_.find(character_id);
+          found != character_styles_told_.end()) {
+        told.insert(*found);
+      } else {
+        dolls_->ForgetStyles(character_id);
+      }
+    }
+    dolls_->UseStyles(told);
+    static_cast<void>(NoteAccountStyles(shell_.client_root(), listed, told));
+    character_styles_told_.clear();
+  }
+}
+
 void LobbyScreen::PreferLastPlayed() {
   if (seats_.selected >= 0) {
     return;
