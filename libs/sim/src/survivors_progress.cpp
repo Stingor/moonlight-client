@@ -308,6 +308,19 @@ void DropGem(SurvivorsField& field, FieldPoint at, std::uint32_t exp) {
   }
 }
 
+// Un choix soldé : le suivant s'ouvre, ou la partie reprend.
+void Settle(SurvivorsField& field) {
+  if (field.pending_level_ups > 0) --field.pending_level_ups;
+  if (field.pending_level_ups > 0) {
+    BuildOffers(field);
+    return;
+  }
+  field.offers.clear();
+  field.phase = SurvivorsPhase::kRunning;
+}
+
+}  // namespace
+
 // La flaque qu'un monstre laisse en tombant en `at` : armée dès ce pas, elle
 // blesse pendant `puddle_ms`, au plus une fois par `puddle_period_ms`. Rien
 // sans dégâts, rayon ou durée, ni au plafond des menaces au sol.
@@ -328,19 +341,6 @@ void LeavePuddle(SurvivorsField& field, const FoeBehaviour& behaviour, FieldPoin
                       .period_steps = StepsOf(behaviour.puddle_period_ms),
                       .next_hurt_step = field.step});
 }
-
-// Un choix soldé : le suivant s'ouvre, ou la partie reprend.
-void Settle(SurvivorsField& field) {
-  if (field.pending_level_ups > 0) --field.pending_level_ups;
-  if (field.pending_level_ups > 0) {
-    BuildOffers(field);
-    return;
-  }
-  field.offers.clear();
-  field.phase = SurvivorsPhase::kRunning;
-}
-
-}  // namespace
 
 void RecomputeStats(SurvivorsField& field) {
   if (field.rules == nullptr || field.hero_class == nullptr) return;

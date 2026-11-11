@@ -139,7 +139,7 @@ constexpr std::array<std::string_view, 6> kPump = {"##...", "###..", "####.",
                                                    "#####", "#####", "#####"};
 
 constexpr std::array<TerrainPieceRule, 7> kLabPieces{{
-    {.piece_id = 1, .key = "tank", .footprint = kTank, .weight = 10},
+    {.piece_id = kLabTankPieceId, .key = "tank", .footprint = kTank, .weight = 10},
     {.piece_id = 3, .key = "crates", .footprint = kCrates, .weight = 6},
     {.piece_id = 4, .key = "broken_tube", .footprint = kBrokenTube, .weight = 4},
     {.piece_id = 5, .key = "pipe", .footprint = kPipe, .weight = 4},

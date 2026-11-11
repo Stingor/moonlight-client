@@ -41,6 +41,8 @@ static_assert(static_cast<int>(ro::sim::BossMoveKind::kFlee) ==
               static_cast<int>(ro::ui::SurvivorsCodexMoveKind::kFlee));
 static_assert(static_cast<int>(ro::sim::EventKind::kGroup) ==
               static_cast<int>(ro::ui::SurvivorsCodexEventKind::kGroup));
+static_assert(static_cast<int>(ro::sim::EventKind::kTanks) ==
+              static_cast<int>(ro::ui::SurvivorsCodexEventKind::kTanks));
 static_assert(ro::sim::kFoeKnockbackImmune == ro::ui::kCodexTraitKnockbackImmune);
 static_assert(ro::sim::kFoeFreezeImmune == ro::ui::kCodexTraitFreezeImmune);
 static_assert(ro::sim::kFoePassesWalls == ro::ui::kCodexTraitPassesWalls);

@@ -203,6 +203,8 @@ inline constexpr std::uint16_t kPlainsTerrainId = 1;
 inline constexpr std::uint16_t kDesertTerrainId = 2;
 inline constexpr std::uint16_t kSnowTerrainId = 3;
 inline constexpr std::uint16_t kLabTerrainId = 4;
+// La cuve à monstre du labo, la pièce que rompt EventKind::kTanks.
+inline constexpr std::uint16_t kLabTankPieceId = 1;
 
 // survivors_rules_mage.cpp : les classes, les skills et les cartes. Les skills
 // sont ceux de la réserve du Magicien, puis les évolués de
@@ -291,6 +293,14 @@ inline constexpr std::size_t kDesertFoeCount = 23;
 inline constexpr std::size_t kSnowFoeCount = 19;
 [[nodiscard]] std::span<const FoeRule> SnowFoes();
 [[nodiscard]] ArenaContent SnowContent();
+
+// survivors_rules_lab.cpp : les monstres propres au labo de Lighthalzen, ses
+// vagues, ses boss et ses événements, et les jeux de boss dont la partie tire
+// le sien. ShippedFoes les met après ceux de la neige.
+inline constexpr std::size_t kLabFoeCount = 26;
+[[nodiscard]] std::span<const FoeRule> LabFoes();
+[[nodiscard]] ArenaContent LabContent();
+[[nodiscard]] std::span<const std::span<const BossRule>> LabBossDraws();
 
 // survivors_rules_bosses.cpp : les mini-boss, le boss final et leurs coups.
 [[nodiscard]] std::span<const BossRule> ShippedBosses();

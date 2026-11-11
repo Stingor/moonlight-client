@@ -211,7 +211,15 @@ struct SurvivorsCodexMove {
 
 // La sorte d'un événement de la chronologie, en miroir des règles, plus les
 // élites et la nuit.
-enum class SurvivorsCodexEventKind : std::uint8_t { kSwarm, kRaid, kRing, kGroup, kElites, kNight };
+enum class SurvivorsCodexEventKind : std::uint8_t {
+  kSwarm,
+  kRaid,
+  kRing,
+  kGroup,
+  kTanks,
+  kElites,
+  kNight
+};
 
 struct SurvivorsCodexEntry {
   SurvivorsCodexSheet sheet = SurvivorsCodexSheet::kSkill;

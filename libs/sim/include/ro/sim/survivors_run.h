@@ -219,6 +219,9 @@ struct SurvivorsField {
   std::vector<SurvivorsHazard> hazards;     // ordre de pose
   std::vector<SurvivorsGem> gems;           // ordre de naissance
   std::vector<SurvivorsPlant> plants;       // ordre de pose
+  // LES CUVES ROMPUES (EventKind::kTanks) : le coin sud-ouest de chacune,
+  // dans l'ordre de rupture.
+  std::vector<CellPosition> burst_tanks;
   // Au fil des tués : `tally.kills` à la dernière naissance d'une plante (0
   // au départ). Les tués depuis cette naissance sont le compteur des plantes.
   std::uint32_t plant_kills_mark = 0;

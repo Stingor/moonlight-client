@@ -309,15 +309,18 @@ constexpr std::array<ElementRow, kSurvivorsElementCount> kElements{{
 
 std::span<const FoeRule> ShippedFoes() {
   // Une table IMMUABLE, assemblée au premier appel : la prairie, le désert,
-  // puis la neige.
-  constexpr std::size_t kAllFoeCount = kPlainsFoeCount + kDesertFoeCount + kSnowFoeCount;
+  // la neige, puis le labo.
+  constexpr std::size_t kAllFoeCount =
+      kPlainsFoeCount + kDesertFoeCount + kSnowFoeCount + kLabFoeCount;
   static const std::array<FoeRule, kAllFoeCount> kAll = [] {
     std::array<FoeRule, kAllFoeCount> all{};
     const std::span<const FoeRule> desert = DesertFoes();
     const std::span<const FoeRule> snow = SnowFoes();
     auto out = std::copy(kFoes.begin(), kFoes.end(), all.begin());
     out = std::copy_n(desert.begin(), std::min(desert.size(), kDesertFoeCount), out);
-    std::copy_n(snow.begin(), std::min(snow.size(), kSnowFoeCount), out);
+    out = std::copy_n(snow.begin(), std::min(snow.size(), kSnowFoeCount), out);
+    const std::span<const FoeRule> lab = LabFoes();
+    std::copy_n(lab.begin(), std::min(lab.size(), kLabFoeCount), out);
     return all;
   }();
   return kAll;
@@ -331,14 +334,15 @@ std::span<const WaveRule> ShippedWaves() { return kWaves; }
 // bestiaire, ses boss et ses événements ; partie libre seulement (lot 12, Q2).
 // lutie_snowfield : le sol généré des neiges de Lutie, de même, en partie
 // libre (lot 17, Q1). lighthalzen_biolab : le laboratoire de Lighthalzen, le
-// premier intérieur, en salles, couloirs et halls ; partie libre, avec le
-// bestiaire de la prairie tant qu'il n'a pas le sien (lot 20). Le numéro 1,
+// premier intérieur, en salles, couloirs et halls ; partie libre, avec son
+// bestiaire, et un MVP final tiré par la graine (lot 20). Le numéro 1,
 // celui de l'ancienne arène sur carte, ne se
 // redonne pas : un carnet ou une trame qui le nomme n'en trouve plus.
 std::span<const ArenaRule> ShippedArenas() {
   static const std::array<ArenaRule, 4> kArenas = [] {
     const ArenaContent desert = DesertContent();
     const ArenaContent snow = SnowContent();
+    const ArenaContent lab = LabContent();
     return std::array<ArenaRule, 4>{{
         {.arena_id = 2,
          .key = "midgard_plains",
@@ -369,7 +373,11 @@ std::span<const ArenaRule> ShippedArenas() {
          .map_name = "",
          .start = std::nullopt,
          .terrain_id = kLabTerrainId,
-         .ranked = false},
+         .ranked = false,
+         .waves = lab.waves,
+         .bosses = lab.bosses,
+         .events = lab.events,
+         .boss_draws = LabBossDraws()},
     }};
   }();
   return kArenas;

@@ -19,7 +19,7 @@ namespace {
 
 using core::TrText;
 
-constexpr std::array<SurvivorsCodexPhraseRow, 130> kPhrases{{
+constexpr std::array<SurvivorsCodexPhraseRow, 163> kPhrases{{
     // ── Les monstres communs ──
     {"1063", TrText("Le premier venu : petit, rapide et fragile.")},                 // Lunatic
     {"1007", TrText("Une larve lente, qui vient en nombre dès le départ.")},         // Fabre
@@ -127,6 +127,42 @@ constexpr std::array<SurvivorsCodexPhraseRow, 130> kPhrases{{
     {"1252",
      TrText("Le seigneur des neiges : charge, appelle ses petits, et son souffle gèle le héros. "
             "Sa chute est la victoire.")},  // Hatii
+    // ── Les monstres du labo de Lighthalzen ──
+    {"1613",
+     TrText("Un petit automate de métal, le premier venu des champs de Lighthalzen.")},  // Metaling
+    {"1103", TrText("Un hérisson des champs, plus têtu que dangereux.")},                // Caramel
+    {"1128", TrText("Un scarabée à corne qui fonce droit devant lui.")},                 // Horn
+    {"1627", TrText("Un moustique qui vient en nuée.")},                                // Anopheles
+    {"1628", TrText("Une taupe qui fouit sous le sol, puis ressurgit.")},               // Holden
+    {"1215", TrText("Un ver qui se tient à distance et crache.")},                      // Stem Worm
+    {"1680", TrText("Un oiseau de proie qui chasse en meute.")},                        // Hill Wind
+    {"1682", TrText("Le nettoyeur du labo : son seau laisse une flaque à sa chute.")},  // Remover
+    {"1652", TrText("Une chercheuse du labo, vive et brûlante.")},           // Egnigem Cenia
+    {"1656", TrText("Un chercheur archer, qui décoche de loin.")},           // Kavach Icarus
+    {"1655", TrText("Une prêtresse du labo, rapide au contact.")},           // Errende Ebecee
+    {"1653", TrText("Un assassin du labo, qui bondit vers le héros.")},      // Wickebine Tres
+    {"1654", TrText("Un forgeron massif que rien ne repousse.")},            // Armeyer Dinze
+    {"1657", TrText("Une sorcière du labo, qui lance ses sorts de loin.")},  // Laurell Weinder
+    {"1634", TrText("Un gardien chevalier qui charge après une annonce.")},  // Seyren Windsor
+    {"1635",
+     TrText("Un gardien assassin qui disparaît, puis reparaît au contact.")},   // Eremes Guile
+    {"1636", TrText("Un gardien forgeron que rien ne repousse.")},              // Howard Alt-Eisen
+    {"1638", TrText("Une gardienne archère, qui décoche de loin.")},            // Cecil Damon
+    {"1639", TrText("Une gardienne sorcière, qui lance ses sorts de loin.")},   // Kathryne Keyron
+    {"1681", TrText("Le robot du premier étage : il appelle des Metalings.")},  // Gemini-S58
+    {"1658",
+     TrText("La chercheuse devenue MVP : elle charge après une annonce.")},  // Egnigem Cenia MVP
+    {"1642",
+     TrText("Cart Termination : une longue charge que rien ne repousse.")},  // Whitesmith Howard
+    {"1643", TrText("Elle presse le pas des prêtresses, et Magnus Exorcismus tombe en cercles "
+                    "annoncés.")},  // High Priest Margaretha
+    {"1641",
+     TrText(
+         "Il bondit vers le héros, et s'éloigne dès qu'on le touche.")},  // Assassin Cross Eremes
+    {"1646", TrText("L'un des deux MVP du labo : charge, appelle ses chevaliers, et Bowling Bash "
+                    "tombe en cercles. Sa chute est la victoire.")},  // Lord Knight Seyren
+    {"1651", TrText("L'un des deux MVP du labo : Storm Gust gèle le héros, Meteor Storm tombe plus "
+                    "loin et plus fort. Sa chute est la victoire.")},  // High Wizard Kathryne
     // ── Les plantes ──
     {"1078", TrText("Une plante qui lâche de la viande, pour reprendre des forces.")},  // Red Plant
     {"1081", TrText("Une plante qui lâche de l'or.")},                // Yellow Plant
@@ -180,6 +216,15 @@ constexpr std::array<SurvivorsCodexPhraseRow, 130> kPhrases{{
     {"swarm_1776", TrText("Une meute de Siromas arrive d'un même côté.")},
     {"raid_1515", TrText("Les petits de Hatii chargent le héros.")},
     {"ring_1777", TrText("Des titans de glace referment un anneau autour du héros.")},
+    // ── Les événements du labo ──
+    {"swarm_1627", TrText("Une nuée d'Anopheles traverse le labo.")},
+    {"ring_1628", TrText("Des Holdens surgissent du sol en anneau autour du héros.")},
+    {"raid_1613", TrText("Un raid de Metalings charge le héros.")},
+    {"tanks_1652",
+     TrText("Les cuves les plus proches cèdent : des chercheuses en sortent, dans l'acide.")},
+    {"raid_1682", TrText("Les nettoyeurs chargent le héros, et laissent leurs flaques.")},
+    {"tanks_1634", TrText("Les cuves cèdent encore : les gardiens chevaliers en sortent.")},
+    {"ring_1635", TrText("Des gardiens assassins referment un anneau autour du héros.")},
     {"elites", TrText("Un monstre de la vague, bien plus robuste, qui lâche une Old Blue Box.")},
     {"night", TrText("Le ciel s'assombrit jusqu'à minuit, et les morts-vivants se lèvent.")},
 }};

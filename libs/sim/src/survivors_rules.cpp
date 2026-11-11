@@ -217,11 +217,24 @@ ArenaContent ContentOf(const SurvivorsRules& rules, const ArenaRule& arena) {
   return ArenaContent{.waves = rules.waves, .bosses = rules.bosses, .events = rules.events};
 }
 
+ArenaContent ContentOf(const SurvivorsRules& rules, const ArenaRule& arena,
+                       std::uint64_t run_seed) {
+  ArenaContent content = ContentOf(rules, arena);
+  if (!arena.waves.empty() && !arena.boss_draws.empty()) {
+    content.bosses = arena.boss_draws[run_seed % arena.boss_draws.size()];
+  }
+  return content;
+}
+
 std::vector<ArenaContent> AllContents(const SurvivorsRules& rules) {
   std::vector<ArenaContent> contents{
       ArenaContent{.waves = rules.waves, .bosses = rules.bosses, .events = rules.events}};
   for (const ArenaRule& arena : rules.arenas) {
-    if (!arena.waves.empty()) contents.push_back(ContentOf(rules, arena));
+    if (arena.waves.empty()) continue;
+    contents.push_back(ContentOf(rules, arena));
+    for (std::size_t draw = 0; draw < arena.boss_draws.size(); ++draw) {
+      contents.push_back(ContentOf(rules, arena, draw));
+    }
   }
   return contents;
 }

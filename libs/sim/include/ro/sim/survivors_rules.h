@@ -332,6 +332,9 @@ struct ArenaRule {
   std::span<const WaveRule> waves;
   std::span<const BossRule> bosses;
   std::span<const EventRule> events;
+  // LE TIRAGE DES BOSS : non vide, la partie joue l'un de ces jeux de boss à
+  // la place de `bosses`, celui de rang `graine % taille` (ContentOf).
+  std::span<const std::span<const BossRule>> boss_draws;
 };
 // LE CONTENU QU'UNE PARTIE JOUE : les vagues, les boss et les événements de
 // son arène, ou ceux des règles.
@@ -677,6 +680,9 @@ struct SurvivorsRules {
 // Le contenu que joue l'arène `arena` : le sien quand elle a des vagues,
 // sinon celui des règles.
 [[nodiscard]] ArenaContent ContentOf(const SurvivorsRules& rules, const ArenaRule& arena);
+// Celui d'une partie de graine `run_seed` : ses boss tirés, s'il y en a.
+[[nodiscard]] ArenaContent ContentOf(const SurvivorsRules& rules, const ArenaRule& arena,
+                                     std::uint64_t run_seed);
 // Le contenu des règles, puis celui de chaque arène qui a le sien : de quoi
 // parcourir toutes les espèces que les règles font naître.
 [[nodiscard]] std::vector<ArenaContent> AllContents(const SurvivorsRules& rules);

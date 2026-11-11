@@ -95,14 +95,19 @@ inline constexpr std::uint32_t kMostFrostMs = 3000;
   return kind == BossMoveKind::kSummon || kind == BossMoveKind::kHowl;
 }
 
-enum class EventKind : std::uint8_t { kSwarm, kRaid, kRing, kGroup };
+// LA RUPTURE DES CUVES (kTanks) : les `count` pièces de terrain `piece_id`
+// les plus proches du héros, à moins de `radius_units`, cèdent l'une après
+// l'autre ; un `foe_id` naît de chacune, dans une flaque d'acide. Une cuve ne
+// cède qu'une fois par partie ; sans cuve à portée, l'événement est soldé.
+enum class EventKind : std::uint8_t { kSwarm, kRaid, kRing, kGroup, kTanks };
 // Une naissance groupée, une fois, à at_ms.
 struct EventRule {
   std::uint32_t at_ms = 0;
   EventKind kind = EventKind::kGroup;
   std::uint16_t foe_id = 0;
   std::uint8_t count = 0;
-  std::int32_t radius_units = 0;  // anneau
+  std::int32_t radius_units = 0;  // anneau, portée des cuves
+  std::uint16_t piece_id = 0;     // les cuves
 };
 
 // Une élite à first_ms, puis toutes les interval_ms jusqu'à last_ms compris ;

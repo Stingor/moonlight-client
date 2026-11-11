@@ -23643,3 +23643,105 @@ tr: Smooth
 
 fr: Adoucit le pantin agrandi. Décoché, chaque pixel du sprite reste net.
 tr: Softens the enlarged doll. Unchecked, every sprite pixel stays sharp.
+
+fr: Un petit automate de métal, le premier venu des champs de Lighthalzen.
+tr: A small metal automaton, the first to come from the Lighthalzen fields.
+
+fr: Un hérisson des champs, plus têtu que dangereux.
+tr: A field hedgehog, more stubborn than dangerous.
+
+fr: Un scarabée à corne qui fonce droit devant lui.
+tr: A horned beetle that rushes straight ahead.
+
+fr: Un moustique qui vient en nuée.
+tr: A mosquito that comes in swarms.
+
+fr: Une taupe qui fouit sous le sol, puis ressurgit.
+tr: A mole that burrows underground, then pops back up.
+
+fr: Un ver qui se tient à distance et crache.
+tr: A worm that keeps its distance and spits.
+
+fr: Un oiseau de proie qui chasse en meute.
+tr: A bird of prey that hunts in packs.
+
+fr: Le nettoyeur du labo : son seau laisse une flaque à sa chute.
+tr: The lab's cleaner: its bucket leaves a puddle when it falls.
+
+fr: Une chercheuse du labo, vive et brûlante.
+tr: A lab researcher, quick and burning.
+
+fr: Un chercheur archer, qui décoche de loin.
+tr: A researcher archer who shoots from afar.
+
+fr: Une prêtresse du labo, rapide au contact.
+tr: A lab priestess, fast in close combat.
+
+fr: Un assassin du labo, qui bondit vers le héros.
+tr: A lab assassin who leaps at the hero.
+
+fr: Un forgeron massif que rien ne repousse.
+tr: A massive blacksmith that nothing pushes back.
+
+fr: Une sorcière du labo, qui lance ses sorts de loin.
+tr: A lab sorceress who casts her spells from afar.
+
+fr: Un gardien chevalier qui charge après une annonce.
+tr: A knight guardian who charges after a warning.
+
+fr: Un gardien assassin qui disparaît, puis reparaît au contact.
+tr: An assassin guardian who vanishes, then reappears at close range.
+
+fr: Un gardien forgeron que rien ne repousse.
+tr: A blacksmith guardian that nothing pushes back.
+
+fr: Une gardienne archère, qui décoche de loin.
+tr: An archer guardian who shoots from afar.
+
+fr: Une gardienne sorcière, qui lance ses sorts de loin.
+tr: A sorceress guardian who casts her spells from afar.
+
+fr: Le robot du premier étage : il appelle des Metalings.
+tr: The robot of the first floor: it calls Metalings.
+
+fr: La chercheuse devenue MVP : elle charge après une annonce.
+tr: The researcher turned MVP: she charges after a warning.
+
+fr: Cart Termination : une longue charge que rien ne repousse.
+tr: Cart Termination: a long charge that nothing pushes back.
+
+fr: Elle presse le pas des prêtresses, et Magnus Exorcismus tombe en cercles annoncés.
+tr: She hurries the priestesses, and Magnus Exorcismus falls in announced circles.
+
+fr: Il bondit vers le héros, et s'éloigne dès qu'on le touche.
+tr: He leaps at the hero, and backs away as soon as he is hit.
+
+fr: L'un des deux MVP du labo : charge, appelle ses chevaliers, et Bowling Bash tombe en cercles. Sa chute est la victoire.
+tr: One of the lab's two MVPs: charges, calls his knights, and Bowling Bash falls in circles. His fall is victory.
+
+fr: L'un des deux MVP du labo : Storm Gust gèle le héros, Meteor Storm tombe plus loin et plus fort. Sa chute est la victoire.
+tr: One of the lab's two MVPs: Storm Gust freezes the hero, Meteor Storm falls farther and harder. Her fall is victory.
+
+fr: Une nuée d'Anopheles traverse le labo.
+tr: A swarm of Anopheles crosses the lab.
+
+fr: Des Holdens surgissent du sol en anneau autour du héros.
+tr: Holdens burst from the ground in a ring around the hero.
+
+fr: Un raid de Metalings charge le héros.
+tr: A raid of Metalings charges the hero.
+
+fr: Les cuves les plus proches cèdent : des chercheuses en sortent, dans l'acide.
+tr: The nearest vats burst: researchers come out, in acid.
+
+fr: Les nettoyeurs chargent le héros, et laissent leurs flaques.
+tr: The cleaners charge the hero, and leave their puddles.
+
+fr: Les cuves cèdent encore : les gardiens chevaliers en sortent.
+tr: The vats burst again: the knight guardians come out.
+
+fr: Des gardiens assassins referment un anneau autour du héros.
+tr: Assassin guardians close a ring around the hero.
+
+fr: Rupture des cuves
+tr: Vat rupture

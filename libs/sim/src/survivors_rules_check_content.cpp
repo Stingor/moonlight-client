@@ -447,6 +447,12 @@ namespace {
     if (event.kind == EventKind::kRing && event.radius_units == 0) {
       return Refuse(named + "anneau sans rayon");
     }
+    if (event.kind == EventKind::kTanks && (event.piece_id == 0 || event.radius_units == 0)) {
+      return Refuse(named + "cuves sans pièce ou sans portée");
+    }
+    if (event.kind != EventKind::kTanks && event.piece_id != 0) {
+      return Refuse(named + "une pièce hors d'une rupture de cuves");
+    }
     if (auto checked = CheckMeasures<1>(named, {{{"rayon", event.radius_units}}}); !checked) {
       return checked;
     }

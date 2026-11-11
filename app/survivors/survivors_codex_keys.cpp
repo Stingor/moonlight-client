@@ -47,11 +47,12 @@ struct EventKindKey {
   ro::sim::EventKind kind;
   const char* key;
 };
-constexpr std::array<EventKindKey, 4> kEventKindKeys{{
+constexpr std::array<EventKindKey, 5> kEventKindKeys{{
     {ro::sim::EventKind::kSwarm, "swarm"},
     {ro::sim::EventKind::kRaid, "raid"},
     {ro::sim::EventKind::kRing, "ring"},
     {ro::sim::EventKind::kGroup, "group"},
+    {ro::sim::EventKind::kTanks, "tanks"},
 }};
 
 // Les chiffres d'un identifiant RO : cinq au plus pour 16 bits.

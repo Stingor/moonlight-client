@@ -41,6 +41,10 @@ void SpawnFoes(SurvivorsField& field);
 // anneau, groupe), sous le plafond des monstres, puis l'élite due, hors
 // plafond.
 void SpawnEvents(SurvivorsField& field);
+
+// La flaque d'un comportement en `at` (survivors_progress.cpp) : armée dès ce
+// pas, rien sans dégâts, rayon ou durée, ni au plafond des menaces au sol.
+void LeavePuddle(SurvivorsField& field, const FoeBehaviour& behaviour, FieldPoint at);
 // survivors_bosses.cpp. Les scripts des boss en vie, dans l'ordre de leur
 // naissance : l'escorte à l'arrivée, puis chaque coup actif dans sa phase de
 // PV et prêt (invocation, bond, charge, séisme, hurlement, fuite), et le coup

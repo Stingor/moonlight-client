@@ -332,7 +332,7 @@ core::Result<SurvivorsRun> SurvivorsRun::Start(const SurvivorsRules& rules, Surv
   SurvivorsField field;
   field.rules = &rules;
   field.hero_class = hero_class;
-  field.content = ContentOf(rules, *arena_rule);
+  field.content = ContentOf(rules, *arena_rule, start.seed);
   field.start = start;
   if (ground.bounded()) {
     field.foe_grid.Reset(ground.width(), ground.height());

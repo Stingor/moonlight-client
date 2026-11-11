@@ -91,7 +91,8 @@ void PutBoss(FnvDigest& digest, const BossRule& boss) {
 }
 
 void PutEvent(FnvDigest& digest, const EventRule& event) {
-  PutAll(digest, event.at_ms, event.kind, event.foe_id, event.count, event.radius_units);
+  PutAll(digest, event.at_ms, event.kind, event.foe_id, event.count, event.radius_units,
+         event.piece_id);
 }
 
 void PutContent(FnvDigest& digest, std::span<const WaveRule> waves,
@@ -124,6 +125,8 @@ void PutArena(FnvDigest& digest, const ArenaRule& arena) {
   PutText(digest, arena.map_name);
   if (arena.start.has_value()) PutAll(digest, arena.start->x, arena.start->y);
   PutContent(digest, arena.waves, arena.bosses, arena.events);
+  PutEach(digest, arena.boss_draws,
+          [&](std::span<const BossRule> bosses) { PutContent(digest, {}, bosses, {}); });
 }
 
 void PutTerrain(FnvDigest& digest, const TerrainRule& terrain) {

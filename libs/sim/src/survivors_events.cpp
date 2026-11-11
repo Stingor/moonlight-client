@@ -10,6 +10,7 @@
 #include "ro/sim/survivors_rules.h"
 #include "ro/sim/survivors_run.h"
 #include "ro/sim/survivors_state.h"
+#include "ro/sim/survivors_terrain.h"
 
 #include "survivors_space.h"
 #include "survivors_systems.h"
@@ -29,6 +30,10 @@ namespace ro::sim::survivors {
 // essaim que le plafond arrête tire autant de Below(4) que de placements, de
 // un à `count`. Les événements suivants attendent qu'il soit soldé. Un membre
 // dont la case est murée est sauté : il compte comme placé.
+//
+// LA RUPTURE DES CUVES ne tire rien : chaque membre est la cuve la plus proche
+// du héros qui n'a pas cédé, à portée, lue dans le terrain généré ; à distance
+// égale, la plus au sud, puis la plus à l'ouest.
 
 namespace {
 
@@ -142,6 +147,90 @@ struct SideLine {
   return event.count;
 }
 
+// L'ACIDE D'UNE CUVE ROMPUE : une flaque large de deux cases, six secondes.
+constexpr FoeBehaviour kTankAcid{.puddle_damage = 4,
+                                 .puddle_radius_units = CellTenths(20),
+                                 .puddle_ms = 6000,
+                                 .puddle_period_ms = 500};
+
+// Une cuve du terrain : son coin sud-ouest et son milieu, en demi-cases.
+struct Tank {
+  CellPosition corner;
+  std::int64_t centre_x2 = 0;
+  std::int64_t centre_y2 = 0;
+};
+
+// La cuve la plus proche du héros qui n'a pas cédé, dont le milieu est à
+// moins de `radius_units` ; rien sur une carte, ou sans cuve à portée.
+[[nodiscard]] std::optional<Tank> NearestTank(const SurvivorsField& field, const EventRule& event) {
+  const TerrainRule* terrain = field.ground.rule();
+  if (field.ground.bounded() || terrain == nullptr) return std::nullopt;
+  const TerrainPieceRule* tank_rule = nullptr;
+  for (const TerrainPieceRule& piece : terrain->pieces) {
+    if (piece.piece_id == event.piece_id) tank_rule = &piece;
+  }
+  if (tank_rule == nullptr) return std::nullopt;
+  const std::int64_t hero_x2 = 2 * std::int64_t{CellOf(field.hero.position.x)} + 1;
+  const std::int64_t hero_y2 = 2 * std::int64_t{CellOf(field.hero.position.y)} + 1;
+  const std::int32_t reach = event.radius_units / Cells(1);
+  const std::int64_t reach2 = std::int64_t{2} * reach;
+  const std::int32_t hero_x = CellOf(field.hero.position.x);
+  const std::int32_t hero_y = CellOf(field.hero.position.y);
+  std::optional<Tank> best;
+  std::int64_t best_distance = 0;
+  for (std::int32_t chunk_y = TerrainChunkOf(hero_y - reach);
+       chunk_y <= TerrainChunkOf(hero_y + reach); ++chunk_y) {
+    for (std::int32_t chunk_x = TerrainChunkOf(hero_x - reach);
+         chunk_x <= TerrainChunkOf(hero_x + reach); ++chunk_x) {
+      const TerrainChunk chunk =
+          GenerateTerrainChunk(*terrain, field.ground.run_seed(), chunk_x, chunk_y);
+      for (const PlacedPiece& placed : chunk.pieces) {
+        if (placed.piece_id != event.piece_id || placed.x < 0 || placed.y < 0) continue;
+        const CellPosition corner{.x = static_cast<std::uint16_t>(placed.x),
+                                  .y = static_cast<std::uint16_t>(placed.y)};
+        const bool burst = std::ranges::any_of(field.burst_tanks, [&](const CellPosition& done) {
+          return done.x == corner.x && done.y == corner.y;
+        });
+        if (burst) continue;
+        const FootprintSize size = FootprintSizeOf(*tank_rule, placed.quarter);
+        const Tank tank{.corner = corner,
+                        .centre_x2 = 2 * std::int64_t{placed.x} + size.width,
+                        .centre_y2 = 2 * std::int64_t{placed.y} + size.height};
+        const std::int64_t dx = tank.centre_x2 - hero_x2;
+        const std::int64_t dy = tank.centre_y2 - hero_y2;
+        const std::int64_t distance = dx * dx + dy * dy;
+        if (distance > reach2 * reach2) continue;
+        const bool nearer = !best || distance < best_distance ||
+                            (distance == best_distance &&
+                             (tank.corner.y < best->corner.y ||
+                              (tank.corner.y == best->corner.y && tank.corner.x < best->corner.x)));
+        if (nearer) {
+          best = tank;
+          best_distance = distance;
+        }
+      }
+    }
+  }
+  return best;
+}
+
+// LA RUPTURE DES CUVES : une cuve par membre ; le monstre naît à son pied, au
+// plus près de son milieu, dans l'acide.
+[[nodiscard]] std::size_t SpawnTanks(SurvivorsField& field, const EventRule& event,
+                                     const FoeRule& rule, std::size_t first) {
+  for (std::size_t member = first; member < event.count; ++member) {
+    if (AtFoeCap(field)) return member;
+    const std::optional<Tank> tank = NearestTank(field, event);
+    if (!tank) return event.count;
+    field.burst_tanks.push_back(tank->corner);
+    const FieldPoint centre{.x = static_cast<std::int32_t>(tank->centre_x2 * Cells(1) / 2),
+                            .y = static_cast<std::int32_t>(tank->centre_y2 * Cells(1) / 2)};
+    LeavePuddle(field, kTankAcid, centre);
+    (void)HatchNear(field, rule, centre, {});
+  }
+  return event.count;
+}
+
 // Les membres de `event` à partir de `first` ; rend le membre suivant à
 // placer, `count` quand l'événement est soldé. Au plafond, rien ne se tire.
 [[nodiscard]] std::size_t SpawnEvent(SurvivorsField& field, const EventRule& event,
@@ -157,6 +246,8 @@ struct SideLine {
       return SpawnRing(field, event, *rule, first);
     case EventKind::kGroup:
       return SpawnGroup(field, event, *rule, first);
+    case EventKind::kTanks:
+      return SpawnTanks(field, event, *rule, first);
   }
   return event.count;
 }

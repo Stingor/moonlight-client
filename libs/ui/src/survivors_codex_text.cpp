@@ -371,6 +371,8 @@ const char* CodexEventKindName(SurvivorsCodexEventKind kind) {
       return core::Tr("Anneau");
     case SurvivorsCodexEventKind::kGroup:
       return core::Tr("Groupe");
+    case SurvivorsCodexEventKind::kTanks:
+      return core::Tr("Rupture des cuves");
     case SurvivorsCodexEventKind::kElites:
       return core::Tr("Élites");
     case SurvivorsCodexEventKind::kNight:
@@ -397,6 +399,7 @@ CodexText CodexEventText(const SurvivorsCodexEntry& entry) {
     case SurvivorsCodexEventKind::kRaid:
     case SurvivorsCodexEventKind::kRing:
     case SurvivorsCodexEventKind::kGroup:
+    case SurvivorsCodexEventKind::kTanks:
       std::snprintf(text.data(), text.size(), core::Tr("À %s : %d %s"), at.data(),
                     static_cast<int>(entry.event_count), CodexLinkName(entry.event_foe));
       break;
@@ -423,6 +426,7 @@ CodexText CodexEntryName(const SurvivorsCodexEntry& entry) {
     case SurvivorsCodexEventKind::kRaid:
     case SurvivorsCodexEventKind::kRing:
     case SurvivorsCodexEventKind::kGroup:
+    case SurvivorsCodexEventKind::kTanks:
       std::snprintf(text.data(), text.size(), core::Tr("%s : %s"),
                     CodexEventKindName(entry.event_kind), CodexLinkName(entry.event_foe));
       break;

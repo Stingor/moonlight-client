@@ -23643,3 +23643,105 @@ tr: Suavizar
 
 fr: Adoucit le pantin agrandi. Décoché, chaque pixel du sprite reste net.
 tr: Suaviza el maniquí ampliado. Desmarcado, cada píxel del sprite queda nítido.
+
+fr: Un petit automate de métal, le premier venu des champs de Lighthalzen.
+tr: Un pequeño autómata de metal, el primero en llegar de los campos de Lighthalzen.
+
+fr: Un hérisson des champs, plus têtu que dangereux.
+tr: Un erizo del campo, más terco que peligroso.
+
+fr: Un scarabée à corne qui fonce droit devant lui.
+tr: Un escarabajo con cuerno que embiste en línea recta.
+
+fr: Un moustique qui vient en nuée.
+tr: Un mosquito que llega en enjambre.
+
+fr: Une taupe qui fouit sous le sol, puis ressurgit.
+tr: Un topo que excava bajo el suelo y vuelve a salir.
+
+fr: Un ver qui se tient à distance et crache.
+tr: Un gusano que guarda las distancias y escupe.
+
+fr: Un oiseau de proie qui chasse en meute.
+tr: Un ave rapaz que caza en manada.
+
+fr: Le nettoyeur du labo : son seau laisse une flaque à sa chute.
+tr: El limpiador del laboratorio: su cubo deja un charco al caer.
+
+fr: Une chercheuse du labo, vive et brûlante.
+tr: Una investigadora del laboratorio, rápida y ardiente.
+
+fr: Un chercheur archer, qui décoche de loin.
+tr: Un investigador arquero que dispara de lejos.
+
+fr: Une prêtresse du labo, rapide au contact.
+tr: Una sacerdotisa del laboratorio, rápida en el cuerpo a cuerpo.
+
+fr: Un assassin du labo, qui bondit vers le héros.
+tr: Un asesino del laboratorio que salta hacia el héroe.
+
+fr: Un forgeron massif que rien ne repousse.
+tr: Un herrero corpulento al que nada hace retroceder.
+
+fr: Une sorcière du labo, qui lance ses sorts de loin.
+tr: Una hechicera del laboratorio que lanza sus hechizos de lejos.
+
+fr: Un gardien chevalier qui charge après une annonce.
+tr: Un guardián caballero que carga tras un aviso.
+
+fr: Un gardien assassin qui disparaît, puis reparaît au contact.
+tr: Un guardián asesino que desaparece y reaparece cuerpo a cuerpo.
+
+fr: Un gardien forgeron que rien ne repousse.
+tr: Un guardián herrero al que nada hace retroceder.
+
+fr: Une gardienne archère, qui décoche de loin.
+tr: Una guardiana arquera que dispara de lejos.
+
+fr: Une gardienne sorcière, qui lance ses sorts de loin.
+tr: Una guardiana hechicera que lanza sus hechizos de lejos.
+
+fr: Le robot du premier étage : il appelle des Metalings.
+tr: El robot de la primera planta: llama a Metalings.
+
+fr: La chercheuse devenue MVP : elle charge après une annonce.
+tr: La investigadora convertida en MVP: carga tras un aviso.
+
+fr: Cart Termination : une longue charge que rien ne repousse.
+tr: Cart Termination: una larga carga a la que nada hace retroceder.
+
+fr: Elle presse le pas des prêtresses, et Magnus Exorcismus tombe en cercles annoncés.
+tr: Apresura a las sacerdotisas, y Magnus Exorcismus cae en círculos anunciados.
+
+fr: Il bondit vers le héros, et s'éloigne dès qu'on le touche.
+tr: Salta hacia el héroe y se aleja en cuanto lo tocan.
+
+fr: L'un des deux MVP du labo : charge, appelle ses chevaliers, et Bowling Bash tombe en cercles. Sa chute est la victoire.
+tr: Uno de los dos MVP del laboratorio: carga, llama a sus caballeros y Bowling Bash cae en círculos. Su caída es la victoria.
+
+fr: L'un des deux MVP du labo : Storm Gust gèle le héros, Meteor Storm tombe plus loin et plus fort. Sa chute est la victoire.
+tr: Uno de los dos MVP del laboratorio: Storm Gust congela al héroe, Meteor Storm cae más lejos y más fuerte. Su caída es la victoria.
+
+fr: Une nuée d'Anopheles traverse le labo.
+tr: Un enjambre de Anopheles cruza el laboratorio.
+
+fr: Des Holdens surgissent du sol en anneau autour du héros.
+tr: Unos Holden surgen del suelo en anillo alrededor del héroe.
+
+fr: Un raid de Metalings charge le héros.
+tr: Una incursión de Metalings carga contra el héroe.
+
+fr: Les cuves les plus proches cèdent : des chercheuses en sortent, dans l'acide.
+tr: Las cubas más cercanas ceden: salen investigadoras, entre ácido.
+
+fr: Les nettoyeurs chargent le héros, et laissent leurs flaques.
+tr: Los limpiadores cargan contra el héroe y dejan sus charcos.
+
+fr: Les cuves cèdent encore : les gardiens chevaliers en sortent.
+tr: Las cubas ceden otra vez: salen los guardianes caballeros.
+
+fr: Des gardiens assassins referment un anneau autour du héros.
+tr: Unos guardianes asesinos cierran un anillo alrededor del héroe.
+
+fr: Rupture des cuves
+tr: Rotura de cubas
