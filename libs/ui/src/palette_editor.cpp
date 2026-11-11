@@ -504,9 +504,14 @@ PaletteEditorAction DrawPaletteEditor(PaletteEditorState& state, const PaletteEd
   DrawUndoButtons(view, art, action);
   ImGui::Separator();
   DrawSendButtons(view, art, action);
-  if (on_body) {
+  // 🔴 LES PRÉRÉGLAGES SUR LE CORPS ET SUR LA TÊTE : un préréglage range la
+  // tenue du personnage, le corps comme la tête. La tête garde en plus son
+  // code de calque.
+  const bool on_head = view.tab == PaletteTabKind::kHair;
+  if (on_body || on_head) {
     DrawPalettePresets(state, view, art, action);
-  } else {
+  }
+  if (!on_body) {
     DrawLayerCode(view, art, action);
     if (view.code_note != nullptr) {
       ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + ImGui::GetFontSize() * kWrapInFonts);

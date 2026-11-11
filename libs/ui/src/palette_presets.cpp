@@ -47,8 +47,8 @@ void DrawPresetMenu(const PaletteEditorState& state, const PaletteEditorView& vi
     }
   };
   load(core::Tr("Tout charger"), PresetPart::kAll);
-  load(core::Tr("Les couleurs seules"), PresetPart::kColors);
-  load(core::Tr("Les cheveux seuls"), PresetPart::kHair);
+  load(core::Tr("Le corps seul"), PresetPart::kColors);
+  load(core::Tr("La tête seule"), PresetPart::kHair);
   ImGui::Separator();
   // ⚠ LE NOUVEAU NOM EST CELUI DU CHAMP : un second champ, dans un menu, se
   // refermerait au premier clic dedans.

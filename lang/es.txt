@@ -671,8 +671,8 @@ tr: El storage está abierto.
 fr: La liaison avec le serveur est perdue.
 tr: Se perdió la conexión con el servidor.
 
-fr: Les cheveux seuls
-tr: Solo el pelo
+fr: La tête seule
+tr: Solo la cabeza
 
 fr: Les clients du groupe n'ont pas la même version : la partie ne peut pas commencer.
 tr: Los clientes del grupo no tienen la misma versión: la partida no puede empezar.
@@ -680,8 +680,8 @@ tr: Los clientes del grupo no tienen la misma versión: la partida no puede empe
 fr: Les couleurs qu'aucune pièce ne règle, par famille de teinte : chaque pastille teint toutes celles de sa famille, et aucune pièce.
 tr: Los colores que ninguna pieza ajusta, por familia de tono: cada muestra tiñe todos los de su familia, y ninguna pieza.
 
-fr: Les couleurs seules
-tr: Solo los colores
+fr: Le corps seul
+tr: Solo el cuerpo
 
 fr: Libérer pour l'inspiration
 tr: Liberar para la inspiración

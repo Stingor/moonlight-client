@@ -1,11 +1,20 @@
 #include "character/style_store.h"
 
 #include <algorithm>
+#include <cstddef>
+#include <cstdint>
 #include <optional>
+#include <span>
+#include <string>
+#include <string_view>
 #include <utility>
+#include <vector>
 
 #include <yaml-cpp/yaml.h>
 
+#include "ro/core/byte_reader.h"
+#include "ro/core/byte_writer.h"
+#include "ro/net/player_style_layers.h"
 #include "ro/sim/style_code.h"
 
 #include "character/style_yaml.h"
@@ -26,6 +35,10 @@ constexpr const char* kPresetsHeader =
     "# Chaque ligne porte un nom et un CODE — la même chaîne que « Copier le\n"
     "# code » met dans le presse-papiers. Tu peux donc en recopier un d'ici,\n"
     "# ou en coller un qu'on t'a donné.\n"
+    "#\n"
+    "# « layers », quand il est là, garde le reste de ta tenue : la tête, la\n"
+    "# peau du visage, la suite et la peau du corps. Il ne se recopie pas à la\n"
+    "# main.\n"
     "#\n"
     "# ⚠ UN STYLE NE VAUT VRAIMENT QUE POUR LE CORPS SUR LEQUEL IL A ÉTÉ FAIT.\n"
     "# Appliqué ailleurs, il se ré-applique par RANG de pièce : le résultat\n"
@@ -55,29 +68,136 @@ constexpr const char* kDraftsHeader =
   return read->recipe;
 }
 
+// LES CALQUES D'UN PRÉRÉGLAGE, en hexadécimal : leurs entrées à la forme du ZC,
+// celle que les tenues emploient déjà. Un préréglage d'avant n'a pas ce champ,
+// et se relit sans calques.
+constexpr const char* kPresetLayersField = "layers";
+constexpr std::string_view kHexDigits = "0123456789abcdef";
+constexpr unsigned kNibbleBits = 4;
+constexpr unsigned kNibbleMask = 0x0F;
+
+[[nodiscard]] std::string LayersHex(std::span<const ro::sim::StyleLayerRecipe> layers) {
+  // ⚠ UNE ENTRÉE REFUSÉE TOMBE SEULE : elle ne doit pas emporter les autres.
+  std::vector<std::uint8_t> raw;
+  for (const ro::sim::StyleLayerRecipe& layer : layers) {
+    std::vector<std::uint8_t> one;
+    ro::core::ByteWriter writer(one);
+    if (ro::net::WriteShownStyleLayer(writer, layer)) {
+      raw.insert(raw.end(), one.begin(), one.end());
+    }
+  }
+  std::string text;
+  text.reserve(raw.size() * 2);
+  for (const std::uint8_t byte : raw) {
+    text.push_back(kHexDigits[byte >> kNibbleBits]);
+    text.push_back(kHexDigits[byte & kNibbleMask]);
+  }
+  return text;
+}
+
+// ⚠ TOUT OU RIEN : un champ abîmé rend le préréglage sans calques plutôt que
+// des calques à moitié lus.
+[[nodiscard]] std::vector<ro::sim::StyleLayerRecipe> ReadLayers(const YAML::Node& node) {
+  if (!node || !node.IsScalar()) {
+    return {};
+  }
+  const std::string text = node.as<std::string>(std::string{});
+  if (text.size() % 2 != 0) {
+    return {};
+  }
+  std::vector<std::uint8_t> raw;
+  raw.reserve(text.size() / 2);
+  for (std::size_t at = 0; at < text.size(); at += 2) {
+    const std::size_t high = kHexDigits.find(text[at]);
+    const std::size_t low = kHexDigits.find(text[at + 1]);
+    if (high == std::string_view::npos || low == std::string_view::npos) {
+      return {};
+    }
+    raw.push_back(static_cast<std::uint8_t>((high << kNibbleBits) | low));
+  }
+  std::vector<ro::sim::StyleLayerRecipe> layers;
+  ro::core::ByteReader reader(raw);
+  while (reader.remaining() > 0) {
+    ro::core::Result<std::optional<ro::sim::StyleLayerRecipe>> entry =
+        ro::net::ReadShownStyleLayer(reader);
+    if (!entry) {
+      return {};
+    }
+    if (entry->has_value() && PresetKeepsLayer((*entry)->layer)) {
+      layers.push_back(std::move(**entry));
+    }
+  }
+  return layers;
+}
+
 }  // namespace
 
-bool StylePresets::Save(std::string_view name, const ro::sim::StyleRecipe& recipe) {
+bool StylePresets::Save(std::string_view name, const ro::sim::StyleRecipe& recipe,
+                        std::vector<ro::sim::StyleLayerRecipe> layers) {
   if (name.empty()) {
     return false;
   }
+  std::erase_if(layers, [](const ro::sim::StyleLayerRecipe& layer) {
+    return !PresetKeepsLayer(layer.layer);
+  });
   const auto found = std::ranges::find(kept_, name, &Named::name);
   if (found != kept_.end()) {
     // ⚠ À SA PLACE : mettre à jour un préréglage ne doit pas le faire sauter
     // en fin de liste sous les doigts de celui qui le retouche.
     found->recipe = recipe;
+    found->layers = std::move(layers);
     return true;
   }
   if (full()) {
     return false;
   }
-  kept_.push_back(Named{.name = std::string(name), .recipe = recipe});
+  kept_.push_back(Named{.name = std::string(name), .recipe = recipe, .layers = std::move(layers)});
   return true;
 }
 
 const ro::sim::StyleRecipe* StylePresets::Find(std::string_view name) const {
+  const Named* found = FindNamed(name);
+  return found == nullptr ? nullptr : &found->recipe;
+}
+
+const StylePresets::Named* StylePresets::FindNamed(std::string_view name) const {
   const auto found = std::ranges::find(kept_, name, &Named::name);
-  return found == kept_.end() ? nullptr : &found->recipe;
+  return found == kept_.end() ? nullptr : &*found;
+}
+
+bool PresetKeepsLayer(ro::sim::StyleLayerKind layer) noexcept {
+  return layer == ro::sim::StyleLayerKind::kHead || layer == ro::sim::StyleLayerKind::kSkin ||
+         layer == ro::sim::StyleLayerKind::kBodyMore || layer == ro::sim::StyleLayerKind::kBodySkin;
+}
+
+std::vector<ro::sim::StyleLayerRecipe> RekeyPresetLayers(
+    std::span<const ro::sim::StyleLayerRecipe> kept, PresetKeys now, PresetLayers part) {
+  std::vector<ro::sim::StyleLayerRecipe> out;
+  for (const ro::sim::StyleLayerRecipe& layer : kept) {
+    const bool on_head = layer.layer == ro::sim::StyleLayerKind::kHead ||
+                         layer.layer == ro::sim::StyleLayerKind::kSkin;
+    const bool on_body = layer.layer == ro::sim::StyleLayerKind::kBodyMore ||
+                         layer.layer == ro::sim::StyleLayerKind::kBodySkin;
+    if ((!on_head && !on_body) || (part == PresetLayers::kBody && !on_body) ||
+        (part == PresetLayers::kHead && !on_head)) {
+      continue;
+    }
+    // La peau du visage n'a qu'une clé, zéro ; la tête suit sa coupe et sa
+    // couleur, la suite et la peau du corps suivent le corps.
+    const std::uint32_t key = layer.layer == ro::sim::StyleLayerKind::kSkin ? 0U
+                              : on_head                                     ? now.head
+                                                                            : now.body;
+    if (key == 0 && layer.layer != ro::sim::StyleLayerKind::kSkin) {
+      continue;
+    }
+    ro::sim::StyleLayerRecipe moved = layer;
+    if (moved.key != key) {
+      moved.retouches.clear();
+    }
+    moved.key = key;
+    out.push_back(std::move(moved));
+  }
+  return out;
 }
 
 bool StylePresets::Rename(std::string_view from, std::string_view to) {
@@ -146,7 +266,8 @@ void LoadStylePresets(const std::filesystem::path& client_root, StylePresets& in
       continue;
     }
     if (const std::optional<ro::sim::StyleRecipe> recipe = ReadCode(entry[kPresetStyleField])) {
-      static_cast<void>(into.Save(name.as<std::string>(std::string{}), *recipe));
+      static_cast<void>(into.Save(name.as<std::string>(std::string{}), *recipe,
+                                  ReadLayers(entry[kPresetLayersField])));
     }
   }
 }
@@ -196,8 +317,11 @@ bool SaveStylePresets(const std::filesystem::path& client_root, const StylePrese
   out << YAML::BeginMap << YAML::Key << kPresetsField << YAML::Value << YAML::BeginSeq;
   for (const StylePresets::Named& kept : from.all()) {
     out << YAML::BeginMap << YAML::Key << kPresetNameField << YAML::Value << kept.name << YAML::Key
-        << kPresetStyleField << YAML::Value << ro::sim::EncodeStyleCode(kept.recipe)
-        << YAML::EndMap;
+        << kPresetStyleField << YAML::Value << ro::sim::EncodeStyleCode(kept.recipe);
+    if (const std::string layers = LayersHex(kept.layers); !layers.empty()) {
+      out << YAML::Key << kPresetLayersField << YAML::Value << layers;
+    }
+    out << YAML::EndMap;
   }
   out << YAML::EndSeq << YAML::EndMap;
   return WriteStyleFile(StylePresetsPath(client_root), kPresetsHeader, out, "préréglages de style");

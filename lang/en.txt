@@ -671,8 +671,8 @@ tr: The storage is open.
 fr: La liaison avec le serveur est perdue.
 tr: The connection to the server is lost.
 
-fr: Les cheveux seuls
-tr: Hair only
+fr: La tête seule
+tr: Head only
 
 fr: Les clients du groupe n'ont pas la même version : la partie ne peut pas commencer.
 tr: The party's clients are not on the same version: the game cannot start.
@@ -680,8 +680,8 @@ tr: The party's clients are not on the same version: the game cannot start.
 fr: Les couleurs qu'aucune pièce ne règle, par famille de teinte : chaque pastille teint toutes celles de sa famille, et aucune pièce.
 tr: The colours no part adjusts, by hue family: each swatch dyes all of its family, and no part.
 
-fr: Les couleurs seules
-tr: Colors only
+fr: Le corps seul
+tr: Body only
 
 fr: Libérer pour l'inspiration
 tr: Release for inspiration

@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <filesystem>
 #include <map>
+#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -40,19 +41,29 @@ namespace moonclient {
 // retrouve plus ce qu'on y a mis, et c'est un gestionnaire qu'il faudrait.
 inline constexpr std::size_t kMaxStylePresets = 32;
 
+// 🔴 UN PRÉRÉGLAGE EST UNE TENUE DU PERSONNAGE, brouillon compris : le corps,
+// et les calques qui lui appartiennent — la tête, la peau du visage, la suite
+// et la peau du corps, avec leur reste et leurs retouches. ⚠ JAMAIS une
+// teinture de coiffe ou de cape : elle appartient à un exemplaire d'objet, et
+// voyage par la garde-robe du compte et le code court.
 class StylePresets {
  public:
   struct Named {
     std::string name;
     ro::sim::StyleRecipe recipe;
+    // Sous les clés du moment où on l'a rangé ; `RekeyPresetLayers` les
+    // reporte sur ce qu'on porte au chargement.
+    std::vector<ro::sim::StyleLayerRecipe> layers;
   };
 
   // Range sous ce nom, en remplaçant un homonyme À SA PLACE — la liste ne se
   // réordonne pas sous les doigts de qui met à jour. Faux si le nom est vide
-  // ou si le plafond est atteint.
-  bool Save(std::string_view name, const ro::sim::StyleRecipe& recipe);
+  // ou si le plafond est atteint. Seuls les calques du personnage sont gardés.
+  bool Save(std::string_view name, const ro::sim::StyleRecipe& recipe,
+            std::vector<ro::sim::StyleLayerRecipe> layers = {});
 
   [[nodiscard]] const ro::sim::StyleRecipe* Find(std::string_view name) const;
+  [[nodiscard]] const Named* FindNamed(std::string_view name) const;
   void Erase(std::string_view name);
   // Renomme À SA PLACE. Faux si le nouveau nom est vide ou déjà pris, ou si
   // l'ancien n'existe pas.
@@ -67,6 +78,35 @@ class StylePresets {
  private:
   std::vector<Named> kept_;
 };
+
+// Un calque qu'un préréglage peut porter : la tête, la peau du visage, la suite
+// et la peau du corps.
+[[nodiscard]] bool PresetKeepsLayer(ro::sim::StyleLayerKind layer) noexcept;
+
+// CE QU'UN CHARGEMENT REPREND d'un préréglage.
+enum class PresetLayers : std::uint8_t {
+  // Tous ses calques.
+  kAll,
+  // Ceux du corps : la suite et la peau du corps.
+  kBody,
+  // Ceux de la tête : la tête et la peau du visage.
+  kHead,
+};
+
+// Les clés de ce qu'on porte, sous lesquelles un chargement range les calques.
+struct PresetKeys {
+  std::uint32_t head = 0;
+  std::uint32_t body = 0;
+};
+
+// LES CALQUES D'UN PRÉRÉGLAGE REPORTÉS SUR CE QU'ON PORTE : la tête sous la tête
+// d'aujourd'hui, la suite et la peau du corps sous le corps qu'on règle.
+//
+// 🔴 UNE RETOUCHE NE SURVIT PAS À UN CHANGEMENT DE CLÉ : elle désigne un index
+// de la palette d'un sprite, qui n'a pas de sens sur un autre. Les pièces et le
+// reste, réglés par rang et par classe de teinte, se reportent tels quels.
+[[nodiscard]] std::vector<ro::sim::StyleLayerRecipe> RekeyPresetLayers(
+    std::span<const ro::sim::StyleLayerRecipe> kept, PresetKeys now, PresetLayers part);
 
 // ── LE BROUILLON ────────────────────────────────────────────────────────────
 

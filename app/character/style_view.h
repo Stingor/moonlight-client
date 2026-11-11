@@ -164,7 +164,9 @@ class StyleView {
   // Les intentions qui touchent aux pièces.
   void ApplyPieces(const ro::ui::PaletteEditorAction& asked, std::uint32_t now_ms);
   // Charge un préréglage, en tout ou en partie.
-  void LoadPreset(const ro::ui::PaletteEditorAction& asked);
+  void LoadPreset(const ro::ui::PaletteEditorAction& asked, const ro::sim::World& world);
+  // Les calques du personnage qu'un préréglage range : voir `StylePresets`.
+  [[nodiscard]] std::vector<ro::sim::StyleLayerRecipe> PresetLayersNow() const;
   // Valide, et fait au besoin de ce corps le style principal.
   void Validate(ro::net::Connection& link, const ro::sim::World& world, std::uint32_t now_ms,
                 bool make_main);

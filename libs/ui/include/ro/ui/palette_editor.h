@@ -492,11 +492,11 @@ enum class PaletteEditorVerb : std::uint8_t {
 
 // CE QU'UN PRÉRÉGLAGE APPORTE QUAND ON LE CHARGE.
 enum class PresetPart : std::uint8_t {
-  // Tout : pièces, teinte de base, coupe et couleur de cheveux.
+  // Tout : le corps et la tête.
   kAll,
-  // Les pièces et la teinte de base, sans toucher aux cheveux.
+  // Le corps : les pièces, la teinte de base, la suite et la peau du corps.
   kColors,
-  // La coupe et la couleur de cheveux seules.
+  // La tête : la coupe, la couleur, la teinture des cheveux et la peau du visage.
   kHair,
 };
 

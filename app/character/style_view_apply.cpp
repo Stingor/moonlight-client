@@ -3,7 +3,9 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <cstdint>
 #include <cstdio>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -12,6 +14,7 @@
 #include "ro/net/player_styles.h"
 #include "ro/render/palette_ramps.h"
 #include "ro/render/sprite_catalog.h"
+#include "ro/render/style_set.h"
 #include "ro/sim/style_code.h"
 #include "ro/sim/world.h"
 
@@ -154,13 +157,15 @@ void StyleView::ApplyPieces(const ro::ui::PaletteEditorAction& asked, std::uint3
   ApplyBodyMore(asked, ToHarmony(asked.harmony), now_ms);
 }
 
-void StyleView::LoadPreset(const ro::ui::PaletteEditorAction& asked) {
-  const ro::sim::StyleRecipe* kept = presets_.Find(asked.preset);
-  if (kept == nullptr) {
+void StyleView::LoadPreset(const ro::ui::PaletteEditorAction& asked, const ro::sim::World& world) {
+  const StylePresets::Named* kept = presets_.FindNamed(asked.preset);
+  const ro::sim::Actor* me = world.player();
+  if (kept == nullptr || me == nullptr) {
     return;
   }
-  const ro::render::PaletteRecipe preset = FromWire(*kept);
+  const ro::render::PaletteRecipe preset = FromWire(kept->recipe);
   ro::render::PaletteRecipe next = session_.recipe();
+  PresetLayers part = PresetLayers::kAll;
   switch (asked.preset_part) {
     case ro::ui::PresetPart::kAll:
       next = preset;
@@ -169,13 +174,50 @@ void StyleView::LoadPreset(const ro::ui::PaletteEditorAction& asked) {
       // ⚠ LA TEINTE DE BASE VA AVEC LES PIÈCES : elle décide de leur découpage.
       next.ramps = preset.ramps;
       next.body_palette = preset.body_palette;
+      part = PresetLayers::kBody;
       break;
     case ro::ui::PresetPart::kHair:
       next.hair_style = preset.hair_style;
       next.hair_palette = preset.hair_palette;
+      part = PresetLayers::kHead;
       break;
   }
   session_.Load(next);
+
+  // 🔴 LA TÊTE SE RANGE SOUS LA COUPE ET LA COULEUR QU'ON VA MONTRER, celles
+  // que le chargement vient de poser ou, à défaut, celles du personnage.
+  const ro::render::ActorLook look = LookOf(*me);
+  const auto hair = static_cast<std::uint16_t>(next.hair_style >= 0 ? next.hair_style : look.hair);
+  const std::int16_t hair_palette = next.hair_palette >= 0 ? next.hair_palette : look.hair_palette;
+  const PresetKeys keys{.head = ro::render::HeadDyeKey(hair, hair_palette),
+                        .body = session_.body_key()};
+  for (const ro::sim::StyleLayerRecipe& layer : RekeyPresetLayers(kept->layers, keys, part)) {
+    if (const std::optional<ro::render::LayerDye> dye = FromWire(layer)) {
+      layers_.Put(*dye);
+    }
+  }
+}
+
+std::vector<ro::sim::StyleLayerRecipe> StyleView::PresetLayersNow() const {
+  // CE QUE LE PANTIN PEINT, brouillons compris, pour ce qu'on porte en ce
+  // moment : la tête de la coupe montrée, la suite et la peau du corps réglé.
+  const LayerTab* head = TabOf(ro::ui::PaletteTabKind::kHair);
+  const std::uint32_t head_key = head != nullptr ? head->at.key : 0U;
+  const std::uint32_t body_key = session_.body_key();
+  std::vector<ro::sim::StyleLayerRecipe> kept;
+  for (const ro::render::LayerDye& dye : layers_.Composed()) {
+    const ro::sim::StyleLayerRecipe wire = ToWire(dye);
+    const bool on_body = wire.layer == ro::sim::StyleLayerKind::kBodyMore ||
+                         wire.layer == ro::sim::StyleLayerKind::kBodySkin;
+    const bool current =
+        wire.layer == ro::sim::StyleLayerKind::kSkin ||
+        (wire.layer == ro::sim::StyleLayerKind::kHead && head_key != 0U && wire.key == head_key) ||
+        (on_body && body_key != 0U && wire.key == body_key);
+    if (current) {
+      kept.push_back(wire);
+    }
+  }
+  return kept;
 }
 
 void StyleView::Validate(ro::net::Connection& link, const ro::sim::World& world,
@@ -298,12 +340,13 @@ void StyleView::ApplyVerb(const ro::ui::PaletteEditorAction& asked, ro::net::Con
       // plus tard, éventuellement sur un autre personnage.
       if (const ro::sim::Actor* me = world.player();
           me != nullptr &&
-          presets_.Save(asked.preset, ToWire(Shareable(session_.recipe(), LookOf(*me))))) {
+          presets_.Save(asked.preset, ToWire(Shareable(session_.recipe(), LookOf(*me))),
+                        PresetLayersNow())) {
         static_cast<void>(SaveStylePresets(client_root_, presets_));
       }
       break;
     case ro::ui::PaletteEditorVerb::kLoadPreset:
-      LoadPreset(asked);
+      LoadPreset(asked, world);
       break;
     case ro::ui::PaletteEditorVerb::kRenamePreset:
       if (presets_.Rename(asked.preset, asked.renamed)) {
