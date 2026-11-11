@@ -71,6 +71,9 @@ struct SkillUnitVisualEntry {
   // avance la relance sur la fin de l'effet pour qu'aucune image ne montre le
   // sol nu. Zéro pour une forme permanente, qui ne se relance pas.
   std::uint8_t withhold_ticks = 0;
+  // CE QUI LE REMPLACE SOUS `/mineffect` : un effet sans porteur, posé à la
+  // place de l'unité, à la même cadence. Zéro, aucun remplaçant.
+  std::uint16_t minimal_effect_id = 0;
 };
 
 // La table entière, triée par identifiant d'unité.

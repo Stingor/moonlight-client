@@ -573,6 +573,15 @@ void EffectsInPlay::NoticeSkillUnitVisuals(const ro::sim::World& world, const Ma
       }
     }
     const std::array<float, 3> ground = GroundPositionAt(stage, unit.cell.x, unit.cell.y);
+    // SOUS `/mineffect`, UN REMPLAÇANT SANS PORTEUR, à la cadence de l'effet
+    // qu'il remplace.
+    if (minimal_effects_ && visual->minimal_effect_id != 0) {
+      static_cast<void>(
+          PlayById(visual->minimal_effect_id, glm::vec3(ground[0], ground[1], ground[2]), now_ms));
+      per_map_.sown_units.insert_or_assign(
+          id, SownUnit{now_ms, ro::render::SkillUnitVisualPeriodMs(*visual), 0, unit.cell});
+      continue;
+    }
     const std::uint32_t period_ms =
         SowUnitVisual(*visual, glm::vec3(ground[0], ground[1], ground[2]), now_ms, first, id);
     per_map_.sown_units.insert_or_assign(id, SownUnit{now_ms, period_ms, 0, unit.cell});

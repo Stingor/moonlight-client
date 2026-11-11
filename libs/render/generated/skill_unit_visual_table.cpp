@@ -36,7 +36,7 @@ constexpr std::array<SkillUnitVisualEntry, 104> kSkillUnitVisuals = {{
     {135, 138, SkillUnitVisualShape::kPermanent, 0},
     {136, 97, SkillUnitVisualShape::kRepeated, 8},
     {141, 74, SkillUnitVisualShape::kPermanent, 0},
-    {142, 95, SkillUnitVisualShape::kRepeated, 20},
+    {142, 95, SkillUnitVisualShape::kRepeated, 20, 1161},
     {146, 171, SkillUnitVisualShape::kPermanent, 0},
     {154, 239, SkillUnitVisualShape::kPermanent, 0},
     {155, 240, SkillUnitVisualShape::kPermanent, 0},
