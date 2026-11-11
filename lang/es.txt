@@ -23637,3 +23637,9 @@ tr: El maniquí ampliado alrededor del cursor mientras apuntas.
 
 fr: Clic : régler la pièce visée.
 tr: Clic: ajustar la pieza apuntada.
+
+fr: Lisser
+tr: Suavizar
+
+fr: Adoucit le pantin agrandi. Décoché, chaque pixel du sprite reste net.
+tr: Suaviza el maniquí ampliado. Desmarcado, cada píxel del sprite queda nítido.

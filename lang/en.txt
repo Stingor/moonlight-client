@@ -23637,3 +23637,9 @@ tr: The doll magnified around the cursor while you aim.
 
 fr: Clic : régler la pièce visée.
 tr: Click: adjust the aimed part.
+
+fr: Lisser
+tr: Smooth
+
+fr: Adoucit le pantin agrandi. Décoché, chaque pixel du sprite reste net.
+tr: Softens the enlarged doll. Unchecked, every sprite pixel stays sharp.

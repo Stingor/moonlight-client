@@ -114,8 +114,12 @@ void DrawPaletteDoll(PaletteDollState& doll, float side, const SkinLook& look, b
     // c'est la carte qui l'agrandit.
     const ImVec2 image_at(at.x + (side - doll.image.width) * 0.5F,
                           at.y + (side - doll.image.height) * 0.5F);
+    // NET PAR DÉFAUT, comme le sprite qu'on règle ; lissé si le joueur le
+    // demande. ⚠ IMPOSÉ DANS LES DEUX CAS : voir `ui_sampler.h`.
+    ImposeImageSampler(into, doll.smooth);
     into->AddImage(doll.image.id, image_at,
                    ImVec2(image_at.x + doll.image.width, image_at.y + doll.image.height));
+    RestoreAmbientSampler(into);
   }
 
   if (!hovered) {
@@ -170,6 +174,11 @@ void DrawPaletteDollControls(PaletteDollState& doll, const SkinArt& art) {
   static_cast<void>(SkinCheckBox(core::Tr("Animé"), &doll.animated, art));
   ImGui::SameLine();
   static_cast<void>(SkinCheckBox(core::Tr("Fond clair"), &doll.light_background, art));
+  ImGui::SameLine();
+  static_cast<void>(SkinCheckBox(core::Tr("Lisser"), &doll.smooth, art));
+  if (ImGui::IsItemHovered()) {
+    SkinTooltip(core::Tr("Adoucit le pantin agrandi. Décoché, chaque pixel du sprite reste net."));
+  }
   ImGui::SameLine();
   static_cast<void>(SkinCheckBox(core::Tr("Loupe"), &doll.magnifier, art));
   if (ImGui::IsItemHovered()) {
