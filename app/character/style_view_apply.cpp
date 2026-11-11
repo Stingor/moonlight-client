@@ -59,6 +59,9 @@ void StyleView::Apply(const ro::ui::PaletteEditorAction& asked, ro::net::Connect
   } else {
     ApplyPieces(asked, now_ms);
   }
+  // La ligne de peau de l'onglet de la vue : le visage sous la Tête, le corps
+  // sous le Corps.
+  ApplySkinLine(asked);
   switch (asked.chosen_in) {
     case ro::ui::PaletteEditorPicker::kNone:
       break;
@@ -246,6 +249,8 @@ void StyleView::ApplyVerb(const ro::ui::PaletteEditorAction& asked, ro::net::Con
           layers_.BackToWorn(tab.at);
         }
       }
+      layers_.BackToWorn(SkinAt(SkinLine::kFace));
+      layers_.BackToWorn(SkinAt(SkinLine::kBody));
       break;
     // ⚠ CES GESTES-LÀ VALENT POUR L'ONGLET OUVERT : le corps a son
     // historique, les calques le leur.
@@ -254,6 +259,11 @@ void StyleView::ApplyVerb(const ro::ui::PaletteEditorAction& asked, ro::net::Con
         layers_.BackToWorn(tab->at);
       } else {
         session_.BackToWorn();
+      }
+      // La peau de l'onglet aussi : celle du visage sous la Tête, celle du corps
+      // sous le Corps.
+      if (const std::optional<SkinLine> line = OpenSkinLine()) {
+        layers_.BackToWorn(SkinAt(*line));
       }
       break;
     case ro::ui::PaletteEditorVerb::kBlankSlate:

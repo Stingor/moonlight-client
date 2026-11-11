@@ -23401,9 +23401,6 @@ tr: Este item se ajusta por familias de tono: cada muestra tiñe todos sus color
 fr: Cette teinture appartient à cet item : elle le suit à l'échange, à la vente, au storage et au courrier.
 tr: Este tinte pertenece a este item: lo sigue en el intercambio, la venta, el storage y el correo.
 
-fr: Cheveux
-tr: Pelo
-
 fr: Code de ce calque
 tr: Código de esta capa
 
@@ -23449,14 +23446,35 @@ tr: El servidor no puede guardar los tintes por ahora.
 fr: Le serveur refuse cette coupe, cette couleur ou cet item.
 tr: El servidor rechaza este corte, este color o este item.
 
-fr: Le visage et les bras se teignent ensemble : la pastille règle les deux.
-tr: La cara y los brazos se tiñen juntos: la muestra ajusta ambos.
-
 fr: Lie toutes les pièces des cheveux et leur donne la couleur de la première : régler l'une règle ensuite toutes les autres.
 tr: Vincula todas las piezas del pelo y les da el color de la primera: ajustar una ajusta luego todas las demás.
 
-fr: Peau
-tr: Piel
+fr: (celle du visage)
+tr: (la de la cara)
+
+fr: Le corps retire sa peau propre et suit de nouveau celle du visage.
+tr: El cuerpo quita su propia piel y vuelve a seguir la de la cara.
+
+fr: Le serveur ne range pas encore la peau du corps : il suit celle du visage.
+tr: El servidor todavía no guarda la piel del cuerpo: sigue la de la cara.
+
+fr: Le visage, et le corps tant qu'il n'a pas sa propre peau.
+tr: La cara, y el cuerpo mientras no tenga su propia piel.
+
+fr: Les bras et les jambes de ce corps, comme un vêtement porté par-dessus : un corps sans peau propre prend celle du visage.
+tr: Los brazos y las piernas de este cuerpo, como una prenda llevada encima: un cuerpo sin piel propia toma la de la cara.
+
+fr: Peau du corps
+tr: Piel del cuerpo
+
+fr: Peau du visage
+tr: Piel de la cara
+
+fr: Rend au visage la peau du dessin.
+tr: Devuelve a la cara la piel del dibujo.
+
+fr: Reprendre celle du visage
+tr: Volver a la de la cara
 
 fr: Peau non réglable sur cette monture : elle peint aussi l'animal.
 tr: La piel no se ajusta en esta montura: también pinta al animal.

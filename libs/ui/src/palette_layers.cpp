@@ -1,6 +1,10 @@
 #include "palette_layers.h"
 
+#include <algorithm>
+#include <array>
+#include <cmath>
 #include <cstddef>
+#include <cstdint>
 #include <cstdio>
 #include <string>
 #include <utility>
@@ -8,6 +12,8 @@
 #include "ro/core/i18n.h"
 #include "ro/ui/skin_popup.h"
 #include "ro/ui/skin_widgets.h"
+
+#include "palette_pieces.h"
 
 namespace ro::ui {
 namespace {
@@ -18,27 +24,10 @@ constexpr float kWrapInFonts = 24.0F;
 // Le côté d'une pastille de teint, en hauteurs de ligne.
 constexpr float kToneInFrames = 1.0F;
 constexpr float kChannelMost = 255.0F;
-
-// Le nom d'un calque, quand ce n'est pas un objet qui le nomme.
-[[nodiscard]] const char* KindName(PaletteTabKind kind) {
-  switch (kind) {
-    case PaletteTabKind::kBody:
-      return core::Tr("Corps");
-    case PaletteTabKind::kSkin:
-      return core::Tr("Peau");
-    case PaletteTabKind::kHair:
-      return core::Tr("Cheveux");
-    case PaletteTabKind::kHeadgearTop:
-      return core::Tr("Coiffe haute");
-    case PaletteTabKind::kHeadgearMiddle:
-      return core::Tr("Coiffe du milieu");
-    case PaletteTabKind::kHeadgearLow:
-      return core::Tr("Coiffe basse");
-    case PaletteTabKind::kGarment:
-      return core::Tr("Cape");
-  }
-  return "";
-}
+// Le rang 1 ne désigne plus d'onglet : la peau du visage se règle sous la Tête.
+constexpr std::uint8_t kRetiredSkinTab = 1;
+// Le nuancier de la ligne de peau, sous l'identifiant de sa ligne.
+constexpr const char* kSkinPickerId = "nuancier_peau";
 
 // Le libellé d'un onglet : « Coiffe haute : Valkyrie », une étoile tant qu'une
 // retouche attend d'être validée.
@@ -48,7 +37,7 @@ constexpr float kChannelMost = 255.0F;
 // retouche ou un autre objet porté en font alors un NOUVEL onglet, l'ancien
 // disparaît, et la barre retombe sur le dernier onglet visité.
 [[nodiscard]] std::string TabLabel(const PaletteTab& tab) {
-  std::string label = KindName(tab.kind);
+  std::string label = PaletteTabName(tab.kind);
   if (!tab.name.empty()) {
     label += " : ";
     label += tab.name;
@@ -139,7 +128,23 @@ void DrawHairTools(const PaletteEditorView& view, const SkinArt& art, PaletteEdi
   }
 }
 
-// LA PEAU : une rangée de teints, du plus clair au plus foncé.
+[[nodiscard]] std::array<float, 3> Channels(ImU32 color) {
+  return {static_cast<float>((color >> IM_COL32_R_SHIFT) & 0xFFU) / kChannelMost,
+          static_cast<float>((color >> IM_COL32_G_SHIFT) & 0xFFU) / kChannelMost,
+          static_cast<float>((color >> IM_COL32_B_SHIFT) & 0xFFU) / kChannelMost};
+}
+
+[[nodiscard]] ImVec4 ToVec4(ImU32 color) {
+  const std::array<float, 3> rgb = Channels(color);
+  return {rgb[0], rgb[1], rgb[2], 1.0F};
+}
+
+[[nodiscard]] std::uint8_t ToByte(float channel) {
+  return static_cast<std::uint8_t>(
+      std::clamp(std::lround(channel * kChannelMost), 0L, static_cast<long>(kChannelMost)));
+}
+
+// Les teints proposés, du plus clair au plus foncé.
 void DrawSkinTones(const PaletteEditorView& view, PaletteEditorAction& action) {
   if (view.skin_tones.empty()) {
     return;
@@ -150,19 +155,130 @@ void DrawSkinTones(const PaletteEditorView& view, PaletteEditorAction& action) {
   for (std::size_t rank = 0; rank < view.skin_tones.size(); ++rank) {
     ImGui::SameLine();
     ImGui::PushID(static_cast<int>(rank));
-    const ImU32 tone = view.skin_tones[rank];
-    const ImVec4 color(static_cast<float>((tone >> IM_COL32_R_SHIFT) & 0xFFU) / kChannelMost,
-                       static_cast<float>((tone >> IM_COL32_G_SHIFT) & 0xFFU) / kChannelMost,
-                       static_cast<float>((tone >> IM_COL32_B_SHIFT) & 0xFFU) / kChannelMost, 1.0F);
-    if (ImGui::ColorButton("##teint", color, ImGuiColorEditFlags_NoTooltip, ImVec2(side, side))) {
+    if (ImGui::ColorButton("##teint", ToVec4(view.skin_tones[rank]), ImGuiColorEditFlags_NoTooltip,
+                           ImVec2(side, side))) {
       action.skin_tone = static_cast<int>(rank);
     }
     ImGui::PopID();
   }
-  Wrapped(core::Tr("Le visage et les bras se teignent ensemble : la pastille règle les deux."));
+}
+
+// Le nuancier de la peau, s'il est ouvert. Rend vrai quand il l'est.
+bool DrawSkinPopup(const PaletteSkinLine& line, const SkinArt& art, PaletteEditorAction& action) {
+  if (!BeginSkinPopup(kSkinPickerId)) {
+    return false;
+  }
+  std::array<float, 3> rgb = Channels(line.color);
+  if (DrawPaletteColorPicker(rgb, art)) {
+    action.skin_picked = true;
+    action.skin_color = {ToByte(rgb[0]), ToByte(rgb[1]), ToByte(rgb[2])};
+  }
+  if (SkinButton(core::Tr("Fermer"), art)) {
+    ImGui::CloseCurrentPopup();
+  }
+  EndSkinPopup();
+  return true;
+}
+
+// Le retour de la ligne : la peau du dessin pour le visage, celle du visage
+// pour un corps qui a la sienne.
+void DrawSkinReset(const PaletteSkinLine& line, const SkinArt& art, PaletteEditorAction& action) {
+  if (line.body ? !line.own : line.adjust.neutral()) {
+    return;
+  }
+  ImGui::SameLine();
+  if (line.body) {
+    if (SkinSmallButton(core::Tr("Reprendre celle du visage"), art)) {
+      action.skin_reset = true;
+    }
+    Explain(core::Tr("Le corps retire sa peau propre et suit de nouveau celle du visage."));
+    return;
+  }
+  // « x » et non une flèche, comme sur une pièce : la police de l'interface
+  // ne couvre pas les icônes.
+  if (SkinSmallButton("x", art)) {
+    action.skin_reset = true;
+  }
+  Explain(core::Tr("Rend au visage la peau du dessin."));
 }
 
 }  // namespace
+
+std::optional<PaletteTabKind> PaletteTabOfNumber(std::uint8_t number) noexcept {
+  if (number == 0 || number > kPaletteTabKinds) {
+    return std::nullopt;
+  }
+  const auto rank = static_cast<std::uint8_t>(number - 1);
+  if (rank == kRetiredSkinTab) {
+    return PaletteTabKind::kHair;
+  }
+  return static_cast<PaletteTabKind>(rank);
+}
+
+const char* PaletteTabName(PaletteTabKind kind) {
+  switch (kind) {
+    case PaletteTabKind::kBody:
+      return core::Tr("Corps");
+    case PaletteTabKind::kHair:
+      return core::Tr("Tête");
+    case PaletteTabKind::kHeadgearTop:
+      return core::Tr("Coiffe haute");
+    case PaletteTabKind::kHeadgearMiddle:
+      return core::Tr("Coiffe du milieu");
+    case PaletteTabKind::kHeadgearLow:
+      return core::Tr("Coiffe basse");
+    case PaletteTabKind::kGarment:
+      return core::Tr("Cape");
+  }
+  return "";
+}
+
+bool DrawSkinLine(PaletteEditorState& state, const PaletteEditorView& view, const SkinArt& art,
+                  PaletteEditorAction& action) {
+  const PaletteSkinLine& line = view.skin;
+  const bool blocked = line.blocked != PaletteTabBlock::kNone;
+  // La demande de la pipette vaut pour la ligne de SON onglet : elle attend que
+  // la vue en soit faite, et tombe si la ligne n'y est pas réglable.
+  const bool asked = state.skin_open == view.tab;
+  if (asked) {
+    state.skin_open.reset();
+  }
+  if (!line.shown) {
+    return false;
+  }
+  ImGui::PushID(line.body ? "peau_corps" : "peau_visage");
+  ImGui::BeginDisabled(blocked);
+  const float side = ImGui::GetFrameHeight() * kToneInFrames;
+  if (ImGui::ColorButton("##peau", ToVec4(line.color), ImGuiColorEditFlags_NoTooltip,
+                         ImVec2(side, side)) ||
+      (asked && !blocked)) {
+    ImGui::OpenPopup(kSkinPickerId);
+  }
+  bool hovered = ImGui::IsItemHovered();
+  ImGui::SameLine();
+  ImGui::AlignTextToFramePadding();
+  ImGui::TextUnformatted(line.body ? core::Tr("Peau du corps") : core::Tr("Peau du visage"));
+  hovered = ImGui::IsItemHovered() || hovered;
+  if (!blocked) {
+    Explain(line.body ? core::Tr("Les bras et les jambes de ce corps, comme un vêtement porté "
+                                 "par-dessus : un corps sans peau propre prend celle du visage.")
+                      : core::Tr("Le visage, et le corps tant qu'il n'a pas sa propre peau."));
+  }
+  if (line.body && !line.own) {
+    ImGui::SameLine();
+    ImGui::TextDisabled("%s", core::Tr("(celle du visage)"));
+  }
+  DrawSkinReset(line, art, action);
+  DrawSkinTones(view, action);
+  const bool open = !blocked && DrawSkinPopup(line, art, action);
+  ImGui::EndDisabled();
+  if (blocked) {
+    ImGui::TextDisabled("%s", TabBlockReason(line.blocked));
+  }
+  ImGui::PopID();
+  state.skin_focus = hovered || open;
+  return open;
+}
 
 const char* TabBlockReason(PaletteTabBlock blocked) {
   switch (blocked) {
@@ -178,6 +294,8 @@ const char* TabBlockReason(PaletteTabBlock blocked) {
       return core::Tr("Peau non réglable sur cette monture : elle peint aussi l'animal.");
     case PaletteTabBlock::kNotFound:
       return core::Tr("Cet item n'est pas dans ton équipement.");
+    case PaletteTabBlock::kBodySkinNotServed:
+      return core::Tr("Le serveur ne range pas encore la peau du corps : il suit celle du visage.");
   }
   return "";
 }
@@ -205,8 +323,8 @@ void DrawLayerTabs(PaletteEditorState& state, const PaletteEditorView& view, con
     const std::string label = TabLabel(tab);
     if (ImGui::BeginTabItem(label.c_str(), nullptr, flags)) {
       if (blocked && !forced) {
-        // ⚠ UN ONGLET OUVERT QUI DEVIENT NON RÉGLABLE — on monte en selle sur
-        // l'onglet de la peau — REND LA MAIN À CELUI QUE LA VUE MONTRE : la
+        // ⚠ UN ONGLET OUVERT QUI DEVIENT NON RÉGLABLE — on enfile l'habit du
+        // GM sous la Tête — REND LA MAIN À CELUI QUE LA VUE MONTRE : la
         // barre ne doit pas désigner un calque pendant que la liste est celle
         // d'un autre.
         state.tab = view.tab;
@@ -237,8 +355,6 @@ void DrawLayerNotes(const PaletteEditorView& view, const SkinArt& art,
   }
   if (tab->kind == PaletteTabKind::kHair) {
     DrawHairTools(view, art, action);
-  } else if (tab->kind == PaletteTabKind::kSkin) {
-    DrawSkinTones(view, action);
   }
 }
 

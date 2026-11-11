@@ -15,6 +15,7 @@
 #include "ro/net/player_style_layers.h"
 #include "ro/render/actor_thumbnails.h"
 #include "ro/render/actor_wardrobe.h"
+#include "ro/sim/style_layer_code.h"
 #include "ro/sim/world_fwd.h"
 #include "ro/ui/palette_editor.h"
 
@@ -22,6 +23,7 @@
 #include "character/style_layers.h"
 #include "character/style_pieces.h"
 #include "character/style_session.h"
+#include "character/style_skin.h"
 #include "character/style_store.h"
 
 namespace moonclient {
@@ -282,6 +284,29 @@ class StyleView {
   // Lit un code de calque sur l'onglet ouvert. Faux s'il n'y va pas.
   bool TryLayerCode(std::string_view code);
 
+  // ── LES DEUX PEAUX — voir `style_view_skin.cpp` ─────────────────────────
+
+  // Ce qui décide si les peaux se règlent, relu au changement d'apparence.
+  void RefreshSkins(const ro::render::ActorLook& look);
+  // Pourquoi cette ligne ne se règle pas, ou rien.
+  [[nodiscard]] SkinRefusal SkinRefusalOf(SkinLine line) const;
+  [[nodiscard]] bool SkinAdjustable(SkinLine line) const;
+  // La ligne de peau de l'onglet de la vue : le visage sous la Tête, le corps
+  // sous le Corps ; rien ailleurs, ni pour un Doram.
+  [[nodiscard]] std::optional<SkinLine> OpenSkinLine() const;
+  // Le calque de la ligne, sous la clé du corps qu'on habille.
+  [[nodiscard]] LayerAt SkinAt(SkinLine line) const;
+  // Le réglage composé de la ligne, neutre sans teinture.
+  [[nodiscard]] ro::render::RampAdjust SkinAdjust(SkinLine line) const;
+  // Ce que la vue montre de la ligne de l'onglet ouvert, et les teints.
+  void RefreshSkinLine();
+  // Les gestes de cette ligne.
+  void ApplySkinLine(const ro::ui::PaletteEditorAction& asked);
+  // La peau a-t-elle une retouche sur l'onglet de cette ligne ?
+  [[nodiscard]] bool SkinEdited(SkinLine line) const;
+  // Lit un code de peau sur l'onglet Tête : il teint le visage.
+  bool TrySkinCode(const ro::sim::StyleLayerCode& code);
+
   ro::render::ActorWardrobe* wardrobe_ = nullptr;
   std::optional<StyleDoll> doll_;
   std::optional<ro::render::ActorThumbnails> thumbnails_;
@@ -390,6 +415,12 @@ class StyleView {
   std::vector<std::array<std::uint8_t, 3>> layer_painted_;
   std::vector<ro::render::LayerDye> composed_;
   std::vector<ImU32> skin_tones_;
+  // LES PEAUX : un Doram n'en a pas ; l'habit du GM et les chemins des corps
+  // décident si elles se règlent ; le serveur, s'il range celle du corps.
+  bool skins_shown_ = false;
+  bool skins_gm_outfit_ = false;
+  std::vector<std::string> skin_body_paths_;
+  int server_layer_last_ = 0;
   // Les pièces liées et gardées, par calque.
   std::map<LayerAt, PieceMarks> layer_marks_;
   // Une teinture d'objet peut-elle se valider, à cette image ? Vrai quand le

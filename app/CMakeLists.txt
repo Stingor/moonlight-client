@@ -1435,6 +1435,7 @@ add_library(moonclient_styles STATIC
     character/style_pieces.cpp
     character/style_recipe.cpp
     character/style_session.cpp
+    character/style_skin.cpp
     character/style_store.cpp
     character/style_yaml.cpp
     world/actor_styles.cpp)
@@ -2119,6 +2120,7 @@ add_executable(moonclient
     character/style_view_apply.cpp
     character/style_view_layers.cpp
     character/style_view_rest.cpp
+    character/style_view_skin.cpp
     game/ui_layouts.cpp
     game/ui_layout_factory.cpp
     game/layout_windows.cpp

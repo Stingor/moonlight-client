@@ -48,17 +48,6 @@ constexpr std::int8_t kClassSaturation = 65;
 constexpr int kHueClassDegrees = 30;
 constexpr std::array<std::uint8_t, 3> kGreySeed = {178, 178, 178};
 
-// LES TEINTS PROPOSÉS, du plus clair au plus foncé.
-constexpr std::array<std::array<std::uint8_t, 3>, 7> kSkinTones = {{
-    {255, 228, 210},
-    {244, 204, 176},
-    {228, 180, 146},
-    {204, 148, 110},
-    {168, 116, 80},
-    {128, 84, 56},
-    {88, 56, 38},
-}};
-
 // Le mot bas d'une clé de tête : la couleur de cheveux.
 constexpr std::uint32_t kHairPaletteMask = 0xFFFFU;
 constexpr unsigned kHairStyleShift = 16;
@@ -209,35 +198,10 @@ void StyleView::RefreshTabs(const ro::render::ActorLook& look, const ro::sim::Wo
     tabs_.clear();
     const bool doram = ro::render::IsDoramJob(look.job);
     const bool gm_outfit = look.player && look.gm_outfit;
+    // Les peaux n'ont pas d'onglet : leurs lignes vivent sous la Tête et le Corps.
+    RefreshSkins(look);
 
-    // ── LA PEAU : un Doram n'en a pas d'onglet ─────────────────────────────
-    if (!doram) {
-      LayerTab skin;
-      skin.shown.kind = PaletteTabKind::kSkin;
-      skin.at = LayerAt{.layer = StyleLayer::kSkin, .key = 0};
-      ro::render::ActorLook body_look = look;
-      KeepBodyOnly(body_look);
-      const std::vector<std::string> paths =
-          ro::render::BodySpritePaths(wardrobe_->catalog(), body_look);
-      const bool on_mount = std::ranges::any_of(
-          paths, [](const std::string& path) { return !ro::render::SkinAdjustable(path); });
-      skin.shown.blocked = gm_outfit  ? PaletteTabBlock::kGmOutfit
-                           : on_mount ? PaletteTabBlock::kSkinOnMount
-                                      : PaletteTabBlock::kNone;
-      skin.base = doll_->body().base;
-      skin.sprite_base = skin.base;
-      const std::span<const std::uint8_t> indices =
-          ro::render::SkinIndices(ro::render::SkinRace::kHuman);
-      if (!indices.empty()) {
-        skin.ramps.push_back(
-            ro::render::PaletteRamp{.start = indices.front(),
-                                    .length = static_cast<std::uint8_t>(indices.size()),
-                                    .ref = indices[indices.size() / 2]});
-      }
-      tabs_.push_back(std::move(skin));
-    }
-
-    // ── LES CHEVEUX ────────────────────────────────────────────────────────
+    // ── LA TÊTE : les cheveux et la peau du visage ─────────────────────────
     {
       LayerTab hair;
       hair.shown.kind = PaletteTabKind::kHair;
@@ -259,10 +223,13 @@ void StyleView::RefreshTabs(const ro::render::ActorLook& look, const ro::sim::Wo
         FillRest(hair, measure.rest);
         hair.retouchable = mixed_allowed_;
       }
-      hair.shown.blocked = gm_outfit            ? PaletteTabBlock::kGmOutfit
-                           : look.orc_head      ? PaletteTabBlock::kOrcHead
-                           : hair.ramps.empty() ? PaletteTabBlock::kNoPiece
-                                                : PaletteTabBlock::kNone;
+      // ⚠ SANS PIÈCE DE CHEVEUX, LA TÊTE RESTE OUVERTE si la peau du visage se
+      // règle : sa ligne est sous cet onglet.
+      const bool face_skin = SkinAdjustable(SkinLine::kFace);
+      hair.shown.blocked = gm_outfit                          ? PaletteTabBlock::kGmOutfit
+                           : look.orc_head                    ? PaletteTabBlock::kOrcHead
+                           : hair.ramps.empty() && !face_skin ? PaletteTabBlock::kNoPiece
+                                                              : PaletteTabBlock::kNone;
       tabs_.push_back(std::move(hair));
     }
 
@@ -336,10 +303,18 @@ void StyleView::RefreshTabs(const ro::render::ActorLook& look, const ro::sim::Wo
     const ro::render::LayerDye* worn = layers_.Worn(tab.at);
     tab.shown.dyed = worn != nullptr && !NeutralDye(*worn);
     tab.shown.edited = layers_.HasEdits(tab.at);
+    // La Tête porte aussi la peau du visage.
+    if (tab.shown.kind == PaletteTabKind::kHair) {
+      const ro::render::LayerDye* face = layers_.Worn(SkinAt(SkinLine::kFace));
+      tab.shown.dyed = tab.shown.dyed || (skins_shown_ && face != nullptr && !NeutralDye(*face));
+      tab.shown.edited = tab.shown.edited || SkinEdited(SkinLine::kFace);
+    }
   }
   tab_views_.clear();
-  tab_views_.push_back(ro::ui::PaletteTab{
-      .kind = PaletteTabKind::kBody, .edited = session_.has_edits(), .dyed = session_.own_style()});
+  tab_views_.push_back(
+      ro::ui::PaletteTab{.kind = PaletteTabKind::kBody,
+                         .edited = session_.has_edits() || SkinEdited(SkinLine::kBody),
+                         .dyed = session_.own_style()});
   for (const LayerTab& tab : tabs_) {
     tab_views_.push_back(tab.shown);
   }
@@ -394,20 +369,14 @@ void StyleView::RefreshLayerPieces(const LayerTab& tab) {
   const PieceMarks& marks = layer_marks_[tab.at];
   view_.links = marks.links();
   view_.locked = marks.locked();
-  view_.has_edits = layers_.HasEdits(tab.at);
+  view_.has_edits = layers_.HasEdits(tab.at) ||
+                    (tab.shown.kind == PaletteTabKind::kHair && SkinEdited(SkinLine::kFace));
   view_.can_undo = layers_.can_undo();
   view_.can_redo = layers_.can_redo();
   view_.share_code = layer_code_.c_str();
   view_.code_shares_in_chat = false;
   view_.can_adapt_cut = tab.shown.kind == PaletteTabKind::kHair && !tab.ramps.empty() &&
                         layers_.PreviousHead(tab.at.key).has_value() && !layers_.HasEdits(tab.at);
-  if (tab.shown.kind == PaletteTabKind::kSkin) {
-    skin_tones_.clear();
-    for (const std::array<std::uint8_t, 3>& tone : kSkinTones) {
-      skin_tones_.push_back(ToColor(tone));
-    }
-    view_.skin_tones = skin_tones_;
-  }
 }
 
 void StyleView::RefreshLayerState(const ro::sim::World& world, std::uint32_t now_ms) {
@@ -424,6 +393,7 @@ void StyleView::RefreshLayerState(const ro::sim::World& world, std::uint32_t now
   retouches_most_ =
       std::min(world.session().style_layer_retouches_most, static_cast<int>(kLayerRetouchesMost));
   mixed_allowed_ = retouches_most_ > 0;
+  server_layer_last_ = world.session().style_layer_last;
   // 🔴 SANS DISTANCE ANNONCÉE, LE SERVEUR N'EXIGE PAS L'ATELIER : une teinture
   // d'objet se valide alors de partout, sur l'objet porté.
   atelier_open_ =
@@ -462,12 +432,14 @@ void StyleView::ReadPipette(const ro::ui::PaletteEditorState& state) {
     return;
   }
   ro::ui::PalettePipette found;
-  const LayerTab* skin = TabOf(PaletteTabKind::kSkin);
-  const bool skin_index =
-      skin != nullptr && skin->shown.blocked == PaletteTabBlock::kNone &&
-      std::ranges::contains(ro::render::SkinIndices(ro::render::SkinRace::kHuman), pick->index);
-  if ((pick->part == ActorPart::kBody || pick->part == ActorPart::kHead) && skin_index) {
-    found = {.found = true, .tab = PaletteTabKind::kSkin, .piece = 0};
+  // 🔴 LA PEAU OUVRE LA LIGNE DE SON ONGLET : le visage celle de la Tête, les
+  // bras celle du Corps.
+  const std::optional<SkinLine> skin = SkinLineUnder(pick->part, pick->index);
+  if (skin.has_value() && SkinAdjustable(*skin)) {
+    found = {.found = true,
+             .tab = *skin == SkinLine::kFace ? PaletteTabKind::kHair : PaletteTabKind::kBody,
+             .piece = -1,
+             .skin = true};
   } else if (pick->part == ActorPart::kBody) {
     const std::optional<std::size_t> rank = ro::render::RampAt(doll_->body().ramps, pick->index);
     found = {.found = true,
@@ -597,11 +569,6 @@ void StyleView::ApplyLayerPieces(const ro::ui::PaletteEditorAction& asked, const
   if (asked.adapt_cut) {
     AdaptCut(tab);
   }
-  if (asked.skin_tone >= 0 && static_cast<std::size_t>(asked.skin_tone) < kSkinTones.size()) {
-    const std::array<std::size_t, 1> skin{0};
-    layers_.Set(tab.at, tab.profile,
-                Reach(tab, skin, kSkinTones[static_cast<std::size_t>(asked.skin_tone)]));
-  }
 }
 
 void StyleView::AdaptCut(const LayerTab& tab) {
@@ -651,6 +618,14 @@ void StyleView::AdaptCut(const LayerTab& tab) {
 std::vector<ro::net::StyleLayerOrder> StyleView::LayerOrders(bool atelier_open) const {
   std::vector<ro::net::StyleLayerOrder> orders;
   for (const ro::render::LayerDye& dye : layers_.Pending()) {
+    // LES PEAUX n'ont pas d'onglet : elles partent quand leur ligne se règle, la
+    // peau du corps seulement vers un serveur qui la range.
+    if (dye.layer == StyleLayer::kSkin || dye.layer == StyleLayer::kBodySkin) {
+      if (SkinAdjustable(dye.layer == StyleLayer::kSkin ? SkinLine::kFace : SkinLine::kBody)) {
+        orders.push_back(ro::net::StyleLayerOrder{.recipe = ToWire(dye), .clear = NeutralDye(dye)});
+      }
+      continue;
+    }
     // ⚠ SEULEMENT CE QU'ON PORTE : la retouche d'une coupe qu'on n'a plus, ou
     // d'un chapeau ôté, attend qu'on le remette. Le serveur ne la rendrait
     // pas, et elle resterait « à valider » pour toujours.
@@ -715,6 +690,10 @@ bool StyleView::TryLayerCode(std::string_view code) {
   const LayerTab* tab = OpenLayer();
   if (!read.has_value() || tab == nullptr || tab->shown.blocked != PaletteTabBlock::kNone) {
     return false;
+  }
+  // Le code d'une peau se colle sous la Tête, sur la peau du visage.
+  if (read->layer == ro::sim::StyleLayerKind::kSkin) {
+    return tab->shown.kind == PaletteTabKind::kHair && TrySkinCode(*read);
   }
   // ⚠ LE MÊME CALQUE ET LE MÊME PROFIL : les rangs d'un autre profil
   // désignent d'autres pièces.

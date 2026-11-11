@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstdint>
+#include <optional>
 #include <span>
 #include <string>
 
@@ -103,9 +104,14 @@ inline constexpr std::array<std::size_t, 4> kPaletteDollPoses = {0, 1, 2, 10};
 //
 // ⚠ LES NUMÉROS VOYAGENT : le styliste ouvre l'éditeur sur un onglet par son
 // numéro, voir `ro/sim/style.h`. On en ajoute en queue, jamais au milieu.
+//
+// 🔴 LE 1 N'EST PLUS UN ONGLET : la peau du visage se règle sous la Tête, celle
+// du corps sous le Corps. Un styliste qui le demande ouvre la Tête, voir
+// `PaletteTabOfNumber`.
 enum class PaletteTabKind : std::uint8_t {
   kBody = 0,
-  kSkin = 1,
+  // LA TÊTE : la coupe, la couleur et les pièces des cheveux, et la peau du
+  // visage.
   kHair = 2,
   kHeadgearTop = 3,
   kHeadgearMiddle = 4,
@@ -113,6 +119,13 @@ enum class PaletteTabKind : std::uint8_t {
   kGarment = 6,
 };
 inline constexpr std::size_t kPaletteTabKinds = 7;
+
+// L'ONGLET QU'UN NUMÉRO DU STYLISTE DÉSIGNE : un de plus que `PaletteTabKind`,
+// zéro pour aucun. Le numéro de l'ancien onglet de la peau ouvre la Tête.
+[[nodiscard]] std::optional<PaletteTabKind> PaletteTabOfNumber(std::uint8_t number) noexcept;
+
+// Le nom d'un onglet, déjà traduit, quand ce n'est pas un objet qui le nomme.
+[[nodiscard]] const char* PaletteTabName(PaletteTabKind kind);
 
 // POURQUOI UN CALQUE NE SE RÈGLE PAS, dit dans son onglet grisé.
 enum class PaletteTabBlock : std::uint8_t {
@@ -127,6 +140,8 @@ enum class PaletteTabBlock : std::uint8_t {
   kSkinOnMount,
   // L'apparence affichée ne correspond à aucun objet de l'équipement.
   kNotFound,
+  // Le serveur ne range pas la peau du corps : le corps suit le visage.
+  kBodySkinNotServed,
 };
 
 struct PaletteTab {
@@ -146,11 +161,35 @@ struct PaletteTab {
 };
 
 // LA RÉPONSE DE LA PIPETTE, toutes pièces confondues : l'onglet du calque sous
-// le curseur, et la pièce de cet onglet — moins un hors de toute pièce.
+// le curseur, et la pièce de cet onglet — moins un hors de toute pièce. Sur la
+// peau, `skin` : la ligne de peau de cet onglet, visage sous la Tête, bras sous
+// le Corps.
 struct PalettePipette {
   bool found = false;
   PaletteTabKind tab = PaletteTabKind::kBody;
   int piece = -1;
+  bool skin = false;
+};
+
+// UNE LIGNE DE PEAU : celle du visage sous l'onglet Tête, celle du corps sous
+// l'onglet Corps. Chacune a sa rangée de teints et son nuancier.
+//
+// 🔴 UN CORPS SANS PEAU PROPRE PREND CELLE DU VISAGE : sa ligne le dit, et
+// n'offre « reprendre celle du visage » que lorsqu'il en a une.
+struct PaletteSkinLine {
+  // La ligne apparaît : faux pour un Doram, qui n'a pas de peau.
+  bool shown = false;
+  // Pourquoi elle ne se règle pas : une monture listée, l'habit du GM.
+  PaletteTabBlock blocked = PaletteTabBlock::kNone;
+  // La peau du corps, et non celle du visage.
+  bool body = false;
+  // Le corps a sa propre peau ; sinon il suit le visage.
+  bool own = false;
+  // La couleur peinte, et celle du dessin.
+  ImU32 color = 0;
+  ImU32 base_color = 0;
+  // Le réglage de la peau, neutre si elle n'en a pas.
+  render::RampAdjust adjust;
 };
 
 // ── LES TROIS GRILLES DE VIGNETTES ──────────────────────────────────────────
@@ -355,7 +394,9 @@ struct PaletteEditorView {
   // Une tête teinte d'une autre coupe existe : sa teinture peut s'adapter à
   // la coupe portée.
   bool can_adapt_cut = false;
-  // LES TEINTS PROPOSÉS sur l'onglet Peau, du plus clair au plus foncé.
+  // LA LIGNE DE PEAU de l'onglet ouvert, et les teints proposés, du plus clair
+  // au plus foncé.
+  PaletteSkinLine skin;
   std::span<const ImU32> skin_tones;
   // Ce que le serveur a fait des teintures de calques envoyées, et la raison
   // d'un refus, déjà traduite, ou nulle.
@@ -519,8 +560,13 @@ struct PaletteEditorAction {
   bool adapt_cut = false;
   // Retirer la teinture de l'objet de l'onglet ouvert.
   bool clear_item_dye = false;
-  // Le teint proposé que le joueur vient de choisir, en rang, ou moins un.
+  // LA LIGNE DE PEAU de l'onglet ouvert : le teint proposé choisi, en rang, ou
+  // moins un ; une couleur désignée au nuancier ; le retour à la peau du dessin,
+  // ou, pour un corps, à celle du visage.
   int skin_tone = -1;
+  bool skin_picked = false;
+  std::array<std::uint8_t, 3> skin_color{};
+  bool skin_reset = false;
   // UNE RETOUCHE : l'index visé et sa couleur exacte ; -1 sans retouche. Et
   // l'index dont on retire la retouche.
   int retouch_index = -1;
@@ -562,6 +608,13 @@ struct PaletteEditorState {
   int open_piece = -1;
   // Le mode avancé du nuancier est-il déplié ?
   bool advanced = false;
+  // LE NUANCIER DE PEAU QUE LA PIPETTE DEMANDE D'OUVRIR : celui de la ligne de
+  // cet onglet, une fois la vue faite de lui.
+  std::optional<PaletteTabKind> skin_open;
+  // ⚠ UN RELEVÉ QUE `app` LIT : le nuancier de peau est ouvert ou sa ligne
+  // survolée. Le pantin montre alors la silhouette entière, visage et bras
+  // ensemble, même sous la Tête.
+  bool skin_focus = false;
 
   // L'ONGLET OUVERT. ⚠ `app` LE LIT pour composer la vue de cet onglet, et
   // retombe sur le corps quand le calque n'est plus porté.

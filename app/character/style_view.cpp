@@ -251,7 +251,11 @@ void StyleView::RefreshDoll(const ro::render::ActorLook& look,
                                      .min_body_height =
                                          state.doll.box_height * ro::ui::kCharacterAvatarBodyFloor},
       .layers = &composed_,
-      .focus = tab != nullptr ? tab->at.layer : ro::render::StyleLayer::kBody};
+      // 🔴 LA PEAU SE RÈGLE SUR LA SILHOUETTE ENTIÈRE, même sous la Tête : le
+      // visage et les bras se montrent ensemble.
+      .focus = state.skin_focus ? ro::render::StyleLayer::kSkin
+               : tab != nullptr ? tab->at.layer
+                                : ro::render::StyleLayer::kBody};
   const ro::render::IconTexture* drawn = doll_->Draw(shot);
   if (drawn == nullptr) {
     return;
@@ -467,6 +471,7 @@ void StyleView::Refresh(const ro::sim::World& world, ro::ui::PaletteEditorState&
   if (const LayerTab* tab = OpenLayer()) {
     RefreshLayerPieces(*tab);
   }
+  RefreshSkinLine();
   RefreshDoll(DollLook(look, full), shown, state, now_ms);
 
   // ⚠ LA PIPETTE APRÈS LE PANTIN, sur le point relevé à l'image précédente :

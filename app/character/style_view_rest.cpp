@@ -37,16 +37,11 @@ constexpr ro::render::PaletteRamp kLoneRamp{.start = kLoneIndex, .length = 1, .r
   return palette;
 }
 
-// Les pièces d'un onglet, peintes sur sa base : la peau pour la peau, les
-// classes au profil 2, les rampes sinon.
+// Les pièces d'un onglet, peintes sur sa base : les classes au profil 2, les
+// rampes sinon.
 [[nodiscard]] ro::formats::Palette PaintedPieces(const ro::render::LayerDye& dye,
                                                  const ro::formats::Palette& base,
                                                  std::span<const ro::render::PaletteRamp> ramps) {
-  if (dye.layer == StyleLayer::kSkin) {
-    ro::formats::Palette painted = base;
-    ro::render::ApplySkin(painted, base, ro::render::SkinRace::kHuman, dye.adjusts[0]);
-    return painted;
-  }
   if (dye.profile == ro::render::kHueClassProfileNumber) {
     return ro::render::ApplyHueClasses(base, ro::render::LayerHueClasses(dye));
   }
@@ -58,9 +53,9 @@ constexpr ro::render::PaletteRamp kLoneRamp{.start = kLoneIndex, .length = 1, .r
 void StyleView::FillRest(LayerTab& tab, const ro::render::RestMeasure& rest) const {
   tab.rest_classes.clear();
   tab.rest_means.clear();
-  const bool takes_rest = mixed_allowed_ && tab.at.layer != StyleLayer::kSkin &&
-                          (tab.profile == ro::render::kLayerProfileNumber ||
-                           tab.profile == ro::render::kBodyContinuationProfileNumber);
+  const bool takes_rest =
+      mixed_allowed_ && (tab.profile == ro::render::kLayerProfileNumber ||
+                         tab.profile == ro::render::kBodyContinuationProfileNumber);
   if (!takes_rest) {
     return;
   }

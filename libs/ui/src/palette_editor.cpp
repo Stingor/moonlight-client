@@ -377,7 +377,14 @@ void DrawBodyLines(const PaletteEditorView& view, const SkinArt& art, PaletteEdi
   } else if (state.doll.clicked && view.pipette.found && view.pipette.tab != view.tab) {
     state.tab = view.pipette.tab;
     state.tab_asked = true;
-    state.open_piece = view.pipette.piece;
+    state.open_piece = view.pipette.skin ? -1 : view.pipette.piece;
+    if (view.pipette.skin) {
+      state.skin_open = view.pipette.tab;
+    }
+  } else if (state.doll.clicked && view.pipette.found && view.pipette.skin) {
+    // 🔴 LA PEAU N'EST PAS UNE PIÈCE : la pipette ouvre le nuancier de la ligne
+    // de peau, qui se dessine sous la liste.
+    state.skin_open = view.tab;
   } else if (state.doll.clicked && view.pipette_ramp >= 0) {
     state.open_piece = view.pipette_ramp;
   }
@@ -402,6 +409,7 @@ PaletteEditorAction DrawPaletteEditor(PaletteEditorState& state, const PaletteEd
   state.picker.open = PaletteEditorPicker::kNone;
   state.hovered_preset = -1;
   state.doll.before = false;
+  state.skin_focus = false;
   if (!state.open) {
     return action;
   }
@@ -469,6 +477,7 @@ PaletteEditorAction DrawPaletteEditor(PaletteEditorState& state, const PaletteEd
   }
   picker_open = DrawPaletteRetouches(state, view, art, action) || picker_open;
   DrawLayerNotes(view, art, action);
+  picker_open = DrawSkinLine(state, view, art, action) || picker_open;
 
   DrawHistory(view, art, action);
   if (!view.ramps.empty()) {

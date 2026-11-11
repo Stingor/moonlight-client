@@ -23401,9 +23401,6 @@ tr: This item is adjusted by hue families: each swatch dyes all of its colors in
 fr: Cette teinture appartient à cet item : elle le suit à l'échange, à la vente, au storage et au courrier.
 tr: This dye belongs to this item: it follows it through trade, sale, storage and mail.
 
-fr: Cheveux
-tr: Hair
-
 fr: Code de ce calque
 tr: Code of this layer
 
@@ -23449,14 +23446,35 @@ tr: The server cannot store dyes right now.
 fr: Le serveur refuse cette coupe, cette couleur ou cet item.
 tr: The server refuses this haircut, this color or this item.
 
-fr: Le visage et les bras se teignent ensemble : la pastille règle les deux.
-tr: The face and arms are dyed together: the swatch adjusts both.
-
 fr: Lie toutes les pièces des cheveux et leur donne la couleur de la première : régler l'une règle ensuite toutes les autres.
 tr: Links all hair pieces and gives them the color of the first: adjusting one then adjusts all the others.
 
-fr: Peau
-tr: Skin
+fr: (celle du visage)
+tr: (the face's)
+
+fr: Le corps retire sa peau propre et suit de nouveau celle du visage.
+tr: The body drops its own skin and follows the face's again.
+
+fr: Le serveur ne range pas encore la peau du corps : il suit celle du visage.
+tr: The server does not store the body's skin yet: it follows the face's.
+
+fr: Le visage, et le corps tant qu'il n'a pas sa propre peau.
+tr: The face, and the body as long as it has no skin of its own.
+
+fr: Les bras et les jambes de ce corps, comme un vêtement porté par-dessus : un corps sans peau propre prend celle du visage.
+tr: This body's arms and legs, like clothing worn on top: a body without its own skin takes the face's.
+
+fr: Peau du corps
+tr: Body skin
+
+fr: Peau du visage
+tr: Face skin
+
+fr: Rend au visage la peau du dessin.
+tr: Gives the face back its drawn skin.
+
+fr: Reprendre celle du visage
+tr: Use the face's again
 
 fr: Peau non réglable sur cette monture : elle peint aussi l'animal.
 tr: Skin cannot be adjusted on this mount: it also paints the animal.
