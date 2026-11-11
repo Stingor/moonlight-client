@@ -559,6 +559,9 @@ void DrawGrid(CashShopWindowState& state, const CashShopView& view, const SkinAr
   if (count == 0) {
     ImGui::TextDisabled("%s", core::Tr("(aucun item dans cette catégorie)"));
   }
+  // L'habillage rend transparent l'ascenseur d'ImGui : une liste enfant peint
+  // le sien, sans quoi elle défile sans montrer où elle en est.
+  PaintWindowScrollbar(art);
   ImGui::EndChild();
   state.preview_active = preview_now;
 }
@@ -613,6 +616,7 @@ void DrawCart(CashShopWindowState& state, const CashShopView& view, const SkinAr
     ImGui::Separator();
     ImGui::PopID();
   }
+  PaintWindowScrollbar(art);
   ImGui::EndChild();
   if (removed < state.cart.size()) {
     state.cart.erase(state.cart.begin() + static_cast<std::ptrdiff_t>(removed));
