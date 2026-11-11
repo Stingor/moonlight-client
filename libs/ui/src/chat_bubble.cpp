@@ -3,8 +3,10 @@
 #include <algorithm>
 #include <cfloat>
 #include <cstddef>
+#include <cstdint>
 #include <span>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include "ro/ui/chat_log.h"
@@ -98,6 +100,9 @@ void PaintChatBubbles(ImDrawList& into_list, std::span<const ChatBubbleView> bub
                    .now_s = ImGui::GetTime()};
   std::vector<float> row_widths;
   std::vector<float> row_shift;
+  // LE HAUT DE LA DERNIÈRE BULLE DE CHAQUE PORTEUR : la suivante s'y pose.
+  std::vector<std::pair<std::uint32_t, float>> stacked_tops;
+  const float stack_gap = 2.0F * scale;
 
   for (const ChatBubbleView& bubble : bubbles) {
     const float life_ms = ChatBubbleLifeMs(look, bubble.text, bubble.images);
@@ -137,10 +142,22 @@ void PaintChatBubbles(ImDrawList& into_list, std::span<const ChatBubbleView> bub
     // ⚠ LA BULLE POUSSE VERS LE HAUT depuis la tête : son BAS est le point
     // donné, moins la montée. Prendre le haut pour référence la ferait descendre
     // sur le personnage à mesure que la phrase s'allonge.
-    const float bottom = bubble.head.y - rise;
+    // ⚠ UNE SECONDE BULLE DU MÊME PORTEUR monte sur la première au lieu de la
+    // couvrir : le texte d'un script reste lisible sous une parole ou un sort.
+    const auto below = bubble.speaker_id == 0
+                           ? stacked_tops.end()
+                           : std::ranges::find(stacked_tops, bubble.speaker_id,
+                                               &std::pair<std::uint32_t, float>::first);
+    const float bottom = below != stacked_tops.end() ? below->second - stack_gap
+                                                     : bubble.head.y - rise;
     const ImVec2 top_left(bubble.head.x - widest * 0.5F - padding_x,
                           bottom - tall - padding_y * 2.0F);
     const ImVec2 bottom_right(bubble.head.x + widest * 0.5F + padding_x, bottom);
+    if (below != stacked_tops.end()) {
+      below->second = top_left.y;
+    } else if (bubble.speaker_id != 0) {
+      stacked_tops.emplace_back(bubble.speaker_id, top_left.y);
+    }
 
     const int first_vertex = into->VtxBuffer.Size;
     if (look.background) {

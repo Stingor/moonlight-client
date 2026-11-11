@@ -26,6 +26,13 @@ void World::ShowSpeech(std::uint32_t speaker_id, std::string text, std::uint32_t
   }
 }
 
+void World::ShowScript(std::uint32_t actor_id, std::string text, std::uint32_t shown_ms) {
+  if (const auto found = actors_.find(actor_id); found != actors_.end()) {
+    found->second.script_text = std::move(text);
+    found->second.script_since_ms = shown_ms;
+  }
+}
+
 void World::RecordChat(ChatKind kind, ChatType type, std::uint32_t speaker_id, std::string text,
                        std::uint32_t said_ms, std::uint32_t color,
                        std::optional<ChatAuthor> author) {

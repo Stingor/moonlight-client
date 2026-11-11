@@ -127,6 +127,8 @@ void World::Spawn(Actor actor) {
     actor.chat_text = std::move(found->second.chat_text);
     actor.chat_since_ms = found->second.chat_since_ms;
     actor.chat_bgr = found->second.chat_bgr;
+    actor.script_text = std::move(found->second.script_text);
+    actor.script_since_ms = found->second.script_since_ms;
     // LA JAUGE aussi : la barre de progression d'un PNJ n'est redite qu'à
     // l'entrée en vue.
     actor.gauge = found->second.gauge;

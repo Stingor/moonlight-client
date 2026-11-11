@@ -411,12 +411,13 @@ FrameOutcome ApplyNoticeFrame(const Frame& frame, sim::World& world, std::uint32
 
     case proto::ShowScriptNotice::kOpcode:
       return Decoded<proto::ShowScriptNotice>(frame, [&world, now_ms](const auto& packet) {
-        // UNE BULLE, ET RIEN DANS LE FIL : le texte s'affiche tel quel au-dessus
-        // de son porteur, joueur compris. Un message vide ne montre rien.
+        // UNE BULLE À ELLE, ET RIEN DANS LE FIL : le texte s'affiche tel quel
+        // au-dessus de son porteur, joueur compris, sans prendre la place de sa
+        // parole ni du nom de son sort. Un message vide ne montre rien.
         if (packet.message.empty()) {
           return FrameOutcome::kIgnored;
         }
-        world.ShowSpeech(packet.actor_id, core::Utf8FromWire(packet.message), now_ms);
+        world.ShowScript(packet.actor_id, core::Utf8FromWire(packet.message), now_ms);
         return FrameOutcome::kApplied;
       });
 

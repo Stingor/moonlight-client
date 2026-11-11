@@ -78,6 +78,7 @@ std::vector<ro::ui::ChatBubbleView> ChatBubblesOnScreen(
   static const ItemIconLookup kNoIcon;
   const ItemIconLookup& icon_of = item_icon != nullptr ? *item_icon : kNoIcon;
   std::vector<ro::ui::ChatBubbleView> bubbles;
+  std::vector<ro::ui::ChatBubbleView> scripts;
   if (decorated != nullptr) {
     decorated->clear();
   }
@@ -85,6 +86,26 @@ std::vector<ro::ui::ChatBubbleView> ChatBubblesOnScreen(
     const ro::sim::Actor* actor = world.Find(ids[index]);
     if (actor == nullptr) {
       continue;
+    }
+    // LE TEXTE D'UN SCRIPT, à part : rangé après les paroles, il se peint au-dessus
+    // d'elles. Ni « ne pas montrer ma bulle » ni décoration : ce n'est pas du
+    // bavardage, et il appartient à l'acteur.
+    if (!actor->script_text.empty()) {
+      const float script_elapsed_ms = now_ms > actor->script_since_ms
+                                          ? static_cast<float>(now_ms - actor->script_since_ms)
+                                          : 0.0F;
+      if (script_elapsed_ms < ro::ui::ChatBubbleLifeMs(look, actor->script_text)) {
+        if (const std::optional<ro::render::ScreenRect> bounds =
+                ro::render::ActorSpeakerScreenBounds(camera, aspect_ratio, drawn[index],
+                                                     viewport_width, viewport_height);
+            bounds.has_value()) {
+          scripts.push_back(
+              {.head = ImVec2((bounds->min.x + bounds->max.x) * 0.5F, bounds->min.y),
+               .text = actor->script_text,
+               .elapsed_ms = script_elapsed_ms,
+               .speaker_id = ids[index]});
+        }
+      }
     }
     // LA PLUS FRAÎCHE DES DEUX L'EMPORTE : une phrase et une bannière occupent
     // le même emplacement chez le client, qui les envoie par le même message.
@@ -180,6 +201,9 @@ std::vector<ro::ui::ChatBubbleView> ChatBubblesOnScreen(
     }
     bubbles.push_back(bubble);
   }
+  // ⚠ APRÈS LES PAROLES : le peintre empile la bulle suivante d'un même porteur
+  // au-dessus de la précédente.
+  bubbles.insert(bubbles.end(), scripts.begin(), scripts.end());
   return bubbles;
 }
 

@@ -299,6 +299,8 @@ class World : public WorldHoldings, public WorldNpcDialog {
   // LA BULLE SANS LA LIGNE (voir `TalkMute`) ; rien d'un inconnu. Sa teinte : `Actor::chat_bgr`.
   void ShowSpeech(std::uint32_t speaker_id, std::string text, std::uint32_t said_ms,
                   std::uint32_t bubble_bgr = 0);
+  // LE TEXTE D'UN SCRIPT au-dessus d'un acteur (`Actor::script_text`) ; rien d'un inconnu.
+  void ShowScript(std::uint32_t actor_id, std::string text, std::uint32_t shown_ms);
   // Un CHUCHOTEMENT, reçu, renvoyé en écho ou refusé : il nomme l'autre.
   void RecordWhisper(WhisperFacts facts, std::string text, std::uint32_t said_ms);
 

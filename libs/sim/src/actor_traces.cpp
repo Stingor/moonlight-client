@@ -24,6 +24,8 @@ void ForgetLastMapTraces(Actor& actor) {
   actor.chat_text.clear();
   actor.chat_since_ms = 0;
   actor.chat_bgr = 0;
+  actor.script_text.clear();
+  actor.script_since_ms = 0;
   actor.announced_skill_id = 0;
   actor.announced_skill_since_ms = 0;
   actor.emotion.reset();
