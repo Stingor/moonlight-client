@@ -114,9 +114,11 @@ bool StateChangesMotion(const ro::sim::Actor& actor, ro::render::SpriteLayout la
 bool SkillUseChangesMotion(const ro::render::SpriteCatalog* catalog, const ro::sim::Actor& actor,
                            ro::render::SpriteLayout layout, ro::render::Motion current,
                            std::uint16_t skill_id) {
-  if (ro::render::SkillUsePosedByTable(actor.look.job, skill_id)) {
-    return catalog != nullptr &&
-           ro::render::MonsterSkillMotionFor(*catalog, actor.look.job, skill_id).has_value();
+  // UNE CRÉATURE QUE SA TABLE NE NOMME PAS prend l'état d'emploi, comme un
+  // joueur : le client ne garde la posture que si un geste de table répond.
+  if (ro::render::SkillUsePosedByTable(actor.look.job, skill_id) && catalog != nullptr &&
+      ro::render::MonsterSkillMotionFor(*catalog, actor.look.job, skill_id).has_value()) {
+    return true;
   }
   const std::int8_t status = ro::render::SkillUseStateFor(skill_id);
   return !SkillUseKeepsPosture(actor, current, status) && StateChangesMotion(actor, layout, status);
@@ -533,21 +535,20 @@ std::optional<PlayedMotion> SkillUsePostureAt(const ro::render::SpriteCatalog* c
   const bool changed = MotionChangedSince(catalog, actor, layout, current, events,
                                           ChangeWindow{use.started_ms, now_ms, true});
   const std::optional<std::uint32_t> stance_ms = ro::sim::CounterStanceMs(use);
-  // 🔴 UNE CRÉATURE N'A PAS D'ÉTAT D'EMPLOI : son geste vient de sa table, et
-  // une compétence que la table ne nomme pas la laisse telle qu'elle est — sauf
-  // la garde d'Auto Counter, que le client pose à tout lanceur.
+  // 🔴 LE GESTE D'UNE CRÉATURE VIENT DE SA TABLE. Une compétence que la table
+  // ne nomme pas lui donne l'état d'emploi, comme à un joueur : c'est le chemin
+  // ci-dessous, où seule l'attaque fait bouger une créature.
   if (ro::render::SkillUsePosedByTable(actor.look.job, use.skill_id)) {
     const std::optional<ro::render::MonsterSkillMotion> gesture =
         catalog != nullptr
             ? ro::render::MonsterSkillMotionFor(*catalog, actor.look.job, use.skill_id)
             : std::nullopt;
-    if (!gesture.has_value() && stance_ms.has_value()) {
-      return CounterStanceAt(catalog, actor, layout, changed, *stance_ms, since_ms);
+    if (gesture.has_value()) {
+      if (changed) {
+        return std::nullopt;
+      }
+      return TableMotion(*gesture, outfit, since_ms, 0.0F);
     }
-    if (!gesture.has_value() || changed) {
-      return std::nullopt;
-    }
-    return TableMotion(*gesture, outfit, since_ms, 0.0F);
   }
   if (stance_ms.has_value()) {
     return CounterStanceAt(catalog, actor, layout, changed, *stance_ms, since_ms);
@@ -555,6 +556,13 @@ std::optional<PlayedMotion> SkillUsePostureAt(const ro::render::SpriteCatalog* c
   const std::int8_t status = ro::render::SkillUseStateFor(use.skill_id);
   if (SkillUseKeepsPosture(actor, current, status)) {
     return std::nullopt;
+  }
+  // UN MONSTRE OU UN PNJ que sa table ne nomme pas ne fait de l'état que ce que
+  // sa famille de gestes lui permet ; le repos ne l'interrompt pas.
+  if (layout != ro::render::SpriteLayout::kPlayer &&
+      ro::render::IsMonsterOrNpcClass(actor.look.job)) {
+    return CreatureStatePostureAt(actor, outfit, layout, current, status, changed, use.started_ms,
+                                  since_ms);
   }
   // Agi Up et Pick Stone, entre autres, ne jouent rien : ils ramènent au repos.
   if (status == kRestState) {
