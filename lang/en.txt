@@ -23628,3 +23628,12 @@ tr: The outfit request could not be sent.
 
 fr: Ce code court n'est pas bien formé.
 tr: This short code is malformed.
+
+fr: Loupe
+tr: Magnifier
+
+fr: Le pantin grossi autour du curseur pendant que tu vises.
+tr: The doll magnified around the cursor while you aim.
+
+fr: Clic : régler la pièce visée.
+tr: Click: adjust the aimed part.

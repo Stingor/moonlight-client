@@ -89,6 +89,9 @@ struct PaletteDollState {
   bool animated = false;
   // Le fond du pantin, clair ou sombre : une couleur se juge sur les deux.
   bool light_background = false;
+  // LA LOUPE : sous la pipette, le pantin grossi autour du curseur, pour viser
+  // un pixel qu'on distingue mal à la taille normale.
+  bool magnifier = false;
 };
 
 // LES POSES QUE LE PANTIN PREND : repos, marche, assis, attaque — rangs du
