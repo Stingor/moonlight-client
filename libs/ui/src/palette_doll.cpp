@@ -12,6 +12,7 @@
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
 
+#include "ui_sampler.h"
 #include "ui_scale.h"
 
 namespace ro::ui {
@@ -67,7 +68,11 @@ void DrawMagnifier(const PaletteDollState& doll, ImVec2 image_at, ImVec2 mouse, 
                       origin.y + (clipped_top - top) * kLoupeZoom);
     const ImVec2 to(origin.x + (clipped_right - left) * kLoupeZoom,
                     origin.y + (clipped_bottom - top) * kLoupeZoom);
+    // 🔴 NET, PIXEL POUR PIXEL : la loupe sert à viser un pixel, et le lissage
+    // ambiant en faisait une tache floue. Voir `ui_sampler.h`.
+    ImposeImageSampler(into, /*smooth=*/false);
     into->AddImage(doll.image.id, from, to, uv0, uv1);
+    RestoreAmbientSampler(into);
   }
   const ImVec2 middle(origin.x + side * 0.5F, origin.y + side * 0.5F);
   const float cross = kLoupeCrossPoints * Scale();
