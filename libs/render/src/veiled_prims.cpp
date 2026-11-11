@@ -197,12 +197,21 @@ std::vector<std::uint8_t> BlendedTextures(const ModelInstances& model) {
 }
 
 std::vector<VeiledPose> BlendedPoses(const ModelInstances& model, std::size_t model_index,
-                                     std::span<const VeiledPose> veiled) {
+                                     std::span<const VeiledPose> veiled,
+                                     const ModelOpacities* opacities) {
   std::vector<VeiledPose> poses;
   if (!std::ranges::any_of(BlendedTextures(model), [](std::uint8_t mark) { return mark != 0; })) {
     return poses;
   }
+  const std::span<const std::uint8_t> row =
+      opacities != nullptr && model_index < opacities->size()
+          ? std::span<const std::uint8_t>((*opacities)[model_index])
+          : std::span<const std::uint8_t>();
+  std::size_t slot = 0;
   const auto add_unless_veiled = [&](std::optional<std::size_t> group, std::size_t index) {
+    const bool hidden = slot < row.size() && row[slot] == 0;
+    ++slot;
+    if (hidden) return;
     const bool is_veiled = std::ranges::any_of(veiled, [&](const VeiledPose& pose) {
       return pose.model_index == model_index && pose.group == group && pose.index == index;
     });

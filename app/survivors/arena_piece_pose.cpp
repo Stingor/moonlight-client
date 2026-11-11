@@ -45,7 +45,8 @@ PlannedPose PieceSlotPose(const PieceModelSlot& slot, const GroundModelChoice& c
                      .north = at.y - turned.y,
                      .yaw_degrees = yaw,
                      .scale = choice.scale * grown,
-                     .sink_units = choice.sink_units * choice.scale * grown};
+                     .sink_units = choice.sink_units * choice.scale * grown,
+                     .hides_when_burst = slot.hides_when_burst};
 }
 
 glm::vec2 PieceSlotPoint(glm::vec2 point, ro::sim::FootprintSize drawn,

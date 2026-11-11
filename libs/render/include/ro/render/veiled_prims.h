@@ -68,13 +68,17 @@ void EmitVeiledPose(const VeiledPose& pose, const ModelInstances& model,
 
 // Les poses PLEINES d'un modèle dont des faces passent par la file translucide :
 // toutes celles qui ne sont pas dans `veiled` — une pose voilée y passe déjà
-// tout entière. Vide pour un modèle sans texture mêlée.
+// tout entière —, sauf celles que `opacities` (la rangée `model_index`) met
+// à zéro : une pose d'opacité nulle ne se peint pas du tout. Nulles, ou une
+// rangée vide ou courte, les autres restent pleines. Vide pour un modèle sans
+// texture mêlée.
 //
 // ⚠ À CHEVAL SUR LA VUE, toutes : rien ne dit ici lesquelles la vue coupe, et
 // écarter les faces entièrement hors de l'écran ne retire rien de visible.
 [[nodiscard]] std::vector<VeiledPose> BlendedPoses(const ModelInstances& model,
                                                    std::size_t model_index,
-                                                   std::span<const VeiledPose> veiled);
+                                                   std::span<const VeiledPose> veiled,
+                                                   const ModelOpacities* opacities = nullptr);
 
 // La plus lointaine d'abord ; à égalité, dans l'ordre d'émission.
 void SortVeiledPrims(std::vector<VeiledPrim>& prims);

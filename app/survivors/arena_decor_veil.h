@@ -9,7 +9,9 @@
 
 #include <glm/glm.hpp>
 
+#include "ro/mapedit/map_edit.h"
 #include "ro/render/camera.h"
+#include "ro/render/decor_opacity.h"
 #include "ro/render/model_sight.h"
 #include "ro/render/model_veil.h"
 #include "ro/sim/survivors_rules.h"
@@ -56,6 +58,9 @@ struct ArenaVeilFrame {
   std::int32_t height = 0;
   std::span<const glm::vec3> targets;
   std::uint32_t now_ms = 0;
+  // LES RANGS DU RSW DES POSES MASQUÉES, croissants (`BrokenPoseRanks`) : ni
+  // peintes, ni voilées, ni porteuses d'ombre.
+  std::span<const std::size_t> hidden_ranks;
 };
 
 class ArenaDecorVeil {
@@ -73,10 +78,23 @@ class ArenaDecorVeil {
   [[nodiscard]] LitDecorVeil decor() const noexcept;
 
  private:
+  // Les poses masquées de `stage`, mêlées au voile : refaites quand la
+  // fenêtre ou les rangs changent, recomposées à chaque image sinon.
+  void Hide(const MapStage& stage, std::span<const std::size_t> hidden_ranks, bool fresh);
+
   ro::render::ModelVeils veils_;
   std::optional<std::uint32_t> prepared_mount_;
   std::optional<std::uint32_t> last_ms_;
   std::vector<ro::render::SightSegment> segments_;
+  // LES POSES MASQUÉES : leurs rangs, le document qui les met à zéro, les
+  // poses qui portent encore ombre, et le voile mêlé à ce document. Rien à
+  // composer tant qu'aucune n'est masquée.
+  std::vector<std::size_t> hidden_ranks_;
+  std::vector<ro::mapedit::ModelOpacity> hidden_by_rank_;
+  ro::render::ModelOpacities hidden_document_;
+  ro::render::ModelOpacities casting_;
+  ro::render::DecorOpacity composed_;
+  bool hides_ = false;
 };
 
 }  // namespace moonclient

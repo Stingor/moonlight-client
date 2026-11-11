@@ -48,6 +48,8 @@ ro::core::Result<void> ArenaScene::Open(ro::vfs::Vfs& vfs, const ro::sim::ArenaR
   ground_.reset();
   lamps_.reset();
   window_lamps_.clear();
+  breakables_.clear();
+  prepared_breakables_.clear();
   origin_ = GroundWindowOrigin();
   ro::core::LogInfo("arène : {} montée", lit_.stage().name);
   return {};
@@ -98,10 +100,12 @@ ro::core::Result<void> ArenaScene::MountGround(ro::vfs::Vfs& vfs, GroundWindowOr
                                              : ro::render::kFlatGroundSubdivisions;
   auto window = BuildGroundWindow(vfs, *ground_, origin_, name, ground_subdivisions_);
   if (!window) return std::unexpected(window.error());
-  if (auto opened = lit_.Open(vfs, std::move(*window), ground_->look->reference_map, read.progress);
+  if (auto opened =
+          lit_.Open(vfs, std::move(window->stage), ground_->look->reference_map, read.progress);
       !opened) {
     return std::unexpected(opened.error());
   }
+  breakables_ = std::move(window->breakables);
   lit_.set_sky_hour_imposed(true);
   ++mounts_;
   lamps_ = std::make_unique<WallLampField>(*ground_->rule, ground_->run_seed, *ground_->look);
@@ -112,7 +116,7 @@ ro::core::Result<void> ArenaScene::MountGround(ro::vfs::Vfs& vfs, GroundWindowOr
   // principal emploie : les fenêtres se bâtissent alors sur le fil principal.
   const GroundBuildThread builds_on =
       ground_->library.missing_terrain_textures == 0 ? thread : GroundBuildThread::kCaller;
-  follow_ = std::make_unique<GroundFollow<MapStage>>(
+  follow_ = std::make_unique<GroundFollow<GroundWindow>>(
       [this, name](GroundWindowOrigin next) {
         return BuildGroundWindow(*vfs_, *ground_, next, name, ground_subdivisions_);
       },
@@ -132,13 +136,14 @@ std::optional<GroundRecentre> ArenaScene::FollowHero(glm::vec2 hero_cell,
       GroundPreparedFateOf(origin_, prepared_origin_, hero_cell,
                            /*uploaded=*/false, shifts_without_trace) == GroundPreparedFate::kDrop) {
     if (std::optional<MapStage> dropped = lit_.DropPrepared()) {
-      follow_->Retire(std::move(*dropped));
+      follow_->Retire(GroundWindow{.stage = std::move(*dropped)});
     }
   }
   if (!lit_.preparing()) {
-    if (std::optional<GroundFollow<MapStage>::Built> built =
+    if (std::optional<GroundFollow<GroundWindow>::Built> built =
             follow_->Next(origin_, hero_cell, forced)) {
-      if (auto prepared = lit_.Prepare(std::move(built->window)); !prepared) {
+      prepared_breakables_ = std::move(built->window.breakables);
+      if (auto prepared = lit_.Prepare(std::move(built->window.stage)); !prepared) {
         ro::core::LogWarning("arène : fenêtre ({}, {}) non préparée — {}", built->origin.x_cells,
                              built->origin.y_cells, ro::core::Describe(prepared.error()));
         return std::nullopt;
@@ -159,7 +164,7 @@ std::optional<GroundRecentre> ArenaScene::FollowHero(glm::vec2 hero_cell,
       return std::nullopt;
     case GroundPreparedFate::kDrop:
       if (std::optional<MapStage> dropped = lit_.DropPrepared()) {
-        follow_->Retire(std::move(*dropped));
+        follow_->Retire(GroundWindow{.stage = std::move(*dropped)});
       }
       return std::nullopt;
     case GroundPreparedFate::kMount:
@@ -176,7 +181,7 @@ std::optional<GroundRecentre> ArenaScene::FollowHero(glm::vec2 hero_cell,
 
 void ArenaScene::ReleaseSpareGround() {
   if (std::optional<MapStage> dropped = lit_.ReleaseSpares(); dropped && follow_ != nullptr) {
-    follow_->Retire(std::move(*dropped));
+    follow_->Retire(GroundWindow{.stage = std::move(*dropped)});
   }
 }
 
@@ -189,9 +194,10 @@ ro::core::Result<GroundRecentre> ArenaScene::Recentre(GroundWindowOrigin origin)
                                   ground_subdivisions_);
   if (!window) return std::unexpected(window.error());
   if (std::optional<MapStage> dropped = lit_.DropPrepared(); dropped && follow_ != nullptr) {
-    follow_->Retire(std::move(*dropped));
+    follow_->Retire(GroundWindow{.stage = std::move(*dropped)});
   }
-  if (auto prepared = lit_.Prepare(std::move(*window)); !prepared) {
+  prepared_breakables_ = std::move(window->breakables);
+  if (auto prepared = lit_.Prepare(std::move(window->stage)); !prepared) {
     return std::unexpected(prepared.error());
   }
   prepared_origin_ = origin;
@@ -205,7 +211,9 @@ ro::core::Result<GroundRecentre> ArenaScene::MountPrepared() {
       std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - started).count();
   if (!outgoing) return std::unexpected(outgoing.error());
   ++mounts_;
-  if (follow_ != nullptr) follow_->Retire(std::move(*outgoing));
+  if (follow_ != nullptr) follow_->Retire(GroundWindow{.stage = std::move(*outgoing)});
+  breakables_ = std::move(prepared_breakables_);
+  prepared_breakables_.clear();
   const GroundRecentre recentre{.from = origin_,
                                 .to = prepared_origin_,
                                 .world_delta = GroundWorldShift(origin_, prepared_origin_),
@@ -241,6 +249,7 @@ void ArenaScene::Paint(LitFrame& frame, const ro::render::Camera& camera, float 
                          .halos = item_halos_,
                          .sun_casters = horde.sun_casters(),
                          .carried_lights = carried_lights_};
+  BrokenPoseRanks(breakables_, overlays.burst_pieces, hidden_ranks_);
   veil_.Advance(ArenaVeilFrame{.stage = &lit_.stage(),
                                .mount = mounts_,
                                .camera = &camera,
@@ -248,7 +257,8 @@ void ArenaScene::Paint(LitFrame& frame, const ro::render::Camera& camera, float 
                                .width = static_cast<std::int32_t>(overlays.viewport_width),
                                .height = static_cast<std::int32_t>(overlays.viewport_height),
                                .targets = overlays.veil_targets,
-                               .now_ms = now_ms});
+                               .now_ms = now_ms,
+                               .hidden_ranks = hidden_ranks_});
   painting_effects_ = overlays.effects;
   const ArenaDarkness darkness =
       ground_ != nullptr ? ground_->look->darkness : ArenaDarkness::kNightfall;

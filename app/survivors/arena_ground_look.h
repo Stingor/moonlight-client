@@ -45,6 +45,9 @@ struct PieceModelSlot {
   // il suit le quart de tour de la pièce, plus `yaw_degrees`.
   bool any_yaw = true;
   float yaw_degrees = 0.0F;
+  // VRAI : le modèle se masque quand sa pièce a cédé
+  // (`SurvivorsField::burst_tanks`) ; les autres places de la pièce restent.
+  bool hides_when_burst = false;
 };
 
 // LE DESSIN D'UNE PIÈCE, par la clé de sa règle dans `sim`.

@@ -189,6 +189,7 @@ void LitStage::Paint(LitFrame& frame, const ro::render::Camera& camera, float as
                      const GraphicsOptions& graphics, std::optional<float> sky_hour,
                      std::uint32_t elapsed_ms, std::uint32_t now_ms, const LitActors& actors,
                      LitLayers& layers, const LitDecorVeil& veil) {
+  painting_casting_ = veil.casting;
   frame.sky = SkyOf(graphics, sky_hour);
   frame.sun = DrawSunShadow(frame.sun_shadows, camera, aspect_ratio, frame.sky,
                             actors.sun_casters.value_or(actors.bodies));
@@ -234,7 +235,8 @@ void LitStage::Paint(LitFrame& frame, const ro::render::Camera& camera, float as
   ShadeVoid(frame.sky, camera, aspect_ratio);
   // LA PASSE TRANSLUCIDE DU DÉCOR : ses faces mêlées et ses poses voilées.
   models_.DrawVeiled(camera, frame.sky.light, aspect_ratio, stage_->scene.models, veil.veiled,
-                     &model_clock_, frame.fog, frame.points);
+                     &model_clock_, frame.fog, frame.points, veil.opacities);
+  painting_casting_ = nullptr;
 }
 
 ro::render::SkyLight LitStage::SkyOf(const GraphicsOptions& graphics,
@@ -251,6 +253,7 @@ ro::render::SunShadowCasters LitStage::ShadowCasters(
   return ro::render::SunShadowCasters{.terrain = &terrain_,
                                       .models = &models_,
                                       .clock = &model_clock_,
+                                      .model_casting = painting_casting_,
                                       .sprites = &sprites_,
                                       .actor_lots = {bodies, {}}};
 }

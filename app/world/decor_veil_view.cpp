@@ -85,7 +85,8 @@ void DecorVeilView::Draw(const ro::render::ModelRenderer& models, const ro::rend
   } else if (enabled_) {
     veiled = veils_.veiled();
   }
-  models.DrawVeiled(camera, light, aspect_ratio, stage.scene.models, veiled, clock, fog, points);
+  models.DrawVeiled(camera, light, aspect_ratio, stage.scene.models, veiled, clock, fog, points,
+                    opacities());
 }
 
 }  // namespace moonclient

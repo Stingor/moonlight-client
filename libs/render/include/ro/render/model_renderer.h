@@ -146,11 +146,13 @@ class ModelRenderer {
   //
   // Elle peint aussi, triées avec elles, les faces à texture mêlée de toutes
   // les poses pleines : voir `ModelStages::blended_apart`. Elle se dessine donc
-  // même sans aucune pose voilée.
+  // même sans aucune pose voilée. `opacities`, celles de la passe opaque,
+  // écarte les poses d'opacité nulle : elles n'ont plus aucune face.
   void DrawVeiled(const Camera& camera, const SceneLight& light, float aspect_ratio,
                   const std::vector<ModelInstances>& models, std::span<const VeiledPose> veiled,
                   const ModelClock* clock = nullptr, const SceneFog& fog = SceneFog(),
-                  const PointLightSet& points = PointLightSet()) const;
+                  const PointLightSet& points = PointLightSet(),
+                  const ModelOpacities* opacities = nullptr) const;
 
   [[nodiscard]] std::size_t instance_count() const noexcept { return instance_count_; }
   // Combien de fois le décor a été téléversé : ce qui dit qu'il a changé.

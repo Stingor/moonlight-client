@@ -1,5 +1,7 @@
 #include "survivors/arena_decor_veil.h"
 
+#include <algorithm>
+
 namespace moonclient {
 namespace {
 
@@ -74,16 +76,46 @@ void ArenaDecorVeil::Advance(const ArenaVeilFrame& frame) {
   }
   veils_.Advance(fresh ? kVeilSettleMs : static_cast<float>(elapsed_ms), segments_,
                  ro::render::SightFrustumOf(*frame.camera, frame.aspect_ratio, client));
+  Hide(stage, frame.hidden_ranks, fresh);
+}
+
+void ArenaDecorVeil::Hide(const MapStage& stage, std::span<const std::size_t> hidden_ranks,
+                          bool fresh) {
+  if (fresh || !std::ranges::equal(hidden_ranks, hidden_ranks_)) {
+    hidden_ranks_.assign(hidden_ranks.begin(), hidden_ranks.end());
+    hidden_by_rank_.clear();
+    for (const std::size_t rank : hidden_ranks_) {
+      hidden_by_rank_.push_back(
+          ro::mapedit::ModelOpacity{.model_index = rank, .opacity = ro::mapedit::kNoOpacity});
+    }
+    ro::render::DocumentOpacities(stage.scene.models, hidden_by_rank_, hidden_document_);
+    ro::render::ShadowCastingOpacities(hidden_document_, casting_);
+  }
+  // SANS POSE MASQUÉE, le voile passe tel quel : rien ne se compose.
+  hides_ = !hidden_document_.empty();
+  if (!hides_) return;
+  ro::render::ComposeDecorOpacity(stage.scene.models, hidden_document_, &veils_.opacities(),
+                                  veils_.veiled(), composed_);
 }
 
 void ArenaDecorVeil::Forget() {
   prepared_mount_.reset();
   last_ms_.reset();
   veils_.Clear();
+  hidden_ranks_.clear();
+  hidden_by_rank_.clear();
+  hidden_document_.clear();
+  casting_.clear();
+  hides_ = false;
 }
 
 LitDecorVeil ArenaDecorVeil::decor() const noexcept {
   if (!prepared_mount_.has_value()) return {};
+  if (hides_) {
+    return LitDecorVeil{.opacities = &composed_.opacities,
+                        .veiled = composed_.translucent,
+                        .casting = casting_.empty() ? nullptr : &casting_};
+  }
   return LitDecorVeil{.opacities = &veils_.opacities(), .veiled = veils_.veiled()};
 }
 

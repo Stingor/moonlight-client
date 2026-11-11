@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <map>
 #include <optional>
+#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -12,6 +13,7 @@
 #include "ro/core/load_progress.h"
 #include "ro/formats/rsw.h"
 #include "ro/render/map_scene.h"
+#include "ro/sim/packed_position.h"
 #include "ro/sim/survivors_terrain.h"
 #include "ro/vfs/vfs.h"
 
@@ -74,13 +76,42 @@ struct GroundSources {
     ro::vfs::Vfs& vfs, const ro::sim::TerrainRule& rule, std::uint64_t run_seed,
     const BiomeLook& look, ro::core::LoadProgress* progress = nullptr);
 
+// UNE POSE QUI SE MASQUE QUAND SA PIÈCE A CÉDÉ (`PlannedPose::hides_when_burst`) :
+// son rang dans le RSW de la fenêtre, et le coin sud-ouest de sa pièce en
+// cases du monde, celui que `SurvivorsField::burst_tanks` retient. Le coin ne
+// dépend pas de la fenêtre : un recentrage retrouve les mêmes pièces rompues.
+struct GroundBreakablePose {
+  std::size_t rsw_rank = 0;
+  std::int32_t piece_x_cells = 0;
+  std::int32_t piece_y_cells = 0;
+  [[nodiscard]] bool operator==(const GroundBreakablePose&) const = default;
+};
+
+// Les poses de `plan` qui se masquent quand leur pièce a cédé, au rang que
+// le RSW de sa fenêtre leur donne, croissants. Une pose n'entre dans le RSW
+// que si son modèle a un fichier dans `model_files` (`GroundSources`).
+[[nodiscard]] std::vector<GroundBreakablePose> GroundBreakablePoses(
+    const std::map<std::string_view, std::string>& model_files, const GroundPlan& plan);
+
+// LES RANGS DU RSW À MASQUER, croissants : ceux des poses de `breakables` dont
+// la pièce est dans `burst`.
+void BrokenPoseRanks(std::span<const GroundBreakablePose> breakables,
+                     std::span<const ro::sim::CellPosition> burst, std::vector<std::size_t>& into);
+
+// UNE FENÊTRE BÂTIE : sa scène, et les poses qui s'y masquent quand leur
+// pièce cède.
+struct GroundWindow {
+  MapStage stage;
+  std::vector<GroundBreakablePose> breakables;
+};
+
 // LA FENÊTRE `origin`, nommée `name`, bâtie sans fichier : plan, GND, GAT, RSW,
 // scène et part pure du téléversement (`PrepareSceneUpload`), grille et lumière
 // des acteurs. Le VFS n'est passé qu'à l'assemblage de la scène, qui y trouve
 // tout dans `sources.library`. Le sol se maille en `ground_subdivisions`
 // sous-carreaux par côté de cube : arrondi d'emblée quand le réglage le
 // demande, plutôt qu'à la première image.
-[[nodiscard]] ro::core::Result<MapStage> BuildGroundWindow(
+[[nodiscard]] ro::core::Result<GroundWindow> BuildGroundWindow(
     ro::vfs::Vfs& vfs, const GroundSources& sources, GroundWindowOrigin origin, std::string name,
     std::int32_t ground_subdivisions = ro::render::kFlatGroundSubdivisions);
 

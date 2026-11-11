@@ -235,6 +235,13 @@ float WorldHeightAt(const ro::formats::GndMap& gnd, float east, float north) {
                                     depth + ro::render::kWorldUnitsPerCube - north * kCellUnits);
 }
 
+// UNE POSE ENTRE DANS LE RSW quand son modèle a un fichier : son rang y est
+// celui des poses qui y entrent avant elle.
+[[nodiscard]] bool PoseEntersRsw(const std::map<std::string_view, std::string>& model_files,
+                                 const PlannedPose& pose) {
+  return model_files.contains(pose.model);
+}
+
 // LES POSES DU PLAN, dans le repère du RSW : relatives au centre de la carte,
 // la hauteur comptée vers le bas comme dans le fichier.
 std::vector<ro::formats::RswModel> ModelsOf(const GroundSources& sources, const GroundPlan& plan,
@@ -242,8 +249,8 @@ std::vector<ro::formats::RswModel> ModelsOf(const GroundSources& sources, const 
   std::vector<ro::formats::RswModel> models;
   models.reserve(plan.poses.size());
   for (const PlannedPose& pose : plan.poses) {
+    if (!PoseEntersRsw(sources.model_files, pose)) continue;
     const auto file = sources.model_files.find(pose.model);
-    if (file == sources.model_files.end()) continue;
     float lowest = WorldHeightAt(gnd, pose.east, pose.north);
     for (const float dx : {-kFootReachCells, kFootReachCells}) {
       for (const float dy : {-kFootReachCells, kFootReachCells}) {
@@ -490,12 +497,44 @@ Result<MapStage> AssembleGroundWindow(ro::vfs::Vfs& vfs, const GroundSources& so
   return stage;
 }
 
-Result<MapStage> BuildGroundWindow(ro::vfs::Vfs& vfs, const GroundSources& sources,
-                                   GroundWindowOrigin origin, std::string name,
-                                   std::int32_t ground_subdivisions) {
+std::vector<GroundBreakablePose> GroundBreakablePoses(
+    const std::map<std::string_view, std::string>& model_files, const GroundPlan& plan) {
+  std::vector<GroundBreakablePose> breakables;
+  std::size_t rsw_rank = 0;
+  for (const PlannedPose& pose : plan.poses) {
+    if (!PoseEntersRsw(model_files, pose)) continue;
+    if (pose.hides_when_burst && pose.piece < plan.pieces.size()) {
+      const ro::sim::PlacedPiece& placed = plan.pieces[pose.piece].placed;
+      breakables.push_back(GroundBreakablePose{
+          .rsw_rank = rsw_rank, .piece_x_cells = placed.x, .piece_y_cells = placed.y});
+    }
+    ++rsw_rank;
+  }
+  return breakables;
+}
+
+void BrokenPoseRanks(std::span<const GroundBreakablePose> breakables,
+                     std::span<const ro::sim::CellPosition> burst, std::vector<std::size_t>& into) {
+  into.clear();
+  if (burst.empty()) return;
+  for (const GroundBreakablePose& pose : breakables) {
+    const bool broken = std::ranges::any_of(burst, [&pose](const ro::sim::CellPosition& corner) {
+      return std::int32_t{corner.x} == pose.piece_x_cells &&
+             std::int32_t{corner.y} == pose.piece_y_cells;
+    });
+    if (broken) into.push_back(pose.rsw_rank);
+  }
+}
+
+Result<GroundWindow> BuildGroundWindow(ro::vfs::Vfs& vfs, const GroundSources& sources,
+                                       GroundWindowOrigin origin, std::string name,
+                                       std::int32_t ground_subdivisions) {
   const GroundPlan plan =
       PlanGroundWindow(*sources.rule, sources.run_seed, *sources.look, origin, sources.plan_light);
-  return AssembleGroundWindow(vfs, sources, plan, std::move(name), ground_subdivisions);
+  auto stage = AssembleGroundWindow(vfs, sources, plan, std::move(name), ground_subdivisions);
+  if (!stage) return std::unexpected(stage.error());
+  return GroundWindow{.stage = std::move(*stage),
+                      .breakables = GroundBreakablePoses(sources.model_files, plan)};
 }
 
 }  // namespace moonclient

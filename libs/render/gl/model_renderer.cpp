@@ -710,7 +710,8 @@ void ModelRenderer::DrawOpaque(const glm::mat4& view_projection, const SceneLigh
 void ModelRenderer::DrawVeiled(const Camera& camera, const SceneLight& light, float aspect_ratio,
                                const std::vector<ModelInstances>& models,
                                std::span<const VeiledPose> veiled, const ModelClock* clock,
-                               const SceneFog& fog, const PointLightSet& points) const {
+                               const SceneFog& fog, const PointLightSet& points,
+                               const ModelOpacities* opacities) const {
   if (veiled_.vertex_buffer == 0) {
     return;
   }
@@ -742,7 +743,7 @@ void ModelRenderer::DrawVeiled(const Camera& camera, const SceneLight& light, fl
       continue;
     }
     for (const VeiledPose& pose :
-         BlendedPoses(models[batch.model_index], batch.model_index, veiled)) {
+         BlendedPoses(models[batch.model_index], batch.model_index, veiled, opacities)) {
       emit(pose, batch.blended);
     }
   }

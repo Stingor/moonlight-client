@@ -58,6 +58,10 @@ struct LitActors {
 struct LitDecorVeil {
   const ro::render::ModelOpacities* opacities = nullptr;
   std::span<const ro::render::VeiledPose> veiled;
+  // LES POSES QUI PORTENT OMBRE, pleines, les autres à zéro
+  // (`ro::render::ShadowCastingOpacities`) : une pose masquée n'ombre plus
+  // rien. Nul : toutes en portent.
+  const ro::render::ModelOpacities* casting = nullptr;
 };
 
 // L'IMAGE EN COURS : ce que la page « Graphics » en a décidé à son ouverture,
@@ -270,6 +274,9 @@ class LitStage {
   bool point_stage_refused_ = false;
   ro::render::VoidShade void_shade_;
   bool void_shade_refused_ = false;
+  // Les poses du décor qui portent ombre dans l'image en cours de peinture
+  // (`LitDecorVeil::casting`) ; nul : toutes.
+  const ro::render::ModelOpacities* painting_casting_ = nullptr;
   // LE DOCUMENT D'ÉDITION DE LA CARTE et celui des lumières de modèle : leurs
   // lumières s'allument et leurs effets se lèvent comme en partie.
   ro::mapedit::MapEdit document_;

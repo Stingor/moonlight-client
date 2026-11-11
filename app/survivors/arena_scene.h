@@ -16,6 +16,7 @@
 #include "ro/render/camera.h"
 #include "ro/render/point_lights.h"
 #include "ro/render/sprite_renderer.h"
+#include "ro/sim/packed_position.h"
 #include "ro/sim/survivors_geometry.h"
 #include "ro/sim/survivors_rules.h"
 #include "ro/vfs/vfs.h"
@@ -46,6 +47,9 @@ struct ArenaOverlays {
   // Le sol sous la case du héros (`ArenaHeroCell`), où pend la lanterne ; rien sans
   // héros.
   std::optional<glm::vec3> hero_feet;
+  // LES PIÈCES QUI ONT CÉDÉ, par leur coin sud-ouest en cases de la partie
+  // (`SurvivorsField::burst_tanks`) : leurs poses fragiles ne se peignent plus.
+  std::span<const ro::sim::CellPosition> burst_pieces;
 };
 
 // UN RECENTRAGE FAIT : la fenêtre passée de `from` à `to`, ce que devient un
@@ -222,12 +226,17 @@ class ArenaScene : private LitLayers {
   std::atomic<std::int32_t> ground_subdivisions_{ro::render::kFlatGroundSubdivisions};
   // ⚠ APRÈS `ground_` : ses fils lisent les ressources, et le suivi doit être
   // détruit — ses fils finis — avant elles.
-  std::unique_ptr<GroundFollow<MapStage>> follow_;
+  std::unique_ptr<GroundFollow<GroundWindow>> follow_;
   bool horde_sun_shadows_ = false;
   // LE FONDU DU FEUILLAGE, et le compte des montages de carte ou de fenêtre :
   // un compte neuf refait ses boîtes.
   ArenaDecorVeil veil_;
   std::uint32_t mounts_ = 0;
+  // LES POSES FRAGILES de la fenêtre montée et de celle qui se prépare, et
+  // les rangs masqués de l'image.
+  std::vector<GroundBreakablePose> breakables_;
+  std::vector<GroundBreakablePose> prepared_breakables_;
+  std::vector<std::size_t> hidden_ranks_;
   // Les effets de l'image en cours de peinture, le temps de `Paint`.
   ArenaEffects* painting_effects_ = nullptr;
   // LA LANTERNE ET LA LUEUR DES OBJETS de l'image, refaites à chaque `Paint`

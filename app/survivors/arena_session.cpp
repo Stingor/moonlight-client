@@ -225,13 +225,16 @@ void ArenaSession::Paint(const ArenaFrameFacts& facts, const GraphicsOptions& gr
   scene_.Paint(
       frame_, camera_.camera(), AspectOf(facts.viewport_width, facts.viewport_height), graphics,
       facts.presentation_ms, now_ms, composer_,
-      ArenaOverlays{.effects = &effects_,
-                    .numbers = &numbers_,
-                    .viewport_width = facts.viewport_width,
-                    .viewport_height = facts.viewport_height,
-                    .veil_targets = veil_targets_,
-                    .hero_feet = hero.has_value() ? std::optional(scene_.GroundAtCell(*hero))
-                                                  : std::nullopt});
+      ArenaOverlays{
+          .effects = &effects_,
+          .numbers = &numbers_,
+          .viewport_width = facts.viewport_width,
+          .viewport_height = facts.viewport_height,
+          .veil_targets = veil_targets_,
+          .hero_feet = hero.has_value() ? std::optional(scene_.GroundAtCell(*hero)) : std::nullopt,
+          .burst_pieces = facts.field != nullptr
+                              ? std::span<const ro::sim::CellPosition>(facts.field->burst_tanks)
+                              : std::span<const ro::sim::CellPosition>()});
 }
 
 std::optional<glm::vec2> ArenaSession::ScreenOf(glm::vec3 world, float viewport_width,

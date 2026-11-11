@@ -107,6 +107,8 @@ struct PlannedPose {
   float sink_units = 0.0F;
   // Rang de sa pièce dans `GroundPlan::pieces`, ou `kSeedPose` pour un semis.
   std::uint32_t piece = 0;
+  // Il se masque quand sa pièce a cédé (`PieceModelSlot::hides_when_burst`).
+  bool hides_when_burst = false;
   [[nodiscard]] bool operator==(const PlannedPose&) const = default;
 };
 inline constexpr std::uint32_t kSeedPose = 0xFFFF'FFFFU;

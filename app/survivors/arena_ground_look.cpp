@@ -386,9 +386,14 @@ constexpr std::array<GroundModelChoice, 1> kPumpModel{{
 }};
 
 // La cuve de 4 × 4 : la machine, et sa cloche de verre sur le même milieu.
+// Une cuve rompue perd sa cloche ; la machine reste debout.
 constexpr std::array<PieceModelSlot, 2> kTankSlots{{
     {.east_cells = 2.0F, .north_cells = 2.0F, .models = kTankModel, .any_yaw = false},
-    {.east_cells = 2.0F, .north_cells = 2.0F, .models = kVatGlassModel, .any_yaw = false},
+    {.east_cells = 2.0F,
+     .north_cells = 2.0F,
+     .models = kVatGlassModel,
+     .any_yaw = false,
+     .hides_when_burst = true},
 }};
 // Les caisses en L : une sur chacun de ses trois carrés de 2 × 2.
 constexpr std::array<PieceModelSlot, 3> kCrateSlots{{
