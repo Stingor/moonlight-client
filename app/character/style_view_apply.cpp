@@ -319,6 +319,11 @@ void StyleView::ApplyVerb(const ro::ui::PaletteEditorAction& asked, ro::net::Con
         layers_.BackToWorn(tab->at);
       } else {
         session_.BackToWorn();
+        // ⚠ LE CORPS MONTRE AUSSI SA SUITE, SON RESTE ET SES RETOUCHES : ils
+        // reviennent au porté avec ses pièces.
+        if (body_more_.at.key != 0) {
+          layers_.BackToWorn(body_more_.at);
+        }
       }
       // La peau de l'onglet aussi : celle du visage sous la Tête, celle du corps
       // sous le Corps.
