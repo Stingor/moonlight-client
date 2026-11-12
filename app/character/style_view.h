@@ -166,6 +166,13 @@ class StyleView {
   // Les pièces liées et gardées du corps réglé.
   [[nodiscard]] PieceMarks& Marks() { return marks_[session_.body_key()]; }
   // Les intentions qui touchent aux pièces.
+  // Ce que `Apply` fait du geste ; `Apply` le note au journal de l'onglet Corps.
+  void ApplyAll(const ro::ui::PaletteEditorAction& asked, ro::net::Connection& link,
+                const ro::sim::World& world, std::uint32_t now_ms);
+  // Défait ou refait le dernier geste de l'onglet Corps, dans ses deux
+  // historiques. Voir `BodyStep`.
+  bool UndoBody();
+  bool RedoBody();
   void ApplyPieces(const ro::ui::PaletteEditorAction& asked, std::uint32_t now_ms);
   // Charge un préréglage, en tout ou en partie.
   void LoadPreset(const ro::ui::PaletteEditorAction& asked, const ro::sim::World& world);
@@ -477,6 +484,17 @@ class StyleView {
   int retouches_most_ = 0;
   // La suite et le reste du corps, comme un onglet de calque caché sous Corps.
   LayerTab body_more_;
+  // 🔴 L'ONGLET CORPS ÉCRIT DANS DEUX HISTORIQUES : la session pour les pièces
+  // v7, les calques pour la suite, le reste, les retouches et la peau du
+  // corps. Chaque geste de l'onglet y note combien de pas il a posés dans
+  // l'un et dans l'autre, et Ctrl+Z défait le geste entier, dans l'ordre où
+  // ils ont été faits.
+  struct BodyStep {
+    std::uint64_t session = 0;
+    std::uint64_t layers = 0;
+  };
+  std::vector<BodyStep> body_undo_;
+  std::vector<BodyStep> body_redo_;
   // Les pièces de la recette qu'on règle, mesurées à part pendant qu'un
   // préréglage survolé occupe le pantin : la vue en lit les rampes.
   ro::render::ActorWardrobe::BodyRamps listed_body_;

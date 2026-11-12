@@ -230,6 +230,7 @@ void StyleLayers::Step(const Edits& before, std::uint32_t stroke) {
   // ⚠ UN TRAIT QUI SE PROLONGE NE FAIT PAS DE PAS NEUF : l'état d'avant est
   // celui d'avant son premier réglage, déjà rangé.
   if (stroke == 0 || stroke != stroke_) {
+    ++steps_taken_;
     undo_.push_back(before);
     if (undo_.size() > kLayerHistoryDepth) {
       undo_.erase(undo_.begin());

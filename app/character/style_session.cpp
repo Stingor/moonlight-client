@@ -124,6 +124,7 @@ void StyleSession::Gesture(const ro::render::PaletteRecipe& recipe, std::uint32_
 }
 
 void StyleSession::Remember(Slot& slot) {
+  ++steps_taken_;
   if (slot.undo.size() >= kStyleHistoryDepth) {
     slot.undo.erase(slot.undo.begin());
   }

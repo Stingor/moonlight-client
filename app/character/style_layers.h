@@ -99,6 +99,9 @@ class StyleLayers {
   bool Redo();
   [[nodiscard]] bool can_undo() const noexcept { return !undo_.empty(); }
   [[nodiscard]] bool can_redo() const noexcept { return !redo_.empty(); }
+  // COMBIEN DE PAS ONT ÉTÉ RANGÉS, tous calques confondus : voir
+  // `StyleSession::steps_taken`.
+  [[nodiscard]] std::uint64_t steps_taken() const noexcept { return steps_taken_; }
 
   // ── CE QU'ON EN LIT ─────────────────────────────────────────────────────
 
@@ -137,6 +140,7 @@ class StyleLayers {
   Edits edits_;
   std::vector<Edits> undo_;
   std::vector<Edits> redo_;
+  std::uint64_t steps_taken_ = 0;
   std::uint32_t stroke_ = 0;
   std::uint32_t revision_ = 1;
   // Les têtes teintes vues, la plus récente au bout.

@@ -150,6 +150,10 @@ class StyleSession {
   bool Redo();
   [[nodiscard]] bool can_undo() const;
   [[nodiscard]] bool can_redo() const;
+  // COMBIEN DE PAS ONT ÉTÉ RANGÉS depuis l'ouverture, tous corps confondus.
+  // Il ne fait que croître : c'est ce qui dit qu'un geste a posé un pas, même
+  // quand l'historique plein en oublie un ancien.
+  [[nodiscard]] std::uint64_t steps_taken() const noexcept { return steps_taken_; }
 
   // ── LES DEMANDES AU SERVEUR ─────────────────────────────────────────────
 
@@ -294,7 +298,7 @@ class StyleSession {
   // Le même, comme un pas d'historique.
   void Gesture(const ro::render::PaletteRecipe& recipe, std::uint32_t stroke);
   // Range la recette courante comme l'état d'avant un pas.
-  static void Remember(Slot& slot);
+  void Remember(Slot& slot);
   void Changed(Slot& slot);
   // Le corps sans verrou reprend ce qu'il porte.
   void Follow();
@@ -306,6 +310,7 @@ class StyleSession {
   void Announce(StyleSendState state, std::uint32_t now_ms);
 
   std::map<std::uint32_t, Slot> slots_;
+  std::uint64_t steps_taken_ = 0;
   std::uint32_t body_key_ = 0;
   bool observed_ = false;
   std::uint32_t revision_ = 1;

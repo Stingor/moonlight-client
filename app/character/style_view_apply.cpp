@@ -52,6 +52,72 @@ constexpr unsigned char kLastAscii = 0x7E;
 
 void StyleView::Apply(const ro::ui::PaletteEditorAction& asked, ro::net::Connection& link,
                       const ro::sim::World& world, std::uint32_t now_ms) {
+  // LE JOURNAL DE L'ONGLET CORPS : voir `BodyStep`. Défaire et refaire ne s'y
+  // notent pas, ils le parcourent.
+  const bool on_body = OpenLayer() == nullptr;
+  const bool walks_history = asked.verb == ro::ui::PaletteEditorVerb::kUndo ||
+                             asked.verb == ro::ui::PaletteEditorVerb::kRedo;
+  const std::uint64_t session_before = session_.steps_taken();
+  const std::uint64_t layers_before = layers_.steps_taken();
+  const int edited_before = edited_body_;
+  ApplyAll(asked, link, world, now_ms);
+  // ⚠ UN AUTRE CORPS A SON PROPRE HISTORIQUE dans la session : le journal ne
+  // vaut que pour celui qu'on réglait.
+  if (edited_body_ != edited_before) {
+    body_undo_.clear();
+    body_redo_.clear();
+    return;
+  }
+  if (!on_body || walks_history) {
+    return;
+  }
+  const BodyStep step{.session = session_.steps_taken() - session_before,
+                      .layers = layers_.steps_taken() - layers_before};
+  if (step.session == 0 && step.layers == 0) {
+    return;
+  }
+  body_undo_.push_back(step);
+  if (body_undo_.size() > kStyleHistoryDepth) {
+    body_undo_.erase(body_undo_.begin());
+  }
+  body_redo_.clear();
+}
+
+bool StyleView::UndoBody() {
+  // Sans journal, un pas d'avant son ouverture : celui de la session.
+  if (body_undo_.empty()) {
+    return session_.Undo();
+  }
+  const BodyStep step = body_undo_.back();
+  body_undo_.pop_back();
+  for (std::uint64_t count = 0; count < step.layers; ++count) {
+    static_cast<void>(layers_.Undo());
+  }
+  for (std::uint64_t count = 0; count < step.session; ++count) {
+    static_cast<void>(session_.Undo());
+  }
+  body_redo_.push_back(step);
+  return true;
+}
+
+bool StyleView::RedoBody() {
+  if (body_redo_.empty()) {
+    return session_.Redo();
+  }
+  const BodyStep step = body_redo_.back();
+  body_redo_.pop_back();
+  for (std::uint64_t count = 0; count < step.session; ++count) {
+    static_cast<void>(session_.Redo());
+  }
+  for (std::uint64_t count = 0; count < step.layers; ++count) {
+    static_cast<void>(layers_.Redo());
+  }
+  body_undo_.push_back(step);
+  return true;
+}
+
+void StyleView::ApplyAll(const ro::ui::PaletteEditorAction& asked, ro::net::Connection& link,
+                         const ro::sim::World& world, std::uint32_t now_ms) {
   // 🔴 LES PIÈCES SONT CELLES DE L'ONGLET DONT LA VUE EST FAITE, pas de celui
   // que la barre vient de choisir : c'est sur elles que le joueur a cliqué.
   if (const LayerTab* tab = OpenLayer()) {
@@ -344,10 +410,10 @@ void StyleView::ApplyVerb(const ro::ui::PaletteEditorAction& asked, ro::net::Con
       }
       break;
     case ro::ui::PaletteEditorVerb::kUndo:
-      static_cast<void>(OpenLayer() != nullptr ? layers_.Undo() : session_.Undo());
+      static_cast<void>(OpenLayer() != nullptr ? layers_.Undo() : UndoBody());
       break;
     case ro::ui::PaletteEditorVerb::kRedo:
-      static_cast<void>(OpenLayer() != nullptr ? layers_.Redo() : session_.Redo());
+      static_cast<void>(OpenLayer() != nullptr ? layers_.Redo() : RedoBody());
       break;
 
     // ── LES PRÉRÉGLAGES ET LES CODES ────────────────────────────────────

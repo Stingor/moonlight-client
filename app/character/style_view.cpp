@@ -474,8 +474,8 @@ void StyleView::Refresh(const ro::sim::World& world, ro::ui::PaletteEditorState&
   view_.has_something_to_send = session_.HasSomethingToSend();
   view_.can_send = session_.CanSend(now_ms);
   view_.evicts_oldest = session_.EvictsOldest();
-  view_.can_undo = session_.can_undo();
-  view_.can_redo = session_.can_redo();
+  view_.can_undo = !body_undo_.empty() || session_.can_undo();
+  view_.can_redo = !body_redo_.empty() || session_.can_redo();
   view_.send = ToView(session_.send_state());
   view_.bodies = body_names_;
   view_.edited_body = edited_body_;
