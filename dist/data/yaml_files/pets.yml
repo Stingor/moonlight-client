@@ -112,5 +112,7 @@ pets: {
   3670: {egg: 9098, food: 537, tame: 0, accessory: 0, auto_feed: true, evolutions: []},
   3790: {egg: 9109, food: 529, tame: 0, accessory: 0, auto_feed: true, evolutions: []},
   20373: {egg: 9116, food: 537, tame: 0, accessory: 0, auto_feed: true, evolutions: []},
-  20420: {egg: 9117, food: 537, tame: 0, accessory: 0, auto_feed: true, evolutions: []}
+  20420: {egg: 9117, food: 537, tame: 0, accessory: 0, auto_feed: true, evolutions: []},
+  20696: {egg: 9123, food: 1000227, tame: 0, accessory: 10043, auto_feed: false, evolutions: [{egg: 9124, materials: [[1000103, 500], [7095, 50], [7094, 10]]}]},
+  20697: {egg: 9124, food: 537, tame: 0, accessory: 10044, auto_feed: true, evolutions: []}
 }

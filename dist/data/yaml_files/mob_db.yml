@@ -78438,6 +78438,77 @@ Body:
     DamageMotion: 336
     Ai: 21
     Class: Boss
+  - Id: 20696
+    AegisName: EP17_2_CHILD_ADMIN1
+    Name: Child Admin Beta
+    Level: 130
+    Hp: 44
+    Attack: 10
+    Attack2: 10
+    Defense: 26
+    MagicDefense: 16
+    Str: 10
+    Agi: 10
+    Vit: 10
+    Int: 10
+    Dex: 10
+    Luk: 10
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    AttackDelay: 1152
+    AttackMotion: 1344
+    ClientAttackMotion: 1152
+    DamageMotion: 480
+    Ai: 01
+  - Id: 20697
+    AegisName: EP17_2_CHILD_ADMIN2
+    Name: Child Admin Alpha
+    Level: 180
+    Hp: 36
+    Attack: 10
+    Attack2: 10
+    Defense: 36
+    MagicDefense: 22
+    Str: 10
+    Agi: 10
+    Vit: 10
+    Int: 10
+    Dex: 10
+    Luk: 10
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    AttackDelay: 1152
+    AttackMotion: 1344
+    ClientAttackMotion: 1152
+    DamageMotion: 480
+    Ai: 01
+  - Id: 20698
+    AegisName: G_ASSISTANT
+    Name: Assistant
+    Level: 137
+    Hp: 74136
+    Attack: 1661
+    Attack2: 658
+    Defense: 31
+    MagicDefense: 19
+    Str: 97
+    Agi: 87
+    Vit: 76
+    Int: 72
+    Dex: 113
+    Luk: 77
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    ElementLevel: 2
+    AttackDelay: 480
+    AttackMotion: 960
+    ClientAttackMotion: 768
+    DamageMotion: 480
+    Ai: 04
   - Id: 20699
     AegisName: G_BELLARE3
     Name: Heart Hunter Commander
