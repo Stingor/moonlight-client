@@ -89,6 +89,99 @@ Body:
       - {Item: Bloody_Coin, Rate: 2500}
       - {Item: Bloody_Coin, Rate: 500}
       - {Item: Lush_Rose, Rate: 2500}
+  - Map: amicitia1
+    Monster: CHIMERA_AMITERA
+    Drops:
+      - {Item: Etel_Dust, Rate: 2000}
+      - {Item: Fourth_Bh_Sword, Rate: 2500}
+      - {Item: Fourth_1h_Book, Rate: 2500}
+      - {Item: Fourth_1h_Spear, Rate: 2500}
+      - {Item: Fourth_Bh_Staff, Rate: 2500}
+  - Map: amicitia1
+    Monster: CHIMERA_FILLIA
+    Drops:
+      - {Item: Etel_Dust, Rate: 2000}
+      - {Item: Fourth_Bh_Sword, Rate: 2500}
+      - {Item: Fourth_1h_Book, Rate: 2500}
+      - {Item: Fourth_1h_Spear, Rate: 2500}
+      - {Item: Fourth_Bh_Staff, Rate: 2500}
+  - Map: amicitia1
+    Monster: CHIMERA_LITUS
+    Drops:
+      - {Item: Etel_Dust, Rate: 2000}
+      - {Item: Fourth_Bh_Sword, Rate: 2500}
+      - {Item: Fourth_1h_Book, Rate: 2500}
+      - {Item: Fourth_1h_Spear, Rate: 2500}
+      - {Item: Fourth_Bh_Staff, Rate: 2500}
+  - Map: amicitia1
+    Monster: CHIMERA_VANILAQUS
+    Drops:
+      - {Item: Etel_Dust, Rate: 2000}
+      - {Item: Fourth_Bh_Sword, Rate: 2500}
+      - {Item: Fourth_1h_Book, Rate: 2500}
+      - {Item: Fourth_1h_Spear, Rate: 2500}
+      - {Item: Fourth_Bh_Staff, Rate: 2500}
+  - Map: amicitia2
+    Monster: CHIMERA_FULGOR
+    Drops:
+      - {Item: Etel_Dust, Rate: 2000}
+      - {Item: Fourth_Bh_Sword, Rate: 1000}
+      - {Item: Fourth_1h_Nindo, Rate: 1000}
+      - {Item: Fourth_1h_Edge, Rate: 1000}
+      - {Item: Fourth_1h_Book, Rate: 1000}
+      - {Item: Fourth_1h_Rod, Rate: 1000}
+      - {Item: Fourth_1h_Spear, Rate: 1000}
+      - {Item: Fourth_Bh_Staff, Rate: 1000}
+      - {Item: Fourth_1h_Wand, Rate: 1000}
+  - Map: amicitia2
+    Monster: CHIMERA_GALENSIS
+    Drops:
+      - {Item: Etel_Dust, Rate: 2000}
+      - {Item: Fourth_Bh_Sword, Rate: 1000}
+      - {Item: Fourth_1h_Nindo, Rate: 1000}
+      - {Item: Fourth_1h_Edge, Rate: 1000}
+      - {Item: Fourth_1h_Book, Rate: 1000}
+      - {Item: Fourth_1h_Rod, Rate: 1000}
+      - {Item: Fourth_1h_Spear, Rate: 1000}
+      - {Item: Fourth_Bh_Staff, Rate: 1000}
+      - {Item: Fourth_1h_Wand, Rate: 1000}
+  - Map: amicitia2
+    Monster: CHIMERA_LAVA
+    Drops:
+      - {Item: Etel_Dust, Rate: 2000}
+      - {Item: Fourth_Bh_Sword, Rate: 1000}
+      - {Item: Fourth_1h_Nindo, Rate: 1000}
+      - {Item: Fourth_1h_Edge, Rate: 1000}
+      - {Item: Fourth_1h_Book, Rate: 1000}
+      - {Item: Fourth_1h_Rod, Rate: 1000}
+      - {Item: Fourth_1h_Spear, Rate: 1000}
+      - {Item: Fourth_Bh_Staff, Rate: 1000}
+      - {Item: Fourth_1h_Wand, Rate: 1000}
+  - Map: amicitia2
+    Monster: CHIMERA_NAPEO
+    Drops:
+      - {Item: Etel_Dust, Rate: 2000}
+      - {Item: Fourth_Bh_Sword, Rate: 1000}
+      - {Item: Fourth_1h_Nindo, Rate: 1000}
+      - {Item: Fourth_1h_Edge, Rate: 1000}
+      - {Item: Fourth_1h_Book, Rate: 1000}
+      - {Item: Fourth_1h_Rod, Rate: 1000}
+      - {Item: Fourth_1h_Spear, Rate: 1000}
+      - {Item: Fourth_Bh_Staff, Rate: 1000}
+      - {Item: Fourth_1h_Wand, Rate: 1000}
+  - Map: amicitia2
+    Monster: CHIMERA_THEONE
+    Drops:
+      - {Item: Etel_Dust, Rate: 25000}
+      - {Item: Etel_Stone, Rate: 5000}
+      - {Item: Fourth_Bh_Sword, Rate: 750}
+      - {Item: Fourth_1h_Nindo, Rate: 750}
+      - {Item: Fourth_1h_Edge, Rate: 750}
+      - {Item: Fourth_1h_Book, Rate: 750}
+      - {Item: Fourth_1h_Rod, Rate: 750}
+      - {Item: Fourth_1h_Spear, Rate: 750}
+      - {Item: Fourth_Bh_Staff, Rate: 750}
+      - {Item: Fourth_1h_Wand, Rate: 750}
   - Map: ant_d02_i
     Monster: ILL_ANDRE
     Drops:

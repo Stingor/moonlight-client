@@ -25950,8 +25950,41 @@ quests:
     icon: dq
   16528:
     title: "Data Backup"
+  16529:
+    title: "Abandoned Lab Amicitia"
+  16530:
+    title: "The ground and fire"
+    icon: dq
+  16531:
+    title: "Earth and Fire"
+    summary: "Hunt 15 Amitera, Hunt 15 Fillia"
+  16532:
+    title: "Water, wind - Waiting"
+    icon: dq
+  16533:
+    title: "Water and Wind"
+    summary: "Hunt 15 Litus, Hunt 15 Vanilaqus"
+  16534:
+    title: "Werner's Trace - Standby"
+    icon: dq
+  16535:
+    title: "Traces of Werner"
+  16536:
+    title: "Imitate and wait"
+    icon: dq
+  16537:
+    title: "Imitation and Real"
+    summary: "Hunt 15 Napeo, Hunt 15 Galensis"
+  16538:
+    title: "Natural change - Waiting"
+    icon: dq
+  16539:
+    title: "Natural change"
+    summary: "Hunt 15 Lavaeter, Hunt 15 Fulgor"
   16540:
     title: "Data Backup"
+  16545:
+    title: "Traces of Werner"
   17000:
     title: Meet with Father Bamph
     icon: ep

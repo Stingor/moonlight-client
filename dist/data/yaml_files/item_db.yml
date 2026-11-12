@@ -138655,6 +138655,48 @@ Body:
             }
          }
       }
+  - Id: 510053
+    AegisName: Fourth_1h_Nindo
+    Name: "Fortified Dagger [2]"
+    Type: Weapon
+    SubType: Dagger
+    Buy: 9900000
+    Sell: 99000
+    Weight: 1100
+    Attack: 160
+    Range: 1
+    Slots: 2
+    Jobs: {Ninja: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 200
+    Refineable: true
+    Script: |
+      bonus bMatk,180;
+      .@r = getrefine();
+      bonus2 bSkillAtk,"NJ_KOUENKA",4*(.@r/2);
+      bonus2 bSkillAtk,"NJ_HYOUSENSOU",4*(.@r/2);
+      bonus2 bMagicAtkEle,Ele_All,2*(.@r/4);
+  - Id: 510054
+    AegisName: Fourth_1h_Edge
+    Name: "Fortified Edge [2]"
+    Type: Weapon
+    SubType: Dagger
+    Buy: 10000000
+    Sell: 100000
+    Weight: 1000
+    Attack: 170
+    Range: 1
+    Slots: 2
+    Jobs: {SuperNovice: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 200
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"SM_BASH",5*(.@r/2);
+      bonus bShortAtkRate,3*(.@r/4);
   - Id: 510055
     AegisName: Fourth_1h_Nindo2
     Name: "Relapse Edge [2]"
@@ -138716,6 +138758,26 @@ Body:
       if (.@r>=9) {
          bonus bVariableCastrate,-10;
       }
+  - Id: 530009
+    AegisName: Fourth_1h_Spear
+    Name: "Fortified Spear [2]"
+    Type: Weapon
+    SubType: 1hSpear
+    Buy: 10300000
+    Sell: 103000
+    Weight: 1400
+    Attack: 200
+    Range: 3
+    Slots: 2
+    Jobs: {Crusader: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 200
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"CR_SHIELDBOOMERANG",5*(.@r/2);
+      bonus bLongAtkRate,2*(.@r/4);
   - Id: 530015
     AegisName: Gelerdria_IL
     Name: "Illusion Gelerdria [2]"
@@ -138804,6 +138866,28 @@ Body:
          bonus2 bSkillAtk,"MG_LIGHTNINGBOLT",30;
          bonus2 bSkillAtk,"MG_FIREBOLT",30;
       }
+  - Id: 540013
+    AegisName: Fourth_1h_Book
+    Name: "Fortified Book [2]"
+    Type: Weapon
+    SubType: Book
+    Buy: 10200000
+    Sell: 102000
+    Weight: 800
+    Attack: 190
+    Range: 1
+    Slots: 2
+    Jobs: {Sage: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 200
+    Refineable: true
+    Script: |
+      bonus bMatk,210;
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bSkillAtk,"MG_FIREBALL",5*(.@r/2);
+      bonus2 bMagicAtkEle,Ele_All,2*(.@r/4);
   - Id: 540043
     AegisName: Fourth_1h_Manual
     Name: "Relapse Book [2]"
@@ -138924,6 +139008,51 @@ Body:
             }
          }
       }
+  - Id: 550057
+    AegisName: Fourth_1h_Rod
+    Name: "Fortified Rod [2]"
+    Type: Weapon
+    SubType: Staff
+    Buy: 9500000
+    Sell: 95000
+    Weight: 900
+    Attack: 120
+    Range: 1
+    Slots: 2
+    Jobs: {SuperNovice: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 200
+    Refineable: true
+    Script: |
+      bonus bMatk,200;
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bSkillAtk,"MG_FIREBALL",5*(.@r/2);
+      bonus2 bSkillAtk,"MG_LIGHTNINGBOLT",5*(.@r/2);
+      bonus2 bMagicAtkEle,Ele_All,3*(.@r/4);
+  - Id: 550059
+    AegisName: Fourth_1h_Wand
+    Name: "Fortified Wand [2]"
+    Type: Weapon
+    SubType: Staff
+    Buy: 10000000
+    Sell: 100000
+    Weight: 1200
+    Attack: 170
+    Range: 1
+    Slots: 2
+    Jobs: {SoulLinker: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 200
+    Refineable: true
+    Script: |
+      bonus bMatk,210;
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bSkillAtk,"SL_SMA",5*(.@r/2);
+      bonus2 bMagicAtkEle,Ele_All,3*(.@r/4);
   - Id: 560004
     AegisName: Ep172_Bh_Knuck
     Name: Ira Fist
@@ -139220,6 +139349,26 @@ Body:
          bonus bCritAtkRate,15;
          bonus bCritical,15;
       }
+  - Id: 600013
+    AegisName: Fourth_Bh_Sword
+    Name: "Fortified Claymore [2]"
+    Type: Weapon
+    SubType: 2hSword
+    Buy: 10800000
+    Sell: 108000
+    Weight: 2300
+    Attack: 250
+    Range: 1
+    Slots: 2
+    Jobs: {Knight: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 200
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"KN_BOWLINGBASH",5*(.@r/2);
+      bonus bShortAtkRate,2*(.@r/4);
   - Id: 610006
     AegisName: Ep172_Bh_Katar
     Name: Avaritia Metal
@@ -139445,6 +139594,28 @@ Body:
       bonus2 bMagicAtkEle,Ele_Water,15;
       bonus bVariableCastrate,-3*(.@r/3);
       bonus bMatkRate,30+6*(.@r/3);
+  - Id: 640013
+    AegisName: Fourth_Bh_Staff
+    Name: "Fortified Staff [2]"
+    Type: Weapon
+    SubType: 2hStaff
+    Buy: 9700000
+    Sell: 97000
+    Weight: 2100
+    Attack: 140
+    Range: 1
+    Slots: 2
+    Jobs: {Wizard: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 200
+    Refineable: true
+    Script: |
+      bonus bMatk,240;
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bSkillAtk,"WZ_FROSTNOVA",5*(.@r/2);
+      bonus2 bMagicAtkEle,Ele_All,2*(.@r/4);
   - Id: 650003
     AegisName: Ep172_Bh_Huuma
     Name: Wrath Wheel
