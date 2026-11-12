@@ -93,7 +93,7 @@ class SurvivorsRankingMode {
   // commence.
   [[nodiscard]] std::optional<SurvivorsBookMode::Begun> Launch(
       SurvivorsBookMode& book, const ro::sim::SurvivorsRules& rules,
-      const std::filesystem::path& client_root, std::uint64_t seed, std::uint16_t first_skill_id);
+      const std::filesystem::path& client_root, std::uint64_t seed);
   // Vrai tant que le départ attend son jeton : l'écran de chargement le couvre.
   [[nodiscard]] bool holding() const noexcept {
     return session_.run_state() == SurvivorsRunRanking::kAwaiting;
@@ -144,7 +144,6 @@ class SurvivorsRankingMode {
     std::uint64_t start_seed = 0;
     std::uint64_t local_seed = 0;
     std::uint16_t class_id = 0;
-    std::uint16_t first_skill_id = 0;
   };
 
   void Write(const std::filesystem::path& client_root);

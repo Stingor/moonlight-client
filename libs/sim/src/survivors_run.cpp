@@ -267,12 +267,8 @@ core::Result<SurvivorsRun> SurvivorsRun::Start(const SurvivorsRules& rules, Surv
   if (hero_class == nullptr) return Refuse("classe inconnue " + std::to_string(start.class_id));
   const ArenaRule* arena_rule = FindArena(rules, start.arena_id);
   if (arena_rule == nullptr) return Refuse("arène inconnue " + std::to_string(start.arena_id));
-  if (FindSkill(rules, start.first_skill_id) == nullptr) {
-    return Refuse("premier skill inconnu " + std::to_string(start.first_skill_id));
-  }
-  if (std::find(hero_class->starter_skills.begin(), hero_class->starter_skills.end(),
-                start.first_skill_id) == hero_class->starter_skills.end()) {
-    return Refuse("premier skill hors des skills de départ " +
+  if (!OpensRun(rules, start.first_skill_id)) {
+    return Refuse("premier skill hors des réserves des classes " +
                   std::to_string(start.first_skill_id));
   }
   if (!LoadoutWithinBounds(start.loadout)) {
@@ -292,10 +288,8 @@ core::Result<SurvivorsRun> SurvivorsRun::Start(const SurvivorsRules& rules, Surv
   for (const SurvivorsAllyStart& ally : start.allies) {
     const ClassRule* ally_class = FindClass(rules, ally.class_id);
     if (ally_class == nullptr) return Refuse("classe inconnue " + std::to_string(ally.class_id));
-    if (std::find(ally_class->starter_skills.begin(), ally_class->starter_skills.end(),
-                  ally.first_skill_id) == ally_class->starter_skills.end() ||
-        FindSkill(rules, ally.first_skill_id) == nullptr) {
-      return Refuse("premier skill hors des skills de départ " +
+    if (!OpensRun(rules, ally.first_skill_id)) {
+      return Refuse("premier skill hors des réserves des classes " +
                     std::to_string(ally.first_skill_id));
     }
     if (!LoadoutWithinBounds(ally.loadout)) {
@@ -349,7 +343,10 @@ core::Result<SurvivorsRun> SurvivorsRun::Start(const SurvivorsRules& rules, Surv
   field.next_elite_ms = rules.elites.first_ms;
   field.hero.position = CellCenter(start_cell->x, start_cell->y);
   field.hero.previous_position = field.hero.position;
-  field.hero.skills.push_back(OwnedSkill{.skill_id = start.first_skill_id, .level = 1});
+  // Le héros part de son auto-attaque, et du skill qu'impose un défi.
+  if (start.first_skill_id != 0) {
+    field.hero.skills.push_back(OwnedSkill{.skill_id = start.first_skill_id, .level = 1});
+  }
   survivors::ArmHero(rules, *hero_class, field.hero);
   field.rerolls_left = start.loadout.rerolls;
   field.skips_left = start.loadout.skips;
@@ -367,7 +364,9 @@ core::Result<SurvivorsRun> SurvivorsRun::Start(const SurvivorsRules& rules, Surv
       kit.hero_class = FindClass(rules, ally.class_id);
       kit.lives_left = ally.lives;
       kit.start = ally;
-      kit.hero.skills.push_back(OwnedSkill{.skill_id = ally.first_skill_id, .level = 1});
+      if (ally.first_skill_id != 0) {
+        kit.hero.skills.push_back(OwnedSkill{.skill_id = ally.first_skill_id, .level = 1});
+      }
       if (kit.hero_class != nullptr) survivors::ArmHero(rules, *kit.hero_class, kit.hero);
       std::optional<CellPosition> cell;
       for (std::int32_t ring = 1; ring <= kStartSearchRings * rules.tuning.spawn_search_ring;

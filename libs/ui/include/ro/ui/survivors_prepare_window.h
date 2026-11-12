@@ -134,8 +134,6 @@ struct SurvivorsPrepareCoop {
 };
 
 struct SurvivorsPrepareView {
-  std::span<const SurvivorsBoltChoice> bolts;
-  std::uint16_t chosen_skill_id = 0;
   // La raison du refus d'entrée. ⚠ EN FRANÇAIS, marquée par `TrText` ; nulle
   // quand la partie peut commencer.
   const char* refusal = nullptr;
@@ -153,7 +151,6 @@ struct SurvivorsPrepareState {
 };
 
 struct SurvivorsPrepareAsk {
-  std::optional<std::uint16_t> choose_skill_id;
   std::optional<SurvivorsBoardTab> choose_board;
   // L'arène de la partie libre ; le défi et la partie classée n'en choisissent pas.
   std::optional<std::uint16_t> choose_arena_id;

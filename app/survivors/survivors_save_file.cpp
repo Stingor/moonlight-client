@@ -157,9 +157,6 @@ ro::core::Result<SurvivorsSaveRead> SaveSurvivorsOptions(const std::filesystem::
     if (after.presence_shown != before.presence_shown) {
       kept.presence_shown = after.presence_shown;
     }
-    if (after.first_skill_id != before.first_skill_id) {
-      kept.first_skill_id = after.first_skill_id;
-    }
     if (after.class_id != before.class_id) kept.class_id = after.class_id;
     if (after.objective_skill_id != before.objective_skill_id) {
       kept.objective_skill_id = after.objective_skill_id;

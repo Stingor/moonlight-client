@@ -21223,8 +21223,8 @@ tr: Start
 fr: Pause
 tr: Pause
 
-fr: Premier sort
-tr: First spell
+fr: Vous partez avec votre auto-attaque ; le premier niveau offre vos skills de départ.
+tr: You start with your auto-attack; the first level offers your starting skills.
 
 fr: R — Relancer (%d)
 tr: R — Reroll (%d)

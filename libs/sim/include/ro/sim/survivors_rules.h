@@ -663,6 +663,13 @@ struct SurvivorsRules {
 // carte ne tombe que si la réserve d'une classe de l'équipe la contient.
 [[nodiscard]] std::vector<const ClassRule*> ClassesHoldingCard(const SurvivorsRules& rules,
                                                                std::uint16_t card_item_id);
+// LES SKILLS QUI PEUVENT OUVRIR UNE PARTIE : ceux des réserves de toutes les
+// classes, sauf les coups d'arme, dans l'ordre des classes puis de leur
+// réserve, chacun une fois. Le défi de la semaine en impose un, de n'importe
+// quelle classe ; une partie ordinaire part de l'auto-attaque seule (Id 0).
+[[nodiscard]] std::vector<std::uint16_t> OpeningSkills(const SurvivorsRules& rules);
+// Vrai pour un premier skill admis : aucun (0), ou l'un des `OpeningSkills`.
+[[nodiscard]] bool OpensRun(const SurvivorsRules& rules, std::uint16_t first_skill_id);
 // La première arène classée du catalogue, celle de la partie classée et du
 // défi ; nulle quand aucune ne l'est.
 [[nodiscard]] const ArenaRule* FirstRankedArena(const SurvivorsRules& rules);

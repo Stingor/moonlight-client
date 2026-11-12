@@ -140,6 +140,23 @@ struct OfferCandidate {
              OwnedSkillOf(hero, evolution.evolved_skill_id) != nullptr;
     });
   };
+  // LE PREMIER NIVEAU d'un héros qui n'a que son auto-attaque lui offre les
+  // skills de départ de sa classe, et eux seuls.
+  const bool armed_only = std::ranges::all_of(hero.skills, [&](const OwnedSkill& owned) {
+    const SurvivorsSkillRule* rule = FindSkill(rules, owned.skill_id);
+    return rule != nullptr && IsWeaponSkill(*rule);
+  });
+  if (armed_only && hero.skills.size() < SkillSlots(field)) {
+    for (const std::uint16_t skill_id : hero_class.starter_skills) {
+      const SurvivorsSkillRule* rule = FindSkill(rules, skill_id);
+      if (rule == nullptr || rule->levels.empty() || Banished(field, skill_id) ||
+          Locked(field, skill_id)) {
+        continue;
+      }
+      candidates.push_back({{OfferKind::kNewSkill, skill_id, 1}, rules.tuning.offer_weight_fresh});
+    }
+    if (!candidates.empty()) return candidates;
+  }
   for (const std::uint16_t skill_id : hero_class.skill_pool) {
     const SurvivorsSkillRule* rule = FindSkill(rules, skill_id);
     if (rule == nullptr || Banished(field, skill_id) || Locked(field, skill_id)) continue;
@@ -154,6 +171,22 @@ struct OfferCandidate {
                !GroupTaken(rules, hero, *rule)) {
       candidates.push_back({{OfferKind::kNewSkill, skill_id, 1}, rules.tuning.offer_weight_fresh});
     }
+  }
+  // Un skill d'une autre classe, qu'un défi impose, monte comme les siens ; un
+  // évolué, hors des réserves lui aussi, garde ses niveaux.
+  for (const OwnedSkill& owned : hero.skills) {
+    if (std::ranges::find(hero_class.skill_pool, owned.skill_id) != hero_class.skill_pool.end() ||
+        FindEvolutionTo(rules, owned.skill_id) != nullptr) {
+      continue;
+    }
+    const SurvivorsSkillRule* rule = FindSkill(rules, owned.skill_id);
+    if (rule == nullptr || IsWeaponSkill(*rule) || spent(owned.skill_id) ||
+        std::size_t{owned.level} >= rule->levels.size()) {
+      continue;
+    }
+    candidates.push_back(
+        {{OfferKind::kSkillLevel, owned.skill_id, static_cast<std::uint8_t>(owned.level + 1U)},
+         rules.tuning.offer_weight_owned});
   }
   const auto offer_card = [&](std::uint16_t card_item_id) {
     const CardRule* rule = FindCard(rules, card_item_id);

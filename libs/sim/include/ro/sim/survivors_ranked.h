@@ -33,18 +33,12 @@ struct SurvivorsEndComponents {
 [[nodiscard]] std::optional<SurvivorsEndComponents> EndComponentsOf(
     const SurvivorsTally& tally, std::uint32_t journal_bytes) noexcept;
 
-// Le premier skill d'une partie de `class_rule` : `first_skill_id` quand il
-// est l'un de ses skills de départ, sinon le premier d'entre eux.
-[[nodiscard]] std::uint16_t FirstSkillOf(const ClassRule& class_rule,
-                                         std::uint16_t first_skill_id) noexcept;
-
 // LE DÉPART D'UNE PARTIE CLASSÉE : neutre, la classe `class_id` — un Id que les
 // règles ne connaissent pas reste tel quel, et la partie refuse de commencer —,
-// la première arène classée, la graine tirée par le serveur et le premier bolt
-// `FirstSkillOf` : un bolt retenu pour une autre classe ne fait pas refuser le
-// départ.
+// la première arène classée et la graine tirée par le serveur. Le héros part de
+// son auto-attaque seule : son premier niveau lui offre ses skills de départ.
 [[nodiscard]] SurvivorsStart RankedStartOf(const SurvivorsRules& rules, std::uint64_t seed,
-                                           std::uint16_t class_id, std::uint16_t first_skill_id);
+                                           std::uint16_t class_id);
 
 // Vrai quand la graine rendue en défi est `SeedOfWeek` de la semaine ISO de
 // `issued_at_utc_s`, l'heure du SERVEUR : la semaine change le lundi à 00:00

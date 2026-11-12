@@ -112,14 +112,10 @@ enum class CodexLinkKind : std::uint8_t { kSkill, kItem, kFoe };
 
 class SurvivorsViews {
  public:
-  // LA PRÉPARATION, dans la fenêtre de la salle : les bolts de départ de la
-  // classe qui jouera (`playing_class`, nulle : aucun), celui qui est choisi,
-  // la raison du refus d'entrée (nulle quand la partie peut commencer) et les
-  // lettres du clavier du joueur.
-  void ComposePrepare(ro::ui::SurvivorsPrepareView& view, const ro::sim::SurvivorsRules& rules,
-                      const ro::sim::ClassRule* playing_class, std::uint16_t chosen_skill_id,
-                      const char* refusal, const std::array<std::string, 4>& key_labels,
-                      const SurvivorsTables& tables);
+  // LA PRÉPARATION, dans la fenêtre de la salle : la raison du refus d'entrée
+  // (nulle quand la partie peut commencer) et les lettres du clavier du joueur.
+  void ComposePrepare(ro::ui::SurvivorsPrepareView& view, const char* refusal,
+                      const std::array<std::string, 4>& key_labels);
 
   // L'ACCUEIL ET SES FENÊTRES DE MÉTA (Q1), depuis le carnet relu : la méta de
   // la préparation, puis l'Église, la Kafra, le Codex et les records ouverts ;
@@ -239,7 +235,6 @@ class SurvivorsViews {
   std::map<std::uint16_t, std::string> foe_names_;
   std::map<std::uint16_t, std::string> job_names_;
   // LES LIGNES DES VUES, réutilisées d'une image à l'autre.
-  std::vector<ro::ui::SurvivorsBoltChoice> bolts_;
   std::vector<ro::ui::SurvivorsHudSlot> skill_slots_;
   std::vector<ro::ui::SurvivorsHudSlot> card_slots_;
   std::vector<ro::ui::SurvivorsEdgeTarget> edge_targets_;

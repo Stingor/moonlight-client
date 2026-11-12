@@ -58,23 +58,21 @@ class SurvivorsBookMode {
   [[nodiscard]] std::int64_t now_utc() const { return now_utc_(); }
 
   // LE DÉPART DE LA PROCHAINE PARTIE et son tableau : la partie libre part du
-  // carnet relu, sur `seed` et `first_skill_id` ; le défi part de la semaine
-  // UTC du moment, et les ignore ; la partie classée part neutre, sur `seed`
-  // et `first_skill_id`, jusqu'à ce que la graine du serveur la remplace. Le
-  // défi et la partie classée jouent la classe retenue.
+  // carnet relu, sur `seed` ; le défi part de la semaine UTC du moment, et
+  // l'ignore ; la partie classée part neutre, sur `seed`, jusqu'à ce que la
+  // graine du serveur la remplace. Le défi et la partie classée jouent la
+  // classe retenue.
   struct Begun {
     ro::sim::SurvivorsStart start;
     SurvivorsRunBoard board;
   };
   [[nodiscard]] Begun StartOf(const ro::sim::SurvivorsRules& rules,
-                              const std::filesystem::path& client_root, std::uint64_t seed,
-                              std::uint16_t first_skill_id) {
-    return StartAs(kind_, rules, client_root, seed, first_skill_id);
+                              const std::filesystem::path& client_root, std::uint64_t seed) {
+    return StartAs(kind_, rules, client_root, seed);
   }
   // Le départ d'un tableau donné, quel que soit le choix de l'accueil.
   [[nodiscard]] Begun StartAs(SurvivorsBoardKind kind, const ro::sim::SurvivorsRules& rules,
-                              const std::filesystem::path& client_root, std::uint64_t seed,
-                              std::uint16_t first_skill_id);
+                              const std::filesystem::path& client_root, std::uint64_t seed);
   // 🔴 LE RABAT D'UNE PARTIE CLASSÉE, quelle qu'en soit la cause — service
   // fermé, jeton refusé ou venu trop tard, classement absent : elle part
   // libre, sur l'arène classée qu'elle demandait (la prairie, que l'onglet
@@ -82,14 +80,13 @@ class SurvivorsBookMode {
   // la partie libre, et avec la classe `class_id` qu'elle demandait.
   [[nodiscard]] Begun StartRankedAsFree(const ro::sim::SurvivorsRules& rules,
                                         const std::filesystem::path& client_root,
-                                        std::uint64_t seed, std::uint16_t first_skill_id,
-                                        std::uint16_t class_id);
+                                        std::uint64_t seed, std::uint16_t class_id);
   // LE DÉPART SANS CLASSEMENT : une partie classée part libre (`StartRankedAsFree`).
   // Rien quand le défi ou la partie classée trouve sa classe verrouillée
   // (`ChosenClassOpen`).
   [[nodiscard]] std::optional<Begun> StartAlone(const ro::sim::SurvivorsRules& rules,
                                                 const std::filesystem::path& client_root,
-                                                std::uint64_t seed, std::uint16_t first_skill_id);
+                                                std::uint64_t seed);
 
   // Une partie neuve commence : elle sera créditée à son tour.
   void Restart() noexcept;
@@ -123,8 +120,7 @@ class SurvivorsBookMode {
   // `arena_id` (`FreeStartOf`).
   [[nodiscard]] Begun FreeStart(const ro::sim::SurvivorsRules& rules,
                                 const std::filesystem::path& client_root, std::uint64_t seed,
-                                std::uint16_t first_skill_id, std::uint16_t arena_id,
-                                std::uint16_t class_id);
+                                std::uint16_t arena_id, std::uint16_t class_id);
 
   UtcClock now_utc_;
   SurvivorsSaveFile file_;

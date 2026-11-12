@@ -75,19 +75,20 @@ void SurvivorsMode::FollowCoopDoor(SurvivorsStage& stage, const SurvivorsContext
   // suit donc sur le fil : le serveur annule « prêt » quand le choix change.
   const ro::sim::ClassRule* chosen_class = PlayingClass();
   if (chosen_class != nullptr) {
-    const std::uint16_t chosen_skill = ChosenBolt();
-    if (coop.ChoiceOwed(context.own_char_id, chosen_class->class_id, chosen_skill) &&
+    // Une partie part de l'auto-attaque seule : le choix ne porte plus de skill.
+    constexpr std::uint16_t kNoFirstSkill = 0;
+    if (coop.ChoiceOwed(context.own_char_id, chosen_class->class_id, kNoFirstSkill) &&
         (asked.coop_ready || coop_choice_sent_ms_ == 0 ||
          context.now_ms - coop_choice_sent_ms_ >= kCoopChoiceRetryMs)) {
       coop.Ask(*context.link, SurvivorsCoopAction::kChoice,
-               ro::net::SurvivorsCoopChoicePart(chosen_class->class_id, chosen_skill));
+               ro::net::SurvivorsCoopChoicePart(chosen_class->class_id, kNoFirstSkill));
       coop_choice_sent_ms_ = context.now_ms;
     }
   }
   if (asked.coop_ready && !refused) {
     // LA PART DE CE JOUEUR : la partie libre que l'accueil a réglée, et son apparence.
     const SurvivorsBookMode::Begun begun =
-        book_.StartAs(SurvivorsBoardKind::kFree, Rules(), context.client_root, 0, ChosenBolt());
+        book_.StartAs(SurvivorsBoardKind::kFree, Rules(), context.client_root, 0);
     const ro::sim::ClassRule* hero_class = ro::sim::FindClass(Rules(), begun.start.class_id);
     if (hero_class != nullptr) {
       ro::sim::SurvivorsCoopPart part;
@@ -125,10 +126,8 @@ void SurvivorsMode::FollowCoopDoor(SurvivorsStage& stage, const SurvivorsContext
     own_ready = own_ready || (member.char_id == context.own_char_id && member.ready);
     // Un choix que les règles de ce client ne connaissent pas ne se nomme pas.
     const ro::sim::ClassRule* member_class = ro::sim::FindClass(Rules(), member.class_id);
-    const bool skill_known =
-        member_class != nullptr &&
-        std::ranges::find(member_class->starter_skills, member.first_skill_id) !=
-            member_class->starter_skills.end();
+    const bool skill_known = member_class != nullptr && member.first_skill_id != 0 &&
+                             ro::sim::OpensRun(Rules(), member.first_skill_id);
     coop_members_.push_back(ro::ui::SurvivorsPrepareCoopMember{
         .name = member.name.c_str(),
         .ready = member.ready,

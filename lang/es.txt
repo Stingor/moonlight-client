@@ -21223,8 +21223,8 @@ tr: Partir
 fr: Pause
 tr: Pausa
 
-fr: Premier sort
-tr: Primer hechizo
+fr: Vous partez avec votre auto-attaque ; le premier niveau offre vos skills de départ.
+tr: Empiezas con tu ataque automático; el primer nivel te ofrece tus habilidades iniciales.
 
 fr: R — Relancer (%d)
 tr: R — Volver a tirar (%d)

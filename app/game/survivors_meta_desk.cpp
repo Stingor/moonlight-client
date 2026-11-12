@@ -242,7 +242,7 @@ ro::ui::SurvivorsPrepareMeta PrepareMetaOf(const ro::sim::SurvivorsRules& rules,
   const ro::sim::SurvivorsMetaStart start = ro::sim::LoadoutOf(Meta(), save.meta.ranks, class_rule);
   meta.lives = start.lives;
   meta.charges = start.loadout.rerolls + start.loadout.skips + start.loadout.banishes;
-  const std::uint16_t bolt = ChallengeFirstSkill(class_rule, week);
+  const std::uint16_t bolt = ChallengeFirstSkill(rules, week);
   const ro::sim::SurvivorsSkillRule* bolt_rule = ro::sim::FindSkill(rules, bolt);
   meta.challenge_bolt = ro::ui::SurvivorsBoltChoice{
       .skill_id = bolt, .description = bolt_rule != nullptr ? bolt_rule->description : ""};

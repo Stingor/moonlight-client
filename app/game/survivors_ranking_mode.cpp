@@ -168,7 +168,7 @@ void SurvivorsRankingMode::Pump(ro::net::Connection& link, const SurvivorsRankin
 
 std::optional<SurvivorsBookMode::Begun> SurvivorsRankingMode::Launch(
     SurvivorsBookMode& book, const ro::sim::SurvivorsRules& rules,
-    const std::filesystem::path& client_root, std::uint64_t seed, std::uint16_t first_skill_id) {
+    const std::filesystem::path& client_root, std::uint64_t seed) {
   launch_.reset();
   // CHAQUE DÉPART OUBLIE LE PRÉCÉDENT : un jeton accordé à un départ qui n'a
   // jamais atteint son bilan ne classe pas la partie suivante.
@@ -180,10 +180,9 @@ std::optional<SurvivorsBookMode::Begun> SurvivorsRankingMode::Launch(
   // La partie classée n'existe que service ouvert : sans lui, elle part libre,
   // sur l'arène et avec la classe qu'elle demandait.
   if (kind == SurvivorsBoardKind::kRanked && !session_.service_open()) {
-    return book.StartRankedAsFree(rules, client_root, seed, first_skill_id,
-                                  book.board_class_id(rules));
+    return book.StartRankedAsFree(rules, client_root, seed, book.board_class_id(rules));
   }
-  SurvivorsBookMode::Begun begun = book.StartAs(kind, rules, client_root, seed, first_skill_id);
+  SurvivorsBookMode::Begun begun = book.StartAs(kind, rules, client_root, seed);
   if (kind == SurvivorsBoardKind::kFree) return begun;
   const ro::sim::ArenaRule* arena = ro::sim::FindArena(rules, begun.start.arena_id);
   const ro::sim::ClassRule* class_rule = ro::sim::FindClass(rules, begun.start.class_id);
@@ -198,14 +197,13 @@ std::optional<SurvivorsBookMode::Begun> SurvivorsRankingMode::Launch(
     launch_ = PendingLaunch{.kind = kind,
                             .start_seed = begun.start.seed,
                             .local_seed = seed,
-                            .class_id = begun.start.class_id,
-                            .first_skill_id = first_skill_id};
+                            .class_id = begun.start.class_id};
     return begun;
   }
   // Un défi sans jeton reste un défi local ; une partie classée part libre,
   // sur l'arène et avec la classe qu'elle demandait.
   if (kind == SurvivorsBoardKind::kRanked) {
-    return book.StartRankedAsFree(rules, client_root, seed, first_skill_id, begun.start.class_id);
+    return book.StartRankedAsFree(rules, client_root, seed, begun.start.class_id);
   }
   return begun;
 }
@@ -220,8 +218,7 @@ std::optional<SurvivorsBookMode::Begun> SurvivorsRankingMode::Settle(
     if (ticket->seed == launch.start_seed) return std::nullopt;
     if (launch.kind == SurvivorsBoardKind::kRanked) {
       return SurvivorsBookMode::Begun{
-          .start =
-              ro::sim::RankedStartOf(rules, ticket->seed, launch.class_id, launch.first_skill_id),
+          .start = ro::sim::RankedStartOf(rules, ticket->seed, launch.class_id),
           .board = SurvivorsRunBoard{.kind = SurvivorsBoardKind::kRanked}};
     }
     // LE DÉFI SE JOUE À LA SEMAINE DU SERVEUR, dont la graine vient d'être
@@ -232,8 +229,7 @@ std::optional<SurvivorsBookMode::Begun> SurvivorsRankingMode::Settle(
         .board = SurvivorsRunBoard{.kind = SurvivorsBoardKind::kChallenge, .week = week}};
   }
   if (launch.kind == SurvivorsBoardKind::kRanked) {
-    return book.StartRankedAsFree(rules, client_root, launch.local_seed, launch.first_skill_id,
-                                  launch.class_id);
+    return book.StartRankedAsFree(rules, client_root, launch.local_seed, launch.class_id);
   }
   return std::nullopt;
 }

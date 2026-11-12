@@ -159,7 +159,7 @@ class SurvivorsMode {
   [[nodiscard]] static const ro::sim::SurvivorsRules& Rules();
   // Pose sur l'arène montée les réglages qui la regardent.
   void PoseArenaOptions();
-  void Enter(SurvivorsStage& stage, const SurvivorsContext& context, std::uint16_t first_skill_id);
+  void Enter(SurvivorsStage& stage, const SurvivorsContext& context);
   // Commence sur l'étage la partie du départ `begun`, sur le sol de son arène.
   [[nodiscard]] ro::core::Result<void> BeginRun(SurvivorsStage& stage,
                                                 const SurvivorsContext& context,
@@ -203,7 +203,6 @@ class SurvivorsMode {
   // La classe que jouera la prochaine partie, celle que l'accueil montre,
   // dans tous les onglets. Nulle sans classe.
   [[nodiscard]] const ro::sim::ClassRule* PlayingClass() const;
-  [[nodiscard]] std::uint16_t ChosenBolt() const;
   // Ce qui suit le commencement d'une partie, seule ou en coop : s'asseoir, garder
   // le volume, surveiller le monde réel.
   void AfterBegin(const SurvivorsContext& context);

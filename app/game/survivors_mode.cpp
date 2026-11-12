@@ -270,7 +270,7 @@ SurvivorsPainted SurvivorsMode::Frame(SurvivorsStage& stage, const SurvivorsCont
           context.minigames->survivors_prepare.open = true;
           return SurvivorsPainted{};
         }
-        Enter(stage, context, ChosenBolt());
+        Enter(stage, context);
         if (!stage.owns_screen()) return SurvivorsPainted{};
         return Frame(stage, context);
     }

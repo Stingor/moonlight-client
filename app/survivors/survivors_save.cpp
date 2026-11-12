@@ -33,7 +33,6 @@ constexpr const char* kShowMeasuresField = "show_measures";
 constexpr const char* kHordeSunShadowsField = "horde_sun_shadows";
 constexpr const char* kPauseWhileTypingField = "pause_while_typing";
 constexpr const char* kPresenceShownField = "presence_shown";
-constexpr const char* kFirstSkillIdField = "first_skill_id";
 constexpr const char* kClassIdField = "class_id";
 constexpr const char* kObjectiveSkillIdField = "objective_skill_id";
 
@@ -262,7 +261,6 @@ void ReadOptions(const YAML::Node& section, SurvivorsOptions& options) {
   options.horde_sun_shadows = FlagIn(section, kHordeSunShadowsField, options.horde_sun_shadows);
   options.pause_while_typing = FlagIn(section, kPauseWhileTypingField, options.pause_while_typing);
   options.presence_shown = FlagIn(section, kPresenceShownField, options.presence_shown);
-  options.first_skill_id = OptionIdIn(section, kFirstSkillIdField);
   options.class_id = OptionIdIn(section, kClassIdField);
   options.objective_skill_id = OptionIdIn(section, kObjectiveSkillIdField);
 }
@@ -471,7 +469,6 @@ void WriteOptions(YAML::Emitter& out, const SurvivorsOptions& options) {
   out << YAML::Key << kHordeSunShadowsField << YAML::Value << options.horde_sun_shadows;
   out << YAML::Key << kPauseWhileTypingField << YAML::Value << options.pause_while_typing;
   out << YAML::Key << kPresenceShownField << YAML::Value << options.presence_shown;
-  out << YAML::Key << kFirstSkillIdField << YAML::Value << options.first_skill_id;
   out << YAML::Key << kClassIdField << YAML::Value << options.class_id;
   out << YAML::Key << kObjectiveSkillIdField << YAML::Value << options.objective_skill_id;
   out << YAML::EndMap;

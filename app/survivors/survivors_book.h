@@ -120,29 +120,28 @@ bool InscribeFeat(SurvivorsSave& save, std::string_view key);
                                                       std::uint16_t class_id);
 
 // LE DÉPART D'UNE PARTIE LIBRE : la classe `ChosenClassOf(class_id)`, l'arène
-// `FreeArenaOf(arena_id)`, son premier skill `ro::sim::FirstSkillOf`, le loadout et les
-// vies des rangs achetés, la dernière Cursed Water choisie, et les verrous du
-// carnet. La graine se tire par app à chaque partie.
+// `FreeArenaOf(arena_id)`, le loadout et les vies des rangs achetés, la
+// dernière Cursed Water choisie, et les verrous du carnet. Le héros part de son
+// auto-attaque seule. La graine se tire par app à chaque partie.
 [[nodiscard]] ro::sim::SurvivorsStart FreeStartOf(const ro::sim::SurvivorsRules& rules,
                                                   const SurvivorsSave& save, std::uint64_t seed,
-                                                  std::uint16_t first_skill_id,
                                                   std::uint16_t arena_id = 0,
                                                   std::uint16_t class_id = 0);
 
 // La semaine ISO d'un instant UTC : le défi change le lundi à 00:00 UTC (Q9).
 [[nodiscard]] ro::sim::IsoWeek IsoWeekOfUtc(std::int64_t utc_s) noexcept;
 
-// LE BOLT IMPOSÉ PAR LA SEMAINE (Q9) : les bolts de départ de la classe en
-// rotation, `starter_skills[IsoWeekOrdinal(semaine) mod leur nombre]` — Fire,
-// Cold puis Lightning pour le mage. 0 sans bolt de départ.
-[[nodiscard]] std::uint16_t ChallengeFirstSkill(const ro::sim::ClassRule& class_rule,
-                                                const ro::sim::IsoWeek& week) noexcept;
+// LE SKILL IMPOSÉ PAR LA SEMAINE : l'un des `ro::sim::OpeningSkills`, de
+// n'importe quelle classe, tiré par `SeedOfWeek` ; le même pour toutes les
+// classes. 0 sans semaine ou sans skill.
+[[nodiscard]] std::uint16_t ChallengeFirstSkill(const ro::sim::SurvivorsRules& rules,
+                                                const ro::sim::IsoWeek& week);
 
 // LE DÉPART DU DÉFI D'UNE SEMAINE pour la classe `class_id` : neutre, sur la
-// première arène classée, la graine `SeedOfWeek` et le bolt que la semaine
-// impose à cette classe. Le même pour tous les carnets, et la même graine pour
-// toutes les classes, chacune à son tableau. Un Id que les règles ne connaissent
-// pas reste tel quel, et la partie refuse de commencer.
+// première arène classée, la graine `SeedOfWeek` et le skill que la semaine
+// impose. Le même pour tous les carnets, et la même graine pour toutes les
+// classes, chacune à son tableau. Un Id que les règles ne connaissent pas reste
+// tel quel, et la partie refuse de commencer.
 [[nodiscard]] ro::sim::SurvivorsStart ChallengeStartOf(const ro::sim::SurvivorsRules& rules,
                                                        const ro::sim::IsoWeek& week,
                                                        std::uint16_t class_id);

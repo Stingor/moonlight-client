@@ -177,6 +177,24 @@ const ArenaRule* FindArena(const SurvivorsRules& rules, std::uint16_t arena_id) 
   return FindById(rules.arenas, arena_id, [](const ArenaRule& rule) { return rule.arena_id; });
 }
 
+std::vector<std::uint16_t> OpeningSkills(const SurvivorsRules& rules) {
+  std::vector<std::uint16_t> opening;
+  for (const ClassRule& hero_class : rules.classes) {
+    for (const std::uint16_t skill_id : hero_class.skill_pool) {
+      const SurvivorsSkillRule* rule = FindSkill(rules, skill_id);
+      if (rule == nullptr || IsWeaponSkill(*rule)) continue;
+      if (std::ranges::find(opening, skill_id) == opening.end()) opening.push_back(skill_id);
+    }
+  }
+  return opening;
+}
+
+bool OpensRun(const SurvivorsRules& rules, std::uint16_t first_skill_id) {
+  if (first_skill_id == 0) return true;
+  const std::vector<std::uint16_t> opening = OpeningSkills(rules);
+  return std::ranges::find(opening, first_skill_id) != opening.end();
+}
+
 const ArenaRule* FirstRankedArena(const SurvivorsRules& rules) {
   const auto ranked =
       std::ranges::find_if(rules.arenas, [](const ArenaRule& rule) { return rule.ranked; });

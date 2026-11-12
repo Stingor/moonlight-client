@@ -22,10 +22,6 @@
 namespace moonclient {
 namespace {
 
-// Le premier bolt présélectionné tant que le joueur n'en a choisi aucun
-// (D2) : Fire Bolt.
-constexpr std::uint16_t kFireBoltSkill = 19;
-
 [[nodiscard]] bool Sitting(const ro::sim::World& world) {
   const ro::sim::Actor* player = world.player();
   return player != nullptr && player->posture == ro::sim::Posture::kSitting;
@@ -35,17 +31,6 @@ constexpr std::uint16_t kFireBoltSkill = 19;
 
 const ro::sim::ClassRule* SurvivorsMode::PlayingClass() const {
   return ChosenClassOf(Rules(), desk_.save(), book_.chosen_class_id());
-}
-
-std::uint16_t SurvivorsMode::ChosenBolt() const {
-  const ro::sim::ClassRule* playing = PlayingClass();
-  if (playing == nullptr || playing->starter_skills.empty()) return 0;
-  const std::span<const std::uint16_t> bolts = playing->starter_skills;
-  if (std::ranges::find(bolts, options_.first_skill_id) != bolts.end()) {
-    return options_.first_skill_id;
-  }
-  if (std::ranges::find(bolts, kFireBoltSkill) != bolts.end()) return kFireBoltSkill;
-  return bolts.front();
 }
 
 void SurvivorsMode::FollowDoor(SurvivorsStage& stage, const SurvivorsContext& context) {
@@ -105,17 +90,11 @@ void SurvivorsMode::FollowDoor(SurvivorsStage& stage, const SurvivorsContext& co
                              .window = std::exchange(windows.survivors_meta.ranking_answer, {})},
         Rules(), playing != nullptr ? playing->class_id : std::uint16_t{0});
   }
-  if (asked.choose_skill_id.has_value() && *asked.choose_skill_id != options_.first_skill_id) {
-    const SurvivorsOptions before = options_;
-    options_.first_skill_id = *asked.choose_skill_id;
-    SaveOptions(before, context);
-  }
   const std::optional<EntryRefusal> refusal = Judge(EntryFactsOf(*context.world, context.aside));
   const MoveKeyLabels labels = LabelsOf(context.key_namer);
   key_labels_ = {labels.north, labels.west, labels.south, labels.east};
-  views_.ComposePrepare(windows.survivors_prepare_view, Rules(), PlayingClass(), ChosenBolt(),
-                        refusal.has_value() ? RefusalText(*refusal) : nullptr, key_labels_,
-                        context.tables);
+  views_.ComposePrepare(windows.survivors_prepare_view,
+                        refusal.has_value() ? RefusalText(*refusal) : nullptr, key_labels_);
   views_.ComposeMeta(windows.survivors_prepare_view, windows.survivors_meta, desk_, book_, Rules(),
                      context.tables, context.ranking, context.now_ms);
   windows.survivors_prepare_composed = true;
@@ -125,12 +104,11 @@ void SurvivorsMode::FollowDoor(SurvivorsStage& stage, const SurvivorsContext& co
     // La vue pointe dans le salon qui vient de s'effacer, et un départ qui échoue laisse
     // la fenêtre ouverte.
     windows.survivors_prepare_view.coop = {};
-    Enter(stage, context, ChosenBolt());
+    Enter(stage, context);
   }
 }
 
-void SurvivorsMode::Enter(SurvivorsStage& stage, const SurvivorsContext& context,
-                          std::uint16_t first_skill_id) {
+void SurvivorsMode::Enter(SurvivorsStage& stage, const SurvivorsContext& context) {
   if (context.vfs == nullptr || context.wardrobe == nullptr) {
     context.say(ro::core::Tr("L'arène des Survivants de Midgard ne peut pas se monter."));
     ro::core::LogWarning("survivors : ni archives ni garde-robe, la partie ne commence pas");
@@ -145,8 +123,8 @@ void SurvivorsMode::Enter(SurvivorsStage& stage, const SurvivorsContext& context
   // part libre sur la prairie.
   const std::optional<SurvivorsBookMode::Begun> book_start =
       context.ranking != nullptr
-          ? context.ranking->Launch(book_, Rules(), context.client_root, seed, first_skill_id)
-          : book_.StartAlone(Rules(), context.client_root, seed, first_skill_id);
+          ? context.ranking->Launch(book_, Rules(), context.client_root, seed)
+          : book_.StartAlone(Rules(), context.client_root, seed);
   TellDamagedCopy(book_.TakeDamagedCopy(), context.say);
   if (!book_start.has_value()) {
     context.say(ro::core::Tr("Cette classe n'est pas débloquée : la partie ne part pas."));

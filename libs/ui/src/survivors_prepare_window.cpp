@@ -40,24 +40,11 @@ void DrawBoltLine(const SurvivorsBoltChoice& bolt) {
   }
 }
 
-// Le choix du premier bolt ; l'identifiant cliqué, s'il change.
-[[nodiscard]] std::optional<std::uint16_t> DrawBolts(const SurvivorsPrepareView& view,
-                                                     const SkinArt& art) {
-  std::optional<std::uint16_t> chosen;
-  ImGui::SeparatorText(core::Tr("Premier sort"));
-  for (const SurvivorsBoltChoice& bolt : view.bolts) {
-    ImGui::PushID(bolt.skill_id);
-    DrawBoltLine(bolt);
-    const bool is_chosen = bolt.skill_id == view.chosen_skill_id;
-    if (SkinRadio(bolt.name, is_chosen, art) && !is_chosen) {
-      chosen = bolt.skill_id;
-    }
-    ImGui::Indent();
-    FaintText(SurvivorsText(bolt.description));
-    ImGui::Unindent();
-    ImGui::PopID();
-  }
-  return chosen;
+// Le héros part de son auto-attaque : son premier niveau offre ses skills.
+void DrawOpening() {
+  FaintText(
+      core::Tr("Vous partez avec votre auto-attaque ; le premier niveau offre vos skills de "
+               "départ."));
 }
 
 void DrawControls(const SurvivorsPrepareView& view) {
@@ -210,11 +197,11 @@ void DrawClass(const SurvivorsPrepareMeta& meta, SurvivorsPrepareAsk& asked, con
   }
 }
 
-void DrawFreeBoard(const SurvivorsPrepareView& view, const SurvivorsPrepareMeta& meta,
-                   SurvivorsPrepareAsk& asked, const SkinArt& art) {
+void DrawFreeBoard(const SurvivorsPrepareMeta& meta, SurvivorsPrepareAsk& asked,
+                   const SkinArt& art) {
   DrawClass(meta, asked, art);
   DrawFreeArena(meta, asked, art);
-  asked.choose_skill_id = DrawBolts(view, art);
+  DrawOpening();
   DrawCursedWater(meta, asked, art);
   DrawWithoutMinimap(meta, asked, art);
   ImGui::Separator();
@@ -244,13 +231,13 @@ void DrawChallengeBoard(const SurvivorsPrepareMeta& meta, SurvivorsPrepareAsk& a
   }
 }
 
-// La partie classée : départ neutre, le bolt au choix, la graine du serveur.
-void DrawRankedBoard(const SurvivorsPrepareView& view, const SurvivorsPrepareMeta& meta,
-                     SurvivorsPrepareAsk& asked, const SkinArt& art) {
+// La partie classée : départ neutre, la graine du serveur.
+void DrawRankedBoard(const SurvivorsPrepareMeta& meta, SurvivorsPrepareAsk& asked,
+                     const SkinArt& art) {
   const SurvivorsPrepareRanking& ranking = *meta.ranking;
   DrawClass(meta, asked, art);
   DrawArenaName(meta.board_arena_name);
-  asked.choose_skill_id = DrawBolts(view, art);
+  DrawOpening();
   ImGui::Separator();
   FaintText(core::Tr("Départ neutre : sans Bénédictions, sans charges, toutes les cartes."));
   FaintText(core::Tr("Graine tirée par le serveur."));
@@ -353,18 +340,18 @@ SurvivorsPrepareAsk DrawSurvivorsPrepareWindow(SurvivorsPrepareState& state,
   }
   FaintText(core::Tr("Survivez quinze minutes à la horde."));
   if (!view.meta.has_value()) {
-    asked.choose_skill_id = DrawBolts(view, art);
+    DrawOpening();
   } else {
     DrawBoardTabs(*view.meta, asked, art);
     switch (BoardShown(*view.meta)) {
       case SurvivorsBoardTab::kFree:
-        DrawFreeBoard(view, *view.meta, asked, art);
+        DrawFreeBoard(*view.meta, asked, art);
         break;
       case SurvivorsBoardTab::kChallenge:
         DrawChallengeBoard(*view.meta, asked, art);
         break;
       case SurvivorsBoardTab::kRanked:
-        DrawRankedBoard(view, *view.meta, asked, art);
+        DrawRankedBoard(*view.meta, asked, art);
         break;
     }
   }

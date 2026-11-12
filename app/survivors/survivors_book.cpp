@@ -231,7 +231,7 @@ void TrimPastChallengeWeeks(SurvivorsSave& save, const ro::sim::IsoWeek& current
   const ro::sim::ClassRule* class_rule = ro::sim::FindClass(rules, start.class_id);
   if (week.week == 0 || class_rule == nullptr ||
       start.seed != ro::sim::SeedOfWeek(week.year, week.week) ||
-      start.first_skill_id != ChallengeFirstSkill(*class_rule, week)) {
+      start.first_skill_id != ChallengeFirstSkill(rules, week)) {
     return RecordVerdict::kNotThisWeek;
   }
   return RecordVerdict::kPlaced;
@@ -391,17 +391,15 @@ const ro::sim::ClassRule* ChosenClassOf(const ro::sim::SurvivorsRules& rules,
 }
 
 ro::sim::SurvivorsStart FreeStartOf(const ro::sim::SurvivorsRules& rules, const SurvivorsSave& save,
-                                    std::uint64_t seed, std::uint16_t first_skill_id,
-                                    std::uint16_t arena_id, std::uint16_t class_id) {
+                                    std::uint64_t seed, std::uint16_t arena_id,
+                                    std::uint16_t class_id) {
   const ro::sim::ArenaRule* arena = FreeArenaOf(rules, arena_id);
   const ro::sim::ClassRule* chosen_class = ChosenClassOf(rules, save, class_id);
   ro::sim::SurvivorsStart start{
       .seed = seed,
       .class_id = chosen_class == nullptr ? std::uint16_t{0} : chosen_class->class_id,
       .arena_id = arena == nullptr ? std::uint16_t{0} : arena->arena_id,
-      .first_skill_id = chosen_class == nullptr
-                            ? first_skill_id
-                            : ro::sim::FirstSkillOf(*chosen_class, first_skill_id),
+      .first_skill_id = 0,
       .loadout = {}};
   // Un carnet plus généreux que les règles ne fait pas refuser la partie : la
   // Cursed Water se ramène au plus haut rang que les règles connaissent.
@@ -423,25 +421,21 @@ ro::sim::IsoWeek IsoWeekOfUtc(std::int64_t utc_s) noexcept {
   return ro::sim::IsoWeekOfDay(FloorDivide(utc_s, ro::sim::kSecondsPerDay));
 }
 
-std::uint16_t ChallengeFirstSkill(const ro::sim::ClassRule& class_rule,
-                                  const ro::sim::IsoWeek& week) noexcept {
-  const std::span<const std::uint16_t> bolts = class_rule.starter_skills;
-  if (bolts.empty()) return 0;
-  const auto count = static_cast<std::int64_t>(bolts.size());
-  const std::int64_t ordinal = ro::sim::IsoWeekOrdinal(week);
-  return bolts[static_cast<std::size_t>(ordinal - FloorDivide(ordinal, count) * count)];
+std::uint16_t ChallengeFirstSkill(const ro::sim::SurvivorsRules& rules,
+                                  const ro::sim::IsoWeek& week) {
+  const std::vector<std::uint16_t> opening = ro::sim::OpeningSkills(rules);
+  if (opening.empty() || week.week == 0) return 0;
+  return opening[ro::sim::SeedOfWeek(week.year, week.week) % opening.size()];
 }
 
 ro::sim::SurvivorsStart ChallengeStartOf(const ro::sim::SurvivorsRules& rules,
                                          const ro::sim::IsoWeek& week, std::uint16_t class_id) {
-  const ro::sim::ClassRule* class_rule = ro::sim::FindClass(rules, class_id);
   const ro::sim::ArenaRule* ranked_arena = ro::sim::FirstRankedArena(rules);
   return ro::sim::SurvivorsStart{
       .seed = ro::sim::SeedOfWeek(week.year, week.week),
       .class_id = class_id,
       .arena_id = ranked_arena == nullptr ? std::uint16_t{0} : ranked_arena->arena_id,
-      .first_skill_id =
-          class_rule == nullptr ? std::uint16_t{0} : ChallengeFirstSkill(*class_rule, week),
+      .first_skill_id = ChallengeFirstSkill(rules, week),
       .loadout = {}};
 }
 
