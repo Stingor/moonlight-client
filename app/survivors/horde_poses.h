@@ -150,7 +150,12 @@ class HordePoses {
                    const ro::sim::SurvivorsField& field, std::uint64_t presentation_ms);
   // LES COUPS DES DERNIERS PAS : un monstre qu'un piège retient (`FreezeHolds`)
   // ne bleuit pas tant que ce gel dure. ⚠ AVANT `Pose`, comme `NoticeFalls`.
-  void NoticeHits(std::span<const ro::sim::SurvivorsHit> hits);
+  //
+  // L'AUTO-ATTAQUE QUI TOUCHE fait jouer au héros son attaque à
+  // `presentation_ms`, à chaque coup et même en marche : elle n'attend pas
+  // `kHeroGestureEveryMs`.
+  void NoticeHits(std::span<const ro::sim::SurvivorsHit> hits, const ro::sim::SurvivorsField& field,
+                  std::uint64_t presentation_ms);
 
   // POSE TOUS LES CORPS à `presentation_ms` : le héros d'abord, puis les
   // monstres, les morts, les plantes, les objets et les gemmes. Les positions
@@ -213,6 +218,9 @@ class HordePoses {
   // autres incantent. `pose.look_id` doit déjà nommer sa tenue.
   void PoseGesture(HordePose& pose, const ro::sim::SurvivorsField& field, std::size_t hero_index,
                    std::uint64_t presentation_ms, const HordeTimesOf& times_of) const;
+  // Vrai, et la pose en attaque, quand l'auto-attaque du héros vient de toucher.
+  [[nodiscard]] bool PoseStrike(HordePose& pose, std::size_t hero_index,
+                                std::uint64_t presentation_ms, const HordeTimesOf& times_of) const;
   void PoseFoes(const ro::sim::SurvivorsField& field, std::uint64_t presentation_ms,
                 std::uint32_t blend_per_mille, const HordeTimesOf& times_of);
   void PoseFalling(std::uint64_t presentation_ms, const HordeTimesOf& times_of);
@@ -239,6 +247,8 @@ class HordePoses {
   // d'attaque, quelle que soit la classe.
   std::array<std::optional<std::uint64_t>, ro::sim::kMostHeroes> gesture_started_ms_;
   std::array<bool, ro::sim::kMostHeroes> gesture_weapon_only_ = {};
+  // Le dernier coup d'auto-attaque de chaque héros qui a touché un monstre.
+  std::array<std::optional<std::uint64_t>, ro::sim::kMostHeroes> strike_started_ms_;
 };
 
 }  // namespace moonclient

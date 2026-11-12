@@ -158,7 +158,7 @@ void ArenaSession::Compose(const ArenaFrameFacts& facts, const GraphicsOptions& 
   carts_.set_camera_yaw_degrees(yaw_degrees);
   falcons_.set_camera_yaw_degrees(yaw_degrees);
   poses_.NoticeFalls(facts.news->falls, facts.presentation_ms);
-  poses_.NoticeHits(facts.news->hits);
+  poses_.NoticeHits(facts.news->hits, field, facts.presentation_ms);
   poses_.NoticeCasts(facts.news->casts, field, facts.presentation_ms);
   poses_.Pose(field, facts.presentation_ms, facts.blend_per_mille, composer_.TimesSource());
   // LES CHARIOTS : le héros qui fait tourner le sien le regarde, ce qui

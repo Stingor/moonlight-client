@@ -149,11 +149,21 @@ void HordePoses::Reset() {
   poses_.clear();
   summon_strikes_.clear();
   gesture_started_ms_ = {};
+  strike_started_ms_ = {};
   gesture_weapon_only_ = {};
 }
 
-void HordePoses::NoticeHits(std::span<const ro::sim::SurvivorsHit> hits) {
+void HordePoses::NoticeHits(std::span<const ro::sim::SurvivorsHit> hits,
+                            const ro::sim::SurvivorsField& field, std::uint64_t presentation_ms) {
   for (const ro::sim::SurvivorsHit& hit : hits) {
+    if (!hit.poison_tick && hit.hero_index < strike_started_ms_.size() &&
+        hit.hero_index < ro::sim::HeroCount(field)) {
+      const ro::sim::ClassRule* hero_class = ro::sim::ClassAt(field, hit.hero_index);
+      if (hero_class != nullptr && hero_class->weapon_skill_id != 0 &&
+          hit.skill_id == hero_class->weapon_skill_id) {
+        strike_started_ms_[hit.hero_index] = presentation_ms;
+      }
+    }
     if (!hit.froze) continue;
     const auto known = std::ranges::find(memory_, hit.foe_serial, &FoeMemory::serial);
     if (known != memory_.end()) known->held = FreezeHolds(hit.skill_id);
@@ -218,6 +228,18 @@ void HordePoses::PoseGesture(HordePose& pose, const ro::sim::SurvivorsField& fie
   }
 }
 
+bool HordePoses::PoseStrike(HordePose& pose, std::size_t hero_index, std::uint64_t presentation_ms,
+                            const HordeTimesOf& times_of) const {
+  if (hero_index >= strike_started_ms_.size() || !strike_started_ms_[hero_index].has_value()) {
+    return false;
+  }
+  const float strike_ms = ElapsedSince(presentation_ms, *strike_started_ms_[hero_index]);
+  if (strike_ms >= times_of(HordeBodyKind::kHero, pose.look_id).attack_ms) return false;
+  pose.motion = Motion::kAttack;
+  pose.motion_ms = strike_ms;
+  return true;
+}
+
 void HordePoses::PoseHero(const ro::sim::SurvivorsField& field, std::uint64_t presentation_ms,
                           std::uint32_t blend_per_mille, const HordeTimesOf& times_of) {
   const ro::sim::SurvivorsHero& hero = field.hero;
@@ -229,6 +251,8 @@ void HordePoses::PoseHero(const ro::sim::SurvivorsField& field, std::uint64_t pr
   } else if (field.tally.outcome == ro::sim::SurvivorsOutcome::kFell) {
     pose.motion = Motion::kDie;
     pose.motion_ms = ElapsedSince(presentation_ms, MsOfStep(field.step));
+  } else if (PoseStrike(pose, field.stage, presentation_ms, times_of)) {
+    // L'auto-attaque qui touche prime sur la marche et sur la garde.
   } else if (Walking(hero)) {
     pose.motion = Motion::kWalk;
     pose.motion_ms = static_cast<float>(presentation_ms);
@@ -258,7 +282,7 @@ void HordePoses::PoseAllies(const ro::sim::SurvivorsField& field, std::uint64_t 
     if (hero.down) {
       pose.motion = Motion::kDie;
       pose.motion_ms = kDownMotionMs;
-    } else {
+    } else if (!PoseStrike(pose, index, presentation_ms, times_of)) {
       const bool moving = Walking(hero);
       pose.motion = moving ? Motion::kWalk : Motion::kReady;
       pose.motion_ms = static_cast<float>(presentation_ms);
