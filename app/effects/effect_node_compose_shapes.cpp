@@ -730,8 +730,11 @@ void EffectNodesInPlay::ComposeNodeAsSprite(const ro::render::PooledEffectNode& 
   // d'un pixel d'écran de chaque côté et toujours AJOUTÉ, quel que soit le
   // mélange de la première. C'est son halo.
   const bool with_halo = pooled.shape == ro::render::PooledNodeShape::kGlowSprite;
+  const std::optional<ro::render::EffectDye> dye =
+      draw_gate_.HatDyeFor(pooled.sown_by_effect_id, pooled.anchor_id, pooled.from_hat);
   const auto place = [&](ComposedPlacement pose) {
     pose.render_word = pooled.node.render_word;
+    pose.dye = dye;
     placements_.push_back(pose);
     if (with_halo) {
       pose.render_word = ro::render::kEffectGlowSpriteHaloRenderWord;
@@ -765,6 +768,7 @@ void EffectNodesInPlay::ComposeNodeAsSprite(const ro::render::PooledEffectNode& 
       ComposedPlacement halo = placement(halos[rang]);
       halo.render_word = pooled.node.render_word;
       halo.grow_screen_pixels = ro::render::kSpriteFanHaloScreenPixels;
+      halo.dye = dye;
       placements_.push_back(halo);
     }
     return;

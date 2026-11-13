@@ -644,6 +644,8 @@ std::span<const ro::render::DrawnActor> EffectNodesInPlay::Drawn(std::uint32_t n
       // rattachent plus bas.
       world_quads_.push_back(ro::render::DrawnWorldQuads{
           {}, &texture->first, &texture->second, pooled.ground_position, pooled.node.render_word});
+      world_quads_.back().dye =
+          draw_gate_.HatDyeFor(pooled.sown_by_effect_id, pooled.anchor_id, pooled.from_hat);
       continue;
     }
     // LE SPRITE, dernier cas de la boucle : il ne compose pas des quads du
@@ -758,6 +760,7 @@ std::span<const ro::render::DrawnActor> EffectNodesInPlay::Drawn(std::uint32_t n
           actor.tint = pose.tint;
           actor.scale = pose.scale;
           actor.grow_screen_pixels = pose.grow_screen_pixels;
+          actor.dye = pose.dye;
           actor.fogged = ro::render::EffectLotIsFogged(pose.render_word);
           drawn_.push_back(actor);
         }

@@ -303,12 +303,21 @@ void EffectClassesInPlay::Advance(const ro::sim::World& world, const MapStage& s
   // LA PORTE DE DESSIN SAUTE LE DESSIN SEUL : l'instance a battu, elle a fait
   // ses sons et ses demandes. Voir `EffectDrawGate`.
   ro::render::EffectClassOutput dessin;
+  dyes_ = {};
   for (const Living& living : living_) {
     if (!living.instance->culled() &&
         draw_gate_.DrawsEffect(living.instance->effect_id(), living.owner_id, living.from_hat)) {
       const OutputSizes before = SizesOf(dessin);
       living.instance->Draw(ViewFrom(view, living.frame_shift), dessin);
       ShiftAdded(dessin, before, living.frame_shift);
+      // LA TEINTURE DE L'INSTANCE suit chacun de ses dessins jusqu'au lot :
+      // la sortie est commune à toutes les instances.
+      const std::optional<ro::render::EffectDye> dye =
+          draw_gate_.HatDyeFor(living.instance->effect_id(), living.owner_id, living.from_hat);
+      dyes_.strs.resize(dessin.strs.size(), dye);
+      dyes_.quads.resize(dessin.quads.size(), dye);
+      dyes_.sprites.resize(dessin.sprites.size(), dye);
+      dyes_.screen_quads.resize(dessin.screen_quads.size(), dye);
     }
   }
   Compose(dessin);
@@ -360,7 +369,8 @@ const ro::render::LoadedActorSprite* EffectClassesInPlay::SpriteFor(const std::s
 }
 
 void EffectClassesInPlay::Compose(const ro::render::EffectClassOutput& output) {
-  for (const ro::render::EffectClassStrDraw& str : output.strs) {
+  for (std::size_t rank = 0; rank < output.strs.size(); ++rank) {
+    const ro::render::EffectClassStrDraw& str = output.strs[rank];
     const ro::render::LoadedEffect* loaded = nullptr;
     if (minimal_effects_ && str.allows_min_variant) {
       loaded = StrFor(MinimalVariant(str.path));
@@ -377,11 +387,13 @@ void EffectClassesInPlay::Compose(const ro::render::EffectClassOutput& output) {
     peint.scale = str.scale;
     peint.alpha = str.alpha;
     peint.flip_x = str.flip_x;
+    peint.dye = dyes_.strs[rank];
     (str.behind_actors ? behind_ : drawn_).push_back(peint);
   }
   // LES QUADS, UN LOT PAR TEXTURE ET PAR MOT DE RENDU, dans l'ordre d'arrivée.
   std::vector<std::size_t> debuts;
-  for (const ro::render::EffectClassQuadDraw& quad : output.quads) {
+  for (std::size_t rank = 0; rank < output.quads.size(); ++rank) {
+    const ro::render::EffectClassQuadDraw& quad = output.quads[rank];
     const std::string texture_path(quad.texture);
     const ro::formats::Image& image = TextureFor(texture_path);
     if (image.pixels.empty()) {
@@ -389,13 +401,15 @@ void EffectClassesInPlay::Compose(const ro::render::EffectClassOutput& output) {
     }
     const auto key = textures_.find(texture_path);
     if (quad_lots_.empty() || quad_lots_.back().texture_path != &key->first ||
-        quad_lots_.back().render_word != quad.render_word) {
+        quad_lots_.back().render_word != quad.render_word ||
+        quad_lots_.back().dye != dyes_.quads[rank]) {
       debuts.push_back(quads_.size());
       ro::render::DrawnWorldQuads lot;
       lot.texture_path = &key->first;
       lot.texture = &key->second;
       lot.ground_position = quad.quad.corners[0];
       lot.render_word = quad.render_word;
+      lot.dye = dyes_.quads[rank];
       quad_lots_.push_back(lot);
     }
     quads_.push_back(quad.quad);
@@ -407,7 +421,8 @@ void EffectClassesInPlay::Compose(const ro::render::EffectClassOutput& output) {
   // LES SPRITES, composés comme ceux d'un nœud : échelle, action, image, et le
   // roulis dans le plan de l'écran.
   std::vector<SpriteBatch> buckets;
-  for (const ro::render::EffectClassSpriteDraw& sprite : output.sprites) {
+  for (std::size_t rank = 0; rank < output.sprites.size(); ++rank) {
+    const ro::render::EffectClassSpriteDraw& sprite = output.sprites[rank];
     const ro::render::LoadedActorSprite* loaded = SpriteFor(std::string(sprite.sprite));
     if (loaded == nullptr) {
       continue;
@@ -434,6 +449,7 @@ void EffectClassesInPlay::Compose(const ro::render::EffectClassOutput& output) {
     drawn.tint = sprite.tint;
     drawn.depth_bias = sprite.depth_bias;
     drawn.screen_offset_pixels = glm::vec2(0.0F, sprite.screen_lift_pixels);
+    drawn.dye = dyes_.sprites[rank];
     SpriteBatch bucket;
     bucket.additive = sprite.additive;
     if (sprite.render_word.has_value()) {
@@ -475,16 +491,19 @@ void EffectClassesInPlay::Compose(const ro::render::EffectClassOutput& output) {
   }
   // LES QUADS D'ÉCRAN, UN LOT PAR TEXTURE, dans l'ordre d'arrivée. C'est ici,
   // l'image en main, que chaque coin reçoit le demi-texel du client.
-  for (const ro::render::EffectClassScreenDraw& screen : output.screen_quads) {
+  for (std::size_t rank = 0; rank < output.screen_quads.size(); ++rank) {
+    const ro::render::EffectClassScreenDraw& screen = output.screen_quads[rank];
     const std::string texture_path(screen.texture);
     const ro::formats::Image& image = TextureFor(texture_path);
     if (image.pixels.empty()) {
       continue;
     }
     const auto key = textures_.find(texture_path);
-    if (screen_quads_.empty() || screen_quads_.back().texture_path != &key->first) {
+    if (screen_quads_.empty() || screen_quads_.back().texture_path != &key->first ||
+        screen_quads_.back().dye != dyes_.screen_quads[rank]) {
       screen_quad_lots_.emplace_back();
-      screen_quads_.push_back(ro::render::DrawnScreenQuads{{}, &key->first, &key->second});
+      screen_quads_.push_back(
+          ro::render::DrawnScreenQuads{{}, &key->first, &key->second, dyes_.screen_quads[rank]});
     }
     ro::render::EffectScreenQuad quad = screen.quad;
     for (glm::vec2& uv : quad.texture_uv) {

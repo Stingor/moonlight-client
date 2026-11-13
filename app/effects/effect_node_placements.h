@@ -9,6 +9,7 @@
 
 #include <glm/glm.hpp>
 
+#include "ro/render/effect_dye.h"
 #include "ro/render/effect_screen_node.h"
 
 // CE QUE LA TROUPE DE NŒUDS (`EffectNodesInPlay`) TIENT POUR UNE IMAGE ET POUR
@@ -32,6 +33,8 @@ struct EffectComposedPlacement {
   // Le mot de rendu du nœud posé. Voir `SpriteBatches`.
   std::optional<std::uint32_t> render_word;
   float grow_screen_pixels = 0.0F;  // voir `DrawnActor::grow_screen_pixels`
+  // La teinture de l'effet de chapeau qui a semé le nœud : voir `DrawnActor::dye`.
+  std::optional<ro::render::EffectDye> dye;
 };
 
 // UN NŒUD D'ECRAN EN VIE : son etat, son image, et OU SON PORTEUR SE TIENT

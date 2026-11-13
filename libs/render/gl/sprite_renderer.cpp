@@ -8,6 +8,7 @@
 
 #include <glad/glad.h>
 
+#include "ro/render/dye_shader.h"
 #include "ro/render/fog_shader.h"
 #include "ro/render/point_light_shader.h"
 #include "ro/render/sun_shadow_map.h"
@@ -119,7 +120,8 @@ uniform vec3 u_daylight;
 out vec4 frag_color;
 
 void main() {
-    vec4 texel = texture(u_texture, v_texture_uv) * v_tint;
+    // La teinture d'un sprite né d'un effet de chapeau : voir `dye_shader.h`.
+    vec4 texel = Dyed(texture(u_texture, v_texture_uv) * v_tint);
     // Les sprites palettisés n'ont qu'un alpha binaire : rejeter les texels
     // vides évite qu'ils n'écrivent quoi que ce soit, et le mélange traite les
     // bords adoucis des images BGRA.
@@ -219,6 +221,10 @@ struct SpriteRenderer::PreparedQuad {
   std::array<glm::vec3, 4> panel_corners{};
   // Un si le calque reçoit les lumières ponctuelles ; zéro pour l'ombre ronde.
   float point_lit = 0.0F;
+  // La teinture de l'effet de chapeau qui a fait naître ce sprite, ou nul, et
+  // « assombri » : un calque additif peint en alpha. Voir `DrawnActor::dye`.
+  const EffectDye* dye = nullptr;
+  bool darkened = false;
 };
 
 SpriteRenderer::SpriteRenderer() = default;
@@ -273,7 +279,8 @@ core::Result<SpriteRenderer> SpriteRenderer::Create() {
       WithPointLights(
           WithFog(WithSunShadow(kVertexShader, kSunShadowSpriteVertexGlsl), kFogVertexGlsl),
           kPointLightGlsl),
-      WithFog(WithSunShadow(kFragmentShader, kSunShadowSpriteFragmentGlsl), kFogFragmentGlsl));
+      WithDye(
+          WithFog(WithSunShadow(kFragmentShader, kSunShadowSpriteFragmentGlsl), kFogFragmentGlsl)));
   if (!program) {
     return std::unexpected(program.error());
   }
@@ -442,15 +449,22 @@ void SpriteRenderer::Draw(const Camera& camera, std::span<const DrawnActor> acto
   // La DESTINATION du mélange change d'un lot à l'autre, la source non : un
   // quad additif ajoute ce que son alpha laisse passer au lieu d'en effacer
   // autant. Voir `Blending`.
+  //
+  // LA TEINTURE D'UN EFFET DE CHAPEAU est un état du lot, comme la texture ; un
+  // calque additif « assombri » se peint en alpha.
   const auto paint = [this, additive_from]() {
+    SetDyeUniforms(program_, nullptr, false);
     for (std::size_t first = 0; first < prepared_.size();) {
       const std::size_t lot_end = first < additive_from ? additive_from : prepared_.size();
+      const PreparedQuad& lot = prepared_[first];
       std::size_t end = first + 1;
-      while (end < lot_end && prepared_[end].texture == prepared_[first].texture) {
+      while (end < lot_end && prepared_[end].texture == lot.texture &&
+             prepared_[end].dye == lot.dye && prepared_[end].darkened == lot.darkened) {
         ++end;
       }
       ++batch_tally_.draw_calls;
-      glBlendFunc(GL_SRC_ALPHA, prepared_[first].additive ? GL_ONE : GL_ONE_MINUS_SRC_ALPHA);
+      SetDyeUniforms(program_, lot.dye, lot.darkened);
+      glBlendFunc(GL_SRC_ALPHA, lot.additive && !lot.darkened ? GL_ONE : GL_ONE_MINUS_SRC_ALPHA);
       prepared_[first].texture->Bind(0);
       glDrawArrays(GL_TRIANGLES, static_cast<GLint>(first * kVerticesPerQuad),
                    static_cast<GLsizei>((end - first) * kVerticesPerQuad));
@@ -626,6 +640,10 @@ void SpriteRenderer::PrepareQuads(const Camera& camera, const BillboardBasis& ba
                        on_ground,
                        panel_corners,
                        point_lit});
+      if (layered && !silhouettes && drawn.dye.has_value()) {
+        prepared_.back().dye = &*drawn.dye;
+        prepared_.back().darkened = drawn.dye->darken && prepared_.back().additive;
+      }
     }
   };
   for (const DrawnActor* drawn : ordered_) {
@@ -732,6 +750,7 @@ void SpriteRenderer::DrawDepth(const glm::mat4& light_view_projection, const glm
   SetPointLightUniforms(program_, PointLightSet());
   // LA SILHOUETTE COUPE OÙ COUPE CELLE DES CORPS : voir `kSpriteDepthAlphaFloor`.
   program_.SetFloat("u_alpha_floor", kSpriteDepthAlphaFloor);
+  SetDyeUniforms(program_, nullptr, false);
   for (std::size_t first = 0; first < prepared_.size();) {
     std::size_t end = first + 1;
     while (end < prepared_.size() && prepared_[end].texture == prepared_[first].texture) {

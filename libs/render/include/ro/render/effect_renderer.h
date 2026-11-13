@@ -108,6 +108,9 @@ struct DrawnWorldQuads {
   // mélange et de l'épreuve de profondeur. Vide, le lot garde le mélange de
   // chaque quad et passe l'épreuve. Voir `effect_render_word.h`.
   std::optional<std::uint32_t> render_word;
+  // LA TEINTURE DU NŒUD OU DE L'INSTANCE QUI A COMPOSÉ CE LOT, ou rien : voir
+  // `DrawnEffect::dye`.
+  std::optional<EffectDye> dye;
 };
 
 // UN LOT DE QUADS D'ÉCRAN, et l'image qu'ils partagent.
@@ -122,6 +125,8 @@ struct DrawnScreenQuads {
   std::span<const EffectScreenQuad> quads;
   const std::string* texture_path = nullptr;
   const formats::Image* texture = nullptr;
+  // Voir `DrawnEffect::dye`.
+  std::optional<EffectDye> dye;
 };
 
 // Dessine les effets animés : en panneaux face à la caméra pour ceux qui
@@ -210,6 +215,8 @@ class EffectRenderer {
   [[nodiscard]] const GlTexture* TextureFor(const std::string& path, const formats::Image& image);
   // Téléverse `vertices_` et peint `prepared_`, un lot de mélange à la fois.
   void PaintQuads(const glm::mat4& view_projection, DepthTest depth_test, const SceneFog& fog);
+  // Pose sur un quad la teinture de son effet, et le mélange qu'elle impose.
+  static void Dye(PreparedQuad& prepared, const EffectDye& dye);
 
   struct CachedTexture {
     GlTexture texture;

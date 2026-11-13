@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <map>
+#include <optional>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
@@ -76,6 +77,10 @@ struct EffectDrawGate {
   // identifiant, ou qui partage la texture, reste d'origine.
   [[nodiscard]] const ro::render::EffectDye* HatDyeOf(std::uint32_t effect_id,
                                                       std::uint32_t bearer_id, bool from_hat) const;
+  // La même, copiée : ce qu'un lot ou une pose garde au-delà de l'image.
+  [[nodiscard]] std::optional<ro::render::EffectDye> HatDyeFor(std::uint32_t effect_id,
+                                                               std::uint32_t bearer_id,
+                                                               bool from_hat) const;
 };
 
 }  // namespace moonclient

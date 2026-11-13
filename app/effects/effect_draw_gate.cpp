@@ -40,4 +40,11 @@ const ro::render::EffectDye* EffectDrawGate::HatDyeOf(std::uint32_t effect_id,
   return found == hat_dyes.end() ? nullptr : &found->second;
 }
 
+std::optional<ro::render::EffectDye> EffectDrawGate::HatDyeFor(std::uint32_t effect_id,
+                                                               std::uint32_t bearer_id,
+                                                               bool from_hat) const {
+  const ro::render::EffectDye* dye = HatDyeOf(effect_id, bearer_id, from_hat);
+  return dye != nullptr ? std::optional(*dye) : std::nullopt;
+}
+
 }  // namespace moonclient

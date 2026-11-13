@@ -13,6 +13,7 @@
 #include "ro/core/error.h"
 #include "ro/render/actor_sprite.h"
 #include "ro/render/camera.h"
+#include "ro/render/effect_dye.h"
 #include "ro/render/gl_program.h"
 #include "ro/render/gl_texture.h"
 #include "ro/render/point_lights.h"
@@ -141,6 +142,10 @@ struct DrawnActor {
   // de `ground_position`. Un corps soulevé — un saut, un objet qui tombe encore —
   // monte seul : son ombre reste au sol, sous lui.
   std::optional<float> shadow_ground_height;
+  // LA TEINTURE DE L'EFFET DE CHAPEAU qui a fait naître ce sprite — un nœud,
+  // une classe —, ou rien. Elle touche ses calques, jamais son ombre ; un
+  // calque additif « assombri » se peint en alpha. Voir `EffectDye`.
+  std::optional<EffectDye> dye;
 };
 
 // Dessine les acteurs, en panneaux face à la caméra.

@@ -641,6 +641,7 @@ add_library(ro_render_gl STATIC
     gl/status_head_icon.cpp
     gl/actor_vignette.cpp
     gl/emotion_icons.cpp
+    gl/dye_shader.cpp
     gl/fog_shader.cpp
     gl/game_images.cpp
     gl/item_icons.cpp

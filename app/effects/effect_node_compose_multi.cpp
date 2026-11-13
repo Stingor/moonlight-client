@@ -105,6 +105,8 @@ bool EffectNodesInPlay::ComposeNodeInSeveralLots(const ro::render::PooledEffectN
       ring_quads_.push_back(std::move(quads));
       world_quads_.push_back(ro::render::DrawnWorldQuads{
           {}, &texture->first, &texture->second, pooled.ground_position});
+      world_quads_.back().dye =
+          draw_gate_.HatDyeFor(pooled.sown_by_effect_id, pooled.anchor_id, pooled.from_hat);
     }
     return true;
   }
@@ -142,6 +144,8 @@ bool EffectNodesInPlay::ComposeNodeInSeveralLots(const ro::render::PooledEffectN
       ring_quads_.push_back(std::move(quads));
       world_quads_.push_back(ro::render::DrawnWorldQuads{
           {}, &texture->first, &texture->second, pooled.ground_position});
+      world_quads_.back().dye =
+          draw_gate_.HatDyeFor(pooled.sown_by_effect_id, pooled.anchor_id, pooled.from_hat);
     }
     return true;
   }
@@ -174,6 +178,8 @@ bool EffectNodesInPlay::ComposeNodeInSeveralLots(const ro::render::PooledEffectN
       ring_quads_.push_back(std::move(per_image[image]));
       world_quads_.push_back(ro::render::DrawnWorldQuads{
           {}, &texture->first, &texture->second, pooled.ground_position});
+      world_quads_.back().dye =
+          draw_gate_.HatDyeFor(pooled.sown_by_effect_id, pooled.anchor_id, pooled.from_hat);
     }
     return true;
   }
@@ -221,6 +227,8 @@ bool EffectNodesInPlay::ComposeNodeInSeveralLots(const ro::render::PooledEffectN
       ring_quads_.push_back(std::move(per_image[image]));
       world_quads_.push_back(ro::render::DrawnWorldQuads{
           {}, &texture->first, &texture->second, pooled.ground_position});
+      world_quads_.back().dye =
+          draw_gate_.HatDyeFor(pooled.sown_by_effect_id, pooled.anchor_id, pooled.from_hat);
     }
     return true;
   }
@@ -249,6 +257,8 @@ bool EffectNodesInPlay::ComposeNodeInSeveralLots(const ro::render::PooledEffectN
       ring_quads_.push_back(std::move(per_image[image]));
       world_quads_.push_back(ro::render::DrawnWorldQuads{
           {}, &texture->first, &texture->second, pooled.ground_position});
+      world_quads_.back().dye =
+          draw_gate_.HatDyeFor(pooled.sown_by_effect_id, pooled.anchor_id, pooled.from_hat);
     }
     return true;
   }
@@ -276,6 +286,8 @@ bool EffectNodesInPlay::ComposeNodeInSeveralLots(const ro::render::PooledEffectN
       // Le mot de rendu du nœud (5) : le mélange propre de chaque quad.
       world_quads_.push_back(ro::render::DrawnWorldQuads{
           {}, &texture->first, &texture->second, pooled.ground_position, pooled.node.render_word});
+      world_quads_.back().dye =
+          draw_gate_.HatDyeFor(pooled.sown_by_effect_id, pooled.anchor_id, pooled.from_hat);
     }
     return true;
   }
@@ -306,6 +318,8 @@ bool EffectNodesInPlay::ComposeNodeInSeveralLots(const ro::render::PooledEffectN
       ring_quads_.push_back(std::move(per_image[image]));
       world_quads_.push_back(ro::render::DrawnWorldQuads{
           {}, &texture->first, &texture->second, pooled.ground_position, pooled.node.render_word});
+      world_quads_.back().dye =
+          draw_gate_.HatDyeFor(pooled.sown_by_effect_id, pooled.anchor_id, pooled.from_hat);
     }
     return true;
   }
@@ -335,6 +349,8 @@ bool EffectNodesInPlay::ComposeNodeInSeveralLots(const ro::render::PooledEffectN
       ring_quads_.push_back(std::move(per_image[image]));
       world_quads_.push_back(ro::render::DrawnWorldQuads{
           {}, &texture->first, &texture->second, pooled.ground_position});
+      world_quads_.back().dye =
+          draw_gate_.HatDyeFor(pooled.sown_by_effect_id, pooled.anchor_id, pooled.from_hat);
     }
     return true;
   }
@@ -403,6 +419,8 @@ bool EffectNodesInPlay::ComposeNodeInSeveralLots(const ro::render::PooledEffectN
     ring_quads_.push_back(std::move(per_image[image]));
     world_quads_.push_back(ro::render::DrawnWorldQuads{
         {}, &texture->first, &texture->second, pooled.ground_position, pooled.node.render_word});
+    world_quads_.back().dye =
+        draw_gate_.HatDyeFor(pooled.sown_by_effect_id, pooled.anchor_id, pooled.from_hat);
   }
   return true;
 }

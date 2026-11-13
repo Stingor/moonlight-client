@@ -10,6 +10,7 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "ro/render/dye_shader.h"
 #include "ro/render/effect_laid.h"
 #include "ro/render/effect_panel_depth.h"
 #include "ro/render/effect_quad_depth.h"
@@ -133,77 +134,17 @@ in vec4 v_tint;
 in float v_fog_kept;
 
 uniform sampler2D u_texture;
-// La teinture du lot : voir `ro::render::EffectDye` et `DyeEffectTexel`, dont
-// ce calcul est la copie. `u_dyed` nul pour tout lot sans teinture, qui garde
-// ses texels au bit près.
-uniform int u_dyed;
-// Le tour de teinte en degrés, puis les facteurs de saturation et de clarté.
-uniform vec3 u_dye;
-uniform int u_dye_darken;
 
 out vec4 frag_color;
 
 // Le seuil du client : un sur deux cent cinquante-cinq.
 const float kAlphaReference = 1.0 / 255.0;
 
-vec3 RgbToHsl(vec3 color) {
-    float high = max(color.r, max(color.g, color.b));
-    float low = min(color.r, min(color.g, color.b));
-    float lightness = (high + low) * 0.5;
-    float spread = high - low;
-    if (spread <= 0.0) {
-        return vec3(0.0, 0.0, lightness);
-    }
-    float saturation = lightness > 0.5 ? spread / (2.0 - high - low) : spread / (high + low);
-    float sextant = high == color.r ? mod((color.g - color.b) / spread + 6.0, 6.0)
-                  : high == color.g ? (color.b - color.r) / spread + 2.0
-                                    : (color.r - color.g) / spread + 4.0;
-    return vec3(sextant * 60.0, saturation, lightness);
-}
-
-float HueChannel(float low, float high, float hue) {
-    float sextant = mod(hue, 360.0) / 60.0;
-    if (sextant < 1.0) {
-        return low + (high - low) * sextant;
-    }
-    if (sextant < 3.0) {
-        return high;
-    }
-    if (sextant < 4.0) {
-        return low + (high - low) * (4.0 - sextant);
-    }
-    return low;
-}
-
-vec3 HslToRgb(vec3 hsl) {
-    if (hsl.y <= 0.0) {
-        return vec3(hsl.z);
-    }
-    float high = hsl.z <= 0.5 ? hsl.z * (1.0 + hsl.y) : hsl.z + hsl.y - hsl.z * hsl.y;
-    float low = 2.0 * hsl.z - high;
-    return vec3(HueChannel(low, high, hsl.x + 120.0), HueChannel(low, high, hsl.x),
-                HueChannel(low, high, hsl.x - 120.0));
-}
-
-vec4 Dyed(vec4 color) {
-    if (u_dye_darken != 0) {
-        float high = max(color.r, max(color.g, color.b));
-        if (high <= 0.0) {
-            return vec4(0.0);
-        }
-        color = vec4(color.rgb / high, color.a * high);
-    }
-    vec3 hsl = RgbToHsl(color.rgb);
-    hsl = vec3(hsl.x + u_dye.x, clamp(hsl.y * u_dye.y, 0.0, 1.0), clamp(hsl.z * u_dye.z, 0.0, 1.0));
-    return vec4(HslToRgb(hsl), color.a);
-}
-
 void main() {
     vec2 uv = v_affine > 0.5 ? v_texture_uv_affine : v_texture_uv;
     vec4 color = texture(u_texture, uv) * v_tint;
-    if (u_dyed != 0) {
-        color = Dyed(color);
-    }
+    // La teinture d'un effet de chapeau : voir `dye_shader.h`.
+    color = Dyed(color);
     if (color.a < kAlphaReference) {
         discard;
     }
@@ -249,21 +190,17 @@ struct EffectRenderer::PreparedQuad {
   bool darkened = false;
 };
 
-namespace {
-
-// Pose la teinture d'un lot dans le nuanceur ; un lot sans teinture n'y passe
-// pas du tout.
-void SetDyeUniforms(const GlProgram& program, const EffectDye* dye, bool darkened) {
-  program.SetInt("u_dyed", dye != nullptr ? 1 : 0);
-  if (dye == nullptr) {
-    return;
+// POSE LA TEINTURE D'UN EFFET DE CHAPEAU sur un quad, commune aux trois
+// entrées. ASSOMBRIR PEINT EN ALPHA ce qui s'ajoutait au fond : voir
+// `EffectDye::darken`. Les autres quads gardent leur mélange.
+void EffectRenderer::Dye(PreparedQuad& prepared, const EffectDye& dye) {
+  prepared.dye = &dye;
+  if (dye.darken && prepared.blend_destination == GL_ONE && prepared.blend_source != GL_ZERO) {
+    prepared.blend_source = BlendFactorOf(kDarkenedBlendSource, GL_SRC_ALPHA);
+    prepared.blend_destination = BlendFactorOf(kDarkenedBlendDestination, GL_ONE);
+    prepared.darkened = true;
   }
-  program.SetVector3("u_dye",
-                     glm::vec3{dye->hue_degrees, dye->saturation_scale, dye->lightness_scale});
-  program.SetInt("u_dye_darken", darkened ? 1 : 0);
 }
-
-}  // namespace
 
 // Commun aux trois entrées, et il faut qu'il le soit : ce qui suit — la
 // profondeur qu'on n'éprouve pas, le mélange par quad, la remise en état — est
@@ -398,7 +335,7 @@ void EffectRenderer::Release() noexcept {
 
 core::Result<EffectRenderer> EffectRenderer::Create() {
   auto program = GlProgram::Link(WithFog(kVertexShader, kFogVertexGlsl),
-                                 WithFog(kFragmentShader, kFogFragmentGlsl));
+                                 WithDye(WithFog(kFragmentShader, kFogFragmentGlsl)));
   if (!program) {
     return std::unexpected(program.error());
   }
@@ -511,15 +448,7 @@ void EffectRenderer::Draw(const Camera& camera, std::span<const DrawnEffect> eff
       PreparedQuad prepared{texture, BlendFactorOf(quad.blend_source, GL_SRC_ALPHA),
                             BlendFactorOf(quad.blend_destination, GL_ONE)};
       if (drawn->dye.has_value()) {
-        prepared.dye = &*drawn->dye;
-        // ASSOMBRIR PEINT EN ALPHA ce qui s'ajoutait au fond : voir
-        // `EffectDye::darken`. Les autres quads gardent leur mélange.
-        if (drawn->dye->darken && prepared.blend_destination == GL_ONE &&
-            prepared.blend_source != GL_ZERO) {
-          prepared.blend_source = BlendFactorOf(kDarkenedBlendSource, GL_SRC_ALPHA);
-          prepared.blend_destination = BlendFactorOf(kDarkenedBlendDestination, GL_ONE);
-          prepared.darkened = true;
-        }
+        Dye(prepared, *drawn->dye);
       }
       prepared_.push_back(prepared);
 
@@ -637,9 +566,13 @@ void EffectRenderer::DrawWorldQuads(const Camera& camera, std::span<const DrawnW
       // ⚠ LE SEAU PEUT IMPOSER SON MÉLANGE, et celui du quad ne compte plus.
       const EffectRenderBlend blend_mode =
           EffectWorldQuadBlend(quad.blend_source, quad.blend_destination, lot->render_word);
-      prepared_.push_back(PreparedQuad{lot_textures_[entry.lot],
-                                       BlendFactorOf(blend_mode.source, GL_SRC_ALPHA),
-                                       BlendFactorOf(blend_mode.destination, GL_ONE)});
+      PreparedQuad prepared{lot_textures_[entry.lot],
+                            BlendFactorOf(blend_mode.source, GL_SRC_ALPHA),
+                            BlendFactorOf(blend_mode.destination, GL_ONE)};
+      if (lot->dye.has_value()) {
+        Dye(prepared, *lot->dye);
+      }
+      prepared_.push_back(prepared);
       // LA PROFONDEUR EST CELLE DU POINT, sans détour : un quad du monde n'est
       // pas un panneau, il n'y a donc pas de panneau debout dont il faudrait
       // emprunter la profondeur. Le shader s'en aperçoit tout seul — les deux
@@ -682,7 +615,11 @@ void EffectRenderer::DrawScreenQuads(std::span<const DrawnScreenQuads> lots, flo
       // quads prennent donc le melange ordinaire, et le nombre attend sa
       // mesure. Lui inventer une paire de facteurs peindrait faux avec
       // l'assurance du juste.
-      prepared_.push_back(PreparedQuad{texture, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA});
+      PreparedQuad prepared{texture, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA};
+      if (lot.dye.has_value()) {
+        Dye(prepared, *lot.dye);
+      }
+      prepared_.push_back(prepared);
       for (const std::size_t corner : kQuadVertexOrder) {
         // LA PROFONDEUR EST NULLE, et les deux positions sont egales : le
         // shader garde alors celle qu'il a transformee, comme pour un quad du

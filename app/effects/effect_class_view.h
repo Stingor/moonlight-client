@@ -196,6 +196,15 @@ class EffectClassesInPlay {
   std::vector<ro::render::EffectWorldQuad> quads_;
   std::vector<ro::render::DrawnWorldQuads> quad_lots_;
   std::vector<ro::render::ComposedActor> composed_;
+  // LA TEINTURE DE CHAQUE DESSIN DE L'IMAGE, rang pour rang avec la sortie
+  // commune : celle de l'instance qui l'a ajouté. Voir `EffectDrawGate::HatDyeOf`.
+  struct DrawnDyes {
+    std::vector<std::optional<ro::render::EffectDye>> strs;
+    std::vector<std::optional<ro::render::EffectDye>> quads;
+    std::vector<std::optional<ro::render::EffectDye>> sprites;
+    std::vector<std::optional<ro::render::EffectDye>> screen_quads;
+  };
+  DrawnDyes dyes_;
   std::vector<ro::render::DrawnActor> actors_;
   std::vector<SpriteBatch> sprite_batches_;
   std::vector<std::vector<ro::render::EffectScreenQuad>> screen_quad_lots_;
