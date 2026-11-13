@@ -7,6 +7,7 @@
 
 #include <cstdint>
 #include <optional>
+#include <span>
 #include <string>
 #include <utility>
 
@@ -175,7 +176,35 @@ void Game::StageStyle(std::uint32_t now_ms) {
     // un effet, que le serveur annonce.
     style_view_->SetHatEffectSources(vfs_, &pieces_.cash_shop.hat_effects());
     style_view_->Refresh(world_, windows_.style, link_.is_open(), now_ms);
+    // LES EFFETS DE CHAPEAU DU PANTIN, par son propre moteur, teints de ce qu'on
+    // règle : il ne naît que si le joueur en affiche un.
+    const auto& doll = style_view_->hat_effect_doll();
+    if (doll.has_value() && !pieces_.style_effects.has_value()) {
+      pieces_.style_effects.emplace(*vfs_);
+    }
+    windows_.style.doll.overlay = {};
+    windows_.style.doll.body_overlaid = false;
+    if (pieces_.style_effects.has_value() && stage_.has_value()) {
+      const std::span<const ro::sim::HatEffectId> worn =
+          doll.has_value() ? std::span<const ro::sim::HatEffectId>(doll->worn)
+                           : std::span<const ro::sim::HatEffectId>{};
+      DollEffects::DollPose pose;
+      if (doll.has_value()) {
+        pose.framing = doll->seat.framing;
+        pose.canvas = DollCanvas{.box_px = doll->box_px};
+        pose.body = DollBodySource{.composed = doll->seat.composed,
+                                   .animation_duration_ms = doll->seat.animation_duration_ms,
+                                   .head_shift = doll->seat.head_shift};
+        pose.sprite_direction = doll->seat.sprite_direction;
+      }
+      const DollEffects::Shown shown = pieces_.style_effects->Advance(
+          worn, pose, world_, *stage_, now_ms, &style_view_->HatEffectDollDyes());
+      windows_.style.doll.overlay = shown.overlay;
+      windows_.style.doll.body_overlaid = shown.body_overlaid;
+    }
   } else {
+    pieces_.style_effects.reset();
+    windows_.style.doll.overlay = {};
     // ⚠ RENDU ENTRE DEUX IMAGES, et une fois, au passage d'ouverte à fermée :
     // oublier un style détruit les tenues qui le portaient, et une
     // composition en cours les lirait mortes.

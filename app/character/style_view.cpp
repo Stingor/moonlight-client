@@ -266,6 +266,7 @@ void StyleView::RefreshDoll(const ro::render::ActorLook& look,
       .focus = state.skin_focus ? ro::render::StyleLayer::kSkin
                : tab != nullptr ? tab->at.layer
                                 : ro::render::StyleLayer::kBody};
+  hat_effect_doll_.reset();
   const ro::render::IconTexture* drawn = doll_->Draw(shot);
   if (drawn == nullptr) {
     return;
@@ -273,6 +274,19 @@ void StyleView::RefreshDoll(const ro::render::ActorLook& look,
   state.doll.image = ro::ui::SkinImage{.id = static_cast<ImTextureID>(drawn->texture.name()),
                                        .width = state.doll.box_width,
                                        .height = state.doll.box_height};
+  // LES EFFETS DE CHAPEAU QUE LE JOUEUR AFFICHE se posent sur le pantin quand il
+  // montre le joueur : un compagnon n'en porte pas.
+  if (tab != nullptr && tab->companion_look.has_value()) {
+    return;
+  }
+  const std::optional<StyleDoll::EffectSeat> seat = doll_->EffectSeatOf();
+  if (!seat.has_value() || worn_hat_effects_.empty()) {
+    return;
+  }
+  hat_effect_doll_ =
+      HatEffectDoll{.worn = worn_hat_effects_,
+                    .seat = *seat,
+                    .box_px = glm::vec2(state.doll.box_width, state.doll.box_height)};
 }
 
 void StyleView::RefreshThumbnails(const ro::render::ActorLook& look,
@@ -452,6 +466,8 @@ void StyleView::Refresh(const ro::sim::World& world, ro::ui::PaletteEditorState&
   view_tab_ = asked_tab != nullptr && asked_tab->shown.blocked == ro::ui::PaletteTabBlock::kNone
                   ? state.tab
                   : ro::ui::PaletteTabKind::kBody;
+  // Ce que le joueur affiche, rangé et sans doublon : le pantin le porte.
+  worn_hat_effects_.assign(player->hat_effects.begin(), player->hat_effects.end());
   // L'ONGLET DES EFFETS DE CHAPEAU, en queue, quand le joueur en affiche : il
   // n'est pas un calque de palette et ne passe pas par les pièces.
   hat_effects_.Refresh(world, state.effects, connected, server_layer_last_ >= kHatEffectWireLayer,

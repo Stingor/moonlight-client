@@ -1,13 +1,17 @@
 #include "world/status_portrait_view.h"
 
 #include <cstddef>
+#include <cstdint>
+#include <map>
 
 #include <glm/glm.hpp>
 
+#include "ro/render/effect_dye.h"
 #include "ro/render/sprite_catalog.h"
 #include "ro/sim/player_status.h"
 #include "ro/sim/world.h"
 
+#include "effects/hat_effect_dyes.h"
 #include "items/doll_effects.h"
 #include "world/actor_view.h"
 #include "world/map_stage.h"
@@ -86,13 +90,20 @@ void PortraitHudView::ShowHatEffects(DollEffects& effects, const ro::sim::World&
   if (!view_.portrait.usable()) {
     hat_effects_.clear();
   }
+  // LES TEINTURES QUE LE JOUEUR PORTE, telles que le livre des styles les tient.
+  std::map<std::uint16_t, ro::render::EffectDye> dyes;
+  for (const WornHatEffectDye& line : WornHatEffectDyes(world)) {
+    if (line.bearer_id == world.player_id() && line.dye.has_value()) {
+      dyes.emplace(line.hat_effect_id, *line.dye);
+    }
+  }
   const DollEffects::Shown shown =
       effects.Advance(hat_effects_,
                       DollEffects::DollPose{.framing = framing_,
                                             .canvas = canvas_,
                                             .body = body_,
                                             .sprite_direction = sprite_direction_},
-                      world, stage, now_ms);
+                      world, stage, now_ms, &dyes);
   view_.overlay = shown.overlay;
   view_.body_overlaid = shown.body_overlaid;
 }

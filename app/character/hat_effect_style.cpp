@@ -115,6 +115,7 @@ void HatEffectStyle::Refresh(const ro::sim::World& world, ro::ui::PaletteEffects
   rows_.clear();
   posing_items_.clear();
   previews_.clear();
+  doll_dyes_.clear();
   for (const auto& [number, setting] : sent_drafts_) {
     state.drafts[number] = setting;
   }
@@ -171,6 +172,9 @@ void HatEffectStyle::Refresh(const ro::sim::World& world, ro::ui::PaletteEffects
       }
       // L'APERÇU, sur le personnage : seulement ce qui diffère de ce qu'il porte.
       const ro::ui::PaletteEffectSetting shown = ro::ui::EffectDraftOf(state, row);
+      if (!shown.neutral() && row.blocked == ro::ui::PaletteEffectBlock::kNone) {
+        doll_dyes_.emplace(number, HatEffectDyeOf(shown));
+      }
       if (shown != row.worn && row.blocked == ro::ui::PaletteEffectBlock::kNone) {
         previews_.push_back(WornHatEffectDye{
             .bearer_id = player->id,

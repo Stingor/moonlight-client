@@ -65,6 +65,11 @@ class HatEffectStyle {
   void Apply(const ro::ui::PaletteEffectsAction& asked, ro::net::Connection& link,
              std::uint32_t now_ms);
 
+  // LA TEINTURE QUE LE PANTIN MONTRE, par numéro : ce qu'on règle, sinon ce
+  // qu'on porte.
+  [[nodiscard]] const std::map<std::uint16_t, ro::render::EffectDye>& doll_dyes() const noexcept {
+    return doll_dyes_;
+  }
   // Les réglages en cours, posés sur le joueur ; rien fenêtre fermée.
   [[nodiscard]] std::span<const WornHatEffectDye> previews() const noexcept { return previews_; }
   void Close() { previews_.clear(); }
@@ -81,6 +86,7 @@ class HatEffectStyle {
   std::vector<ro::ui::PaletteEffectRow> rows_;
   std::vector<std::uint32_t> posing_items_;
   std::vector<WornHatEffectDye> previews_;
+  std::map<std::uint16_t, ro::render::EffectDye> doll_dyes_;
   // Les réglages que la vue montrait, et ceux qu'un envoi impose à la fenêtre.
   std::map<std::uint16_t, ro::ui::PaletteEffectSetting> drafts_;
   std::map<std::uint16_t, ro::ui::PaletteEffectSetting> sent_drafts_;

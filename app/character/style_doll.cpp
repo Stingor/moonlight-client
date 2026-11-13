@@ -9,6 +9,8 @@
 #include "ro/render/sprite_frame.h"
 #include "ro/render/style_set.h"
 
+#include "world/actor_view.h"
+
 namespace moonclient {
 namespace {
 
@@ -228,6 +230,27 @@ std::optional<std::size_t> StyleDoll::RampUnder(glm::vec2 in_box, glm::vec2 show
   // ⚠ UN INDEX HORS DE TOUTE RAMPE EST UNE VRAIE RÉPONSE : c'est la part du
   // corps qu'aucun réglage n'atteint, celle qu'annonce « Réglable : N % ».
   return ro::render::RampAt(body_.ramps, pick->index);
+}
+
+std::optional<StyleDoll::EffectSeat> StyleDoll::EffectSeatOf() {
+  if (shown_ == nullptr || !shown_->vignette.has_value()) {
+    return std::nullopt;
+  }
+  const ro::render::ActorVignette& vignette = *shown_->vignette;
+  const ro::render::ComposedActor* composed = vignette.composed();
+  if (!vignette.framing().usable() || composed == nullptr) {
+    return std::nullopt;
+  }
+  // ⚠ LA MÊME APPARENCE QUE CELLE DESSINÉE, style compris : la tête se mesure
+  // sur la composition affichée.
+  const ro::render::ActorOutfit* outfit = wardrobe_->OutfitFor(shown_look_);
+  return EffectSeat{.framing = vignette.framing(),
+                    .composed = composed,
+                    .animation_duration_ms = vignette.animation_duration_ms(),
+                    .head_shift = outfit != nullptr
+                                      ? HeadShiftOf(*wardrobe_, *outfit, shown_look_, *composed)
+                                      : std::nullopt,
+                    .sprite_direction = shown_direction_};
 }
 
 void StyleDoll::Close() {

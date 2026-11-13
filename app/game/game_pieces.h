@@ -494,6 +494,10 @@ struct GamePieces {
   // pas le moteur des aperçus, qui ne l'éteignent pas davantage. Né au premier
   // effet à montrer, rendu quand le portrait quitte l'écran.
   std::optional<DollEffects> portrait_effects;
+  // ET CELUI DU PANTIN DE L'ÉDITEUR DE STYLE, qui montre les effets teints de ce
+  // qu'on y règle. Né à l'ouverture d'un éditeur dont le joueur affiche un
+  // effet, rendu à sa fermeture.
+  std::optional<DollEffects> style_effects;
 
   // LE DÉCOR QUI SE VOILE DEVANT LE JOUEUR : voir `DecorVeilView`.
   DecorVeilView decor_veil;

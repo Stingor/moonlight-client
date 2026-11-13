@@ -89,9 +89,14 @@ class DollEffects {
     // L'image composée du pantin ne se pose pas : le rappel peint le corps.
     bool body_overlaid = false;
   };
+  //
+  // `dyes` : la teinture de chaque effet, par son numéro — ce que le joueur
+  // porte, ou ce qu'il règle dans l'éditeur. Un numéro absent se montre
+  // d'origine.
   [[nodiscard]] Shown Advance(std::span<const ro::sim::HatEffectId> worn, const DollPose& doll,
                               const ro::sim::World& world, const MapStage& stage,
-                              std::uint32_t now_ms);
+                              std::uint32_t now_ms,
+                              const std::map<std::uint16_t, ro::render::EffectDye>* dyes = nullptr);
 
   // L'APERÇU D'UNE PIÈCE : l'effet de CE RANG sur le pantin de `doll`, dans la
   // direction où la molette l'a tourné, et dont le rappel se pose sur lui. Rien

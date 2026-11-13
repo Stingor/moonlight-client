@@ -155,6 +155,21 @@ class StyleView {
   void SetHatEffectSources(ro::vfs::Vfs* vfs, const ro::sim::HatEffectItems* items) {
     hat_effects_.SetSources(vfs, items);
   }
+  // LES EFFETS DE CHAPEAU DU PANTIN : ce qu'il porte, où ils s'appuient, et la
+  // teinture qu'ils montrent. Rien sans dessin ou sans effet.
+  struct HatEffectDoll {
+    std::vector<ro::sim::HatEffectId> worn;
+    StyleDoll::EffectSeat seat;
+    // La boîte du pantin, en pixels d'interface.
+    glm::vec2 box_px{0.0F, 0.0F};
+  };
+  [[nodiscard]] const std::optional<HatEffectDoll>& hat_effect_doll() const noexcept {
+    return hat_effect_doll_;
+  }
+  [[nodiscard]] const std::map<std::uint16_t, ro::render::EffectDye>& HatEffectDollDyes()
+      const noexcept {
+    return hat_effects_.doll_dyes();
+  }
   // Les réglages d'effet en cours, posés sur le joueur ; rien fenêtre fermée.
   [[nodiscard]] std::span<const WornHatEffectDye> HatEffectPreviews() const noexcept {
     return hat_effects_.previews();
@@ -488,8 +503,10 @@ class StyleView {
   // Une teinture d'objet peut-elle se valider, à cette image ? Vrai quand le
   // serveur n'exige pas l'atelier du styliste, ou quand celui-ci est ouvert.
   bool atelier_open_ = false;
-  // L'onglet des effets de chapeau.
+  // L'onglet des effets de chapeau, et ce que le pantin en montre.
   HatEffectStyle hat_effects_;
+  std::optional<HatEffectDoll> hat_effect_doll_;
+  std::vector<ro::sim::HatEffectId> worn_hat_effects_;
   // 🔴 LE PROFIL MIXTE N'EXISTE QUE SI LE SERVEUR L'ANNONCE (règle 24) : sans
   // elle, ni reste ni retouche ne s'offrent, ni ne partent.
   bool mixed_allowed_ = false;

@@ -108,6 +108,18 @@ class StyleDoll {
   // mortes.
   void Close();
 
+  // L'APPUI DES EFFETS DE CHAPEAU sur le dernier dessin : son cadrage, le corps
+  // composé, sa durée d'animation, le déplacement de sa tête et sa direction.
+  // Rien sans dessin.
+  struct EffectSeat {
+    ro::render::VignetteFraming framing;
+    const ro::render::ComposedActor* composed = nullptr;
+    float animation_duration_ms = 0.0F;
+    std::optional<glm::vec2> head_shift;
+    std::size_t sprite_direction = 0;
+  };
+  [[nodiscard]] std::optional<EffectSeat> EffectSeatOf();
+
  private:
   // Les paliers de la pulsation.
   static constexpr std::size_t kPulseSteps = 4;

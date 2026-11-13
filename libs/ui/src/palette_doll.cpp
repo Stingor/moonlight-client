@@ -116,10 +116,19 @@ void DrawPaletteDoll(PaletteDollState& doll, float side, const SkinLook& look, b
                           at.y + (side - doll.image.height) * 0.5F);
     // NET PAR DÉFAUT, comme le sprite qu'on règle ; lissé si le joueur le
     // demande. ⚠ IMPOSÉ DANS LES DEUX CAS : voir `ui_sampler.h`.
-    ImposeImageSampler(into, doll.smooth);
-    into->AddImage(doll.image.id, image_at,
-                   ImVec2(image_at.x + doll.image.width, image_at.y + doll.image.height));
-    RestoreAmbientSampler(into);
+    const ImVec2 image_end(image_at.x + doll.image.width, image_at.y + doll.image.height);
+    DollOverlayCall call{.painter = doll.overlay.painter,
+                         .min = image_at,
+                         .max = image_end,
+                         .pass = DollOverlayPass::kBehind};
+    PaintDollOverlay(doll.overlay, call);
+    if (doll.overlay.paint == nullptr || !doll.body_overlaid) {
+      ImposeImageSampler(into, doll.smooth);
+      into->AddImage(doll.image.id, image_at, image_end);
+      RestoreAmbientSampler(into);
+    }
+    call.pass = DollOverlayPass::kFront;
+    PaintDollOverlay(doll.overlay, call);
   }
 
   if (!hovered) {

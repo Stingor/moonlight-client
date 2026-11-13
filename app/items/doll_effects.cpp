@@ -56,9 +56,10 @@ DollEffects::DollEffects(ro::vfs::Vfs& vfs)
   ground_quads_ = std::move(*ground_quads);
 }
 
-DollEffects::Shown DollEffects::Advance(std::span<const ro::sim::HatEffectId> worn,
-                                        const DollPose& doll, const ro::sim::World& world,
-                                        const MapStage& stage, std::uint32_t now_ms) {
+DollEffects::Shown DollEffects::Advance(
+    std::span<const ro::sim::HatEffectId> worn, const DollPose& doll, const ro::sim::World& world,
+    const MapStage& stage, std::uint32_t now_ms,
+    const std::map<std::uint16_t, ro::render::EffectDye>* dyes) {
   const ro::sim::Actor* player = world.player();
   const bool ready = effect_renderer_.has_value() && sprites_.has_value();
   if (worn.empty() || !doll.framing.usable() || !doll.canvas.usable() || player == nullptr ||
@@ -130,7 +131,19 @@ DollEffects::Shown DollEffects::Advance(std::span<const ro::sim::HatEffectId> wo
                                         },
                                     .head_shifts = &head_shifts_});
   effects_.Classes().SeeScene(camera_, canvas_px.x, canvas_px.y, effects_.MinimalEffects());
+  // LA TEINTURE DE CHAQUE EFFET, sur le porteur : la porte la range sous chaque
+  // naissance que le relevé des chapeaux vient de retenir.
+  for (const ro::sim::HatEffectId number : wearing_.worn) {
+    std::optional<ro::render::EffectDye> dye;
+    if (dyes != nullptr) {
+      if (const auto found = dyes->find(number); found != dyes->end()) {
+        dye = found->second;
+      }
+    }
+    effects_.SetHatEffectDye(kBearerId, number, dye);
+  }
   effects_.NoticeHatEffects(stand_, stage, planner_, now_ms);
+  effects_.NoticeDrawGate(stand_, nullptr);
   played_ = effects_.Drawn(now_ms, stage, stand_, planner_);
   static_cast<void>(nodes_.Drawn(now_ms, camera_));
   effects_.SowRequestedEffects(stand_, stage, planner_, now_ms);

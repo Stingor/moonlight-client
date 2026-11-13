@@ -11,6 +11,7 @@
 #include "ro/core/i18n.h"
 #include "ro/render/palette_ramps.h"
 #include "ro/render/palette_rest.h"
+#include "ro/ui/doll_overlay.h"
 #include "ro/ui/palette_effects.h"
 #include "ro/ui/skin_art.h"
 #include "ro/ui/wheel_gate.h"
@@ -47,6 +48,11 @@ namespace ro::ui {
 // pièces qu'on cherche justement à voir —, la coiffe cadrée sur la tête, la
 // cape vue de dos, la peau sur le visage et les bras ensemble.
 struct PaletteDollState {
+  // LES EFFETS DE CHAPEAU QUE LE PANTIN PORTE, peints par `app` autour de son
+  // image : derrière, puis devant. Un corps que ses effets changent se repeint
+  // par le rappel, et l'image ne se pose pas. Voir `DollOverlay`.
+  DollOverlay overlay;
+  bool body_overlaid = false;
   // La silhouette composée, posée par `app`.
   SkinImage image;
   // La boîte, mesurée ICI et lue par `app` à l'image suivante : elle dépend de

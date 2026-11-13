@@ -79,6 +79,9 @@ void ReloadSkinPieces(ro::vfs::Vfs& vfs, GamePieces& pieces, bool world_loaded) 
   if (pieces.portrait_effects.has_value()) {
     pieces.portrait_effects->ForgetTextures();
   }
+  if (pieces.style_effects.has_value()) {
+    pieces.style_effects->ForgetTextures();
+  }
   if (world_loaded) {
     ForgetWorldArt(pieces);
     pieces.boss_badges = ro::render::LoadBossBadges(vfs);
