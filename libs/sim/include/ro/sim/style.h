@@ -127,6 +127,10 @@ inline constexpr std::size_t kStyleLayerAdjustCount = 13;
 // Un corps sans la sienne prend celle du visage.
 // `kCompanion` est le corps d'un compagnon (homoncule, familier), sous la clé de
 // sa classe ; dans le ZC, il voyage dans le bloc du gid du compagnon.
+// `kHatEffect` est un EFFET DE CHAPEAU affiché, sous la clé de son numéro
+// d'effet de chapeau : un seul réglage (teinte, saturation, clarté, et
+// « assombrir » à la place de l'absolu). Il appartient à l'exemplaire de l'objet
+// qui pose l'effet ; le serveur le retrouve parmi ce que l'émetteur porte.
 enum class StyleLayerKind : std::uint8_t {
   kHead = 1,
   kHeadgear = 2,
@@ -134,7 +138,8 @@ enum class StyleLayerKind : std::uint8_t {
   kSkin = 4,
   kBodyMore = 5,
   kBodySkin = 6,
-  kCompanion = 7
+  kCompanion = 7,
+  kHatEffect = 8
 };
 
 // UNE RETOUCHE : la couleur exacte d'un index de la palette du calque.

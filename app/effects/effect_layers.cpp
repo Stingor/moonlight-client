@@ -14,6 +14,7 @@
 #include "ro/sim/movement.h"
 
 #include "effects/effect_requests.h"
+#include "effects/hat_effect_dyes.h"
 #include "world/actor_view.h"
 
 namespace moonclient {
@@ -128,6 +129,9 @@ void DrawEffectLayers(EffectsInPlay& effects, EffectNodesInPlay& nodes, ActorSou
   // instants où l'état change, et c'est la donnée qui les fait durer ensuite.
   // Trente-huit états de quatrième classe n'ont que ce chemin-là.
   effects.NoticeStateEffects(*scene.world, *scene.stage, *scene.planner, scene.now_ms);
+  // LA TEINTURE DES EFFETS DE CHAPEAU, tirée du livre des styles, avant le relevé
+  // qui la range sous chaque naissance.
+  NoticeHatEffectDyes(effects, *scene.world);
   effects.NoticeHatEffects(*scene.world, *scene.stage, *scene.planner, scene.now_ms);
   // Et les UNITÉS posées, qui s'entretiennent de la même façon : un mur de
   // feu ne se voit pas parce qu'un paquet le redit, mais parce que le

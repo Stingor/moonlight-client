@@ -63,6 +63,11 @@ inline constexpr std::size_t kStyleLayerRampRanks = 8;
 // La suite du corps : les rampes 9 à 12, aux rangs 0 à 3, sous la clé du corps.
 inline constexpr std::uint8_t kStyleLayerBodyMoreProfile = 3;
 inline constexpr std::size_t kStyleLayerBodyMoreRanks = 4;
+// Un effet de chapeau : un seul réglage, au rang 0, ni reste ni retouche.
+inline constexpr std::uint8_t kStyleLayerEffectProfile = 4;
+// Le plus d'effets de chapeau qu'un CZ teint d'un coup : ceux qu'un joueur
+// affiche tiennent largement en dessous.
+inline constexpr std::size_t kStyleHatEffectsMost = 8;
 
 // La plus grosse entrée : huit pièces, le reste en treize classes, et toutes
 // les retouches. Elle tient sa taille sur un octet.

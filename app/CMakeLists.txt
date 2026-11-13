@@ -152,6 +152,7 @@ add_library(moonclient_effects STATIC
     effects/effect_ground_scope.cpp
     effects/effect_ground_skill_view.cpp
     effects/effect_hat.cpp
+    effects/hat_effect_dyes.cpp
     effects/effect_looping.cpp
     effects/effect_lua_view.cpp
     effects/effect_named.cpp

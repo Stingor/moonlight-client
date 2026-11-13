@@ -35,7 +35,7 @@ constexpr std::uint8_t kPayloadZipped = 0x01;
 
 // Le calque d'une entrée, tel que le fil le numérote.
 constexpr std::uint8_t kWireHead = static_cast<std::uint8_t>(sim::StyleLayerKind::kHead);
-constexpr std::uint8_t kWireLayerLast = static_cast<std::uint8_t>(sim::StyleLayerKind::kCompanion);
+constexpr std::uint8_t kWireLayerLast = static_cast<std::uint8_t>(sim::StyleLayerKind::kHatEffect);
 
 static_assert(proto::CzMoonclientStyleLayers::kWireSize == 6,
               "l'en-tête du CZ des calques ne vaut plus ce que le serveur déclare");
@@ -43,19 +43,24 @@ static_assert(proto::ZcMoonclientStyleLayers::kWireSize == 7,
               "l'en-tête du ZC des calques ne vaut plus ce que le serveur déclare");
 static_assert(kStyleLayerEntryMost <= UINT8_MAX, "une entrée doit tenir sa taille sur un octet");
 // Le pire CZ : tête, peau du visage, quatre suites, huit emplacements, plus la
-// peau de chacun des quatre corps.
+// peau de chacun des quatre corps et les effets de chapeau, d'un réglage chacun.
 constexpr std::size_t kRequestEntriesWorst = 1 + 1 + sim::kStyleBodyVariantsMost +
                                              (static_cast<std::size_t>(StyleSlot::kCostumeGarment) -
                                               static_cast<std::size_t>(StyleSlot::kHeadTop) + 1);
 static_assert(proto::CzMoonclientStyleLayers::kWireSize +
                       kRequestEntriesWorst * kStyleLayerEntryMost +
-                      sim::kStyleBodyVariantsMost * kStyleSkinEntryMost <=
+                      (sim::kStyleBodyVariantsMost + kStyleHatEffectsMost) * kStyleSkinEntryMost <=
                   kStyleLayersRequestMost,
               "le pire CZ doit tenir sous le plafond du serveur");
 
 // Une peau, du visage ou d'un corps : un seul réglage, ni reste ni retouche.
 [[nodiscard]] bool IsSkin(sim::StyleLayerKind layer) noexcept {
   return layer == sim::StyleLayerKind::kSkin || layer == sim::StyleLayerKind::kBodySkin;
+}
+
+// Un calque d'un seul réglage, sans queue : une peau, ou un effet de chapeau.
+[[nodiscard]] bool IsSingle(sim::StyleLayerKind layer) noexcept {
+  return IsSkin(layer) || layer == sim::StyleLayerKind::kHatEffect;
 }
 
 [[nodiscard]] bool Neutral(const sim::StyleAdjust& adjust) noexcept {
@@ -90,6 +95,8 @@ static_assert(proto::CzMoonclientStyleLayers::kWireSize +
     // Un compagnon se découpe comme une coiffe.
     case sim::StyleLayerKind::kCompanion:
       return RanksOf(profile);
+    case sim::StyleLayerKind::kHatEffect:
+      return profile == kStyleLayerEffectProfile ? 1 : 0;
   }
   return 0;
 }
@@ -111,11 +118,11 @@ static_assert(proto::CzMoonclientStyleLayers::kWireSize +
   if (layer == sim::StyleLayerKind::kBodyMore) {
     return profile == kStyleLayerBodyMoreProfile;
   }
-  return !IsSkin(layer) && profile == kStyleLayerRampProfile;
+  return !IsSingle(layer) && profile == kStyleLayerRampProfile;
 }
 
-// Les retouches : partout sauf sur une peau.
-[[nodiscard]] bool TakesRetouches(sim::StyleLayerKind layer) noexcept { return !IsSkin(layer); }
+// Les retouches : partout sauf sur une peau et un effet de chapeau.
+[[nodiscard]] bool TakesRetouches(sim::StyleLayerKind layer) noexcept { return !IsSingle(layer); }
 
 // Des retouches au plus `kStyleRetouchesMost`, permises, d'index strictement
 // croissants.
@@ -155,9 +162,12 @@ void WriteAdjust(core::ByteWriter& writer, const sim::StyleAdjust& adjust) {
     wire_layer = static_cast<std::uint8_t>(*order.slot);
   } else if (recipe.layer == sim::StyleLayerKind::kHead || IsSkin(recipe.layer) ||
              recipe.layer == sim::StyleLayerKind::kBodyMore ||
-             recipe.layer == sim::StyleLayerKind::kCompanion) {
+             recipe.layer == sim::StyleLayerKind::kCompanion ||
+             recipe.layer == sim::StyleLayerKind::kHatEffect) {
     // 🔴 UN COMPAGNON NE SE DÉSIGNE PAS : la clé est la classe ATTENDUE, et le
-    // serveur lit lui-même le compagnon actif de la session.
+    // serveur lit lui-même le compagnon actif de la session. Un effet de
+    // chapeau non plus : la clé est son numéro, et le serveur cherche parmi ce
+    // que l'émetteur porte l'objet qui le pose.
     wire_layer = static_cast<std::uint8_t>(recipe.layer);
   } else {
     return core::Fail(core::ErrorCode::kInvalidArgument,
