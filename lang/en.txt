@@ -23809,8 +23809,6 @@ tr: Sent: waiting for the server.
 fr: Fait tourner toutes les couleurs de l'effet, en degrés.
 tr: Turns every color of the effect, in degrees.
 
-fr: Gris
-tr: Grey
 
 fr: La teinture des effets de chapeau que tu affiches.
 tr: The dye of the hat effects you show.
@@ -23833,8 +23831,6 @@ tr: Opens the effects tab, where the aura or effect this item shows is dyed.
 fr: Partagé : les autres le voient.
 tr: Shared: others see it.
 
-fr: Proposés :
-tr: Suggested:
 
 fr: Rend à l'effet ses couleurs d'origine, sans rien envoyer.
 tr: Gives the effect its original colors back, without sending anything.
@@ -23862,3 +23858,15 @@ tr: A glow adds to what is behind it: lower makes it fade; it does not darken.
 
 fr: Une teinture d'effet se valide auprès du styliste.
 tr: An effect dye is confirmed at the stylist.
+
+fr: Choisis la couleur de l'effet : la teinte, la saturation et la clarté suivent.
+tr: Pick the effect's color: hue, saturation and lightness follow.
+
+fr: Couleur de l'effet
+tr: Effect color
+
+fr: La couleur de cet effet vit dans son code : règle-le dans les réglages avancés.
+tr: This effect's color lives in its code: adjust it in the advanced settings.
+
+fr: Réglages avancés
+tr: Advanced settings

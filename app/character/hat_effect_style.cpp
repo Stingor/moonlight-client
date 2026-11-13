@@ -3,14 +3,15 @@
 #include "character/hat_effect_style.h"
 
 #include <algorithm>
+#include <cmath>
 #include <cstddef>
 #include <string>
 #include <string_view>
 #include <utility>
 
 #include "ro/core/ascii.h"
-#include "ro/formats/str.h"
 #include "ro/net/player_style_layers.h"
+#include "ro/render/effect_frame.h"
 #include "ro/render/effect_table.h"
 #include "ro/sim/inventory.h"
 #include "ro/sim/world.h"
@@ -29,6 +30,8 @@ constexpr std::uint32_t kEquipBits = 32;
 constexpr std::uint32_t kSendPatienceMs = 5000;
 // La cadence du serveur entre deux envois de calques.
 constexpr std::uint32_t kSendCadenceMs = 1000;
+constexpr std::size_t kRgbaBytes = 4;
+constexpr double kChannelMax = 255.0;
 
 }  // namespace
 
@@ -69,38 +72,72 @@ std::string HatEffectDisplayName(std::string_view constant) {
   return shown;
 }
 
-bool HatEffectStyle::Additive(const ro::render::HatEffect& record) {
-  if (const auto known = additive_.find(record.hat_effect_id); known != additive_.end()) {
+const HatEffectStyle::Described& HatEffectStyle::Describe(const ro::render::HatEffect& record) {
+  if (const auto known = described_.find(record.hat_effect_id); known != described_.end()) {
     return known->second;
   }
-  // UN EFFET SANS FICHIER EST ADDITIF : les nœuds et les classes qu'un chapeau
-  // sème le sont presque tous. Un fichier le dit par ses images clés.
-  bool additive = true;
+  // UN EFFET SANS FICHIER EST ADDITIF, et sa couleur vit dans le code : les
+  // nœuds et les classes qu'un chapeau sème le sont presque tous.
+  Described described;
   std::string file = record.file;
   if (file.empty() && record.effect_id != 0 && table_.has_value()) {
     const ro::render::HatEffect* shown = table_->FindByConcreteId(record.effect_id);
     file = shown != nullptr ? shown->file : ro::render::EffectFile(record.effect_id);
   }
-  if (!file.empty() && vfs_ != nullptr) {
-    if (auto bytes = vfs_->Read(std::string(ro::render::kEffectFolder) + file)) {
-      if (auto effect = ro::formats::StrEffect::Parse(*bytes)) {
-        std::size_t adds = 0;
-        std::size_t keys = 0;
-        for (const ro::formats::StrLayer& layer : effect->layers()) {
-          for (const ro::formats::StrKeyFrame& key : layer.key_frames) {
-            if (key.type != 0) {
-              continue;
-            }
-            ++keys;
-            adds += ro::render::EffectBlendAdds(key.blend_source, key.blend_destination) ? 1U : 0U;
-          }
+  if (!catalog_.has_value() && vfs_ != nullptr) {
+    catalog_.emplace(*vfs_);
+  }
+  const ro::render::LoadedEffect* loaded =
+      file.empty() || !catalog_.has_value()
+          ? nullptr
+          : catalog_->Load(std::string(ro::render::kEffectFolder) + file);
+  if (loaded != nullptr) {
+    std::size_t adds = 0;
+    std::size_t keys = 0;
+    std::array<double, 3> sum = {};
+    double weights = 0.0;
+    for (const ro::render::PreparedEffectLayer& layer : loaded->prepared.layers) {
+      if (layer.keys.empty()) {
+        continue;
+      }
+      for (const ro::render::PreparedEffectKey& key : layer.keys) {
+        if (key.key.type != 0) {
+          continue;
         }
-        additive = keys == 0 || adds * 2 >= keys;
+        ++keys;
+        adds +=
+            ro::render::EffectBlendAdds(key.key.blend_source, key.key.blend_destination) ? 1U : 0U;
+      }
+      const std::array<float, 4>& tint = layer.keys.front().key.color;
+      for (std::size_t rank = layer.first_texture;
+           rank < layer.first_texture + layer.texture_count && rank < loaded->textures.size();
+           ++rank) {
+        const std::vector<std::uint8_t>& texels = loaded->textures[rank].pixels;
+        for (std::size_t at = 0; at + kRgbaBytes <= texels.size(); at += kRgbaBytes) {
+          const double alpha = texels[at + 3] / kChannelMax;
+          const double bright =
+              std::max({texels[at], texels[at + 1], texels[at + 2]}) / kChannelMax;
+          const double weight = alpha * bright;
+          for (std::size_t channel = 0; channel < sum.size(); ++channel) {
+            sum[channel] +=
+                weight * texels[at + channel] * static_cast<double>(tint[channel]) / kChannelMax;
+          }
+          weights += weight;
+        }
       }
     }
+    described.additive = keys == 0 || adds * 2 >= keys;
+    // ⚠ PORTÉE À PLEIN ÉCLAT : la pastille montre une couleur, et une moyenne
+    // de halos sur fond noir serait presque noire.
+    const double high = std::max({sum[0], sum[1], sum[2]});
+    if (weights > 0.0 && high > 0.0) {
+      described.base_color = std::array<std::uint8_t, 3>{
+          static_cast<std::uint8_t>(std::lround(sum[0] / high * kChannelMax)),
+          static_cast<std::uint8_t>(std::lround(sum[1] / high * kChannelMax)),
+          static_cast<std::uint8_t>(std::lround(sum[2] / high * kChannelMax))};
+    }
   }
-  additive_.emplace(record.hat_effect_id, additive);
-  return additive;
+  return described_.emplace(record.hat_effect_id, described).first->second;
 }
 
 void HatEffectStyle::Refresh(const ro::sim::World& world, ro::ui::PaletteEffectsState& state,
@@ -137,7 +174,11 @@ void HatEffectStyle::Refresh(const ro::sim::World& world, ro::ui::PaletteEffects
                  ChangesOnlyItsBearer(record->effect_id)) {
         row.blocked = ro::ui::PaletteEffectBlock::kChangesBody;
       }
-      row.additive = record != nullptr && Additive(*record);
+      if (record != nullptr) {
+        const Described& described = Describe(*record);
+        row.additive = described.additive;
+        row.base_color = described.base_color;
+      }
       // L'OBJET PORTÉ QUI LE POSE, pour le nommer ; le serveur le retrouve
       // lui-même à la validation.
       if (items_ != nullptr) {

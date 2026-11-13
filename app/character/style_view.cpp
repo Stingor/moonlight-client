@@ -274,9 +274,10 @@ void StyleView::RefreshDoll(const ro::render::ActorLook& look,
   state.doll.image = ro::ui::SkinImage{.id = static_cast<ImTextureID>(drawn->texture.name()),
                                        .width = state.doll.box_width,
                                        .height = state.doll.box_height};
-  // LES EFFETS DE CHAPEAU QUE LE JOUEUR AFFICHE se posent sur le pantin quand il
-  // montre le joueur : un compagnon n'en porte pas.
-  if (tab != nullptr && tab->companion_look.has_value()) {
+  // LES EFFETS DE CHAPEAU QUE LE JOUEUR AFFICHE se posent sur le pantin de
+  // l'onglet des effets, et là seulement : c'est là qu'on les règle, et ailleurs
+  // ils cacheraient les pièces qu'on teint.
+  if (view_tab_ != ro::ui::PaletteTabKind::kEffects) {
     return;
   }
   const std::optional<StyleDoll::EffectSeat> seat = doll_->EffectSeatOf();

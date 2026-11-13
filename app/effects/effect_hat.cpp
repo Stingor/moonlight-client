@@ -204,8 +204,14 @@ void EffectsInPlay::NoticeHatEffects(const ro::sim::World& world, const MapStage
                                      ro::sim::WalkPlanner& planner, std::uint32_t now_ms) {
   // UN PORTEUR PARTI EMPORTE SES SEMIS. Sans cela, le compte d'un costume ancien
   // retiendrait le premier semis de celui qui reprendrait son identifiant.
+  //
+  // 🔴 ET UN COSTUME ÔTÉ EMPORTE LE SIEN : l'effet s'éteint à l'instant, et
+  // remis, il doit renaître aussitôt. Garder l'instant du dernier semis le ferait
+  // attendre la fin de sa période — dix secondes et plus pour une aura —, comme
+  // s'il n'était jamais revenu.
   std::erase_if(per_map_.sown_hats, [&world](const auto& entry) {
-    return !world.actors().contains(entry.first.first);
+    const ro::sim::Actor* bearer = world.Find(entry.first.first);
+    return bearer == nullptr || !bearer->hat_effects.contains(entry.first.second);
   });
   std::erase_if(per_map_.hat_actor_changes, [&world](const auto& entry) {
     return !world.actors().contains(entry.first.first);

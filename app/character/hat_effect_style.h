@@ -1,11 +1,13 @@
 #pragma once
 
+#include <array>
 #include <cstdint>
 #include <map>
 #include <optional>
 #include <span>
 #include <vector>
 
+#include "ro/render/effect_catalog.h"
 #include "ro/render/effect_dye.h"
 #include "ro/render/hat_effect_table.h"
 #include "ro/sim/hat_effect_items.h"
@@ -75,14 +77,21 @@ class HatEffectStyle {
   void Close() { previews_.clear(); }
 
  private:
-  // Vrai quand l'effet s'ajoute au fond, d'après les images clés de son fichier.
-  [[nodiscard]] bool Additive(const ro::render::HatEffect& record);
+  // CE QU'UN EFFET PEINT, d'après son fichier : s'il s'ajoute au fond (ses
+  // images clés le disent), et sa couleur d'origine (la moyenne de ses texels,
+  // pesés par leur opacité et leur éclat, teints par la couleur de leurs clés).
+  struct Described {
+    bool additive = true;
+    std::optional<std::array<std::uint8_t, 3>> base_color;
+  };
+  [[nodiscard]] const Described& Describe(const ro::render::HatEffect& record);
 
   ro::vfs::Vfs* vfs_ = nullptr;
   const ro::sim::HatEffectItems* items_ = nullptr;
   std::optional<ro::render::HatEffectTable> table_;
   bool table_read_ = false;
-  std::map<std::uint16_t, bool> additive_;
+  std::map<std::uint16_t, Described> described_;
+  std::optional<ro::render::EffectCatalog> catalog_;
   std::vector<ro::ui::PaletteEffectRow> rows_;
   std::vector<std::uint32_t> posing_items_;
   std::vector<WornHatEffectDye> previews_;

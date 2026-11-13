@@ -23809,8 +23809,6 @@ tr: Enviado: esperando al servidor.
 fr: Fait tourner toutes les couleurs de l'effet, en degrés.
 tr: Gira todos los colores del efecto, en grados.
 
-fr: Gris
-tr: Gris
 
 fr: La teinture des effets de chapeau que tu affiches.
 tr: El tinte de los efectos de sombrero que muestras.
@@ -23833,8 +23831,6 @@ tr: Abre la pestaña de efectos, donde se tiñe el aura o el efecto que muestra 
 fr: Partagé : les autres le voient.
 tr: Compartido: los demás lo ven.
 
-fr: Proposés :
-tr: Sugeridos:
 
 fr: Rend à l'effet ses couleurs d'origine, sans rien envoyer.
 tr: Devuelve al efecto sus colores originales, sin enviar nada.
@@ -23862,3 +23858,15 @@ tr: Un brillo se suma a lo que hay detrás: menos lo hace palidecer; no se oscur
 
 fr: Une teinture d'effet se valide auprès du styliste.
 tr: Un tinte de efecto se confirma con el estilista.
+
+fr: Choisis la couleur de l'effet : la teinte, la saturation et la clarté suivent.
+tr: Elige el color del efecto: el tono, la saturación y la claridad lo siguen.
+
+fr: Couleur de l'effet
+tr: Color del efecto
+
+fr: La couleur de cet effet vit dans son code : règle-le dans les réglages avancés.
+tr: El color de este efecto vive en su código: ajústalo en los ajustes avanzados.
+
+fr: Réglages avancés
+tr: Ajustes avanzados

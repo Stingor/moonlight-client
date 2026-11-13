@@ -446,9 +446,21 @@ PaletteEditorAction DrawPaletteEditor(PaletteEditorState& state, const PaletteEd
   ImGui::PopTextWrapPos();
   DrawLayerTabs(state, view, art);
   // L'ONGLET DES EFFETS n'a ni pièces, ni historique, ni codes : son corps est le
-  // sien. Voir `ro/ui/palette_effects.h`.
+  // sien. Voir `ro/ui/palette_effects.h`. Le pantin y joue les effets, teints de
+  // ce qu'on règle.
+  //
+  // 🔴 SANS PIPETTE NI LOUPE : il n'y a pas de pièce à désigner, et un clic à
+  // travers l'aura ouvrirait la pièce du personnage qu'elle recouvre.
   if (view.tab == PaletteTabKind::kEffects && view.effects != nullptr) {
+    ImGui::BeginGroup();
+    DrawPaletteDoll(state.doll, kDollMinPoints * Scale(), art.look(), /*pipette=*/false);
+    DrawPaletteDollControls(state.doll, art);
+    ImGui::EndGroup();
+    state.hovered_ramp = -1;
+    ImGui::SameLine();
+    ImGui::BeginGroup();
     action.effects = DrawPaletteEffects(state.effects, *view.effects, art);
+    ImGui::EndGroup();
     EndSkinnedWindow();
     return action;
   }

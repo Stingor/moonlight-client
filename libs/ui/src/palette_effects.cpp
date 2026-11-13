@@ -2,14 +2,18 @@
 
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <cstdio>
 #include <string>
 
 #include <imgui.h>
 
 #include "ro/core/i18n.h"
+#include "ro/render/effect_dye.h"
 #include "ro/ui/skin_popup.h"
 #include "ro/ui/skin_widgets.h"
+
+#include "palette_pieces.h"
 
 namespace ro::ui {
 namespace {
@@ -17,9 +21,52 @@ namespace {
 // La largeur des textes d'aide, en tailles de police.
 constexpr float kWrapInFonts = 24.0F;
 
-// Les tours de teinte proposés, en degrés : de quoi passer d'une couleur à
-// ses voisines et à son opposée sans chercher au curseur.
-constexpr std::array<int, 5> kProposedTurns = {-120, -60, 60, 120, 180};
+// Le côté de la pastille de l'effet, en tailles de police.
+constexpr float kSwatchInFonts = 2.0F;
+constexpr float kChannelMax = 255.0F;
+constexpr float kHalfTurnDegrees = 180.0F;
+constexpr float kFullTurnDegrees = 360.0F;
+constexpr float kPercent = 100.0F;
+
+std::array<float, 3> Unit(std::array<std::uint8_t, 3> rgb) {
+  return {static_cast<float>(rgb[0]) / kChannelMax, static_cast<float>(rgb[1]) / kChannelMax,
+          static_cast<float>(rgb[2]) / kChannelMax};
+}
+
+std::uint8_t ToByte(float unit) {
+  return static_cast<std::uint8_t>(std::lround(std::clamp(unit, 0.0F, 1.0F) * kChannelMax));
+}
+
+// Teinte en degrés, saturation et clarté en unités, en TSL : la même que la
+// teinture du dessin.
+std::array<float, 3> Hsl(std::array<std::uint8_t, 3> rgb) {
+  const std::array<float, 3> unit = Unit(rgb);
+  const float high = std::max({unit[0], unit[1], unit[2]});
+  const float low = std::min({unit[0], unit[1], unit[2]});
+  const float lightness = (high + low) * 0.5F;
+  const float spread = high - low;
+  if (spread <= 0.0F) {
+    return {0.0F, 0.0F, lightness};
+  }
+  const float saturation = lightness > 0.5F ? spread / (2.0F - high - low) : spread / (high + low);
+  float sextant = 0.0F;
+  if (high == unit[0]) {
+    sextant = std::fmod((unit[1] - unit[2]) / spread + 6.0F, 6.0F);
+  } else if (high == unit[1]) {
+    sextant = (unit[2] - unit[0]) / spread + 2.0F;
+  } else {
+    sextant = (unit[0] - unit[1]) / spread + 4.0F;
+  }
+  return {sextant * (kFullTurnDegrees / 6.0F), saturation, lightness};
+}
+
+// Le facteur relatif, en pour-cent, qui mène `from` à `to`.
+int RelativePercent(float from, float to) {
+  if (from <= 0.0F) {
+    return 0;
+  }
+  return static_cast<int>(std::lround((to / from - 1.0F) * kPercent));
+}
 
 void Wrapped(const char* text) {
   ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + ImGui::GetFontSize() * kWrapInFonts);
@@ -65,9 +112,55 @@ void DrawRows(PaletteEffectsState& state, const PaletteEffectsView& view,
   }
 }
 
-// Les trois curseurs, « Assombrir » et les tours proposés. Rend le réglage.
-PaletteEffectSetting DrawSetting(const PaletteEffectRow& row, PaletteEffectSetting setting,
-                                 const SkinArt& art) {
+// LA PASTILLE DE L'EFFET : la couleur que le réglage donne, et le nuancier
+// qu'elle ouvre. Rend le réglage.
+PaletteEffectSetting DrawSwatch(const PaletteEffectRow& row, PaletteEffectSetting setting,
+                                const SkinArt& art) {
+  if (!row.base_color.has_value()) {
+    ImGui::TextDisabled("%s", core::Tr("La couleur de cet effet vit dans son code : règle-le "
+                                       "dans les réglages avancés."));
+    return setting;
+  }
+  const std::array<float, 3> shown = Unit(EffectColorOf(*row.base_color, setting));
+  const float side = ImGui::GetFontSize() * kSwatchInFonts;
+  // ⚠ SANS LE GLISSER NI L'INFOBULLE D'IMGUI, en anglais : on pose la nôtre.
+  if (ImGui::ColorButton("##couleur_effet", ImVec4(shown[0], shown[1], shown[2], 1.0F),
+                         ImGuiColorEditFlags_NoAlpha | ImGuiColorEditFlags_NoDragDrop |
+                             ImGuiColorEditFlags_NoTooltip,
+                         ImVec2(side, side))) {
+    ImGui::OpenPopup("nuancier_effet");
+  }
+  Explain(
+      core::Tr("Choisis la couleur de l'effet : la teinte, la saturation et la clarté "
+               "suivent."));
+  ImGui::SameLine();
+  ImGui::AlignTextToFramePadding();
+  ImGui::TextUnformatted(core::Tr("Couleur de l'effet"));
+  if (BeginSkinPopup("nuancier_effet")) {
+    std::array<float, 3> picked = shown;
+    if (DrawPaletteColorPicker(picked, art)) {
+      setting = EffectSettingToward(*row.base_color,
+                                    {ToByte(picked[0]), ToByte(picked[1]), ToByte(picked[2])},
+                                    setting, row.additive);
+    }
+    EndSkinPopup();
+  }
+  return setting;
+}
+
+// « RÉGLAGES AVANCÉS », repliés par défaut : les trois curseurs et
+// « Assombrir ». Rend le réglage.
+PaletteEffectSetting DrawAdvanced(PaletteEffectsState& state, const PaletteEffectRow& row,
+                                  PaletteEffectSetting setting, const SkinArt& art) {
+  ImGui::SetNextItemOpen(state.advanced || !row.base_color.has_value());
+  const std::string label = std::string(core::Tr("Réglages avancés")) + "###reglages_effet";
+  const bool open = ImGui::TreeNode(label.c_str());
+  if (row.base_color.has_value()) {
+    state.advanced = open;
+  }
+  if (!open) {
+    return setting;
+  }
   static_cast<void>(SkinSliderInt(core::Tr("Teinte"), &setting.hue, -kPaletteEffectHueMost,
                                   kPaletteEffectHueMost, art, "%d°"));
   Explain(core::Tr("Fait tourner toutes les couleurs de l'effet, en degrés."));
@@ -91,19 +184,7 @@ PaletteEffectSetting DrawSetting(const PaletteEffectRow& row, PaletteEffectSetti
         core::Tr("Une aura lumineuse ne fonce pas, elle pâlit. Assombrir la peint comme une "
                  "fumée, qui ne brille plus : elle peut alors foncer."));
   }
-  ImGui::TextUnformatted(core::Tr("Proposés :"));
-  for (const int turn : kProposedTurns) {
-    ImGui::SameLine();
-    char label[32] = {};
-    std::snprintf(label, sizeof(label), "%+d°###tour%d", turn, turn);
-    if (SkinSmallButton(label, art)) {
-      setting.hue = turn;
-    }
-  }
-  ImGui::SameLine();
-  if (SkinSmallButton(core::Tr("Gris"), art)) {
-    setting.saturation = -kPaletteEffectPercentMost;
-  }
+  ImGui::TreePop();
   return ClampedEffectSetting(setting, row.additive);
 }
 
@@ -192,6 +273,36 @@ PaletteEffectSetting ClampedEffectSetting(PaletteEffectSetting setting, bool add
   return setting;
 }
 
+std::array<std::uint8_t, 3> EffectColorOf(std::array<std::uint8_t, 3> base,
+                                          const PaletteEffectSetting& setting) {
+  // ⚠ SANS « ASSOMBRIR » : la pastille montre la couleur, et non le mélange qui
+  // la pose.
+  const render::EffectDye dye =
+      render::MakeEffectDye(setting.hue, setting.saturation, setting.lightness, false);
+  const std::array<std::uint8_t, 4> dyed = render::DyeEffectTexel(
+      {base[0], base[1], base[2], static_cast<std::uint8_t>(kChannelMax)}, dye);
+  return {dyed[0], dyed[1], dyed[2]};
+}
+
+PaletteEffectSetting EffectSettingToward(std::array<std::uint8_t, 3> base,
+                                         std::array<std::uint8_t, 3> wanted,
+                                         const PaletteEffectSetting& current, bool additive) {
+  const std::array<float, 3> from = Hsl(base);
+  const std::array<float, 3> to = Hsl(wanted);
+  PaletteEffectSetting setting = current;
+  if (from[1] > 0.0F && to[1] > 0.0F) {
+    float turn = std::fmod(to[0] - from[0] + kFullTurnDegrees, kFullTurnDegrees);
+    if (turn > kHalfTurnDegrees) {
+      turn -= kFullTurnDegrees;
+    }
+    setting.hue = static_cast<int>(std::lround(turn));
+  }
+  setting.saturation =
+      from[1] > 0.0F ? RelativePercent(from[1], to[1]) : (to[1] > 0.0F ? 0 : current.saturation);
+  setting.lightness = RelativePercent(from[2], to[2]);
+  return ClampedEffectSetting(setting, additive);
+}
+
 const char* EffectBlockReason(PaletteEffectBlock blocked) {
   switch (blocked) {
     case PaletteEffectBlock::kNone:
@@ -224,7 +335,8 @@ PaletteEffectsAction DrawPaletteEffects(PaletteEffectsState& state, const Palett
   DrawRows(state, view, *chosen);
   ImGui::Separator();
   const PaletteEffectSetting before = EffectDraftOf(state, *chosen);
-  const PaletteEffectSetting after = DrawSetting(*chosen, before, art);
+  const PaletteEffectSetting after =
+      DrawAdvanced(state, *chosen, DrawSwatch(*chosen, before, art), art);
   if (after != before) {
     state.drafts[chosen->number] = after;
   }

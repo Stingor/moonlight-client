@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <cstdint>
 #include <map>
 #include <optional>
@@ -55,6 +56,10 @@ struct PaletteEffectRow {
   // L'effet s'ajoute au fond : baisser sa clarté le pâlit, « Assombrir » le
   // fonce.
   bool additive = false;
+  // LA COULEUR DE L'EFFET, d'origine : la moyenne de ce qu'il peint. Le nuancier
+  // part d'elle, et un réglage s'y lit comme la couleur qu'il donne. Rien pour
+  // un effet dont la couleur vit dans le code : il ne se règle qu'au détail.
+  std::optional<std::array<std::uint8_t, 3>> base_color;
   PaletteEffectBlock blocked = PaletteEffectBlock::kNone;
   // Ce que le serveur dit qu'il porte.
   PaletteEffectSetting worn;
@@ -81,6 +86,8 @@ struct PaletteEffectsState {
   // Les réglages en cours, par numéro d'effet. Un effet absent montre ce qu'il
   // porte.
   std::map<std::uint16_t, PaletteEffectSetting> drafts;
+  // « Réglages avancés », replié par défaut.
+  bool advanced = false;
 };
 
 struct PaletteEffectsAction {
@@ -103,6 +110,19 @@ struct PaletteEffectsAction {
 // additif.
 [[nodiscard]] PaletteEffectSetting ClampedEffectSetting(PaletteEffectSetting setting,
                                                         bool additive);
+
+// LA COULEUR QU'UN RÉGLAGE DONNE à la couleur d'origine d'un effet.
+[[nodiscard]] std::array<std::uint8_t, 3> EffectColorOf(std::array<std::uint8_t, 3> base,
+                                                        const PaletteEffectSetting& setting);
+
+// LE RÉGLAGE QUI MÈNE LA COULEUR D'ORIGINE À CELLE DU NUANCIER : le tour de teinte
+// qui les sépare, puis les facteurs de saturation et de clarté, dans les bornes.
+// « Assombrir » reste ce qu'il était. Une couleur d'origine grise n'a pas de
+// teinte à tourner : seule la clarté suit.
+[[nodiscard]] PaletteEffectSetting EffectSettingToward(std::array<std::uint8_t, 3> base,
+                                                       std::array<std::uint8_t, 3> wanted,
+                                                       const PaletteEffectSetting& current,
+                                                       bool additive);
 
 // Pourquoi un effet ne se teint pas, déjà traduit ; vide sinon.
 [[nodiscard]] const char* EffectBlockReason(PaletteEffectBlock blocked);
