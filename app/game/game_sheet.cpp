@@ -171,6 +171,9 @@ void Game::StageStyle(std::uint32_t now_ms) {
   // OUVERTE — composer une silhouette que personne ne regarde coûte une
   // palette et une texture par palier de pulsation.
   if (windows_.style.open) {
+    // L'onglet des effets lit la table de l'installation et les items qui posent
+    // un effet, que le serveur annonce.
+    style_view_->SetHatEffectSources(vfs_, &pieces_.cash_shop.hat_effects());
     style_view_->Refresh(world_, windows_.style, link_.is_open(), now_ms);
   } else {
     // ⚠ RENDU ENTRE DEUX IMAGES, et une fois, au passage d'ouverte à fermée :

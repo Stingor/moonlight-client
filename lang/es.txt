@@ -23787,3 +23787,78 @@ tr: Teñir a la mascota en el editor de estilo.
 
 fr: Le serveur ne range pas encore la teinture des compagnons.
 tr: El servidor todavía no guarda el tinte de los compañeros.
+
+fr: Assombrir
+tr: Oscurecer
+
+fr: Cet effet change ton corps, pas une lumière : il n'a rien à teindre.
+tr: Este efecto cambia tu cuerpo, no una luz: no hay nada que teñir.
+
+fr: Cet item porte un effet : le régler
+tr: Este item muestra un efecto: ajustarlo
+
+fr: Cette teinture appartient à l'item qui pose l'effet : elle le suit à l'échange, à la vente, au storage et au courrier.
+tr: Este tinte pertenece al item que muestra el efecto: lo sigue en intercambios, ventas, storage y correo.
+
+fr: Clarté
+tr: Claridad
+
+fr: Envoyé : en attente du serveur.
+tr: Enviado: esperando al servidor.
+
+fr: Fait tourner toutes les couleurs de l'effet, en degrés.
+tr: Gira todos los colores del efecto, en grados.
+
+fr: Gris
+tr: Gris
+
+fr: La teinture des effets de chapeau que tu affiches.
+tr: El tinte de los efectos de sombrero que muestras.
+
+fr: Le micro de la voix ne se teint pas.
+tr: El micrófono de voz no se puede teñir.
+
+fr: Le serveur ne range pas encore la teinture des effets de chapeau.
+tr: El servidor aún no guarda el tinte de los efectos de sombrero.
+
+fr: Moins, l'effet fonce ; plus, il s'éclaircit.
+tr: Menos oscurece el efecto; más lo aclara.
+
+fr: Moins, l'effet tourne au gris ; plus, ses couleurs se font vives.
+tr: Menos vuelve gris el efecto; más aviva sus colores.
+
+fr: Ouvre l'onglet des effets, où se teint l'aura ou l'effet que l'item pose.
+tr: Abre la pestaña de efectos, donde se tiñe el aura o el efecto que muestra este item.
+
+fr: Partagé : les autres le voient.
+tr: Compartido: los demás lo ven.
+
+fr: Proposés :
+tr: Sugeridos:
+
+fr: Rend à l'effet ses couleurs d'origine, sans rien envoyer.
+tr: Devuelve al efecto sus colores originales, sin enviar nada.
+
+fr: Retirer la teinture de cet effet
+tr: Quitar el tinte de este efecto
+
+fr: Retirer la teinture de cet effet ?
+tr: ¿Quitar el tinte de este efecto?
+
+fr: Revenir à ce que je porte
+tr: Volver a lo que llevo
+
+fr: Teinte
+tr: Tono
+
+fr: Tu n'affiches aucun effet de chapeau.
+tr: No muestras ningún efecto de sombrero.
+
+fr: Une aura lumineuse ne fonce pas, elle pâlit. Assombrir la peint comme une fumée, qui ne brille plus : elle peut alors foncer.
+tr: Un aura luminosa no se oscurece, palidece. Oscurecer la pinta como humo, que ya no brilla: entonces puede oscurecerse.
+
+fr: Une lueur s'ajoute à ce qui est derrière elle : moins, elle pâlit ; elle ne fonce pas.
+tr: Un brillo se suma a lo que hay detrás: menos lo hace palidecer; no se oscurece.
+
+fr: Une teinture d'effet se valide auprès du styliste.
+tr: Un tinte de efecto se confirma con el estilista.

@@ -41,8 +41,12 @@ std::vector<WornHatEffectDye> WornHatEffectDyes(const ro::sim::World& world) {
   return worn;
 }
 
-void NoticeHatEffectDyes(EffectsInPlay& effects, const ro::sim::World& world) {
+void NoticeHatEffectDyes(EffectsInPlay& effects, const ro::sim::World& world,
+                         std::span<const WornHatEffectDye> previews) {
   for (const WornHatEffectDye& line : WornHatEffectDyes(world)) {
+    effects.SetHatEffectDye(line.bearer_id, line.hat_effect_id, line.dye);
+  }
+  for (const WornHatEffectDye& line : previews) {
     effects.SetHatEffectDye(line.bearer_id, line.hat_effect_id, line.dye);
   }
 }

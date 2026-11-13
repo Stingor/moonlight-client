@@ -18,6 +18,9 @@
 namespace moonclient {
 namespace {
 
+// Le calque des effets de chapeau sur le fil : la règle 25 doit l'annoncer.
+constexpr int kHatEffectWireLayer = static_cast<int>(ro::sim::StyleLayerKind::kHatEffect);
+
 constexpr int kFullValue = 255;
 constexpr int kPercent = 100;
 // COMBIEN DE VIGNETTES NEUVES PAR IMAGE. 🔴 UN BUDGET, PAS UNE LIMITE DE
@@ -449,6 +452,29 @@ void StyleView::Refresh(const ro::sim::World& world, ro::ui::PaletteEditorState&
   view_tab_ = asked_tab != nullptr && asked_tab->shown.blocked == ro::ui::PaletteTabBlock::kNone
                   ? state.tab
                   : ro::ui::PaletteTabKind::kBody;
+  // L'ONGLET DES EFFETS DE CHAPEAU, en queue, quand le joueur en affiche : il
+  // n'est pas un calque de palette et ne passe pas par les pièces.
+  hat_effects_.Refresh(world, state.effects, connected, server_layer_last_ >= kHatEffectWireLayer,
+                       atelier_open_, wardrobe_ != nullptr ? &wardrobe_->catalog().items : nullptr,
+                       now_ms);
+  view_.effects = &hat_effects_.view();
+  if (!hat_effects_.view().rows.empty()) {
+    ro::ui::PaletteTab effects;
+    effects.kind = ro::ui::PaletteTabKind::kEffects;
+    effects.name = ro::ui::PaletteTabName(ro::ui::PaletteTabKind::kEffects);
+    effects.dyed = std::ranges::any_of(hat_effects_.view().rows,
+                                       [](const auto& row) { return !row.worn.neutral(); });
+    tab_views_.push_back(std::move(effects));
+    if (state.tab == ro::ui::PaletteTabKind::kEffects) {
+      view_tab_ = ro::ui::PaletteTabKind::kEffects;
+    }
+  }
+  // L'onglet d'un objet qui pose un effet mène à celui des effets. ⚠ LA PREMIÈRE
+  // VUE EST LE CORPS : celle d'un calque vient un rang plus loin.
+  for (std::size_t rank = 0; rank < tabs_.size() && rank + 1 < tab_views_.size(); ++rank) {
+    ro::ui::PaletteTab& view_of_tab = tab_views_[rank + 1];
+    view_of_tab.poses_effect = view_of_tab.item && hat_effects_.PosesEffect(tabs_[rank].item_id);
+  }
 
   view_.recipe = session_.recipe();
   view_.ramps = body.ramps;
@@ -560,6 +586,9 @@ void StyleView::Close() {
   }
   thumbs_.clear();
   shown_picker_ = ro::ui::PaletteEditorPicker::kNone;
+  // ⚠ L'APERÇU DES EFFETS S'ÉTEINT AVEC LA FENÊTRE : un réglage non validé ne
+  // reste pas sur le personnage.
+  hat_effects_.Close();
   // ⛔ LA SESSION NE SE REMET PAS À ZÉRO : refermer la fenêtre ne rend pas ses
   // couleurs au joueur. Il rouvre et retrouve ce qu'il composait.
 }

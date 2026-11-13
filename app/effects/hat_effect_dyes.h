@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <optional>
+#include <span>
 #include <vector>
 
 #include "ro/render/effect_dye.h"
@@ -26,7 +27,9 @@ struct WornHatEffectDye {
 [[nodiscard]] std::vector<WornHatEffectDye> WornHatEffectDyes(const ro::sim::World& world);
 
 // Pose ces teintures sur les effets en jeu, et ôte celles que le livre ne
-// porte plus.
-void NoticeHatEffectDyes(EffectsInPlay& effects, const ro::sim::World& world);
+// porte plus. `previews` passe par-dessus : les réglages qu'on règle dans
+// l'éditeur, sur le joueur, avant de les valider.
+void NoticeHatEffectDyes(EffectsInPlay& effects, const ro::sim::World& world,
+                         std::span<const WornHatEffectDye> previews = {});
 
 }  // namespace moonclient

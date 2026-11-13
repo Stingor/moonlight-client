@@ -23787,3 +23787,78 @@ tr: Dye the pet in the style editor.
 
 fr: Le serveur ne range pas encore la teinture des compagnons.
 tr: The server does not store companion dyes yet.
+
+fr: Assombrir
+tr: Darken
+
+fr: Cet effet change ton corps, pas une lumière : il n'a rien à teindre.
+tr: This effect changes your body, not a light: there is nothing to dye.
+
+fr: Cet item porte un effet : le régler
+tr: This item shows an effect: adjust it
+
+fr: Cette teinture appartient à l'item qui pose l'effet : elle le suit à l'échange, à la vente, au storage et au courrier.
+tr: This dye belongs to the item that shows the effect: it follows it through trades, sales, storage and mail.
+
+fr: Clarté
+tr: Lightness
+
+fr: Envoyé : en attente du serveur.
+tr: Sent: waiting for the server.
+
+fr: Fait tourner toutes les couleurs de l'effet, en degrés.
+tr: Turns every color of the effect, in degrees.
+
+fr: Gris
+tr: Grey
+
+fr: La teinture des effets de chapeau que tu affiches.
+tr: The dye of the hat effects you show.
+
+fr: Le micro de la voix ne se teint pas.
+tr: The voice microphone cannot be dyed.
+
+fr: Le serveur ne range pas encore la teinture des effets de chapeau.
+tr: The server does not store hat effect dyes yet.
+
+fr: Moins, l'effet fonce ; plus, il s'éclaircit.
+tr: Lower darkens the effect; higher lightens it.
+
+fr: Moins, l'effet tourne au gris ; plus, ses couleurs se font vives.
+tr: Lower turns the effect grey; higher makes its colors vivid.
+
+fr: Ouvre l'onglet des effets, où se teint l'aura ou l'effet que l'item pose.
+tr: Opens the effects tab, where the aura or effect this item shows is dyed.
+
+fr: Partagé : les autres le voient.
+tr: Shared: others see it.
+
+fr: Proposés :
+tr: Suggested:
+
+fr: Rend à l'effet ses couleurs d'origine, sans rien envoyer.
+tr: Gives the effect its original colors back, without sending anything.
+
+fr: Retirer la teinture de cet effet
+tr: Remove this effect's dye
+
+fr: Retirer la teinture de cet effet ?
+tr: Remove this effect's dye?
+
+fr: Revenir à ce que je porte
+tr: Back to what I wear
+
+fr: Teinte
+tr: Hue
+
+fr: Tu n'affiches aucun effet de chapeau.
+tr: You show no hat effect.
+
+fr: Une aura lumineuse ne fonce pas, elle pâlit. Assombrir la peint comme une fumée, qui ne brille plus : elle peut alors foncer.
+tr: A glowing aura does not darken, it fades. Darken paints it like smoke, which no longer glows: it can then get darker.
+
+fr: Une lueur s'ajoute à ce qui est derrière elle : moins, elle pâlit ; elle ne fonce pas.
+tr: A glow adds to what is behind it: lower makes it fade; it does not darken.
+
+fr: Une teinture d'effet se valide auprès du styliste.
+tr: An effect dye is confirmed at the stylist.

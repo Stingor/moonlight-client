@@ -19,6 +19,7 @@
 #include "ro/sim/world_fwd.h"
 #include "ro/ui/palette_editor.h"
 
+#include "character/hat_effect_style.h"
 #include "character/style_doll.h"
 #include "character/style_layers.h"
 #include "character/style_outfits.h"
@@ -149,6 +150,15 @@ class StyleView {
   // fenêtre d'ouverte à fermée. ⚠ ENTRE DEUX IMAGES : un style qu'on oublie
   // détruit les tenues qui le portaient.
   void Close();
+  // L'ONGLET DES EFFETS DE CHAPEAU : l'installation et les objets qui posent un
+  // effet. Voir `character/hat_effect_style.h`.
+  void SetHatEffectSources(ro::vfs::Vfs* vfs, const ro::sim::HatEffectItems* items) {
+    hat_effects_.SetSources(vfs, items);
+  }
+  // Les réglages d'effet en cours, posés sur le joueur ; rien fenêtre fermée.
+  [[nodiscard]] std::span<const WornHatEffectDye> HatEffectPreviews() const noexcept {
+    return hat_effects_.previews();
+  }
 
  private:
   // Ce qui se lit sur la recette et sur les pièces : pastilles, plafonds,
@@ -478,6 +488,8 @@ class StyleView {
   // Une teinture d'objet peut-elle se valider, à cette image ? Vrai quand le
   // serveur n'exige pas l'atelier du styliste, ou quand celui-ci est ouvert.
   bool atelier_open_ = false;
+  // L'onglet des effets de chapeau.
+  HatEffectStyle hat_effects_;
   // 🔴 LE PROFIL MIXTE N'EXISTE QUE SI LE SERVEUR L'ANNONCE (règle 24) : sans
   // elle, ni reste ni retouche ne s'offrent, ni ne partent.
   bool mixed_allowed_ = false;

@@ -14,22 +14,11 @@
 #include "ro/render/effect_table.h"
 #include "ro/sim/status_effects.h"
 
+#include "effects/effect_bearer_change.h"
 #include "effects/effect_map_memory.h"
 #include "effects/effect_view.h"
 
 namespace moonclient {
-
-// UN EFFET QUI NE FAIT QUE CHANGER SON PORTEUR : ni fichier, ni nœuds, ni
-// classe, mais une entrée de la table des changements d'acteur. Le client le
-// crée comme un autre, dans la liste d'effets de l'acteur, et c'est la mise à
-// jour de cette instance qui, à chaque tic, lève son drapeau de rendu, teint
-// le corps ou sème ses copies. Le jouer comme un dessin ne montrerait rien.
-[[nodiscard]] inline bool ChangesOnlyItsBearer(std::uint32_t effect_id) {
-  return ro::render::ActorEffectChangeFor(effect_id) != nullptr &&
-         ro::render::EffectFile(effect_id).empty() &&
-         !ro::render::KnowsProceduralEffect(effect_id) &&
-         !ro::render::IsPortedEffectClass(effect_id);
-}
 
 // COMBIEN DE TEMPS L'INSTANCE VIT D'ELLE-MÊME, ou rien quand seule la levée de
 // ce qui l'a posée l'éteint — les copies qui rembobinent leur âge un tic avant

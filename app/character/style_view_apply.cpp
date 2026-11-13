@@ -60,6 +60,8 @@ void StyleView::Apply(const ro::ui::PaletteEditorAction& asked, ro::net::Connect
   const std::uint64_t session_before = session_.steps_taken();
   const std::uint64_t layers_before = layers_.steps_taken();
   const int edited_before = edited_body_;
+  // L'onglet des effets de chapeau : ce qu'on y valide ou retire part seul.
+  hat_effects_.Apply(asked.effects, link, now_ms);
   ApplyAll(asked, link, world, now_ms);
   // ⚠ UN AUTRE CORPS A SON PROPRE HISTORIQUE dans la session : le journal ne
   // vaut que pour celui qu'on réglait.

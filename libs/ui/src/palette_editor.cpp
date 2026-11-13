@@ -445,6 +445,13 @@ PaletteEditorAction DrawPaletteEditor(PaletteEditorState& state, const PaletteEd
   ImGui::TextUnformatted(core::Tr("Choisis une pièce, puis règle sa couleur."));
   ImGui::PopTextWrapPos();
   DrawLayerTabs(state, view, art);
+  // L'ONGLET DES EFFETS n'a ni pièces, ni historique, ni codes : son corps est le
+  // sien. Voir `ro/ui/palette_effects.h`.
+  if (view.tab == PaletteTabKind::kEffects && view.effects != nullptr) {
+    action.effects = DrawPaletteEffects(state.effects, *view.effects, art);
+    EndSkinnedWindow();
+    return action;
+  }
   const bool on_body = view.tab == PaletteTabKind::kBody;
 
   // ── CE QUE LES RÉGLAGES ATTEIGNENT VRAIMENT ───────────────────────────────
@@ -478,6 +485,9 @@ PaletteEditorAction DrawPaletteEditor(PaletteEditorState& state, const PaletteEd
   }
   picker_open = DrawPaletteRetouches(state, view, art, action) || picker_open;
   DrawLayerNotes(view, art, action);
+  if (action.open_effects) {
+    state.tab = PaletteTabKind::kEffects;
+  }
   picker_open = DrawSkinLine(state, view, art, action) || picker_open;
 
   DrawHistory(view, art, action);

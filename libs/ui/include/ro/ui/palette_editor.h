@@ -11,6 +11,7 @@
 #include "ro/core/i18n.h"
 #include "ro/render/palette_ramps.h"
 #include "ro/render/palette_rest.h"
+#include "ro/ui/palette_effects.h"
 #include "ro/ui/skin_art.h"
 #include "ro/ui/wheel_gate.h"
 
@@ -127,8 +128,11 @@ enum class PaletteTabKind : std::uint8_t {
   // teinture appartient au compagnon, et vaut pour sa forme d'aujourd'hui.
   kHomunculus = 7,
   kPet = 8,
+  // LES EFFETS DE CHAPEAU AFFICHÉS : un réglage par effet, sans pièces. Voir
+  // `ro/ui/palette_effects.h`.
+  kEffects = 9,
 };
-inline constexpr std::size_t kPaletteTabKinds = 9;
+inline constexpr std::size_t kPaletteTabKinds = 10;
 
 // L'ONGLET QU'UN NUMÉRO DU STYLISTE DÉSIGNE : un de plus que `PaletteTabKind`,
 // zéro pour aucun. Le numéro de l'ancien onglet de la peau ouvre la Tête.
@@ -174,6 +178,9 @@ struct PaletteTab {
   bool companion = false;
   // Le compagnon est surtout gris : seul le réglage absolu le colore.
   bool mostly_grey = false;
+  // L'OBJET POSE UN EFFET DE CHAPEAU affiché : son onglet mène à l'onglet des
+  // effets.
+  bool poses_effect = false;
 };
 
 // LA RÉPONSE DE LA PIPETTE, toutes pièces confondues : l'onglet du calque sous
@@ -375,6 +382,8 @@ struct PaletteEditorView {
 
   // Les onglets des calques portés, le corps en tête.
   std::span<const PaletteTab> tabs;
+  // L'onglet des effets, quand le joueur en affiche : voir `PaletteTabKind::kEffects`.
+  const PaletteEffectsView* effects = nullptr;
   // L'ONGLET DONT CETTE VUE EST FAITE. ⚠ PAS FORCÉMENT `state.tab` : un clic
   // sur la barre change celui-ci pendant le dessin, et la vue ne suivra qu'à
   // l'image suivante. Ce que la fenêtre montre, et ce que `app` fait des
@@ -624,6 +633,10 @@ struct PaletteEditorAction {
   bool adapt_cut = false;
   // Retirer la teinture de l'objet, ou du compagnon, de l'onglet ouvert.
   bool clear_item_dye = false;
+  // L'onglet des effets : ce qu'on y valide ou retire.
+  PaletteEffectsAction effects;
+  // L'onglet d'un objet qui pose un effet mène à l'onglet des effets.
+  bool open_effects = false;
   // LA LIGNE DE PEAU de l'onglet ouvert : le teint proposé choisi, en rang, ou
   // moins un ; une couleur désignée au nuancier ; le retour à la peau du dessin,
   // ou, pour un corps, à celle du visage.
@@ -712,6 +725,8 @@ struct PaletteEditorState {
   std::array<char, kOutfitCodeFieldSize> outfit_code{};
   // La garde-robe a-t-elle été demandée depuis l'ouverture de la section ?
   bool wardrobe_asked = false;
+  // L'onglet des effets : l'effet choisi et les réglages en cours.
+  PaletteEffectsState effects;
 };
 
 // OUVRE L'ÉDITEUR SUR UN ONGLET quand `asked` : un bouton « Couleurs » d'une

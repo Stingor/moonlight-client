@@ -77,6 +77,13 @@ void DrawItemNotes(const PaletteTab& tab, const PaletteEditorView& view, const S
         core::Tr("L'aperçu est libre partout. Pour teindre ou déteindre l'item pour de "
                  "bon, parle au styliste : il t'ouvre son atelier pour quelques minutes."));
   }
+  // L'EFFET QUE L'OBJET POSE se teint dans son onglet à lui : il n'a pas de pièces.
+  if (tab.poses_effect) {
+    if (SkinSmallButton(core::Tr("Cet item porte un effet : le régler"), art)) {
+      action.open_effects = true;
+    }
+    Explain(core::Tr("Ouvre l'onglet des effets, où se teint l'aura ou l'effet que l'item pose."));
+  }
   if (!tab.dyed) {
     return;
   }
@@ -287,6 +294,8 @@ const char* PaletteTabName(PaletteTabKind kind) {
       return core::Tr("Homoncule");
     case PaletteTabKind::kPet:
       return core::Tr("Familier");
+    case PaletteTabKind::kEffects:
+      return core::Tr("Effets");
   }
   return "";
 }
@@ -401,6 +410,8 @@ void DrawLayerTabs(PaletteEditorState& state, const PaletteEditorView& view, con
       Explain(core::Tr("La teinture de cet onglet appartient à l'item porté."));
     } else if (tab.companion) {
       Explain(core::Tr("La teinture de cet onglet appartient à ce compagnon."));
+    } else if (tab.kind == PaletteTabKind::kEffects) {
+      Explain(core::Tr("La teinture des effets de chapeau que tu affiches."));
     }
   }
   EndSkinTabBar();

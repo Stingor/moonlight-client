@@ -27,6 +27,7 @@
 #include "ro/sim/skill_book.h"
 
 #include "effects/effect_layers.h"
+#include "effects/hat_effect_dyes.h"
 #include "game/game.h"
 #include "game/setting_destination_open.h"
 #include "game/survivors_presence_mode.h"
@@ -441,6 +442,12 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   // Les effets par-dessus les acteurs : ils ÉCLAIRCISSENT ce qui est déjà peint,
   // et n'auraient rien à éclaircir plus tôt. Leur porte de dessin se juge sur le
   // monde et le groupe de cette image.
+  // LA TEINTURE DES EFFETS DE CHAPEAU, tirée du livre des styles, et par-dessus
+  // ce qu'on règle dans l'éditeur : avant la porte, qui la range sous chaque
+  // naissance.
+  NoticeHatEffectDyes(*effects_, world_,
+                      style_view_.has_value() ? style_view_->HatEffectPreviews()
+                                              : std::span<const WornHatEffectDye>{});
   effects_->NoticeDrawGate(world_, &party_);
   DrawEffectLayers(*effects_, *effect_nodes_, *actor_sounds_, footprints_, drops_, scene, sprites_,
                    effect_renderer_, pieces_.effect_ground, aspect_ratio_,

@@ -1434,6 +1434,7 @@ target_include_directories(moonclient_names PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 # la liste, un préréglage mis à jour qui saute en fin de liste, un brouillon
 # réécrit à chaque image.
 add_library(moonclient_styles STATIC
+    character/hat_effect_style.cpp
     character/style_outfits.cpp
     character/style_layers.cpp
     character/style_pieces.cpp
@@ -1446,7 +1447,7 @@ add_library(moonclient_styles STATIC
     world/actor_styles.cpp)
 
 target_link_libraries(moonclient_styles
-    PUBLIC ro_net ro_render ro_sim
+    PUBLIC ro_net ro_render ro_sim ro_ui
     PRIVATE yaml-cpp::yaml-cpp ro_warnings)
 
 target_include_directories(moonclient_styles PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
