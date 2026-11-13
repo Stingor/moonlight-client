@@ -12,6 +12,7 @@
 
 #include <algorithm>
 #include <array>
+#include <map>
 #include <set>
 #include <string>
 #include <utility>
@@ -112,6 +113,18 @@ void ReseatHatStr(EffectMapMemory::Playing& playing, const ro::sim::Actor& beare
   playing.scale = anchor.scale;
 }
 
+void EffectsInPlay::SetHatEffectDye(std::uint32_t bearer_id, std::uint16_t hat_effect_id,
+                                    std::optional<ro::render::EffectDye> dye) {
+  const auto key = std::pair{bearer_id, hat_effect_id};
+  // UNE TEINTURE NEUTRE N'EN EST PAS UNE : elle se range comme une absence, et
+  // le lot de ce porteur se peint avec les autres.
+  if (!dye.has_value() || ro::render::IsNeutralEffectDye(*dye)) {
+    per_map_.hat_effect_dyes.erase(key);
+    return;
+  }
+  per_map_.hat_effect_dyes.insert_or_assign(key, *dye);
+}
+
 const ro::render::HatEffect* EffectsInPlay::HatEffectFor(std::uint16_t hat_effect_id) {
   if (!hat_effects_read_) {
     hat_effects_read_ = true;
@@ -199,6 +212,7 @@ void EffectsInPlay::NoticeHatEffects(const ro::sim::World& world, const MapStage
   });
 
   std::set<std::pair<std::uint32_t, std::uint32_t>> still_worn;
+  std::map<std::pair<std::uint32_t, std::uint32_t>, std::uint16_t> numbers;
   for (const auto& [id, actor] : world.actors()) {
     for (const ro::sim::HatEffectId worn : actor.hat_effects) {
       const ro::render::HatEffect* record = HatEffectFor(worn);
@@ -214,6 +228,7 @@ void EffectsInPlay::NoticeHatEffects(const ro::sim::World& world, const MapStage
       const bool plays_id = record->effect_id != 0 && (record->file.empty() || record->effect_pair);
       if (plays_id) {
         still_worn.emplace(id, record->effect_id);
+        numbers.insert_or_assign({id, record->effect_id}, worn);
       }
       if (plays_id && ro::render::IsPortedEffectClass(record->effect_id)) {
         if (!classes_.Carries(record->effect_id, id)) {
@@ -244,6 +259,7 @@ void EffectsInPlay::NoticeHatEffects(const ro::sim::World& world, const MapStage
       const std::string file = HatFileOf(*record);
       if (!file.empty()) {
         still_worn.emplace(id, ro::render::kHatEffectIdBase + worn);
+        numbers.insert_or_assign({id, ro::render::kHatEffectIdBase + worn}, worn);
       }
       const auto key = std::pair{id, worn};
       const auto sown = per_map_.sown_hats.find(key);
@@ -309,6 +325,7 @@ void EffectsInPlay::NoticeHatEffects(const ro::sim::World& world, const MapStage
     }
   }
   per_map_.worn_hat_effects = std::move(still_worn);
+  per_map_.worn_hat_numbers = std::move(numbers);
 }
 
 }  // namespace moonclient

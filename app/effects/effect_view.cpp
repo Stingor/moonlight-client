@@ -407,6 +407,11 @@ std::span<const ro::render::DrawnEffect> EffectsInPlay::Drawn(std::uint32_t now_
       shown.scale = playing.scale;
       shown.flip_x = playing.flip_x;
       shown.flip_y = playing.flip_y;
+      if (const ro::render::EffectDye* dye =
+              draw_gate_.HatDyeOf(playing.from_effect_id, playing.actor_id, playing.from_hat);
+          dye != nullptr) {
+        shown.dye = *dye;
+      }
       (playing.behind_actors ? behind_ : playing.over_everything ? over_ : drawn_).push_back(shown);
     }
     per_map_.playing[kept] = playing;

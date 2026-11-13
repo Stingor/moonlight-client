@@ -226,18 +226,18 @@ class EffectsInPlay {
                                std::optional<std::int32_t> state_value, bool sprite_rebuilt,
                                const std::array<float, 3>& ground, std::uint32_t now_ms);
 
-  // Les effets de CHAPEAU que les acteurs portent : un costume, une monture,
-  // une aura d'événement. ⚠ NI UN ÉTAT NI UN EFFET D'OPTION : ce numéro est un
-  // numéro de la table des effets de chapeau, `hat_effects.yml`, et le confondre ferait
-  // jouer l'effet d'un état homonyme. Comme les effets d'option, ils ne
-  // s'annoncent qu'une fois : le compte du temps les fait durer tant que le
-  // costume est porté.
+  // Les effets de CHAPEAU que portent les acteurs : costume, monture, aura d'événement.
+  // ⚠ NI UN ÉTAT NI UN EFFET D'OPTION : ce numéro est celui de `hat_effects.yml`, et le
+  // confondre jouerait l'effet d'un état homonyme. Annoncés une fois, ils durent par le
+  // compte du temps tant que le costume est porté.
   void NoticeHatEffects(const ro::sim::World& world, const MapStage& stage,
                         ro::sim::WalkPlanner& planner, std::uint32_t now_ms);
-  // La fiche d'un effet de chapeau, ou nul. La table se lit à la première
-  // demande et son échec est RETENU : une installation qui n'a pas ces deux
-  // fichiers ne les aura pas davantage au costume suivant.
+  // La fiche d'un effet de chapeau, ou nul. La table se lit à la première demande, et son
+  // échec est RETENU : l'installation qui n'a pas ces fichiers ne les aura pas plus tard.
   [[nodiscard]] const ro::render::HatEffect* HatEffectFor(std::uint16_t hat_effect_id);
+  // LA TEINTURE de cet effet de chapeau chez ce porteur ; rien l'ôte. Voir `EffectDye`.
+  void SetHatEffectDye(std::uint32_t bearer_id, std::uint16_t hat_effect_id,
+                       std::optional<ro::render::EffectDye> dye);
 
   // Ce que les UNITÉS POSÉES entretiennent sous elles, tant qu'elles tiennent
   // leur case : un mur de feu, un sanctuaire, un portail.

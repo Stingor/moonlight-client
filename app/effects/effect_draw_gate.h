@@ -1,8 +1,12 @@
 #pragma once
 
 #include <cstdint>
+#include <map>
 #include <unordered_map>
 #include <unordered_set>
+#include <utility>
+
+#include "ro/render/effect_dye.h"
 
 // LA PORTE DE DESSIN D'UN EFFET PORTÉ PAR UN ACTEUR.
 //
@@ -62,6 +66,16 @@ struct EffectDrawGate {
   // porte commune pour tout autre.
   [[nodiscard]] bool DrawsEffect(std::uint32_t effect_id, std::uint32_t bearer_id,
                                  bool from_hat) const;
+
+  // LES TEINTURES DES EFFETS DE CHAPEAU DE L'IMAGE, sous (porteur, identifiant
+  // sous lequel l'effet est né) : le rang plus 2442 pour un fichier joué sous
+  // son rang, l'identifiant concret sinon. Voir `ro::render::EffectDye`.
+  std::map<std::pair<std::uint32_t, std::uint32_t>, ro::render::EffectDye> hat_dyes;
+  // LA TEINTURE QUI VAUT POUR CET EFFET, ou nul. ⚠ SEULE UNE INSTANCE NÉE D'UN
+  // CHAPEAU LA PREND : la compétence que le même porteur joue sous le même
+  // identifiant, ou qui partage la texture, reste d'origine.
+  [[nodiscard]] const ro::render::EffectDye* HatDyeOf(std::uint32_t effect_id,
+                                                      std::uint32_t bearer_id, bool from_hat) const;
 };
 
 }  // namespace moonclient

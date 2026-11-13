@@ -200,6 +200,7 @@ add_library(ro_render STATIC
     src/effect_arc_ribbon_seed.cpp
     src/effect_texture_touchup.cpp
     src/effect_canvas.cpp
+    src/effect_dye.cpp
     src/effect_case_lookup.cpp
     src/effect_class.cpp
     src/effect_class_bearers.cpp

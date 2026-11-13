@@ -49,6 +49,15 @@ void EffectsInPlay::NoticeDrawGate(const ro::sim::World& world, const ro::sim::P
       draw_gate_.concealed.emplace(id, gate);
     }
   }
+  // LES TEINTURES DES CHAPEAUX PORTÉS, sous l'identifiant de naissance que le
+  // dessin connaît : le numéro de chaque naissance vient du dernier relevé des
+  // chapeaux, la teinture du réglage de ce numéro chez ce porteur.
+  for (const auto& [born, number] : per_map_.worn_hat_numbers) {
+    const auto dye = per_map_.hat_effect_dyes.find({born.first, number});
+    if (dye != per_map_.hat_effect_dyes.end()) {
+      draw_gate_.hat_dyes.emplace(born, dye->second);
+    }
+  }
   // ⚠ LA TROUPE PROCÉDURALE ET LES CLASSES LA VEULENT AUSSI, par le même geste
   // que les bascules.
   nodes_->NoticeDrawGate(draw_gate_);

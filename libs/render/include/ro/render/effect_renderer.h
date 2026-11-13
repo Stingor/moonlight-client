@@ -13,6 +13,7 @@
 #include "ro/core/error.h"
 #include "ro/render/camera.h"
 #include "ro/render/effect_catalog.h"
+#include "ro/render/effect_dye.h"
 #include "ro/render/effect_node_world.h"
 #include "ro/render/effect_scene.h"
 #include "ro/render/effect_screen_quad.h"
@@ -82,6 +83,10 @@ struct DrawnEffect {
   // les couches s'y déforment entre deux images. Zéro peint `frame` tel quel.
   // Voir `EffectLayerAt`.
   float frame_fraction = 0.0F;
+  // LA TEINTURE DE CET EFFET-CI, ou rien : celle qu'un joueur a posée sur
+  // l'effet de chapeau qu'il porte. Elle ne touche que les quads de cet
+  // effet ; la texture, partagée, reste d'origine. Voir `EffectDye`.
+  std::optional<EffectDye> dye;
 };
 
 // Un lot de quads d'effet DÉJÀ POSÉS DANS LE MONDE, et la texture qui les

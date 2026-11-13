@@ -133,15 +133,77 @@ in vec4 v_tint;
 in float v_fog_kept;
 
 uniform sampler2D u_texture;
+// La teinture du lot : voir `ro::render::EffectDye` et `DyeEffectTexel`, dont
+// ce calcul est la copie. `u_dyed` nul pour tout lot sans teinture, qui garde
+// ses texels au bit près.
+uniform int u_dyed;
+// Le tour de teinte en degrés, puis les facteurs de saturation et de clarté.
+uniform vec3 u_dye;
+uniform int u_dye_darken;
 
 out vec4 frag_color;
 
 // Le seuil du client : un sur deux cent cinquante-cinq.
 const float kAlphaReference = 1.0 / 255.0;
 
+vec3 RgbToHsl(vec3 color) {
+    float high = max(color.r, max(color.g, color.b));
+    float low = min(color.r, min(color.g, color.b));
+    float lightness = (high + low) * 0.5;
+    float spread = high - low;
+    if (spread <= 0.0) {
+        return vec3(0.0, 0.0, lightness);
+    }
+    float saturation = lightness > 0.5 ? spread / (2.0 - high - low) : spread / (high + low);
+    float sextant = high == color.r ? mod((color.g - color.b) / spread + 6.0, 6.0)
+                  : high == color.g ? (color.b - color.r) / spread + 2.0
+                                    : (color.r - color.g) / spread + 4.0;
+    return vec3(sextant * 60.0, saturation, lightness);
+}
+
+float HueChannel(float low, float high, float hue) {
+    float sextant = mod(hue, 360.0) / 60.0;
+    if (sextant < 1.0) {
+        return low + (high - low) * sextant;
+    }
+    if (sextant < 3.0) {
+        return high;
+    }
+    if (sextant < 4.0) {
+        return low + (high - low) * (4.0 - sextant);
+    }
+    return low;
+}
+
+vec3 HslToRgb(vec3 hsl) {
+    if (hsl.y <= 0.0) {
+        return vec3(hsl.z);
+    }
+    float high = hsl.z <= 0.5 ? hsl.z * (1.0 + hsl.y) : hsl.z + hsl.y - hsl.z * hsl.y;
+    float low = 2.0 * hsl.z - high;
+    return vec3(HueChannel(low, high, hsl.x + 120.0), HueChannel(low, high, hsl.x),
+                HueChannel(low, high, hsl.x - 120.0));
+}
+
+vec4 Dyed(vec4 color) {
+    if (u_dye_darken != 0) {
+        float high = max(color.r, max(color.g, color.b));
+        if (high <= 0.0) {
+            return vec4(0.0);
+        }
+        color = vec4(color.rgb / high, color.a * high);
+    }
+    vec3 hsl = RgbToHsl(color.rgb);
+    hsl = vec3(hsl.x + u_dye.x, clamp(hsl.y * u_dye.y, 0.0, 1.0), clamp(hsl.z * u_dye.z, 0.0, 1.0));
+    return vec4(HslToRgb(hsl), color.a);
+}
+
 void main() {
     vec2 uv = v_affine > 0.5 ? v_texture_uv_affine : v_texture_uv;
     vec4 color = texture(u_texture, uv) * v_tint;
+    if (u_dyed != 0) {
+        color = Dyed(color);
+    }
     if (color.a < kAlphaReference) {
         discard;
     }
@@ -179,7 +241,29 @@ struct EffectRenderer::PreparedQuad {
   const GlTexture* texture = nullptr;
   GLenum blend_source = GL_SRC_ALPHA;
   GLenum blend_destination = GL_ONE;
+  // La teinture de l'effet qui a posé ce quad, ou nul : un état du lot, comme
+  // la texture et le mélange.
+  const EffectDye* dye = nullptr;
+  // ASSOMBRI : ce quad ajoutait au fond, et « assombrir » le peint en alpha.
+  // Les quads alpha du même effet gardent leurs texels, seulement teints.
+  bool darkened = false;
 };
+
+namespace {
+
+// Pose la teinture d'un lot dans le nuanceur ; un lot sans teinture n'y passe
+// pas du tout.
+void SetDyeUniforms(const GlProgram& program, const EffectDye* dye, bool darkened) {
+  program.SetInt("u_dyed", dye != nullptr ? 1 : 0);
+  if (dye == nullptr) {
+    return;
+  }
+  program.SetVector3("u_dye",
+                     glm::vec3{dye->hue_degrees, dye->saturation_scale, dye->lightness_scale});
+  program.SetInt("u_dye_darken", darkened ? 1 : 0);
+}
+
+}  // namespace
 
 // Commun aux trois entrées, et il faut qu'il le soit : ce qui suit — la
 // profondeur qu'on n'éprouve pas, le mélange par quad, la remise en état — est
@@ -230,12 +314,22 @@ void EffectRenderer::PaintQuads(const glm::mat4& view_projection, DepthTest dept
   const auto same_state = [this](std::size_t left, std::size_t right) {
     return prepared_[left].texture == prepared_[right].texture &&
            prepared_[left].blend_source == prepared_[right].blend_source &&
-           prepared_[left].blend_destination == prepared_[right].blend_destination;
+           prepared_[left].blend_destination == prepared_[right].blend_destination &&
+           prepared_[left].dye == prepared_[right].dye &&
+           prepared_[left].darkened == prepared_[right].darkened;
   };
+  SetDyeUniforms(program_, nullptr, false);
+  const EffectDye* dye_set = nullptr;
+  bool darkened_set = false;
   for (std::size_t first = 0; first < prepared_.size();) {
     std::size_t end = first + 1;
     while (end < prepared_.size() && same_state(first, end)) {
       ++end;
+    }
+    if (prepared_[first].dye != dye_set || prepared_[first].darkened != darkened_set) {
+      dye_set = prepared_[first].dye;
+      darkened_set = prepared_[first].darkened;
+      SetDyeUniforms(program_, dye_set, darkened_set);
     }
     prepared_[first].texture->Bind(0);
     glBlendFunc(prepared_[first].blend_source, prepared_[first].blend_destination);
@@ -414,8 +508,20 @@ void EffectRenderer::Draw(const Camera& camera, std::span<const DrawnEffect> eff
       if (texture == nullptr) {
         continue;
       }
-      prepared_.push_back(PreparedQuad{texture, BlendFactorOf(quad.blend_source, GL_SRC_ALPHA),
-                                       BlendFactorOf(quad.blend_destination, GL_ONE)});
+      PreparedQuad prepared{texture, BlendFactorOf(quad.blend_source, GL_SRC_ALPHA),
+                            BlendFactorOf(quad.blend_destination, GL_ONE)};
+      if (drawn->dye.has_value()) {
+        prepared.dye = &*drawn->dye;
+        // ASSOMBRIR PEINT EN ALPHA ce qui s'ajoutait au fond : voir
+        // `EffectDye::darken`. Les autres quads gardent leur mélange.
+        if (drawn->dye->darken && prepared.blend_destination == GL_ONE &&
+            prepared.blend_source != GL_ZERO) {
+          prepared.blend_source = BlendFactorOf(kDarkenedBlendSource, GL_SRC_ALPHA);
+          prepared.blend_destination = BlendFactorOf(kDarkenedBlendDestination, GL_ONE);
+          prepared.darkened = true;
+        }
+      }
+      prepared_.push_back(prepared);
 
       // Les coins d'un effet sont en pixels autour de son point d'appui,
       // exactement comme ceux d'un sprite : le jeu les grandit de la même

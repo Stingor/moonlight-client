@@ -354,6 +354,12 @@ struct EffectMapMemory {
   // costume l'éteint aussitôt, comme le client qui retire toutes les instances
   // de ce numéro sur l'acteur.
   std::set<std::pair<std::uint32_t, std::uint32_t>> worn_hat_effects;
+  // LE NUMÉRO D'EFFET DE CHAPEAU DE CHACUN, sous la même clé : c'est sous ce
+  // numéro, et non sous l'identifiant de naissance, qu'une teinture se range.
+  std::map<std::pair<std::uint32_t, std::uint32_t>, std::uint16_t> worn_hat_numbers;
+  // LES TEINTURES DES EFFETS DE CHAPEAU, par porteur et numéro d'effet de
+  // chapeau. Voir `EffectsInPlay::SetHatEffectDye`.
+  std::map<std::pair<std::uint32_t, std::uint16_t>, ro::render::EffectDye> hat_effect_dyes;
   // LES CHANGEMENTS D'ACTEUR QU'UN COSTUME A POSÉS — rapetisser, blanchir,
   // dédoubler —, avec l'instant de la pose ; vide une fois leur vie propre
   // écoulée, pour ne pas les reposer tant que le costume reste.

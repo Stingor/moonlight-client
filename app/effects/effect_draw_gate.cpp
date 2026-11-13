@@ -30,4 +30,14 @@ bool EffectDrawGate::DrawsEffect(std::uint32_t effect_id, std::uint32_t bearer_i
   return effect_id == kWindSignEffect ? DrawsWindSign(bearer_id) : Draws(bearer_id, from_hat);
 }
 
+const ro::render::EffectDye* EffectDrawGate::HatDyeOf(std::uint32_t effect_id,
+                                                      std::uint32_t bearer_id,
+                                                      bool from_hat) const {
+  if (!from_hat || bearer_id == 0) {
+    return nullptr;
+  }
+  const auto found = hat_dyes.find({bearer_id, effect_id});
+  return found == hat_dyes.end() ? nullptr : &found->second;
+}
+
 }  // namespace moonclient
