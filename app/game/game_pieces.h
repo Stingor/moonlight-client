@@ -84,6 +84,7 @@
 #include "guard/cheat_guard.h"
 #include "items/doll_effects.h"
 #include "items/item_reform_book.h"
+#include "items/item_sheet_editor_stage.h"
 #include "items/laphine_book.h"
 #include "mvp/mvp_tracker_stage.h"
 #include "options/commands_page.h"
@@ -205,6 +206,8 @@ struct GamePieces {
   ChatBlockLog chat_block_log;
   // « JOUEURS EN LIGNE » DU STAFF : la liste que le serveur rend, et sa cadence.
   StaffRoster staff_roster;
+  // « MODIFIER LA FICHE » DU STAFF : la fiche d'un objet éditée, et ses bons.
+  ItemSheetEditorStage item_sheet_editor;
   // « SIGNALER CE JOUEUR » : le joueur visé, l'envoi et l'accusé.
   PlayerReportDesk player_report;
   HomunculusStage homunculus;

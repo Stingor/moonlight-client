@@ -24,6 +24,7 @@ constexpr std::string_view kNameField = "name";
 constexpr std::string_view kResourceField = "resource";
 constexpr std::string_view kSlotsField = "slots";
 constexpr std::string_view kViewField = "view";
+constexpr std::string_view kTintField = "tint";
 constexpr std::string_view kDescriptionField = "description";
 // Les deux champs que seuls les faits du serveur portent.
 constexpr std::string_view kTypeField = "type";
@@ -47,6 +48,9 @@ constexpr std::string_view kLocationsField = "locations";
     const bool read = table.ReadWhole(std::numeric_limits<std::uint16_t>::max(), number);
     record.view = static_cast<std::uint16_t>(number);
     return read;
+  }
+  if (field == kTintField) {
+    return table.ReadQuoted(record.tint);
   }
   if (field == kDescriptionField) {
     return table.ReadQuotedList(record.description);
@@ -244,6 +248,10 @@ void AppendRecord(const ItemInfoRecord& record, std::string& out) {
   if (record.view != 0) {
     field(kViewField);
     out += std::to_string(record.view);
+  }
+  if (!record.tint.empty()) {
+    field(kTintField);
+    AppendQuoted(record.tint, out);
   }
   if (!record.description.empty()) {
     field(kDescriptionField);

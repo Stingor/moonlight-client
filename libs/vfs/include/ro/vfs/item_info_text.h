@@ -41,6 +41,9 @@ struct ItemInfoRecord {
   std::string resource;
   std::uint8_t slots = 0;
   std::uint16_t view = 0;
+  // Le MOT de la teinte de l'icône (`ro::formats::IconTint`), tel que la table
+  // l'écrit ; vide : l'icône de l'installation.
+  std::string tint;
   // Les lignes BRUTES : le `#` final qui vaut trait de séparation y reste.
   std::vector<std::string> description;
 
@@ -88,7 +91,7 @@ struct ItemServerFactsRecord {
 // IDENTIFIANT CROISSANT quel que soit l'ordre reçu.
 //
 // 🔴 OCTET POUR OCTET LA FORME DU SCRIPT D'IMPORT, et un essai le tient : les
-// champs dans l'ordre `name`, `resource`, `slots`, `view`, `description` ; un
+// champs dans l'ordre `name`, `resource`, `slots`, `view`, `tint`, `description` ; un
 // champ nul ou vide omis ; les textes entre guillemets à la manière de JSON
 // sans échappement des caractères non ASCII — seuls `"`, `\`, les fins de
 // ligne, la tabulation et les autres caractères de contrôle s'échappent,

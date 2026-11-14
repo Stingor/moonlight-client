@@ -41,6 +41,7 @@ add_library(ro_formats STATIC
     src/grf.cpp
     src/grf_merge.cpp
     src/grf_writer.cpp
+    src/icon_tint.cpp
     src/image.cpp
     src/palette.cpp
     src/rsm.cpp

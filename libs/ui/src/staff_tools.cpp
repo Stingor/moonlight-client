@@ -379,6 +379,10 @@ StaffToolsAction DrawStaffTools(StaffToolsState& state, const SkinArt& art, bool
   if (state.roster_view != nullptr) {
     state.roster_answer = DrawStaffRosterWindow(state.roster, *state.roster_view, art);
   }
+  // LA FICHE D'UN OBJET ÉDITÉE, de même : la fiche d'un objet l'ouvre.
+  if (state.item_editor_view != nullptr) {
+    state.item_editor_answer = DrawItemSheetEditor(state.item_editor, *state.item_editor_view, art);
+  }
   if (!state.open) {
     return action;
   }

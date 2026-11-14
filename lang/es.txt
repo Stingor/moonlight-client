@@ -302,6 +302,12 @@ tr: Anuncia a todo el servidor, con tu nombre delante.
 fr: Annule tes retouches en cours et revient à ce que ton personnage porte. Ctrl+Z les rend.
 tr: Descarta tus retoques y vuelve a lo que lleva tu personaje. Ctrl+Z los recupera.
 
+fr: Annuler le bon
+tr: Anular la orden
+
+fr: Aperçu
+tr: Vista previa
+
 fr: Arsenal
 tr: Arsenal
 
@@ -362,11 +368,23 @@ tr: Herido, desapareces sin dejar de golpear, y tu primer golpe al salir es un c
 fr: Blessé, vous vous terrez un instant : rien ne vous touche, mais vous ne frappez plus.
 tr: Herido, te ocultas un instante: nada te toca, pero dejas de golpear.
 
+fr: Bleu
+tr: Azul
+
 fr: Bloque les chuchotements de ce joueur ; seule, liste les bloqués.
 tr: Bloquea los susurros de este jugador; sola, lista los bloqueados.
 
 fr: Bloque les chuchotements de tout le monde.
 tr: Bloquea los susurros de todo el mundo.
+
+fr: Bon annulé : la table reste telle quelle.
+tr: Orden anulada: la tabla queda como está.
+
+fr: Bon enregistré dans savedata\\item_info_delta.yml.
+tr: Orden guardada en savedata\\item_info_delta.yml.
+
+fr: Bons en attente : %zu. À porter par apply_item_info_delta.py, puis relancer le client.
+tr: Órdenes pendientes: %zu. Aplicarlas con apply_item_info_delta.py y luego reiniciar el cliente.
 
 fr: Carnet (%d)
 tr: Cuaderno (%d)
@@ -394,6 +412,12 @@ tr: La del juego
 
 fr: Celle du jeu est la police du client d'origine. Le titre garde sa place : une police plus large se coupe plus tôt en « ... », et la souris sur le titre le montre en entier.
 tr: La del juego es la fuente del cliente original. El título conserva su espacio: una fuente más ancha se corta antes con «...», y pasar el ratón por el título lo muestra entero.
+
+fr: Cet item n'est pas dans la table : le bon créera sa fiche.
+tr: Este item no está en la tabla: la orden creará su ficha.
+
+fr: Cette ressource ne s'écrit pas en CP949, l'encodage des archives.
+tr: Este recurso no se puede escribir en CP949, la codificación de los archivos.
 
 fr: Chance d'esquive : certains coups le manquent.
 tr: Probabilidad de esquiva: algunos golpes no le alcanzan.
@@ -587,6 +611,9 @@ tr: Hacerlo mi estilo principal
 fr: En plus du butin, sur cette map. Les taux du serveur ne les changent pas.
 tr: Además del botín, en este mapa. Las tasas del servidor no los cambian.
 
+fr: Enregistrer le bon
+tr: Guardar la orden
+
 fr: Entendre les autres joueurs, et leur parler en tenant la touche « Parler (voix) » des raccourcis. Seulement sur un serveur qui ouvre la voix.
 tr: Oír a los demás jugadores, y hablarles manteniendo pulsada la tecla «Hablar (voz)» de los atajos. Solo en un servidor que abre la voz.
 
@@ -595,6 +622,9 @@ tr: Esquiva +%d %%
 
 fr: Feuilles restantes : %d
 tr: Hojas restantes: %d
+
+fr: Fiche d'item (staff)
+tr: Ficha de item (staff)
 
 fr: Fond clair
 tr: Fondo claro
@@ -626,11 +656,20 @@ tr: Debes estar en una ciudad o en un interior.
 fr: Il rejoint le carnet.
 tr: Pasa al cuaderno.
 
+fr: Item %u
+tr: Item %u
+
 fr: Item dévoilé !
 tr: ¡Objeto revelado!
 
 fr: Items dévoilés : %d sur %d
 tr: Objetos revelados: %d de %d
+
+fr: L'installation n'a pas d'icône sous cette ressource.
+tr: La instalación no tiene icono con este recurso.
+
+fr: La couleur posée sur l'icône au chargement, à la luminance de chaque pixel. Aucun fichier de l'installation n'est réécrit.
+tr: El color aplicado al icono al cargarlo, según la luminancia de cada píxel. No se reescribe ningún archivo de la instalación.
 
 fr: La partie continue : votre héros reste à découvert.
 tr: La partida continúa: tu héroe queda expuesto.
@@ -641,11 +680,23 @@ tr: La partida del grupo se ha desincronizado: termina aquí.
 fr: La partie du groupe ne peut pas commencer.
 tr: La partida del grupo no puede empezar.
 
+fr: La saisie redit la table : aucun bon pour cet item.
+tr: Lo escrito coincide con la tabla: ninguna orden para este item.
+
+fr: Le bon n'a pas pu s'écrire : voir le journal.
+tr: No se pudo escribir la orden: ver el registro.
+
 fr: Le groupe compte plus de quatre membres.
 tr: El grupo tiene más de cuatro miembros.
 
 fr: Le groupe ne répond plus : vous quittez la partie.
 tr: El grupo ya no responde: abandonas la partida.
+
+fr: Le nom du fichier de l'icône et de l'illustration de collection, sans extension. Toutes les cartes portent celui du dos de carte générique.
+tr: El nombre de archivo del icono y de la ilustración de colección, sin extensión. Todas las cards llevan el del dorso genérico.
+
+fr: Le nom ne peut pas être vide.
+tr: El nombre no puede estar vacío.
 
 fr: Le personnage est mort.
 tr: Tu personaje está muerto.
@@ -701,14 +752,32 @@ tr: Mejor del día:
 fr: Mode avancé
 tr: Modo avanzado
 
+fr: Modifier la fiche
+tr: Editar ficha
+
 fr: Monture de boutique
 tr: Montura de tienda
 
 fr: Monté
 tr: Montado
 
+fr: Noir
+tr: Negro
+
 fr: On vous propose un échange.
 tr: Alguien te propone un intercambio.
+
+fr: Or
+tr: Oro
+
+fr: Orange
+tr: Naranja
+
+fr: Oublie la saisie : revient au bon en attente, sinon à la table.
+tr: Descarta lo escrito: vuelve a la orden pendiente o, si no la hay, a la tabla.
+
+fr: Ouvre la fiche de l'item à l'édition : nom, ressource, teinte de l'icône, description. Le changement part en bon de travail.
+tr: Abre la ficha del item para editarla: nombre, recurso, tinte del icono, descripción. El cambio sale como orden de trabajo.
 
 fr: Par moments, un venin mortel : vos dégâts explosent.
 tr: A ratos, un veneno mortal: tu daño se dispara.
@@ -767,6 +836,9 @@ tr: ¿Reiniciar toda la vista previa? Ctrl+Z lo deshace si cambias de opinión.
 fr: Renommer avec le nom saisi
 tr: Renombrar con el nombre escrito
 
+fr: Ressource
+tr: Recurso
+
 fr: Retirer cette retouche
 tr: Quitar este retoque
 
@@ -779,8 +851,14 @@ tr: Vuelve a lo que tu personaje tiene de por sí, sin tocar las piezas.
 fr: Rien à valider : ton personnage porte déjà ce style.
 tr: Nada que validar: tu personaje ya lleva este estilo.
 
+fr: Rose
+tr: Rosa
+
 fr: Rotation : %+d°
 tr: Rotación: %+d°
+
+fr: Rouge
+tr: Rojo
 
 fr: Règle une monture ou une tenue sans la porter. Valider ne change que le corps choisi.
 tr: Ajusta una montura o un atuendo sin llevarlo. Validar solo cambia el cuerpo elegido.
@@ -797,8 +875,14 @@ tr: Saturación: %+d %%
 fr: Saturation : %d %%
 tr: Saturación: %d %%
 
+fr: Table
+tr: Tabla
+
 fr: Teinte : %d°
 tr: Tono: %d°
+
+fr: Teinte d'icône
+tr: Tinte del icono
 
 fr: Teintes voisines
 tr: Tonos vecinos
@@ -829,6 +913,9 @@ tr: Tríada
 
 fr: Tu as déjà habillé autant de corps que le serveur en garde. Valider celui-ci effacera le style du plus ancien — jamais ton style principal.
 tr: Ya has vestido tantos cuerpos como guarda el servidor. Validar este borrará el estilo del más antiguo — nunca tu estilo principal.
+
+fr: Un bon attend le script pour cet item : la saisie le montre.
+tr: Una orden para este item espera el script: lo escrito la muestra.
 
 fr: Un bond en arrière blesse et repousse ce qui vous talonne.
 tr: Un salto atrás hiere y repele lo que te pisa los talones.
@@ -2087,8 +2174,14 @@ tr: Valida este estilo y lo da a todos tus cuerpos que no tienen el suyo, para t
 fr: Vaut pour l'heure forcée ci-dessus comme pour le « Cycle jour/nuit » de Graphics. Seul ce client le voit.
 tr: Vale para la hora forzada de arriba y para el «Ciclo día/noche» de Graphics. Solo este cliente lo ve.
 
+fr: Vert
+tr: Verde
+
 fr: Videz un plateau d'item de son orange pour l'y ranger.
 tr: Vacía de naranja un tablero de objeto para guardarlo aquí.
+
+fr: Violet
+tr: Morado
 
 fr: Visez à la souris, affinez à la molette, cliquez pour tirer.
 tr: Apunta con el ratón, afina con la rueda y haz clic para disparar.
@@ -5486,6 +5579,9 @@ tr: Sigues a %s.
 
 fr: ce site
 tr: este sitio
+
+fr: Écrit les champs changés dans savedata\\item_info_delta.yml. Le client n'en montre rien avant le passage du script.
+tr: Escribe los campos cambiados en savedata\\item_info_delta.yml. El cliente no muestra nada hasta que pase el script.
 
 fr: Éleveur de Porings
 tr: Criador de Porings

@@ -394,6 +394,15 @@ void DrawStaffItemRow(const DescriptionView& view, const SkinArt& art, int& amou
     ImGui::SameLine();
     ImGui::TextDisabled(core::Tr("(%d au plus)"), granted);
   }
+  ImGui::SameLine();
+  if (SkinSmallButton(core::Tr("Modifier la fiche"), art)) {
+    action.edit_sheet = view.item_id;
+  }
+  if (ImGui::IsItemHovered()) {
+    SkinTooltip(
+        core::Tr("Ouvre la fiche de l'item à l'édition : nom, ressource, teinte de "
+                 "l'icône, description. Le changement part en bon de travail."));
+  }
   if (!hovered) {
     return;
   }

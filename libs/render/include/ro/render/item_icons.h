@@ -2,11 +2,15 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <map>
 #include <optional>
 #include <string>
+#include <string_view>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
+#include "ro/formats/icon_tint.h"
 #include "ro/formats/image.h"
 #include "ro/render/icon_texture.h"
 #include "ro/vfs/card_illustrations.h"
@@ -50,7 +54,19 @@ class ItemIcons {
   // installation n'en déclare AUCUNE — pas un `unRes` sur 27 208 entrées — et le
   // serveur, lui, ne fabrique jamais d'objet non identifié hors de commandes
   // d'administration. Une clé de cache à deux champs ne séparerait donc rien.
+  //
+  // L'icône porte la teinte que la table donne à l'objet (`ItemEntry::tint`).
   [[nodiscard]] const IconTexture& Get(std::uint32_t item_id);
+
+  // L'ICÔNE D'UNE RESSOURCE (en CP949) SOUS UNE TEINTE, pour l'aperçu d'une
+  // fiche qu'on édite : ni la ressource ni la teinte ne sont encore celles de
+  // la table. Rend une icône inutilisable quand l'installation n'a pas ce
+  // fichier.
+  //
+  // ⚠ LA RÉFÉRENCE NE VAUT QUE JUSQU'À L'APPEL SUIVANT : une saisie demande une
+  // ressource par touche, et le cache se vide au-delà de `kPreviewMost`.
+  [[nodiscard]] const IconTexture& Preview(const std::string& resource, formats::IconTint tint);
+  static constexpr std::size_t kPreviewMost = 32;
 
   // L'ILLUSTRATION DE COLLECTION, la grande image de la description.
   //
@@ -111,6 +127,7 @@ class ItemIcons {
   std::unordered_map<std::uint32_t, IconTexture> loaded_;
   std::unordered_map<std::uint32_t, IconTexture> collections_;
   std::unordered_map<std::uint32_t, IconTexture> illustrations_;
+  std::map<std::pair<std::string, formats::IconTint>, IconTexture> previews_;
   std::optional<std::vector<std::uint32_t>> collection_items_;
   std::uint64_t generation_ = 0;
 };
@@ -143,5 +160,9 @@ class ItemIcons {
 // que le chemin, lui, se vérifie hors jeu. C'est ce qui permet à `roc-cli` de
 // dire ce que l'installation possède sans ouvrir de fenêtre.
 [[nodiscard]] std::string ItemIconPath(const vfs::ItemTable& items, std::uint32_t item_id);
+
+// Le même chemin, pour un nom de ressource EN CP949 qu'aucun objet ne porte
+// encore ; vide pour une ressource vide.
+[[nodiscard]] std::string ItemIconPathOfResource(std::string_view resource);
 
 }  // namespace ro::render

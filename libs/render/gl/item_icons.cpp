@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "ro/formats/bmp.h"
+#include "ro/formats/icon_tint.h"
 #include "ro/formats/image.h"
 
 namespace ro::render {
@@ -18,8 +19,10 @@ namespace {
 
 // Lit un bitmap du jeu, transparence posée ; vide quand il manque.
 // `on_paper` : une illustration de collection, peinte sur du papier blanc ; son
-// fond se détoure, pour qu'elle se pose sur n'importe quel panneau.
-std::optional<formats::Image> ReadImage(vfs::Vfs& vfs, const std::string& path, bool on_paper) {
+// fond se détoure, pour qu'elle se pose sur n'importe quel panneau. `tint` :
+// la couleur posée sur l'image, après sa transparence.
+std::optional<formats::Image> ReadImage(vfs::Vfs& vfs, const std::string& path, bool on_paper,
+                                        formats::IconTint tint = formats::IconTint::kNone) {
   if (path.empty()) {
     return std::nullopt;
   }
@@ -37,12 +40,14 @@ std::optional<formats::Image> ReadImage(vfs::Vfs& vfs, const std::string& path, 
   if (on_paper) {
     formats::MattePaperBackground(*image);
   }
+  formats::ApplyIconTint(*image, tint);
   return std::move(*image);
 }
 
 // Charge un bitmap du jeu dans une texture, ou laisse la case vide.
-void LoadInto(vfs::Vfs& vfs, const std::string& path, IconTexture& into, bool on_paper = false) {
-  auto image = ReadImage(vfs, path, on_paper);
+void LoadInto(vfs::Vfs& vfs, const std::string& path, IconTexture& into, bool on_paper = false,
+              formats::IconTint tint = formats::IconTint::kNone) {
+  auto image = ReadImage(vfs, path, on_paper, tint);
   if (!image) {
     return;
   }
@@ -115,7 +120,24 @@ void ItemIcons::Clear() {
   loaded_.clear();
   collections_.clear();
   illustrations_.clear();
+  previews_.clear();
   ++generation_;
+}
+
+const IconTexture& ItemIcons::Preview(const std::string& resource, formats::IconTint tint) {
+  auto key = std::make_pair(resource, tint);
+  const auto known = previews_.find(key);
+  if (known != previews_.end()) {
+    return known->second;
+  }
+  if (previews_.size() >= kPreviewMost) {
+    previews_.clear();
+  }
+  IconTexture& icon = previews_[std::move(key)];
+  if (vfs_ != nullptr) {
+    LoadInto(*vfs_, ItemIconPathOfResource(resource), icon, /*on_paper=*/false, tint);
+  }
+  return icon;
 }
 
 const IconTexture& ItemIcons::Get(std::uint32_t item_id) {
@@ -129,7 +151,9 @@ const IconTexture& ItemIcons::Get(std::uint32_t item_id) {
   if (vfs_ == nullptr || items_ == nullptr) {
     return icon;
   }
-  LoadInto(*vfs_, ItemIconPath(*items_, item_id), icon);
+  const vfs::ItemEntry* const entry = items_->Find(item_id);
+  LoadInto(*vfs_, ItemIconPath(*items_, item_id), icon, /*on_paper=*/false,
+           entry != nullptr ? entry->tint : formats::IconTint::kNone);
   return icon;
 }
 

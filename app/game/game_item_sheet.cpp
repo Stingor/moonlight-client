@@ -137,6 +137,10 @@ void Game::RouteItemSheet(const ro::ui::DescriptionWindowAction& asked, std::uin
   if (asked.staff_item.has_value()) {
     SendStaffItems(std::span(&*asked.staff_item, 1), Rights(), link_, world_);
   }
+  // « Modifier la fiche » du staff : la fenêtre d'édition, sur l'item décrit.
+  if (asked.edit_sheet != 0 && Rights().staff_tools) {
+    ro::ui::OpenItemSheetEditor(windows_.staff_tools.item_editor, asked.edit_sheet);
+  }
   if (asked.open_craft_atlas) {
     ro::ui::OpenCraftAtlasOn(windows_.craft_atlas.state, item_id);
   }

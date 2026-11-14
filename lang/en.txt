@@ -302,6 +302,12 @@ tr: Announces to the whole server, your name first.
 fr: Annule tes retouches en cours et revient à ce que ton personnage porte. Ctrl+Z les rend.
 tr: Discards your current edits and goes back to what your character wears. Ctrl+Z brings them back.
 
+fr: Annuler le bon
+tr: Cancel order
+
+fr: Aperçu
+tr: Preview
+
 fr: Arsenal
 tr: Arsenal
 
@@ -362,11 +368,23 @@ tr: When wounded, you vanish without ceasing to strike, and your first blow on l
 fr: Blessé, vous vous terrez un instant : rien ne vous touche, mais vous ne frappez plus.
 tr: When wounded, you go to ground for a moment: nothing touches you, but you stop striking.
 
+fr: Bleu
+tr: Blue
+
 fr: Bloque les chuchotements de ce joueur ; seule, liste les bloqués.
 tr: Blocks this player's whispers; alone, lists the blocked ones.
 
 fr: Bloque les chuchotements de tout le monde.
 tr: Blocks everyone's whispers.
+
+fr: Bon annulé : la table reste telle quelle.
+tr: Order cancelled: the table stays as it is.
+
+fr: Bon enregistré dans savedata\\item_info_delta.yml.
+tr: Order saved in savedata\\item_info_delta.yml.
+
+fr: Bons en attente : %zu. À porter par apply_item_info_delta.py, puis relancer le client.
+tr: Pending orders: %zu. Apply them with apply_item_info_delta.py, then restart the client.
 
 fr: Carnet (%d)
 tr: Notebook (%d)
@@ -394,6 +412,12 @@ tr: The game's
 
 fr: Celle du jeu est la police du client d'origine. Le titre garde sa place : une police plus large se coupe plus tôt en « ... », et la souris sur le titre le montre en entier.
 tr: The game's is the original client's font. The title keeps its room: a wider font gets cut into "..." sooner, and hovering the title shows it in full.
+
+fr: Cet item n'est pas dans la table : le bon créera sa fiche.
+tr: This item is not in the table: the order will create its entry.
+
+fr: Cette ressource ne s'écrit pas en CP949, l'encodage des archives.
+tr: This resource cannot be written in CP949, the archive encoding.
 
 fr: Chance d'esquive : certains coups le manquent.
 tr: Dodge chance: some blows miss him.
@@ -587,6 +611,9 @@ tr: Make it my main style
 fr: En plus du butin, sur cette map. Les taux du serveur ne les changent pas.
 tr: On top of the regular loot, on this map. Server drop rates do not change them.
 
+fr: Enregistrer le bon
+tr: Save order
+
 fr: Entendre les autres joueurs, et leur parler en tenant la touche « Parler (voix) » des raccourcis. Seulement sur un serveur qui ouvre la voix.
 tr: Hear the other players, and talk to them by holding the "Talk (voice)" shortcut key. Only on a server that opens voice.
 
@@ -595,6 +622,9 @@ tr: Dodge +%d %%
 
 fr: Feuilles restantes : %d
 tr: Leaves left: %d
+
+fr: Fiche d'item (staff)
+tr: Item sheet (staff)
 
 fr: Fond clair
 tr: Light background
@@ -626,11 +656,20 @@ tr: You must be in a town or indoors.
 fr: Il rejoint le carnet.
 tr: It joins the notebook.
 
+fr: Item %u
+tr: Item %u
+
 fr: Item dévoilé !
 tr: Item revealed!
 
 fr: Items dévoilés : %d sur %d
 tr: Items revealed: %d of %d
+
+fr: L'installation n'a pas d'icône sous cette ressource.
+tr: The installation has no icon under this resource.
+
+fr: La couleur posée sur l'icône au chargement, à la luminance de chaque pixel. Aucun fichier de l'installation n'est réécrit.
+tr: The colour laid on the icon when it loads, at each pixel's luminance. No installation file is rewritten.
 
 fr: La partie continue : votre héros reste à découvert.
 tr: The game goes on: your hero is exposed.
@@ -641,11 +680,23 @@ tr: The party's game has desynchronised: it stops here.
 fr: La partie du groupe ne peut pas commencer.
 tr: The party's game cannot start.
 
+fr: La saisie redit la table : aucun bon pour cet item.
+tr: The input matches the table: no order for this item.
+
+fr: Le bon n'a pas pu s'écrire : voir le journal.
+tr: The order could not be written: see the log.
+
 fr: Le groupe compte plus de quatre membres.
 tr: The party has more than four members.
 
 fr: Le groupe ne répond plus : vous quittez la partie.
 tr: The party is no longer responding: you are leaving the game.
+
+fr: Le nom du fichier de l'icône et de l'illustration de collection, sans extension. Toutes les cartes portent celui du dos de carte générique.
+tr: The file name of the icon and of the collection picture, without extension. All cards carry the generic card back's.
+
+fr: Le nom ne peut pas être vide.
+tr: The name cannot be empty.
 
 fr: Le personnage est mort.
 tr: Your character is dead.
@@ -701,14 +752,32 @@ tr: Today's best:
 fr: Mode avancé
 tr: Advanced mode
 
+fr: Modifier la fiche
+tr: Edit sheet
+
 fr: Monture de boutique
 tr: Shop mount
 
 fr: Monté
 tr: Mounted
 
+fr: Noir
+tr: Black
+
 fr: On vous propose un échange.
 tr: Someone is offering you a trade.
+
+fr: Or
+tr: Gold
+
+fr: Orange
+tr: Orange
+
+fr: Oublie la saisie : revient au bon en attente, sinon à la table.
+tr: Discards the input: back to the pending order, otherwise to the table.
+
+fr: Ouvre la fiche de l'item à l'édition : nom, ressource, teinte de l'icône, description. Le changement part en bon de travail.
+tr: Opens the item's sheet for editing: name, resource, icon tint, description. The change goes out as a work order.
 
 fr: Par moments, un venin mortel : vos dégâts explosent.
 tr: At times, a deadly venom: your damage soars.
@@ -767,6 +836,9 @@ tr: Reset the whole preview? Ctrl+Z undoes it if you change your mind.
 fr: Renommer avec le nom saisi
 tr: Rename to the typed name
 
+fr: Ressource
+tr: Resource
+
 fr: Retirer cette retouche
 tr: Remove this touch-up
 
@@ -779,8 +851,14 @@ tr: Goes back to what your character has on its own, without touching the parts.
 fr: Rien à valider : ton personnage porte déjà ce style.
 tr: Nothing to confirm: your character already wears this style.
 
+fr: Rose
+tr: Pink
+
 fr: Rotation : %+d°
 tr: Rotation: %+d°
+
+fr: Rouge
+tr: Red
 
 fr: Règle une monture ou une tenue sans la porter. Valider ne change que le corps choisi.
 tr: Edit a mount or an outfit without wearing it. Confirming only changes the chosen body.
@@ -797,8 +875,14 @@ tr: Saturation: %+d %%
 fr: Saturation : %d %%
 tr: Saturation: %d %%
 
+fr: Table
+tr: Table
+
 fr: Teinte : %d°
 tr: Hue: %d°
+
+fr: Teinte d'icône
+tr: Icon tint
 
 fr: Teintes voisines
 tr: Neighboring hues
@@ -829,6 +913,9 @@ tr: Triad
 
 fr: Tu as déjà habillé autant de corps que le serveur en garde. Valider celui-ci effacera le style du plus ancien — jamais ton style principal.
 tr: You have already styled as many bodies as the server keeps. Confirming this one will erase the oldest one's style — never your main style.
+
+fr: Un bon attend le script pour cet item : la saisie le montre.
+tr: An order for this item awaits the script: the input shows it.
 
 fr: Un bond en arrière blesse et repousse ce qui vous talonne.
 tr: A leap backward wounds and pushes away what is on your heels.
@@ -2087,8 +2174,14 @@ tr: Confirms this style and gives it to all your bodies that don't have their ow
 fr: Vaut pour l'heure forcée ci-dessus comme pour le « Cycle jour/nuit » de Graphics. Seul ce client le voit.
 tr: Applies to the forced hour above as well as to the “Day/night cycle” in Graphics. Only this client sees it.
 
+fr: Vert
+tr: Green
+
 fr: Videz un plateau d'item de son orange pour l'y ranger.
 tr: Clear an item board of its orange to file the item here.
+
+fr: Violet
+tr: Purple
 
 fr: Visez à la souris, affinez à la molette, cliquez pour tirer.
 tr: Aim with the mouse, fine-tune with the wheel, click to shoot.
@@ -5486,6 +5579,9 @@ tr: You are following %s.
 
 fr: ce site
 tr: this site
+
+fr: Écrit les champs changés dans savedata\\item_info_delta.yml. Le client n'en montre rien avant le passage du script.
+tr: Writes the changed fields to savedata\\item_info_delta.yml. The client shows nothing of it until the script has run.
 
 fr: Éleveur de Porings
 tr: Poring Breeder

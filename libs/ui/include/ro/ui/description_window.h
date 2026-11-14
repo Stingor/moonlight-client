@@ -535,6 +535,8 @@ struct DescriptionWindowAction {
   bool refresh_boss = false;
   // Le bouton « @item » du staff : l'item décrit, à la quantité du champ.
   std::optional<StaffItemGrant> staff_item;
+  // Le bouton « Modifier la fiche » du staff : l'item décrit ; zéro sinon.
+  std::uint32_t edit_sheet = 0;
   // L'onglet « Vendu chez » est montré : la demande au Marché peut partir. Elle
   // n'attend que lui, pour qu'une fiche feuilletée ne coûte rien au serveur.
   bool sellers_shown = false;

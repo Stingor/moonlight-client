@@ -12,6 +12,7 @@
 #include "ro/core/i18n.h"
 #include "ro/render/actor_pick.h"
 #include "ro/render/sky_clock.h"
+#include "ro/ui/item_sheet_editor.h"
 #include "ro/ui/map_editor_panel.h"
 #include "ro/ui/quick_cast_look.h"
 #include "ro/ui/skin_art.h"
@@ -199,6 +200,12 @@ struct StaffToolsState {
   const StaffRosterView* roster_view = nullptr;
   StaffRosterWindowState roster;
   StaffRosterAnswer roster_answer;
+  // LA FICHE D'UN OBJET ÉDITÉE, de même : sa vue, nulle tant que la fenêtre ne
+  // montre rien ; son état ; et ce qu'elle a demandé pendant l'image. Voir
+  // `item_sheet_editor.h`.
+  const ItemSheetEditorView* item_editor_view = nullptr;
+  ItemSheetEditorState item_editor;
+  ItemSheetEditorAnswer item_editor_answer;
   // LES BRUITAGES SONNENT-ILS ? Posé par l'appelant avant le dessin : l'établi
   // ne connaît pas l'audio.
   //

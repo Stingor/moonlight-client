@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "ro/core/error.h"
+#include "ro/formats/icon_tint.h"
 #include "ro/vfs/item_info_text.h"
 #include "ro/vfs/vfs.h"
 
@@ -55,6 +56,10 @@ struct ItemEntry {
   // Combien de cartes l'objet peut recevoir. C'est ce nombre qui compose le
   // suffixe « [N] » du nom affiché.
   std::uint8_t card_slots = 0;
+
+  // La couleur posée sur son icône au chargement ; `kNone` : l'icône telle que
+  // l'installation la donne.
+  formats::IconTint tint = formats::IconTint::kNone;
 };
 
 class ItemTable {
@@ -149,7 +154,8 @@ inline constexpr std::string_view kDescriptionRule = "________________________";
 // L'OBJET TEL QUE LE CLIENT LE MONTRE, tiré d'une entrée de la table : la
 // ressource retranscodée en CP949, les trois lignes du script de chargement en
 // tête de la description, et chaque `#` final changé en trait. Refuse une
-// ressource que le CP949 ne sait pas écrire à l'identique.
+// ressource que le CP949 ne sait pas écrire à l'identique, et une teinte dont
+// le mot n'est pas celui d'une `formats::IconTint`.
 //
 // ⚠ C'EST LA RÈGLE QUE `ParseItemTable` APPLIQUE À CHAQUE ENTRÉE, et la seule :
 // qui montre une entrée hors de la table — l'éditeur de tables, pour son

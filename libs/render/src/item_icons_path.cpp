@@ -66,7 +66,10 @@ std::string ItemCollectionPath(const vfs::ItemTable& items, std::uint32_t item_i
 }
 
 std::string ItemIconPath(const vfs::ItemTable& items, std::uint32_t item_id) {
-  const std::string_view resource = items.ResourceOf(item_id);
+  return ItemIconPathOfResource(items.ResourceOf(item_id));
+}
+
+std::string ItemIconPathOfResource(std::string_view resource) {
   if (resource.empty() || IconFolderCp949().empty()) {
     return {};
   }

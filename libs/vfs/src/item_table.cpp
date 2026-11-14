@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <expected>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -82,7 +83,13 @@ core::Result<ItemEntry> DescribeItem(ItemInfoRecord record) {
     return std::unexpected(
         Refused("objet " + std::to_string(record.item_id) + " : ressource intraduisible en CP949"));
   }
+  const std::optional<formats::IconTint> tint = formats::IconTintFromWord(record.tint);
+  if (!tint.has_value()) {
+    return std::unexpected(Refused("objet " + std::to_string(record.item_id) +
+                                   " : teinte inconnue « " + record.tint + " »"));
+  }
   ItemEntry described;
+  described.tint = *tint;
   described.name = std::move(record.name);
   described.resource = std::move(*archived);
   described.view_id = record.view;
