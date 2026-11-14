@@ -65,6 +65,19 @@ namespace moonclient {
 // pas changée : le serveur l'accepte par la gauche et la pose sur les deux.
 [[nodiscard]] std::uint32_t WearAt(std::uint32_t wearable_at, bool alternate);
 
+// OÙ VA LA PIÈCE LÂCHÉE SUR UNE CASE DONT L'EMPLACEMENT EST `aimed_at`.
+//
+// 🔴 LA CASE VISÉE GAGNE quand la pièce peut y aller : un costume de tête
+// déclare les trois coiffes d'apparat, et renvoyer ce masque laisse le serveur
+// prendre la première libre — la coiffe haute, par-dessus le chapeau porté.
+// Resserré sur un seul bit, il pose la pièce là où on l'a lâchée. Même chose
+// pour l'accessoire de gauche ou de droite, et pour la main d'un ambidextre.
+//
+// ⚠ UNE CASE OÙ LA PIÈCE NE VA PAS NE FAIT PAS ÉCHOUER LE GESTE : on retombe sur
+// `WearAt`, et le serveur range la pièce à sa place.
+[[nodiscard]] std::uint32_t WearAimedAt(std::uint32_t wearable_at, bool alternate,
+                                        std::uint32_t aimed_at);
+
 // CE QU'UNE CASE DE BARRE FAIT DE L'OBJET QU'ELLE DÉSIGNE.
 enum class ShortcutItemAct : std::uint8_t {
   kUse,

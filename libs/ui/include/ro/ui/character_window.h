@@ -563,10 +563,10 @@ enum class CharacterVerb : std::uint8_t {
   kTakeOff,
   // Porter la pièce qu'on vient de lâcher sur le mannequin.
   //
-  // ⚠ LA CASE VISÉE NE DÉCIDE DE RIEN, et c'est le geste du client : on
-  // lâche sur le mannequin, pas sur un emplacement. Le serveur sait où la
-  // pièce va — il refuserait une place impossible — et exiger la bonne case
-  // ferait échouer un geste qu'il aurait accepté.
+  // ⚠ LA CASE VISÉE RESSERRE, ELLE N'EXIGE PAS. Une pièce qui peut aller à
+  // plusieurs places — un costume de tête, un accessoire — va à celle où on
+  // l'a lâchée ; une case où elle ne peut pas aller ne fait pas échouer le
+  // geste, et le serveur la range où il veut.
   kWear,
   // Monter une caractéristique de `amount` crans.
   kRaiseAttribute,
@@ -582,6 +582,10 @@ struct CharacterWindowAction {
   // Ctrl tenu pendant le lâcher : dans l'AUTRE main. Même variante que le
   // double-clic du sac, et elle ne veut rien dire par elle-même.
   bool alternate = false;
+  // LA CASE OÙ IL A LÂCHÉ, pour `kWear`, et l'onglet qui la montrait : la même
+  // case désigne la coiffe ordinaire ou celle d'apparat.
+  std::optional<EquipSlot> wear_aimed;
+  bool wear_costume = false;
   // L'OBJET DONT IL VEUT LA DESCRIPTION, et d'où il vient. ⚠ LA PLACE EST CELLE
   // DU SAC : une pièce portée y vit toujours, avec un drapeau — le mannequin
   // n'est pas un contenant du serveur.

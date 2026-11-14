@@ -185,10 +185,11 @@ void PaintBadge(ImDrawList* into, const EquipSlotView& piece, ImVec2 top_left, f
   // le serveur remplace ce qui s'y trouve, exactement comme le sac le
   // demanderait par un double-clic.
   //
-  // ⚠ SAUF CE QUI EST DÉJÀ SUR LE CORPS. La case visée ne décide de rien — le
-  // serveur sait où la pièce va —, donc traîner un équipement d'une case à
-  // l'autre ne demande rien de neuf, et l'enfiler une seconde fois enverrait un
-  // paquet qui ne change rien.
+  // ⚠ LA CASE VISÉE PART AVEC LA DEMANDE : un costume de tête lâché sur la
+  // coiffe basse doit y aller, pas à la première place libre.
+  //
+  // ⚠ SAUF CE QUI EST DÉJÀ SUR LE CORPS : l'enfiler une seconde fois enverrait
+  // un paquet que le serveur refuse.
   //
   // 🔴 UNE CARTE LÂCHÉE SUR UNE PIÈCE PORTÉE DEMANDE LE SERTISSAGE, pas
   // l'enfilage : c'est `app` qui dira pourquoi il refuse.
@@ -203,6 +204,7 @@ void PaintBadge(ImDrawList* into, const EquipSlotView& piece, ImVec2 top_left, f
         action.verb = CharacterVerb::kWear;
         action.slot = carried.client_slot;
         action.alternate = ImGui::GetIO().KeyCtrl;
+        action.wear_aimed = slot;
         asked = true;
       }
     }
@@ -553,6 +555,7 @@ void DrawCharacterDoll(const CharacterHeaderView& header, std::span<const EquipS
                   art.look());
 
   float used_height = avatar_height + kDollTopGap * scale;
+  action.wear_costume = costume;
   if (costume) {
     // DEUX RANGÉES, CENTRÉES CONTRE L'AVATAR. ⚠ ET AUCUNE CASE VIDE DE PLUS :
     // les six autres places n'existent pas pour un costume, et en dessiner les

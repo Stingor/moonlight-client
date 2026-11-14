@@ -449,8 +449,10 @@ void CharacterView::Apply(const ro::ui::CharacterWindowAction& asked, ro::net::C
       if (piece == nullptr || piece->wearable_at == 0) {
         return;
       }
+      const std::uint32_t aimed_at =
+          asked.wear_aimed.has_value() ? EquipLocationOf(*asked.wear_aimed, asked.wear_costume) : 0;
       sent = ro::net::RequestEquip(link, piece->client_slot,
-                                   WearAt(piece->wearable_at, asked.alternate));
+                                   WearAimedAt(piece->wearable_at, asked.alternate, aimed_at));
       break;
     }
     case ro::ui::CharacterVerb::kRaiseAttribute: {

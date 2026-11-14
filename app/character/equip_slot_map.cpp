@@ -84,6 +84,13 @@ std::uint32_t WearAt(std::uint32_t wearable_at, bool alternate) {
   return wearable_at;
 }
 
+std::uint32_t WearAimedAt(std::uint32_t wearable_at, bool alternate, std::uint32_t aimed_at) {
+  if ((wearable_at & aimed_at) != 0) {
+    return aimed_at;
+  }
+  return WearAt(wearable_at, alternate);
+}
+
 ShortcutItemGesture ShortcutGestureOf(const ro::sim::InventoryItem& item) {
   if (item.wearable_at == ro::sim::kEquipAmmo) {
     return {ShortcutItemAct::kWear, ro::sim::kEquipAmmo};
