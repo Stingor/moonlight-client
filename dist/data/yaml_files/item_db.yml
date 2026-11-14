@@ -129145,6 +129145,58 @@ Body:
     Weight: 10
     Script: |
       laphine_upgrade();
+  - Id: 100626
+    AegisName: GrayWolf_7_Ticket
+    Name: Gray Wolf +7 Refinement Box
+    Type: DelayConsume
+    Weight: 10
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      laphine_upgrade();
+  - Id: 100627
+    AegisName: GrayWolf_9_Ticket
+    Name: Gray Wolf +9 Refinement Box
+    Type: DelayConsume
+    Weight: 10
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      laphine_upgrade();
+  - Id: 100650
+    AegisName: Pontifex_Courage
+    Name: Pontifex Courage
+    Type: DelayConsume
+    Weight: 10
+    EquipLevelMin: 180
+    Flags: {BuyingStore: true}
+    Script: |
+      laphine_upgrade();
+  - Id: 100651
+    AegisName: Pontifex_Wisdom
+    Name: Pontifex Wisdom
+    Type: DelayConsume
+    Weight: 10
+    EquipLevelMin: 180
+    Flags: {BuyingStore: true}
+    Script: |
+      laphine_upgrade();
+  - Id: 100652
+    AegisName: Pontifex_Tenacity
+    Name: Pontifex Tenacity
+    Type: DelayConsume
+    Weight: 10
+    EquipLevelMin: 180
+    Flags: {BuyingStore: true}
+    Script: |
+      laphine_upgrade();
+  - Id: 100653
+    AegisName: Pontifex_Belief
+    Name: Pontifex Belief
+    Type: DelayConsume
+    Weight: 10
+    EquipLevelMin: 180
+    Flags: {BuyingStore: true}
+    Script: |
+      laphine_upgrade();
   - Id: 100699
     AegisName: Twins_Box_IL
     Name: Twins Refinement Box
@@ -138545,6 +138597,44 @@ Body:
       if (getallrefine() >= 22) {
          bonus bAspdRate,10;
       }
+  - Id: 450177
+    AegisName: Gray_W_Suits
+    Name: "Gray Wolf Suit [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Weight: 1000
+    Defense: 12
+    Slots: 1
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 190
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,130+15*(.@r/2);
+      if (.@r>=7) {
+         bonus bAspdRate,15;
+      }
+  - Id: 450178
+    AegisName: Gray_W_Robe
+    Name: "Gray Wolf Robe [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Weight: 1000
+    Defense: 12
+    Slots: 1
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 190
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMatk,130+(15*(.@r/2));
+      if (.@r>=7) {
+         bonus bVariableCastrate,-15;
+      }
   - Id: 450179
     AegisName: Celine_Dress
     Name: "Celine's Dress [1]"
@@ -138742,6 +138832,44 @@ Body:
             }
          }
       }
+  - Id: 470087
+    AegisName: Gray_W_Boots
+    Name: "Gray Wolf Boots [1]"
+    Type: Armor
+    Buy: 45000
+    Sell: 11250
+    Weight: 500
+    Defense: 6
+    Slots: 1
+    Locations: {Shoes: true}
+    ArmorLevel: 1
+    EquipLevelMin: 190
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMaxSP,300+50*(.@r/2);
+      if (.@r>=7) {
+         bonus bLongAtkRate,7;
+      }
+  - Id: 470088
+    AegisName: Gray_W_Shoes
+    Name: "Gray Wolf Shoes [1]"
+    Type: Armor
+    Buy: 45000
+    Sell: 11250
+    Weight: 500
+    Defense: 6
+    Slots: 1
+    Locations: {Shoes: true}
+    ArmorLevel: 1
+    EquipLevelMin: 190
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMaxSP,250+20*(.@r/2);
+      if (.@r>=7) {
+         bonus2 bMagicAtkEle,Ele_All,7;
+      }
   - Id: 480018
     AegisName: Grace_Attack_Manteau
     Name: "Grace Attack Manteau [1]"
@@ -138900,6 +139028,44 @@ Body:
     Type: Armor
     Locations: {Costume_Garment: true}
     View: 89
+  - Id: 480090
+    AegisName: Gray_W_Muffler
+    Name: "Gray Wolf Muffler [1]"
+    Type: Armor
+    Buy: 57000
+    Sell: 14250
+    Weight: 900
+    Defense: 6
+    Slots: 1
+    Locations: {Garment: true}
+    ArmorLevel: 1
+    EquipLevelMin: 190
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHP,1500+100*(.@r/2);
+      if (.@r>=7) {
+         bonus bVariableCastrate,-7;
+      }
+  - Id: 480091
+    AegisName: Gray_W_Manteau
+    Name: "Gray Wolf Manteau [1]"
+    Type: Armor
+    Buy: 57000
+    Sell: 14250
+    Weight: 900
+    Defense: 6
+    Slots: 1
+    Locations: {Garment: true}
+    ArmorLevel: 1
+    EquipLevelMin: 190
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHP,2500+150*(.@r/2);
+      if (.@r>=7) {
+         bonus bAspdRate,7;
+      }
   - Id: 480092
     AegisName: C_Sudden_Wealth_J
     Name: Costume Sudden Wealth
@@ -140214,6 +140380,62 @@ Body:
     Script: |
       bonus bCritical,5;
       bonus bBaseAtk,20;
+  - Id: 490106
+    AegisName: Gray_W_Pendant
+    Name: "Gray Wolf Pendant [1]"
+    Type: Armor
+    Buy: 5500
+    Sell: 2750
+    Weight: 100
+    Slots: 1
+    Locations: {Right_Accessory: true}
+    ArmorLevel: 1
+    EquipLevelMin: 190
+    Script: |
+      bonus2 bAddClass,Class_All,7;
+      bonus bMaxHPrate,5;
+  - Id: 490107
+    AegisName: Gray_W_Ring
+    Name: "Gray Wolf Ring [1]"
+    Type: Armor
+    Buy: 5500
+    Sell: 2750
+    Weight: 100
+    Slots: 1
+    Locations: {Left_Accessory: true}
+    ArmorLevel: 1
+    EquipLevelMin: 190
+    Script: |
+      bonus2 bAddClass,Class_All,7;
+      bonus bMaxSPrate,5;
+  - Id: 490108
+    AegisName: Gray_W_Earing
+    Name: "Gray Wolf Earring [1]"
+    Type: Armor
+    Buy: 5500
+    Sell: 2750
+    Weight: 100
+    Slots: 1
+    Locations: {Right_Accessory: true}
+    ArmorLevel: 1
+    EquipLevelMin: 190
+    Script: |
+      bonus bMatkRate,7;
+      bonus bMaxHPrate,5;
+  - Id: 490109
+    AegisName: Gray_W_Necklace
+    Name: "Gray Wolf Necklace [1]"
+    Type: Armor
+    Buy: 5500
+    Sell: 2750
+    Weight: 100
+    Slots: 1
+    Locations: {Left_Accessory: true}
+    ArmorLevel: 1
+    EquipLevelMin: 190
+    Script: |
+      bonus bMatkRate,7;
+      bonus bMaxSPrate,5;
   - Id: 490120
     AegisName: Sprint_Ring_IL
     Name: "Illusion Sprint Ring [1]"
@@ -140315,6 +140537,170 @@ Body:
       .@r = getrefine();
       bonus2 bSkillAtk,"AM_ACIDTERROR",5*(.@r/2);
       bonus2 bAddClass,Class_All,3*(.@r/4);
+  - Id: 500025
+    AegisName: Adulter_F_G_Sword
+    Name: "Adulter Fides Guardian Sword [2]"
+    Type: Weapon
+    SubType: 1hSword
+    Buy: 10300000
+    Sell: 103000
+    Weight: 2000
+    Attack: 200
+    Range: 1
+    Slots: 2
+    Jobs: {Crusader: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 180
+    Refineable: true
+    Script: |
+      bonus bMatk,220;
+      .@r = getrefine();
+      bonus2 bSkillAtk,"CR_GRANDCROSS",10;
+      bonus bMatk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"CR_GRANDCROSS",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-2;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"CR_GRANDCROSS",25;
+               if (getallrefine() >= 24) {
+                  bonus2 bMagicAtkEle,Ele_Neutral,15;
+                  bonus2 bMagicAtkEle,Ele_Holy,15;
+               }
+            }
+         }
+      }
+  - Id: 500026
+    AegisName: Adulter_F_Lapier
+    Name: "Adulter Fides Rapier [2]"
+    Type: Weapon
+    SubType: 1hSword
+    Buy: 10400000
+    Sell: 104000
+    Weight: 2000
+    Attack: 210
+    Range: 1
+    Slots: 2
+    Jobs: {Alchemist: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 180
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"AM_ACIDTERROR",10;
+      bonus bBaseAtk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"AM_ACIDTERROR",20;
+         if (.@r>=9) {
+            bonus bVariableCastrate,-10;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"AM_ACIDTERROR",25;
+               if (getallrefine() >= 24) {
+                  bonus bLongAtkRate,15;
+               }
+            }
+         }
+      }
+  - Id: 500027
+    AegisName: Vivatus_F_G_Sword
+    Name: "Vivatus Fides Guardian Sword [2]"
+    Type: Weapon
+    SubType: 1hSword
+    Buy: 10300000
+    Sell: 103000
+    Weight: 2000
+    Attack: 200
+    Range: 1
+    Slots: 2
+    Jobs: {Crusader: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Gradable: true
+    Script: |
+      bonus bMatk,220;
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus2 bSkillAtk,"CR_GRANDCROSS",10;
+      bonus bMatk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"CR_GRANDCROSS",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-2;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"CR_GRANDCROSS",25;
+               if (getallrefine() >= 24) {
+                  bonus2 bMagicAtkEle,Ele_Neutral,15;
+                  bonus2 bMagicAtkEle,Ele_Holy,15;
+               }
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus2 bMagicAddEle,Ele_All,15;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         if (.@g >= ENCHANTGRADE_B) {
+            bonus bMatkRate,7;
+            if (.@g >= ENCHANTGRADE_A) {
+               bonus bSMatk,(.@r/3);
+               bonus bSpl,(.@r/3);
+            }
+         }
+      }
+  - Id: 500028
+    AegisName: Vivatus_F_Lapier
+    Name: "Vivatus Fides Rapier [2]"
+    Type: Weapon
+    SubType: 1hSword
+    Buy: 10400000
+    Sell: 104000
+    Weight: 2000
+    Attack: 210
+    Range: 1
+    Slots: 2
+    Jobs: {Alchemist: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus2 bSkillAtk,"AM_ACIDTERROR",10;
+      bonus bBaseAtk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"AM_ACIDTERROR",20;
+         if (.@r>=9) {
+            bonus bVariableCastrate,-10;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"AM_ACIDTERROR",25;
+               if (getallrefine() >= 24) {
+                  bonus bLongAtkRate,15;
+               }
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus2 bAddEle,Ele_All,15;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         if (.@g >= ENCHANTGRADE_B) {
+            bonus2 bAddClass,Class_All,7;
+            if (.@g >= ENCHANTGRADE_A) {
+               bonus bPAtk,(.@r/3);
+               bonus bPow,(.@r/3);
+            }
+         }
+      }
   - Id: 500030
     AegisName: Excalibur_IL
     Name: "Illusion Excalibur [2]"
@@ -140416,6 +140802,86 @@ Body:
       .@r = getrefine();
       bonus2 bSkillAtk,"RG_RAID",5*(.@r/2);
       bonus2 bMagicAtkEle,Ele_All,2*(.@r/4);
+  - Id: 510032
+    AegisName: Adulter_F_Dagger
+    Name: "Adulter Fides Dagger [2]"
+    Type: Weapon
+    SubType: Dagger
+    Buy: 10400000
+    Sell: 104000
+    Weight: 1200
+    Attack: 210
+    Range: 1
+    Slots: 2
+    Jobs: {Rogue: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 180
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"RG_BACKSTAP",10;
+      bonus bBaseAtk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"RG_BACKSTAP",20;
+         if (.@r>=9) {
+            bonus2 bAddSize,Size_All,15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"RG_BACKSTAP",25;
+               if (getallrefine() >= 24) {
+                  bonus bShortAtkRate,15;
+               }
+            }
+         }
+      }
+  - Id: 510033
+    AegisName: Vivatus_F_Dagger
+    Name: "Vivatus Fides Dagger [2]"
+    Type: Weapon
+    SubType: Dagger
+    Buy: 10400000
+    Sell: 104000
+    Weight: 1200
+    Attack: 210
+    Range: 1
+    Slots: 2
+    Jobs: {Rogue: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus2 bSkillAtk,"RG_BACKSTAP",10;
+      bonus bBaseAtk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"RG_BACKSTAP",20;
+         if (.@r>=9) {
+            bonus2 bAddSize,Size_All,15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"RG_BACKSTAP",25;
+               if (getallrefine() >= 24) {
+                  bonus bShortAtkRate,15;
+               }
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus2 bAddEle,Ele_All,15;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         if (.@g >= ENCHANTGRADE_B) {
+            bonus2 bAddClass,Class_All,7;
+            if (.@g >= ENCHANTGRADE_A) {
+               bonus bPAtk,(.@r/3);
+               bonus bPow,(.@r/3);
+            }
+         }
+      }
   - Id: 510034
     AegisName: Ancient_Dagger_IL
     Name: "Illusion Ancient Dagger [2]"
@@ -140529,6 +140995,88 @@ Body:
       .@r = getrefine();
       bonus bUnbreakableWeapon;
       bonus bBaseAtk,40*.@r;
+  - Id: 520008
+    AegisName: Adulter_F_Axe
+    Name: "Adulter Fides Axe [2]"
+    Type: Weapon
+    SubType: 1hAxe
+    Buy: 11000000
+    Sell: 110000
+    Weight: 7500
+    Attack: 270
+    Range: 1
+    Slots: 2
+    Jobs: {Blacksmith: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 180
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bSkillAtk,"MC_CARTREVOLUTION",10;
+      bonus bBaseAtk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"MC_CARTREVOLUTION",20;
+         if (.@r>=9) {
+            bonus2 bAddSize,Size_All,15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"MC_CARTREVOLUTION",25;
+               if (getallrefine() >= 24) {
+                  bonus bLongAtkRate,15;
+               }
+            }
+         }
+      }
+  - Id: 520009
+    AegisName: Vivatus_F_Axe
+    Name: "Vivatus Fides Axe [2]"
+    Type: Weapon
+    SubType: 1hAxe
+    Buy: 11000000
+    Sell: 110000
+    Weight: 7500
+    Attack: 270
+    Range: 1
+    Slots: 2
+    Jobs: {Blacksmith: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bSkillAtk,"MC_CARTREVOLUTION",10;
+      bonus bBaseAtk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"MC_CARTREVOLUTION",20;
+         if (.@r>=9) {
+            bonus2 bAddSize,Size_All,15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"MC_CARTREVOLUTION",25;
+               if (getallrefine() >= 24) {
+                  bonus bLongAtkRate,15;
+               }
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus2 bAddEle,Ele_All,15;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         if (.@g >= ENCHANTGRADE_B) {
+            bonus2 bAddClass,Class_All,7;
+            if (.@g >= ENCHANTGRADE_A) {
+               bonus bPAtk,(.@r/3);
+               bonus bPow,(.@r/3);
+            }
+         }
+      }
   - Id: 530002
     AegisName: Ep172_1h_Spear
     Name: Gluttony Stick
@@ -140571,6 +141119,86 @@ Body:
       .@r = getrefine();
       bonus2 bSkillAtk,"CR_SHIELDBOOMERANG",5*(.@r/2);
       bonus bLongAtkRate,2*(.@r/4);
+  - Id: 530013
+    AegisName: Adulter_F_G_Spear
+    Name: "Adulter Fides Guardian Spear [2]"
+    Type: Weapon
+    SubType: 1hSpear
+    Buy: 10500000
+    Sell: 105000
+    Weight: 1800
+    Attack: 220
+    Range: 3
+    Slots: 2
+    Jobs: {Crusader: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 180
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"KN_BRANDISHSPEAR",10;
+      bonus bBaseAtk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"KN_BRANDISHSPEAR",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-10;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"KN_BRANDISHSPEAR",25;
+               if (getallrefine() >= 24) {
+                  bonus bShortAtkRate,15;
+               }
+            }
+         }
+      }
+  - Id: 530014
+    AegisName: Vivatus_F_G_Spear
+    Name: "Vivatus Fides Guardian Spear [2]"
+    Type: Weapon
+    SubType: 1hSpear
+    Buy: 10500000
+    Sell: 105000
+    Weight: 1800
+    Attack: 220
+    Range: 3
+    Slots: 2
+    Jobs: {Crusader: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus2 bSkillAtk,"KN_BRANDISHSPEAR",10;
+      bonus bBaseAtk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"KN_BRANDISHSPEAR",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-10;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"KN_BRANDISHSPEAR",25;
+               if (getallrefine() >= 24) {
+                  bonus bShortAtkRate,15;
+               }
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus2 bAddEle,Ele_All,15;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         if (.@g >= ENCHANTGRADE_B) {
+            bonus2 bAddClass,Class_All,7;
+            if (.@g >= ENCHANTGRADE_A) {
+               bonus bPAtk,(.@r/3);
+               bonus bPow,(.@r/3);
+            }
+         }
+      }
   - Id: 530015
     AegisName: Gelerdria_IL
     Name: "Illusion Gelerdria [2]"
@@ -140681,6 +141309,326 @@ Body:
       bonus bUnbreakableWeapon;
       bonus2 bSkillAtk,"MG_FIREBALL",5*(.@r/2);
       bonus2 bMagicAtkEle,Ele_All,2*(.@r/4);
+  - Id: 540019
+    AegisName: Adulter_F_M_Book
+    Name: "Adulter Fides Magic Book [2]"
+    Type: Weapon
+    SubType: Book
+    Buy: 10000000
+    Sell: 100000
+    Weight: 1200
+    Attack: 170
+    Range: 1
+    Slots: 2
+    Jobs: {Sage: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 180
+    Refineable: true
+    Script: |
+      bonus bMatk,200;
+      .@r = getrefine();
+      bonus2 bSkillAtk,"PF_SOULBURN",10;
+      bonus bMatk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"PF_SOULBURN",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-5;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"PF_SOULBURN",25;
+               if (getallrefine() >= 24) {
+                  bonus2 bMagicAtkEle,Ele_Neutral,15;
+               }
+            }
+         }
+      }
+  - Id: 540020
+    AegisName: Adulter_F_P_Book
+    Name: "Adulter Fides Poison Book [2]"
+    Type: Weapon
+    SubType: Book
+    Buy: 10000000
+    Sell: 100000
+    Weight: 1300
+    Attack: 170
+    Range: 1
+    Slots: 2
+    Jobs: {Sage: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 180
+    Refineable: true
+    Script: |
+      bonus bMatk,200;
+      .@r = getrefine();
+      bonus2 bSkillAtk,"WZ_HEAVENDRIVE",10;
+      bonus bMatk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"WZ_HEAVENDRIVE",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-5;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"WZ_HEAVENDRIVE",25;
+               if (getallrefine() >= 24) {
+                  bonus2 bMagicAtkEle,Ele_Poison,15;
+               }
+            }
+         }
+      }
+  - Id: 540021
+    AegisName: Adulter_F_Bible
+    Name: "Adulter Fides Bible [2]"
+    Type: Weapon
+    SubType: Book
+    Buy: 10400000
+    Sell: 104000
+    Weight: 1800
+    Attack: 210
+    Range: 1
+    Slots: 2
+    Jobs: {Priest: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 180
+    Refineable: true
+    Script: |
+      bonus bMatk,210;
+      .@r = getrefine();
+      bonus2 bAddRace,RC_Undead,15;
+      bonus2 bMagicAddRace,RC_Undead,15;
+      bonus bMatk,12*(.@r/3);
+      bonus bBaseAtk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bAddRace,RC_Undead,25;
+         bonus2 bMagicAddRace,RC_Undead,25;
+         if (.@r>=9) {
+            bonus bAspdRate,10;
+            if (getallrefine() >= 22) {
+               bonus2 bAddRace,RC_Undead,40;
+               bonus2 bMagicAddRace,RC_Undead,40;
+               if (getallrefine() >= 24) {
+                  bonus bShortAtkRate,15;
+               }
+            }
+         }
+      }
+  - Id: 540022
+    AegisName: Adulter_F_Moon_B
+    Name: "Adulter Fides Moon Book [2]"
+    Type: Weapon
+    SubType: Book
+    Buy: 10600000
+    Sell: 106000
+    Weight: 1100
+    Attack: 230
+    Range: 1
+    Slots: 2
+    Jobs: {StarGladiator: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 180
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"TK_TURNKICK",10;
+      bonus bBaseAtk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"TK_TURNKICK",20;
+         if (.@r>=9) {
+            bonus2 bAddSize,Size_All,15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"TK_TURNKICK",25;
+               if (getallrefine() >= 24) {
+                  bonus bShortAtkRate,15;
+               }
+            }
+         }
+      }
+  - Id: 540023
+    AegisName: Adulter_F_Star_B
+    Name: "Adulter Fides Stardust Book [2]"
+    Type: Weapon
+    SubType: Book
+    Buy: 10700000
+    Sell: 107000
+    Weight: 1000
+    Attack: 240
+    Range: 1
+    Slots: 2
+    Jobs: {StarGladiator: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 180
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"TK_COUNTER",10;
+      bonus bBaseAtk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"TK_COUNTER",20;
+         if (.@r>=9) {
+            bonus2 bAddSize,Size_All,15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"TK_COUNTER",25;
+               if (getallrefine() >= 24) {
+                  bonus bShortAtkRate,15;
+               }
+            }
+         }
+      }
+  - Id: 540024
+    AegisName: Vivatus_F_M_Book
+    Name: "Vivatus Fides Magic Book [2]"
+    Type: Weapon
+    SubType: Book
+    Buy: 10000000
+    Sell: 100000
+    Weight: 1200
+    Attack: 170
+    Range: 1
+    Slots: 2
+    Jobs: {Sage: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Gradable: true
+    Script: |
+      bonus bMatk,200;
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus2 bSkillAtk,"PF_SOULBURN",10;
+      bonus bMatk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"PF_SOULBURN",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-5;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"PF_SOULBURN",25;
+               if (getallrefine() >= 24) {
+                  bonus2 bMagicAtkEle,Ele_Neutral,15;
+               }
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus2 bMagicAddEle,Ele_All,15;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         if (.@g >= ENCHANTGRADE_B) {
+            bonus bMatkRate,7;
+            if (.@g >= ENCHANTGRADE_A) {
+               bonus bSMatk,(.@r/3);
+               bonus bSpl,(.@r/3);
+            }
+         }
+      }
+  - Id: 540025
+    AegisName: Vivatus_F_P_Book
+    Name: "Vivatus Fides Poison Book [2]"
+    Type: Weapon
+    SubType: Book
+    Buy: 10000000
+    Sell: 100000
+    Weight: 1300
+    Attack: 170
+    Range: 1
+    Slots: 2
+    Jobs: {Sage: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Gradable: true
+    Script: |
+      bonus bMatk,200;
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus2 bSkillAtk,"WZ_HEAVENDRIVE",10;
+      bonus bMatk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"WZ_HEAVENDRIVE",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-5;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"WZ_HEAVENDRIVE",25;
+               if (getallrefine() >= 24) {
+                  bonus2 bMagicAtkEle,Ele_Poison,15;
+               }
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus2 bMagicAddEle,Ele_All,15;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         if (.@g >= ENCHANTGRADE_B) {
+            bonus bMatkRate,7;
+            if (.@g >= ENCHANTGRADE_A) {
+               bonus bSMatk,(.@r/3);
+               bonus bSpl,(.@r/3);
+            }
+         }
+      }
+  - Id: 540026
+    AegisName: Vivatus_F_Bible
+    Name: "Vivatus Fides Bible [2]"
+    Type: Weapon
+    SubType: Book
+    Buy: 10400000
+    Sell: 104000
+    Weight: 1800
+    Attack: 210
+    Range: 1
+    Slots: 2
+    Jobs: {Priest: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Gradable: true
+    Script: |
+      bonus bMatk,210;
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus2 bAddRace,RC_Undead,15;
+      bonus2 bMagicAddRace,RC_Undead,15;
+      bonus bMatk,12*(.@r/3);
+      bonus bBaseAtk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bAddRace,RC_Undead,25;
+         bonus2 bMagicAddRace,RC_Undead,25;
+         if (.@r>=9) {
+            bonus bAspdRate,10;
+            if (getallrefine() >= 22) {
+               bonus2 bAddRace,RC_Undead,40;
+               bonus2 bMagicAddRace,RC_Undead,40;
+               if (getallrefine() >= 24) {
+                  bonus bShortAtkRate,15;
+               }
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus2 bMagicAddEle,Ele_All,15;
+            bonus2 bAddEle,Ele_All,15;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         if (.@g >= ENCHANTGRADE_B) {
+            bonus bMatkRate,7;
+            bonus2 bAddClass,Class_All,7;
+            if (.@g >= ENCHANTGRADE_A) {
+               bonus bPAtk,(.@r/3);
+               bonus bPow,(.@r/3);
+            }
+         }
+      }
   - Id: 540043
     AegisName: Fourth_1h_Manual
     Name: "Relapse Book [2]"
@@ -140702,6 +141650,102 @@ Body:
       bonus bUnbreakableWeapon;
       bonus bShortAtkRate,3*(.@r/4);
       bonus2 bSkillAtk,"TK_STORMKICK",5*(.@r/2);
+  - Id: 540045
+    AegisName: Vivatus_F_Star_B
+    Name: "Vivatus Fides Stardust Book [2]"
+    Type: Weapon
+    SubType: Book
+    Buy: 10700000
+    Sell: 107000
+    Weight: 1000
+    Attack: 240
+    Range: 1
+    Slots: 2
+    Jobs: {StarGladiator: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus2 bSkillAtk,"TK_COUNTER",10;
+      bonus bBaseAtk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"TK_COUNTER",20;
+         if (.@r>=9) {
+            bonus2 bAddSize,Size_All,15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"TK_COUNTER",25;
+               if (getallrefine() >= 24) {
+                  bonus bShortAtkRate,15;
+               }
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus2 bAddEle,Ele_All,15;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         if (.@g >= ENCHANTGRADE_B) {
+            bonus2 bAddClass,Class_All,7;
+            if (.@g >= ENCHANTGRADE_A) {
+               bonus bPAtk,(.@r/3);
+               bonus bPow,(.@r/3);
+            }
+         }
+      }
+  - Id: 540046
+    AegisName: Vivatus_F_Moon_B
+    Name: "Vivatus Fides Moon Book [2]"
+    Type: Weapon
+    SubType: Book
+    Buy: 10600000
+    Sell: 106000
+    Weight: 1100
+    Attack: 230
+    Range: 1
+    Slots: 2
+    Jobs: {StarGladiator: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus2 bSkillAtk,"TK_TURNKICK",10;
+      bonus bBaseAtk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"TK_TURNKICK",20;
+         if (.@r>=9) {
+            bonus2 bAddSize,Size_All,15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"TK_TURNKICK",25;
+               if (getallrefine() >= 24) {
+                  bonus bShortAtkRate,15;
+               }
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus2 bAddEle,Ele_All,15;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         if (.@g >= ENCHANTGRADE_B) {
+            bonus2 bAddClass,Class_All,7;
+            if (.@g >= ENCHANTGRADE_A) {
+               bonus bPAtk,(.@r/3);
+               bonus bPow,(.@r/3);
+            }
+         }
+      }
   - Id: 550008
     AegisName: Ep172_1h_Wand
     Name: Greed Wand
@@ -140724,6 +141768,164 @@ Body:
       bonus bMatkRate,2*.@r;
       if (.@r>=9) {
          bonus bVariableCastrate,-10;
+      }
+  - Id: 550024
+    AegisName: Adulter_F_Wand
+    Name: "Adulter Fides Wand [2]"
+    Type: Weapon
+    SubType: Staff
+    Buy: 9900000
+    Sell: 99000
+    Weight: 1500
+    Attack: 160
+    Range: 1
+    Slots: 2
+    Jobs: {Priest: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 180
+    Refineable: true
+    Script: |
+      bonus bMatk,210;
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bSkillAtk,"PR_MAGNUS",10;
+      bonus bMatk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"PR_MAGNUS",20;
+         if (.@r>=9) {
+            bonus2 bMagicAddSize,Size_All,15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"PR_MAGNUS",25;
+               if (getallrefine() >= 24) {
+                  bonus2 bMagicAtkEle,Ele_Holy,15;
+               }
+            }
+         }
+      }
+  - Id: 550025
+    AegisName: Adulter_F_S_Stick
+    Name: "Adulter Fides Soul Stick [2]"
+    Type: Weapon
+    SubType: Staff
+    Buy: 9900000
+    Sell: 99000
+    Weight: 1900
+    Attack: 160
+    Range: 1
+    Slots: 2
+    Jobs: {SoulLinker: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 180
+    Refineable: true
+    Script: |
+      bonus bMatk,205;
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bSkillAtk,"SL_STUN",10;
+      bonus bMatk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"SL_STUN",20;
+         if (.@r>=9) {
+            bonus bVariableCastrate,-10;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"SL_STUN",25;
+               if (getallrefine() >= 24) {
+                  bonus2 bMagicAtkEle,Ele_Holy,15;
+                  bonus2 bMagicAtkEle,Ele_Fire,15;
+                  bonus2 bMagicAtkEle,Ele_Earth,15;
+                  bonus2 bMagicAtkEle,Ele_Water,15;
+                  bonus2 bMagicAtkEle,Ele_Wind,15;
+                  bonus2 bMagicAtkEle,Ele_Ghost,15;
+                  bonus2 bMagicAtkEle,Ele_Dark,15;
+               }
+            }
+         }
+      }
+  - Id: 550026
+    AegisName: Adulter_F_D_Wand
+    Name: "Adulter Fides Dark Wand [2]"
+    Type: Weapon
+    SubType: Staff
+    Buy: 9900000
+    Sell: 99000
+    Weight: 1600
+    Attack: 160
+    Range: 1
+    Slots: 2
+    Jobs: {SoulLinker: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 180
+    Refineable: true
+    Script: |
+      bonus bMatk,220;
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bSkillAtk,"SL_SMA",10;
+      bonus bMatk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"SL_SMA",20;
+         if (.@r>=9) {
+            bonus2 bMagicAddSize,Size_All,15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"SL_SMA",25;
+               if (getallrefine() >= 24) {
+                  bonus2 bMagicAtkEle,Ele_Dark,15;
+               }
+            }
+         }
+      }
+  - Id: 550029
+    AegisName: Vivatus_F_Wand
+    Name: "Vivatus Fides Wand [2]"
+    Type: Weapon
+    SubType: Staff
+    Buy: 9900000
+    Sell: 99000
+    Weight: 1500
+    Attack: 160
+    Range: 1
+    Slots: 2
+    Jobs: {Priest: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Gradable: true
+    Script: |
+      bonus bMatk,210;
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bSkillAtk,"PR_MAGNUS",10;
+      bonus bMatk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"PR_MAGNUS",20;
+         if (.@r>=9) {
+            bonus2 bMagicAddSize,Size_All,15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"PR_MAGNUS",25;
+               if (getallrefine() >= 24) {
+                  bonus2 bMagicAtkEle,Ele_Holy,15;
+               }
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus2 bMagicAddEle,Ele_All,15;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         if (.@g >= ENCHANTGRADE_B) {
+            bonus bMatkRate,7;
+            if (.@g >= ENCHANTGRADE_A) {
+               bonus bSMatk,(.@r/3);
+               bonus bSpl,(.@r/3);
+            }
+         }
       }
   - Id: 550030
     AegisName: Thorn_Staff_IL
@@ -140846,6 +142048,112 @@ Body:
       bonus bUnbreakableWeapon;
       bonus2 bSkillAtk,"SL_SMA",5*(.@r/2);
       bonus2 bMagicAtkEle,Ele_All,3*(.@r/4);
+  - Id: 550063
+    AegisName: Vivatus_F_D_Wand
+    Name: "Vivatus Fides Dark Wand [2]"
+    Type: Weapon
+    SubType: Staff
+    Buy: 9900000
+    Sell: 99000
+    Weight: 1600
+    Attack: 160
+    Range: 1
+    Slots: 2
+    Jobs: {SoulLinker: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Gradable: true
+    Script: |
+      bonus bMatk,220;
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bSkillAtk,"SL_SMA",10;
+      bonus bMatk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"SL_SMA",20;
+         if (.@r>=9) {
+            bonus2 bMagicAddSize,Size_All,15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"SL_SMA",25;
+               if (getallrefine() >= 24) {
+                  bonus2 bMagicAtkEle,Ele_Dark,15;
+               }
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus2 bMagicAddEle,Ele_All,15;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         if (.@g >= ENCHANTGRADE_B) {
+            bonus bMatkRate,7;
+            if (.@g >= ENCHANTGRADE_A) {
+               bonus bSMatk,(.@r/3);
+               bonus bSpl,(.@r/3);
+            }
+         }
+      }
+  - Id: 550064
+    AegisName: Vivatus_F_S_Stick
+    Name: "Vivatus Fides Soul Stick [2]"
+    Type: Weapon
+    SubType: Staff
+    Buy: 9900000
+    Sell: 99000
+    Weight: 1900
+    Attack: 160
+    Range: 1
+    Slots: 2
+    Jobs: {SoulLinker: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Gradable: true
+    Script: |
+      bonus bMatk,205;
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bSkillAtk,"SL_STUN",10;
+      bonus bMatk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"SL_STUN",20;
+         if (.@r>=9) {
+            bonus bVariableCastrate,-10;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"SL_STUN",25;
+               if (getallrefine() >= 24) {
+                  bonus2 bMagicAtkEle,Ele_Holy,15;
+                  bonus2 bMagicAtkEle,Ele_Fire,15;
+                  bonus2 bMagicAtkEle,Ele_Earth,15;
+                  bonus2 bMagicAtkEle,Ele_Water,15;
+                  bonus2 bMagicAtkEle,Ele_Wind,15;
+                  bonus2 bMagicAtkEle,Ele_Ghost,15;
+                  bonus2 bMagicAtkEle,Ele_Dark,15;
+               }
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus2 bMagicAddEle,Ele_All,15;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         if (.@g >= ENCHANTGRADE_B) {
+            bonus bMatkRate,7;
+            if (.@g >= ENCHANTGRADE_A) {
+               bonus bSMatk,(.@r/3);
+               bonus bSpl,(.@r/3);
+            }
+         }
+      }
   - Id: 560004
     AegisName: Ep172_Bh_Knuck
     Name: Ira Fist
@@ -140885,6 +142193,166 @@ Body:
       bonus2 bSkillAtk,"MO_INVESTIGATE",5*(.@r/2);
       bonus2 bSkillAtk,"MO_FINGEROFFENSIVE",5*(.@r/2);
       bonus bShortAtkRate,2*(.@r/4);
+  - Id: 560018
+    AegisName: Adulter_F_Knuckle
+    Name: "Adulter Fides Knuckle [2]"
+    Type: Weapon
+    SubType: Knuckle
+    Buy: 10400000
+    Sell: 104000
+    Weight: 1000
+    Attack: 210
+    Range: 1
+    Slots: 2
+    Jobs: {Monk: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 180
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"MO_EXTREMITYFIST",10;
+      bonus bBaseAtk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"MO_EXTREMITYFIST",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-2;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"MO_EXTREMITYFIST",25;
+               if (getallrefine() >= 24) {
+                  bonus bShortAtkRate,15;
+               }
+            }
+         }
+      }
+  - Id: 560019
+    AegisName: Adulter_F_Claw
+    Name: "Adulter Fides Claw [2]"
+    Type: Weapon
+    SubType: Knuckle
+    Buy: 10400000
+    Sell: 104000
+    Weight: 900
+    Attack: 210
+    Range: 1
+    Slots: 2
+    Jobs: {Monk: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 180
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"MO_EXTREMITYFIST",10;
+      bonus bBaseAtk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"MO_EXTREMITYFIST",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-5;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"MO_EXTREMITYFIST",25;
+               if (getallrefine() >= 24) {
+                  bonus bLongAtkRate,15;
+               }
+            }
+         }
+      }
+  - Id: 560020
+    AegisName: Vivatus_F_Knuckle
+    Name: "Vivatus Fides Knuckle [2]"
+    Type: Weapon
+    SubType: Knuckle
+    Buy: 10400000
+    Sell: 104000
+    Weight: 1000
+    Attack: 210
+    Range: 1
+    Slots: 2
+    Jobs: {Monk: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus2 bSkillAtk,"MO_EXTREMITYFIST",10;
+      bonus bBaseAtk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"MO_EXTREMITYFIST",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-2;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"MO_EXTREMITYFIST",25;
+               if (getallrefine() >= 24) {
+                  bonus bShortAtkRate,15;
+               }
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus2 bAddEle,Ele_All,15;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         if (.@g >= ENCHANTGRADE_B) {
+            bonus2 bAddClass,Class_All,7;
+            if (.@g >= ENCHANTGRADE_A) {
+               bonus bPAtk,(.@r/3);
+               bonus bPow,(.@r/3);
+            }
+         }
+      }
+  - Id: 560021
+    AegisName: Vivatus_F_Claw
+    Name: "Vivatus Fides Claw [2]"
+    Type: Weapon
+    SubType: Knuckle
+    Buy: 10400000
+    Sell: 104000
+    Weight: 900
+    Attack: 210
+    Range: 1
+    Slots: 2
+    Jobs: {Monk: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus2 bSkillAtk,"MO_EXTREMITYFIST",10;
+      bonus bBaseAtk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"MO_EXTREMITYFIST",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-5;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"MO_EXTREMITYFIST",25;
+               if (getallrefine() >= 24) {
+                  bonus bLongAtkRate,15;
+               }
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus2 bAddEle,Ele_All,15;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         if (.@g >= ENCHANTGRADE_B) {
+            bonus2 bAddClass,Class_All,7;
+            if (.@g >= ENCHANTGRADE_A) {
+               bonus bPAtk,(.@r/3);
+               bonus bPow,(.@r/3);
+            }
+         }
+      }
   - Id: 570005
     AegisName: Ep172_1h_Inst
     Name: Pigritia Wave
@@ -140963,6 +142431,172 @@ Body:
       .@r = getrefine();
       bonus2 bSkillAtk,"BA_MUSICALSTRIKE",5*(.@r/2);
       bonus bLongAtkRate,2*(.@r/4);
+  - Id: 570017
+    AegisName: Adulter_F_Violin
+    Name: "Adulter Fides Violin [2]"
+    Type: Weapon
+    SubType: Musical
+    Buy: 10000000
+    Sell: 100000
+    Weight: 1200
+    Attack: 170
+    Range: 1
+    Slots: 2
+    Jobs: {BardDancer: true}
+    Gender: Male
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 180
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"CG_ARROWVULCAN",10;
+      bonus bBaseAtk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"CG_ARROWVULCAN",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-12;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"CG_ARROWVULCAN",25;
+               if (getallrefine() >= 24) {
+                  bonus bLongAtkRate,15;
+               }
+            }
+         }
+      }
+  - Id: 570018
+    AegisName: Adulter_F_Harp
+    Name: "Adulter Fides Harp [2]"
+    Type: Weapon
+    SubType: Musical
+    Buy: 9300000
+    Sell: 93000
+    Weight: 1000
+    Attack: 100
+    Range: 1
+    Slots: 2
+    Jobs: {BardDancer: true}
+    Gender: Male
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 180
+    Refineable: true
+    Script: |
+      bonus bMatk,210;
+      .@r = getrefine();
+      bonus2 bSkillAtk,"BA_MUSICALSTRIKE",10;
+      bonus bMatk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"BA_MUSICALSTRIKE",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-10;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"BA_MUSICALSTRIKE",25;
+               if (getallrefine() >= 24) {
+                  bonus2 bMagicAtkEle,Ele_Neutral,15;
+               }
+            }
+         }
+      }
+  - Id: 570019
+    AegisName: Vivatus_F_Violin
+    Name: "Vivatus Fides Violin [2]"
+    Type: Weapon
+    SubType: Musical
+    Buy: 10000000
+    Sell: 100000
+    Weight: 1200
+    Attack: 170
+    Range: 1
+    Slots: 2
+    Jobs: {BardDancer: true}
+    Gender: Male
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus2 bSkillAtk,"CG_ARROWVULCAN",10;
+      bonus bBaseAtk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"CG_ARROWVULCAN",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-12;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"CG_ARROWVULCAN",25;
+               if (getallrefine() >= 24) {
+                  bonus bLongAtkRate,15;
+               }
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus2 bAddEle,Ele_All,15;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         if (.@g >= ENCHANTGRADE_B) {
+            bonus2 bAddClass,Class_All,7;
+            if (.@g >= ENCHANTGRADE_A) {
+               bonus bPAtk,(.@r/3);
+               bonus bPow,(.@r/3);
+            }
+         }
+      }
+  - Id: 570020
+    AegisName: Vivatus_F_Harp
+    Name: "Vivatus Fides Harp [2]"
+    Type: Weapon
+    SubType: Musical
+    Buy: 9300000
+    Sell: 93000
+    Weight: 1000
+    Attack: 100
+    Range: 1
+    Slots: 2
+    Jobs: {BardDancer: true}
+    Gender: Male
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Gradable: true
+    Script: |
+      bonus bMatk,210;
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus2 bSkillAtk,"BA_MUSICALSTRIKE",10;
+      bonus bMatk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"BA_MUSICALSTRIKE",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-10;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"BA_MUSICALSTRIKE",25;
+               if (getallrefine() >= 24) {
+                  bonus2 bMagicAtkEle,Ele_Neutral,15;
+               }
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus2 bMagicAddEle,Ele_All,15;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         if (.@g >= ENCHANTGRADE_B) {
+            bonus bMatkRate,7;
+            if (.@g >= ENCHANTGRADE_A) {
+               bonus bSMatk,(.@r/3);
+               bonus bSpl,(.@r/3);
+            }
+         }
+      }
   - Id: 580005
     AegisName: Ep172_1h_Whip
     Name: Pigritia Spark
@@ -141041,6 +142675,172 @@ Body:
       .@r = getrefine();
       bonus2 bSkillAtk,"DC_THROWARROW",5*(.@r/2);
       bonus bLongAtkRate,2*(.@r/4);
+  - Id: 580017
+    AegisName: Adulter_F_C_Rope
+    Name: "Adulter Fides Chain Rope [2]"
+    Type: Weapon
+    SubType: Whip
+    Buy: 10000000
+    Sell: 100000
+    Weight: 1200
+    Attack: 170
+    Range: 2
+    Slots: 2
+    Jobs: {BardDancer: true}
+    Gender: Female
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 180
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"CG_ARROWVULCAN",10;
+      bonus bBaseAtk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"CG_ARROWVULCAN",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-12;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"CG_ARROWVULCAN",25;
+               if (getallrefine() >= 24) {
+                  bonus bLongAtkRate,15;
+               }
+            }
+         }
+      }
+  - Id: 580018
+    AegisName: Adulter_F_Ribbon
+    Name: "Adulter Fides Ribbon [2]"
+    Type: Weapon
+    SubType: Whip
+    Buy: 9300000
+    Sell: 93000
+    Weight: 1000
+    Attack: 100
+    Range: 2
+    Slots: 2
+    Jobs: {BardDancer: true}
+    Gender: Female
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 180
+    Refineable: true
+    Script: |
+      bonus bMatk,210;
+      .@r = getrefine();
+      bonus2 bSkillAtk,"BA_MUSICALSTRIKE",10;
+      bonus bMatk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"BA_MUSICALSTRIKE",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-10;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"BA_MUSICALSTRIKE",25;
+               if (getallrefine() >= 24) {
+                  bonus2 bMagicAtkEle,Ele_Neutral,15;
+               }
+            }
+         }
+      }
+  - Id: 580019
+    AegisName: Vivatus_F_C_Rope
+    Name: "Vivatus Fides Chain Rope [2]"
+    Type: Weapon
+    SubType: Whip
+    Buy: 10000000
+    Sell: 100000
+    Weight: 1200
+    Attack: 170
+    Range: 2
+    Slots: 2
+    Jobs: {BardDancer: true}
+    Gender: Female
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus2 bSkillAtk,"CG_ARROWVULCAN",10;
+      bonus bBaseAtk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"CG_ARROWVULCAN",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-12;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"CG_ARROWVULCAN",25;
+               if (getallrefine() >= 24) {
+                  bonus bLongAtkRate,15;
+               }
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus2 bAddEle,Ele_All,15;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         if (.@g >= ENCHANTGRADE_B) {
+            bonus2 bAddClass,Class_All,7;
+            if (.@g >= ENCHANTGRADE_A) {
+               bonus bPAtk,(.@r/3);
+               bonus bPow,(.@r/3);
+            }
+         }
+      }
+  - Id: 580020
+    AegisName: Vivatus_F_Ribbon
+    Name: "Vivatus Fides Ribbon [2]"
+    Type: Weapon
+    SubType: Whip
+    Buy: 9300000
+    Sell: 93000
+    Weight: 1000
+    Attack: 100
+    Range: 2
+    Slots: 2
+    Jobs: {BardDancer: true}
+    Gender: Female
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Gradable: true
+    Script: |
+      bonus bMatk,210;
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus2 bSkillAtk,"BA_MUSICALSTRIKE",10;
+      bonus bMatk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"BA_MUSICALSTRIKE",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-10;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"BA_MUSICALSTRIKE",25;
+               if (getallrefine() >= 24) {
+                  bonus2 bMagicAtkEle,Ele_Neutral,15;
+               }
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus2 bMagicAddEle,Ele_All,15;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         if (.@g >= ENCHANTGRADE_B) {
+            bonus bMatkRate,7;
+            if (.@g >= ENCHANTGRADE_A) {
+               bonus bSMatk,(.@r/3);
+               bonus bSpl,(.@r/3);
+            }
+         }
+      }
   - Id: 590006
     AegisName: Ep172_1h_Hammer
     Name: Envy Blunt
@@ -141087,6 +142887,170 @@ Body:
       bonus2 bSkillAtk,"PR_MAGNUS",5*(.@r/2);
       bonus bHealPower,5*(.@r/2);
       bonus2 bMagicAtkEle,Ele_All,2*(.@r/4);
+  - Id: 590021
+    AegisName: Adulter_F_Mace
+    Name: "Adulter Fides Mace [2]"
+    Type: Weapon
+    SubType: Mace
+    Buy: 11700000
+    Sell: 117000
+    Weight: 4000
+    Attack: 340
+    Range: 1
+    Slots: 2
+    Jobs: {Blacksmith: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 180
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bSkillAtk,"WS_CARTTERMINATION",10;
+      bonus bBaseAtk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"WS_CARTTERMINATION",20;
+         if (.@r>=9) {
+            bonus bAspdRate,10;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"WS_CARTTERMINATION",25;
+               if (getallrefine() >= 24) {
+                  bonus bLongAtkRate,15;
+               }
+            }
+         }
+      }
+  - Id: 590022
+    AegisName: Adulter_F_Hall
+    Name: "Adulter Fides Hall [2]"
+    Type: Weapon
+    SubType: Mace
+    Buy: 10600000
+    Sell: 106000
+    Weight: 3000
+    Attack: 230
+    Range: 1
+    Slots: 2
+    Jobs: {Alchemist: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 180
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bSkillAtk,"WS_CARTTERMINATION",10;
+      bonus bBaseAtk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"WS_CARTTERMINATION",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-10;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"WS_CARTTERMINATION",25;
+               if (getallrefine() >= 24) {
+                  bonus bShortAtkRate,15;
+               }
+            }
+         }
+      }
+  - Id: 590023
+    AegisName: Vivatus_F_Mace
+    Name: "Vivatus Fides Mace [2]"
+    Type: Weapon
+    SubType: Mace
+    Buy: 11700000
+    Sell: 117000
+    Weight: 4000
+    Attack: 340
+    Range: 1
+    Slots: 2
+    Jobs: {Blacksmith: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bSkillAtk,"WS_CARTTERMINATION",10;
+      bonus bBaseAtk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"WS_CARTTERMINATION",20;
+         if (.@r>=9) {
+            bonus bAspdRate,10;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"WS_CARTTERMINATION",25;
+               if (getallrefine() >= 24) {
+                  bonus bLongAtkRate,15;
+               }
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus2 bAddEle,Ele_All,15;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         if (.@g >= ENCHANTGRADE_B) {
+            bonus2 bAddClass,Class_All,7;
+            if (.@g >= ENCHANTGRADE_A) {
+               bonus bPAtk,(.@r/3);
+               bonus bPow,(.@r/3);
+            }
+         }
+      }
+  - Id: 590024
+    AegisName: Vivatus_F_Hall
+    Name: "Vivatus Fides Scepter [2]"
+    Type: Weapon
+    SubType: Mace
+    Buy: 10600000
+    Sell: 106000
+    Weight: 3000
+    Attack: 230
+    Range: 1
+    Slots: 2
+    Jobs: {Alchemist: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bSkillAtk,"WS_CARTTERMINATION",10;
+      bonus bBaseAtk,12*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"WS_CARTTERMINATION",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-10;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"WS_CARTTERMINATION",25;
+               if (getallrefine() >= 24) {
+                  bonus bShortAtkRate,15;
+               }
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus2 bAddEle,Ele_All,15;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         if (.@g >= ENCHANTGRADE_B) {
+            bonus2 bAddClass,Class_All,7;
+            if (.@g >= ENCHANTGRADE_A) {
+               bonus bPAtk,(.@r/3);
+               bonus bPow,(.@r/3);
+            }
+         }
+      }
   - Id: 600008
     AegisName: Ep172_Bh_Sword
     Name: Hypocrisy Edge
@@ -141162,6 +143126,86 @@ Body:
       .@r = getrefine();
       bonus2 bSkillAtk,"KN_BOWLINGBASH",5*(.@r/2);
       bonus bShortAtkRate,2*(.@r/4);
+  - Id: 600017
+    AegisName: Adulter_F_T_Sword
+    Name: "Adulter Fides Two-Handed Sword [2]"
+    Type: Weapon
+    SubType: 2hSword
+    Buy: 11300000
+    Sell: 113000
+    Weight: 4000
+    Attack: 300
+    Range: 1
+    Slots: 2
+    Jobs: {Knight: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 180
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"KN_BOWLINGBASH",10;
+      bonus bBaseAtk,18*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"KN_BOWLINGBASH",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-10;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"KN_BOWLINGBASH",25;
+               if (getallrefine() >= 24) {
+                  bonus bShortAtkRate,15;
+               }
+            }
+         }
+      }
+  - Id: 600018
+    AegisName: Vivatus_F_T_Sword
+    Name: "Vivatus Fides Two-handed Sword [2]"
+    Type: Weapon
+    SubType: 2hSword
+    Buy: 11300000
+    Sell: 113000
+    Weight: 4000
+    Attack: 300
+    Range: 1
+    Slots: 2
+    Jobs: {Knight: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus2 bSkillAtk,"KN_BOWLINGBASH",10;
+      bonus bBaseAtk,18*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"KN_BOWLINGBASH",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-10;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"KN_BOWLINGBASH",25;
+               if (getallrefine() >= 24) {
+                  bonus bShortAtkRate,15;
+               }
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus2 bAddEle,Ele_All,15;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         if (.@g >= ENCHANTGRADE_B) {
+            bonus2 bAddClass,Class_All,7;
+            if (.@g >= ENCHANTGRADE_A) {
+               bonus bPAtk,(.@r/3);
+               bonus bPow,(.@r/3);
+            }
+         }
+      }
   - Id: 610006
     AegisName: Ep172_Bh_Katar
     Name: Avaritia Metal
@@ -141230,6 +143274,166 @@ Body:
       .@r = getrefine();
       bonus2 bSkillAtk,"ASC_METEORASSAULT",5*(.@r/2);
       bonus bShortAtkRate,2*(.@r/4);
+  - Id: 610020
+    AegisName: Adulter_F_Cakram
+    Name: "Adulter Fides Chakram [2]"
+    Type: Weapon
+    SubType: Katar
+    Buy: 10800000
+    Sell: 108000
+    Weight: 2000
+    Attack: 250
+    Range: 1
+    Slots: 2
+    Jobs: {Assassin: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 180
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"AS_GRIMTOOTH",10;
+      bonus bBaseAtk,18*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"AS_GRIMTOOTH",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-10;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"AS_GRIMTOOTH",25;
+               if (getallrefine() >= 24) {
+                  bonus bShortAtkRate,15;
+               }
+            }
+         }
+      }
+  - Id: 610021
+    AegisName: Adulter_F_Katar
+    Name: "Adulter Fides Katar [2]"
+    Type: Weapon
+    SubType: Katar
+    Buy: 10600000
+    Sell: 106000
+    Weight: 1700
+    Attack: 230
+    Range: 1
+    Slots: 2
+    Jobs: {Assassin: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 180
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"AS_SONICBLOW",10;
+      bonus bBaseAtk,18*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"AS_SONICBLOW",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-10;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"AS_SONICBLOW",25;
+               if (getallrefine() >= 24) {
+                  bonus bShortAtkRate,15;
+               }
+            }
+         }
+      }
+  - Id: 610022
+    AegisName: Vivatus_F_Cakram
+    Name: "Vivatus Fides Chakram [2]"
+    Type: Weapon
+    SubType: Katar
+    Buy: 10800000
+    Sell: 108000
+    Weight: 2000
+    Attack: 250
+    Range: 1
+    Slots: 2
+    Jobs: {Assassin: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus2 bSkillAtk,"AS_GRIMTOOTH",10;
+      bonus bBaseAtk,18*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"AS_GRIMTOOTH",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-10;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"AS_GRIMTOOTH",25;
+               if (getallrefine() >= 24) {
+                  bonus bShortAtkRate,15;
+               }
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus2 bAddEle,Ele_All,15;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         if (.@g >= ENCHANTGRADE_B) {
+            bonus2 bAddClass,Class_All,7;
+            if (.@g >= ENCHANTGRADE_A) {
+               bonus bPAtk,(.@r/3);
+               bonus bPow,(.@r/3);
+            }
+         }
+      }
+  - Id: 610023
+    AegisName: Vivatus_F_Katar
+    Name: "Vivatus Fides Katar [2]"
+    Type: Weapon
+    SubType: Katar
+    Buy: 10600000
+    Sell: 106000
+    Weight: 1700
+    Attack: 230
+    Range: 1
+    Slots: 2
+    Jobs: {Assassin: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus2 bSkillAtk,"AS_SONICBLOW",10;
+      bonus bBaseAtk,18*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"AS_SONICBLOW",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-10;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"AS_SONICBLOW",25;
+               if (getallrefine() >= 24) {
+                  bonus bShortAtkRate,15;
+               }
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus2 bAddEle,Ele_All,15;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         if (.@g >= ENCHANTGRADE_B) {
+            bonus2 bAddClass,Class_All,7;
+            if (.@g >= ENCHANTGRADE_A) {
+               bonus bPAtk,(.@r/3);
+               bonus bPow,(.@r/3);
+            }
+         }
+      }
   - Id: 620005
     AegisName: Fourth_Bh_Axe
     Name: "Relapse Axe [2]"
@@ -141365,6 +143569,86 @@ Body:
          bonus2 bAddSize,Size_Large,10;
          bonus bHit,10;
       }
+  - Id: 630012
+    AegisName: Adulter_F_Lance
+    Name: "Adulter Fides Lance [2]"
+    Type: Weapon
+    SubType: 2hSpear
+    Buy: 11000000
+    Sell: 110000
+    Weight: 3800
+    Attack: 270
+    Range: 3
+    Slots: 2
+    Jobs: {Knight: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 180
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"KN_PIERCE",10;
+      bonus bBaseAtk,18*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"KN_PIERCE",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-8;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"KN_PIERCE",25;
+               if (getallrefine() >= 24) {
+                  bonus bLongAtkRate,15;
+               }
+            }
+         }
+      }
+  - Id: 630013
+    AegisName: Vivatus_F_Lance
+    Name: "Vivatus Fides Lance [2]"
+    Type: Weapon
+    SubType: 2hSpear
+    Buy: 11000000
+    Sell: 110000
+    Weight: 3800
+    Attack: 270
+    Range: 3
+    Slots: 2
+    Jobs: {Knight: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus2 bSkillAtk,"KN_PIERCE",10;
+      bonus bBaseAtk,18*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"KN_PIERCE",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-8;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"KN_PIERCE",25;
+               if (getallrefine() >= 24) {
+                  bonus bLongAtkRate,15;
+               }
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus2 bAddEle,Ele_All,15;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         if (.@g >= ENCHANTGRADE_B) {
+            bonus2 bAddClass,Class_All,7;
+            if (.@g >= ENCHANTGRADE_A) {
+               bonus bPAtk,(.@r/3);
+               bonus bPow,(.@r/3);
+            }
+         }
+      }
   - Id: 640005
     AegisName: Ep172_Bh_Staff
     Name: Pride Stone
@@ -141409,6 +143693,174 @@ Body:
       bonus bUnbreakableWeapon;
       bonus2 bSkillAtk,"WZ_FROSTNOVA",5*(.@r/2);
       bonus2 bMagicAtkEle,Ele_All,2*(.@r/4);
+  - Id: 640019
+    AegisName: Adulter_F_T_Staff
+    Name: "Adulter Fides Two-Handed Staff [2]"
+    Type: Weapon
+    SubType: 2hStaff
+    Buy: 10300000
+    Sell: 103000
+    Weight: 2000
+    Attack: 200
+    Range: 1
+    Slots: 2
+    Jobs: {Wizard: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 180
+    Refineable: true
+    Script: |
+      bonus bMatk,340;
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bSkillAtk,"WZ_METEOR",10;
+      bonus bMatk,18*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"WZ_METEOR",20;
+         if (.@r>=9) {
+            bonus2 bMagicAddSize,Size_All,15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"WZ_METEOR",25;
+               if (getallrefine() >= 24) {
+                  bonus2 bMagicAtkEle,Ele_Neutral,15;
+               }
+            }
+         }
+      }
+  - Id: 640020
+    AegisName: Adulter_F_Rod
+    Name: "Adulter Fides Rod [2]"
+    Type: Weapon
+    SubType: 2hStaff
+    Buy: 10300000
+    Sell: 103000
+    Weight: 1900
+    Attack: 200
+    Range: 1
+    Slots: 2
+    Jobs: {Wizard: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 180
+    Refineable: true
+    Script: |
+      bonus bMatk,340;
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bSkillAtk,"MG_SOULSTRIKE",10;
+      bonus bMatk,18*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"MG_SOULSTRIKE",20;
+         if (.@r>=9) {
+            bonus2 bMagicAddSize,Size_All,15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"MG_SOULSTRIKE",25;
+               if (getallrefine() >= 24) {
+                  bonus2 bMagicAtkEle,Ele_Ghost,15;
+               }
+            }
+         }
+      }
+  - Id: 640021
+    AegisName: Vivatus_F_T_Staff
+    Name: "Vivatus Fides Two-handed Staff [2]"
+    Type: Weapon
+    SubType: 2hStaff
+    Buy: 10300000
+    Sell: 103000
+    Weight: 2000
+    Attack: 200
+    Range: 1
+    Slots: 2
+    Jobs: {Wizard: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Gradable: true
+    Script: |
+      bonus bMatk,340;
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bSkillAtk,"WZ_METEOR",10;
+      bonus bMatk,18*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"WZ_METEOR",20;
+         if (.@r>=9) {
+            bonus2 bMagicAddSize,Size_All,15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"WZ_METEOR",25;
+               if (getallrefine() >= 24) {
+                  bonus2 bMagicAtkEle,Ele_Neutral,15;
+               }
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus2 bMagicAddEle,Ele_All,15;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         if (.@g >= ENCHANTGRADE_B) {
+            bonus bMatkRate,7;
+            if (.@g >= ENCHANTGRADE_A) {
+               bonus bSMatk,(.@r/3);
+               bonus bSpl,(.@r/3);
+            }
+         }
+      }
+  - Id: 640022
+    AegisName: Vivatus_F_Rod
+    Name: "Vivatus Fides Rod [2]"
+    Type: Weapon
+    SubType: 2hStaff
+    Buy: 10300000
+    Sell: 103000
+    Weight: 1900
+    Attack: 200
+    Range: 1
+    Slots: 2
+    Jobs: {Wizard: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Gradable: true
+    Script: |
+      bonus bMatk,340;
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bSkillAtk,"MG_SOULSTRIKE",10;
+      bonus bMatk,18*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"MG_SOULSTRIKE",20;
+         if (.@r>=9) {
+            bonus2 bMagicAddSize,Size_All,15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"MG_SOULSTRIKE",25;
+               if (getallrefine() >= 24) {
+                  bonus2 bMagicAtkEle,Ele_Ghost,15;
+               }
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus2 bMagicAddEle,Ele_All,15;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         if (.@g >= ENCHANTGRADE_B) {
+            bonus bMatkRate,7;
+            if (.@g >= ENCHANTGRADE_A) {
+               bonus bSMatk,(.@r/3);
+               bonus bSpl,(.@r/3);
+            }
+         }
+      }
   - Id: 650003
     AegisName: Ep172_Bh_Huuma
     Name: Wrath Wheel
@@ -141430,6 +143882,72 @@ Body:
       bonus bUnbreakableWeapon;
       bonus bVariableCastrate,-2*(.@r/3);
       bonus bBaseAtk,30*.@r;
+  - Id: 650008
+    AegisName: Adulter_F_Humma
+    Name: "Adulter Fides Huuma Shuriken [2]"
+    Type: Weapon
+    SubType: Huuma
+    Buy: 11900000
+    Sell: 119000
+    Weight: 2000
+    Attack: 360
+    Range: 1
+    Slots: 2
+    Jobs: {Ninja: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 180
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bSkillAtk,"NJ_HUUMA",10;
+      bonus bBaseAtk,18*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"NJ_HUUMA",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-10;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"NJ_HUUMA",25;
+               if (getallrefine() >= 24) {
+                  bonus bLongAtkRate,15;
+               }
+            }
+         }
+      }
+  - Id: 650009
+    AegisName: Adulter_F_C_Humma
+    Name: "Adulter Fides Cross-Shaped Huuma Shuriken [2]"
+    Type: Weapon
+    SubType: Huuma
+    Buy: 11900000
+    Sell: 119000
+    Weight: 2200
+    Attack: 360
+    Range: 1
+    Slots: 2
+    Jobs: {Ninja: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 180
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bSkillAtk,"NJ_ISSEN",10;
+      bonus bBaseAtk,18*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"NJ_ISSEN",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-10;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"NJ_ISSEN",25;
+               if (getallrefine() >= 24) {
+                  bonus bLongAtkRate,15;
+               }
+            }
+         }
+      }
   - Id: 650020
     AegisName: Fourth_Bh_Fuuma
     Name: "Scrap Slasher [2]"
@@ -141451,6 +143969,104 @@ Body:
       bonus bUnbreakableWeapon;
       bonus2 bSkillAtk,"NJ_HUUMA",5*(.@r/2);
       bonus bLongAtkRate,3*(.@r/4);
+  - Id: 650021
+    AegisName: Vivatus_F_C_Humma
+    Name: "Vivatus Fides Cross Huuma Shuriken [2]"
+    Type: Weapon
+    SubType: Huuma
+    Buy: 11900000
+    Sell: 119000
+    Weight: 2200
+    Attack: 360
+    Range: 1
+    Slots: 2
+    Jobs: {Ninja: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bSkillAtk,"NJ_ISSEN",10;
+      bonus bBaseAtk,18*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"NJ_ISSEN",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-10;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"NJ_ISSEN",25;
+               if (getallrefine() >= 24) {
+                  bonus bLongAtkRate,15;
+               }
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus2 bAddEle,Ele_All,15;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         if (.@g >= ENCHANTGRADE_B) {
+            bonus2 bAddClass,Class_All,7;
+            if (.@g >= ENCHANTGRADE_A) {
+               bonus bPAtk,(.@r/3);
+               bonus bPow,(.@r/3);
+            }
+         }
+      }
+  - Id: 650022
+    AegisName: Vivatus_F_Humma
+    Name: "Vivatus Fides Huuma Shuriken [2]"
+    Type: Weapon
+    SubType: Huuma
+    Buy: 11900000
+    Sell: 119000
+    Weight: 2000
+    Attack: 360
+    Range: 1
+    Slots: 2
+    Jobs: {Ninja: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bSkillAtk,"NJ_HUUMA",10;
+      bonus bBaseAtk,18*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"NJ_HUUMA",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-10;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"NJ_HUUMA",25;
+               if (getallrefine() >= 24) {
+                  bonus bLongAtkRate,15;
+               }
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus2 bAddEle,Ele_All,15;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         if (.@g >= ENCHANTGRADE_B) {
+            bonus2 bAddClass,Class_All,7;
+            if (.@g >= ENCHANTGRADE_A) {
+               bonus bPAtk,(.@r/3);
+               bonus bPow,(.@r/3);
+            }
+         }
+      }
   - Id: 700007
     AegisName: Ep172_Bh_Bow
     Name: Superbia String
@@ -141531,6 +144147,283 @@ Body:
       .@r = getrefine();
       bonus2 bSkillAtk,"AC_SHOWER",5*(.@r/2);
       bonus bLongAtkRate,2*(.@r/4);
+  - Id: 700030
+    AegisName: Adulter_F_C_Bow
+    Name: "Adulter Fides Crossbow [2]"
+    Type: Weapon
+    SubType: Bow
+    Buy: 10700000
+    Sell: 107000
+    Weight: 1500
+    Attack: 240
+    Range: 5
+    Slots: 2
+    Jobs: {Rogue: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 180
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"AC_DOUBLE",10;
+      bonus bBaseAtk,18*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"AC_DOUBLE",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-10;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"AC_DOUBLE",25;
+               if (getallrefine() >= 24) {
+                  bonus bLongAtkRate,15;
+               }
+            }
+         }
+      }
+  - Id: 700031
+    AegisName: Adulter_F_Ballista
+    Name: "Adulter Fides Ballista [2]"
+    Type: Weapon
+    SubType: Bow
+    Buy: 10800000
+    Sell: 108000
+    Weight: 1700
+    Attack: 250
+    Range: 5
+    Slots: 2
+    Jobs: {Hunter: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 180
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bSkillAtk,"AC_SHOWER",10;
+      bonus bBaseAtk,18*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"AC_SHOWER",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-6;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"AC_SHOWER",25;
+               if (getallrefine() >= 24) {
+                  bonus bLongAtkRate,15;
+               }
+            }
+         }
+      }
+  - Id: 700032
+    AegisName: Adulter_F_A_Bow
+    Name: "Adulter Fides Aiming Bow [2]"
+    Type: Weapon
+    SubType: Bow
+    Buy: 10600000
+    Sell: 106000
+    Weight: 1500
+    Attack: 230
+    Range: 5
+    Slots: 2
+    Jobs: {Hunter: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 180
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"SN_SHARPSHOOTING",10;
+      bonus bBaseAtk,18*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"SN_SHARPSHOOTING",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-10;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"SN_SHARPSHOOTING",25;
+               if (getallrefine() >= 24) {
+                  bonus bLongAtkRate,15;
+               }
+            }
+         }
+      }
+  - Id: 700033
+    AegisName: Vivatus_F_C_Bow
+    Name: "Vivatus Fides Cross Bow [2]"
+    Type: Weapon
+    SubType: Bow
+    Buy: 10700000
+    Sell: 107000
+    Weight: 1500
+    Attack: 240
+    Range: 5
+    Slots: 2
+    Jobs: {Rogue: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus2 bSkillAtk,"AC_DOUBLE",10;
+      bonus bBaseAtk,18*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"AC_DOUBLE",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-10;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"AC_DOUBLE",25;
+               if (getallrefine() >= 24) {
+                  bonus bLongAtkRate,15;
+               }
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus2 bAddEle,Ele_All,15;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         if (.@g >= ENCHANTGRADE_B) {
+            bonus2 bAddClass,Class_All,7;
+            if (.@g >= ENCHANTGRADE_A) {
+               bonus bPAtk,(.@r/3);
+               bonus bPow,(.@r/3);
+            }
+         }
+      }
+  - Id: 700034
+    AegisName: Vivatus_F_Ballista
+    Name: "Vivatus Fides Ballista [2]"
+    Type: Weapon
+    SubType: Bow
+    Buy: 10800000
+    Sell: 108000
+    Weight: 1700
+    Attack: 250
+    Range: 5
+    Slots: 2
+    Jobs: {Hunter: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bSkillAtk,"AC_SHOWER",10;
+      bonus bBaseAtk,18*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"AC_SHOWER",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-6;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"AC_SHOWER",25;
+               if (getallrefine() >= 24) {
+                  bonus bLongAtkRate,15;
+               }
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus2 bAddEle,Ele_All,15;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         if (.@g >= ENCHANTGRADE_B) {
+            bonus2 bAddClass,Class_All,7;
+            if (.@g >= ENCHANTGRADE_A) {
+               bonus bPAtk,(.@r/3);
+               bonus bPow,(.@r/3);
+            }
+         }
+      }
+  - Id: 700035
+    AegisName: Vivatus_F_A_Bow
+    Name: "Vivatus Fides Aiming Bow [2]"
+    Type: Weapon
+    SubType: Bow
+    Buy: 10600000
+    Sell: 106000
+    Weight: 1500
+    Attack: 230
+    Range: 5
+    Slots: 2
+    Jobs: {Hunter: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus2 bSkillAtk,"SN_SHARPSHOOTING",10;
+      bonus bBaseAtk,18*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"SN_SHARPSHOOTING",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-10;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"SN_SHARPSHOOTING",25;
+               if (getallrefine() >= 24) {
+                  bonus bLongAtkRate,15;
+               }
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus2 bAddEle,Ele_All,15;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         if (.@g >= ENCHANTGRADE_B) {
+            bonus2 bAddClass,Class_All,7;
+            if (.@g >= ENCHANTGRADE_A) {
+               bonus bPAtk,(.@r/3);
+               bonus bPow,(.@r/3);
+            }
+         }
+      }
+  - Id: 800003
+    AegisName: Adulter_F_Revolver
+    Name: "Adulter Fides Revolver [2]"
+    Type: Weapon
+    SubType: Revolver
+    Buy: 10400000
+    Sell: 104000
+    Weight: 1200
+    Attack: 210
+    Range: 7
+    Slots: 2
+    Jobs: {Gunslinger: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 180
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bSkillAtk,"GS_RAPIDSHOWER",10;
+      bonus bBaseAtk,18*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"GS_RAPIDSHOWER",20;
+         if (.@r>=9) {
+            bonus2 bSubRace,RC_All,15;
+            bonus2 bSubRace,RC_Player_Human,-15;
+            bonus2 bSubRace,RC_Player_Doram,-15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"GS_RAPIDSHOWER",25;
+               if (getallrefine() >= 24) {
+                  bonus bLongAtkRate,15;
+               }
+            }
+         }
+      }
   - Id: 800010
     AegisName: Fourth_Revolver
     Name: "Scrap Pistol [2]"
@@ -141551,6 +144444,57 @@ Body:
       .@r = getrefine();
       bonus2 bSkillAtk,"GS_TRACKING",6*(.@r/2);
       bonus bLongAtkRate,3*(.@r/4);
+  - Id: 800012
+    AegisName: Vivatus_F_Revolver
+    Name: "Vivatus Fides Revolver [2]"
+    Type: Weapon
+    SubType: Revolver
+    Buy: 10400000
+    Sell: 104000
+    Weight: 1200
+    Attack: 210
+    Range: 7
+    Slots: 2
+    Jobs: {Gunslinger: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bSkillAtk,"GS_RAPIDSHOWER",10;
+      bonus bBaseAtk,18*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"GS_RAPIDSHOWER",20;
+         if (.@r>=9) {
+            bonus2 bSubRace,RC_All,15;
+            bonus2 bSubRace,RC_Player_Human,-15;
+            bonus2 bSubRace,RC_Player_Doram,-15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"GS_RAPIDSHOWER",25;
+               if (getallrefine() >= 24) {
+                  bonus bLongAtkRate,15;
+               }
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus2 bAddEle,Ele_All,15;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         if (.@g >= ENCHANTGRADE_B) {
+            bonus2 bAddClass,Class_All,7;
+            if (.@g >= ENCHANTGRADE_A) {
+               bonus bPAtk,(.@r/3);
+               bonus bCon,(.@r/3);
+            }
+         }
+      }
   - Id: 810000
     AegisName: Ep172_1h_Rifle
     Name: Lust Pointer
@@ -141570,6 +144514,39 @@ Body:
       .@r = getrefine();
       bonus bAspdRate,3*.@r;
       bonus bBaseAtk,20*.@r;
+  - Id: 810002
+    AegisName: Adulter_F_Rifle
+    Name: "Adulter Fides Rifle [2]"
+    Type: Weapon
+    SubType: Rifle
+    Buy: 11100000
+    Sell: 111000
+    Weight: 1500
+    Attack: 280
+    Range: 9
+    Slots: 2
+    Jobs: {Gunslinger: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 180
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bSkillAtk,"GS_DUST",10;
+      bonus bBaseAtk,18*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"GS_DUST",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-25;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"GS_DUST",25;
+               if (getallrefine() >= 24) {
+                  bonus bLongAtkRate,15;
+               }
+            }
+         }
+      }
   - Id: 810006
     AegisName: Fourth_Rifle
     Name: "Scrap Piercer [2]"
@@ -141590,6 +144567,55 @@ Body:
       .@r = getrefine();
       bonus2 bSkillAtk,"GS_PIERCINGSHOT",6*(.@r/2);
       bonus bLongAtkRate,3*(.@r/4);
+  - Id: 810008
+    AegisName: Vivatus_F_Rifle
+    Name: "Vivatus Fides Rifle [2]"
+    Type: Weapon
+    SubType: Rifle
+    Buy: 11100000
+    Sell: 111000
+    Weight: 1500
+    Attack: 280
+    Range: 9
+    Slots: 2
+    Jobs: {Gunslinger: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bSkillAtk,"GS_DUST",10;
+      bonus bBaseAtk,18*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"GS_DUST",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-25;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"GS_DUST",25;
+               if (getallrefine() >= 24) {
+                  bonus bLongAtkRate,15;
+               }
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus2 bAddEle,Ele_All,15;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         if (.@g >= ENCHANTGRADE_B) {
+            bonus2 bAddClass,Class_All,7;
+            if (.@g >= ENCHANTGRADE_A) {
+               bonus bPAtk,(.@r/3);
+               bonus bCon,(.@r/3);
+            }
+         }
+      }
   - Id: 820000
     AegisName: Ep172_1h_Shotgun
     Name: Lust Shatter
@@ -141610,6 +144636,39 @@ Body:
       bonus bSplashRange,1;
       bonus bAspdRate,3*.@r;
       bonus bBaseAtk,15*.@r;
+  - Id: 820002
+    AegisName: Adulter_F_Shotgun
+    Name: "Adulter Fides Shotgun [2]"
+    Type: Weapon
+    SubType: Shotgun
+    Buy: 11500000
+    Sell: 115000
+    Weight: 2000
+    Attack: 320
+    Range: 9
+    Slots: 2
+    Jobs: {Gunslinger: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 180
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bSplashRange,1;
+      bonus2 bSkillAtk,"GS_SPREADATTACK",10;
+      bonus bBaseAtk,18*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"GS_SPREADATTACK",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-5;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"GS_SPREADATTACK",25;
+               if (getallrefine() >= 24) {
+                  bonus bLongAtkRate,15;
+               }
+            }
+         }
+      }
   - Id: 820005
     AegisName: Fourth_Shotgun
     Name: "Scrap Shatter [2]"
@@ -141631,6 +144690,55 @@ Body:
       bonus bSplashRange,1;
       bonus bLongAtkRate,3*(getrefine()/4);
       bonus2 bSkillAtk,"GS_SPREADATTACK",6*(.@r/2);
+  - Id: 820006
+    AegisName: Vivatus_F_Shotgun
+    Name: "Vivatus Fides Shotgun [2]"
+    Type: Weapon
+    SubType: Shotgun
+    Buy: 11500000
+    Sell: 115000
+    Weight: 2000
+    Attack: 320
+    Range: 9
+    Slots: 2
+    Jobs: {Gunslinger: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus bSplashRange,1;
+      bonus2 bSkillAtk,"GS_SPREADATTACK",10;
+      bonus bBaseAtk,18*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"GS_SPREADATTACK",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-5;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"GS_SPREADATTACK",25;
+               if (getallrefine() >= 24) {
+                  bonus bLongAtkRate,15;
+               }
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus2 bAddEle,Ele_All,15;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         if (.@g >= ENCHANTGRADE_B) {
+            bonus2 bAddClass,Class_All,7;
+            if (.@g >= ENCHANTGRADE_A) {
+               bonus bPAtk,(.@r/3);
+               bonus bCon,(.@r/3);
+            }
+         }
+      }
   - Id: 830001
     AegisName: Ep172_1h_Gatling
     Name: Lust Crusher
@@ -141650,6 +144758,38 @@ Body:
       .@r = getrefine();
       bonus bAspdRate,6*.@r;
       bonus bBaseAtk,15*.@r;
+  - Id: 830003
+    AegisName: Adulter_F_Gatling
+    Name: "Adulter Fides Gatling Gun [2]"
+    Type: Weapon
+    SubType: Gatling
+    Buy: 10800000
+    Sell: 108000
+    Weight: 1500
+    Attack: 250
+    Range: 9
+    Slots: 2
+    Jobs: {Gunslinger: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 180
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"GS_FULLBUSTER",10;
+      bonus bBaseAtk,18*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"GS_FULLBUSTER",20;
+         if (.@r>=9) {
+            bonus2 bAddSize,Size_All,15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"GS_FULLBUSTER",25;
+               if (getallrefine() >= 24) {
+                  bonus bLongAtkRate,15;
+               }
+            }
+         }
+      }
   - Id: 830009
     AegisName: Fourth_Gatling
     Name: "Scrap Splatter [2]"
@@ -141670,6 +144810,54 @@ Body:
       .@r = getrefine();
       bonus2 bSkillAtk,"GS_RAPIDSHOWER",6*(.@r/2);
       bonus bLongAtkRate,3*(.@r/4);
+  - Id: 830011
+    AegisName: Vivatus_F_Gatling
+    Name: "Vivatus Fides Gatling Gun [2]"
+    Type: Weapon
+    SubType: Gatling
+    Buy: 10800000
+    Sell: 108000
+    Weight: 1500
+    Attack: 250
+    Range: 9
+    Slots: 2
+    Jobs: {Gunslinger: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus2 bSkillAtk,"GS_FULLBUSTER",10;
+      bonus bBaseAtk,18*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"GS_FULLBUSTER",20;
+         if (.@r>=9) {
+            bonus2 bAddSize,Size_All,15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"GS_FULLBUSTER",25;
+               if (getallrefine() >= 24) {
+                  bonus bLongAtkRate,15;
+               }
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus2 bAddEle,Ele_All,15;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         if (.@g >= ENCHANTGRADE_B) {
+            bonus2 bAddClass,Class_All,7;
+            if (.@g >= ENCHANTGRADE_A) {
+               bonus bPAtk,(.@r/3);
+               bonus bCon,(.@r/3);
+            }
+         }
+      }
   - Id: 840000
     AegisName: Ep172_1h_Grenade
     Name: Lust Boom
@@ -141689,6 +144877,38 @@ Body:
       .@r = getrefine();
       bonus bAspdRate,3*.@r;
       bonus bBaseAtk,20*.@r;
+  - Id: 840002
+    AegisName: Adulter_F_Launcher
+    Name: "Adulter Fides Launcher [2]"
+    Type: Weapon
+    SubType: Grenade
+    Buy: 11800000
+    Sell: 118000
+    Weight: 3000
+    Attack: 350
+    Range: 9
+    Slots: 2
+    Jobs: {Gunslinger: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 180
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"GS_DESPERADO",10;
+      bonus bBaseAtk,18*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"GS_DESPERADO",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-10;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"GS_DESPERADO",25;
+               if (getallrefine() >= 24) {
+                  bonus bLongAtkRate,15;
+               }
+            }
+         }
+      }
   - Id: 840005
     AegisName: Fourth_Grenade
     Name: "Scrap Bomber [2]"
@@ -141709,6 +144929,54 @@ Body:
       .@r = getrefine();
       bonus2 bSkillAtk,"GS_GROUNDDRIFT",6*(.@r/2);
       bonus bLongAtkRate,3*(.@r/4);
+  - Id: 840007
+    AegisName: Vivatus_F_Launcher
+    Name: "Vivatus Fides Launcher [2]"
+    Type: Weapon
+    SubType: Grenade
+    Buy: 11800000
+    Sell: 118000
+    Weight: 3000
+    Attack: 350
+    Range: 9
+    Slots: 2
+    Jobs: {Gunslinger: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus2 bSkillAtk,"GS_DESPERADO",10;
+      bonus bBaseAtk,18*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"GS_DESPERADO",20;
+         if (.@r>=9) {
+            bonus bDelayrate,-10;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"GS_DESPERADO",25;
+               if (getallrefine() >= 24) {
+                  bonus bLongAtkRate,15;
+               }
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus2 bAddEle,Ele_All,15;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         if (.@g >= ENCHANTGRADE_B) {
+            bonus2 bAddClass,Class_All,7;
+            if (.@g >= ENCHANTGRADE_A) {
+               bonus bPAtk,(.@r/3);
+               bonus bCon,(.@r/3);
+            }
+         }
+      }
   - Id: 1000092
     AegisName: ELYUMINA_RADAR
     Name: Elyumina Radar
