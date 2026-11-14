@@ -24290,3 +24290,21 @@ tr: Your character wears nothing on this layer: these colors have nothing to dre
 
 fr: Trop de retouches exactes pour tenir dans une ligne de chat.
 tr: Too many exact retouches to fit in one chat line.
+
+fr: Toutes les factions
+tr: All factions
+
+fr: Palier maximal
+tr: Highest tier
+
+fr: Aucune faction à montrer.
+tr: No faction to show.
+
+fr: La table des réputations manque à l'installation.
+tr: The reputation table is missing from the installation.
+
+fr: Total du groupe
+tr: Group total
+
+fr: Récupération des réputations…
+tr: Fetching reputations…

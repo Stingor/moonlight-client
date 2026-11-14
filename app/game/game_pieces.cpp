@@ -99,6 +99,11 @@ void LoadItemReformBook(ro::vfs::Vfs& vfs, GamePieces& pieces) {
   pieces.item_reform_book = ReadItemReformBook(vfs);
 }
 
+// LES RÉPUTATIONS. Absentes ou illisibles, leur fenêtre le dit.
+void LoadReputationBook(ro::vfs::Vfs& vfs, GamePieces& pieces) {
+  pieces.reputation_book = ReadReputationBook(vfs);
+}
+
 // LES MONSTRES DU SERVEUR. Absente ou illisible, la table reste inconnue : les
 // listes de monstres ne proposent que ceux que le client a vus.
 void LoadMonsterList(ro::vfs::Vfs& vfs, GamePieces& pieces) {
@@ -731,6 +736,7 @@ void LoadWorldPieces(ro::vfs::Vfs& vfs, GamePieces& pieces, ro::core::LoadProgre
       LoadItemProperties,
       LoadLaphineBook,
       LoadItemReformBook,
+      LoadReputationBook,
       LoadMonsterList,
       LoadRandomOptionNames,
       LoadBooks,

@@ -62,6 +62,7 @@ MenuIconFacts MenuIconFactsOf(const ro::sim::World& world, const UiStage::Window
   open_when(MenuCommand::kCardAlbum, windows.card_album.open);
   open_when(MenuCommand::kPetWindow, windows.pet.open);
   open_when(MenuCommand::kRankingBoard, windows.ranking_board.window.open);
+  open_when(MenuCommand::kReputation, windows.reputation.window.open);
   open_when(MenuCommand::kMarket, windows.trade.market.state.open);
   open_when(MenuCommand::kDatabase, windows.monster_sheet.database.state.open);
   open_when(MenuCommand::kRojeweled, windows.minigames.rojeweled.open);
@@ -142,6 +143,9 @@ void ApplyMenuCommand(MenuCommand command, const MenuIconTargets& to) {
       break;
     case MenuCommand::kRankingBoard:
       ToggleRankingBoard(to.windows->ranking_board);
+      break;
+    case MenuCommand::kReputation:
+      ToggleReputationWindow(to.windows->reputation);
       break;
     case MenuCommand::kBooking:
       TogglePartyBooking(to.windows->party_booking);

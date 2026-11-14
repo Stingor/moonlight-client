@@ -51,7 +51,7 @@ constexpr std::array<MenuIconEntry, kMenuCommandCount> kCatalogue = {{
     {kSocialNetwork, "sns", false, false},
     {kAttendance, "attendance", false, false},
     {kAdventurerAgency, "adventurerAgency", false, false},
-    {kReputation, "repute", false, false},
+    {kReputation, "repute", true, false},
     {kAdventureGuide, "adventureguide", false, false},
     {kProbability, "probability", false, false},
     {kCardAlbum, "album", true, false},

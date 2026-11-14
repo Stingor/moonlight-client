@@ -153,6 +153,17 @@ TEST_CASE("Icônes de menu : le tableau des classements a son icône, sans art l
   CHECK(Find(Compose(facts), MenuCommand::kRankingBoard)->shows_open);
 }
 
+TEST_CASE("Icônes de menu : la réputation ouvre sa fenêtre", "[app][menu]") {
+  MenuIconFacts facts;
+  const std::vector<MenuIconView> icons = Compose(facts);
+  const MenuIconView* reputation = Find(icons, MenuCommand::kReputation);
+  REQUIRE(reputation != nullptr);
+  CHECK(reputation->ported);
+  CHECK(moonclient::MenuCommandPorted(MenuCommand::kReputation));
+  facts.open = {MenuCommand::kReputation};
+  CHECK(Find(Compose(facts), MenuCommand::kReputation)->shows_open);
+}
+
 TEST_CASE("Icônes de menu : le Marché a son icône, sans art livré", "[app][menu]") {
   MenuIconFacts facts;
   const std::vector<MenuIconView> icons = Compose(facts);

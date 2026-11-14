@@ -147,6 +147,15 @@ FrameOutcome ApplyLedgerFrame(const Frame& frame, sim::CharacterLedger& ledger) 
         for (const proto::ZcReputeInfoSub& entry : packet.list) {
           ledger.SetReputation(entry.type, entry.points);
         }
+        ledger.MarkReputationReceived();
+        return FrameOutcome::kApplied;
+      });
+
+    // Le troisième champ ne choisit que la texture du client d'origine : ignoré.
+    case proto::ZcReputeOpen::kOpcode:
+      return Decoded<proto::ZcReputeOpen>(frame, [&ledger](const auto& packet) {
+        ledger.AskReputationOpening(
+            sim::ReputationOpening{.group_id = packet.table, .faction_id = packet.type});
         return FrameOutcome::kApplied;
       });
 

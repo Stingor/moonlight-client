@@ -111,6 +111,7 @@
 #include "world/broadcast_balloons.h"
 #include "world/music_player_stage.h"
 #include "world/ranking_board.h"
+#include "world/reputation_board.h"
 
 struct SDL_Window;
 union SDL_Event;
@@ -376,9 +377,7 @@ class UiStage {
     using Navigation = NavigationWindows;
     Navigation navigation;
     CashShopWindows cash_shop;  // La boutique de vote : `game/cash_shop_windows.h`.
-    // LES COMMERCES — boutiques de PNJ, échoppes, troc —, groupés à part : voir
-    // `game/trade_windows.h` et `ui_stage_trade.cpp`.
-    TradeWindows trade;
+    TradeWindows trade;         // Les commerces : `game/trade_windows.h`, `ui_stage_trade.cpp`.
     // LE COURRIER : la boîte et l'écriture. Voir `ui_stage_mail.cpp`.
     MailWindows mail;
     // LES SALONS : le formulaire, la salle, l'invite. Voir `ui_stage_chat_room.cpp`.
@@ -391,6 +390,7 @@ class UiStage {
     MemorialWindows memorial;           // L'instance : `game/memorial_stage.h`.
     BattlegroundWindows battleground;   // Voir `ui_stage_battleground.cpp`.
     RankingBoardWindows ranking_board;  // Voir `ui_stage_ranking.cpp`.
+    ReputationWindows reputation;       // Voir `world/reputation_board.h`.
     PartyBookingWindows party_booking;  // Voir `ui_stage_party_booking.cpp`.
     PartyWindows party;                 // Groupe, amis et grille : `game/party_windows.h`.
     MusicPlayerWindows music_player;    // Le lecteur : `world/music_player_stage.h`.

@@ -70,6 +70,7 @@ add_library(ro_ui STATIC
     src/party_booking_rules.cpp
     src/party_booking_window.cpp
     src/ranking_window.cpp
+    src/reputation_window.cpp
     src/repair_window.cpp
     src/spell_list_window.cpp
     src/cash_shop_slots.cpp

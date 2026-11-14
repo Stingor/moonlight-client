@@ -24290,3 +24290,21 @@ tr: Tu personaje no lleva nada en esta capa: estos colores no tienen nada que ve
 
 fr: Trop de retouches exactes pour tenir dans une ligne de chat.
 tr: Demasiados retoques exactos para caber en una línea de chat.
+
+fr: Toutes les factions
+tr: Todas las facciones
+
+fr: Palier maximal
+tr: Nivel máximo
+
+fr: Aucune faction à montrer.
+tr: Ninguna facción que mostrar.
+
+fr: La table des réputations manque à l'installation.
+tr: Falta la tabla de reputaciones en la instalación.
+
+fr: Total du groupe
+tr: Total del grupo
+
+fr: Récupération des réputations…
+tr: Obteniendo las reputaciones…

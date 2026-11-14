@@ -135,6 +135,7 @@ bool MenuCommandPorted(MenuCommand command) {
   // la liste, selon qu'on est en file.
   // LE TABLEAU DES CLASSEMENTS NON PLUS : il n'a pas de touche, `/ranking` et
   // son icône l'ouvrent.
+  // LA RÉPUTATION NON PLUS : son icône, et le script qui l'ouvre.
   // LA RECHERCHE DE GROUPE NON PLUS : son icône, et le bouton de la fenêtre de
   // groupe.
   // LE MARCHÉ NON PLUS : sa touche passe par son étage, que l'icône n'atteint
@@ -146,7 +147,7 @@ bool MenuCommandPorted(MenuCommand command) {
          command == MenuCommand::kRankingBoard || command == MenuCommand::kBooking ||
          command == MenuCommand::kMarket || command == MenuCommand::kDatabase ||
          command == MenuCommand::kRojeweled || command == MenuCommand::kRoggle ||
-         command == MenuCommand::kSurvivors;
+         command == MenuCommand::kSurvivors || command == MenuCommand::kReputation;
 }
 
 void ComposeMenuIcons(std::vector<ro::ui::MenuIconView>& into, ro::render::GameImages* images,

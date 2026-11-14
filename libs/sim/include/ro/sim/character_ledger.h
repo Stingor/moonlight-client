@@ -54,6 +54,14 @@ struct EquipSwitchNews {
   EquipSwitchRefusal refusal = EquipSwitchRefusal::kNone;
 };
 
+// L'OUVERTURE DE LA FENÊTRE DE RÉPUTATION qu'un script demande.
+struct ReputationOpening {
+  // Le groupe à montrer ; zéro, toutes les factions.
+  std::uint64_t group_id = 0;
+  // La faction à désigner dans la liste ; zéro, aucune.
+  std::uint64_t faction_id = 0;
+};
+
 // CE QUE LE SERVEUR DIT DU PERSONNAGE ET QU'AUCUNE FENÊTRE NE MONTRE ENCORE.
 //
 // Le serveur l'envoie à l'entrée sur la carte, et ne le redit qu'au
@@ -81,6 +89,10 @@ class CharacterLedger {
   [[nodiscard]] const std::map<std::uint64_t, std::int64_t>& reputation() const noexcept {
     return reputation_;
   }
+  // La liste des points est-elle arrivée ? Le serveur l'envoie à chaque entrée
+  // sur une carte, même vide : avant elle, une faction sans points n'est pas une
+  // faction à zéro.
+  [[nodiscard]] bool reputation_received() const noexcept { return reputation_received_; }
 
   // Un pack acheté — ou redit à la connexion, un par pack.
   void OwnEmotionPack(std::uint16_t pack_id, std::optional<std::int32_t> uses_left) {
@@ -110,11 +122,21 @@ class CharacterLedger {
   // ⚠ FUSIONNE : le serveur envoie la liste entière à la connexion, puis la
   // seule faction qui change.
   void SetReputation(std::uint64_t faction, std::int64_t points) { reputation_[faction] = points; }
+  void MarkReputationReceived() noexcept { reputation_received_ = true; }
+
+  // UN SCRIPT OUVRE LA FENÊTRE DE RÉPUTATION. Gardé jusqu'à ce que la fenêtre le
+  // prenne ; une seconde demande remplace la première.
+  void AskReputationOpening(ReputationOpening opening) noexcept { reputation_opening_ = opening; }
+  [[nodiscard]] std::optional<ReputationOpening> TakeReputationOpening() noexcept {
+    return std::exchange(reputation_opening_, std::nullopt);
+  }
 
  private:
   std::map<std::uint16_t, std::optional<std::int32_t>> emotion_packs_;
   std::vector<EquipSwitchPiece> equip_switch_;
   std::map<std::uint64_t, std::int64_t> reputation_;
+  bool reputation_received_ = false;
+  std::optional<ReputationOpening> reputation_opening_;
 };
 
 }  // namespace ro::sim

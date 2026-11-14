@@ -15,7 +15,9 @@ namespace ro::net {
 // - le jeu d'équipement de rechange (`ZC_EQUIPSWITCH_LIST 0x0A9B`) ;
 // - les points de réputation (`ZC_REPUTE_INFO 0x0B8D`), toutes les factions à
 //   la connexion puis la seule qui change. Un paquet marqué en échec est lu et
-//   ignoré.
+//   ignoré ;
+// - l'ouverture de la fenêtre de réputation qu'un script demande
+//   (`ZC_REPUTE_OPEN 0x0B8E`), gardée jusqu'à ce que la fenêtre la prenne.
 //
 // Les accusés du jeu de rechange — pièce rangée (`0x0A98`), sortie (`0x0A9A`),
 // échange complet (`0x0A9D`) — le tiennent à jour. ⚠ LE SERVEUR EN ENVOIE SANS

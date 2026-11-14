@@ -119,6 +119,7 @@
 #include "world/quest_marker_view.h"
 #include "world/rank_notices.h"
 #include "world/ranking_board.h"
+#include "world/reputation_board.h"
 #include "world/skill_refusal_report.h"
 #include "world/sleep_bubbles_view.h"
 #include "world/staff_roster.h"
@@ -450,6 +451,8 @@ struct GamePieces {
   LaphineBook laphine_book;
   // CE QUE CHAQUE DÉCLENCHEUR DE RÉFORME CHANGE. Vide quand la table manque.
   ItemReformBook item_reform_book;
+  // LES FACTIONS DE RÉPUTATION ET LEURS GROUPES. Non lu quand la table manque.
+  ReputationBook reputation_book;
   // LES MONSTRES QUE LE SERVEUR CONNAÎT, que la liste « Monstre de la cible »
   // de l'IA des compagnons propose. Inconnue quand la table manque.
   ro::vfs::MonsterList monster_list;
@@ -561,6 +564,8 @@ struct GamePieces {
   RankNotices rank_notices;
   // LE TABLEAU DES CLASSEMENTS : voir `RankingBoard`.
   RankingBoard ranking_board;
+  // LA FENÊTRE DE RÉPUTATION : voir `ReputationBoard`.
+  ReputationBoard reputation_board;
   // LA RECHERCHE DE GROUPE : voir `PartyBookingBoard`.
   PartyBookingBoard party_booking;
   // LE LECTEUR DE MUSIQUE : voir `MusicPlayerStage`.

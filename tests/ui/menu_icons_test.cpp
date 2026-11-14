@@ -90,7 +90,7 @@ TEST_CASE("Menu d'icônes : le catalogue suit l'ordre de l'énumération", "[ui]
   CHECK(rank == ro::ui::kMenuCommandCount);
 }
 
-TEST_CASE("Menu d'icônes : vingt-quatre cases montrées, un bouton hors grille, sept « nouveau »",
+TEST_CASE("Menu d'icônes : vingt-huit cases montrées, un bouton hors grille, sept « nouveau »",
           "[ui][menu_icons]") {
   std::size_t in_grid = 0;
   std::size_t off_grid = 0;
@@ -100,10 +100,10 @@ TEST_CASE("Menu d'icônes : vingt-quatre cases montrées, un bouton hors grille,
     off_grid += entry.off_grid ? 1U : 0U;
     with_news += entry.has_news_art ? 1U : 0U;
   }
-  // Dix-sept icônes du jeu, l'album, l'atlas, le carnet MVP, la fiche du pet,
-  // le tableau des classements, le Marché, la base de données et les trois
-  // mini-jeux de ce client.
-  constexpr std::size_t kShownOnThisServer = 27;
+  // Dix-huit icônes du jeu, la réputation comprise, l'album, l'atlas, le carnet
+  // MVP, la fiche du pet, le tableau des classements, le Marché, la base de
+  // données et les trois mini-jeux de ce client.
+  constexpr std::size_t kShownOnThisServer = 28;
   constexpr std::size_t kWithNewsArt = 7;
   CHECK(in_grid == kShownOnThisServer);
   CHECK(off_grid == 1);

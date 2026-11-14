@@ -5,6 +5,7 @@
 #include "ro/net/character_ledger.h"
 
 #include <cstdint>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -298,6 +299,31 @@ TEST_CASE("Réputation : la liste puis une seule faction, fusionnées", "[net][l
   info.list = {{.type = 1, .points = 0}};
   CHECK(ApplyLedgerFrame(FrameOf(Encode(info)), ledger) == FrameOutcome::kIgnored);
   CHECK(ledger.reputation().at(1) == 100);
+}
+
+TEST_CASE("Réputation : la liste vide dit qu'elle est arrivée", "[net][ledger]") {
+  CharacterLedger ledger;
+  CHECK_FALSE(ledger.reputation_received());
+  ro::proto::ZcReputeInfo info;
+  info.success = 1;
+  REQUIRE(ApplyLedgerFrame(FrameOf(Encode(info)), ledger) == FrameOutcome::kApplied);
+  CHECK(ledger.reputation().empty());
+  CHECK(ledger.reputation_received());
+}
+
+TEST_CASE("Réputation : l'ouverture d'un script se garde jusqu'à sa prise", "[net][ledger]") {
+  CharacterLedger ledger;
+  CHECK_FALSE(ledger.TakeReputationOpening().has_value());
+  REQUIRE(ApplyLedgerFrame(FrameOf(Encode(ro::proto::ZcReputeOpen{.table = 2, .type = 3})),
+                           ledger) == FrameOutcome::kApplied);
+  // La seconde remplace la première.
+  REQUIRE(ApplyLedgerFrame(FrameOf(Encode(ro::proto::ZcReputeOpen{.table = 0, .type = 3})),
+                           ledger) == FrameOutcome::kApplied);
+  const std::optional<ro::sim::ReputationOpening> opening = ledger.TakeReputationOpening();
+  REQUIRE(opening.has_value());
+  CHECK(opening->group_id == 0);
+  CHECK(opening->faction_id == 3);
+  CHECK_FALSE(ledger.TakeReputationOpening().has_value());
 }
 
 TEST_CASE("Packs d'émotions : avec ou sans compte d'utilisations", "[net][ledger]") {

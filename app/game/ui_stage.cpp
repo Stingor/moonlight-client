@@ -419,6 +419,7 @@ UiStage::Answers UiStage::Draw(
   DrawQuestWindows(windows.quests, windows.tracker);
   DrawAchievementWindows(windows.achievements);
   DrawRankingWindows(windows.ranking_board);
+  DrawReputationWindows(windows.reputation, skin_, escape_);
   DrawPartyBookingWindows(windows.party_booking);
   if (windows.music_player.composed) {
     windows.music_player.answer = ro::ui::DrawMusicPlayerWindow(windows.music_player.window,

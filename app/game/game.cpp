@@ -184,6 +184,8 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
   pieces_.rank_notices.Advance(world_, now_ms);
   // Le tableau montre le dernier classement, et demande celui d'un onglet.
   pieces_.ranking_board.Advance(windows_.ranking_board, pieces_.rank_notices, link_, now_ms);
+  // La réputation s'ouvre par son icône ou par un script, et montre le registre.
+  pieces_.reputation_board.Advance(windows_.reputation, ledger_, pieces_.reputation_book);
   std::vector<InterfaceSoundFile> star_sounds;
   for (std::string& sound : pieces_.rank_notices.TakeSounds()) {
     star_sounds.push_back(

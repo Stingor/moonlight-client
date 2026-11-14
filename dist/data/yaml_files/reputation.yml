@@ -1,0 +1,27 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  La réputation : les factions et leurs groupes
+#
+#  Exporté des tables reputation et reputation_group du serveur Moonlight
+#  (mode Prerenewal) par scripts/yaml_tables/reputation.py. Ne pas éditer à la main :
+#      python scripts/yaml_tables/reputation.py --serveur <dépôt moonlight>
+#
+#  factions : id, nom, bornes des points (least négatif ou nul, most positif ou
+#             nul) et visibilité — always, never, ou with_points (montrée dès
+#             qu'elle a des points).
+#  groups   : id, nom, et les factions qu'il réunit, dans l'ordre du serveur.
+#
+#  Lu par moonclient (app/world/reputation_book.h). Absente, la fenêtre de
+#  réputation le dit au lieu de montrer des factions.
+# ─────────────────────────────────────────────────────────────────────────────
+version: 1
+mode: Prerenewal
+factions:
+  - id: 3
+    name: "Grey Wolf Village"
+    least: -5000
+    most: 5000
+    shown: always
+groups:
+  - id: 2
+    name: "Arunafeltz"
+    factions: [3]
