@@ -33,7 +33,6 @@ constexpr ImU32 kPositiveColor = IM_COL32(121, 146, 205, 255);
 constexpr ImU32 kNegativeColor = IM_COL32(205, 64, 64, 255);
 // Le fond de la faction qu'un script désigne.
 constexpr ImU32 kHighlightColor = IM_COL32(255, 231, 222, 255);
-constexpr float kGaugeHeightPixels = 12.0F;
 constexpr float kGroupComboPixels = 140.0F;
 constexpr float kRowGapPixels = 6.0F;
 
@@ -127,7 +126,8 @@ void DrawRow(const ReputationRowView& row) {
                                  : static_cast<float>(gauge.into_step) /
                                        static_cast<float>(kReputationPointsPerStep);
   ImGui::PushStyleColor(ImGuiCol_PlotHistogram, gauge.negative ? kNegativeColor : kPositiveColor);
-  ImGui::ProgressBar(ratio, ImVec2(-1.0F, Px(kGaugeHeightPixels)), label.data());
+  // HAUTEUR NULLE : celle d'un cadre, que le texte de la barre remplit sans être coupé.
+  ImGui::ProgressBar(ratio, ImVec2(-1.0F, 0.0F), label.data());
   ImGui::PopStyleColor();
   ImGui::EndGroup();
   if (row.highlighted) {
