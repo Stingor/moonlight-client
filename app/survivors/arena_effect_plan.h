@@ -33,6 +33,11 @@ struct ArenaEffectSwitches {
   // « EFFETS RÉDUITS » (U20) : seuls les chiffres et l'étoile de coup restent,
   // la gerbe ordinaire pour tout skill (`kPlainHitEffect`).
   bool reduced = false;
+  // LE TIR DE BAGUETTE AMÉLIORÉ, l'option graphique du jeu : le coup de
+  // baguette vole en boule d'énergie (`ro/render/wand_orb.h`) ; coupée, il
+  // garde le trait que le jeu donne aux bâtons.
+  bool wand_orb = true;
+  [[nodiscard]] bool operator==(const ArenaEffectSwitches&) const = default;
 };
 
 // ── LA PRIORITÉ (A) ─────────────────────────────────────────────────────────

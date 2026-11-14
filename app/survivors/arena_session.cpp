@@ -145,6 +145,11 @@ void ArenaSession::Compose(const ArenaFrameFacts& facts, const GraphicsOptions& 
   // du cadre couvre le pas qu'elle fera à celle-ci.
   const ArenaSight sight = ArenaSightOf(
       camera_.camera(), AspectOf(facts.viewport_width, facts.viewport_height), field.hero.position);
+  if (ArenaEffectSwitches switches = effects_.switches();
+      switches.wand_orb != graphics.wand_orb()) {
+    switches.wand_orb = graphics.wand_orb();
+    effects_.set_switches(switches);
+  }
   effects_.Advance(*facts.news, field, facts.orbs, ground_of, renderer_ms, sight);
   effects_ms_ =
       std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - effects_started)

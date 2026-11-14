@@ -13,6 +13,7 @@
 #include "ro/render/effect_launch.h"
 #include "ro/render/effect_sound_table.h"
 #include "ro/render/effect_table.h"
+#include "ro/render/wand_orb.h"
 #include "ro/sim/actor.h"
 #include "ro/sim/movement.h"
 #include "ro/sim/survivors_geometry.h"
@@ -691,9 +692,13 @@ void ArenaEffects::ShootHeroArrows(const ro::sim::SurvivorsField& field, const G
     const glm::vec3 lift{0.0F, ro::render::kArrowFlightHeight, 0.0F};
     const auto life_ticks = static_cast<std::int32_t>(std::max<std::uint32_t>(
         flight_ms / static_cast<std::uint32_t>(ro::render::kEffectTickMs), 1));
+    ro::render::ProjectileFlight flight = ro::render::ProjectileFlightOf(*sprites_, shooter);
+    // La baguette ne porte pas d'élément : sa boule est de l'arcane.
+    if (look->shoots_wand_bolt && switches_.wand_orb) {
+      flight.wand_orb_rgb = ro::render::WandOrbRgb(std::nullopt);
+    }
     static_cast<void>(nodes_.ShootSprite(sprite, ground_of(shot.position) + lift,
-                                         ground_of(lands) + lift, life_ticks,
-                                         ro::render::ProjectileFlightOf(*sprites_, shooter)));
+                                         ground_of(lands) + lift, life_ticks, flight));
     ++launched_total_;
   }
 }
