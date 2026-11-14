@@ -53,8 +53,15 @@ void SurvivorsViews::ComposeCodex(SurvivorsMetaWindows& windows, const Survivors
                                              FoundCardItemsOf(rules, save));
   windows.codex_view.objective_skill_id = windows.objective_skill_id;
   windows.codex_view.home_class_id = album_class != nullptr ? album_class->class_id : 0;
+  // Les noms suivent la langue du joueur : ils se refont à chaque composition.
+  card_holders_.clear();
   for (std::vector<ro::ui::SurvivorsCodexEntry>& tab : codex_rows_.entries) {
-    for (ro::ui::SurvivorsCodexEntry& entry : tab) NameCodexEntry(entry, tables);
+    for (ro::ui::SurvivorsCodexEntry& entry : tab) {
+      NameCodexEntry(entry, tables);
+      if (entry.drops_card) {
+        entry.card.held_by = CardHoldersOf(rules, entry.card.card.ro_id, tables);
+      }
+    }
   }
   for (ro::ui::SurvivorsCodexEntry& entry :
        codex_rows_.entries[static_cast<std::size_t>(ro::ui::SurvivorsCodexTab::kSkills)]) {

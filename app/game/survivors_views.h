@@ -206,6 +206,11 @@ class SurvivorsViews {
   void ComposeAlbum(SurvivorsMetaWindows& windows, const SurvivorsSave& save,
                     const ro::sim::SurvivorsRules& rules, const ro::sim::ClassRule* album_class,
                     const SurvivorsTables& tables);
+  // LES CLASSES POUR QUI UNE CARTE TOMBE, nommées et séparées par des virgules ;
+  // vide quand toutes les classes la tiennent. Le texte vit dans `card_holders_`.
+  [[nodiscard]] const char* CardHoldersOf(const ro::sim::SurvivorsRules& rules,
+                                          std::uint16_t card_item_id,
+                                          const SurvivorsTables& tables);
   // LE CODEX OUVERT (`survivors_codex_views.cpp`), à l'accueil ou sur la
   // pause : les fiches tirées des règles, du carnet et du relevé de la partie
   // en cours (`live`, nul hors partie), puis leurs noms, leurs icônes, le
@@ -270,8 +275,9 @@ class SurvivorsViews {
   std::vector<ro::ui::SurvivorsShopRow> church_rows_;
   std::vector<ro::ui::SurvivorsShopRow> kafra_rows_;
   std::vector<ro::ui::SurvivorsAlbumEntry> album_cards_;
-  // Par carte de l'Album, les classes pour qui elle tombe, que l'entrée désigne.
-  std::vector<std::string> album_holders_;
+  // Par carte, les classes pour qui elle tombe, que l'Album et les fiches du
+  // Codex désignent ; vide quand toutes le peuvent.
+  std::map<std::uint16_t, std::string> card_holders_;
   std::vector<ro::ui::SurvivorsFeatEntry> album_feats_;
   SurvivorsRecordRowsHeld record_rows_;
   SurvivorsCreditRowsHeld credit_rows_;

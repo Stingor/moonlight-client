@@ -251,8 +251,6 @@ void SurvivorsViews::ComposeAlbum(SurvivorsMetaWindows& windows, const Survivors
   const std::span<const std::uint16_t> pool =
       album_class != nullptr ? album_class->card_pool : std::span<const std::uint16_t>();
   AlbumCardsOf(rules, save, pool, album_cards_);
-  // Taillé AVANT d'y pointer : les entrées gardent l'adresse de leur texte.
-  album_holders_.assign(album_cards_.size(), std::string());
   for (std::size_t rank = 0; rank < album_cards_.size() && rank < pool.size(); ++rank) {
     ro::ui::SurvivorsAlbumEntry& entry = album_cards_[rank];
     const std::uint16_t card_item_id = pool[rank];
@@ -266,18 +264,7 @@ void SurvivorsViews::ComposeAlbum(SurvivorsMetaWindows& windows, const Survivors
     const auto dropper =
         std::ranges::find(rules.foes, card_item_id, &ro::sim::FoeRule::card_item_id);
     if (dropper != rules.foes.end()) entry.dropped_by = FoeName(dropper->foe_id, tables);
-    // UNE CARTE QUE TOUTES LES CLASSES NE PEUVENT PAS OBTENIR le dit : elle ne
-    // tombe que si une classe de l'équipe la tient dans sa réserve.
-    const std::vector<const ro::sim::ClassRule*> holders =
-        ro::sim::ClassesHoldingCard(rules, card_item_id);
-    if (holders.size() < rules.classes.size()) {
-      std::string& names = album_holders_[rank];
-      for (const ro::sim::ClassRule* holder : holders) {
-        if (!names.empty()) names += ", ";
-        names += ClassName(*holder, tables);
-      }
-      entry.held_by = names.c_str();
-    }
+    entry.held_by = CardHoldersOf(rules, card_item_id, tables);
   }
   FeatEntriesOf(save, album_feats_);
   NameFeats(album_feats_, rules, tables);
@@ -289,6 +276,25 @@ void SurvivorsViews::ComposeAlbum(SurvivorsMetaWindows& windows, const Survivors
                                                   .card_back = back.id,
                                                   .card_back_size = ImVec2(back.width, back.height),
                                                   .feats = album_feats_};
+}
+
+const char* SurvivorsViews::CardHoldersOf(const ro::sim::SurvivorsRules& rules,
+                                          std::uint16_t card_item_id,
+                                          const SurvivorsTables& tables) {
+  // UNE CARTE QUE TOUTES LES CLASSES NE PEUVENT PAS OBTENIR le dit : elle ne
+  // tombe que si une classe de l'équipe la tient dans sa réserve.
+  const auto [held, inserted] = card_holders_.try_emplace(card_item_id);
+  if (inserted) {
+    const std::vector<const ro::sim::ClassRule*> holders =
+        ro::sim::ClassesHoldingCard(rules, card_item_id);
+    if (holders.size() < rules.classes.size()) {
+      for (const ro::sim::ClassRule* holder : holders) {
+        if (!held->second.empty()) held->second += ", ";
+        held->second += ClassName(*holder, tables);
+      }
+    }
+  }
+  return held->second.c_str();
 }
 
 void SurvivorsViews::NameFeats(std::span<ro::ui::SurvivorsFeatEntry> feats,

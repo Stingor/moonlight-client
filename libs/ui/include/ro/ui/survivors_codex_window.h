@@ -184,11 +184,14 @@ struct SurvivorsCodexBehaviour {
 };
 
 // La carte qu'un monstre lâche : une fois sur `odds`, ou garantie au premier
-// tué de son espèce.
+// tué de son espèce — pourvu qu'une classe de l'équipe la tienne dans sa
+// réserve.
 struct SurvivorsCodexCardDrop {
   SurvivorsCodexLink card;
   std::uint32_t odds = 0;
   bool guaranteed = false;
+  // Les classes pour qui elle tombe ; vide quand toutes le peuvent.
+  const char* held_by = "";
 };
 
 // Un coup de boss, en miroir des règles. Actif tant que les PV restants (en %)

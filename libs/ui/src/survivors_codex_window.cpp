@@ -323,6 +323,10 @@ void DrawFoeBody(const SurvivorsCodexEntry& entry) {
                   static_cast<unsigned>(entry.card.odds));
     ImGui::TextUnformatted(line.data());
   }
+  if (entry.card.held_by[0] != '\0') {
+    std::snprintf(line.data(), line.size(), core::Tr("Ne tombe que pour : %s"), entry.card.held_by);
+    ImGui::TextWrapped("%s", line.data());
+  }
 }
 
 void DrawBossSheet(const SurvivorsCodexEntry& entry) {
