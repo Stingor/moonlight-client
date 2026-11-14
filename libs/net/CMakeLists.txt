@@ -20,6 +20,7 @@ add_library(ro_net STATIC
     src/bank.cpp
     src/barter.cpp
     src/laphine.cpp
+    src/item_reform.cpp
     src/battleground.cpp
     src/card_album.cpp
     src/moonclient_handshake.cpp

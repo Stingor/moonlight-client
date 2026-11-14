@@ -17,6 +17,7 @@
 #include "game/barter_stage.h"
 #include "game/buying_store_stage.h"
 #include "game/deal_stage.h"
+#include "game/item_reform_stage.h"
 #include "game/laphine_stage.h"
 #include "game/market_stage.h"
 #include "game/npc_shop_stage.h"
@@ -55,8 +56,12 @@ class TradeStages {
   void SeeItemProperties(const ro::vfs::ItemProperties* properties) noexcept {
     item_properties_ = properties;
   }
-  // Ce que le Laphine accepte. Même règle : une adresse donnée une fois.
-  void SeeLaphineBook(const LaphineBook* book) noexcept { laphine_book_ = book; }
+  // Ce que le Laphine accepte et ce que la réforme change. Même règle : une adresse
+  // donnée une fois.
+  void SeeItemBooks(const LaphineBook* laphine, const ItemReformBook* reform) noexcept {
+    laphine_book_ = laphine;
+    item_reform_book_ = reform;
+  }
   // La base du serveur, lue ou non. Même règle : une adresse donnée une fois.
   void SeeServerDb(const ro::vfs::ServerDb* db) noexcept { server_db_ = db; }
 
@@ -107,6 +112,7 @@ class TradeStages {
   [[nodiscard]] NpcShopStage& npc_shop() noexcept { return npc_shop_; }
   [[nodiscard]] BarterStage& barter() noexcept { return barter_; }
   [[nodiscard]] LaphineStage& laphine() noexcept { return laphine_; }
+  [[nodiscard]] ItemReformStage& item_reform() noexcept { return item_reform_; }
   [[nodiscard]] BuyingStoreStage& buying_store() noexcept { return buying_store_; }
   [[nodiscard]] VendingStage& vending() noexcept { return vending_; }
   [[nodiscard]] DealStage& deal() noexcept { return deal_; }
@@ -150,12 +156,14 @@ class TradeStages {
   const ro::sim::CommandSettings* commands_ = nullptr;
   const ro::vfs::ItemProperties* item_properties_ = nullptr;
   const LaphineBook* laphine_book_ = nullptr;
+  const ItemReformBook* item_reform_book_ = nullptr;
   const ro::vfs::ServerDb* server_db_ = nullptr;
   const ro::sim::BannedWords* banned_ = nullptr;
   ro::render::GameImages* images_ = nullptr;
   NpcShopStage npc_shop_;
   BarterStage barter_;
   LaphineStage laphine_;
+  ItemReformStage item_reform_;
   BuyingStoreStage buying_store_;
   VendingStage vending_;
   DealStage deal_;

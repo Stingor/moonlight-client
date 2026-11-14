@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "ro/ui/barter_window.h"
+#include "ro/ui/item_reform_window.h"
 #include "ro/ui/laphine_window.h"
 #include "ro/ui/npc_shop_window.h"
 #include "ro/ui/signboard_tip.h"
@@ -48,6 +49,14 @@ struct TradeWindows {
     ro::ui::LaphineWindowAction answer;
   };
   Laphine laphine;
+
+  // LA RÉFORME : un PNJ ou un objet ouvre sa fenêtre. Même contrat.
+  struct ItemReform {
+    ro::ui::ItemReformWindowState state;
+    const ro::ui::ItemReformView* view = nullptr;
+    ro::ui::ItemReformWindowAction answer;
+  };
+  ItemReform item_reform;
 
   // L'ÉCHOPPE D'ACHAT : la préparation, la mienne ouverte, son historique, et
   // celle d'un autre à qui je vends.

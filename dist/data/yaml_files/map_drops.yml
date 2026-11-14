@@ -43,6 +43,9 @@ Body:
       - {Item: Vivatus_F_S_Stick, Rate: 750}
       - {Item: Vivatus_F_Star_B, Rate: 750}
       - {Item: Vivatus_F_Wand, Rate: 750}
+      - {Item: Purificatory_Holy_O, Rate: 50000}
+      - {Item: Purificatory_Holy_W, Rate: 50000}
+      - {Item: Sanctuary_Sudarium, Rate: 50000}
   - Map: "1@advs"
     Monster: EP18_MD_DEMI_FREYJA_R
     Drops:
@@ -74,6 +77,9 @@ Body:
     Drops:
       - {Item: Ep18_Amethyst_Fragment, Rate: 2000}
       - {Item: Pontifex_Belief, Rate: 500}
+      - {Item: Purificatory_Holy_O, Rate: 2000}
+      - {Item: Purificatory_Holy_W, Rate: 2000}
+      - {Item: Sanctuary_Sudarium, Rate: 2000}
   - Map: "1@advs"
     Monster: EP18_MD_HEARTHUNTER_R2
     Drops:
@@ -84,6 +90,9 @@ Body:
     Drops:
       - {Item: Ep18_Amethyst_Fragment, Rate: 2000}
       - {Item: Pontifex_Tenacity, Rate: 500}
+      - {Item: Purificatory_Holy_O, Rate: 2000}
+      - {Item: Purificatory_Holy_W, Rate: 2000}
+      - {Item: Sanctuary_Sudarium, Rate: 2000}
   - Map: "1@advs"
     Monster: EP18_MD_SANARE_R
     Drops:
@@ -113,6 +122,9 @@ Body:
       - {Item: Vivatus_F_T_Staff, Rate: 750}
       - {Item: Vivatus_F_T_Sword, Rate: 750}
       - {Item: Vivatus_F_Violin, Rate: 750}
+      - {Item: Purificatory_Holy_O, Rate: 50000}
+      - {Item: Purificatory_Holy_W, Rate: 50000}
+      - {Item: Sanctuary_Sudarium, Rate: 50000}
   - Map: "1@advs"
     Monster: EP18_MD_SCHULANG_R
     Drops:

@@ -94,6 +94,11 @@ void LoadLaphineBook(ro::vfs::Vfs& vfs, GamePieces& pieces) {
   pieces.laphine_book = ReadLaphineBook(vfs);
 }
 
+// CE QUE LA RÉFORME CHANGE. Absent ou illisible, ses fenêtres se referment.
+void LoadItemReformBook(ro::vfs::Vfs& vfs, GamePieces& pieces) {
+  pieces.item_reform_book = ReadItemReformBook(vfs);
+}
+
 // LES MONSTRES DU SERVEUR. Absente ou illisible, la table reste inconnue : les
 // listes de monstres ne proposent que ceux que le client a vus.
 void LoadMonsterList(ro::vfs::Vfs& vfs, GamePieces& pieces) {
@@ -725,6 +730,7 @@ void LoadWorldPieces(ro::vfs::Vfs& vfs, GamePieces& pieces, ro::core::LoadProgre
       LoadPackageItems,
       LoadItemProperties,
       LoadLaphineBook,
+      LoadItemReformBook,
       LoadMonsterList,
       LoadRandomOptionNames,
       LoadBooks,

@@ -23885,3 +23885,48 @@ tr: Delete this style
 
 fr: Chasseur
 tr: Hunter
+
+fr: (aucune pièce réformable dans l'inventory)
+tr: (no reformable item in the inventory)
+
+fr: Cette pièce ne se réforme pas ici.
+tr: This item cannot be reformed here.
+
+fr: Choisie
+tr: Chosen
+
+fr: Choisir
+tr: Choose
+
+fr: Choisissez la pièce à réformer.
+tr: Choose the item to reform.
+
+fr: Choisissez une pièce : elle devient une autre, contre les matériaux demandés.
+tr: Choose an item: it becomes another one, in exchange for the required materials.
+
+fr: Choisissez une pièce à gauche.
+tr: Choose an item on the left.
+
+fr: Devient
+tr: Becomes
+
+fr: La pièce choisie n'est plus dans l'inventory.
+tr: The chosen item is no longer in the inventory.
+
+fr: Le client ne connaît pas encore cette réforme.
+tr: The client does not know this reform yet.
+
+fr: Le serveur a refusé la réforme.
+tr: The server refused the reform.
+
+fr: Matériau insuffisant : %s.
+tr: Not enough material: %s.
+
+fr: Pièces réformables
+tr: Reformable items
+
+fr: Réformer
+tr: Reform
+
+fr: Réformer %s en %s ? La pièce et les matériaux seront consommés.
+tr: Reform %s into %s? The item and the materials will be consumed.

@@ -69,6 +69,7 @@ class TradeItems {
 // ⚠ PASSÉ PAR RÉFÉRENCES, et ne vit que le temps de l'appel : l'étage ne
 // retient rien de ce qu'il ne possède pas.
 class LaphineBook;
+class ItemReformBook;
 
 struct TradeContext {
   ro::net::Connection& link;
@@ -96,6 +97,8 @@ struct TradeContext {
   ro::render::GameImages* images = nullptr;
   // CE QUE LE LAPHINE ACCEPTE. Nul : ses fenêtres se referment aussitôt.
   const LaphineBook* laphine_book = nullptr;
+  // CE QUE LA RÉFORME CHANGE. Nul : ses fenêtres se referment aussitôt.
+  const ItemReformBook* item_reform_book = nullptr;
 };
 
 // Les couleurs des lignes de conversation, celles des commerces : cyan pour ce

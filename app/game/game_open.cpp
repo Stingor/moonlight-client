@@ -484,7 +484,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
                     &pieces_.item_words);
   pieces_.trade.SeeCommands(&pieces_.commands.settings());
   pieces_.trade.SeeItemProperties(&pieces_.item_properties);
-  pieces_.trade.SeeLaphineBook(&pieces_.laphine_book);
+  pieces_.trade.SeeItemBooks(&pieces_.laphine_book, &pieces_.item_reform_book);
   pieces_.trade.SeeServerDb(&database_.base());
   pieces_.trade.SeeBannedWords(&pieces_.banned_words);
   pieces_.trade.SeeGameImages(pieces_.game_images.has_value() ? &*pieces_.game_images : nullptr);

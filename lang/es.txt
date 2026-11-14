@@ -23885,3 +23885,48 @@ tr: Eliminar este estilo
 
 fr: Chasseur
 tr: Cazador
+
+fr: (aucune pièce réformable dans l'inventory)
+tr: (ninguna pieza reformable en el inventario)
+
+fr: Cette pièce ne se réforme pas ici.
+tr: Esta pieza no se puede reformar aquí.
+
+fr: Choisie
+tr: Elegida
+
+fr: Choisir
+tr: Elegir
+
+fr: Choisissez la pièce à réformer.
+tr: Elige la pieza que quieres reformar.
+
+fr: Choisissez une pièce : elle devient une autre, contre les matériaux demandés.
+tr: Elige una pieza: se convierte en otra a cambio de los materiales requeridos.
+
+fr: Choisissez une pièce à gauche.
+tr: Elige una pieza a la izquierda.
+
+fr: Devient
+tr: Se convierte en
+
+fr: La pièce choisie n'est plus dans l'inventory.
+tr: La pieza elegida ya no está en el inventario.
+
+fr: Le client ne connaît pas encore cette réforme.
+tr: El cliente aún no conoce esta reforma.
+
+fr: Le serveur a refusé la réforme.
+tr: El servidor ha rechazado la reforma.
+
+fr: Matériau insuffisant : %s.
+tr: Material insuficiente: %s.
+
+fr: Pièces réformables
+tr: Piezas reformables
+
+fr: Réformer
+tr: Reformar
+
+fr: Réformer %s en %s ? La pièce et les matériaux seront consommés.
+tr: ¿Reformar %s en %s? La pieza y los materiales se consumirán.

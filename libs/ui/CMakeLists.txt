@@ -54,6 +54,7 @@ add_library(ro_ui STATIC
     src/memorial_dungeon_window.cpp
     src/barter_window.cpp
     src/laphine_window.cpp
+    src/item_reform_window.cpp
     src/buying_store_log_window.cpp
     src/buying_store_own_window.cpp
     src/buying_store_sell_window.cpp

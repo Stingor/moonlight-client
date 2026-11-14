@@ -8,6 +8,7 @@
 #include "ro/core/log.h"
 #include "ro/net/barter.h"
 #include "ro/net/buying_store.h"
+#include "ro/net/item_reform.h"
 #include "ro/net/laphine.h"
 #include "ro/net/market.h"
 #include "ro/net/npc_shop.h"
@@ -29,6 +30,7 @@ void TradeStages::StartSession() {
   npc_shop_.StartSession();
   barter_.StartSession();
   laphine_.StartSession();
+  item_reform_.StartSession();
   buying_store_.StartSession();
   vending_.StartSession();
   deal_.StartSession();
@@ -82,6 +84,13 @@ ro::net::FrameOutcome TradeStages::ApplyFrame(const ro::net::Frame& frame,
       laphined != ro::net::FrameOutcome::kUnhandled) {
     return laphined;
   }
+  // LA RÉFORME : ses opcodes ne sont qu'à elle, et elle lit sans les prendre les
+  // changements de carte. ⚠ LA PIÈCE RÉFORMÉE ARRIVE AU SAC AVANT LE RÉSULTAT.
+  if (const ro::net::FrameOutcome reformed =
+          ro::net::ApplyItemReformFrame(frame, item_reform_.reform());
+      reformed != ro::net::FrameOutcome::kUnhandled) {
+    return reformed;
+  }
   // LE TROC D'ABORD : il ne prend le résultat partagé que s'il l'attend.
   if (const ro::net::FrameOutcome bartered = ro::net::ApplyBarterFrame(frame, barter_.barter());
       bartered != ro::net::FrameOutcome::kUnhandled) {
@@ -105,7 +114,8 @@ void TradeStages::Advance(TradeWindows& windows, ro::net::Connection& link, ro::
                              .server_db = server_db_,
                              .banned = banned_,
                              .images = images_,
-                             .laphine_book = laphine_book_};
+                             .laphine_book = laphine_book_,
+                             .item_reform_book = item_reform_book_};
   if (in_chat_room) {
     RefuseStoresInChatRoom(windows, context);
   }
@@ -123,6 +133,9 @@ void TradeStages::Advance(TradeWindows& windows, ro::net::Connection& link, ro::
   windows.barter.view = barter_.view();
   laphine_.Advance(windows.laphine.state, std::exchange(windows.laphine.answer, {}), context);
   windows.laphine.view = laphine_.view();
+  item_reform_.Advance(windows.item_reform.state, std::exchange(windows.item_reform.answer, {}),
+                       context);
+  windows.item_reform.view = item_reform_.view();
   buying_store_.Advance(windows.buying_store, context);
   vending_.Advance(windows.vending, context);
   deal_.Advance(windows.deal, context);
@@ -212,7 +225,8 @@ void TradeStages::VisitStore(std::uint32_t owner_id, ro::sim::SignboardKind kind
 
 bool TradeStages::HoldsWorld() const noexcept {
   return npc_shop_.shop().open() || barter_.barter().open() || laphine_.laphine().open() ||
-         buying_store_.HoldsWorld() || vending_.HoldsWorld() || deal_.HoldsWorld();
+         item_reform_.reform().open() || buying_store_.HoldsWorld() || vending_.HoldsWorld() ||
+         deal_.HoldsWorld();
 }
 
 TradeItemFocus TradeStages::hovered() const noexcept {
@@ -236,6 +250,9 @@ TradeItemFocus TradeStages::hovered() const noexcept {
   }
   if (laphine_.hovered().item_id != 0) {
     return laphine_.hovered();
+  }
+  if (item_reform_.hovered().item_id != 0) {
+    return item_reform_.hovered();
   }
   return npc_shop_.hovered();
 }
@@ -262,6 +279,9 @@ std::optional<TradeItemFocus> TradeStages::TakeDescribed() noexcept {
   }
   if (std::optional<TradeItemFocus> laphined = laphine_.TakeDescribed(); laphined.has_value()) {
     return laphined;
+  }
+  if (std::optional<TradeItemFocus> reformed = item_reform_.TakeDescribed(); reformed.has_value()) {
+    return reformed;
   }
   return npc_shop_.TakeDescribed();
 }

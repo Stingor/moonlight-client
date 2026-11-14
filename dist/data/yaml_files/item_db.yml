@@ -129161,6 +129161,18 @@ Body:
     Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
     Script: |
       laphine_upgrade();
+  - Id: 100648
+    AegisName: Consecrate_Weapon_1
+    Name: Purification Ritual
+    Type: DelayConsume
+    Script: |
+      item_reform();
+  - Id: 100649
+    AegisName: Consecrate_Weapon_2
+    Name: Advanced Purification Ritual
+    Type: DelayConsume
+    Script: |
+      item_reform();
   - Id: 100650
     AegisName: Pontifex_Courage
     Name: Pontifex Courage
@@ -145496,6 +145508,18 @@ Body:
     AegisName: Vila_Basement_Key
     Name: Villa Basement Key
     Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1000501
+    AegisName: Purificatory_Holy_O
+    Name: Holy Oil of Purification
+    Flags: {BuyingStore: true}
+  - Id: 1000502
+    AegisName: Purificatory_Holy_W
+    Name: Holy Water of Purification
+    Flags: {BuyingStore: true}
+  - Id: 1000503
+    AegisName: Sanctuary_Sudarium
+    Name: Sabbatical Handkerchief
     Flags: {BuyingStore: true}
   - Id: 1000504
     AegisName: Dry_Sand

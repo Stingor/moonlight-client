@@ -1,0 +1,615 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  La réforme : ce que chaque objet déclencheur change
+#
+#  Exporté de la table item_reform du serveur Moonlight et résolu sur son item_db
+#  (mode Prerenewal) par scripts/yaml_tables/item_reform.py. Ne pas éditer à la main :
+#      python scripts/yaml_tables/item_reform.py --serveur <dépôt moonlight>
+#
+#  refine_cap : le plafond du raffinement du serveur.
+#  triggers   : item, puis ses recettes — pièce, résultat, raffinement admis,
+#               options exigées, cartes admises, pas du raffinement,
+#               [objet, quantité]...
+#
+#  Lu par moonclient (app/items/item_reform_book.h). Absent, une fenêtre de
+#  réforme se referme en le disant.
+# ─────────────────────────────────────────────────────────────────────────────
+version: 1
+mode: Prerenewal
+refine_cap: 10
+triggers:
+  - item: 100648
+    recipes:
+      - base: 500025
+        result: 500027
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[1000405, 200], [1000501, 50], [1000502, 50], [1000503, 50]]
+      - base: 500026
+        result: 500028
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[1000405, 200], [1000501, 50], [1000502, 50], [1000503, 50]]
+      - base: 510032
+        result: 510033
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[1000405, 200], [1000501, 50], [1000502, 50], [1000503, 50]]
+      - base: 520008
+        result: 520009
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[1000405, 200], [1000501, 50], [1000502, 50], [1000503, 50]]
+      - base: 530013
+        result: 530014
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[1000405, 200], [1000501, 50], [1000502, 50], [1000503, 50]]
+      - base: 540019
+        result: 540024
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[1000405, 200], [1000501, 50], [1000502, 50], [1000503, 50]]
+      - base: 540020
+        result: 540025
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[1000405, 200], [1000501, 50], [1000502, 50], [1000503, 50]]
+      - base: 540021
+        result: 540026
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[1000405, 200], [1000501, 50], [1000502, 50], [1000503, 50]]
+      - base: 540022
+        result: 540046
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[1000405, 200], [1000501, 50], [1000502, 50], [1000503, 50]]
+      - base: 540023
+        result: 540045
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[1000405, 200], [1000501, 50], [1000502, 50], [1000503, 50]]
+      - base: 550024
+        result: 550029
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[1000405, 200], [1000501, 50], [1000502, 50], [1000503, 50]]
+      - base: 550025
+        result: 550064
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[1000405, 200], [1000501, 50], [1000502, 50], [1000503, 50]]
+      - base: 550026
+        result: 550063
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[1000405, 200], [1000501, 50], [1000502, 50], [1000503, 50]]
+      - base: 560018
+        result: 560020
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[1000405, 200], [1000501, 50], [1000502, 50], [1000503, 50]]
+      - base: 560019
+        result: 560021
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[1000405, 200], [1000501, 50], [1000502, 50], [1000503, 50]]
+      - base: 570017
+        result: 570019
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[1000405, 200], [1000501, 50], [1000502, 50], [1000503, 50]]
+      - base: 570018
+        result: 570020
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[1000405, 200], [1000501, 50], [1000502, 50], [1000503, 50]]
+      - base: 580017
+        result: 580019
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[1000405, 200], [1000501, 50], [1000502, 50], [1000503, 50]]
+      - base: 580018
+        result: 580020
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[1000405, 200], [1000501, 50], [1000502, 50], [1000503, 50]]
+      - base: 590021
+        result: 590023
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[1000405, 200], [1000501, 50], [1000502, 50], [1000503, 50]]
+      - base: 590022
+        result: 590024
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[1000405, 200], [1000501, 50], [1000502, 50], [1000503, 50]]
+      - base: 600017
+        result: 600018
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[1000405, 200], [1000501, 50], [1000502, 50], [1000503, 50]]
+      - base: 610020
+        result: 610022
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[1000405, 200], [1000501, 50], [1000502, 50], [1000503, 50]]
+      - base: 610021
+        result: 610023
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[1000405, 200], [1000501, 50], [1000502, 50], [1000503, 50]]
+      - base: 630012
+        result: 630013
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[1000405, 200], [1000501, 50], [1000502, 50], [1000503, 50]]
+      - base: 640019
+        result: 640021
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[1000405, 200], [1000501, 50], [1000502, 50], [1000503, 50]]
+      - base: 640020
+        result: 640022
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[1000405, 200], [1000501, 50], [1000502, 50], [1000503, 50]]
+      - base: 650008
+        result: 650022
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[1000405, 200], [1000501, 50], [1000502, 50], [1000503, 50]]
+      - base: 650009
+        result: 650021
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[1000405, 200], [1000501, 50], [1000502, 50], [1000503, 50]]
+      - base: 700030
+        result: 700033
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[1000405, 200], [1000501, 50], [1000502, 50], [1000503, 50]]
+      - base: 700031
+        result: 700034
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[1000405, 200], [1000501, 50], [1000502, 50], [1000503, 50]]
+      - base: 700032
+        result: 700035
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[1000405, 200], [1000501, 50], [1000502, 50], [1000503, 50]]
+      - base: 800003
+        result: 800012
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[1000405, 200], [1000501, 50], [1000502, 50], [1000503, 50]]
+      - base: 810002
+        result: 810008
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[1000405, 200], [1000501, 50], [1000502, 50], [1000503, 50]]
+      - base: 820002
+        result: 820006
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[1000405, 200], [1000501, 50], [1000502, 50], [1000503, 50]]
+      - base: 830003
+        result: 830011
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[1000405, 200], [1000501, 50], [1000502, 50], [1000503, 50]]
+      - base: 840002
+        result: 840007
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[1000405, 200], [1000501, 50], [1000502, 50], [1000503, 50]]
+  - item: 100649
+    recipes:
+      - base: 500025
+        result: 500027
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200]]
+      - base: 500026
+        result: 500028
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200]]
+      - base: 510032
+        result: 510033
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200]]
+      - base: 520008
+        result: 520009
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200]]
+      - base: 530013
+        result: 530014
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200]]
+      - base: 540019
+        result: 540024
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200]]
+      - base: 540020
+        result: 540025
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200]]
+      - base: 540021
+        result: 540026
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200]]
+      - base: 540022
+        result: 540046
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200]]
+      - base: 540023
+        result: 540045
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200]]
+      - base: 550024
+        result: 550029
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200]]
+      - base: 550025
+        result: 550064
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200]]
+      - base: 550026
+        result: 550063
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200]]
+      - base: 560018
+        result: 560020
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200]]
+      - base: 560019
+        result: 560021
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200]]
+      - base: 570017
+        result: 570019
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200]]
+      - base: 570018
+        result: 570020
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200]]
+      - base: 580017
+        result: 580019
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200]]
+      - base: 580018
+        result: 580020
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200]]
+      - base: 590021
+        result: 590023
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200]]
+      - base: 590022
+        result: 590024
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200]]
+      - base: 600017
+        result: 600018
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200]]
+      - base: 610020
+        result: 610022
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200]]
+      - base: 610021
+        result: 610023
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200]]
+      - base: 630012
+        result: 630013
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200]]
+      - base: 640019
+        result: 640021
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200]]
+      - base: 640020
+        result: 640022
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200]]
+      - base: 650008
+        result: 650022
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200]]
+      - base: 650009
+        result: 650021
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200]]
+      - base: 700030
+        result: 700033
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200]]
+      - base: 700031
+        result: 700034
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200]]
+      - base: 700032
+        result: 700035
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200]]
+      - base: 800003
+        result: 800012
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200]]
+      - base: 810002
+        result: 810008
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200]]
+      - base: 820002
+        result: 820006
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200]]
+      - base: 830003
+        result: 830011
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200]]
+      - base: 840002
+        result: 840007
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200]]
