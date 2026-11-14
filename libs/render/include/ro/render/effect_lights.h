@@ -85,6 +85,9 @@ inline constexpr float kEffectLightMinStrength = 0.05F;
 // texture, teintée de sa couleur et pesée par son alpha et sa taille de
 // l'instant. La lumière se tient au centre pondéré de ces couches.
 //
+// LA TEINTURE D'UN EFFET TEINT SA LUMIÈRE comme ses texels, et un effet
+// assombri n'éclaire plus : il ne s'ajoute plus au fond.
+//
 // `effects` : les fichiers `.str`, en panneaux que `basis` dresse face à la
 // caméra. `world_lots` : les quads du monde des nœuds et des méthodes nommées,
 // une lumière par lot.

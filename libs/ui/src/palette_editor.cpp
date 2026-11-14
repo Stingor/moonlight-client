@@ -1,7 +1,6 @@
 #include "ro/ui/palette_editor.h"
 
 #include <algorithm>
-#include <cfloat>
 #include <cstdio>
 
 #include "ro/core/i18n.h"
@@ -420,12 +419,6 @@ PaletteEditorAction DrawPaletteEditor(PaletteEditorState& state, const PaletteEd
   bool open = true;
   // ⚠ SANS REDIMENSIONNEMENT : la fenêtre suit son contenu.
   PoseBugReportButton(state.bug_report);
-  // 🔴 L'ONGLET DES EFFETS NE RÉTRÉCIT PAS LA FENÊTRE : il garde au moins la
-  // taille qu'elle avait sur les pièces, et changer d'onglet ne la fait pas
-  // sauter.
-  if (view.tab == PaletteTabKind::kEffects && state.pieces_window_size.x > 0.0F) {
-    ImGui::SetNextWindowSizeConstraints(state.pieces_window_size, ImVec2(FLT_MAX, FLT_MAX));
-  }
   const bool begun =
       BeginSkinnedWindow(name.Get(), &open, art, SkinnedTitle::kBar,
                          ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
@@ -474,7 +467,6 @@ PaletteEditorAction DrawPaletteEditor(PaletteEditorState& state, const PaletteEd
     EndSkinnedWindow();
     return action;
   }
-  state.pieces_window_size = ImGui::GetWindowSize();
   const bool on_body = view.tab == PaletteTabKind::kBody;
 
   // ── CE QUE LES RÉGLAGES ATTEIGNENT VRAIMENT ───────────────────────────────

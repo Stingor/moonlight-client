@@ -733,8 +733,6 @@ struct PaletteEditorState {
   bool wardrobe_asked = false;
   // L'onglet des effets : l'effet choisi et les réglages en cours.
   PaletteEffectsState effects;
-  // La taille de la fenêtre sur un onglet de pièces : celui des effets la garde.
-  ImVec2 pieces_window_size{0.0F, 0.0F};
 };
 
 // OUVRE L'ÉDITEUR SUR UN ONGLET quand `asked` : un bouton « Couleurs » d'une

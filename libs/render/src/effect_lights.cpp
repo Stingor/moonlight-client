@@ -2,9 +2,12 @@
 
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <optional>
 
+#include "ro/render/effect_dye.h"
 #include "ro/render/effect_laid.h"
 #include "ro/render/effect_render_word.h"
 #include "ro/render/effect_scene.h"
@@ -83,10 +86,33 @@ class GlowSum {
   float weight_ = 0.0F;
 };
 
+// UNE COUCHE ASSOMBRIE N'ÉCLAIRE PLUS : elle se peint en fumée, en alpha, et ne
+// s'ajoute plus au fond.
+bool Darkened(const std::optional<EffectDye>& dye) { return dye.has_value() && dye->darken; }
+
+// LA COULEUR DE LA LUMIÈRE PREND LA TEINTURE DE SON EFFET, comme ses texels : un
+// effet recoloré n'éclaire plus le sol de sa couleur d'origine.
+glm::vec3 DyedLight(glm::vec3 color, const std::optional<EffectDye>& dye) {
+  if (!dye.has_value() || IsNeutralEffectDye(*dye)) {
+    return color;
+  }
+  const auto to_byte = [](float unit) {
+    return static_cast<std::uint8_t>(std::lround(std::clamp(unit, 0.0F, 1.0F) * kChannelMax));
+  };
+  const std::array<std::uint8_t, 4> dyed =
+      DyeEffectTexel({to_byte(color.r), to_byte(color.g), to_byte(color.b),
+                      static_cast<std::uint8_t>(kChannelMax)},
+                     *dye);
+  return glm::vec3(static_cast<float>(dyed[0]), static_cast<float>(dyed[1]),
+                   static_cast<float>(dyed[2])) /
+         kChannelMax;
+}
+
 // La lumière d'une couche additive : la lueur de sa texture, teintée de sa
-// couleur, pesée par son alpha et par sa taille jusqu'à la pleine lueur.
+// couleur puis de la teinture de son effet, pesée par son alpha et par sa
+// taille jusqu'à la pleine lueur.
 LayerGlow LayerOf(const TextureGlow& glow, const std::array<std::uint8_t, 4>& tint, float alpha,
-                  const std::array<glm::vec3, 4>& corners) {
+                  const std::array<glm::vec3, 4>& corners, const std::optional<EffectDye>& dye) {
   const glm::vec3 tint_color = glm::vec3(static_cast<float>(tint[0]), static_cast<float>(tint[1]),
                                          static_cast<float>(tint[2])) /
                                kChannelMax;
@@ -95,7 +121,8 @@ LayerGlow LayerOf(const TextureGlow& glow, const std::array<std::uint8_t, 4>& ti
   // face.
   const float half_size = glm::length(corners[2] - corners[0]) * 0.5F;
   const float size_share = std::min(half_size / kEffectLightFullSizeWorld, 1.0F);
-  return LayerGlow{.emission = glow.color * tint_color * (glow.strength * tint_alpha * size_share),
+  return LayerGlow{.emission = DyedLight(glow.color * tint_color, dye) *
+                               (glow.strength * tint_alpha * size_share),
                    .centre = (corners[0] + corners[1] + corners[2] + corners[3]) * 0.25F,
                    .half_size_world = half_size};
 }
@@ -143,7 +170,7 @@ void EffectLightsOf(std::span<const DrawnEffect> effects,
                     TextureGlowCache& glows, std::vector<PointLight>& out) {
   std::vector<EffectQuad> quads;
   for (const DrawnEffect& drawn : effects) {
-    if (drawn.effect == nullptr) {
+    if (drawn.effect == nullptr || Darkened(drawn.dye)) {
       continue;
     }
     const LoadedEffect& loaded = *drawn.effect;
@@ -165,12 +192,14 @@ void EffectLightsOf(std::span<const DrawnEffect> effects,
       std::array<glm::vec2, 4> pixels = quad.corners;
       ShapeStandingEffectCorners(pixels, drawn.lift_pixels, drawn.spin_degrees, drawn.scale,
                                  drawn.flip_x, drawn.flip_y);
-      sum.Add(LayerOf(glow, quad.tint, drawn.alpha, BillboardCorners(pixels, anchor, basis)));
+      sum.Add(LayerOf(glow, quad.tint, drawn.alpha, BillboardCorners(pixels, anchor, basis),
+                      drawn.dye));
     }
     sum.Emit(out);
   }
   for (const DrawnWorldQuads& lot : world_lots) {
-    if (lot.texture == nullptr || lot.texture_path == nullptr || lot.texture->empty()) {
+    if (lot.texture == nullptr || lot.texture_path == nullptr || lot.texture->empty() ||
+        Darkened(lot.dye)) {
       continue;
     }
     const TextureGlow& glow = glows.Of(*lot.texture_path, *lot.texture);
@@ -184,7 +213,7 @@ void EffectLightsOf(std::span<const DrawnEffect> effects,
           !AddsLight(blend.source, blend.destination)) {
         continue;
       }
-      sum.Add(LayerOf(glow, quad.tint, 1.0F, quad.corners));
+      sum.Add(LayerOf(glow, quad.tint, 1.0F, quad.corners, lot.dye));
     }
     sum.Emit(out);
   }
