@@ -97,6 +97,8 @@ enum class ChatLinkKind : std::uint8_t {
   kSetting,
   // UNE TENUE RANGÉE SUR LE SERVEUR, désignée par son code court.
   kOutfit,
+  // LES COULEURS D'UN CALQUE — un chapeau, une cape —, par leur code.
+  kLayer,
 };
 
 // CE QUE LE MENU D'UN JOUEUR REFUSE D'AVANCE, et pourquoi : chaque raison, déjà

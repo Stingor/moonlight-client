@@ -135,6 +135,8 @@ class StyleView {
     // désigné, ou vide pour le style en cours — c'est alors `Game` qui y met
     // notre pseudo, seul à le connaître.
     std::string label;
+    // Le code d'un CALQUE, à poser sous son propre lien ; faux pour le corps.
+    bool layer = false;
 
     [[nodiscard]] bool empty() const noexcept { return code.empty(); }
   };
@@ -146,6 +148,9 @@ class StyleView {
   // l'éditeur en proposition.
   void FetchOutfit(std::string_view code, ro::net::Connection& link, const ro::sim::World& world,
                    std::uint32_t now_ms);
+  // UN LIEN DE CALQUE REÇU : l'éditeur s'ouvre sur le calque qu'il teint, et
+  // ses couleurs y passent en proposition, à la prochaine vue.
+  void OpenLayerLink(std::string_view code) { layer_link_ = std::string(code); }
 
   // LE CODE DE LA RECETTE EN COURS, tel quel, pour un rapport de bug.
   [[nodiscard]] std::string ReportCode() const;
@@ -566,6 +571,10 @@ class StyleView {
   // code reçu, prêt pour `Game`.
   std::optional<std::string> sharing_slot_name_;
   StyleToShare outfit_to_share_;
+  // Le code d'un lien de calque reçu, en attente de son onglet ; vide sinon.
+  std::string layer_link_;
+  // L'onglet qui reçoit ce code, et le code y verse ses couleurs.
+  void LandLayerLink(ro::ui::PaletteEditorState& state);
   std::string outfit_code_shown_;
   std::vector<ro::ui::PaletteWardrobeSlot> wardrobe_view_;
 };

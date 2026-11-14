@@ -282,10 +282,14 @@ void Game::ApplyStyleAnswers(const UiStage::Answers& answers, std::uint32_t now_
   // ⚠ CONSOMMÉ : laissé en place, le même code se reposerait à chaque image et
   // la saisie se remplirait toute seule.
   if (const StyleView::StyleToShare shared = style_view_->TakeStyleToShare(); !shared.empty()) {
-    PostStyleLink(shared.code, shared.label);
+    if (shared.layer) {
+      PostSharedLink(ro::ui::ChatLinkKind::kLayer, shared.code, shared.label);
+    } else {
+      PostStyleLink(shared.code, shared.label);
+    }
   }
   if (const StyleView::StyleToShare outfit = style_view_->TakeOutfitToShare(); !outfit.empty()) {
-    PostOutfitLink(outfit.code, outfit.label);
+    PostSharedLink(ro::ui::ChatLinkKind::kOutfit, outfit.code, outfit.label);
   }
   // ── CE QUE L'APERÇU D'UN STYLE REÇU A DEMANDÉ ─────────────────────────────
   //

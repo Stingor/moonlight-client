@@ -345,6 +345,8 @@ void StyleView::ApplyVerb(const ro::ui::PaletteEditorAction& asked, ro::net::Con
     case ro::ui::PaletteEditorVerb::kWearOutfit:
     case ro::ui::PaletteEditorVerb::kStoreOutfit:
     case ro::ui::PaletteEditorVerb::kClearOutfit:
+    case ro::ui::PaletteEditorVerb::kRenameOutfit:
+    case ro::ui::PaletteEditorVerb::kShareOutfit:
       // Les tenues ont leur propre guichet : voir `ApplyOutfits`.
       break;
     case ro::ui::PaletteEditorVerb::kApply:
@@ -457,8 +459,13 @@ void StyleView::ApplyVerb(const ro::ui::PaletteEditorAction& asked, ro::net::Con
       }
       break;
     case ro::ui::PaletteEditorVerb::kShareCode:
-      // Étiquette vide : c'est notre style, et `Game` y mettra notre pseudo.
-      to_share_ = StyleToShare{.code = share_code_};
+      // UN CALQUE SE PARTAGE SOUS LE NOM DE CE QU'IL HABILLE. Le corps, lui, a
+      // l'étiquette vide : c'est notre style, et `Game` y mettra notre pseudo.
+      if (const LayerTab* open = OpenLayer(); open != nullptr) {
+        to_share_ = StyleToShare{.code = layer_code_, .label = open->shown.name, .layer = true};
+      } else {
+        to_share_ = StyleToShare{.code = share_code_};
+      }
       break;
     case ro::ui::PaletteEditorVerb::kPasteCode:
       static_cast<void>(TryCode(asked.pasted, now_ms));

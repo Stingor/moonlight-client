@@ -293,8 +293,8 @@ void Game::FollowChatLink(const ro::ui::ChatLinkAsk& asked, std::uint32_t now_ms
     FollowStyleLink(*aimed, asked.gesture, now_ms);
     return;
   }
-  if (aimed->kind == ro::ui::ChatLinkKind::kOutfit) {
-    FollowOutfitLink(*aimed, asked.gesture, now_ms);
+  if (aimed->kind == ro::ui::ChatLinkKind::kOutfit || aimed->kind == ro::ui::ChatLinkKind::kLayer) {
+    FollowSharedLink(*aimed, asked.gesture, now_ms);
     return;
   }
   // ── UNE ADRESSE WEB : la confirmation, l'aperçu, la visionneuse ───────────

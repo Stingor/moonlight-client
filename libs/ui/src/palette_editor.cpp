@@ -251,6 +251,18 @@ void DrawUndoButtons(const PaletteEditorView& view, const SkinArt& art,
 // corps neuf efface le plus ancien sur le serveur, sans retour possible.
 void DrawSendButtons(const PaletteEditorView& view, const SkinArt& art,
                      PaletteEditorAction& action) {
+  // 🔴 PARTAGER AU CHAT, À GAUCHE DE VALIDER : un lien cliquable que l'autre
+  // essaie d'un clic, au lieu d'un code à copier puis coller.
+  ImGui::BeginDisabled(!view.code_shares_in_chat || view.share_code[0] == '\0');
+  if (SkinButton(core::Tr("Partager dans le chat"), art)) {
+    action.verb = PaletteEditorVerb::kShareCode;
+  }
+  ImGui::EndDisabled();
+  Explain(view.code_shares_in_chat
+              ? core::Tr("Pose le lien de ces couleurs dans ta saisie — à toi d'envoyer. Qui le "
+                         "reçoit les essaie d'un clic, sans rien changer sur lui.")
+              : core::Tr("Trop de retouches exactes pour tenir dans une ligne de chat."));
+  ImGui::SameLine();
   const bool sendable = view.connected && view.has_something_to_send && view.can_send;
   ImGui::BeginDisabled(!sendable);
   if (SkinButton(core::Tr("Valider et partager mon style"), art)) {
@@ -565,7 +577,6 @@ PaletteEditorAction DrawPaletteEditor(PaletteEditorState& state, const PaletteEd
     DrawPaletteOutfits(state, view, art, action);
   }
   if (!on_body) {
-    DrawLayerCode(view, art, action);
     if (view.code_note != nullptr) {
       ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + ImGui::GetFontSize() * kWrapInFonts);
       ImGui::TextDisabled("%s", view.code_note);

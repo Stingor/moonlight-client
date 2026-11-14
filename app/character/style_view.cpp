@@ -463,10 +463,14 @@ void StyleView::Refresh(const ro::sim::World& world, ro::ui::PaletteEditorState&
   RefreshTabs(previewing ? settled_full : full, world);
   // 🔴 L'ONGLET DEMANDÉ, S'IL EST LÀ ET RÉGLABLE : un chapeau ôté ramène au
   // corps.
+  LandLayerLink(state);
   const LayerTab* asked_tab = TabOf(state.tab);
   view_tab_ = asked_tab != nullptr && asked_tab->shown.blocked == ro::ui::PaletteTabBlock::kNone
                   ? state.tab
                   : ro::ui::PaletteTabKind::kBody;
+  if (!layer_link_.empty() && view_tab_ != ro::ui::PaletteTabKind::kBody) {
+    static_cast<void>(TryLayerCode(std::exchange(layer_link_, std::string())));
+  }
   // Ce que le joueur affiche, rangé et sans doublon : le pantin le porte.
   worn_hat_effects_.assign(player->hat_effects.begin(), player->hat_effects.end());
   // L'ONGLET DES EFFETS DE CHAPEAU, en queue, quand le joueur en affiche : il

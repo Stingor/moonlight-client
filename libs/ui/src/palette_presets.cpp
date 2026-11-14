@@ -140,25 +140,8 @@ void DrawShareCode(const PaletteEditorView& view, const SkinArt& art, PaletteEdi
     ImGui::SetClipboardText(view.share_code);
     action.verb = PaletteEditorVerb::kCopyCode;
   }
-  ImGui::SameLine();
-  // Poser le code dans la barre de chat. ⚠ LE GESTE S'ARRÊTE LÀ : c'est le
-  // joueur qui envoie, comme pour tout autre lien.
-  //
-  // ⚠ LE CODE D'UN CALQUE NE PART PAS DANS LE CHAT : la balise d'un style est
-  // celle que les autres clients du serveur lisent, et elle ne porte que le
-  // corps. Il se copie et se colle.
-  if (view.code_shares_in_chat && SkinButton(core::Tr("Partager dans le chat"), art)) {
-    action.verb = PaletteEditorVerb::kShareCode;
-  }
-  if (view.code_shares_in_chat && ImGui::IsItemHovered()) {
-    // ⚠ ON DIT CE QUE LE GESTE FAIT, ET OÙ IL S'ARRÊTE : le lien se pose dans
-    // la saisie, c'est le joueur qui envoie. ⛔ Et l'on ne promet rien de plus
-    // que ce que le fil tient — un client sans greffon verra la balise brute,
-    // ce qui reste un code à coller.
-    SkinTooltip(
-        core::Tr("Pose le lien de ton style dans ta saisie — à toi d'envoyer. Qui le "
-                 "reçoit le voit sur lui d'un clic."));
-  }
+  // ⚠ « PARTAGER DANS LE CHAT » EST À GAUCHE DE « VALIDER », pour le corps
+  // comme pour les calques.
   ImGui::SameLine();
   if (SkinButton(core::Tr("Coller un code"), art)) {
     const char* clipboard = ImGui::GetClipboardText();
@@ -237,24 +220,6 @@ void DrawPalettePresets(PaletteEditorState& state, const PaletteEditorView& view
   }
 
   ImGui::Separator();
-  DrawShareCode(view, art, action);
-  ImGui::TreePop();
-}
-
-void DrawLayerCode(const PaletteEditorView& view, const SkinArt& art, PaletteEditorAction& action) {
-  ImGui::Separator();
-  // 🔴 LE TITRE DIT LE GESTE, ET LE TEXTE CE QU'IL FAIT, À LA VUE : « code de
-  // ce calque » ne disait ni à quoi sert un code, ni ce qu'on risque à en
-  // coller un.
-  if (!ImGui::TreeNode(core::Tr("Copier ou coller ces couleurs"))) {
-    return;
-  }
-  ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + ImGui::GetFontSize() * kPresetHintWrapInFonts);
-  ImGui::TextDisabled(
-      "%s", core::Tr("« Copier le code » met les couleurs de ce calque dans le presse-papiers, "
-                     "à envoyer à qui tu veux. Colle ici un code reçu : ses couleurs passent "
-                     "dans l'aperçu, et rien ne change sur toi tant que tu ne valides pas."));
-  ImGui::PopTextWrapPos();
   DrawShareCode(view, art, action);
   ImGui::TreePop();
 }

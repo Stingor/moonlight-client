@@ -22,6 +22,7 @@
 
 #include "character/style_recipe.h"
 #include "character/style_view.h"
+#include "chat/chat_layer_link.h"
 #include "world/actor_view.h"
 
 namespace moonclient {
@@ -391,7 +392,8 @@ void StyleView::RefreshLayerPieces(const LayerTab& tab) {
   view_.can_undo = layers_.can_undo();
   view_.can_redo = layers_.can_redo();
   view_.share_code = layer_code_.c_str();
-  view_.code_shares_in_chat = false;
+  // ⚠ CHARGÉ DE RETOUCHES EXACTES, UN CODE PEUT NE PAS TENIR DANS UNE LIGNE.
+  view_.code_shares_in_chat = !BuildLayerLink(tab.shown.name, layer_code_).empty();
   view_.can_adapt_cut = tab.shown.kind == PaletteTabKind::kHair && !tab.ramps.empty() &&
                         layers_.PreviousHead(tab.at.key).has_value() && !layers_.HasEdits(tab.at);
 }
@@ -762,5 +764,36 @@ bool StyleView::TryLayerCode(std::string_view code) {
 }
 
 const char* StyleView::LayersRefusal() const { return RefusalText(session_.layers_refusal()); }
+
+void StyleView::LandLayerLink(ro::ui::PaletteEditorState& state) {
+  if (layer_link_.empty()) {
+    return;
+  }
+  const std::optional<ro::sim::StyleLayerCode> read = ro::sim::DecodeStyleLayerCode(layer_link_);
+  // 🔴 LE CALQUE QUE LE CODE TEINT, sur le même objet de préférence : un code
+  // de chapeau se pose sur le chapeau qu'on porte. La peau va sous la Tête.
+  const LayerTab* landing = nullptr;
+  for (const LayerTab& tab : tabs_) {
+    const auto layer = static_cast<ro::sim::StyleLayerKind>(tab.at.layer);
+    const bool fits = read.has_value() &&
+                      (layer == read->layer || (read->layer == ro::sim::StyleLayerKind::kSkin &&
+                                                tab.shown.kind == PaletteTabKind::kHair));
+    if (!fits || tab.shown.blocked != ro::ui::PaletteTabBlock::kNone) {
+      continue;
+    }
+    if (landing == nullptr || tab.at.key == read->key) {
+      landing = &tab;
+    }
+  }
+  if (landing == nullptr) {
+    // ⚠ RIEN À TEINDRE : on le dit, plutôt qu'un clic sans réponse.
+    code_note_ = ro::core::Tr(
+        "Ton personnage ne porte rien sur ce calque : ces couleurs n'ont rien à habiller.");
+    layer_link_.clear();
+    return;
+  }
+  state.tab = landing->shown.kind;
+  state.tab_asked = true;
+}
 
 }  // namespace moonclient
