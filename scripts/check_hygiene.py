@@ -90,15 +90,16 @@ CATALOGUE_FILES = {
         "`effect_track_burst.h` —, et ce qui reste ne se coupe plus sur une "
         "frontière : le partager par ordre alphabétique ou par taille donnerait "
         "deux noms qui mentent",
-    "scripts/lectures_a_la_main_des_patrons.py":
-        "une lecture à la main par entrée : on y cherche LA fonction dont on "
-        "porte la mesure, jamais deux. Il a DÉJÀ été coupé une fois — les cribles, c'est-à-dire "
-        "tout ce qui DÉCIDE, sont partis dans "
-        "`gen_client_effect_node_patterns.py` —, et ce qui reste ne se coupe "
-        "plus sur une frontière : seize tables rangées par ce qu'elles "
-        "MESURENT, que partager par ordre alphabétique ou par taille donnerait "
-        "deux noms qui mentent",
 }
+
+# Les catalogues des scripts que le dépôt public ne porte pas vivent avec eux,
+# dans un module à part : sans ces scripts, il n'y a rien à dispenser. Si le
+# module manquait à côté d'eux, leur longueur les ferait refuser.
+try:
+    from hygiene_script_catalogues import SCRIPT_CATALOGUE_FILES
+except ModuleNotFoundError:
+    SCRIPT_CATALOGUE_FILES = {}
+CATALOGUE_FILES.update(SCRIPT_CATALOGUE_FILES)
 
 # Ce qu'une entrée de catalogue ne doit pas dépasser. La plus longue des
 # méthodes de `effect_node_sow.cpp` en fait trente-quatre : la marge est large,
