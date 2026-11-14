@@ -1,5 +1,6 @@
 #include "ro/ui/item_reform_window.h"
 
+#include <cfloat>
 #include <string>
 
 #include "ro/core/i18n.h"
@@ -19,6 +20,8 @@ constexpr float kFirstLeftPixels = 160.0F;
 constexpr float kFirstTopPixels = 130.0F;
 constexpr float kFirstWidthPixels = 640.0F;
 constexpr float kFirstHeightPixels = 420.0F;
+constexpr float kLeastWidthPixels = 480.0F;
+constexpr float kLeastHeightPixels = 300.0F;
 constexpr float kCloseButtonPixels = 90.0F;
 constexpr float kChildRoundingPixels = 6.0F;
 // La part de la largeur que prend la liste des pièces.
@@ -31,20 +34,28 @@ constexpr float kFooterLines = 3.0F;
 constexpr const char* kConfirmId = "##item_reform_confirm";
 constexpr const char* kItemMenuId = "##item_reform_item_menu";
 
-// Pousse le prochain élément au bord droit de la ligne.
-void AlignRight(float width) {
-  const float right = ImGui::GetContentRegionMax().x - width;
-  if (right > ImGui::GetCursorPosX()) {
-    ImGui::SetCursorPosX(right);
-  }
+// L'ITEM D'UNE LIGNE, ROGNÉ pour laisser `trailing` pixels au bout : un nom trop
+// long se coupe au bord au lieu de pousser ce qui le suit hors du volet. Le
+// curseur repart sur la même ligne, calé à droite pour `trailing`.
+TradeItemGesture DrawItemBefore(const TradeItemView& item, float trailing) {
+  const float content_right = ImGui::GetContentRegionMax().x;
+  const float right = content_right - trailing - ImGui::GetStyle().ItemSpacing.x;
+  const ImVec2 start = ImGui::GetCursorScreenPos();
+  const float clip_right = ImGui::GetWindowPos().x + right - ImGui::GetScrollX();
+  ImGui::PushClipRect(start, ImVec2(clip_right, FLT_MAX), true);
+  const TradeItemGesture gesture = DrawTradeItem(item);
+  ImGui::PopClipRect();
+  ImGui::SameLine();
+  ImGui::SetCursorPosX(content_right - trailing);
+  return gesture;
 }
 
 void DrawCandidate(ItemReformWindowState& state, const ItemReformPieceView& row, bool waiting,
                    const SkinArt& art, ItemReformWindowAction& action) {
-  NoteItemBySlot(DrawTradeItem(row.item), row.item, row.client_slot, state.item_menu, action);
-  ImGui::SameLine();
   const char* label = row.chosen ? core::Tr("Choisie") : core::Tr("Choisir");
-  AlignRight(ImGui::CalcTextSize(label).x + ImGui::GetStyle().FramePadding.x * 2.0F);
+  const float button = ImGui::CalcTextSize(label).x + ImGui::GetStyle().FramePadding.x * 2.0F;
+  NoteItemBySlot(DrawItemBefore(row.item, button), row.item, row.client_slot, state.item_menu,
+                 action);
   const bool held = waiting || row.chosen || !row.refusal.empty();
   if (held) {
     ImGui::BeginDisabled();
@@ -77,11 +88,10 @@ void DrawList(ItemReformWindowState& state, const ItemReformView& view, const Sk
 
 void DrawMaterial(ItemReformWindowState& state, const ItemReformMaterialView& material,
                   ItemReformWindowAction& action) {
-  NoteItemById(DrawTradeItem(material.item), material.item, material.item.item_id, state.item_menu,
-               action);
-  ImGui::SameLine();
   const std::string count = core::Printed("%d / %d", material.owned, material.needed);
-  AlignRight(ImGui::CalcTextSize(count.c_str()).x);
+  NoteItemById(DrawItemBefore(material.item, ImGui::CalcTextSize(count.c_str()).x), material.item,
+               material.item.item_id, state.item_menu, action);
+  ImGui::AlignTextToFramePadding();
   if (material.owned < material.needed) {
     ColoredText(kTradeRefusedText, count);
   } else {
@@ -209,6 +219,9 @@ ItemReformWindowAction DrawItemReformWindow(ItemReformWindowState& state,
   ImGui::SetNextWindowPos(ImVec2(kFirstLeftPixels, kFirstTopPixels), ImGuiCond_FirstUseEver);
   ImGui::SetNextWindowSize(ImVec2(kFirstWidthPixels * scale, kFirstHeightPixels * scale),
                            ImGuiCond_FirstUseEver);
+  // EN DEÇÀ, les deux volets n'ont plus la place d'un nom et de son bouton.
+  ImGui::SetNextWindowSizeConstraints(ImVec2(Px(kLeastWidthPixels), Px(kLeastHeightPixels)),
+                                      ImVec2(FLT_MAX, FLT_MAX));
   const std::string title = std::string(view.title) + "###" + kItemReformWindowId;
   const bool body_shown = BeginSkinnedWindow(title.c_str(), &state.open, art, SkinnedTitle::kBar,
                                              ImGuiWindowFlags_NoCollapse);
