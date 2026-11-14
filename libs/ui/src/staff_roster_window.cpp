@@ -208,6 +208,11 @@ void DrawRowTooltip(const StaffRosterView& view, std::size_t rank) {
   if (!BeginSkinTooltip()) {
     return;
   }
+  // ⚠ REPLIÉE AU BORD DROIT DE LA BULLE, relevé en tête : la bulle ne s'élargit
+  // pas au-delà de sa borne, et une valeur longue — le client, une liste de
+  // noms — y serait coupée. Une valeur repliée reprend sous son propre début.
+  ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + kSkinnedTooltipWidest -
+                         2.0F * ImGui::GetStyle().WindowPadding.x);
   const StaffRosterRow& row = view.rows[rank];
   Unformatted(row.name);
   if (!row.job_name.empty()) {
@@ -257,6 +262,7 @@ void DrawRowTooltip(const StaffRosterView& view, std::size_t rank) {
   if (row.jailed) {
     ColoredText(kDangerColor, core::Tr("En prison"));
   }
+  ImGui::PopTextWrapPos();
   EndSkinTooltip();
 }
 
