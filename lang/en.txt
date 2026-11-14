@@ -23386,9 +23386,6 @@ tr: This item is adjusted by hue families: each swatch dyes all of its colors in
 fr: Cette teinture appartient à cet item : elle le suit à l'échange, à la vente, au storage et au courrier.
 tr: This dye belongs to this item: it follows it through trade, sale, storage and mail.
 
-fr: Code de ce calque
-tr: Code of this layer
-
 fr: Coiffe basse
 tr: Lower headgear
 
@@ -23490,9 +23487,6 @@ tr: Too many dyes for the server.
 
 fr: Trop rapproché de la demande précédente : attends une seconde.
 tr: Too close to the previous request: wait a second.
-
-fr: Un code par calque, à côté de celui du corps. Coller le code d'un chapeau teint l'applique au chapeau que tu portes.
-tr: One code per layer, next to the body's. Pasting a dyed hat's code applies it to the hat you wear.
 
 fr: Un costume et un chapeau ordinaire de même apparence ont chacun la leur, et deux exemplaires du même chapeau peuvent porter deux couleurs.
 tr: A costume and an ordinary hat with the same look each have their own, and two copies of the same hat can wear two colors.
@@ -24134,3 +24128,9 @@ tr: vending shop
 
 fr: Écrire @users dans la conversation
 tr: Write @users to the chat
+
+fr: Copier ou coller ces couleurs
+tr: Copy or paste these colors
+
+fr: « Copier le code » met les couleurs de ce calque dans le presse-papiers, à envoyer à qui tu veux. Colle ici un code reçu : ses couleurs passent dans l'aperçu, et rien ne change sur toi tant que tu ne valides pas.
+tr: “Copy code” puts this layer's colors on your clipboard, to send to anyone. Paste a code you received here: its colors go into the preview, and nothing changes on you until you apply.

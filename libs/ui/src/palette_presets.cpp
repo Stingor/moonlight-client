@@ -243,14 +243,18 @@ void DrawPalettePresets(PaletteEditorState& state, const PaletteEditorView& view
 
 void DrawLayerCode(const PaletteEditorView& view, const SkinArt& art, PaletteEditorAction& action) {
   ImGui::Separator();
-  if (!ImGui::TreeNode(core::Tr("Code de ce calque"))) {
+  // 🔴 LE TITRE DIT LE GESTE, ET LE TEXTE CE QU'IL FAIT, À LA VUE : « code de
+  // ce calque » ne disait ni à quoi sert un code, ni ce qu'on risque à en
+  // coller un.
+  if (!ImGui::TreeNode(core::Tr("Copier ou coller ces couleurs"))) {
     return;
   }
-  if (ImGui::IsItemHovered()) {
-    SkinTooltip(
-        core::Tr("Un code par calque, à côté de celui du corps. Coller le code d'un "
-                 "chapeau teint l'applique au chapeau que tu portes."));
-  }
+  ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + ImGui::GetFontSize() * kPresetHintWrapInFonts);
+  ImGui::TextDisabled(
+      "%s", core::Tr("« Copier le code » met les couleurs de ce calque dans le presse-papiers, "
+                     "à envoyer à qui tu veux. Colle ici un code reçu : ses couleurs passent "
+                     "dans l'aperçu, et rien ne change sur toi tant que tu ne valides pas."));
+  ImGui::PopTextWrapPos();
   DrawShareCode(view, art, action);
   ImGui::TreePop();
 }

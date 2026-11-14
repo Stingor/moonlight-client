@@ -71,9 +71,12 @@ constexpr std::size_t kBackDirection = ro::render::kDirectionCount / 2;
 
 // LE CADRAGE : un portrait pour la tête et les coiffes, qui font quelques
 // pixels sur une silhouette en pied ; le pied pour tout le reste.
+//
+// 🔴 LA COIFFE ENTIÈRE DANS LE CADRE, en hauteur comme en largeur : c'est elle
+// qu'on règle, et une coiffe haute se couperait au sommet.
 [[nodiscard]] std::optional<ro::render::PortraitAim> AimFor(ro::render::StyleLayer focus) {
   if (focus == ro::render::StyleLayer::kHead || focus == ro::render::StyleLayer::kHeadgear) {
-    return ro::render::PortraitAim{.head_only = true};
+    return ro::render::PortraitAim{.head_only = true, .fit_height = true};
   }
   return std::nullopt;
 }

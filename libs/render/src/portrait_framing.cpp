@@ -1,5 +1,6 @@
 #include "ro/render/portrait_framing.h"
 
+#include <algorithm>
 #include <cstddef>
 
 #include "ro/render/doll_animation.h"
@@ -108,7 +109,11 @@ VignetteFraming FramePortrait(const PortraitBoxes& boxes, const PortraitAim& aim
   // Le cadre entier, et non la seule boîte dessinée : c'est sur lui que le
   // joueur règle sa vue.
   const glm::vec2 frame = box_size + glm::vec2(kEdgesPerAxis * aim.inset_px);
-  const float scale = ((frame.x - kPortraitFitMarginPx) / extent.x) * aim.zoom;
+  float fitted = (frame.x - kPortraitFitMarginPx) / extent.x;
+  if (aim.fit_height) {
+    fitted = std::min(fitted, (frame.y - kPortraitFitMarginPx) / extent.y);
+  }
+  const float scale = fitted * aim.zoom;
   if (scale <= 0.0F) {
     return framing;
   }

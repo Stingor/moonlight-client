@@ -23386,9 +23386,6 @@ tr: Este item se ajusta por familias de tono: cada muestra tiñe todos sus color
 fr: Cette teinture appartient à cet item : elle le suit à l'échange, à la vente, au storage et au courrier.
 tr: Este tinte pertenece a este item: lo sigue en el intercambio, la venta, el storage y el correo.
 
-fr: Code de ce calque
-tr: Código de esta capa
-
 fr: Coiffe basse
 tr: Accesorio inferior
 
@@ -23490,9 +23487,6 @@ tr: Demasiados tintes para el servidor.
 
 fr: Trop rapproché de la demande précédente : attends une seconde.
 tr: Demasiado cerca de la solicitud anterior: espera un segundo.
-
-fr: Un code par calque, à côté de celui du corps. Coller le code d'un chapeau teint l'applique au chapeau que tu portes.
-tr: Un código por capa, junto al del cuerpo. Pegar el código de un sombrero teñido lo aplica al sombrero que llevas.
 
 fr: Un costume et un chapeau ordinaire de même apparence ont chacun la leur, et deux exemplaires du même chapeau peuvent porter deux couleurs.
 tr: Un disfraz y un sombrero normal de la misma apariencia tienen cada uno el suyo, y dos ejemplares del mismo sombrero pueden llevar dos colores.
@@ -24134,3 +24128,9 @@ tr: tienda de venta
 
 fr: Écrire @users dans la conversation
 tr: Escribir @users en la conversación
+
+fr: Copier ou coller ces couleurs
+tr: Copiar o pegar estos colores
+
+fr: « Copier le code » met les couleurs de ce calque dans le presse-papiers, à envoyer à qui tu veux. Colle ici un code reçu : ses couleurs passent dans l'aperçu, et rien ne change sur toi tant que tu ne valides pas.
+tr: «Copiar el código» pone los colores de esta capa en el portapapeles, para enviarlos a quien quieras. Pega aquí un código recibido: sus colores pasan a la vista previa, y nada cambia en ti hasta que lo apliques.

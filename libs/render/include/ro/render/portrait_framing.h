@@ -81,6 +81,10 @@ struct PortraitAim {
   bool head_only = true;
   // × l'échelle qui fait tenir la boîte cadrée dans la LARGEUR du cadre.
   float zoom = 1.0F;
+  // Vrai : la boîte tient AUSSI dans la hauteur du cadre. Une coiffe haute —
+  // une chope, une corne — dépasserait sinon par le haut d'un cadre carré
+  // réglé sur sa seule largeur.
+  bool fit_height = false;
   // Où tombe le point visé, en tailles du cadre, depuis son centre : zéro le
   // laisse au milieu. ⚠ LE ZOOM PIVOTE TOUJOURS AUTOUR DE CE POINT, d'où un
   // décalage qui ne bouge pas quand on zoome.
