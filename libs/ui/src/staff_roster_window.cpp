@@ -39,7 +39,7 @@ constexpr float kMapColumnPixels = 100.0F;
 constexpr float kGuildColumnPixels = 110.0F;
 constexpr float kDurationColumnPixels = 64.0F;
 constexpr float kActionColumnPixels = 78.0F;
-constexpr float kClientColumnPixels = 128.0F;
+constexpr float kClientColumnPixels = 170.0F;
 // Entre le nom d'un joueur et chacune de ses étiquettes.
 constexpr float kTagGapPixels = 6.0F;
 // Entre deux comptes du bandeau de synthèse.
@@ -111,10 +111,22 @@ constexpr const char* kNothing = "—";
   return core::Printed("%.*s #%d", static_cast<int>(map.size()), map.data(), instance_id);
 }
 
-// Le client en une cellule : son nom, et son patch quand il en a un.
+// Le client en une cellule : son nom et sa révision, suivie d'un astérisque
+// quand l'arbre était modifié. La révision dit la version même quand la mise à
+// jour est passée par le miroir sans changer le patch ; le patch ne la remplace
+// que pour un client qui ne déclare pas de révision.
 [[nodiscard]] std::string ClientCellText(const StaffRosterRow& row) {
   std::string text = ClientLabel(row.client);
-  if (row.client != StaffRosterClientKind::kNone && row.patch_index >= 0) {
+  if (row.client == StaffRosterClientKind::kNone) {
+    return text;
+  }
+  if (!row.revision.empty()) {
+    text += ' ';
+    text += row.revision.substr(0, kRevisionShownChars);
+    if (row.tree_modified) {
+      text += '*';
+    }
+  } else if (row.patch_index >= 0) {
     text += core::Printed(" p%d", row.patch_index);
   }
   return text;
