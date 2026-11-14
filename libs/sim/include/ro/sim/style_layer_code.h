@@ -12,7 +12,8 @@
 namespace ro::sim {
 
 // LA TEINTURE D'UN CALQUE ÉCRITE EN CLAIR : ce qu'un joueur copie et colle pour
-// partager la couleur d'un chapeau, d'une cape, de ses cheveux ou de sa peau.
+// partager la couleur d'un chapeau, d'une cape, de ses cheveux, de sa peau ou
+// d'un compagnon.
 //
 // La forme est `L1:<calque>:<profil>:<masque>:` suivie de dix chiffres
 // hexadécimaux par réglage non neutre, dans l'ordre des rangs : la teinte sur

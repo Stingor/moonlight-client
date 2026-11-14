@@ -203,7 +203,9 @@ std::size_t StyleLayerRanks(StyleLayerKind layer, std::uint8_t profile) noexcept
   if (layer == StyleLayerKind::kSkin) {
     return ramps ? 1 : 0;
   }
-  if (layer == StyleLayerKind::kHead) {
+  // Un compagnon n'est teint que par rampes : ses pièces sont celles de son
+  // sprite, mesurées comme celles d'une tête.
+  if (layer == StyleLayerKind::kHead || layer == StyleLayerKind::kCompanion) {
     return ramps ? kStyleLayerCodeRampRanks : 0;
   }
   if (layer == StyleLayerKind::kHeadgear || layer == StyleLayerKind::kGarment) {
@@ -266,7 +268,7 @@ std::optional<StyleLayerCode> DecodeStyleLayerCode(std::string_view text) {
     return std::nullopt;
   }
   if (*layer < static_cast<int>(StyleLayerKind::kHead) ||
-      *layer > static_cast<int>(StyleLayerKind::kSkin)) {
+      *layer > static_cast<int>(StyleLayerKind::kCompanion)) {
     return std::nullopt;
   }
   StyleLayerCode code;
