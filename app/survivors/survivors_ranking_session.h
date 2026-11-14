@@ -106,6 +106,13 @@ struct SurvivorsRunEnd {
   bool frozen_by_link_loss = false;
 };
 
+// L'ARÈNE ET LA CLASSE D'UN TABLEAU MONTRÉ : chacune a les siens.
+struct SurvivorsBoardShown {
+  std::uint16_t arena_id = 0;
+  std::uint16_t class_id = 0;
+  [[nodiscard]] bool operator==(const SurvivorsBoardShown&) const = default;
+};
+
 // La dernière page reçue d'un tableau, avec son instant.
 struct SurvivorsHeldPage {
   ro::net::SurvivorsBoardPage page;
@@ -182,10 +189,10 @@ class SurvivorsRankingSession {
   [[nodiscard]] std::uint16_t ruleset() const noexcept { return ruleset_; }
   // Le serveur du personnage connecté : ses résultats en attente sont les siens.
   [[nodiscard]] const std::string& server_key() const noexcept { return server_key_; }
-  // La page tenue d'un genre de tableau pour la classe `class_id` ; nulle quand
-  // celle qui est tenue en montre une autre.
+  // La page tenue d'un genre de tableau pour l'arène et la classe `shown` ;
+  // nulle quand celle qui est tenue en montre d'autres.
   [[nodiscard]] const SurvivorsHeldPage* page(ro::net::SurvivorsBoardKind board,
-                                              std::uint16_t class_id) const noexcept;
+                                              const SurvivorsBoardShown& shown) const noexcept;
   // L'instant d'où une demande de tableau peut repartir.
   [[nodiscard]] std::int64_t board_ready_at_ms() const noexcept;
   [[nodiscard]] std::span<const SurvivorsPendingResult> pending() const noexcept {

@@ -419,10 +419,9 @@ TEST_CASE("Classement survivors : hors d'une poignée de main vérifiée, rien n
 
 TEST_CASE("Classement survivors : une classée sans jeton repart libre sur l'arène demandée",
           "[app][survivors]") {
-  // L'ACCUEIL A RETENU une arène libre pour la partie libre : une partie
-  // classée qui part libre n'y va pas, qu'elle n'ait pas de service ou que le
-  // serveur refuse son jeton. Il ne classe ici que cette arène, et refuse la
-  // prairie.
+  // L'ACCUEIL A RETENU une autre arène que la prairie : une partie classée
+  // qui part libre y va, qu'elle n'ait pas de service ou que le serveur refuse
+  // son jeton. Il ne classe ici que la prairie, et refuse cette arène.
   const sim::SurvivorsRules& rules = sim::ShippedSurvivorsRules();
   const sim::ArenaRule* plains = moonclient::DefaultArenaOf(rules);
   REQUIRE(plains != nullptr);
@@ -432,21 +431,22 @@ TEST_CASE("Classement survivors : une classée sans jeton repart libre sur l'ar�
   }
   REQUIRE(field != nullptr);
   const sim::ClassRule& mage = rules.classes.front();
-  Bench bench(ts::ServingSetup(rules.ruleset_version, field->arena_id, mage.class_id));
+  Bench bench(ts::ServingSetup(rules.ruleset_version, plains->arena_id, mage.class_id));
   bench.book.ChooseArena(rules, field->arena_id);
   bench.book.Choose(SurvivorsBoardKind::kFree);
   CHECK(bench.mode.Launch(bench.book, rules, bench.root.path(), kLocalSeed)->start.arena_id ==
         field->arena_id);
 
-  // SERVICE FERMÉ : la classée part libre aussitôt, sur la prairie.
+  // SERVICE FERMÉ : la classée part libre aussitôt, sur l'arène retenue.
   bench.book.Choose(SurvivorsBoardKind::kRanked);
   const SurvivorsBookMode::Begun closed =
       bench.mode.Launch(bench.book, rules, bench.root.path(), kLocalSeed).value();
   CHECK(closed.board.kind == SurvivorsBoardKind::kFree);
-  CHECK(closed.start.arena_id == plains->arena_id);
+  CHECK(closed.start.arena_id == field->arena_id);
   CHECK_FALSE(bench.mode.holding());
 
-  // JETON REFUSÉ : le départ refait au règlement part libre, sur la prairie.
+  // JETON REFUSÉ : le départ refait au règlement part libre, sur l'arène
+  // retenue.
   bench.Deliver(bench.server.AnnounceCaps(kAlice, bench.mode.caps()));
   REQUIRE(bench.mode.session().service_open());
   const SurvivorsBookMode::Begun asked =
@@ -460,7 +460,7 @@ TEST_CASE("Classement survivors : une classée sans jeton repart libre sur l'ar�
       bench.mode.Settle(bench.book, rules, bench.root.path());
   REQUIRE(refused.has_value());
   CHECK(refused->board.kind == SurvivorsBoardKind::kFree);
-  CHECK(refused->start.arena_id == plains->arena_id);
+  CHECK(refused->start.arena_id == field->arena_id);
   CHECK(bench.server.cuts() == 0);
 }
 

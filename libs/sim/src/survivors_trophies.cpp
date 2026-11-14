@@ -71,6 +71,20 @@ constexpr std::array<EvolvedTrophy, survivors::kArcherEvolvedSkillCount> kArcher
     {survivors::kPhantasmicArrowId, MinigameTrophy::kSurvivorsPhantasmicArrow},
 }};
 
+// Ceux des évolués du Marchand.
+constexpr std::array<EvolvedTrophy, survivors::kMerchantEvolvedSkillCount> kMerchantTrophies{{
+    {survivors::kAcidDemonstrationId, MinigameTrophy::kSurvivorsAcidDemonstration},
+    {survivors::kSlimPotionPitcherId, MinigameTrophy::kSurvivorsSlimPotionPitcher},
+    {survivors::kFullChemicalProtectionId, MinigameTrophy::kSurvivorsFullChemicalProtection},
+    {survivors::kPlantCultivationId, MinigameTrophy::kSurvivorsPlantCultivation},
+    {survivors::kCartCannonId, MinigameTrophy::kSurvivorsCartCannon},
+    {survivors::kCartTornadoId, MinigameTrophy::kSurvivorsCartTornado},
+    {survivors::kSbr44Id, MinigameTrophy::kSurvivorsSbr44},
+    {survivors::kBioExplosionId, MinigameTrophy::kSurvivorsBioExplosion},
+    {survivors::kMentalChangeId, MinigameTrophy::kSurvivorsMentalChange},
+    {survivors::kBloodLustId, MinigameTrophy::kSurvivorsBloodLust},
+}};
+
 // Les trophées d'un skill de base porté à son plus haut niveau.
 constexpr std::array<EvolvedTrophy, 3> kTopLevelTrophies{{
     {survivors::kFireBallId, MinigameTrophy::kSurvivorsFireBall},
@@ -212,6 +226,12 @@ std::vector<MinigameTrophy> RecordSurvivors(MinigameRecord& record, const Surviv
   }
   EarnMinigameTrophy(record, MinigameTrophy::kSurvivorsGrandArcher,
                      HoldsAllEvolvedOf(record, field, survivors::ArcherClass().skill_pool), fresh);
+  for (const EvolvedTrophy& evolved : kMerchantTrophies) {
+    EarnMinigameTrophy(record, evolved.trophy, Owns(field, evolved.skill_id), fresh);
+  }
+  EarnMinigameTrophy(record, MinigameTrophy::kSurvivorsGrandAlchemist,
+                     HoldsAllEvolvedOf(record, field, survivors::MerchantClass().skill_pool),
+                     fresh);
   return fresh;
 }
 

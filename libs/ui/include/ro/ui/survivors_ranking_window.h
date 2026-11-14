@@ -64,6 +64,13 @@ struct SurvivorsRankingPage {
 struct SurvivorsRankingView {
   SurvivorsRankingPage ranked;
   SurvivorsRankingPage challenge;
+  // L'arène des deux tableaux (en UTF-8, déjà dans la langue du joueur ; vide,
+  // elle ne se nomme pas).
+  const char* arena_name = "";
+  // Les arènes classées qu'on peut regarder, et celle qui est montrée. Vide :
+  // l'arène se nomme seulement (`arena_name`).
+  std::span<const SurvivorsArenaChoice> arenas;
+  std::uint16_t arena_id = 0;
   // La classe des deux tableaux (en UTF-8, déjà dans la langue du joueur ;
   // vide, elle ne se nomme pas).
   const char* class_name = "";
@@ -81,7 +88,8 @@ struct SurvivorsRankingView {
 struct SurvivorsRankingState {
   bool open = false;
   SurvivorsRankingTab tab = SurvivorsRankingTab::kRanked;
-  // La classe choisie dans la fenêtre ; 0 : celle de l'accueil.
+  // L'arène et la classe choisies dans la fenêtre ; 0 : celles de l'accueil.
+  std::uint16_t arena_id = 0;
   std::uint16_t class_id = 0;
 };
 

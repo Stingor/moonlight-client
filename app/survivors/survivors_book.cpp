@@ -362,11 +362,11 @@ const ro::sim::ArenaRule* FreeArenaOf(const ro::sim::SurvivorsRules& rules,
 
 const char* ClassTitleOf(const ro::sim::ClassRule& class_rule) {
   const std::string_view key = class_rule.key;
-  if (key == "mage") return ro::core::Tr("Sorcier");
-  if (key == "knight") return ro::core::Tr("Chevalier");
+  if (key == "mage") return ro::core::Tr("Wizard");
+  if (key == "knight") return ro::core::Tr("Knight");
   if (key == "thief") return ro::core::Tr("Assassin");
-  if (key == "archer") return ro::core::Tr("Chasseur");
-  if (key == "merchant") return ro::core::Tr("Alchimiste");
+  if (key == "archer") return ro::core::Tr("Hunter");
+  if (key == "merchant") return ro::core::Tr("Alchemist");
   return nullptr;
 }
 
@@ -430,8 +430,9 @@ std::uint16_t ChallengeFirstSkill(const ro::sim::SurvivorsRules& rules,
 }
 
 ro::sim::SurvivorsStart ChallengeStartOf(const ro::sim::SurvivorsRules& rules,
-                                         const ro::sim::IsoWeek& week, std::uint16_t class_id) {
-  const ro::sim::ArenaRule* ranked_arena = ro::sim::FirstRankedArena(rules);
+                                         const ro::sim::IsoWeek& week, std::uint16_t class_id,
+                                         std::uint16_t arena_id) {
+  const ro::sim::ArenaRule* ranked_arena = ro::sim::RankedArenaOr(rules, arena_id);
   return ro::sim::SurvivorsStart{
       .seed = ro::sim::SeedOfWeek(week.year, week.week),
       .class_id = class_id,

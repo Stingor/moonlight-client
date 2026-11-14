@@ -284,11 +284,12 @@ const rn::SurvivorsTicket* SurvivorsRankingSession::ranked_ticket() const noexce
   return &*run_ticket_;
 }
 
-const SurvivorsHeldPage* SurvivorsRankingSession::page(rn::SurvivorsBoardKind board,
-                                                       std::uint16_t class_id) const noexcept {
+const SurvivorsHeldPage* SurvivorsRankingSession::page(
+    rn::SurvivorsBoardKind board, const SurvivorsBoardShown& shown) const noexcept {
   const std::optional<SurvivorsHeldPage>& held =
       board == rn::SurvivorsBoardKind::kChallenge ? challenge_page_ : ranked_page_;
-  if (board == rn::SurvivorsBoardKind::kUnknown || !held || held->page.key.class_id != class_id) {
+  if (board == rn::SurvivorsBoardKind::kUnknown || !held ||
+      held->page.key.arena_id != shown.arena_id || held->page.key.class_id != shown.class_id) {
     return nullptr;
   }
   return &*held;

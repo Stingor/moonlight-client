@@ -119,9 +119,9 @@ constexpr std::array<PinnedFoe, 45> kPinnedFoes{{
 
 }  // namespace
 
-TEST_CASE("Catalogue survivors : le ruleset 7, compte par compte", "[sim][survivors]") {
+TEST_CASE("Catalogue survivors : le ruleset 8, compte par compte", "[sim][survivors]") {
   const SurvivorsRules& shipped = Shipped();
-  CHECK(shipped.ruleset_version == 7);
+  CHECK(shipped.ruleset_version == 8);
   CHECK(shipped.run_ms == 900000U);
   const ro::core::Result<void> checked = ro::sim::CheckSurvivorsRules(shipped);
   INFO((checked ? std::string_view{} : std::string_view{checked.error().detail}));
@@ -159,7 +159,7 @@ TEST_CASE("Catalogue survivors : le ruleset 7, compte par compte", "[sim][surviv
   CHECK(shipped.classes[4].lent_cards.size() == 6U);
   CHECK(shipped.classes[4].evolved_job_id == 18);
   CHECK(shipped.classes[4].reborn_job_id == 4019);
-  CHECK(shipped.classes[4].free_play_only);
+  CHECK_FALSE(shipped.classes[4].free_play_only);
   CHECK(shipped.skills.size() == 101U);
   CHECK(shipped.cards.size() == 30U);
   CHECK(shipped.evolutions.size() == 42U);
@@ -173,14 +173,15 @@ TEST_CASE("Catalogue survivors : le ruleset 7, compte par compte", "[sim][surviv
                               [](const ro::sim::BossRule& boss) { return boss.final; }) == 1);
   CHECK(shipped.bosses.back().final);
 
-  // Quatre arènes, toutes des biomes générés, sans carte : la prairie, seule
-  // classée, puis le désert et la neige, libres, chacun avec son contenu, et
-  // le labo, libre, avec son contenu et ses MVP tirés. Les plantes de la
-  // prairie s'éveillent et se perdent par morceau.
+  // Quatre arènes, toutes des biomes générés, sans carte, toutes classées :
+  // la prairie, puis le désert et la neige, chacun avec son contenu, et le
+  // labo, avec son contenu et ses MVP tirés. Les plantes de la prairie
+  // s'éveillent et se perdent par morceau.
   REQUIRE(shipped.arenas.size() == 4U);
   for (const ro::sim::ArenaRule& arena : shipped.arenas) {
     CHECK(std::string_view{arena.map_name}.empty());
     CHECK(arena.terrain_id != 0);
+    CHECK(arena.ranked);
   }
   CHECK(shipped.arenas[0].ranked);
   CHECK(ro::sim::FirstRankedArena(shipped) == &shipped.arenas[0]);
@@ -192,7 +193,6 @@ TEST_CASE("Catalogue survivors : le ruleset 7, compte par compte", "[sim][surviv
   const ro::sim::ArenaRule& desert = shipped.arenas[1];
   CHECK(desert.arena_id == 3);
   CHECK(std::string_view{desert.key} == "morroc_desert");
-  CHECK_FALSE(desert.ranked);
   CHECK(desert.waves.size() == 18U);
   CHECK(desert.events.size() == 7U);
   REQUIRE(desert.bosses.size() == 5U);
@@ -207,7 +207,6 @@ TEST_CASE("Catalogue survivors : le ruleset 7, compte par compte", "[sim][surviv
   const ro::sim::ArenaRule& lab = shipped.arenas[3];
   CHECK(lab.arena_id == 5);
   CHECK(std::string_view{lab.key} == "lighthalzen_biolab");
-  CHECK_FALSE(lab.ranked);
   CHECK(ro::sim::ContentOf(shipped, lab).waves.data() == lab.waves.data());
   CHECK(lab.events.size() == 7U);
   // LE MVP TIRÉ : deux jeux de boss, que la graine choisit ; chacun finit

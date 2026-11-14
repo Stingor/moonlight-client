@@ -122,7 +122,7 @@ void SurvivorsViews::ComposeMeta(ro::ui::SurvivorsPrepareView& prepare,
   const SurvivorsSave& save = desk.save();
   const std::int64_t now_utc_s = book.now_utc();
   ro::ui::SurvivorsPrepareMeta meta =
-      PrepareMetaOf(rules, save, book.chosen(), now_utc_s, book.chosen_class_id());
+      PrepareMetaOf(rules, save, book.chosen(), now_utc_s, book.chosen_class_id(), book.arena_id());
   const ro::sim::ClassRule* chosen_class = ChosenClassOf(rules, save, book.chosen_class_id());
   const std::uint16_t class_id =
       chosen_class != nullptr ? chosen_class->class_id : std::uint16_t{0};
@@ -133,38 +133,47 @@ void SurvivorsViews::ComposeMeta(ro::ui::SurvivorsPrepareView& prepare,
   // LE CLASSEMENT N'A RIEN À L'ACCUEIL SERVICE FERMÉ : ni onglet, ni bouton,
   // ni compteur, ni l'onglet local des parties classées, ni le tableau.
   const bool ranking_open = ranking != nullptr && ranking->session().service_open();
-  // LE CLASSEMENT S'OUVRE SUR LA CLASSE DE L'ACCUEIL, puis montre celle que le
-  // joueur choisit dans son en-tête, jusqu'à sa fermeture.
-  if (!windows.ranking.open) windows.ranking.class_id = 0;
-  const std::uint16_t ranking_class_id =
-      windows.ranking.class_id != 0 ? windows.ranking.class_id : class_id;
-  if (ranking != nullptr) {
-    meta.ranking = PrepareRankingOf(ranking->session(), ranking_rows_, class_id);
-    ComposeRankingWindow(*ranking, windows.ranking, windows.ranking_view, ranking_rows_,
-                         ranking_class_id, ShownClassName(rules, ranking_class_id, tables));
-  } else {
-    windows.ranking.open = false;
-  }
-  // LES ARÈNES (Q6 amendée) : toute arène du catalogue en partie libre, la
-  // prairie par défaut ; le défi et la partie classée nomment la leur.
+  // LES ARÈNES : toute arène du catalogue, la prairie par défaut, partagée par
+  // les trois onglets ; chacune a son tableau classé et son défi.
   arena_names_.clear();
   arena_choices_.clear();
+  ranking_arena_choices_.clear();
   for (const ro::sim::ArenaRule& arena : rules.arenas) {
     arena_names_.push_back(ArenaNameOf(rules, arena, tables.map_names));
   }
   // Après les noms : une liste qui grandit déplacerait les textes désignés.
   for (std::size_t rank = 0; rank < rules.arenas.size(); ++rank) {
-    arena_choices_.push_back(ro::ui::SurvivorsArenaChoice{.arena_id = rules.arenas[rank].arena_id,
-                                                          .name = arena_names_[rank].c_str()});
+    const ro::ui::SurvivorsArenaChoice choice{.arena_id = rules.arenas[rank].arena_id,
+                                              .name = arena_names_[rank].c_str()};
+    arena_choices_.push_back(choice);
+    if (rules.arenas[rank].ranked) ranking_arena_choices_.push_back(choice);
   }
-  const ro::sim::ArenaRule* free_arena = FreeArenaOf(rules, book.free_arena_id());
-  const ro::sim::ArenaRule* board_arena = DefaultArenaOf(rules);
-  board_arena_name_ =
-      board_arena != nullptr ? ArenaNameOf(rules, *board_arena, tables.map_names) : std::string();
-  meta.free_arenas = arena_choices_;
-  meta.free_arena_id = free_arena != nullptr ? free_arena->arena_id : std::uint16_t{0};
+  const ro::sim::ArenaRule* chosen_arena = FreeArenaOf(rules, book.arena_id());
+  const std::uint16_t arena_id =
+      chosen_arena != nullptr ? chosen_arena->arena_id : std::uint16_t{0};
+  meta.arenas = arena_choices_;
+  meta.arena_id = arena_id;
+  // LE CLASSEMENT S'OUVRE SUR L'ARÈNE ET LA CLASSE DE L'ACCUEIL, puis montre
+  // celles que le joueur choisit dans son en-tête, jusqu'à sa fermeture.
+  if (!windows.ranking.open) {
+    windows.ranking.arena_id = 0;
+    windows.ranking.class_id = 0;
+  }
+  const SurvivorsBoardShown ranking_shown{
+      .arena_id = windows.ranking.arena_id != 0 ? windows.ranking.arena_id : arena_id,
+      .class_id = windows.ranking.class_id != 0 ? windows.ranking.class_id : class_id};
+  if (ranking != nullptr) {
+    meta.ranking =
+        PrepareRankingOf(ranking->session(), ranking_rows_,
+                         SurvivorsBoardShown{.arena_id = arena_id, .class_id = class_id});
+    ComposeRankingWindow(*ranking, windows.ranking, windows.ranking_view, ranking_rows_,
+                         ranking_shown, ShownClassName(rules, ranking_shown.class_id, tables));
+  } else {
+    windows.ranking.open = false;
+  }
   ComposeClassChoices(rules, save, tables, book.chosen_class_id(), meta);
-  meta.board_arena_name = board_arena_name_.c_str();
+  windows.ranking_view.arenas = ranking_arena_choices_;
+  windows.ranking_view.arena_id = ranking_shown.arena_id;
   // Les classes du classement : celles qui ont un tableau, verrouillées ou non.
   ranking_class_choices_.clear();
   for (const ro::ui::SurvivorsClassChoice& choice : class_choices_) {
@@ -174,7 +183,7 @@ void SurvivorsViews::ComposeMeta(ro::ui::SurvivorsPrepareView& prepare,
         ro::ui::SurvivorsClassChoice{.class_id = choice.class_id, .name = choice.name});
   }
   windows.ranking_view.classes = ranking_class_choices_;
-  windows.ranking_view.class_id = ranking_class_id;
+  windows.ranking_view.class_id = ranking_shown.class_id;
   prepare.meta = meta;
   if (windows.church.open) ComposeShop(SurvivorsMetaShop::kChurch, windows, save, tables);
   if (windows.kafra.open) ComposeShop(SurvivorsMetaShop::kKafra, windows, save, tables);
@@ -194,7 +203,7 @@ void SurvivorsViews::ComposeMeta(ro::ui::SurvivorsPrepareView& prepare,
     windows.records_view = RecordsViewOf(
         rules, save, now_utc_s,
         credit.has_value() ? std::optional<std::int64_t>(credit->played_at_utc_s) : std::nullopt,
-        record_rows_, book.free_arena_id(), windows.records.class_id);
+        record_rows_, book.arena_id(), windows.records.class_id);
     windows.records_view.ranked_shown = ranking_open;
     windows.records_view.classes = class_choices_;
     windows.records_view.class_id = windows.records.class_id;
@@ -212,10 +221,10 @@ void SurvivorsViews::ComposeRanking(const SurvivorsStage& stage, const Survivors
   if (view.summary != nullptr) summary_.ranking = SummaryRankOf(session, board);
   if (stage.screen() != SurvivorsScreen::kSummary || facts.meta == nullptr) return;
   SurvivorsMetaWindows& meta = *facts.meta;
-  // AU BILAN, LE TABLEAU EST CELUI DE LA CLASSE DE LA PARTIE.
-  const std::uint16_t class_id = SummaryClassId(stage);
-  ComposeRankingWindow(*facts.ranking, meta.ranking, meta.ranking_view, ranking_rows_, class_id,
-                       ShownClassName(rules, class_id, tables));
+  // AU BILAN, LE TABLEAU EST CELUI DE L'ARÈNE ET DE LA CLASSE DE LA PARTIE.
+  const SurvivorsBoardShown shown = SummaryBoardShown(stage);
+  ComposeRankingWindow(*facts.ranking, meta.ranking, meta.ranking_view, ranking_rows_, shown,
+                       ShownClassName(rules, shown.class_id, tables));
   if (!meta.ranking.open) return;
   view.ranking = &meta.ranking_view;
   view.ranking_state = &meta.ranking;

@@ -563,10 +563,7 @@ constexpr ClassRule kMerchant{.class_id = kMerchantClassId,
                               .reborn_job_id = kCreatorJobId,
                               .reborn_damage_pct = kMerchantRebornDamagePct,
                               .final_boss_hp_bonus_pct = kMerchantFinalBossHpBonusPct,
-                              .lent_cards = kMerchantLentCards,
-                              // Ses invocations frappent hors de sa main : le
-                              // serveur ne les relit pas encore.
-                              .free_play_only = true};
+                              .lent_cards = kMerchantLentCards};
 
 }  // namespace
 

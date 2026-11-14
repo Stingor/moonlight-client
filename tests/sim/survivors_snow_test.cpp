@@ -85,8 +85,8 @@ TEST_CASE("Neige survivors : l'arène 4 joue son terrain et son contenu", "[sim]
   REQUIRE(arena != nullptr);
   CHECK(std::string_view{arena->key} == "lutie_snowfield");
   CHECK(arena->terrain_id == kSnowTerrainId);
-  // Une partie libre seulement (lot 17, Q1).
-  CHECK_FALSE(arena->ranked);
+  // Classée, comme toute arène livrée.
+  CHECK(arena->ranked);
   const ro::sim::TerrainRule* terrain = ro::sim::FindTerrain(Rules(), kSnowTerrainId);
   REQUIRE(terrain != nullptr);
   CHECK(std::string_view{terrain->key} == "lutie_snowfield");

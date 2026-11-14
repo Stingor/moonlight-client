@@ -41,28 +41,30 @@ struct SurvivorsRankingRowsHeld {
   std::vector<ro::ui::SurvivorsPendingRow> pending_rows;
 };
 
-// La classe de la partie du bilan : 0 sans bilan.
-[[nodiscard]] std::uint16_t SummaryClassId(const SurvivorsStage& stage) noexcept;
+// L'arène et la classe de la partie du bilan : 0 sans bilan.
+[[nodiscard]] SurvivorsBoardShown SummaryBoardShown(const SurvivorsStage& stage) noexcept;
 
-// LE TABLEAU MONDIAL D'UNE CLASSE : les deux pages tenues pour `class_id` — une
-// page d'une autre classe ne s'y montre pas —, leur âge à l'instant `now`, la
+// LE TABLEAU MONDIAL D'UNE ARÈNE ET D'UNE CLASSE : les deux pages tenues pour
+// `shown` — une page d'une autre arène ou classe ne s'y montre pas —, leur âge
+// à l'instant `now`, la
 // semaine du défi comptée à l'heure du serveur, la cadence, et la classe nommée
 // (`class_name` en UTF-8, déjà dans la langue du joueur ; vide, elle ne se nomme
 // pas).
 [[nodiscard]] ro::ui::SurvivorsRankingView RankingViewOf(const SurvivorsRankingSession& session,
                                                          const SurvivorsRankingNow& now,
                                                          SurvivorsRankingRowsHeld& held,
-                                                         std::uint16_t class_id,
+                                                         const SurvivorsBoardShown& shown,
                                                          const char* class_name);
 
 // Les résultats en attente du serveur connecté, tous personnages confondus.
 [[nodiscard]] std::size_t PendingCountOf(const SurvivorsRankingSession& session);
 
-// L'ACCUEIL : le meilleur rang du tableau classé de la classe `class_id`, su
-// seulement quand sa page est tenue, et les résultats en attente, toutes classes
-// confondues ; rien service fermé.
+// L'ACCUEIL : le meilleur rang du tableau classé de l'arène et de la classe
+// `shown`, su seulement quand sa page est tenue, et les résultats en attente,
+// toutes classes confondues ; rien service fermé.
 [[nodiscard]] std::optional<ro::ui::SurvivorsPrepareRanking> PrepareRankingOf(
-    const SurvivorsRankingSession& session, SurvivorsRankingRowsHeld& held, std::uint16_t class_id);
+    const SurvivorsRankingSession& session, SurvivorsRankingRowsHeld& held,
+    const SurvivorsBoardShown& shown);
 
 // Le verdict d'une partie envoyée s'attend 5 s ; au-delà, l'écran de fin la
 // dit en attente, renvoyée à la prochaine connexion.
@@ -104,10 +106,11 @@ void SayRankingNotices(SurvivorsRankingMode& ranking, const SurvivorsStage& stag
 // l'accueil (sur l'onglet retenu) ou depuis l'écran de fin (sur l'onglet de la
 // partie), actualiser, changer d'onglet. Chacune demande la page de l'onglet,
 // une fois dans la cadence, et une demande que la cadence retient part dès
-// qu'elle le permet, fenêtre ouverte sur son onglet. Le tableau est celui de la
-// classe `class_id` : la classe retenue à l'accueil, celle de la partie au bilan ;
-// quand elle change, fenêtre ouverte, sa page se demande. À appeler à chaque
-// image ; service fermé, rien ne s'ouvre.
+// qu'elle le permet, fenêtre ouverte sur son onglet. Le tableau est celui de
+// l'arène et de la classe `shown` : celles que la fenêtre montre, à défaut
+// celles de l'accueil ou de la partie au bilan ; quand elles changent, fenêtre
+// ouverte, sa page se demande. À appeler à chaque image ; service fermé, rien
+// ne s'ouvre.
 struct SurvivorsRankingAsks {
   bool open = false;
   std::optional<ro::ui::SurvivorsRankingTab> open_on;
@@ -115,12 +118,12 @@ struct SurvivorsRankingAsks {
 };
 void FollowRankingAsks(SurvivorsRankingMode& ranking, ro::ui::SurvivorsRankingState& state,
                        const SurvivorsRankingAsks& asks, const ro::sim::SurvivorsRules& rules,
-                       std::uint16_t class_id);
+                       const SurvivorsBoardShown& shown);
 
-// LA FENÊTRE DU TABLEAU DE LA CLASSE `class_id` (`RankingViewOf`), composée quand
-// elle est ouverte ; fermée service fermé.
+// LA FENÊTRE DU TABLEAU DE `shown` (`RankingViewOf`), composée quand elle est
+// ouverte ; fermée service fermé.
 void ComposeRankingWindow(const SurvivorsRankingMode& ranking, ro::ui::SurvivorsRankingState& state,
                           ro::ui::SurvivorsRankingView& view, SurvivorsRankingRowsHeld& held,
-                          std::uint16_t class_id, const char* class_name);
+                          const SurvivorsBoardShown& shown, const char* class_name);
 
 }  // namespace moonclient

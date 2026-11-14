@@ -30,6 +30,24 @@ constexpr int kColumns = 5;
 constexpr ImGuiTableFlags kTableFlags =
     ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_BordersInnerH;
 
+// L'arène montrée : une case par arène classée, ou son seul nom.
+void DrawArenas(SurvivorsRankingState& state, const SurvivorsRankingView& view,
+                const SkinArt& art) {
+  if (view.arenas.size() <= 1) {
+    if (*view.arena_name != '\0') ImGui::Text(core::Tr("Arène : %s"), view.arena_name);
+    return;
+  }
+  ImGui::AlignTextToFramePadding();
+  ImGui::TextUnformatted(core::Tr("Arène"));
+  for (const SurvivorsArenaChoice& choice : view.arenas) {
+    ImGui::SameLine();
+    ImGui::PushID(choice.arena_id);
+    const bool chosen = choice.arena_id == view.arena_id;
+    if (SkinRadio(choice.name, chosen, art) && !chosen) state.arena_id = choice.arena_id;
+    ImGui::PopID();
+  }
+}
+
 // La classe montrée : une case par classe classée, ou son seul nom.
 void DrawClasses(SurvivorsRankingState& state, const SurvivorsRankingView& view,
                  const SkinArt& art) {
@@ -168,6 +186,7 @@ SurvivorsRankingAsk DrawSurvivorsRankingWindow(SurvivorsRankingState& state,
   std::array<char, kLineSize> line = {};
   std::snprintf(line.data(), line.size(), core::Tr("Règles %d"), view.ruleset);
   FaintText(line.data());
+  DrawArenas(state, view, art);
   DrawClasses(state, view, art);
   DrawTabs(state, asked, art);
   ImGui::Separator();

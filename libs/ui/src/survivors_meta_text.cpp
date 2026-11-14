@@ -81,10 +81,10 @@ const char* SurvivorsFeatGoal(std::string_view feat_key) {
     return core::Tr("Rejoindre l'Assassin qui attend sur la prairie, en partie libre, seul");
   }
   if (feat_key == "archer_met") {
-    return core::Tr("Rejoindre le Chasseur qui guette dans le désert, avant 5:00, seul");
+    return core::Tr("Rejoindre le Hunter qui guette dans le désert, avant 5:00, seul");
   }
   if (feat_key == "merchant_met") {
-    return core::Tr("Rejoindre l'Alchimiste sur la neige avec des zeny de la partie, seul");
+    return core::Tr("Rejoindre l'Alchemist sur la neige avec des zeny de la partie, seul");
   }
   return "";
 }

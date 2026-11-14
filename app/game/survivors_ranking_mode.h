@@ -58,7 +58,7 @@ struct SurvivorsRankingFacts {
 // La page qu'une demande retenue par la cadence attend.
 struct SurvivorsBoardOwed {
   ro::net::SurvivorsBoardKind board = ro::net::SurvivorsBoardKind::kRanked;
-  std::uint16_t class_id = 0;
+  SurvivorsBoardShown shown;
   [[nodiscard]] bool operator==(const SurvivorsBoardOwed&) const = default;
 };
 
@@ -110,10 +110,10 @@ class SurvivorsRankingMode {
   // elle n'envoie rien, ni une partie libre ou à départ chargé.
   void FollowEnded(const SurvivorsStage& stage, bool frozen_by_link_loss);
 
-  // LE TABLEAU MONDIAL DEMANDÉ pour l'arène classée et la classe `class_id` :
-  // vrai quand la demande part à la prochaine image — classe connue, service
-  // ouvert et cadence passée.
-  bool AskBoard(const ro::sim::SurvivorsRules& rules, std::uint16_t class_id,
+  // LE TABLEAU MONDIAL DEMANDÉ pour l'arène et la classe `shown` : vrai quand
+  // la demande part à la prochaine image — arène classée et classe connues,
+  // service ouvert et cadence passée.
+  bool AskBoard(const ro::sim::SurvivorsRules& rules, const SurvivorsBoardShown& shown,
                 ro::net::SurvivorsBoardKind board);
   // LA PAGE QUE LA FENÊTRE DU TABLEAU ATTEND encore, la cadence ayant retenu
   // sa demande ; rien quand aucune n'est due.
@@ -121,10 +121,10 @@ class SurvivorsRankingMode {
     return board_owed_;
   }
   void OweBoard(std::optional<SurvivorsBoardOwed> board) noexcept { board_owed_ = board; }
-  // La classe dont la fenêtre du tableau montre les pages ; vrai quand elle
-  // vient de changer.
-  [[nodiscard]] bool FollowBoardClass(std::uint16_t class_id) noexcept {
-    return std::exchange(board_class_id_, class_id) != class_id;
+  // L'arène et la classe dont la fenêtre du tableau montre les pages ; vrai
+  // quand elles viennent de changer.
+  [[nodiscard]] bool FollowBoardShown(const SurvivorsBoardShown& shown) noexcept {
+    return std::exchange(board_shown_, shown) != shown;
   }
 
   // CE QUE LA SESSION A DIT depuis la dernière lecture, déjà écrit au journal :
@@ -144,6 +144,7 @@ class SurvivorsRankingMode {
     std::uint64_t start_seed = 0;
     std::uint64_t local_seed = 0;
     std::uint16_t class_id = 0;
+    std::uint16_t arena_id = 0;
   };
 
   void Write(const std::filesystem::path& client_root);
@@ -160,7 +161,7 @@ class SurvivorsRankingMode {
   std::optional<PendingLaunch> launch_;
   SurvivorsRankingNow now_;
   std::optional<SurvivorsBoardOwed> board_owed_;
-  std::uint16_t board_class_id_ = 0;
+  SurvivorsBoardShown board_shown_;
   std::vector<SurvivorsRankingNotice> told_;
 };
 

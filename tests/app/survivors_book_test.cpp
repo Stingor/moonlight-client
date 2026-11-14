@@ -223,16 +223,15 @@ TEST_CASE("Carnet en jeu : le défi part neutre, le même pour deux carnets", "[
   CHECK(free_rich.board == SurvivorsRunBoard{});
 }
 
-TEST_CASE("Carnet en jeu : le défi et la classée sur la prairie, la partie libre au choix",
+TEST_CASE("Carnet en jeu : toute partie se joue sur l'arène retenue, la prairie par défaut",
           "[app][survivors]") {
-  // LE DÉFI ET LA PARTIE CLASSÉE se jouent sur la prairie générée (Q6
-  // amendée, Q7 A), pas sur la première arène du catalogue.
+  // LA PRAIRIE GÉNÉRÉE est l'arène par défaut du défi et de la partie classée.
   const ro::sim::ArenaRule* plains = ro::sim::FirstRankedArena(Rules());
   REQUIRE(plains != nullptr);
   CHECK(std::string_view(plains->key) == "midgard_plains");
   CHECK(plains->terrain_id != 0);
   CHECK(ChallengeStartOf(Rules(), kWeek43, kMageClassId).arena_id == plains->arena_id);
-  CHECK(ro::sim::RankedStartOf(Rules(), kFreeSeed, kMageClassId).arena_id == plains->arena_id);
+  CHECK(ro::sim::RankedStartOf(Rules(), kFreeSeed, kMageClassId, 0).arena_id == plains->arena_id);
   // LA PARTIE LIBRE part sur la prairie par défaut, sur le désert quand
   // l'accueil le retient ; un Id inconnu reprend la prairie.
   REQUIRE(moonclient::DefaultArenaOf(Rules()) == plains);
@@ -241,7 +240,7 @@ TEST_CASE("Carnet en jeu : le défi et la classée sur la prairie, la partie lib
     if (std::string_view(arena.key) == "morroc_desert") field = &arena;
   }
   REQUIRE(field != nullptr);
-  REQUIRE_FALSE(field->ranked);
+  REQUIRE(field->ranked);
   constexpr std::uint16_t kUnknownArena = 999;
   CHECK(FreeStartOf(Rules(), SurvivorsSave{}, kFreeSeed).arena_id == plains->arena_id);
   CHECK(FreeStartOf(Rules(), SurvivorsSave{}, kFreeSeed, field->arena_id).arena_id ==
@@ -249,26 +248,29 @@ TEST_CASE("Carnet en jeu : le défi et la classée sur la prairie, la partie lib
   CHECK(FreeStartOf(Rules(), SurvivorsSave{}, kFreeSeed, kUnknownArena).arena_id ==
         plains->arena_id);
 
-  // LE CHOIX DE L'ACCUEIL ne vaut que pour la partie libre : le défi et la
-  // partie classée gardent la prairie, et une classée sans jeton repart libre
-  // sur la prairie, l'arène qu'elle demandait.
+  // LE CHOIX DE L'ACCUEIL vaut pour les trois tableaux, chaque arène ayant
+  // son défi et son classement ; une classée sans jeton repart libre sur
+  // l'arène qu'elle demandait.
   const TempDirectory root;
   SurvivorsBookMode book([] { return NoonOf(kWeek43); });
-  CHECK(book.free_arena_id() == 0);
+  CHECK(book.arena_id() == 0);
   book.ChooseArena(Rules(), field->arena_id);
-  CHECK(book.free_arena_id() == field->arena_id);
+  CHECK(book.arena_id() == field->arena_id);
   CHECK(book.StartOf(Rules(), root.path(), kFreeSeed).start.arena_id == field->arena_id);
   book.Choose(SurvivorsBoardKind::kChallenge);
-  CHECK(book.StartOf(Rules(), root.path(), kFreeSeed).start.arena_id == plains->arena_id);
+  CHECK(book.StartOf(Rules(), root.path(), kFreeSeed).start.arena_id == field->arena_id);
   book.Choose(SurvivorsBoardKind::kRanked);
-  CHECK(book.StartOf(Rules(), root.path(), kFreeSeed).start.arena_id == plains->arena_id);
+  CHECK(book.StartOf(Rules(), root.path(), kFreeSeed).start.arena_id == field->arena_id);
   const SurvivorsBookMode::Begun fallback =
-      book.StartRankedAsFree(Rules(), root.path(), kFreeSeed, kMageClassId);
+      book.StartRankedAsFree(Rules(), root.path(), kFreeSeed, kMageClassId, field->arena_id);
   CHECK(fallback.board.kind == SurvivorsBoardKind::kFree);
-  CHECK(fallback.start.arena_id == plains->arena_id);
+  CHECK(fallback.start.arena_id == field->arena_id);
+  // Le défi d'une semaine a la même graine sur toutes les arènes.
+  CHECK(ChallengeStartOf(Rules(), kWeek43, kMageClassId, field->arena_id).seed ==
+        ChallengeStartOf(Rules(), kWeek43, kMageClassId).seed);
   // Un Id que les règles ne connaissent pas ne se retient pas.
   book.ChooseArena(Rules(), kUnknownArena);
-  CHECK(book.free_arena_id() == field->arena_id);
+  CHECK(book.arena_id() == field->arena_id);
 }
 
 TEST_CASE("Carnet en jeu : une victoire verse ses Zeny et prend la tête du tableau",
@@ -644,8 +646,8 @@ TEST_CASE("Carnet survivors : le Chevalier se débloque par une partie tenue 10:
   CHECK(moonclient::FeatProgressOf(met, *meeting_feat) == 1);
 
   // Chaque classe livrée porte son nom, distinct de celui de son métier.
-  CHECK(std::string_view(moonclient::ClassTitleOf(*knight)) == "Chevalier");
-  CHECK(std::string_view(moonclient::ClassTitleOf(Rules().classes.front())) == "Sorcier");
+  CHECK(std::string_view(moonclient::ClassTitleOf(*knight)) == "Knight");
+  CHECK(std::string_view(moonclient::ClassTitleOf(Rules().classes.front())) == "Wizard");
 
   // Le défi et la partie classée jouent la classe qu'on leur donne, chacune son
   // premier skill, la même graine de semaine pour toutes.

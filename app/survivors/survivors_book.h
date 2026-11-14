@@ -88,14 +88,13 @@ bool InscribeFeat(SurvivorsSave& save, std::string_view key);
                                                      const ro::sim::ClassRule& class_rule,
                                                      const SurvivorsSave& save);
 
-// L'ARÈNE PAR DÉFAUT : celle que la partie libre joue tant que l'accueil n'en a
-// pas retenu d'autre, la première arène classée — celle du défi et de la
-// partie classée (Q6, Q7). Nulle quand aucune ne l'est.
+// L'ARÈNE PAR DÉFAUT : celle que toute partie joue tant que l'accueil n'en a
+// pas retenu d'autre, la première arène classée. Nulle quand aucune ne l'est.
 [[nodiscard]] const ro::sim::ArenaRule* DefaultArenaOf(const ro::sim::SurvivorsRules& rules);
 
-// L'ARÈNE DE LA PARTIE LIBRE : celle d'Id `arena_id` quand les règles la
-// connaissent, sinon l'arène par défaut. Toute arène du catalogue se joue en
-// partie libre, classée ou non.
+// L'ARÈNE RETENUE : celle d'Id `arena_id` quand les règles la connaissent,
+// sinon l'arène par défaut. Toute arène du catalogue se joue en partie libre,
+// classée ou non.
 [[nodiscard]] const ro::sim::ArenaRule* FreeArenaOf(const ro::sim::SurvivorsRules& rules,
                                                     std::uint16_t arena_id);
 
@@ -137,14 +136,16 @@ bool InscribeFeat(SurvivorsSave& save, std::string_view key);
 [[nodiscard]] std::uint16_t ChallengeFirstSkill(const ro::sim::SurvivorsRules& rules,
                                                 const ro::sim::IsoWeek& week);
 
-// LE DÉPART DU DÉFI D'UNE SEMAINE pour la classe `class_id` : neutre, sur la
-// première arène classée, la graine `SeedOfWeek` et le skill que la semaine
-// impose. Le même pour tous les carnets, et la même graine pour toutes les
-// classes, chacune à son tableau. Un Id que les règles ne connaissent pas reste
-// tel quel, et la partie refuse de commencer.
+// LE DÉPART DU DÉFI D'UNE SEMAINE pour la classe `class_id` : neutre, sur
+// l'arène classée `arena_id` — à défaut la première —, la graine `SeedOfWeek`
+// et le skill que la semaine impose. Le même pour tous les carnets, et la même
+// graine pour toutes les classes et toutes les arènes, chacune à son tableau.
+// Un Id de classe que les règles ne connaissent pas reste tel quel, et la
+// partie refuse de commencer.
 [[nodiscard]] ro::sim::SurvivorsStart ChallengeStartOf(const ro::sim::SurvivorsRules& rules,
                                                        const ro::sim::IsoWeek& week,
-                                                       std::uint16_t class_id);
+                                                       std::uint16_t class_id,
+                                                       std::uint16_t arena_id = 0);
 
 // Ce que devient une partie au tableau des records.
 enum class RecordVerdict : std::uint8_t {

@@ -166,16 +166,15 @@ TEST_CASE("Méta : l'accueil choisit le tableau, la Cursed Water et le lieu ouve
   desk.FollowPrepare({.choose_board = ro::ui::SurvivorsBoardTab::kFree}, windows, book, Rules(),
                      root.path(), heard.Say());
   CHECK(book.chosen() == SurvivorsBoardKind::kFree);
-  // L'arène de la partie libre : retenue au carnet du mode, et seulement une
-  // arène des règles.
+  // L'arène retenue : au carnet du mode, et seulement une arène des règles.
   constexpr std::uint16_t kUnknownArena = 999;
   const std::uint16_t field_id = Rules().arenas[1].arena_id;
   desk.FollowPrepare({.choose_arena_id = field_id}, windows, book, Rules(), root.path(),
                      heard.Say());
-  CHECK(book.free_arena_id() == field_id);
+  CHECK(book.arena_id() == field_id);
   desk.FollowPrepare({.choose_arena_id = kUnknownArena}, windows, book, Rules(), root.path(),
                      heard.Say());
-  CHECK(book.free_arena_id() == field_id);
+  CHECK(book.arena_id() == field_id);
 
   SurvivorsSave save;
   CHECK_FALSE(ChooseCursedWater(save, Rules(), -1));
@@ -330,16 +329,16 @@ TEST_CASE("Méta : les records d'anciennes règles restent, marqués, sous ceux 
   CHECK(view.free_runs[3].older_rules);
 }
 
-TEST_CASE("Méta : les tableaux sont ceux de la prairie, ceux du ruleset 3 restent dessous (Q10)",
+TEST_CASE("Méta : les tableaux sont ceux de l'arène retenue, ceux du ruleset 3 dessous (Q10)",
           "[app][survivors]") {
   const std::uint16_t current = Rules().ruleset_version;
   const auto older = static_cast<std::uint16_t>(current - 1);
   const ro::sim::ArenaRule* plains = moonclient::DefaultArenaOf(Rules());
   const ro::sim::ArenaRule* field = nullptr;
-  for (const ro::sim::ArenaRule& arena : Rules().arenas) {
-    if (!arena.ranked) field = &arena;
-  }
   REQUIRE(plains != nullptr);
+  for (const ro::sim::ArenaRule& arena : Rules().arenas) {
+    if (arena.arena_id != plains->arena_id) field = &arena;
+  }
   REQUIRE(field != nullptr);
   const auto board = [](const char* arena_key, std::string_view board_key, IsoWeek week,
                         std::vector<ro::sim::SurvivorsRecord> runs) {
@@ -390,8 +389,8 @@ TEST_CASE("Méta : les tableaux sont ceux de la prairie, ceux du ruleset 3 reste
   REQUIRE(view.ranked_runs.size() == 1);
   CHECK(view.ranked_runs[0].older_rules);
 
-  // PRT_FILD08 RETENUE POUR LA PARTIE LIBRE : son tableau, anciennes règles
-  // comprises ; le défi et les parties classées restent ceux de la prairie.
+  // UNE AUTRE ARÈNE RETENUE : ses tableaux, les trois, anciennes règles
+  // comprises ; la partie neuve de la prairie reste à celle-ci.
   const ro::ui::SurvivorsRecordsView field_view =
       RecordsViewOf(Rules(), save, NoonOf(kWeek43), std::nullopt, held, field->arena_id);
   REQUIRE(field_view.free_runs.size() == 3);
@@ -399,13 +398,19 @@ TEST_CASE("Méta : les tableaux sont ceux de la prairie, ceux du ruleset 3 reste
   CHECK_FALSE(field_view.free_runs[0].older_rules);
   CHECK(field_view.free_runs[1].score == 900);
   CHECK(field_view.free_runs[2].score == 700);
-  REQUIRE(field_view.week_runs.size() == 2);
-  CHECK(field_view.week_runs[0].score == 50);
+  REQUIRE(field_view.week_runs.size() == 1);
+  CHECK(field_view.week_runs[0].score == 600);
+  REQUIRE(field_view.ranked_runs.size() == 1);
+  CHECK(field_view.ranked_runs[0].score == 500);
 
-  // LE MEILLEUR DE LA SEMAINE, à l'accueil, est celui du défi de la prairie.
+  // LE MEILLEUR DE LA SEMAINE, à l'accueil, est celui du défi de l'arène
+  // retenue, sous les règles en vigueur.
   const ro::ui::SurvivorsPrepareMeta meta =
       PrepareMetaOf(Rules(), save, SurvivorsBoardKind::kChallenge, NoonOf(kWeek43));
   CHECK(meta.week_best_score == std::optional<std::uint64_t>(50));
+  const ro::ui::SurvivorsPrepareMeta field_meta = PrepareMetaOf(
+      Rules(), save, SurvivorsBoardKind::kChallenge, NoonOf(kWeek43), 0, field->arena_id);
+  CHECK_FALSE(field_meta.week_best_score.has_value());
 }
 
 TEST_CASE("Méta : l'écran de fin dit le crédit, une carte neuve une fois, et les succès",

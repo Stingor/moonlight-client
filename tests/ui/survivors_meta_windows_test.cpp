@@ -482,8 +482,7 @@ TEST_CASE("Survivors méta : l'accueil rend ses intentions, l'écran de fin son 
   CHECK(SweepClicks("###survivors_summary", church));
 }
 
-TEST_CASE("Survivors méta : la partie libre choisit son arène, le défi et la classée la nomment",
-          "[ui][survivors]") {
+TEST_CASE("Survivors méta : les trois onglets choisissent leur arène", "[ui][survivors]") {
   constexpr std::uint16_t kFieldArena = 1;
   constexpr std::uint16_t kPlainsArena = 2;
   const std::array<ro::ui::SurvivorsArenaChoice, 2> arenas{{
@@ -492,9 +491,7 @@ TEST_CASE("Survivors méta : la partie libre choisit son arène, le défi et la 
   }};
   ro::ui::SurvivorsPrepareState prepare{.open = true};
   ro::ui::SurvivorsPrepareView view;
-  view.meta = ro::ui::SurvivorsPrepareMeta{.free_arenas = arenas,
-                                           .free_arena_id = kPlainsArena,
-                                           .board_arena_name = "Prairie de Midgard"};
+  view.meta = ro::ui::SurvivorsPrepareMeta{.arenas = arenas, .arena_id = kPlainsArena};
   const auto asks_arena = [&](std::optional<std::uint16_t> wanted) {
     return [&, wanted]() {
       prepare.open = true;
@@ -505,25 +502,20 @@ TEST_CASE("Survivors méta : la partie libre choisit son arène, le défi et la 
   };
   const auto text = [&] { return TextOf([&] { (void)asks_arena(std::nullopt)(); }); };
 
-  // LA PARTIE LIBRE : les deux arènes, la retenue ne se redemande pas.
-  CHECK(text().find("Champ d'essai") != std::string::npos);
-  CHECK(SweepClicks("###survivors_prepare", asks_arena(kFieldArena)));
-  CHECK_FALSE(SweepClicks("###survivors_prepare", asks_arena(kPlainsArena)));
-
-  // LE DÉFI ET LA PARTIE CLASSÉE : leur arène nommée, aucun choix.
-  view.meta->board = ro::ui::SurvivorsBoardTab::kChallenge;
-  CHECK(text().find("Arène : Prairie de Midgard") != std::string::npos);
-  CHECK(text().find("Champ d'essai") == std::string::npos);
-  CHECK_FALSE(SweepClicks("###survivors_prepare", asks_arena(std::nullopt)));
-  view.meta->board = ro::ui::SurvivorsBoardTab::kRanked;
+  // CHAQUE ONGLET : les deux arènes, la retenue ne se redemande pas.
   view.meta->ranking = ro::ui::SurvivorsPrepareRanking{};
-  CHECK(text().find("Arène : Prairie de Midgard") != std::string::npos);
-  CHECK(text().find("Champ d'essai") == std::string::npos);
-  CHECK_FALSE(SweepClicks("###survivors_prepare", asks_arena(std::nullopt)));
+  for (const ro::ui::SurvivorsBoardTab tab :
+       {ro::ui::SurvivorsBoardTab::kFree, ro::ui::SurvivorsBoardTab::kChallenge,
+        ro::ui::SurvivorsBoardTab::kRanked}) {
+    view.meta->board = tab;
+    CHECK(text().find("Champ d'essai") != std::string::npos);
+    CHECK(SweepClicks("###survivors_prepare", asks_arena(kFieldArena)));
+    CHECK_FALSE(SweepClicks("###survivors_prepare", asks_arena(kPlainsArena)));
+  }
 
   // UNE SEULE ARÈNE PROPOSÉE se nomme, sans choix.
   view.meta->board = ro::ui::SurvivorsBoardTab::kFree;
-  view.meta->free_arenas = std::span(arenas).first(1);
+  view.meta->arenas = std::span(arenas).first(1);
   CHECK(text().find("Arène : Prairie de Midgard") != std::string::npos);
   CHECK_FALSE(SweepClicks("###survivors_prepare", asks_arena(std::nullopt)));
 }

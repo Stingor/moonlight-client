@@ -5888,14 +5888,14 @@ achievements:
       objectives:
         - {text: "1 000 monstres en une partie"}
   910013:
-    name: "Mage aguerri"
+    name: "Wizard aguerri"
     score: 30
     targets: []
     reward: {item: 0, title: 0, script: false}
     dependents: []
     window:
       summary: "Survivants de Midgard"
-      details: "Atteindre le niveau 40 avec le Magicien dans Survivants de Midgard."
+      details: "Atteindre le niveau 40 avec le Wizard dans Survivants de Midgard."
       gauge: bullets
       group: "ADVENTURE"
       major: 6
@@ -5925,7 +5925,7 @@ achievements:
     dependents: []
     window:
       summary: "Survivants de Midgard"
-      details: "Gagner une partie avec le Magicien et des skills Fire seulement."
+      details: "Gagner une partie avec le Wizard et des skills Fire seulement."
       gauge: bullets
       group: "ADVENTURE"
       major: 6
@@ -6023,14 +6023,14 @@ achievements:
       objectives:
         - {text: "Napalm Vulcan"}
   910022:
-    name: "Grand sorcier"
+    name: "Grand Wizard"
     score: 50
     targets: []
     reward: {item: 0, title: 0, script: false}
     dependents: []
     window:
       summary: "Survivants de Midgard"
-      details: "Obtenir chacun des skills évolués du Magicien, au fil des parties."
+      details: "Obtenir chacun des skills évolués du Wizard, au fil des parties."
       gauge: bullets
       group: "ADVENTURE"
       major: 6
@@ -6353,20 +6353,20 @@ achievements:
       objectives:
         - {text: "Ignition Break obtenu"}
   910044:
-    name: "Grand chevalier"
+    name: "Grand Knight"
     score: 50
     targets: []
     reward: {item: 0, title: 0, script: false}
     dependents: []
     window:
       summary: "Survivants de Midgard"
-      details: "Obtenir chacun des skills évolués du Chevalier, au fil des parties."
+      details: "Obtenir chacun des skills évolués du Knight, au fil des parties."
       gauge: bullets
       group: "ADVENTURE"
       major: 6
       minor: 1
       objectives:
-        - {text: "Tous les évolués du Chevalier"}
+        - {text: "Tous les évolués du Knight"}
   910045:
     name: "Lame sonique"
     score: 20
@@ -6473,20 +6473,20 @@ achievements:
       objectives:
         - {text: "Meteor Assault obtenu"}
   910052:
-    name: "Grand voleur"
+    name: "Grand Assassin"
     score: 50
     targets: []
     reward: {item: 0, title: 0, script: false}
     dependents: []
     window:
       summary: "Survivants de Midgard"
-      details: "Obtenir chacun des skills évolués du Voleur, au fil des parties."
+      details: "Obtenir chacun des skills évolués de l'Assassin, au fil des parties."
       gauge: bullets
       group: "ADVENTURE"
       major: 6
       minor: 1
       objectives:
-        - {text: "Tous les évolués du Voleur"}
+        - {text: "Tous les évolués de l'Assassin"}
   910053:
     name: "Tir de chasse"
     score: 20
@@ -6593,17 +6593,182 @@ achievements:
       objectives:
         - {text: "Phantasmic Arrow obtenu"}
   910060:
-    name: "Grand archer"
+    name: "Grand Hunter"
     score: 50
     targets: []
     reward: {item: 0, title: 0, script: false}
     dependents: []
     window:
       summary: "Survivants de Midgard"
-      details: "Obtenir chacun des skills évolués de l'Archer, au fil des parties."
+      details: "Obtenir chacun des skills évolués du Hunter, au fil des parties."
       gauge: bullets
       group: "ADVENTURE"
       major: 6
       minor: 1
       objectives:
-        - {text: "Tous les évolués de l'Archer"}
+        - {text: "Tous les évolués du Hunter"}
+  910061:
+    name: "Demonstration acide"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir Acid Demonstration dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Acid Demonstration obtenu"}
+  910062:
+    name: "Lancer de fioles"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir Slim Potion Pitcher dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Slim Potion Pitcher obtenu"}
+  910063:
+    name: "Blindage chimique"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir Full Chemical Protection dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Full Chemical Protection obtenu"}
+  910064:
+    name: "Main verte"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir Plant Cultivation dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Plant Cultivation obtenu"}
+  910065:
+    name: "Artillerie roulante"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir Cart Cannon dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Cart Cannon obtenu"}
+  910066:
+    name: "Tourbillon de fer"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir Cart Tornado dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Cart Tornado obtenu"}
+  910067:
+    name: "Dernier recours"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir S.B.R.44 dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "S.B.R.44 obtenu"}
+  910068:
+    name: "Explosion organique"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir Bio Explosion dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Bio Explosion obtenu"}
+  910069:
+    name: "Changement d'esprit"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir Mental Change dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Mental Change obtenu"}
+  910070:
+    name: "Soif de sang"
+    score: 20
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir Blood Lust dans une partie de Survivants de Midgard."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Blood Lust obtenu"}
+  910071:
+    name: "Grand Alchemist"
+    score: 50
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Survivants de Midgard"
+      details: "Obtenir chacun des skills évolués de l'Alchemist, au fil des parties."
+      gauge: bullets
+      group: "ADVENTURE"
+      major: 6
+      minor: 1
+      objectives:
+        - {text: "Tous les évolués de l'Alchemist"}

@@ -39,9 +39,10 @@ constexpr std::size_t kSayTextSize = 256;
   return rules.cursed_water.empty() ? 0 : static_cast<int>(rules.cursed_water.size() - 1);
 }
 
-// La clé de l'arène par défaut, celle du défi et de la partie classée.
-[[nodiscard]] const char* BoardArenaKey(const ro::sim::SurvivorsRules& rules) {
-  const ro::sim::ArenaRule* arena = DefaultArenaOf(rules);
+// La clé de l'arène retenue (`FreeArenaOf`), celle de tous les tableaux.
+[[nodiscard]] const char* ChosenArenaKey(const ro::sim::SurvivorsRules& rules,
+                                         std::uint16_t arena_id) {
+  const ro::sim::ArenaRule* arena = FreeArenaOf(rules, arena_id);
   return arena != nullptr ? arena->key : "";
 }
 
@@ -220,7 +221,8 @@ ro::ui::SurvivorsShopView ShopViewOf(const SurvivorsSave& save, SurvivorsMetaSho
 
 ro::ui::SurvivorsPrepareMeta PrepareMetaOf(const ro::sim::SurvivorsRules& rules,
                                            const SurvivorsSave& save, SurvivorsBoardKind board,
-                                           std::int64_t now_utc_s, std::uint16_t class_id) {
+                                           std::int64_t now_utc_s, std::uint16_t class_id,
+                                           std::uint16_t arena_id) {
   ro::ui::SurvivorsPrepareMeta meta;
   meta.board = TabOf(board);
   meta.zeny = save.meta.zeny;
@@ -246,8 +248,8 @@ ro::ui::SurvivorsPrepareMeta PrepareMetaOf(const ro::sim::SurvivorsRules& rules,
   const ro::sim::SurvivorsSkillRule* bolt_rule = ro::sim::FindSkill(rules, bolt);
   meta.challenge_bolt = ro::ui::SurvivorsBoltChoice{
       .skill_id = bolt, .description = bolt_rule != nullptr ? bolt_rule->description : ""};
-  if (const SurvivorsBoard* best =
-          FindBoard(save, class_rule.key, BoardArenaKey(rules), kChallengeBoardKey, week);
+  if (const SurvivorsBoard* best = FindBoard(save, class_rule.key, ChosenArenaKey(rules, arena_id),
+                                             kChallengeBoardKey, week);
       // Les règles en vigueur se rangent en tête : une tête plus ancienne dit
       // qu'aucune partie de la semaine ne les a jouées.
       best != nullptr && !best->runs.empty() &&
@@ -295,18 +297,16 @@ void FeatEntriesOf(const SurvivorsSave& save, std::vector<ro::ui::SurvivorsFeatE
 ro::ui::SurvivorsRecordsView RecordsViewOf(const ro::sim::SurvivorsRules& rules,
                                            const SurvivorsSave& save, std::int64_t now_utc_s,
                                            std::optional<std::int64_t> latest_utc_s,
-                                           SurvivorsRecordRowsHeld& held,
-                                           std::uint16_t free_arena_id, std::uint16_t class_id) {
+                                           SurvivorsRecordRowsHeld& held, std::uint16_t arena_id,
+                                           std::uint16_t class_id) {
   held = SurvivorsRecordRowsHeld{};
   const ro::sim::IsoWeek week = IsoWeekOfUtc(now_utc_s);
   const ro::sim::ClassRule* chosen_class = ChosenClassOf(rules, save, class_id);
   const std::string_view class_key = chosen_class != nullptr ? chosen_class->key : "";
-  const ro::sim::ArenaRule* free_arena = FreeArenaOf(rules, free_arena_id);
-  const std::string_view free_arena_key = free_arena != nullptr ? free_arena->key : "";
-  const std::string_view board_arena_key = BoardArenaKey(rules);
+  const std::string_view arena_key = ChosenArenaKey(rules, arena_id);
   // Une partie d'une autre arène n'entre que jouée sous d'anciennes règles.
-  const auto shown = [&rules](const SurvivorsBoard& board, std::string_view arena_key,
-                              const ro::sim::SurvivorsRecord& run) {
+  const auto shown = [&rules, arena_key](const SurvivorsBoard& board,
+                                         const ro::sim::SurvivorsRecord& run) {
     return board.arena_key == arena_key || run.ruleset < rules.ruleset_version;
   };
   std::vector<const ro::sim::SurvivorsRecord*> free_runs;
@@ -321,13 +321,11 @@ ro::ui::SurvivorsRecordsView RecordsViewOf(const ro::sim::SurvivorsRules& rules,
         : challenge && board.week == week    ? &week_runs
         : board.board_key == kRankedBoardKey ? &ranked_runs
                                              : nullptr;
-    const std::string_view arena_key =
-        board.board_key == kFreeBoardKey ? free_arena_key : board_arena_key;
     if (kept != nullptr) {
       for (const ro::sim::SurvivorsRecord& run : board.runs) {
-        if (shown(board, arena_key, run)) kept->push_back(&run);
+        if (shown(board, run)) kept->push_back(&run);
       }
-    } else if (challenge && !board.runs.empty() && shown(board, arena_key, board.runs.front())) {
+    } else if (challenge && !board.runs.empty() && shown(board, board.runs.front())) {
       past.push_back(&board);
     }
   }

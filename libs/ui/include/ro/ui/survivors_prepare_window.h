@@ -50,7 +50,7 @@ struct SurvivorsBoltChoice {
 
 enum class SurvivorsBoardTab : std::uint8_t { kFree, kChallenge, kRanked };
 
-// Une arène de la partie libre, déjà nommée par `app`.
+// Une arène proposée, déjà nommée par `app`.
 struct SurvivorsArenaChoice {
   std::uint16_t arena_id = 0;
   const char* name = "";  // ⚠ EN UTF-8, déjà dans la langue du joueur
@@ -105,15 +105,13 @@ struct SurvivorsPrepareMeta {
   SurvivorsBoltChoice challenge_bolt;
   std::optional<std::uint64_t> week_best_score;
   std::optional<SurvivorsPrepareRanking> ranking;
-  // Les arènes de la partie libre, la retenue, et celle du défi et de la
-  // partie classée (en UTF-8, déjà dans la langue du joueur ; vide, elle ne se
-  // nomme pas).
-  std::span<const SurvivorsArenaChoice> free_arenas;
-  std::uint16_t free_arena_id = 0;
+  // Les arènes et la retenue, que tous les onglets partagent : chacune a son
+  // tableau classé et son défi.
+  std::span<const SurvivorsArenaChoice> arenas;
+  std::uint16_t arena_id = 0;
   // Les classes et la retenue, que tous les onglets partagent.
   std::span<const SurvivorsClassChoice> classes;
   std::uint16_t class_id = 0;
-  const char* board_arena_name = "";
 };
 
 // LE SALON DU GROUPE, dans l'accueil. `shown` : le serveur tient la coop.
@@ -152,7 +150,7 @@ struct SurvivorsPrepareState {
 
 struct SurvivorsPrepareAsk {
   std::optional<SurvivorsBoardTab> choose_board;
-  // L'arène de la partie libre ; le défi et la partie classée n'en choisissent pas.
+  // L'arène de tous les onglets.
   std::optional<std::uint16_t> choose_arena_id;
   // La classe de tous les onglets, jamais une classe verrouillée.
   std::optional<std::uint16_t> choose_class_id;

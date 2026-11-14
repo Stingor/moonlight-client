@@ -24,7 +24,7 @@ class SurvivorsRun;
 //   boss final, quelle que soit la classe.
 // - « Métamorphose » : un skill évolué.
 // - « Marée repoussée » : 1 000 monstres vaincus dans la partie.
-// - « Mage aguerri » : le niveau 40, avec le Magicien.
+// - « Wizard aguerri » : le niveau 40, avec le Magicien.
 // - « Première carte » : une carte tombée d'un monstre et ramassée au sol ;
 //   une carte prise dans une offre ou un coffre n'en est pas une.
 // - « Pyromane » : la victoire avec le Magicien, chaque skill possédé à la fin
@@ -35,7 +35,7 @@ class SurvivorsRun;
 // - « Blizzard », « Foudre de Jupiter », « Seigneur du tonnerre », « Ciel en
 //   feu », « Union » : Storm Gust, Jupitel Thunder, Lord of Vermilion,
 //   Heaven's Drive, Napalm Vulcan possédé à la fin de la partie.
-// - « Grand sorcier » : chacun des skills évolués du Magicien obtenu au moins
+// - « Grand Wizard » : chacun des skills évolués du Magicien obtenu au moins
 //   une fois, au fil des parties (`MinigameRecord::survivors_evolved`).
 // - « Hiver éternel » : 1 000 monstres gelés dans la partie.
 // - « À l'aveugle » : la victoire dans une partie lancée sans minimap.
@@ -46,19 +46,19 @@ class SurvivorsRun;
 //   « Esprit affûté », « Berserker », « Terre embrasée » : Head Crush, Spiral
 //   Pierce, Joint Beat, Aura Blade, Concentration, Frenzy, Ignition Break possédé
 //   à la fin de la partie.
-// - « Grand chevalier » : chacun des skills évolués du Chevalier obtenu au moins
+// - « Grand Knight » : chacun des skills évolués du Chevalier obtenu au moins
 //   une fois, au fil des parties.
 // - « Lame sonique », « Briseur d'âmes », « Éclats de venin », « Venin mortel »,
 //   « Insaisissable », « Couteau empoisonné », « Assaut météore » : Sonic Blow, Soul
 //   Destroyer, Venom Splasher, Enchant Deadly Poison, Cloaking, Throw Venom Knife,
 //   Meteor Assault possédé à la fin de la partie.
-// - « Grand voleur » : chacun des skills évolués du Voleur obtenu au moins une fois,
+// - « Grand Assassin » : chacun des skills évolués du Voleur obtenu au moins une fois,
 //   au fil des parties.
 // - « Tir de chasse », « Tireur d'élite », « Assaut du faucon », « Œil de lynx »,
 //   « Piège Claymore », « Mine de vent », « Flèche fantôme » : Beast Strafing, Sharp
 //   Shooting, Falcon Assault, True Sight, Claymore Trap, Blast Mine, Phantasmic Arrow
 //   possédé à la fin de la partie.
-// - « Grand archer » : chacun des skills évolués de l'Archer obtenu au moins une
+// - « Grand Hunter » : chacun des skills évolués de l'Archer obtenu au moins une
 //   fois, au fil des parties.
 
 // CE QUE LA PARTIE NE SAIT PAS D'ELLE-MÊME, et qu'`app` dit : la minimap est

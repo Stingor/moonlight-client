@@ -151,7 +151,7 @@ struct GoldenOwned {
 // kSurvivorsRulesetVersion et kGoldenRulesetVersion ensemble, car un journal ne
 // se rejoue que contre les règles qui l'ont produit. Les mêmes valeurs sous
 // MSVC et sous g++-14.
-inline constexpr std::uint16_t kGoldenRulesetVersion = 7;
+inline constexpr std::uint16_t kGoldenRulesetVersion = 8;
 inline constexpr sim::SurvivorsTally kGoldenTally{
     .survived_steps = 15000,
     .kills = 316,

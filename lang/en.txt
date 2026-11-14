@@ -21460,12 +21460,6 @@ tr: Tide Turned Back
 fr: Vaincre 1 000 monstres dans une partie de Survivants de Midgard.
 tr: Defeat 1,000 monsters in a game of Midgard Survivors.
 
-fr: Mage aguerri
-tr: Seasoned Mage
-
-fr: Atteindre le niveau 40 avec le Sorcier dans Survivants de Midgard.
-tr: Reach level 40 with the Wizard in Midgard Survivors.
-
 fr: Première carte
 tr: First Card
 
@@ -21474,9 +21468,6 @@ tr: Pick up a dropped card in a game of Midgard Survivors.
 
 fr: Pyromane
 tr: Pyromaniac
-
-fr: Gagner une partie avec le Sorcier et des skills Fire seulement.
-tr: Win a game with the Wizard using Fire skills only.
 
 fr: Esprit pur
 tr: Pure Mind
@@ -21513,9 +21504,6 @@ tr: Union
 
 fr: Obtenir Napalm Vulcan, l'union de Soul Strike et de Napalm Beat.
 tr: Obtain Napalm Vulcan, the union of Soul Strike and Napalm Beat.
-
-fr: Grand sorcier
-tr: Archwizard
 
 fr: Hiver éternel
 tr: Eternal Winter
@@ -21558,9 +21546,6 @@ tr: Hoarfrost
 
 fr: Obtenir Jack Frost, l'union de Water Ball et de Cold Bolt.
 tr: Obtain Jack Frost, the union of Water Ball and Cold Bolt.
-
-fr: Obtenir chacun des skills évolués du Sorcier, au fil des parties.
-tr: Obtain each of the Wizard's evolved skills, across runs.
 
 fr: Recharge de tous les skills raccourcie.
 tr: Shorter cooldown for every skill.
@@ -22975,18 +22960,6 @@ tr: Scorched Earth
 fr: Obtenir Ignition Break, l'union de Bowling Bash et de Brandish Spear.
 tr: Obtain Ignition Break, the union of Bowling Bash and Brandish Spear.
 
-fr: Grand chevalier
-tr: Grand Knight
-
-fr: Obtenir chacun des skills évolués du Chevalier, au fil des parties.
-tr: Obtain each of the Knight's evolved skills, across runs.
-
-fr: Sorcier
-tr: Wizard
-
-fr: Chevalier
-tr: Knight
-
 fr: Cette classe n'est pas débloquée : la partie ne part pas.
 tr: This class is not unlocked: the run does not start.
 
@@ -23173,9 +23146,6 @@ tr: Meteor Assault
 fr: Obtenir Meteor Assault, l'union d'Envenom et de Sprinkle Sand.
 tr: Obtain Meteor Assault, the union of Envenom and Sprinkle Sand.
 
-fr: Grand voleur
-tr: Grand Thief
-
 fr: Obtenir chacun des skills évolués de l'Assassin, au fil des parties.
 tr: Obtain each of the Assassin's evolved skills, across runs.
 
@@ -23199,12 +23169,6 @@ tr: Ranged damage: your shots and bursts hit harder.
 
 fr: Flèche fantôme
 tr: Phantom Arrow
-
-fr: Grand archer
-tr: Grand Archer
-
-fr: Le Chasseur vous a rejoint : sa classe est débloquée.
-tr: The Hunter joined you: the class is unlocked.
 
 fr: Le Black Mushroom pousse : sa Yggdrasil Berry rend tous les PV.
 tr: The Black Mushroom grows: its Yggdrasil Berry restores all HP.
@@ -23233,9 +23197,6 @@ tr: Obtain Sharp Shooting in a Midgard Survivors run.
 fr: Obtenir True Sight dans une partie de Survivants de Midgard.
 tr: Obtain True Sight in a Midgard Survivors run.
 
-fr: Obtenir chacun des skills évolués du Chasseur, au fil des parties.
-tr: Obtain each of the Hunter's evolved skills, across runs.
-
 fr: Par moments, vos tirs se pressent : vos skills reviennent plus vite.
 tr: At times, your shots quicken: your skills come back faster.
 
@@ -23250,9 +23211,6 @@ tr: Rare plants %d %%
 
 fr: Recharge réduite : vos skills reviennent plus vite.
 tr: Reduced cooldown: your skills come back faster.
-
-fr: Rejoindre le Chasseur qui guette dans le désert, avant 5:00, seul
-tr: Join the Hunter lurking in the desert, before 5:00, alone
 
 fr: Relèves +%d
 tr: Revives +%d
@@ -23434,17 +23392,11 @@ tr: Summons: your plants and your homunculus hit harder.
 fr: L'acide et la bombe, ensemble, écrasent le plus fort.
 tr: Acid and bomb together crush the strongest.
 
-fr: L'Alchimiste a vu vos zeny : sa classe est débloquée.
-tr: The Alchemist saw your zeny: the class is unlocked.
-
 fr: Lif vous suit et soigne le héros le plus blessé.
 tr: Lif follows you and heals the most wounded hero.
 
 fr: Lif, évolué, soigne bien plus et frappe de loin.
 tr: Lif, evolved, heals far more and strikes from afar.
-
-fr: Alchimiste
-tr: Alchemist
 
 fr: Par moments, votre armure devient presque impénétrable.
 tr: At times, your armor becomes almost impenetrable.
@@ -23457,9 +23409,6 @@ tr: At times, your shout spurs you on: your damage rises.
 
 fr: Plus de zeny : chaque Gold ramassé vaut davantage.
 tr: More zeny: every Gold picked up is worth more.
-
-fr: Rejoindre l'Alchimiste sur la neige avec des zeny de la partie, seul
-tr: Join the Alchemist on the snow with zeny from the run, alone
 
 fr: Riposte de gel %d %%
 tr: Frost riposte %d %%
@@ -23920,7 +23869,6 @@ tr: Sent: waiting for the server.
 fr: Fait tourner toutes les couleurs de l'effet, en degrés.
 tr: Turns every color of the effect, in degrees.
 
-
 fr: La teinture des effets de chapeau que tu affiches.
 tr: The dye of the hat effects you show.
 
@@ -23941,7 +23889,6 @@ tr: Opens the effects tab, where the aura or effect this item shows is dyed.
 
 fr: Partagé : les autres le voient.
 tr: Shared: others see it.
-
 
 fr: Rend à l'effet ses couleurs d'origine, sans rien envoyer.
 tr: Gives the effect its original colors back, without sending anything.
@@ -24011,9 +23958,6 @@ tr: Three hues evenly spaced on the wheel, on the parts you didn't keep.
 
 fr: Supprimer ce style
 tr: Delete this style
-
-fr: Chasseur
-tr: Hunter
 
 fr: (aucune pièce réformable dans l'inventory)
 tr: (no reformable item in the inventory)
@@ -24308,3 +24252,120 @@ tr: Group total
 
 fr: Récupération des réputations…
 tr: Fetching reputations…
+
+fr: Wizard aguerri
+tr: Seasoned Wizard
+
+fr: Atteindre le niveau 40 avec le Wizard dans Survivants de Midgard.
+tr: Reach level 40 with the Wizard in Midgard Survivors.
+
+fr: Gagner une partie avec le Wizard et des skills Fire seulement.
+tr: Win a game with the Wizard using Fire skills only.
+
+fr: Grand Wizard
+tr: Grand Wizard
+
+fr: Obtenir chacun des skills évolués du Wizard, au fil des parties.
+tr: Obtain each of the Wizard's evolved skills, across runs.
+
+fr: Grand Knight
+tr: Grand Knight
+
+fr: Obtenir chacun des skills évolués du Knight, au fil des parties.
+tr: Obtain each of the Knight's evolved skills, across runs.
+
+fr: Wizard
+tr: Wizard
+
+fr: Knight
+tr: Knight
+
+fr: Grand Assassin
+tr: Grand Assassin
+
+fr: Grand Hunter
+tr: Grand Hunter
+
+fr: Le Hunter vous a rejoint : sa classe est débloquée.
+tr: The Hunter joined you: the class is unlocked.
+
+fr: Obtenir chacun des skills évolués du Hunter, au fil des parties.
+tr: Obtain each of the Hunter's evolved skills, across runs.
+
+fr: Rejoindre le Hunter qui guette dans le désert, avant 5:00, seul
+tr: Join the Hunter lurking in the desert, before 5:00, alone
+
+fr: L'Alchemist a vu vos zeny : sa classe est débloquée.
+tr: The Alchemist saw your zeny: the class is unlocked.
+
+fr: Rejoindre l'Alchemist sur la neige avec des zeny de la partie, seul
+tr: Join the Alchemist on the snow with zeny from the run, alone
+
+fr: Hunter
+tr: Hunter
+
+fr: Démonstration acide
+tr: Acid Show
+
+fr: Obtenir Acid Demonstration dans une partie de Survivants de Midgard.
+tr: Obtain Acid Demonstration in a Midgard Survivors run.
+
+fr: Lancer de fioles
+tr: Vial Toss
+
+fr: Obtenir Slim Potion Pitcher dans une partie de Survivants de Midgard.
+tr: Obtain Slim Potion Pitcher in a Midgard Survivors run.
+
+fr: Blindage chimique
+tr: Chemical Plating
+
+fr: Obtenir Full Chemical Protection dans une partie de Survivants de Midgard.
+tr: Obtain Full Chemical Protection in a Midgard Survivors run.
+
+fr: Main verte
+tr: Green Thumb
+
+fr: Obtenir Plant Cultivation dans une partie de Survivants de Midgard.
+tr: Obtain Plant Cultivation in a Midgard Survivors run.
+
+fr: Artillerie roulante
+tr: Rolling Artillery
+
+fr: Obtenir Cart Cannon dans une partie de Survivants de Midgard.
+tr: Obtain Cart Cannon in a Midgard Survivors run.
+
+fr: Tourbillon de fer
+tr: Iron Whirl
+
+fr: Obtenir Cart Tornado dans une partie de Survivants de Midgard.
+tr: Obtain Cart Tornado in a Midgard Survivors run.
+
+fr: Dernier recours
+tr: Last Resort
+
+fr: Obtenir S.B.R.44 dans une partie de Survivants de Midgard.
+tr: Obtain S.B.R.44 in a Midgard Survivors run.
+
+fr: Explosion organique
+tr: Organic Blast
+
+fr: Obtenir Bio Explosion dans une partie de Survivants de Midgard.
+tr: Obtain Bio Explosion in a Midgard Survivors run.
+
+fr: Changement d'esprit
+tr: Change of Mind
+
+fr: Obtenir Mental Change dans une partie de Survivants de Midgard.
+tr: Obtain Mental Change in a Midgard Survivors run.
+
+fr: Soif de sang
+tr: Bloodthirst
+
+fr: Obtenir Blood Lust dans une partie de Survivants de Midgard.
+tr: Obtain Blood Lust in a Midgard Survivors run.
+
+fr: Grand Alchemist
+tr: Grand Alchemist
+
+fr: Obtenir chacun des skills évolués de l'Alchemist, au fil des parties.
+tr: Obtain each of the Alchemist's evolved skills, across runs.

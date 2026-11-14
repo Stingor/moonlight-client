@@ -151,18 +151,17 @@ void DrawArenaName(const char* name) {
   ImGui::Text(core::Tr("Arène : %s"), name);
 }
 
-// L'arène de la partie libre : une case par arène proposée, sur une ligne.
-void DrawFreeArena(const SurvivorsPrepareMeta& meta, SurvivorsPrepareAsk& asked,
-                   const SkinArt& art) {
-  if (meta.free_arenas.size() == 1) DrawArenaName(meta.free_arenas.front().name);
-  if (meta.free_arenas.size() < 2) return;
+// L'arène, de tous les onglets : une case par arène proposée, sur une ligne.
+void DrawArena(const SurvivorsPrepareMeta& meta, SurvivorsPrepareAsk& asked, const SkinArt& art) {
+  if (meta.arenas.size() == 1) DrawArenaName(meta.arenas.front().name);
+  if (meta.arenas.size() < 2) return;
   ImGui::SeparatorText(core::Tr("Arène"));
   bool first = true;
-  for (const SurvivorsArenaChoice& arena : meta.free_arenas) {
+  for (const SurvivorsArenaChoice& arena : meta.arenas) {
     if (!first) ImGui::SameLine();
     first = false;
     ImGui::PushID(arena.arena_id);
-    const bool chosen = arena.arena_id == meta.free_arena_id;
+    const bool chosen = arena.arena_id == meta.arena_id;
     if (SkinRadio(arena.name, chosen, art) && !chosen) asked.choose_arena_id = arena.arena_id;
     ImGui::PopID();
   }
@@ -200,7 +199,7 @@ void DrawClass(const SurvivorsPrepareMeta& meta, SurvivorsPrepareAsk& asked, con
 void DrawFreeBoard(const SurvivorsPrepareMeta& meta, SurvivorsPrepareAsk& asked,
                    const SkinArt& art) {
   DrawClass(meta, asked, art);
-  DrawFreeArena(meta, asked, art);
+  DrawArena(meta, asked, art);
   DrawOpening();
   DrawCursedWater(meta, asked, art);
   DrawWithoutMinimap(meta, asked, art);
@@ -212,7 +211,7 @@ void DrawFreeBoard(const SurvivorsPrepareMeta& meta, SurvivorsPrepareAsk& asked,
 void DrawChallengeBoard(const SurvivorsPrepareMeta& meta, SurvivorsPrepareAsk& asked,
                         const SkinArt& art) {
   DrawClass(meta, asked, art);
-  DrawArenaName(meta.board_arena_name);
+  DrawArena(meta, asked, art);
   ImGui::TextUnformatted(SurvivorsWeekText(meta.week_year, meta.week_number).data());
   const std::int64_t hours = meta.week_left_s / kSecondsPerHour;
   ImGui::Text(core::Tr("Se termine dans %d j %d h"), static_cast<int>(hours / kHoursPerDay),
@@ -236,7 +235,7 @@ void DrawRankedBoard(const SurvivorsPrepareMeta& meta, SurvivorsPrepareAsk& aske
                      const SkinArt& art) {
   const SurvivorsPrepareRanking& ranking = *meta.ranking;
   DrawClass(meta, asked, art);
-  DrawArenaName(meta.board_arena_name);
+  DrawArena(meta, asked, art);
   DrawOpening();
   ImGui::Separator();
   FaintText(core::Tr("Départ neutre : sans Bénédictions, sans charges, toutes les cartes."));

@@ -41,6 +41,7 @@ namespace sim = ro::sim;
 namespace ts = ro::test_support;
 namespace ui = ro::ui;
 using moonclient::SurvivorsBoardKind;
+using moonclient::SurvivorsBoardShown;
 using moonclient::SurvivorsBookMode;
 using moonclient::SurvivorsRankingAsks;
 using moonclient::SurvivorsRankingFacts;
@@ -54,6 +55,9 @@ using moonclient::SurvivorsScreen;
 using moonclient::SurvivorsStage;
 
 constexpr const char* kServerKey = "127.0.0.1:6900";
+// Le tableau de l'arène et de la classe de la table d'essai.
+constexpr SurvivorsBoardShown kTinyShown{.arena_id = ts::kTinyArenaId,
+                                         .class_id = ts::kTinyClassId};
 constexpr std::uint32_t kAlice = 150001;
 constexpr std::uint32_t kAccount = 2000001;
 constexpr std::uint64_t kLocalSeed = 77;
@@ -208,17 +212,16 @@ TEST_CASE("Classement survivors à l'écran : service fermé, ni bouton, ni ongl
           "[app][survivors]") {
   Bench bench(ts::TodaySetup());
   SurvivorsRankingRowsHeld held;
-  CHECK_FALSE(
-      moonclient::PrepareRankingOf(bench.mode.session(), held, ts::kTinyClassId).has_value());
+  CHECK_FALSE(moonclient::PrepareRankingOf(bench.mode.session(), held, kTinyShown).has_value());
 
   // Le bouton « Classement » n'existe pas ; une intention forcée n'ouvre rien.
   ui::SurvivorsRankingState state;
   moonclient::FollowRankingAsks(bench.mode, state, SurvivorsRankingAsks{.open = true},
-                                ts::TinyRules(), ts::kTinyClassId);
+                                ts::TinyRules(), kTinyShown);
   CHECK_FALSE(state.open);
   state.open = true;
   ui::SurvivorsRankingView view;
-  moonclient::ComposeRankingWindow(bench.mode, state, view, held, ts::kTinyClassId, "");
+  moonclient::ComposeRankingWindow(bench.mode, state, view, held, kTinyShown, "");
   CHECK_FALSE(state.open);
 
   // Une partie classée demandée part libre : ni marque au HUD, ni section à
@@ -240,7 +243,7 @@ TEST_CASE("Classement survivors à l'écran : du jeton à l'écran de fin, rang 
   Bench bench(ts::ServingSetup(sim::kSurvivorsRulesetVersion, ts::kTinyArenaId, ts::kTinyClassId));
   bench.Announce();
   SurvivorsRankingRowsHeld held;
-  REQUIRE(moonclient::PrepareRankingOf(bench.mode.session(), held, ts::kTinyClassId).has_value());
+  REQUIRE(moonclient::PrepareRankingOf(bench.mode.session(), held, kTinyShown).has_value());
 
   bench.PlayRun(SurvivorsBoardKind::kRanked);
   CHECK(bench.hud_ranked_seen);
@@ -268,7 +271,7 @@ TEST_CASE("Classement survivors à l'écran : du jeton à l'écran de fin, rang 
   REQUIRE(summary.has_value());
   CHECK(summary->standing.status == ui::SurvivorsRankStatus::kPending);
   const std::optional<ui::SurvivorsPrepareRanking> waiting =
-      moonclient::PrepareRankingOf(bench.mode.session(), held, ts::kTinyClassId);
+      moonclient::PrepareRankingOf(bench.mode.session(), held, kTinyShown);
   REQUIRE(waiting.has_value());
   REQUIRE(waiting->pending.size() == 1);
   CHECK(std::string(waiting->pending.front().character) == "Alice");
@@ -288,7 +291,7 @@ TEST_CASE("Classement survivors à l'écran : du jeton à l'écran de fin, rang 
   CHECK(bench.Said().empty());
   CHECK(moonclient::PendingCountOf(bench.mode.session()) == 0);
   const std::optional<ui::SurvivorsPrepareRanking> emptied =
-      moonclient::PrepareRankingOf(bench.mode.session(), held, ts::kTinyClassId);
+      moonclient::PrepareRankingOf(bench.mode.session(), held, kTinyShown);
   REQUIRE(emptied.has_value());
   CHECK(emptied->pending.empty());
 
@@ -339,17 +342,17 @@ TEST_CASE("Classement survivors à l'écran : ouvrir le tableau le demande une f
   // « Classement » à l'accueil : la fenêtre s'ouvre sur le tableau classé et
   // demande sa page.
   moonclient::FollowRankingAsks(bench.mode, state, SurvivorsRankingAsks{.open = true},
-                                ts::TinyRules(), ts::kTinyClassId);
+                                ts::TinyRules(), kTinyShown);
   CHECK(state.open);
   CHECK(state.tab == ui::SurvivorsRankingTab::kRanked);
-  moonclient::ComposeRankingWindow(bench.mode, state, view, held, ts::kTinyClassId, "");
+  moonclient::ComposeRankingWindow(bench.mode, state, view, held, kTinyShown, "");
   CHECK_FALSE(view.ranked.received);
   bench.Pump();
   CHECK(bench.BoardAsksSent() == 1);
 
   // Une seconde après : ni « Actualiser » ni un autre onglet ne repartent.
   bench.Pump(kWithinCadenceMs);
-  moonclient::ComposeRankingWindow(bench.mode, state, view, held, ts::kTinyClassId, "");
+  moonclient::ComposeRankingWindow(bench.mode, state, view, held, kTinyShown, "");
   CHECK(view.ranked.received);
   CHECK(view.ranked.own_rank == 0);
   CHECK_FALSE(view.refresh_ready);
@@ -357,32 +360,32 @@ TEST_CASE("Classement survivors à l'écran : ouvrir le tableau le demande une f
   CHECK(view.ruleset == sim::kSurvivorsRulesetVersion);
   moonclient::FollowRankingAsks(
       bench.mode, state, SurvivorsRankingAsks{.window = ui::SurvivorsRankingAsk{.refresh = true}},
-      ts::TinyRules(), ts::kTinyClassId);
+      ts::TinyRules(), kTinyShown);
   state.tab = ui::SurvivorsRankingTab::kChallenge;
   moonclient::FollowRankingAsks(
       bench.mode, state,
       SurvivorsRankingAsks{.window = ui::SurvivorsRankingAsk{.tab_changed = true}}, ts::TinyRules(),
-      ts::kTinyClassId);
+      kTinyShown);
   bench.Pump();
   CHECK(bench.BoardAsksSent() == 1);
 
   // Pendant la cadence, la page du défi attend sa demande.
-  moonclient::ComposeRankingWindow(bench.mode, state, view, held, ts::kTinyClassId, "");
+  moonclient::ComposeRankingWindow(bench.mode, state, view, held, kTinyShown, "");
   CHECK_FALSE(view.challenge.received);
 
   // LA CADENCE PASSÉE, LA DEMANDE RETENUE PART D'ELLE-MÊME, une fois : la
   // fenêtre n'a plus rien demandé.
   bench.Pump(moonclient::kSurvivorsBoardCadenceMs);
   moonclient::FollowRankingAsks(bench.mode, state, SurvivorsRankingAsks{}, ts::TinyRules(),
-                                ts::kTinyClassId);
+                                kTinyShown);
   bench.Pump();
   CHECK(bench.BoardAsksSent() == 2);
   bench.Pump(moonclient::kSurvivorsBoardCadenceMs);
   moonclient::FollowRankingAsks(bench.mode, state, SurvivorsRankingAsks{}, ts::TinyRules(),
-                                ts::kTinyClassId);
+                                kTinyShown);
   bench.Pump();
   CHECK(bench.BoardAsksSent() == 2);
-  moonclient::ComposeRankingWindow(bench.mode, state, view, held, ts::kTinyClassId, "");
+  moonclient::ComposeRankingWindow(bench.mode, state, view, held, kTinyShown, "");
   CHECK(view.refresh_ready);
   CHECK(view.challenge.received);
   const sim::IsoWeek week = moonclient::IsoWeekOfUtc(bench.utc_s());
@@ -419,6 +422,7 @@ TEST_CASE("Classement survivors à l'écran : une page de plus de vingt lignes e
   session.NoteService(
       rn::SurvivorsService{.ruleset_low = session.ruleset(), .ruleset_high = session.ruleset()});
   const rn::SurvivorsBoardKey key{.ruleset = session.ruleset(),
+                                  .arena_id = ts::kTinyArenaId,
                                   .class_id = ts::kTinyClassId,
                                   .board = rn::SurvivorsBoardKind::kRanked};
   REQUIRE(session.AskBoard(key));
@@ -430,7 +434,7 @@ TEST_CASE("Classement survivors à l'écran : une page de plus de vingt lignes e
   session.NoteFrame(page);
   SurvivorsRankingRowsHeld held;
   const ui::SurvivorsRankingView view =
-      moonclient::RankingViewOf(session, {}, held, ts::kTinyClassId, "");
+      moonclient::RankingViewOf(session, {}, held, kTinyShown, "");
   REQUIRE(view.ranked.rows.size() == ui::kSurvivorsRankingMostRows);
   CHECK(std::string(view.ranked.rows.back().name) == "Survivant20");
 }
@@ -495,18 +499,19 @@ TEST_CASE("Classement survivors à l'écran : l'accueil lit le meilleur rang de 
   session.NoteService(
       rn::SurvivorsService{.ruleset_low = session.ruleset(), .ruleset_high = session.ruleset()});
   const rn::SurvivorsBoardKey key{.ruleset = session.ruleset(),
+                                  .arena_id = ts::kTinyArenaId,
                                   .class_id = ts::kTinyClassId,
                                   .board = rn::SurvivorsBoardKind::kRanked};
   REQUIRE(session.AskBoard(key));
   session.NoteFrame(rn::SurvivorsBoardPage{.key = key, .own_rank = kOwnRank});
   SurvivorsRankingRowsHeld held;
   const std::optional<ui::SurvivorsPrepareRanking> own =
-      moonclient::PrepareRankingOf(session, held, ts::kTinyClassId);
+      moonclient::PrepareRankingOf(session, held, kTinyShown);
   REQUIRE(own.has_value());
   CHECK(own->best_known);
   CHECK(own->best_rank == kOwnRank);
-  const std::optional<ui::SurvivorsPrepareRanking> other =
-      moonclient::PrepareRankingOf(session, held, kOtherClass);
+  const std::optional<ui::SurvivorsPrepareRanking> other = moonclient::PrepareRankingOf(
+      session, held, SurvivorsBoardShown{.arena_id = ts::kTinyArenaId, .class_id = kOtherClass});
   REQUIRE(other.has_value());
   // La page tenue est celle d'une autre classe : son rang n'est pas su.
   CHECK_FALSE(other->best_known);
@@ -525,6 +530,8 @@ TEST_CASE("Classement survivors à l'écran : un tableau par classe, redemandé 
   REQUIRE(ranked_arena != nullptr);
   Bench bench(ts::ServingSetup(rules.ruleset_version, ranked_arena->arena_id,
                                std::vector<std::uint16_t>{kMageClass, kKnightClass}));
+  const SurvivorsBoardShown mage{.arena_id = ranked_arena->arena_id, .class_id = kMageClass};
+  const SurvivorsBoardShown knight{.arena_id = ranked_arena->arena_id, .class_id = kKnightClass};
   bench.Announce();
   ui::SurvivorsRankingState state;
   SurvivorsRankingRowsHeld held;
@@ -538,42 +545,45 @@ TEST_CASE("Classement survivors à l'écran : un tableau par classe, redemandé 
   };
 
   // LE TABLEAU DU MAGICIEN.
-  moonclient::FollowRankingAsks(bench.mode, state, SurvivorsRankingAsks{.open = true}, rules,
-                                kMageClass);
+  moonclient::FollowRankingAsks(bench.mode, state, SurvivorsRankingAsks{.open = true}, rules, mage);
   bench.Pump();
   REQUIRE(bench.BoardAsksSent() == 1);
   CHECK(last_ask_class() == kMageClass);
-  moonclient::ComposeRankingWindow(bench.mode, state, view, held, kMageClass, "Magicien");
+  moonclient::ComposeRankingWindow(bench.mode, state, view, held, mage, "Magicien");
   CHECK(view.ranked.received);
   CHECK(std::string(view.class_name) == "Magicien");
 
   // LA CLASSE CHANGE, FENÊTRE OUVERTE : la page du Magicien ne se montre pas sous
   // le Chevalier, et la demande attend la cadence, sans autre intention.
-  moonclient::FollowRankingAsks(bench.mode, state, SurvivorsRankingAsks{}, rules, kKnightClass);
+  moonclient::FollowRankingAsks(bench.mode, state, SurvivorsRankingAsks{}, rules, knight);
   bench.Pump();
   CHECK(bench.BoardAsksSent() == 1);
-  moonclient::ComposeRankingWindow(bench.mode, state, view, held, kKnightClass, kKnightName);
+  moonclient::ComposeRankingWindow(bench.mode, state, view, held, knight, kKnightName);
   CHECK_FALSE(view.ranked.received);
   CHECK(std::string(view.class_name) == kKnightName);
   bench.Pump(moonclient::kSurvivorsBoardCadenceMs);
-  moonclient::FollowRankingAsks(bench.mode, state, SurvivorsRankingAsks{}, rules, kKnightClass);
+  moonclient::FollowRankingAsks(bench.mode, state, SurvivorsRankingAsks{}, rules, knight);
   bench.Pump();
   REQUIRE(bench.BoardAsksSent() == 2);
   CHECK(last_ask_class() == kKnightClass);
-  moonclient::ComposeRankingWindow(bench.mode, state, view, held, kKnightClass, kKnightName);
+  moonclient::ComposeRankingWindow(bench.mode, state, view, held, knight, kKnightName);
   CHECK(view.ranked.received);
 
   // UNE DEMANDE RETENUE POUR UNE CLASSE QUITTÉE NE PART PAS : seule part la dernière.
-  moonclient::FollowRankingAsks(bench.mode, state, SurvivorsRankingAsks{}, rules, kMageClass);
-  moonclient::FollowRankingAsks(bench.mode, state, SurvivorsRankingAsks{}, rules, kKnightClass);
+  moonclient::FollowRankingAsks(bench.mode, state, SurvivorsRankingAsks{}, rules, mage);
+  moonclient::FollowRankingAsks(bench.mode, state, SurvivorsRankingAsks{}, rules, knight);
   bench.Pump(moonclient::kSurvivorsBoardCadenceMs);
-  moonclient::FollowRankingAsks(bench.mode, state, SurvivorsRankingAsks{}, rules, kKnightClass);
+  moonclient::FollowRankingAsks(bench.mode, state, SurvivorsRankingAsks{}, rules, knight);
   bench.Pump();
   CHECK(bench.BoardAsksSent() == 3);
   CHECK(last_ask_class() == kKnightClass);
 
   // Une classe que les règles ne connaissent pas ne demande rien.
   bench.Pump(moonclient::kSurvivorsBoardCadenceMs);
-  CHECK_FALSE(bench.mode.AskBoard(rules, 0, rn::SurvivorsBoardKind::kRanked));
+  CHECK_FALSE(bench.mode.AskBoard(rules, {.arena_id = ranked_arena->arena_id},
+                                  rn::SurvivorsBoardKind::kRanked));
+  // Une arène que les règles ne connaissent pas non plus.
+  CHECK_FALSE(
+      bench.mode.AskBoard(rules, {.class_id = kKnightClass}, rn::SurvivorsBoardKind::kRanked));
   CHECK(bench.server.cuts() == 0);
 }

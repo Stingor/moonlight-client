@@ -245,7 +245,7 @@ SurvivorsPainted SurvivorsMode::Frame(SurvivorsStage& stage, const SurvivorsCont
   if (context.ranking != nullptr) {
     FollowRankingAsks(*context.ranking, meta.ranking,
                       SurvivorsRankingAsks{.open_on = summary.open_ranking, .window = ask_.ranking},
-                      Rules(), SummaryClassId(stage));
+                      Rules(), SummaryBoardShown(stage));
   }
   if (gestures.escape) meta.CloseTopOverSummary();
   ask_ = {};

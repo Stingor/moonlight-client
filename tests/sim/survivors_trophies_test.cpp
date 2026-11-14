@@ -74,7 +74,7 @@ constexpr std::array<std::uint16_t, 11> kShippedEvolved{83, 81, 80,  88,   89,  
 constexpr std::uint64_t kManyFreezes = 1000;
 
 // Les trophées du Chevalier, et ses évolués dans le même ordre ; son dernier rang est
-// « Grand chevalier ».
+// « Grand Knight ».
 constexpr std::size_t kFirstKnightRank = 36;
 constexpr std::array<std::string_view, 8> kKnightKeys = {
     "survivors_head_crush",     "survivors_spiral_pierce", "survivors_joint_beat",
@@ -96,7 +96,7 @@ constexpr std::array<EvolvedOfClass, 7> kKnightEvolved{{
 constexpr std::uint16_t kMagnumBreakSkillId = 7;
 
 // Les trophées du Voleur, à la fin du catalogue, et ses évolués dans le même ordre ;
-// le dernier rang est « Grand voleur ».
+// le dernier rang est « Grand Assassin ».
 constexpr std::size_t kFirstThiefRank = 44;
 constexpr std::array<std::string_view, 8> kThiefKeys = {
     "survivors_sonic_blow",     "survivors_soul_destroyer",
@@ -114,7 +114,7 @@ constexpr std::array<EvolvedOfClass, 7> kThiefEvolved{{
 }};
 
 // Les trophées de l'Archer, après ceux du Voleur, et ses évolués dans le même
-// ordre ; le dernier rang est « Grand archer ».
+// ordre ; le dernier rang est « Grand Hunter ».
 constexpr std::size_t kFirstArcherRank = 52;
 constexpr std::array<std::string_view, 8> kArcherKeys = {
     "survivors_beast_strafing",   "survivors_sharp_shooting", "survivors_falcon_assault",
@@ -128,6 +128,33 @@ constexpr std::array<EvolvedOfClass, 7> kArcherEvolved{{
     {.skill_id = 123, .trophy = MinigameTrophy::kSurvivorsClaymoreTrap},
     {.skill_id = 122, .trophy = MinigameTrophy::kSurvivorsBlastMine},
     {.skill_id = 1009, .trophy = MinigameTrophy::kSurvivorsPhantasmicArrow},
+}};
+
+// Les trophées de l'Alchemist, après ceux de l'Archer, et ses évolués dans le
+// même ordre ; le dernier rang est « Grand Alchemist ».
+constexpr std::size_t kFirstMerchantRank = 60;
+constexpr std::array<std::string_view, 11> kMerchantKeys = {"survivors_acid_demonstration",
+                                                            "survivors_slim_potion_pitcher",
+                                                            "survivors_full_chemical_protection",
+                                                            "survivors_plant_cultivation",
+                                                            "survivors_cart_cannon",
+                                                            "survivors_cart_tornado",
+                                                            "survivors_sbr44",
+                                                            "survivors_bio_explosion",
+                                                            "survivors_mental_change",
+                                                            "survivors_blood_lust",
+                                                            "survivors_grand_alchemist"};
+constexpr std::array<EvolvedOfClass, 10> kMerchantEvolved{{
+    {.skill_id = 490, .trophy = MinigameTrophy::kSurvivorsAcidDemonstration},
+    {.skill_id = 478, .trophy = MinigameTrophy::kSurvivorsSlimPotionPitcher},
+    {.skill_id = 479, .trophy = MinigameTrophy::kSurvivorsFullChemicalProtection},
+    {.skill_id = 491, .trophy = MinigameTrophy::kSurvivorsPlantCultivation},
+    {.skill_id = 2477, .trophy = MinigameTrophy::kSurvivorsCartCannon},
+    {.skill_id = 2476, .trophy = MinigameTrophy::kSurvivorsCartTornado},
+    {.skill_id = 8012, .trophy = MinigameTrophy::kSurvivorsSbr44},
+    {.skill_id = 8016, .trophy = MinigameTrophy::kSurvivorsBioExplosion},
+    {.skill_id = 8004, .trophy = MinigameTrophy::kSurvivorsMentalChange},
+    {.skill_id = 8008, .trophy = MinigameTrophy::kSurvivorsBloodLust},
 }};
 
 // Les boss finals des deux arènes livrées.
@@ -177,6 +204,7 @@ void PlayKnight(SurvivorsField& field) { PlayClass(field, "knight"); }
 void PlayThief(SurvivorsField& field) { PlayClass(field, "thief"); }
 
 void PlayArcher(SurvivorsField& field) { PlayClass(field, "archer"); }
+void PlayMerchant(SurvivorsField& field) { PlayClass(field, "merchant"); }
 
 }  // namespace
 
@@ -207,7 +235,13 @@ TEST_CASE("Trophées survivors : ceux du Voleur, puis ceux de l'Archer, ferment 
   CHECK(kFirstKnightRank + kKnightKeys.size() == kFirstThiefRank);
   CHECK(kFirstThiefRank + kThiefKeys.size() == kFirstArcherRank);
   const auto catalog = ro::sim::MinigameTrophies();
-  REQUIRE(catalog.size() == kFirstArcherRank + kArcherKeys.size());
+  CHECK(kFirstArcherRank + kArcherKeys.size() == kFirstMerchantRank);
+  REQUIRE(catalog.size() == kFirstMerchantRank + kMerchantKeys.size());
+  for (std::size_t index = 0; index < kMerchantKeys.size(); ++index) {
+    const ro::sim::MinigameTrophyText& text = catalog[kFirstMerchantRank + index];
+    CHECK(std::string_view(text.key) == kMerchantKeys[index]);
+    CHECK(static_cast<std::size_t>(text.trophy) == kFirstMerchantRank + index);
+  }
   for (std::size_t index = 0; index < kArcherKeys.size(); ++index) {
     const ro::sim::MinigameTrophyText& text = catalog[kFirstArcherRank + index];
     CHECK(std::string_view(text.key) == kArcherKeys[index]);
@@ -380,8 +414,7 @@ TEST_CASE("Trophées survivors : Fire Ball, Water Ball, Ice Wall au plus haut ni
         }) == Trophies{MinigameTrophy::kSurvivorsJackFrost});
 }
 
-TEST_CASE("Trophées survivors : Grand sorcier, les évolués au fil des parties",
-          "[sim][survivors]") {
+TEST_CASE("Trophées survivors : Grand Wizard, les évolués au fil des parties", "[sim][survivors]") {
   MinigameRecord record;
   // Huit évolués dans une partie, le neuvième dans une autre.
   SurvivorsRun first = Fresh();
@@ -411,8 +444,7 @@ TEST_CASE("Trophées survivors : chacun des évolués du Chevalier a le sien", "
   }
 }
 
-TEST_CASE("Trophées survivors : Grand chevalier, ses évolués au fil des parties",
-          "[sim][survivors]") {
+TEST_CASE("Trophées survivors : Grand Knight, ses évolués au fil des parties", "[sim][survivors]") {
   MinigameRecord record;
   SurvivorsRun first = Fresh();
   PlayKnight(first.field_for_tests());
@@ -427,11 +459,11 @@ TEST_CASE("Trophées survivors : Grand chevalier, ses évolués au fil des parti
       OwnedSkill{.skill_id = kKnightEvolved.back().skill_id});
   const Trophies earned = RecordSurvivors(record, second);
   CHECK(Holds(earned, MinigameTrophy::kSurvivorsGrandKnight));
-  // Les évolués du Chevalier n'entrent pas dans « Grand sorcier ».
+  // Les évolués du Chevalier n'entrent pas dans « Grand Wizard ».
   CHECK_FALSE(Holds(earned, MinigameTrophy::kSurvivorsGrandWizard));
 }
 
-TEST_CASE("Trophées survivors : Grand chevalier relit les évolués déjà mémorisés",
+TEST_CASE("Trophées survivors : Grand Knight relit les évolués déjà mémorisés",
           "[sim][survivors]") {
   MinigameRecord record;
   for (const EvolvedOfClass& one : kKnightEvolved) {
@@ -443,7 +475,7 @@ TEST_CASE("Trophées survivors : Grand chevalier relit les évolués déjà mém
   CHECK(RecordSurvivors(record, run) == Trophies{MinigameTrophy::kSurvivorsGrandKnight});
 }
 
-TEST_CASE("Trophées survivors : les règles sans Chevalier ne donnent pas Grand chevalier",
+TEST_CASE("Trophées survivors : les règles sans Chevalier ne donnent pas Grand Knight",
           "[sim][survivors]") {
   MinigameRecord record;
   for (const EvolvedOfClass& one : kKnightEvolved) {
@@ -476,7 +508,8 @@ TEST_CASE("Trophées survivors : chaque évolué des règles du Voleur a le sien
   CHECK(evolved_count == kThiefEvolved.size());
 }
 
-TEST_CASE("Trophées survivors : Grand voleur, ses évolués au fil des parties", "[sim][survivors]") {
+TEST_CASE("Trophées survivors : Grand Assassin, ses évolués au fil des parties",
+          "[sim][survivors]") {
   MinigameRecord record;
   SurvivorsRun first = Fresh();
   PlayThief(first.field_for_tests());
@@ -491,12 +524,12 @@ TEST_CASE("Trophées survivors : Grand voleur, ses évolués au fil des parties"
       OwnedSkill{.skill_id = kThiefEvolved.back().skill_id});
   const Trophies earned = RecordSurvivors(record, second);
   CHECK(Holds(earned, MinigameTrophy::kSurvivorsGrandThief));
-  // Les évolués du Voleur n'entrent ni dans « Grand sorcier » ni dans « Grand chevalier ».
+  // Les évolués du Voleur n'entrent ni dans « Grand Wizard » ni dans « Grand Knight ».
   CHECK_FALSE(Holds(earned, MinigameTrophy::kSurvivorsGrandWizard));
   CHECK_FALSE(Holds(earned, MinigameTrophy::kSurvivorsGrandKnight));
 }
 
-TEST_CASE("Trophées survivors : Grand voleur relit les évolués déjà mémorisés",
+TEST_CASE("Trophées survivors : Grand Assassin relit les évolués déjà mémorisés",
           "[sim][survivors]") {
   MinigameRecord record;
   for (const EvolvedOfClass& one : kThiefEvolved) {
@@ -508,7 +541,7 @@ TEST_CASE("Trophées survivors : Grand voleur relit les évolués déjà mémori
   CHECK(RecordSurvivors(record, run) == Trophies{MinigameTrophy::kSurvivorsGrandThief});
 }
 
-TEST_CASE("Trophées survivors : les règles sans Voleur ne donnent pas Grand voleur",
+TEST_CASE("Trophées survivors : les règles sans Voleur ne donnent pas Grand Assassin",
           "[sim][survivors]") {
   MinigameRecord record;
   for (const EvolvedOfClass& one : kThiefEvolved) {
@@ -519,7 +552,7 @@ TEST_CASE("Trophées survivors : les règles sans Voleur ne donnent pas Grand vo
   CHECK(RecordSurvivors(record, run).empty());
 }
 
-TEST_CASE("Trophées survivors : le niveau 40 du Voleur n'est pas un Mage aguerri",
+TEST_CASE("Trophées survivors : le niveau 40 du Voleur n'est pas un Wizard aguerri",
           "[sim][survivors]") {
   CHECK(EarnedBy([](SurvivorsField& field) {
           PlayThief(field);
@@ -527,7 +560,7 @@ TEST_CASE("Trophées survivors : le niveau 40 du Voleur n'est pas un Mage aguerr
         }).empty());
 }
 
-TEST_CASE("Trophées survivors : le niveau 40 du Chevalier n'est pas un Mage aguerri",
+TEST_CASE("Trophées survivors : le niveau 40 du Chevalier n'est pas un Wizard aguerri",
           "[sim][survivors]") {
   CHECK(EarnedBy([](SurvivorsField& field) {
           PlayKnight(field);
@@ -596,7 +629,7 @@ TEST_CASE("Trophées survivors : le skill de départ est bien Fire", "[sim][surv
   CHECK(run.field().hero.skills.front().skill_id == kTinyStrikeId);
 }
 
-TEST_CASE("Trophées survivors : chaque évolué de l'Archer a le sien, et Grand archer les veut tous",
+TEST_CASE("Trophées survivors : chaque évolué de l'Archer a le sien, et Grand Hunter les veut tous",
           "[sim][survivors]") {
   const ro::sim::SurvivorsRules& rules = ro::sim::ShippedSurvivorsRules();
   const auto archer = std::ranges::find_if(rules.classes, [](const auto& hero_class) {
@@ -633,4 +666,44 @@ TEST_CASE("Trophées survivors : chaque évolué de l'Archer a le sien, et Grand
   const Trophies earned = RecordSurvivors(record, second);
   CHECK(Holds(earned, MinigameTrophy::kSurvivorsGrandArcher));
   CHECK_FALSE(Holds(earned, MinigameTrophy::kSurvivorsGrandThief));
+}
+
+TEST_CASE(
+    "Trophées survivors : chaque évolué de l'Alchemist a le sien, et Grand Alchemist les veut tous",
+    "[sim][survivors]") {
+  const ro::sim::SurvivorsRules& rules = ro::sim::ShippedSurvivorsRules();
+  const auto merchant = std::ranges::find_if(rules.classes, [](const auto& hero_class) {
+    return std::string_view(hero_class.key) == "merchant";
+  });
+  REQUIRE(merchant != rules.classes.end());
+  std::size_t evolved_count = 0;
+  for (const ro::sim::EvolutionRule& evolution : rules.evolutions) {
+    if (std::ranges::find(merchant->skill_pool, evolution.skill_id) == merchant->skill_pool.end()) {
+      continue;
+    }
+    ++evolved_count;
+    const auto listed =
+        std::ranges::find(kMerchantEvolved, evolution.evolved_skill_id, &EvolvedOfClass::skill_id);
+    REQUIRE(listed != kMerchantEvolved.end());
+    CHECK(EarnedBy([&evolution](SurvivorsField& field) {
+            field.hero.skills.push_back(OwnedSkill{.skill_id = evolution.evolved_skill_id});
+          }) == Trophies{listed->trophy});
+  }
+  CHECK(evolved_count == kMerchantEvolved.size());
+
+  MinigameRecord record;
+  SurvivorsRun first = Fresh();
+  PlayMerchant(first.field_for_tests());
+  for (std::size_t index = 0; index + 1 < kMerchantEvolved.size(); ++index) {
+    first.field_for_tests().hero.skills.push_back(
+        OwnedSkill{.skill_id = kMerchantEvolved[index].skill_id});
+  }
+  CHECK_FALSE(Holds(RecordSurvivors(record, first), MinigameTrophy::kSurvivorsGrandAlchemist));
+  SurvivorsRun second = Fresh();
+  PlayMerchant(second.field_for_tests());
+  second.field_for_tests().hero.skills.push_back(
+      OwnedSkill{.skill_id = kMerchantEvolved.back().skill_id});
+  const Trophies earned = RecordSurvivors(record, second);
+  CHECK(Holds(earned, MinigameTrophy::kSurvivorsGrandAlchemist));
+  CHECK_FALSE(Holds(earned, MinigameTrophy::kSurvivorsGrandArcher));
 }

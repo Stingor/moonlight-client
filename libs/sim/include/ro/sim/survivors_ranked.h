@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <optional>
+#include <vector>
 
 #include "ro/sim/survivors_rules.h"
 #include "ro/sim/survivors_run.h"
@@ -35,10 +36,46 @@ struct SurvivorsEndComponents {
 
 // LE DÉPART D'UNE PARTIE CLASSÉE : neutre, la classe `class_id` — un Id que les
 // règles ne connaissent pas reste tel quel, et la partie refuse de commencer —,
-// la première arène classée et la graine tirée par le serveur. Le héros part de
-// son auto-attaque seule : son premier niveau lui offre ses skills de départ.
+// l'arène classée `arena_id` — à défaut la première arène classée — et la
+// graine tirée par le serveur. Le héros part de son auto-attaque seule : son
+// premier niveau lui offre ses skills de départ.
 [[nodiscard]] SurvivorsStart RankedStartOf(const SurvivorsRules& rules, std::uint64_t seed,
-                                           std::uint16_t class_id);
+                                           std::uint16_t class_id, std::uint16_t arena_id);
+
+// L'arène classée `arena_id`, à défaut la première arène classée ; nulle
+// quand les règles n'en classent aucune.
+[[nodiscard]] const ArenaRule* RankedArenaOr(const SurvivorsRules& rules,
+                                             std::uint16_t arena_id) noexcept;
+
+// ── LES BORNES QUE LE SERVEUR IMPOSE À UNE PARTIE D'UNE ARÈNE ───────────────
+//
+// Le serveur juge une partie vraisemblable par ces bornes, qu'il recopie de
+// cette fonction, arène par arène : `RankingBoundsOf` est leur seule source.
+
+// Un boss programmé : l'instant où il paraît, les points et l'XP de sa chute.
+struct SurvivorsBossBound {
+  std::uint32_t at_ms = 0;
+  std::uint32_t kill_points = 0;
+  std::uint32_t exp = 0;
+  bool final = false;  // sa chute est la victoire
+  [[nodiscard]] bool operator==(const SurvivorsBossBound&) const = default;
+};
+
+struct SurvivorsArenaBounds {
+  // Triés par instant. Une arène qui tire ses boss en garde, rang par rang,
+  // le plus tôt paru et le plus riche de tous les tirages : aucune partie ne
+  // rencontre plus tôt un boss plus riche.
+  std::vector<SurvivorsBossBound> bosses;
+  // Les points et l'XP d'un tué ordinaire au plus, élite comprise : toute
+  // espèce que les vagues, les événements, les escortes et les invocations
+  // font naître.
+  std::uint32_t most_common_kill_points = 0;
+  std::uint32_t most_common_kill_exp = 0;
+  [[nodiscard]] bool operator==(const SurvivorsArenaBounds&) const = default;
+};
+
+[[nodiscard]] SurvivorsArenaBounds RankingBoundsOf(const SurvivorsRules& rules,
+                                                   const ArenaRule& arena);
 
 // Vrai quand la graine rendue en défi est `SeedOfWeek` de la semaine ISO de
 // `issued_at_utc_s`, l'heure du SERVEUR : la semaine change le lundi à 00:00

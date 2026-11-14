@@ -21460,12 +21460,6 @@ tr: Marea contenida
 fr: Vaincre 1 000 monstres dans une partie de Survivants de Midgard.
 tr: Vencer a 1000 monstruos en una partida de Supervivientes de Midgard.
 
-fr: Mage aguerri
-tr: Mago curtido
-
-fr: Atteindre le niveau 40 avec le Sorcier dans Survivants de Midgard.
-tr: Alcanzar el nivel 40 con el Mago en Supervivientes de Midgard.
-
 fr: Première carte
 tr: Primera carta
 
@@ -21474,9 +21468,6 @@ tr: Recoger una carta caída en una partida de Supervivientes de Midgard.
 
 fr: Pyromane
 tr: Pirómano
-
-fr: Gagner une partie avec le Sorcier et des skills Fire seulement.
-tr: Gana una partida con el Mago solo con skills Fire.
 
 fr: Esprit pur
 tr: Mente pura
@@ -21513,9 +21504,6 @@ tr: Unión
 
 fr: Obtenir Napalm Vulcan, l'union de Soul Strike et de Napalm Beat.
 tr: Obtén Napalm Vulcan, la unión de Soul Strike y Napalm Beat.
-
-fr: Grand sorcier
-tr: Gran hechicero
 
 fr: Hiver éternel
 tr: Invierno eterno
@@ -21558,9 +21546,6 @@ tr: Escarcha
 
 fr: Obtenir Jack Frost, l'union de Water Ball et de Cold Bolt.
 tr: Obtén Jack Frost, la unión de Water Ball y Cold Bolt.
-
-fr: Obtenir chacun des skills évolués du Sorcier, au fil des parties.
-tr: Obtén cada una de las habilidades evolucionadas del Mago, a lo largo de las partidas.
 
 fr: Recharge de tous les skills raccourcie.
 tr: Recarga más corta para todas las habilidades.
@@ -22975,18 +22960,6 @@ tr: Tierra abrasada
 fr: Obtenir Ignition Break, l'union de Bowling Bash et de Brandish Spear.
 tr: Obtén Ignition Break, la unión de Bowling Bash y Brandish Spear.
 
-fr: Grand chevalier
-tr: Gran caballero
-
-fr: Obtenir chacun des skills évolués du Chevalier, au fil des parties.
-tr: Obtén cada una de las habilidades evolucionadas del Caballero, a lo largo de las partidas.
-
-fr: Sorcier
-tr: Mago
-
-fr: Chevalier
-tr: Caballero
-
 fr: Cette classe n'est pas débloquée : la partie ne part pas.
 tr: Esta clase no está desbloqueada: la partida no empieza.
 
@@ -23123,13 +23096,13 @@ fr: %s : il attend sur la prairie, en partie libre, seul.
 tr: %s: espera en la Pradera de Midgard, en partida libre, solo.
 
 fr: L'Assassin vous a vu passer : sa classe est débloquée.
-tr: El Asesino te ha visto pasar: su clase queda desbloqueada.
+tr: El Assassin te ha visto pasar: su clase queda desbloqueada.
 
 fr: Rejoindre l'Assassin qui attend sur la prairie, en partie libre, seul
-tr: Reunirse con el Asesino que espera en la Pradera de Midgard, en partida libre, solo
+tr: Reunirse con el Assassin que espera en la Pradera de Midgard, en partida libre, solo
 
 fr: Assassin
-tr: Asesino
+tr: Assassin
 
 fr: Lame sonique
 tr: Hoja sónica
@@ -23173,11 +23146,8 @@ tr: Asalto meteórico
 fr: Obtenir Meteor Assault, l'union d'Envenom et de Sprinkle Sand.
 tr: Obtén Meteor Assault, la unión de Envenom y Sprinkle Sand.
 
-fr: Grand voleur
-tr: Gran ladrón
-
 fr: Obtenir chacun des skills évolués de l'Assassin, au fil des parties.
-tr: Obtén cada una de las habilidades evolucionadas del Asesino, a lo largo de las partidas.
+tr: Obtén cada una de las habilidades evolucionadas del Assassin, a lo largo de las partidas.
 
 fr: %s : il guette dans le désert jusqu'à 5:00, en partie libre, seul.
 tr: %s: acecha en el desierto hasta las 5:00, en partida libre, solo.
@@ -23199,12 +23169,6 @@ tr: Daño a distancia: tus disparos y estallidos golpean más fuerte.
 
 fr: Flèche fantôme
 tr: Flecha fantasma
-
-fr: Grand archer
-tr: Gran arquero
-
-fr: Le Chasseur vous a rejoint : sa classe est débloquée.
-tr: El Cazador se unió a ti: su clase está desbloqueada.
 
 fr: Le Black Mushroom pousse : sa Yggdrasil Berry rend tous les PV.
 tr: Crece el Black Mushroom: su Yggdrasil Berry restaura todos los PV.
@@ -23233,9 +23197,6 @@ tr: Obtén Sharp Shooting en una partida de Supervivientes de Midgard.
 fr: Obtenir True Sight dans une partie de Survivants de Midgard.
 tr: Obtén True Sight en una partida de Supervivientes de Midgard.
 
-fr: Obtenir chacun des skills évolués du Chasseur, au fil des parties.
-tr: Obtén cada una de las habilidades evolucionadas del Cazador, a lo largo de las partidas.
-
 fr: Par moments, vos tirs se pressent : vos skills reviennent plus vite.
 tr: A ratos, tus disparos se aceleran: tus habilidades vuelven antes.
 
@@ -23250,9 +23211,6 @@ tr: Plantas raras %d %%
 
 fr: Recharge réduite : vos skills reviennent plus vite.
 tr: Recarga reducida: tus habilidades vuelven antes.
-
-fr: Rejoindre le Chasseur qui guette dans le désert, avant 5:00, seul
-tr: Reúnete con el Cazador que acecha en el desierto, antes de las 5:00, solo
 
 fr: Relèves +%d
 tr: Resurrecciones +%d
@@ -23434,17 +23392,11 @@ tr: Invocaciones: tus plantas y tu homúnculo golpean más fuerte.
 fr: L'acide et la bombe, ensemble, écrasent le plus fort.
 tr: El ácido y la bomba, juntos, aplastan al más fuerte.
 
-fr: L'Alchimiste a vu vos zeny : sa classe est débloquée.
-tr: El Alquimista vio tus zeny: su clase está desbloqueada.
-
 fr: Lif vous suit et soigne le héros le plus blessé.
 tr: Lif te sigue y cura al héroe más herido.
 
 fr: Lif, évolué, soigne bien plus et frappe de loin.
 tr: Lif, evolucionado, cura mucho más y golpea de lejos.
-
-fr: Alchimiste
-tr: Alquimista
 
 fr: Par moments, votre armure devient presque impénétrable.
 tr: A ratos, tu armadura se vuelve casi impenetrable.
@@ -23457,9 +23409,6 @@ tr: A ratos, tu grito te enardece: tu daño sube.
 
 fr: Plus de zeny : chaque Gold ramassé vaut davantage.
 tr: Más zeny: cada Gold recogido vale más.
-
-fr: Rejoindre l'Alchimiste sur la neige avec des zeny de la partie, seul
-tr: Reunirse con el Alquimista en la nieve con zeny de la partida, solo
 
 fr: Riposte de gel %d %%
 tr: Réplica de hielo %d %%
@@ -23920,7 +23869,6 @@ tr: Enviado: esperando al servidor.
 fr: Fait tourner toutes les couleurs de l'effet, en degrés.
 tr: Gira todos los colores del efecto, en grados.
 
-
 fr: La teinture des effets de chapeau que tu affiches.
 tr: El tinte de los efectos de sombrero que muestras.
 
@@ -23941,7 +23889,6 @@ tr: Abre la pestaña de efectos, donde se tiñe el aura o el efecto que muestra 
 
 fr: Partagé : les autres le voient.
 tr: Compartido: los demás lo ven.
-
 
 fr: Rend à l'effet ses couleurs d'origine, sans rien envoyer.
 tr: Devuelve al efecto sus colores originales, sin enviar nada.
@@ -24011,9 +23958,6 @@ tr: Tres tonos a igual distancia en el círculo, en las piezas no conservadas.
 
 fr: Supprimer ce style
 tr: Eliminar este estilo
-
-fr: Chasseur
-tr: Cazador
 
 fr: (aucune pièce réformable dans l'inventory)
 tr: (ninguna pieza reformable en el inventario)
@@ -24308,3 +24252,120 @@ tr: Total del grupo
 
 fr: Récupération des réputations…
 tr: Obteniendo las reputaciones…
+
+fr: Wizard aguerri
+tr: Wizard curtido
+
+fr: Atteindre le niveau 40 avec le Wizard dans Survivants de Midgard.
+tr: Alcanzar el nivel 40 con el Wizard en Supervivientes de Midgard.
+
+fr: Gagner une partie avec le Wizard et des skills Fire seulement.
+tr: Gana una partida con el Wizard solo con skills Fire.
+
+fr: Grand Wizard
+tr: Gran Wizard
+
+fr: Obtenir chacun des skills évolués du Wizard, au fil des parties.
+tr: Obtén cada una de las habilidades evolucionadas del Wizard, a lo largo de las partidas.
+
+fr: Grand Knight
+tr: Gran Knight
+
+fr: Obtenir chacun des skills évolués du Knight, au fil des parties.
+tr: Obtén cada una de las habilidades evolucionadas del Knight, a lo largo de las partidas.
+
+fr: Wizard
+tr: Wizard
+
+fr: Knight
+tr: Knight
+
+fr: Grand Assassin
+tr: Gran Assassin
+
+fr: Grand Hunter
+tr: Gran Hunter
+
+fr: Le Hunter vous a rejoint : sa classe est débloquée.
+tr: El Hunter se unió a ti: su clase está desbloqueada.
+
+fr: Obtenir chacun des skills évolués du Hunter, au fil des parties.
+tr: Obtén cada una de las habilidades evolucionadas del Hunter, a lo largo de las partidas.
+
+fr: Rejoindre le Hunter qui guette dans le désert, avant 5:00, seul
+tr: Reúnete con el Hunter que acecha en el desierto, antes de las 5:00, solo
+
+fr: L'Alchemist a vu vos zeny : sa classe est débloquée.
+tr: El Alchemist vio tus zeny: su clase está desbloqueada.
+
+fr: Rejoindre l'Alchemist sur la neige avec des zeny de la partie, seul
+tr: Reunirse con el Alchemist en la nieve con zeny de la partida, solo
+
+fr: Hunter
+tr: Hunter
+
+fr: Démonstration acide
+tr: Demostración ácida
+
+fr: Obtenir Acid Demonstration dans une partie de Survivants de Midgard.
+tr: Obtén Acid Demonstration en una partida de Supervivientes de Midgard.
+
+fr: Lancer de fioles
+tr: Lanzamiento de frascos
+
+fr: Obtenir Slim Potion Pitcher dans une partie de Survivants de Midgard.
+tr: Obtén Slim Potion Pitcher en una partida de Supervivientes de Midgard.
+
+fr: Blindage chimique
+tr: Blindaje químico
+
+fr: Obtenir Full Chemical Protection dans une partie de Survivants de Midgard.
+tr: Obtén Full Chemical Protection en una partida de Supervivientes de Midgard.
+
+fr: Main verte
+tr: Mano verde
+
+fr: Obtenir Plant Cultivation dans une partie de Survivants de Midgard.
+tr: Obtén Plant Cultivation en una partida de Supervivientes de Midgard.
+
+fr: Artillerie roulante
+tr: Artillería rodante
+
+fr: Obtenir Cart Cannon dans une partie de Survivants de Midgard.
+tr: Obtén Cart Cannon en una partida de Supervivientes de Midgard.
+
+fr: Tourbillon de fer
+tr: Torbellino de hierro
+
+fr: Obtenir Cart Tornado dans une partie de Survivants de Midgard.
+tr: Obtén Cart Tornado en una partida de Supervivientes de Midgard.
+
+fr: Dernier recours
+tr: Último recurso
+
+fr: Obtenir S.B.R.44 dans une partie de Survivants de Midgard.
+tr: Obtén S.B.R.44 en una partida de Supervivientes de Midgard.
+
+fr: Explosion organique
+tr: Explosión orgánica
+
+fr: Obtenir Bio Explosion dans une partie de Survivants de Midgard.
+tr: Obtén Bio Explosion en una partida de Supervivientes de Midgard.
+
+fr: Changement d'esprit
+tr: Cambio de mente
+
+fr: Obtenir Mental Change dans une partie de Survivants de Midgard.
+tr: Obtén Mental Change en una partida de Supervivientes de Midgard.
+
+fr: Soif de sang
+tr: Sed de sangre
+
+fr: Obtenir Blood Lust dans une partie de Survivants de Midgard.
+tr: Obtén Blood Lust en una partida de Supervivientes de Midgard.
+
+fr: Grand Alchemist
+tr: Gran Alchemist
+
+fr: Obtenir chacun des skills évolués de l'Alchemist, au fil des parties.
+tr: Obtén cada una de las habilidades evolucionadas del Alchemist, a lo largo de las partidas.

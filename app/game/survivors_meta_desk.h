@@ -71,13 +71,11 @@ void ShopRowsOf(const SurvivorsSave& save, SurvivorsMetaShop shop,
 
 // L'ACCUEIL : le solde, la Cursed Water et son bonus, le résumé du départ
 // acheté, et la semaine du défi au moment `now_utc_s`. Le résumé, le bolt imposé
-// et le meilleur score de la semaine sont ceux de `ChosenClassOf(class_id)` ; le
-// bolt n'y a que son Id.
-[[nodiscard]] ro::ui::SurvivorsPrepareMeta PrepareMetaOf(const ro::sim::SurvivorsRules& rules,
-                                                         const SurvivorsSave& save,
-                                                         SurvivorsBoardKind board,
-                                                         std::int64_t now_utc_s,
-                                                         std::uint16_t class_id = 0);
+// et le meilleur score de la semaine sont ceux de `ChosenClassOf(class_id)`, ce
+// dernier sur l'arène `FreeArenaOf(arena_id)` ; le bolt n'y a que son Id.
+[[nodiscard]] ro::ui::SurvivorsPrepareMeta PrepareMetaOf(
+    const ro::sim::SurvivorsRules& rules, const SurvivorsSave& save, SurvivorsBoardKind board,
+    std::int64_t now_utc_s, std::uint16_t class_id = 0, std::uint16_t arena_id = 0);
 
 // L'ALBUM : une entrée par carte de la réserve d'une classe, celle du Chevalier
 // montrant son Peco Peco, un exploit par ligne de `ShippedSurvivorsFeats`.
@@ -94,10 +92,9 @@ void FeatEntriesOf(const SurvivorsSave& save, std::vector<ro::ui::SurvivorsFeatE
 // règles, marquées, sous celles des règles en vigueur, dans leur ordre de
 // score, et leur numéro continue celui des lignes qui les précèdent.
 //
-// LES TABLEAUX SONT CEUX D'UNE ARÈNE ET D'UNE CLASSE, la classe retenue à
-// l'accueil pour tous (`ChosenClassOf(class_id)`) : les parties libres, de
-// l'arène de la partie libre (`FreeArenaOf(free_arena_id)`) ; le défi et les
-// parties classées, de l'arène par défaut, la prairie. LES RECORDS D'ANCIENNES RÈGLES
+// LES TABLEAUX SONT CEUX D'UNE ARÈNE ET D'UNE CLASSE, celles retenues à
+// l'accueil pour tous (`FreeArenaOf(arena_id)`, `ChosenClassOf(class_id)`).
+// LES RECORDS D'ANCIENNES RÈGLES
 // D'UNE AUTRE ARÈNE (Q10 A) — ceux du ruleset 3, tous joués sur `prt_fild08` —
 // se rangent sous eux, marqués, du même tableau ; ceux des règles en vigueur
 // d'une autre arène restent aux tableaux de leur arène.
@@ -110,7 +107,7 @@ struct SurvivorsRecordRowsHeld {
 [[nodiscard]] ro::ui::SurvivorsRecordsView RecordsViewOf(
     const ro::sim::SurvivorsRules& rules, const SurvivorsSave& save, std::int64_t now_utc_s,
     std::optional<std::int64_t> latest_utc_s, SurvivorsRecordRowsHeld& held,
-    std::uint16_t free_arena_id = 0, std::uint16_t class_id = 0);
+    std::uint16_t arena_id = 0, std::uint16_t class_id = 0);
 
 // L'ÉCRAN DE FIN, depuis le crédit : Zeny versés et solde du carnet relu
 // `save` (un achat fait à l'Église depuis l'écran de fin s'y voit), tableau,

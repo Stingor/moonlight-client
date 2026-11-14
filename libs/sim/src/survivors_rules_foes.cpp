@@ -145,8 +145,7 @@ constexpr std::array<FoeRule, kPlainsFoeCount> kFoes{{
         Common(kPupaId, 2, kSmall, kEarth, 60, kStillWalkMs, kNoTouchDamage, kNoTouchMs, 2, kStill),
         kPupaCardId),
     WithCard(Common(kRockerId, 9, kMedium, kEarth, 30, 200, 7, 1864, 2), kRockerCardId),
-    // L'oiseau de la prairie : il porte la carte du Peco Peco, qui n'y naît pas.
-    WithCard(Common(kCondorId, 5, kMedium, kWind, 24, 150, 6, 1148, 2), kPecoPecoCardId),
+    Common(kCondorId, 5, kMedium, kWind, 24, 150, 6, 1148, 2),
     Common(kSavageBabeId, 7, kSmall, kEarth, 20, 400, 5, 1624, 2),
     WithCard(Common(kHornetId, 8, kSmall, kWind, 20, 150, 6, 1292, 2), kHornetCardId),
     Common(kFamiliarId, 8, kSmall, kDark, 18, 150, 5, 1276, 2, kFlyer),
@@ -328,13 +327,13 @@ std::span<const FoeRule> ShippedFoes() {
 
 std::span<const WaveRule> ShippedWaves() { return kWaves; }
 
-// LES ARÈNES SONT DES BIOMES GÉNÉRÉS, sans carte. midgard_plains : le sol
-// généré de la prairie, sans bord, né au centre du monde, l'arène classée et
-// celle du défi (ADR 0134). morroc_desert : le sol généré du désert, avec son
-// bestiaire, ses boss et ses événements ; partie libre seulement (lot 12, Q2).
-// lutie_snowfield : le sol généré des neiges de Lutie, de même, en partie
-// libre (lot 17, Q1). lighthalzen_biolab : le laboratoire de Lighthalzen, le
-// premier intérieur, en salles, couloirs et halls ; partie libre, avec son
+// LES ARÈNES SONT DES BIOMES GÉNÉRÉS, sans carte, toutes classées : chacune a
+// son tableau classé et son défi. midgard_plains : le sol généré de la
+// prairie, sans bord, né au centre du monde, l'arène par défaut (ADR 0134).
+// morroc_desert : le sol généré du désert, avec son bestiaire, ses boss et
+// ses événements (lot 12, Q2). lutie_snowfield : le sol généré des neiges de
+// Lutie, de même (lot 17, Q1). lighthalzen_biolab : le laboratoire de
+// Lighthalzen, le premier intérieur, en salles, couloirs et halls, avec son
 // bestiaire, et un MVP final tiré par la graine (lot 20). Le numéro 1,
 // celui de l'ancienne arène sur carte, ne se
 // redonne pas : un carnet ou une trame qui le nomme n'en trouve plus.
@@ -355,7 +354,7 @@ std::span<const ArenaRule> ShippedArenas() {
          .map_name = "",
          .start = std::nullopt,
          .terrain_id = kDesertTerrainId,
-         .ranked = false,
+         .ranked = true,
          .waves = desert.waves,
          .bosses = desert.bosses,
          .events = desert.events},
@@ -364,7 +363,7 @@ std::span<const ArenaRule> ShippedArenas() {
          .map_name = "",
          .start = std::nullopt,
          .terrain_id = kSnowTerrainId,
-         .ranked = false,
+         .ranked = true,
          .waves = snow.waves,
          .bosses = snow.bosses,
          .events = snow.events},
@@ -373,7 +372,7 @@ std::span<const ArenaRule> ShippedArenas() {
          .map_name = "",
          .start = std::nullopt,
          .terrain_id = kLabTerrainId,
-         .ranked = false,
+         .ranked = true,
          .waves = lab.waves,
          .bosses = lab.bosses,
          .events = lab.events,

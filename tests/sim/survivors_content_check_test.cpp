@@ -105,9 +105,9 @@ TEST_CASE("Contenu survivors : le ruleset 3 emploie chaque mécanique d'une arè
   // Une mécanique que le catalogue livré laisse à son défaut inerte n'est
   // éprouvée par aucune partie : la partie en or ne la verrait pas.
   const SurvivorsRules& shipped = ro::sim::ShippedSurvivorsRules();
-  // La méta : trente et un porteurs de carte, la Cursed Water entière.
+  // La méta : trente porteurs de carte, la Cursed Water entière.
   CHECK(std::count_if(shipped.foes.begin(), shipped.foes.end(),
-                      [](const ro::sim::FoeRule& foe) { return foe.card_item_id != 0; }) == 31);
+                      [](const ro::sim::FoeRule& foe) { return foe.card_item_id != 0; }) == 30);
   CHECK(shipped.cursed_water.size() == std::size_t{ro::sim::kMostCursedWater} + 1);
   CHECK(shipped.card_drops.common_odds == ro::sim::kCommonCardOdds);
   CHECK_FALSE(shipped.events.empty());

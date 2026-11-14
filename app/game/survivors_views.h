@@ -286,7 +286,7 @@ class SurvivorsViews {
   // LES ARÈNES DE L'ACCUEIL et leurs noms, que les choix désignent.
   std::vector<std::string> arena_names_;
   std::vector<ro::ui::SurvivorsArenaChoice> arena_choices_;
-  std::string board_arena_name_;
+  std::vector<ro::ui::SurvivorsArenaChoice> ranking_arena_choices_;
   // LES CLASSES DE L'ACCUEIL et ce qui débloque chacune, que les choix désignent.
   std::vector<std::string> class_hints_;
   std::vector<ro::ui::SurvivorsClassChoice> class_choices_;

@@ -180,7 +180,8 @@ std::optional<SurvivorsBookMode::Begun> SurvivorsRankingMode::Launch(
   // La partie classée n'existe que service ouvert : sans lui, elle part libre,
   // sur l'arène et avec la classe qu'elle demandait.
   if (kind == SurvivorsBoardKind::kRanked && !session_.service_open()) {
-    return book.StartRankedAsFree(rules, client_root, seed, book.board_class_id(rules));
+    return book.StartRankedAsFree(rules, client_root, seed, book.board_class_id(rules),
+                                  book.arena_id());
   }
   SurvivorsBookMode::Begun begun = book.StartAs(kind, rules, client_root, seed);
   if (kind == SurvivorsBoardKind::kFree) return begun;
@@ -197,13 +198,15 @@ std::optional<SurvivorsBookMode::Begun> SurvivorsRankingMode::Launch(
     launch_ = PendingLaunch{.kind = kind,
                             .start_seed = begun.start.seed,
                             .local_seed = seed,
-                            .class_id = begun.start.class_id};
+                            .class_id = begun.start.class_id,
+                            .arena_id = begun.start.arena_id};
     return begun;
   }
   // Un défi sans jeton reste un défi local ; une partie classée part libre,
   // sur l'arène et avec la classe qu'elle demandait.
   if (kind == SurvivorsBoardKind::kRanked) {
-    return book.StartRankedAsFree(rules, client_root, seed, begun.start.class_id);
+    return book.StartRankedAsFree(rules, client_root, seed, begun.start.class_id,
+                                  begun.start.arena_id);
   }
   return begun;
 }
@@ -218,18 +221,19 @@ std::optional<SurvivorsBookMode::Begun> SurvivorsRankingMode::Settle(
     if (ticket->seed == launch.start_seed) return std::nullopt;
     if (launch.kind == SurvivorsBoardKind::kRanked) {
       return SurvivorsBookMode::Begun{
-          .start = ro::sim::RankedStartOf(rules, ticket->seed, launch.class_id),
+          .start = ro::sim::RankedStartOf(rules, ticket->seed, launch.class_id, launch.arena_id),
           .board = SurvivorsRunBoard{.kind = SurvivorsBoardKind::kRanked}};
     }
     // LE DÉFI SE JOUE À LA SEMAINE DU SERVEUR, dont la graine vient d'être
     // vérifiée : la machine a pu changer de semaine avant ou après lui.
     const ro::sim::IsoWeek week = IsoWeekOfUtc(ticket->issued_at_utc_s);
     return SurvivorsBookMode::Begun{
-        .start = ChallengeStartOf(rules, week, launch.class_id),
+        .start = ChallengeStartOf(rules, week, launch.class_id, launch.arena_id),
         .board = SurvivorsRunBoard{.kind = SurvivorsBoardKind::kChallenge, .week = week}};
   }
   if (launch.kind == SurvivorsBoardKind::kRanked) {
-    return book.StartRankedAsFree(rules, client_root, launch.local_seed, launch.class_id);
+    return book.StartRankedAsFree(rules, client_root, launch.local_seed, launch.class_id,
+                                  launch.arena_id);
   }
   return std::nullopt;
 }
@@ -273,15 +277,15 @@ void SurvivorsRankingMode::Write(const std::filesystem::path& client_root) {
   }
 }
 
-bool SurvivorsRankingMode::AskBoard(const ro::sim::SurvivorsRules& rules, std::uint16_t class_id,
+bool SurvivorsRankingMode::AskBoard(const ro::sim::SurvivorsRules& rules,
+                                    const SurvivorsBoardShown& shown,
                                     rn::SurvivorsBoardKind board) {
-  // Les tableaux sont ceux de l'arène classée.
-  const ro::sim::ArenaRule* ranked_arena = ro::sim::FirstRankedArena(rules);
-  if (ranked_arena == nullptr || ro::sim::FindClass(rules, class_id) == nullptr) return false;
-  return session_.AskBoard(rn::SurvivorsBoardAsk{.ruleset = ruleset_,
-                                                 .arena_id = ranked_arena->arena_id,
-                                                 .class_id = class_id,
-                                                 .board = board});
+  const ro::sim::ArenaRule* arena = ro::sim::FindArena(rules, shown.arena_id);
+  if (arena == nullptr || !arena->ranked || ro::sim::FindClass(rules, shown.class_id) == nullptr) {
+    return false;
+  }
+  return session_.AskBoard(rn::SurvivorsBoardAsk{
+      .ruleset = ruleset_, .arena_id = shown.arena_id, .class_id = shown.class_id, .board = board});
 }
 
 }  // namespace moonclient

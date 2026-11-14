@@ -197,20 +197,24 @@ constexpr std::size_t kDateTextSize = 16;
 
 }  // namespace
 
-std::uint16_t SummaryClassId(const SurvivorsStage& stage) noexcept {
-  const SurvivorsEnding* ending = stage.ending();
-  return ending != nullptr ? ending->class_id : std::uint16_t{0};
+SurvivorsBoardShown SummaryBoardShown(const SurvivorsStage& stage) noexcept {
+  SurvivorsBoardShown shown;
+  if (const SurvivorsEnding* ending = stage.ending()) shown.class_id = ending->class_id;
+  if (const ro::sim::SurvivorsPlay* play = stage.play()) {
+    shown.arena_id = play->run().field().start.arena_id;
+  }
+  return shown;
 }
 
 ui::SurvivorsRankingView RankingViewOf(const SurvivorsRankingSession& session,
                                        const SurvivorsRankingNow& now,
-                                       SurvivorsRankingRowsHeld& held, std::uint16_t class_id,
-                                       const char* class_name) {
+                                       SurvivorsRankingRowsHeld& held,
+                                       const SurvivorsBoardShown& shown, const char* class_name) {
   const ro::sim::IsoWeek week = IsoWeekOfUtc(now.utc_s + session.server_offset_s());
   return ui::SurvivorsRankingView{
-      .ranked = PageOf(session.page(rn::SurvivorsBoardKind::kRanked, class_id), now,
-                       held.ranked_names, held.ranked_rows),
-      .challenge = PageOf(session.page(rn::SurvivorsBoardKind::kChallenge, class_id), now,
+      .ranked = PageOf(session.page(rn::SurvivorsBoardKind::kRanked, shown), now, held.ranked_names,
+                       held.ranked_rows),
+      .challenge = PageOf(session.page(rn::SurvivorsBoardKind::kChallenge, shown), now,
                           held.challenge_names, held.challenge_rows),
       .class_name = class_name,
       .ruleset = session.ruleset(),
@@ -228,12 +232,12 @@ std::size_t PendingCountOf(const SurvivorsRankingSession& session) {
 
 std::optional<ui::SurvivorsPrepareRanking> PrepareRankingOf(const SurvivorsRankingSession& session,
                                                             SurvivorsRankingRowsHeld& held,
-                                                            std::uint16_t class_id) {
+                                                            const SurvivorsBoardShown& shown) {
   held.pending_names.clear();
   held.pending_rows.clear();
   if (!session.service_open()) return std::nullopt;
   ui::SurvivorsPrepareRanking ranking;
-  if (const SurvivorsHeldPage* page = session.page(rn::SurvivorsBoardKind::kRanked, class_id)) {
+  if (const SurvivorsHeldPage* page = session.page(rn::SurvivorsBoardKind::kRanked, shown)) {
     ranking.best_known = true;
     ranking.best_rank = page->page.own_rank;
     ranking.best_score = page->page.own_score;
@@ -334,14 +338,14 @@ void SayRankingNotices(SurvivorsRankingMode& ranking, const SurvivorsStage& stag
 
 void FollowRankingAsks(SurvivorsRankingMode& ranking, ui::SurvivorsRankingState& state,
                        const SurvivorsRankingAsks& asks, const ro::sim::SurvivorsRules& rules,
-                       std::uint16_t class_id) {
+                       const SurvivorsBoardShown& shown) {
   if (!ranking.session().service_open()) {
     state.open = false;
     ranking.OweBoard(std::nullopt);
     return;
   }
-  const bool class_changed = ranking.FollowBoardClass(class_id);
-  bool ask = state.open && (asks.window.refresh || asks.window.tab_changed || class_changed);
+  const bool shown_changed = ranking.FollowBoardShown(shown);
+  bool ask = state.open && (asks.window.refresh || asks.window.tab_changed || shown_changed);
   if (asks.open_on.has_value()) {
     state.open = true;
     state.tab = *asks.open_on;
@@ -351,28 +355,28 @@ void FollowRankingAsks(SurvivorsRankingMode& ranking, ui::SurvivorsRankingState&
     ask = true;
   }
   // UNE DEMANDE RETENUE PAR LA CADENCE RESTE DUE : elle part dès que la
-  // cadence le permet, tant que la fenêtre reste ouverte sur son onglet et sa
-  // classe.
-  const SurvivorsBoardOwed wanted{.board = WireBoardOf(state.tab), .class_id = class_id};
+  // cadence le permet, tant que la fenêtre reste ouverte sur son onglet, son
+  // arène et sa classe.
+  const SurvivorsBoardOwed wanted{.board = WireBoardOf(state.tab), .shown = shown};
   if (!state.open || (ranking.board_owed().has_value() && *ranking.board_owed() != wanted)) {
     ranking.OweBoard(std::nullopt);
   }
   if (!state.open) return;
   if (ask) ranking.OweBoard(wanted);
-  if (ranking.board_owed().has_value() && ranking.AskBoard(rules, class_id, wanted.board)) {
+  if (ranking.board_owed().has_value() && ranking.AskBoard(rules, shown, wanted.board)) {
     ranking.OweBoard(std::nullopt);
   }
 }
 
 void ComposeRankingWindow(const SurvivorsRankingMode& ranking, ui::SurvivorsRankingState& state,
                           ui::SurvivorsRankingView& view, SurvivorsRankingRowsHeld& held,
-                          std::uint16_t class_id, const char* class_name) {
+                          const SurvivorsBoardShown& shown, const char* class_name) {
   if (!state.open) return;
   if (!ranking.session().service_open()) {
     state.open = false;
     return;
   }
-  view = RankingViewOf(ranking.session(), ranking.now(), held, class_id, class_name);
+  view = RankingViewOf(ranking.session(), ranking.now(), held, shown, class_name);
 }
 
 }  // namespace moonclient

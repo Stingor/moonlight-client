@@ -80,8 +80,9 @@ using EvolutionCase = ro::sim::EvolutionRule;
 // Mastering, Eclipse, Dragon Fly et Vagabond Wolf : des cartes verrouillées en
 // partie libre, que leur mini-boss déverrouille.
 constexpr std::array<std::uint16_t, 4> kCardBosses{1090, 1093, 1091, 1092};
-// Peco Peco au désert, Condor sur la prairie comme au désert.
-constexpr std::array<std::uint16_t, 2> kPecoPecoCarriers{1019, 1009};
+// Le Peco Peco, au désert : le seul porteur de sa carte.
+constexpr std::array<std::uint16_t, 1> kPecoPecoCarriers{1019};
+constexpr std::uint16_t kCondorId = 1009;
 
 [[nodiscard]] ro::sim::SurvivorsStart KnightStart() {
   return ro::sim::SurvivorsStart{.seed = kSeed,
@@ -495,13 +496,16 @@ TEST_CASE("Chevalier survivors : les cartes de ses évolutions lui restent obten
   }
 }
 
-TEST_CASE("Peco Peco Card : elle tombe du Peco Peco et du Condor, pour le Chevalier seul",
-          "[sim][survivors]") {
+TEST_CASE("Peco Peco Card : elle tombe du Peco Peco, pour le Chevalier seul", "[sim][survivors]") {
   // Une cote de un : chaque tirage fait tomber la carte.
   ro::sim::SurvivorsRules rules = ro::sim::ShippedSurvivorsRules();
   rules.card_drops.common_odds = 1;
   const ro::sim::ClassRule& mage = rules.classes.front();
   CHECK(std::ranges::find(mage.card_pool, kPecoPecoCardId) == mage.card_pool.end());
+  // Le Condor ne porte aucune carte.
+  const ro::sim::FoeRule* condor = ro::sim::FindFoe(rules, kCondorId);
+  REQUIRE(condor != nullptr);
+  CHECK(condor->card_item_id == 0);
 
   for (const std::uint16_t foe_id : kPecoPecoCarriers) {
     INFO("monstre " << foe_id);

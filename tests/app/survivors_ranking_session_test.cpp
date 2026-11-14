@@ -629,19 +629,23 @@ TEST_CASE("survivors_ranking_session : le tableau se demande toutes les 2 s au p
   CHECK(bench.sent == 1);
 
   const moonclient::SurvivorsHeldPage* held =
-      bench.session.page(rn::SurvivorsBoardKind::kRanked, ts::kGoldenClassId);
+      bench.session.page(rn::SurvivorsBoardKind::kRanked,
+                         {.arena_id = ts::kGoldenArenaId, .class_id = ts::kGoldenClassId});
   REQUIRE(held != nullptr);
   CHECK(held->received_at_ms == 0);
   CHECK(held->page.lines.empty());
   CHECK_FALSE(moonclient::IsRankedOnPage(held->page));
-  CHECK(bench.session.page(rn::SurvivorsBoardKind::kChallenge, ts::kGoldenClassId) == nullptr);
+  CHECK(bench.session.page(rn::SurvivorsBoardKind::kChallenge,
+                           {.arena_id = ts::kGoldenArenaId, .class_id = ts::kGoldenClassId}) ==
+        nullptr);
 
   // Une partie classée, puis la page qui la porte.
   bench.StartRanked();
   bench.Deliver(bench.FinishRanked(ShortTally()));
   CHECK(bench.session.AskBoard(GoldenBoard()));
   bench.Exchange();
-  held = bench.session.page(rn::SurvivorsBoardKind::kRanked, ts::kGoldenClassId);
+  held = bench.session.page(rn::SurvivorsBoardKind::kRanked,
+                            {.arena_id = ts::kGoldenArenaId, .class_id = ts::kGoldenClassId});
   REQUIRE(held != nullptr);
   CHECK(held->page.own_rank == 1);
   CHECK(moonclient::IsRankedOnPage(held->page));
@@ -667,21 +671,26 @@ TEST_CASE("survivors_ranking_session : seule la page de la dernière demande de 
 
   // Une page que rien n'a demandée ne se garde pas.
   note(golden, 1);
-  CHECK(session.page(rn::SurvivorsBoardKind::kRanked, ts::kGoldenClassId) == nullptr);
+  CHECK(session.page(rn::SurvivorsBoardKind::kRanked,
+                     {.arena_id = ts::kGoldenArenaId, .class_id = ts::kGoldenClassId}) == nullptr);
 
   // La demande faite, sa page se garde, et ne se montre que sous sa classe.
   REQUIRE(session.AskBoard(golden));
   note(golden, 1);
-  CHECK(session.page(rn::SurvivorsBoardKind::kRanked, ts::kGoldenClassId) != nullptr);
-  CHECK(session.page(rn::SurvivorsBoardKind::kRanked, kOtherClass) == nullptr);
-  CHECK(session.page(rn::SurvivorsBoardKind::kChallenge, ts::kGoldenClassId) == nullptr);
+  CHECK(session.page(rn::SurvivorsBoardKind::kRanked,
+                     {.arena_id = ts::kGoldenArenaId, .class_id = ts::kGoldenClassId}) != nullptr);
+  CHECK(session.page(rn::SurvivorsBoardKind::kRanked,
+                     {.arena_id = ts::kGoldenArenaId, .class_id = kOtherClass}) == nullptr);
+  CHECK(session.page(rn::SurvivorsBoardKind::kChallenge,
+                     {.arena_id = ts::kGoldenArenaId, .class_id = ts::kGoldenClassId}) == nullptr);
 
   // UNE RÉPONSE EN RETARD D'UNE CLASSE QUITTÉE ne remplace rien.
   session.Tick(moonclient::SurvivorsRankingNow{.steady_ms = moonclient::kSurvivorsBoardCadenceMs});
   REQUIRE(session.AskBoard(other));
   note(golden, 2);
   const moonclient::SurvivorsHeldPage* held =
-      session.page(rn::SurvivorsBoardKind::kRanked, ts::kGoldenClassId);
+      session.page(rn::SurvivorsBoardKind::kRanked,
+                   {.arena_id = ts::kGoldenArenaId, .class_id = ts::kGoldenClassId});
   REQUIRE(held != nullptr);
   CHECK(held->page.own_rank == 1);
 
@@ -689,14 +698,17 @@ TEST_CASE("survivors_ranking_session : seule la page de la dernière demande de 
   rn::SurvivorsBoardKey other_arena = other;
   other_arena.arena_id = other.arena_id + 1;
   note(other_arena, 3);
-  CHECK(session.page(rn::SurvivorsBoardKind::kRanked, kOtherClass) == nullptr);
+  CHECK(session.page(rn::SurvivorsBoardKind::kRanked,
+                     {.arena_id = ts::kGoldenArenaId, .class_id = kOtherClass}) == nullptr);
 
   // La page attendue prend la place de l'ancienne, et l'autre classe ne se montre plus.
   note(other, 4);
-  held = session.page(rn::SurvivorsBoardKind::kRanked, kOtherClass);
+  held = session.page(rn::SurvivorsBoardKind::kRanked,
+                      {.arena_id = ts::kGoldenArenaId, .class_id = kOtherClass});
   REQUIRE(held != nullptr);
   CHECK(held->page.own_rank == 4);
-  CHECK(session.page(rn::SurvivorsBoardKind::kRanked, ts::kGoldenClassId) == nullptr);
+  CHECK(session.page(rn::SurvivorsBoardKind::kRanked,
+                     {.arena_id = ts::kGoldenArenaId, .class_id = ts::kGoldenClassId}) == nullptr);
 }
 
 TEST_CASE("survivors_ranking_session : une partie de l'ancienne version survit à la montée",

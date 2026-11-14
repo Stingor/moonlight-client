@@ -114,13 +114,13 @@ void StepQuietly(SurvivorsRun& run, std::uint32_t steps) {
 
 }  // namespace
 
-TEST_CASE("Marchand survivors : sa classe, ses corps, hors classement", "[sim][survivors]") {
+TEST_CASE("Marchand survivors : sa classe, ses corps, classée", "[sim][survivors]") {
   const ro::sim::SurvivorsRules& rules = ro::sim::ShippedSurvivorsRules();
   const ro::sim::ClassRule* merchant = ro::sim::FindClass(rules, kMerchantClassId);
   REQUIRE(merchant != nullptr);
   CHECK(std::string_view(merchant->key) == "merchant");
   CHECK(merchant->attack_gesture);
-  CHECK(merchant->free_play_only);
+  CHECK_FALSE(merchant->free_play_only);
   // Il ramasse le plus loin du mode.
   for (const ro::sim::ClassRule& other : rules.classes) {
     if (other.class_id != kMerchantClassId) CHECK(other.magnet_units < merchant->magnet_units);

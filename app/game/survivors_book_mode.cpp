@@ -27,7 +27,7 @@ SurvivorsBookMode::SurvivorsBookMode(UtcClock now_utc, SurvivorsSaveFile file)
 
 void SurvivorsBookMode::ChooseArena(const ro::sim::SurvivorsRules& rules,
                                     std::uint16_t arena_id) noexcept {
-  if (ro::sim::FindArena(rules, arena_id) != nullptr) free_arena_id_ = arena_id;
+  if (ro::sim::FindArena(rules, arena_id) != nullptr) arena_id_ = arena_id;
 }
 
 void SurvivorsBookMode::ChooseClass(const ro::sim::SurvivorsRules& rules,
@@ -66,20 +66,20 @@ SurvivorsBookMode::Begun SurvivorsBookMode::StartAs(SurvivorsBoardKind kind,
                                                     std::uint64_t seed) {
   if (kind == SurvivorsBoardKind::kChallenge) {
     const ro::sim::IsoWeek week = IsoWeekOfUtc(now_utc_());
-    return Begun{.start = ChallengeStartOf(rules, week, board_class_id(rules)),
+    return Begun{.start = ChallengeStartOf(rules, week, board_class_id(rules), arena_id_),
                  .board = SurvivorsRunBoard{.kind = SurvivorsBoardKind::kChallenge, .week = week}};
   }
   if (kind == SurvivorsBoardKind::kRanked) {
-    return Begun{.start = ro::sim::RankedStartOf(rules, seed, board_class_id(rules)),
+    return Begun{.start = ro::sim::RankedStartOf(rules, seed, board_class_id(rules), arena_id_),
                  .board = SurvivorsRunBoard{.kind = SurvivorsBoardKind::kRanked}};
   }
-  return FreeStart(rules, client_root, seed, free_arena_id_, class_id_);
+  return FreeStart(rules, client_root, seed, arena_id_, class_id_);
 }
 
 SurvivorsBookMode::Begun SurvivorsBookMode::StartRankedAsFree(
     const ro::sim::SurvivorsRules& rules, const std::filesystem::path& client_root,
-    std::uint64_t seed, std::uint16_t class_id) {
-  const ro::sim::ArenaRule* ranked_arena = ro::sim::FirstRankedArena(rules);
+    std::uint64_t seed, std::uint16_t class_id, std::uint16_t arena_id) {
+  const ro::sim::ArenaRule* ranked_arena = ro::sim::RankedArenaOr(rules, arena_id);
   return FreeStart(rules, client_root, seed,
                    ranked_arena == nullptr ? std::uint16_t{0} : ranked_arena->arena_id, class_id);
 }
@@ -91,7 +91,7 @@ std::optional<SurvivorsBookMode::Begun> SurvivorsBookMode::StartAlone(
     return std::nullopt;
   }
   if (kind_ == SurvivorsBoardKind::kRanked) {
-    return StartRankedAsFree(rules, client_root, seed, board_class_id(rules));
+    return StartRankedAsFree(rules, client_root, seed, board_class_id(rules), arena_id_);
   }
   return StartOf(rules, client_root, seed);
 }
