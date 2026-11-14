@@ -13,11 +13,17 @@ namespace ro::ui {
 //
 // ⚠ EN-TÊTE PRIVÉ : rien hors de `libs/ui/src` n'appelle ceci.
 
-// La barre des onglets portés. Un onglet grisé dit pourquoi au survol.
+// LA LISTE DE CE QU'ON RÈGLE : les corps d'abord — le corps porté, puis ses
+// variantes, monté, en tenue —, la tête, puis chaque calque porté. Une entrée
+// grisée dit pourquoi au survol.
 //
-// ⚠ ELLE ÉCRIT `state.tab` : c'est l'onglet que `app` composera à l'image
-// suivante.
-void DrawLayerTabs(PaletteEditorState& state, const PaletteEditorView& view, const SkinArt& art);
+// 🔴 UNE LISTE ET NON UNE BARRE D'ONGLETS : dix calques nommés côte à côte
+// imposaient à la fenêtre une largeur que rien d'autre ne demande.
+//
+// ⚠ ELLE ÉCRIT `state.tab`, et le corps choisi dans `action.edit_body` : c'est
+// ce que `app` composera à l'image suivante.
+void DrawLayerChoice(PaletteEditorState& state, const PaletteEditorView& view, const SkinArt& art,
+                     PaletteEditorAction& action);
 
 // L'onglet dont la vue est faite, ou nul.
 [[nodiscard]] const PaletteTab* OpenTab(const PaletteEditorView& view);

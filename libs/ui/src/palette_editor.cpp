@@ -307,19 +307,7 @@ void DrawSendButtons(const PaletteEditorView& view, const SkinArt& art,
 //
 // ⚠ LE CORPS NE PEUT PAS ÊTRE NOMMÉ : son nom est le chemin de son sprite, en
 // coréen. On dit donc ce qui se DÉCIDE, pas ce qui se porte.
-void DrawBodyLines(const PaletteEditorView& view, const SkinArt& art, PaletteEditorAction& action) {
-  if (view.bodies.size() > 1) {
-    int chosen = view.edited_body;
-    ImGui::AlignTextToFramePadding();
-    ImGui::TextUnformatted(core::Tr("Corps réglé :"));
-    ImGui::SameLine();
-    if (SkinCombo("##corps", &chosen, view.bodies, art)) {
-      action.edit_body = chosen;
-    }
-    Explain(
-        core::Tr("Règle une monture ou une tenue sans la porter. Valider ne change que le "
-                 "corps choisi."));
-  }
+void DrawBodyLines(const PaletteEditorView& view) {
   if (view.is_main) {
     ImGui::TextUnformatted(core::Tr("Ce corps porte ton style principal."));
   } else if (view.body_has_own_style) {
@@ -436,12 +424,25 @@ PaletteEditorAction DrawPaletteEditor(PaletteEditorState& state, const PaletteEd
       BeginSkinnedWindow(name.Get(), &open, art, SkinnedTitle::kBar,
                          ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
   action.report_bug = begun && state.bug_report && TitleActionClicked(0);
-  if (!open) {
+  // 🔴 UN STYLE NON VALIDÉ SE PERD À LA FERMETURE : on le dit avant. Rien
+  // d'autre n'est parti, et l'aperçu ne survit pas à la fenêtre.
+  const bool unsent = view.has_something_to_send ||
+                      (view.effects != nullptr && EffectsDiffer(state.effects, *view.effects));
+  if (!open && !unsent) {
     state.open = false;
   }
   if (!begun) {
     EndSkinnedWindow();
     return action;
+  }
+  if (!open && unsent) {
+    ImGui::OpenPopup("fermer_sans_valider");
+  }
+  if (Confirm("fermer_sans_valider",
+              core::Tr("Ton style n'est pas validé : fermer l'éditeur le perd. Personne ne l'a "
+                       "vu, et ton personnage garde ce qu'il porte."),
+              core::Tr("Fermer sans valider"), art)) {
+    state.open = false;
   }
 
   // ── LE TRAIT EN COURS ─────────────────────────────────────────────────────
@@ -457,7 +458,7 @@ PaletteEditorAction DrawPaletteEditor(PaletteEditorState& state, const PaletteEd
   ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + ImGui::GetFontSize() * kWrapInFonts);
   ImGui::TextUnformatted(core::Tr("Choisis une pièce, puis règle sa couleur."));
   ImGui::PopTextWrapPos();
-  DrawLayerTabs(state, view, art);
+  DrawLayerChoice(state, view, art, action);
   // L'ONGLET DES EFFETS n'a ni pièces, ni historique, ni codes : son corps est le
   // sien. Voir `ro/ui/palette_effects.h`. Le pantin y joue les effets, teints de
   // ce qu'on règle.
@@ -482,14 +483,6 @@ PaletteEditorAction DrawPaletteEditor(PaletteEditorState& state, const PaletteEd
   }
   const bool on_body = view.tab == PaletteTabKind::kBody;
 
-  // ── CE QUE LES RÉGLAGES ATTEIGNENT VRAIMENT ───────────────────────────────
-  if (view.coverage_percent >= 0) {
-    char line[128] = {};
-    std::snprintf(line, sizeof(line),
-                  on_body ? core::Tr("Réglable : %d%% du corps") : core::Tr("Réglable : %d%%"),
-                  view.coverage_percent);
-    ImGui::TextUnformatted(line);
-  }
   if (view.hue_classes) {
     ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + ImGui::GetFontSize() * kWrapInFonts);
     ImGui::TextUnformatted(
@@ -498,7 +491,7 @@ PaletteEditorAction DrawPaletteEditor(PaletteEditorState& state, const PaletteEd
     ImGui::PopTextWrapPos();
   }
   if (on_body) {
-    DrawBodyLines(view, art, action);
+    DrawBodyLines(view);
   }
   ImGui::Separator();
 

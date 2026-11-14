@@ -467,9 +467,6 @@ tr: %s (%s, %s): waiting
 fr: Corps porté
 tr: Worn body
 
-fr: Corps réglé :
-tr: Body being edited:
-
 fr: Coucher (h)
 tr: Sunset (h)
 
@@ -11562,9 +11559,6 @@ tr: Refused: an upload is already in progress, or the service is unavailable.
 
 fr: Refusé par le serveur pendant une guerre de guildes\net sur les cartes verrouillées.
 tr: Refused by the server during a guild war\nand on locked maps.
-
-fr: Réglable : %d%% du corps
-tr: Adjustable: %d%% of the body
 
 fr: Réinitialiser cette pièce
 tr: Reset this part
@@ -23482,9 +23476,6 @@ tr: Remove this item's dye
 fr: Retirer la teinture de cet item ? Il retrouve ses couleurs d'origine, où qu'il aille ensuite.
 tr: Remove this item's dye? It gets its original colors back, wherever it goes next.
 
-fr: Réglable : %d%%
-tr: Adjustable: %d%%
-
 fr: Seulement à l'atelier du styliste.
 tr: Only at the stylist's workshop.
 
@@ -23930,3 +23921,12 @@ tr: Reform
 
 fr: Réformer %s en %s ? La pièce et les matériaux seront consommés.
 tr: Reform %s into %s? The item and the materials will be consumed.
+
+fr: Je règle :
+tr: Editing:
+
+fr: Ton style n'est pas validé : fermer l'éditeur le perd. Personne ne l'a vu, et ton personnage garde ce qu'il porte.
+tr: Your style isn't applied: closing the editor discards it. Nobody has seen it, and your character keeps what they wear.
+
+fr: Fermer sans valider
+tr: Close without applying

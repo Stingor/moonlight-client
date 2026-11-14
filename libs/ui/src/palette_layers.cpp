@@ -8,6 +8,7 @@
 #include <cstdio>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "ro/core/i18n.h"
 #include "ro/ui/skin_popup.h"
@@ -380,43 +381,102 @@ const PaletteTab* OpenTab(const PaletteEditorView& view) {
   return nullptr;
 }
 
-void DrawLayerTabs(PaletteEditorState& state, const PaletteEditorView& view, const SkinArt& art) {
-  if (view.tabs.size() < 2 ||
-      !BeginSkinTabBar("calques", art, ImGuiTabBarFlags_FittingPolicyScroll)) {
+void DrawLayerChoice(PaletteEditorState& state, const PaletteEditorView& view, const SkinArt& art,
+                     PaletteEditorAction& action) {
+  static_cast<void>(std::exchange(state.tab_asked, false));
+  // Les entrées : un corps par variante, puis chaque calque hors du corps.
+  struct Entry {
+    std::string label;
+    PaletteTabKind kind = PaletteTabKind::kBody;
+    int body = -1;
+    const PaletteTab* tab = nullptr;
+  };
+  std::vector<Entry> entries;
+  const PaletteTab* body_tab = nullptr;
+  for (const PaletteTab& tab : view.tabs) {
+    if (tab.kind == PaletteTabKind::kBody) {
+      body_tab = &tab;
+    }
+  }
+  const std::size_t bodies = std::max<std::size_t>(view.bodies.size(), 1);
+  for (std::size_t rank = 0; rank < bodies; ++rank) {
+    std::string label = PaletteTabName(PaletteTabKind::kBody);
+    if (rank > 0) {
+      label += " : ";
+      label += SkinComboItemText(view.bodies[rank]);
+    }
+    if (body_tab != nullptr && body_tab->edited && static_cast<int>(rank) == view.edited_body) {
+      label += " *";
+    }
+    entries.push_back(Entry{.label = std::move(label),
+                            .kind = PaletteTabKind::kBody,
+                            .body = static_cast<int>(rank),
+                            .tab = body_tab});
+  }
+  for (const PaletteTab& tab : view.tabs) {
+    if (tab.kind == PaletteTabKind::kBody) {
+      continue;
+    }
+    std::string label = TabLabel(tab);
+    label.erase(label.find("###"));
+    entries.push_back(Entry{.label = std::move(label), .kind = tab.kind, .tab = &tab});
+  }
+  // ⚠ UN CALQUE OUVERT QUI DEVIENT NON RÉGLABLE — on enfile l'habit du GM sous
+  // la Tête — REND LA MAIN À CELUI QUE LA VUE MONTRE.
+  for (const Entry& entry : entries) {
+    if (entry.kind == state.tab && entry.tab != nullptr &&
+        entry.tab->blocked != PaletteTabBlock::kNone) {
+      state.tab = view.tab;
+    }
+  }
+  int current = -1;
+  for (std::size_t rank = 0; rank < entries.size(); ++rank) {
+    const Entry& entry = entries[rank];
+    if (entry.kind == state.tab &&
+        (entry.kind != PaletteTabKind::kBody || entry.body == view.edited_body)) {
+      current = static_cast<int>(rank);
+    }
+  }
+  float widest = 0.0F;
+  for (const Entry& entry : entries) {
+    widest = std::max(widest, ImGui::CalcTextSize(entry.label.c_str()).x);
+  }
+  ImGui::AlignTextToFramePadding();
+  ImGui::TextUnformatted(core::Tr("Je règle :"));
+  ImGui::SameLine();
+  ImGui::SetNextItemWidth(widest + SkinComboChromeWidth(art));
+  const char* shown = current >= 0 ? entries[static_cast<std::size_t>(current)].label.c_str() : "";
+  if (!BeginSkinCombo("##calque", shown, art)) {
     return;
   }
-  const bool forced = std::exchange(state.tab_asked, false);
-  for (const PaletteTab& tab : view.tabs) {
-    const bool blocked = tab.blocked != PaletteTabBlock::kNone;
-    const ImGuiTabItemFlags flags =
-        forced && state.tab == tab.kind ? ImGuiTabItemFlags_SetSelected : 0;
+  for (std::size_t rank = 0; rank < entries.size(); ++rank) {
+    const Entry& entry = entries[rank];
+    const bool blocked = entry.tab != nullptr && entry.tab->blocked != PaletteTabBlock::kNone;
+    ImGui::PushID(static_cast<int>(rank));
     ImGui::BeginDisabled(blocked);
-    const std::string label = TabLabel(tab);
-    if (ImGui::BeginTabItem(label.c_str(), nullptr, flags)) {
-      if (blocked && !forced) {
-        // ⚠ UN ONGLET OUVERT QUI DEVIENT NON RÉGLABLE — on enfile l'habit du
-        // GM sous la Tête — REND LA MAIN À CELUI QUE LA VUE MONTRE : la
-        // barre ne doit pas désigner un calque pendant que la liste est celle
-        // d'un autre.
-        state.tab = view.tab;
-        state.tab_asked = true;
-      } else if (!forced) {
-        state.tab = tab.kind;
+    if (ImGui::Selectable(entry.label.c_str(), static_cast<int>(rank) == current)) {
+      state.tab = entry.kind;
+      if (entry.body >= 0) {
+        action.edit_body = entry.body;
       }
-      ImGui::EndTabItem();
     }
     ImGui::EndDisabled();
+    ImGui::PopID();
     if (blocked) {
-      Explain(TabBlockReason(tab.blocked));
-    } else if (tab.item) {
+      Explain(TabBlockReason(entry.tab->blocked));
+    } else if (entry.body > 0) {
+      Explain(
+          core::Tr("Règle une monture ou une tenue sans la porter. Valider ne change que le "
+                   "corps choisi."));
+    } else if (entry.tab != nullptr && entry.tab->item) {
       Explain(core::Tr("La teinture de cet onglet appartient à l'item porté."));
-    } else if (tab.companion) {
+    } else if (entry.tab != nullptr && entry.tab->companion) {
       Explain(core::Tr("La teinture de cet onglet appartient à ce compagnon."));
-    } else if (tab.kind == PaletteTabKind::kEffects) {
+    } else if (entry.kind == PaletteTabKind::kEffects) {
       Explain(core::Tr("La teinture des effets de chapeau que tu affiches."));
     }
   }
-  EndSkinTabBar();
+  EndSkinCombo();
 }
 
 void DrawLayerNotes(const PaletteEditorView& view, const SkinArt& art,

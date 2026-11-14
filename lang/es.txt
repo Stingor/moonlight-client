@@ -467,9 +467,6 @@ tr: %s (%s, %s): en espera
 fr: Corps porté
 tr: Cuerpo actual
 
-fr: Corps réglé :
-tr: Cuerpo ajustado:
-
 fr: Coucher (h)
 tr: Ocaso (h)
 
@@ -11562,9 +11559,6 @@ tr: Rechazado: ya hay un envío en curso, o el servicio no está disponible.
 
 fr: Refusé par le serveur pendant une guerre de guildes\net sur les cartes verrouillées.
 tr: Rechazado por el servidor durante una guerra de guilds\ny en los mapas bloqueados.
-
-fr: Réglable : %d%% du corps
-tr: Ajustable: %d%% del cuerpo
 
 fr: Réinitialiser cette pièce
 tr: Restablecer esta pieza
@@ -23482,9 +23476,6 @@ tr: Quitar el tinte de este item
 fr: Retirer la teinture de cet item ? Il retrouve ses couleurs d'origine, où qu'il aille ensuite.
 tr: ¿Quitar el tinte de este item? Recupera sus colores originales, vaya donde vaya después.
 
-fr: Réglable : %d%%
-tr: Ajustable: %d%%
-
 fr: Seulement à l'atelier du styliste.
 tr: Solo en el taller del estilista.
 
@@ -23930,3 +23921,12 @@ tr: Reformar
 
 fr: Réformer %s en %s ? La pièce et les matériaux seront consommés.
 tr: ¿Reformar %s en %s? La pieza y los materiales se consumirán.
+
+fr: Je règle :
+tr: Editando:
+
+fr: Ton style n'est pas validé : fermer l'éditeur le perd. Personne ne l'a vu, et ton personnage garde ce qu'il porte.
+tr: Tu estilo no está aplicado: cerrar el editor lo descarta. Nadie lo ha visto y tu personaje conserva lo que lleva.
+
+fr: Fermer sans valider
+tr: Cerrar sin aplicar

@@ -236,6 +236,11 @@ void EndSkinCombo();
 // premier cran, dans un sens comme dans l'autre, vise la première entrée.
 [[nodiscard]] int SkinComboStepped(int rank, int step, int count);
 
+// LE LIBELLÉ D'UNE ENTRÉE, traduit à la LECTURE : un littéral marqué par
+// `TrText` loin de la liste qui le montre. Pour une liste que l'appelant pose
+// lui-même, entrée par entrée.
+[[nodiscard]] const char* SkinComboItemText(const char* marked);
+
 // LA LISTE TOUTE FAITE : des libellés et l'index choisi. La molette la fait
 // défiler.
 //

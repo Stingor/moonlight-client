@@ -170,6 +170,8 @@ void EndSkinCombo() {
   ImGui::PopID();
 }
 
+const char* SkinComboItemText(const char* marked) { return core::Tr(marked); }
+
 int SkinComboStepped(int rank, int step, int count) {
   if (step == 0 || count <= 0) {
     return rank;
