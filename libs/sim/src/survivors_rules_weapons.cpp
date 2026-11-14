@@ -19,10 +19,9 @@ namespace {
 
 constexpr std::size_t kWeaponLevelCount = 2;
 
-// Le tir de baguette du Magicien : des billes guidées.
+// Le trait de baguette du Magicien : un projectile droit, comme la flèche.
 constexpr std::int32_t kRodSpeedCellsPerSecond = 10;
 constexpr std::int32_t kRodHitRadiusTenths = 4;
-constexpr std::uint32_t kRodLifeMs = 1200;
 constexpr std::uint32_t kRodCooldownMs = 900;
 
 [[nodiscard]] constexpr SkillLevel RodShot(std::uint8_t amount, std::int32_t damage,
@@ -32,8 +31,7 @@ constexpr std::uint32_t kRodCooldownMs = 900;
                     .amount = amount,
                     .reach_units = Cells(reach_cells),
                     .speed_units_per_s = Cells(kRodSpeedCellsPerSecond),
-                    .hit_radius_units = CellTenths(kRodHitRadiusTenths),
-                    .life_ms = kRodLifeMs};
+                    .hit_radius_units = CellTenths(kRodHitRadiusTenths)};
 }
 
 // Le coup de dague du Voleur, puis le double coup de katar de l'Assassin.
@@ -112,8 +110,8 @@ constexpr std::array<std::uint16_t, kWeaponLevelCount> kBowItems{kBowItemId, kHu
 constexpr std::array<SurvivorsSkillRule, kWeaponSkillCount> kWeaponSkills{{
     {.skill_id = kRodShotSkillId,
      .key = "rod_shot",
-     .description = core::TrText("Votre baguette tire une bille qui poursuit le plus proche."),
-     .archetype = SkillArchetype::kHoming,
+     .description = core::TrText("Votre baguette tire un trait droit sur le plus proche."),
+     .archetype = SkillArchetype::kLinear,
      .target = TargetRule::kNearest,
      .element = SurvivorsElement::kNeutral,
      .levels = kRodShotLevels,

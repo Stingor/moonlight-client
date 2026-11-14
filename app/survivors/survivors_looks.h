@@ -155,6 +155,11 @@ inline constexpr std::uint32_t kArrowFallbackEffect = 1;
 // L'arc que la flèche suppose : celui de l'Archer.
 inline constexpr std::uint16_t kArrowShooterJob = 3;
 inline constexpr std::uint16_t kArrowShooterWeapon = 1701;
+// LE COUP DE BAGUETTE du Magicien tire le trait que le jeu donne aux bâtons
+// (`ro::render::ShootsWandBolts`), et non une flèche.
+inline constexpr std::uint16_t kRodShotSkill = 60001;
+inline constexpr std::uint16_t kWandShooterJob = 2;
+inline constexpr std::uint16_t kWandShooterWeapon = 1601;
 // LE BRUIT D'UNE FLÈCHE QUI TOUCHE : celui que le jeu donne à l'arc, à l'impact
 // et non au lâcher.
 inline constexpr std::string_view kArrowHitSound = "_hit_arrow.wav";
@@ -331,6 +336,8 @@ struct SkillLook {
   // Ses projectiles se dessinent en flèches d'arc, et un lancer sans effet de
   // table ne joue rien de plus.
   bool shoots_arrow = false;
+  // Ces projectiles sont le trait d'une baguette, et non la flèche d'un arc.
+  bool shoots_wand_bolt = false;
   // Sa zone est un piège : une marque au sol, sans flamme.
   bool trap = false;
   // SON ORBE EST LE CHARIOT du héros, qui tourne : il ne porte aucun effet, et

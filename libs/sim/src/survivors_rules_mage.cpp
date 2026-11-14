@@ -228,40 +228,44 @@ constexpr std::uint32_t kIceWallLifeMs = 6000;
                     .block_hp = block_hp};
 }
 
+// LES TROIS BOLTS DE DÉPART frappent UNE cible, de plus en plus fort, comme
+// les éclairs du jeu s'ajoutent sur leur cible à chaque niveau. Seul le bonus
+// de quantité (Mastering Card) en ajoute d'autres.
+//
 // Bolt(frappes, dégâts, recharge en ms).
 constexpr std::array<SkillLevel, kMostSkillLevels> kFireBoltLevels{{
-    Bolt(2, 12, 1100),
-    Bolt(3, 12, 1100),
-    Bolt(3, 14, 1100),
-    Bolt(4, 14, 1100),
-    Bolt(4, 14, 950),
-    Bolt(5, 14, 950),
-    Bolt(5, 20, 950),
-    Bolt(7, 20, 950),
+    Bolt(1, 29, 1100),
+    Bolt(1, 43, 1100),
+    Bolt(1, 50, 1100),
+    Bolt(1, 67, 1100),
+    Bolt(1, 67, 950),
+    Bolt(1, 84, 950),
+    Bolt(1, 120, 950),
+    Bolt(1, 168, 950),
 }};
 
 // Bolt(frappes, dégâts, recharge en ms, glaçage en ms).
 constexpr std::array<SkillLevel, kMostSkillLevels> kColdBoltLevels{{
-    Bolt(2, 11, 1300, 1500),
-    Bolt(3, 11, 1300, 1500),
-    Bolt(3, 12, 1300, 1500),
-    Bolt(3, 12, 1300, 2500),
-    Bolt(4, 12, 1300, 2500),
-    Bolt(4, 12, 1100, 2500),
-    Bolt(5, 12, 1100, 2500),
-    Bolt(5, 16, 1100, 3000),
+    Bolt(1, 26, 1300, 1500),
+    Bolt(1, 40, 1300, 1500),
+    Bolt(1, 43, 1300, 1500),
+    Bolt(1, 43, 1300, 2500),
+    Bolt(1, 58, 1300, 2500),
+    Bolt(1, 58, 1100, 2500),
+    Bolt(1, 72, 1100, 2500),
+    Bolt(1, 96, 1100, 3000),
 }};
 
 // Bolt(frappes, dégâts, recharge en ms), puis BouncingBolt(…, rebonds).
 constexpr std::array<SkillLevel, kMostSkillLevels> kLightningBoltLevels{{
-    Bolt(2, 16, 1500),
-    Bolt(3, 16, 1500),
-    Bolt(3, 19, 1500),
-    BouncingBolt(4, 19, 1500, 1),
-    BouncingBolt(4, 19, 1250, 1),
-    BouncingBolt(4, 24, 1250, 1),
-    BouncingBolt(5, 24, 1250, 1),
-    BouncingBolt(7, 24, 1250, 2),
+    Bolt(1, 38, 1500),
+    Bolt(1, 58, 1500),
+    Bolt(1, 68, 1500),
+    BouncingBolt(1, 91, 1500, 1),
+    BouncingBolt(1, 91, 1250, 1),
+    BouncingBolt(1, 115, 1250, 1),
+    BouncingBolt(1, 144, 1250, 1),
+    BouncingBolt(1, 202, 1250, 2),
 }};
 
 // Soul(esprits, dégâts, recharge en ms, perçage).

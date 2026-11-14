@@ -23524,8 +23524,8 @@ tr: Un color para todo el pelo
 fr: Une teinture d'item se valide auprès du styliste.
 tr: Un tinte de item se valida con el estilista.
 
-fr: Votre baguette tire une bille qui poursuit le plus proche.
-tr: Tu vara dispara una esfera que persigue al más cercano.
+fr: Votre baguette tire un trait droit sur le plus proche.
+tr: Tu vara dispara un rayo recto al más cercano.
 
 fr: Un coup de lame vif au plus proche ; au katar, deux.
 tr: Un golpe rápido de hoja al más cercano; con katar, dos.

@@ -18,7 +18,7 @@ namespace ro::sim {
 // LES RÈGLES DU MODE SURVIVORS : des données, injectées dans une partie.
 // Si l'essai de rejeu en or change, montez kSurvivorsRulesetVersion : un journal
 // ne se rejoue que contre la version de règles qui l'a produit.
-inline constexpr std::uint16_t kSurvivorsRulesetVersion = 6;
+inline constexpr std::uint16_t kSurvivorsRulesetVersion = 7;
 inline constexpr std::size_t kMostSkillLevels = 8;
 inline constexpr std::size_t kMostCardLevels = 5;
 inline constexpr std::uint8_t kMostOffers = 4;

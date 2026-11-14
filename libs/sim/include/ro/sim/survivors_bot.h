@@ -31,6 +31,13 @@ struct SurvivorsBotProfile {
   // au lieu de `threat_radius_units`. 0 : il tient jusqu'au bout.
   std::int32_t retreat_below_pct = 0;
   std::int32_t retreat_radius_units = 0;
+  // LES SORTS DE ZONE D'ABORD : tant qu'il tient moins de `area_skills_wanted`
+  // des `area_skills` (ou de leurs évolués), un sort de zone neuf passe devant
+  // toute montée, et un skill de départ ne monte pas au-delà de
+  // `starter_level_before_area`. Vide : aucune préférence.
+  std::span<const std::uint16_t> area_skills;
+  std::size_t area_skills_wanted = 0;
+  std::uint8_t starter_level_before_area = 0;
 };
 
 class SurvivorsBot {

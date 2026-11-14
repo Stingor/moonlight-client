@@ -151,9 +151,9 @@ class HordePoses {
   // LES COUPS DES DERNIERS PAS : un monstre qu'un piège retient (`FreezeHolds`)
   // ne bleuit pas tant que ce gel dure. ⚠ AVANT `Pose`, comme `NoticeFalls`.
   //
-  // L'AUTO-ATTAQUE QUI TOUCHE fait jouer au héros son attaque à
-  // `presentation_ms`, à chaque coup et même en marche : elle n'attend pas
-  // `kHeroGestureEveryMs`.
+  // L'AUTO-ATTAQUE QUI TOUCHE fait jouer au héros immobile son attaque à
+  // `presentation_ms`, à chaque coup : elle n'attend pas `kHeroGestureEveryMs`.
+  // En marche, il marche : un geste joué en avançant le ferait glisser.
   void NoticeHits(std::span<const ro::sim::SurvivorsHit> hits, const ro::sim::SurvivorsField& field,
                   std::uint64_t presentation_ms);
 

@@ -23524,8 +23524,8 @@ tr: One color for all the hair
 fr: Une teinture d'item se valide auprès du styliste.
 tr: An item dye is confirmed at the stylist.
 
-fr: Votre baguette tire une bille qui poursuit le plus proche.
-tr: Your rod fires an orb that chases the nearest foe.
+fr: Votre baguette tire un trait droit sur le plus proche.
+tr: Your rod fires a straight bolt at the nearest foe.
 
 fr: Un coup de lame vif au plus proche ; au katar, deux.
 tr: A quick blade strike on the nearest foe; two with a katar.

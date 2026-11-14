@@ -60,6 +60,7 @@ constexpr std::uint32_t kMostGemTries = 8;
 // Rangs de la table de priorité des offres, du meilleur au pire.
 enum class OfferTier : std::uint8_t {
   kEvolutionCard,  // la carte qui complète l'évolution d'un skill possédé
+  kAreaSkill,      // un sort de zone neuf, tant qu'il en manque (`area_skills_wanted`)
   kEvolvingSkill,  // la montée d'un skill qui a une évolution
   kFreshSkill,     // un skill neuf, tant qu'un emplacement reste
   kCard,           // une carte neuve ou montée
@@ -403,6 +404,23 @@ SurvivorsAnswer SurvivorsBot::Choose(const SurvivorsField& field) const {
   const SurvivorsRules& rules = *field.rules;
   const bool hurt = BelowPct(field.hero, profile_.heal_below_pct);
   const bool slot_free = field.hero.skills.size() < rules.caps.skill_slots;
+  // Un sort de zone tenu, de base ou évolué.
+  const auto area = [&](std::uint16_t skill_id) {
+    if (std::ranges::find(profile_.area_skills, skill_id) != profile_.area_skills.end()) {
+      return true;
+    }
+    const EvolutionRule* evolution = FindEvolutionTo(rules, skill_id);
+    return evolution != nullptr && std::ranges::find(profile_.area_skills, evolution->skill_id) !=
+                                       profile_.area_skills.end();
+  };
+  const auto areas_held = static_cast<std::size_t>(std::ranges::count_if(
+      field.hero.skills, [&](const OwnedSkill& owned) { return area(owned.skill_id); }));
+  const bool wants_area = areas_held < profile_.area_skills_wanted;
+  const ClassRule* hero_class = field.hero_class;
+  const auto starter = [&](std::uint16_t skill_id) {
+    return hero_class != nullptr && std::ranges::find(hero_class->starter_skills, skill_id) !=
+                                        hero_class->starter_skills.end();
+  };
   OfferRank best;
   for (std::size_t index = 0; index < field.offers.size(); ++index) {
     const SurvivorsOffer& offer = field.offers[index];
@@ -419,7 +437,10 @@ SurvivorsAnswer SurvivorsBot::Choose(const SurvivorsField& field) const {
         }
         break;
       case OfferKind::kSkillLevel: {
-        if (FindEvolutionOf(rules, offer.id) == nullptr) {
+        // Sans ses sorts de zone, un skill de départ assez monté attend.
+        const bool held_back = wants_area && starter(offer.id) &&
+                               offer.next_level > profile_.starter_level_before_area;
+        if (held_back || FindEvolutionOf(rules, offer.id) == nullptr) {
           rank = {OfferTier::kOtherSkill, 0};
           break;
         }
@@ -430,7 +451,11 @@ SurvivorsAnswer SurvivorsBot::Choose(const SurvivorsField& field) const {
         break;
       }
       case OfferKind::kNewSkill:
-        if (slot_free) rank = {OfferTier::kFreshSkill, RankIn(profile_.skill_order, offer.id)};
+        if (slot_free) {
+          const OfferTier tier =
+              wants_area && area(offer.id) ? OfferTier::kAreaSkill : OfferTier::kFreshSkill;
+          rank = {tier, RankIn(profile_.skill_order, offer.id)};
+        }
         break;
       case OfferKind::kHeal:
         rank = {hurt ? OfferTier::kWanted : OfferTier::kUnwanted, 0};
@@ -458,6 +483,10 @@ const SurvivorsBotProfile& MageBotProfile() {
   static constexpr std::array<std::uint16_t, 16> kCardOrder{4019, 4072, 4003, 4197, 4009, 4022,
                                                             4266, 4179, 4183, 4147, 4016, 4001,
                                                             4079, 4085, 4127, 4044};
+  // Ses sorts de zone — Napalm Beat, Fire Wall, Thunderstorm, Fire Ball — : il
+  // en veut deux avant de monter un bolt au-delà du niveau 3, qui ne frappe
+  // qu'une cible.
+  static constexpr std::array<std::uint16_t, 4> kAreaSkills{11, 18, 21, 17};
   static const SurvivorsBotProfile kProfile{.skill_order = kSkillOrder,
                                             .card_order = kCardOrder,
                                             .threat_radius_units = Cells(8),
@@ -465,7 +494,10 @@ const SurvivorsBotProfile& MageBotProfile() {
                                             .gem_reach_units = Cells(10),
                                             .edge_margin_units = Cells(20),
                                             .heal_below_pct = 50,
-                                            .steady_steps = 5};
+                                            .steady_steps = 5,
+                                            .area_skills = kAreaSkills,
+                                            .area_skills_wanted = 2,
+                                            .starter_level_before_area = 3};
   return kProfile;
 }
 

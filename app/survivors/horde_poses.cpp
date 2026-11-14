@@ -251,14 +251,12 @@ void HordePoses::PoseHero(const ro::sim::SurvivorsField& field, std::uint64_t pr
   } else if (field.tally.outcome == ro::sim::SurvivorsOutcome::kFell) {
     pose.motion = Motion::kDie;
     pose.motion_ms = ElapsedSince(presentation_ms, MsOfStep(field.step));
-  } else if (PoseStrike(pose, field.stage, presentation_ms, times_of)) {
-    // L'auto-attaque qui touche prime sur la marche et sur la garde.
   } else if (Walking(hero)) {
     pose.motion = Motion::kWalk;
     pose.motion_ms = static_cast<float>(presentation_ms);
-  } else {
+  } else if (!PoseStrike(pose, field.stage, presentation_ms, times_of)) {
     // Immobile ou emporté par son bond, il se tient en garde, et la garde d'un
-    // personnage s'anime.
+    // personnage s'anime ; l'auto-attaque qui touche y prime.
     pose.motion = Motion::kReady;
     pose.motion_ms = static_cast<float>(presentation_ms);
     PoseGesture(pose, field, field.stage, presentation_ms, times_of);
@@ -282,11 +280,13 @@ void HordePoses::PoseAllies(const ro::sim::SurvivorsField& field, std::uint64_t 
     if (hero.down) {
       pose.motion = Motion::kDie;
       pose.motion_ms = kDownMotionMs;
-    } else if (!PoseStrike(pose, index, presentation_ms, times_of)) {
+    } else {
       const bool moving = Walking(hero);
       pose.motion = moving ? Motion::kWalk : Motion::kReady;
       pose.motion_ms = static_cast<float>(presentation_ms);
-      if (!moving) PoseGesture(pose, field, index, presentation_ms, times_of);
+      if (!moving && !PoseStrike(pose, index, presentation_ms, times_of)) {
+        PoseGesture(pose, field, index, presentation_ms, times_of);
+      }
     }
     pose.direction = DirectionOf(hero.facing, pose.motion != Motion::kDie, camera_yaw_degrees_);
     if (!hero.down && field.step < hero.frost_until_step) pose.tint = kFrostedHeroTint;

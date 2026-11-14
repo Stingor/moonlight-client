@@ -668,12 +668,17 @@ void ArenaEffects::ShootHeroArrows(const ro::sim::SurvivorsField& field, const G
   });
   const ro::render::ActorLook bow{
       .player = true, .job = kArrowShooterJob, .weapon = kArrowShooterWeapon};
-  const std::string_view sprite = ro::render::ArrowSpriteOf(*sprites_, bow, false);
+  const ro::render::ActorLook wand{
+      .player = true, .job = kWandShooterJob, .weapon = kWandShooterWeapon};
+  const std::string_view arrow_sprite = ro::render::ArrowSpriteOf(*sprites_, bow, false);
+  const std::string_view wand_sprite = ro::render::ArrowSpriteOf(*sprites_, wand, false);
   for (const ro::sim::SurvivorsShot& shot : team_shots_) {
     if (std::ranges::find(arrows_, shot.serial) != arrows_.end()) continue;
     const SkillLook* look = looks_.Find(shot.skill_id);
     if (look == nullptr || !look->shoots_arrow) continue;
     arrows_.push_back(shot.serial);
+    const ro::render::ActorLook& shooter = look->shoots_wand_bolt ? wand : bow;
+    const std::string_view sprite = look->shoots_wand_bolt ? wand_sprite : arrow_sprite;
     if (!switches_.shown || switches_.reduced || sprite.empty()) continue;
     const std::uint32_t steps = shot.expires_step > field.step ? shot.expires_step - field.step : 0;
     const ro::sim::FieldPoint lands = Along(shot.position, shot.velocity, steps);
@@ -688,7 +693,7 @@ void ArenaEffects::ShootHeroArrows(const ro::sim::SurvivorsField& field, const G
         flight_ms / static_cast<std::uint32_t>(ro::render::kEffectTickMs), 1));
     static_cast<void>(nodes_.ShootSprite(sprite, ground_of(shot.position) + lift,
                                          ground_of(lands) + lift, life_ticks,
-                                         ro::render::ProjectileFlightOf(*sprites_, bow)));
+                                         ro::render::ProjectileFlightOf(*sprites_, shooter)));
     ++launched_total_;
   }
 }

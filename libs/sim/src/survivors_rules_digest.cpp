@@ -147,6 +147,8 @@ void PutBot(FnvDigest& digest, const SurvivorsBotProfile& profile) {
   PutAll(digest, profile.threat_radius_units, profile.panic_radius_units, profile.gem_reach_units,
          profile.edge_margin_units, profile.heal_below_pct, profile.steady_steps,
          profile.retreat_below_pct, profile.retreat_radius_units);
+  PutNumbers(digest, profile.area_skills);
+  PutAll(digest, profile.area_skills_wanted, profile.starter_level_before_area);
 }
 
 void PutCaps(FnvDigest& digest, const SurvivorsCaps& caps) {

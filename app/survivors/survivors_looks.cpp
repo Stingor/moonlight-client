@@ -244,6 +244,7 @@ namespace {
       look.effect_id = kArrowFallbackEffect;
       look.fallback = true;
       look.shoots_arrow = true;
+      look.shoots_wand_bolt = look.skill_id == kRodShotSkill;
       break;
     case ro::sim::SkillArchetype::kCone:
       look.effect_skill_id = kSpearStabSkill;
@@ -388,7 +389,7 @@ bool SkillThudsOnHit(const SkillLook& look) {
 }
 
 std::string SkillHitSoundOf(const SkillLook& look, std::uint32_t draw) {
-  if (look.shoots_arrow) return std::string(kArrowHitSound);
+  if (look.shoots_arrow && !look.shoots_wand_bolt) return std::string(kArrowHitSound);
   // UN PIÈGE SONNE QUAND IL SAUTE, du bruit de son amorce ; celui qui n'en a pas
   // (Ankle Snare, Skid Trap) se tait.
   if (look.trap) {
