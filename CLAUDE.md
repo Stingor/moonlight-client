@@ -85,6 +85,18 @@ Sans argument, `check_format.py` juge tout l'arbre et rend 1 s'il trouve un
 écart ; `--corriger` formate au lieu de refuser ; des chemins le restreignent à
 ces fichiers. Il refuse net une autre version que celle de l'épingle.
 
+**Les règles d'écriture se vérifient aussi**, en partie, à la machine :
+
+```bash
+python scripts/check_hygiene.py --self-test
+python scripts/check_hygiene.py
+```
+
+Le premier prouve que chaque règle MORD encore sur un cas qu'elle doit
+refuser : un contrôle qui passe toujours ne prouve rien. Le second juge
+l'arbre : dépendances entre couches, plafond de lignes, `memset` sur un agrégat,
+`//` terminé par `\`, identifiants en anglais, adresses en commentaire…
+
 ## Tester
 
 ```bash

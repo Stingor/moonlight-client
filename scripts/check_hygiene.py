@@ -83,17 +83,16 @@ CATALOGUE_FILES = {
         "deux moitiés d'une même conversation, et par ordre alphabétique "
         "donnerait deux noms qui mentent",
     "libs/render/include/ro/render/effect_track_motion.h":
-        "une déclaration par SOUS-TYPE du client, chacune avec l'adresse de son "
-        "cas et ce qui la distingue de sa voisine : on y cherche le mouvement "
+        "une déclaration par SOUS-TYPE de mouvement, chacune avec ce qui la "
+        "distingue de sa voisine : on y cherche le mouvement "
         "qu'on porte, jamais deux. Il a DÉJÀ été coupé une fois — le modèle "
         "d'une piste est parti dans `effect_track.h` et cinq familles dans "
         "`effect_track_burst.h` —, et ce qui reste ne se coupe plus sur une "
         "frontière : le partager par ordre alphabétique ou par taille donnerait "
         "deux noms qui mentent",
     "scripts/lectures_a_la_main_des_patrons.py":
-        "une lecture à la main par entrée, chacune adossée à l'ADRESSE du code "
-        "qu'elle relève : on y cherche LA fonction dont on porte la mesure, "
-        "jamais deux. Il a DÉJÀ été coupé une fois — les cribles, c'est-à-dire "
+        "une lecture à la main par entrée : on y cherche LA fonction dont on "
+        "porte la mesure, jamais deux. Il a DÉJÀ été coupé une fois — les cribles, c'est-à-dire "
         "tout ce qui DÉCIDE, sont partis dans "
         "`gen_client_effect_node_patterns.py` —, et ce qui reste ne se coupe "
         "plus sur une frontière : seize tables rangées par ce qu'elles "
@@ -170,7 +169,7 @@ def longest_python_catalogue_entry(text: str) -> tuple[int, str]:
     délimiteur C++ ne verrait qu'une entrée par table — `CHAMPS_LUS_A_LA_MAIN`
     en fait cent quatre-vingt-onze lignes — et la dispense serait inutilisable
     justement là où elle sert. Ce qu'on cherche dans un tel fichier est UN
-    relevé, jamais la table qui le range.
+    article, jamais la table qui le range.
 
     Une entrée commence donc à l'une de ces deux frontières, et court jusqu'à la
     suivante :
@@ -182,8 +181,8 @@ def longest_python_catalogue_entry(text: str) -> tuple[int, str]:
     · dans une table, la ligne qui suit celle ramenant la profondeur au niveau
       de la table ET se terminant par une virgule — la fin d'un article.
 
-    Les commentaires qui précèdent un article lui appartiennent : ils portent
-    l'adresse relevée, et c'est justement ce qui fait la taille d'une entrée.
+    Les commentaires qui précèdent un article lui appartiennent : ils disent
+    d'où il vient, et c'est justement ce qui fait la taille d'une entrée.
     """
     lines = text.splitlines()
     starts: list[int] = []
@@ -758,8 +757,8 @@ def self_test() -> list[str]:
     if "render" not in layer_dependencies().get("ui", frozenset()):
         failures.append("self-test : le graphe des couches ne se lit plus dans les CMakeLists")
 
-    # LA PROVENANCE NATIVE : ses cas vivent avec la règle, formes et liste
-    # blanche ensemble.
+    # LA PROVENANCE : ses cas vivent avec la règle, formes et liste blanche
+    # ensemble.
     failures += self_test_native_provenance()
     failures += self_test_header_definitions()
     failures += self_test_generator_escapes()
