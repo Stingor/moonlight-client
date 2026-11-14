@@ -91,6 +91,20 @@ void ItemEntries(ChatLinkAsk& asked, const ItemLinkFacts& link_facts) {
 // ⛔ NI DESCRIPTION NI BASE DE DONNÉES : un style n'existe dans aucune table,
 // et il n'y a rien à en dire que le pantin ne montre mieux. « Voir ce style »
 // est donc le premier geste, et c'est aussi celui du clic gauche.
+// ⚠ PAS D'APERÇU À PART : la tenue s'ouvre dans l'éditeur, en proposition,
+// et rien ne change avant « Valider ».
+void OutfitEntries(ChatLinkAsk& asked) {
+  if (ImGui::MenuItem(core::Tr("Essayer dans l'éditeur"))) {
+    asked.gesture = ChatLinkGesture::kTryStyle;
+  }
+  if (ImGui::MenuItem(core::Tr("Copier le code"))) {
+    asked.gesture = ChatLinkGesture::kCopyCode;
+  }
+  if (ImGui::MenuItem(core::Tr("Lien dans le chat"))) {
+    asked.gesture = ChatLinkGesture::kRepost;
+  }
+}
+
 void StyleEntries(ChatLinkAsk& asked) {
   if (ImGui::MenuItem(core::Tr("Voir ce style"))) {
     asked.gesture = ChatLinkGesture::kDescribe;
@@ -472,6 +486,9 @@ ChatLinkAsk DrawChatLinkMenu(const char* popup_id, ChatLinkKind kind, std::uint3
       break;
     case ChatLinkKind::kSetting:
       SettingEntries(asked);
+      break;
+    case ChatLinkKind::kOutfit:
+      OutfitEntries(asked);
       break;
   }
   EndSkinPopup();

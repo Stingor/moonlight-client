@@ -290,6 +290,7 @@ add_library(moonclient_chatlinks STATIC
     chat/chat_place_link.cpp
     chat/chat_recipe_link.cpp
     chat/chat_setting_link.cpp
+    chat/chat_outfit_link.cpp
     chat/chat_mention_piece.cpp
     chat/chat_rich_decor.cpp
     chat/chat_search_gestures.cpp
@@ -1917,6 +1918,7 @@ add_executable(moonclient
     effects/effect_layers.cpp
     effects/effect_hit_view.cpp
     game/game_chat_links.cpp
+    game/game_outfit_links.cpp
     game/map_plan_tip.cpp
     game/client_shell.cpp
     shell/backdrop_effects.cpp

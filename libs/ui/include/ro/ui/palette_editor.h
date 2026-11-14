@@ -552,6 +552,9 @@ enum class PaletteEditorVerb : std::uint8_t {
   kWearOutfit,
   kStoreOutfit,
   kClearOutfit,
+  // Renommer le rangement `outfit_slot` en `preset`, ou le partager au chat.
+  kRenameOutfit,
+  kShareOutfit,
 
   // ── LES AUTRES GESTES ───────────────────────────────────────────────────
 
@@ -728,6 +731,8 @@ struct PaletteEditorState {
   std::array<char, kOutfitCodeFieldSize> outfit_code{};
   // La garde-robe a-t-elle été demandée depuis l'ouverture de la section ?
   bool wardrobe_asked = false;
+  // Le nom en cours de saisie pour renommer un rangement.
+  std::array<char, kPresetNameSize> wardrobe_rename{};
   // L'onglet des effets : l'effet choisi et les réglages en cours.
   PaletteEffectsState effects;
   // UNE FERMETURE DEMANDÉE D'AILLEURS — la fiche, le styliste — que la

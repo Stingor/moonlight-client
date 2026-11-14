@@ -284,6 +284,9 @@ void Game::ApplyStyleAnswers(const UiStage::Answers& answers, std::uint32_t now_
   if (const StyleView::StyleToShare shared = style_view_->TakeStyleToShare(); !shared.empty()) {
     PostStyleLink(shared.code, shared.label);
   }
+  if (const StyleView::StyleToShare outfit = style_view_->TakeOutfitToShare(); !outfit.empty()) {
+    PostOutfitLink(outfit.code, outfit.label);
+  }
   // ── CE QUE L'APERÇU D'UN STYLE REÇU A DEMANDÉ ─────────────────────────────
   //
   // ⚠ « COPIER » A DÉJÀ EU LIEU : la fenêtre seule parle au presse-papiers,

@@ -704,11 +704,10 @@ class Game : public Screen,
   void PostChatLink(const MvpLink& link);
   void PostChatLink(const NaviSearchLink& link);  // `<NAVS>` : `chat_navi_search_link.h`
   // POSE LE LIEN D'UN STYLE DANS LA SAISIE : `<STYL>étiquette:code</STYL>`.
-  //
-  // 🔴 LA RECETTE ENTIÈRE VOYAGE, et pas une désignation : un style n'existe
-  // nulle part hors de son porteur. ⚠ ÉTIQUETTE VIDE = NOTRE PSEUDO, résolu
-  // ici : le nom du personnage appartient au monde, pas à l'éditeur de style.
+  // 🔴 LA RECETTE ENTIÈRE VOYAGE : un style n'existe nulle part hors de son
+  // porteur. ⚠ ÉTIQUETTE VIDE = NOTRE PSEUDO, que le monde seul connaît.
   void PostStyleLink(const std::string& code, const std::string& label);
+  void PostOutfitLink(const std::string& code, const std::string& label);  // `<OUTF>`
   // LE DÉPÔT LUI-MÊME, commun aux deux espèces : élagage, plafond, séparation
   // du mot d'avant, et la barre qu'on déplie. Faux quand la place manque.
   //
@@ -732,8 +731,8 @@ class Game : public Screen,
   void FollowNaviSearchLink(const ro::ui::ChatLinkAsk& asked, const NaviSearchLink& link,
                             std::uint32_t now_ms);
   void OpenNaviSearch(const NaviSearchLink& link);
-  // La branche des liens de STYLE. ⚠ AUCUN DE SES GESTES NE TOUCHE AU
-  // PERSONNAGE : un code vient d'un autre joueur.
+  // Les liens de STYLE et de TENUE : aucun geste ne touche au personnage.
+  void FollowOutfitLink(const ChatLinkTarget&, ro::ui::ChatLinkGesture, std::uint32_t now_ms);
   void FollowStyleLink(const ChatLinkTarget& aimed, ro::ui::ChatLinkGesture gesture,
                        std::uint32_t now_ms);
   // LE MÊME GESTE, DEPUIS UN DIALOGUE DE PNJ, et les liens de son balisage.

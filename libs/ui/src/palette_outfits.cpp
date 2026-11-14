@@ -6,6 +6,7 @@
 #include <string_view>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/skin_popup.h"
 #include "ro/ui/skin_widgets.h"
 
 namespace ro::ui {
@@ -69,6 +70,51 @@ void DrawShortCode(PaletteEditorState& state, const PaletteEditorView& view, con
 
 // ── LA GARDE-ROBE ───────────────────────────────────────────────────────────
 
+// RENOMMER ET PARTAGER UN RANGEMENT PLEIN, sur sa ligne.
+//
+// 🔴 RENOMMER NE TOUCHE PAS À LA TENUE : c'est celle du rangement qui se range
+// à nouveau, sous le nouveau nom — pas ce que le personnage porte.
+void DrawSlotGestures(PaletteEditorState& state, const PaletteEditorView& view, const SkinArt& art,
+                      PaletteEditorAction& action, int slot, const std::string& name) {
+  ImGui::SameLine();
+  ImGui::BeginDisabled(!view.outfits_can_send);
+  if (SkinSmallButton(core::Tr("Renommer"), art)) {
+    state.wardrobe_rename = {};
+    std::snprintf(state.wardrobe_rename.data(), state.wardrobe_rename.size(), "%s", name.c_str());
+    ImGui::OpenPopup("renommer");
+  }
+  ImGui::SameLine();
+  if (SkinSmallButton(core::Tr("Partager"), art)) {
+    action.verb = PaletteEditorVerb::kShareOutfit;
+    action.outfit_slot = slot;
+  }
+  ImGui::EndDisabled();
+  Hint(
+      core::Tr("Pose un lien vers cette tenue dans ta saisie — à toi d'envoyer. Qui le reçoit "
+               "l'essaie d'un clic, sans rien changer sur lui."));
+  if (!BeginSkinPopup("renommer")) {
+    return;
+  }
+  ImGui::SetNextItemWidth(ImGui::GetFontSize() * kSlotNameInFonts);
+  if (ImGui::IsWindowAppearing()) {
+    ImGui::SetKeyboardFocusHere();
+  }
+  const bool entered =
+      ImGui::InputText("##nom", state.wardrobe_rename.data(), state.wardrobe_rename.size(),
+                       ImGuiInputTextFlags_EnterReturnsTrue);
+  const std::string typed = state.wardrobe_rename.data();
+  ImGui::SameLine();
+  ImGui::BeginDisabled(typed.empty() || typed == name);
+  if ((SkinButton(core::Tr("Renommer"), art) || entered) && !typed.empty() && typed != name) {
+    action.verb = PaletteEditorVerb::kRenameOutfit;
+    action.outfit_slot = slot;
+    action.preset = typed;
+    ImGui::CloseCurrentPopup();
+  }
+  ImGui::EndDisabled();
+  EndSkinPopup();
+}
+
 void DrawWardrobe(PaletteEditorState& state, const PaletteEditorView& view, const SkinArt& art,
                   PaletteEditorAction& action) {
   // UNE SEULE DEMANDE PAR OUVERTURE : la liste revient, et c'est `app` qui la
@@ -115,6 +161,7 @@ void DrawWardrobe(PaletteEditorState& state, const PaletteEditorView& view, cons
         core::Tr("Range ta tenue validée sous le nom saisi dans les préréglages. Tous les "
                  "personnages du compte la retrouvent."));
     if (filled) {
+      DrawSlotGestures(state, view, art, action, slot, found->name);
       ImGui::SameLine();
       ImGui::BeginDisabled(!view.outfits_can_send);
       if (SkinSmallButton("x", art)) {

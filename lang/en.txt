@@ -24134,3 +24134,9 @@ tr: Copy or paste these colors
 
 fr: « Copier le code » met les couleurs de ce calque dans le presse-papiers, à envoyer à qui tu veux. Colle ici un code reçu : ses couleurs passent dans l'aperçu, et rien ne change sur toi tant que tu ne valides pas.
 tr: “Copy code” puts this layer's colors on your clipboard, to send to anyone. Paste a code you received here: its colors go into the preview, and nothing changes on you until you apply.
+
+fr: Tenue
+tr: Outfit
+
+fr: Pose un lien vers cette tenue dans ta saisie — à toi d'envoyer. Qui le reçoit l'essaie d'un clic, sans rien changer sur lui.
+tr: Puts a link to this outfit in your chat input — you send it. Whoever receives it can try it on with one click, without changing anything on them.

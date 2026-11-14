@@ -62,6 +62,13 @@ void StyleView::RefreshOutfits(const ro::sim::World& world, std::uint32_t now_ms
                             last.action == ro::sim::OutfitAction::kWardrobeClear)) {
       wardrobe_stale_ = true;
     }
+    // UN RANGEMENT À PARTAGER : son code est la réponse à sa publication.
+    if (last.action == ro::sim::OutfitAction::kPublish && sharing_slot_name_.has_value()) {
+      if (last.accepted() && !last.code.empty()) {
+        outfit_to_share_ = StyleToShare{.code = last.code, .label = *sharing_slot_name_};
+      }
+      sharing_slot_name_.reset();
+    }
   }
   if (std::optional<ro::sim::StyleOutfit> proposal = outfits_.TakeProposal()) {
     ProposeOutfit(*proposal, world);
@@ -122,6 +129,25 @@ void StyleView::ApplyOutfits(const ro::ui::PaletteEditorAction& asked, ro::net::
     if (slotted) {
       outfit_status_ = SendRefusal(outfits_.Clear(link, world, slot, now_ms));
     }
+  } else if (asked.verb == Verb::kRenameOutfit) {
+    // 🔴 RENOMMER, C'EST RANGER LA MÊME TENUE SOUS UN AUTRE NOM : celle que le
+    // serveur a listée, et non ce que le personnage porte.
+    if (const ro::sim::StyleWardrobeEntry* kept = world.outfits().Slot(slot);
+        kept != nullptr && slotted && !asked.preset.empty()) {
+      outfit_status_ =
+          SendRefusal(outfits_.Store(link, world, slot, asked.preset, kept->outfit, now_ms));
+    }
+  } else if (asked.verb == Verb::kShareOutfit) {
+    // PARTAGER UN RANGEMENT : le serveur lui donne un code court — le même
+    // qu'avant si la tenue a déjà été publiée —, et le lien part avec lui.
+    if (const ro::sim::StyleWardrobeEntry* kept = world.outfits().Slot(slot);
+        kept != nullptr && slotted) {
+      const ro::core::Result<void> sent = outfits_.Publish(link, world, kept->outfit, now_ms);
+      outfit_status_ = SendRefusal(sent);
+      if (sent) {
+        sharing_slot_name_ = kept->name;
+      }
+    }
   } else if (wardrobe_stale_ && outfits_.CanSend(world, now_ms) &&
              outfits_.ListWardrobe(link, world, now_ms)) {
     // ⚠ UNE LISTE PÉRIMÉE SE REDEMANDE D'ELLE-MÊME, dès que la cadence le
@@ -150,6 +176,15 @@ void StyleView::ProposeOutfit(const ro::sim::StyleOutfit& outfit, const ro::sim:
       layers_.Put(*dye);
     }
   }
+}
+
+StyleView::StyleToShare StyleView::TakeOutfitToShare() {
+  return std::exchange(outfit_to_share_, StyleToShare{});
+}
+
+void StyleView::FetchOutfit(std::string_view code, ro::net::Connection& link,
+                            const ro::sim::World& world, std::uint32_t now_ms) {
+  outfit_status_ = SendRefusal(outfits_.Fetch(link, world, code, now_ms));
 }
 
 }  // namespace moonclient

@@ -139,6 +139,13 @@ class StyleView {
     [[nodiscard]] bool empty() const noexcept { return code.empty(); }
   };
   [[nodiscard]] StyleToShare TakeStyleToShare();
+  // UN RANGEMENT À PARTAGER, une fois son code court reçu : `label` est le nom
+  // du rangement. Se consomme de même.
+  [[nodiscard]] StyleToShare TakeOutfitToShare();
+  // Demande la tenue d'un code court reçu dans un lien ; elle s'ouvrira dans
+  // l'éditeur en proposition.
+  void FetchOutfit(std::string_view code, ro::net::Connection& link, const ro::sim::World& world,
+                   std::uint32_t now_ms);
 
   // LE CODE DE LA RECETTE EN COURS, tel quel, pour un rapport de bug.
   [[nodiscard]] std::string ReportCode() const;
@@ -555,6 +562,10 @@ class StyleView {
   const char* outfit_status_ = nullptr;
   // Un rangement a changé : la liste se redemande dès que la cadence le permet.
   bool wardrobe_stale_ = false;
+  // LE RANGEMENT DONT ON ATTEND LE CODE pour le partager, par son nom ; et le
+  // code reçu, prêt pour `Game`.
+  std::optional<std::string> sharing_slot_name_;
+  StyleToShare outfit_to_share_;
   std::string outfit_code_shown_;
   std::vector<ro::ui::PaletteWardrobeSlot> wardrobe_view_;
 };

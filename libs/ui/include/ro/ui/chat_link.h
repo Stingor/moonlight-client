@@ -95,6 +95,8 @@ enum class ChatLinkKind : std::uint8_t {
   kUrl,
   kDiscordName,
   kSetting,
+  // UNE TENUE RANGÉE SUR LE SERVEUR, désignée par son code court.
+  kOutfit,
 };
 
 // CE QUE LE MENU D'UN JOUEUR REFUSE D'AVANCE, et pourquoi : chaque raison, déjà

@@ -7,6 +7,7 @@
 #include "ro/vfs/item_link.h"
 #include "ro/vfs/item_name.h"
 
+#include "chat/chat_outfit_link.h"
 #include "chat/chat_setting_link.h"
 
 namespace moonclient {
@@ -23,6 +24,7 @@ static_assert(kRecipeLinkOpen.front() == kChatTagLead);
 static_assert(kMvpLinkOpen.front() == kChatTagLead);
 static_assert(kNaviSearchLinkOpen.front() == kChatTagLead);
 static_assert(kSettingLinkOpen.front() == kChatTagLead);
+static_assert(kOutfitLinkOpen.front() == kChatTagLead);
 
 // UNE BALISE D'OBJET, posée dans la ligne en cours de composition. Rend ce
 // qu'il faut sauter dans la source.
@@ -60,6 +62,31 @@ static_assert(kSettingLinkOpen.front() == kChatTagLead);
                                             .damaged = link.damaged});
   out->carried.push_back(ChatLinkTarget{.kind = ro::ui::ChatLinkKind::kItem, .item = link});
   out->text.push_back(kChatLinkClose);
+  return after;
+}
+
+// UNE BALISE DE TENUE. Même contrat de retour ; illisible, il n'en reste que
+// l'étiquette, comme d'un style.
+[[nodiscard]] std::size_t PlaceOutfitTag(std::string_view tail, DecoratedChatLine* out) {
+  OutfitLink link;
+  std::size_t after = 0;
+  if (!ParseOutfitLink(tail, &link, &after)) {
+    if (after == 0) {
+      out->text.append(tail);
+    } else {
+      out->text.append(OutfitLinkLabel({}));
+    }
+    return after;
+  }
+  const std::string label = OutfitLinkLabel(link.label);
+  const auto offset = static_cast<std::uint32_t>(out->text.size());
+  out->text.append(label);
+  out->links.push_back(ro::ui::ChatLinkSpan{.offset = offset,
+                                            .length = static_cast<std::uint32_t>(label.size()),
+                                            .kind = ro::ui::ChatLinkKind::kOutfit});
+  out->carried.push_back(ChatLinkTarget{.kind = ro::ui::ChatLinkKind::kOutfit,
+                                        .code = std::move(link.code),
+                                        .owner = std::move(link.label)});
   return after;
 }
 
@@ -368,7 +395,8 @@ bool DecorateChatLine(std::string_view raw, const ro::vfs::ItemTable& items,
        FindPlaceLink(raw, 0) == std::string_view::npos &&
        FindMvpLink(raw, 0) == std::string_view::npos &&
        FindNaviSearchLink(raw, 0) == std::string_view::npos &&
-       FindSettingLink(raw, 0) == std::string_view::npos)) {
+       FindSettingLink(raw, 0) == std::string_view::npos &&
+       FindOutfitLink(raw, 0) == std::string_view::npos)) {
     return false;
   }
   out->text.clear();
@@ -388,8 +416,9 @@ bool DecorateChatLine(std::string_view raw, const ro::vfs::ItemTable& items,
     const std::size_t mvp_at = FindMvpLink(raw, at);
     const std::size_t search_at = FindNaviSearchLink(raw, at);
     const std::size_t setting_at = FindSettingLink(raw, at);
-    const std::size_t tag = std::min(
-        {item_at, style_at, monster_at, recipe_at, place_at, mvp_at, search_at, setting_at});
+    const std::size_t outfit_at = FindOutfitLink(raw, at);
+    const std::size_t tag = std::min({item_at, style_at, monster_at, recipe_at, place_at, mvp_at,
+                                      search_at, setting_at, outfit_at});
     if (tag == std::string_view::npos) {
       out->text.append(raw.substr(at));
       break;
@@ -410,6 +439,8 @@ bool DecorateChatLine(std::string_view raw, const ro::vfs::ItemTable& items,
       after = PlaceNaviSearchTag(raw.substr(tag), maps, out);
     } else if (tag == setting_at) {
       after = PlaceSettingTag(raw.substr(tag), settings, out);
+    } else if (tag == outfit_at) {
+      after = PlaceOutfitTag(raw.substr(tag), out);
     } else {
       after = PlaceItemTag(raw.substr(tag), items, words, creators, out);
     }
