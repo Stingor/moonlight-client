@@ -27,7 +27,7 @@ import subprocess
 import sys
 import tempfile
 
-from gen_support import DEPOT, FormatIndisponible, verifier_clang_format
+from clang_format_pin import DEPOT, FormatIndisponible, verifier_clang_format
 
 # Les racines que l'intégration parcourt, et les extensions qu'elle retient.
 RACINES = ("app", "libs", "tools", "tests")

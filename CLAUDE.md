@@ -70,8 +70,20 @@ manifeste** (`vcpkg.json`), jamais par un submodule.
 Les sources sont listées **explicitement** dans les `CMakeLists.txt`, sans glob :
 un fichier ajouté sans être déclaré doit provoquer une erreur, pas disparaître.
 
-Le format suit le `.clang-format` du dépôt. Le code est compilé avec les
-avertissements en erreur.
+Le code est compilé avec les avertissements en erreur.
+
+**Le format est ÉPINGLÉ** à la version de clang-format que nomme
+`scripts/format_version.txt` : deux versions coupent les lignes différemment, et
+celle qui traîne sur la machine reformaterait un arbre que personne n'a touché.
+
+```bash
+python -m pip install "clang-format==$(cat scripts/format_version.txt)"
+python scripts/check_format.py --corriger
+```
+
+Sans argument, `check_format.py` juge tout l'arbre et rend 1 s'il trouve un
+écart ; `--corriger` formate au lieu de refuser ; des chemins le restreignent à
+ces fichiers. Il refuse net une autre version que celle de l'épingle.
 
 ## Tester
 
