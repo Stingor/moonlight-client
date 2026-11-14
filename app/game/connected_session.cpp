@@ -43,6 +43,16 @@ ro::sim::Appearance AppearanceOf(const ro::proto::CharacterInfo& character,
   return look;
 }
 
+ro::sim::Actor SeatedActorOf(const ro::proto::CharacterInfo& character, std::uint8_t account_sex) {
+  ro::sim::Actor seated;
+  seated.kind = ro::sim::ActorKind::kPlayer;
+  seated.look = AppearanceOf(character, account_sex);
+  // La même option que celle avec laquelle le personnage entre en jeu : voir
+  // `ComposeMapEntry`.
+  seated.option = static_cast<std::uint32_t>(character.effectstate);
+  return seated;
+}
+
 MapEntry ComposeMapEntry(const ro::proto::CharacterInfo& chosen,
                          const ro::net::LoginPhase::Account& account, std::string map_name,
                          const ro::net::MapPhase::Spawn& spawn) {

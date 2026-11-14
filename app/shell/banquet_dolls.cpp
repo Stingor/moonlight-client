@@ -107,13 +107,11 @@ BanquetDolls::Seated BanquetDolls::Seat(int seat, const ro::proto::CharacterInfo
   }
 
   // ⚠ L'APPARENCE PASSE PAR LES DEUX MÊMES PORTES QUE L'ENTRÉE EN JEU —
-  // `AppearanceOf` puis `LookOf` —, et c'est ce qui garantit qu'un personnage
+  // `SeatedActorOf` puis `LookOf` —, et c'est ce qui garantit qu'un personnage
   // se ressemble d'un écran à l'autre. Les recopier ici les ferait diverger sur
-  // un champ qu'on aurait oublié : l'ordre des trois accessoires, ou le sexe
-  // « celui du compte ».
-  ro::sim::Actor seated;
-  seated.kind = ro::sim::ActorKind::kPlayer;
-  seated.look = AppearanceOf(character, account_sex);
+  // un champ qu'on aurait oublié : l'ordre des trois accessoires, le sexe
+  // « celui du compte », ou l'option qui choisit le corps d'un monté.
+  const ro::sim::Actor seated = SeatedActorOf(character, account_sex);
 
   auto& puppet = puppets_[static_cast<std::size_t>(seat)];
   if (!puppet.has_value()) {

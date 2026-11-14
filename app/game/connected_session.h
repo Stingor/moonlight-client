@@ -89,6 +89,16 @@ struct MapEntry {
 [[nodiscard]] ro::sim::Appearance AppearanceOf(const ro::proto::CharacterInfo& character,
                                                std::uint8_t account_sex);
 
+// LE PERSONNAGE DE LA LISTE TEL QU'IL SE MONTRE, pour la tablée : son
+// apparence, ET SON OPTION.
+//
+// 🔴 L'OPTION CHOISIT LE CORPS : Peco, dragon, loup, Madogear. Un personnage
+// monté porte en jeu le corps de sa monture, et sa recette de couleurs se range
+// sous la clé de CE corps. Assis à pied, il en prenait une autre, et ses
+// couleurs avec : c'est le cas de beaucoup de classes bébé.
+[[nodiscard]] ro::sim::Actor SeatedActorOf(const ro::proto::CharacterInfo& character,
+                                           std::uint8_t account_sex);
+
 // CE QUE LA LISTE ET L'ACCORD D'ENTRÉE DISENT DU PERSONNAGE CHOISI.
 //
 // ⚠ EXTRAIT POUR ÊTRE PARTAGÉ, et non par goût du découpage : l'écran de
