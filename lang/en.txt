@@ -21325,8 +21325,8 @@ tr: Defeat 1,000 monsters in a game of Midgard Survivors.
 fr: Mage aguerri
 tr: Seasoned Mage
 
-fr: Atteindre le niveau 40 avec le Magicien dans Survivants de Midgard.
-tr: Reach level 40 with the Mage in Midgard Survivors.
+fr: Atteindre le niveau 40 avec le Sorcier dans Survivants de Midgard.
+tr: Reach level 40 with the Wizard in Midgard Survivors.
 
 fr: Première carte
 tr: First Card
@@ -21337,8 +21337,8 @@ tr: Pick up a dropped card in a game of Midgard Survivors.
 fr: Pyromane
 tr: Pyromaniac
 
-fr: Gagner une partie avec le Magicien et des skills Fire seulement.
-tr: Win a game with the Mage using Fire skills only.
+fr: Gagner une partie avec le Sorcier et des skills Fire seulement.
+tr: Win a game with the Wizard using Fire skills only.
 
 fr: Esprit pur
 tr: Pure Mind
@@ -21421,8 +21421,8 @@ tr: Hoarfrost
 fr: Obtenir Jack Frost, l'union de Water Ball et de Cold Bolt.
 tr: Obtain Jack Frost, the union of Water Ball and Cold Bolt.
 
-fr: Obtenir chacun des skills évolués du Magicien, au fil des parties.
-tr: Obtain each of the Mage's evolved skills, across runs.
+fr: Obtenir chacun des skills évolués du Sorcier, au fil des parties.
+tr: Obtain each of the Wizard's evolved skills, across runs.
 
 fr: Recharge de tous les skills raccourcie.
 tr: Shorter cooldown for every skill.
@@ -22843,8 +22843,8 @@ tr: Grand Knight
 fr: Obtenir chacun des skills évolués du Chevalier, au fil des parties.
 tr: Obtain each of the Knight's evolved skills, across runs.
 
-fr: Magicien
-tr: Mage
+fr: Sorcier
+tr: Wizard
 
 fr: Chevalier
 tr: Knight
@@ -22984,14 +22984,14 @@ tr: %s, level %d\n%s
 fr: %s : il attend sur la prairie, en partie libre, seul.
 tr: %s: he is waiting on the Midgard Plains, in a free run, alone.
 
-fr: Le Voleur vous a vu passer : sa classe est débloquée.
-tr: The Thief saw you pass by: his class is unlocked.
+fr: L'Assassin vous a vu passer : sa classe est débloquée.
+tr: The Assassin saw you pass by: the class is unlocked.
 
-fr: Rejoindre le Voleur qui attend sur la prairie, en partie libre, seul
-tr: Reach the Thief who waits on the Midgard Plains, in a free run, alone
+fr: Rejoindre l'Assassin qui attend sur la prairie, en partie libre, seul
+tr: Reach the Assassin who waits on the Midgard Plains, in a free run, alone
 
-fr: Voleur
-tr: Thief
+fr: Assassin
+tr: Assassin
 
 fr: Lame sonique
 tr: Sonic Blade
@@ -23038,8 +23038,8 @@ tr: Obtain Meteor Assault, the union of Envenom and Sprinkle Sand.
 fr: Grand voleur
 tr: Grand Thief
 
-fr: Obtenir chacun des skills évolués du Voleur, au fil des parties.
-tr: Obtain each of the Thief's evolved skills, across runs.
+fr: Obtenir chacun des skills évolués de l'Assassin, au fil des parties.
+tr: Obtain each of the Assassin's evolved skills, across runs.
 
 fr: %s : il guette dans le désert jusqu'à 5:00, en partie libre, seul.
 tr: %s: lurking in the desert until 5:00, in a free run, alone.
@@ -23065,8 +23065,8 @@ tr: Phantom Arrow
 fr: Grand archer
 tr: Grand Archer
 
-fr: L'Archer vous a rejoint : sa classe est débloquée.
-tr: The Archer joined you: the class is unlocked.
+fr: Le Chasseur vous a rejoint : sa classe est débloquée.
+tr: The Hunter joined you: the class is unlocked.
 
 fr: Le Black Mushroom pousse : sa Yggdrasil Berry rend tous les PV.
 tr: The Black Mushroom grows: its Yggdrasil Berry restores all HP.
@@ -23095,8 +23095,8 @@ tr: Obtain Sharp Shooting in a Midgard Survivors run.
 fr: Obtenir True Sight dans une partie de Survivants de Midgard.
 tr: Obtain True Sight in a Midgard Survivors run.
 
-fr: Obtenir chacun des skills évolués de l'Archer, au fil des parties.
-tr: Obtain each of the Archer's evolved skills, across runs.
+fr: Obtenir chacun des skills évolués du Chasseur, au fil des parties.
+tr: Obtain each of the Hunter's evolved skills, across runs.
 
 fr: Par moments, vos tirs se pressent : vos skills reviennent plus vite.
 tr: At times, your shots quicken: your skills come back faster.
@@ -23113,8 +23113,8 @@ tr: Rare plants %d %%
 fr: Recharge réduite : vos skills reviennent plus vite.
 tr: Reduced cooldown: your skills come back faster.
 
-fr: Rejoindre l'Archer qui guette dans le désert, avant 5:00, seul
-tr: Join the Archer lurking in the desert, before 5:00, alone
+fr: Rejoindre le Chasseur qui guette dans le désert, avant 5:00, seul
+tr: Join the Hunter lurking in the desert, before 5:00, alone
 
 fr: Relèves +%d
 tr: Revives +%d
@@ -23296,8 +23296,8 @@ tr: Summons: your plants and your homunculus hit harder.
 fr: L'acide et la bombe, ensemble, écrasent le plus fort.
 tr: Acid and bomb together crush the strongest.
 
-fr: Le Marchand a vu vos zeny : sa classe est débloquée.
-tr: The Merchant saw your zeny: his class is unlocked.
+fr: L'Alchimiste a vu vos zeny : sa classe est débloquée.
+tr: The Alchemist saw your zeny: the class is unlocked.
 
 fr: Lif vous suit et soigne le héros le plus blessé.
 tr: Lif follows you and heals the most wounded hero.
@@ -23305,8 +23305,8 @@ tr: Lif follows you and heals the most wounded hero.
 fr: Lif, évolué, soigne bien plus et frappe de loin.
 tr: Lif, evolved, heals far more and strikes from afar.
 
-fr: Marchand
-tr: Merchant
+fr: Alchimiste
+tr: Alchemist
 
 fr: Par moments, votre armure devient presque impénétrable.
 tr: At times, your armor becomes almost impenetrable.
@@ -23320,8 +23320,8 @@ tr: At times, your shout spurs you on: your damage rises.
 fr: Plus de zeny : chaque Gold ramassé vaut davantage.
 tr: More zeny: every Gold picked up is worth more.
 
-fr: Rejoindre le Marchand sur la neige avec des zeny de la partie, seul
-tr: Join the Merchant on the snow with zeny from the run, alone
+fr: Rejoindre l'Alchimiste sur la neige avec des zeny de la partie, seul
+tr: Join the Alchemist on the snow with zeny from the run, alone
 
 fr: Riposte de gel %d %%
 tr: Frost riposte %d %%
@@ -23882,3 +23882,6 @@ tr: Three hues evenly spaced on the wheel, on the parts you didn't keep.
 
 fr: Supprimer ce style
 tr: Delete this style
+
+fr: Chasseur
+tr: Hunter

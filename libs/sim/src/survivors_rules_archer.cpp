@@ -19,8 +19,7 @@ namespace {
 // évolution, et Sniper à sa renaissance.
 
 constexpr std::uint16_t kArcherClassId = 4;
-constexpr std::uint16_t kArcherJobId = 3;     // l'apparence du départ
-constexpr std::uint16_t kHunterJobId = 11;    // après une évolution
+constexpr std::uint16_t kHunterJobId = 11;    // l'apparence, dès le départ
 constexpr std::uint16_t kSniperJobId = 4012;  // rené
 constexpr std::int32_t kArcherMaxHp = 350;
 constexpr std::uint32_t kArcherWalkMsPerCell = 145;
@@ -505,7 +504,7 @@ constexpr std::array<std::uint16_t, kArcherCardCount> kArcherLentCards{
 
 constexpr ClassRule kArcher{.class_id = kArcherClassId,
                             .key = "archer",
-                            .job_id = kArcherJobId,
+                            .job_id = kHunterJobId,
                             .weapon_item_id = kBowItemId,
                             .max_hp = kArcherMaxHp,
                             .walk_ms_per_cell = kArcherWalkMsPerCell,

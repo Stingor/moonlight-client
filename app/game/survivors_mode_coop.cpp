@@ -211,7 +211,7 @@ void SurvivorsMode::EnterCoop(SurvivorsStage& stage, const SurvivorsContext& con
   }
   local_hero_ = departure->local_player;
   ally_faces_ = departure->looks;
-  ally_jobs_ = {};
+  ally_bodies_ = {};
   coop_left_told_ = false;
   coop_alert_until_ms_ = 0;
   if (!posture_.seated_by_us() && posture_.SitOnEntry(Sitting(*context.world)) &&
@@ -269,11 +269,11 @@ const char* SurvivorsMode::TeamNotice(const SurvivorsStage& stage,
                                       std::uint64_t now_ms) const noexcept {
   if (meeting_.TellingAt(stage.presentation_ms()) && meeting_rule_ != nullptr) {
     if (meeting_rule_->feat_key == kMerchantMeetingFeat) {
-      return ro::core::TrText("Le Marchand a vu vos zeny : sa classe est débloquée.");
+      return ro::core::TrText("L'Alchimiste a vu vos zeny : sa classe est débloquée.");
     }
     return meeting_rule_->feat_key == kArcherMeetingFeat
-               ? ro::core::TrText("L'Archer vous a rejoint : sa classe est débloquée.")
-               : ro::core::TrText("Le Voleur vous a vu passer : sa classe est débloquée.");
+               ? ro::core::TrText("Le Chasseur vous a rejoint : sa classe est débloquée.")
+               : ro::core::TrText("L'Assassin vous a vu passer : sa classe est débloquée.");
   }
   if (!stage.coop() || stage.coop_over()) return nullptr;
   if (stage.coop_stalled_ms() >= kCoopWaitNoticeMs) {
@@ -294,10 +294,10 @@ void SurvivorsMode::PoseAllyLooks(const SurvivorsStage& stage) {
     if (index == field.stage) continue;
     const ro::sim::ClassRule* hero_class = ro::sim::ClassAt(field, index);
     if (hero_class == nullptr) continue;
-    const std::uint16_t job = ro::sim::HeroJobOf(*hero_class, ro::sim::HeroAt(field, index));
-    if (ally_jobs_[index] == job) continue;
-    arena_->SetAllyLook(index, HeroLook(ally_faces_[index], *hero_class, job), *hero_class);
-    ally_jobs_[index] = job;
+    const HeroBody body = HeroBodyOf(*hero_class, ro::sim::HeroAt(field, index));
+    if (ally_bodies_[index] == body) continue;
+    arena_->SetAllyLook(index, HeroLook(ally_faces_[index], *hero_class, body), *hero_class);
+    ally_bodies_[index] = body;
   }
 }
 

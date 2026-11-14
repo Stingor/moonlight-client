@@ -286,16 +286,20 @@ std::uint16_t PickupLookOf(const ro::sim::SurvivorsPickup& pickup) noexcept {
   return pickup.kind == ro::sim::PickupKind::kCard ? kGroundCardItem : pickup.item_id;
 }
 
+HeroBody HeroBodyOf(const ro::sim::ClassRule& hero_class,
+                    const ro::sim::SurvivorsHero& hero) noexcept {
+  return HeroBody{.job = ro::sim::HeroJobOf(hero_class, hero), .evolved = hero.evolutions > 0};
+}
+
 ro::render::ActorLook HeroLook(const ro::render::ActorLook& player,
-                               const ro::sim::ClassRule& hero_class, std::uint16_t job) noexcept {
+                               const ro::sim::ClassRule& hero_class, HeroBody body) noexcept {
   ro::render::ActorLook look;
   look.player = true;
-  look.job = job != 0 ? job : hero_class.job_id;
+  look.job = body.job != 0 ? body.job : hero_class.job_id;
   look.sex = player.sex;
   look.hair = player.hair;
   look.headgears = player.headgears;
-  const bool evolved_body = look.job != hero_class.job_id;
-  look.weapon = evolved_body && hero_class.evolved_weapon_item_id != 0
+  look.weapon = body.evolved && hero_class.evolved_weapon_item_id != 0
                     ? hero_class.evolved_weapon_item_id
                     : hero_class.weapon_item_id;
   look.robe = player.robe;

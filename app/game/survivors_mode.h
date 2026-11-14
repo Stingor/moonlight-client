@@ -36,6 +36,7 @@
 #include "survivors/real_world_watch.h"
 #include "survivors/survivors_door.h"
 #include "survivors/survivors_keys.h"
+#include "survivors/survivors_looks.h"
 #include "survivors/survivors_meeting.h"
 #include "survivors/survivors_route.h"
 #include "survivors/survivors_save.h"
@@ -258,7 +259,7 @@ class SurvivorsMode {
   // L'icône que la flèche de la rencontre montre.
   ImTextureID meeting_icon_ = ImTextureID{0};
   // L'apparence du héros posée, et si elle était celle de l'évolution.
-  std::optional<std::uint16_t> hero_job_;
+  std::optional<HeroBody> hero_body_;
   int pressed_card_key_ = 0;
   // Ctrl+Tab a masqué la minimap ; elle le reste d'une partie à l'autre.
   bool minimap_hidden_ = false;
@@ -267,7 +268,7 @@ class SurvivorsMode {
   // le salon montre, et si le serveur sait déjà que ce joueur a quitté la partie.
   std::size_t local_hero_ = 0;
   std::array<ro::render::ActorLook, ro::sim::kMostHeroes> ally_faces_{};
-  std::array<std::optional<std::uint16_t>, ro::sim::kMostHeroes> ally_jobs_{};
+  std::array<std::optional<HeroBody>, ro::sim::kMostHeroes> ally_bodies_{};
   std::vector<ro::ui::SurvivorsPrepareCoopMember> coop_members_;
   std::uint64_t coop_choice_sent_ms_ = 0;
   std::vector<const char*> coop_refusals_;

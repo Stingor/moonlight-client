@@ -414,16 +414,16 @@ void SurvivorsMode::PaintArena(const SurvivorsStage& stage, const SurvivorsConte
   const ro::sim::SurvivorsField& field = play.run().field();
   // LE HÉROS PORTE LE VISAGE DU PERSONNAGE (U7), et le corps de son métier :
   // évolué dès la première évolution, monté sur sa monture.
-  const std::uint16_t hero_job =
-      field.hero_class != nullptr ? ro::sim::HeroJobOf(*field.hero_class, field.hero) : 0;
-  if (hero_job_ != hero_job && field.hero_class != nullptr) {
+  const HeroBody hero_body =
+      field.hero_class != nullptr ? HeroBodyOf(*field.hero_class, field.hero) : HeroBody{};
+  if (hero_body_ != hero_body && field.hero_class != nullptr) {
     const ro::sim::Actor* player = context.world->player();
     const ro::render::ActorLook face =
         player != nullptr ? LookOf(*player)
                           : ro::render::ActorLook{
                                 .player = true, .sex = kFallbackHeroSex, .hair = kFallbackHeroHair};
-    arena_->SetHeroLook(HeroLook(face, *field.hero_class, hero_job), *field.hero_class);
-    hero_job_ = hero_job;
+    arena_->SetHeroLook(HeroLook(face, *field.hero_class, hero_body), *field.hero_class);
+    hero_body_ = hero_body;
   }
   PoseAllyLooks(stage);
   play.run().Orbs(orbs_);

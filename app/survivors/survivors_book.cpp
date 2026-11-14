@@ -362,10 +362,11 @@ const ro::sim::ArenaRule* FreeArenaOf(const ro::sim::SurvivorsRules& rules,
 
 const char* ClassTitleOf(const ro::sim::ClassRule& class_rule) {
   const std::string_view key = class_rule.key;
-  if (key == "mage") return ro::core::Tr("Magicien");
+  if (key == "mage") return ro::core::Tr("Sorcier");
   if (key == "knight") return ro::core::Tr("Chevalier");
-  if (key == "thief") return ro::core::Tr("Voleur");
-  if (key == "merchant") return ro::core::Tr("Marchand");
+  if (key == "thief") return ro::core::Tr("Assassin");
+  if (key == "archer") return ro::core::Tr("Chasseur");
+  if (key == "merchant") return ro::core::Tr("Alchimiste");
   return nullptr;
 }
 

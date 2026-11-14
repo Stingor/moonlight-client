@@ -20,8 +20,7 @@ namespace {
 // renaissance.
 
 constexpr std::uint16_t kMerchantClassId = 5;
-constexpr std::uint16_t kMerchantJobId = 5;    // l'apparence du départ
-constexpr std::uint16_t kAlchemistJobId = 18;  // après une évolution
+constexpr std::uint16_t kAlchemistJobId = 18;  // l'apparence, dès le départ
 constexpr std::uint16_t kCreatorJobId = 4019;  // rené
 constexpr std::int32_t kMerchantMaxHp = 650;
 constexpr std::uint32_t kMerchantWalkMsPerCell = 155;
@@ -545,7 +544,7 @@ constexpr std::array<std::uint16_t, kMerchantCardCount> kMerchantLentCards{
 
 constexpr ClassRule kMerchant{.class_id = kMerchantClassId,
                               .key = "merchant",
-                              .job_id = kMerchantJobId,
+                              .job_id = kAlchemistJobId,
                               .weapon_item_id = kAxeItemId,
                               .max_hp = kMerchantMaxHp,
                               .walk_ms_per_cell = kMerchantWalkMsPerCell,

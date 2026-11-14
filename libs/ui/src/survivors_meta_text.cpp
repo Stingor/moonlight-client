@@ -78,13 +78,13 @@ const char* SurvivorsFeatGoal(std::string_view feat_key) {
   if (feat_key == "water_ball") return core::Tr("Monstres Fire vaincus, au cumul");
   if (feat_key == "ice_wall") return core::Tr("Survivre en une seule partie");
   if (feat_key == "thief_met") {
-    return core::Tr("Rejoindre le Voleur qui attend sur la prairie, en partie libre, seul");
+    return core::Tr("Rejoindre l'Assassin qui attend sur la prairie, en partie libre, seul");
   }
   if (feat_key == "archer_met") {
-    return core::Tr("Rejoindre l'Archer qui guette dans le désert, avant 5:00, seul");
+    return core::Tr("Rejoindre le Chasseur qui guette dans le désert, avant 5:00, seul");
   }
   if (feat_key == "merchant_met") {
-    return core::Tr("Rejoindre le Marchand sur la neige avec des zeny de la partie, seul");
+    return core::Tr("Rejoindre l'Alchimiste sur la neige avec des zeny de la partie, seul");
   }
   return "";
 }

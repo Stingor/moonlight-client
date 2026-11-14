@@ -18,8 +18,7 @@ namespace {
 // sa première évolution, et Assassin Cross à sa renaissance.
 
 constexpr std::uint16_t kThiefClassId = 3;
-constexpr std::uint16_t kThiefJobId = 6;             // l'apparence du départ
-constexpr std::uint16_t kAssassinJobId = 12;         // après une évolution
+constexpr std::uint16_t kAssassinJobId = 12;         // l'apparence, dès le départ
 constexpr std::uint16_t kAssassinCrossJobId = 4013;  // rené
 constexpr std::int32_t kThiefMaxHp = 560;
 constexpr std::uint32_t kThiefWalkMsPerCell = 135;
@@ -539,7 +538,7 @@ constexpr std::array<std::uint16_t, 17> kThiefCardPool{
 
 constexpr ClassRule kThief{.class_id = kThiefClassId,
                            .key = "thief",
-                           .job_id = kThiefJobId,
+                           .job_id = kAssassinJobId,
                            .weapon_item_id = kKnifeItemId,
                            .max_hp = kThiefMaxHp,
                            .walk_ms_per_cell = kThiefWalkMsPerCell,

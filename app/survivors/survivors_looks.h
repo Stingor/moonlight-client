@@ -52,17 +52,25 @@ inline constexpr std::uint16_t kGroundCardItem = 4001;
 // L'objet qui montre un objet au sol : le sien, la carte au sol pour une carte.
 [[nodiscard]] std::uint16_t PickupLookOf(const ro::sim::SurvivorsPickup& pickup) noexcept;
 
+// CE QUE LE HÉROS MONTRE de son état : le corps de son métier
+// (`ro::sim::HeroJobOf` : rené, monté), et s'il a évolué, ce qui change son arme.
+struct HeroBody {
+  std::uint16_t job = 0;  // nul : le métier de la classe
+  bool evolved = false;
+  [[nodiscard]] bool operator==(const HeroBody&) const = default;
+};
+[[nodiscard]] HeroBody HeroBodyOf(const ro::sim::ClassRule& hero_class,
+                                  const ro::sim::SurvivorsHero& hero) noexcept;
+
 // LE HÉROS (U7) : la tête, la coiffure, les coiffes, la cape et les couleurs
-// du personnage (`player`), sur le corps du métier `job` que le héros montre
-// (ro::sim::HeroJobOf : évolué, monté) et l'arme de ce corps : celle du départ
-// sur le corps de départ, celle de l'évolution sur tout autre quand la classe
-// en a une. `job` nul : le métier de la classe.
+// du personnage (`player`), sur le corps `body.job`, avec l'arme du départ, ou
+// celle de l'évolution une fois évolué quand la classe en a une.
 //
 // ⚠ CE QUI CHANGERAIT LE CORPS EST RETIRÉ : costume, monture, habit de GM,
 // combinaison, tête d'orc et bouclier sont ceux du personnage, pas du mode.
 [[nodiscard]] ro::render::ActorLook HeroLook(const ro::render::ActorLook& player,
                                              const ro::sim::ClassRule& hero_class,
-                                             std::uint16_t job) noexcept;
+                                             HeroBody body) noexcept;
 
 // LE CORPS DE LA RENCONTRE : le métier et l'arme du départ de la classe, sous une
 // tête ordinaire, sans rien du personnage du joueur.

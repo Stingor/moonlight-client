@@ -21325,7 +21325,7 @@ tr: Vencer a 1000 monstruos en una partida de Supervivientes de Midgard.
 fr: Mage aguerri
 tr: Mago curtido
 
-fr: Atteindre le niveau 40 avec le Magicien dans Survivants de Midgard.
+fr: Atteindre le niveau 40 avec le Sorcier dans Survivants de Midgard.
 tr: Alcanzar el nivel 40 con el Mago en Supervivientes de Midgard.
 
 fr: Première carte
@@ -21337,7 +21337,7 @@ tr: Recoger una carta caída en una partida de Supervivientes de Midgard.
 fr: Pyromane
 tr: Pirómano
 
-fr: Gagner une partie avec le Magicien et des skills Fire seulement.
+fr: Gagner une partie avec le Sorcier et des skills Fire seulement.
 tr: Gana una partida con el Mago solo con skills Fire.
 
 fr: Esprit pur
@@ -21421,7 +21421,7 @@ tr: Escarcha
 fr: Obtenir Jack Frost, l'union de Water Ball et de Cold Bolt.
 tr: Obtén Jack Frost, la unión de Water Ball y Cold Bolt.
 
-fr: Obtenir chacun des skills évolués du Magicien, au fil des parties.
+fr: Obtenir chacun des skills évolués du Sorcier, au fil des parties.
 tr: Obtén cada una de las habilidades evolucionadas del Mago, a lo largo de las partidas.
 
 fr: Recharge de tous les skills raccourcie.
@@ -22843,7 +22843,7 @@ tr: Gran caballero
 fr: Obtenir chacun des skills évolués du Chevalier, au fil des parties.
 tr: Obtén cada una de las habilidades evolucionadas del Caballero, a lo largo de las partidas.
 
-fr: Magicien
+fr: Sorcier
 tr: Mago
 
 fr: Chevalier
@@ -22984,14 +22984,14 @@ tr: %s, nivel %d\n%s
 fr: %s : il attend sur la prairie, en partie libre, seul.
 tr: %s: espera en la Pradera de Midgard, en partida libre, solo.
 
-fr: Le Voleur vous a vu passer : sa classe est débloquée.
-tr: El Ladrón te ha visto pasar: su clase queda desbloqueada.
+fr: L'Assassin vous a vu passer : sa classe est débloquée.
+tr: El Asesino te ha visto pasar: su clase queda desbloqueada.
 
-fr: Rejoindre le Voleur qui attend sur la prairie, en partie libre, seul
-tr: Reunirse con el Ladrón que espera en la Pradera de Midgard, en partida libre, solo
+fr: Rejoindre l'Assassin qui attend sur la prairie, en partie libre, seul
+tr: Reunirse con el Asesino que espera en la Pradera de Midgard, en partida libre, solo
 
-fr: Voleur
-tr: Ladrón
+fr: Assassin
+tr: Asesino
 
 fr: Lame sonique
 tr: Hoja sónica
@@ -23038,8 +23038,8 @@ tr: Obtén Meteor Assault, la unión de Envenom y Sprinkle Sand.
 fr: Grand voleur
 tr: Gran ladrón
 
-fr: Obtenir chacun des skills évolués du Voleur, au fil des parties.
-tr: Obtén cada una de las habilidades evolucionadas del Ladrón, a lo largo de las partidas.
+fr: Obtenir chacun des skills évolués de l'Assassin, au fil des parties.
+tr: Obtén cada una de las habilidades evolucionadas del Asesino, a lo largo de las partidas.
 
 fr: %s : il guette dans le désert jusqu'à 5:00, en partie libre, seul.
 tr: %s: acecha en el desierto hasta las 5:00, en partida libre, solo.
@@ -23065,8 +23065,8 @@ tr: Flecha fantasma
 fr: Grand archer
 tr: Gran arquero
 
-fr: L'Archer vous a rejoint : sa classe est débloquée.
-tr: El Arquero se unió a ti: su clase está desbloqueada.
+fr: Le Chasseur vous a rejoint : sa classe est débloquée.
+tr: El Cazador se unió a ti: su clase está desbloqueada.
 
 fr: Le Black Mushroom pousse : sa Yggdrasil Berry rend tous les PV.
 tr: Crece el Black Mushroom: su Yggdrasil Berry restaura todos los PV.
@@ -23095,8 +23095,8 @@ tr: Obtén Sharp Shooting en una partida de Supervivientes de Midgard.
 fr: Obtenir True Sight dans une partie de Survivants de Midgard.
 tr: Obtén True Sight en una partida de Supervivientes de Midgard.
 
-fr: Obtenir chacun des skills évolués de l'Archer, au fil des parties.
-tr: Obtén cada una de las habilidades evolucionadas del Arquero, a lo largo de las partidas.
+fr: Obtenir chacun des skills évolués du Chasseur, au fil des parties.
+tr: Obtén cada una de las habilidades evolucionadas del Cazador, a lo largo de las partidas.
 
 fr: Par moments, vos tirs se pressent : vos skills reviennent plus vite.
 tr: A ratos, tus disparos se aceleran: tus habilidades vuelven antes.
@@ -23113,8 +23113,8 @@ tr: Plantas raras %d %%
 fr: Recharge réduite : vos skills reviennent plus vite.
 tr: Recarga reducida: tus habilidades vuelven antes.
 
-fr: Rejoindre l'Archer qui guette dans le désert, avant 5:00, seul
-tr: Reúnete con el Arquero que acecha en el desierto, antes de las 5:00, solo
+fr: Rejoindre le Chasseur qui guette dans le désert, avant 5:00, seul
+tr: Reúnete con el Cazador que acecha en el desierto, antes de las 5:00, solo
 
 fr: Relèves +%d
 tr: Resurrecciones +%d
@@ -23296,8 +23296,8 @@ tr: Invocaciones: tus plantas y tu homúnculo golpean más fuerte.
 fr: L'acide et la bombe, ensemble, écrasent le plus fort.
 tr: El ácido y la bomba, juntos, aplastan al más fuerte.
 
-fr: Le Marchand a vu vos zeny : sa classe est débloquée.
-tr: El Mercader vio tus zeny: su clase está desbloqueada.
+fr: L'Alchimiste a vu vos zeny : sa classe est débloquée.
+tr: El Alquimista vio tus zeny: su clase está desbloqueada.
 
 fr: Lif vous suit et soigne le héros le plus blessé.
 tr: Lif te sigue y cura al héroe más herido.
@@ -23305,8 +23305,8 @@ tr: Lif te sigue y cura al héroe más herido.
 fr: Lif, évolué, soigne bien plus et frappe de loin.
 tr: Lif, evolucionado, cura mucho más y golpea de lejos.
 
-fr: Marchand
-tr: Mercader
+fr: Alchimiste
+tr: Alquimista
 
 fr: Par moments, votre armure devient presque impénétrable.
 tr: A ratos, tu armadura se vuelve casi impenetrable.
@@ -23320,8 +23320,8 @@ tr: A ratos, tu grito te enardece: tu daño sube.
 fr: Plus de zeny : chaque Gold ramassé vaut davantage.
 tr: Más zeny: cada Gold recogido vale más.
 
-fr: Rejoindre le Marchand sur la neige avec des zeny de la partie, seul
-tr: Reunirse con el Mercader en la nieve con zeny de la partida, solo
+fr: Rejoindre l'Alchimiste sur la neige avec des zeny de la partie, seul
+tr: Reunirse con el Alquimista en la nieve con zeny de la partida, solo
 
 fr: Riposte de gel %d %%
 tr: Réplica de hielo %d %%
@@ -23882,3 +23882,6 @@ tr: Tres tonos a igual distancia en el círculo, en las piezas no conservadas.
 
 fr: Supprimer ce style
 tr: Eliminar este estilo
+
+fr: Chasseur
+tr: Cazador

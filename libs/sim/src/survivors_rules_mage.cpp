@@ -19,8 +19,7 @@ namespace {
 // carte, métier RO pour l'apparence.
 
 constexpr std::uint16_t kMageClassId = 1;
-constexpr std::uint16_t kMageJobId = 2;
-constexpr std::uint16_t kWizardJobId = 9;         // l'apparence après une évolution
+constexpr std::uint16_t kWizardJobId = 9;         // l'apparence, dès le départ
 constexpr std::uint16_t kHighWizardJobId = 4010;  // rené
 constexpr std::uint16_t kMageRebornLevel = 50;
 constexpr std::int32_t kMageRebornDamagePct = 5;
@@ -578,7 +577,7 @@ constexpr std::array<std::uint16_t, 16> kMageCardPool{
 
 constexpr ClassRule kMage{.class_id = kMageClassId,
                           .key = "mage",
-                          .job_id = kMageJobId,
+                          .job_id = kWizardJobId,
                           .weapon_item_id = kRodItemId,
                           .max_hp = kMageMaxHp,
                           .walk_ms_per_cell = kMageWalkMsPerCell,

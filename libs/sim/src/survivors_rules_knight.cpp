@@ -19,8 +19,7 @@ namespace {
 // première évolution, et Lord Knight à sa renaissance.
 
 constexpr std::uint16_t kKnightClassId = 2;
-constexpr std::uint16_t kSwordmanJobId = 1;           // l'apparence du départ
-constexpr std::uint16_t kKnightJobId = 7;             // après une évolution
+constexpr std::uint16_t kKnightJobId = 7;             // l'apparence, dès le départ
 constexpr std::uint16_t kLordKnightJobId = 4008;      // rené
 constexpr std::uint16_t kKnightPecoJobId = 13;        // monté sur son Peco Peco
 constexpr std::uint16_t kLordKnightPecoJobId = 4014;  // monté, rené
@@ -476,7 +475,7 @@ constexpr std::array<std::uint16_t, 16> kKnightCardPool{
 
 constexpr ClassRule kKnight{.class_id = kKnightClassId,
                             .key = "knight",
-                            .job_id = kSwordmanJobId,
+                            .job_id = kKnightJobId,
                             .weapon_item_id = kSwordItemId,
                             .max_hp = kKnightMaxHp,
                             .walk_ms_per_cell = kKnightWalkMsPerCell,
