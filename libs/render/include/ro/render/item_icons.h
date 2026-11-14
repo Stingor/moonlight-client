@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <map>
 #include <optional>
 #include <string>
@@ -68,6 +69,12 @@ class ItemIcons {
   [[nodiscard]] const IconTexture& Preview(const std::string& resource, formats::IconTint tint);
   static constexpr std::size_t kPreviewMost = 32;
 
+  // L'ILLUSTRATION DE COLLECTION D'UNE RESSOURCE (en CP949), pour la même
+  // fiche : elle suit la ressource saisie comme l'icône. Même borne, même
+  // durée de la référence que `Preview`. Inutilisable quand l'installation n'a
+  // pas ce fichier.
+  [[nodiscard]] const IconTexture& PreviewCollection(const std::string& resource);
+
   // L'ILLUSTRATION DE COLLECTION, la grande image de la description.
   //
   // ⚠ UN SECOND CACHE, et non une clé à deux champs : les deux images ne se
@@ -128,6 +135,7 @@ class ItemIcons {
   std::unordered_map<std::uint32_t, IconTexture> collections_;
   std::unordered_map<std::uint32_t, IconTexture> illustrations_;
   std::map<std::pair<std::string, formats::IconTint>, IconTexture> previews_;
+  std::map<std::string, IconTexture, std::less<>> collection_previews_;
   std::optional<std::vector<std::uint32_t>> collection_items_;
   std::uint64_t generation_ = 0;
 };
@@ -135,6 +143,10 @@ class ItemIcons {
 // LE CHEMIN D'ARCHIVE de l'illustration de collection d'un objet, en CP949.
 // Vide aux mêmes conditions que celui de l'icône.
 [[nodiscard]] std::string ItemCollectionPath(const vfs::ItemTable& items, std::uint32_t item_id);
+
+// Le même chemin, pour un nom de ressource EN CP949 ; vide pour une ressource
+// vide.
+[[nodiscard]] std::string ItemCollectionPathOfResource(std::string_view resource);
 
 // LES OBJETS DONT L'INSTALLATION PORTE L'ILLUSTRATION DE COLLECTION,
 // croissants, un seul par ressource : les cartes partagent toutes le dos de

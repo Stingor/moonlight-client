@@ -18,6 +18,7 @@
 #include "ro/ui/window_bounds.h"
 #include "ro/ui/window_name.h"
 
+#include "map_editor_names_font.h"
 #include "ui_scale.h"
 #include "ui_text.h"
 
@@ -27,7 +28,7 @@ namespace {
 constexpr const char* kTitle = core::TrText("Fiche d'item (staff)");
 
 constexpr float kFirstWidthPixels = 560.0F;
-constexpr float kFirstHeightPixels = 520.0F;
+constexpr float kFirstHeightPixels = 600.0F;
 constexpr float kLeastWidthPixels = 420.0F;
 constexpr float kLeastHeightPixels = 380.0F;
 // La colonne des libellés, et le côté d'une icône : le double des 24 pixels
@@ -35,6 +36,10 @@ constexpr float kLeastHeightPixels = 380.0F;
 constexpr float kLabelColumnPixels = 96.0F;
 constexpr float kIconSidePixels = 48.0F;
 constexpr float kIconGapPixels = 12.0F;
+// La hauteur de l'illustration dans la fiche : une carte d'environ 300 sur 460
+// s'y réduit, une illustration de collection d'environ 75 sur 100 s'y agrandit
+// à peine. Le dessin d'une carte se voit en entier au survol.
+constexpr float kIllustrationHeightPixels = 120.0F;
 // Les lignes que la description laisse sous elle et au-dessus : l'état (au
 // plus quatre lignes) et les trois champs d'une ligne. Et sa hauteur la
 // moindre, en lignes de texte.
@@ -94,10 +99,26 @@ void DrawIcon(const SkinImage& icon, const char* caption) {
   ImGui::EndGroup();
 }
 
+void DrawIllustration(const ItemSheetEditorView& view) {
+  const SkinImage& picture = view.illustration;
+  const float height = Px(kIllustrationHeightPixels);
+  ImGui::BeginGroup();
+  ImGui::Image(picture.id, ImVec2(height * picture.width / picture.height, height));
+  if (view.illustration_is_card && ImGui::IsItemHovered()) {
+    CardDrawingTooltip(picture);
+  }
+  FaintText(view.illustration_is_card ? core::Tr("Illustration") : core::Tr("Collection"));
+  ImGui::EndGroup();
+}
+
 void DrawIcons(const ItemSheetEditorView& view) {
   DrawIcon(view.table_icon, core::Tr("Table"));
   ImGui::SameLine(0.0F, Px(kIconGapPixels));
   DrawIcon(view.preview_icon, core::Tr("Aperçu"));
+  if (view.illustration.usable()) {
+    ImGui::SameLine(0.0F, Px(kIconGapPixels));
+    DrawIllustration(view);
+  }
   if (view.preview_icon.id == 0) {
     ImGui::SameLine(0.0F, Px(kIconGapPixels));
     ImGui::PushStyleColor(ImGuiCol_Text, kBadColor);
@@ -114,7 +135,10 @@ void DrawFields(ItemSheetEditorState& state, const ItemSheetEditorView& view, co
 
   FieldLabel(core::Tr("Ressource"));
   ImGui::SetNextItemWidth(-FLT_MIN);
-  ImGui::InputText("##ressource", state.resource.data(), state.resource.size());
+  {
+    const NamesFont korean(state.resource_font);
+    ImGui::InputText("##ressource", state.resource.data(), state.resource.size());
+  }
   if (ImGui::IsItemHovered()) {
     SkinTooltip(
         core::Tr("Le nom du fichier de l'icône et de l'illustration de collection, sans "

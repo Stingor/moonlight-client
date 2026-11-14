@@ -8,6 +8,8 @@
 #include <string_view>
 #include <vector>
 
+#include <imgui.h>
+
 #include "ro/core/i18n.h"
 #include "ro/ui/skin_art.h"
 
@@ -111,6 +113,11 @@ struct ItemSheetEditorState {
   bool refineable = false;
   std::array<std::array<char, kItemSheetEditorScriptBytes>, kItemSheetServerScripts.size()>
       scripts{};
+
+  // LA POLICE DU CHAMP « RESSOURCE », posée par `app` à chaque image : une
+  // ressource est un nom de fichier coréen, que la police de l'interface n'a
+  // pas toujours. Nulle : celle de l'interface.
+  ImFont* resource_font = nullptr;
 };
 
 // Ce que la saisie montre en s'ouvrant : le bon en attente s'il y en a un,
@@ -142,6 +149,12 @@ struct ItemSheetEditorView {
   // saisies.
   SkinImage table_icon;
   SkinImage preview_icon;
+  // L'ILLUSTRATION : le dessin de la carte s'il en est une — la table des
+  // illustrations le nomme, la ressource n'y est pour rien —, sinon
+  // l'illustration de collection que donnerait la ressource saisie.
+  // Inutilisable quand l'installation n'en a pas.
+  SkinImage illustration;
+  bool illustration_is_card = false;
   // Un bon attend le script pour CET objet ; et combien en tout.
   bool pending = false;
   std::size_t pending_count = 0;

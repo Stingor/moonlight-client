@@ -121,6 +121,7 @@ void ItemIcons::Clear() {
   collections_.clear();
   illustrations_.clear();
   previews_.clear();
+  collection_previews_.clear();
   ++generation_;
 }
 
@@ -138,6 +139,21 @@ const IconTexture& ItemIcons::Preview(const std::string& resource, formats::Icon
     LoadInto(*vfs_, ItemIconPathOfResource(resource), icon, /*on_paper=*/false, tint);
   }
   return icon;
+}
+
+const IconTexture& ItemIcons::PreviewCollection(const std::string& resource) {
+  const auto known = collection_previews_.find(resource);
+  if (known != collection_previews_.end()) {
+    return known->second;
+  }
+  if (collection_previews_.size() >= kPreviewMost) {
+    collection_previews_.clear();
+  }
+  IconTexture& art = collection_previews_[resource];
+  if (vfs_ != nullptr) {
+    LoadInto(*vfs_, ItemCollectionPathOfResource(resource), art, /*on_paper=*/true);
+  }
+  return art;
 }
 
 const IconTexture& ItemIcons::Get(std::uint32_t item_id) {

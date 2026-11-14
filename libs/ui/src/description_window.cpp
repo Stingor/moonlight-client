@@ -440,21 +440,11 @@ void DrawItemBody(DescriptionDollState* doll, int* staff_amount, const Descripti
     ImGui::Image(view.picture.id, picture);
     // LE DESSIN D'UNE CARTE SE REGARDE EN ENTIER AU SURVOL, comme au client.
     //
-    // ⚠ UNE INFOBULLE SANS RIEN AUTOUR : ni fond ni bordure. Le dessin porte son
-    // propre cadre — c'est une carte à jouer — et un second cadre autour ferait
-    // deux bords qui ne s'alignent pas.
-    //
     // ⚠ SEULEMENT POUR UNE CARTE. L'illustration de collection est déjà ce que
     // la vignette montre à sa taille, et l'icône de vingt-quatre pixels agrandie
     // ne serait qu'une bouillie.
     if (view.picture_is_card && ImGui::IsItemHovered()) {
-      ImGui::PushStyleColor(ImGuiCol_PopupBg, IM_COL32_BLACK_TRANS);
-      ImGui::PushStyleColor(ImGuiCol_Border, IM_COL32_BLACK_TRANS);
-      if (ImGui::BeginTooltip()) {
-        ImGui::Image(view.picture.id, ImVec2(view.picture.width, view.picture.height));
-        ImGui::EndTooltip();
-      }
-      ImGui::PopStyleColor(2);
+      CardDrawingTooltip(view.picture);
     }
     // L'ILLUSTRATION D'UNE PIÈCE QUI SE PORTE montre le pantin qui la porte,
     // comme sa ligne « ViewID » — et celle d'un costume qui n'a qu'un effet de

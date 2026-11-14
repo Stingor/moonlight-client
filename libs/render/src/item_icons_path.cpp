@@ -55,7 +55,10 @@ std::string CardIllustrationPath(const vfs::CardIllustrations& cards, std::uint3
 }
 
 std::string ItemCollectionPath(const vfs::ItemTable& items, std::uint32_t item_id) {
-  const std::string_view resource = items.ResourceOf(item_id);
+  return ItemCollectionPathOfResource(items.ResourceOf(item_id));
+}
+
+std::string ItemCollectionPathOfResource(std::string_view resource) {
   if (resource.empty() || CollectionFolderCp949().empty()) {
     return {};
   }

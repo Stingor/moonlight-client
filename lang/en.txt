@@ -476,6 +476,9 @@ tr: Click the window to resume.
 fr: Colle la caméra au personnage, ou la laisse rattraper.
 tr: Sticks the camera to the character, or lets it catch up.
 
+fr: Collection
+tr: Collection
+
 fr: Collectionneur
 tr: Collector
 
@@ -1225,6 +1228,9 @@ tr: Force the noon altitude
 
 fr: Il n'y a aucun équipement à échanger.
 tr: There is no item to replace.
+fr: Illustration
+tr: Illustration
+
 fr: Impossible de ranger cet item dans la fenêtre d'échange.
 tr: Unable to register item.
 fr: Impossible d'échanger l'équipement.

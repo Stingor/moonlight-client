@@ -119,8 +119,10 @@ UiStage::Answers UiStage::Draw(
   // dessineront à l'image suivante.
   // Les noms de fichiers de l'éditeur de carte, et du menu d'un modèle, sont
   // coréens : leur police les dessine, quelle que soit celle de l'interface.
+  // La ressource de la fiche d'item est un tel nom de fichier.
   windows.staff_tools.map_editor_panel.names_font = windows.entity_menu.state.hangul_font =
-      ui_->FontNamed(kHangulFontFamily, ro::ui::FontStyle::kRegular);
+      windows.staff_tools.item_editor.resource_font =
+          ui_->FontNamed(kHangulFontFamily, ro::ui::FontStyle::kRegular);
   const ro::ui::StaffToolsAction staff_action =
       ro::ui::DrawStaffTools(windows.staff_tools, skin_, rights.staff_tools);
   if (staff_action.toggle_log) {

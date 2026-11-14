@@ -60,6 +60,13 @@ void PaintWarningMark(ImDrawList& into, ImVec2 top_left, float side);
 // devient pas une conversion.
 void SkinTooltipWarned(const char* text, const char* warning);
 
+// LE DESSIN D'UNE CARTE EN ENTIER, flottant au survol : une bulle SANS FOND NI
+// BORDURE, parce que le dessin porte son propre cadre — c'est une carte à jouer
+// — et qu'un second cadre autour ferait deux bords qui ne s'alignent pas.
+//
+// ⚠ ELLE NE TESTE PAS LE SURVOL, comme `SkinTooltipFormat`.
+void CardDrawingTooltip(const SkinImage& drawing);
+
 // L'habillage de la fenêtre ou de la modale habillée en cours de dessin, sinon
 // celui qu'un cadre non habillé prête, ou nul. Tenu par `skinned_window.cpp`.
 [[nodiscard]] const SkinArt* PaintingSkinArt() noexcept;

@@ -4,6 +4,7 @@
 #include <charconv>
 #include <cstddef>
 #include <cstdint>
+#include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
@@ -316,11 +317,22 @@ void ItemSheetEditorStage::Compose(const ro::ui::ItemSheetEditorState& state,
   if (context.icons != nullptr) {
     view_.table_icon = SizedSkinImageOf(context.icons->Get(item_id));
     // L'APERÇU suit la saisie : la ressource tapée, sous la teinte choisie.
-    if (auto archived = ro::vfs::Utf8ToCp949(state.resource.data()); archived) {
+    const auto archived = ro::vfs::Utf8ToCp949(state.resource.data());
+    if (archived.has_value()) {
       const ro::formats::IconTint tint =
           ro::formats::IconTintFromWord(ItemSheetTintWord(state.tint_rank))
               .value_or(ro::formats::IconTint::kNone);
       view_.preview_icon = SizedSkinImageOf(context.icons->Preview(*archived, tint));
+    }
+    // L'ILLUSTRATION, dans l'ordre de la description : le dessin de la carte,
+    // sinon la collection — celle de la ressource saisie, puisque c'est elle
+    // qui la nomme.
+    if (const ro::render::IconTexture& drawn = context.icons->GetCardIllustration(item_id);
+        drawn.usable()) {
+      view_.illustration = SizedSkinImageOf(drawn);
+      view_.illustration_is_card = true;
+    } else if (archived.has_value()) {
+      view_.illustration = SizedSkinImageOf(context.icons->PreviewCollection(*archived));
     }
   }
 }

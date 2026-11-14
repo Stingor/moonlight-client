@@ -146,4 +146,14 @@ void SkinTooltipWarned(const char* text, const char* warning) {
   EndSkinTooltip();
 }
 
+void CardDrawingTooltip(const SkinImage& drawing) {
+  ImGui::PushStyleColor(ImGuiCol_PopupBg, IM_COL32_BLACK_TRANS);
+  ImGui::PushStyleColor(ImGuiCol_Border, IM_COL32_BLACK_TRANS);
+  if (ImGui::BeginTooltip()) {
+    ImGui::Image(drawing.id, ImVec2(drawing.width, drawing.height));
+    ImGui::EndTooltip();
+  }
+  ImGui::PopStyleColor(2);
+}
+
 }  // namespace ro::ui
