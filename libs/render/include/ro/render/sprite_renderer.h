@@ -13,6 +13,7 @@
 #include "ro/core/error.h"
 #include "ro/render/actor_sprite.h"
 #include "ro/render/camera.h"
+#include "ro/render/effect_color_tally.h"
 #include "ro/render/effect_dye.h"
 #include "ro/render/gl_program.h"
 #include "ro/render/gl_texture.h"
@@ -331,6 +332,11 @@ class SpriteRenderer {
   [[nodiscard]] const BatchTally& batch_tally() const noexcept { return batch_tally_; }
   void ResetBatchTally() noexcept { batch_tally_ = BatchTally(); }
 
+  // LA MESURE DE COULEUR D'UN EFFET DE CHAPEAU, ou nul : chaque calque dont la
+  // teinture est sa sonde y verse son image. Un effet peint en sprites — un
+  // SPR/ACT posé sur son porteur — ne passe jamais par les quads d'effet.
+  void SetColorTally(EffectColorTally* tally) noexcept { tally_ = tally; }
+
  private:
   void Release() noexcept;
   // Rend la texture d'une image, en la téléversant à la première demande.
@@ -376,6 +382,10 @@ class SpriteRenderer {
   std::vector<SpriteVertex> vertices_;
   std::vector<LayerDraw> layer_draws_;
   BatchTally batch_tally_;
+  EffectColorTally* tally_ = nullptr;
+  // LES IMAGES QU'UNE MESURE A LUES, décodées une fois : la mesure garde la
+  // moyenne de chacune sous son adresse, qui doit donc rester la même.
+  std::map<SpriteImageKey, formats::Image> tallied_images_;
 };
 
 }  // namespace ro::render

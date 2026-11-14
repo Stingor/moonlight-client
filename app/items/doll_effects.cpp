@@ -311,6 +311,11 @@ void DollEffects::PaintInto(const ro::ui::DollOverlayCall& call, const ImVec4& c
       .viewport_width = width,
       .viewport_height = height,
       .fog = {}};
+  // 🔴 LA MESURE ÉCOUTE LES DEUX PASSES ET LES DEUX RENDERERS : un effet peint
+  // derrière le pantin, ou en sprites posés sur lui, a lui aussi une couleur.
+  ro::render::EffectColorTally* const listening = probing_ ? &tally_ : nullptr;
+  effect_renderer_->SetColorTally(listening);
+  sprites_->SetColorTally(listening);
   // LES DEUX PASSES DE LA PARTIE : derrière le pantin, ce qu'elle peint avant
   // les corps et dans le même ordre ; devant, tout le reste.
   if (call.pass == ro::ui::DollOverlayPass::kBehind) {
@@ -328,17 +333,15 @@ void DollEffects::PaintInto(const ro::ui::DollOverlayCall& call, const ImVec4& c
           {}, ro::render::SpriteRenderer::DrawOrder::kAsGiven);
     }
   } else {
-    if (probing_) {
-      effect_renderer_->SetColorTally(&tally_);
-    }
     PaintEffectsUnderStr(effects_, nodes_, painters);
     PaintStrEffects(effects_, nodes_, played_, painters);
     PaintEffectsLast(effects_, nodes_, painters);
     if (probing_) {
-      effect_renderer_->SetColorTally(nullptr);
       tally_.NoteImage();
     }
   }
+  effect_renderer_->SetColorTally(nullptr);
+  sprites_->SetColorTally(nullptr);
   ro::render::EndInsetPaint();
 }
 

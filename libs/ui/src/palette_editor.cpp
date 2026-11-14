@@ -487,14 +487,15 @@ PaletteEditorAction DrawPaletteEditor(PaletteEditorState& state, const PaletteEd
   // panneau, et ses réglages dessous, sur toute la largeur.
   if (view.tab == PaletteTabKind::kEffects && view.effects != nullptr) {
     DrawPaletteDoll(state.doll, std::max(kDollMinPoints * Scale(), state.effects.panel_height),
-                    art.look(), /*pipette=*/false);
+                    art.look(), /*pipette=*/false, /*magnifier=*/false);
     state.hovered_ramp = -1;
     ImGui::SameLine();
     ImGui::BeginGroup();
     action.effects = DrawPaletteEffects(state.effects, *view.effects, art);
     ImGui::EndGroup();
     state.effects.panel_height = ImGui::GetItemRectSize().y;
-    DrawPaletteDollControls(state.doll, art, EffectsDiffer(state.effects, *view.effects));
+    DrawPaletteDollControls(state.doll, art, EffectsDiffer(state.effects, *view.effects), {},
+                            /*magnifier=*/false);
     EndSkinnedWindow();
     return action;
   }

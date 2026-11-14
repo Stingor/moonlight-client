@@ -106,7 +106,8 @@ void DrawMagnifier(const PaletteDollState& doll, ImVec2 image_at, ImVec2 mouse, 
 
 }  // namespace
 
-void DrawPaletteDoll(PaletteDollState& doll, float side, const SkinLook& look, bool pipette) {
+void DrawPaletteDoll(PaletteDollState& doll, float side, const SkinLook& look, bool pipette,
+                     bool magnifier) {
   const ImVec2 at = ImGui::GetCursorScreenPos();
   doll.clicked = ImGui::InvisibleButton("##pantin", ImVec2(side, side));
   const bool hovered = ImGui::IsItemHovered();
@@ -154,7 +155,7 @@ void DrawPaletteDoll(PaletteDollState& doll, float side, const SkinLook& look, b
   if (!hovered) {
     return;
   }
-  if (doll.magnifier && doll.image.usable()) {
+  if (magnifier && doll.magnifier && doll.image.usable()) {
     const ImVec2 image_at(at.x + (side - doll.image.width) * 0.5F,
                           at.y + (side - doll.image.height) * 0.5F);
     DrawMagnifier(doll, image_at, mouse, doll.light_background ? kLightBackground : look.doll,
@@ -174,7 +175,7 @@ void DrawPaletteDoll(PaletteDollState& doll, float side, const SkinLook& look, b
 }
 
 void DrawPaletteDollControls(PaletteDollState& doll, const SkinArt& art, bool differs,
-                             const std::function<void()>& between) {
+                             const std::function<void()>& between, bool magnifier) {
   // ── AVANT / APRÈS ─────────────────────────────────────────────────────────
   //
   // 🔴 TENU, PAS BASCULÉ : on compare en relâchant, et un bouton qu'on aurait
@@ -220,6 +221,9 @@ void DrawPaletteDollControls(PaletteDollState& doll, const SkinArt& art, bool di
   }
   ImGui::SameLine();
   static_cast<void>(SkinCheckBox(core::Tr("Fond clair"), &doll.light_background, art));
+  if (!magnifier) {
+    return;
+  }
   ImGui::SameLine();
   static_cast<void>(SkinCheckBox(core::Tr("Loupe"), &doll.magnifier, art));
   if (ImGui::IsItemHovered()) {

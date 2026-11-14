@@ -238,7 +238,9 @@ SpriteRenderer::SpriteRenderer(SpriteRenderer&& other) noexcept
       prepared_(std::move(other.prepared_)),
       vertices_(std::move(other.vertices_)),
       layer_draws_(std::move(other.layer_draws_)),
-      batch_tally_(other.batch_tally_) {
+      batch_tally_(other.batch_tally_),
+      tally_(other.tally_),
+      tallied_images_(std::move(other.tallied_images_)) {
   other.vertex_array_ = 0;
   other.vertex_buffer_ = 0;
 }
@@ -255,6 +257,8 @@ SpriteRenderer& SpriteRenderer::operator=(SpriteRenderer&& other) noexcept {
     vertices_ = std::move(other.vertices_);
     layer_draws_ = std::move(other.layer_draws_);
     batch_tally_ = other.batch_tally_;
+    tally_ = other.tally_;
+    tallied_images_ = std::move(other.tallied_images_);
     other.vertex_array_ = 0;
     other.vertex_buffer_ = 0;
   }
@@ -643,6 +647,14 @@ void SpriteRenderer::PrepareQuads(const Camera& camera, const BillboardBasis& ba
       if (layered && !silhouettes && drawn.dye.has_value()) {
         prepared_.back().dye = &*drawn.dye;
         prepared_.back().darkened = drawn.dye->darken && prepared_.back().additive;
+        if (tally_ != nullptr && tally_->Counts(drawn.dye)) {
+          const SpriteImageKey& key = composed.sources[index];
+          auto kept = tallied_images_.find(key);
+          if (kept == tallied_images_.end()) {
+            kept = tallied_images_.emplace(key, ResolveImage(key)).first;
+          }
+          tally_->Add(kept->second, prepared_.back().tint);
+        }
       }
     }
   };

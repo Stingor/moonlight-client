@@ -18,9 +18,10 @@ namespace ro::ui {
 // 🔴 ET LA BOÎTE EST MESURÉE ICI, LUE PAR `app` À L'IMAGE SUIVANTE : c'est
 // elle qui dit à quelle taille composer, et elle dépend d'une mise en page
 // qu'on ne connaît qu'au dessin.
-// `pipette` : un clic y choisit une pièce, et la bulle le dit.
-void DrawPaletteDoll(PaletteDollState& doll, float side, const SkinLook& look,
-                     bool pipette = false);
+// `pipette` : un clic y choisit une pièce, et la bulle le dit. `magnifier` :
+// la loupe y est offerte ; sans elle, la case « Loupe » ne la rallume pas.
+void DrawPaletteDoll(PaletteDollState& doll, float side, const SkinLook& look, bool pipette = false,
+                     bool magnifier = true);
 
 // SES COMMANDES, sous lui dans l'éditeur : avant/après, rotation, pose et son
 // animation, fond, loupe.
@@ -28,8 +29,8 @@ void DrawPaletteDoll(PaletteDollState& doll, float side, const SkinLook& look,
 // `differs` : ce qu'on compose diffère de ce que le personnage porte ; sans
 // quoi « Avant » n'aurait rien à montrer, et se grise. `between` se dessine
 // sur la même ligne, entre « Avant » et la rotation : l'historique de
-// l'éditeur.
+// l'éditeur. `magnifier` : la case « Loupe » se montre.
 void DrawPaletteDollControls(PaletteDollState& doll, const SkinArt& art, bool differs,
-                             const std::function<void()>& between = {});
+                             const std::function<void()>& between = {}, bool magnifier = true);
 
 }  // namespace ro::ui

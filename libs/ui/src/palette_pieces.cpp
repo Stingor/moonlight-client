@@ -261,23 +261,29 @@ bool DrawSwatch(const PieceShown& piece, PaletteEditorState& state, const Palett
 // 🔴 LA COULEUR NOMMÉE EST CELLE D'ORIGINE, ET SEULEMENT TANT QU'ELLE SE
 // MONTRE : c'est par elle que le joueur reconnaît sa manche, mais une pièce
 // réglée ne la porte plus, et le nom mentirait sur ce que la pastille montre.
-bool DrawName(const PieceShown& piece) {
-  char label[128] = {};
+struct PieceLabel {
+  std::array<char, 128> text{};
+};
+
+PieceLabel LabelOf(const PieceShown& piece) {
+  PieceLabel made;
+  char* const label = made.text.data();
+  const std::size_t size = made.text.size();
   const char* kind = piece.rest ? core::Tr("Reste") : core::Tr("Pièce");
   int written = 0;
   if (!piece.adjust.neutral()) {
-    written = piece.rest ? std::snprintf(label, sizeof(label), "%s", kind)
-                         : std::snprintf(label, sizeof(label), "%s %zu", kind, piece.rank + 1);
+    written = piece.rest ? std::snprintf(label, size, "%s", kind)
+                         : std::snprintf(label, size, "%s %zu", kind, piece.rank + 1);
   } else {
-    written = piece.rest ? std::snprintf(label, sizeof(label), "%s — %s", kind,
-                                         PieceColorName(piece.base_color))
-                         : std::snprintf(label, sizeof(label), "%s %zu — %s", kind, piece.rank + 1,
-                                         PieceColorName(piece.base_color));
+    written = piece.rest
+                  ? std::snprintf(label, size, "%s — %s", kind, PieceColorName(piece.base_color))
+                  : std::snprintf(label, size, "%s %zu — %s", kind, piece.rank + 1,
+                                  PieceColorName(piece.base_color));
   }
-  const auto append = [&label, &written](const char* tail) {
-    if (written >= 0 && static_cast<std::size_t>(written) < sizeof(label)) {
-      written += std::snprintf(label + written, sizeof(label) - static_cast<std::size_t>(written),
-                               " %s", tail);
+  const auto append = [label, size, &written](const char* tail) {
+    if (written >= 0 && static_cast<std::size_t>(written) < size) {
+      written +=
+          std::snprintf(label + written, size - static_cast<std::size_t>(written), " %s", tail);
     }
   };
   const bool in_shadow = piece.ceiling < kShadowCeiling;
@@ -290,6 +296,13 @@ bool DrawName(const PieceShown& piece) {
   if (piece.locked) {
     append(core::Tr("(fixe)"));
   }
+  return made;
+}
+
+bool DrawName(const PieceShown& piece) {
+  const PieceLabel made = LabelOf(piece);
+  const char* const label = made.text.data();
+  const bool in_shadow = piece.ceiling < kShadowCeiling;
   // 🔴 `AlignTextToFramePadding`, ET SURTOUT PAS UN CURSEUR POSÉ À LA MAIN :
   // les pièces se dessineraient toutes au même endroit, empilées.
   ImGui::AlignTextToFramePadding();
@@ -347,6 +360,10 @@ bool DrawPiecePopup(const PieceShown& piece, PaletteEditorState& state, const Sk
   if (!BeginSkinPopup("nuancier")) {
     return false;
   }
+  // 🔴 LE NUANCIER DIT QUELLE PIÈCE IL RÈGLE : il recouvre la liste, et l'on
+  // perdrait de vue la ligne cliquée.
+  ImGui::TextUnformatted(LabelOf(piece).text.data());
+  ImGui::Separator();
   std::array<float, 3> rgb = Channels(piece.color);
   if (DrawPaletteColorPicker(rgb, art)) {
     action.picked_ramp = static_cast<int>(piece.rank);

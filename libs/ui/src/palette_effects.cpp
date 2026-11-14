@@ -112,44 +112,6 @@ void DrawRows(PaletteEffectsState& state, const PaletteEffectsView& view,
   }
 }
 
-// LA PASTILLE DE L'EFFET : la couleur que le réglage donne, et le nuancier
-// qu'elle ouvre. Rend le réglage.
-PaletteEffectSetting DrawSwatch(const PaletteEffectRow& row, PaletteEffectSetting setting,
-                                const SkinArt& art) {
-  if (!row.base_color.has_value()) {
-    ImGui::TextDisabled("%s", row.measuring_color
-                                  ? core::Tr("Mesure de la couleur de l'effet…")
-                                  : core::Tr("Cet effet ne laisse pas lire sa couleur : règle-le "
-                                             "dans les réglages avancés."));
-    return setting;
-  }
-  const std::array<float, 3> shown = Unit(EffectColorOf(*row.base_color, setting));
-  const float side = ImGui::GetFontSize() * kSwatchInFonts;
-  // ⚠ SANS LE GLISSER NI L'INFOBULLE D'IMGUI, en anglais : on pose la nôtre.
-  if (ImGui::ColorButton("##couleur_effet", ImVec4(shown[0], shown[1], shown[2], 1.0F),
-                         ImGuiColorEditFlags_NoAlpha | ImGuiColorEditFlags_NoDragDrop |
-                             ImGuiColorEditFlags_NoTooltip,
-                         ImVec2(side, side))) {
-    ImGui::OpenPopup("nuancier_effet");
-  }
-  Explain(
-      core::Tr("Choisis la couleur de l'effet : la teinte, la saturation et la clarté "
-               "suivent."));
-  ImGui::SameLine();
-  ImGui::AlignTextToFramePadding();
-  ImGui::TextUnformatted(core::Tr("Couleur de l'effet"));
-  if (BeginSkinPopup("nuancier_effet")) {
-    std::array<float, 3> picked = shown;
-    if (DrawPaletteColorPicker(picked, art)) {
-      setting = EffectSettingToward(*row.base_color,
-                                    {ToByte(picked[0]), ToByte(picked[1]), ToByte(picked[2])},
-                                    setting, row.additive);
-    }
-    EndSkinPopup();
-  }
-  return setting;
-}
-
 // « RÉGLAGES AVANCÉS », repliés par défaut : les trois curseurs et
 // « Assombrir ». Rend le réglage.
 PaletteEffectSetting DrawAdvanced(PaletteEffectsState& state, const PaletteEffectRow& row,
@@ -188,6 +150,50 @@ PaletteEffectSetting DrawAdvanced(PaletteEffectsState& state, const PaletteEffec
   }
   ImGui::TreePop();
   return ClampedEffectSetting(setting, row.additive);
+}
+
+// LA PASTILLE DE L'EFFET : la couleur que le réglage donne, et le nuancier
+// qu'elle ouvre, réglages avancés compris. Rend le réglage.
+//
+// 🔴 LES RÉGLAGES AVANCÉS VIVENT DANS LE NUANCIER : ses curseurs et les leurs
+// règlent la même teinture, l'une en couleur visée, l'autre en écarts. Deux
+// panneaux côte à côte se liraient comme deux réglages. Sans couleur lue, il
+// n'y a pas de pastille, et ils restent seuls dans le panneau.
+PaletteEffectSetting DrawSwatch(PaletteEffectsState& state, const PaletteEffectRow& row,
+                                PaletteEffectSetting setting, const SkinArt& art) {
+  if (!row.base_color.has_value()) {
+    ImGui::TextDisabled("%s", row.measuring_color
+                                  ? core::Tr("Mesure de la couleur de l'effet…")
+                                  : core::Tr("Cet effet ne laisse pas lire sa couleur : règle-le "
+                                             "dans les réglages avancés."));
+    return DrawAdvanced(state, row, setting, art);
+  }
+  const std::array<float, 3> shown = Unit(EffectColorOf(*row.base_color, setting));
+  const float side = ImGui::GetFontSize() * kSwatchInFonts;
+  // ⚠ SANS LE GLISSER NI L'INFOBULLE D'IMGUI, en anglais : on pose la nôtre.
+  if (ImGui::ColorButton("##couleur_effet", ImVec4(shown[0], shown[1], shown[2], 1.0F),
+                         ImGuiColorEditFlags_NoAlpha | ImGuiColorEditFlags_NoDragDrop |
+                             ImGuiColorEditFlags_NoTooltip,
+                         ImVec2(side, side))) {
+    ImGui::OpenPopup("nuancier_effet");
+  }
+  Explain(
+      core::Tr("Choisis la couleur de l'effet : la teinte, la saturation et la clarté "
+               "suivent."));
+  ImGui::SameLine();
+  ImGui::AlignTextToFramePadding();
+  ImGui::TextUnformatted(core::Tr("Couleur de l'effet"));
+  if (BeginSkinPopup("nuancier_effet")) {
+    std::array<float, 3> picked = shown;
+    if (DrawPaletteColorPicker(picked, art)) {
+      setting = EffectSettingToward(*row.base_color,
+                                    {ToByte(picked[0]), ToByte(picked[1]), ToByte(picked[2])},
+                                    setting, row.additive);
+    }
+    setting = DrawAdvanced(state, row, setting, art);
+    EndSkinPopup();
+  }
+  return setting;
 }
 
 // « Valider », « D'origine », « Retirer la teinture », et ce qui les retient.
@@ -338,8 +344,7 @@ PaletteEffectsAction DrawPaletteEffects(PaletteEffectsState& state, const Palett
   DrawRows(state, view, *chosen);
   ImGui::Separator();
   const PaletteEffectSetting before = EffectDraftOf(state, *chosen);
-  const PaletteEffectSetting after =
-      DrawAdvanced(state, *chosen, DrawSwatch(*chosen, before, art), art);
+  const PaletteEffectSetting after = DrawSwatch(state, *chosen, before, art);
   if (after != before) {
     state.drafts[chosen->number] = after;
   }
