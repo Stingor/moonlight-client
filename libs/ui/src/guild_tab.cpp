@@ -30,7 +30,6 @@ constexpr float kEmblemHoverPixels = 2.0F;
 constexpr ImU32 kEmblemBackdrop = IM_COL32(0, 0, 0, 30);
 constexpr ImU32 kEmblemBorder = IM_COL32(90, 90, 110, 220);
 constexpr ImU32 kEmblemHoverBorder = IM_COL32(255, 220, 120, 255);
-constexpr float kExpGaugePixels = 14.0F;
 constexpr float kPercent = 100.0F;
 constexpr float kCreateFieldPixels = 220.0F;
 constexpr float kInviteFieldPixels = 130.0F;
@@ -179,7 +178,8 @@ void DrawHeader(GuildTabState& state, const GuildView& view, const SkinArt& art,
     std::snprintf(line.data(), line.size(), "EXP %lld / %lld  (%.1f %%)",
                   static_cast<long long>(view.exp), static_cast<long long>(view.next_exp),
                   static_cast<double>(ratio * kPercent));
-    ImGui::ProgressBar(ratio, ImVec2(-1.0F, Px(kExpGaugePixels)), line.data());
+    // HAUTEUR NULLE : celle d'un cadre, que le texte de la barre remplit sans être coupé.
+    ImGui::ProgressBar(ratio, ImVec2(-1.0F, 0.0F), line.data());
   }
 }
 
