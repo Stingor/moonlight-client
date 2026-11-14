@@ -3926,6 +3926,33 @@ quests:
     icon: lq
     summary: "Join the Illusion Investigation Team"
     description: "Join the Illusion Investigation Team."
+  3493:
+    title: "Conversation with Jarad"
+  3494:
+    title: "Conversation with Rohi"
+  3495:
+    title: "Conversation with Jeojin"
+  3496:
+    title: "Conversation with Skuain"
+  3497:
+    title: "Conversation with Senado"
+  3498:
+    title: "Conversation with Japer"
+  3499:
+    title: "Conversation with Shiroan"
+  3500:
+    title: "Conversation with Isira"
+  3501:
+    title: "Conversation with Dina"
+  3502:
+    title: "Conversation with Hari"
+  3503:
+    title: "[Daily] Opinion Gathering"
+  3504:
+    title: "[Cooldown] Opinion Gathering"
+    icon: dq
+  3505:
+    title: "Completed Opinion Gathering"
   3507:
     title: "Illusion Investigation Team - Sheshin"
     icon: lq
@@ -7923,6 +7950,29 @@ quests:
   5900:
     title: "[Waiting] Cleaning the first power plant."
     icon: dq
+  5932:
+    title: "Abused Child"
+  5933:
+    title: "Business Plan"
+  5934:
+    title: "Foraging Practice (1)"
+  5935:
+    title: "Foraging Practice (2)"
+  5936:
+    title: "Foraging Practice (3)"
+  5937:
+    title: "[Cooldown] Half Flower Gathering"
+    icon: dq
+  5938:
+    title: "[Daily] Half Flower Gathering"
+  5939:
+    title: "[Daily] Half Flower Gathering"
+  5940:
+    title: "[Daily] Half Flower Gathering"
+  5941:
+    title: "[Daily] Half Flower Gathering"
+  5942:
+    title: "Flower Room Opening Ceremony"
   6000:
     title: Job Change to Taekwon
     description: You've chosen your path to become a Taekwon. You must increase your base level and talk with Phoenix.
@@ -13706,6 +13756,54 @@ quests:
     title: "Sorry for being sleepy (2)"
   8681:
     title: "Towards Rachel (1)"
+  8682:
+    title: "Towards Rachel (2)"
+  8683:
+    title: "Heated Argument"
+  8684:
+    title: "State of Conflict"
+  8685:
+    title: "Suspicious Movement"
+  8686:
+    title: "Intruder of the Temple"
+  8687:
+    title: "Staged Plot"
+  8688:
+    title: "Today's Daily Bread"
+  8689:
+    title: "[Cooldown] Today's Daily Bread"
+    icon: dq
+  8690:
+    title: "[Daily] Today's Daily Bread"
+  8691:
+    title: "Water Purification (1)"
+  8692:
+    title: "Water Purification (2)"
+  8693:
+    title: "Water Purification (3)"
+  8694:
+    title: "[Cooldown] Water Purification"
+    icon: dq
+  8695:
+    title: "[Daily] Water Purification (1)"
+  8696:
+    title: "[Daily] Water Purification (2)"
+  8697:
+    title: "[Daily] Water Purification (3)"
+  8698:
+    title: "Horim's Bizarre Adventure (1)"
+  8699:
+    title: "Horim's Bizarre Adventure (2)"
+  8700:
+    title: "Horim's Bizarre Adventure (3)"
+  8701:
+    title: "Horim's Bizarre Adventure (4)"
+  8702:
+    title: "Horim's Bizarre Adventure (5)"
+  8703:
+    title: "Horim's Bizarre Adventure (6)"
+  8718:
+    title: "Greetings from a Friend"
   8719:
     title: "A new area somewhere in the anthill"
     icon: lq
@@ -18387,6 +18485,96 @@ quests:
   11639:
     title: "The ultimate collection of scrap metal"
     icon: dq
+  11696:
+    title: "Niren's Request (1)"
+  11697:
+    title: "Niren's Request (2)"
+  11698:
+    title: "Niren's Request (3)"
+  11699:
+    title: "Niren's Request (4)"
+  11700:
+    title: "Niren's Request (5)"
+  11701:
+    title: "Niren's Request (6)"
+  11702:
+    title: "Niren's Request (7)"
+  11703:
+    title: "Niren's Request (8)"
+  11704:
+    title: "Gray Children (1)"
+  11705:
+    title: "Gray Children (2)"
+  11706:
+    title: "Gray Children (3)"
+  11707:
+    title: "Gray Children (4)"
+  11708:
+    title: "Gray Children (5)"
+  11709:
+    title: "Gray Children (6)"
+  11710:
+    title: "Gray Children (7)"
+  11711:
+    title: "Gray Children (8)"
+  11712:
+    title: "Gray Children (9)"
+  11713:
+    title: "Gray Children (10)"
+  11714:
+    title: "Gray Children (11)"
+  11715:
+    title: "Gray Children (12)"
+  11716:
+    title: "Gray Children (13)"
+  11717:
+    title: "Gray Children (14)"
+  11719:
+    title: "Gray Children (16)"
+  11720:
+    title: "Gray Children (17)"
+  11721:
+    title: "Gray Children (18)"
+  11722:
+    title: "Gray Children (19)"
+  11723:
+    title: "Gray Children (20)"
+  11724:
+    title: "Gray Children (21)"
+  11725:
+    title: "The Labyrinth and the Merchant (1)"
+  11726:
+    title: "The Labyrinth and the Merchant (2)"
+  11727:
+    title: "The Labyrinth and the Merchant (3)"
+  11728:
+    title: "The Labyrinth and the Merchant (4)"
+  11729:
+    title: "The Labyrinth and the Merchant (5)"
+  11730:
+    title: "The Labyrinth and the Merchant (6)"
+  11731:
+    title: "The Labyrinth and the Merchant (7)"
+  11732:
+    title: "The Labyrinth and the Merchant (8)"
+  11733:
+    title: "The Labyrinth and the Merchant (9)"
+  11734:
+    title: "The Labyrinth and the Merchant (10)"
+  11735:
+    title: "The Labyrinth and the Merchant (11)"
+  11736:
+    title: "Oz Labyrinth 1F (170lv)"
+    summary: "Hunt 20 Ash Toad"
+  11737:
+    title: "[Cooldown] Oz Labyrinth 1F"
+    icon: dq
+  11738:
+    title: "Oz Labyrinth 2F (200lv)"
+    summary: "Hunt 20 Hot Molar"
+  11739:
+    title: "[Cooldown] Oz Labyrinth 2F"
+    icon: dq
   12000:
     title: An old friend
     description: Find Maku's old friend and talk with him.
@@ -20568,6 +20756,31 @@ quests:
   12500:
     title: "Red Pepper - Lambda Suppression"
     summary: "Hunt 1 Senior Red Pepper"
+  12520:
+    title: "[Normal] Villa of Deception"
+  12521:
+    title: "[Hard] Villa of Deception"
+  12522:
+    title: "[Cooldown] Villa of Deception"
+    icon: dq
+  12531:
+    title: "Transporting Goods"
+  12532:
+    title: "Broken Wagon"
+  12533:
+    title: "Hidden Helper"
+  12534:
+    title: "Missing Camille"
+  12535:
+    title: "Chief Decision"
+  12536:
+    title: "Scattered Goods (North)"
+  12537:
+    title: "Scattered Goods (West)"
+  12538:
+    title: "Scattered Goods (East)"
+  12539:
+    title: "Scattered Goods (South)"
   13000:
     title: RWC 2011Card Gathering
     description: Defeat the Gold Porings that are randomly around Rune Midgard and collect enough Blue Cards to spell out "RWC 2011"
@@ -25985,6 +26198,86 @@ quests:
     title: "Data Backup"
   16545:
     title: "Traces of Werner"
+  16548:
+    title: "I can't sleep"
+    summary: "Hunt 30 Firewind Kite"
+  16549:
+    title: "[Daily] I can't sleep"
+    summary: "Hunt 30 Firewind Kite"
+  16550:
+    title: "[Cooldown] I can't sleep"
+    icon: dq
+  16551:
+    title: "Collecting Folklore (1)"
+  16552:
+    title: "Collecting Folklore (2)"
+  16553:
+    title: "Collecting Folklore (3)"
+  16554:
+    title: "Collecting Folklore (4)"
+  16555:
+    title: "[Daily] Dinar's Story"
+  16556:
+    title: "[Daily] Amira's Story"
+  16557:
+    title: "[Daily] Shanina's Story"
+  16558:
+    title: "[Daily] Collecting Folklore"
+  16559:
+    title: "[Cooldown] Collecting Folklore"
+    icon: dq
+  16560:
+    title: "Ahab's Gossip (1)"
+  16561:
+    title: "Ahab's Gossip (2)"
+  16562:
+    title: "Ahab's Gossip (3)"
+  16563:
+    title: "Ahab's Gossip (4)"
+  16564:
+    title: "Ahab's Gossip (5)"
+  16565:
+    title: "Ahab's Gossip (6)"
+  16566:
+    title: "Ahab's Gossip (7)"
+  16567:
+    title: "Gray Wolf Forest Tournament (1)"
+  16568:
+    title: "People's Opinion (1)"
+  16569:
+    title: "People's Opinion (2)"
+  16570:
+    title: "People's Opinion (3)"
+  16571:
+    title: "People's Opinion (4)"
+  16572:
+    title: "Gray Wolf Forest Tournament (2)"
+  16573:
+    title: "Source of Weapons (1)"
+  16574:
+    title: "Source of Weapons (2)"
+  16575:
+    title: "Source of Weapons (3)"
+  16576:
+    title: "Source of Weapons (4)"
+  16577:
+    title: "Source of Weapons (5)"
+  16578:
+    title: "Source of Weapons (6)"
+  16579:
+    title: "Source of Weapons (7)"
+  16580:
+    title: "Source of Weapons (8)"
+  16581:
+    title: "Even children know (1)"
+  16582:
+    title: "Even children know (2)"
+  16583:
+    title: "Even children know (3)"
+  16584:
+    title: "The Price of Labor (1)"
+  16585:
+    title: "The Price of Labor (2)"
   17000:
     title: Meet with Father Bamph
     icon: ep
@@ -26419,6 +26712,58 @@ quests:
     icon: dq
   17381:
     title: "Joining the company"
+  17504:
+    title: "Where is My Home (1)"
+  17505:
+    title: "Where is My Home (2)"
+  17506:
+    title: "Where is My Home (3)"
+  17507:
+    title: "Where is My Home (4)"
+  17508:
+    title: "[Daily] Shortage of Supplies"
+  17509:
+    title: "[Cooldown] Shortage of Supplies"
+    icon: dq
+  17510:
+    title: "There are no evil beasts in this world (1)"
+  17511:
+    title: "There are no evil beasts in this world (2)"
+  17512:
+    title: "There are no evil beasts in this world (3)"
+  17513:
+    title: "An Unexpected Shepherd (1)"
+  17514:
+    title: "An Unexpected Shepherd (2)"
+    summary: "Hunt 20 Ashring"
+  17515:
+    title: "An Unexpected Shepherd (3)"
+  17516:
+    title: "[Cooldown] An Unexpected Shepherd"
+    icon: dq
+  17517:
+    title: "Rebellion (1)"
+  17518:
+    title: "Rebellion (2)"
+  17519:
+    title: "Rebellion (3)"
+  17520:
+    title: "Wolf Among Sheep (1)"
+  17521:
+    title: "Wolf Among Sheep (2)"
+  17522:
+    title: "Wolf Among Sheep (3)"
+  17523:
+    title: "Sanctuary Purification"
+  17524:
+    title: "[Completed] Renegade Cleaning"
+  17525:
+    title: "Aftermath"
+  17526:
+    title: "[Completed] Sanctuary Purification"
+  17527:
+    title: "[Cooldown] Sanctuary Purification"
+    icon: dq
   18000:
     title: "Ready to enter"
     icon: lq
@@ -26683,6 +27028,19 @@ quests:
     title: Winter is Banished
     summary: Csar Aleksay III
     description: You broke the bottle of Baba Yaga's Secret Medicine in the center of town. Report to Csar Aleksay III and tell him that you have banished winter from returning.
+  18082:
+    title: "Eligibility to attend the competition"
+  18083:
+    title: "High Priest's Villa"
+  18084:
+    title: "Fact Finding"
+  18085:
+    title: "Direction of Prayer"
+  18086:
+    title: "[Daily] Gray Wolf Forest Hunting"
+  18087:
+    title: "[Cooldown] Gray Wolf Forest Hunting"
+    icon: dq
   18100:
     title: Legends from Moscovia
     summary: Berbayeff

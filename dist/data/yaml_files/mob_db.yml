@@ -79385,6 +79385,52 @@ Body:
       - {Item: Shadowdecon, Rate: 50}
       - {Item: E_Abyss1, Rate: 1000}
       - {Item: ILL_Abysmal_Witch_Card, Rate: 1, StealProtected: true}
+  - Id: 20846
+    AegisName: MD_HIDDEN_GROUND01
+    Name: Plague of Corruption
+    Level: 170
+    Hp: 22007
+    Attack: 10000
+    Attack2: 10000
+    Str: 100
+    Agi: 100
+    Vit: 100
+    Int: 100
+    Dex: 100
+    Luk: 100
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Race: Demon
+    AttackDelay: 432
+    AttackMotion: 288
+    ClientAttackMotion: 0
+    DamageMotion: 576
+    Ai: 27
+    Class: Boss
+    Modes: {IgnoreMagic: true, IgnoreMelee: true, IgnoreMisc: true, IgnoreRanged: true}
+  - Id: 20847
+    AegisName: MD_HIDDEN_GROUND02
+    Name: Plague of Corruption
+    Level: 170
+    Hp: 22007
+    Attack: 1
+    Attack2: 1
+    Str: 100
+    Agi: 100
+    Vit: 100
+    Int: 100
+    Dex: 100
+    Luk: 100
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    AttackDelay: 1
+    AttackMotion: 1
+    ClientAttackMotion: 0
+    DamageMotion: 1
+    Class: Boss
+    Modes: {IgnoreMagic: true, IgnoreMelee: true, IgnoreMisc: true, IgnoreRanged: true}
   - Id: 20920
     AegisName: CHIMERA_LAVA
     Name: Lavaeter
@@ -80342,6 +80388,74 @@ Body:
       - {Item: Shadowdecon, Rate: 1000}
       - {Item: Zelunium, Rate: 1000}
       - {Item: Death_Witch_Card, Rate: 1, StealProtected: true}
+  - Id: 21292
+    AegisName: EP18_ARMED_VILLAGER01
+    Name: Armed villager
+    Level: 180
+    Hp: 690833
+    Sp: 0
+    Attack: 2000
+    Attack2: 240
+    Str: 80
+    Agi: 80
+    Vit: 80
+    Int: 80
+    Dex: 80
+    Luk: 80
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    AttackDelay: 432
+    AttackMotion: 432
+    ClientAttackMotion: 144
+    DamageMotion: 360
+    Ai: 04
+  - Id: 21293
+    AegisName: EP18_ARMED_VILLAGER02
+    Name: Armed villager
+    Level: 180
+    Hp: 690833
+    Sp: 0
+    Attack: 2000
+    Attack2: 250
+    Str: 80
+    Agi: 80
+    Vit: 80
+    Int: 80
+    Dex: 80
+    Luk: 80
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    AttackDelay: 252
+    AttackMotion: 504
+    ClientAttackMotion: 216
+    DamageMotion: 360
+    Ai: 04
+  - Id: 21294
+    AegisName: EP18_ARMED_VILLAGER03
+    Name: Armed villager
+    Level: 180
+    Hp: 690833
+    Sp: 0
+    Attack: 2000
+    Attack2: 250
+    Str: 80
+    Agi: 80
+    Vit: 80
+    Int: 80
+    Dex: 80
+    Luk: 80
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    AttackDelay: 432
+    AttackMotion: 432
+    ClientAttackMotion: 144
+    DamageMotion: 360
+    Ai: 04
   - Id: 21295
     AegisName: EP18_ASH_TOAD
     Name: Ash Toad
@@ -80825,6 +80939,595 @@ Body:
       - {Item: Zelunium_Ore, Rate: 130}
       - {Item: Shadowdecon_Ore, Rate: 130}
       - {Item: EP18_Phantom_Wolf_Card, Rate: 1, StealProtected: true}
+  - Id: 21308
+    AegisName: EP18_MD_HEARTHUNTER_A
+    Name: Heart Hunter
+    Level: 178
+    Hp: 311269
+    Sp: 0
+    Attack: 2114
+    Attack2: 1068
+    Defense: 39
+    MagicDefense: 25
+    Str: 95
+    Agi: 107
+    Vit: 72
+    Int: 90
+    Dex: 93
+    Luk: 32
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Demihuman
+    WalkSpeed: 200
+    AttackDelay: 864
+    AttackMotion: 864
+    ClientAttackMotion: 480
+    DamageMotion: 480
+    Ai: 04
+  - Id: 21309
+    AegisName: EP18_MD_THOR_GUARD
+    Name: Base Soldier
+    Level: 179
+    Hp: 375099
+    Sp: 0
+    Attack: 2260
+    Attack2: 907
+    Defense: 43
+    MagicDefense: 25
+    Str: 101
+    Agi: 100
+    Vit: 150
+    Int: 76
+    Dex: 153
+    Luk: 61
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Demihuman
+    ElementLevel: 2
+    AttackDelay: 648
+    AttackMotion: 648
+    ClientAttackMotion: 360
+    DamageMotion: 480
+    Ai: 04
+  - Id: 21310
+    AegisName: EP18_MD_GUARD_A
+    Name: Temple Guard
+    Level: 179
+    Hp: 371036
+    Sp: 0
+    Attack: 2909
+    Attack2: 668
+    Defense: 43
+    MagicDefense: 24
+    Str: 130
+    Agi: 118
+    Vit: 145
+    Int: 56
+    Dex: 130
+    Luk: 66
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Demihuman
+    ElementLevel: 2
+    AttackDelay: 648
+    AttackMotion: 648
+    ClientAttackMotion: 1152
+    DamageMotion: 480
+    Ai: 04
+  - Id: 21311
+    AegisName: EP18_MD_GUARD_B
+    Name: Traditional Temple Guard
+    Level: 182
+    Hp: 458774
+    Sp: 0
+    Attack: 2958
+    Attack2: 1068
+    Defense: 45
+    MagicDefense: 25
+    Str: 130
+    Agi: 135
+    Vit: 180
+    Int: 88
+    Dex: 188
+    Luk: 77
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Demihuman
+    ElementLevel: 2
+    WalkSpeed: 140
+    AttackDelay: 648
+    AttackMotion: 648
+    ClientAttackMotion: 1152
+    DamageMotion: 480
+    Ai: 04
+  - Id: 21312
+    AegisName: EP18_MD_HEARTHUNTER_R
+    Name: Heart Hunter
+    Level: 184
+    Hp: 456876
+    Sp: 0
+    Attack: 2484
+    Attack2: 834
+    Defense: 41
+    MagicDefense: 25
+    Str: 108
+    Agi: 121
+    Vit: 80
+    Int: 68
+    Dex: 113
+    Luk: 80
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Demihuman
+    ElementLevel: 2
+    AttackDelay: 864
+    AttackMotion: 432
+    ClientAttackMotion: 960
+    DamageMotion: 360
+    Ai: 04
+  - Id: 21313
+    AegisName: EP18_MD_HEARTHUNTER_F
+    Name: Heart Hunter
+    Level: 185
+    Hp: 455304
+    Sp: 0
+    Attack: 2613
+    Attack2: 987
+    Defense: 41
+    MagicDefense: 25
+    Str: 113
+    Agi: 180
+    Vit: 77
+    Int: 80
+    Dex: 180
+    Luk: 67
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    Race: Demihuman
+    ElementLevel: 2
+    WalkSpeed: 200
+    AttackDelay: 576
+    AttackMotion: 288
+    ClientAttackMotion: 144
+    DamageMotion: 360
+    Ai: 04
+  - Id: 21314
+    AegisName: EP18_MD_SCHULANG
+    Name: Schulang
+    Level: 185
+    Hp: 4128323
+    Sp: 0
+    Attack: 4394
+    Attack2: 1958
+    Defense: 48
+    MagicDefense: 36
+    Str: 190
+    Agi: 211
+    Vit: 30
+    Int: 180
+    Dex: 222
+    Luk: 77
+    AttackRange: 3
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Demon
+    Element: Ghost
+    ElementLevel: 2
+    AttackDelay: 720
+    AttackMotion: 1440
+    ClientAttackMotion: 504
+    DamageMotion: 480
+    Ai: 21
+    Class: Boss
+    Modes: {Mvp: true}
+    Drops:
+      - {Item: Fourth_Bh_Bow, Rate: 1}
+      - {Item: Eraser, Rate: 1}
+      - {Item: Noble_Cross, Rate: 1}
+      - {Item: Asura_, Rate: 1}
+      - {Item: Ep172_1h_Book2, Rate: 1}
+      - {Item: EP18_Schulang_Card, Rate: 1, StealProtected: true}
+  - Id: 21315
+    AegisName: EP18_MD_DEMI_FREYJA
+    Name: Twisted God Freyja
+    Level: 186
+    Hp: 2050843
+    Sp: 0
+    Attack: 4673
+    Attack2: 1891
+    Defense: 47
+    MagicDefense: 31
+    Str: 201
+    Agi: 177
+    Vit: 90
+    Int: 153
+    Dex: 186
+    Luk: 103
+    AttackRange: 3
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Angel
+    Element: Holy
+    ElementLevel: 2
+    AttackDelay: 736
+    AttackMotion: 1104
+    ClientAttackMotion: 576
+    DamageMotion: 480
+    Ai: 21
+    Class: Boss
+    Drops:
+      - {Item: EP18_Demi_Freyja_Card, Rate: 1, StealProtected: true}
+  - Id: 21316
+    AegisName: EP18_MD_SCHULANG_R
+    Name: Schulang
+    Level: 185
+    Hp: 21584526
+    Sp: 0
+    Attack: 4394
+    Attack2: 2220
+    Defense: 48
+    MagicDefense: 36
+    Str: 190
+    Agi: 211
+    Vit: 30
+    Int: 180
+    Dex: 222
+    Luk: 77
+    AttackRange: 3
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Demon
+    Element: Ghost
+    ElementLevel: 2
+    AttackDelay: 720
+    AttackMotion: 1440
+    ClientAttackMotion: 2592
+    DamageMotion: 480
+    Ai: 21
+    Class: Boss
+    Modes: {Mvp: true}
+    MvpDrops:
+      - {Item: Yggdrasilberry, Rate: 500}
+      - {Item: Old_Violet_Box, Rate: 1500}
+    Drops:
+      - {Item: EP18_Schulang_Card, Rate: 1, StealProtected: true}
+  - Id: 21317
+    AegisName: EP18_MD_DEMI_FREYJA_R
+    Name: Twisted God Freyja
+    Level: 185
+    Hp: 21584526
+    Sp: 0
+    Attack: 4673
+    Attack2: 1897
+    Defense: 52
+    MagicDefense: 35
+    Str: 201
+    Agi: 177
+    Vit: 90
+    Int: 153
+    Dex: 186
+    Luk: 103
+    AttackRange: 3
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Angel
+    Element: Holy
+    ElementLevel: 2
+    AttackDelay: 736
+    AttackMotion: 1104
+    ClientAttackMotion: 672
+    DamageMotion: 480
+    Ai: 21
+    Class: Boss
+    Modes: {Mvp: true}
+    MvpDrops:
+      - {Item: Yggdrasilberry, Rate: 2500}
+      - {Item: Old_Violet_Box, Rate: 1000}
+    Drops:
+      - {Item: EP18_Demi_Freyja_Card, Rate: 1, StealProtected: true}
+  - Id: 21318
+    AegisName: EP18_MD_SANARE_R
+    Name: Goddess Guardian
+    Level: 170
+    Hp: 512007
+    Sp: 0
+    Attack: 6000
+    Attack2: 2500
+    Defense: 40
+    MagicDefense: 30
+    Str: 230
+    Agi: 200
+    Vit: 130
+    Int: 230
+    Dex: 230
+    Luk: 77
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Demihuman
+    Element: Holy
+    ElementLevel: 2
+    AttackDelay: 576
+    AttackMotion: 1152
+    ClientAttackMotion: 672
+    DamageMotion: 720
+    Ai: 04
+    Drops:
+      - {Item: Apple, Rate: 1, StealProtected: true}
+  - Id: 21319
+    AegisName: EP18_MD_HEARTHUNTER_R2
+    Name: Cottage Keeper
+    Level: 170
+    Hp: 512007
+    Sp: 0
+    Attack: 6000
+    Attack2: 2500
+    Defense: 39
+    MagicDefense: 27
+    Str: 200
+    Agi: 180
+    Vit: 100
+    Int: 160
+    Dex: 250
+    Luk: 80
+    AttackRange: 9
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Demihuman
+    ElementLevel: 2
+    AttackDelay: 864
+    AttackMotion: 432
+    ClientAttackMotion: 288
+    DamageMotion: 360
+    Ai: 05
+  - Id: 21320
+    AegisName: EP18_NPC_MARAM
+    Name: Maram
+    Level: 185
+    Hp: 501533
+    Sp: 0
+    Attack: 2000
+    Attack2: 250
+    Str: 80
+    Agi: 80
+    Vit: 80
+    Int: 80
+    Dex: 80
+    Luk: 80
+    AttackRange: 1
+    Ai: 21
+  - Id: 21321
+    AegisName: EP18_NPC_MIRIAM
+    Name: Miriam
+    Level: 185
+    Hp: 501533
+    Sp: 0
+    Attack: 2000
+    Attack2: 250
+    Str: 80
+    Agi: 80
+    Vit: 80
+    Int: 80
+    Dex: 80
+    Luk: 80
+    AttackRange: 1
+    Ai: 21
+  - Id: 21323
+    AegisName: EP18_GREY_GOAT
+    Name: Ashen Goat
+    Level: 168
+    Hp: 215969
+    BaseExp: 345550
+    JobExp: 224608
+    Attack: 3570
+    Attack2: 1792
+    Defense: 38
+    MagicDefense: 27
+    Str: 170
+    Agi: 70
+    Vit: 84
+    Int: 160
+    Dex: 170
+    Luk: 70
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Brute
+    ElementLevel: 2
+    WalkSpeed: 165
+    AttackDelay: 540
+    AttackMotion: 1080
+    ClientAttackMotion: 660
+    DamageMotion: 336
+    Ai: 04
+    Drops:
+      - {Item: Goat's_Horn, Rate: 2280}
+      - {Item: Gaoat's_Skin, Rate: 1250}
+      - {Item: Red_Herb, Rate: 250}
+      - {Item: Blue_Herb, Rate: 500}
+      - {Item: Zelunium_Ore, Rate: 80}
+      - {Item: Shadowdecon_Ore, Rate: 80}
+      - {Item: Goat_Card, Rate: 1, StealProtected: true}
+  - Id: 21324
+    AegisName: EP18_GREY_WOLF_BABY
+    Name: Baby Gray Wolf
+    Level: 165
+    Hp: 218062
+    BaseExp: 348899
+    JobExp: 226784
+    Attack: 1444
+    Attack2: 1650
+    Defense: 37
+    MagicDefense: 26
+    Str: 70
+    Agi: 88
+    Vit: 76
+    Int: 150
+    Dex: 167
+    Luk: 67
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Race: Brute
+    AttackDelay: 1600
+    AttackMotion: 900
+    ClientAttackMotion: 252
+    DamageMotion: 240
+    Ai: 04
+    Drops:
+      - {Item: Animal's_Skin, Rate: 1000}
+      - {Item: Orange, Rate: 500}
+      - {Item: Zelunium_Ore, Rate: 90}
+      - {Item: Shadowdecon_Ore, Rate: 90}
+      - {Item: Desert_Wolf_Babe_Card, Rate: 1, StealProtected: true}
+  - Id: 21360
+    AegisName: EP18_MD_SCHULANG_L
+    Name: Schulang
+    Level: 224
+    Hp: 21584526
+    Sp: 0
+    Attack: 8244
+    Attack2: 1053
+    Defense: 62
+    MagicDefense: 40
+    Resistance: 205
+    MagicResistance: 368
+    Str: 257
+    Agi: 178
+    Vit: 146
+    Int: 145
+    Dex: 170
+    Luk: 199
+    AttackRange: 3
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Demon
+    Element: Ghost
+    ElementLevel: 2
+    AttackDelay: 720
+    AttackMotion: 1440
+    ClientAttackMotion: 504
+    DamageMotion: 480
+    Ai: 21
+    Class: Boss
+    Modes: {Mvp: true}
+    MvpDrops:
+      - {Item: Yggdrasilberry, Rate: 1500}
+      - {Item: Old_Card_Album, Rate: 500}
+    Drops:
+      - {Item: EP18_Schulang_Card, Rate: 1, StealProtected: true}
+  - Id: 21361
+    AegisName: EP18_MD_DEMI_FREYJA_L
+    Name: Twisted God Freyja
+    Level: 224
+    Hp: 21584526
+    Sp: 0
+    Attack: 8244
+    Attack2: 1053
+    Defense: 62
+    MagicDefense: 40
+    Resistance: 249
+    MagicResistance: 499
+    Str: 257
+    Agi: 178
+    Vit: 146
+    Int: 145
+    Dex: 170
+    Luk: 199
+    AttackRange: 3
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Angel
+    Element: Holy
+    ElementLevel: 2
+    AttackDelay: 736
+    AttackMotion: 1104
+    ClientAttackMotion: 576
+    DamageMotion: 480
+    Ai: 21
+    Class: Boss
+    Modes: {Mvp: true}
+    MvpDrops:
+      - {Item: Yggdrasilberry, Rate: 5000}
+      - {Item: Old_Card_Album, Rate: 1000}
+    Drops:
+      - {Item: EP18_Demi_Freyja_Card, Rate: 1, StealProtected: true}
+  - Id: 21377
+    AegisName: EP18_MD_SANARE_L
+    Name: Goddess Guardian
+    Level: 210
+    Hp: 505693
+    Sp: 0
+    Attack: 6000
+    Attack2: 2500
+    Defense: 48
+    MagicDefense: 34
+    Str: 230
+    Agi: 200
+    Vit: 130
+    Int: 230
+    Dex: 230
+    Luk: 77
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Demihuman
+    Element: Holy
+    ElementLevel: 2
+    AttackDelay: 576
+    AttackMotion: 1152
+    ClientAttackMotion: 480
+    DamageMotion: 720
+    Ai: 04
+  - Id: 21378
+    AegisName: EP18_MD_HEARTHUNTER_L
+    Name: Cottage Keeper
+    Level: 210
+    Hp: 505693
+    Sp: 0
+    Attack: 6000
+    Attack2: 2500
+    Defense: 47
+    MagicDefense: 32
+    Str: 200
+    Agi: 180
+    Vit: 100
+    Int: 160
+    Dex: 250
+    Luk: 80
+    AttackRange: 9
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Demihuman
+    ElementLevel: 2
+    AttackDelay: 864
+    AttackMotion: 432
+    ClientAttackMotion: 288
+    DamageMotion: 360
+    Ai: 05
   - Id: 21386
     AegisName: ILL_ANDRE
     Name: Diligent Andre
