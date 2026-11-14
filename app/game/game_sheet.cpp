@@ -175,6 +175,13 @@ void Game::StageStyle(std::uint32_t now_ms) {
     // L'onglet des effets lit la table de l'installation et les items qui posent
     // un effet, que le serveur annonce.
     style_view_->SetHatEffectSources(vfs_, &pieces_.cash_shop.hat_effects());
+    // CE QUE LE PANTIN A COMPTÉ À L'IMAGE PRÉCÉDENTE, avant que la vue ne
+    // choisisse la sonde de celle-ci.
+    if (pieces_.style_effects.has_value()) {
+      if (const ro::render::EffectColorTally* tally = pieces_.style_effects->color_tally()) {
+        style_view_->NoteHatEffectColor(*tally);
+      }
+    }
     style_view_->Refresh(world_, windows_.style, link_.is_open(), now_ms);
     // LES EFFETS DE CHAPEAU DU PANTIN, par son propre moteur, teints de ce qu'on
     // règle : il ne naît que si le joueur en affiche un.
@@ -197,6 +204,7 @@ void Game::StageStyle(std::uint32_t now_ms) {
                                    .head_shift = doll->seat.head_shift};
         pose.sprite_direction = doll->seat.sprite_direction;
       }
+      pieces_.style_effects->SetColorProbe(style_view_->HatEffectColorProbe());
       const DollEffects::Shown shown = pieces_.style_effects->Advance(
           worn, pose, world_, *stage_, now_ms, &style_view_->HatEffectDollDyes());
       windows_.style.doll.overlay = shown.overlay;

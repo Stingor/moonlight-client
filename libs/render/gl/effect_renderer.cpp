@@ -450,6 +450,9 @@ void EffectRenderer::Draw(const Camera& camera, std::span<const DrawnEffect> eff
       if (drawn->dye.has_value()) {
         Dye(prepared, *drawn->dye);
       }
+      if (tally_ != nullptr && tally_->Counts(drawn->dye)) {
+        tally_->Add(loaded.textures[quad.texture], quad.tint);
+      }
       prepared_.push_back(prepared);
 
       // Les coins d'un effet sont en pixels autour de son point d'appui,
@@ -572,6 +575,9 @@ void EffectRenderer::DrawWorldQuads(const Camera& camera, std::span<const DrawnW
       if (lot->dye.has_value()) {
         Dye(prepared, *lot->dye);
       }
+      if (tally_ != nullptr && tally_->Counts(lot->dye)) {
+        tally_->Add(*lot->texture, quad.tint);
+      }
       prepared_.push_back(prepared);
       // LA PROFONDEUR EST CELLE DU POINT, sans détour : un quad du monde n'est
       // pas un panneau, il n'y a donc pas de panneau debout dont il faudrait
@@ -618,6 +624,9 @@ void EffectRenderer::DrawScreenQuads(std::span<const DrawnScreenQuads> lots, flo
       PreparedQuad prepared{texture, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA};
       if (lot.dye.has_value()) {
         Dye(prepared, *lot.dye);
+      }
+      if (tally_ != nullptr && tally_->Counts(lot.dye)) {
+        tally_->Add(*lot.texture, quad.tint);
       }
       prepared_.push_back(prepared);
       for (const std::size_t corner : kQuadVertexOrder) {

@@ -12,6 +12,7 @@
 
 #include "ro/render/camera.h"
 #include "ro/render/effect_catalog.h"
+#include "ro/render/effect_color_tally.h"
 #include "ro/render/effect_renderer.h"
 #include "ro/render/ground_quad_renderer.h"
 #include "ro/render/sprite_renderer.h"
@@ -110,6 +111,14 @@ class DollEffects {
 
   // Oublie ce qui joue : plus aucun pantin ne montre d'effet.
   void Rest();
+
+  // LA MESURE DE COULEUR : les quads que cette sonde marque se comptent à la
+  // peinture. Une autre sonde repart de zéro ; rien n'en pose aucune.
+  void SetColorProbe(const std::optional<ro::render::EffectDye>& probe);
+  // Ce qui a compté jusqu'ici, ou rien sans sonde.
+  [[nodiscard]] const ro::render::EffectColorTally* color_tally() const {
+    return probing_ ? &tally_ : nullptr;
+  }
   // OUBLIE LES TEXTURES téléversées : le skin a changé, et un même chemin
   // désigne une autre image. ⚠ ENTRE DEUX IMAGES.
   void ForgetTextures();
@@ -117,7 +126,8 @@ class DollEffects {
  private:
   // Le rappel de l'interface, et ce qu'il fait une fois son peintre retrouvé.
   static void Paint(const ImDrawList* list, const ImDrawCmd* command);
-  void PaintInto(const ro::ui::DollOverlayCall& call);
+  // `clip_rect` : la découpe de l'interface au moment de l'appel, en points.
+  void PaintInto(const ro::ui::DollOverlayCall& call, const ImVec4& clip_rect);
   // Jette ce que la partie entendrait ou ferait trembler : un pantin est muet,
   // et son écran ne bouge pas. ⚠ CE QUE LES EFFETS FONT À L'ACTEUR, lui,
   // s'inscrit sur le porteur : c'est ce qui rapetisse, éclaire ou double le
@@ -156,6 +166,8 @@ class DollEffects {
   DollWearing wearing_;
   // La toile de la dernière image, que le rappel retrouve.
   DollCanvas canvas_;
+  ro::render::EffectColorTally tally_;
+  bool probing_ = false;
 };
 
 }  // namespace moonclient

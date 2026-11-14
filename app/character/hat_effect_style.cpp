@@ -11,6 +11,7 @@
 
 #include "ro/core/ascii.h"
 #include "ro/net/player_style_layers.h"
+#include "ro/render/effect_color_tally.h"
 #include "ro/render/effect_frame.h"
 #include "ro/render/effect_table.h"
 #include "ro/sim/inventory.h"
@@ -30,8 +31,14 @@ constexpr std::uint32_t kEquipBits = 32;
 constexpr std::uint32_t kSendPatienceMs = 5000;
 // La cadence du serveur entre deux envois de calques.
 constexpr std::uint32_t kSendCadenceMs = 1000;
-constexpr std::size_t kRgbaBytes = 4;
-constexpr double kChannelMax = 255.0;
+// LA SONDE : ce qu'elle ajoute à la clarté de la teinture, invisible à l'œil et
+// distinct de tout réglage, qui va par pour-cent.
+constexpr float kProbeLightnessNudge = 0.001F;
+// Les images peintes avant de retenir la mesure — une animation entière, ou
+// presque — et celles au bout desquelles on renonce à un effet qui ne peint
+// rien sous la sonde.
+constexpr std::uint32_t kProbeImagesWanted = 90;
+constexpr std::uint32_t kProbeNotesGiveUp = 600;
 
 }  // namespace
 
@@ -94,8 +101,7 @@ const HatEffectStyle::Described& HatEffectStyle::Describe(const ro::render::HatE
   if (loaded != nullptr) {
     std::size_t adds = 0;
     std::size_t keys = 0;
-    std::array<double, 3> sum = {};
-    double weights = 0.0;
+    ro::render::EffectColorTally tally;
     for (const ro::render::PreparedEffectLayer& layer : loaded->prepared.layers) {
       if (layer.keys.empty()) {
         continue;
@@ -112,30 +118,11 @@ const HatEffectStyle::Described& HatEffectStyle::Describe(const ro::render::HatE
       for (std::size_t rank = layer.first_texture;
            rank < layer.first_texture + layer.texture_count && rank < loaded->textures.size();
            ++rank) {
-        const std::vector<std::uint8_t>& texels = loaded->textures[rank].pixels;
-        for (std::size_t at = 0; at + kRgbaBytes <= texels.size(); at += kRgbaBytes) {
-          const double alpha = texels[at + 3] / kChannelMax;
-          const double bright =
-              std::max({texels[at], texels[at + 1], texels[at + 2]}) / kChannelMax;
-          const double weight = alpha * bright;
-          for (std::size_t channel = 0; channel < sum.size(); ++channel) {
-            sum[channel] +=
-                weight * texels[at + channel] * static_cast<double>(tint[channel]) / kChannelMax;
-          }
-          weights += weight;
-        }
+        tally.Add(loaded->textures[rank], tint);
       }
     }
     described.additive = keys == 0 || adds * 2 >= keys;
-    // ⚠ PORTÉE À PLEIN ÉCLAT : la pastille montre une couleur, et une moyenne
-    // de halos sur fond noir serait presque noire.
-    const double high = std::max({sum[0], sum[1], sum[2]});
-    if (weights > 0.0 && high > 0.0) {
-      described.base_color = std::array<std::uint8_t, 3>{
-          static_cast<std::uint8_t>(std::lround(sum[0] / high * kChannelMax)),
-          static_cast<std::uint8_t>(std::lround(sum[1] / high * kChannelMax)),
-          static_cast<std::uint8_t>(std::lround(sum[2] / high * kChannelMax))};
-    }
+    described.base_color = tally.Color();
   }
   return described_.emplace(record.hat_effect_id, described).first->second;
 }
@@ -178,6 +165,10 @@ void HatEffectStyle::Refresh(const ro::sim::World& world, ro::ui::PaletteEffects
         const Described& described = Describe(*record);
         row.additive = described.additive;
         row.base_color = described.base_color;
+      }
+      if (const auto measured = measured_.find(number);
+          !row.base_color.has_value() && measured != measured_.end()) {
+        row.base_color = measured->second;
       }
       // L'OBJET PORTÉ QUI LE POSE, pour le nommer ; le serveur le retrouve
       // lui-même à la validation.
@@ -225,6 +216,26 @@ void HatEffectStyle::Refresh(const ro::sim::World& world, ro::ui::PaletteEffects
       rows_.push_back(std::move(row));
     }
   }
+  // L'EFFET CHOISI SANS COULEUR CONNUE se mesure : il porte la sonde sur le
+  // pantin. Une sonde qui change remet la mesure à zéro.
+  const ro::ui::PaletteEffectsView chosen_among{.rows = rows_};
+  const ro::ui::PaletteEffectRow* chosen = ro::ui::SelectedEffect(state, chosen_among);
+  std::optional<Probe> probe;
+  if (chosen != nullptr && !chosen->base_color.has_value() && !measured_.contains(chosen->number)) {
+    const auto dyed = doll_dyes_.find(chosen->number);
+    ro::render::EffectDye dye = dyed != doll_dyes_.end() ? dyed->second : ro::render::EffectDye{};
+    dye.lightness_scale += kProbeLightnessNudge;
+    doll_dyes_[chosen->number] = dye;
+    probe = Probe{.number = chosen->number, .dye = dye};
+    const std::uint16_t measured_number = chosen->number;
+    for (ro::ui::PaletteEffectRow& row : rows_) {
+      row.measuring_color = row.number == measured_number;
+    }
+  }
+  if (!probe.has_value() || !probe_.has_value() || probe_->number != probe->number) {
+    probe_notes_ = 0;
+  }
+  probe_ = probe;
   if (send_ == ro::ui::PaletteEffectSend::kSent && now_ms - sent_ms_ >= kSendPatienceMs) {
     send_ = ro::ui::PaletteEffectSend::kNone;
   }
@@ -235,6 +246,19 @@ void HatEffectStyle::Refresh(const ro::sim::World& world, ro::ui::PaletteEffects
   view_.atelier_open = atelier_open;
   view_.can_send = sent_ms_ == 0 || now_ms - sent_ms_ >= kSendCadenceMs;
   view_.send = send_;
+}
+
+void HatEffectStyle::NoteColorTally(const ro::render::EffectColorTally& tally) {
+  if (!probe_.has_value() || !(tally.probe == probe_->dye)) {
+    return;
+  }
+  ++probe_notes_;
+  const std::optional<std::array<std::uint8_t, 3>> color = tally.Color();
+  if ((tally.images_counted() >= kProbeImagesWanted && color.has_value()) ||
+      probe_notes_ >= kProbeNotesGiveUp) {
+    measured_[probe_->number] = color;
+    probe_.reset();
+  }
 }
 
 bool HatEffectStyle::PosesEffect(std::uint32_t item_id) const {

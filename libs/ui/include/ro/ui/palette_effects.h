@@ -57,9 +57,12 @@ struct PaletteEffectRow {
   // fonce.
   bool additive = false;
   // LA COULEUR DE L'EFFET, d'origine : la moyenne de ce qu'il peint. Le nuancier
-  // part d'elle, et un réglage s'y lit comme la couleur qu'il donne. Rien pour
-  // un effet dont la couleur vit dans le code : il ne se règle qu'au détail.
+  // part d'elle, et un réglage s'y lit comme la couleur qu'il donne. Rien tant
+  // qu'elle se mesure, ni pour un effet qui ne la laisse pas lire : il ne se
+  // règle alors qu'au détail.
   std::optional<std::array<std::uint8_t, 3>> base_color;
+  // Sa couleur se mesure sur le pantin, le temps d'une animation.
+  bool measuring_color = false;
   PaletteEffectBlock blocked = PaletteEffectBlock::kNone;
   // Ce que le serveur dit qu'il porte.
   PaletteEffectSetting worn;
@@ -88,6 +91,9 @@ struct PaletteEffectsState {
   std::map<std::uint16_t, PaletteEffectSetting> drafts;
   // « Réglages avancés », replié par défaut.
   bool advanced = false;
+  // LA HAUTEUR DU PANNEAU à l'image précédente, en pixels : le pantin la prend,
+  // comme ailleurs celle de la liste des pièces.
+  float panel_height = 0.0F;
 };
 
 struct PaletteEffectsAction {

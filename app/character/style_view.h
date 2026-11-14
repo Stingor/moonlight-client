@@ -174,6 +174,13 @@ class StyleView {
   [[nodiscard]] std::span<const WornHatEffectDye> HatEffectPreviews() const noexcept {
     return hat_effects_.previews();
   }
+  // LA MESURE DE COULEUR D'UN EFFET DESSINÉ EN CODE. Voir `HatEffectStyle`.
+  [[nodiscard]] std::optional<ro::render::EffectDye> HatEffectColorProbe() const {
+    return hat_effects_.color_probe();
+  }
+  void NoteHatEffectColor(const ro::render::EffectColorTally& tally) {
+    hat_effects_.NoteColorTally(tally);
+  }
 
  private:
   // Ce qui se lit sur la recette et sur les pièces : pastilles, plafonds,

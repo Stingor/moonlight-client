@@ -191,6 +191,17 @@ void DollEffects::Advance(ro::ui::DescriptionDollState& doll, std::int16_t ordin
   }
 }
 
+void DollEffects::SetColorProbe(const std::optional<ro::render::EffectDye>& probe) {
+  if (!probe.has_value()) {
+    probing_ = false;
+    return;
+  }
+  if (!probing_ || !(tally_.probe == *probe)) {
+    tally_.Reset(*probe);
+  }
+  probing_ = true;
+}
+
 void DollEffects::Rest() {
   if (wearing_.worn.empty()) {
     return;
@@ -242,11 +253,11 @@ void DollEffects::Paint(const ImDrawList* list, const ImDrawCmd* command) {
   ro::ui::DollOverlayCall call;
   std::memcpy(&call, command->UserCallbackData, sizeof(call));
   if (call.painter != nullptr) {
-    static_cast<DollEffects*>(call.painter)->PaintInto(call);
+    static_cast<DollEffects*>(call.painter)->PaintInto(call, command->ClipRect);
   }
 }
 
-void DollEffects::PaintInto(const ro::ui::DollOverlayCall& call) {
+void DollEffects::PaintInto(const ro::ui::DollOverlayCall& call, const ImVec4& clip_rect) {
   const ImDrawData* frame = ImGui::GetDrawData();
   if (wearing_.worn.empty() || stage_ == nullptr || !effect_renderer_.has_value() ||
       !sprites_.has_value() || frame == nullptr) {
@@ -270,11 +281,15 @@ void DollEffects::PaintInto(const ro::ui::DollOverlayCall& call) {
   const float image_width = frame->DisplaySize.x * scale.x;
   const float image_height = frame->DisplaySize.y * scale.y;
   const float bottom = image_height - top - height;
-  // ⚠ LA VUE PEUT DÉBORDER DE L'IMAGE, la découpe non : elle s'y borne.
-  const float clip_left = std::max(left, 0.0F);
-  const float clip_bottom = std::max(bottom, 0.0F);
-  const float clip_right = std::min(left + width, image_width);
-  const float clip_top = std::min(bottom + height, image_height);
+  // ⚠ LA VUE PEUT DÉBORDER DE L'IMAGE, la découpe non : elle s'y borne, et à
+  // celle de l'interface — la bulle de la loupe, le bord de la fenêtre.
+  const float clip_left = std::max({left, 0.0F, (clip_rect.x - frame->DisplayPos.x) * scale.x});
+  const float clip_bottom =
+      std::max({bottom, 0.0F, image_height - (clip_rect.w - frame->DisplayPos.y) * scale.y});
+  const float clip_right =
+      std::min({left + width, image_width, (clip_rect.z - frame->DisplayPos.x) * scale.x});
+  const float clip_top = std::min({bottom + height, image_height,
+                                   image_height - (clip_rect.y - frame->DisplayPos.y) * scale.y});
   if (clip_right <= clip_left || clip_top <= clip_bottom) {
     return;
   }
@@ -313,9 +328,16 @@ void DollEffects::PaintInto(const ro::ui::DollOverlayCall& call) {
           {}, ro::render::SpriteRenderer::DrawOrder::kAsGiven);
     }
   } else {
+    if (probing_) {
+      effect_renderer_->SetColorTally(&tally_);
+    }
     PaintEffectsUnderStr(effects_, nodes_, painters);
     PaintStrEffects(effects_, nodes_, played_, painters);
     PaintEffectsLast(effects_, nodes_, painters);
+    if (probing_) {
+      effect_renderer_->SetColorTally(nullptr);
+      tally_.NoteImage();
+    }
   }
   ro::render::EndInsetPaint();
 }

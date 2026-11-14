@@ -13,6 +13,7 @@
 #include "ro/core/error.h"
 #include "ro/render/camera.h"
 #include "ro/render/effect_catalog.h"
+#include "ro/render/effect_color_tally.h"
 #include "ro/render/effect_dye.h"
 #include "ro/render/effect_node_world.h"
 #include "ro/render/effect_scene.h"
@@ -203,6 +204,11 @@ class EffectRenderer {
 
   [[nodiscard]] std::size_t cached_texture_count() const noexcept { return textures_.size(); }
 
+  // LA MESURE DE COULEUR, ou rien : chaque quad que sa sonde marque s'y ajoute,
+  // dans les trois voies. Voir `EffectColorTally`. ⚠ L'APPELANT LA GARDE EN VIE
+  // tant qu'elle est posée.
+  void SetColorTally(EffectColorTally* tally) noexcept { tally_ = tally; }
+
  private:
   // Si les quads préparés s'éprouvent contre la profondeur déjà écrite. Voir
   // `PaintQuads`.
@@ -236,6 +242,7 @@ class EffectRenderer {
   std::vector<EffectQuad> effect_quads_;
   std::vector<EffectPaintedQuad> painted_;
   std::vector<const GlTexture*> lot_textures_;
+  EffectColorTally* tally_ = nullptr;
   std::vector<PreparedQuad> prepared_;
   std::vector<EffectVertex> vertices_;
 };

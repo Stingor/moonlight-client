@@ -23865,8 +23865,11 @@ tr: Elige el color del efecto: el tono, la saturación y la claridad lo siguen.
 fr: Couleur de l'effet
 tr: Color del efecto
 
-fr: La couleur de cet effet vit dans son code : règle-le dans les réglages avancés.
-tr: El color de este efecto vive en su código: ajústalo en los ajustes avanzados.
+fr: Cet effet ne laisse pas lire sa couleur : règle-le dans les réglages avancés.
+tr: Este efecto no deja leer su color: ajústalo en los ajustes avanzados.
+
+fr: Mesure de la couleur de l'effet…
+tr: Midiendo el color del efecto…
 
 fr: Réglages avancés
 tr: Ajustes avanzados

@@ -1,6 +1,7 @@
 #include "ro/ui/palette_editor.h"
 
 #include <algorithm>
+#include <cfloat>
 #include <cstdio>
 
 #include "ro/core/i18n.h"
@@ -419,6 +420,12 @@ PaletteEditorAction DrawPaletteEditor(PaletteEditorState& state, const PaletteEd
   bool open = true;
   // ⚠ SANS REDIMENSIONNEMENT : la fenêtre suit son contenu.
   PoseBugReportButton(state.bug_report);
+  // 🔴 L'ONGLET DES EFFETS NE RÉTRÉCIT PAS LA FENÊTRE : il garde au moins la
+  // taille qu'elle avait sur les pièces, et changer d'onglet ne la fait pas
+  // sauter.
+  if (view.tab == PaletteTabKind::kEffects && state.pieces_window_size.x > 0.0F) {
+    ImGui::SetNextWindowSizeConstraints(state.pieces_window_size, ImVec2(FLT_MAX, FLT_MAX));
+  }
   const bool begun =
       BeginSkinnedWindow(name.Get(), &open, art, SkinnedTitle::kBar,
                          ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
@@ -451,19 +458,23 @@ PaletteEditorAction DrawPaletteEditor(PaletteEditorState& state, const PaletteEd
   //
   // 🔴 SANS PIPETTE NI LOUPE : il n'y a pas de pièce à désigner, et un clic à
   // travers l'aura ouvrirait la pièce du personnage qu'elle recouvre.
+  //
+  // LA MÊME DISPOSITION QUE LES PIÈCES : le pantin à gauche, aussi haut que le
+  // panneau, et ses réglages dessous, sur toute la largeur.
   if (view.tab == PaletteTabKind::kEffects && view.effects != nullptr) {
-    ImGui::BeginGroup();
-    DrawPaletteDoll(state.doll, kDollMinPoints * Scale(), art.look(), /*pipette=*/false);
-    DrawPaletteDollControls(state.doll, art);
-    ImGui::EndGroup();
+    DrawPaletteDoll(state.doll, std::max(kDollMinPoints * Scale(), state.effects.panel_height),
+                    art.look(), /*pipette=*/false);
     state.hovered_ramp = -1;
     ImGui::SameLine();
     ImGui::BeginGroup();
     action.effects = DrawPaletteEffects(state.effects, *view.effects, art);
     ImGui::EndGroup();
+    state.effects.panel_height = ImGui::GetItemRectSize().y;
+    DrawPaletteDollControls(state.doll, art);
     EndSkinnedWindow();
     return action;
   }
+  state.pieces_window_size = ImGui::GetWindowSize();
   const bool on_body = view.tab == PaletteTabKind::kBody;
 
   // ── CE QUE LES RÉGLAGES ATTEIGNENT VRAIMENT ───────────────────────────────

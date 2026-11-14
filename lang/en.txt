@@ -23865,8 +23865,11 @@ tr: Pick the effect's color: hue, saturation and lightness follow.
 fr: Couleur de l'effet
 tr: Effect color
 
-fr: La couleur de cet effet vit dans son code : règle-le dans les réglages avancés.
-tr: This effect's color lives in its code: adjust it in the advanced settings.
+fr: Cet effet ne laisse pas lire sa couleur : règle-le dans les réglages avancés.
+tr: This effect doesn't reveal its color: adjust it in the advanced settings.
+
+fr: Mesure de la couleur de l'effet…
+tr: Measuring the effect's color…
 
 fr: Réglages avancés
 tr: Advanced settings

@@ -43,7 +43,12 @@ constexpr ImU32 kLoupeCross = IM_COL32(255, 0, 255, 255);
 // ⚠ LA RÉGION SE ROGNE AU BORD DE L'IMAGE au lieu de déborder : au-delà, la
 // texture se répéterait ou s'étirerait, et l'on viserait un pixel qui n'existe
 // pas. La croix reste sur le pixel visé.
-void DrawMagnifier(const PaletteDollState& doll, ImVec2 image_at, ImVec2 mouse, ImU32 background) {
+//
+// 🔴 CE QUE LE RAPPEL PEINT S'Y GROSSIT AUSSI — les effets de chapeau, le corps
+// qu'ils changent — dans le même ordre que sur le pantin : il reçoit l'image
+// entière grossie, et la bulle le découpe.
+void DrawMagnifier(const PaletteDollState& doll, ImVec2 image_at, ImVec2 mouse, ImU32 background,
+                   bool pipette) {
   if (!BeginSkinTooltip()) {
     return;
   }
@@ -61,7 +66,15 @@ void DrawMagnifier(const PaletteDollState& doll, ImVec2 image_at, ImVec2 mouse, 
   const float clipped_top = std::max(top, 0.0F);
   const float clipped_right = std::min(left + seen, doll.image.width);
   const float clipped_bottom = std::min(top + seen, doll.image.height);
-  if (clipped_right > clipped_left && clipped_bottom > clipped_top) {
+  ImGui::PushClipRect(origin, ImVec2(origin.x + side, origin.y + side), true);
+  DollOverlayCall call{.painter = doll.overlay.painter,
+                       .min = ImVec2(origin.x - left * kLoupeZoom, origin.y - top * kLoupeZoom),
+                       .max = ImVec2(origin.x + (doll.image.width - left) * kLoupeZoom,
+                                     origin.y + (doll.image.height - top) * kLoupeZoom),
+                       .pass = DollOverlayPass::kBehind};
+  PaintDollOverlay(doll.overlay, call);
+  const bool image_shown = doll.overlay.paint == nullptr || !doll.body_overlaid;
+  if (image_shown && clipped_right > clipped_left && clipped_bottom > clipped_top) {
     const ImVec2 uv0(clipped_left / doll.image.width, clipped_top / doll.image.height);
     const ImVec2 uv1(clipped_right / doll.image.width, clipped_bottom / doll.image.height);
     const ImVec2 from(origin.x + (clipped_left - left) * kLoupeZoom,
@@ -74,13 +87,18 @@ void DrawMagnifier(const PaletteDollState& doll, ImVec2 image_at, ImVec2 mouse, 
     into->AddImage(doll.image.id, from, to, uv0, uv1);
     RestoreAmbientSampler(into);
   }
+  call.pass = DollOverlayPass::kFront;
+  PaintDollOverlay(doll.overlay, call);
+  ImGui::PopClipRect();
   const ImVec2 middle(origin.x + side * 0.5F, origin.y + side * 0.5F);
   const float cross = kLoupeCrossPoints * Scale();
   into->AddLine(ImVec2(middle.x - cross, middle.y), ImVec2(middle.x + cross, middle.y),
                 kLoupeCross);
   into->AddLine(ImVec2(middle.x, middle.y - cross), ImVec2(middle.x, middle.y + cross),
                 kLoupeCross);
-  ImGui::TextUnformatted(core::Tr("Clic : régler la pièce visée."));
+  if (pipette) {
+    ImGui::TextUnformatted(core::Tr("Clic : régler la pièce visée."));
+  }
   EndSkinTooltip();
 }
 
@@ -134,10 +152,11 @@ void DrawPaletteDoll(PaletteDollState& doll, float side, const SkinLook& look, b
   if (!hovered) {
     return;
   }
-  if (pipette && doll.magnifier && doll.image.usable()) {
+  if (doll.magnifier && doll.image.usable()) {
     const ImVec2 image_at(at.x + (side - doll.image.width) * 0.5F,
                           at.y + (side - doll.image.height) * 0.5F);
-    DrawMagnifier(doll, image_at, mouse, doll.light_background ? kLightBackground : look.doll);
+    DrawMagnifier(doll, image_at, mouse, doll.light_background ? kLightBackground : look.doll,
+                  pipette);
   } else {
     SkinTooltip(pipette ? core::Tr("Clic : régler la pièce visée. Molette : tourner.")
                         : core::Tr("Molette : tourner"));

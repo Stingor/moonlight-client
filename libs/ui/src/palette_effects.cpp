@@ -117,8 +117,10 @@ void DrawRows(PaletteEffectsState& state, const PaletteEffectsView& view,
 PaletteEffectSetting DrawSwatch(const PaletteEffectRow& row, PaletteEffectSetting setting,
                                 const SkinArt& art) {
   if (!row.base_color.has_value()) {
-    ImGui::TextDisabled("%s", core::Tr("La couleur de cet effet vit dans son code : règle-le "
-                                       "dans les réglages avancés."));
+    ImGui::TextDisabled("%s", row.measuring_color
+                                  ? core::Tr("Mesure de la couleur de l'effet…")
+                                  : core::Tr("Cet effet ne laisse pas lire sa couleur : règle-le "
+                                             "dans les réglages avancés."));
     return setting;
   }
   const std::array<float, 3> shown = Unit(EffectColorOf(*row.base_color, setting));
@@ -152,12 +154,12 @@ PaletteEffectSetting DrawSwatch(const PaletteEffectRow& row, PaletteEffectSettin
 // « Assombrir ». Rend le réglage.
 PaletteEffectSetting DrawAdvanced(PaletteEffectsState& state, const PaletteEffectRow& row,
                                   PaletteEffectSetting setting, const SkinArt& art) {
-  ImGui::SetNextItemOpen(state.advanced || !row.base_color.has_value());
+  // 🔴 REPLIÉ PAR DÉFAUT ET TOUJOURS REPLIABLE, couleur connue ou non : c'est
+  // le joueur qui l'ouvre, et sa main seule le referme.
+  ImGui::SetNextItemOpen(state.advanced);
   const std::string label = std::string(core::Tr("Réglages avancés")) + "###reglages_effet";
   const bool open = ImGui::TreeNode(label.c_str());
-  if (row.base_color.has_value()) {
-    state.advanced = open;
-  }
+  state.advanced = open;
   if (!open) {
     return setting;
   }
@@ -203,6 +205,7 @@ void DrawSendButtons(PaletteEffectsState& state, const PaletteEffectsView& view,
     state.drafts.erase(row.number);
   }
   ImGui::EndDisabled();
+  ImGui::SameLine();
   const bool ready = view.connected && view.served && view.atelier_open && view.can_send && changed;
   ImGui::BeginDisabled(!ready);
   if (SkinButton(core::Tr("Valider"), art)) {

@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "ro/render/effect_catalog.h"
+#include "ro/render/effect_color_tally.h"
 #include "ro/render/effect_dye.h"
 #include "ro/render/hat_effect_table.h"
 #include "ro/sim/hat_effect_items.h"
@@ -74,6 +75,16 @@ class HatEffectStyle {
   }
   // Les réglages en cours, posés sur le joueur ; rien fenêtre fermée.
   [[nodiscard]] std::span<const WornHatEffectDye> previews() const noexcept { return previews_; }
+
+  // LA COULEUR D'UN EFFET DESSINÉ EN CODE se mesure sur le pantin : l'effet
+  // choisi dont aucun fichier ne dit la couleur y porte cette sonde — sa
+  // teinture, à un millième près —, et le pantin compte ce qu'elle marque. Rien
+  // quand il n'y a rien à mesurer.
+  [[nodiscard]] std::optional<ro::render::EffectDye> color_probe() const {
+    return probe_.has_value() ? std::optional(probe_->dye) : std::nullopt;
+  }
+  // ⚠ AVANT `Refresh` : ce que le pantin a compté à l'image précédente.
+  void NoteColorTally(const ro::render::EffectColorTally& tally);
   void Close() { previews_.clear(); }
 
  private:
@@ -100,6 +111,15 @@ class HatEffectStyle {
   std::map<std::uint16_t, ro::ui::PaletteEffectSetting> drafts_;
   std::map<std::uint16_t, ro::ui::PaletteEffectSetting> sent_drafts_;
   ro::ui::PaletteEffectsView view_;
+  // LA MESURE EN COURS : l'effet, et la sonde qu'il porte sur le pantin. Les
+  // couleurs mesurées, par numéro ; rien pour une mesure qui n'a rien trouvé.
+  struct Probe {
+    std::uint16_t number = 0;
+    ro::render::EffectDye dye;
+  };
+  std::optional<Probe> probe_;
+  std::uint32_t probe_notes_ = 0;
+  std::map<std::uint16_t, std::optional<std::array<std::uint8_t, 3>>> measured_;
   // Le dernier envoi : quel effet, quand, et l'état qu'on en montre.
   std::uint16_t sent_number_ = 0;
   std::uint32_t sent_ms_ = 0;
