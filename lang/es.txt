@@ -278,6 +278,9 @@ tr: Imanta o libera las ventanas.
 fr: Aimanter les fenêtres entre elles
 tr: Imantar las ventanas entre sí
 
+fr: Ajoutée à l'Album
+tr: Añadida al Álbum
+
 fr: Alignez trois monstres de la même couleur, en trente coups.
 tr: Alinea tres monstruos del mismo color, en treinta movimientos.
 
@@ -823,6 +826,9 @@ tr: Alcance (celdas)
 
 fr: Pour %s
 tr: Para %s
+
+fr: pour vos prochaines parties
+tr: para tus próximas partidas
 
 fr: Première pièce
 tr: Primera pieza

@@ -1,6 +1,7 @@
 #include "ro/ui/survivors_hud.h"
 
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <cstdio>
 #include <span>
@@ -67,6 +68,9 @@ constexpr std::size_t kNumberTextSize = 48;
 // l'illustration, et la part de sa vie qu'elle met à entrer, puis à sortir.
 constexpr float kCardVignetteHeight = 150.0F;
 constexpr float kCardSlideShare = 0.1F;
+// La légende au-dessus de la vignette, en or clair.
+constexpr float kCardCaptionGap = 4.0F;
+constexpr ImU32 kCardCaptionColor = IM_COL32(255, 230, 150, 255);
 
 constexpr float kTeamNoticeHeightShare = 0.18F;
 constexpr ImU32 kTeamNoticeColor = IM_COL32(255, 210, 90, 255);
@@ -195,7 +199,9 @@ void DrawArrow(ImDrawList& draw, const EdgeArrowPlace& place, ImU32 color) {
 }
 
 // L'illustration de la carte ramassée, sortie du bord droit selon sa vie,
-// posée au-dessus de la marge du bas.
+// posée au-dessus de la marge du bas. Au-dessus d'elle, alignées sur son bord
+// droit, les lignes qui disent où elle va : une carte ramassée n'agit pas dans
+// la partie, elle entre à l'Album.
 void DrawFoundCard(ImDrawList& draw, const SurvivorsHudCard& card, ImVec2 far) {
   if (card.illustration == 0 || card.size.x <= 0.0F || card.size.y <= 0.0F) return;
   const float slide = SurvivorsCardSlide(card.fraction);
@@ -206,6 +212,15 @@ void DrawFoundCard(ImDrawList& draw, const SurvivorsHudCard& card, ImVec2 far) {
   draw.AddRectFilled(top_left, bottom_right, kSlotBack);
   draw.AddImage(card.illustration, top_left, bottom_right);
   draw.AddRect(top_left, bottom_right, kSlotEdge);
+  const std::array<const char*, 2> lines = {core::Tr("Ajoutée à l'Album"),
+                                            core::Tr("pour vos prochaines parties")};
+  float line_top =
+      top_left.y - kCardCaptionGap - ImGui::GetTextLineHeight() * static_cast<float>(lines.size());
+  for (const char* line : lines) {
+    const float line_width = ImGui::CalcTextSize(line).x;
+    ShadowedText(draw, ImVec2(bottom_right.x - line_width, line_top), kCardCaptionColor, line);
+    line_top += ImGui::GetTextLineHeight();
+  }
 }
 
 constexpr float kAllyListMarginPx = 12.0F;

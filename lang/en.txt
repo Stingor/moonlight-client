@@ -278,6 +278,9 @@ tr: Snaps windows together, or frees them.
 fr: Aimanter les fenêtres entre elles
 tr: Snap windows to each other
 
+fr: Ajoutée à l'Album
+tr: Added to the Album
+
 fr: Alignez trois monstres de la même couleur, en trente coups.
 tr: Line up three monsters of the same colour, in thirty moves.
 
@@ -823,6 +826,9 @@ tr: Range (cells)
 
 fr: Pour %s
 tr: For %s
+
+fr: pour vos prochaines parties
+tr: for your next runs
 
 fr: Première pièce
 tr: First piece

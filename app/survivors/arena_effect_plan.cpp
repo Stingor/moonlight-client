@@ -221,6 +221,14 @@ void CollectArenaLaunches(const ro::sim::SurvivorsNews& news, const ro::sim::Sur
                           std::vector<ArenaLaunch>& out) {
   out.clear();
   if (!switches.shown) return;
+  // UNE RELÈVE se voit même en effets réduits : c'est une vie qui s'en va. Le
+  // héros local la porte ; celle d'un allié naît à ses pieds.
+  for (const ro::sim::SurvivorsReviveNews& revive : news.revives) {
+    out.push_back(ArenaLaunch{.effect_id = kReviveEffect,
+                              .kind = revive.at == field.hero.position ? ArenaLaunchKind::kOnHero
+                                                                       : ArenaLaunchKind::kOnGround,
+                              .at = revive.at});
+  }
   if (!switches.reduced) {
     if (news.level_ups > 0) {
       out.push_back(ArenaLaunch{.effect_id = ro::sim::BaseLevelUpEffectId(HeroJobOf(field)),

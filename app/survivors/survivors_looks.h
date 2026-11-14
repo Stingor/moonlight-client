@@ -303,6 +303,10 @@ inline constexpr std::uint16_t kHeavensDriveSkill = 91;
 // L'EFFET D'UNE ÉVOLUTION : le changement de métier, sur le héros.
 inline constexpr std::uint32_t kJobChangeEffect = 156;
 
+// LA RELÈVE D'UNE VIE DE RÉSERVE : l'effet de Resurrection sur sa cible, sur le
+// héros qui se relève.
+inline constexpr std::uint32_t kReviveEffect = 77;
+
 // L'ÉCLAT D'UNE CARTE RAMASSÉE (Q6) : l'étincelle du soin, brève, sur le
 // héros qui vient de la prendre.
 inline constexpr std::uint32_t kCardPickupEffect = 309;
