@@ -284,6 +284,7 @@ class SurvivorsViews {
   // LES CLASSES DE L'ACCUEIL et ce qui débloque chacune, que les choix désignent.
   std::vector<std::string> class_hints_;
   std::vector<ro::ui::SurvivorsClassChoice> class_choices_;
+  std::vector<ro::ui::SurvivorsClassChoice> ranking_class_choices_;
   // LE CODEX : ses lignes, et le sprite de l'entrée choisie, sur la
   // garde-robe qui l'a vu naître.
   SurvivorsCodexRowsHeld codex_rows_;

@@ -8,6 +8,7 @@
 #include <imgui.h>
 
 #include "ro/ui/skin_art.h"
+#include "ro/ui/survivors_prepare_window.h"
 
 namespace ro::ui {
 
@@ -24,7 +25,8 @@ namespace ro::ui {
 //   - en pied « Actualiser », grisé tant que la cadence du serveur ne permet
 //     pas de redemander, « Fermer », et l'âge de la page ;
 //   - la version des règles en petit sous le titre, et la classe dont ces
-//     tableaux sont ceux : il y en a un par classe.
+//     tableaux sont ceux : il y en a un par classe. Ouverte de l'accueil, la
+//     fenêtre en propose une case par classe classée ; seule, elle se nomme.
 //
 // Les noms viennent du serveur et se posent tels quels : un nom de joueur ne
 // se traduit jamais. La fenêtre ne connaît aucun type de `sim` ni de `net` :
@@ -65,6 +67,10 @@ struct SurvivorsRankingView {
   // La classe des deux tableaux (en UTF-8, déjà dans la langue du joueur ;
   // vide, elle ne se nomme pas).
   const char* class_name = "";
+  // Les classes classées qu'on peut regarder, et celle qui est montrée. Vide :
+  // la classe se nomme seulement (`class_name`).
+  std::span<const SurvivorsClassChoice> classes;
+  std::uint16_t class_id = 0;
   int ruleset = 0;
   // La semaine ISO du défi telle que le serveur la compte.
   int week_year = 0;
@@ -75,6 +81,8 @@ struct SurvivorsRankingView {
 struct SurvivorsRankingState {
   bool open = false;
   SurvivorsRankingTab tab = SurvivorsRankingTab::kRanked;
+  // La classe choisie dans la fenêtre ; 0 : celle de l'accueil.
+  std::uint16_t class_id = 0;
 };
 
 struct SurvivorsRankingAsk {

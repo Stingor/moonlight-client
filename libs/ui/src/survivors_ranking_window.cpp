@@ -30,6 +30,24 @@ constexpr int kColumns = 5;
 constexpr ImGuiTableFlags kTableFlags =
     ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_BordersInnerH;
 
+// La classe montrée : une case par classe classée, ou son seul nom.
+void DrawClasses(SurvivorsRankingState& state, const SurvivorsRankingView& view,
+                 const SkinArt& art) {
+  if (view.classes.size() <= 1) {
+    if (*view.class_name != '\0') ImGui::Text(core::Tr("Classe : %s"), view.class_name);
+    return;
+  }
+  ImGui::AlignTextToFramePadding();
+  ImGui::TextUnformatted(core::Tr("Classe"));
+  for (const SurvivorsClassChoice& choice : view.classes) {
+    ImGui::SameLine();
+    ImGui::PushID(choice.class_id);
+    const bool chosen = choice.class_id == view.class_id;
+    if (SkinRadio(choice.name, chosen, art) && !chosen) state.class_id = choice.class_id;
+    ImGui::PopID();
+  }
+}
+
 void DrawTabs(SurvivorsRankingState& state, SurvivorsRankingAsk& asked, const SkinArt& art) {
   const bool ranked = state.tab == SurvivorsRankingTab::kRanked;
   SurvivorsRankingTab chosen = state.tab;
@@ -150,7 +168,7 @@ SurvivorsRankingAsk DrawSurvivorsRankingWindow(SurvivorsRankingState& state,
   std::array<char, kLineSize> line = {};
   std::snprintf(line.data(), line.size(), core::Tr("Règles %d"), view.ruleset);
   FaintText(line.data());
-  if (*view.class_name != '\0') ImGui::Text(core::Tr("Classe : %s"), view.class_name);
+  DrawClasses(state, view, art);
   DrawTabs(state, asked, art);
   ImGui::Separator();
   const bool ranked = state.tab == SurvivorsRankingTab::kRanked;

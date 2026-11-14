@@ -83,12 +83,17 @@ void SurvivorsMode::FollowDoor(SurvivorsStage& stage, const SurvivorsContext& co
     SaveOptions(before, context);
   }
   if (context.ranking != nullptr) {
+    // La classe choisie dans la fenêtre du classement, sinon celle de l'accueil.
     const ro::sim::ClassRule* playing = PlayingClass();
+    const std::uint16_t shown_class_id =
+        windows.survivors_meta.ranking.class_id != 0
+            ? windows.survivors_meta.ranking.class_id
+            : (playing != nullptr ? playing->class_id : std::uint16_t{0});
     FollowRankingAsks(
         *context.ranking, windows.survivors_meta.ranking,
         SurvivorsRankingAsks{.open = asked.open_ranking,
                              .window = std::exchange(windows.survivors_meta.ranking_answer, {})},
-        Rules(), playing != nullptr ? playing->class_id : std::uint16_t{0});
+        Rules(), shown_class_id);
   }
   const std::optional<EntryRefusal> refusal = Judge(EntryFactsOf(*context.world, context.aside));
   const MoveKeyLabels labels = LabelsOf(context.key_namer);

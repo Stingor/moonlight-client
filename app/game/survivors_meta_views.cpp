@@ -126,7 +126,6 @@ void SurvivorsViews::ComposeMeta(ro::ui::SurvivorsPrepareView& prepare,
   const ro::sim::ClassRule* chosen_class = ChosenClassOf(rules, save, book.chosen_class_id());
   const std::uint16_t class_id =
       chosen_class != nullptr ? chosen_class->class_id : std::uint16_t{0};
-  const char* class_name = ShownClassName(rules, class_id, tables);
   if (const std::uint16_t bolt = meta.challenge_bolt.skill_id; bolt != 0) {
     meta.challenge_bolt.icon = SurvivorsSkillIcon(bolt, tables);
     meta.challenge_bolt.name = SkillName(bolt, tables);
@@ -134,10 +133,15 @@ void SurvivorsViews::ComposeMeta(ro::ui::SurvivorsPrepareView& prepare,
   // LE CLASSEMENT N'A RIEN À L'ACCUEIL SERVICE FERMÉ : ni onglet, ni bouton,
   // ni compteur, ni l'onglet local des parties classées, ni le tableau.
   const bool ranking_open = ranking != nullptr && ranking->session().service_open();
+  // LE CLASSEMENT S'OUVRE SUR LA CLASSE DE L'ACCUEIL, puis montre celle que le
+  // joueur choisit dans son en-tête, jusqu'à sa fermeture.
+  if (!windows.ranking.open) windows.ranking.class_id = 0;
+  const std::uint16_t ranking_class_id =
+      windows.ranking.class_id != 0 ? windows.ranking.class_id : class_id;
   if (ranking != nullptr) {
     meta.ranking = PrepareRankingOf(ranking->session(), ranking_rows_, class_id);
-    ComposeRankingWindow(*ranking, windows.ranking, windows.ranking_view, ranking_rows_, class_id,
-                         class_name);
+    ComposeRankingWindow(*ranking, windows.ranking, windows.ranking_view, ranking_rows_,
+                         ranking_class_id, ShownClassName(rules, ranking_class_id, tables));
   } else {
     windows.ranking.open = false;
   }
@@ -161,6 +165,16 @@ void SurvivorsViews::ComposeMeta(ro::ui::SurvivorsPrepareView& prepare,
   meta.free_arena_id = free_arena != nullptr ? free_arena->arena_id : std::uint16_t{0};
   ComposeClassChoices(rules, save, tables, book.chosen_class_id(), meta);
   meta.board_arena_name = board_arena_name_.c_str();
+  // Les classes du classement : celles qui ont un tableau, verrouillées ou non.
+  ranking_class_choices_.clear();
+  for (const ro::ui::SurvivorsClassChoice& choice : class_choices_) {
+    const ro::sim::ClassRule* class_rule = ro::sim::FindClass(rules, choice.class_id);
+    if (class_rule == nullptr || class_rule->free_play_only) continue;
+    ranking_class_choices_.push_back(
+        ro::ui::SurvivorsClassChoice{.class_id = choice.class_id, .name = choice.name});
+  }
+  windows.ranking_view.classes = ranking_class_choices_;
+  windows.ranking_view.class_id = ranking_class_id;
   prepare.meta = meta;
   if (windows.church.open) ComposeShop(SurvivorsMetaShop::kChurch, windows, save, tables);
   if (windows.kafra.open) ComposeShop(SurvivorsMetaShop::kKafra, windows, save, tables);
