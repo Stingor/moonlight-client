@@ -555,6 +555,11 @@ bool BeginSkinnedWindow(const char* name, bool* open, const SkinArt& art, Skinne
   window->SkipItems = skipped_items;
 
   into->PopClipRect();
+  // 🔴 LA DÉCOUPE DE LA FENÊTRE SE REPREND SUR CELLE DE LA LISTE. Un bouton de
+  // barre la recopie de la liste à son `ImGui::PopClipRect`, qui trouvait
+  // encore la fenêtre entière : le contenu défilé sous la barre y prenait le
+  // clic qui devait la déplacer.
+  window->ClipRect = ImRect(into->_ClipRectStack.back());
   // 🔴 LE CORPS D'UNE DESCRIPTION S'ARRÊTE AU-DESSUS DU BAS DE SON CADRE. ImGui
   // découpe jusqu'au filet d'un pixel d'une fenêtre ordinaire : la ligne qui
   // défile passerait sur le cadre, plus épais. La découpe de la fenêtre remonte
