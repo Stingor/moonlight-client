@@ -257,6 +257,9 @@ tr: Acepta las invitaciones de grupo.
 fr: Accepte ou refuse l'appel d'urgence.
 tr: Acepta o rechaza la llamada de emergencia.
 
+fr: Achat (zeny)
+tr: Compra (zeny)
+
 fr: Active ou coupe les secousses d'écran.
 tr: Activa o desactiva las sacudidas de pantalla.
 
@@ -377,11 +380,14 @@ tr: Bloquea los susurros de este jugador; sola, lista los bloqueados.
 fr: Bloque les chuchotements de tout le monde.
 tr: Bloquea los susurros de todo el mundo.
 
-fr: Bon annulé : la table reste telle quelle.
-tr: Orden anulada: la tabla queda como está.
+fr: Bon annulé : rien ne change.
+tr: Orden anulada: nada cambia.
 
-fr: Bon enregistré dans savedata\\item_info_delta.yml.
-tr: Orden guardada en savedata\\item_info_delta.yml.
+fr: Bon enregistré dans savedata : %s.
+tr: Orden guardada en savedata: %s.
+
+fr: Bons du serveur en attente : %zu. À porter par apply_item_db_delta.py, puis @reloaditemdb.
+tr: Órdenes del servidor pendientes: %zu. Aplicarlas con apply_item_db_delta.py y luego @reloaditemdb.
 
 fr: Bons en attente : %zu. À porter par apply_item_info_delta.py, puis relancer le client.
 tr: Órdenes pendientes: %zu. Aplicarlas con apply_item_info_delta.py y luego reiniciar el cliente.
@@ -412,6 +418,9 @@ tr: La del juego
 
 fr: Celle du jeu est la police du client d'origine. Le titre garde sa place : une police plus large se coupe plus tôt en « ... », et la souris sur le titre le montre en entier.
 tr: La del juego es la fuente del cliente original. El título conserva su espacio: una fuente más ancha se corta antes con «...», y pasar el ratón por el título lo muestra entero.
+
+fr: Cet item n'est pas dans l'item_db du serveur : le bon ne peut pas en créer un.
+tr: Este item no está en el item_db del servidor: una orden no puede crearlo.
 
 fr: Cet item n'est pas dans la table : le bon créera sa fiche.
 tr: Este item no está en la tabla: la orden creará su ficha.
@@ -599,6 +608,9 @@ tr: Revela 25 objetos distintos en Roggle.
 fr: Dévoiler un item dans Roggle.
 tr: Revela un objeto en Roggle.
 
+fr: Emplacements de card
+tr: Ranuras de card
+
 fr: En attente des autres joueurs…
 tr: Esperando a los demás jugadores…
 
@@ -704,6 +716,9 @@ tr: Tu personaje está muerto.
 fr: Le poison éclate là où les monstres se pressent.
 tr: El veneno estalla donde los monstruos se agolpan.
 
+fr: Le prix d'une arme ou d'une armure suit les formules du serveur.
+tr: El precio de un arma o de una armadura sigue las fórmulas del servidor.
+
 fr: Le serveur ne connaît pas le reste ni les retouches : seules les pièces du code sont appliquées.
 tr: El servidor no conoce el resto ni los retoques: solo se aplican las piezas del código.
 
@@ -715,6 +730,9 @@ tr: Se perdió la conexión con el servidor.
 
 fr: La tête seule
 tr: Solo la cabeza
+
+fr: Lecture de la base du serveur...
+tr: Leyendo la base del servidor...
 
 fr: Les clients du groupe n'ont pas la même version : la partie ne peut pas commencer.
 tr: Los clientes del grupo no tienen la misma versión: la partida no puede empezar.
@@ -761,6 +779,9 @@ tr: Montura de tienda
 fr: Monté
 tr: Montado
 
+fr: Niveau maximal
+tr: Nivel máximo
+
 fr: Noir
 tr: Negro
 
@@ -793,6 +814,12 @@ tr: Hablar (voz)
 
 fr: Plateau :
 tr: Tablero:
+
+fr: Poids (dixièmes)
+tr: Peso (décimas)
+
+fr: Portée (cases)
+tr: Alcance (celdas)
 
 fr: Pour %s
 tr: Para %s
@@ -845,6 +872,9 @@ tr: Quitar este retoque
 fr: Retouche exacte
 tr: Retoque exacto
 
+fr: Revente (zeny)
+tr: Venta (zeny)
+
 fr: Revient à ce que ton personnage a de lui-même, sans toucher aux pièces.
 tr: Vuelve a lo que tu personaje tiene de por sí, sin tocar las piezas.
 
@@ -874,6 +904,12 @@ tr: Saturación: %+d %%
 
 fr: Saturation : %d %%
 tr: Saturación: %d %%
+
+fr: Script au port
+tr: Script al equipar
+
+fr: Script au retrait
+tr: Script al desequipar
 
 fr: Table
 tr: Tabla
@@ -916,6 +952,9 @@ tr: Ya has vestido tantos cuerpos como guarda el servidor. Validar este borrará
 
 fr: Un bon attend le script pour cet item : la saisie le montre.
 tr: Una orden para este item espera el script: lo escrito la muestra.
+
+fr: Un bon du serveur attend le script pour cet item : la saisie le montre.
+tr: Una orden del servidor para este item espera el script: lo escrito la muestra.
 
 fr: Un bond en arrière blesse et repousse ce qui vous talonne.
 tr: Un salto atrás hiere y repele lo que te pisa los talones.
@@ -5580,8 +5619,8 @@ tr: Sigues a %s.
 fr: ce site
 tr: este sitio
 
-fr: Écrit les champs changés dans savedata\\item_info_delta.yml. Le client n'en montre rien avant le passage du script.
-tr: Escribe los campos cambiados en savedata\\item_info_delta.yml. El cliente no muestra nada hasta que pase el script.
+fr: Écrit les champs changés : ceux du client dans savedata\\item_info_delta.yml, ceux du serveur dans savedata\\item_db_delta.yml. Rien ne change avant le passage des scripts.
+tr: Escribe los campos cambiados: los del cliente en savedata\\item_info_delta.yml, los del servidor en savedata\\item_db_delta.yml. Nada cambia hasta que pasen los scripts.
 
 fr: Éleveur de Porings
 tr: Criador de Porings

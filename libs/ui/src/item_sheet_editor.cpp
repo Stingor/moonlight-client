@@ -38,9 +38,14 @@ constexpr float kIconGapPixels = 12.0F;
 // Les lignes que la description laisse sous elle et au-dessus : l'état (au
 // plus quatre lignes) et les trois champs d'une ligne. Et sa hauteur la
 // moindre, en lignes de texte.
-constexpr float kStatusLines = 4.0F;
+constexpr float kStatusLines = 5.0F;
 constexpr float kSingleLineFields = 3.0F;
 constexpr float kLeastDescriptionLines = 4.0F;
+// L'onglet du serveur : ses nombres sur deux paires de colonnes (libellé,
+// saisie), le pas rapide d'une saisie, et la hauteur d'un script en lignes.
+constexpr int kNumberColumns = 4;
+constexpr int kNumberFastStep = 10;
+constexpr float kScriptLines = 5.0F;
 
 constexpr ImU32 kGoodColor = IM_COL32(38, 110, 46, 255);
 constexpr ImU32 kBadColor = IM_COL32(153, 31, 31, 255);
@@ -59,6 +64,15 @@ void FillFromView(ItemSheetEditorState& state, const ItemSheetEditorView& view) 
   Fill(state.description, ItemSheetEditorText(view.start.description));
   state.tint_rank = view.start.tint_rank;
   state.filled = true;
+}
+
+void FillServerFromView(ItemSheetEditorState& state, const ItemSheetEditorView& view) {
+  state.numbers = view.server_start.numbers;
+  state.refineable = view.server_start.refineable;
+  for (std::size_t rank = 0; rank < state.scripts.size(); ++rank) {
+    Fill(state.scripts[rank], view.server_start.scripts[rank]);
+  }
+  state.server_filled = true;
 }
 
 // Le libellé d'une ligne de champ, dans sa colonne.
@@ -121,9 +135,77 @@ void DrawFields(ItemSheetEditorState& state, const ItemSheetEditorView& view, co
                             ImVec2(-FLT_MIN, description_height));
 }
 
+void DrawTabs(ItemSheetEditorState& state, const SkinArt& art) {
+  if (!BeginSkinTabBar("##fiche_onglets", art)) {
+    return;
+  }
+  const auto tab = [&state](const char* label, const char* id, ItemSheetEditorTab which) {
+    const std::string name = std::string(label) + "###" + id;
+    if (ImGui::BeginTabItem(name.c_str())) {
+      state.tab = which;
+      ImGui::EndTabItem();
+    }
+  };
+  tab(core::Tr("Client"), "client", ItemSheetEditorTab::kClient);
+  tab(core::Tr("Serveur"), "serveur", ItemSheetEditorTab::kServer);
+  EndSkinTabBar();
+}
+
+void DrawServerFields(ItemSheetEditorState& state, const ItemSheetEditorView& view,
+                      const SkinArt& art, float height) {
+  if (!ImGui::BeginChild("##serveur", ImVec2(0.0F, height))) {
+    ImGui::EndChild();
+    return;
+  }
+  if (view.server_loading) {
+    FaintText(core::Tr("Lecture de la base du serveur..."));
+  } else if (!view.server_known) {
+    FaintText(
+        core::Tr("Cet item n'est pas dans l'item_db du serveur : le bon ne peut pas en "
+                 "créer un."));
+  } else {
+    FaintText(core::Tr("Le prix d'une arme ou d'une armure suit les formules du serveur."));
+    constexpr ImGuiTableFlags kTableFlags = ImGuiTableFlags_SizingStretchSame;
+    if (ImGui::BeginTable("##nombres", kNumberColumns, kTableFlags)) {
+      for (std::size_t rank = 0; rank < kItemSheetServerNumbers.size(); ++rank) {
+        const ItemSheetServerNumber& number = kItemSheetServerNumbers[rank];
+        ImGui::TableNextColumn();
+        ImGui::AlignTextToFramePadding();
+        ImGui::TextUnformatted(ItemSheetServerNumberLabel(number));
+        ImGui::TableNextColumn();
+        ImGui::SetNextItemWidth(-FLT_MIN);
+        ImGui::PushID(static_cast<int>(rank));
+        static_cast<void>(SkinInputInt("##nombre", &state.numbers[rank], 0, number.most, 1,
+                                       kNumberFastStep, art));
+        ImGui::PopID();
+      }
+      ImGui::EndTable();
+    }
+    static_cast<void>(SkinCheckBox(core::Tr("Raffinable"), &state.refineable, art));
+    const float script_height = ImGui::GetTextLineHeight() * kScriptLines;
+    for (std::size_t rank = 0; rank < kItemSheetServerScripts.size(); ++rank) {
+      ImGui::TextUnformatted(ItemSheetServerScriptLabel(kItemSheetServerScripts[rank]));
+      ImGui::PushID(static_cast<int>(rank));
+      ImGui::InputTextMultiline("##script", state.scripts[rank].data(), state.scripts[rank].size(),
+                                ImVec2(-FLT_MIN, script_height));
+      ImGui::PopID();
+    }
+  }
+  ImGui::EndChild();
+}
+
 void DrawStatus(const ItemSheetEditorView& view) {
   if (!view.known) {
     FaintText(core::Tr("Cet item n'est pas dans la table : le bon créera sa fiche."));
+  }
+  if (view.server_pending) {
+    FaintText(core::Tr("Un bon du serveur attend le script pour cet item : la saisie le montre."));
+  }
+  if (view.server_pending_count > 0) {
+    FaintText(core::Printed(core::Tr("Bons du serveur en attente : %zu. À porter par "
+                                     "apply_item_db_delta.py, puis @reloaditemdb."),
+                            view.server_pending_count)
+                  .c_str());
   }
   if (view.pending) {
     FaintText(core::Tr("Un bon attend le script pour cet item : la saisie le montre."));
@@ -148,11 +230,12 @@ void DrawFooter(ItemSheetEditorState& state, const ItemSheetEditorView& view, co
   }
   if (ImGui::IsItemHovered()) {
     SkinTooltip(
-        core::Tr("Écrit les champs changés dans savedata\\item_info_delta.yml. Le "
-                 "client n'en montre rien avant le passage du script."));
+        core::Tr("Écrit les champs changés : ceux du client dans savedata\\item_info_delta.yml, "
+                 "ceux du serveur dans savedata\\item_db_delta.yml. Rien ne change avant le "
+                 "passage des scripts."));
   }
   ImGui::SameLine();
-  ImGui::BeginDisabled(!view.pending);
+  ImGui::BeginDisabled(!view.pending && !view.server_pending);
   if (SkinButton(core::Tr("Annuler le bon"), art)) {
     answer.clear_pending = true;
   }
@@ -160,6 +243,7 @@ void DrawFooter(ItemSheetEditorState& state, const ItemSheetEditorView& view, co
   ImGui::SameLine();
   if (SkinButton(core::Tr("Rétablir"), art)) {
     state.filled = false;
+    state.server_filled = false;
   }
   if (ImGui::IsItemHovered()) {
     SkinTooltip(core::Tr("Oublie la saisie : revient au bon en attente, sinon à la table."));
@@ -180,6 +264,7 @@ void OpenItemSheetEditor(ItemSheetEditorState& state, std::uint32_t item_id) {
   state.raise = true;
   state.item_id = item_id;
   state.filled = false;
+  state.server_filled = false;
 }
 
 std::vector<std::string> ItemSheetEditorLines(std::string_view text) {
@@ -221,6 +306,9 @@ ItemSheetEditorAnswer DrawItemSheetEditor(ItemSheetEditorState& state,
   if (!state.filled) {
     FillFromView(state, view);
   }
+  if (!state.server_filled && view.server_known) {
+    FillServerFromView(state, view);
+  }
   if (state.raise) {
     state.raise = false;
     ImGui::SetNextWindowFocus();
@@ -238,15 +326,21 @@ ItemSheetEditorAnswer DrawItemSheetEditor(ItemSheetEditorState& state,
   if (BeginSkinnedWindow(name.Get(), &state.open, art, SkinnedTitle::kBar, kFlags) && state.open) {
     ImGui::TextUnformatted(core::Printed(core::Tr("Item %u"), view.item_id).c_str());
     DrawIcons(view);
-    ImGui::Separator();
-    // La description prend ce qui reste, moins les champs d'une ligne, l'état
-    // et le pied.
-    const float below = ImGui::GetTextLineHeightWithSpacing() * kStatusLines +
-                        ImGui::GetFrameHeightWithSpacing() * kSingleLineFields +
-                        SkinFooterHeight(art);
-    const float description_height = std::max(ImGui::GetTextLineHeight() * kLeastDescriptionLines,
-                                              ImGui::GetContentRegionAvail().y - below);
-    DrawFields(state, view, art, description_height);
+    DrawTabs(state, art);
+    // L'onglet prend ce qui reste, moins l'état et le pied ; la description, ce
+    // que l'onglet du client laisse sous ses champs d'une ligne.
+    const float reserved =
+        ImGui::GetTextLineHeightWithSpacing() * kStatusLines + SkinFooterHeight(art);
+    const float body_height = std::max(ImGui::GetTextLineHeight() * kLeastDescriptionLines,
+                                       ImGui::GetContentRegionAvail().y - reserved);
+    if (state.tab == ItemSheetEditorTab::kServer) {
+      DrawServerFields(state, view, art, body_height);
+    } else {
+      const float description_height =
+          std::max(ImGui::GetTextLineHeight() * kLeastDescriptionLines,
+                   body_height - ImGui::GetFrameHeightWithSpacing() * kSingleLineFields);
+      DrawFields(state, view, art, description_height);
+    }
     DrawStatus(view);
     DrawFooter(state, view, art, answer);
   }

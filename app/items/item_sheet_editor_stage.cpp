@@ -1,11 +1,16 @@
 #include "items/item_sheet_editor_stage.h"
 
+#include <algorithm>
+#include <charconv>
 #include <cstddef>
+#include <cstdint>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
+#include "ro/core/printed.h"
 #include "ro/vfs/encoding.h"
 
 #include "game/skin_image_of.h"
@@ -14,6 +19,19 @@ namespace moonclient {
 namespace {
 
 constexpr const char* kNoTintLabel = ro::core::TrText("Aucune");
+// Les noms des deux bons, tels que la notice les dit.
+constexpr const char* kItemInfoDeltaName = "item_info_delta.yml";
+constexpr const char* kItemDbDeltaName = "item_db_delta.yml";
+// `Refineable` dans le bon, comme le serveur l'écrit.
+constexpr const char* kTrueWord = "true";
+constexpr const char* kFalseWord = "false";
+
+// Un entier écrit dans un bon, ou `fallback` s'il n'en est pas un.
+[[nodiscard]] int WholeOr(std::string_view text, int fallback) {
+  int value = 0;
+  const auto [end, failure] = std::from_chars(text.data(), text.data() + text.size(), value);
+  return failure == std::errc() && end == text.data() + text.size() ? value : fallback;
+}
 
 // La ressource s'écrit-elle en CP949, à l'identique ? C'est l'encodage des
 // archives : un caractère remplacé désignerait un autre fichier.
@@ -98,7 +116,8 @@ void ItemSheetEditorStage::Notice(std::string text, bool ok) {
 }
 
 void ItemSheetEditorStage::Save(ro::ui::ItemSheetEditorState& state,
-                                const ro::vfs::ItemInfoRecord& table) {
+                                const ro::vfs::ItemInfoRecord& table,
+                                const ro::vfs::ServerItem* server) {
   ro::vfs::ItemInfoRecord typed;
   typed.name = state.name.data();
   typed.resource = state.resource.data();
@@ -113,19 +132,151 @@ void ItemSheetEditorStage::Save(ro::ui::ItemSheetEditorState& state,
            false);
     return;
   }
+  // CHAQUE BON SE POSE OU SE RETIRE : une saisie qui redit la table retire le
+  // bon d'avant. Celui du serveur ne se touche que si l'onglet a été rempli.
   const ItemInfoDeltaEntry entry = ItemSheetEdit(state.item_id, table, typed);
-  if (entry.empty()) {
-    const bool cleared = delta_->Clear(state.item_id);
-    Notice(cleared ? ro::core::Tr("La saisie redit la table : aucun bon pour cet item.")
-                   : ro::core::Tr("Le bon n'a pas pu s'écrire : voir le journal."),
-           cleared);
+  bool written = entry.empty() ? delta_->Clear(state.item_id) : delta_->Set(entry);
+  std::string files = entry.empty() ? std::string() : std::string(kItemInfoDeltaName);
+  if (server != nullptr && state.server_filled) {
+    const ItemDbDeltaEntry server_entry =
+        ItemSheetServerEdit(state.item_id, ItemSheetServerBase(*server), state);
+    written = (server_entry.fields.empty() ? server_delta_->Clear(state.item_id)
+                                           : server_delta_->Set(server_entry)) &&
+              written;
+    if (!server_entry.fields.empty()) {
+      files += files.empty() ? "" : ", ";
+      files += kItemDbDeltaName;
+    }
+  }
+  if (!written) {
+    Notice(ro::core::Tr("Le bon n'a pas pu s'écrire : voir le journal."), false);
+  } else if (files.empty()) {
+    Notice(ro::core::Tr("La saisie redit la table : aucun bon pour cet item."), true);
   } else {
-    const bool written = delta_->Set(entry);
-    Notice(written ? ro::core::Tr("Bon enregistré dans savedata\\item_info_delta.yml.")
-                   : ro::core::Tr("Le bon n'a pas pu s'écrire : voir le journal."),
-           written);
+    Notice(ro::core::Printed(ro::core::Tr("Bon enregistré dans savedata : %s."), files.c_str()),
+           true);
   }
   state.filled = false;
+  state.server_filled = false;
+}
+
+void ItemSheetEditorStage::ComposeServer(std::uint32_t item_id,
+                                         const ItemSheetEditorContext& context) {
+  view_.server_loading = context.server_db == nullptr;
+  const ro::vfs::ServerItem* const item =
+      context.server_db != nullptr ? context.server_db->FindItem(item_id) : nullptr;
+  view_.server_known = item != nullptr;
+  const ItemDbDeltaEntry* const pending = server_delta_->Find(item_id);
+  view_.server_pending = pending != nullptr;
+  view_.server_pending_count = server_delta_->entries().size();
+  if (item == nullptr) {
+    return;
+  }
+  // CE QUE L'ONGLET MONTRE EN S'OUVRANT : le bon en attente par-dessus la base.
+  ro::ui::ItemSheetServerFields start = ItemSheetServerBase(*item);
+  const auto& numbers = ro::ui::kItemSheetServerNumbers;
+  const auto& scripts = ro::ui::kItemSheetServerScripts;
+  for (std::size_t rank = 0; rank < scripts.size(); ++rank) {
+    server_scripts_[rank] = std::string(start.scripts[rank]);
+  }
+  const std::vector<std::pair<std::string, std::string>> no_fields;
+  for (const auto& [key, value] : pending != nullptr ? pending->fields : no_fields) {
+    if (key == ro::ui::kItemSheetRefineableKey) {
+      start.refineable = value == kTrueWord;
+    }
+    for (std::size_t rank = 0; rank < numbers.size(); ++rank) {
+      if (numbers[rank].key == key) {
+        start.numbers[rank] = WholeOr(value, start.numbers[rank]);
+      }
+    }
+    for (std::size_t rank = 0; rank < scripts.size(); ++rank) {
+      if (scripts[rank].key == key) {
+        server_scripts_[rank] = value;
+      }
+    }
+  }
+  for (std::size_t rank = 0; rank < scripts.size(); ++rank) {
+    start.scripts[rank] = server_scripts_[rank];
+  }
+  view_.server_start = start;
+}
+
+int ItemSheetServerNumberOf(const ro::vfs::ServerItem& item, std::string_view key) {
+  const auto bounded = [](std::uint64_t value) {
+    return static_cast<int>(std::min<std::uint64_t>(value, ro::ui::kItemSheetMostNumber));
+  };
+  if (key == "Buy") {
+    return bounded(item.buy_zeny);
+  }
+  if (key == "Sell") {
+    return bounded(item.sell_zeny);
+  }
+  if (key == "Weight") {
+    return bounded(item.weight_tenths);
+  }
+  if (key == "Attack") {
+    return bounded(item.attack);
+  }
+  if (key == "MagicAttack") {
+    return bounded(item.magic_attack);
+  }
+  if (key == "Defense") {
+    return bounded(item.defense);
+  }
+  if (key == "Range") {
+    return bounded(item.range_cells);
+  }
+  if (key == "Slots") {
+    return bounded(item.slots);
+  }
+  if (key == "WeaponLevel") {
+    return bounded(item.weapon_level);
+  }
+  if (key == "ArmorLevel") {
+    return bounded(item.armor_level);
+  }
+  if (key == "EquipLevelMin") {
+    return bounded(item.equip_level_min);
+  }
+  if (key == "EquipLevelMax") {
+    return bounded(item.equip_level_max);
+  }
+  return 0;
+}
+
+ro::ui::ItemSheetServerFields ItemSheetServerBase(const ro::vfs::ServerItem& item) {
+  ro::ui::ItemSheetServerFields base;
+  for (std::size_t rank = 0; rank < ro::ui::kItemSheetServerNumbers.size(); ++rank) {
+    base.numbers[rank] = ItemSheetServerNumberOf(item, ro::ui::kItemSheetServerNumbers[rank].key);
+  }
+  base.refineable = item.refineable;
+  base.scripts = {item.script, item.equip_script, item.unequip_script};
+  return base;
+}
+
+ItemDbDeltaEntry ItemSheetServerEdit(std::uint32_t item_id,
+                                     const ro::ui::ItemSheetServerFields& base,
+                                     const ro::ui::ItemSheetEditorState& typed) {
+  ItemDbDeltaEntry entry;
+  entry.item_id = item_id;
+  for (std::size_t rank = 0; rank < ro::ui::kItemSheetServerNumbers.size(); ++rank) {
+    if (typed.numbers[rank] != base.numbers[rank]) {
+      entry.fields.emplace_back(std::string(ro::ui::kItemSheetServerNumbers[rank].key),
+                                std::to_string(typed.numbers[rank]));
+    }
+  }
+  if (typed.refineable != base.refineable) {
+    entry.fields.emplace_back(std::string(ro::ui::kItemSheetRefineableKey),
+                              typed.refineable ? kTrueWord : kFalseWord);
+  }
+  for (std::size_t rank = 0; rank < ro::ui::kItemSheetServerScripts.size(); ++rank) {
+    const std::string_view script(typed.scripts[rank].data());
+    if (script != base.scripts[rank]) {
+      entry.fields.emplace_back(std::string(ro::ui::kItemSheetServerScripts[rank].key),
+                                std::string(script));
+    }
+  }
+  return entry;
 }
 
 void ItemSheetEditorStage::Compose(const ro::ui::ItemSheetEditorState& state,
@@ -184,21 +335,26 @@ void ItemSheetEditorStage::Advance(ro::ui::StaffToolsState& tools,
   }
   if (!delta_.has_value()) {
     delta_.emplace(*context.client_root);
+    server_delta_.emplace(*context.client_root);
   }
   const ro::vfs::ItemInfoRecord* const known = TableRecord(state.item_id, context.vfs);
   const ro::vfs::ItemInfoRecord table =
       known != nullptr ? *known : ro::vfs::ItemInfoRecord{.item_id = state.item_id};
+  const ro::vfs::ServerItem* const server =
+      context.server_db != nullptr ? context.server_db->FindItem(state.item_id) : nullptr;
   if (answer.save) {
-    Save(state, table);
+    Save(state, table, server);
   }
   if (answer.clear_pending) {
-    const bool cleared = delta_->Clear(state.item_id);
-    Notice(cleared ? ro::core::Tr("Bon annulé : la table reste telle quelle.")
+    const bool cleared = delta_->Clear(state.item_id) && server_delta_->Clear(state.item_id);
+    Notice(cleared ? ro::core::Tr("Bon annulé : rien ne change.")
                    : ro::core::Tr("Le bon n'a pas pu s'écrire : voir le journal."),
            cleared);
     state.filled = false;
+    state.server_filled = false;
   }
   Compose(state, context);
+  ComposeServer(state.item_id, context);
   tools.item_editor_view = &view_;
 }
 

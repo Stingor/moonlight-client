@@ -87,6 +87,7 @@ add_library(ro_ui STATIC
     src/market_window.cpp
     src/item_sheet.cpp
     src/item_sheet_editor.cpp
+    src/item_sheet_editor_labels.cpp
     src/database_labels.cpp
     src/database_window.cpp
     src/weapon_refine_window.cpp

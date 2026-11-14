@@ -12,8 +12,10 @@
 #include "ro/ui/staff_tools.h"
 #include "ro/vfs/item_info_text.h"
 #include "ro/vfs/item_table.h"
+#include "ro/vfs/server_db.h"
 #include "ro/vfs/vfs.h"
 
+#include "items/item_db_delta.h"
 #include "items/item_info_delta.h"
 
 namespace moonclient {
@@ -25,6 +27,8 @@ struct ItemSheetEditorContext {
   const std::filesystem::path* client_root = nullptr;
   ro::vfs::Vfs* vfs = nullptr;
   ro::render::ItemIcons* icons = nullptr;
+  // La base EXPORTÉE du serveur, nulle tant qu'elle se lit.
+  const ro::vfs::ServerDb* server_db = nullptr;
 };
 
 // LA FICHE D'UN OBJET ÉDITÉE PAR LE STAFF, vue de la partie : la vue que
@@ -45,11 +49,18 @@ class ItemSheetEditorStage {
   // quand la table ne l'a pas.
   [[nodiscard]] const ro::vfs::ItemInfoRecord* TableRecord(std::uint32_t item_id,
                                                            ro::vfs::Vfs* vfs);
-  void Save(ro::ui::ItemSheetEditorState& state, const ro::vfs::ItemInfoRecord& table);
+  // `server` : l'item dans la base exportée du serveur, nul quand elle ne le
+  // connaît pas ou se lit encore — l'onglet « Serveur » ne pose alors rien.
+  void Save(ro::ui::ItemSheetEditorState& state, const ro::vfs::ItemInfoRecord& table,
+            const ro::vfs::ServerItem* server);
   void Compose(const ro::ui::ItemSheetEditorState& state, const ItemSheetEditorContext& context);
+  void ComposeServer(std::uint32_t item_id, const ItemSheetEditorContext& context);
   void Notice(std::string text, bool ok);
 
   std::optional<ItemInfoDelta> delta_;
+  std::optional<ItemDbDelta> server_delta_;
+  // Les scripts que l'onglet « Serveur » montre en s'ouvrant, le temps de l'image.
+  std::array<std::string, ro::ui::kItemSheetServerScripts.size()> server_scripts_;
 
   std::uint32_t record_for_ = 0;
   std::optional<ro::vfs::ItemInfoRecord> record_;
@@ -59,7 +70,6 @@ class ItemSheetEditorStage {
   std::array<const char*, ro::formats::kIconTintShades.size() + 1> tint_labels_{};
   // Ce que la vue désigne, gardé ici le temps de l'image.
   ro::vfs::ItemInfoRecord start_;
-  std::string start_resource_;
   std::string notice_;
   bool notice_ok_ = true;
   std::uint32_t notice_for_ = 0;
@@ -77,5 +87,21 @@ class ItemSheetEditorStage {
 [[nodiscard]] ItemInfoDeltaEntry ItemSheetEdit(std::uint32_t item_id,
                                                const ro::vfs::ItemInfoRecord& table,
                                                const ro::vfs::ItemInfoRecord& typed);
+
+// ── L'ONGLET « SERVEUR » ────────────────────────────────────────────────────
+
+// La valeur d'un nombre de `kItemSheetServerNumbers` dans la base exportée ;
+// zéro pour une clé qu'on ne connaît pas. Bornée à ce qu'une saisie tient.
+[[nodiscard]] int ItemSheetServerNumberOf(const ro::vfs::ServerItem& item, std::string_view key);
+
+// Ce que la base exportée dit de l'item, dans la forme de l'onglet. Les scripts
+// désignent ceux de `item`.
+[[nodiscard]] ro::ui::ItemSheetServerFields ItemSheetServerBase(const ro::vfs::ServerItem& item);
+
+// LE BON QUE DONNE LA SAISIE DE L'ONGLET : les seuls champs qui diffèrent de la
+// base, dans l'ordre des catalogues. Vide quand la saisie redit la base.
+[[nodiscard]] ItemDbDeltaEntry ItemSheetServerEdit(std::uint32_t item_id,
+                                                   const ro::ui::ItemSheetServerFields& base,
+                                                   const ro::ui::ItemSheetEditorState& typed);
 
 }  // namespace moonclient

@@ -771,6 +771,7 @@ target_include_directories(moonclient_cardalbum PUBLIC ${CMAKE_CURRENT_SOURCE_DI
 # LA FICHE D'UN OBJET ÉDITÉE PAR LE STAFF, en bibliothèque pour que son bon de
 # travail et la comparaison à la table se vérifient sans partie.
 add_library(moonclient_itemsheeteditor STATIC
+    items/item_db_delta.cpp
     items/item_info_delta.cpp
     items/item_sheet_editor_stage.cpp)
 
