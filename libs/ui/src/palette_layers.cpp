@@ -196,7 +196,8 @@ void DrawHairTools(const PaletteEditorView& view, const SkinArt& art, PaletteEdi
       std::clamp(std::lround(channel * kChannelMost), 0L, static_cast<long>(kChannelMost)));
 }
 
-// Les teints proposés, du plus clair au plus foncé.
+// Les teints proposés, du plus clair au plus foncé, en tête du nuancier de la
+// peau.
 void DrawSkinTones(const PaletteEditorView& view, PaletteEditorAction& action) {
   if (view.skin_tones.empty()) {
     return;
@@ -216,10 +217,12 @@ void DrawSkinTones(const PaletteEditorView& view, PaletteEditorAction& action) {
 }
 
 // Le nuancier de la peau, s'il est ouvert. Rend vrai quand il l'est.
-bool DrawSkinPopup(const PaletteSkinLine& line, const SkinArt& art, PaletteEditorAction& action) {
+bool DrawSkinPopup(const PaletteSkinLine& line, const PaletteEditorView& view, const SkinArt& art,
+                   PaletteEditorAction& action) {
   if (!BeginSkinPopup(kSkinPickerId)) {
     return false;
   }
+  DrawSkinTones(view, action);
   std::array<float, 3> rgb = Channels(line.color);
   if (DrawPaletteColorPicker(rgb, art)) {
     action.skin_picked = true;
@@ -336,8 +339,7 @@ bool DrawSkinLine(PaletteEditorState& state, const PaletteEditorView& view, cons
     ImGui::TextDisabled("%s", core::Tr("(celle du visage)"));
   }
   DrawSkinReset(line, art, action);
-  DrawSkinTones(view, action);
-  const bool open = !blocked && DrawSkinPopup(line, art, action);
+  const bool open = !blocked && DrawSkinPopup(line, view, art, action);
   ImGui::EndDisabled();
   if (blocked) {
     ImGui::TextDisabled("%s", TabBlockReason(line.blocked));

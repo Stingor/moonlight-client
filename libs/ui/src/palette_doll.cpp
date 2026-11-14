@@ -22,7 +22,9 @@ namespace {
 // sombre, assez terne pour ne pas éblouir à côté de l'habillage.
 constexpr ImU32 kLightBackground = IM_COL32(214, 210, 200, 255);
 // La largeur de la liste des poses, en largeurs de police.
-constexpr float kPoseFieldInFonts = 6.0F;
+constexpr float kPoseFieldInFonts = 9.0F;
+// Chaque pose figée, puis animée : deux entrées de la liste par pose.
+constexpr int kPoseVariants = 2;
 
 // Le pas d'un quart de tour, en directions du .ACT.
 [[nodiscard]] std::uint8_t Turned(std::uint8_t direction, bool forward) {
@@ -132,8 +134,8 @@ void DrawPaletteDoll(PaletteDollState& doll, float side, const SkinLook& look, b
     // c'est la carte qui l'agrandit.
     const ImVec2 image_at(at.x + (side - doll.image.width) * 0.5F,
                           at.y + (side - doll.image.height) * 0.5F);
-    // NET PAR DÉFAUT, comme le sprite qu'on règle ; lissé si le joueur le
-    // demande. ⚠ IMPOSÉ DANS LES DEUX CAS : voir `ui_sampler.h`.
+    // 🔴 NET, PIXEL POUR PIXEL : on règle des pixels, et le lissage les noie.
+    // ⚠ IMPOSÉ : voir `ui_sampler.h`.
     const ImVec2 image_end(image_at.x + doll.image.width, image_at.y + doll.image.height);
     DollOverlayCall call{.painter = doll.overlay.painter,
                          .min = image_at,
@@ -141,7 +143,7 @@ void DrawPaletteDoll(PaletteDollState& doll, float side, const SkinLook& look, b
                          .pass = DollOverlayPass::kBehind};
     PaintDollOverlay(doll.overlay, call);
     if (doll.overlay.paint == nullptr || !doll.body_overlaid) {
-      ImposeImageSampler(into, doll.smooth);
+      ImposeImageSampler(into, /*smooth=*/false);
       into->AddImage(doll.image.id, image_at, image_end);
       RestoreAmbientSampler(into);
     }
@@ -171,17 +173,25 @@ void DrawPaletteDoll(PaletteDollState& doll, float side, const SkinLook& look, b
   doll.direction = Turned(doll.direction, wheel > 0.0F);
 }
 
-void DrawPaletteDollControls(PaletteDollState& doll, const SkinArt& art) {
+void DrawPaletteDollControls(PaletteDollState& doll, const SkinArt& art, bool differs,
+                             const std::function<void()>& between) {
   // ── AVANT / APRÈS ─────────────────────────────────────────────────────────
   //
   // 🔴 TENU, PAS BASCULÉ : on compare en relâchant, et un bouton qu'on aurait
   // oublié enfoncé ferait croire que les réglages ne prennent plus.
+  ImGui::BeginDisabled(!differs);
   static_cast<void>(SkinSmallButton(core::Tr("Avant"), art));
-  doll.before = ImGui::IsItemActive();
-  if (ImGui::IsItemHovered()) {
-    SkinTooltip(core::Tr("Tiens le bouton : le pantin montre ce que tu portes."));
+  doll.before = differs && ImGui::IsItemActive();
+  ImGui::EndDisabled();
+  if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+    SkinTooltip(differs ? core::Tr("Tiens le bouton : le pantin montre ce que tu portes.")
+                        : core::Tr("Rien à comparer : le pantin montre déjà ce que tu portes."));
   }
   ImGui::SameLine();
+  if (between) {
+    between();
+    ImGui::SameLine();
+  }
   if (SkinSmallButton("<", art)) {
     doll.direction = Turned(doll.direction, false);
   }
@@ -191,22 +201,25 @@ void DrawPaletteDollControls(PaletteDollState& doll, const SkinArt& art) {
   }
 
   // ── LA POSE ───────────────────────────────────────────────────────────────
+  //
+  // 🔴 HUIT ENTRÉES POUR QUATRE POSES, chacune figée puis animée, comme sur la
+  // fiche du personnage : une pose tenue se regarde, une animation se joue, et
+  // une case à part les séparait de la liste qu'elle modifie.
+  //
   // Les libellés se passent en français : la liste les traduit à la lecture.
-  static constexpr std::array<const char*, kPaletteDollPoses.size()> kPoseNames = {
-      core::TrText("Repos"), core::TrText("Marche"), core::TrText("Assis"),
-      core::TrText("Attaque")};
+  static constexpr std::array<const char*, kPaletteDollPoses.size() * kPoseVariants> kPoseNames = {
+      core::TrText("Repos"),          core::TrText("Repos (animé)"),  core::TrText("Marche"),
+      core::TrText("Marche (animé)"), core::TrText("Assis"),          core::TrText("Assis (animé)"),
+      core::TrText("Attaque"),        core::TrText("Attaque (animé)")};
   doll.pose = std::clamp(doll.pose, 0, static_cast<int>(kPaletteDollPoses.size()) - 1);
+  int entry = doll.pose * kPoseVariants + (doll.animated ? 1 : 0);
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * kPoseFieldInFonts);
-  static_cast<void>(SkinCombo("##pose", &doll.pose, kPoseNames, art));
-  ImGui::SameLine();
-  static_cast<void>(SkinCheckBox(core::Tr("Animé"), &doll.animated, art));
+  if (SkinCombo("##pose", &entry, kPoseNames, art)) {
+    doll.pose = entry / kPoseVariants;
+    doll.animated = entry % kPoseVariants != 0;
+  }
   ImGui::SameLine();
   static_cast<void>(SkinCheckBox(core::Tr("Fond clair"), &doll.light_background, art));
-  ImGui::SameLine();
-  static_cast<void>(SkinCheckBox(core::Tr("Lisser"), &doll.smooth, art));
-  if (ImGui::IsItemHovered()) {
-    SkinTooltip(core::Tr("Adoucit le pantin agrandi. Décoché, chaque pixel du sprite reste net."));
-  }
   ImGui::SameLine();
   static_cast<void>(SkinCheckBox(core::Tr("Loupe"), &doll.magnifier, art));
   if (ImGui::IsItemHovered()) {

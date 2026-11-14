@@ -284,9 +284,6 @@ tr: Lightens or restores the effects.
 fr: Aléatoires
 tr: Random
 
-fr: Animé
-tr: Animated
-
 fr: Anneaux
 tr: Rings
 
@@ -631,9 +628,6 @@ tr: You must be in a town or indoors.
 
 fr: Il rejoint le carnet.
 tr: It joins the notebook.
-
-fr: Inspiration
-tr: Inspiration
 
 fr: Item dévoilé !
 tr: Item revealed!
@@ -11272,9 +11266,6 @@ tr: Forgetting the total
 fr: Oublier
 tr: Forget
 
-fr: Oublier le style de ce corps
-tr: Forget this body's style
-
 fr: Oublier le style de ce corps ? Il reprendra ton style principal, chez toi comme chez les autres. Tes autres corps ne changent pas.
 tr: Forget this body's style? It will fall back to your main style, for you and for everyone else. Your other bodies are unchanged.
 
@@ -12099,9 +12090,6 @@ tr: Track new quests
 
 fr: Supprimer
 tr: Delete
-
-fr: Supprimer mon style
-tr: Delete my style
 
 fr: Sur moi
 tr: On me
@@ -23638,12 +23626,6 @@ tr: The doll magnified around the cursor while you aim.
 fr: Clic : régler la pièce visée.
 tr: Click: adjust the aimed part.
 
-fr: Lisser
-tr: Smooth
-
-fr: Adoucit le pantin agrandi. Décoché, chaque pixel du sprite reste net.
-tr: Softens the enlarged doll. Unchecked, every sprite pixel stays sharp.
-
 fr: Un petit automate de métal, le premier venu des champs de Lighthalzen.
 tr: A small metal automaton, the first to come from the Lighthalzen fields.
 
@@ -23873,3 +23855,30 @@ tr: Measuring the effect's color…
 
 fr: Réglages avancés
 tr: Advanced settings
+
+fr: Repos (animé)
+tr: Idle (animated)
+
+fr: Assis (animé)
+tr: Sitting (animated)
+
+fr: Attaque (animé)
+tr: Attack (animated)
+
+fr: Rien à comparer : le pantin montre déjà ce que tu portes.
+tr: Nothing to compare: the doll already shows what you wear.
+
+fr: Inspiration :
+tr: Inspiration:
+
+fr: Des teintes proches les unes des autres, sur les pièces non gardées.
+tr: Hues close to one another, on the parts you didn't keep.
+
+fr: Des teintes opposées sur le cercle, sur les pièces non gardées.
+tr: Hues opposite on the wheel, on the parts you didn't keep.
+
+fr: Trois teintes à égale distance sur le cercle, sur les pièces non gardées.
+tr: Three hues evenly spaced on the wheel, on the parts you didn't keep.
+
+fr: Supprimer ce style
+tr: Delete this style

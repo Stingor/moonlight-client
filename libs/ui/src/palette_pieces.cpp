@@ -258,15 +258,22 @@ bool DrawSwatch(const PieceShown& piece, PaletteEditorState& state, const Palett
 
 // LE NOM : « Pièce 3 — rouge », et ce qui la distingue.
 //
-// 🔴 LA COULEUR NOMMÉE EST CELLE D'ORIGINE : un nom qui changerait à chaque
-// réglage ne désignerait plus rien, et c'est par la couleur du dessin que le
-// joueur reconnaît sa manche.
+// 🔴 LA COULEUR NOMMÉE EST CELLE D'ORIGINE, ET SEULEMENT TANT QU'ELLE SE
+// MONTRE : c'est par elle que le joueur reconnaît sa manche, mais une pièce
+// réglée ne la porte plus, et le nom mentirait sur ce que la pastille montre.
 bool DrawName(const PieceShown& piece) {
   char label[128] = {};
-  int written = piece.rest ? std::snprintf(label, sizeof(label), "%s — %s", core::Tr("Reste"),
-                                           PieceColorName(piece.base_color))
-                           : std::snprintf(label, sizeof(label), "%s %zu — %s", core::Tr("Pièce"),
-                                           piece.rank + 1, PieceColorName(piece.base_color));
+  const char* kind = piece.rest ? core::Tr("Reste") : core::Tr("Pièce");
+  int written = 0;
+  if (!piece.adjust.neutral()) {
+    written = piece.rest ? std::snprintf(label, sizeof(label), "%s", kind)
+                         : std::snprintf(label, sizeof(label), "%s %zu", kind, piece.rank + 1);
+  } else {
+    written = piece.rest ? std::snprintf(label, sizeof(label), "%s — %s", kind,
+                                         PieceColorName(piece.base_color))
+                         : std::snprintf(label, sizeof(label), "%s %zu — %s", kind, piece.rank + 1,
+                                         PieceColorName(piece.base_color));
+  }
   const auto append = [&label, &written](const char* tail) {
     if (written >= 0 && static_cast<std::size_t>(written) < sizeof(label)) {
       written += std::snprintf(label + written, sizeof(label) - static_cast<std::size_t>(written),

@@ -284,9 +284,6 @@ tr: Aligera o restablece los efectos.
 fr: Aléatoires
 tr: Aleatorias
 
-fr: Animé
-tr: Animado
-
 fr: Anneaux
 tr: Anillos
 
@@ -631,9 +628,6 @@ tr: Debes estar en una ciudad o en un interior.
 
 fr: Il rejoint le carnet.
 tr: Pasa al cuaderno.
-
-fr: Inspiration
-tr: Inspiración
 
 fr: Item dévoilé !
 tr: ¡Objeto revelado!
@@ -11272,9 +11266,6 @@ tr: Olvido del acumulado
 fr: Oublier
 tr: Olvidar
 
-fr: Oublier le style de ce corps
-tr: Olvidar el estilo de este cuerpo
-
 fr: Oublier le style de ce corps ? Il reprendra ton style principal, chez toi comme chez les autres. Tes autres corps ne changent pas.
 tr: ¿Olvidar el estilo de este cuerpo? Volverá a tu estilo principal, para ti y para los demás. Tus otros cuerpos no cambian.
 
@@ -12099,9 +12090,6 @@ tr: Seguir las misiones nuevas
 
 fr: Supprimer
 tr: Borrar
-
-fr: Supprimer mon style
-tr: Eliminar mi estilo
 
 fr: Sur moi
 tr: Sobre mí
@@ -23638,12 +23626,6 @@ tr: El maniquí ampliado alrededor del cursor mientras apuntas.
 fr: Clic : régler la pièce visée.
 tr: Clic: ajustar la pieza apuntada.
 
-fr: Lisser
-tr: Suavizar
-
-fr: Adoucit le pantin agrandi. Décoché, chaque pixel du sprite reste net.
-tr: Suaviza el maniquí ampliado. Desmarcado, cada píxel del sprite queda nítido.
-
 fr: Un petit automate de métal, le premier venu des champs de Lighthalzen.
 tr: Un pequeño autómata de metal, el primero en llegar de los campos de Lighthalzen.
 
@@ -23873,3 +23855,30 @@ tr: Midiendo el color del efecto…
 
 fr: Réglages avancés
 tr: Ajustes avanzados
+
+fr: Repos (animé)
+tr: Reposo (animado)
+
+fr: Assis (animé)
+tr: Sentado (animado)
+
+fr: Attaque (animé)
+tr: Ataque (animado)
+
+fr: Rien à comparer : le pantin montre déjà ce que tu portes.
+tr: Nada que comparar: el muñeco ya muestra lo que llevas.
+
+fr: Inspiration :
+tr: Inspiración:
+
+fr: Des teintes proches les unes des autres, sur les pièces non gardées.
+tr: Tonos cercanos entre sí, en las piezas no conservadas.
+
+fr: Des teintes opposées sur le cercle, sur les pièces non gardées.
+tr: Tonos opuestos en el círculo, en las piezas no conservadas.
+
+fr: Trois teintes à égale distance sur le cercle, sur les pièces non gardées.
+tr: Tres tonos a igual distancia en el círculo, en las piezas no conservadas.
+
+fr: Supprimer ce style
+tr: Eliminar este estilo

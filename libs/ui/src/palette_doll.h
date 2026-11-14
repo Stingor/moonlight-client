@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include "ro/ui/palette_editor.h"
 #include "ro/ui/skin_art.h"
 
@@ -20,8 +22,14 @@ namespace ro::ui {
 void DrawPaletteDoll(PaletteDollState& doll, float side, const SkinLook& look,
                      bool pipette = false);
 
-// SES COMMANDES, sous lui dans l'éditeur : avant/après, rotation, pose,
-// animation, fond.
-void DrawPaletteDollControls(PaletteDollState& doll, const SkinArt& art);
+// SES COMMANDES, sous lui dans l'éditeur : avant/après, rotation, pose et son
+// animation, fond, loupe.
+//
+// `differs` : ce qu'on compose diffère de ce que le personnage porte ; sans
+// quoi « Avant » n'aurait rien à montrer, et se grise. `between` se dessine
+// sur la même ligne, entre « Avant » et la rotation : l'historique de
+// l'éditeur.
+void DrawPaletteDollControls(PaletteDollState& doll, const SkinArt& art, bool differs,
+                             const std::function<void()>& between = {});
 
 }  // namespace ro::ui

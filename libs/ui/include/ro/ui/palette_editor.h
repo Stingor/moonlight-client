@@ -99,9 +99,6 @@ struct PaletteDollState {
   // LA LOUPE : sous la pipette, le pantin grossi autour du curseur, pour viser
   // un pixel qu'on distingue mal à la taille normale.
   bool magnifier = false;
-  // LE PANTIN LISSÉ en s'agrandissant ; décoché, chaque pixel du sprite reste
-  // net, et c'est le défaut : on règle des pixels.
-  bool smooth = false;
 };
 
 // LES POSES QUE LE PANTIN PREND : repos, marche, assis, attaque — rangs du

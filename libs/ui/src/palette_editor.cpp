@@ -128,27 +128,31 @@ void ReadHistoryKeys(PaletteEditorAction& action) {
   }
 }
 
-// L'INSPIRATION : des couleurs en harmonie sur les pièces non gardées.
+// L'INSPIRATION : des couleurs en harmonie sur les pièces non gardées, un
+// bouton par harmonie.
 void DrawInspiration(const SkinArt& art, PaletteEditorAction& action) {
-  if (SkinSmallButton(core::Tr("Inspiration"), art)) {
-    ImGui::OpenPopup("inspiration");
-  }
+  ImGui::AlignTextToFramePadding();
+  ImGui::TextUnformatted(core::Tr("Inspiration :"));
   Explain(
       core::Tr("Tire des couleurs qui vont ensemble. Clic droit sur une pièce pour la garder "
                "telle quelle."));
-  if (!BeginSkinPopup("inspiration")) {
-    return;
-  }
-  const auto offer = [&action](const char* label, PaletteHarmony harmony) {
-    if (ImGui::MenuItem(label)) {
+  const auto offer = [&art, &action](const char* label, const char* tip, PaletteHarmony harmony) {
+    ImGui::SameLine();
+    if (SkinSmallButton(label, art)) {
       action.verb = PaletteEditorVerb::kInspire;
       action.harmony = harmony;
     }
+    Explain(tip);
   };
-  offer(core::Tr("Teintes voisines"), PaletteHarmony::kAnalogous);
-  offer(core::Tr("Complémentaires"), PaletteHarmony::kComplementary);
-  offer(core::Tr("Triade"), PaletteHarmony::kTriadic);
-  EndSkinPopup();
+  offer(core::Tr("Teintes voisines"),
+        core::Tr("Des teintes proches les unes des autres, sur les pièces non gardées."),
+        PaletteHarmony::kAnalogous);
+  offer(core::Tr("Complémentaires"),
+        core::Tr("Des teintes opposées sur le cercle, sur les pièces non gardées."),
+        PaletteHarmony::kComplementary);
+  offer(core::Tr("Triade"),
+        core::Tr("Trois teintes à égale distance sur le cercle, sur les pièces non gardées."),
+        PaletteHarmony::kTriadic);
 }
 
 // LES BOUTONS QUI DÉFONT : revenir, repartir de zéro, oublier, supprimer.
@@ -165,9 +169,9 @@ void DrawUndoButtons(const PaletteEditorView& view, const SkinArt& art,
                          : core::Tr("Rien à annuler : l'aperçu montre déjà ce que ton personnage "
                                     "porte."));
 
-  // 🔴 EMPILÉS, ET NON SUR UNE RANGÉE : quatre libellés côte à côte imposent à
-  // la fenêtre une largeur que rien d'autre ne demande, et qui ENFLE À LA
-  // TRADUCTION.
+  // 🔴 SUR UNE RANGÉE : revenir, repartir de zéro, supprimer — trois gestes qui
+  // défont, côte à côte.
+  ImGui::SameLine();
   if (SkinButton(core::Tr("Repartir de zéro"), art)) {
     ImGui::OpenPopup("zero");
   }
@@ -181,34 +185,35 @@ void DrawUndoButtons(const PaletteEditorView& view, const SkinArt& art,
     action.verb = PaletteEditorVerb::kBlankSlate;
   }
 
-  // 🔴 SANS LIAISON, NI L'UN NI L'AUTRE NE PEUT RIEN : le serveur seul efface.
+  // 🔴 « SUPPRIMER CE STYLE », SUR LE CORPS SEUL : c'est là qu'un style se
+  // range. Un chapeau, une cape ont leur propre teinture, qui appartient à
+  // l'item.
+  if (!on_body) {
+    return;
+  }
+  // 🔴 SANS LIAISON, IL NE PEUT RIEN : le serveur seul efface.
+  ImGui::SameLine();
   ImGui::BeginDisabled(!view.connected);
-  // ⚠ LE GESTE FIN N'APPARAÎT QUE QUAND IL DIT AUTRE CHOSE QUE LE SUIVANT :
-  // il faut que CE corps ait son propre style, et qu'il en reste un autre
-  // derrière.
-  const bool forgettable = on_body && view.body_has_own_style && view.body_style_count > 1;
-  if (forgettable) {
-    if (SkinButton(core::Tr("Oublier le style de ce corps"), art)) {
-      ImGui::OpenPopup("oublier");
-    }
-    Explain(
-        core::Tr("Efface le style de CE corps seulement. Tes autres corps gardent le "
-                 "leur, et celui-ci reprend ton style principal."));
-    if (Confirm("oublier",
-                core::Tr("Oublier le style de ce corps ? Il reprendra ton style principal, "
-                         "chez toi comme chez les autres. Tes autres corps ne changent pas."),
-                core::Tr("Oublier"), art)) {
-      action.verb = PaletteEditorVerb::kForgetBody;
-    }
+  // ⚠ IL OUBLIE CE CORPS SEUL QUAND CELA DIT AUTRE CHOSE QUE TOUT EFFACER : il
+  // faut que CE corps ait son propre style, et qu'il en reste un autre
+  // derrière. Sinon, son style est LE style, et le supprimer efface tout.
+  const bool forgettable = view.body_has_own_style && view.body_style_count > 1;
+  if (SkinButton(core::Tr("Supprimer ce style"), art)) {
+    ImGui::OpenPopup(forgettable ? "oublier" : "supprimer");
   }
-
-  if (SkinButton(core::Tr("Supprimer mon style"), art)) {
-    ImGui::OpenPopup("supprimer");
+  Explain(forgettable
+              ? core::Tr("Efface le style de CE corps seulement. Tes autres corps gardent le "
+                         "leur, et celui-ci reprend ton style principal.")
+              : core::Tr("Efface les couleurs de tous tes corps, de tes cheveux et de ta peau, "
+                         "chez toi ET sur le serveur. Ta coupe et ta couleur de cheveux restent "
+                         "celles que tu portes ; les teintures de tes items leur appartiennent "
+                         "et restent."));
+  if (Confirm("oublier",
+              core::Tr("Oublier le style de ce corps ? Il reprendra ton style principal, "
+                       "chez toi comme chez les autres. Tes autres corps ne changent pas."),
+              core::Tr("Oublier"), art)) {
+    action.verb = PaletteEditorVerb::kForgetBody;
   }
-  Explain(
-      core::Tr("Efface les couleurs de tous tes corps, de tes cheveux et de ta peau, chez toi "
-               "ET sur le serveur. Ta coupe et ta couleur de cheveux restent celles que tu "
-               "portes ; les teintures de tes items leur appartiennent et restent."));
   if (Confirm("supprimer",
               core::Tr("Supprimer ton style, chez toi ET sur le serveur ? Tes corps, tes "
                        "cheveux et ta peau retrouvent leurs couleurs d'origine, pour toi comme "
@@ -334,6 +339,13 @@ void DrawBodyLines(const PaletteEditorView& view, const SkinArt& art, PaletteEdi
   }
 }
 
+// Un réglage d'effet en cours diffère de ce que l'effet porte.
+[[nodiscard]] bool EffectsDiffer(const PaletteEffectsState& state, const PaletteEffectsView& view) {
+  return std::ranges::any_of(view.rows, [&state](const PaletteEffectRow& row) {
+    return EffectDraftOf(state, row) != row.worn;
+  });
+}
+
 // CE QUE DIT UN ONGLET SANS PIÈCE : la raison du calque, s'il en a une.
 [[nodiscard]] const char* EmptyTabText(const PaletteEditorView& view) {
   if (view.tab == PaletteTabKind::kBody) {
@@ -395,7 +407,8 @@ void DrawBodyLines(const PaletteEditorView& view, const SkinArt& art, PaletteEdi
   // CE QUI PULSE SUR LE PANTIN : la ligne survolée si le curseur est dans la
   // liste, sinon la pièce que la pipette désigne sur le pantin.
   state.hovered_ramp = pieces.hovered >= 0 ? pieces.hovered : view.pipette_ramp;
-  DrawPaletteDollControls(state.doll, art);
+  DrawPaletteDollControls(state.doll, art, view.has_edits,
+                          [&view, &art, &action] { DrawHistory(view, art, action); });
   return pieces.picker_open;
 }
 
@@ -463,7 +476,7 @@ PaletteEditorAction DrawPaletteEditor(PaletteEditorState& state, const PaletteEd
     action.effects = DrawPaletteEffects(state.effects, *view.effects, art);
     ImGui::EndGroup();
     state.effects.panel_height = ImGui::GetItemRectSize().y;
-    DrawPaletteDollControls(state.doll, art);
+    DrawPaletteDollControls(state.doll, art, EffectsDiffer(state.effects, *view.effects));
     EndSkinnedWindow();
     return action;
   }
@@ -505,9 +518,11 @@ PaletteEditorAction DrawPaletteEditor(PaletteEditorState& state, const PaletteEd
   }
   picker_open = DrawSkinLine(state, view, art, action) || picker_open;
 
-  DrawHistory(view, art, action);
-  if (!view.ramps.empty()) {
-    ImGui::SameLine();
+  // ⚠ SANS PIÈCE, PAS DE PANTIN NI DE SES COMMANDES : l'historique se tient
+  // alors seul.
+  if (view.ramps.empty()) {
+    DrawHistory(view, art, action);
+  } else {
     DrawInspiration(art, action);
   }
   ImGui::Separator();
