@@ -9,8 +9,8 @@ comment y écrire du code.
 Le développement a lieu ailleurs : chaque commit de ce dépôt rejoue un commit du
 dépôt de travail, et son message porte la ligne `moonclient: <révision>` qui le
 désigne. Une modification faite ici ne sera donc pas fusionnée telle quelle ;
-elle sera lue, et reprise là-bas si elle est bonne. Les scripts, les tests et la
-documentation du dépôt de travail n'y figurent pas.
+elle sera lue, et reprise là-bas si elle est bonne. Les scripts et la
+documentation du dépôt de travail n'y figurent pas ; les tests, si.
 
 ## Langue
 
@@ -72,6 +72,28 @@ un fichier ajouté sans être déclaré doit provoquer une erreur, pas disparaî
 
 Le format suit le `.clang-format` du dépôt. Le code est compilé avec les
 avertissements en erreur.
+
+## Tester
+
+```bash
+cmake --build --preset windows-debug
+ctest --preset windows-debug
+```
+
+Les essais sont sous `tests/`, un dossier par couche, avec Catch2. Quatre
+étages :
+
+1. **Unitaire** : parsers, math, paquets. Aucune I/O.
+2. **Golden files** : le résultat d'un parseur est comparé à un export d'une
+   implémentation de référence indépendante.
+3. **Rejeu headless** : une capture réseau est rejouée dans `sim`, sans fenêtre
+   ni GPU, et l'état final est vérifié.
+4. **Snapshot visuel** : une scène fixe est rendue hors écran et comparée à
+   l'image de `tests/app/snapshots/`. Sans contexte OpenGL, l'essai se saute.
+
+Aucune donnée du jeu n'y entre : les essais de format construisent des archives
+**synthétiques en mémoire** (`tests/support/grf_builder.h`), et les images de
+référence sont peintes sur une installation synthétique.
 
 ## Règles d'écriture
 

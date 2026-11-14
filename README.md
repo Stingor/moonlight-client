@@ -69,6 +69,17 @@ vite que le triplet par défaut.
 sans lui, le client ne retient rien plutôt que d'écrire le mot de passe en
 clair.
 
+## Tester
+
+```bash
+cmake --build --preset windows-debug
+ctest --preset windows-debug
+```
+
+Sous Linux, le préréglage `linux-gcc` a le sien. Les essais n'ont besoin
+d'aucune donnée du jeu : ils construisent leurs archives en mémoire. Ceux qui
+peignent hors écran se sautent sur une machine sans contexte OpenGL.
+
 ## Installer
 
 Dans le dossier d'une installation du jeu, à côté des archives :
