@@ -557,7 +557,7 @@ TEST_CASE("Éditeur : le nuancier d'une pièce lit un code couleur tapé, et une
     ImGuiWindow* const popup = context.OpenPopupStack.back().Window;
     REQUIRE(popup != nullptr);
     // Le clavier va au champ du code, comme après un clic dessus.
-    const ImGuiID field = popup->GetID("Code couleur");
+    const ImGuiID field = popup->GetID("##code");
     context.NavNextActivateId = field;
     context.NavNextActivateFlags = ImGuiActivateFlags_PreferInput;
     static_cast<void>(DrawOne(ui, state, view, art));

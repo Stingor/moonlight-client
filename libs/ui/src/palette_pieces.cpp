@@ -35,10 +35,11 @@ constexpr int kHalfTurn = 180;
 // Sous cette saturation, une couleur d'origine n'a aucune teinte : rien à
 // tourner, et aucun rapport de saturation à tirer d'elle.
 constexpr float kHuelessBelow = 0.01F;
-// Le champ du code couleur : la place d'une saisie, préfixe compris et un peu
-// plus qu'un code pour qu'un collage mal rogné s'y lise, et le texte dont il
-// prend la largeur — le code le plus large, un chiffre de marge pour le
-// curseur.
+// Le champ du code couleur : son identifiant, qui ne suit pas la langue de son
+// libellé ; la place d'une saisie, préfixe compris et un peu plus qu'un code
+// pour qu'un collage mal rogné s'y lise ; et le texte dont il prend la largeur
+// — le code le plus large, un chiffre de marge pour le curseur.
+constexpr const char* kCodeFieldId = "##code";
 constexpr std::size_t kCodeFieldSize = 16;
 constexpr const char* kWidestCode = "0xDDDDDDD";
 
@@ -124,21 +125,24 @@ struct HsvColor {
 // couleur, `InputText` rend vrai à CHAQUE image : s'y fier rejouerait le même
 // code sans fin — et choisir une couleur, c'est l'imposer en couleur unique.
 [[nodiscard]] bool DrawCode(std::array<float, 3>& rgb) {
-  const char* const label = core::Tr("Code couleur");
-  const ImGuiID field = ImGui::GetID(label);
+  const ImGuiID field = ImGui::GetID(kCodeFieldId);
   std::array<char, kCodeFieldSize> typed{};
   const std::array<char, kColorCodeSize> code =
       FormatColorCode({ToByte(rgb[0]), ToByte(rgb[1]), ToByte(rgb[2])});
   std::copy(code.begin(), code.end(), typed.begin());
-  ImGui::SetNextItemWidth(ImGui::CalcTextSize(kWidestCode).x +
-                          ImGui::GetStyle().FramePadding.x * 2.0F);
+  const ImGuiStyle& style = ImGui::GetStyle();
+  ImGui::SetNextItemWidth(ImGui::CalcTextSize(kWidestCode).x + style.FramePadding.x * 2.0F);
   static_cast<void>(
-      ImGui::InputText(label, typed.data(), typed.size(),
+      ImGui::InputText(kCodeFieldId, typed.data(), typed.size(),
                        ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_CharsNoBlank));
   const bool active = ImGui::IsItemActive();
   SkinTooltip(
       core::Tr("Le code de cette couleur. Copie-le, ou colle un autre code à sa place : "
                "0xRRGGBB, #RRGGBB ou RRGGBB."));
+  // Le libellé à droite du champ, comme le pose ImGui, sans entrer dans son
+  // identifiant.
+  ImGui::SameLine(0.0F, style.ItemInnerSpacing.x);
+  ImGui::TextUnformatted(core::Tr("Code couleur"));
   const ImGuiInputTextState* const typing = active ? ImGui::GetInputTextState(field) : nullptr;
   if (typing == nullptr || !typing->EditedThisFrame) {
     return false;
