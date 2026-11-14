@@ -55,6 +55,7 @@ add_library(ro_net STATIC
     src/link_watch.cpp
     src/discord_relay.cpp
     src/chat_blocks.cpp
+    src/staff_roster.cpp
     src/entity_props.cpp
     src/equip_attributes.cpp
     src/frame_tally.cpp

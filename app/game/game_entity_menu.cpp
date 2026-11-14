@@ -31,6 +31,7 @@
 
 #include "chat/player_link_judge.h"
 #include "game/game.h"
+#include "game/staff_roster_round.h"
 #include "game/whisper_stage.h"
 #include "world/blocked_npcs.h"
 #include "world/click_action.h"
@@ -134,6 +135,10 @@ void Game::AdvanceEntityMenu(std::uint32_t now_ms) {
   menu_gestures_.staff_models = Rights().staff_tools && stage_.has_value();
 
   ro::ui::EntityMenuAnswer answer = std::exchange(windows_.entity_menu.answer, {});
+  // LES JOUEURS EN LIGNE DU STAFF, liaison tenue ou non : sans elle, la pièce
+  // oublie tout.
+  std::optional<StaffRosterMenu> roster_menu = AdvanceStaffRoster(
+      pieces_, windows_.staff_tools, link_, world_, handshake_.identity(), now_ms);
   if (!link_.is_open()) {
     menu_gestures_.ask.reset();
     menu_gestures_.model_ask.reset();
@@ -272,6 +277,16 @@ void Game::AdvanceEntityMenu(std::uint32_t now_ms) {
         OpenEntityMenu(*actor, family, now_ms);
       }
     }
+  }
+
+  // ── LE CLIC DROIT SUR UNE LIGNE DES JOUEURS EN LIGNE ──────────────────────
+  if (roster_menu.has_value()) {
+    menu_target_ = std::move(roster_menu->target);
+    menu_view_ = std::move(roster_menu->view);
+    menu_model_.reset();
+    menu_ground_.reset();
+    windows_.entity_menu.state.open_requested = true;
+    menu_asked_ms_ = now_ms;
   }
 
   // ── CTRL+ALT+CLIC DROIT SUR UN MODÈLE, pour le staff ─────────────────────
@@ -665,6 +680,12 @@ void Game::PlayEntityVerb(EntityVerb verb, std::uint32_t id, int points, std::ui
       return;
     case EntityVerb::kFullStrip:
       ReportRefusal(ro::net::RequestFullStrip(link_, id));
+      return;
+    case EntityVerb::kStaffGoTo:
+    case EntityVerb::kStaffRecall:
+      // Le serveur rejoue la commande @ sous les droits du groupe.
+      ReportRefusal(
+          ro::net::SendServerCommand(link_, world_.player_name(), StaffTravelCommand(verb, name)));
       return;
     case EntityVerb::kNpcReloadFile:
     case EntityVerb::kNpcMoveHere:

@@ -186,6 +186,10 @@ constexpr std::size_t kMaxFrameSize = 0xFFFF;
                                                const MoonlightEquipBonus& value);
 [[maybe_unused]] void ReadMoonlightChatBlock(ByteReader& reader, MoonlightChatBlock& value);
 [[maybe_unused]] void WriteMoonlightChatBlock(ByteWriter& writer, const MoonlightChatBlock& value);
+[[maybe_unused]] void ReadMoonlightStaffRosterEntry(ByteReader& reader,
+                                                    MoonlightStaffRosterEntry& value);
+[[maybe_unused]] void WriteMoonlightStaffRosterEntry(ByteWriter& writer,
+                                                     const MoonlightStaffRosterEntry& value);
 [[maybe_unused]] void ReadMoonlightMarketItemId(ByteReader& reader, MoonlightMarketItemId& value);
 [[maybe_unused]] void WriteMoonlightMarketItemId(ByteWriter& writer,
                                                  const MoonlightMarketItemId& value);
@@ -1100,6 +1104,80 @@ void WriteMoonlightChatBlock(ByteWriter& writer, const MoonlightChatBlock& value
   writer.I32(static_cast<std::int32_t>(value.minutes));
   writer.U8(static_cast<std::uint8_t>(value.kind));
   writer.FixedString(value.author, 24);
+}
+
+void ReadMoonlightStaffRosterEntry(ByteReader& reader, MoonlightStaffRosterEntry& value) {
+  value.account_id = static_cast<std::uint32_t>(reader.U32());
+  value.char_id = static_cast<std::uint32_t>(reader.U32());
+  value.name = reader.FixedString(24);
+  value.guild = reader.FixedString(24);
+  value.party = reader.FixedString(24);
+  value.map = reader.FixedString(12);
+  value.instance_id = static_cast<std::uint16_t>(reader.U16());
+  value.x = static_cast<std::int16_t>(reader.I16());
+  value.y = static_cast<std::int16_t>(reader.I16());
+  value.job = static_cast<std::uint16_t>(reader.U16());
+  value.base_level = static_cast<std::uint16_t>(reader.U16());
+  value.job_level = static_cast<std::uint16_t>(reader.U16());
+  value.group_level = static_cast<std::uint8_t>(reader.U8());
+  value.state = static_cast<std::uint32_t>(reader.U32());
+  value.online_s = static_cast<std::uint32_t>(reader.U32());
+  value.character_s = static_cast<std::uint32_t>(reader.U32());
+  value.idle_s = static_cast<std::uint32_t>(reader.U32());
+  value.walk_age_s = static_cast<std::uint32_t>(reader.U32());
+  value.fight_age_s = static_cast<std::uint32_t>(reader.U32());
+  value.item_age_s = static_cast<std::uint32_t>(reader.U32());
+  value.talk_age_s = static_cast<std::uint32_t>(reader.U32());
+  value.gesture_age_s = static_cast<std::uint32_t>(reader.U32());
+  value.npc_age_s = static_cast<std::uint32_t>(reader.U32());
+  value.command_age_s = static_cast<std::uint32_t>(reader.U32());
+  value.client = static_cast<std::uint8_t>(reader.U8());
+  value.client_flags = static_cast<std::uint8_t>(reader.U8());
+  value.patch_index = static_cast<std::int32_t>(reader.I32());
+  value.commit = reader.FixedString(16);
+  value.machine_group = static_cast<std::uint16_t>(reader.U16());
+  value.account_group = static_cast<std::uint16_t>(reader.U16());
+  value.cheat_clock = static_cast<std::uint16_t>(reader.U16());
+  value.cheat_cadence = static_cast<std::uint16_t>(reader.U16());
+  value.cheat_client = static_cast<std::uint16_t>(reader.U16());
+  value.mute_minutes = static_cast<std::int32_t>(reader.I32());
+}
+
+void WriteMoonlightStaffRosterEntry(ByteWriter& writer, const MoonlightStaffRosterEntry& value) {
+  writer.U32(static_cast<std::uint32_t>(value.account_id));
+  writer.U32(static_cast<std::uint32_t>(value.char_id));
+  writer.FixedString(value.name, 24);
+  writer.FixedString(value.guild, 24);
+  writer.FixedString(value.party, 24);
+  writer.FixedString(value.map, 12);
+  writer.U16(static_cast<std::uint16_t>(value.instance_id));
+  writer.I16(static_cast<std::int16_t>(value.x));
+  writer.I16(static_cast<std::int16_t>(value.y));
+  writer.U16(static_cast<std::uint16_t>(value.job));
+  writer.U16(static_cast<std::uint16_t>(value.base_level));
+  writer.U16(static_cast<std::uint16_t>(value.job_level));
+  writer.U8(static_cast<std::uint8_t>(value.group_level));
+  writer.U32(static_cast<std::uint32_t>(value.state));
+  writer.U32(static_cast<std::uint32_t>(value.online_s));
+  writer.U32(static_cast<std::uint32_t>(value.character_s));
+  writer.U32(static_cast<std::uint32_t>(value.idle_s));
+  writer.U32(static_cast<std::uint32_t>(value.walk_age_s));
+  writer.U32(static_cast<std::uint32_t>(value.fight_age_s));
+  writer.U32(static_cast<std::uint32_t>(value.item_age_s));
+  writer.U32(static_cast<std::uint32_t>(value.talk_age_s));
+  writer.U32(static_cast<std::uint32_t>(value.gesture_age_s));
+  writer.U32(static_cast<std::uint32_t>(value.npc_age_s));
+  writer.U32(static_cast<std::uint32_t>(value.command_age_s));
+  writer.U8(static_cast<std::uint8_t>(value.client));
+  writer.U8(static_cast<std::uint8_t>(value.client_flags));
+  writer.I32(static_cast<std::int32_t>(value.patch_index));
+  writer.FixedString(value.commit, 16);
+  writer.U16(static_cast<std::uint16_t>(value.machine_group));
+  writer.U16(static_cast<std::uint16_t>(value.account_group));
+  writer.U16(static_cast<std::uint16_t>(value.cheat_clock));
+  writer.U16(static_cast<std::uint16_t>(value.cheat_cadence));
+  writer.U16(static_cast<std::uint16_t>(value.cheat_client));
+  writer.I32(static_cast<std::int32_t>(value.mute_minutes));
 }
 
 void ReadMoonlightMarketItemId(ByteReader& reader, MoonlightMarketItemId& value) {
@@ -11984,6 +12062,75 @@ std::vector<std::uint8_t> Encode(const ZcMoonlightChatBlocks& packet) {
   writer.U8(static_cast<std::uint8_t>(packet.status));
   for (const MoonlightChatBlock& element : packet.entries) {
     WriteMoonlightChatBlock(writer, element);
+  }
+  if (writer.size() > kMaxFrameSize ||
+      !writer.PatchU16(kLengthOffset, static_cast<std::uint16_t>(writer.size()))) {
+    return {};
+  }
+  return out;
+}
+
+bool Decode(std::span<const std::uint8_t> frame, CzMoonlightReqStaffRoster& packet) {
+  if (frame.size() != CzMoonlightReqStaffRoster::kWireSize) {
+    return false;
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != CzMoonlightReqStaffRoster::kOpcode) {
+    return false;
+  }
+  packet.packetLength = static_cast<std::int16_t>(reader.I16());
+  packet.request_id = static_cast<std::uint16_t>(reader.U16());
+  return reader.ok();
+}
+
+std::vector<std::uint8_t> Encode(const CzMoonlightReqStaffRoster& packet) {
+  std::vector<std::uint8_t> out;
+  out.reserve(CzMoonlightReqStaffRoster::kWireSize);
+  ByteWriter writer(out);
+  writer.U16(CzMoonlightReqStaffRoster::kOpcode);
+  writer.I16(static_cast<std::int16_t>(packet.packetLength));
+  writer.U16(static_cast<std::uint16_t>(packet.request_id));
+  return out;
+}
+
+bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightStaffRoster& packet) {
+  if (frame.size() < ZcMoonlightStaffRoster::kWireSize) {
+    return false;
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != ZcMoonlightStaffRoster::kOpcode) {
+    return false;
+  }
+  // La longueur est déjà connue : c'est celle de la trame.
+  reader.Skip(2);
+  packet.request_id = static_cast<std::uint16_t>(reader.U16());
+  packet.status = static_cast<std::uint8_t>(reader.U8());
+  packet.page = static_cast<std::uint8_t>(reader.U8());
+  packet.pages = static_cast<std::uint8_t>(reader.U8());
+  if (reader.remaining() % MoonlightStaffRosterEntry::kWireSize != 0) {
+    reader.Invalidate();
+  } else {
+    packet.entries.resize(reader.remaining() / MoonlightStaffRosterEntry::kWireSize);
+    for (MoonlightStaffRosterEntry& element : packet.entries) {
+      ReadMoonlightStaffRosterEntry(reader, element);
+    }
+  }
+  return reader.ok();
+}
+
+std::vector<std::uint8_t> Encode(const ZcMoonlightStaffRoster& packet) {
+  std::vector<std::uint8_t> out;
+  out.reserve(ZcMoonlightStaffRoster::kWireSize);
+  ByteWriter writer(out);
+  writer.U16(ZcMoonlightStaffRoster::kOpcode);
+  // Réservée : la longueur ne sera connue qu'une fois la queue écrite.
+  writer.U16(0);
+  writer.U16(static_cast<std::uint16_t>(packet.request_id));
+  writer.U8(static_cast<std::uint8_t>(packet.status));
+  writer.U8(static_cast<std::uint8_t>(packet.page));
+  writer.U8(static_cast<std::uint8_t>(packet.pages));
+  for (const MoonlightStaffRosterEntry& element : packet.entries) {
+    WriteMoonlightStaffRosterEntry(writer, element);
   }
   if (writer.size() > kMaxFrameSize ||
       !writer.PatchU16(kLengthOffset, static_cast<std::uint16_t>(writer.size()))) {

@@ -5087,6 +5087,70 @@ struct ZcMoonlightChatBlocks {
   std::vector<MoonlightChatBlock> entries;
 };
 
+// PACKET_MOONLIGHT_STAFF_ROSTER_ENTRY
+struct MoonlightStaffRosterEntry {
+  // Taille sur le fil, en octets.
+  static constexpr std::size_t kWireSize = 185;
+
+  std::uint32_t account_id = 0;
+  std::uint32_t char_id = 0;
+  std::string name;
+  std::string guild;
+  std::string party;
+  std::string map;
+  std::uint16_t instance_id = 0;
+  std::int16_t x = 0;
+  std::int16_t y = 0;
+  std::uint16_t job = 0;
+  std::uint16_t base_level = 0;
+  std::uint16_t job_level = 0;
+  std::uint8_t group_level = 0;
+  std::uint32_t state = 0;
+  std::uint32_t online_s = 0;
+  std::uint32_t character_s = 0;
+  std::uint32_t idle_s = 0;
+  std::uint32_t walk_age_s = 0;
+  std::uint32_t fight_age_s = 0;
+  std::uint32_t item_age_s = 0;
+  std::uint32_t talk_age_s = 0;
+  std::uint32_t gesture_age_s = 0;
+  std::uint32_t npc_age_s = 0;
+  std::uint32_t command_age_s = 0;
+  std::uint8_t client = 0;
+  std::uint8_t client_flags = 0;
+  std::int32_t patch_index = 0;
+  std::string commit;
+  std::uint16_t machine_group = 0;
+  std::uint16_t account_group = 0;
+  std::uint16_t cheat_clock = 0;
+  std::uint16_t cheat_cadence = 0;
+  std::uint16_t cheat_client = 0;
+  std::int32_t mute_minutes = 0;
+};
+
+// PACKET_CZ_MOONLIGHT_REQ_STAFF_ROSTER
+struct CzMoonlightReqStaffRoster {
+  static constexpr std::uint16_t kOpcode = 0x0f67;
+  // Taille sur le fil, en octets.
+  static constexpr std::size_t kWireSize = 6;
+
+  std::int16_t packetLength = 0;
+  std::uint16_t request_id = 0;
+};
+
+// PACKET_ZC_MOONLIGHT_STAFF_ROSTER
+struct ZcMoonlightStaffRoster {
+  static constexpr std::uint16_t kOpcode = 0x0f68;
+  // Taille sur le fil SANS la queue variable, qui la porte elle-même.
+  static constexpr std::size_t kWireSize = 9;
+
+  std::uint16_t request_id = 0;
+  std::uint8_t status = 0;
+  std::uint8_t page = 0;
+  std::uint8_t pages = 0;
+  std::vector<MoonlightStaffRosterEntry> entries;
+};
+
 // PACKET_ZC_MOONLIGHT_INSTANCE_INFO
 struct ZcMoonlightInstanceInfo {
   static constexpr std::uint16_t kOpcode = 0x0f40;
@@ -8736,6 +8800,8 @@ struct CzMoveItemToPersonal {
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightEquipAttributes& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzMoonlightReqChatBlocks& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightChatBlocks& packet);
+[[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzMoonlightReqStaffRoster& packet);
+[[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightStaffRoster& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightInstanceInfo& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzMoonlightMarketReq& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightMarket& packet);
@@ -9379,6 +9445,8 @@ struct CzMoveItemToPersonal {
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightEquipAttributes& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonlightReqChatBlocks& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightChatBlocks& packet);
+[[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonlightReqStaffRoster& packet);
+[[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightStaffRoster& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightInstanceInfo& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonlightMarketReq& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightMarket& packet);

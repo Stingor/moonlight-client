@@ -23930,3 +23930,207 @@ tr: Tu estilo no está aplicado: cerrar el editor lo descarta. Nadie lo ha visto
 
 fr: Fermer sans valider
 tr: Cerrar sin aplicar
+
+fr: %d en ligne
+tr: %d en línea
+
+fr: %d en ligne, %d hors ligne
+tr: %d en línea, %d desconectados
+
+fr: %u h %02u
+tr: %u h %02u
+
+fr: %u j %02u h
+tr: %u d %02u h
+
+fr: @jumpto : vous êtes téléporté sur sa case, où qu'il soit.
+tr: @jumpto: te teletransportas a su celda, esté donde esté.
+
+fr: @recall : il est téléporté sur votre case, d'où qu'il vienne.
+tr: @recall: es teletransportado a tu celda, venga de donde venga.
+
+fr: AID / CID
+tr: AID / CID
+
+fr: Aller à lui
+tr: Ir hasta él
+
+fr: Cartes occupées
+tr: Mapas ocupados
+
+fr: Client
+tr: Cliente
+
+fr: Clients en retard
+tr: Clientes atrasados
+
+fr: Connecté
+tr: Conectado
+
+fr: En prison
+tr: En la cárcel
+
+fr: Geste
+tr: Gesto
+
+fr: Inactif
+tr: Inactivo
+
+fr: Inactif depuis
+tr: Inactivo desde hace
+
+fr: Inactifs
+tr: Inactivos
+
+fr: Indices de triche
+tr: Indicios de trampa
+
+fr: Joueurs en ligne
+tr: Jugadores en línea
+
+fr: Joueurs en ligne…
+tr: Jugadores en línea…
+
+fr: Le rappeler ici
+tr: Llamarlo aquí
+
+fr: Le serveur a répondu par un statut que ce client ne connaît pas : il est sans doute plus récent que lui.
+tr: El servidor respondió con un estado que este cliente no conoce: probablemente es más reciente que él.
+
+fr: Liste reçue il y a %s
+tr: Lista recibida hace %s
+
+fr: Muet
+tr: Silenciado
+
+fr: Multi-comptes
+tr: Multicuentas
+
+fr: Même compte Moonlight
+tr: Misma cuenta Moonlight
+
+fr: Même machine
+tr: Misma máquina
+
+fr: NPC
+tr: NPC
+
+fr: Nom, guilde ou carte
+tr: Nombre, guild o mapa
+
+fr: Par carte
+tr: Por mapa
+
+fr: Par joueur
+tr: Por jugador
+
+fr: Parole
+tr: Habla
+
+fr: Sans les échoppes hors ligne
+tr: Sin las tiendas desconectadas
+
+fr: Session du compte
+tr: Sesión de la cuenta
+
+fr: Staff seulement
+tr: Solo staff
+
+fr: Sur ce personnage
+tr: En este personaje
+
+fr: Toutes les %u s
+tr: Cada %u s
+
+fr: arbre modifié
+tr: árbol modificado
+
+fr: assis
+tr: sentado
+
+fr: autre client
+tr: otro cliente
+
+fr: autre révision que la vôtre
+tr: otra revisión que la tuya
+
+fr: caché
+tr: oculto
+
+fr: client d'origine
+tr: cliente original
+
+fr: dialogue de NPC
+tr: diálogo de NPC
+
+fr: en retard
+tr: atrasado
+
+fr: encore %d min
+tr: quedan %d min
+
+fr: horloge %d, cadence %d, détecteur %d
+tr: reloj %d, cadencia %d, detector %d
+
+fr: hors ligne
+tr: desconectado
+
+fr: il y a %s
+tr: hace %s
+
+fr: jamais patché
+tr: nunca parcheado
+
+fr: muet
+tr: silenciado
+
+fr: même compte
+tr: misma cuenta
+
+fr: même machine
+tr: misma máquina
+
+fr: patch %d
+tr: parche %d
+
+fr: prison
+tr: cárcel
+
+fr: révision %s
+tr: revisión %s
+
+fr: salon
+tr: sala de chat
+
+fr: sans poignée de main
+tr: sin saludo de enlace
+
+fr: staff
+tr: staff
+
+fr: storage ouvert
+tr: storage abierto
+
+fr: triche
+tr: trampa
+
+fr: À signaux
+tr: Con señales
+
+fr: Échoppes hors ligne
+tr: Tiendas desconectadas
+
+fr: échange
+tr: intercambio
+
+fr: échoppe
+tr: tienda
+
+fr: échoppe d'achat
+tr: tienda de compra
+
+fr: échoppe de vente
+tr: tienda de venta
+
+fr: Écrire @users dans la conversation
+tr: Escribir @users en la conversación

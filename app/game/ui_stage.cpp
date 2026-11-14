@@ -537,6 +537,7 @@ UiStage::Answers UiStage::Draw(
   escape_.Register(ro::ui::kLogWindowId, &windows.log.open);
   escape_.SkipNext();
   escape_.Register(ro::ui::kStaffToolsId, &windows.staff_tools.open);
+  escape_.Register(ro::ui::kStaffRosterWindowId, &windows.staff_tools.roster.open);
   // Les macros, elles, RENTRENT dans la pile : on les ouvre pour écrire une
   // ligne et on les referme, comme toute fenêtre de réglage.
   escape_.Register(ro::ui::kChatMacroId, &windows.macros.open);

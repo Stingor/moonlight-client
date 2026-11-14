@@ -45,6 +45,8 @@ void RememberLayoutWindows(ro::ui::UiContext& ui, UiStage::Windows& windows) {
   // ⚠ UN `true` HÉRITÉ N'OUVRE PAS L'ÉTABLI SANS LE DROIT : le dessin le
   // revérifie.
   ui.RememberWindow(ro::ui::kStaffToolsId, &windows.staff_tools.open);
+  // De même pour les joueurs en ligne, que l'établi dessine sous le même droit.
+  ui.RememberWindow(ro::ui::kStaffRosterWindowId, &windows.staff_tools.roster.open);
   ui.RememberWindow(ro::ui::kChatMacroId, &windows.macros.open);
   ui.RememberWindow(ro::ui::kCraftAtlasWindowId, &windows.craft_atlas.state.open);
   ui.RememberWindow(ro::ui::kNavigationWindowId, &windows.navigation.state.open);

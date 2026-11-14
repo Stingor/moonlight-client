@@ -272,6 +272,10 @@ enum class EntityVerb : int {
   // `kMute`, qui est la sanction de chat du staff.
   kVoiceBlock,
   kVoiceAllow,
+  // « ALLER À LUI » ET « LE RAPPELER ICI », au staff, sur un joueur de sa
+  // liste des joueurs en ligne. Voir `world/staff_roster_menu.h`.
+  kStaffGoTo,
+  kStaffRecall,
 };
 
 // ── LE SOUS-MENU « TACTIQUE DU COMPAGNON » ──────────────────────────────────
@@ -293,7 +297,7 @@ inline constexpr int kTacticVerbBase = 1000;
 inline constexpr int kTacticVerbsPerCompanion = 16;
 // 🔴 `EntityVerb` grandit à chaque geste ajouté : s'il atteignait la base, un
 // verbe du menu se lirait comme une tactique. Son DERNIER verbe est ici.
-static_assert(static_cast<int>(EntityVerb::kVoiceAllow) < kTacticVerbBase);
+static_assert(static_cast<int>(EntityVerb::kStaffRecall) < kTacticVerbBase);
 static_assert(static_cast<int>(TacticMenuChoice::kTriggerFirst) ==
               static_cast<int>(ro::sim::kTacticRankCount));
 static_assert(static_cast<int>(TacticMenuChoice::kRemove) ==

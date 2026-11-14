@@ -48,6 +48,7 @@
 #include "world/click_action.h"
 #include "world/follow_action.h"
 #include "world/navi_session.h"
+#include "world/staff_roster.h"
 
 namespace moonclient {
 namespace {
@@ -431,6 +432,12 @@ void SaveChatAndSay(const ChatTabsView& tabs, const ChatRoomStage* rooms, bool t
 void SubmitChat(const ChatDispatch& to, const std::string& line, std::uint32_t said_ms,
                 ro::net::ChatKeys keys) {
   if (line.empty()) {
+    return;
+  }
+  // `@users` : la partie tranche. Au staff la fenêtre des joueurs en ligne, aux
+  // autres la commande du serveur, telle que tapée.
+  if (IsStaffRosterCommand(line) && to.player_asks != nullptr) {
+    RunPlayerCommand(to, PlayerCommand{.kind = PlayerCommandKind::kStaffRoster}, said_ms);
     return;
   }
   // 🔴 UNE COMMANDE PRISE ICI SE PROPOSE AUSSI : elle s'inscrit dans

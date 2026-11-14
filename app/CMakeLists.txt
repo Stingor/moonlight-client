@@ -1217,7 +1217,9 @@ add_library(moonclient_entitymenu STATIC
     world/player_report.cpp
     world/entity_inspector.cpp
     world/entity_menu.cpp
-    world/entity_menu_tactics.cpp)
+    world/entity_menu_tactics.cpp
+    world/staff_roster.cpp
+    world/staff_roster_menu.cpp)
 # ⚠ LES LIENS DU CHAT EN PRIVÉ : « Linker ce NPC » ne s'offre que pour un nom
 # que la balise `<NAVS>` peut porter, et cette règle est la leur.
 target_link_libraries(moonclient_entitymenu
@@ -2005,6 +2007,7 @@ add_executable(moonclient
     game/over_world_layer.cpp
     game/game_cursor.cpp
     game/game_entity_menu.cpp
+    game/staff_roster_round.cpp
     game/game_network.cpp
     game/game_link_loss.cpp
     game/game_frame_beyond_world.cpp

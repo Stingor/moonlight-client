@@ -15,6 +15,7 @@
 #include "ro/ui/map_editor_panel.h"
 #include "ro/ui/quick_cast_look.h"
 #include "ro/ui/skin_art.h"
+#include "ro/ui/staff_roster_window.h"
 
 namespace ro::ui {
 
@@ -191,6 +192,13 @@ struct StaffToolsState {
   MapEditorView map_editor;
   MapEditorPanelState map_editor_panel;
   std::vector<MapEditorIntent> map_editor_intents;
+  // LES JOUEURS EN LIGNE : leur vue, posée par l'appelant avant le dessin et
+  // nulle tant qu'il n'y en a pas ; leur fenêtre, que l'établi dessine ouvert
+  // ou non ; et ce qu'elle a demandé pendant l'image, que l'appelant consomme.
+  // Voir `staff_roster_window.h`.
+  const StaffRosterView* roster_view = nullptr;
+  StaffRosterWindowState roster;
+  StaffRosterAnswer roster_answer;
   // LES BRUITAGES SONNENT-ILS ? Posé par l'appelant avant le dessin : l'établi
   // ne connaît pas l'audio.
   //

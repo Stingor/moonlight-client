@@ -23930,3 +23930,207 @@ tr: Your style isn't applied: closing the editor discards it. Nobody has seen it
 
 fr: Fermer sans valider
 tr: Close without applying
+
+fr: %d en ligne
+tr: %d online
+
+fr: %d en ligne, %d hors ligne
+tr: %d online, %d offline
+
+fr: %u h %02u
+tr: %u h %02u
+
+fr: %u j %02u h
+tr: %u d %02u h
+
+fr: @jumpto : vous êtes téléporté sur sa case, où qu'il soit.
+tr: @jumpto: you are teleported to their cell, wherever they are.
+
+fr: @recall : il est téléporté sur votre case, d'où qu'il vienne.
+tr: @recall: they are teleported to your cell, wherever they come from.
+
+fr: AID / CID
+tr: AID / CID
+
+fr: Aller à lui
+tr: Go to them
+
+fr: Cartes occupées
+tr: Maps in use
+
+fr: Client
+tr: Client
+
+fr: Clients en retard
+tr: Outdated clients
+
+fr: Connecté
+tr: Connected
+
+fr: En prison
+tr: In jail
+
+fr: Geste
+tr: Gesture
+
+fr: Inactif
+tr: Idle
+
+fr: Inactif depuis
+tr: Idle for
+
+fr: Inactifs
+tr: Idle
+
+fr: Indices de triche
+tr: Cheat signals
+
+fr: Joueurs en ligne
+tr: Players online
+
+fr: Joueurs en ligne…
+tr: Players online…
+
+fr: Le rappeler ici
+tr: Recall here
+
+fr: Le serveur a répondu par un statut que ce client ne connaît pas : il est sans doute plus récent que lui.
+tr: The server answered with a status this client does not know: it is probably newer than the client.
+
+fr: Liste reçue il y a %s
+tr: List received %s ago
+
+fr: Muet
+tr: Muted
+
+fr: Multi-comptes
+tr: Multi-accounts
+
+fr: Même compte Moonlight
+tr: Same Moonlight account
+
+fr: Même machine
+tr: Same machine
+
+fr: NPC
+tr: NPC
+
+fr: Nom, guilde ou carte
+tr: Name, guild or map
+
+fr: Par carte
+tr: By map
+
+fr: Par joueur
+tr: By player
+
+fr: Parole
+tr: Talk
+
+fr: Sans les échoppes hors ligne
+tr: Without offline shops
+
+fr: Session du compte
+tr: Account session
+
+fr: Staff seulement
+tr: Staff only
+
+fr: Sur ce personnage
+tr: On this character
+
+fr: Toutes les %u s
+tr: Every %u s
+
+fr: arbre modifié
+tr: modified tree
+
+fr: assis
+tr: sitting
+
+fr: autre client
+tr: other client
+
+fr: autre révision que la vôtre
+tr: a different revision than yours
+
+fr: caché
+tr: hidden
+
+fr: client d'origine
+tr: original client
+
+fr: dialogue de NPC
+tr: NPC dialog
+
+fr: en retard
+tr: outdated
+
+fr: encore %d min
+tr: %d min left
+
+fr: horloge %d, cadence %d, détecteur %d
+tr: clock %d, cadence %d, detector %d
+
+fr: hors ligne
+tr: offline
+
+fr: il y a %s
+tr: %s ago
+
+fr: jamais patché
+tr: never patched
+
+fr: muet
+tr: muted
+
+fr: même compte
+tr: same account
+
+fr: même machine
+tr: same machine
+
+fr: patch %d
+tr: patch %d
+
+fr: prison
+tr: jail
+
+fr: révision %s
+tr: revision %s
+
+fr: salon
+tr: chat room
+
+fr: sans poignée de main
+tr: no handshake
+
+fr: staff
+tr: staff
+
+fr: storage ouvert
+tr: storage open
+
+fr: triche
+tr: cheat
+
+fr: À signaux
+tr: Flagged
+
+fr: Échoppes hors ligne
+tr: Offline shops
+
+fr: échange
+tr: trade
+
+fr: échoppe
+tr: shop
+
+fr: échoppe d'achat
+tr: buying shop
+
+fr: échoppe de vente
+tr: vending shop
+
+fr: Écrire @users dans la conversation
+tr: Write @users to the chat

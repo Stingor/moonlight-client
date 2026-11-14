@@ -213,6 +213,7 @@ void RunPlayerCommand(const ChatDispatch& to, PlayerCommand command, std::uint32
     case PlayerCommandKind::kCreateGuild:
     case PlayerCommandKind::kInviteToGuild:
     case PlayerCommandKind::kBreakGuild:
+    case PlayerCommandKind::kStaffRoster:
       if (to.player_asks != nullptr) {
         to.player_asks->push_back(std::move(command));
       }

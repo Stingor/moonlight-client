@@ -375,6 +375,10 @@ StaffToolsAction DrawStaffTools(StaffToolsState& state, const SkinArt& art, bool
   }
   // LE PANNEAU DE L'ÉDITEUR, établi ouvert ou non : le mode garde sa fenêtre.
   DrawMapEditor(state.map_editor, state.map_editor_panel, state.map_editor_intents, art);
+  // LES JOUEURS EN LIGNE, de même : `@users` les ouvre sans l'établi.
+  if (state.roster_view != nullptr) {
+    state.roster_answer = DrawStaffRosterWindow(state.roster, *state.roster_view, art);
+  }
   if (!state.open) {
     return action;
   }
@@ -403,6 +407,10 @@ StaffToolsAction DrawStaffTools(StaffToolsState& state, const SkinArt& art, bool
     return action;
   }
 
+  if (SkinButton(core::Tr("Joueurs en ligne…"), art)) {
+    state.roster.open = true;
+    state.roster.raise = true;
+  }
   ImGui::PushItemWidth(Px(kControlWidthPixels));
   DrawCaptureBackdrop(state.look.flat_ground, art);
   DrawGmOutfit(state, art);

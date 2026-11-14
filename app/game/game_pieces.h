@@ -120,6 +120,7 @@
 #include "world/ranking_board.h"
 #include "world/skill_refusal_report.h"
 #include "world/sleep_bubbles_view.h"
+#include "world/staff_roster.h"
 
 // LES ACCESSOIRES DU CLIENT : ce qui se charge UNE FOIS, et dont l'absence
 // n'empêche pas de jouer.
@@ -202,6 +203,8 @@ struct GamePieces {
   EntityInspector entity_inspector;
   // ET LE JOURNAL DES BLOCAGES DE CHAT D'UN JOUEUR.
   ChatBlockLog chat_block_log;
+  // « JOUEURS EN LIGNE » DU STAFF : la liste que le serveur rend, et sa cadence.
+  StaffRoster staff_roster;
   // « SIGNALER CE JOUEUR » : le joueur visé, l'envoi et l'accusé.
   PlayerReportDesk player_report;
   HomunculusStage homunculus;

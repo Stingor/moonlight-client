@@ -43,6 +43,10 @@ enum class PlayerCommandKind : std::uint8_t {
   kEmotionList,
   kSoundVolume,
   kMusicVolume,
+  // `@users` : la fenêtre des joueurs en ligne pour le staff, la commande du
+  // serveur pour les autres. Ce n'est pas `ReadPlayerCommand` qui la lit : voir
+  // `IsStaffRosterCommand`.
+  kStaffRoster,
 };
 
 struct PlayerCommand {

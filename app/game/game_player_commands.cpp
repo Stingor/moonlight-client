@@ -14,6 +14,7 @@
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
 #include "ro/core/text.h"
+#include "ro/net/chat_target.h"
 #include "ro/net/deal.h"
 #include "ro/net/guild.h"
 #include "ro/net/party.h"
@@ -23,6 +24,7 @@
 #include "game/game.h"
 #include "party/party_panel.h"
 #include "world/click_action.h"
+#include "world/staff_roster.h"
 
 namespace moonclient {
 namespace {
@@ -193,6 +195,14 @@ void Game::RunPlayerAsks(std::uint32_t now_ms) {
           break;
         }
         ReportRefusal(ro::net::RequestGuildDisband(link_, name));
+        break;
+      case PlayerCommandKind::kStaffRoster:
+        // Sans le droit du staff, la commande part telle que le joueur l'a
+        // tapée, et le serveur y répond dans la conversation.
+        if (!pieces_.staff_roster.Ask()) {
+          ReportRefusal(
+              ro::net::SendServerCommand(link_, world_.player_name(), kStaffRosterCommand));
+        }
         break;
       default:
         break;

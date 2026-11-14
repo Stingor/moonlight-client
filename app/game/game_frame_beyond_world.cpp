@@ -114,6 +114,7 @@ ro::net::FrameOutcome Game::ApplyFrameBeyondWorld(const ro::net::Frame& received
         ro::net::ApplyAdoptionFrame(received, pieces_.adoption.desk()),
         ro::net::ApplyMarriageFrame(received, world_, now_ms),
         pieces_.entity_inspector.ApplyFrame(received), pieces_.chat_block_log.ApplyFrame(received),
+        pieces_.staff_roster.ApplyFrame(received, now_ms),
         PlayerReportDesk::ApplyFrame(received, world_, now_ms),
         ro::net::ApplyMannerPointFrame(received, world_, now_ms),
         ro::net::ApplyStatusChatFrame(received, world_, party_, now_ms),
