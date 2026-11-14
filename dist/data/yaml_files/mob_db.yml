@@ -80342,6 +80342,489 @@ Body:
       - {Item: Shadowdecon, Rate: 1000}
       - {Item: Zelunium, Rate: 1000}
       - {Item: Death_Witch_Card, Rate: 1, StealProtected: true}
+  - Id: 21295
+    AegisName: EP18_ASH_TOAD
+    Name: Ash Toad
+    Level: 179
+    Hp: 310164
+    Sp: 0
+    BaseExp: 496262
+    JobExp: 322570
+    Attack: 4139
+    Attack2: 1885
+    Defense: 38
+    MagicDefense: 28
+    Str: 185
+    Agi: 101
+    Vit: 50
+    Int: 158
+    Dex: 178
+    Luk: 77
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Brute
+    Element: Fire
+    ElementLevel: 2
+    AttackDelay: 1008
+    AttackMotion: 1008
+    ClientAttackMotion: 504
+    DamageMotion: 936
+    Ai: 04
+    Drops:
+      - {Item: Spawn, Rate: 1000}
+      - {Item: Cold_Magma, Rate: 250}
+      - {Item: Sticky_Webfoot, Rate: 500}
+      - {Item: Zelunium_Ore, Rate: 120}
+      - {Item: Shadowdecon_Ore, Rate: 120}
+      - {Item: EP18_Ash_Toad_Card, Rate: 1, StealProtected: true}
+  - Id: 21296
+    AegisName: EP18_RAKEHAND
+    Name: Rakehand
+    Level: 177
+    Hp: 312445
+    Sp: 0
+    BaseExp: 499912
+    JobExp: 324943
+    Attack: 3938
+    Attack2: 1888
+    Defense: 39
+    MagicDefense: 28
+    Str: 180
+    Agi: 122
+    Vit: 77
+    Int: 160
+    Dex: 170
+    Luk: 97
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Plant
+    Element: Earth
+    ElementLevel: 2
+    WalkSpeed: 1000
+    AttackDelay: 432
+    AttackMotion: 864
+    ClientAttackMotion: 504
+    DamageMotion: 1512
+    Ai: 10
+    Drops:
+      - {Item: Sticky_Mucus, Rate: 2000}
+      - {Item: Black_Powder, Rate: 150}
+      - {Item: Zelunium_Ore, Rate: 100}
+      - {Item: Shadowdecon_Ore, Rate: 100}
+      - {Item: EP18_Rakehand_Card, Rate: 1, StealProtected: true}
+  - Id: 21297
+    AegisName: EP18_SPARK
+    Name: Spark
+    Level: 181
+    Hp: 460504
+    Sp: 0
+    BaseExp: 736806
+    JobExp: 478924
+    Attack: 4005
+    Attack2: 1569
+    Defense: 39
+    MagicDefense: 27
+    Str: 177
+    Agi: 75
+    Vit: 50
+    Int: 130
+    Dex: 170
+    Luk: 109
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Element: Fire
+    ElementLevel: 2
+    AttackDelay: 936
+    AttackMotion: 1872
+    ClientAttackMotion: 1728
+    DamageMotion: 432
+    Ai: 04
+    Drops:
+      - {Item: Burning_Heart, Rate: 1500}
+      - {Item: Live_Coal, Rate: 900}
+      - {Item: Zelunium_Ore, Rate: 120}
+      - {Item: Shadowdecon_Ore, Rate: 120}
+      - {Item: EP18_Spark_Card, Rate: 1, StealProtected: true}
+  - Id: 21298
+    AegisName: EP18_HOT_MOLAR
+    Name: Hot Molar
+    Level: 212
+    Hp: 505226
+    Sp: 0
+    BaseExp: 808362
+    JobExp: 525435
+    Attack: 8242
+    Attack2: 1682
+    Defense: 49
+    MagicDefense: 30
+    Resistance: 139
+    MagicResistance: 126
+    Str: 311
+    Agi: 177
+    Vit: 131
+    Int: 119
+    Dex: 122
+    Luk: 115
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Brute
+    WalkSpeed: 130
+    AttackDelay: 571
+    AttackMotion: 1152
+    ClientAttackMotion: 648
+    DamageMotion: 288
+    Ai: 04
+    Drops:
+      - {Item: Claw_Of_Wolves, Rate: 5000}
+      - {Item: Cold_Magma, Rate: 500}
+      - {Item: Zelunium_Ore, Rate: 150}
+      - {Item: Shadowdecon_Ore, Rate: 150}
+      - {Item: Zelunium, Rate: 12}
+      - {Item: Shadowdecon, Rate: 12}
+      - {Item: EP18_Hot_Molar_Card, Rate: 1, StealProtected: true}
+  - Id: 21299
+    AegisName: EP18_VOLCARING
+    Name: Volcaring
+    Level: 185
+    Hp: 453911
+    Sp: 0
+    BaseExp: 726258
+    JobExp: 472068
+    Attack: 6406
+    Attack2: 1653
+    Defense: 46
+    MagicDefense: 28
+    Str: 277
+    Agi: 87
+    Vit: 175
+    Int: 134
+    Dex: 131
+    Luk: 130
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Element: Fire
+    ElementLevel: 3
+    WalkSpeed: 250
+    AttackDelay: 792
+    AttackMotion: 1584
+    ClientAttackMotion: 648
+    DamageMotion: 504
+    Ai: 02
+    Drops:
+      - {Item: Burning_Heart, Rate: 2500}
+      - {Item: Live_Coal, Rate: 500}
+      - {Item: Zelunium_Ore, Rate: 130}
+      - {Item: Shadowdecon_Ore, Rate: 130}
+      - {Item: EP18_Volcaring_Card, Rate: 1, StealProtected: true}
+  - Id: 21300
+    AegisName: EP18_LAVA_TOAD
+    Name: Lava Toad
+    Level: 211
+    Hp: 505270
+    Sp: 0
+    BaseExp: 808432
+    JobExp: 525481
+    Attack: 7385
+    Attack2: 2630
+    Defense: 49
+    MagicDefense: 33
+    Resistance: 141
+    MagicResistance: 197
+    Str: 280
+    Agi: 99
+    Vit: 134
+    Int: 187
+    Dex: 149
+    Luk: 61
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Brute
+    Element: Fire
+    ElementLevel: 3
+    WalkSpeed: 170
+    AttackDelay: 504
+    AttackMotion: 1008
+    ClientAttackMotion: 504
+    DamageMotion: 360
+    Ai: 04
+    Drops:
+      - {Item: Spawn, Rate: 1500}
+      - {Item: Cold_Magma, Rate: 300}
+      - {Item: Burning_Heart, Rate: 300}
+      - {Item: Zelunium_Ore, Rate: 150}
+      - {Item: Shadowdecon_Ore, Rate: 150}
+      - {Item: Zelunium, Rate: 12}
+      - {Item: Shadowdecon, Rate: 12}
+      - {Item: EP18_Lava_Toad_Card, Rate: 1, StealProtected: true}
+  - Id: 21301
+    AegisName: EP18_BURNING_FANG
+    Name: Burning Fang
+    Level: 212
+    Hp: 4786958
+    Sp: 0
+    BaseExp: 7659133
+    JobExp: 4978436
+    Attack: 9143
+    Attack2: 4904
+    Defense: 62
+    MagicDefense: 44
+    Resistance: 205
+    MagicResistance: 368
+    Str: 345
+    Agi: 214
+    Vit: 193
+    Int: 347
+    Dex: 221
+    Luk: 80
+    AttackRange: 3
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    Race: Brute
+    Element: Fire
+    ElementLevel: 4
+    WalkSpeed: 200
+    AttackDelay: 420
+    AttackMotion: 840
+    ClientAttackMotion: 480
+    DamageMotion: 432
+    Ai: 21
+    Class: Boss
+    Modes: {Mvp: true}
+    MvpDrops:
+      - {Item: Old_Card_Album, Rate: 2000}
+      - {Item: Yggdrasilberry, Rate: 2500}
+    Drops:
+      - {Item: Old_Violet_Box, Rate: 1500}
+      - {Item: Old_Card_Album, Rate: 500}
+      - {Item: Burning_Heart, Rate: 5000}
+      - {Item: Zelunium_Ore, Rate: 10000}
+      - {Item: Shadowdecon_Ore, Rate: 10000}
+      - {Item: EP18_Burning_Fang_Card, Rate: 1, StealProtected: true}
+  - Id: 21302
+    AegisName: EP18_ASHHOPPER
+    Name: Ashhopper
+    Level: 185
+    Hp: 453911
+    Sp: 0
+    BaseExp: 726258
+    JobExp: 472068
+    Attack: 4648
+    Attack2: 1727
+    Defense: 39
+    MagicDefense: 28
+    Str: 201
+    Agi: 104
+    Vit: 40
+    Int: 140
+    Dex: 280
+    Luk: 90
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Race: Insect
+    Element: Dark
+    ElementLevel: 4
+    WalkSpeed: 130
+    AttackDelay: 760
+    AttackMotion: 1080
+    ClientAttackMotion: 792
+    DamageMotion: 360
+    Ai: 04
+    Modes: {Detector: true}
+    Drops:
+      - {Item: Grasshopper's_Leg, Rate: 5000}
+      - {Item: Grasshopper_Doll, Rate: 15}
+      - {Item: Zelunium_Ore, Rate: 130}
+      - {Item: Shadowdecon_Ore, Rate: 130}
+      - {Item: EP18_Ashhopper_Card, Rate: 1, StealProtected: true}
+  - Id: 21303
+    AegisName: EP18_ASHRING
+    Name: Ashring
+    Level: 185
+    Hp: 454504
+    Sp: 0
+    BaseExp: 727206
+    JobExp: 472684
+    Attack: 4509
+    Attack2: 2220
+    Defense: 40
+    MagicDefense: 29
+    Str: 195
+    Agi: 94
+    Vit: 50
+    Int: 180
+    Dex: 220
+    Luk: 77
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    ElementLevel: 2
+    WalkSpeed: 200
+    AttackDelay: 1152
+    AttackMotion: 1152
+    ClientAttackMotion: 288
+    DamageMotion: 432
+    Ai: 02
+    Drops:
+      - {Item: Sticky_Mucus, Rate: 6000}
+      - {Item: Explosive_Powder, Rate: 100}
+      - {Item: Zelunium_Ore, Rate: 130}
+      - {Item: Shadowdecon_Ore, Rate: 130}
+      - {Item: EP18_Ashring_Card, Rate: 1, StealProtected: true}
+  - Id: 21304
+    AegisName: EP18_GREY_WOLF
+    Name: Grey Wolf
+    Level: 187
+    Hp: 453377
+    Sp: 0
+    BaseExp: 725403
+    JobExp: 471512
+    Attack: 5610
+    Attack2: 997
+    Defense: 43
+    MagicDefense: 26
+    Str: 240
+    Agi: 102
+    Vit: 111
+    Int: 80
+    Dex: 240
+    Luk: 76
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Brute
+    ElementLevel: 2
+    AttackDelay: 576
+    AttackMotion: 576
+    ClientAttackMotion: 360
+    DamageMotion: 648
+    Ai: 04
+    Drops:
+      - {Item: Claw_Of_Wolves, Rate: 4000}
+      - {Item: Explosive_Powder, Rate: 100}
+      - {Item: Zelunium_Ore, Rate: 130}
+      - {Item: Shadowdecon_Ore, Rate: 130}
+      - {Item: EP18_Grey_Wolf_Card, Rate: 1, StealProtected: true}
+  - Id: 21305
+    AegisName: EP18_TUMBLE_RING
+    Name: Tumblering
+    Level: 185
+    Hp: 453970
+    Sp: 0
+    BaseExp: 726352
+    JobExp: 472129
+    Attack: 4163
+    Attack2: 2467
+    Defense: 39
+    MagicDefense: 30
+    Str: 180
+    Agi: 111
+    Vit: 32
+    Int: 200
+    Dex: 213
+    Luk: 79
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Race: Plant
+    Element: Poison
+    ElementLevel: 2
+    WalkSpeed: 100
+    AttackDelay: 506
+    AttackMotion: 1008
+    ClientAttackMotion: 576
+    DamageMotion: 504
+    Ai: 07
+    Drops:
+      - {Item: Root_Of_Maneater, Rate: 5000}
+      - {Item: Prickly_Fruit, Rate: 150}
+      - {Item: Shoot, Rate: 200}
+      - {Item: Zelunium_Ore, Rate: 130}
+      - {Item: Shadowdecon_Ore, Rate: 130}
+      - {Item: EP18_Tumble_Ring_Card, Rate: 1, StealProtected: true}
+  - Id: 21306
+    AegisName: EP18_FIREWIND_KITE
+    Name: Firewind Kite
+    Level: 188
+    Hp: 451018
+    Sp: 0
+    BaseExp: 721629
+    JobExp: 469059
+    Attack: 5405
+    Attack2: 877
+    Defense: 42
+    MagicDefense: 25
+    Str: 230
+    Agi: 109
+    Vit: 80
+    Int: 70
+    Dex: 310
+    Luk: 77
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Brute
+    Element: Fire
+    ElementLevel: 2
+    WalkSpeed: 120
+    AttackDelay: 720
+    AttackMotion: 720
+    ClientAttackMotion: 432
+    DamageMotion: 1512
+    Ai: 04
+    Drops:
+      - {Item: BurningFeather, Rate: 2500}
+      - {Item: Zelunium_Ore, Rate: 130}
+      - {Item: Shadowdecon_Ore, Rate: 130}
+      - {Item: EP18_Firewind_Kite_Card, Rate: 1, StealProtected: true}
+  - Id: 21307
+    AegisName: EP18_PHANTOM_WOLF
+    Name: Phantom Wolf
+    Level: 186
+    Hp: 454217
+    Sp: 0
+    BaseExp: 726747
+    JobExp: 472386
+    Attack: 5185
+    Attack2: 1525
+    Defense: 42
+    MagicDefense: 27
+    Str: 223
+    Agi: 82
+    Vit: 90
+    Int: 123
+    Dex: 288
+    Luk: 67
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Brute
+    Element: Ghost
+    ElementLevel: 2
+    AttackDelay: 792
+    AttackMotion: 792
+    ClientAttackMotion: 432
+    DamageMotion: 360
+    Ai: 04
+    Drops:
+      - {Item: Transparent_Cloth, Rate: 1250}
+      - {Item: Zelunium_Ore, Rate: 130}
+      - {Item: Shadowdecon_Ore, Rate: 130}
+      - {Item: EP18_Phantom_Wolf_Card, Rate: 1, StealProtected: true}
   - Id: 21386
     AegisName: ILL_ANDRE
     Name: Diligent Andre
