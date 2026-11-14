@@ -112,33 +112,23 @@ void DrawRows(PaletteEffectsState& state, const PaletteEffectsView& view,
   }
 }
 
-// « RÉGLAGES AVANCÉS », repliés par défaut : les trois curseurs et
-// « Assombrir ». Rend le réglage.
-PaletteEffectSetting DrawAdvanced(PaletteEffectsState& state, const PaletteEffectRow& row,
-                                  PaletteEffectSetting setting, const SkinArt& art) {
-  // 🔴 REPLIÉ PAR DÉFAUT ET TOUJOURS REPLIABLE, couleur connue ou non : c'est
-  // le joueur qui l'ouvre, et sa main seule le referme.
-  ImGui::SetNextItemOpen(state.advanced);
-  const std::string label = std::string(core::Tr("Réglages avancés")) + "###reglages_effet";
-  const bool open = ImGui::TreeNode(label.c_str());
-  state.advanced = open;
-  if (!open) {
-    return setting;
-  }
-  static_cast<void>(SkinSliderInt(core::Tr("Teinte"), &setting.hue, -kPaletteEffectHueMost,
-                                  kPaletteEffectHueMost, art, "%d°"));
+// LES TROIS CURSEURS D'UN EFFET, et « Assombrir » : le réglage lui-même, en
+// écarts aux couleurs d'origine, écrits avec leur signe. Rend le réglage.
+PaletteEffectSetting DrawSliders(const PaletteEffectRow& row, PaletteEffectSetting setting,
+                                 const SkinArt& art) {
+  static_cast<void>(SkinSliderInt("##teinte", &setting.hue, -kPaletteEffectHueMost,
+                                  kPaletteEffectHueMost, art, core::Tr("Teinte : %+d°")));
   Explain(core::Tr("Fait tourner toutes les couleurs de l'effet, en degrés."));
-  static_cast<void>(SkinSliderInt(core::Tr("Saturation"), &setting.saturation,
-                                  -kPaletteEffectPercentMost, kPaletteEffectPercentMost, art,
-                                  "%d%%"));
+  static_cast<void>(SkinSliderInt("##saturation", &setting.saturation, -kPaletteEffectPercentMost,
+                                  kPaletteEffectPercentMost, art, core::Tr("Saturation : %+d %%")));
   Explain(core::Tr("Moins, l'effet tourne au gris ; plus, ses couleurs se font vives."));
   // 🔴 UNE LUEUR NE FONCE PAS, ELLE PÂLIT : sous un mélange additif, le
   // curseur ne règle que son intensité, et le dire évite un curseur qui
   // semble cassé.
   const bool intensity = row.additive && !setting.darken;
-  static_cast<void>(SkinSliderInt(intensity ? core::Tr("Intensité") : core::Tr("Clarté"),
-                                  &setting.lightness, -kPaletteEffectPercentMost,
-                                  kPaletteEffectPercentMost, art, "%d%%"));
+  static_cast<void>(SkinSliderInt(
+      "##clarte", &setting.lightness, -kPaletteEffectPercentMost, kPaletteEffectPercentMost, art,
+      intensity ? core::Tr("Intensité : %+d %%") : core::Tr("Clarté : %+d %%")));
   Explain(intensity ? core::Tr("Une lueur s'ajoute à ce qui est derrière elle : moins, elle "
                                "pâlit ; elle ne fonce pas.")
                     : core::Tr("Moins, l'effet fonce ; plus, il s'éclaircit."));
@@ -148,17 +138,35 @@ PaletteEffectSetting DrawAdvanced(PaletteEffectsState& state, const PaletteEffec
         core::Tr("Une aura lumineuse ne fonce pas, elle pâlit. Assombrir la peint comme une "
                  "fumée, qui ne brille plus : elle peut alors foncer."));
   }
-  ImGui::TreePop();
   return ClampedEffectSetting(setting, row.additive);
 }
 
+// « RÉGLAGES AVANCÉS », repliés par défaut : les curseurs d'un effet qui n'a
+// pas de pastille, donc pas de nuancier où les ranger. Rend le réglage.
+PaletteEffectSetting DrawAdvanced(PaletteEffectsState& state, const PaletteEffectRow& row,
+                                  PaletteEffectSetting setting, const SkinArt& art) {
+  // 🔴 REPLIÉ PAR DÉFAUT ET TOUJOURS REPLIABLE : c'est le joueur qui l'ouvre,
+  // et sa main seule le referme.
+  ImGui::SetNextItemOpen(state.advanced);
+  const std::string label = std::string(core::Tr("Réglages avancés")) + "###reglages_effet";
+  const bool open = ImGui::TreeNode(label.c_str());
+  state.advanced = open;
+  if (!open) {
+    return setting;
+  }
+  setting = DrawSliders(row, setting, art);
+  ImGui::TreePop();
+  return setting;
+}
+
 // LA PASTILLE DE L'EFFET : la couleur que le réglage donne, et le nuancier
-// qu'elle ouvre, réglages avancés compris. Rend le réglage.
+// qu'elle ouvre. Rend le réglage.
 //
-// 🔴 LES RÉGLAGES AVANCÉS VIVENT DANS LE NUANCIER : ses curseurs et les leurs
-// règlent la même teinture, l'une en couleur visée, l'autre en écarts. Deux
-// panneaux côte à côte se liraient comme deux réglages. Sans couleur lue, il
-// n'y a pas de pastille, et ils restent seuls dans le panneau.
+// 🔴 LE NUANCIER N'A QU'UN JEU DE CURSEURS, ceux du réglage : le carré désigne
+// une couleur, eux disent les écarts qui y mènent, et les affinent. Montrer en
+// plus la couleur visée en curseurs écrirait deux fois la teinte, la saturation
+// et la clarté. Sans couleur lue, il n'y a pas de pastille, et les curseurs
+// restent seuls dans le panneau, repliés.
 PaletteEffectSetting DrawSwatch(PaletteEffectsState& state, const PaletteEffectRow& row,
                                 PaletteEffectSetting setting, const SkinArt& art) {
   if (!row.base_color.has_value()) {
@@ -185,12 +193,12 @@ PaletteEffectSetting DrawSwatch(PaletteEffectsState& state, const PaletteEffectR
   ImGui::TextUnformatted(core::Tr("Couleur de l'effet"));
   if (BeginSkinPopup("nuancier_effet")) {
     std::array<float, 3> picked = shown;
-    if (DrawPaletteColorPicker(picked, art)) {
+    if (DrawPaletteColorChoice(picked)) {
       setting = EffectSettingToward(*row.base_color,
                                     {ToByte(picked[0]), ToByte(picked[1]), ToByte(picked[2])},
                                     setting, row.additive);
     }
-    setting = DrawAdvanced(state, row, setting, art);
+    setting = DrawSliders(row, setting, art);
     EndSkinPopup();
   }
   return setting;

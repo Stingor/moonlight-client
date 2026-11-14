@@ -89,7 +89,7 @@ struct PaletteEffectsState {
   // Les réglages en cours, par numéro d'effet. Un effet absent montre ce qu'il
   // porte.
   std::map<std::uint16_t, PaletteEffectSetting> drafts;
-  // « Réglages avancés », replié par défaut.
+  // « Réglages avancés » d'un effet sans pastille, replié par défaut.
   bool advanced = false;
   // LA HAUTEUR DU PANNEAU à l'image précédente, en pixels : le pantin la prend,
   // comme ailleurs celle de la liste des pièces.

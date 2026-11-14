@@ -515,8 +515,8 @@ tr: Title color
 fr: Couleur n° %d
 tr: Colour #%d
 
-fr: Couleur unique (absolu)
-tr: Single colour (absolute)
+fr: Couleur unique
+tr: Single color
 
 fr: Coup d'éclat
 tr: Masterstroke
@@ -584,8 +584,8 @@ tr: Sand thrown ahead of you blinds the horde.
 fr: Déclencher les deux pouvoirs d'un plateau de Roggle.
 tr: Trigger both powers of a Roggle board.
 
-fr: Décoché : la teinte tourne, et la pièce garde sa matière — ses reflets, ses ombres colorées. Coché : une teinte et une saturation uniques, qui colorent aussi les gris et les blancs.
-tr: Unticked: the hue turns and the part keeps its material — its highlights, its colored shadows. Ticked: a single hue and saturation, which also colour greys and whites.
+fr: Les couleurs d'origine sont décalées ensemble : la pièce garde ses reflets et ses ombres colorées. Un gris reste gris.
+tr: The original colors are shifted together: the part keeps its highlights and its colored shadows. A grey stays grey.
 
 fr: Défaire
 tr: Undo
@@ -773,8 +773,8 @@ tr: Score 10,000 points in a single Roggle shot.
 fr: Meilleur du jour :
 tr: Today's best:
 
-fr: Mode avancé
-tr: Advanced mode
+fr: Garder les nuances
+tr: Keep the shades
 
 fr: Modifier la fiche
 tr: Edit sheet
@@ -893,8 +893,8 @@ tr: Nothing to confirm: your character already wears this style.
 fr: Rose
 tr: Pink
 
-fr: Rotation : %+d°
-tr: Rotation: %+d°
+fr: Teinte : %+d°
+tr: Hue: %+d°
 
 fr: Rouge
 tr: Red
@@ -23821,11 +23821,11 @@ tr: This dye belongs to this companion, and applies to its current form.
 fr: Une évolution change son sprite : la teinture s'endort alors, et il retrouve ses couleurs d'origine. Elle revient s'il reprend cette forme.
 tr: Evolving changes its sprite: the dye then goes dormant, and it gets its original colors back. The dye returns if it takes this form again.
 
-fr: Ce compagnon est presque gris : coche « Couleur unique (absolu) » sur une pièce pour la colorer.
-tr: This companion is almost grey: tick « Single color (absolute) » on a piece to color it.
+fr: Ce compagnon est presque gris : choisis « Couleur unique » sur une pièce pour la colorer.
+tr: This companion is almost grey: choose « Single color » on a part to color it.
 
-fr: Tourner la teinte ne change pas un gris. Le réglage absolu impose une teinte et une saturation : c'est lui qui colore un Lunatic blanc.
-tr: Turning the hue does not change a grey. The absolute setting imposes a hue and a saturation: that is what colors a white Lunatic.
+fr: Décaler la teinte ne change pas un gris. « Couleur unique » impose une teinte et une saturation : c'est elle qui colore un Lunatic blanc.
+tr: Shifting the hue does not change a grey. « Single color » imposes a hue and a saturation: that is what colors a white Lunatic.
 
 fr: Une teinture de compagnon se valide auprès du styliste.
 tr: A companion dye is confirmed at the stylist.
@@ -23860,8 +23860,8 @@ tr: This item shows an effect: adjust it
 fr: Cette teinture appartient à l'item qui pose l'effet : elle le suit à l'échange, à la vente, au storage et au courrier.
 tr: This dye belongs to the item that shows the effect: it follows it through trades, sales, storage and mail.
 
-fr: Clarté
-tr: Lightness
+fr: Intensité : %+d %%
+tr: Intensity: %+d %%
 
 fr: Envoyé : en attente du serveur.
 tr: Sent: waiting for the server.
@@ -23901,9 +23901,6 @@ tr: Remove this effect's dye?
 
 fr: Revenir à ce que je porte
 tr: Back to what I wear
-
-fr: Teinte
-tr: Hue
 
 fr: Tu n'affiches aucun effet de chapeau.
 tr: You show no hat effect.
@@ -24369,3 +24366,30 @@ tr: Grand Alchemist
 
 fr: Obtenir chacun des skills évolués de l'Alchemist, au fil des parties.
 tr: Obtain each of the Alchemist's evolved skills, across runs.
+
+fr: Toute la pièce prend la teinte et la saturation choisies : c'est ce qui colore aussi un gris ou un blanc.
+tr: The whole part takes the chosen hue and saturation: this is what also colors a grey or a white.
+
+fr: La teinte que prend toute la pièce.
+tr: The hue the whole part takes.
+
+fr: À zéro, la pièce est grise ; à cent, sa couleur est franche.
+tr: At zero the part is grey; at a hundred its color is pure.
+
+fr: Fait tourner les teintes d'origine de la pièce, en degrés.
+tr: Turns the part's original hues, in degrees.
+
+fr: Moins, la pièce tourne au gris ; plus, ses couleurs se font vives.
+tr: Lower turns the part grey; higher makes its colors vivid.
+
+fr: Plus sombre ou plus claire que le dessin d'origine, dont la pièce garde les ombres et les reflets.
+tr: Darker or brighter than the original drawing, whose shadows and highlights the part keeps.
+
+fr: Un gris n'a pas de teinte à décaler : « Couleur unique » le colore.
+tr: A grey has no hue to shift: « Single color » colors it.
+
+fr: Code couleur
+tr: Color code
+
+fr: Le code de cette couleur. Copie-le, ou colle un autre code à sa place : 0xRRGGBB, #RRGGBB ou RRGGBB.
+tr: This color's code. Copy it, or paste another code over it: 0xRRGGBB, #RRGGBB or RRGGBB.

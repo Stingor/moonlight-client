@@ -12,7 +12,9 @@
 
 #include <algorithm>
 #include <array>
+#include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 #include <optional>
 #include <string_view>
 
@@ -21,6 +23,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+#include "ro/render/palette_ramps.h"
 #include "ro/ui/palette_effects.h"
 #include "ro/ui/skin_art.h"
 #include "ro/ui/ui_context.h"
@@ -428,4 +431,151 @@ TEST_CASE("Éditeur : une fermeture demandée d'ailleurs attend un style validé
   // Fermer un éditeur déjà fermé ne laisse aucune demande en suspens.
   ro::ui::ClosePaletteEditor(state);
   CHECK_FALSE(state.close_asked);
+}
+
+// ── LE NUANCIER D'UNE PIÈCE ──────────────────────────────────────────────────
+
+namespace {
+
+using Rgb = std::array<std::uint8_t, 3>;
+
+// L'écart toléré entre deux couleurs qui devraient être la même : la teinte
+// d'un réglage s'arrondit au degré, sa saturation au pour-cent.
+constexpr int kSameColorWithin = 4;
+
+[[nodiscard]] Rgb Painted(const Rgb& base, const ro::render::RampAdjust& adjust) {
+  Rgb out{};
+  ro::render::AdjustColor(base.data(), adjust, out.data());
+  return out;
+}
+
+[[nodiscard]] bool SameColor(const Rgb& left, const Rgb& right) {
+  for (std::size_t channel = 0; channel < left.size(); ++channel) {
+    if (std::abs(static_cast<int>(left[channel]) - static_cast<int>(right[channel])) >
+        kSameColorWithin) {
+      return false;
+    }
+  }
+  return true;
+}
+
+// Une image de l'éditeur, et ce qu'elle demande.
+[[nodiscard]] ro::ui::PaletteEditorAction DrawOne(ro::ui::UiContext& ui, PaletteEditorState& state,
+                                                  const PaletteEditorView& view,
+                                                  const ro::ui::SkinArt& art) {
+  ui.BeginFrame(kViewport, kFrameSeconds);
+  ro::ui::PaletteEditorAction action = ro::ui::DrawPaletteEditor(state, view, art);
+  ui.EndFrame();
+  return action;
+}
+
+}  // namespace
+
+TEST_CASE("Éditeur : une pièce change de mode sans changer de couleur", "[ui][palette]") {
+  using ro::render::RampAdjust;
+  using ro::ui::PieceAdjustInMode;
+  // Un rouge de tissu, décalé vers le vert, terni et éclairci.
+  const Rgb base{200, 60, 50};
+  const ImU32 base_color = IM_COL32(base[0], base[1], base[2], 255);
+  const RampAdjust shifted{.hue = 120, .saturation = -30, .value = 12, .absolute = false};
+
+  const RampAdjust single = PieceAdjustInMode(shifted, /*single_colour=*/true, base_color);
+  CHECK(single.absolute);
+  CHECK(single.value == shifted.value);
+  CHECK(SameColor(Painted(base, single), Painted(base, shifted)));
+
+  const RampAdjust back = PieceAdjustInMode(single, /*single_colour=*/false, base_color);
+  CHECK_FALSE(back.absolute);
+  CHECK(back.value == shifted.value);
+  CHECK(SameColor(Painted(base, back), Painted(base, shifted)));
+
+  // Un décalage vers le bas donne une teinte positive, et l'écart inverse
+  // prend le chemin le plus court.
+  const RampAdjust down{.hue = -90, .saturation = 0, .value = 0, .absolute = false};
+  const RampAdjust down_single = PieceAdjustInMode(down, true, base_color);
+  CHECK(down_single.hue >= 0);
+  CHECK(SameColor(Painted(base, down_single), Painted(base, down)));
+  CHECK(PieceAdjustInMode(down_single, false, base_color).hue == down.hue);
+
+  // Une pièce intacte passe en couleur unique sans se repeindre.
+  CHECK(SameColor(Painted(base, PieceAdjustInMode(RampAdjust{}, true, base_color)), base));
+  // Déjà dans le mode demandé : rien ne bouge.
+  CHECK(PieceAdjustInMode(shifted, false, base_color).hue == shifted.hue);
+  CHECK(PieceAdjustInMode(single, true, base_color).hue == single.hue);
+}
+
+TEST_CASE("Éditeur : un gris n'a rien à décaler, ses nuances gardées reviennent à zéro",
+          "[ui][palette]") {
+  using ro::render::RampAdjust;
+  const ImU32 grey = IM_COL32(128, 128, 128, 255);
+  const RampAdjust blue{.hue = 210, .saturation = 80, .value = -10, .absolute = true};
+  const RampAdjust kept = ro::ui::PieceAdjustInMode(blue, /*single_colour=*/false, grey);
+  CHECK_FALSE(kept.absolute);
+  CHECK(kept.hue == 0);
+  CHECK(kept.saturation == 0);
+  CHECK(kept.value == blue.value);
+}
+
+TEST_CASE("Éditeur : le nuancier d'une pièce lit un code couleur tapé, et une seule fois",
+          "[ui][palette]") {
+  ro::ui::UiContext ui;
+  const ro::ui::SkinArt art;
+  const std::array<PaletteTab, 1> tabs{PaletteTab{.kind = PaletteTabKind::kBody}};
+  const std::array<ro::render::PaletteRamp, 1> ramps{
+      ro::render::PaletteRamp{.start = 1, .length = 4, .pixels = 500, .ref = 2}};
+  // Une pièce grise : en nuances gardées, le nuancier dit qu'elle ne se
+  // colore pas ainsi.
+  const std::array<ImU32, 1> colors{IM_COL32(128, 128, 128, 255)};
+  PaletteEditorState state;
+  state.open = true;
+  PaletteEditorView view;
+  view.bounds = Bounds();
+  view.tabs = tabs;
+  view.ramps = ramps;
+  view.colors = colors;
+  view.base_colors = colors;
+
+  SECTION("il se dessine dans ses deux modes") {
+    for (const bool single_colour : {false, true}) {
+      view.recipe.ramps[0] = ro::render::RampAdjust{
+          .hue = 30, .saturation = 20, .value = 10, .absolute = single_colour};
+      state.open_piece = 0;
+      DrawFrames(ui, state, view, art);
+      CHECK(state.open_piece == -1);
+      CHECK_FALSE(ImGui::GetCurrentContext()->OpenPopupStack.empty());
+      // Sans geste, le nuancier ne demande rien.
+      const ro::ui::PaletteEditorAction idle = DrawOne(ui, state, view, art);
+      CHECK(idle.picked_ramp == -1);
+      CHECK(idle.adjusted_ramp == -1);
+    }
+  }
+  SECTION("un code entier repeint, un code à moitié tapé non") {
+    state.open_piece = 0;
+    DrawFrames(ui, state, view, art);
+    ImGuiContext& context = *ImGui::GetCurrentContext();
+    REQUIRE_FALSE(context.OpenPopupStack.empty());
+    ImGuiWindow* const popup = context.OpenPopupStack.back().Window;
+    REQUIRE(popup != nullptr);
+    // Le clavier va au champ du code, comme après un clic dessus.
+    const ImGuiID field = popup->GetID("Code couleur");
+    context.NavNextActivateId = field;
+    context.NavNextActivateFlags = ImGuiActivateFlags_PreferInput;
+    static_cast<void>(DrawOne(ui, state, view, art));
+    REQUIRE(context.ActiveId == field);
+
+    ImGui::GetIO().AddInputCharactersUTF8("0xFF88");
+    const ro::ui::PaletteEditorAction partial = DrawOne(ui, state, view, art);
+    CHECK(partial.picked_ramp == -1);
+
+    ImGui::GetIO().AddInputCharactersUTF8("0a");
+    const ro::ui::PaletteEditorAction whole = DrawOne(ui, state, view, art);
+    CHECK(whole.picked_ramp == 0);
+    CHECK(whole.picked_color == Rgb{255, 136, 10});
+
+    // 🔴 LA PIÈCE N'A PAS PRIS CE CODE — la vue de cet essai ne bouge pas —, le
+    // champ reste actif et diffère de sa couleur : rien ne repart pour autant.
+    CHECK(context.ActiveId == field);
+    const ro::ui::PaletteEditorAction after = DrawOne(ui, state, view, art);
+    CHECK(after.picked_ramp == -1);
+  }
 }

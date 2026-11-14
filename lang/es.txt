@@ -515,8 +515,8 @@ tr: Color del título
 fr: Couleur n° %d
 tr: Color n.º %d
 
-fr: Couleur unique (absolu)
-tr: Color único (absoluto)
+fr: Couleur unique
+tr: Color único
 
 fr: Coup d'éclat
 tr: Golpe maestro
@@ -584,8 +584,8 @@ tr: Arena lanzada ante ti ciega a la horda.
 fr: Déclencher les deux pouvoirs d'un plateau de Roggle.
 tr: Activa los dos poderes de un tablero de Roggle.
 
-fr: Décoché : la teinte tourne, et la pièce garde sa matière — ses reflets, ses ombres colorées. Coché : une teinte et une saturation uniques, qui colorent aussi les gris et les blancs.
-tr: Sin marcar: el tono gira y la pieza conserva su material — sus brillos, sus sombras de color. Marcado: un único tono y una única saturación, que también colorean los grises y los blancos.
+fr: Les couleurs d'origine sont décalées ensemble : la pièce garde ses reflets et ses ombres colorées. Un gris reste gris.
+tr: Los colores originales se desplazan juntos: la pieza conserva sus brillos y sus sombras de color. Un gris sigue gris.
 
 fr: Défaire
 tr: Deshacer
@@ -773,8 +773,8 @@ tr: Consigue 10 000 puntos en un solo tiro de Roggle.
 fr: Meilleur du jour :
 tr: Mejor del día:
 
-fr: Mode avancé
-tr: Modo avanzado
+fr: Garder les nuances
+tr: Conservar los matices
 
 fr: Modifier la fiche
 tr: Editar ficha
@@ -893,8 +893,8 @@ tr: Nada que validar: tu personaje ya lleva este estilo.
 fr: Rose
 tr: Rosa
 
-fr: Rotation : %+d°
-tr: Rotación: %+d°
+fr: Teinte : %+d°
+tr: Tono: %+d°
 
 fr: Rouge
 tr: Rojo
@@ -23821,11 +23821,11 @@ tr: Este tinte pertenece a este compañero y vale para su forma actual.
 fr: Une évolution change son sprite : la teinture s'endort alors, et il retrouve ses couleurs d'origine. Elle revient s'il reprend cette forme.
 tr: Una evolución cambia su sprite: el tinte queda dormido y recupera sus colores originales. Vuelve si retoma esta forma.
 
-fr: Ce compagnon est presque gris : coche « Couleur unique (absolu) » sur une pièce pour la colorer.
-tr: Este compañero es casi gris: marca « Color único (absoluto) » en una pieza para colorearla.
+fr: Ce compagnon est presque gris : choisis « Couleur unique » sur une pièce pour la colorer.
+tr: Este compañero es casi gris: elige « Color único » en una pieza para colorearla.
 
-fr: Tourner la teinte ne change pas un gris. Le réglage absolu impose une teinte et une saturation : c'est lui qui colore un Lunatic blanc.
-tr: Girar el tono no cambia un gris. El ajuste absoluto impone un tono y una saturación: es lo que colorea a un Lunatic blanco.
+fr: Décaler la teinte ne change pas un gris. « Couleur unique » impose une teinte et une saturation : c'est elle qui colore un Lunatic blanc.
+tr: Desplazar el tono no cambia un gris. « Color único » impone un tono y una saturación: es lo que colorea a un Lunatic blanco.
 
 fr: Une teinture de compagnon se valide auprès du styliste.
 tr: Un tinte de compañero se confirma con el estilista.
@@ -23860,8 +23860,8 @@ tr: Este item muestra un efecto: ajustarlo
 fr: Cette teinture appartient à l'item qui pose l'effet : elle le suit à l'échange, à la vente, au storage et au courrier.
 tr: Este tinte pertenece al item que muestra el efecto: lo sigue en intercambios, ventas, storage y correo.
 
-fr: Clarté
-tr: Claridad
+fr: Intensité : %+d %%
+tr: Intensidad: %+d %%
 
 fr: Envoyé : en attente du serveur.
 tr: Enviado: esperando al servidor.
@@ -23901,9 +23901,6 @@ tr: ¿Quitar el tinte de este efecto?
 
 fr: Revenir à ce que je porte
 tr: Volver a lo que llevo
-
-fr: Teinte
-tr: Tono
 
 fr: Tu n'affiches aucun effet de chapeau.
 tr: No muestras ningún efecto de sombrero.
@@ -24369,3 +24366,30 @@ tr: Gran Alchemist
 
 fr: Obtenir chacun des skills évolués de l'Alchemist, au fil des parties.
 tr: Obtén cada una de las habilidades evolucionadas del Alchemist, a lo largo de las partidas.
+
+fr: Toute la pièce prend la teinte et la saturation choisies : c'est ce qui colore aussi un gris ou un blanc.
+tr: Toda la pieza toma el tono y la saturación elegidos: es lo que colorea también un gris o un blanco.
+
+fr: La teinte que prend toute la pièce.
+tr: El tono que toma toda la pieza.
+
+fr: À zéro, la pièce est grise ; à cent, sa couleur est franche.
+tr: En cero, la pieza es gris; en cien, su color es puro.
+
+fr: Fait tourner les teintes d'origine de la pièce, en degrés.
+tr: Gira los tonos originales de la pieza, en grados.
+
+fr: Moins, la pièce tourne au gris ; plus, ses couleurs se font vives.
+tr: Menos vuelve gris la pieza; más aviva sus colores.
+
+fr: Plus sombre ou plus claire que le dessin d'origine, dont la pièce garde les ombres et les reflets.
+tr: Más oscura o más clara que el dibujo original, del que la pieza conserva las sombras y los brillos.
+
+fr: Un gris n'a pas de teinte à décaler : « Couleur unique » le colore.
+tr: Un gris no tiene tono que desplazar: « Color único » lo colorea.
+
+fr: Code couleur
+tr: Código de color
+
+fr: Le code de cette couleur. Copie-le, ou colle un autre code à sa place : 0xRRGGBB, #RRGGBB ou RRGGBB.
+tr: El código de este color. Cópialo, o pega otro código en su lugar: 0xRRGGBB, #RRGGBB o RRGGBB.

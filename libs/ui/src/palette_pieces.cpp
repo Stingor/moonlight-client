@@ -6,7 +6,10 @@
 #include <cstdio>
 #include <optional>
 
+#include <imgui_internal.h>  // GetInputTextState : ce que la saisie du code vient de changer
+
 #include "ro/core/i18n.h"
+#include "ro/ui/color_code.h"
 #include "ro/ui/skin_palette.h"
 #include "ro/ui/skin_popup.h"
 #include "ro/ui/skin_widgets.h"
@@ -26,9 +29,18 @@ constexpr int kFullValue = 255;
 constexpr float kFullChannel = 255.0F;
 constexpr int kPercent = 100;
 constexpr int kDegreesPerTurn = 360;
-// La rotation relative du mode avancé : un demi-tour de chaque côté suffit à
-// atteindre toutes les teintes.
+// Le décalage de teinte des nuances gardées : un demi-tour de chaque côté
+// suffit à atteindre toutes les teintes.
 constexpr int kHalfTurn = 180;
+// Sous cette saturation, une couleur d'origine n'a aucune teinte : rien à
+// tourner, et aucun rapport de saturation à tirer d'elle.
+constexpr float kHuelessBelow = 0.01F;
+// Le champ du code couleur : la place d'une saisie, préfixe compris et un peu
+// plus qu'un code pour qu'un collage mal rogné s'y lise, et le texte dont il
+// prend la largeur — le code le plus large, un chiffre de marge pour le
+// curseur.
+constexpr std::size_t kCodeFieldSize = 16;
+constexpr const char* kWidestCode = "0xDDDDDDD";
 
 // L'ambre dont s'allume la pièce que la pipette désigne, la même que celle du
 // cadre d'une case choisie.
@@ -66,22 +78,92 @@ constexpr float kPinkUpTo = 340.0F;
   return static_cast<std::uint8_t>(std::clamp(std::lround(channel * kFullChannel), 0L, 255L));
 }
 
+// Teinte en degrés, saturation et clarté sur un.
+struct HsvColor {
+  float degrees = 0.0F;
+  float saturation = 0.0F;
+  float value = 0.0F;
+};
+
+[[nodiscard]] HsvColor HsvOf(ImU32 color) {
+  const std::array<float, 3> rgb = Channels(color);
+  float hue = 0.0F;
+  HsvColor read;
+  ImGui::ColorConvertRGBtoHSV(rgb[0], rgb[1], rgb[2], hue, read.saturation, read.value);
+  read.degrees = hue * static_cast<float>(kDegreesPerTurn);
+  return read;
+}
+
 // ── LE NUANCIER ─────────────────────────────────────────────────────────────
 
-// LE NUANCIER D'UNE PIÈCE : le carré et la barre de teinte d'ImGui, sans son
-// infobulle, son menu ni ses champs, tous en anglais ; puis nos trois
-// curseurs, en degrés et en pour-cent. Rend vrai quand la couleur a changé.
-[[nodiscard]] bool DrawPicker(std::array<float, 3>& rgb, const SkinArt& art) {
-  bool changed = false;
+// LE CARRÉ ET LA BARRE DE TEINTE d'ImGui, sans son infobulle, son menu ni ses
+// champs, tous en anglais. Rend vrai quand la couleur a changé.
+[[nodiscard]] bool DrawSquare(std::array<float, 3>& rgb) {
   std::array<float, 4> picked = {rgb[0], rgb[1], rgb[2], 1.0F};
-  if (ImGui::ColorPicker4("##choix", picked.data(),
-                          ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoAlpha |
-                              ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoOptions |
-                              ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoLabel |
-                              ImGuiColorEditFlags_PickerHueBar)) {
-    rgb = {picked[0], picked[1], picked[2]};
-    changed = true;
+  if (!ImGui::ColorPicker4("##choix", picked.data(),
+                           ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoAlpha |
+                               ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoOptions |
+                               ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoLabel |
+                               ImGuiColorEditFlags_PickerHueBar)) {
+    return false;
   }
+  rgb = {picked[0], picked[1], picked[2]};
+  return true;
+}
+
+// LE CODE DE LA COULEUR, sous le carré : `0xRRGGBB`, qu'un clic sélectionne en
+// entier pour le copier, ou pour coller un autre code à sa place. Rend vrai
+// quand un code entier vient d'être tapé ou collé.
+//
+// 🔴 HORS SAISIE, LE CHAMP DIT LA COULEUR RÉELLE : il se réécrit à chaque image
+// depuis ce que la pastille montre, et ImGui ne lui préfère la saisie que tant
+// qu'il tient le clavier. Une pièce qui n'a pas pu atteindre le code tapé le
+// montre donc dès qu'on quitte le champ.
+//
+// ⚠ ON NE REPEINT QU'À LA FRAPPE. Tant que le champ est actif et diffère de la
+// couleur, `InputText` rend vrai à CHAQUE image : s'y fier rejouerait le même
+// code sans fin — et choisir une couleur, c'est l'imposer en couleur unique.
+[[nodiscard]] bool DrawCode(std::array<float, 3>& rgb) {
+  const char* const label = core::Tr("Code couleur");
+  const ImGuiID field = ImGui::GetID(label);
+  std::array<char, kCodeFieldSize> typed{};
+  const std::array<char, kColorCodeSize> code =
+      FormatColorCode({ToByte(rgb[0]), ToByte(rgb[1]), ToByte(rgb[2])});
+  std::copy(code.begin(), code.end(), typed.begin());
+  ImGui::SetNextItemWidth(ImGui::CalcTextSize(kWidestCode).x +
+                          ImGui::GetStyle().FramePadding.x * 2.0F);
+  static_cast<void>(
+      ImGui::InputText(label, typed.data(), typed.size(),
+                       ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_CharsNoBlank));
+  const bool active = ImGui::IsItemActive();
+  SkinTooltip(
+      core::Tr("Le code de cette couleur. Copie-le, ou colle un autre code à sa place : "
+               "0xRRGGBB, #RRGGBB ou RRGGBB."));
+  const ImGuiInputTextState* const typing = active ? ImGui::GetInputTextState(field) : nullptr;
+  if (typing == nullptr || !typing->EditedThisFrame) {
+    return false;
+  }
+  const std::optional<std::array<std::uint8_t, 3>> read = ParseColorCode(typed.data());
+  if (!read.has_value()) {
+    return false;
+  }
+  rgb = {static_cast<float>((*read)[0]) / kFullChannel,
+         static_cast<float>((*read)[1]) / kFullChannel,
+         static_cast<float>((*read)[2]) / kFullChannel};
+  return true;
+}
+
+// LE CHOIX D'UNE COULEUR, À L'ŒIL OU AU CODE : le carré, puis son code.
+[[nodiscard]] bool DrawChoice(std::array<float, 3>& rgb) {
+  const bool squared = DrawSquare(rgb);
+  return DrawCode(rgb) || squared;
+}
+
+// LE NUANCIER D'UNE COULEUR EXACTE — la peau, une retouche : le carré et son
+// code, puis cette couleur en trois curseurs, en degrés et en pour-cent. Rend
+// vrai quand la couleur a changé.
+[[nodiscard]] bool DrawPicker(std::array<float, 3>& rgb, const SkinArt& art) {
+  bool changed = DrawChoice(rgb);
   float hue = 0.0F;
   float saturation = 0.0F;
   float value = 0.0F;
@@ -107,82 +189,97 @@ constexpr float kPinkUpTo = 340.0F;
   return changed;
 }
 
-// LE RÉGLAGE ABSOLU, à portée de main sous le nuancier : c'est lui qui colore
-// un gris ou un blanc, qu'une rotation de teinte laisse gris.
+// LE MODE D'UNE PIÈCE, entre le carré et les curseurs : il dit ce que ceux-ci
+// règlent. Rend le réglage passé dans l'autre mode, ou rien.
 //
-// 🔴 LA ROTATION RELATIVE GARDE LA MATIÈRE : elle tourne les teintes de la
-// pièce sans les écraser sur une seule, si bien qu'un tissu à reflets garde
-// ses reflets. Le mode absolu, lui, pose une teinte et une saturation
-// uniques. Rend le réglage changé, ou rien.
-[[nodiscard]] std::optional<render::RampAdjust> DrawAbsoluteToggle(
-    const render::RampAdjust& current, ImU32 base_color, const SkinArt& art) {
-  render::RampAdjust next = current;
-  bool changed = false;
-  bool absolute = current.absolute;
-  if (SkinCheckBox(core::Tr("Couleur unique (absolu)"), &absolute, art)) {
-    next.absolute = absolute;
-    if (absolute) {
-      // On part de la couleur d'origine : basculer ne doit rien repeindre.
-      const std::array<float, 3> rgb = Channels(base_color);
-      float hue = 0.0F;
-      float saturation = 0.0F;
-      float value = 0.0F;
-      ImGui::ColorConvertRGBtoHSV(rgb[0], rgb[1], rgb[2], hue, saturation, value);
-      next.hue = static_cast<std::int16_t>(std::lround(hue * static_cast<float>(kDegreesPerTurn)) %
-                                           kDegreesPerTurn);
-      next.saturation = static_cast<std::int8_t>(std::lround(saturation * kPercent));
-    } else {
-      next.hue = 0;
-      next.saturation = 0;
-    }
-    changed = true;
+// 🔴 « GARDER LES NUANCES » DÉCALE LES COULEURS D'ORIGINE sans les écraser sur
+// une seule, si bien qu'un tissu à reflets garde ses reflets. « COULEUR
+// UNIQUE » pose une teinte et une saturation uniques : c'est elle qui colore
+// un gris ou un blanc, qu'un décalage laisse gris — et c'est elle que donne
+// une couleur désignée dans le carré.
+[[nodiscard]] std::optional<render::RampAdjust> DrawMode(const render::RampAdjust& current,
+                                                         ImU32 base_color, const SkinArt& art) {
+  bool single_colour = current.absolute;
+  if (SkinRadio(core::Tr("Couleur unique"), current.absolute, art)) {
+    single_colour = true;
   }
-  if (ImGui::IsItemHovered()) {
-    SkinTooltip(
-        core::Tr("Décoché : la teinte tourne, et la pièce garde sa matière — ses reflets, "
-                 "ses ombres colorées. Coché : une teinte et une saturation uniques, qui "
-                 "colorent aussi les gris et les blancs."));
+  SkinTooltip(
+      core::Tr("Toute la pièce prend la teinte et la saturation choisies : c'est ce qui "
+               "colore aussi un gris ou un blanc."));
+  ImGui::SameLine();
+  if (SkinRadio(core::Tr("Garder les nuances"), !current.absolute, art)) {
+    single_colour = false;
   }
-  if (!changed) {
+  SkinTooltip(
+      core::Tr("Les couleurs d'origine sont décalées ensemble : la pièce garde ses "
+               "reflets et ses ombres colorées. Un gris reste gris."));
+  if (single_colour == current.absolute) {
     return std::nullopt;
   }
-  return next;
+  return PieceAdjustInMode(current, single_colour, base_color);
 }
 
-// LE MODE AVANCÉ : le réglage lui-même, plutôt qu'une couleur à atteindre.
-// Rend le réglage changé, ou rien.
-[[nodiscard]] std::optional<render::RampAdjust> DrawAdvanced(const render::RampAdjust& current,
-                                                             const SkinArt& art) {
-  render::RampAdjust next = current;
+// LES TROIS CURSEURS DU NUANCIER : le réglage lui-même. Rend le réglage
+// changé, ou rien.
+//
+// 🔴 UN SEUL JEU DE CURSEURS, où chaque nom ne figure qu'une fois : le carré
+// désigne une couleur, eux disent le réglage qui y mène, et l'affinent.
+// Montrer en plus la couleur visée en curseurs écrirait deux fois la teinte et
+// la saturation, sous le même nom.
+//
+// ⚠ EN COULEUR UNIQUE, teinte et saturation sont celles que prend la pièce ; en
+// nuances gardées, des écarts à ses couleurs d'origine, écrits avec leur
+// signe. LA CLARTÉ EST UN ÉCART DANS LES DEUX : c'est elle qui porte le modelé,
+// et sa borne haute est le plafond de la pièce.
+[[nodiscard]] std::optional<render::RampAdjust> DrawSliders(const render::RampAdjust& current,
+                                                            const SkinArt& art) {
+  int hue = current.hue;
+  int saturation = current.saturation;
+  int value = current.value;
   bool changed = false;
-  int hue = next.hue;
-  int saturation = next.saturation;
-  int value = next.value;
-  if (next.absolute) {
-    changed = SkinSliderInt("##teinte_abs", &hue, 0, kDegreesPerTurn - 1, art,
-                            core::Tr("Teinte : %d°")) ||
-              changed;
+  if (current.absolute) {
     changed =
-        SkinSliderInt("##sat_abs", &saturation, 0, kPercent, art, core::Tr("Saturation : %d %%")) ||
-        changed;
-  } else {
-    changed = SkinSliderInt("##rotation", &hue, -kHalfTurn, kHalfTurn, art,
-                            core::Tr("Rotation : %+d°")) ||
+        SkinSliderInt("##teinte", &hue, 0, kDegreesPerTurn - 1, art, core::Tr("Teinte : %d°"));
+    SkinTooltip(core::Tr("La teinte que prend toute la pièce."));
+    changed = SkinSliderInt("##saturation", &saturation, 0, kPercent, art,
+                            core::Tr("Saturation : %d %%")) ||
               changed;
-    changed = SkinSliderInt("##sat_rel", &saturation, -kPercent, kPercent, art,
+    SkinTooltip(core::Tr("À zéro, la pièce est grise ; à cent, sa couleur est franche."));
+  } else {
+    changed =
+        SkinSliderInt("##teinte", &hue, -kHalfTurn, kHalfTurn, art, core::Tr("Teinte : %+d°"));
+    SkinTooltip(core::Tr("Fait tourner les teintes d'origine de la pièce, en degrés."));
+    changed = SkinSliderInt("##saturation", &saturation, -kPercent, kPercent, art,
                             core::Tr("Saturation : %+d %%")) ||
               changed;
+    SkinTooltip(core::Tr("Moins, la pièce tourne au gris ; plus, ses couleurs se font vives."));
   }
-  changed = SkinSliderInt("##clarte_rel", &value, -kPercent, kPercent, art,
-                          core::Tr("Clarté : %+d %%")) ||
-            changed;
+  changed =
+      SkinSliderInt("##clarte", &value, -kPercent, kPercent, art, core::Tr("Clarté : %+d %%")) ||
+      changed;
+  SkinTooltip(
+      core::Tr("Plus sombre ou plus claire que le dessin d'origine, dont la pièce garde "
+               "les ombres et les reflets."));
   if (!changed) {
     return std::nullopt;
   }
+  render::RampAdjust next = current;
   next.hue = static_cast<std::int16_t>(hue);
   next.saturation = static_cast<std::int8_t>(saturation);
   next.value = static_cast<std::int8_t>(value);
   return next;
+}
+
+// 🔴 UN GRIS NE SE COLORE PAS PAR UN DÉCALAGE : sans le dire, les curseurs de
+// teinte et de saturation auraient l'air cassés.
+void DrawGreyHint(const render::RampAdjust& current, ImU32 base_color) {
+  if (current.absolute || HsvOf(base_color).saturation >= kGreyBelow) {
+    return;
+  }
+  ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + ImGui::CalcItemWidth());
+  ImGui::TextDisabled(
+      "%s", core::Tr("Un gris n'a pas de teinte à décaler : « Couleur unique » le colore."));
+  ImGui::PopTextWrapPos();
 }
 
 // ── UNE PIÈCE ───────────────────────────────────────────────────────────────
@@ -354,9 +451,9 @@ void DrawPieceMenu(const PieceShown& piece, PaletteEditorAction& action) {
   EndSkinPopup();
 }
 
-// Le nuancier de la pièce, s'il est ouvert. Rend vrai quand il l'est.
-bool DrawPiecePopup(const PieceShown& piece, PaletteEditorState& state, const SkinArt& art,
-                    PaletteEditorAction& action) {
+// Le nuancier de la pièce, s'il est ouvert : le carré, le mode, les trois
+// curseurs. Rend vrai quand il l'est.
+bool DrawPiecePopup(const PieceShown& piece, const SkinArt& art, PaletteEditorAction& action) {
   if (!BeginSkinPopup("nuancier")) {
     return false;
   }
@@ -365,25 +462,19 @@ bool DrawPiecePopup(const PieceShown& piece, PaletteEditorState& state, const Sk
   ImGui::TextUnformatted(LabelOf(piece).text.data());
   ImGui::Separator();
   std::array<float, 3> rgb = Channels(piece.color);
-  if (DrawPaletteColorPicker(rgb, art)) {
+  if (DrawChoice(rgb)) {
     action.picked_ramp = static_cast<int>(piece.rank);
     action.picked_color = {ToByte(rgb[0]), ToByte(rgb[1]), ToByte(rgb[2])};
   }
-  if (const std::optional<render::RampAdjust> adjust =
-          DrawAbsoluteToggle(piece.adjust, piece.base_color, art)) {
+  std::optional<render::RampAdjust> adjust = DrawMode(piece.adjust, piece.base_color, art);
+  if (const std::optional<render::RampAdjust> slid = DrawSliders(piece.adjust, art)) {
+    adjust = slid;
+  }
+  if (adjust.has_value()) {
     action.adjusted_ramp = static_cast<int>(piece.rank);
     action.adjust = *adjust;
   }
-  // D13 : replié par défaut, il ne s'adresse qu'à qui le cherche.
-  ImGui::SetNextItemOpen(state.advanced);
-  state.advanced = ImGui::TreeNode(core::Tr("Mode avancé"));
-  if (state.advanced) {
-    if (const std::optional<render::RampAdjust> adjust = DrawAdvanced(piece.adjust, art)) {
-      action.adjusted_ramp = static_cast<int>(piece.rank);
-      action.adjust = *adjust;
-    }
-    ImGui::TreePop();
-  }
+  DrawGreyHint(piece.adjust, piece.base_color);
   if (SkinButton(core::Tr("Fermer"), art)) {
     ImGui::CloseCurrentPopup();
   }
@@ -396,7 +487,7 @@ bool DrawPiece(const PieceShown& piece, PaletteEditorState& state, const Palette
                const SkinArt& art, PaletteEditorAction& action, bool& picker_open) {
   ImGui::PushID(static_cast<int>(piece.rank));
   bool hovered = DrawSwatch(piece, state, view, action);
-  picker_open = DrawPiecePopup(piece, state, art, action) || picker_open;
+  picker_open = DrawPiecePopup(piece, art, action) || picker_open;
   // 🔴 SUR LA MÊME LIGNE QUE LA PASTILLE : sans cet appel, chaque pièce prend
   // deux rangées, et le pantin, dont le côté vaut la hauteur calculée de la
   // liste, se retrouve deux fois trop petit.
@@ -423,17 +514,65 @@ bool DrawPiece(const PieceShown& piece, PaletteEditorState& state, const Palette
 
 }  // namespace
 
+bool DrawPaletteColorChoice(std::array<float, 3>& rgb) { return DrawChoice(rgb); }
+
 bool DrawPaletteColorPicker(std::array<float, 3>& rgb, const SkinArt& art) {
   return DrawPicker(rgb, art);
 }
 
+render::RampAdjust PieceAdjustInMode(const render::RampAdjust& current, bool single_colour,
+                                     ImU32 base_color) {
+  if (current.absolute == single_colour) {
+    return current;
+  }
+  const HsvColor base = HsvOf(base_color);
+  const auto full_turn = static_cast<float>(kDegreesPerTurn);
+  render::RampAdjust next = current;
+  next.absolute = single_colour;
+  if (single_colour) {
+    // La couleur que les écarts donnaient à la pièce devient celle qu'on lui
+    // impose. ⚠ LE RESTE D'UNE DIVISION GARDE LE SIGNE DE SON DIVIDENDE : une
+    // teinte décalée vers le bas sortirait négative.
+    float turned = std::fmod(base.degrees + static_cast<float>(current.hue), full_turn);
+    if (turned < 0.0F) {
+      turned += full_turn;
+    }
+    next.hue = static_cast<std::int16_t>(std::lround(turned) % kDegreesPerTurn);
+    const float saturation = base.saturation * (1.0F + static_cast<float>(current.saturation) /
+                                                           static_cast<float>(kPercent));
+    next.saturation = static_cast<std::int8_t>(
+        std::lround(std::clamp(saturation, 0.0F, 1.0F) * static_cast<float>(kPercent)));
+    return next;
+  }
+  // Une couleur d'origine sans teinte n'a rien à tourner ni à raviver.
+  if (base.saturation < kHuelessBelow) {
+    next.hue = 0;
+    next.saturation = 0;
+    return next;
+  }
+  // L'écart le plus court vers la teinte imposée, d'un côté ou de l'autre.
+  const auto half_turn = static_cast<float>(kHalfTurn);
+  float turn = std::fmod(static_cast<float>(current.hue) - base.degrees, full_turn);
+  if (turn > half_turn) {
+    turn -= full_turn;
+  } else if (turn < -half_turn) {
+    turn += full_turn;
+  }
+  next.hue = static_cast<std::int16_t>(std::lround(turn));
+  const float factor =
+      static_cast<float>(current.saturation) / static_cast<float>(kPercent) / base.saturation -
+      1.0F;
+  next.saturation = static_cast<std::int8_t>(
+      std::clamp(std::lround(factor * static_cast<float>(kPercent)), -static_cast<long>(kPercent),
+                 static_cast<long>(kPercent)));
+  return next;
+}
+
 const char* PieceColorName(ImU32 color) {
-  const std::array<float, 3> rgb = Channels(color);
-  float hue = 0.0F;
-  float saturation = 0.0F;
-  float value = 0.0F;
-  ImGui::ColorConvertRGBtoHSV(rgb[0], rgb[1], rgb[2], hue, saturation, value);
-  const float degrees = hue * static_cast<float>(kDegreesPerTurn);
+  const HsvColor read = HsvOf(color);
+  const float degrees = read.degrees;
+  const float saturation = read.saturation;
+  const float value = read.value;
   if (value < kBlackBelow) {
     return core::Tr("noir");
   }

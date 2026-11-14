@@ -873,6 +873,7 @@ add_executable(ro_tests
     ui/packet_window_test.cpp
     ui/palette_editor_test.cpp
     ui/palette_effects_test.cpp
+    ui/color_code_test.cpp
     ui/shortcut_bar_test.cpp
     ui/shortcut_wheel_test.cpp
     ui/skin_art_test.cpp

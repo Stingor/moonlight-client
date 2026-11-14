@@ -121,15 +121,15 @@ void DrawCompanionNotes(const PaletteTab& tab, const PaletteEditorView& view, co
   Explain(
       core::Tr("Une évolution change son sprite : la teinture s'endort alors, et il "
                "retrouve ses couleurs d'origine. Elle revient s'il reprend cette forme."));
-  // 🔴 UN GRIS NE SE COLORE PAS PAR UNE ROTATION : sans le dire, les curseurs de
+  // 🔴 UN GRIS NE SE COLORE PAS PAR UN DÉCALAGE : sans le dire, les curseurs de
   // teinte auraient l'air cassés.
   if (tab.mostly_grey) {
     Wrapped(
-        core::Tr("Ce compagnon est presque gris : coche « Couleur unique (absolu) » sur une "
-                 "pièce pour la colorer."));
+        core::Tr("Ce compagnon est presque gris : choisis « Couleur unique » sur une pièce "
+                 "pour la colorer."));
     Explain(
-        core::Tr("Tourner la teinte ne change pas un gris. Le réglage absolu impose une "
-                 "teinte et une saturation : c'est lui qui colore un Lunatic blanc."));
+        core::Tr("Décaler la teinte ne change pas un gris. « Couleur unique » impose une "
+                 "teinte et une saturation : c'est elle qui colore un Lunatic blanc."));
   }
   if (!view.atelier_open) {
     ImGui::TextDisabled("%s", core::Tr("Une teinture de compagnon se valide auprès du styliste."));

@@ -692,8 +692,6 @@ struct PaletteEditorState {
   std::uint32_t stroke = 0;
   // La pièce dont la pipette demande d'ouvrir le nuancier, ou moins un.
   int open_piece = -1;
-  // Le mode avancé du nuancier est-il déplié ?
-  bool advanced = false;
   // LE NUANCIER DE PEAU QUE LA PIPETTE DEMANDE D'OUVRIR : celui de la ligne de
   // cet onglet, une fois la vue faite de lui.
   std::optional<PaletteTabKind> skin_open;
@@ -780,6 +778,14 @@ void OpenPaletteTab(PaletteEditorState& state, bool asked, PaletteTabKind tab);
 // LE NOM D'UNE COULEUR, tel qu'une pièce le porte : « rouge », « bleu »,
 // « gris »…, DÉJÀ TRADUIT dans la langue du joueur.
 [[nodiscard]] const char* PieceColorName(ImU32 color);
+
+// LE RÉGLAGE D'UNE PIÈCE PASSÉE DANS L'AUTRE MODE, « couleur unique » ou
+// « nuances gardées », sans changer la couleur de sa pastille : les écarts
+// deviennent la teinte et la saturation qu'ils donnaient, et l'inverse. La
+// clarté, un écart dans les deux modes, ne bouge pas. ⚠ Une couleur d'origine
+// grise n'a rien à décaler : ses nuances gardées reviennent à zéro.
+[[nodiscard]] render::RampAdjust PieceAdjustInMode(const render::RampAdjust& current,
+                                                   bool single_colour, ImU32 base_color);
 
 inline constexpr const char* kPaletteEditorTitle = core::TrText("Couleurs du personnage");
 inline constexpr const char* kPaletteEditorId = "style";
