@@ -730,7 +730,17 @@ struct PaletteEditorState {
   bool wardrobe_asked = false;
   // L'onglet des effets : l'effet choisi et les réglages en cours.
   PaletteEffectsState effects;
+  // UNE FERMETURE DEMANDÉE D'AILLEURS — la fiche, le styliste — que la
+  // fenêtre honore à sa prochaine image, après confirmation si le style n'est
+  // pas validé. Remise à faux une fois lue.
+  bool close_asked = false;
 };
+
+// 🔴 FERME L'ÉDITEUR COMME SA CROIX : un style non validé demande d'abord
+// confirmation. Jamais `open = false` depuis l'extérieur.
+void ClosePaletteEditor(PaletteEditorState& state);
+// Ouvre l'éditeur fermé, ferme l'éditeur ouvert par `ClosePaletteEditor`.
+void TogglePaletteEditor(PaletteEditorState& state);
 
 // OUVRE L'ÉDITEUR SUR UN ONGLET quand `asked` : un bouton « Couleurs » d'une
 // autre fenêtre. Un onglet absent (le compagnon est rentré) retombe sur le

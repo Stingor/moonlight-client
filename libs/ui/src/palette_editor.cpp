@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cstdio>
+#include <utility>
 
 #include "ro/core/i18n.h"
 #include "ro/ui/bug_report_window.h"
@@ -402,6 +403,16 @@ void DrawBodyLines(const PaletteEditorView& view) {
 
 }  // namespace
 
+void ClosePaletteEditor(PaletteEditorState& state) { state.close_asked = state.open; }
+
+void TogglePaletteEditor(PaletteEditorState& state) {
+  if (state.open) {
+    ClosePaletteEditor(state);
+  } else {
+    state.open = true;
+  }
+}
+
 PaletteEditorAction DrawPaletteEditor(PaletteEditorState& state, const PaletteEditorView& view,
                                       const SkinArt& art) {
   PaletteEditorAction action;
@@ -413,6 +424,7 @@ PaletteEditorAction DrawPaletteEditor(PaletteEditorState& state, const PaletteEd
   state.doll.before = false;
   state.skin_focus = false;
   if (!state.open) {
+    state.close_asked = false;
     return action;
   }
 
@@ -428,14 +440,15 @@ PaletteEditorAction DrawPaletteEditor(PaletteEditorState& state, const PaletteEd
   // d'autre n'est parti, et l'aperçu ne survit pas à la fenêtre.
   const bool unsent = view.has_something_to_send ||
                       (view.effects != nullptr && EffectsDiffer(state.effects, *view.effects));
-  if (!open && !unsent) {
+  const bool closing = !open || std::exchange(state.close_asked, false);
+  if (closing && !unsent) {
     state.open = false;
   }
   if (!begun) {
     EndSkinnedWindow();
     return action;
   }
-  if (!open && unsent) {
+  if (closing && unsent) {
     ImGui::OpenPopup("fermer_sans_valider");
   }
   if (Confirm("fermer_sans_valider",

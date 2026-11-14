@@ -144,13 +144,13 @@ void Game::StageStyle(std::uint32_t now_ms) {
   if (const std::optional<ro::sim::StyleEditorRequest> asked = world_.styles().TakeRequest()) {
     switch (*asked) {
       case ro::sim::StyleEditorRequest::kClose:
-        windows_.style.open = false;
+        ro::ui::ClosePaletteEditor(windows_.style);
         break;
       case ro::sim::StyleEditorRequest::kOpen:
         windows_.style.open = true;
         break;
       case ro::sim::StyleEditorRequest::kToggle:
-        windows_.style.open = !windows_.style.open;
+        ro::ui::TogglePaletteEditor(windows_.style);
         break;
     }
     // U17 : LE STYLISTE OUVRE SUR UN ONGLET. Un onglet que le joueur ne porte
@@ -235,7 +235,7 @@ void Game::StageStyle(std::uint32_t now_ms) {
 void Game::ApplySheetAnswers(const UiStage::Answers& answers) {
   const ro::ui::PresetAction& asked = answers.character.presets;
   if (asked.toggle_style) {
-    windows_.style.open = !windows_.style.open;
+    ro::ui::TogglePaletteEditor(windows_.style);
   }
   presets_->Apply(asked, windows_.character.presets, link_, world_);
 
