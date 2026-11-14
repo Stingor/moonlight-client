@@ -23,8 +23,9 @@ texte du jeu. Le client lit l'installation que le joueur possède déjà ; sans
 elle, il n'affiche rien.
 
 Ce dépôt est une **copie publiée** des sources du client. Le développement a
-lieu ailleurs, et chaque mise à jour arrive ici en un seul commit qui nomme sa
-révision d'origine. Les signalements sont bienvenus dans les *issues* ; une
+lieu ailleurs, et chaque commit arrive ici avec son message, sous une ligne
+`moonclient: <révision>` qui nomme l'original. Voir `CLAUDE.md` pour les règles
+d'écriture. Les signalements sont bienvenus dans les *issues* ; une
 *pull request* ne peut pas être fusionnée telle quelle, mais elle sera lue.
 
 ## Construire
@@ -88,11 +89,13 @@ par l'éditeur de liens : une couche n'inclut que celles qu'elle déclare.
 core     ← ne connaît rien
 formats  ← core                 lecture des formats de fichiers
 vfs      ← core, formats        système de fichiers virtuel sur les archives
+mapedit  ← core, formats        édition des cartes
 proto    ← core                 paquets du protocole
 audio    ← core
 sim      ← core, formats        état du monde, sans fenêtre
 net      ← core, proto, sim
-render   ← core, formats, vfs   rendu OpenGL, sans état de jeu
+voice    ← core, net            voix en jeu
+render   ← core, formats, vfs, mapedit   rendu OpenGL, sans état de jeu
 ui       ← core, render         fenêtres ImGui, en lecture seule
 app      ← tout
 ```
