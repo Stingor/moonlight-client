@@ -262,8 +262,12 @@ void DrawSendButtons(const PaletteEditorView& view, const SkinArt& art,
   }
   ImGui::EndDisabled();
   Explain(SendExplanation(view));
-  ImGui::SameLine();
-  DrawSendStatus(view.send);
+  // ⚠ LA MÊME LIGNE SEULEMENT POUR UN VERDICT À DIRE : sans lui, l'élément
+  // suivant — le trait des préréglages — s'y collerait à droite du bouton.
+  if (view.send != PaletteSendStatus::kNone) {
+    ImGui::SameLine();
+    DrawSendStatus(view.send);
+  }
   // ⚠ LES CALQUES ONT LEUR PROPRE VERDICT : le corps peut être partagé et un
   // chapeau refusé hors de l'atelier, et le joueur doit lire les deux.
   if (view.layers_send != PaletteSendStatus::kNone) {

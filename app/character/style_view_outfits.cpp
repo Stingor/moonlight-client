@@ -51,7 +51,7 @@ namespace {
 
 }  // namespace
 
-void StyleView::RefreshOutfits(const ro::sim::World& world, std::uint32_t /*now_ms*/) {
+void StyleView::RefreshOutfits(const ro::sim::World& world, std::uint32_t now_ms) {
   outfits_.Update(world);
   const ro::sim::OutfitReply& last = world.outfits().last();
   if (last.sequence != 0 && last.sequence != outfit_heard_) {
@@ -69,6 +69,7 @@ void StyleView::RefreshOutfits(const ro::sim::World& world, std::uint32_t /*now_
 
   const ro::sim::Actor* me = world.player();
   view_.outfits_served = StyleOutfits::Served(world);
+  view_.outfits_can_send = outfits_.CanSend(world, now_ms);
   view_.has_outfit =
       me != nullptr && StyleOutfits::Capture(world.player_id(), world.styles()).has_value();
   outfit_code_shown_ = outfits_.published_code().empty()
