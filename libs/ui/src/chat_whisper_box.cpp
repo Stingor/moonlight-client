@@ -160,8 +160,9 @@ void TakeName(ChatInputState& state, std::string_view name, ImGuiID box) {
   return std::nullopt;
 }
 
-// LA LISTE DÉROULÉE, collée sous la box. Rend le rang, dans `names`, du nom
-// cliqué.
+// LA LISTE DÉROULÉE, collée sous la box — ou AU-DESSUS quand le bas de l'écran
+// la couperait : une barre posée en bas déroulerait ses noms hors de la vue.
+// Rend le rang, dans `names`, du nom cliqué.
 //
 // ⚠ LE CLIC SE PREND À L'ENFONCEMENT : cliquer hors de la box la désactive
 // dans la même image, et la liste, qui ne se montre qu'à la box active,
@@ -169,16 +170,22 @@ void TakeName(ChatInputState& state, std::string_view name, ImGuiID box) {
 [[nodiscard]] std::optional<std::size_t> DrawDropDown(ChatInputState& state,
                                                       std::span<const ChatRecentWhisper> names,
                                                       const ChatWhisperListView& view,
-                                                      ImVec2 box_corner, float box_width,
+                                                      ImVec2 box_min, ImVec2 box_max,
                                                       const SkinArt& art) {
   std::optional<std::size_t> picked;
   const SkinLook& look = art.look();
   const ImGuiStyle& style = ImGui::GetStyle();
-  const float width = std::max(box_width, RowWidth(names) + 2.0F * style.WindowPadding.x);
+  const float width =
+      std::max(box_max.x - box_min.x, RowWidth(names) + 2.0F * style.WindowPadding.x);
   const float row_height = ImGui::GetTextLineHeightWithSpacing();
   const float height = static_cast<float>(view.rows.size()) * row_height - style.ItemSpacing.y +
                        2.0F * style.WindowPadding.y;
-  ImGui::SetNextWindowPos(ImVec2(box_corner.x, box_corner.y + kListGap), ImGuiCond_Always);
+  // Le bas de la zone de travail de la fenêtre qui porte la box.
+  const ImGuiViewport* viewport = ImGui::GetWindowViewport();
+  const float screen_bottom = viewport->WorkPos.y + viewport->WorkSize.y;
+  const bool fits_below = box_max.y + kListGap + height <= screen_bottom;
+  const float top = fits_below ? box_max.y + kListGap : box_min.y - kListGap - height;
+  ImGui::SetNextWindowPos(ImVec2(box_min.x, top), ImGuiCond_Always);
   ImGui::SetNextWindowSize(ImVec2(width, height), ImGuiCond_Always);
   ImGui::PushStyleColor(ImGuiCol_WindowBg, look.popup);
   ImGui::PushStyleColor(ImGuiCol_Border, look.border);
@@ -250,8 +257,8 @@ void TakeName(ChatInputState& state, std::string_view name, ImGuiID box) {
   const ImGuiID box = ImGui::GetItemID();
   gesture.active = ImGui::IsItemActive();
   const bool activated = ImGui::IsItemActivated();
-  const ImVec2 box_corner(ImGui::GetItemRectMin().x, ImGui::GetItemRectMax().y);
-  const float box_width = ImGui::GetItemRectSize().x;
+  const ImVec2 box_min = ImGui::GetItemRectMin();
+  const ImVec2 box_max = ImGui::GetItemRectMax();
   // ⚠ RELEVÉ COLLÉ AU WIDGET : plus bas, « l'item » désignerait le dernier
   // dessiné — une infobulle, un menu — et le test d'Échap porterait sur autre
   // chose.
@@ -294,7 +301,7 @@ void TakeName(ChatInputState& state, std::string_view name, ImGuiID box) {
   const ChatWhisperListView view = FollowWhisperList(list, names, state.whisper_to.data());
   if (!picked.has_value() && view.open && (gesture.active || list.box_was_active) && !menu_open &&
       !right_clicked) {
-    picked = DrawDropDown(state, names, view, box_corner, box_width, art);
+    picked = DrawDropDown(state, names, view, box_min, box_max, art);
   }
 
   if (BeginSkinPopup(kWhisperMenu)) {
