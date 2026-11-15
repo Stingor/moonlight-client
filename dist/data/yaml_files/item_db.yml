@@ -129262,6 +129262,13 @@ Body:
     Script: |
       specialeffect2 EF_CLOAKING;
       transform 21530,1200000;
+  - Id: 101184
+    AegisName: Ice_F_Stone_Box2
+    Name: Ice Magic Stone Box 2
+    Type: DelayConsume
+    Trade: {NoDrop: true, NoTrade: true, NoSell: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      laphine_synthesis();
   - Id: 101187
     AegisName: Snow_F_Refine
     Name: Snow Flower Armor +9 Refinement Cube
@@ -132222,6 +132229,1690 @@ Body:
          bonus bReduceDamageReturn,5;
       else
          bonus bReduceDamageReturn,3;
+  - Id: 311092
+    AegisName: Ice_F_Orb_Str
+    Name: Ice Magic Orb (STR)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bStr,3;
+      .@r = getrefine();
+      if (.@r >= 7) {
+        bonus bStr,1;
+        if (.@r >= 9) {
+          bonus bStr,1;
+          if (getallrefine() >= 22) {
+            bonus bPow,1;
+            bonus bShortAtkRate,3;
+          }
+        }
+      }
+  - Id: 311093
+    AegisName: Ice_F_Orb_Dex
+    Name: Ice Magic Orb (DEX)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDex,3;
+      .@r = getrefine();
+      if (.@r >= 7) {
+        bonus bDex,1;
+        if (.@r >= 9) {
+          bonus bDex,1;
+          if (getallrefine() >= 22) {
+            bonus bCon,1;
+            bonus bLongAtkRate,3;
+          }
+        }
+      }
+  - Id: 311094
+    AegisName: Ice_F_Orb_Agi
+    Name: Ice Magic Orb (AGI)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bAgi,3;
+      .@r = getrefine();
+      if (.@r >= 7) {
+        bonus bAgi,1;
+        if (.@r >= 9) {
+          bonus bAgi,1;
+          if (getallrefine() >= 22) {
+            bonus bWis,1;
+            bonus bPerfectHitAddRate,3;
+          }
+        }
+      }
+  - Id: 311095
+    AegisName: Ice_F_Orb_Int
+    Name: Ice Magic Orb (INT)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bInt,3;
+      .@r = getrefine();
+      if (.@r >= 7) {
+        bonus bInt,1;
+        if (.@r >= 9) {
+          bonus bInt,1;
+          if (getallrefine() >= 22) {
+            bonus bSpl,1;
+            bonus2 bMagicAtkEle,Ele_All,3;
+          }
+        }
+      }
+  - Id: 311096
+    AegisName: Ice_F_Orb_Vit
+    Name: Ice Magic Orb (VIT)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bVit,3;
+      .@r = getrefine();
+      if (.@r >= 7) {
+        bonus bVit,1;
+        if (.@r >= 9) {
+          bonus bVit,1;
+          if (getallrefine() >= 22) {
+            bonus bSta,1;
+            bonus bDelayrate,-3;
+          }
+        }
+      }
+  - Id: 311097
+    AegisName: Ice_F_Orb_luk
+    Name: Ice Magic Orb (LUK)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bLuk,3;
+      .@r = getrefine();
+      if (.@r >= 7) {
+        bonus bLuk,1;
+        if (.@r >= 9) {
+          bonus bLuk,1;
+          if (getallrefine() >= 22) {
+            bonus bCrt,1;
+            bonus bCritAtkRate,3;
+          }
+        }
+      }
+  - Id: 311098
+    AegisName: Ice_F_Orb_Def
+    Name: Ice Magic Orb (Defense)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDef,5;
+      bonus bRes,50;
+      .@r = getrefine();
+      if (.@r >= 7) {
+        bonus bDef,1;
+        bonus bRes,10;
+        if (.@r >= 9) {
+          bonus bDef,2;
+          bonus bRes,10;
+          if (getallrefine() >= 22) {
+            bonus bDef,2;
+            bonus bRes,10;
+          }
+        }
+      }
+  - Id: 311099
+    AegisName: Ice_F_Orb_Mdef
+    Name: Ice Magic Orb (Magic Defense)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMdef,5;
+      bonus bMRes,25;
+      .@r = getrefine();
+      if (.@r >= 7) {
+        bonus bMdef,1;
+        bonus bMRes,5;
+        if (.@r >= 9) {
+          bonus bMdef,2;
+          bonus bMRes,5;
+          if (getallrefine() >= 22) {
+            bonus bMdef,2;
+            bonus bMRes,5;
+          }
+        }
+      }
+  - Id: 311100
+    AegisName: Ice_F_Orb_Ran
+    Name: Ice Magic Orb (Sniper)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,6;
+      bonus bBaseAtk,100;
+      .@r = getrefine();
+      if (.@r >= 7) {
+        bonus bLongAtkRate,5;
+        if (.@r >= 9) {
+          bonus bLongAtkRate,5;
+          if (getallrefine() >= 22) {
+            bonus bLongAtkRate,5;
+          }
+        }
+      }
+  - Id: 311101
+    AegisName: Ice_F_Orb_War
+    Name: Ice Magic Orb (Warrior)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,6;
+      bonus bBaseAtk,100;
+      .@r = getrefine();
+      if (.@r >= 7) {
+        bonus bShortAtkRate,5;
+        if (.@r >= 9) {
+          bonus bShortAtkRate,5;
+          if (getallrefine() >= 22) {
+            bonus bShortAtkRate,5;
+          }
+        }
+      }
+  - Id: 311102
+    AegisName: Ice_F_Orb_Mag
+    Name: Ice Magic Orb (Mage)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatkRate,6;
+      bonus bMatk,100;
+      .@r = getrefine();
+      if (.@r >= 7) {
+        bonus2 bMagicAtkEle,Ele_All,5;
+        if (.@r >= 9) {
+          bonus2 bMagicAtkEle,Ele_All,5;
+          if (getallrefine() >= 22) {
+            bonus2 bMagicAtkEle,Ele_All,5;
+          }
+        }
+      }
+  - Id: 311103
+    AegisName: Ice_F_Orb_R_Reject
+    Name: Ice Magic Orb (Reject Reflection)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bReduceDamageReturn,4;
+      .@r = getrefine();
+      if (.@r >= 7) {
+        bonus bReduceDamageReturn,4;
+        if (.@r >= 9) {
+          bonus bReduceDamageReturn,4;
+          if (getallrefine() >= 22) {
+            bonus bReduceDamageReturn,4;
+          }
+        }
+      }
+  - Id: 311104
+    AegisName: Ice_F_Orb_Force
+    Name: Ice Magic Orb (Power Force)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,2;
+      bonus bMatkRate,2;
+      .@r = getrefine();
+      if (.@r >= 7) {
+        bonus2 bAddClass,Class_All,2;
+        bonus bMatkRate,2;
+        if (.@r >= 9) {
+          bonus2 bAddClass,Class_All,2;
+          bonus bMatkRate,2;
+          if (getallrefine() >= 22) {
+            bonus2 bAddClass,Class_All,4;
+            bonus bMatkRate,4;
+          }
+        }
+      }
+  - Id: 311105
+    AegisName: Ice_F_Orb_S_Delay
+    Name: Ice Magic Orb (Cast Delay)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDelayrate,-4;
+      .@r = getrefine();
+      if (.@r >= 7) {
+        bonus bDelayrate,-4;
+        if (.@r >= 9) {
+          bonus bDelayrate,-4;
+          if (getallrefine() >= 22) {
+            bonus bDelayrate,-4;
+          }
+        }
+      }
+  - Id: 311106
+    AegisName: Ice_F_Orb_Speed
+    Name: Ice Magic Orb (Speed)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bFlee,30;
+      .@r = getrefine();
+      if (.@r >= 7) {
+        bonus bAspdRate,8;
+        if (.@r >= 9) {
+          bonus bAspdRate,8;
+          if (getallrefine() >= 22) {
+            bonus bAspdRate,8;
+          }
+        }
+      }
+  - Id: 311107
+    AegisName: Ice_F_Orb_Caster
+    Name: Ice Magic Orb (Caster)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,30;
+      bonus bVariableCastrate,-8;
+      .@r = getrefine();
+      if (.@r >= 7) {
+        bonus bVariableCastrate,-8;
+        if (.@r >= 9) {
+          bonus bVariableCastrate,-8;
+          if (getallrefine() >= 22) {
+            bonus bVariableCastrate,-8;
+          }
+        }
+      }
+  - Id: 311108
+    AegisName: Ice_F_Orb_Critical
+    Name: Ice Magic Orb (Critical)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bCritical,15;
+      .@r = getrefine();
+      if (.@r >= 7) {
+        bonus bCritAtkRate,8;
+        if (.@r >= 9) {
+          bonus bCritAtkRate,8;
+          if (getallrefine() >= 22) {
+            bonus bCritAtkRate,8;
+          }
+        }
+      }
+  - Id: 311109
+    AegisName: Ice_F_Orb_Guide
+    Name: Ice Magic Orb (Guide Attack)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bHit,30;
+      .@r = getrefine();
+      if (.@r >= 7) {
+        bonus bPerfectHitAddRate,8;
+        if (.@r >= 9) {
+          bonus bPerfectHitAddRate,8;
+          if (getallrefine() >= 22) {
+            bonus bPerfectHitAddRate,8;
+          }
+        }
+      }
+  - Id: 311110
+    AegisName: Ice_F_Orb_Above
+    Name: Ice Magic Orb (Above All)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bSubClass,Class_Normal,7;
+      bonus2 bSubClass,Class_Boss,7;
+      .@r = getrefine();
+      if (.@r>=7) {
+         bonus2 bSubEle,Ele_All,7;
+         if (.@r>=9) {
+            bonus2 bSubSize,Size_All,7;
+            if (getallrefine() >= 22) {
+               bonus2 bSubRace,RC_All,7;
+               bonus2 bSubRace,RC_Player_Human,-7;
+               bonus2 bSubRace,RC_Player_Doram,-7;
+            }
+         }
+      }
+  - Id: 311111
+    AegisName: Ice_F_Orb_P_Full
+    Name: Ice Magic Orb (Powerful)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAtkEle,Ele_All,3;
+      bonus bLongAtkRate,3;
+      bonus bShortAtkRate,3;
+      .@r = getrefine();
+      if (.@r>=7) {
+         bonus2 bMagicAtkEle,Ele_All,3;
+         bonus bLongAtkRate,3;
+         bonus bShortAtkRate,3;
+         if (.@r>=9) {
+            bonus2 bMagicAtkEle,Ele_All,3;
+            bonus bLongAtkRate,3;
+            bonus bShortAtkRate,3;
+            if (getallrefine() >= 22) {
+               bonus2 bMagicAtkEle,Ele_All,3;
+               bonus bLongAtkRate,3;
+               bonus bShortAtkRate,3;
+            }
+         }
+      }
+  - Id: 311112
+    AegisName: Ice_F_Orb_M_Counter
+    Name: Ice Magic Orb (Mirror Counter)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bReduceDamageReturn,4;
+      if (.@r>=7) {
+         bonus bReduceDamageReturn,4;
+         if (.@r>=9) {
+            bonus bReduceDamageReturn,5;
+            if (getallrefine() >= 22) {
+               bonus bReduceDamageReturn,5;
+            }
+         }
+      }
+  - Id: 311113
+    AegisName: Ice_F_Orb_Hp
+    Name: Ice Magic Orb (Stamina)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHPrate,5;
+      bonus bMaxHP,2500;
+      if (.@r>=7) {
+         bonus bMaxHPrate,5;
+         if (.@r>=9) {
+            bonus bMaxHPrate,5;
+            if (getallrefine() >= 22) {
+               bonus bMaxHPrate,5;
+            }
+         }
+      }
+  - Id: 311114
+    AegisName: Ice_F_Orb_Sp
+    Name: Ice Magic Orb (Spirit)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMaxSPrate,5;
+      bonus bMaxSP,450;
+      if (.@r>=7) {
+         bonus bMaxSPrate,5;
+         if (.@r>=9) {
+            bonus bMaxSPrate,5;
+            if (getallrefine() >= 22) {
+               bonus bMaxSPrate,5;
+            }
+         }
+      }
+  - Id: 311115
+    AegisName: Ice_F_Orb_Heal
+    Name: Ice Magic Orb (Heal)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bHealPower,5;
+      if (.@r>=7) {
+         bonus bHealPower,5;
+         if (.@r>=9) {
+            bonus bHealPower,7;
+            if (getallrefine() >= 22) {
+               bonus bHealPower,7;
+            }
+         }
+      }
+  - Id: 311116
+    AegisName: Ice_F_Orb_Robust
+    Name: Ice Magic Orb (Robust)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHPrate,5;
+      bonus bMaxSPrate,5;
+      bonus bMaxHP,2000;
+      bonus bMaxSP,350;
+      if (.@r>=7) {
+         bonus bMaxHPrate,3;
+         bonus bMaxSPrate,3;
+         if (.@r>=9) {
+            bonus bMaxHPrate,4;
+            bonus bMaxSPrate,4;
+            if (getallrefine() >= 22) {
+               bonus bMaxHPrate,5;
+               bonus bMaxSPrate,5;
+            }
+         }
+      }
+  - Id: 311117
+    AegisName: Ice_F_Orb_F_Cast
+    Name: Ice Magic Orb (Fixed Casting)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bFixedCast,-1000;
+  - Id: 311118
+    AegisName: Ice_F_Orb_M_F
+    Name: Ice Magic Orb (Magical Force)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bMagicAddSize,Size_All,4;
+      if (.@r>=7) {
+         bonus2 bMagicAddSize,Size_All,4;
+         if (.@r>=9) {
+            bonus2 bMagicAddSize,Size_All,4;
+            if (getallrefine() >= 22) {
+               bonus2 bMagicAddSize,Size_All,4;
+            }
+         }
+      }
+  - Id: 311119
+    AegisName: Ice_F_Orb_P_F
+    Name: Ice Magic Orb (Physical Force)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bAddSize,Size_All,4;
+      if (.@r>=7) {
+         bonus2 bAddSize,Size_All,4;
+         if (.@r>=9) {
+            bonus2 bAddSize,Size_All,4;
+            if (getallrefine() >= 22) {
+               bonus2 bAddSize,Size_All,4;
+            }
+         }
+      }
+  - Id: 311120
+    AegisName: Ice_F_Orb_Un_Vit
+    Name: Ice Magic Orb (Unlimited Vital)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      autobonus "{ bonus2 bAddClass,Class_All,25; bonus bVit,50; }",30,10000,BF_WEAPON,"{ specialeffect2 EF_POTION_BERSERK; }";
+  - Id: 311121
+    AegisName: Ice_F_Orb_Sp_Int
+    Name: Ice Magic Orb (Spell Buster)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      autobonus "{ bonus bMatkRate,25; bonus bInt,50; }",30,10000,BF_MAGIC,"{ specialeffect2 EF_POTION_BERSERK; }";
+  - Id: 311122
+    AegisName: Ice_F_Orb_Fi_Dex
+    Name: Ice Magic Orb (Firing Shot)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      autobonus "{ bonus bLongAtkRate,15; bonus bDex,50; }",30,10000,BF_WEAPON,"{ specialeffect2 EF_POTION_BERSERK; }";
+  - Id: 311123
+    AegisName: Ice_F_Orb_Ov_Str
+    Name: Ice Magic Orb (Overpower)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      autobonus "{ bonus bShortAtkRate,15; bonus bStr,50; }",30,10000,BF_WEAPON,"{ specialeffect2 EF_POTION_BERSERK; }";
+  - Id: 311124
+    AegisName: Ice_F_Orb_Fa_Agi
+    Name: Ice Magic Orb (Fatal Flash)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      autobonus "{ bonus bCritAtkRate,25; bonus bAgi,50; }",30,10000,BF_WEAPON,"{ specialeffect2 EF_POTION_BERSERK; }";
+  - Id: 311125
+    AegisName: Ice_F_Orb_Lu_Luk
+    Name: Ice Magic Orb (Lucky Strike)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      autobonus "{ bonus2 bMagicAtkEle,Ele_All,15; bonus bLuk,50; }",30,10000,BF_MAGIC,"{ specialeffect2 EF_POTION_BERSERK; }";
+  - Id: 311126
+    AegisName: Ice_F_Orb_A_Delay
+    Name: Ice Magic Orb (Delay After Attack)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bAspdRate,10;
+      bonus bBaseAtk,30;
+  - Id: 311127
+    AegisName: Ice_F_Orb_E_Archer
+    Name: Ice Magic Orb (Expert Archer)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bLongAtkRate,10;
+      bonus bHit,20;
+  - Id: 311128
+    AegisName: Ice_F_Orb_Fatal
+    Name: Ice Magic Orb (Fatal)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bCritAtkRate,12;
+      bonus bCritical,15;
+  - Id: 311129
+    AegisName: Ice_F_Orb_F_Spirit
+    Name: Ice Magic Orb (Fighting Spirit)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bShortAtkRate,10;
+      bonus bPerfectHitAddRate,5;
+  - Id: 311130
+    AegisName: Ice_F_Orb_Spell
+    Name: Ice Magic Orb (Magic)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bVariableCastrate,-10;
+      bonus bMatk,30;
+  - Id: 311131
+    AegisName: Ice_F_Orb_HealHP
+    Name: Ice Magic Orb (HP Recovery)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bHPrecovRate,50;
+  - Id: 311132
+    AegisName: Ice_F_Orb_HealSP
+    Name: Ice Magic Orb (SP Recovery)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bSPrecovRate,50;
+  - Id: 311133
+    AegisName: Ice_F_Orb_Life
+    Name: Ice Magic Orb (Drain Life)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bHPDrainRate,20,4;
+  - Id: 311134
+    AegisName: Ice_F_Orb_Soul
+    Name: Ice Magic Orb (Drain Soul)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bSPDrainRate,10,3;
+  - Id: 311135
+    AegisName: Ice_F_Orb_M_Heal
+    Name: Ice Magic Orb (Magic Healing)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      autobonus "{ bonus2 bHPRegenRate,700,500; }",40,19000,BF_MAGIC;
+  - Id: 311136
+    AegisName: Ice_F_Orb_M_Soul
+    Name: Ice Magic Orb (Magic Soul)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      autobonus "{ bonus2 bSPRegenRate,100,500; }",20,19000,BF_MAGIC;
+  - Id: 311137
+    AegisName: Ice_F_Orb_A_Force
+    Name: Ice Magic Orb (All Force)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAtkEle,Ele_All,7;
+      bonus bLongAtkRate,7;
+      bonus bShortAtkRate,7;
+  - Id: 311138
+    AegisName: Ice_F_Orb_Skill_1
+    Name: Ice Magic Orb (Dragonic Breach)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"KN_BOWLINGBASH",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"KN_BOWLINGBASH",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"KN_BOWLINGBASH",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"KN_BOWLINGBASH",15;
+          }
+        }
+      }
+  - Id: 311139
+    AegisName: Ice_F_Orb_Skill_2
+    Name: Ice Magic Orb (Cutter Break)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"KN_BOWLINGBASH",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"KN_BOWLINGBASH",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"KN_BOWLINGBASH",15;
+          if (getallrefine() >= 22) {
+            bonus bDelayrate,-2;
+            bonus2 bSkillAtk,"KN_BOWLINGBASH",15;
+          }
+        }
+      }
+  - Id: 311140
+    AegisName: Ice_F_Orb_Skill_3
+    Name: Ice Magic Orb (Hundred Wave)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"KN_PIERCE",15;
+      bonus2 bSkillAtk,"LK_SPIRALPIERCE",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"KN_PIERCE",15;
+        bonus2 bSkillAtk,"LK_SPIRALPIERCE",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"KN_PIERCE",15;
+          bonus2 bSkillAtk,"LK_SPIRALPIERCE",15;
+          if (getallrefine() >= 22) {
+            bonus bDelayrate,-2;
+            bonus2 bSkillAtk,"LK_SPIRALPIERCE",15;
+          }
+        }
+      }
+  - Id: 311141
+    AegisName: Ice_F_Orb_Skill_4
+    Name: Ice Magic Orb (Brand Lit)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"CR_GRANDCROSS",15;
+      bonus2 bSkillAtk,"KN_BRANDISHSPEAR",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"CR_GRANDCROSS",15;
+        bonus2 bSkillAtk,"KN_BRANDISHSPEAR",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"CR_GRANDCROSS",15;
+          bonus2 bSkillAtk,"KN_BRANDISHSPEAR",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"CR_GRANDCROSS",15;
+            bonus2 bSkillAtk,"KN_BRANDISHSPEAR",15;
+          }
+        }
+      }
+  - Id: 311142
+    AegisName: Ice_F_Orb_Skill_5
+    Name: Ice Magic Orb (Banishing Cannon)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"CR_HOLYCROSS",15;
+      bonus2 bSkillAtk,"PA_SHIELDCHAIN",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"CR_HOLYCROSS",15;
+        bonus2 bSkillAtk,"PA_SHIELDCHAIN",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"CR_HOLYCROSS",15;
+          bonus2 bSkillAtk,"PA_SHIELDCHAIN",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"CR_HOLYCROSS",15;
+            bonus2 bSkillAtk,"PA_SHIELDCHAIN",15;
+            bonus2 bSkillAtk,"CR_SHIELDBOOMERANG",15;
+          }
+        }
+      }
+  - Id: 311143
+    AegisName: Ice_F_Orb_Skill_6
+    Name: Ice Magic Orb (Genesis Pressure)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"CR_GRANDCROSS",15;
+      bonus2 bSkillAtk,"PA_PRESSURE",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"CR_GRANDCROSS",15;
+        bonus2 bSkillAtk,"PA_PRESSURE",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"CR_GRANDCROSS",15;
+          bonus2 bSkillAtk,"PA_PRESSURE",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"CR_GRANDCROSS",15;
+            bonus2 bSkillAtk,"PA_PRESSURE",15;
+          }
+        }
+      }
+  - Id: 311144
+    AegisName: Ice_F_Orb_Skill_7
+    Name: Ice Magic Orb (Genesis Pressure)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"WS_CARTTERMINATION",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"WS_CARTTERMINATION",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"WS_CARTTERMINATION",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"WS_CARTTERMINATION",15;
+          }
+        }
+      }
+  - Id: 311145
+    AegisName: Ice_F_Orb_Skill_8
+    Name: Ice Magic Orb (Vulkan Boomerang)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"MC_CARTREVOLUTION",15;
+      bonus2 bSkillAtk,"WS_CARTTERMINATION",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"MC_CARTREVOLUTION",15;
+        bonus2 bSkillAtk,"WS_CARTTERMINATION",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"MC_CARTREVOLUTION",15;
+          bonus2 bSkillAtk,"WS_CARTTERMINATION",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"MC_CARTREVOLUTION",15;
+            bonus2 bSkillAtk,"WS_CARTTERMINATION",15;
+            bonus bDelayrate,-10;
+          }
+        }
+      }
+  - Id: 311146
+    AegisName: Ice_F_Orb_Skill_9
+    Name: Ice Magic Orb (Tornado Swing)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"MC_MAMMONITE",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"MC_MAMMONITE",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"MC_MAMMONITE",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"MC_MAMMONITE",15;
+            bonus2 bSkillAtk,"MC_CARTREVOLUTION",15;
+          }
+        }
+      }
+  - Id: 311147
+    AegisName: Ice_F_Orb_Skill_10
+    Name: Ice Magic Orb (Hell Tornado)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"WS_CARTTERMINATION",15;
+      bonus2 bSkillAtk,"AM_DEMONSTRATION",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"WS_CARTTERMINATION",15;
+        bonus2 bSkillAtk,"AM_DEMONSTRATION",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"WS_CARTTERMINATION",15;
+          bonus2 bSkillAtk,"AM_DEMONSTRATION",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"WS_CARTTERMINATION",15;
+            bonus2 bSkillAtk,"AM_DEMONSTRATION",15;
+            bonus2 bSkillAtk,"AM_ACIDTERROR",15;
+          }
+        }
+      }
+  - Id: 311148
+    AegisName: Ice_F_Orb_Skill_11
+    Name: Ice Magic Orb (Crazy Cannon)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"AM_DEMONSTRATION",15;
+      bonus2 bSkillAtk,"AM_ACIDTERROR",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"AM_DEMONSTRATION",15;
+        bonus2 bSkillAtk,"AM_ACIDTERROR",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"AM_DEMONSTRATION",15;
+          bonus2 bSkillAtk,"AM_ACIDTERROR",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"AM_DEMONSTRATION",15;
+            bonus2 bSkillAtk,"AM_ACIDTERROR",15;
+            bonus bDelayrate,-7;
+          }
+        }
+      }
+  - Id: 311149
+    AegisName: Ice_F_Orb_Skill_12
+    Name: Ice Magic Orb (Acid Explosion)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"CR_ACIDDEMONSTRATION",15;
+      bonus2 bSkillAtk,"AM_ACIDTERROR",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"CR_ACIDDEMONSTRATION",25;
+        bonus2 bSkillAtk,"AM_ACIDTERROR",25;
+        if (.@r>=9) {
+          bonus bDelayrate,-10;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"CR_ACIDDEMONSTRATION",20;
+            bonus2 bSkillAtk,"AM_ACIDTERROR",20;
+          }
+        }
+      }
+  - Id: 311150
+    AegisName: Ice_F_Orb_Skill_13
+    Name: Ice Magic Orb (Sonic Impact)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"AS_SONICBLOW",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"AS_SONICBLOW",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"AS_SONICBLOW",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"AS_SONICBLOW",15;
+          }
+        }
+      }
+  - Id: 311151
+    AegisName: Ice_F_Orb_Skill_14
+    Name: Ice Magic Orb (Cutter Slasher)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"ASC_METEORASSAULT",15;
+      bonus2 bSkillAtk,"AS_GRIMTOOTH",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"ASC_METEORASSAULT",15;
+        bonus2 bSkillAtk,"AS_GRIMTOOTH",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"ASC_METEORASSAULT",15;
+          bonus2 bSkillAtk,"AS_GRIMTOOTH",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"ASC_METEORASSAULT",15;
+            bonus2 bSkillAtk,"AS_GRIMTOOTH",15;
+          }
+        }
+      }
+  - Id: 311152
+    AegisName: Ice_F_Orb_Skill_15
+    Name: Ice Magic Orb (Berserk Slash)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"ASC_BREAKER",15;
+      bonus2 bSkillAtk,"AS_SONICBLOW",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"ASC_BREAKER",15;
+        bonus2 bSkillAtk,"AS_SONICBLOW",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"ASC_BREAKER",15;
+          bonus2 bSkillAtk,"AS_SONICBLOW",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"ASC_BREAKER",15;
+            bonus2 bSkillAtk,"AS_SONICBLOW",15;
+          }
+        }
+      }
+  - Id: 311153
+    AegisName: Ice_F_Orb_Skill_16
+    Name: Ice Magic Orb (Fatal Attack)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"RG_BACKSTAP",15;
+      bonus2 bSkillAtk,"RG_RAID",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"RG_BACKSTAP",15;
+        bonus2 bSkillAtk,"RG_RAID",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"RG_BACKSTAP",15;
+          bonus2 bSkillAtk,"RG_RAID",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"RG_BACKSTAP",15;
+            bonus2 bSkillAtk,"RG_RAID",15;
+          }
+        }
+      }
+  - Id: 311154
+    AegisName: Ice_F_Orb_Skill_17
+    Name: Ice Magic Orb (Shadow Spell)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bMagicAtkEle,Ele_All,15;
+      if (.@r>=7) {
+        bonus2 bMagicAtkEle,Ele_All,15;
+        if (.@r>=9) {
+          bonus2 bMagicAtkEle,Ele_All,15;
+          if (getallrefine() >= 22) {
+            bonus2 bMagicAtkEle,Ele_All,15;
+            bonus2 bSkillAtk,"RG_RAID",15;
+          }
+        }
+      }
+  - Id: 311155
+    AegisName: Ice_F_Orb_Skill_18
+    Name: Ice Magic Orb (Angle Shot)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"AC_DOUBLE",15;
+      bonus bLongAtkRate,5;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"AC_DOUBLE",15;
+        bonus bLongAtkRate,10;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"AC_DOUBLE",15;
+          bonus bLongAtkRate,10;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"AC_DOUBLE",15;
+            bonus bLongAtkRate,15;
+          }
+        }
+      }
+  - Id: 311156
+    AegisName: Ice_F_Orb_Skill_19
+    Name: Ice Magic Orb (Crimson Strain)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"WZ_METEOR",15;
+      bonus2 bSkillAtk,"WZ_HEAVENDRIVE",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"WZ_METEOR",15;
+        bonus2 bSkillAtk,"WZ_HEAVENDRIVE",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"WZ_METEOR",15;
+          bonus2 bSkillAtk,"WZ_HEAVENDRIVE",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"WZ_METEOR",15;
+            bonus2 bSkillAtk,"WZ_HEAVENDRIVE",15;
+          }
+        }
+      }
+  - Id: 311157
+    AegisName: Ice_F_Orb_Skill_20
+    Name: Ice Magic Orb (Jack Lightning)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"WZ_FROSTNOVA",15;
+      bonus2 bSkillAtk,"WZ_VERMILION",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"WZ_FROSTNOVA",15;
+        bonus2 bSkillAtk,"WZ_VERMILION",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"WZ_FROSTNOVA",15;
+          bonus2 bSkillAtk,"WZ_VERMILION",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"WZ_FROSTNOVA",15;
+            bonus2 bSkillAtk,"WZ_VERMILION",15;
+          }
+        }
+      }
+  - Id: 311158
+    AegisName: Ice_F_Orb_Skill_21
+    Name: Ice Magic Orb (Comet Expansion)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"WZ_METEOR",15;
+      bonus2 bSkillAtk,"MG_SOULSTRIKE",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"WZ_METEOR",15;
+        bonus2 bSkillAtk,"MG_SOULSTRIKE",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"WZ_METEOR",15;
+          bonus2 bSkillAtk,"MG_SOULSTRIKE",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"WZ_METEOR",15;
+            bonus2 bSkillAtk,"MG_SOULSTRIKE",15;
+          }
+        }
+      }
+  - Id: 311159
+    AegisName: Ice_F_Orb_Skill_22
+    Name: Ice Magic Orb (Cloud Buster)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"WZ_HEAVENDRIVE",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"WZ_HEAVENDRIVE",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"WZ_HEAVENDRIVE",15;
+          bonus bDelayrate,-2;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"WZ_HEAVENDRIVE",15;
+          }
+        }
+      }
+  - Id: 311160
+    AegisName: Ice_F_Orb_Skill_23
+    Name: Ice Magic Orb (Varetyr Wave)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"PF_SOULBURN",15;
+      bonus2 bSkillAtk,"MG_THUNDERSTORM",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"PF_SOULBURN",15;
+        bonus2 bSkillAtk,"MG_THUNDERSTORM",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"PF_SOULBURN",15;
+          bonus2 bSkillAtk,"MG_THUNDERSTORM",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"PF_SOULBURN",15;
+            bonus2 bSkillAtk,"MG_THUNDERSTORM",15;
+            bonus2 bSkillAtk,"MG_FIREBALL",15;
+          }
+        }
+      }
+  - Id: 311161
+    AegisName: Ice_F_Orb_Skill_24
+    Name: Ice Magic Orb (Diamond Grave)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"MG_COLDBOLT",15;
+      bonus2 bSkillAtk,"WZ_EARTHSPIKE",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"MG_COLDBOLT",15;
+        bonus2 bSkillAtk,"WZ_EARTHSPIKE",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"MG_COLDBOLT",15;
+          bonus2 bSkillAtk,"WZ_EARTHSPIKE",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"MG_COLDBOLT",15;
+            bonus2 bSkillAtk,"WZ_EARTHSPIKE",15;
+          }
+        }
+      }
+  - Id: 311162
+    AegisName: Ice_F_Orb_Skill_25
+    Name: Ice Magic Orb (Magnusmus)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"PR_MAGNUS",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"PR_MAGNUS",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"PR_MAGNUS",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"PR_MAGNUS",15;
+          }
+        }
+      }
+  - Id: 311163
+    AegisName: Ice_F_Orb_Skill_26
+    Name: Ice Magic Orb (Holy Judex)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"AL_HOLYLIGHT",15;
+      bonus2 bMagicAtkEle,Ele_Holy,5;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"AL_HOLYLIGHT",15;
+        bonus2 bMagicAtkEle,Ele_Holy,10;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"AL_HOLYLIGHT",15;
+          bonus2 bMagicAtkEle,Ele_Holy,10;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"AL_HOLYLIGHT",15;
+            bonus2 bMagicAtkEle,Ele_Holy,15;
+            bonus2 bSkillAtk,"PR_MAGNUS",15;
+          }
+        }
+      }
+  - Id: 311164
+    AegisName: Ice_F_Orb_Skill_27
+    Name: Ice Magic Orb (Milliduple)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bAddRace,RC_Undead,15;
+      bonus2 bMagicAddRace,RC_Undead,15;
+      bonus bLongAtkRate,5;
+      bonus bShortAtkRate,5;
+      if (.@r>=7) {
+        bonus2 bAddRace,RC_Undead,15;
+        bonus2 bMagicAddRace,RC_Undead,15;
+        bonus bLongAtkRate,10;
+        bonus bShortAtkRate,10;
+        if (.@r>=9) {
+          bonus2 bAddRace,RC_Undead,15;
+          bonus2 bMagicAddRace,RC_Undead,15;
+          bonus bLongAtkRate,10;
+          bonus bShortAtkRate,10;
+          if (getallrefine() >= 22) {
+            bonus2 bAddRace,RC_Undead,15;
+            bonus2 bMagicAddRace,RC_Undead,15;
+            bonus bLongAtkRate,15;
+            bonus bShortAtkRate,15;
+          }
+        }
+      }
+  - Id: 311165
+    AegisName: Ice_F_Orb_Skill_28
+    Name: Ice Magic Orb (Cannon Empire)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"MO_EXTREMITYFIST",15;
+      bonus2 bSkillAtk,"MO_CHAINCOMBO",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"MO_EXTREMITYFIST",15;
+        bonus2 bSkillAtk,"MO_CHAINCOMBO",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"MO_EXTREMITYFIST",15;
+          bonus2 bSkillAtk,"MO_CHAINCOMBO",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"MO_EXTREMITYFIST",15;
+            bonus2 bSkillAtk,"MO_CHAINCOMBO",15;
+          }
+        }
+      }
+  - Id: 311166
+    AegisName: Ice_F_Orb_Skill_29
+    Name: Ice Magic Orb (Thunder Blast)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"MO_EXTREMITYFIST",15;
+      bonus2 bSkillAtk,"MO_BODYRELOCATION",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"MO_EXTREMITYFIST",15;
+        bonus2 bSkillAtk,"MO_BODYRELOCATION",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"MO_EXTREMITYFIST",15;
+          bonus2 bSkillAtk,"MO_BODYRELOCATION",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"MO_BODYRELOCATION",15;
+            bonus bDelayrate,-2;
+          }
+        }
+      }
+  - Id: 311167
+    AegisName: Ice_F_Orb_Skill_30
+    Name: Ice Magic Orb (Hell Arrow)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"MO_EXTREMITYFIST",15;
+      bonus2 bSkillAtk,"MO_FINGEROFFENSIVE",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"MO_EXTREMITYFIST",15;
+        bonus2 bSkillAtk,"MO_FINGEROFFENSIVE",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"MO_EXTREMITYFIST",15;
+          bonus2 bSkillAtk,"MO_FINGEROFFENSIVE",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"MO_EXTREMITYFIST",15;
+            bonus2 bSkillAtk,"MO_FINGEROFFENSIVE",15;
+          }
+        }
+      }
+  - Id: 311168
+    AegisName: Ice_F_Orb_Skill_31
+    Name: Ice Magic Orb (Aimed Rush)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"SN_SHARPSHOOTING",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"SN_SHARPSHOOTING",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"SN_SHARPSHOOTING",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"SN_SHARPSHOOTING",15;
+          }
+        }
+      }
+  - Id: 311169
+    AegisName: Ice_F_Orb_Skill_32
+    Name: Ice Magic Orb (Breeze Shooting)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"SN_SHARPSHOOTING",15;
+      bonus bCritAtkRate,10;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"SN_SHARPSHOOTING",15;
+        bonus bCritAtkRate,10;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"SN_SHARPSHOOTING",15;
+          bonus bCritAtkRate,15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"SN_SHARPSHOOTING",15;
+            bonus bCritAtkRate,15;
+          }
+        }
+      }
+  - Id: 311170
+    AegisName: Ice_F_Orb_Skill_33
+    Name: Ice Magic Orb (Arrow Gale)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"AC_SHOWER",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"AC_SHOWER",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"AC_SHOWER",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"AC_SHOWER",15;
+          }
+        }
+      }
+  - Id: 311171
+    AegisName: Ice_F_Orb_Skill_34
+    Name: Ice Magic Orb (Sound Metal)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"BA_MUSICALSTRIKE",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"BA_MUSICALSTRIKE",10;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"BA_MUSICALSTRIKE",10;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"BA_MUSICALSTRIKE",15;
+          }
+        }
+      }
+  - Id: 311172
+    AegisName: Ice_F_Orb_Skill_35
+    Name: Ice Magic Orb (Rainstorm)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"CG_ARROWVULCAN",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"CG_ARROWVULCAN",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"CG_ARROWVULCAN",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"CG_ARROWVULCAN",15;
+          }
+        }
+      }
+  - Id: 311173
+    AegisName: Ice_F_Orb_Skill_36
+    Name: Ice Magic Orb (Vulcan Shooting)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"CG_ARROWVULCAN",20;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"CG_ARROWVULCAN",20;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"CG_ARROWVULCAN",20;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"CG_ARROWVULCAN",20;
+          }
+        }
+      }
+  - Id: 311174
+    AegisName: Ice_F_Orb_Skill_37
+    Name: Ice Magic Orb (Prominence Burst)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"TK_DOWNKICK",15;
+      bonus2 bSkillAtk,"TK_STORMKICK",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"TK_DOWNKICK",15;
+        bonus2 bSkillAtk,"TK_STORMKICK",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"TK_DOWNKICK",15;
+          bonus2 bSkillAtk,"TK_STORMKICK",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"TK_DOWNKICK",15;
+            bonus2 bSkillAtk,"TK_STORMKICK",15;
+          }
+        }
+      }
+  - Id: 311175
+    AegisName: Ice_F_Orb_Skill_38
+    Name: Ice Magic Orb (Moon Kick)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"TK_TURNKICK",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"TK_TURNKICK",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"TK_TURNKICK",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"TK_TURNKICK",15;
+          }
+        }
+      }
+  - Id: 311176
+    AegisName: Ice_F_Orb_Skill_39
+    Name: Ice Magic Orb (Flash Fall)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"TK_JUMPKICK",15;
+      bonus2 bSkillAtk,"TK_COUNTER",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"TK_JUMPKICK",15;
+        bonus2 bSkillAtk,"TK_COUNTER",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"TK_JUMPKICK",15;
+          bonus2 bSkillAtk,"TK_COUNTER",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"TK_JUMPKICK",15;
+            bonus2 bSkillAtk,"TK_COUNTER",15;
+          }
+        }
+      }
+  - Id: 311177
+    AegisName: Ice_F_Orb_Skill_40
+    Name: Ice Magic Orb (Eswhoo)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"SL_SMA",15;
+      bonus2 bSkillAtk,"SL_STUN",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"SL_SMA",15;
+        bonus2 bSkillAtk,"SL_STUN",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"SL_SMA",15;
+          bonus2 bSkillAtk,"SL_STUN",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"SL_SMA",15;
+            bonus2 bSkillAtk,"SL_STUN",15;
+          }
+        }
+      }
+  - Id: 311178
+    AegisName: Ice_F_Orb_Skill_41
+    Name: Ice Magic Orb (Espa)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"SL_STIN",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"SL_STIN",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"SL_STIN",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"SL_STIN",15;
+          }
+        }
+      }
+  - Id: 311179
+    AegisName: Ice_F_Orb_Skill_42
+    Name: Ice Magic Orb (Curse Explosion)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"SL_SMA",15;
+      bonus2 bMagicAtkEle,Ele_Dark,5;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"SL_SMA",15;
+        bonus2 bMagicAtkEle,Ele_Dark,10;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"SL_SMA",15;
+          bonus2 bMagicAtkEle,Ele_Dark,10;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"SL_SMA",15;
+            bonus2 bMagicAtkEle,Ele_Dark,15;
+          }
+        }
+      }
+  - Id: 311180
+    AegisName: Ice_F_Orb_Skill_43
+    Name: Ice Magic Orb (Death Hammer Dance)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"GS_DESPERADO",15;
+      bonus2 bSkillAtk,"GS_RAPIDSHOWER",15;
+      bonus2 bSkillAtk,"GS_DUST",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"GS_DESPERADO",15;
+        bonus2 bSkillAtk,"GS_RAPIDSHOWER",15;
+        bonus2 bSkillAtk,"GS_DUST",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"GS_DESPERADO",15;
+          bonus2 bSkillAtk,"GS_RAPIDSHOWER",15;
+          bonus2 bSkillAtk,"GS_DUST",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"GS_DESPERADO",15;
+            bonus2 bSkillAtk,"GS_RAPIDSHOWER",15;
+            bonus2 bSkillAtk,"GS_DUST",15;
+            bonus2 bSkillAtk,"GS_TRACKING",15;
+          }
+        }
+      }
+  - Id: 311181
+    AegisName: Ice_F_Orb_Skill_44
+    Name: Ice Magic Orb (Fire Howling Tail)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"GS_SPREADATTACK",15;
+      bonus2 bSkillAtk,"GS_GROUNDDRIFT",15;
+      bonus2 bSkillAtk,"GS_DESPERADO",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"GS_SPREADATTACK",15;
+        bonus2 bSkillAtk,"GS_GROUNDDRIFT",15;
+        bonus2 bSkillAtk,"GS_DESPERADO",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"GS_SPREADATTACK",15;
+          bonus2 bSkillAtk,"GS_GROUNDDRIFT",15;
+          bonus2 bSkillAtk,"GS_DESPERADO",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"GS_SPREADATTACK",15;
+            bonus2 bSkillAtk,"GS_GROUNDDRIFT",15;
+            bonus2 bSkillAtk,"GS_DESPERADO",15;
+          }
+        }
+      }
+  - Id: 311182
+    AegisName: Ice_F_Orb_Skill_45
+    Name: Ice Magic Orb (Storm Buster Trip)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"GS_SPREADATTACK",15;
+      bonus2 bSkillAtk,"GS_FULLBUSTER",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"GS_SPREADATTACK",15;
+        bonus2 bSkillAtk,"GS_FULLBUSTER",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"GS_SPREADATTACK",15;
+          bonus2 bSkillAtk,"GS_FULLBUSTER",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"GS_SPREADATTACK",15;
+            bonus2 bSkillAtk,"GS_FULLBUSTER",15;
+          }
+        }
+      }
+  - Id: 311183
+    AegisName: Ice_F_Orb_Skill_46
+    Name: Ice Magic Orb (Flame Ice Wind)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"NJ_KOUENKA",15;
+      bonus2 bSkillAtk,"NJ_HYOUSENSOU",15;
+      bonus2 bSkillAtk,"NJ_HUUJIN",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"NJ_KOUENKA",15;
+        bonus2 bSkillAtk,"NJ_HYOUSENSOU",15;
+        bonus2 bSkillAtk,"NJ_HUUJIN",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"NJ_KOUENKA",15;
+          bonus2 bSkillAtk,"NJ_HYOUSENSOU",15;
+          bonus2 bSkillAtk,"NJ_HUUJIN",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"NJ_KOUENKA",15;
+            bonus2 bSkillAtk,"NJ_HYOUSENSOU",15;
+            bonus2 bSkillAtk,"NJ_HUUJIN",15;
+          }
+        }
+      }
+  - Id: 311184
+    AegisName: Ice_F_Orb_Skill_47
+    Name: Ice Magic Orb (Cross Petal)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"NJ_ISSEN",15;
+      bonus2 bSkillAtk,"NJ_HUUMA",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"NJ_ISSEN",15;
+        bonus2 bSkillAtk,"NJ_HUUMA",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"NJ_ISSEN",15;
+          bonus2 bSkillAtk,"NJ_HUUMA",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"NJ_ISSEN",15;
+            bonus2 bSkillAtk,"NJ_HUUMA",15;
+          }
+        }
+      }
+  - Id: 311185
+    AegisName: Ice_F_Orb_Skill_48
+    Name: Ice Magic Orb (Flame Wind)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"NJ_BAKUENRYU",15;
+      bonus2 bSkillAtk,"NJ_HYOUSYOURAKU",15;
+      bonus2 bSkillAtk,"NJ_KAMAITACHI",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"NJ_BAKUENRYU",15;
+        bonus2 bSkillAtk,"NJ_HYOUSYOURAKU",15;
+        bonus2 bSkillAtk,"NJ_KAMAITACHI",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"NJ_BAKUENRYU",15;
+          bonus2 bSkillAtk,"NJ_HYOUSYOURAKU",15;
+          bonus2 bSkillAtk,"NJ_KAMAITACHI",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"NJ_BAKUENRYU",15;
+            bonus2 bSkillAtk,"NJ_HYOUSYOURAKU",15;
+            bonus2 bSkillAtk,"NJ_KAMAITACHI",15;
+          }
+        }
+      }
+  - Id: 311189
+    AegisName: Ice_F_Orb_Skill_52
+    Name: Ice Magic Orb (Hyper Melee)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"CR_HOLYCROSS",15;
+      bonus2 bSkillAtk,"RG_BACKSTAP",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"CR_HOLYCROSS",15;
+        bonus2 bSkillAtk,"RG_BACKSTAP",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"CR_HOLYCROSS",15;
+          bonus2 bSkillAtk,"RG_BACKSTAP",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"CR_HOLYCROSS",15;
+            bonus2 bSkillAtk,"RG_BACKSTAP",15;
+            bonus2 bSkillAtk,"SM_BASH",15;
+          }
+        }
+      }
+  - Id: 311190
+    AegisName: Ice_F_Orb_Skill_53
+    Name: Ice Magic Orb (Hyper Range)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"CR_SHIELDBOOMERANG",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"CR_SHIELDBOOMERANG",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"CR_SHIELDBOOMERANG",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"CR_SHIELDBOOMERANG",15;
+          }
+        }
+      }
+  - Id: 311191
+    AegisName: Ice_F_Orb_Skill_54
+    Name: Ice Magic Orb (Hyper Magic)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"WZ_METEOR",15;
+      bonus2 bSkillAtk,"WZ_JUPITEL",15;
+      if (.@r>=7) {
+        bonus2 bSkillAtk,"WZ_METEOR",15;
+        bonus2 bSkillAtk,"WZ_JUPITEL",15;
+        if (.@r>=9) {
+          bonus2 bSkillAtk,"WZ_METEOR",15;
+          bonus2 bSkillAtk,"WZ_JUPITEL",15;
+          if (getallrefine() >= 22) {
+            bonus2 bSkillAtk,"WZ_METEOR",15;
+            bonus2 bSkillAtk,"WZ_JUPITEL",15;
+            bonus2 bSkillAtk,"MG_FIREBALL",15;
+            bonus2 bSkillAtk,"MG_LIGHTNINGBOLT",15;
+          }
+        }
+      }
   - Id: 400020
     AegisName: C_BeachBall
     Name: Costume Beachball
@@ -146503,6 +148194,297 @@ Body:
     AegisName: Ep19_Ice_Meat
     Name: Frozen Meat
     Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+  - Id: 1000711
+    AegisName: Ice_F_Stone_Str
+    Name: Ice Magic Stone (STR)
+  - Id: 1000712
+    AegisName: Ice_F_Stone_Dex
+    Name: Ice Magic Stone (DEX)
+  - Id: 1000713
+    AegisName: Ice_F_Stone_Agi
+    Name: Ice Magic Stone (AGI)
+  - Id: 1000714
+    AegisName: Ice_F_Stone_Int
+    Name: Ice Magic Stone (INT)
+  - Id: 1000715
+    AegisName: Ice_F_Stone_Vit
+    Name: Ice Magic Stone (VIT)
+  - Id: 1000716
+    AegisName: Ice_F_Stone_luk
+    Name: Ice Magic Stone (LUK)
+  - Id: 1000717
+    AegisName: Ice_F_Stone_Def
+    Name: Ice Magic Stone (Defense)
+  - Id: 1000718
+    AegisName: Ice_F_Stone_Mdef
+    Name: Ice Magic Stone (Magic Defense)
+  - Id: 1000719
+    AegisName: Ice_F_Stone_Ran
+    Name: Ice Magic Stone (Sniper)
+  - Id: 1000720
+    AegisName: Ice_F_Stone_War
+    Name: Ice Magic Stone (Warrior)
+  - Id: 1000721
+    AegisName: Ice_F_Stone_Mag
+    Name: Ice Magic Stone (Mage)
+  - Id: 1000722
+    AegisName: Ice_F_Stone_R_Reject
+    Name: Ice Magic Stone (Reject Reflection)
+  - Id: 1000723
+    AegisName: Ice_F_Stone_Force
+    Name: Ice Magic Stone (Power Force)
+  - Id: 1000724
+    AegisName: Ice_F_Stone_S_Delay
+    Name: Ice Magic Stone (Cast Delay)
+  - Id: 1000725
+    AegisName: Ice_F_Stone_Speed
+    Name: Ice Magic Stone (Speed)
+  - Id: 1000726
+    AegisName: Ice_F_Stone_Caster
+    Name: Ice Magic Stone (Caster)
+  - Id: 1000727
+    AegisName: Ice_F_Stone_Critical
+    Name: Ice Flower Magic Stone (Critical)
+  - Id: 1000728
+    AegisName: Ice_F_Stone_Guide
+    Name: Ice Magic Stone (Guide Attack)
+  - Id: 1000729
+    AegisName: Ice_F_Stone_Above
+    Name: Ice Magic Stone (Above All)
+  - Id: 1000730
+    AegisName: Ice_F_Stone_P_Full
+    Name: Ice Magic Stone (Powerful)
+  - Id: 1000731
+    AegisName: Ice_F_Stone_M_Counter
+    Name: Ice Magic Stone (Mirror Counter)
+  - Id: 1000732
+    AegisName: Ice_F_Stone_Hp
+    Name: Ice Magic Stone (Stamina)
+  - Id: 1000733
+    AegisName: Ice_F_Stone_Sp
+    Name: Ice Magic Stone (Spirit)
+  - Id: 1000734
+    AegisName: Ice_F_Stone_Heal
+    Name: Ice Magic Stone (Heal)
+  - Id: 1000735
+    AegisName: Ice_F_Stone_Robust
+    Name: Ice Magic Stone (Robust)
+  - Id: 1000736
+    AegisName: Ice_F_Stone_F_Cast
+    Name: Ice Magic Stone (Fixed Casting)
+  - Id: 1000737
+    AegisName: Ice_F_Stone_M_F
+    Name: Ice Magic Stone (Magical Force)
+  - Id: 1000738
+    AegisName: Ice_F_Stone_P_F
+    Name: Ice Magic Stone (Physical Force)
+  - Id: 1000739
+    AegisName: Ice_F_Stone_Un_Vit
+    Name: Ice Magic Stone (Unlimited Vital)
+  - Id: 1000740
+    AegisName: Ice_F_Stone_Sp_Int
+    Name: Ice Magic Stone (Spell Buster)
+  - Id: 1000741
+    AegisName: Ice_F_Stone_Fi_Dex
+    Name: Ice Magic Stone (Firing Shot)
+  - Id: 1000742
+    AegisName: Ice_F_Stone_Ov_Str
+    Name: Ice Magic Stone (Overpower)
+  - Id: 1000743
+    AegisName: Ice_F_Stone_Fa_Agi
+    Name: Ice Magic Stone (Fatal Flash)
+  - Id: 1000744
+    AegisName: Ice_F_Stone_Lu_Luk
+    Name: Ice Magic Stone (Lucky Strike)
+  - Id: 1000745
+    AegisName: Ice_F_Stone_A_Delay
+    Name: Ice Magic Stone (Delay After Attack)
+  - Id: 1000746
+    AegisName: Ice_F_Stone_E_Archer
+    Name: Ice Magic Stone (Expert Archer)
+  - Id: 1000747
+    AegisName: Ice_F_Stone_Fatal
+    Name: Ice Magic Stone (Fatal)
+  - Id: 1000748
+    AegisName: Ice_F_Stone_F_Spirit
+    Name: Ice Magic Stone (Fighting Spirit)
+  - Id: 1000749
+    AegisName: Ice_F_Stone_Spell
+    Name: Ice Magic Stone (Magic)
+  - Id: 1000750
+    AegisName: Ice_F_Stone_HealHP
+    Name: Ice Magic Stone (HP Recovery)
+  - Id: 1000751
+    AegisName: Ice_F_Stone_HealSP
+    Name: Ice Magic Stone (SP Recovery)
+  - Id: 1000752
+    AegisName: Ice_F_Stone_Life
+    Name: Ice Magic Stone (Drain Life)
+  - Id: 1000753
+    AegisName: Ice_F_Stone_Soul
+    Name: Ice Magic Stone (Drain Soul)
+  - Id: 1000754
+    AegisName: Ice_F_Stone_M_Heal
+    Name: Ice Magic Stone (Magic Healing)
+  - Id: 1000755
+    AegisName: Ice_F_Stone_M_Soul
+    Name: Ice Magic Stone (Magic Soul)
+  - Id: 1000756
+    AegisName: Ice_F_Stone_A_Force
+    Name: Ice Magic Stone (All Force)
+  - Id: 1000757
+    AegisName: Ice_F_Stone_Skill_1
+    Name: Ice Magic Stone (Dragonic Breach)
+  - Id: 1000758
+    AegisName: Ice_F_Stone_Skill_2
+    Name: Ice Magic Stone (Cutter Break)
+  - Id: 1000759
+    AegisName: Ice_F_Stone_Skill_3
+    Name: Ice Magic Stone (Hundred Wave)
+  - Id: 1000760
+    AegisName: Ice_F_Stone_Skill_4
+    Name: Ice Magic Stone (Brand Drive)
+  - Id: 1000761
+    AegisName: Ice_F_Stone_Skill_5
+    Name: Ice Magic Stone (Banishing Cannon)
+  - Id: 1000762
+    AegisName: Ice_F_Stone_Skill_6
+    Name: Ice Magic Stone (Genesis Pressure)
+  - Id: 1000763
+    AegisName: Ice_F_Stone_Skill_7
+    Name: Ice Magic Stone (Genesis Pressure)
+  - Id: 1000764
+    AegisName: Ice_F_Stone_Skill_8
+    Name: Ice Magic Stone (Vulkan Boomerang)
+  - Id: 1000765
+    AegisName: Ice_F_Stone_Skill_9
+    Name: Ice Magic Stone (Tornado Swing)
+  - Id: 1000766
+    AegisName: Ice_F_Stone_Skill_10
+    Name: Ice Magic Stone (Hell Tornado)
+  - Id: 1000767
+    AegisName: Ice_F_Stone_Skill_11
+    Name: Ice Magic Stone (Crazy Cannon)
+  - Id: 1000768
+    AegisName: Ice_F_Stone_Skill_12
+    Name: Ice Magic Stone (Acid Explosion)
+  - Id: 1000769
+    AegisName: Ice_F_Stone_Skill_13
+    Name: Ice Magic Stone (Sonic Impact)
+  - Id: 1000770
+    AegisName: Ice_F_Stone_Skill_14
+    Name: Ice Magic Stone (Cutter Slasher)
+  - Id: 1000771
+    AegisName: Ice_F_Stone_Skill_15
+    Name: Ice Magic Stone (Berserk Slash)
+  - Id: 1000772
+    AegisName: Ice_F_Stone_Skill_16
+    Name: Ice Magic Stone (Fatal Attack)
+  - Id: 1000773
+    AegisName: Ice_F_Stone_Skill_17
+    Name: Ice Magic Stone (Shadow Spell)
+  - Id: 1000774
+    AegisName: Ice_F_Stone_Skill_18
+    Name: Ice Magic Stone (Angle Shot)
+  - Id: 1000775
+    AegisName: Ice_F_Stone_Skill_19
+    Name: Ice Magic Stone (Crimson Strain)
+  - Id: 1000776
+    AegisName: Ice_F_Stone_Skill_20
+    Name: Ice Magic Stone (Jack Lightning)
+  - Id: 1000777
+    AegisName: Ice_F_Stone_Skill_21
+    Name: Ice Magic Stone (Soul Comet)
+  - Id: 1000778
+    AegisName: Ice_F_Stone_Skill_22
+    Name: Ice Magic Stone (Cloud Buster)
+  - Id: 1000779
+    AegisName: Ice_F_Stone_Skill_23
+    Name: Ice Magic Stone (Varetyr Wave)
+  - Id: 1000780
+    AegisName: Ice_F_Stone_Skill_24
+    Name: Ice Magic Stone (Diamond Grave)
+  - Id: 1000781
+    AegisName: Ice_F_Stone_Skill_25
+    Name: Ice Magic Stone (Magnusmus)
+  - Id: 1000782
+    AegisName: Ice_F_Stone_Skill_26
+    Name: Ice Magic Stone (Holy Judex)
+  - Id: 1000783
+    AegisName: Ice_F_Stone_Skill_27
+    Name: Ice Magic Stone (Milliduple)
+  - Id: 1000784
+    AegisName: Ice_F_Stone_Skill_28
+    Name: Ice Magic Stone (Cannon Empire)
+  - Id: 1000785
+    AegisName: Ice_F_Stone_Skill_29
+    Name: Ice Magic Stone (Thunder Blast)
+  - Id: 1000786
+    AegisName: Ice_F_Stone_Skill_30
+    Name: Ice Magic Stone (Hell Arrow)
+  - Id: 1000787
+    AegisName: Ice_F_Stone_Skill_31
+    Name: Ice Magic Stone (Aimed Rush)
+  - Id: 1000788
+    AegisName: Ice_F_Stone_Skill_32
+    Name: Ice Magic Stone (Breeze Shooting)
+  - Id: 1000789
+    AegisName: Ice_F_Stone_Skill_33
+    Name: Ice Magic Stone (Arrow Gale)
+  - Id: 1000790
+    AegisName: Ice_F_Stone_Skill_34
+    Name: Ice Magic Stone (Sound Metal)
+  - Id: 1000791
+    AegisName: Ice_F_Stone_Skill_35
+    Name: Ice Magic Stone (Rainstorm)
+  - Id: 1000792
+    AegisName: Ice_F_Stone_Skill_36
+    Name: Ice Magic Stone (Vulcan Shooting)
+  - Id: 1000793
+    AegisName: Ice_F_Stone_Skill_37
+    Name: Ice Magic Stone (Prominence Burst)
+  - Id: 1000794
+    AegisName: Ice_F_Stone_Skill_38
+    Name: Ice Magic Stone (Moon Kick)
+  - Id: 1000795
+    AegisName: Ice_F_Stone_Skill_39
+    Name: Ice Magic Stone (Flash Fall)
+  - Id: 1000796
+    AegisName: Ice_F_Stone_Skill_40
+    Name: Ice Magic Stone (Eswhoo)
+  - Id: 1000797
+    AegisName: Ice_F_Stone_Skill_41
+    Name: Ice Magic Stone (Espa)
+  - Id: 1000798
+    AegisName: Ice_F_Stone_Skill_42
+    Name: Ice Magic Stone (Curse Explosion)
+  - Id: 1000799
+    AegisName: Ice_F_Stone_Skill_43
+    Name: Ice Magic Stone (Death Hammer Dance)
+  - Id: 1000800
+    AegisName: Ice_F_Stone_Skill_44
+    Name: Ice Magic Stone (Fire Howling Tail)
+  - Id: 1000801
+    AegisName: Ice_F_Stone_Skill_45
+    Name: Ice Magic Stone (Storm Buster Trip)
+  - Id: 1000802
+    AegisName: Ice_F_Stone_Skill_46
+    Name: Ice Magic Stone (Flame Ice Wind)
+  - Id: 1000803
+    AegisName: Ice_F_Stone_Skill_47
+    Name: Ice Magic Stone (Cross Petal)
+  - Id: 1000804
+    AegisName: Ice_F_Stone_Skill_48
+    Name: Ice Magic Stone (Flame Wind)
+  - Id: 1000808
+    AegisName: Ice_F_Stone_Skill_52
+    Name: Ice Magic Stone (Hyper Melee)
+  - Id: 1000809
+    AegisName: Ice_F_Stone_Skill_53
+    Name: Ice Magic Stone (Hyper Range)
+  - Id: 1000810
+    AegisName: Ice_F_Stone_Skill_54
+    Name: Ice Magic Stone (Hyper Magic)
   - Id: 1000811
     AegisName: Snow_F_Ore
     Name: Snow Flower Ore
