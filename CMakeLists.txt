@@ -187,3 +187,7 @@ if(MOONCLIENT_BUILD_TESTS AND EXISTS "${CMAKE_SOURCE_DIR}/tests/CMakeLists.txt")
   enable_testing()
   add_subdirectory(tests)
 endif()
+
+# Les cibles qui n'ont pas leur propre en-tête précompilé reprennent celui des
+# en-têtes standard : voir cmake/build_speed.cmake. Après la DERNIÈRE cible.
+moonclient_share_standard_headers()

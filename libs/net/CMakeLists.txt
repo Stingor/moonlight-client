@@ -161,8 +161,3 @@ target_link_libraries(ro_net
 if(WIN32)
     target_link_libraries(ro_net PRIVATE ws2_32)
 endif()
-
-# Les en-têtes que chaque source relit, précompilés : voir cmake/build_speed.cmake.
-if(TARGET ro_net)
-  moonclient_precompile_headers(ro_net)
-endif()

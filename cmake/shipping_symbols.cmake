@@ -16,12 +16,14 @@
 # l'ARCHIVE, indexé par révision — voir `scripts/archive_symbols.py`.
 
 if(MSVC)
-  # `/Zi` en publication : le code reste optimisé, le `.pdb` est produit à côté.
+  # LES INFORMATIONS DE DÉBOGAGE en publication : le code reste optimisé, et
+  # chaque objet porte les siennes (`/Z7`).
   #
-  # Sans cette ligne, la configuration Release de CMake passe `/O2 /DNDEBUG` et
-  # RIEN d'autre : le binaire est muet, et un rapport ne peut nommer que des
-  # adresses.
-  add_compile_options($<$<CONFIG:Release>:/Zi>)
+  # Sans elles, la configuration Release de CMake passe `/O2 /DNDEBUG` et RIEN
+  # d'autre : le binaire est muet, et un rapport ne peut nommer que des
+  # adresses. Leur format se pose par `CMAKE_MSVC_DEBUG_INFORMATION_FORMAT`,
+  # avec celui des autres configurations : voir `build_speed.cmake`, qui dit
+  # pourquoi ce n'est pas `/Zi`.
 
   # `/DEBUG` demande l'édition des liens avec le `.pdb`. Les deux `/OPT` la
   # suivent parce que `/DEBUG` les désactive par défaut : sans elles, le binaire

@@ -1880,6 +1880,13 @@ target_link_libraries(moonclient_web_http
 
 target_include_directories(moonclient_web_http PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
+# ⚠ SANS L'EN-TÊTE PRÉCOMPILÉ COMMUN hors de Windows : libsecret amène
+# `-pthread`, qui définit `_REENTRANT`, et GCC refuse alors un en-tête
+# précompilé bâti sans elle. Voir `moonclient_share_standard_headers`.
+if(NOT WIN32)
+  set_target_properties(moonclient_web_http PROPERTIES DISABLE_PRECOMPILE_HEADERS ON)
+endif()
+
 add_library(moonclient_patcher_net STATIC ${_patcher_net_sources})
 
 target_link_libraries(moonclient_patcher_net
@@ -2336,7 +2343,24 @@ if(MOONCLIENT_DEPLOY_DIR AND EXISTS "${CMAKE_SOURCE_DIR}/scripts/deploy_client.p
     endif()
 endif()
 
-# Les en-têtes que chaque source relit, précompilés : voir cmake/build_speed.cmake.
+# LES FENÊTRES DE L'INTERFACE, PRÉCOMPILÉES AVEC LES EN-TÊTES STANDARD.
+#
+# `game/ui_stage.h` tire les en-têtes de toutes les fenêtres et de leurs étapes,
+# plus de quatre cents, et plus du tiers des sources de l'exécutable l'incluent :
+# c'est le seuil que pose `moonclient_precompile_headers`. Une source qui
+# l'inclut y passait l'essentiel de son temps de compilation.
+#
+# ⚠ AUCUN AUTRE EN-TÊTE DE `app/` N'ATTEINT CE SEUIL. `game/game.h` en tire deux
+# fois plus, mais une source sur six seulement l'inclut : précompilé, il ferait
+# recompiler tout l'exécutable à chaque retouche de ce que lisent ces seules
+# sources.
+#
+# ⚠ LE PROLOGUE DE CMake EST RETIRÉ, et c'est ce qui garde les avertissements.
+# CMake coiffe l'en-tête précompilé d'un `#pragma system_header`, et sous
+# `/external:W0` MSVC étend ce statut à tout ce que le fichier inclut : `/W4` et
+# `/WX` se tairaient dans nos propres en-têtes. Les en-têtes entre chevrons
+# n'en ont pas besoin, `/external:anglebrackets` les couvre déjà.
 if(TARGET moonclient)
-  moonclient_precompile_headers(moonclient GLM)
+  set(CMAKE_PCH_PROLOGUE "")
+  moonclient_precompile_headers(moonclient GLM HEADERS game/ui_stage.h)
 endif()

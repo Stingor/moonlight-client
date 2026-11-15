@@ -204,8 +204,3 @@ target_include_directories(ro_sim PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(ro_sim
     PUBLIC ro_core ro_formats
     PRIVATE ro_warnings)
-
-# Les en-têtes que chaque source relit, précompilés : voir cmake/build_speed.cmake.
-if(TARGET ro_sim)
-  moonclient_precompile_headers(ro_sim)
-endif()
