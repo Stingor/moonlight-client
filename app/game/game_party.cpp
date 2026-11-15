@@ -18,7 +18,9 @@
 #include "game/party_windows.h"
 #include "game/survivors_presence_mode.h"
 #include "game/whisper_stage.h"
+#include "mvp/mvp_tracker_stage.h"
 #include "options/option_sections.h"
+#include "party/party_booking_board.h"
 #include "world/click_action.h"
 #include "world/map_stage.h"
 
@@ -52,11 +54,11 @@ void Game::RefreshParty(std::uint32_t now_ms) {
   party_panel_->JudgesMvpInvites([this](std::string_view name, bool same_account) {
     return JudgeMvpInvite(
         name,
-        MvpInviteCircle{.book = pieces_.mvp_tracker.book(),
+        MvpInviteCircle{.book = pieces_.mvp_tracker->book(),
                         .guild = guild_book_,
                         .friends = friends_,
                         .enabled = settings_->options().pages().mvp_tracker.settings().enabled,
-                        .link_ready = pieces_.mvp_tracker.link_ready()},
+                        .link_ready = pieces_.mvp_tracker->link_ready()},
         same_account);
   });
   party_panel_->Refresh(party_, friends_, world_, page, window,
@@ -111,10 +113,10 @@ void Game::ApplyPartyAnswers(std::uint32_t now_ms) {
     AskBugReport(windows_.bug_report, PartyBookingBugReport(windows_.party_booking->window,
                                                             *windows_.party_booking->view));
   }
-  pieces_.party_booking.Advance(windows_.party_booking, link_, world_, now_ms);
-  if (const std::optional<PartyBookingWhisper> whisper = pieces_.party_booking.TakeWhisper()) {
+  pieces_.party_booking->Advance(windows_.party_booking, link_, world_, now_ms);
+  if (const std::optional<PartyBookingWhisper> whisper = pieces_.party_booking->TakeWhisper()) {
     if (whisper->own_window) {
-      pieces_.whispers.Open(whisper->name);
+      pieces_.whispers->Open(whisper->name);
     } else {
       ArmWhisper(windows_.chat->main.input, whisper->name);
     }
@@ -134,7 +136,7 @@ void Game::ApplyPartyAnswers(std::uint32_t now_ms) {
     return;
   }
   // L'ADOPTION : la réponse à la demande reçue, et les refus de la nôtre.
-  pieces_.adoption.Advance(windows_.party->adoption, link_, world_, now_ms);
+  pieces_.adoption->Advance(windows_.party->adoption, link_, world_, now_ms);
 
   // LE NOM CLIQUÉ vise ou frappe comme un clic sur le sprite : voir
   // `world/name_click.h`.
@@ -155,7 +157,7 @@ void Game::ApplyPartyAnswers(std::uint32_t now_ms) {
       ArmWhisper(windows_.chat->main.input, asked.name);
       break;
     case ro::ui::PartyFriendVerb::kWhisperWindow:
-      pieces_.whispers.Open(asked.name);
+      pieces_.whispers->Open(asked.name);
       break;
     case ro::ui::PartyFriendVerb::kMakeLeader:
       ReportRefusal(ro::net::RequestPartyLeader(link_, asked.account_id));
@@ -209,7 +211,7 @@ void Game::ApplyPartyAnswers(std::uint32_t now_ms) {
       open_menu(asked.account_id);
       break;
     case ro::ui::PartyFriendVerb::kInviteMvp:
-      pieces_.mvp_tracker.Invite(asked.name, link_);
+      pieces_.mvp_tracker->Invite(asked.name, link_);
       break;
   }
 
@@ -226,7 +228,7 @@ void Game::ApplyPartyAnswers(std::uint32_t now_ms) {
       ArmWhisper(windows_.chat->main.input, tile.verb_name);
       break;
     case ro::ui::PartyGridVerb::kWhisperWindow:
-      pieces_.whispers.Open(tile.verb_name);
+      pieces_.whispers->Open(tile.verb_name);
       break;
     case ro::ui::PartyGridVerb::kMakeLeader:
       ReportRefusal(ro::net::RequestPartyLeader(link_, tile.verb_account_id));

@@ -18,6 +18,7 @@
 #include "options/damage_page_names.h"
 #include "options/entity_page_tabs.h"
 #include "world/damage_path_sample.h"
+#include "world/entity_sample.h"
 #include "world/hit_popup_rules.h"
 
 namespace moonclient {
@@ -56,8 +57,8 @@ void Game::ComposeOptionSamples(std::uint32_t now_ms) {
     const HitPopupLook& look = settings_->options().damage_look();
     const ro::sim::Actor* player = world_.player();
     DamagePathStage stage;
-    stage.target = pieces_.entity_sampler.Compose(
-        pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr, &styles_,
+    stage.target = pieces_.entity_sampler->Compose(
+        pieces_.wardrobe->has_value() ? &**pieces_.wardrobe : nullptr, &styles_,
         PathTargetShown(DamagePathOf(look.path_shown)), world_, sprite_scale, anchor, now_ms);
     stage.sprite_scale = sprite_scale;
     stage.ground = SampleGroundOf(
@@ -65,19 +66,19 @@ void Game::ComposeOptionSamples(std::uint32_t now_ms) {
         player != nullptr ? ClientBodyDegrees(*player, ro::sim::FacingAt(*player, now_ms)) : 0.0F);
     stage.font = interface_->DamageFont(look.font_name, look.font_bold);
     settings_->options().pages().damage_path_sample =
-        pieces_.damage_path_sampler.Compose(pieces_.numbers, look, std::move(stage), now_ms);
+        pieces_.damage_path_sampler->Compose(pieces_.numbers, look, std::move(stage), now_ms);
   }
   if (entity_frame) {
-    settings_->options().pages().entity_sample = pieces_.entity_sampler.Compose(
-        pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr, &styles_,
+    settings_->options().pages().entity_sample = pieces_.entity_sampler->Compose(
+        pieces_.wardrobe->has_value() ? &**pieces_.wardrobe : nullptr, &styles_,
         EntityPageDrawn(EntityPageTabOf(windows_.options->section_tab)), world_, sprite_scale,
         anchor, now_ms);
     // L'EMBLÈME DE SA GUILDE OU DE SON CLAN : le cadre montre son personnage.
     ro::ui::EntitySample& sample = settings_->options().pages().entity_sample;
-    sample.emblem = SampleEmblem(sample, world_, guild_book_,
-                                 guild_emblems_.has_value() ? &*guild_emblems_ : nullptr,
-                                 pieces_.game_images.has_value() ? &*pieces_.game_images : nullptr,
-                                 settings_->options().entity_names());
+    sample.emblem = SampleEmblem(
+        sample, world_, guild_book_, guild_emblems_.has_value() ? &*guild_emblems_ : nullptr,
+        pieces_.game_images->has_value() ? &**pieces_.game_images : nullptr,
+        settings_->options().entity_names());
   }
 }
 

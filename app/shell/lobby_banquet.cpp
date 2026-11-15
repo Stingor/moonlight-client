@@ -89,17 +89,17 @@ void LobbyScreen::OpenBanquet() {
     shell_.EnsureWorldPieces(loading.progress());
   }
   ro::core::LogInfo("chargement pièces du monde : {} ms", SDL_GetTicks() - started_ms);
-  if (!shell_.pieces().wardrobe.has_value()) {
+  if (!shell_.pieces().wardrobe->has_value()) {
     // ⚠ PAS UNE PANNE : sans garde-robe la tablée se dessine sans ses pantins,
     // et les noms suffisent à choisir. C'est la règle des accessoires.
     ro::core::LogWarning("tablée : pas de garde-robe, les convives resteront en silhouette");
     return;
   }
-  dolls_.emplace(*shell_.pieces().wardrobe);
+  dolls_.emplace(**shell_.pieces().wardrobe);
   const KeptCharacterStyles kept = LoadCharacterStyles(shell_.client_root());
   dolls_->UseStyles(kept.characters);
   character_styles_served_ = kept.served;
-  newcomer_dolls_.emplace(*shell_.pieces().wardrobe);
+  newcomer_dolls_.emplace(**shell_.pieces().wardrobe);
   PreferLastPlayed();
 }
 

@@ -7,7 +7,10 @@
 
 #include "ro/sim/world.h"
 
+#include "game/companion_ai_stage.h"
 #include "game/game_pieces.h"
+#include "world/quest_marker_view.h"
+#include "world/sleep_bubbles_view.h"
 
 namespace moonclient {
 
@@ -20,21 +23,21 @@ std::vector<std::span<const ro::render::DrawnActor>> DrawnHeldChildSprites(
       lots.push_back(held);
     }
   };
-  if (pieces.sleep_bubbles.has_value()) {
-    keep(pieces.sleep_bubbles->Drawn(now_ms, drawn, ids, world, translucent));
+  if (pieces.sleep_bubbles->has_value()) {
+    keep((*pieces.sleep_bubbles)->Drawn(now_ms, drawn, ids, world, translucent));
   }
-  if (pieces.silence_dots.has_value()) {
-    keep(pieces.silence_dots->Drawn(now_ms, drawn, ids, world, translucent));
+  if (pieces.silence_dots->has_value()) {
+    keep((*pieces.silence_dots)->Drawn(now_ms, drawn, ids, world, translucent));
   }
-  if (pieces.stun_stars.has_value()) {
-    keep(pieces.stun_stars->Drawn(now_ms, drawn, ids, world, translucent));
+  if (pieces.stun_stars->has_value()) {
+    keep((*pieces.stun_stars)->Drawn(now_ms, drawn, ids, world, translucent));
   }
-  if (pieces.quest_markers.has_value()) {
-    keep(pieces.quest_markers->Drawn(now_ms, drawn, ids, world, translucent));
+  if (pieces.quest_markers->has_value()) {
+    keep((*pieces.quest_markers)->Drawn(now_ms, drawn, ids, world, translucent));
   }
-  if (pieces.companion_target_marks.has_value()) {
-    keep(pieces.companion_target_marks->Drawn(now_ms, pieces.companion_ai.target_marks(), drawn,
-                                              ids, world, translucent));
+  if (pieces.companion_target_marks->has_value()) {
+    keep((*pieces.companion_target_marks)
+             ->Drawn(now_ms, pieces.companion_ai->target_marks(), drawn, ids, world, translucent));
   }
   return lots;
 }
@@ -42,20 +45,20 @@ std::vector<std::span<const ro::render::DrawnActor>> DrawnHeldChildSprites(
 std::span<const ro::render::DrawnActor> DrawnFrozenIce(
     GamePieces& pieces, std::uint32_t now_ms, std::span<const ro::render::DrawnActor> drawn,
     std::span<const std::uint32_t> ids, const ro::sim::World& world, bool translucent) {
-  if (!pieces.frozen_ice.has_value()) {
+  if (!pieces.frozen_ice->has_value()) {
     return {};
   }
-  return pieces.frozen_ice->Drawn(now_ms, drawn, ids, world, translucent);
+  return (*pieces.frozen_ice)->Drawn(now_ms, drawn, ids, world, translucent);
 }
 
 std::span<const ro::render::DrawnActor> DrawnCurseMarks(
     GamePieces& pieces, std::uint32_t now_ms, float camera_yaw_degrees,
     std::span<const ro::render::DrawnActor> drawn, std::span<const std::uint32_t> ids,
     const ro::sim::World& world, bool translucent) {
-  if (!pieces.curse_marks.has_value()) {
+  if (!pieces.curse_marks->has_value()) {
     return {};
   }
-  return pieces.curse_marks->Drawn(now_ms, camera_yaw_degrees, drawn, ids, world, translucent);
+  return (*pieces.curse_marks)->Drawn(now_ms, camera_yaw_degrees, drawn, ids, world, translucent);
 }
 
 }  // namespace moonclient

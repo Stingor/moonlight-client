@@ -20,6 +20,7 @@
 #include "ro/sim/pvp_rank.h"
 #include "ro/ui/afk_clock.h"
 
+#include "character/shortcut_wheel.h"
 #include "game/game.h"
 
 namespace moonclient {
@@ -109,7 +110,7 @@ void Game::StartAfkNow(std::uint32_t now_ms) {
     LetGoRight(world_mouse_);
   }
   if ((held_buttons & SDL_BUTTON_MMASK) != 0) {
-    pieces_.shortcut_wheel.Cancel();
+    pieces_.shortcut_wheel->Cancel();
   }
 }
 

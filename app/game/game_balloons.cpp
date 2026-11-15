@@ -24,23 +24,25 @@ void Game::StageBalloons(std::uint32_t now_ms) {
   boards.hunt_ask = {};
 
   const ro::ui::BroadcastBalloonLook& look = settings_->options().pages().balloons.look();
-  pieces_.balloons.Notice(world_, look);
+  pieces_.balloons->Notice(world_, look);
   const SettingReach reach = SettingReachOf(pieces_);
   // UN ITEM FORGÉ LIÉ se nomme par son forgeron, comme dans le fil.
   const CreatorNames creators =
       item_description_.has_value() ? item_description_->creator_names() : CreatorNames();
   const BalloonDecor decor{
-      .tables =
-          ChatDecorTables{
-              .items = pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr,
-              .words = &pieces_.item_words,
-              .creators = &creators,
-              .maps = pieces_.map_display_names.has_value() ? &*pieces_.map_display_names : nullptr,
-              .settings = &reach},
+      .tables = ChatDecorTables{.items = pieces_.wardrobe->has_value()
+                                             ? &(*pieces_.wardrobe)->catalog().items
+                                             : nullptr,
+                                .words = &*pieces_.item_words,
+                                .creators = &creators,
+                                .maps = pieces_.map_display_names->has_value()
+                                            ? &**pieces_.map_display_names
+                                            : nullptr,
+                                .settings = &reach},
       .item_icon = chat_tabs_.has_value() ? chat_tabs_->rich().item_icon : ItemIconLookup()};
-  pieces_.balloons.Compose(now_ms, look, decor, !look.announcements.locked, !look.hunts.locked);
-  boards.announcements = pieces_.balloons.announcements();
-  boards.hunts = pieces_.balloons.hunts();
+  pieces_.balloons->Compose(now_ms, look, decor, !look.announcements.locked, !look.hunts.locked);
+  boards.announcements = pieces_.balloons->announcements();
+  boards.hunts = pieces_.balloons->hunts();
   boards.look = &look;
 }
 

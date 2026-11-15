@@ -68,15 +68,15 @@ void Game::AdvanceMvpTracker(std::uint32_t now_ms) {
       .own_name = world_.player_name()};
   // Le clic droit de l'en-tête montre « Délai » : le fichier de réglages doit
   // l'apprendre.
-  if (pieces_.mvp_tracker.Advance(tracker, context)) {
+  if (pieces_.mvp_tracker->Advance(tracker, context)) {
     settings_->file().Touch();
   }
   // LE RÉSULTAT D'UNE INVITATION OU D'UNE SAISIE, carnet fermé : le bandeau
   // rouge ne se voit que carnet ouvert, le chat le dit.
-  for (std::string& notice : pieces_.mvp_tracker.TakeNotices()) {
+  for (std::string& notice : pieces_.mvp_tracker->TakeNotices()) {
     world_.RecordChat(ro::sim::ChatKind::kServer, 0, std::move(notice), now_ms);
   }
-  if (pieces_.mvp_tracker.TakeAlertSound()) {
+  if (pieces_.mvp_tracker->TakeAlertSound()) {
     PlayMvpAlertSound({.audio = audio_,
                        .vfs = *vfs_,
                        .client_root = client_root_,
@@ -89,7 +89,7 @@ void Game::AdvanceMvpTracker(std::uint32_t now_ms) {
   // ⚠ ICI, AVANT LE DESSIN QUI COMPOSE LA PAGE : les réglages ne voient pas
   // l'étage, et sans ce compte « Tout remettre au carnet » n'apparaîtrait jamais.
   // Ni le moteur : sans ce relevé, « bruitages coupés » survivrait à leur retour.
-  page.NoteLineCount(pieces_.mvp_tracker.line_count());
+  page.NoteLineCount(pieces_.mvp_tracker->line_count());
   page.NoteSoundAudible(audio_.sound_audible());
   if (open_settings) {
     GameSettings::OpenOptionsAt(windows_, OptionSection::kMvpTracker);
@@ -148,10 +148,10 @@ void Game::FollowMvpLink(const ro::ui::ChatLinkAsk& asked, const MvpLink& link,
       // ⚠ LE CLIC N'IMPORTE RIEN : écrire dans le carnet touche celui de tout le
       // groupe, et cela ne se fait pas par mégarde. Il ouvre le carnet sur la
       // ligne — sans viser, si le créneau n'est pas au catalogue.
-      pieces_.mvp_tracker.RequestOpenOn(pieces_.mvp_tracker.SlotOf(link));
+      pieces_.mvp_tracker->RequestOpenOn(pieces_.mvp_tracker->SlotOf(link));
       break;
     case ro::ui::ChatLinkGesture::kAddToMvpLog:
-      pieces_.mvp_tracker.Import(link, sender, link_);
+      pieces_.mvp_tracker->Import(link, sender, link_);
       break;
     case ro::ui::ChatLinkGesture::kGuideToTomb:
       // Tombe inconnue (-1) : « Y aller », le guidage vers la carte entière.

@@ -34,13 +34,19 @@
 #include "chat/chat_image_cache.h"
 #include "chat/chat_item_link.h"
 #include "chat/chat_line_preview.h"
+#include "chat/chat_mentions.h"
 #include "chat/chat_rich_decor.h"
 #include "chat/chat_view.h"
+#include "chat/chat_web_stage.h"
+#include "game/chat_room_stage.h"
+#include "game/damage_meter_stage.h"
 #include "game/game.h"
 #include "game/setting_destination_open.h"
 #include "game/ui_answers.h"
 #include "game/ui_chat_ask.h"
 #include "game/ui_stage.h"
+#include "game/whisper_stage.h"
+#include "mvp/mvp_tracker_stage.h"
 #include "options/chat_web_options.h"
 #include "options/game_option_ids.h"
 #include "world/click_action.h"
@@ -93,10 +99,10 @@ void Game::StageChat(std::uint32_t now_ms) {
   // sélection, la table de l'installation n'est lue qu'à l'entrée en jeu. Sans
   // elles, une balise d'objet resterait à l'écran telle quelle.
   chat_tabs_->ReadsItems(
-      pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr,
-      &pieces_.item_words);
-  chat_tabs_->ReadsMaps(pieces_.map_display_names.has_value() ? &*pieces_.map_display_names
-                                                              : nullptr);
+      pieces_.wardrobe->has_value() ? &(*pieces_.wardrobe)->catalog().items : nullptr,
+      &*pieces_.item_words);
+  chat_tabs_->ReadsMaps(pieces_.map_display_names->has_value() ? &**pieces_.map_display_names
+                                                               : nullptr);
   // LE COMPTEUR RANGÉ PARMI LES ONGLETS. Rangé ou flottant, c'est le profil de
   // disposition qui le dit ; éteint dans les réglages, sa languette se cache
   // sans qu'il sorte. Elle porte ce que le joueur a choisi d'y lire.
@@ -104,20 +110,20 @@ void Game::StageChat(std::uint32_t now_ms) {
   // conversation, et une image de retard ne se voit pas.
   chat_tabs_->HideMeter(!settings_->options().pages().damage_meter.look().shown, windows_.chat);
   chat_tabs_->FollowMeterDock(windows_.damage_meter->docked, windows_.chat);
-  chat_tabs_->LabelMeter(pieces_.damage_meter.tab_label());
+  chat_tabs_->LabelMeter(pieces_.damage_meter->tab_label());
   // LES CONVERSATIONS 1:1 AVANT LE TRI : ce qu'elles prennent au fil n'y paraît
   // pas, et elles le prennent en lisant les lignes neuves. L'alarme sonne pour
   // celles qu'une ligne vient d'ouvrir.
   WhisperOptions& whisper_page = settings_->options().pages().whispers;
   const bool whisper_rang =
-      pieces_.whispers.Advance(windows_.whispers,
-                               WhisperContext{.link = link_,
-                                              .world = world_,
-                                              .setup = whisper_page.setup(),
-                                              .now_ms = now_ms,
-                                              .judge_mvp = [this](const MvpLink& link) {
-                                                return pieces_.mvp_tracker.FactsFor(link);
-                                              }}) > 0;
+      pieces_.whispers->Advance(windows_.whispers,
+                                WhisperContext{.link = link_,
+                                               .world = world_,
+                                               .setup = whisper_page.setup(),
+                                               .now_ms = now_ms,
+                                               .judge_mvp = [this](const MvpLink& link) {
+                                                 return pieces_.mvp_tracker->FactsFor(link);
+                                               }}) > 0;
   if (whisper_rang && vfs_ != nullptr) {
     PlayWhisperAlarm(audio_, *vfs_, client_root_, whisper_page.setup().alarm);
   }
@@ -133,7 +139,7 @@ void Game::StageChat(std::uint32_t now_ms) {
   // LA BARRE A REPRIS LE CLAVIER : un lien posé y retourne, plus dans la
   // dernière conversation 1:1.
   if (windows_.chat->main.input.was_active) {
-    pieces_.whispers.ReleaseLinks();
+    pieces_.whispers->ReleaseLinks();
   }
   // ── LE RELAI DISCORD ───────────────────────────────────────────────────
   // Ses lignes se filtrent par la case « Discord » des onglets ; un relai que
@@ -143,14 +149,14 @@ void Game::StageChat(std::uint32_t now_ms) {
   // ⚠ AVANT LE TRI : le cache libère ses textures ici, et la décoration lit
   // les faits que `Compose` a pu oublier.
   const ChatWebSetup& web = settings_->options().pages().chat_web.setup();
-  pieces_.chat_web.Configure(web);
-  pieces_.chat_web.Compose(windows_.chat, now_ms);
+  pieces_.chat_web->Configure(web);
+  pieces_.chat_web->Compose(windows_.chat, now_ms);
   const ro::sim::MentionRules& mention_rules =
-      pieces_.mentions.RulesFor(world_.player_name(), world_.player_id(), web.mention_words);
+      pieces_.mentions->RulesFor(world_.player_name(), world_.player_id(), web.mention_words);
   // ⚠ LES LIGNES SE CONSOMMENT MÊME CASE DÉCOCHÉE : la cocher ne doit pas faire
   // sonner ce qui s'est dit avant. ⚠ UN CHUCHOTEMENT QUI VIENT DE SONNER NE
   // SONNE PAS DEUX FOIS : son alarme vaut aussi pour la mention.
-  if (pieces_.mentions.Advance(world_.chat_lines(), mention_rules, now_ms) && web.mentions &&
+  if (pieces_.mentions->Advance(world_.chat_lines(), mention_rules, now_ms) && web.mentions &&
       !whisper_rang) {
     if (web.mention_sound && vfs_ != nullptr) {
       PlayWhisperAlarm(audio_, *vfs_, client_root_, /*alarm=*/true);
@@ -166,29 +172,29 @@ void Game::StageChat(std::uint32_t now_ms) {
       .item_icons = web.item_icons,
       .emote_images = web.emote_images,
       .pictures = web.pictures,
-      .url_facts = [this](std::string_view written) { return pieces_.chat_web.FactsOf(written); },
+      .url_facts = [this](std::string_view written) { return pieces_.chat_web->FactsOf(written); },
       .picture = [this](
                      std::string_view url,
-                     ro::ui::ChatInlineImage& image) { pieces_.chat_web.FillPicture(url, image); },
+                     ro::ui::ChatInlineImage& image) { pieces_.chat_web->FillPicture(url, image); },
       .item_icon = [this](std::uint32_t item_id) -> ImTextureID {
-        if (!pieces_.item_icons.has_value()) {
+        if (!pieces_.item_icons->has_value()) {
           return 0;
         }
-        const ro::render::IconTexture& icon = pieces_.item_icons->Get(item_id);
+        const ro::render::IconTexture& icon = (*pieces_.item_icons)->Get(item_id);
         return icon.usable() ? static_cast<ImTextureID>(icon.texture.name()) : 0;
       },
       .naming_seqs =
-          web.mentions ? pieces_.mentions.naming_seqs() : std::span<const std::uint64_t>()});
-  chat_tabs_->SeesConversations(&pieces_.whispers.desk());
-  chat_tabs_->MasksConversations(&pieces_.banned_words);
+          web.mentions ? pieces_.mentions->naming_seqs() : std::span<const std::uint64_t>()});
+  chat_tabs_->SeesConversations(&pieces_.whispers->desk());
+  chat_tabs_->MasksConversations(&*pieces_.banned_words);
   chat_tabs_->SeesOwnName(world_.player_name());
   chat_tabs_->JudgesPlayers([this](std::string_view name) {
     const MvpInviteCircle hunt{
-        .book = pieces_.mvp_tracker.book(),
+        .book = pieces_.mvp_tracker->book(),
         .guild = guild_book_,
         .friends = friends_,
         .enabled = settings_->options().pages().mvp_tracker.settings().enabled,
-        .link_ready = pieces_.mvp_tracker.link_ready()};
+        .link_ready = pieces_.mvp_tracker->link_ready()};
     return JudgePlayerLink(name, PlayerLinkCircle{.party = party_,
                                                   .guild = guild_book_,
                                                   .friends = friends_,
@@ -199,13 +205,13 @@ void Game::StageChat(std::uint32_t now_ms) {
   // LES RESPAWNS DE MVP DU FIL : l'heure du serveur, qui dit lesquels sont
   // échus, et ce que leur menu sait d'avance — le carnet seul le sait.
   chat_tabs_->ReadsMvpClock(
-      MvpLinkClock{.server_now_s = pieces_.mvp_tracker.ServerNow(LocalUnixSeconds()),
-                   .book = &pieces_.mvp_tracker.book()});
+      MvpLinkClock{.server_now_s = pieces_.mvp_tracker->ServerNow(LocalUnixSeconds()),
+                   .book = &pieces_.mvp_tracker->book()});
   // LES LIENS DE RÉGLAGE DU FIL : une destination que le lecteur n'a pas — l'onglet
   // d'un compagnon absent — reste en texte inerte.
   chat_tabs_->ReadsSettingReach(SettingReachOf(pieces_));
   chat_tabs_->JudgesMvpLinks(
-      [this](const MvpLink& link) { return pieces_.mvp_tracker.FactsFor(link); });
+      [this](const MvpLink& link) { return pieces_.mvp_tracker->FactsFor(link); });
   // L'APPARENCE PRÊTE LE TEXTE RICHE à toutes les fenêtres : une copie, parce
   // que ce pointeur-là n'est pas un réglage.
   ro::ui::ChatAppearance look = settings_->options().chat_look();
@@ -214,14 +220,15 @@ void Game::StageChat(std::uint32_t now_ms) {
   chat_tabs_->Refresh(windows_.chat, world_.chat_lines(), now_ms, look, look.diagnostic);
   // LE FIL DU SALON, APRÈS : il prend ses jetons de liens à la suite de ceux de
   // la conversation. Et la barre se prête à sa salle tant qu'il dure.
-  chat_tabs_->RefreshRoom(pieces_.chat_rooms.room().lines(), pieces_.chat_rooms.room().room_seq());
+  chat_tabs_->RefreshRoom(pieces_.chat_rooms->room().lines(),
+                          pieces_.chat_rooms->room().room_seq());
   // « ENREGISTRER LE CHAT », choisi dans le menu d'un membre : le salon seul.
-  if (pieces_.chat_rooms.TakeSaveAsked()) {
-    SaveChatAndSay(*chat_tabs_, &pieces_.chat_rooms, /*tabs_too=*/false, world_, now_ms);
+  if (pieces_.chat_rooms->TakeSaveAsked()) {
+    SaveChatAndSay(*chat_tabs_, &*pieces_.chat_rooms, /*tabs_too=*/false, world_, now_ms);
   }
   // LES CONVERSATIONS 1:1, de même.
-  chat_tabs_->RefreshWhispers(world_.chat_lines(), pieces_.whispers.desk().conversations());
-  windows_.chat->main.input_lent = pieces_.chat_rooms.LendsInput();
+  chat_tabs_->RefreshWhispers(world_.chat_lines(), pieces_.whispers->desk().conversations());
+  windows_.chat->main.input_lent = pieces_.chat_rooms->LendsInput();
   // ⚠ ÉLAGUÉS AVANT D'ÊTRE PEINTS : un libellé que le joueur a effacé de sa
   // saisie n'a plus de pastille à porter, et sa place au plafond se libère.
   // ⚠ CE QUE LA SAISIE PORTERA À CETTE IMAGE, dépôt en attente compris : une
@@ -238,7 +245,7 @@ void Game::StageChat(std::uint32_t now_ms) {
     if (MvpLink posed;
         pending_links_[rank].kind == ro::ui::ChatLinkKind::kMvp &&
         ParseMvpLink(pending_links_[rank].wire, &posed, nullptr) == MvpLinkRead::kRead) {
-      facts = pieces_.mvp_tracker.FactsFor(posed);
+      facts = pieces_.mvp_tracker->FactsFor(posed);
     }
     // UNE RECHERCHE POSÉE DE MÊME : son menu sait si elle a un lieu.
     ro::ui::NaviSearchMenuFacts navi;
@@ -279,7 +286,7 @@ void Game::StageChat(std::uint32_t now_ms) {
   // une place que le serveur coupera.
   const std::string outgoing = ResolveChatLinks(typed, pending_links_);
   chat_preview_.Refresh(outgoing.c_str(), WireSpeakerOf(world_, chat_preview_), armed_chat_,
-                        pieces_.chat_rooms.room().in_room());
+                        pieces_.chat_rooms->room().in_room());
   // LES COMMANDES PROPOSÉES, à la mesure du groupe que le serveur a dit : un
   // compte du staff voit les siennes dès que le niveau arrive.
   chat_commands_.Refresh(world_.group_level(), pieces_.job_names);
@@ -340,7 +347,7 @@ void Game::ApplyChatAnswers(const UiStage::Answers& answers, std::uint32_t now_m
   // raccourci — il faudrait retraduire entre deux.
   DamageMeterOptions& meter = settings_->options().pages().damage_meter;
   // CE QUE LA FENÊTRE DU COMPTEUR A DEMANDÉ.
-  if (pieces_.damage_meter.Apply(answers.damage_meter, world_, meter)) {
+  if (pieces_.damage_meter->Apply(answers.damage_meter, world_, meter)) {
     settings_->file().Touch();
   }
   if (answers.damage_meter->open_settings) {
@@ -367,7 +374,7 @@ void Game::ApplyChatAnswers(const UiStage::Answers& answers, std::uint32_t now_m
       settings_->file().Touch();
     }
     chat_tabs_->Apply(ask.group, ask.asked, windows_.chat);
-    if (pieces_.damage_meter.Apply(ask.asked.meter, world_, meter)) {
+    if (pieces_.damage_meter->Apply(ask.asked.meter, world_, meter)) {
       settings_->file().Touch();
     }
     if (ask.asked.meter.open_settings) {
@@ -389,7 +396,7 @@ void Game::ApplyChatAnswers(const UiStage::Answers& answers, std::uint32_t now_m
     }
     // LE MOT QUI REMPLACE LA BARRE PRÊTÉE ramène la salle devant.
     if (ask.asked.lent_input_asked) {
-      pieces_.chat_rooms.Raise();
+      pieces_.chat_rooms->Raise();
     }
     // LA PORTE VERS LES RÉGLAGES, à défaut d'une puce : le cadre de la chatbox
     // n'a pas de barre de titre où en poser une.
@@ -430,20 +437,20 @@ void Game::ApplyChatAnswers(const UiStage::Answers& answers, std::uint32_t now_m
   // ── LES ADRESSES ET LES IMAGES, APRÈS LE DESSIN ─────────────────────────
   // Les vignettes que le fil a posées sans les avoir, puis les réponses des
   // confirmations et de la visionneuse.
-  pieces_.chat_web.RequestSeen(*chat_tabs_);
-  pieces_.chat_web.Answer(windows_.chat, client_root_);
+  pieces_.chat_web->RequestSeen(*chat_tabs_);
+  pieces_.chat_web->Answer(windows_.chat, client_root_);
   ChatWebOptions& web = settings_->options().pages().chat_web;
   // ⚠ LE RÉGLAGE EST LA SEULE LISTE : l'étape la relit à l'image suivante, et
   // le fichier ne se réécrit que si elle a changé.
-  if (const std::optional<std::string> host = pieces_.chat_web.TakeHostToAllow();
+  if (const std::optional<std::string> host = pieces_.chat_web->TakeHostToAllow();
       host.has_value() && web.AddPreviewHost(*host)) {
     settings_->file().Touch();
   }
-  if (const std::optional<std::string> host = pieces_.chat_web.TakeHostToOpenAlways();
+  if (const std::optional<std::string> host = pieces_.chat_web->TakeHostToOpenAlways();
       host.has_value() && web.AddOpenHost(*host)) {
     settings_->file().Touch();
   }
-  if (const std::optional<ChatSaveOutcome> saved = pieces_.chat_web.TakeSaved();
+  if (const std::optional<ChatSaveOutcome> saved = pieces_.chat_web->TakeSaved();
       saved.has_value()) {
     world_.RecordChat(ro::sim::ChatKind::kServer, 0, SavedPictureLine(*saved), now_ms);
   }

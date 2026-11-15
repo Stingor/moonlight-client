@@ -16,16 +16,19 @@
 #include "ro/sim/inventory.h"
 #include "ro/sim/world.h"
 
+#include "game/cash_shop_stage.h"
 #include "game/cash_shop_windows.h"
 #include "game/game.h"
+#include "game/trade_stages.h"
 #include "game/ui_window_rounds.h"
+#include "items/doll_effects.h"
 
 namespace moonclient {
 
 DatabaseContext Game::DatabaseContextNow(std::uint32_t now_ms) {
   return DatabaseContext{.link = link_,
                          .world = world_,
-                         .market = pieces_.trade.market().market(),
+                         .market = pieces_.trade->market().market(),
                          .online = link_.is_open(),
                          .link_facts = ItemLinkFactsNow(),
                          .now_ms = now_ms};
@@ -34,7 +37,7 @@ DatabaseContext Game::DatabaseContextNow(std::uint32_t now_ms) {
 ro::ui::ItemLinkFacts Game::ItemLinkFactsNow() {
   // L'ALBUM S'OUVRE PARTOUT EN PARTIE : c'est au serveur qu'il demande son état,
   // et le lien seul le permet.
-  return ro::ui::ItemLinkFacts{.vote_shop = pieces_.cash_shop.offers(),
+  return ro::ui::ItemLinkFacts{.vote_shop = pieces_.cash_shop->offers(),
                                .album = card_album_.LinkFacts(link_.is_open())};
 }
 
@@ -44,7 +47,7 @@ void Game::ShowCardInAlbum(std::uint32_t card_id, std::uint32_t now_ms) {
 
 void Game::DecorateItemSheet(DescriptionView& sheet, std::uint32_t item_id) {
   sheet.NoteLinkFacts(ItemLinkFactsNow());
-  sheet.NoteHatEffect(pieces_.cash_shop.hat_effects().OrdinalOf(item_id) != 0);
+  sheet.NoteHatEffect(pieces_.cash_shop->hat_effects().OrdinalOf(item_id) != 0);
   // L'ÉTIQUETTE « CRAFT », que seul l'Atlas sait composer.
   std::string craft_label;
   std::string craft_tip;
@@ -53,12 +56,12 @@ void Game::DecorateItemSheet(DescriptionView& sheet, std::uint32_t item_id) {
   }
   // LE BOUTON DU VOTE SHOP, que seule la boutique sait composer — et seulement
   // quand l'item est à son catalogue.
-  if (const std::optional<CashShopStage::Offer> offer = pieces_.cash_shop.Find(item_id);
+  if (const std::optional<CashShopStage::Offer> offer = pieces_.cash_shop->Find(item_id);
       offer.has_value()) {
     sheet.NoteVoteShopTag(ro::core::Printed(ro::core::Tr("Vote Shop : %d pts"), offer->price));
   }
   // LA LIGNE « @item », pour le staff seulement.
-  sheet.NoteStaff(Rights().staff_tools, pieces_.item_properties.IsStackable(item_id),
+  sheet.NoteStaff(Rights().staff_tools, pieces_.item_properties->IsStackable(item_id),
                   StaffFreeBagSlots(world_.inventory()));
 }
 
@@ -66,28 +69,32 @@ void Game::AdvanceHoveredDollEffect(std::uint32_t now_ms) {
   // L'EFFET DE CHAPEAU DU PANTIN SURVOLÉ. ⚠ APRÈS LES PANTINS, composés plus
   // haut, qui effacent chacun le rappel de l'image d'avant ; un seul se survole
   // à la fois, et la boutique passe d'abord.
-  if (!pieces_.doll_effects.has_value()) {
+  if (!pieces_.doll_effects->has_value()) {
     return;
   }
-  const ro::sim::HatEffectItems& hats = pieces_.cash_shop.hat_effects();
+  const ro::sim::HatEffectItems& hats = pieces_.cash_shop->hat_effects();
   ro::ui::DescriptionWindowState& database_sheet =
       windows_.monster_sheet->database.state.item_sheet;
   if (windows_.cash_shop->state.doll.wanted) {
-    pieces_.doll_effects->Advance(
-        windows_.cash_shop->state.doll, hats.OrdinalOf(windows_.cash_shop->state.doll_item),
-        pieces_.cash_shop.doll_framing(), pieces_.cash_shop.doll_body(), world_, *stage_, now_ms);
+    (*pieces_.doll_effects)
+        ->Advance(windows_.cash_shop->state.doll,
+                  hats.OrdinalOf(windows_.cash_shop->state.doll_item),
+                  pieces_.cash_shop->doll_framing(), pieces_.cash_shop->doll_body(), world_,
+                  *stage_, now_ms);
   } else if (windows_.description->open && windows_.description->doll.wanted) {
-    pieces_.doll_effects->Advance(
-        windows_.description->doll, hats.OrdinalOf(windows_.description->item_id),
-        item_description_->doll_framing(), item_description_->doll_body(), world_, *stage_, now_ms);
+    (*pieces_.doll_effects)
+        ->Advance(windows_.description->doll, hats.OrdinalOf(windows_.description->item_id),
+                  item_description_->doll_framing(), item_description_->doll_body(), world_,
+                  *stage_, now_ms);
   } else if (const DescriptionView* const shown = database_.item_sheet();
              database_sheet.doll.wanted && shown != nullptr) {
     // LA FICHE D'UN OBJET DANS LA BASE, qui a son propre pantin.
-    pieces_.doll_effects->Advance(
-        database_sheet.doll, hats.OrdinalOf(database_.ShownItem(windows_.monster_sheet->database)),
-        shown->doll_framing(), shown->doll_body(), world_, *stage_, now_ms);
+    (*pieces_.doll_effects)
+        ->Advance(database_sheet.doll,
+                  hats.OrdinalOf(database_.ShownItem(windows_.monster_sheet->database)),
+                  shown->doll_framing(), shown->doll_body(), world_, *stage_, now_ms);
   } else {
-    pieces_.doll_effects->Rest();
+    (*pieces_.doll_effects)->Rest();
   }
 }
 
@@ -134,7 +141,7 @@ void Game::RouteItemSheet(const ro::ui::DescriptionWindowAction& asked, std::uin
 
   // LES BOUTONS DE L'OBJET MONTRÉ.
   if (asked.open_vote_shop) {
-    static_cast<void>(pieces_.cash_shop.OpenWithItem(item_id, windows_.cash_shop->state, link_));
+    static_cast<void>(pieces_.cash_shop->OpenWithItem(item_id, windows_.cash_shop->state, link_));
   }
   // Le « @item » du staff : le droit se relit ici, au geste.
   if (asked.staff_item.has_value()) {
@@ -159,7 +166,7 @@ void Game::RouteItemSheet(const ro::ui::DescriptionWindowAction& asked, std::uin
     item_description_->ToggleAutoloot(link_, item_id);
   }
   if (asked.search_market && item_id != 0) {
-    pieces_.trade.market().AskOpen(item_id);
+    pieces_.trade->market().AskOpen(item_id);
   }
   if (asked.open_database && item_id != 0) {
     database_.AskOpen(ro::ui::DatabaseTarget{.kind = ro::ui::DatabaseKind::kItem, .id = item_id});

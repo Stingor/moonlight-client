@@ -11,7 +11,9 @@
 #include "ro/core/printed.h"
 #include "ro/net/mercenary_frames.h"
 #include "ro/net/skill.h"
+#include "ro/render/skill_icons.h"
 #include "ro/sim/skill_book.h"
+#include "ro/sim/skill_tree.h"
 
 #include "game/game_pieces.h"
 #include "game/skin_image_of.h"
@@ -112,7 +114,7 @@ void MercenaryStage::Stage(const ro::sim::World& world, GamePieces& pieces) {
 
   // LES NOMS D'ABORD, tous : les lignes en gardent des vues, qu'une
   // réallocation laisserait pendre.
-  const ro::sim::SkillTree* tree = pieces.skill_tree.has_value() ? &*pieces.skill_tree : nullptr;
+  const ro::sim::SkillTree* tree = pieces.skill_tree->has_value() ? &**pieces.skill_tree : nullptr;
   skill_names_.clear();
   for (const ro::sim::MercenarySkill& skill : book_.skills()) {
     const ro::sim::SkillNode* node = tree != nullptr ? tree->Find(skill.skill_id) : nullptr;
@@ -136,9 +138,9 @@ void MercenaryStage::Stage(const ro::sim::World& world, GamePieces& pieces) {
         .range_cells = skill.range_cells,
     };
     ++rank;
-    if (pieces.skill_icons.has_value()) {
+    if (pieces.skill_icons->has_value()) {
       const ro::render::IconTexture& icon =
-          pieces.skill_icons->Get(skill.skill_id, node != nullptr ? node->idname : skill.name);
+          (*pieces.skill_icons)->Get(skill.skill_id, node != nullptr ? node->idname : skill.name);
       if (icon.usable()) {
         row.icon = SkinImageOf(icon);
       }

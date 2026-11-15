@@ -2,9 +2,18 @@
 // effets, nombres, rémanences, gestes en attente, menus qui désignent une
 // entité, et les textures que la carte quittée a seule réclamées.
 
+#include "game/cart_choice_stage.h"
+#include "game/companion_ai_stage.h"
 #include "game/game.h"
+#include "game/talkbox_stage.h"
 #include "game/ui_window_rounds.h"
+#include "world/actor_carts.h"
+#include "world/actor_falcons.h"
 #include "world/entity_menu.h"
+#include "world/hit_popups.h"
+#include "world/item_obtain_toast.h"
+#include "world/map_sprites.h"
+#include "world/npc_illustration_stage.h"
 
 namespace moonclient {
 
@@ -20,11 +29,11 @@ void Game::ForgetWhatPlayed() {
   if (effect_nodes_.has_value()) {
     effect_nodes_->Forget();
   }
-  if (pieces_.numbers.has_value()) {
-    pieces_.numbers->Forget();
+  if (pieces_.numbers->has_value()) {
+    (*pieces_.numbers)->Forget();
   }
-  if (pieces_.item_toast.has_value()) {
-    pieces_.item_toast->Forget();
+  if (pieces_.item_toast->has_value()) {
+    (*pieces_.item_toast)->Forget();
   }
   if (actor_sounds_.has_value()) {
     actor_sounds_->Forget();
@@ -34,13 +43,13 @@ void Game::ForgetWhatPlayed() {
   // Ce qui s'effaçait sur l'ancienne carte n'a rien à faire sur la nouvelle.
   scene_actors_.fading.clear();
   scene_actors_.corpses.clear();
-  pieces_.falcons.Forget();
-  pieces_.carts.Forget();
-  pieces_.map_sprites.Forget();
-  pieces_.ailment_tints.Forget();
-  pieces_.cart_choice.Forget();
-  pieces_.talkbox.Forget();
-  pieces_.npc_illustration.Forget();
+  pieces_.falcons->Forget();
+  pieces_.carts->Forget();
+  pieces_.map_sprites->Forget();
+  pieces_.ailment_tints->Forget();
+  pieces_.cart_choice->Forget();
+  pieces_.talkbox->Forget();
+  pieces_.npc_illustration->Forget();
   drops_.Forget();
   // Le monde purge la cible à l'arrivée ; les gestes en attente partent avec.
   targeting_.Forget();
@@ -61,7 +70,7 @@ void Game::ForgetWhatPlayed() {
   // Le curseur armé vise la même carte révolue.
   grimoire_.CancelPending();
   grimoire_.Disarm();
-  pieces_.companion_ai.Disarm();
+  pieces_.companion_ai->Disarm();
   // LA FLÈCHE RENAÎT CACHÉE, et son animation repart, même carte comprise.
   // L'engagement, lui, ne tombe que sur une AUTRE carte.
   EnterMap(world_mouse_.engagement, same_map);
@@ -84,7 +93,7 @@ void Game::ForgetWhatPlayed() {
   // vient de quitter : un aller-retour ne retéléverse rien.
   sprites_.ForgetUnusedTextures();
   effect_renderer_.ForgetUnusedTextures();
-  pieces_.overlay.ForgetUnusedTextures();
+  pieces_.overlay->ForgetUnusedTextures();
 }
 
 }  // namespace moonclient

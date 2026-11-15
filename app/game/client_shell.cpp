@@ -24,6 +24,7 @@
 #include "game/save_folder.h"
 #include "game/skin_reload.h"
 #include "game/ui_stage.h"
+#include "guard/cheat_guard.h"
 #include "loading/loading_plans.h"
 #include "loading/loading_presenter.h"
 #include "options/screen_choice.h"
@@ -129,7 +130,7 @@ ro::core::Result<void> ClientShell::OpenWindow(int width, int height) {
   ReportStage("fenêtre");
   // LE GARDE observe dès que la fenêtre existe : son crochet lit les messages
   // qu'elle reçoit.
-  pieces_.guard.Start();
+  pieces_.guard->Start();
 
   // L'INTERFACE, aussitôt après : elle est ce qui décide, à chaque événement,
   // si le geste revient au jeu ou à une fenêtre.
@@ -256,8 +257,8 @@ void ClientShell::DrawLoadingFrame(const ro::core::LoadProgress* progress, float
     return;
   }
   loading_screens_.Draw(*interface_, vfs_.has_value() ? &*vfs_ : nullptr,
-                        pieces_.game_images.has_value() ? &*pieces_.game_images : nullptr, progress,
-                        opacity, now_ms);
+                        pieces_.game_images->has_value() ? &**pieces_.game_images : nullptr,
+                        progress, opacity, now_ms);
 }
 
 void ClientShell::KeepAlive() const {

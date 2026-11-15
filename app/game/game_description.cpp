@@ -29,10 +29,15 @@
 #include "ro/ui/rich_text.h"
 
 #include "game/bug_report_route.h"
+#include "game/cash_shop_stage.h"
 #include "game/game.h"
+#include "game/mail_stage.h"
+#include "game/npc_shop_stage.h"
+#include "game/trade_stages.h"
 #include "game/ui_answers.h"
 #include "game/ui_stage.h"
 #include "game/ui_window_rounds.h"
+#include "world/player_report.h"
 
 namespace moonclient {
 
@@ -139,7 +144,7 @@ void Game::StageDescriptions(std::uint32_t now_ms) {
     // LE PANTIN DU « VIEWID », quand sa ligne est survolée.
     item_description_->RefreshDoll(
         world_, windows_.description->doll,
-        pieces_.cash_shop.hat_effects().OrdinalOf(windows_.description->item_id) != 0, styles_,
+        pieces_.cash_shop->hat_effects().OrdinalOf(windows_.description->item_id) != 0, styles_,
         now_ms);
   }
   // ⚠ L'APERÇU NE SE BÂTIT QUE S'IL SE MONTRE : sans le réglage, il n'a rien à
@@ -231,8 +236,8 @@ void Game::ApplyDescriptionAnswers(const UiStage::Answers& answers, std::uint32_
   RouteBugReports(answers, windows_, world_, *item_description_, skill_description_->view(),
                   settings_->options().bug_report().buttons(), link_);
   // « SIGNALER CE JOUEUR » : l'envoi que sa fenêtre demande.
-  pieces_.player_report.Advance(windows_.player_report, answers.player_report, world_.player_id(),
-                                link_);
+  pieces_.player_report->Advance(windows_.player_report, answers.player_report, world_.player_id(),
+                                 link_);
   if (answers.book->closed) {
     item_description_->books().NoteClosed(windows_.book->item_id, answers.book->page);
   }
@@ -275,8 +280,8 @@ void Game::ApplyDescriptionAnswers(const UiStage::Answers& answers, std::uint32_
     // Une pièce jointe de courrier survolée vaut une offre de commerce, et une
     // carte de la boutique de vote aussi.
     TradeItemFocus traded =
-        pieces_.trade.hovered().item_id != 0 ? pieces_.trade.hovered() : pieces_.mail.hovered();
-    if (const std::optional<ro::vfs::ItemLink>& voted = pieces_.cash_shop.hovered();
+        pieces_.trade->hovered().item_id != 0 ? pieces_.trade->hovered() : pieces_.mail->hovered();
+    if (const std::optional<ro::vfs::ItemLink>& voted = pieces_.cash_shop->hovered();
         traded.item_id == 0 && voted.has_value()) {
       traded = TradeItemFocus{.item_id = voted->item_id, .link = voted};
     }

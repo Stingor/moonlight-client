@@ -4,6 +4,7 @@
 
 #include "ro/core/error.h"
 #include "ro/core/log.h"
+#include "ro/render/skill_icons.h"
 #include "ro/sim/skill_tree.h"
 
 #include "game/game_pieces.h"
@@ -13,7 +14,7 @@
 namespace moonclient {
 
 void LoadSkillTree(ro::vfs::Vfs& vfs, GamePieces& pieces) {
-  pieces.skill_icons.emplace(vfs);
+  pieces.skill_icons->emplace(vfs);
   auto tables = LoadSkillTables(vfs);
   if (!tables) {
     // ⚠ CET ÉCHEC-CI COÛTE AUSSI LES DESCRIPTIONS : elles vivent dans la même
@@ -41,9 +42,9 @@ void LoadSkillTree(ro::vfs::Vfs& vfs, GamePieces& pieces) {
         "règles des compétences : {} — la grille se montrera entière, et rien ne s'y montera",
         ro::core::Describe(rules.error()));
   }
-  pieces.skill_tree = std::move(tree);
+  *pieces.skill_tree = std::move(tree);
   ro::core::LogInfo("descriptions de compétences : {} fiche(s)", tables->words.skill_count());
-  pieces.skill_words = std::move(tables->words);
+  *pieces.skill_words = std::move(tables->words);
 }
 
 }  // namespace moonclient

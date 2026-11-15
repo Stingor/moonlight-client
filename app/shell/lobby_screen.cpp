@@ -25,6 +25,7 @@
 
 #include "ro/core/log.h"
 #include "ro/core/text.h"
+#include "ro/render/overlay_renderer.h"
 #include "ro/ui/system_fonts.h"
 
 #include "character/recent_characters.h"
@@ -225,11 +226,11 @@ void LobbyScreen::MountNow(const PendingMount& mount) {
   // LE BANDEAU DE LA VILLE MONTÉE, comme à l'arrivée en jeu. ⚠ SON COMPTE PART
   // D'ICI : le montage bloque, et l'heure prise avant lui mangerait le bandeau.
   GamePieces& pieces = shell_.pieces();
-  pieces.map_sign.Enter(pieces.map_display_names.has_value()
-                            ? pieces.map_display_names->SignOf(MapSignFileOf(mount.map_name))
-                            : nullptr,
-                        shell_.settings().options().pages().map_sign.mode(),
-                        static_cast<std::uint32_t>(SDL_GetTicks()));
+  pieces.map_sign->Enter(pieces.map_display_names->has_value()
+                             ? (*pieces.map_display_names)->SignOf(MapSignFileOf(mount.map_name))
+                             : nullptr,
+                         shell_.settings().options().pages().map_sign.mode(),
+                         static_cast<std::uint32_t>(SDL_GetTicks()));
   if (mount.live) {
     backdrop_.WatchCell(ro::sim::UnpackPosition(flow_.backdrop().spawn().packed_position));
   }
@@ -325,9 +326,9 @@ ro::ui::LoginWindowView LobbyScreen::Compose() {
   // 🔴 SANS VILLE, L'ILLUSTRATION DU CLIENT D'ORIGINE — et non un aplat. Le
   // décor vivant PREND SA PLACE (ADR 0057) ; l'éteindre doit donc rendre ce
   // qu'il avait pris, pas laisser un trou. C'est le seul JPEG de l'interface.
-  if (!ShowingCity() && shell_.pieces().game_images.has_value()) {
+  if (!ShowingCity() && shell_.pieces().game_images->has_value()) {
     const ro::render::IconTexture& art =
-        shell_.pieces().game_images->GetOurs(ro::ui::kLoginArtPath);
+        (*shell_.pieces().game_images)->GetOurs(ro::ui::kLoginArtPath);
     if (art.usable()) {
       view.backdrop = SkinImageOf(art);
     }
@@ -499,7 +500,7 @@ void LobbyScreen::FollowSettings(std::uint32_t now_ms) {
 
 void LobbyScreen::ComposeCursor(std::uint32_t now_ms) {
   const GamePieces& pieces = shell_.pieces();
-  if (pieces.cursor.sprite == nullptr) {
+  if (pieces.cursor->sprite == nullptr) {
     return;
   }
   // ⚠ DEUX FORMES SEULEMENT : la flèche, et la main sur ce qui se clique. Les
@@ -620,7 +621,7 @@ ro::core::Result<void> LobbyScreen::Frame(std::uint32_t now_ms) {
     // le monde et le nom de la carte où il se trouve, et elle compare. Voir
     // `BackdropScene::Draw`.
     ro::render::ActorWardrobe* wardrobe =
-        shell_.pieces().wardrobe.has_value() ? &*shell_.pieces().wardrobe : nullptr;
+        shell_.pieces().wardrobe->has_value() ? &**shell_.pieces().wardrobe : nullptr;
     // 🔴 LA PAGE « GRAPHICS » SE RELIT À CHAQUE IMAGE, comme en partie : la
     // ville est l'aperçu de ce que le joueur règle ici. Voir `BackdropLens`.
     const GraphicsOptions& graphics = shell_.settings().options().graphics();
@@ -694,8 +695,8 @@ ro::core::Result<void> LobbyScreen::Frame(std::uint32_t now_ms) {
       GamePieces& pieces = shell_.pieces();
       const std::optional<ro::ui::MapSignView> sign =
           show_city && shell_.settings().options().pages().map_sign.mode() != MapSignMode::kNever
-              ? pieces.map_sign.Stage(
-                    pieces.game_images.has_value() ? &*pieces.game_images : nullptr, now_ms)
+              ? pieces.map_sign->Stage(
+                    pieces.game_images->has_value() ? &**pieces.game_images : nullptr, now_ms)
               : std::nullopt;
       const ro::ui::LoginWindowView form = Compose();
       // ⚠ LA CONNEXION LES REFERME : ils n'appartiennent qu'à cet écran-ci.
@@ -723,8 +724,8 @@ ro::core::Result<void> LobbyScreen::Frame(std::uint32_t now_ms) {
   // ce client, et c'est celui-ci.
   ComposeCursor(now_ms);
   if (!cursor_quads_.empty()) {
-    shell_.pieces().overlay.Draw(cursor_quads_, static_cast<float>(shell_.width()),
-                                 static_cast<float>(shell_.height()));
+    shell_.pieces().overlay->Draw(cursor_quads_, static_cast<float>(shell_.width()),
+                                  static_cast<float>(shell_.height()));
     cursor_quads_.clear();
   }
 

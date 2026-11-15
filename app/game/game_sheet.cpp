@@ -20,10 +20,13 @@
 #include "character/staff_view.h"
 #include "character/status_window_view.h"
 #include "game/bug_report_context.h"
+#include "game/cash_shop_stage.h"
 #include "game/game.h"
+#include "game/homunculus_stage.h"
 #include "game/hud_rounds.h"
 #include "game/ui_answers.h"
 #include "game/ui_stage.h"
+#include "items/doll_effects.h"
 #include "world/actor_view.h"
 
 namespace moonclient {
@@ -32,7 +35,7 @@ void Game::StageCharacterSheet(std::uint32_t now_ms) {
   // LES DÉPARTS DE LA GUILDE S'ÉCRIVENT DANS LA CONVERSATION, même l'écran de
   // veille levé. Le nôtre ferme la fenêtre de guilde : la fiche, quand c'est
   // elle qu'elle montre.
-  if (ro::net::SayGuildDepartures(guild_book_, world_, &pieces_.banned_words, now_ms) &&
+  if (ro::net::SayGuildDepartures(guild_book_, world_, &*pieces_.banned_words, now_ms) &&
       windows_.character->tab == ro::ui::CharacterTab::kGuild) {
     windows_.character->open = false;
   }
@@ -102,8 +105,8 @@ void Game::StageCharacterSheet(std::uint32_t now_ms) {
         dressed.headgears = worn.headgears;
         dressed.robe = worn.robe;
       }
-      if (pieces_.wardrobe.has_value()) {
-        styles_.Dress(world_.player_id(), dressed, *pieces_.wardrobe, world_.styles());
+      if (pieces_.wardrobe->has_value()) {
+        styles_.Dress(world_.player_id(), dressed, **pieces_.wardrobe, world_.styles());
       }
     }
     character_->RefreshAvatar(world_, windows_.character->avatar,
@@ -123,14 +126,15 @@ void Game::StageCharacterSheet(std::uint32_t now_ms) {
   // reconnexion.
   windows_.character_view->staff_allowed = Rights().staff_tools;
   if (windows_.character_view->staff_allowed) {
-    FeedStaffPane(world_, staff_.jobs, &pieces_.job_names, windows_.character_view->staff);
+    FeedStaffPane(world_, staff_.jobs, &*pieces_.job_names, windows_.character_view->staff);
     // LA CRÉATION D'UN HOMONCULE, dans la ligne du staff du grimoire : le
     // serveur refuse d'en créer un second. ⚠ `present()` NE DIT QUE CE QUE LE
     // CLIENT A VU : un homoncule accusé reste présent au repos ou mort, mais
     // celui qui l'était déjà à la connexion n'est jamais annoncé, et le serveur
     // le compte quand même. Le bouton reste alors cliquable.
-    windows_.character_view->grimoire_staff = ro::ui::GrimoireStaffView{
-        .homunculi = staff_.homunculi, .has_homunculus = pieces_.homunculus.homunculus().present()};
+    windows_.character_view->grimoire_staff =
+        ro::ui::GrimoireStaffView{.homunculi = staff_.homunculi,
+                                  .has_homunculus = pieces_.homunculus->homunculus().present()};
     // 🔴 LE SOUHAIT SE REPOSE ICI, SOUS LE DROIT : c'est lui qui dit que le
     // serveur est prêt à l'entendre, et il n'arrive qu'après l'entrée sur la
     // carte. Plus tôt, la commande serait refusée — et notée comme faite.
@@ -177,11 +181,11 @@ void Game::StageStyle(std::uint32_t now_ms) {
   if (windows_.style->open) {
     // L'onglet des effets lit la table de l'installation et les items qui posent
     // un effet, que le serveur annonce.
-    style_view_->SetHatEffectSources(vfs_, &pieces_.cash_shop.hat_effects());
+    style_view_->SetHatEffectSources(vfs_, &pieces_.cash_shop->hat_effects());
     // CE QUE LE PANTIN A COMPTÉ À L'IMAGE PRÉCÉDENTE, avant que la vue ne
     // choisisse la sonde de celle-ci.
-    if (pieces_.style_effects.has_value()) {
-      if (const ro::render::EffectColorTally* tally = pieces_.style_effects->color_tally()) {
+    if (pieces_.style_effects->has_value()) {
+      if (const ro::render::EffectColorTally* tally = (*pieces_.style_effects)->color_tally()) {
         style_view_->NoteHatEffectColor(*tally);
       }
     }
@@ -189,12 +193,12 @@ void Game::StageStyle(std::uint32_t now_ms) {
     // LES EFFETS DE CHAPEAU DU PANTIN, par son propre moteur, teints de ce qu'on
     // règle : il ne naît que si le joueur en affiche un.
     const auto& doll = style_view_->hat_effect_doll();
-    if (doll.has_value() && !pieces_.style_effects.has_value()) {
-      pieces_.style_effects.emplace(*vfs_);
+    if (doll.has_value() && !pieces_.style_effects->has_value()) {
+      pieces_.style_effects->emplace(*vfs_);
     }
     windows_.style->doll.overlay = {};
     windows_.style->doll.body_overlaid = false;
-    if (pieces_.style_effects.has_value() && stage_.has_value()) {
+    if (pieces_.style_effects->has_value() && stage_.has_value()) {
       const std::span<const ro::sim::HatEffectId> worn =
           doll.has_value() ? std::span<const ro::sim::HatEffectId>(doll->worn)
                            : std::span<const ro::sim::HatEffectId>{};
@@ -207,14 +211,15 @@ void Game::StageStyle(std::uint32_t now_ms) {
                                    .head_shift = doll->seat.head_shift};
         pose.sprite_direction = doll->seat.sprite_direction;
       }
-      pieces_.style_effects->SetColorProbe(style_view_->HatEffectColorProbe());
-      const DollEffects::Shown shown = pieces_.style_effects->Advance(
-          worn, pose, world_, *stage_, now_ms, &style_view_->HatEffectDollDyes());
+      (*pieces_.style_effects)->SetColorProbe(style_view_->HatEffectColorProbe());
+      const DollEffects::Shown shown =
+          (*pieces_.style_effects)
+              ->Advance(worn, pose, world_, *stage_, now_ms, &style_view_->HatEffectDollDyes());
       windows_.style->doll.overlay = shown.overlay;
       windows_.style->doll.body_overlaid = shown.body_overlaid;
     }
   } else {
-    pieces_.style_effects.reset();
+    pieces_.style_effects->reset();
     windows_.style->doll.overlay = {};
     // ⚠ RENDU ENTRE DEUX IMAGES, et une fois, au passage d'ouverte à fermée :
     // oublier un style détruit les tenues qui le portaient, et une
@@ -250,7 +255,7 @@ void Game::ApplySheetAnswers(const UiStage::Answers& answers) {
   }
   // ⚠ UN CLIC QUI NE PEUT RIEN FAIRE LE DIT : sans sprites ni personnage, la
   // place de l'avatar est vide, et le GIF le serait aussi.
-  if (!pieces_.wardrobe.has_value()) {
+  if (!pieces_.wardrobe->has_value()) {
     pieces_.doll_gif->Refuse("l'installation n'a pas de garde-robe");
   } else if (world_.player() == nullptr) {
     pieces_.doll_gif->Refuse("aucun personnage à photographier");
@@ -268,7 +273,7 @@ void Game::ApplySheetAnswers(const UiStage::Answers& answers) {
     order.file_name = ro::ui::DollGifFileName(
         world_.player_name(), ro::ui::CharacterPoseLabel(avatar.pose, avatar.animated),
         avatar.direction);
-    pieces_.doll_gif->Start(order, *pieces_.wardrobe, gl_->window(), client_root_);
+    pieces_.doll_gif->Start(order, **pieces_.wardrobe, gl_->window(), client_root_);
   }
 }
 

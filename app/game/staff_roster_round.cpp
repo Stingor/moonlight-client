@@ -19,7 +19,7 @@ std::optional<StaffRosterMenu> AdvanceStaffRoster(
   roster.Advance(tools.roster, answer,
                  StaffRosterContext{
                      .allowed = allowed,
-                     .job_names = &pieces.job_names,
+                     .job_names = &*pieces.job_names,
                      .own = {.patch_index = own_client.patch_index, .commit = own_client.commit}},
                  now_ms);
   if (link.is_open()) {

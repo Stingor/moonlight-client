@@ -17,19 +17,19 @@ constexpr std::string_view kMapPlanExtension = ".bmp";
 }  // namespace
 
 ro::ui::SkinImage MapPlanOf(std::string_view map, GamePieces& pieces) {
-  if (!pieces.game_images.has_value() || map.empty()) {
+  if (!pieces.game_images->has_value() || map.empty()) {
     return {};
   }
   std::string path(ro::render::kSkinRoot);
   path += kMapPlanFolder;
   path += map;
   path += kMapPlanExtension;
-  return SkinImageOf(pieces.game_images->GetOurs(path));
+  return SkinImageOf((*pieces.game_images)->GetOurs(path));
 }
 
 ro::ui::NavigationPlaceTip PlaceTipOf(const PlaceLink& place, GamePieces& pieces) {
   ro::ui::NavigationPlaceTip tip = PlaceTipText(
-      place, pieces.map_display_names.has_value() ? &*pieces.map_display_names : nullptr);
+      place, pieces.map_display_names->has_value() ? &**pieces.map_display_names : nullptr);
   tip.map_image = MapPlanOf(place.map, pieces);
   return tip;
 }

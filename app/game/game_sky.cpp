@@ -14,6 +14,9 @@
 #include "ro/render/sun_shadow_pass.h"
 
 #include "game/game.h"
+#include "world/actor_models.h"
+#include "world/decor_veil_view.h"
+#include "world/night_light_view.h"
 #include "world/scene_graphics.h"
 #include "world/server_sky_hour.h"
 
@@ -27,7 +30,7 @@ bool Game::SunShadowsAsked(const ro::render::TerrainStages& stages) const {
 ro::render::SkyLight Game::SkyOfFrame(std::uint32_t now_ms) {
   const std::optional<std::uint32_t> last_ms = std::exchange(last_sky_ms_, now_ms);
   ro::ui::StaffSkyClock& clock = windows_.staff_tools->sky;
-  const ro::render::SceneLight& map_light = pieces_.night_light.light();
+  const ro::render::SceneLight& map_light = pieces_.night_light->light();
   // LA COURSE que l'établi règle, pour l'heure forcée comme pour le cycle.
   const ro::ui::StaffToolsLook& look = windows_.staff_tools->look;
   const ro::render::SkyCourse course =
@@ -111,17 +114,17 @@ ro::render::PointLightSet Game::DrawPointShadowsIfAsked(
 
 ro::render::SunShadowCasters Game::ShadowCastersOfFrame(
     bool models_shown, std::span<const ro::render::DrawnActor> companions) {
-  const bool actor_models_shown = link_.is_open() && pieces_.actor_models.has_value() &&
-                                  pieces_.actor_model_renderer.has_value();
+  const bool actor_models_shown = link_.is_open() && pieces_.actor_models->has_value() &&
+                                  pieces_.actor_model_renderer->has_value();
   return ro::render::SunShadowCasters{
       .terrain = &terrain_,
       .models = models_shown ? &models_ : nullptr,
       .clock = &model_clock_,
-      .model_casting = pieces_.decor_veil.shadow_casting(),
+      .model_casting = pieces_.decor_veil->shadow_casting(),
       .sprites = &sprites_,
       .actor_lots = {scene_actors_.drawn, companions},
-      .actor_model_renderer = actor_models_shown ? &*pieces_.actor_model_renderer : nullptr,
-      .actor_models = actor_models_shown ? pieces_.actor_models->drawn()
+      .actor_model_renderer = actor_models_shown ? &**pieces_.actor_model_renderer : nullptr,
+      .actor_models = actor_models_shown ? (*pieces_.actor_models)->drawn()
                                          : std::span<const ro::render::DrawnActorModel>()};
 }
 

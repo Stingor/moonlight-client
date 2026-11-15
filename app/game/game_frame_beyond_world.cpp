@@ -50,10 +50,35 @@
 #include "ro/sim/world.h"
 #include "ro/vfs/warp_memo_words.h"
 
+#include "game/achievement_stage.h"
+#include "game/adoption_stage.h"
+#include "game/battleground_stage.h"
+#include "game/cart_choice_stage.h"
+#include "game/cash_shop_stage.h"
+#include "game/chat_room_stage.h"
+#include "game/companion_ai_stage.h"
 #include "game/game.h"
+#include "game/homunculus_stage.h"
+#include "game/mail_stage.h"
+#include "game/memorial_stage.h"
+#include "game/mercenary_stage.h"
+#include "game/pet_stage.h"
+#include "game/quest_stage.h"
+#include "game/repair_stage.h"
+#include "game/spell_list_stage.h"
 #include "game/survivors_presence_mode.h"
+#include "game/trade_stages.h"
 #include "items/warp_memo_report.h"
+#include "mvp/mvp_tracker_stage.h"
+#include "options/commands_page.h"
+#include "party/party_booking_board.h"
+#include "world/chat_block_log.h"
+#include "world/entity_inspector.h"
+#include "world/map_edit_sync.h"
+#include "world/npc_illustration_stage.h"
 #include "world/player_report.h"
+#include "world/rank_notices.h"
+#include "world/staff_roster.h"
 
 namespace moonclient {
 
@@ -74,7 +99,7 @@ ro::net::FrameOutcome Game::ApplyFrameBeyondWorld(const ro::net::Frame& received
     }
     return ro::net::FrameOutcome::kApplied;
   }
-  const ro::sim::BannedWords* banned = &pieces_.banned_words;
+  const ro::sim::BannedWords* banned = &*pieces_.banned_words;
   // LES TITRES VIVENT HORS DU MONDE, et leur traducteur passe APRÈS lui : la
   // carte de nom du joueur intéresse les deux, et chacun y lit sa part.
   const ro::net::FrameOutcome titled =
@@ -111,17 +136,18 @@ ro::net::FrameOutcome Game::ApplyFrameBeyondWorld(const ro::net::Frame& received
         ro::net::ApplyBossInfoFrame(received, navi_.guidance, world_, now_ms),
         ro::net::ApplyItemNewsFrame(received, pieces_.item_news, now_ms),
         ro::net::ApplyGuildRelationAnswerFrame(received, world_, now_ms),
-        ro::net::ApplyAdoptionFrame(received, pieces_.adoption.desk()),
+        ro::net::ApplyAdoptionFrame(received, pieces_.adoption->desk()),
         ro::net::ApplyMarriageFrame(received, world_, now_ms),
-        pieces_.entity_inspector.ApplyFrame(received), pieces_.chat_block_log.ApplyFrame(received),
-        pieces_.staff_roster.ApplyFrame(received, now_ms),
+        pieces_.entity_inspector->ApplyFrame(received),
+        pieces_.chat_block_log->ApplyFrame(received),
+        pieces_.staff_roster->ApplyFrame(received, now_ms),
         PlayerReportDesk::ApplyFrame(received, world_, now_ms),
         ro::net::ApplyMannerPointFrame(received, world_, now_ms),
         ro::net::ApplyStatusChatFrame(received, world_, party_, now_ms),
         character_->SayEquipSwitch(received, world_, now_ms),
         character_->SayEquipChange(received, world_, now_ms),
         character_->SayEquipAttributes(received, world_, now_ms),
-        pieces_.map_edit_sync.ApplyFrame(received)}) {
+        pieces_.map_edit_sync->ApplyFrame(received)}) {
     if (outcome == ro::net::FrameOutcome::kUnhandled) {
       outcome = told;
     }
@@ -137,88 +163,89 @@ ro::net::FrameOutcome Game::ApplyFrameBeyondWorld(const ro::net::Frame& received
   }
   // ET LES MESSAGES PAR NUMÉRO, qui s'écrivent dans la conversation.
   const ro::net::FrameOutcome said = ro::net::ApplyServerMessageFrame(
-      received, world_, pieces_.skill_tree.has_value() ? &*pieces_.skill_tree : nullptr, now_ms,
-      ItemBaseNames(pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr));
+      received, world_, pieces_.skill_tree->has_value() ? &**pieces_.skill_tree : nullptr, now_ms,
+      ItemBaseNames(pieces_.wardrobe->has_value() ? &(*pieces_.wardrobe)->catalog().items
+                                                  : nullptr));
   if (outcome == ro::net::FrameOutcome::kUnhandled) {
     outcome = said;
   }
   // ET LA LISTE DES CHARRETTES QUE LE SERVEUR PROPOSE, qui ouvre sa fenêtre.
   const ro::net::FrameOutcome carted =
-      ro::net::ApplyCartChoiceFrame(received, pieces_.cart_choice.choice());
+      ro::net::ApplyCartChoiceFrame(received, pieces_.cart_choice->choice());
   if (outcome == ro::net::FrameOutcome::kUnhandled) {
     outcome = carted;
   }
   // ET LES SORTS QU'AUTOSPELL PROPOSE, qui ouvrent leur liste.
   const ro::net::FrameOutcome spelled =
-      ro::net::ApplySpellListFrame(received, pieces_.spell_list.offer());
+      ro::net::ApplySpellListFrame(received, pieces_.spell_list->offer());
   if (outcome == ro::net::FrameOutcome::kUnhandled) {
     outcome = spelled;
   }
   // ET LES PIÈCES QUE REPAIR WEAPON PROPOSE, avec l'issue de la réparation.
   const ro::net::FrameOutcome repaired =
-      ro::net::ApplyRepairFrame(received, pieces_.repair.offer());
+      ro::net::ApplyRepairFrame(received, pieces_.repair->offer());
   if (outcome == ro::net::FrameOutcome::kUnhandled) {
     outcome = repaired;
   }
-  pieces_.repair.SayOutcome(world_, now_ms);
+  pieces_.repair->SayOutcome(world_, now_ms);
   // ET LES TROIS COMPAGNONS QUI ONT UNE FICHE.
   for (const ro::net::FrameOutcome companion :
-       {pieces_.pet.ApplyFrame(received, world_, now_ms),
-        pieces_.homunculus.ApplyFrame(received, world_, pieces_, now_ms),
-        pieces_.mercenary.ApplyFrame(received, world_, now_ms)}) {
+       {pieces_.pet->ApplyFrame(received, world_, now_ms),
+        pieces_.homunculus->ApplyFrame(received, world_, pieces_, now_ms),
+        pieces_.mercenary->ApplyFrame(received, world_, now_ms)}) {
     if (outcome == ro::net::FrameOutcome::kUnhandled) {
       outcome = companion;
     }
   }
-  pieces_.companion_ai.ObserveFrame(received, pieces_.homunculus, pieces_.mercenary, now_ms);
+  pieces_.companion_ai->ObserveFrame(received, pieces_.homunculus, pieces_.mercenary, now_ms);
   // ET LA BOUTIQUE DE VOTE, avec la carte des items à effet de chapeau. ⚠
   // ELLE LIT AUSSI LES CHANGEMENTS DE CARTE, que le monde vient d'appliquer :
   // la boutique se ferme avec eux.
   const ro::net::FrameOutcome shopped =
-      ro::net::ApplyCashShopFrame(received, pieces_.cash_shop.shop());
+      ro::net::ApplyCashShopFrame(received, pieces_.cash_shop->shop());
   if (outcome == ro::net::FrameOutcome::kUnhandled) {
     outcome = shopped;
   }
   const ro::net::FrameOutcome hatted =
-      ro::net::ApplyHatEffectItemsFrame(received, pieces_.cash_shop.hat_effects());
+      ro::net::ApplyHatEffectItemsFrame(received, pieces_.cash_shop->hat_effects());
   if (outcome == ro::net::FrameOutcome::kUnhandled) {
     outcome = hatted;
   }
   // ET LES COMMERCES — boutiques de PNJ, échoppes, troc. ⚠ EUX AUSSI LISENT
   // LES CHANGEMENTS DE CARTE, qui les ferment.
-  if (const ro::net::FrameOutcome traded = pieces_.trade.ApplyFrame(received, world_.inventory());
+  if (const ro::net::FrameOutcome traded = pieces_.trade->ApplyFrame(received, world_.inventory());
       outcome == ro::net::FrameOutcome::kUnhandled) {
     outcome = traded;
   }
   // ET LE COURRIER, daté sur l'horloge réelle : le serveur annonce
   // l'expiration en secondes restantes. ⚠ IL LIT AUSSI LES CHANGEMENTS DE
   // CARTE, qui remettent l'écriture à zéro chez le serveur.
-  if (const ro::net::FrameOutcome mailed = pieces_.mail.ApplyFrame(received, MailNowUnixSeconds());
+  if (const ro::net::FrameOutcome mailed = pieces_.mail->ApplyFrame(received, MailNowUnixSeconds());
       outcome == ro::net::FrameOutcome::kUnhandled) {
     outcome = mailed;
   }
   // ET LES SALONS. ⚠ APRÈS LE MONDE : l'entrée lit l'enseigne qu'il tient.
   if (const ro::net::FrameOutcome roomed =
-          pieces_.chat_rooms.ApplyFrame(received, world_, pieces_.item_words, now_ms);
+          pieces_.chat_rooms->ApplyFrame(received, world_, pieces_.item_words, now_ms);
       outcome == ro::net::FrameOutcome::kUnhandled) {
     outcome = roomed;
   }
   // LES SUCCÈS, dont 0x0A23 et 0x0A26 sont aussi lus par les titres : chacun
   // y prend sa part.
   if (const ro::net::FrameOutcome achieved =
-          pieces_.achievements.ApplyFrame(received, windows_.achievements, world_, now_ms);
+          pieces_.achievements->ApplyFrame(received, windows_.achievements, world_, now_ms);
       outcome == ro::net::FrameOutcome::kUnhandled) {
     outcome = achieved;
   }
   if (const ro::net::FrameOutcome quested =
-          pieces_.quests.ApplyFrame(received, windows_.quests, world_, now_ms);
+          pieces_.quests->ApplyFrame(received, windows_.quests, world_, now_ms);
       outcome == ro::net::FrameOutcome::kUnhandled) {
     outcome = quested;  // Le journal des quêtes.
   }
   // ET CE QU'UN SCRIPT POSE À L'ÉCRAN : l'illustration, montrée ou effacée, et
   // la barre de progression — voir ro/net/progress_bar.h.
   for (const ro::net::FrameOutcome scripted :
-       {ro::net::ApplyNpcIllustrationFrame(received, pieces_.npc_illustration.slot()),
+       {ro::net::ApplyNpcIllustrationFrame(received, pieces_.npc_illustration->slot()),
         ro::net::ApplyProgressFrame(received, world_, pieces_.progress, now_ms)}) {
     if (outcome == ro::net::FrameOutcome::kUnhandled) {
       outcome = scripted;
@@ -243,7 +270,7 @@ ro::net::FrameOutcome Game::ApplyFrameBeyondWorld(const ro::net::Frame& received
     // ET LES RÉGLAGES DE COMMANDE, APRÈS LES FAITS : la liste des presets
     // retient comme sauvegardée la liste de ramassage qu'ils viennent de lire.
     if (const ro::net::FrameOutcome commanded = ro::net::ApplyCommandSettingsFrame(
-            received, pieces_.commands.settings(), item_description_->facts());
+            received, pieces_.commands->settings(), item_description_->facts());
         outcome == ro::net::FrameOutcome::kUnhandled) {
       outcome = commanded;
     }
@@ -303,26 +330,26 @@ ro::net::FrameOutcome Game::ApplyFrameBeyondWorld(const ro::net::Frame& received
   // tout en secondes. ⚠ DÈS LA POIGNÉE DE MAIN : l'invitation en attente
   // arrive avant toute ouverture.
   if (const ro::net::FrameOutcome hunted =
-          pieces_.mvp_tracker.ApplyFrame(received, LocalUnixSeconds(), now_ms);
+          pieces_.mvp_tracker->ApplyFrame(received, LocalUnixSeconds(), now_ms);
       outcome == ro::net::FrameOutcome::kUnhandled) {
     outcome = hunted;
   }
   // ET LES CLASSEMENTS, LES POINTS DE RANG ET LES AVIS D'ÉTOILE. ⚠ ÉMET : un
   // classement demande les noms qui lui manquent.
   if (const ro::net::FrameOutcome ranked =
-          pieces_.rank_notices.ApplyFrame(received, world_, link_, now_ms);
+          pieces_.rank_notices->ApplyFrame(received, world_, link_, now_ms);
       outcome == ro::net::FrameOutcome::kUnhandled) {
     outcome = ranked;
   }
   // ET LA RECHERCHE DE GROUPE, dont les avis s'écrivent dans la conversation.
   if (const ro::net::FrameOutcome booked =
-          pieces_.party_booking.ApplyFrame(received, world_, now_ms);
+          pieces_.party_booking->ApplyFrame(received, world_, now_ms);
       outcome == ro::net::FrameOutcome::kUnhandled) {
     outcome = booked;
   }
   // ET LE CHAMP DE BATAILLE : la file d'inscription, puis le combat.
   if (const ro::net::FrameOutcome fought =
-          pieces_.battleground.ApplyFrame(received, world_, now_ms);
+          pieces_.battleground->ApplyFrame(received, world_, now_ms);
       outcome == ro::net::FrameOutcome::kUnhandled) {
     outcome = fought;
   }
@@ -334,7 +361,7 @@ ro::net::FrameOutcome Game::ApplyFrameBeyondWorld(const ro::net::Frame& received
   // ET L'INSTANCE, datée sur l'horloge réelle : le serveur annonce ses
   // échéances en secondes Unix.
   if (const ro::net::FrameOutcome instanced =
-          pieces_.memorial.ApplyFrame(received, static_cast<std::int64_t>(std::time(nullptr)));
+          pieces_.memorial->ApplyFrame(received, static_cast<std::int64_t>(std::time(nullptr)));
       outcome == ro::net::FrameOutcome::kUnhandled) {
     outcome = instanced;
   }

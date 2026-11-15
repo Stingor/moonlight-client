@@ -11,8 +11,10 @@
 #include "ro/ui/database_window.h"
 
 #include "game/bug_report_context.h"
+#include "game/cash_shop_stage.h"
 #include "game/game.h"
 #include "game/ui_window_rounds.h"
+#include "items/item_sheet_editor_stage.h"
 
 namespace moonclient {
 
@@ -78,7 +80,7 @@ void Game::AdvanceDatabase(std::uint32_t now_ms) {
     const std::uint32_t item_id = database_.ShownItem(windows);
     DecorateItemSheet(*shown, item_id);
     shown->RefreshDoll(world_, windows.state.item_sheet.doll,
-                       pieces_.cash_shop.hat_effects().OrdinalOf(item_id) != 0, styles_, now_ms);
+                       pieces_.cash_shop->hat_effects().OrdinalOf(item_id) != 0, styles_, now_ms);
   }
   // LA FICHE D'UN OBJET ÉDITÉE PAR LE STAFF, que la fiche ouvre dans ses deux
   // hôtes : l'établi la dessine sous le même droit. Son onglet « Serveur » lit
@@ -86,13 +88,13 @@ void Game::AdvanceDatabase(std::uint32_t now_ms) {
   if (windows_.staff_tools->item_editor.open) {
     database_.Read();
   }
-  pieces_.item_sheet_editor.Advance(
+  pieces_.item_sheet_editor->Advance(
       windows_.staff_tools,
       ItemSheetEditorContext{
           .allowed = Rights().staff_tools,
           .client_root = &client_root_,
           .vfs = vfs_,
-          .icons = pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr,
+          .icons = pieces_.item_icons->has_value() ? &**pieces_.item_icons : nullptr,
           .server_db = database_.db()});
   // « Y ALLER » vers un PNJ qui vend l'objet : la navigation y guide.
   if (const std::optional<ro::sim::MarketOffer> seller = database_.TakeGoTo(); seller.has_value()) {

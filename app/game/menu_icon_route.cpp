@@ -4,21 +4,31 @@
 
 #include "ro/render/camera.h"
 #include "ro/render/sprite_catalog.h"
+#include "ro/render/status_head_icon.h"
 #include "ro/sim/world.h"
 #include "ro/vfs/cash_shop_words.h"
 
+#include "game/achievement_stage.h"
 #include "game/battleground_stage.h"
 #include "game/cash_shop_windows.h"
 #include "game/hud_rounds.h"
+#include "game/mail_stage.h"
+#include "game/minigame_stage.h"
 #include "game/navigation_windows.h"
 #include "game/party_windows.h"
+#include "game/quest_stage.h"
 #include "game/skin_image_of.h"
+#include "game/trade_windows.h"
 #include "game/ui_stage.h"
 #include "game/ui_window_rounds.h"
 #include "game/ui_windows.h"
 #include "input/key_action.h"
+#include "mvp/mvp_tracker_stage.h"
+#include "party/party_booking_board.h"
 #include "world/actor_styles.h"
 #include "world/actor_view.h"
+#include "world/ranking_board.h"
+#include "world/reputation_board.h"
 
 namespace moonclient {
 
@@ -98,10 +108,10 @@ MenuIconFacts MenuIconFactsOf(const ro::sim::World& world, const UiStage::Window
   lit_when(MenuCommand::kMvpTracker, windows.mvp_tracker->badge_lit);
   // LA TÊTE DU STATUT : refaite ici quand elle change, montrée tant qu'elle est
   // rendue. Sans garde-robe, le Statut garde son art.
-  if (pieces.status_head.has_value() && pieces.wardrobe.has_value()) {
-    pieces.status_head->Refresh(StatusHeadKeyOf(world, styles, character_id));
-    facts.status_head = SkinImageOf(pieces.status_head->normal());
-    facts.status_head_pressed = SkinImageOf(pieces.status_head->pressed());
+  if (pieces.status_head->has_value() && pieces.wardrobe->has_value()) {
+    (*pieces.status_head)->Refresh(StatusHeadKeyOf(world, styles, character_id));
+    facts.status_head = SkinImageOf((*pieces.status_head)->normal());
+    facts.status_head_pressed = SkinImageOf((*pieces.status_head)->pressed());
   }
   return facts;
 }

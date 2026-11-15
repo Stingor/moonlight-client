@@ -12,10 +12,23 @@
 
 #include "ro/core/i18n.h"
 #include "ro/ui/bank_window.h"
+#include "ro/ui/companion_ai_window.h"
+#include "ro/ui/companion_tactic_window.h"
+#include "ro/ui/pet_window.h"
 #include "ro/vfs/item_table.h"
 
+#include "game/cart_choice_stage.h"
+#include "game/companion_ai_stage.h"
 #include "game/game.h"
+#include "game/homunculus_stage.h"
+#include "game/mail_stage.h"
+#include "game/mercenary_stage.h"
 #include "game/message_language.h"
+#include "game/pet_stage.h"
+#include "game/repair_stage.h"
+#include "game/spell_list_stage.h"
+#include "game/talkbox_stage.h"
+#include "game/trade_stages.h"
 #include "game/ui_answers.h"
 #include "game/ui_stage.h"
 #include "game/warp_list_stage.h"
@@ -45,48 +58,48 @@ void Game::StageContainers() {
   // les écrivent ne se composent.
   FollowMessageLanguage(pieces_.item_words, pieces_.item_words_language);
   StageWarpList(world_, pieces_.item_words,
-                pieces_.map_display_names.has_value() ? &*pieces_.map_display_names : nullptr,
+                pieces_.map_display_names->has_value() ? &**pieces_.map_display_names : nullptr,
                 windows_);
   // LA LISTE DES CHARRETTES QU'OUVRE `MC_CHANGECART`, dressée au niveau de base
   // du moment où la compétence part.
   if (grimoire_.TakeCartChoiceAsked()) {
-    pieces_.cart_choice.choice().OfferChange(world_.player_status().base_level);
+    pieces_.cart_choice->choice().OfferChange(world_.player_status().base_level);
   }
-  pieces_.cart_choice.Stage(vfs_, pieces_.item_words, windows_.cart_choice,
-                            windows_.cart_choice_view);
-  pieces_.spell_list.Stage(pieces_.skill_tree.has_value() ? &*pieces_.skill_tree : nullptr,
-                           pieces_.skill_icons.has_value() ? &*pieces_.skill_icons : nullptr,
-                           world_, windows_.spell_list, windows_.spell_list_view);
-  pieces_.repair.Stage(world_, windows_.repair, windows_.repair_view);
+  pieces_.cart_choice->Stage(vfs_, pieces_.item_words, windows_.cart_choice,
+                             windows_.cart_choice_view);
+  pieces_.spell_list->Stage(pieces_.skill_tree->has_value() ? &**pieces_.skill_tree : nullptr,
+                            pieces_.skill_icons->has_value() ? &**pieces_.skill_icons : nullptr,
+                            world_, windows_.spell_list, windows_.spell_list_view);
+  pieces_.repair->Stage(world_, windows_.repair, windows_.repair_view);
   // LES TROIS COMPAGNONS QUI ONT UNE FICHE.
-  pieces_.pet.Stage(*vfs_, world_, pieces_, windows_.pet, windows_.pet_view, windows_.pet_hatch,
-                    windows_.pet_hatch_view);
+  pieces_.pet->Stage(*vfs_, world_, pieces_, windows_.pet, windows_.pet_view, windows_.pet_hatch,
+                     windows_.pet_hatch_view);
   windows_.pet_view->staff_allowed = Rights().staff_tools;
-  pieces_.homunculus.Stage(world_, pieces_);
-  pieces_.mercenary.Stage(world_, pieces_);
+  pieces_.homunculus->Stage(world_, pieces_);
+  pieces_.mercenary->Stage(world_, pieces_);
   // LA SAISIE QU'OUVRE LA POSE DE TALKIE BOX : la compétence attend son texte.
   if (const std::optional<GroundCast> cast = grimoire_.TakeTalkboxAsked()) {
-    pieces_.talkbox.Ask(*cast);
+    pieces_.talkbox->Ask(*cast);
   }
-  pieces_.talkbox.Stage(pieces_.item_words, windows_.talkbox, windows_.talkbox_view);
+  pieces_.talkbox->Stage(pieces_.item_words, windows_.talkbox, windows_.talkbox_view);
   // LES RÉGLAGES AVANCÉS D'UNE TACTIQUE DE COMPAGNON.
-  pieces_.companion_ai.StageTacticWindow(
+  pieces_.companion_ai->StageTacticWindow(
       pieces_.homunculus, pieces_.mercenary,
-      pieces_.skill_tree.has_value() ? &*pieces_.skill_tree : nullptr, windows_.companion_tactic,
+      pieces_.skill_tree->has_value() ? &**pieces_.skill_tree : nullptr, windows_.companion_tactic,
       windows_.companion_tactic_view);
   // Ses distances s'arrêtent à la portée du jeu que le serveur annonce.
   windows_.companion_tactic_view->view_cells = world_.session().GameAreaCells();
   // LA FENÊTRE « IA DU COMPAGNON ».
-  pieces_.companion_ai.StageAiWindow(
+  pieces_.companion_ai->StageAiWindow(
       pieces_.homunculus, pieces_.mercenary,
       CompanionAiWindowBooks{
           .world = world_,
-          .skill_tree = pieces_.skill_tree.has_value() ? &*pieces_.skill_tree : nullptr,
-          .statuses = &pieces_.status_table,
-          .words = &pieces_.item_words,
+          .skill_tree = pieces_.skill_tree->has_value() ? &**pieces_.skill_tree : nullptr,
+          .statuses = &*pieces_.status_table,
+          .words = &*pieces_.item_words,
           .monster_sheets = monster_sheet_.has_value() ? &monster_sheet_->book() : nullptr,
-          .monster_list = &pieces_.monster_list,
-          .job_names = &pieces_.job_names},
+          .monster_list = &*pieces_.monster_list,
+          .job_names = &*pieces_.job_names},
       windows_.companion_ai, windows_.companion_ai_view);
   // Le droit du staff, relu à chaque image : l'identifiant d'un skill au survol.
   windows_.companion_ai_view->staff_allowed = Rights().staff_tools;
@@ -101,7 +114,7 @@ void Game::StageContainers() {
   windows_.cart_view->storage_open = world_.storage_open();
   // UNE ÉCHOPPE EN PRÉPARATION GÈLE LES TRANSFERTS : les trois fenêtres le
   // montrent, et `HoldTransfers` retient ce qui passerait quand même.
-  const bool frozen = pieces_.trade.PreparingStore();
+  const bool frozen = pieces_.trade->PreparingStore();
   windows_.inventory_view->transfers_frozen = frozen;
   windows_.cart_view->transfers_frozen = frozen;
   windows_.storage_view->transfers_frozen = frozen;
@@ -146,16 +159,18 @@ void Game::StageContainers() {
   windows_.cart_view->album_links = album_links;
   windows_.storage_view->album_links = album_links;
   // LE COURRIER EN COURS D'ÉCRITURE : une pièce jointe peut partir du menu.
-  windows_.inventory_view->mail_writing = pieces_.mail.writing();
+  windows_.inventory_view->mail_writing = pieces_.mail->writing();
   // LE BOUTON « Vider » DE LA BARRE DE TITRE, pour le staff seulement.
   windows_.inventory_view->staff_tools = Rights().staff_tools;
   if (windows_.card_album->open) {
     card_album_.Compose(
         CardAlbumPieces{
-            .items = pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr,
-            .icons = pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr,
-            .thumbnails = pieces_.card_thumbnails.has_value() ? &*pieces_.card_thumbnails : nullptr,
-            .packages = &pieces_.package_items},
+            .items =
+                pieces_.wardrobe->has_value() ? &(*pieces_.wardrobe)->catalog().items : nullptr,
+            .icons = pieces_.item_icons->has_value() ? &**pieces_.item_icons : nullptr,
+            .thumbnails =
+                pieces_.card_thumbnails->has_value() ? &**pieces_.card_thumbnails : nullptr,
+            .packages = &*pieces_.package_items},
         world_, windows_.card_album, Rights().staff_tools);
   }
   windows_.card_album_view = &card_album_.view();
@@ -167,7 +182,7 @@ void Game::ApplyContainerAnswers(const UiStage::Answers& answers, std::uint32_t 
   ro::ui::InventoryWindowAction bag_asked = answers.inventory;
   ro::ui::CartWindowAction cart_asked = answers.cart;
   ro::ui::StorageWindowAction storage_asked = answers.storage;
-  if (pieces_.trade.PreparingStore() && HoldTransfers(bag_asked, cart_asked, storage_asked)) {
+  if (pieces_.trade->PreparingStore() && HoldTransfers(bag_asked, cart_asked, storage_asked)) {
     world_.RecordChat(ro::sim::ChatKind::kServer, 0,
                       ro::core::Tr("Échoppe en préparation : les transferts sont gelés."), now_ms);
   }
@@ -280,7 +295,7 @@ void Game::ApplyContainerAnswers(const UiStage::Answers& answers, std::uint32_t 
     ShowCardInAlbum(card_id, now_ms);
   }
   if (answers.inventory->market_item_id != 0) {
-    pieces_.trade.market().AskOpen(answers.inventory->market_item_id);
+    pieces_.trade->market().AskOpen(answers.inventory->market_item_id);
   }
   if (answers.inventory->database_item_id != 0) {
     database_.AskOpen(ro::ui::DatabaseTarget{.kind = ro::ui::DatabaseKind::kItem,

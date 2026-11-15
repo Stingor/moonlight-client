@@ -22,7 +22,9 @@
 
 #include "chat/banned_input.h"
 #include "game/game.h"
+#include "game/mail_stage.h"
 #include "game/party_windows.h"
+#include "game/trade_stages.h"
 #include "party/party_panel.h"
 #include "world/click_action.h"
 #include "world/staff_roster.h"
@@ -87,7 +89,7 @@ void Game::RunPlayerAsks(std::uint32_t now_ms) {
     switch (asked.kind) {
       case PlayerCommandKind::kDeal: {
         // ⚠ PAS PENDANT L'ÉCRITURE D'UN COURRIER : le serveur l'ignorerait.
-        if (pieces_.mail.HoldsDealProposal()) {
+        if (pieces_.mail->HoldsDealProposal()) {
           break;
         }
         const ro::sim::Actor* partner = VisiblePlayerNamed(world_, name);
@@ -98,7 +100,7 @@ void Game::RunPlayerAsks(std::uint32_t now_ms) {
         // ⚠ LA DEMANDE PART TELLE QUELLE, à portée ou non : c'est le serveur
         // qui juge la distance, et sa réponse le dit.
         if (auto sent = ro::net::ProposeDeal(
-                link_, pieces_.trade.deal().deal(),
+                link_, pieces_.trade->deal().deal(),
                 ro::sim::DealPartner{
                     .account_id = partner->id,
                     .name = partner->name,
@@ -200,7 +202,7 @@ void Game::RunPlayerAsks(std::uint32_t now_ms) {
       case PlayerCommandKind::kStaffRoster:
         // Sans le droit du staff, la commande part telle que le joueur l'a
         // tapée, et le serveur y répond dans la conversation.
-        if (!pieces_.staff_roster.Ask()) {
+        if (!pieces_.staff_roster->Ask()) {
           ReportRefusal(
               ro::net::SendServerCommand(link_, world_.player_name(), kStaffRosterCommand));
         }

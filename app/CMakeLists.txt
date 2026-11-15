@@ -1984,6 +1984,8 @@ add_executable(moonclient
     loading/loading_presenter.cpp
     loading/loading_screens.cpp
     game/game_pieces.cpp
+    game/game_pieces_held.cpp
+    game/game_pieces_fonts.cpp
     game/game_pieces_drawn.cpp
     game/skill_tree_load.cpp
     game/skin_reload.cpp
@@ -2130,6 +2132,7 @@ add_executable(moonclient
     guild/sample_emblem.cpp
     guild/guild_skill_rows.cpp
     game/game_open.cpp
+    game/game_open_emotions.cpp
     game/game_foundation.cpp
     game/game_targeting.cpp
     game/hud_lock.cpp

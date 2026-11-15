@@ -14,7 +14,12 @@
 #include "ro/net/moonclient_handshake.h"
 #include "ro/net/session.h"
 
+#include "game/craft_stage.h"
 #include "game/game.h"
+#include "game/gm_outfit_announcer.h"
+#include "game/surface_announcer.h"
+#include "game/trade_stages.h"
+#include "game/whisper_stage.h"
 #include "patcher/patcher_state.h"
 
 namespace moonclient {
@@ -66,17 +71,17 @@ void Game::AdvanceZoneMove(std::uint32_t now_ms) {
     case ro::net::PhaseState::kDone:
       link_ = moving_->TakeLink();
       // LA LIAISON EST NEUVE : les ateliers doivent la regarder à nouveau.
-      pieces_.craft.Watch(link_, world_);
-      pieces_.trade.deal().Watch(link_);
+      pieces_.craft->Watch(link_, world_);
+      pieces_.trade->deal().Watch(link_);
       // 🔴 LA POIGNÉE DE MAIN SE REFAIT : c'est un AUTRE serveur, qui arme son
       // propre minuteur et n'a jamais entendu la première.
       handshake_ = FreshHandshake();
       reported_handshake_ = ro::net::MoonclientHandshakeState::kUnsent;
       // Ce serveur n'a jamais entendu nos surfaces non plus.
-      pieces_.surfaces.Rearm();
-      pieces_.gm_outfit.Rearm();
+      pieces_.surfaces->Rearm();
+      pieces_.gm_outfit->Rearm();
       // Ni ceux qu'on bloquait : il repart d'une liste vide.
-      pieces_.whispers.blocks().Clear();
+      pieces_.whispers->blocks().Clear();
       ro::core::LogInfo("serveur de zone : entrée acceptée");
       moving_.reset();
       return;

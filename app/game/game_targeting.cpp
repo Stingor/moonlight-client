@@ -21,9 +21,14 @@
 #include "ro/sim/movement.h"
 
 #include "character/basic_info_compose.h"
+#include "game/cash_shop_stage.h"
+#include "game/chat_room_stage.h"
 #include "game/game.h"
 #include "game/hud_rounds.h"
+#include "game/mail_stage.h"
+#include "game/trade_stages.h"
 #include "game/ui_stage.h"
+#include "items/doll_effects.h"
 #include "world/armed_cursor.h"
 #include "world/click_action.h"
 #include "world/click_rules.h"
@@ -56,7 +61,7 @@ void Game::AdvanceStatusPortrait(std::uint32_t now_ms) {
   }
   if (!link_.is_open() || !status_portrait_.has_value()) {
     windows_.status_portrait->view = nullptr;
-    pieces_.portrait_effects.reset();
+    pieces_.portrait_effects->reset();
     return;
   }
   status_portrait_->Refresh(world_, options, settings_->options().stat_bars(), styles_, now_ms,
@@ -64,18 +69,18 @@ void Game::AdvanceStatusPortrait(std::uint32_t now_ms) {
   // LES EFFETS DE CHAPEAU DU PORTRAIT, par son propre moteur : un monde et trois
   // renderers, qu'un joueur sans costume ou sans portrait ne paie pas.
   if (!status_portrait_->portrait_shown()) {
-    pieces_.portrait_effects.reset();
-  } else if (!pieces_.portrait_effects.has_value() && effects_.has_value() &&
+    pieces_.portrait_effects->reset();
+  } else if (!pieces_.portrait_effects->has_value() && effects_.has_value() &&
              std::ranges::any_of(status_portrait_->hat_effects(),
                                  [this](ro::sim::HatEffectId effect) {
                                    return effects_->HatEffectFor(effect) != nullptr;
                                  })) {
     // ⚠ UN NUMÉRO SANS FICHE NE FAIT PAS NAÎTRE LE MOTEUR : il ne montrerait
     // rien.
-    pieces_.portrait_effects.emplace(*vfs_);
+    pieces_.portrait_effects->emplace(*vfs_);
   }
-  if (pieces_.portrait_effects.has_value() && stage_.has_value()) {
-    status_portrait_->ShowHatEffects(*pieces_.portrait_effects, world_, *stage_, now_ms);
+  if (pieces_.portrait_effects->has_value() && stage_.has_value()) {
+    status_portrait_->ShowHatEffects(**pieces_.portrait_effects, world_, *stage_, now_ms);
   }
   windows_.status_portrait->view = &status_portrait_->view();
 }
@@ -319,8 +324,8 @@ void Game::DecideSelectionMarker(std::uint32_t now_ms) {
   // Un ATELIER DE FABRICATION ne fige pas — flèches, élémentaires, poisons,
   // cuisine, bombes, pharmacie, forge, ni les runes du Rune Knight : sa
   // fenêtre laisse la souris au monde.
-  engagement.trade_freeze = pieces_.trade.HoldsWorld() || pieces_.cash_shop.shop().open() ||
-                            pieces_.mail.HoldsWorld() || windows_.chat_room->make.open;
+  engagement.trade_freeze = pieces_.trade->HoldsWorld() || pieces_.cash_shop->shop().open() ||
+                            pieces_.mail->HoldsWorld() || windows_.chat_room->make.open;
 
   const MouseRoute route = MouseRouteOf(world_, grimoire_, engagement, now_ms);
   if (route.runs()) {

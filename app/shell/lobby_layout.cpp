@@ -79,8 +79,8 @@ void LobbyScreen::ScanBackgrounds() {
   // 🔴 UNE ABSENCE RETENUE NE SE REDEMANDE JAMAIS : sans cet oubli, un décor
   // choisi avant que son fichier ne soit déposé resterait introuvable jusqu'au
   // prochain lancement.
-  if (shell_.pieces().game_images.has_value() && !shown_background_.empty()) {
-    shell_.pieces().game_images->Forget(shown_background_);
+  if (shell_.pieces().game_images->has_value() && !shown_background_.empty()) {
+    (*shell_.pieces().game_images)->Forget(shown_background_);
   }
 }
 
@@ -101,8 +101,8 @@ void LobbyScreen::OpenBackgroundFolder() {
 
 void LobbyScreen::ComposeLayout(ro::ui::CharacterSelectView& view) {
   // LA SALLE, celle que la mise en page désigne.
-  if (shell_.pieces().game_images.has_value()) {
-    ro::render::GameImages& images = *shell_.pieces().game_images;
+  if (shell_.pieces().game_images->has_value()) {
+    ro::render::GameImages& images = **shell_.pieces().game_images;
     const std::string wanted = ro::ui::BackgroundPath(seats_.layout);
     // ⚠ LE DÉCOR QUITTÉ S'OUBLIE : parcourir la galerie en garderait sinon une
     // texture plein écran par décor essayé. Il n'est plus dans aucune liste de

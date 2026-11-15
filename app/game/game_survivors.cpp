@@ -28,9 +28,11 @@
 #include "ro/ui/chat_bar.h"
 
 #include "capture/recorder_verb.h"
+#include "game/adoption_stage.h"
 #include "game/game.h"
 #include "game/survivors_mode.h"
 #include "game/survivors_presence_mode.h"
+#include "game/trade_stages.h"
 #include "game/ui_answers.h"
 #include "game/ui_chat_ask.h"
 #include "game/ui_stage.h"
@@ -227,7 +229,7 @@ void Game::FrameSurvivors(std::uint32_t now_ms) {
       if (!sent)
         ro::core::LogWarning("{} : refus non émis — {}", what, ro::core::Describe(sent.error()));
     };
-    pieces_.trade.deal().RefuseWhileAway(link_);
+    pieces_.trade->deal().RefuseWhileAway(link_);
     if (const auto& party = party_.invitation(); party.has_value()) {
       report("groupe", ro::net::AnswerPartyInvitation(link_, party->party_id, false));
       party_.ForgetInvitation();
@@ -244,24 +246,24 @@ void Game::FrameSurvivors(std::uint32_t now_ms) {
       report("alliance", ro::net::AnswerGuildAlliance(link_, alliance->inviter_account_id, false));
       guild_book_.ForgetAllianceOffer();
     }
-    ro::sim::AdoptionDesk& adoption = pieces_.adoption.desk();
+    ro::sim::AdoptionDesk& adoption = pieces_.adoption->desk();
     if (const auto& parent = adoption.invitation(); parent.has_value()) {
       report("adoption", ro::net::AnswerAdoption(link_, *parent, false));
       adoption.ForgetInvitation();
     }
   }
   const ro::vfs::TownInfo* towns = navi_.towns();
-  const ro::sim::DealPhase deal = pieces_.trade.deal().deal().phase();
+  const ro::sim::DealPhase deal = pieces_.trade->deal().deal().phase();
   survivors_mode_->Remember(SurvivorsContext{
       .vfs = vfs_,
-      .wardrobe = pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr,
+      .wardrobe = pieces_.wardrobe->has_value() ? &**pieces_.wardrobe : nullptr,
       .audio = &audio_,
       .music = &music_,
       .link = &link_,
       .world = &world_,
       .damage_meter = &world_.damage_meter(),
       .minigames = &*windows_.minigames,
-      .minigame_stage = &pieces_.minigames,
+      .minigame_stage = &*pieces_.minigames,
       .ranking = &survivors_ranking_,
       .coop = &survivors_presence_->coop,
       .voice = &voice_,
@@ -270,8 +272,8 @@ void Game::FrameSurvivors(std::uint32_t now_ms) {
                           .on_indoor_map = camera_rig_.indoor(),
                           .trade_open = deal != ro::sim::DealPhase::kNone,
                           .trade_offered = deal == ro::sim::DealPhase::kProposed &&
-                                           !pieces_.trade.deal().deal().answer_sent(),
-                          .shop_open = pieces_.trade.HoldsWorld(),
+                                           !pieces_.trade->deal().deal().answer_sent(),
+                          .shop_open = pieces_.trade->HoldsWorld(),
                           .loading = moving_.has_value() || !stage_.has_value(),
                           .party_invited = party_.invitation().has_value(),
                           .guild_invited = guild_book_.invitation().has_value(),
@@ -282,17 +284,17 @@ void Game::FrameSurvivors(std::uint32_t now_ms) {
       .graphics = &settings_->options().graphics(),
       .tables =
           SurvivorsTables{
-              .skill_tree = pieces_.skill_tree.has_value() ? &*pieces_.skill_tree : nullptr,
-              .skill_icons = pieces_.skill_icons.has_value() ? &*pieces_.skill_icons : nullptr,
-              .items = &pieces_.trade.items(),
-              .item_icons = pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr,
-              .monsters = &pieces_.monster_list,
-              .jobs = &pieces_.job_names,
-              .wardrobe = pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr,
+              .skill_tree = pieces_.skill_tree->has_value() ? &**pieces_.skill_tree : nullptr,
+              .skill_icons = pieces_.skill_icons->has_value() ? &**pieces_.skill_icons : nullptr,
+              .items = &pieces_.trade->items(),
+              .item_icons = pieces_.item_icons->has_value() ? &**pieces_.item_icons : nullptr,
+              .monsters = &*pieces_.monster_list,
+              .jobs = &*pieces_.job_names,
+              .wardrobe = pieces_.wardrobe->has_value() ? &**pieces_.wardrobe : nullptr,
               .map_names =
-                  pieces_.map_display_names.has_value() ? &*pieces_.map_display_names : nullptr},
-      .map_names = pieces_.map_display_names.has_value() ? &*pieces_.map_display_names : nullptr,
-      .images = pieces_.game_images.has_value() ? &*pieces_.game_images : nullptr,
+                  pieces_.map_display_names->has_value() ? &**pieces_.map_display_names : nullptr},
+      .map_names = pieces_.map_display_names->has_value() ? &**pieces_.map_display_names : nullptr,
+      .images = pieces_.game_images->has_value() ? &**pieces_.game_images : nullptr,
       .sign_mode = settings_->options().pages().map_sign.mode(),
       .client_root = client_root_,
       .key_namer = KeyNameOf,
@@ -324,7 +326,7 @@ void Game::FrameSurvivors(std::uint32_t now_ms) {
                  .own = PresenceOfStage(survivors_),
                  .now_ms = now_ms});
   const ro::vfs::MapDisplayNames* map_names =
-      pieces_.map_display_names.has_value() ? &*pieces_.map_display_names : nullptr;
+      pieces_.map_display_names->has_value() ? &**pieces_.map_display_names : nullptr;
   survivors_presence_->labels.Compose(
       survivors_presence_->mode.seen(),
       [map_names](std::uint16_t arena_id) {

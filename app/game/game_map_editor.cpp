@@ -32,6 +32,7 @@
 
 #include "game/game.h"
 #include "game/ui_window_rounds.h"
+#include "world/map_edit_sync.h"
 #include "world/map_editor_cell_marks.h"
 #include "world/map_editor_mesh.h"
 #include "world/map_editor_overlay.h"
@@ -283,7 +284,7 @@ void Game::ServeMapEditorTools() {
   // LES ÉDITIONS QUE LE SERVEUR TIENT, chez tout joueur, staff ou non.
   if (stage_.has_value()) {
     const MapEditSync::Report synced =
-        pieces_.map_edit_sync.Serve(stage_->name, map_edits_, *vfs_, link_);
+        pieces_.map_edit_sync->Serve(stage_->name, map_edits_, *vfs_, link_);
     FollowServedMapEdit(synced);
   }
   // SANS LE DROIT, le mode se ferme : il peut se perdre en cours de session.
@@ -320,7 +321,8 @@ void Game::ServeMapEditorTools() {
   };
   editor_libraries_.models.NoteIntents(tools.map_editor_intents);
   for (ro::ui::MapEditorIntent& intent : tools.map_editor_intents) {
-    NameMapSprite(intent, pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog() : nullptr);
+    NameMapSprite(intent,
+                  pieces_.wardrobe->has_value() ? &(*pieces_.wardrobe)->catalog() : nullptr);
     apply(intent);
   }
   tools.map_editor_intents.clear();
@@ -336,13 +338,13 @@ void Game::ServeMapEditorTools() {
   FollowMapGround();
   tools.map_editor = map_editor_.View(stage_->scene, map_edits_);
   tools.map_editor.server_conflict =
-      pieces_.map_edit_sync.Conflicted(stage_->name) ||
-      pieces_.map_edit_sync.Conflicted(ro::mapedit::kModelLightsDocument);
+      pieces_.map_edit_sync->Conflicted(stage_->name) ||
+      pieces_.map_edit_sync->Conflicted(ro::mapedit::kModelLightsDocument);
   // CE QUE LE .act DE CHAQUE SPRITE PORTE, que le panneau borne.
-  if (pieces_.wardrobe.has_value()) {
+  if (pieces_.wardrobe->has_value()) {
     for (ro::ui::MapEditorSprite& sprite : tools.map_editor.sprites) {
       const MapSprites::ActCounts counts =
-          pieces_.map_sprites.CountsOf(*pieces_.wardrobe, sprite.sprite, sprite.action);
+          pieces_.map_sprites->CountsOf(**pieces_.wardrobe, sprite.sprite, sprite.action);
       sprite.action_count = counts.action_count;
       sprite.frame_count = counts.frame_count;
     }

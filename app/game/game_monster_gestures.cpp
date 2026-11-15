@@ -114,8 +114,8 @@ void Game::FollowNaviSearchLink(const ro::ui::ChatLinkAsk& asked, const NaviSear
         navi_.GuideToPlace(map, 0, 0);
         world_.RecordChat(
             ro::sim::ChatKind::kServer, 0,
-            PlaceDestinationLine(PlaceLink{.map = map}, pieces_.map_display_names.has_value()
-                                                            ? &*pieces_.map_display_names
+            PlaceDestinationLine(PlaceLink{.map = map}, pieces_.map_display_names->has_value()
+                                                            ? &**pieces_.map_display_names
                                                             : nullptr),
             now_ms);
       }

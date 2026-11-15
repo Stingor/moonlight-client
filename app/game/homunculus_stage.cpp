@@ -12,7 +12,10 @@
 #include "ro/net/chat_target.h"
 #include "ro/net/homunculus_frames.h"
 #include "ro/net/skill.h"
+#include "ro/render/actor_wardrobe.h"
+#include "ro/render/skill_icons.h"
 #include "ro/render/sprite_catalog.h"
+#include "ro/sim/skill_tree.h"
 
 #include "chat/banned_input.h"
 #include "game/game_pieces.h"
@@ -43,8 +46,8 @@ void Complain(const ro::core::Result<void>& sent, const char* what) {
 
 // Le nom d'un objet, ou son numéro quand la table ne le connaît pas.
 [[nodiscard]] std::string ItemName(const GamePieces& pieces, std::uint32_t item_id) {
-  if (pieces.wardrobe.has_value()) {
-    if (const ro::vfs::ItemEntry* entry = pieces.wardrobe->catalog().items.Find(item_id);
+  if (pieces.wardrobe->has_value()) {
+    if (const ro::vfs::ItemEntry* entry = (*pieces.wardrobe)->catalog().items.Find(item_id);
         entry != nullptr && !entry->name.empty()) {
       return entry->name;
     }
@@ -97,10 +100,10 @@ void WriteEcho(const ro::net::HomunculusEcho& echo, ro::sim::World& world, const
 
 [[nodiscard]] ro::ui::SkinImage IconOf(GamePieces& pieces, std::uint16_t skill_id,
                                        const ro::sim::SkillNode* node) {
-  if (!pieces.skill_icons.has_value() || node == nullptr) {
+  if (!pieces.skill_icons->has_value() || node == nullptr) {
     return {};
   }
-  return SkinImageOf(pieces.skill_icons->Get(skill_id, node->idname));
+  return SkinImageOf((*pieces.skill_icons)->Get(skill_id, node->idname));
 }
 
 }  // namespace
@@ -142,12 +145,12 @@ void HomunculusStage::Stage(const ro::sim::World& world, GamePieces& pieces) {
   if (const ro::sim::Actor* actor = world.Find(homunculus_.actor_id());
       actor != nullptr && homunculus_.present() && actor->look.job != species_job_) {
     species_job_ = actor->look.job;
-    species_ = pieces.wardrobe.has_value()
-                   ? ro::render::NonPlayerResourceName(pieces.wardrobe->catalog(), species_job_)
+    species_ = pieces.wardrobe->has_value()
+                   ? ro::render::NonPlayerResourceName((*pieces.wardrobe)->catalog(), species_job_)
                    : std::string();
   }
   rows_.clear();
-  const ro::sim::SkillTree* tree = pieces.skill_tree.has_value() ? &*pieces.skill_tree : nullptr;
+  const ro::sim::SkillTree* tree = pieces.skill_tree->has_value() ? &**pieces.skill_tree : nullptr;
   for (const ro::sim::HomunculusSkill& skill : homunculus_.skills()) {
     const ro::sim::SkillNode* node = tree != nullptr ? tree->Find(skill.skill_id) : nullptr;
     rows_.push_back(ro::ui::HomunculusSkillRow{

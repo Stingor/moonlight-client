@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+#include "ro/render/overlay_renderer.h"
 #include "ro/render/pvp_hud.h"
 #include "ro/render/screen_overlay.h"
 #include "ro/render/screen_text.h"
@@ -15,7 +16,10 @@
 #include "ro/sim/world.h"
 
 #include "chat/chat_view.h"
+#include "game/homunculus_stage.h"
+#include "game/mercenary_stage.h"
 #include "game/survivors_presence_labels.h"
+#include "game/trade_stages.h"
 #include "guild/plate_emblem.h"
 #include "voice/voice_marks.h"
 #include "world/armed_cursor.h"
@@ -39,7 +43,7 @@ void PaintGameHud(const ScreenOverlays& what, std::span<const ro::render::Screen
     what.game_hud->insert(what.game_hud->end(), quads.begin(), quads.end());
     return;
   }
-  what.pieces->overlay.Draw(quads, viewport_width, viewport_height);
+  what.pieces->overlay->Draw(quads, viewport_width, viewport_height);
 }
 
 // LA BARRE QUE CET ACTEUR PORTE VRAIMENT SOUS SES PIEDS À CETTE IMAGE, ou rien.
@@ -74,14 +78,14 @@ void PaintBattlefield(const ScreenOverlays& what, float aspect_ratio, float view
                       float viewport_height) {
   GamePieces& pieces = *what.pieces;
   const ro::sim::World& world = *what.world;
-  if (what.battleground.score_shown && pieces.pvp_rank_font.sprite != nullptr &&
-      pieces.pvp_rank_font.animation != nullptr) {
+  if (what.battleground.score_shown && pieces.pvp_rank_font->sprite != nullptr &&
+      pieces.pvp_rank_font->animation != nullptr) {
     if (const std::optional<ro::render::BattleScoreFigures> figures =
             BattleScoreOf(world, what.battleground.own_side_highlighted);
         figures.has_value()) {
       PaintGameHud(what,
                    ro::render::ComposeBattleScore(
-                       *pieces.pvp_rank_font.sprite, *pieces.pvp_rank_font.animation,
+                       *pieces.pvp_rank_font->sprite, *pieces.pvp_rank_font->animation,
                        pieces.battlefield_art, *figures, {viewport_width, viewport_height}),
                    viewport_width, viewport_height);
     }
@@ -107,7 +111,7 @@ HoveredActor DrawScreenOverlays(const ScreenOverlays& what, float aspect_ratio, 
   const ro::sim::PartyRoster& party = *what.party;
   const ro::render::Camera& camera = *what.camera;
   const ComposedScene& actors = *what.actors;
-  const ro::render::FontAtlas* font = pieces.font.has_value() ? &*pieces.font : nullptr;
+  const ro::render::FontAtlas* font = pieces.font->has_value() ? &**pieces.font : nullptr;
 
   // L'ENSEIGNE qu'un acteur porte au-dessus de lui. ⚠ SES JAUGES ET SON
   // INCANTATION NE SONT PAS ICI : elles écrivent du texte, et se peignent en
@@ -115,21 +119,21 @@ HoveredActor DrawScreenOverlays(const ScreenOverlays& what, float aspect_ratio, 
   //
   // ⚠ SON CADRE SE RELÈVE EN PEIGNANT, pour le clic qui ouvre l'échoppe : une
   // enseigne qu'on ne voit pas ne se clique pas.
-  pieces.trade.signboards().clear();
+  pieces.trade->signboards().clear();
   const ro::render::FontAtlas* board_font = EnsureSignboardFont(pieces, what.signboards);
   if (what.connected && !actors.drawn.empty() && board_font != nullptr) {
     // ⚠ LES COULEURS D'UNE ÉCHOPPE SONT PEINTES DANS SA SURFACE : repeintes
     // quand le réglage change, et la texture qui y était attachée oubliée.
-    if (pieces.signboards.shop_colors != what.signboards.look.shop) {
+    if (pieces.signboards->shop_colors != what.signboards.look.shop) {
       ForgetShopSignboards(pieces);
       ro::render::RecolorShopSurfaces(pieces.signboards, what.signboards.look.shop);
     }
     const std::vector<ro::render::ScreenQuad> boards = DrawnSignboards(
         camera, aspect_ratio, actors.drawn, actors.ids, world, party, *board_font,
         pieces.signboards, what.entity_bars, what.signboards.look,
-        pieces.trade.store_search().spotlit_owner_aid(), viewport_width, viewport_height,
-        &pieces.banned_words, what.arena_status, &pieces.trade.signboards());
-    pieces.overlay.Draw(boards, viewport_width, viewport_height);
+        pieces.trade->store_search().spotlit_owner_aid(), viewport_width, viewport_height,
+        &*pieces.banned_words, what.arena_status, &pieces.trade->signboards());
+    pieces.overlay->Draw(boards, viewport_width, viewport_height);
   }
 
   // Ce que la souris DÉSIGNE décide de deux choses : la forme du curseur et le
@@ -148,15 +152,15 @@ HoveredActor DrawScreenOverlays(const ScreenOverlays& what, float aspect_ratio, 
   // laquelle est vraiment peinte. L'ordre de PEINTURE, lui, ne s'en trouve pas
   // changé : rien n'est dessiné ici.
   if (what.connected && what.entity_bars.shown && what.entity_bars_on_screen != nullptr) {
-    const ro::sim::HomunculusSheet& homunculus = pieces.homunculus.homunculus().sheet();
-    const ro::sim::MercenaryProfile& mercenary = pieces.mercenary.book().profile();
+    const ro::sim::HomunculusSheet& homunculus = pieces.homunculus->homunculus().sheet();
+    const ro::sim::MercenaryProfile& mercenary = pieces.mercenary->book().profile();
     const std::array<OwnCompanionGauges, kOwnCompanionSheets> own_companions = {{
-        {.actor_id = pieces.homunculus.own_homunculus_id(),
+        {.actor_id = pieces.homunculus->own_homunculus_id(),
          .health = static_cast<std::int32_t>(homunculus.hp),
          .max_health = static_cast<std::int32_t>(homunculus.max_hp),
          .magic = static_cast<std::int32_t>(homunculus.sp),
          .max_magic = static_cast<std::int32_t>(homunculus.max_sp)},
-        {.actor_id = pieces.mercenary.own_mercenary_id(),
+        {.actor_id = pieces.mercenary->own_mercenary_id(),
          .health = mercenary.hp,
          .max_health = mercenary.max_hp,
          .magic = mercenary.sp,
@@ -201,12 +205,12 @@ HoveredActor DrawScreenOverlays(const ScreenOverlays& what, float aspect_ratio, 
   // enseignes et les panneaux d'atelier, que ce réglage-là ne doit pas emporter.
   const ro::render::FontAtlas* name_font = EnsureNameFont(pieces, what.entity_names.font_pixels);
   if (name_font != nullptr) {
-    const ro::render::TitleTable* titles = pieces.titles.has_value() ? &*pieces.titles : nullptr;
+    const ro::render::TitleTable* titles = pieces.titles->has_value() ? &**pieces.titles : nullptr;
     // LE NOM D'UN OBJET AU SOL SE COMPOSE ICI, et nulle part ailleurs : le
     // serveur ne le donne pas, et c'est la table de l'installation qui le
     // porte. Vide pour tout autre acteur, dont le nom vient du fil.
     const ro::vfs::ItemTable* items =
-        pieces.wardrobe.has_value() ? &pieces.wardrobe->catalog().items : nullptr;
+        pieces.wardrobe->has_value() ? &(*pieces.wardrobe)->catalog().items : nullptr;
     const std::uint32_t hovered_id = hovered.actor != nullptr ? hovered.actor->id : 0;
     const std::uint32_t targeted_id = world.selected_id();
 
@@ -234,11 +238,11 @@ HoveredActor DrawScreenOverlays(const ScreenOverlays& what, float aspect_ratio, 
       const std::vector<ro::render::ScreenQuad> one = DrawnName(
           *name_font, camera, aspect_ratio, actors.drawn[rank], *actor, titles, world,
           BarsUnderFeetOf(what, actor->id), what.entity_names, pieces.boss_badges, emblem,
-          viewport_width, viewport_height, &pieces.banned_words, item_name,
+          viewport_width, viewport_height, &*pieces.banned_words, item_name,
           what.arena_status != nullptr ? what.arena_status->Of(actor->id) : std::string_view());
       names.insert(names.end(), one.begin(), one.end());
     }
-    pieces.overlay.Draw(names, viewport_width, viewport_height);
+    pieces.overlay->Draw(names, viewport_width, viewport_height);
   }
 
   // LA PAROLE : RÉCOLTÉE ICI, PEINTE PAR L'ÉTAGE D'INTERFACE.
@@ -258,9 +262,9 @@ HoveredActor DrawScreenOverlays(const ScreenOverlays& what, float aspect_ratio, 
     *what.bubbles_on_screen = ChatBubblesOnScreen(
         camera, aspect_ratio, actors.drawn, actors.ids, world, now_ms, viewport_width,
         viewport_height, what.bubbles, what.items, what.words, what.bubble_texts,
-        pieces.skill_tree.has_value() ? &*pieces.skill_tree : nullptr, &what.creators,
-        pieces.map_display_names.has_value() ? &*pieces.map_display_names : nullptr, what.item_icon,
-        what.setting_reach);
+        pieces.skill_tree->has_value() ? &**pieces.skill_tree : nullptr, &what.creators,
+        pieces.map_display_names->has_value() ? &**pieces.map_display_names : nullptr,
+        what.item_icon, what.setting_reach);
     const std::vector<ro::ui::ChatBubbleView> talkbox =
         TalkboxBubblesOnScreen(camera, aspect_ratio, what.talkbox_speakers, world, now_ms,
                                viewport_width, viewport_height, what.bubbles);
@@ -271,7 +275,7 @@ HoveredActor DrawScreenOverlays(const ScreenOverlays& what, float aspect_ratio, 
     what.voice->marks = VoiceMarksOnScreen(camera, aspect_ratio, actors.drawn, actors.ids, world,
                                            *what.voice, viewport_width, viewport_height);
     what.voice->mark_icon = SpeakingIconImage(
-        pieces.game_images.has_value() ? &*pieces.game_images : nullptr, what.speaking_icon);
+        pieces.game_images->has_value() ? &**pieces.game_images : nullptr, what.speaking_icon);
   }
   // LES INCANTATIONS : RÉCOLTÉES ICI, PEINTES PAR L'ÉTAGE D'INTERFACE.
   //
@@ -282,7 +286,7 @@ HoveredActor DrawScreenOverlays(const ScreenOverlays& what, float aspect_ratio, 
     if (what.connected) {
       *what.cast_bars_on_screen =
           CastBarsOnScreen(camera, aspect_ratio, actors.drawn, actors.ids, world, party,
-                           pieces.skill_tree.has_value() ? &*pieces.skill_tree : nullptr,
+                           pieces.skill_tree->has_value() ? &**pieces.skill_tree : nullptr,
                            what.bubbles_on_screen != nullptr
                                ? std::span<const ro::ui::ChatBubbleView>(*what.bubbles_on_screen)
                                : std::span<const ro::ui::ChatBubbleView>(),
@@ -302,23 +306,23 @@ HoveredActor DrawScreenOverlays(const ScreenOverlays& what, float aspect_ratio, 
   // Exiger le drapeau tairait le compteur là où lui le montre.
   if (what.connected) {
     const ro::sim::PvpRank& rank = world.pvp_rank();
-    if (pieces.pvp_rank_font.sprite != nullptr && pieces.pvp_rank_font.animation != nullptr) {
-      PaintGameHud(
-          what,
-          ro::render::ComposePvpRank(
-              *pieces.pvp_rank_font.sprite, *pieces.pvp_rank_font.animation, rank.rank, rank.total,
-              ro::ui::PvpHudPlacementOf(ro::ui::PvpHudPart::kRank, what.pvp_hud,
-                                        {viewport_width, viewport_height})),
-          viewport_width, viewport_height);
+    if (pieces.pvp_rank_font->sprite != nullptr && pieces.pvp_rank_font->animation != nullptr) {
+      PaintGameHud(what,
+                   ro::render::ComposePvpRank(
+                       *pieces.pvp_rank_font->sprite, *pieces.pvp_rank_font->animation, rank.rank,
+                       rank.total,
+                       ro::ui::PvpHudPlacementOf(ro::ui::PvpHudPart::kRank, what.pvp_hud,
+                                                 {viewport_width, viewport_height})),
+                   viewport_width, viewport_height);
     }
     // ⚠ LE CHRONOMÈTRE NE SE DESSINE QUE PREMIER, et son instant de départ vaut
     // zéro autrement. Le peindre sans cette garde ferait courir un compteur
     // depuis l'origine de l'horloge de l'appelant.
-    if (rank.leader_since_ms != 0 && pieces.pvp_stopwatch_font.sprite != nullptr &&
-        pieces.pvp_stopwatch_font.animation != nullptr) {
+    if (rank.leader_since_ms != 0 && pieces.pvp_stopwatch_font->sprite != nullptr &&
+        pieces.pvp_stopwatch_font->animation != nullptr) {
       PaintGameHud(what,
                    ro::render::ComposePvpStopwatch(
-                       *pieces.pvp_stopwatch_font.sprite, *pieces.pvp_stopwatch_font.animation,
+                       *pieces.pvp_stopwatch_font->sprite, *pieces.pvp_stopwatch_font->animation,
                        now_ms - rank.leader_since_ms,
                        ro::ui::PvpHudPlacementOf(ro::ui::PvpHudPart::kTimer, what.pvp_hud,
                                                  {viewport_width, viewport_height})),
@@ -334,7 +338,7 @@ HoveredActor DrawScreenOverlays(const ScreenOverlays& what, float aspect_ratio, 
     const ro::sim::KnownSkill* armed = what.book->armed();
     if (armed != nullptr && what.armed_skill.banner_shown) {
       const ro::sim::SkillTree* skills =
-          pieces.skill_tree.has_value() ? &*pieces.skill_tree : nullptr;
+          pieces.skill_tree->has_value() ? &**pieces.skill_tree : nullptr;
       // ⚠ NOMMÉ, et non composé dans l'appel : la vue que prend le composeur
       // désigne cette chaîne, et elle doit lui survivre.
       const std::string banner =

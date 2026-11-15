@@ -14,11 +14,13 @@
 #include "chat/banned_input.h"
 #include "chat/player_link_judge.h"
 #include "game/game.h"
+#include "game/mail_stage.h"
 #include "game/save_folder.h"
 #include "game/survivors_presence_mode.h"
 #include "game/ui_answers.h"
 #include "game/ui_stage.h"
 #include "game/whisper_stage.h"
+#include "mvp/mvp_tracker_stage.h"
 
 namespace moonclient {
 namespace {
@@ -31,12 +33,12 @@ constexpr std::string_view kEmblemCacheFolder = "emblemes";
 void Game::OpenGuild() {
   guild_panel_.emplace(GuildPanelPieces{
       .vfs = vfs_,
-      .jobs = &pieces_.job_names,
-      .items = pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr,
-      .item_icons = pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr,
-      .skills = pieces_.skill_tree.has_value() ? &*pieces_.skill_tree : nullptr,
-      .skill_icons = pieces_.skill_icons.has_value() ? &*pieces_.skill_icons : nullptr,
-      .wardrobe = pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr,
+      .jobs = &*pieces_.job_names,
+      .items = pieces_.wardrobe->has_value() ? &(*pieces_.wardrobe)->catalog().items : nullptr,
+      .item_icons = pieces_.item_icons->has_value() ? &**pieces_.item_icons : nullptr,
+      .skills = pieces_.skill_tree->has_value() ? &**pieces_.skill_tree : nullptr,
+      .skill_icons = pieces_.skill_icons->has_value() ? &**pieces_.skill_icons : nullptr,
+      .wardrobe = pieces_.wardrobe->has_value() ? &**pieces_.wardrobe : nullptr,
       .styles = &styles_,
       .absent_styles = &absent_styles_,
       .client_root = client_root_,
@@ -53,7 +55,7 @@ void Game::OpenGuild() {
   guild_emblems_.emplace(
       std::move(origin),
       client_root_ / std::filesystem::path(kSaveFolder) / std::filesystem::path(kEmblemCacheFolder),
-      &pieces_.overlay);
+      &*pieces_.overlay);
   guild_emblems_->SetIdentity(web::EmblemIdentity{.account_id = ticket_.account.account_id,
                                                   .token = ticket_.account.web_token,
                                                   .world_name = ticket_.account.world_name});
@@ -74,11 +76,11 @@ void Game::RefreshGuild(std::uint32_t now_ms) {
   guild_panel_->JudgesMvpInvites([this](std::string_view name, bool same_account) {
     return JudgeMvpInvite(
         name,
-        MvpInviteCircle{.book = pieces_.mvp_tracker.book(),
+        MvpInviteCircle{.book = pieces_.mvp_tracker->book(),
                         .guild = guild_book_,
                         .friends = friends_,
                         .enabled = settings_->options().pages().mvp_tracker.settings().enabled,
-                        .link_ready = pieces_.mvp_tracker.link_ready()},
+                        .link_ready = pieces_.mvp_tracker->link_ready()},
         same_account);
   });
   guild_panel_->Refresh(guild_book_, world_, windows_.character->guild, *guild_emblems_, player,
@@ -114,15 +116,15 @@ void Game::ApplyGuildAnswers(const UiStage::Answers& answers, std::uint32_t now_
   ArmWhisper(windows_.chat->main.input, elsewhere.whisper_to);
   // LA CONVERSATION 1:1 À PART : elle s'ouvre, ou revient devant.
   if (!elsewhere.whisper_window.empty()) {
-    pieces_.whispers.Open(elsewhere.whisper_window);
+    pieces_.whispers->Open(elsewhere.whisper_window);
   }
   // ENVOYER UN COURRIER : l'écriture se demande au serveur, adressée au membre.
   if (!elsewhere.mail_to.empty()) {
-    pieces_.mail.Compose(elsewhere.mail_to);
+    pieces_.mail->Compose(elsewhere.mail_to);
   }
   // L'INVITATION AU CARNET DE CHASSE part tout de suite.
   if (!elsewhere.mvp_invite.empty()) {
-    pieces_.mvp_tracker.Invite(elsewhere.mvp_invite, link_);
+    pieces_.mvp_tracker->Invite(elsewhere.mvp_invite, link_);
   }
   // LA DESCRIPTION D'UNE COMPÉTENCE DE GUILDE : la fenêtre du grimoire.
   ro::ui::AskSkillDescription(windows_.skill_description, elsewhere.describe_skill);

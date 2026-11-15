@@ -13,7 +13,9 @@
 #include "ro/sim/skill_book.h"
 #include "ro/sim/world.h"
 
+#include "game/companion_ai_stage.h"
 #include "game/game.h"
+#include "game/trade_stages.h"
 #include "game/ui_stage.h"
 #include "world/armed_cursor.h"
 #include "world/click_action.h"
@@ -52,7 +54,7 @@ void Game::ComposeCursor(const ro::sim::Actor* designated,
   }
   // La forme du curseur se décide ICI, où l'on sait ce que la souris désigne ;
   // sa peinture attend l'interface.
-  if (pieces_.cursor.sprite != nullptr) {
+  if (pieces_.cursor->sprite != nullptr) {
     // AU-DESSUS D'UN PANNEAU, la flèche NEUTRE. Les autres formes annoncent ce
     // qu'un clic ferait au monde, et le clic n'ira pas au monde : les garder
     // promettrait un coup qui ne partira jamais.
@@ -116,7 +118,7 @@ void Game::ComposeCursor(const ro::sim::Actor* designated,
     // L'enseigne d'un salon aussi, dont le double-clic fait entrer — sauf celle
     // d'un salon sans place, étiquette qu'un script pose au-dessus d'un PNJ.
     const std::optional<SignboardHit> top_board =
-        TopSignboardAt(pieces_.trade.signboards(), mouse_);
+        TopSignboardAt(pieces_.trade->signboards(), mouse_);
     const ro::sim::Actor* room_host =
         top_board.has_value() && top_board->kind == ro::sim::SignboardKind::kChatRoom
             ? world_.Find(top_board->owner_id)
@@ -126,13 +128,13 @@ void Game::ComposeCursor(const ro::sim::Actor* designated,
     const bool shift_held = (SDL_GetModState() & SDL_KMOD_SHIFT) != 0;
     const bool over_store =
         grimoire_.aim() == SkillAim::kNothing &&
-        (over_room || pieces_.trade.SignboardAt(mouse_).has_value() ||
+        (over_room || pieces_.trade->SignboardAt(mouse_).has_value() ||
          (hovered_other != nullptr && hovered_other->signboard.has_value() &&
           SignboardOpensStore(hovered_other->signboard->kind) &&
           !ActorTakesClick(*hovered_other,
                            VersusGateOf(world_, shift_held, settings_->options().no_shift()))));
-    const SkillAim aim =
-        grimoire_.aim() != SkillAim::kNothing ? grimoire_.aim() : pieces_.companion_ai.cursor_aim();
+    const SkillAim aim = grimoire_.aim() != SkillAim::kNothing ? grimoire_.aim()
+                                                               : pieces_.companion_ai->cursor_aim();
     // L'ÉPÉE TANT QU'UN ENGAGEMENT QUI NE SE POURSUIT PAS EST TENU, quoi que la
     // souris désigne : voir `EngagementShowsSword`. Une compétence armée garde
     // son anneau.
@@ -211,8 +213,8 @@ void Game::PaintCursor() {
   if (cursor_quads_.empty()) {
     return;
   }
-  pieces_.overlay.Draw(cursor_quads_, static_cast<float>(shell_.width()),
-                       static_cast<float>(shell_.height()));
+  pieces_.overlay->Draw(cursor_quads_, static_cast<float>(shell_.width()),
+                        static_cast<float>(shell_.height()));
   cursor_quads_.clear();
 }
 

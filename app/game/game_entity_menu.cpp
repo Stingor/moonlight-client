@@ -30,16 +30,26 @@
 #include "ro/vfs/item_link.h"
 
 #include "chat/player_link_judge.h"
+#include "game/companion_ai_stage.h"
 #include "game/game.h"
+#include "game/homunculus_stage.h"
+#include "game/mail_stage.h"
+#include "game/mercenary_stage.h"
+#include "game/pet_stage.h"
 #include "game/staff_roster_round.h"
 #include "game/staff_window_rounds.h"
+#include "game/trade_stages.h"
 #include "game/ui_answers.h"
 #include "game/ui_window_rounds.h"
 #include "game/whisper_stage.h"
+#include "mvp/mvp_tracker_stage.h"
 #include "world/blocked_npcs.h"
+#include "world/chat_block_log.h"
 #include "world/click_action.h"
+#include "world/entity_inspector.h"
 #include "world/follow_action.h"
 #include "world/overlay_view.h"
+#include "world/player_report.h"
 
 namespace moonclient {
 namespace {
@@ -108,9 +118,9 @@ void RefreshTacticChecks(ro::ui::EntityMenuView& view, ro::sim::AiCompanion comp
 
 // LES ACTEURS DE NOS COMPAGNONS, tels que leurs stages les tiennent.
 [[nodiscard]] OwnCompanionIds OwnCompanionsOf(const GamePieces& pieces) {
-  return {.pet_id = pieces.pet.own_pet_id(),
-          .homunculus_id = pieces.homunculus.own_homunculus_id(),
-          .mercenary_id = pieces.mercenary.own_mercenary_id()};
+  return {.pet_id = pieces.pet->own_pet_id(),
+          .homunculus_id = pieces.homunculus->own_homunculus_id(),
+          .mercenary_id = pieces.mercenary->own_mercenary_id()};
 }
 
 [[nodiscard]] ro::net::NpcAdminAction NpcAdminOf(EntityVerb verb) {
@@ -155,16 +165,16 @@ void Game::AdvanceEntityMenu(std::uint32_t now_ms) {
     PlayMapGroundVerb(std::exchange(answer.chosen, 0));
   }
   // L'INSPECTEUR DU STAFF : sa fenêtre, puis la demande qu'elle attend.
-  windows_.entity_inspector->view = &pieces_.entity_inspector.view();
-  pieces_.entity_inspector.Advance(windows_.entity_inspector->state,
-                                   std::exchange(windows_.entity_inspector->answer, {}),
-                                   world_.map_name(), now_ms);
-  pieces_.entity_inspector.SendRequest(link_);
+  windows_.entity_inspector->view = &pieces_.entity_inspector->view();
+  pieces_.entity_inspector->Advance(windows_.entity_inspector->state,
+                                    std::exchange(windows_.entity_inspector->answer, {}),
+                                    world_.map_name(), now_ms);
+  pieces_.entity_inspector->SendRequest(link_);
   // ET SON JOURNAL DES BLOCAGES DE CHAT, de même.
-  windows_.chat_block_log->view = &pieces_.chat_block_log.view();
-  pieces_.chat_block_log.Advance(windows_.chat_block_log->state,
-                                 std::exchange(windows_.chat_block_log->answer, {}), now_ms);
-  pieces_.chat_block_log.SendRequest(link_);
+  windows_.chat_block_log->view = &pieces_.chat_block_log->view();
+  pieces_.chat_block_log->Advance(windows_.chat_block_log->state,
+                                  std::exchange(windows_.chat_block_log->answer, {}), now_ms);
+  pieces_.chat_block_log->SendRequest(link_);
 
   // ── CE QUE LE MENU A RENDU À L'IMAGE PRÉCÉDENTE ───────────────────────────
   //
@@ -187,13 +197,13 @@ void Game::AdvanceEntityMenu(std::uint32_t now_ms) {
             : ro::sim::AiCompanion::kMercenary;
     // ⚠ L'ÉTAT DEMANDÉ, ET NON UNE BASCULE AVEUGLE : l'attente a pu changer
     // pendant que le menu était ouvert (Alt+T, un ordre direct, une carte).
-    if (answer.toggled_on != pieces_.companion_ai.standby(companion)) {
-      static_cast<void>(pieces_.companion_ai.ToggleStandby(companion, world_, now_ms));
+    if (answer.toggled_on != pieces_.companion_ai->standby(companion)) {
+      static_cast<void>(pieces_.companion_ai->ToggleStandby(companion, world_, now_ms));
     }
     // L'état vrai est celui de l'IA, pas celui de la case.
     for (ro::ui::EntityMenuItem& item : menu_view_.items) {
       if (item.verb == answer.toggled) {
-        item.checked = pieces_.companion_ai.standby(companion);
+        item.checked = pieces_.companion_ai->standby(companion);
       }
     }
   }
@@ -205,11 +215,11 @@ void Game::AdvanceEntityMenu(std::uint32_t now_ms) {
         answer.toggled == static_cast<int>(EntityVerb::kHomunculusFriend)
             ? ro::sim::AiCompanion::kHomunculus
             : ro::sim::AiCompanion::kMercenary;
-    pieces_.companion_ai.SetCompanionFriend(companion, menu_target_.name, answer.toggled_on,
-                                            now_ms);
+    pieces_.companion_ai->SetCompanionFriend(companion, menu_target_.name, answer.toggled_on,
+                                             now_ms);
     for (ro::ui::EntityMenuItem& item : menu_view_.items) {
       if (item.verb == answer.toggled) {
-        item.checked = pieces_.companion_ai.IsCompanionFriend(companion, menu_target_.name);
+        item.checked = pieces_.companion_ai->IsCompanionFriend(companion, menu_target_.name);
       }
     }
   }
@@ -218,34 +228,34 @@ void Game::AdvanceEntityMenu(std::uint32_t now_ms) {
   if (const std::optional<TacticVerbParts> parts = TacticVerbOf(answer.toggled);
       parts.has_value()) {
     if (answer.toggled_on) {
-      pieces_.companion_ai.ChooseTactic(parts->companion, menu_target_.job, parts->choice);
+      pieces_.companion_ai->ChooseTactic(parts->companion, menu_target_.job, parts->choice);
     }
     RefreshTacticChecks(menu_view_, parts->companion,
-                        pieces_.companion_ai.TacticFor(parts->companion, menu_target_.job));
+                        pieces_.companion_ai->TacticFor(parts->companion, menu_target_.job));
   }
   // LE SOUS-MENU « CONDUITE DU COMPAGNON », sur un joueur, comme la tactique.
   if (const std::optional<TacticVerbParts> parts = ConductVerbOf(answer.toggled);
       parts.has_value()) {
     if (answer.toggled_on) {
-      pieces_.companion_ai.ChooseConduct(parts->companion, menu_target_.name, parts->choice);
+      pieces_.companion_ai->ChooseConduct(parts->companion, menu_target_.name, parts->choice);
     }
     RefreshConductChecks(menu_view_, parts->companion,
-                         pieces_.companion_ai.ConductFor(parts->companion, menu_target_.name));
+                         pieces_.companion_ai->ConductFor(parts->companion, menu_target_.name));
   }
   if (const std::optional<TacticVerbParts> parts = ConductVerbOf(answer.chosen);
       parts.has_value()) {
     if (parts->choice == static_cast<int>(TacticMenuChoice::kAdvanced)) {
-      pieces_.companion_ai.OpenConductWindow(parts->companion, windows_.companion_ai);
+      pieces_.companion_ai->OpenConductWindow(parts->companion, windows_.companion_ai);
     } else {
-      pieces_.companion_ai.ChooseConduct(parts->companion, menu_target_.name, parts->choice);
+      pieces_.companion_ai->ChooseConduct(parts->companion, menu_target_.name, parts->choice);
     }
   } else if (const std::optional<TacticVerbParts> tactic = TacticVerbOf(answer.chosen);
              tactic.has_value()) {
     if (tactic->choice == static_cast<int>(TacticMenuChoice::kAdvanced)) {
-      pieces_.companion_ai.OpenTacticWindow(tactic->companion, menu_target_.job, menu_target_.name,
-                                            windows_.companion_tactic);
+      pieces_.companion_ai->OpenTacticWindow(tactic->companion, menu_target_.job, menu_target_.name,
+                                             windows_.companion_tactic);
     } else {
-      pieces_.companion_ai.ChooseTactic(tactic->companion, menu_target_.job, tactic->choice);
+      pieces_.companion_ai->ChooseTactic(tactic->companion, menu_target_.job, tactic->choice);
     }
   } else if (answer.chosen != 0) {
     PlayEntityVerb(static_cast<EntityVerb>(answer.chosen), menu_target_.id, 0, now_ms);
@@ -322,7 +332,7 @@ void Game::OpenEntityMenu(const ro::sim::Actor& actor, EntityFamily family, std:
     // celui d'un équipement tombé, et l'en-tête reste alors anonyme.
     if (facts.item_id != 0 && facts.item_identified) {
       facts.name = GroundItemName(
-          actor, pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr,
+          actor, pieces_.wardrobe->has_value() ? &(*pieces_.wardrobe)->catalog().items : nullptr,
           pieces_.item_words);
     }
     // LA LISTE DE RAMASSAGE AUTOMATIQUE, celle que la description tient.
@@ -351,30 +361,30 @@ void Game::OpenEntityMenu(const ro::sim::Actor& actor, EntityFamily family, std:
   const ro::sim::Friend* befriended = friends_.FindByName(actor.name);
   facts.target_is_friend = befriended != nullptr && befriended->account_id == actor.id;
   facts.friends_full = friends_.full();
-  facts.whisper_blocked = pieces_.whispers.blocks().Blocks(actor.name);
+  facts.whisper_blocked = pieces_.whispers->blocks().Blocks(actor.name);
   facts.voice_heard = voice_.PeerOf(actor.name) == VoiceMode::Peer::kHeard;
   facts.voice_blocked = voice_.PeerOf(actor.name) == VoiceMode::Peer::kBlocked;
-  facts.dealing = pieces_.trade.deal().deal().phase() != ro::sim::DealPhase::kNone;
+  facts.dealing = pieces_.trade->deal().deal().phase() != ro::sim::DealPhase::kNone;
   facts.followed = world_mouse_.follow.followed_id == actor.id;
   facts.store_open =
       actor.signboard.has_value() && MarketKindOfSignboard(actor.signboard->kind).has_value();
   facts.npc_blocked = page.blocked().Has(actor.id);
-  facts.pet_has_accessory = pieces_.pet.has_accessory();
-  if (const char* refusal = pieces_.pet.FeedRefusal(); refusal != nullptr) {
+  facts.pet_has_accessory = pieces_.pet->has_accessory();
+  if (const char* refusal = pieces_.pet->FeedRefusal(); refusal != nullptr) {
     facts.pet_feed_refusal = refusal;
   }
-  facts.homunculus_resting = pieces_.homunculus.resting();
+  facts.homunculus_resting = pieces_.homunculus->resting();
   facts.companion_standby = (family == EntityFamily::kOwnHomunculus &&
-                             pieces_.companion_ai.standby(ro::sim::AiCompanion::kHomunculus)) ||
+                             pieces_.companion_ai->standby(ro::sim::AiCompanion::kHomunculus)) ||
                             (family == EntityFamily::kOwnMercenary &&
-                             pieces_.companion_ai.standby(ro::sim::AiCompanion::kMercenary));
+                             pieces_.companion_ai->standby(ro::sim::AiCompanion::kMercenary));
   if (family == EntityFamily::kMonster) {
     for (const ro::sim::AiCompanion companion :
          {ro::sim::AiCompanion::kHomunculus, ro::sim::AiCompanion::kMercenary}) {
-      if (pieces_.companion_ai.present(companion)) {
+      if (pieces_.companion_ai->present(companion)) {
         facts.companion_tactics.push_back(CompanionTacticFacts{
             .companion = companion,
-            .line = pieces_.companion_ai.TacticFor(companion, actor.look.job)});
+            .line = pieces_.companion_ai->TacticFor(companion, actor.look.job)});
       }
     }
   }
@@ -382,18 +392,18 @@ void Game::OpenEntityMenu(const ro::sim::Actor& actor, EntityFamily family, std:
     // « INVITER DANS MON CARNET MVP » : ses raisons, jugées à l'ouverture ;
     // carnet éteint, l'entrée disparaît.
     const MvpInviteCircle hunt{
-        .book = pieces_.mvp_tracker.book(),
+        .book = pieces_.mvp_tracker->book(),
         .guild = guild_book_,
         .friends = friends_,
         .enabled = settings_->options().pages().mvp_tracker.settings().enabled,
-        .link_ready = pieces_.mvp_tracker.link_ready()};
+        .link_ready = pieces_.mvp_tracker->link_ready()};
     facts.mvp_invite_withdrawn = !hunt.enabled;
     if (const char* refusal = JudgeMvpInvite(actor.name, hunt); refusal != nullptr) {
       facts.mvp_invite_refusal = refusal;
     }
     // LE COURRIER : le serveur refuse d'en ouvrir un second, et pendant un
     // échange.
-    if (pieces_.mail.writing()) {
+    if (pieces_.mail->writing()) {
       facts.mail_refusal = Tr("Un courrier est déjà en cours d'écriture.");
     } else if (facts.dealing) {
       facts.mail_refusal = Tr("Un échange est en cours : le serveur refuse d'ouvrir un courrier.");
@@ -403,14 +413,14 @@ void Game::OpenEntityMenu(const ro::sim::Actor& actor, EntityFamily family, std:
                                  world_.skill_book(), facts.target_in_party, actor.look.job));
     for (const ro::sim::AiCompanion companion :
          {ro::sim::AiCompanion::kHomunculus, ro::sim::AiCompanion::kMercenary}) {
-      if (pieces_.companion_ai.present(companion)) {
+      if (pieces_.companion_ai->present(companion)) {
         facts.companion_friends.push_back(CompanionFriendFacts{
             .companion = companion,
-            .befriended = pieces_.companion_ai.IsCompanionFriend(companion, actor.name),
-            .full = pieces_.companion_ai.CompanionFriendsFull(companion)});
+            .befriended = pieces_.companion_ai->IsCompanionFriend(companion, actor.name),
+            .full = pieces_.companion_ai->CompanionFriendsFull(companion)});
         facts.companion_conducts.push_back(
             CompanionConductFacts{.companion = companion,
-                                  .line = pieces_.companion_ai.ConductFor(companion, actor.name)});
+                                  .line = pieces_.companion_ai->ConductFor(companion, actor.name)});
       }
     }
   }
@@ -457,7 +467,7 @@ void Game::PlayEntityVerb(EntityVerb verb, std::uint32_t id, int points, std::ui
       return;
     case EntityVerb::kMvpInvite:
       // ⚠ LE NOM PART EN UTF-8 : le carnet convertit lui-même pour le fil.
-      pieces_.mvp_tracker.Invite(name, link_);
+      pieces_.mvp_tracker->Invite(name, link_);
       return;
     case EntityVerb::kTarget:
       static_cast<void>(targeting_.DesignateByProxy(world_, id));
@@ -487,7 +497,7 @@ void Game::PlayEntityVerb(EntityVerb verb, std::uint32_t id, int points, std::ui
     case EntityVerb::kWhisperBlock:
     case EntityVerb::kWhisperAllow:
       // La liste ne change qu'à la réponse du serveur : le menu suivant la lira.
-      ReportRefusal(ro::net::RequestWhisperBlock(link_, pieces_.whispers.blocks(), name,
+      ReportRefusal(ro::net::RequestWhisperBlock(link_, pieces_.whispers->blocks(), name,
                                                  verb == EntityVerb::kWhisperBlock
                                                      ? ro::sim::WhisperBlockWay::kBlock
                                                      : ro::sim::WhisperBlockWay::kAllow));
@@ -500,7 +510,7 @@ void Game::PlayEntityVerb(EntityVerb verb, std::uint32_t id, int points, std::ui
       // ⚠ JAMAIS POUR SOI : le menu de soi n'a pas l'entrée, et le clic le
       // revérifie.
       if (id != world_.player_id() && !name.empty()) {
-        pieces_.mail.Compose(name);
+        pieces_.mail->Compose(name);
       }
       return;
     case EntityVerb::kAdopt: {
@@ -535,16 +545,16 @@ void Game::PlayEntityVerb(EntityVerb verb, std::uint32_t id, int points, std::ui
     case EntityVerb::kWhisperWindow:
       // LA CONVERSATION 1:1 À PART : elle s'ouvre, ou revient devant, et prend
       // le clavier.
-      pieces_.whispers.Open(name);
+      pieces_.whispers->Open(name);
       return;
     case EntityVerb::kDealPropose:
       // ⚠ PAS PENDANT L'ÉCRITURE D'UN COURRIER : le serveur l'ignorerait en
       // silence. Le refus se dit à l'image suivante.
-      if (pieces_.mail.HoldsDealProposal()) {
+      if (pieces_.mail->HoldsDealProposal()) {
         return;
       }
       // La proposition part à l'image suivante, une fois à portée.
-      pieces_.trade.deal().Propose(
+      pieces_.trade->deal().Propose(
           id, name,
           actor != nullptr ? static_cast<std::uint16_t>(std::max<int>(actor->level, 0)) : 0);
       return;
@@ -623,7 +633,7 @@ void Game::PlayEntityVerb(EntityVerb verb, std::uint32_t id, int points, std::ui
     }
     case EntityVerb::kInspect: {
       // En tête de la fenêtre : la famille, le nom, et l'identifiant demandé.
-      pieces_.entity_inspector.Open(
+      pieces_.entity_inspector->Open(
           windows_.entity_inspector->state, id,
           ro::core::Printed(Tr("%s — %s — identifiant %u"), EntityFamilyLabel(menu_target_.family),
                             name.empty() ? Tr("(nom inconnu)") : name.c_str(), id),
@@ -632,7 +642,7 @@ void Game::PlayEntityVerb(EntityVerb verb, std::uint32_t id, int points, std::ui
     }
     case EntityVerb::kChatBlockLog: {
       // En tête de la fenêtre : le nom du personnage, et l'AID demandé.
-      pieces_.chat_block_log.Open(
+      pieces_.chat_block_log->Open(
           windows_.chat_block_log->state, id,
           ro::core::Printed(Tr("%s — AID %u"), name.empty() ? Tr("(nom inconnu)") : name.c_str(),
                             id),
@@ -643,14 +653,14 @@ void Game::PlayEntityVerb(EntityVerb verb, std::uint32_t id, int points, std::ui
       // L'ENSEIGNE EST RELUE AU CLIC : l'échoppe a pu fermer depuis l'ouverture.
       if (const ro::sim::Actor* shop = world_.Find(id); shop != nullptr && shop->signboard) {
         if (const auto kind = MarketKindOfSignboard(shop->signboard->kind); kind.has_value()) {
-          pieces_.trade.market().AskCompare({.owner_aid = id, .kind = *kind, .owner_name = name});
+          pieces_.trade->market().AskCompare({.owner_aid = id, .kind = *kind, .owner_name = name});
         }
       }
       return;
     case EntityVerb::kReportPlayer:
       // ⚠ JAMAIS SOI : le menu de soi n'a pas l'entrée, et le clic le revérifie.
       if (id != world_.player_id()) {
-        pieces_.player_report.Open(windows_.player_report, id, name);
+        pieces_.player_report->Open(windows_.player_report, id, name);
       }
       return;
     // ── L'OUTILLAGE DU STAFF ───────────────────────────────────────────────
@@ -748,19 +758,19 @@ void Game::PlayEntityVerb(EntityVerb verb, std::uint32_t id, int points, std::ui
       return;
     }
     case EntityVerb::kPetStatus:
-      pieces_.pet.ToggleWindow(windows_.pet, link_);
+      pieces_.pet->ToggleWindow(windows_.pet, link_);
       return;
     case EntityVerb::kPetFeed:
-      pieces_.pet.Feed(link_, world_);
+      pieces_.pet->Feed(link_, world_);
       return;
     case EntityVerb::kPetPerform:
-      pieces_.pet.Perform(link_);
+      pieces_.pet->Perform(link_);
       return;
     case EntityVerb::kPetUnequip:
-      pieces_.pet.UnequipAccessory(link_);
+      pieces_.pet->UnequipAccessory(link_);
       return;
     case EntityVerb::kPetToEgg:
-      pieces_.pet.ReturnToEgg(link_);
+      pieces_.pet->ReturnToEgg(link_);
       return;
     // LE STATUT DE L'HOMONCULE ET DU MERCENAIRE est leur onglet de la fiche,
     // ouvert dessus même s'il était ailleurs.
@@ -770,10 +780,10 @@ void Game::PlayEntityVerb(EntityVerb verb, std::uint32_t id, int points, std::ui
       windows_.character->tab_request = ro::ui::CharacterTab::kHomunculus;
       return;
     case EntityVerb::kHomunculusFeed:
-      pieces_.homunculus.Feed(link_);
+      pieces_.homunculus->Feed(link_);
       return;
     case EntityVerb::kMercenaryStatus:
-      pieces_.mercenary.RequestInfo(link_);
+      pieces_.mercenary->RequestInfo(link_);
       windows_.character->open = true;
       windows_.character->tab = ro::ui::CharacterTab::kMercenary;
       windows_.character->tab_request = ro::ui::CharacterTab::kMercenary;

@@ -2,8 +2,10 @@
 
 #include "ro/core/log.h"
 
+#include "game/cash_shop_stage.h"
 #include "game/game_pieces.h"
 #include "game/surface_announcer.h"
+#include "guard/cheat_guard.h"
 
 namespace moonclient {
 
@@ -28,19 +30,19 @@ void PumpHandshake(ro::net::Connection& link, ro::net::MoonclientHandshake& hand
     if (reported == ro::net::MoonclientHandshakeState::kVerified) {
       // LE CATALOGUE DE LA BOUTIQUE, une fois par partie : le personnage est
       // sur sa carte, et le serveur écoute.
-      pieces.cash_shop.RequestCatalogueOnce(link);
+      pieces.cash_shop->RequestCatalogueOnce(link);
     }
   }
   // 🔴 LE SERVEUR NOUS RECONNAÎT : c'est alors qu'il accepte nos annonces, et il
   // les oublie à chaque entrée en zone. Sans elles, il refuse toute commande
   // d'album et dépouille les dialogues de leurs images. Le carnet y entre et en
   // sort avec son interrupteur.
-  pieces.surfaces.Pump(link, handshake.state() == ro::net::MoonclientHandshakeState::kVerified,
-                       ShownSurfaces(mvp_tracker_enabled) | reading_caps);
+  pieces.surfaces->Pump(link, handshake.state() == ro::net::MoonclientHandshakeState::kVerified,
+                        ShownSurfaces(mvp_tracker_enabled) | reading_caps);
   // LE GARDE ne parle qu'à une session reconnue : le serveur ignore ses
   // signalements avant.
-  pieces.guard.Pump(link, handshake.state() == ro::net::MoonclientHandshakeState::kVerified,
-                    now_ms);
+  pieces.guard->Pump(link, handshake.state() == ro::net::MoonclientHandshakeState::kVerified,
+                     now_ms);
 }
 
 }  // namespace moonclient

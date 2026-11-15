@@ -36,24 +36,39 @@
 #include "ro/sim/world.h"
 #include "ro/ui/link_notice.h"
 
+#include "game/achievement_stage.h"
 #include "game/bug_report_context.h"
+#include "game/cash_shop_stage.h"
 #include "game/cash_shop_windows.h"
+#include "game/chat_room_stage.h"
+#include "game/companion_ai_stage.h"
 #include "game/connected_session.h"
 #include "game/game.h"
+#include "game/gm_outfit_announcer.h"
 #include "game/handshake_pump.h"
 #include "game/interface_sound.h"
 #include "game/level_up_cue.h"
+#include "game/mail_stage.h"
+#include "game/npc_shop_stage.h"
+#include "game/pet_stage.h"
 #include "game/survivors_presence_mode.h"
+#include "game/trade_stages.h"
+#include "game/trade_windows.h"
 #include "game/ui_window_rounds.h"
+#include "game/whisper_stage.h"
 #include "input/camera_aim.h"
 #include "loading/loading_plans.h"
 #include "loading/loading_presenter.h"
 #include "world/attack_intent.h"
+#include "world/battle_log.h"
 #include "world/click_action.h"
 #include "world/follow_action.h"
+#include "world/hit_popups.h"
 #include "world/item_broadcast_report.h"
+#include "world/item_pickup_report.h"
 #include "world/monster_auras.h"
 #include "world/scene_graphics.h"
+#include "world/skill_refusal_report.h"
 
 namespace moonclient {
 
@@ -64,9 +79,9 @@ void Game::FollowGmOutfit() {
   // et chaque réapparition le pose de nouveau.
   world_.DressPlayerAsGameMaster(worn);
   if (link_.is_open()) {
-    pieces_.gm_outfit.Pump(link_,
-                           handshake_.state() == ro::net::MoonclientHandshakeState::kVerified,
-                           windows_.staff_tools->admin, worn);
+    pieces_.gm_outfit->Pump(link_,
+                            handshake_.state() == ro::net::MoonclientHandshakeState::kVerified,
+                            windows_.staff_tools->admin, worn);
   }
 }
 
@@ -117,17 +132,17 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
     const std::optional<ro::net::NpcFarewell> farewell = ro::net::NpcFarewellDue(world_);
     // UN COUP SE JUGE AUSSI SUR L'ÉTAT D'AVANT : voir `PetStage::NoteBeforeWorld`.
     const auto rests = [&](const ro::sim::Actor& actor) {
-      return ActorRestsAt(pieces_.wardrobe ? &*pieces_.wardrobe : nullptr, world_, planner_, actor,
-                          now_ms);
+      return ActorRestsAt(pieces_.wardrobe->has_value() ? &**pieces_.wardrobe : nullptr, world_,
+                          planner_, actor, now_ms);
     };
-    pieces_.pet.NoteBeforeWorld(received, world_, rests, now_ms);
+    pieces_.pet->NoteBeforeWorld(received, world_, rests, now_ms);
     // 🔴 EN SALON, LA PAROLE REVIENT AU SALON, et le monde ne l'écrit pas : le
     // serveur ne nous fait plus entendre la carte.
-    ro::net::FrameOutcome outcome = pieces_.chat_rooms.ClaimLine(received, world_, now_ms);
+    ro::net::FrameOutcome outcome = pieces_.chat_rooms->ClaimLine(received, world_, now_ms);
     // LES CHUCHOTEMENTS AVANT LE MONDE : eux seuls savent qui sont nos amis et
     // ce qui attend un accusé. La parole masquée aussi.
     if (outcome == ro::net::FrameOutcome::kUnhandled) {
-      outcome = pieces_.whispers.ApplyFrame(received, world_, friends_, guild_book_, now_ms);
+      outcome = pieces_.whispers->ApplyFrame(received, world_, friends_, guild_book_, now_ms);
     }
     if (outcome == ro::net::FrameOutcome::kUnhandled) {
       outcome = ro::net::ApplyFrame(received, world_, now_ms);
@@ -246,9 +261,9 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
     scene_actors_.fading.push_back(std::move(leaving));
   }
   // LES EFFETS D'OFFICE de qui vient de paraître ou de se cacher.
-  DressMonsters(world_,
-                pieces_.wardrobe.has_value() ? pieces_.wardrobe->monster_size_effects() : nullptr,
-                now_ms);
+  DressMonsters(
+      world_, pieces_.wardrobe->has_value() ? (*pieces_.wardrobe)->monster_size_effects() : nullptr,
+      now_ms);
 
   // ⚠ CE QUI FINIT DE LUI-MÊME N'EST ANNONCÉ PAR PERSONNE : un état dont la
   // durée s'achève ne vaut aucun paquet, et sans ce balayage son icône
@@ -372,8 +387,8 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
       if (auto told = ro::net::NotifyMapLoaded(link_); !told) {
         ro::core::LogError("avis de chargement refusé : {}", ro::core::Describe(told.error()));
       }
-      pieces_.whispers.NoteMapEntered();
-      pieces_.companion_ai.NoteArrival(static_cast<std::uint32_t>(SDL_GetTicks()));
+      pieces_.whispers->NoteMapEntered();
+      pieces_.companion_ai->NoteArrival(static_cast<std::uint32_t>(SDL_GetTicks()));
     }
   }
 
@@ -413,7 +428,7 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
     grimoire_.CancelPending();
   }
   if (store_reached.has_value()) {
-    pieces_.trade.VisitStore(store_reached->owner_id, store_reached->kind);
+    pieces_.trade->VisitStore(store_reached->owner_id, store_reached->kind);
   }
 
   // L'ACTION EN ATTENTE AVANCE D'UN TOUR : on marche vers la cible désignée
@@ -432,14 +447,14 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
                 .deferred_walk = &world_mouse_.deferred_walk,
                 .player_gesture = scene_actors_.player_gesture,
                 .entity_menu = &windows_.entity_menu->state,
-                .in_chat_room = pieces_.chat_rooms.room().in_room(),
+                .in_chat_room = pieces_.chat_rooms->room().in_room(),
                 .left_held = (SDL_GetMouseState(nullptr, nullptr) & SDL_BUTTON_LMASK) != 0,
                 .now_ms = now_ms});
   }
   // L'IA DES COMPAGNONS, après le changement de carte qu'elle doit voir.
   const CompanionAiBooks companion_books{
       .party = party_,
-      .skill_tree = pieces_.skill_tree.has_value() ? &*pieces_.skill_tree : nullptr,
+      .skill_tree = pieces_.skill_tree->has_value() ? &**pieces_.skill_tree : nullptr,
       .monster_sheets = monster_sheet_.has_value() ? &monster_sheet_->book() : nullptr,
       .walk_map = stage_.has_value() ? PlannedMapOf(*stage_) : nullptr,
       // La guilde du livre ; à défaut, celle que le serveur pose sur notre
@@ -448,12 +463,12 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
                             ? static_cast<std::uint32_t>(guild_book_.belonging()->guild_id)
                         : world_.player() != nullptr ? world_.player()->guild_id
                                                      : 0};
-  if (pieces_.companion_ai.Advance(link_, world_, pieces_.homunculus, pieces_.mercenary,
-                                   companion_books, grimoire_.armed() != nullptr,
-                                   world_mouse_.engagement, now_ms)) {
+  if (pieces_.companion_ai->Advance(link_, world_, pieces_.homunculus, pieces_.mercenary,
+                                    companion_books, grimoire_.armed() != nullptr,
+                                    world_mouse_.engagement, now_ms)) {
     grimoire_.Disarm();
   }
-  if (const std::uint32_t wanted = pieces_.companion_ai.TakeWantedMonsterSheet();
+  if (const std::uint32_t wanted = pieces_.companion_ai->TakeWantedMonsterSheet();
       wanted != 0 && monster_sheet_.has_value()) {
     monster_sheet_->NoteWanted(wanted);
   }
@@ -471,17 +486,17 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
   AdvanceCraftAtlas(now_ms);
   AdvanceNavigation(now_ms);
   // La boutique de vote : ce que sa fenêtre a rendu, et la vue qu'elle dessinera.
-  pieces_.cash_shop.Advance(windows_.cash_shop->state,
-                            std::exchange(windows_.cash_shop->answer, {}), link_, world_,
-                            pieces_.item_words, styles_, now_ms);
-  windows_.cash_shop->view = pieces_.cash_shop.view();
+  pieces_.cash_shop->Advance(windows_.cash_shop->state,
+                             std::exchange(windows_.cash_shop->answer, {}), link_, world_,
+                             pieces_.item_words, styles_, now_ms);
+  windows_.cash_shop->view = pieces_.cash_shop->view();
   // MAJ + CLIC SUR UNE CARTE : son lien dans la saisie du chat ; et ce que son
   // menu a choisi d'autre que la description.
-  if (const std::optional<ro::vfs::ItemLink> reposted = pieces_.cash_shop.TakeReposted();
+  if (const std::optional<ro::vfs::ItemLink> reposted = pieces_.cash_shop->TakeReposted();
       reposted.has_value()) {
     PostChatLink(*reposted);
   }
-  if (const std::optional<ro::ui::ChatLinkAsk> chosen = pieces_.cash_shop.TakeChosen();
+  if (const std::optional<ro::ui::ChatLinkAsk> chosen = pieces_.cash_shop->TakeChosen();
       chosen.has_value()) {
     FollowCatalogItem(*chosen, now_ms);
   }
@@ -494,50 +509,50 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
       windows_.trade->npc_shop.state.tab == ro::ui::NpcShopTab::kSell) {
     database_.Read();
   }
-  pieces_.trade.deal().RefuseProposals(settings_->options().pages().deal_refusal.refuses_deals());
-  pieces_.trade.Advance(
+  pieces_.trade->deal().RefuseProposals(settings_->options().pages().deal_refusal.refuses_deals());
+  pieces_.trade->Advance(
       windows_.trade, link_, world_, pieces_.item_words,
       item_description_.has_value() ? item_description_->creator_names() : CreatorNames(),
-      settings_->options().inventory_sell_locked(), pieces_.chat_rooms.room().in_room(), now_ms);
+      settings_->options().inventory_sell_locked(), pieces_.chat_rooms->room().in_room(), now_ms);
   // UNE VISITE REFERMÉE D'UN CLIC DROIT EMPORTE LA DESCRIPTION OUVERTE, comme
   // au client d'origine : c'était le plus souvent celle d'un article.
-  if (pieces_.trade.TakeClosedVisits()) {
+  if (pieces_.trade->TakeClosedVisits()) {
     windows_.description->open = false;
   }
   // LE COURRIER : les silences, ce que ses fenêtres ont rendu, les nouvelles,
   // et les vues qu'elles dessineront. Une pièce jointe se décrit comme un
   // objet de commerce.
-  pieces_.mail.Advance(
+  pieces_.mail->Advance(
       windows_.mail, link_, world_, pieces_.item_words,
       item_description_.has_value() ? item_description_->creator_names() : CreatorNames(), now_ms);
-  AskBugReport(windows_.bug_report, pieces_.mail.TakeBugReport());
+  AskBugReport(windows_.bug_report, pieces_.mail->TakeBugReport());
   // LES SALONS : ce que leurs fenêtres ont rendu, les nouvelles, et les vues.
-  pieces_.chat_rooms.Advance(
+  pieces_.chat_rooms->Advance(
       windows_.chat_room,
       ChatRoomContext{
           .link = link_,
           .world = world_,
-          .words = pieces_.item_words,
+          .words = *pieces_.item_words,
           .friends = friends_,
           .stores =
-              ChatRoomStoreState{.in_room = pieces_.chat_rooms.room().in_room(),
-                                 .vending_open = pieces_.trade.vending().vending().shop_open(),
-                                 .buying_store_open = pieces_.trade.buying_store().store().open()},
+              ChatRoomStoreState{.in_room = pieces_.chat_rooms->room().in_room(),
+                                 .vending_open = pieces_.trade->vending().vending().shop_open(),
+                                 .buying_store_open = pieces_.trade->buying_store().store().open()},
           .now_ms = now_ms});
   // LES SUCCÈS : ce que la fenêtre et le panneau ont rendu, et leurs vues.
-  pieces_.achievements.Advance(windows_.achievements, link_, world_, now_ms);
-  AskBugReport(windows_.bug_report, pieces_.achievements.TakeBugReport());
-  std::optional<TradeItemFocus> described = pieces_.trade.TakeDescribed();
+  pieces_.achievements->Advance(windows_.achievements, link_, world_, now_ms);
+  AskBugReport(windows_.bug_report, pieces_.achievements->TakeBugReport());
+  std::optional<TradeItemFocus> described = pieces_.trade->TakeDescribed();
   // UNE CARTE DE LA BOUTIQUE DE VOTE se décrit comme une offre de commerce :
   // l'item n'est à personne, et son lien porte ce qu'on en sait.
-  if (std::optional<ro::vfs::ItemLink> voted = pieces_.cash_shop.TakeDescribed();
+  if (std::optional<ro::vfs::ItemLink> voted = pieces_.cash_shop->TakeDescribed();
       voted.has_value()) {
     described = TradeItemFocus{.item_id = voted->item_id, .link = std::move(voted)};
   }
-  if (std::optional<TradeItemFocus> mailed = pieces_.mail.TakeDescribed(); mailed.has_value()) {
+  if (std::optional<TradeItemFocus> mailed = pieces_.mail->TakeDescribed(); mailed.has_value()) {
     described = std::move(mailed);
   }
-  if (std::optional<TradeItemFocus> rewarded = pieces_.achievements.TakeDescribed();
+  if (std::optional<TradeItemFocus> rewarded = pieces_.achievements->TakeDescribed();
       rewarded.has_value()) {
     described = std::move(rewarded);
   }
@@ -570,11 +585,12 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
 
   // Les coups nouveaux font naître leurs nombres — et l'aperçu des réglages,
   // tant qu'il est allumé, ses coups factices.
-  if (pieces_.numbers.has_value()) {
+  if (pieces_.numbers->has_value()) {
     const HitPopupLook& damage_look = settings_->options().damage_look();
-    pieces_.numbers->Notice(world_, pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr,
-                            damage_look);
-    pieces_.numbers->Rehearse(now_ms, world_, damage_look);
+    (*pieces_.numbers)
+        ->Notice(world_, pieces_.wardrobe->has_value() ? &**pieces_.wardrobe : nullptr,
+                 damage_look);
+    (*pieces_.numbers)->Rehearse(now_ms, world_, damage_look);
   }
   // La plaisanterie et le cri font PARLER le personnage : c'est le seul effet du
   // lot qui émette vers le serveur, et chaque réplique se permet à part.
@@ -588,8 +604,8 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
   // Les ramassages neufs ouvrent leur ligne de bandeau. ⚠ DANS LE POMPAGE et
   // non dans le dessin : c'est ici que les faits du monde se relèvent, et une
   // image sautée ne doit pas perdre un objet.
-  if (pieces_.item_toast.has_value()) {
-    pieces_.item_toast->Notice(world_, settings_->options().item_obtain(), creators, now_ms);
+  if (pieces_.item_toast->has_value()) {
+    (*pieces_.item_toast)->Notice(world_, settings_->options().item_obtain(), creators, now_ms);
   }
   // LES BULLES D'ANNONCE, pour la même raison : une image sautée ne doit en
   // perdre aucune.
@@ -597,21 +613,22 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
   // Et ce que le ramassage dit dans la conversation : le gain, le refus.
   // ⚠ INDÉPENDANT DU BANDEAU, comme chez le client : couper l'un ne coupe
   // pas l'autre.
-  if (pieces_.item_report.has_value()) {
-    pieces_.item_report->Notice(world_, creators, now_ms);
-    pieces_.item_report->NoticeNews(pieces_.item_news, world_, party_, creators);
+  if (pieces_.item_report->has_value()) {
+    (*pieces_.item_report)->Notice(world_, creators, now_ms);
+    (*pieces_.item_report)->NoticeNews(pieces_.item_news, world_, party_, creators);
   }
   // Ce que le serveur annonce à tous sur des objets : rare, raffinage, grade.
   ReportItemBroadcasts(pieces_.item_news, world_);
   // Et les refus de compétence, nommés et avec l'objet qui manque.
-  pieces_.skill_refusals.Notice(
-      world_, pieces_.skill_tree.has_value() ? &*pieces_.skill_tree : nullptr,
-      pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr,
+  pieces_.skill_refusals->Notice(
+      world_, pieces_.skill_tree->has_value() ? &**pieces_.skill_tree : nullptr,
+      pieces_.wardrobe->has_value() ? &(*pieces_.wardrobe)->catalog().items : nullptr,
       settings_->options().skill_fail_shown());
   // Et ce que les coups y écrivent, à l'instant de chaque frappe.
-  if (pieces_.battle_log.has_value()) {
-    pieces_.battle_log->Notice(world_, pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr,
-                               party_, now_ms);
+  if (pieces_.battle_log->has_value()) {
+    (*pieces_.battle_log)
+        ->Notice(world_, pieces_.wardrobe->has_value() ? &**pieces_.wardrobe : nullptr, party_,
+                 now_ms);
   }
   return {};
 }

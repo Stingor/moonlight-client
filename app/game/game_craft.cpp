@@ -5,6 +5,7 @@
 #include "ro/sim/inventory.h"
 #include "ro/ui/craft_atlas_window.h"
 
+#include "game/craft_stage.h"
 #include "game/game.h"
 #include "game/ui_window_rounds.h"
 #include "options/weapon_refine_options.h"

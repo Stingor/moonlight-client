@@ -8,9 +8,18 @@
 #include "ro/formats/image.h"
 #include "ro/render/battlefield_art.h"
 #include "ro/render/boss_badge.h"
+#include "ro/render/card_thumbnails.h"
 #include "ro/render/clan_emblem.h"
+#include "ro/render/game_images.h"
+#include "ro/render/ground_quad_renderer.h"
+#include "ro/render/item_icons.h"
+#include "ro/render/overlay_renderer.h"
 #include "ro/render/signboard.h"
+#include "ro/render/skill_icons.h"
 #include "ro/render/skin_pieces.h"
+#include "ro/render/skin_textures.h"
+
+#include "items/doll_effects.h"
 
 namespace moonclient {
 namespace {
@@ -19,22 +28,22 @@ namespace {
 // surimpressions les range par ADRESSE, et une image relue garde la sienne :
 // sans cet oubli, il peindrait l'ancienne.
 void ForgetWorldArt(GamePieces& pieces) {
-  const std::array<const ro::formats::Image*, 11> images = {&pieces.boss_badges.mini_boss,
-                                                            &pieces.boss_badges.mvp,
-                                                            &pieces.battlefield_art.enemy_marker,
-                                                            &pieces.battlefield_art.lion,
-                                                            &pieces.battlefield_art.eagle,
-                                                            &pieces.signboards.open_room,
-                                                            &pieces.signboards.locked_room,
-                                                            &pieces.signboards.vending,
-                                                            &pieces.signboards.buying,
-                                                            &pieces.signboards.spotlit_vending,
-                                                            &pieces.signboards.spotlit_buying};
+  const std::array<const ro::formats::Image*, 11> images = {&pieces.boss_badges->mini_boss,
+                                                            &pieces.boss_badges->mvp,
+                                                            &pieces.battlefield_art->enemy_marker,
+                                                            &pieces.battlefield_art->lion,
+                                                            &pieces.battlefield_art->eagle,
+                                                            &pieces.signboards->open_room,
+                                                            &pieces.signboards->locked_room,
+                                                            &pieces.signboards->vending,
+                                                            &pieces.signboards->buying,
+                                                            &pieces.signboards->spotlit_vending,
+                                                            &pieces.signboards->spotlit_buying};
   for (const ro::formats::Image* image : images) {
-    pieces.overlay.ForgetAtlas(*image);
+    pieces.overlay->ForgetAtlas(*image);
   }
-  for (const auto& [clan_id, emblem] : pieces.clan_emblems.by_clan) {
-    pieces.overlay.ForgetAtlas(emblem);
+  for (const auto& [clan_id, emblem] : pieces.clan_emblems->by_clan) {
+    pieces.overlay->ForgetAtlas(emblem);
   }
 }
 
@@ -52,42 +61,42 @@ void LoadSkinTextures(ro::vfs::Vfs& vfs, GamePieces& pieces) {
     ro::core::LogWarning("habillage : {} pièce(s) sur {} manquent à l'installation",
                          read.missing.size(), ro::render::kSkinPieceCount);
   }
-  pieces.skin = ro::render::SkinTextures::Upload(read);
+  *pieces.skin = ro::render::SkinTextures::Upload(read);
 }
 
 void ReloadSkinPieces(ro::vfs::Vfs& vfs, GamePieces& pieces, bool world_loaded) {
   LoadSkinTextures(vfs, pieces);
-  if (pieces.game_images.has_value()) {
-    pieces.game_images->Clear();
+  if (pieces.game_images->has_value()) {
+    (*pieces.game_images)->Clear();
   }
-  if (pieces.item_icons.has_value()) {
-    pieces.item_icons->Clear();
+  if (pieces.item_icons->has_value()) {
+    (*pieces.item_icons)->Clear();
   }
-  if (pieces.skill_icons.has_value()) {
-    pieces.skill_icons->Clear();
+  if (pieces.skill_icons->has_value()) {
+    (*pieces.skill_icons)->Clear();
   }
-  if (pieces.card_thumbnails.has_value()) {
-    pieces.card_thumbnails->Clear();
+  if (pieces.card_thumbnails->has_value()) {
+    (*pieces.card_thumbnails)->Clear();
   }
   // Les flèches du guidage : elles se relisent d'elles-mêmes, mais le sol
   // garde leur texture sous le même chemin.
-  pieces.effect_ground.ForgetTextures();
+  pieces.effect_ground->ForgetTextures();
   // Le pantin des descriptions a son propre moteur d'effets.
-  if (pieces.doll_effects.has_value()) {
-    pieces.doll_effects->ForgetTextures();
+  if (pieces.doll_effects->has_value()) {
+    (*pieces.doll_effects)->ForgetTextures();
   }
-  if (pieces.portrait_effects.has_value()) {
-    pieces.portrait_effects->ForgetTextures();
+  if (pieces.portrait_effects->has_value()) {
+    (*pieces.portrait_effects)->ForgetTextures();
   }
-  if (pieces.style_effects.has_value()) {
-    pieces.style_effects->ForgetTextures();
+  if (pieces.style_effects->has_value()) {
+    (*pieces.style_effects)->ForgetTextures();
   }
   if (world_loaded) {
     ForgetWorldArt(pieces);
-    pieces.boss_badges = ro::render::LoadBossBadges(vfs);
-    pieces.clan_emblems = ro::render::LoadClanEmblems(vfs);
-    pieces.battlefield_art = ro::render::LoadBattlefieldArt(vfs);
-    pieces.signboards = ro::render::LoadSignboardSurfaces(vfs);
+    *pieces.boss_badges = ro::render::LoadBossBadges(vfs);
+    *pieces.clan_emblems = ro::render::LoadClanEmblems(vfs);
+    *pieces.battlefield_art = ro::render::LoadBattlefieldArt(vfs);
+    *pieces.signboards = ro::render::LoadSignboardSurfaces(vfs);
   }
 }
 

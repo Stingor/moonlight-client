@@ -16,11 +16,8 @@
 #include "ro/net/connection.h"
 #include "ro/net/frame_tally.h"
 #include "ro/net/moonclient_handshake.h"
-#include "ro/net/session.h"
-#include "ro/net/zone_move.h"
 #include "ro/render/camera.h"
 #include "ro/render/effect_catalog.h"
-#include "ro/render/gl_context.h"
 #include "ro/render/sky_clock.h"
 #include "ro/render/sun_shadow_pass.h"
 #include "ro/sim/character_ledger.h"
@@ -31,7 +28,6 @@
 #include "ro/sim/world.h"
 #include "ro/ui/afk_clock.h"
 #include "ro/ui/staff_tools.h"
-#include "ro/vfs/vfs.h"
 
 #include "capture/zone_recorder.h"
 #include "character/character_view.h"
@@ -54,16 +50,12 @@
 #include "effects/effect_bench_view.h"
 #include "effects/effect_node_view.h"
 #include "effects/effect_view.h"
-#include "game/client_shell.h"
 #include "game/database_stage.h"
 #include "game/game_foundation.h"
 #include "game/game_modes.h"
-#include "game/game_pieces.h"
 #include "game/game_rendering.h"
-#include "game/game_settings.h"
 #include "game/game_ui_buffers.h"
 #include "game/item_gesture.h"
-#include "game/ui_stage_fwd.h"
 #include "guild/guild_emblems.h"
 #include "guild/guild_panel.h"
 #include "input/camera_aim.h"
@@ -94,6 +86,7 @@
 #include "world/ground_unit_view.h"
 #include "world/item_drops.h"
 #include "world/map_edit_store.h"
+#include "world/map_edit_sync.h"
 #include "world/map_editor_mesh.h"
 #include "world/map_editor_session.h"
 #include "world/map_music.h"
@@ -111,6 +104,9 @@
 union SDL_Event;
 
 namespace moonclient {
+
+struct CraftGestures;
+struct TradeItemFocus;
 
 // LA PARTIE : tout ce que le client tient ouvert, et l'image qu'il en fait.
 //
@@ -464,6 +460,10 @@ class Game : public Screen,
   // boutons-là parlent à une machine qui tient l'écran et une horloge, et
   // les réglages ne possèdent ni l'une ni l'autre.
   void ApplyCaptureGesture(const UiAnswers& answers, std::uint32_t now_ms);
+
+  // LES ÉMOTICONES ET LES EMOJI QU'ON PEUT ENVOYER, posés à l'ouverture d'une
+  // partie : `game_open_emotions.cpp`.
+  void OpenChatEmotions();
 
   // ── LA GUILDE, LE GROUPE ET LES AMIS ──────────────────────────────────────
   //

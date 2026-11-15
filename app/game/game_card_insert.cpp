@@ -7,6 +7,7 @@
 #include <cstdint>
 
 #include "game/game.h"
+#include "game/trade_stages.h"
 #include "game/ui_answers.h"
 #include "game/ui_stage.h"
 
@@ -35,7 +36,7 @@ void Game::StageCardInsert() {
 }
 
 void Game::ApplyCardDrop(const UiStage::Answers& answers, std::uint32_t now_ms) {
-  const bool dealing = pieces_.trade.deal().deal().open();
+  const bool dealing = pieces_.trade->deal().deal().open();
   const CardDropStep step = card_insert_->StepCardDrop(
       answers.inventory->card_drop, answers.character->card_drop, world_, dealing, now_ms);
   CardInsertView::AskCompatible(step.ask_compatible, link_, world_);

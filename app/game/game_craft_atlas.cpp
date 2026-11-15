@@ -70,7 +70,7 @@ void Game::AdvanceCraftAtlas(std::uint32_t now_ms) {
                                           .only_craftable = options.only_craftable(),
                                           .can_share = windows_.chat->main.open});
   craft_atlas_->NoteLinkFacts(ItemLinkFactsNow());
-  craft_atlas_->NoteStaff(Rights().staff_tools, pieces_.item_properties.stacking(),
+  craft_atlas_->NoteStaff(Rights().staff_tools, pieces_.item_properties->stacking(),
                           StaffFreeBagSlots(world_.inventory()));
   window.view = &craft_atlas_->view();
 }

@@ -24,8 +24,10 @@
 #include "game/game.h"
 #include "game/navigation_windows.h"
 #include "game/skin_image_of.h"
+#include "game/trade_stages.h"
 #include "game/ui_stage.h"
 #include "game/ui_window_rounds.h"
+#include "mvp/mvp_tracker_stage.h"
 #include "world/battlefield_view.h"
 #include "world/map_stage.h"
 #include "world/minimap_compose.h"
@@ -75,13 +77,13 @@ void Game::AdvanceNavigation(std::uint32_t now_ms) {
   }
 
   // ── « Y aller » au Marché : le guidage jusqu'à l'échoppe, comme un lieu ────
-  if (const std::optional<MarketDestination> shop = pieces_.trade.market().TakeGoTo()) {
+  if (const std::optional<MarketDestination> shop = pieces_.trade->market().TakeGoTo()) {
     const PlaceLink place{.map = shop->map_name, .x = shop->cell_x, .y = shop->cell_y};
     navi_.GuideToPlace(place.map, place.x, place.y);
     world_.RecordChat(
         ro::sim::ChatKind::kServer, 0,
         PlaceDestinationLine(
-            place, pieces_.map_display_names.has_value() ? &*pieces_.map_display_names : nullptr),
+            place, pieces_.map_display_names->has_value() ? &**pieces_.map_display_names : nullptr),
         now_ms);
   }
 
@@ -95,13 +97,13 @@ void Game::AdvanceNavigation(std::uint32_t now_ms) {
   if (mini.warp_to.has_value())
     SendStaffWarp(PlaceLink{.map = here, .x = mini.warp_to->x, .y = mini.warp_to->y}, Rights(),
                   link_, world_);
-  if (mini.open_mvp_slot.has_value()) pieces_.mvp_tracker.RequestOpenOn(*mini.open_mvp_slot);
+  if (mini.open_mvp_slot.has_value()) pieces_.mvp_tracker->RequestOpenOn(*mini.open_mvp_slot);
   if (mini.open_navigation) {
     navigation.state.open = true;
     navigation.state.raise = true;
   }
   if (mini.open_world_map) {
-    if (pieces_.world_view.has_value()) {
+    if (pieces_.world_view->has_value()) {
       navigation.world_map.open = true;
       navigation.world_map.raise = true;
     } else {
@@ -257,11 +259,12 @@ void Game::AdvanceNavigation(std::uint32_t now_ms) {
 
   // ── Les vues ───────────────────────────────────────────────────────────────
   const MinimapImageAt image_at = [this](std::string_view path) -> ro::ui::SkinImage {
-    return SkinImageAt(pieces_.game_images.has_value() ? &*pieces_.game_images : nullptr, path);
+    return SkinImageAt(pieces_.game_images->has_value() ? &**pieces_.game_images : nullptr, path);
   };
   std::string_view here_label;
-  if (pieces_.map_display_names.has_value() && !here.empty())
-    here_label = pieces_.map_display_names->DisplayNameOf(here + std::string(kGatExtension))
+  if (pieces_.map_display_names->has_value() && !here.empty())
+    here_label = (*pieces_.map_display_names)
+                     ->DisplayNameOf(here + std::string(kGatExtension))
                      .value_or(std::string_view());
 
   ro::ui::MinimapLayout& minimap_layout = shell_.layouts().minimap();
@@ -281,12 +284,12 @@ void Game::AdvanceNavigation(std::uint32_t now_ms) {
     sources.boss = navi_.guidance.boss;
     sources.guide = minimap_layout.settings.show_route ? &navi_.guide : nullptr;
     sources.memos = navi_.MemosOn(here);
-    sources.store_search = &pieces_.trade.store_search().search();
+    sources.store_search = &pieces_.trade->store_search().search();
     // LES TOMBES DU CARNET DE CHASSE, que son interrupteur et son réglage
     // éteignent ensemble.
     const MvpTrackerSettings hunt = settings_->options().pages().mvp_tracker.settings();
     sources.tombs =
-        pieces_.mvp_tracker.TombsOn(here, hunt.enabled && hunt.show_tombs, LocalUnixSeconds());
+        pieces_.mvp_tracker->TombsOn(here, hunt.enabled && hunt.show_tombs, LocalUnixSeconds());
     // LES COÉQUIPIERS DU CHAMP DE BATAILLE, dans la couleur de notre camp.
     sources.battle_mates_shown = settings_->options().pages().battleground.settings().minimap_mates;
     sources.battle_mate_color = BattleSideColor(world_.battlefield().own_side());
@@ -306,7 +309,7 @@ void Game::AdvanceNavigation(std::uint32_t now_ms) {
     minimap.view = nullptr;
   }
   // ── La carte du monde ──────────────────────────────────────────────────────
-  if (navigation.world_map.open && pieces_.world_view.has_value()) {
+  if (navigation.world_map.open && pieces_.world_view->has_value()) {
     const std::vector<std::string> route = WorldRouteMaps(&navi_.guide);
     const std::string step_map = WorldRouteStepMap(&navi_.guide);
     const ro::sim::Actor* self = world_.Find(world_.player_id());
@@ -317,23 +320,24 @@ void Game::AdvanceNavigation(std::uint32_t now_ms) {
     // LE WARP AGENT de la ville désignée, si elle en a un. La garde-robe se
     // vide à chaque entrée de carte : sa figure se recompose alors de zéro.
     const ro::vfs::WarpAgents* agents =
-        pieces_.warp_agents.has_value() ? &*pieces_.warp_agents : nullptr;
+        pieces_.warp_agents->has_value() ? &**pieces_.warp_agents : nullptr;
     const std::optional<std::uint32_t> agent_job =
         agents != nullptr ? agents->ClassAt(navigation.world_map.hovered_map) : std::nullopt;
     WorldMapWarpAgent::Shown agent_shown;
-    if (agent_job.has_value() && pieces_.wardrobe.has_value()) {
+    if (agent_job.has_value() && pieces_.wardrobe->has_value()) {
       if (!navi_.warp_agent.has_value() || navi_.warp_agent_map_entries != world_.map_entries()) {
-        navi_.warp_agent.emplace(*pieces_.wardrobe);
+        navi_.warp_agent.emplace(**pieces_.wardrobe);
         navi_.warp_agent_map_entries = world_.map_entries();
       }
       agent_shown = navi_.warp_agent->Compose(
           *agent_job, WorldMapWarpAgentScale(navigation.world_map.size_tier), now_ms);
     }
     navigation.world_map_view = &navi_.world_map_view.Compose(WorldMapSources{
-        .tables = &*pieces_.world_view,
+        .tables = &**pieces_.world_view,
         .here_map = here,
         .route = route,
-        .map_names = pieces_.map_display_names.has_value() ? &*pieces_.map_display_names : nullptr,
+        .map_names =
+            pieces_.map_display_names->has_value() ? &**pieces_.map_display_names : nullptr,
         .step_map = step_map,
         .party = party,
         .preview_map = navigation.world_map.hovered_map,

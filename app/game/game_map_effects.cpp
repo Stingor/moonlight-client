@@ -118,10 +118,10 @@ void Game::AdvanceMapEffects(std::uint32_t now_ms) {
   if (!map_effects_raised_) {
     // LE BANDEAU DU NOM, au même instant : le client le lève en entrant dans le
     // monde de la carte, juste après ses objets.
-    pieces_.map_sign.Enter(pieces_.map_display_names.has_value()
-                               ? pieces_.map_display_names->SignOf(MapSignFileOf(stage_->name))
-                               : nullptr,
-                           settings_->options().pages().map_sign.mode(), now_ms);
+    pieces_.map_sign->Enter(pieces_.map_display_names->has_value()
+                                ? (*pieces_.map_display_names)->SignOf(MapSignFileOf(stage_->name))
+                                : nullptr,
+                            settings_->options().pages().map_sign.mode(), now_ms);
     map_effects_raised_ = true;
   }
   // LES CHEMINÉES QU'UN EFFET ANNONCÉ A DEMANDÉES rejoignent celles du RSW, et

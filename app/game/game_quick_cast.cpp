@@ -10,6 +10,7 @@
 
 #include "ro/render/actor_pick.h"
 
+#include "game/companion_ai_stage.h"
 #include "game/game.h"
 #include "game/ui_stage.h"
 #include "world/click_action.h"
@@ -85,7 +86,7 @@ void Game::AdvanceQuickCast(std::uint32_t now_ms) {
         return *armed;
       }
       // UN SEUL ARMEMENT À LA FOIS : voir `CompanionAiStage::Advance`.
-      const std::optional<CompanionAim>& aim = game_.pieces_.companion_ai.aim();
+      const std::optional<CompanionAim>& aim = game_.pieces_.companion_ai->aim();
       if (!aim.has_value()) {
         return std::nullopt;
       }
@@ -96,11 +97,11 @@ void Game::AdvanceQuickCast(std::uint32_t now_ms) {
     }
     void Disarm() override {
       game_.grimoire_.Disarm();
-      game_.pieces_.companion_ai.Disarm();
+      game_.pieces_.companion_ai->Disarm();
     }
     [[nodiscard]] bool CoolingDown(const ro::sim::KnownSkill& skill) const override {
       return OfCompanion(skill)
-                 ? game_.pieces_.companion_ai.RecastPaused(skill.id, now_ms_)
+                 ? game_.pieces_.companion_ai->RecastPaused(skill.id, now_ms_)
                  : game_.world_.skill_book().CooldownRemainingMs(skill.id, now_ms_) > 0;
     }
     // ⚠ LE COMPAGNON LANCE PENDANT QUE SON MAÎTRE INCANTE.
@@ -163,7 +164,7 @@ void Game::AdvanceQuickCast(std::uint32_t now_ms) {
 
     bool CastOnGround(const ro::sim::KnownSkill& skill, ro::sim::CellPosition where) override {
       if (OfCompanion(skill)) {
-        return game_.pieces_.companion_ai.RecastOnGround(skill.id, where);
+        return game_.pieces_.companion_ai->RecastOnGround(skill.id, where);
       }
       // ⚠ COMME SUR UN ACTEUR : l'attaque ou le ramassage d'avant tombe, sans
       // quoi deux poursuites enverraient chacune leur marche, vers deux cases.
@@ -178,7 +179,7 @@ void Game::AdvanceQuickCast(std::uint32_t now_ms) {
       // ⚠ NI L'ATTAQUE NI LE RAMASSAGE DU PERSONNAGE NE TOMBENT : c'est le
       // compagnon qui lance, et ce qui retient le maître ne le retient pas.
       if (OfCompanion(skill)) {
-        return game_.pieces_.companion_ai.RecastOnActor(skill.id, id);
+        return game_.pieces_.companion_ai->RecastOnActor(skill.id, id);
       }
       const ro::sim::Actor* target = game_.world_.Find(id);
       if (target == nullptr) {
@@ -203,7 +204,7 @@ void Game::AdvanceQuickCast(std::uint32_t now_ms) {
 
    private:
     [[nodiscard]] bool OfCompanion(const ro::sim::KnownSkill& skill) const {
-      return game_.pieces_.companion_ai.ArmedLast(skill.id);
+      return game_.pieces_.companion_ai->ArmedLast(skill.id);
     }
     [[nodiscard]] float Width() const { return static_cast<float>(game_.shell_.width()); }
     [[nodiscard]] float Height() const { return static_cast<float>(game_.shell_.height()); }
@@ -216,14 +217,14 @@ void Game::AdvanceQuickCast(std::uint32_t now_ms) {
   // Les armements viennent de TOUS les chemins — une touche, une case, une ligne
   // du panneau, le grimoire comme un compagnon — et la machine sait, par la frappe
   // retenue, lequel est le sien.
-  QuickCastSignals seen{.arms = grimoire_.arms() + pieces_.companion_ai.arms()};
+  QuickCastSignals seen{.arms = grimoire_.arms() + pieces_.companion_ai->arms()};
   if (shortcuts_.has_value()) {
     seen.item_uses = shortcuts_->item_uses();
     seen.item_slot = shortcuts_->last_item_slot();
     seen.item_id = shortcuts_->last_item_id();
   }
   quick_cast_.Advance(hands, seen, now_ms);
-  pieces_.companion_ai.SayAim(world_, now_ms, quick_cast_.arm_key() != 0);
+  pieces_.companion_ai->SayAim(world_, now_ms, quick_cast_.arm_key() != 0);
 }
 
 }  // namespace moonclient

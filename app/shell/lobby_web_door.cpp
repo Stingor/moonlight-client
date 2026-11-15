@@ -66,8 +66,8 @@ ro::ui::WebDoorView LobbyScreen::ComposeWebDoor() {
   view.ticket_alive = !web_.accounts().empty();
   // LE LOGO DE LA PORTE DISCORD. ⚠ SON ABSENCE N'EST PAS UNE PANNE : l'image
   // vit dans l'archive du serveur, et le bouton se rabat sur son libellé.
-  if (shell_.pieces().game_images.has_value()) {
-    ro::render::GameImages& images = *shell_.pieces().game_images;
+  if (shell_.pieces().game_images->has_value()) {
+    ro::render::GameImages& images = **shell_.pieces().game_images;
     view.discord = SkinImageOf(images.GetOurs(ro::ui::kDiscordMarkPath));
     view.discord_shape = SkinImageOf(images.GetOursInkShape(ro::ui::kDiscordMarkPath));
   }

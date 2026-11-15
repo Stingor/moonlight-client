@@ -15,25 +15,59 @@
 #include "ro/core/log.h"
 #include "ro/formats/assist_address.h"
 #include "ro/render/emotion.h"
+#include "ro/render/emotion_icons.h"
 #include "ro/render/map_scene.h"
 #include "ro/ui/chat_emote_names.h"
 #include "ro/ui/minimap_window.h"
 #include "ro/ui/packet_window.h"
+#include "ro/ui/player_report_window.h"
 #include "ro/ui/system_fonts.h"
 #include "ro/ui/tracker_panel.h"
+#include "ro/vfs/achievement_catalog.h"
 
 #include "chat/banned_input.h"
+#include "chat/chat_mentions.h"
 #include "chat/chat_tab_file.h"
+#include "chat/chat_web_stage.h"
 #include "chat/emoji_catalog.h"
 #include "chat/emotion_catalog.h"
+#include "game/achievement_stage.h"
+#include "game/battleground_stage.h"
+#include "game/cash_shop_stage.h"
 #include "game/cash_shop_windows.h"
+#include "game/chat_room_stage.h"
+#include "game/companion_ai_stage.h"
+#include "game/craft_stage.h"
 #include "game/game.h"
+#include "game/gm_outfit_announcer.h"
+#include "game/homunculus_stage.h"
+#include "game/mail_stage.h"
+#include "game/memorial_stage.h"
+#include "game/mercenary_stage.h"
 #include "game/navigation_windows.h"
 #include "game/party_windows.h"
+#include "game/pet_stage.h"
+#include "game/quest_stage.h"
+#include "game/repair_stage.h"
 #include "game/store_search_catalogue.h"
+#include "game/surface_announcer.h"
+#include "game/talkbox_stage.h"
+#include "game/tracker_stage.h"
+#include "game/trade_stages.h"
 #include "game/ui_window_rounds.h"
+#include "game/whisper_stage.h"
+#include "items/doll_effects.h"
 #include "loading/loading_plans.h"
 #include "loading/loading_presenter.h"
+#include "mvp/mvp_tracker_stage.h"
+#include "options/commands_page.h"
+#include "party/party_booking_board.h"
+#include "quest/quest_catalog.h"
+#include "quest/recommended_catalog.h"
+#include "world/chat_block_log.h"
+#include "world/entity_inspector.h"
+#include "world/player_report.h"
+#include "world/ranking_board.h"
 
 namespace moonclient {
 
@@ -48,8 +82,8 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   settings_->options().context_menu().blocked().ForgetExplanations();
   // LES RÉGLAGES DU SERVEUR REPARTENT DE RIEN : ils sont ceux d'un personnage, et
   // le serveur redira ceux du nouveau à l'entrée en jeu.
-  pieces_.commands = CommandsPage{};
-  settings_->options().pages().commands_body = pieces_.commands.Body();
+  *pieces_.commands = CommandsPage{};
+  settings_->options().pages().commands_body = pieces_.commands->Body();
   // LE RANGEMENT DU COMPTEUR PART DU FICHIER DES ONGLETS : un profil de
   // disposition qui ne le nomme pas encore le garde ainsi tel qu'il était.
   ChatTabs tabs_on_disk;
@@ -203,10 +237,10 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   if (auto renderer = ro::render::EffectRenderer::Create(); renderer) {
     effect_renderer_ = std::move(*renderer);
   }
-  pieces_.doll_effects.emplace(*vfs_);
+  pieces_.doll_effects->emplace(*vfs_);
   // CELUI DU PORTRAIT RENAÎT À SON PREMIER EFFET : un autre personnage, même
   // costume et même carte, n'hérite pas du porteur de son prédécesseur.
-  pieces_.portrait_effects.reset();
+  pieces_.portrait_effects->reset();
   ro::core::EndLoadStep(loading->progress());
   loading.reset();
   report_stage("effets");
@@ -246,7 +280,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   }
   ground_unit_models_ = std::move(*ground_models);
 
-  if (pieces_.wardrobe.has_value()) {
+  if (pieces_.wardrobe->has_value()) {
     auto renderer = ro::render::SpriteRenderer::Create();
     if (!renderer) {
       return std::unexpected(renderer.error());
@@ -273,94 +307,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   }
 
   acknowledged_entries_ = world_.map_entries();
-  // LES ÉMOTICONES QU'ON PEUT ENVOYER, une fois pour toutes : la grille les
-  // montre TOUTES dès qu'elle s'ouvre, donc les étaler n'étalerait rien.
-  //
-  // 🔴 L'INTERSECTION DE DEUX LISTES, ET IL EN FAUT DEUX. Le CATALOGUE dit
-  // ce que le joueur a le droit d'envoyer — une partie des numéros appartient au
-  // jeu et aux PNJ. Le SPRITE dit ce que cette installation-ci sait dessiner.
-  // Proposer ce qui manque à l'une des deux, c'est promettre une émoticone que
-  // personne ne verra — pas même celui qui l'envoie.
-  emotion_layers_.clear();
-  emotion_frames_.clear();
-  emotions_.clear();
-  if (pieces_.emotion_icons.has_value()) {
-    // ⚠ LA PLACE SE RÉSERVE D'ABORD, et il faut donc compter avant de remplir :
-    // les vues pointent DANS ces tableaux, et une réallocation en cours de route
-    // les laisserait pendantes. Le premier passage téléverse déjà tout ; le
-    // second ne fait que relire ce qui est en cache.
-    std::size_t layers = 0;
-    std::size_t frames = 0;
-    for (std::uint16_t emotion = 0; emotion < kKnownEmotions; ++emotion) {
-      if (!EmotionIsOffered(emotion)) {
-        continue;
-      }
-      const std::uint16_t count = pieces_.emotion_icons->FrameCount(emotion);
-      for (std::uint16_t frame = 0; frame < count; ++frame) {
-        layers += pieces_.emotion_icons->Layers(emotion, frame).size();
-      }
-      frames += count;
-    }
-    emotion_layers_.reserve(layers);
-    emotion_frames_.reserve(frames);
-
-    for (std::uint16_t emotion = 0; emotion < kKnownEmotions; ++emotion) {
-      const std::uint16_t count = pieces_.emotion_icons->FrameCount(emotion);
-      const ro::render::EmotionBounds box = pieces_.emotion_icons->ActionBounds(emotion);
-      if (!EmotionIsOffered(emotion) || count == 0 || !box.usable()) {
-        continue;
-      }
-      const std::size_t first_frame = emotion_frames_.size();
-      for (std::uint16_t frame = 0; frame < count; ++frame) {
-        const std::size_t first_layer = emotion_layers_.size();
-        for (const ro::render::EmotionLayer& layer :
-             pieces_.emotion_icons->Layers(emotion, frame)) {
-          ro::ui::ChatEmotionLayer posed{
-              .id = static_cast<ImTextureID>(layer.texture),
-              .tint = IM_COL32(layer.tint[0], layer.tint[1], layer.tint[2], layer.tint[3])};
-          for (std::size_t point = 0; point < posed.corners.size(); ++point) {
-            posed.corners[point] = ImVec2(layer.corners[point].x, layer.corners[point].y);
-          }
-          emotion_layers_.push_back(posed);
-        }
-        emotion_frames_.push_back(ro::ui::ChatEmotionFrame{
-            .layers = std::span<const ro::ui::ChatEmotionLayer>(emotion_layers_)
-                          .subspan(first_layer, emotion_layers_.size() - first_layer)});
-      }
-      // SON NOM `:nom:` SE LIT PAR L'ACTION DU SPRITE, et non par le numéro :
-      // c'est ainsi que Discord et les autres clients le rangent.
-      const std::optional<std::size_t> action = ro::render::EmotionAction(emotion);
-      emotions_.push_back(ro::ui::ChatEmotion{
-          .id = emotion,
-          .name = EmotionName(emotion),
-          // ⚠ LA COMMANDE DU JEU, ET NON LE NOM COURT : le
-          // menu des macros écrit ce qui joue la bulle chez
-          // TOUS les clients, pas un jeton de cette chatbox.
-          .command = EmotionCommandOf(emotion),
-          .frames = std::span<const ro::ui::ChatEmotionFrame>(emotion_frames_)
-                        .subspan(first_frame, count),
-          .frame_ms = pieces_.emotion_icons->FrameMs(emotion),
-          .box_min = ImVec2(box.min.x, box.min.y),
-          .box_max = ImVec2(box.max.x, box.max.y),
-          .chat_token = action.has_value() ? ro::ui::ChatEmoteName(*action) : std::string_view()});
-    }
-    ro::core::LogInfo("émoticônes : {} proposée(s), {} image(s), {} couche(s)", emotions_.size(),
-                      emotion_frames_.size(), emotion_layers_.size());
-  }
-  // LE FIL LES PEINT AUSSI, rangées par action : le `:nom:` d'une ligne.
-  pieces_.chat_web.NoteEmotions(emotions_);
-  // LES EMOJI. ⚠ SEULEMENT SI LA POLICE EST LÀ : sans elle, la grille ne
-  // rendrait que des losanges « glyphe absent », et l'on chercherait le défaut
-  // du côté de la table alors qu'il est dans l'atlas. Un onglet absent se
-  // comprend ; un onglet plein de carrés, non.
-  emojis_.clear();
-  if (!ro::ui::EmojiFontSource().empty()) {
-    for (const EmojiCategory& group : EmojiCategories()) {
-      // L'intertitre arrive déjà traduit : c'est le catalogue qui le fait, là
-      // où les libellés sont des littéraux.
-      emojis_.push_back(ro::ui::ChatEmojiGroup{.label = group.label, .items = group.items});
-    }
-  }
+  OpenChatEmotions();
 
   chat_tabs_.emplace(client_root_);
   // CE QUI S'EST DIT LA PARTIE D'AVANT. ⚠ APRÈS LA LECTURE DES RÉGLAGES : c'est
@@ -383,58 +330,58 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   // LES DIX MACROS, descendues UNE FOIS dans les tampons de leur fenêtre : voir
   // `GameSettings::RestoreChatMacros`.
   settings_->RestoreChatMacros(windows_);
-  sheet_.emplace(pieces_.skill_tree.has_value() ? &*pieces_.skill_tree : nullptr,
-                 pieces_.skill_icons.has_value() ? &*pieces_.skill_icons : nullptr);
-  grimoire_.UseSkillTree(pieces_.skill_tree.has_value() ? &*pieces_.skill_tree : nullptr);
-  bag_.emplace(pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr,
-               &pieces_.item_words,
-               pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr);
-  card_insert_.emplace(pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr,
-                       &pieces_.item_words,
-                       pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr);
+  sheet_.emplace(pieces_.skill_tree->has_value() ? &**pieces_.skill_tree : nullptr,
+                 pieces_.skill_icons->has_value() ? &**pieces_.skill_icons : nullptr);
+  grimoire_.UseSkillTree(pieces_.skill_tree->has_value() ? &**pieces_.skill_tree : nullptr);
+  bag_.emplace(pieces_.wardrobe->has_value() ? &(*pieces_.wardrobe)->catalog().items : nullptr,
+               &*pieces_.item_words,
+               pieces_.item_icons->has_value() ? &**pieces_.item_icons : nullptr);
+  card_insert_.emplace(
+      pieces_.wardrobe->has_value() ? &(*pieces_.wardrobe)->catalog().items : nullptr,
+      &*pieces_.item_words, pieces_.item_icons->has_value() ? &**pieces_.item_icons : nullptr);
   character_.emplace(
-      pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr,
-      &pieces_.item_words, pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr,
-      &pieces_.job_names, pieces_.skill_tree.has_value() ? &*pieces_.skill_tree : nullptr,
-      &pieces_.status_table, pieces_.skill_icons.has_value() ? &*pieces_.skill_icons : nullptr,
-      pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr);
+      pieces_.wardrobe->has_value() ? &(*pieces_.wardrobe)->catalog().items : nullptr,
+      &*pieces_.item_words, pieces_.item_icons->has_value() ? &**pieces_.item_icons : nullptr,
+      &*pieces_.job_names, pieces_.skill_tree->has_value() ? &**pieces_.skill_tree : nullptr,
+      &*pieces_.status_table, pieces_.skill_icons->has_value() ? &**pieces_.skill_icons : nullptr,
+      pieces_.wardrobe->has_value() ? &**pieces_.wardrobe : nullptr);
   // Les presets se rangent sous l'identifiant du personnage.
-  presets_.emplace(pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr,
-                   &pieces_.item_words,
-                   pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr, client_root_,
+  presets_.emplace(pieces_.wardrobe->has_value() ? &(*pieces_.wardrobe)->catalog().items : nullptr,
+                   &*pieces_.item_words,
+                   pieces_.item_icons->has_value() ? &**pieces_.item_icons : nullptr, client_root_,
                    ticket_.character_id);
   // Les préréglages de stats, sous l'identifiant du COMPTE.
   stat_presets_.emplace(client_root_, ticket_.account.account_id);
   title_view_.emplace(
-      pieces_.achievement_titles.has_value() ? &*pieces_.achievement_titles : nullptr,
-      pieces_.titles.has_value() ? &*pieces_.titles : nullptr);
+      pieces_.achievement_titles->has_value() ? &**pieces_.achievement_titles : nullptr,
+      pieces_.titles->has_value() ? &**pieces_.titles : nullptr);
   // 🔴 L'ÉDITEUR DE STYLE REPART À NEUF : l'état de sa fenêtre appartient à la
   // coquille et survit à la partie, et ce qu'il gardait — grille, pantin,
   // pièce survolée — désignait le personnage d'avant. Sa recette, elle, vit
   // dans la session, qui renaît ici avec la partie.
   *windows_.style = ro::ui::PaletteEditorState{};
-  style_view_.emplace(pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr, client_root_,
+  style_view_.emplace(pieces_.wardrobe->has_value() ? &**pieces_.wardrobe : nullptr, client_root_,
                       ticket_.character_id);
-  style_preview_.emplace(pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr);
-  cart_.emplace(pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr,
-                &pieces_.item_words,
-                pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr);
-  storage_.emplace(pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr,
-                   &pieces_.item_words,
-                   pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr);
+  style_preview_.emplace(pieces_.wardrobe->has_value() ? &**pieces_.wardrobe : nullptr);
+  cart_.emplace(pieces_.wardrobe->has_value() ? &(*pieces_.wardrobe)->catalog().items : nullptr,
+                &*pieces_.item_words,
+                pieces_.item_icons->has_value() ? &**pieces_.item_icons : nullptr);
+  storage_.emplace(pieces_.wardrobe->has_value() ? &(*pieces_.wardrobe)->catalog().items : nullptr,
+                   &*pieces_.item_words,
+                   pieces_.item_icons->has_value() ? &**pieces_.item_icons : nullptr);
   item_description_.emplace(
-      pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr,
-      &pieces_.item_words, pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr);
+      pieces_.wardrobe->has_value() ? &(*pieces_.wardrobe)->catalog().items : nullptr,
+      &*pieces_.item_words, pieces_.item_icons->has_value() ? &**pieces_.item_icons : nullptr);
   description_preview_.emplace(
-      pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr,
-      &pieces_.item_words, pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr);
+      pieces_.wardrobe->has_value() ? &(*pieces_.wardrobe)->catalog().items : nullptr,
+      &*pieces_.item_words, pieces_.item_icons->has_value() ? &**pieces_.item_icons : nullptr);
   // L'équipement d'un autre joueur se décrit et se survole comme le nôtre.
   item_description_->SeeViewedEquipment(&inspected_);
-  item_description_->SeePackages(&pieces_.package_items);
-  item_description_->SeeMonsters(&pieces_.monster_list);
-  item_description_->SeeRandomOptions(&pieces_.random_option_names);
+  item_description_->SeePackages(&*pieces_.package_items);
+  item_description_->SeeMonsters(&*pieces_.monster_list);
+  item_description_->SeeRandomOptions(&*pieces_.random_option_names);
   description_preview_->SeeViewedEquipment(&inspected_);
-  description_preview_->SeeRandomOptions(&pieces_.random_option_names);
+  description_preview_->SeeRandomOptions(&*pieces_.random_option_names);
   description_preview_->ShareCreatorsWith(*item_description_);
   item_description_->EnableComparison();
   // LE BLOC DE FAITS DE L'ITEM_DB suit les lignes de la table, dans la fenêtre,
@@ -443,151 +390,152 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   description_preview_->SeeServerDb(&database_.base());
   // Les tables du familier nomment ce qu'un appât capture, ce qui sort d'un œuf
   // et ce qu'il mange.
-  const ro::vfs::PetTables* const pet_tables = pieces_.pet.Tables(*vfs_);
+  const ro::vfs::PetTables* const pet_tables = pieces_.pet->Tables(*vfs_);
   item_description_->SeePets(pet_tables);
   description_preview_->SeePets(pet_tables);
   item_description_->books().See(
-      vfs_, &pieces_.books,
-      pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr);
+      vfs_, &*pieces_.books,
+      pieces_.wardrobe->has_value() ? &(*pieces_.wardrobe)->catalog().items : nullptr);
   // Les signets se rangent sous l'identifiant du personnage, comme les presets.
   item_description_->books().RememberFor(client_root_, ticket_.character_id);
-  item_description_->SeeWardrobe(pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr);
+  item_description_->SeeWardrobe(pieces_.wardrobe->has_value() ? &**pieces_.wardrobe : nullptr);
   // LA BOUTIQUE DE VOTE REPART À ZÉRO : la session d'avant est finie, et le
   // serveur renverra son catalogue à qui le redemande.
-  pieces_.cash_shop.See(pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr,
-                        pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr,
-                        pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr);
-  pieces_.cash_shop.StartSession();
+  pieces_.cash_shop->See(
+      pieces_.wardrobe->has_value() ? &(*pieces_.wardrobe)->catalog().items : nullptr,
+      pieces_.item_icons->has_value() ? &**pieces_.item_icons : nullptr,
+      pieces_.wardrobe->has_value() ? &**pieces_.wardrobe : nullptr);
+  pieces_.cash_shop->StartSession();
   *windows_.cash_shop = CashShopWindows{};
   // LES COMMERCES AUSSI : aucune boutique, aucune échoppe ne survit à la partie.
-  pieces_.trade.See(pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr,
-                    pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr,
-                    &pieces_.item_words);
-  pieces_.trade.SeeCommands(&pieces_.commands.settings());
-  pieces_.trade.SeeItemProperties(&pieces_.item_properties);
-  pieces_.trade.SeeItemBooks(pieces_.item_books());
-  pieces_.trade.SeeServerDb(&database_.base());
-  pieces_.trade.SeeBannedWords(&pieces_.banned_words);
-  pieces_.trade.SeeGameImages(pieces_.game_images.has_value() ? &*pieces_.game_images : nullptr);
-  pieces_.chat_rooms.SeeBannedWords(&pieces_.banned_words);
-  pieces_.whispers.SeeBannedWords(&pieces_.banned_words);
-  pieces_.homunculus.SeeBannedWords(&pieces_.banned_words);
-  pieces_.pet.SeeBannedWords(&pieces_.banned_words);
-  pieces_.talkbox.SeeBannedWords(&pieces_.banned_words);
-  pieces_.battleground.SeeBannedWords(&pieces_.banned_words);
+  pieces_.trade->See(
+      pieces_.wardrobe->has_value() ? &(*pieces_.wardrobe)->catalog().items : nullptr,
+      pieces_.item_icons->has_value() ? &**pieces_.item_icons : nullptr, &*pieces_.item_words);
+  pieces_.trade->SeeCommands(&pieces_.commands->settings());
+  pieces_.trade->SeeItemProperties(&*pieces_.item_properties);
+  pieces_.trade->SeeItemBooks(pieces_.item_books());
+  pieces_.trade->SeeServerDb(&database_.base());
+  pieces_.trade->SeeBannedWords(&*pieces_.banned_words);
+  pieces_.trade->SeeGameImages(pieces_.game_images->has_value() ? &**pieces_.game_images : nullptr);
+  pieces_.chat_rooms->SeeBannedWords(&*pieces_.banned_words);
+  pieces_.whispers->SeeBannedWords(&*pieces_.banned_words);
+  pieces_.homunculus->SeeBannedWords(&*pieces_.banned_words);
+  pieces_.pet->SeeBannedWords(&*pieces_.banned_words);
+  pieces_.talkbox->SeeBannedWords(&*pieces_.banned_words);
+  pieces_.battleground->SeeBannedWords(&*pieces_.banned_words);
   // `/notalkmsg` ET `/notalkmsg2`, lus à chaque parole : un réglage basculé vaut aussitôt.
   const ro::sim::TalkMute* talk_mute = &settings_->options().pages().talk_filter.mute();
-  pieces_.whispers.SeeTalkMute(talk_mute);
-  pieces_.battleground.SeeTalkMute(talk_mute);
-  pieces_.pet.SeeTalkMute(talk_mute);
-  pieces_.trade.deal().SeeApproachClock(&grimoire_.approach_clock());
-  pieces_.trade.store_search().SeeCards(
-      {.illustrations = &pieces_.card_illustrations, .listed = &pieces_.card_items});
+  pieces_.whispers->SeeTalkMute(talk_mute);
+  pieces_.battleground->SeeTalkMute(talk_mute);
+  pieces_.pet->SeeTalkMute(talk_mute);
+  pieces_.trade->deal().SeeApproachClock(&grimoire_.approach_clock());
+  pieces_.trade->store_search().SeeCards(
+      {.illustrations = &*pieces_.card_illustrations, .listed = &*pieces_.card_items});
   // LES MÊMES CARTES portent « Voir dans l'album » à leur menu.
-  if (pieces_.wardrobe.has_value()) {
+  if (pieces_.wardrobe->has_value()) {
     card_album_.NoteCardItems(CardItemIdsOf(
-        pieces_.wardrobe->catalog().items, pieces_.item_words,
-        {.illustrations = &pieces_.card_illustrations, .listed = &pieces_.card_items}));
+        (*pieces_.wardrobe)->catalog().items, pieces_.item_words,
+        {.illustrations = &*pieces_.card_illustrations, .listed = &*pieces_.card_items}));
   }
-  pieces_.trade.market().SeeRandomOptions(&pieces_.random_option_names);
+  pieces_.trade->market().SeeRandomOptions(&*pieces_.random_option_names);
   // LA BASE DE DONNÉES : ses tables ne se lisent qu'à la première ouverture de
   // la base ou d'une description. Sa fiche d'objet emprunte celle de la
   // description.
-  database_.See(vfs_, pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr,
-                pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr,
-                &pieces_.item_words);
+  database_.See(
+      vfs_, pieces_.wardrobe->has_value() ? &(*pieces_.wardrobe)->catalog().items : nullptr,
+      pieces_.item_icons->has_value() ? &**pieces_.item_icons : nullptr, &*pieces_.item_words);
   database_.BorrowSheetFrom(*item_description_,
-                            pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr);
-  pieces_.trade.vending().SeeSaveRoot(client_root_);
+                            pieces_.wardrobe->has_value() ? &**pieces_.wardrobe : nullptr);
+  pieces_.trade->vending().SeeSaveRoot(client_root_);
   // Les paniers d'achat enregistrés, sous l'identifiant du COMPTE.
-  pieces_.trade.npc_shop().SeeSaveRoot(client_root_, ticket_.account.account_id);
-  pieces_.trade.StartSession();
+  pieces_.trade->npc_shop().SeeSaveRoot(client_root_, ticket_.account.account_id);
+  pieces_.trade->StartSession();
   *windows_.trade = TradeWindows{};
   // NI CE QUE LE SERVEUR A DIT DES ÉDITIONS DE CARTE.
-  pieces_.map_edit_sync.StartSession();
+  pieces_.map_edit_sync->StartSession();
   // LE COURRIER AUSSI : ni boîte, ni écriture ne survivent à la partie.
-  pieces_.mail.See(pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr,
-                   pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr,
-                   &pieces_.item_words, &pieces_.job_names,
-                   pieces_.game_images.has_value() ? &*pieces_.game_images : nullptr);
-  pieces_.mail.StartSession();
+  pieces_.mail->See(pieces_.wardrobe->has_value() ? &(*pieces_.wardrobe)->catalog().items : nullptr,
+                    pieces_.item_icons->has_value() ? &**pieces_.item_icons : nullptr,
+                    &*pieces_.item_words, &*pieces_.job_names,
+                    pieces_.game_images->has_value() ? &**pieces_.game_images : nullptr);
+  pieces_.mail->StartSession();
   // NI LA DEMANDE D'ADOPTION REÇUE.
-  pieces_.adoption.StartSession();
+  pieces_.adoption->StartSession();
   // NI LE FAMILIER, NI LE MERCENAIRE du personnage d'avant, ni la fiche
   // ouverte sur l'un d'eux.
-  pieces_.pet.StartSession();
+  pieces_.pet->StartSession();
   *windows_.pet = ro::ui::PetWindowState{};
-  pieces_.mercenary.StartSession();
+  pieces_.mercenary->StartSession();
   // NI L'ENTITÉ, NI LE JOUEUR QUE LE STAFF CONSULTAIT, NI CELUI QU'ON
   // SIGNALAIT : leurs identifiants étaient ceux d'une autre partie.
-  pieces_.entity_inspector = EntityInspector{};
-  pieces_.chat_block_log = ChatBlockLog{};
-  pieces_.player_report = PlayerReportDesk{};
+  *pieces_.entity_inspector = EntityInspector{};
+  *pieces_.chat_block_log = ChatBlockLog{};
+  *pieces_.player_report = PlayerReportDesk{};
   windows_.player_report->open = false;
   *windows_.mail = MailWindows{};
   // LES SALONS : on n'est dans aucun. ⚠ LA SAISIE DU FORMULAIRE SURVIT, elle
   // n'appartient pas au personnage.
-  pieces_.chat_rooms.See(client_root_);
+  pieces_.chat_rooms->See(client_root_);
   // L'IA DES COMPAGNONS : les profils de ce personnage relus, ses compagnons à
   // neuf.
-  pieces_.companion_ai.See(client_root_, ticket_.character_id);
-  pieces_.chat_rooms.StartSession();
+  pieces_.companion_ai->See(client_root_, ticket_.character_id);
+  pieces_.chat_rooms->StartSession();
   windows_.chat_room->room = ro::ui::ChatRoomWindowState{};
   windows_.chat_room->password = ro::ui::ChatRoomPasswordState{};
   windows_.chat_room->make.open = false;
   // LES CONVERSATIONS 1:1 : aucune n'est ouverte, aucun envoi n'attend.
-  pieces_.whispers.StartSession(world_.last_chat_seq());
+  pieces_.whispers->StartSession(world_.last_chat_seq());
   // Ni les récents de la box « Pseudo » : ce qui a été chuchoté avant n'est
   // pas neuf.
   chat_preview_.recent_whispers().StartSession(world_.last_chat_seq());
-  pieces_.banned_words = LoadBannedWords(vfs_);
+  *pieces_.banned_words = LoadBannedWords(vfs_);
   *windows_.whispers = WhisperWindows{};
   // LA LISTE DE BLOCAGE DU COMPTE, que le service web garde d'une connexion à
   // l'autre : relue maintenant, rejouée après la première carte.
-  pieces_.whispers.RememberBlocks(
+  pieces_.whispers->RememberBlocks(
       shell_.web().empty() ? std::string() : ro::formats::AssistOrigin(shell_.web()),
       web::UserConfigIdentity{.account_id = ticket_.account.account_id,
                               .token = ticket_.account.web_token,
                               .world_name = ticket_.account.world_name});
   // LES MENTIONS : ce qui a été dit avant d'entrer ne sonne pas.
-  pieces_.mentions.StartSession(world_.last_chat_seq());
+  pieces_.mentions->StartSession(world_.last_chat_seq());
   // LES SUCCÈS AUSSI : leur progression est celle du personnage qui entre.
-  pieces_.achievements.See(
-      pieces_.achievement_catalog.has_value() ? &*pieces_.achievement_catalog : nullptr,
-      &pieces_.item_words, pieces_.titles.has_value() ? &*pieces_.titles : nullptr,
-      &pieces_.status_table,
-      pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr,
-      pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr,
-      pieces_.game_images.has_value() ? &*pieces_.game_images : nullptr);
-  pieces_.achievements.SeeSaveRoot(client_root_);
-  pieces_.achievements.StartSession();
+  pieces_.achievements->See(
+      pieces_.achievement_catalog->has_value() ? &**pieces_.achievement_catalog : nullptr,
+      &*pieces_.item_words, pieces_.titles->has_value() ? &**pieces_.titles : nullptr,
+      &*pieces_.status_table,
+      pieces_.wardrobe->has_value() ? &(*pieces_.wardrobe)->catalog().items : nullptr,
+      pieces_.item_icons->has_value() ? &**pieces_.item_icons : nullptr,
+      pieces_.game_images->has_value() ? &**pieces_.game_images : nullptr);
+  pieces_.achievements->SeeSaveRoot(client_root_);
+  pieces_.achievements->StartSession();
   // ⚠ L'OUVERTURE SURVIT, elle : le profil de disposition vient de la poser.
   const bool achievements_open = windows_.achievements->window.open;
   *windows_.achievements = AchievementWindows{};
   windows_.achievements->window.open = achievements_open;
   // LES QUÊTES DE MÊME : le journal est celui du personnage qui entre, et le
   // serveur le redit à l'entrée sur la carte. Le suivi reprend ses réglages.
-  pieces_.quests.See(
-      pieces_.quest_catalog.has_value() ? &*pieces_.quest_catalog : nullptr,
+  pieces_.quests->See(
+      pieces_.quest_catalog->has_value() ? &**pieces_.quest_catalog : nullptr,
       pieces_.quest_catalog_problem,
-      pieces_.recommended_catalog.has_value() ? &*pieces_.recommended_catalog : nullptr,
-      pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr,
-      pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr, &pieces_.item_words,
-      pieces_.game_images.has_value() ? &*pieces_.game_images : nullptr);
-  pieces_.quests.SeeSaveRoot(client_root_);
+      pieces_.recommended_catalog->has_value() ? &**pieces_.recommended_catalog : nullptr,
+      pieces_.wardrobe->has_value() ? &(*pieces_.wardrobe)->catalog().items : nullptr,
+      pieces_.item_icons->has_value() ? &**pieces_.item_icons : nullptr, &*pieces_.item_words,
+      pieces_.game_images->has_value() ? &**pieces_.game_images : nullptr);
+  pieces_.quests->SeeSaveRoot(client_root_);
   // LES RÉGLAGES DE LA MINIMAP AU PANNEAU D'OPTIONS : ceux du profil de
   // disposition, par le dessin du sous-menu de la minimap. Repris à la fin de la
   // partie.
   settings_->options().pages().minimap_panel.Entrust([this](const ro::ui::SkinArt& art) {
     return ro::ui::DrawMinimapSettings(shell_.layouts().minimap().settings, art);
   });
-  pieces_.quests.StartSession();
+  pieces_.quests->StartSession();
   // L'ouverture survit, de même.
   const bool quests_open = windows_.quests->window.open;
   *windows_.quests = QuestWindows{};
   windows_.quests->window.open = quests_open;
-  pieces_.tracker.SeeSaveRoot(client_root_);
-  pieces_.tracker.StartSession();
+  pieces_.tracker->SeeSaveRoot(client_root_);
+  pieces_.tracker->StartSession();
   *windows_.tracker = TrackerWindows{};
   // LE SUIVI AU PANNEAU D'OPTIONS : ses demandes passent là où passent celles du
   // journal, et l'étage du suivi les écrit. Repris à la fin de la partie.
@@ -606,85 +554,87 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   });
   // LE CARNET DE CHASSE MVP : ses sprites, ses images, les noms lisibles des
   // cartes, et ses lignes détachées.
-  pieces_.mvp_tracker.See(MvpTrackerPieces{
-      .wardrobe = pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr,
-      .images = pieces_.game_images.has_value() ? &*pieces_.game_images : nullptr,
-      .map_names = pieces_.map_display_names.has_value() ? &*pieces_.map_display_names : nullptr});
-  pieces_.mvp_tracker.SeeSaveRoot(client_root_);
+  pieces_.mvp_tracker->See(MvpTrackerPieces{
+      .wardrobe = pieces_.wardrobe->has_value() ? &**pieces_.wardrobe : nullptr,
+      .images = pieces_.game_images->has_value() ? &**pieces_.game_images : nullptr,
+      .map_names =
+          pieces_.map_display_names->has_value() ? &**pieces_.map_display_names : nullptr});
+  pieces_.mvp_tracker->SeeSaveRoot(client_root_);
   // 🔴 CE QUE LE SERVEUR EN SAVAIT REPART À ZÉRO : catalogue, groupe, alertes et
   // instantané sont ceux du personnage qui entre. Les lignes détachées, l'épingle
   // et l'ouverture de la fenêtre, elles, appartiennent au joueur.
-  pieces_.mvp_tracker.StartSession(windows_.mvp_tracker);
+  pieces_.mvp_tracker->StartSession(windows_.mvp_tracker);
   // LA FILE DU CHAMP DE BATAILLE repart hors file : le serveur redit ce qu'il tient.
-  pieces_.battleground.StartSession(windows_.battleground);
-  pieces_.memorial.StartSession(windows_.memorial);
+  pieces_.battleground->StartSession(windows_.battleground);
+  pieces_.memorial->StartSession(windows_.memorial);
   // LA RECHERCHE DE GROUPE : le serveur oublie l'annonce d'un personnage qui part.
-  pieces_.party_booking.StartSession();
-  pieces_.party_booking.SeePlaces(vfs_);
+  pieces_.party_booking->StartSession();
+  pieces_.party_booking->SeePlaces(vfs_);
   // LA POIGNÉE DE MAIN EST NEUVE : nos surfaces se ré-annoncent, même si le
   // serveur nous reconnaît dès la première image.
-  pieces_.surfaces.Rearm();
-  pieces_.gm_outfit.Rearm();
+  pieces_.surfaces->Rearm();
+  pieces_.gm_outfit->Rearm();
   viewed_equipment_.emplace(
-      pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr,
-      &pieces_.item_words, pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr,
-      pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr);
+      pieces_.wardrobe->has_value() ? &(*pieces_.wardrobe)->catalog().items : nullptr,
+      &*pieces_.item_words, pieces_.item_icons->has_value() ? &**pieces_.item_icons : nullptr,
+      pieces_.wardrobe->has_value() ? &**pieces_.wardrobe : nullptr);
   // LES FORGERONS : toutes les surfaces qui nomment un item les lisent dans la
   // description, qui les demande.
   const CreatorNames creators = item_description_->creator_names();
   bag_->SeeCreators(creators);
-  bag_->SeeDealGuard([this] { return pieces_.trade.deal().HoldsBagGesture(); });
+  bag_->SeeDealGuard([this] { return pieces_.trade->deal().HoldsBagGesture(); });
   bag_->SeeMailDesk(InventoryMailDesk{
-      .withheld = [this](std::uint16_t slot) { return pieces_.mail.WithheldAt(slot); },
-      .holds_use = [this] { return pieces_.mail.HoldsItemUse(); },
+      .withheld = [this](std::uint16_t slot) { return pieces_.mail->WithheldAt(slot); },
+      .holds_use = [this] { return pieces_.mail->HoldsItemUse(); },
       .attach = [this](std::uint16_t slot,
-                       int amount) { pieces_.mail.QueueAttach(slot, amount); }});
+                       int amount) { pieces_.mail->QueueAttach(slot, amount); }});
   bag_->SeePetDesk(InventoryPetDesk{
       .offers =
           [this](const ro::sim::InventoryItem& item) {
-            return pieces_.pet.OffersAsAccessory(item);
+            return pieces_.pet->OffersAsAccessory(item);
           },
-      .refuses = [this](ro::sim::World& world) { return pieces_.pet.RefusesAccessory(world); }});
+      .refuses = [this](ro::sim::World& world) { return pieces_.pet->RefusesAccessory(world); }});
   cart_->SeeCreators(creators);
   storage_->SeeCreators(creators);
   card_insert_->SeeCreators(creators);
   character_->SeeCreators(creators);
   viewed_equipment_->SeeCreators(creators);
   chat_tabs_->SeeCreators(creators);
-  monster_sheet_.emplace(pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr,
-                         &pieces_.item_words,
-                         pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr,
-                         pieces_.skill_tree.has_value() ? &*pieces_.skill_tree : nullptr,
-                         pieces_.skill_words.has_value() ? &*pieces_.skill_words : nullptr, vfs_);
-  monster_sheet_->ReadsMaps(pieces_.map_display_names.has_value() ? &*pieces_.map_display_names
-                                                                  : nullptr);
-  database_.ReadsMaps(pieces_.map_display_names.has_value() ? &*pieces_.map_display_names
-                                                            : nullptr);
+  monster_sheet_.emplace(pieces_.wardrobe->has_value() ? &**pieces_.wardrobe : nullptr,
+                         &*pieces_.item_words,
+                         pieces_.item_icons->has_value() ? &**pieces_.item_icons : nullptr,
+                         pieces_.skill_tree->has_value() ? &**pieces_.skill_tree : nullptr,
+                         pieces_.skill_words->has_value() ? &**pieces_.skill_words : nullptr, vfs_);
+  monster_sheet_->ReadsMaps(pieces_.map_display_names->has_value() ? &**pieces_.map_display_names
+                                                                   : nullptr);
+  database_.ReadsMaps(pieces_.map_display_names->has_value() ? &**pieces_.map_display_names
+                                                             : nullptr);
   // LA NAVIGATION : les préférences du joueur, puis les tables du graphe, lues
   // en arrière-plan.
   navi_.Open(shell_.client_root(), shell_.mount_options());
   navi_.UseArchive(vfs_);
-  if (pieces_.wardrobe.has_value()) navi_.preview_sprite.emplace(*pieces_.wardrobe, vfs_);
+  if (pieces_.wardrobe->has_value()) navi_.preview_sprite.emplace(**pieces_.wardrobe, vfs_);
   // L'ATLAS DES RECETTES : son livre se lit ici, une fois par partie, et sa
   // page de réglages dit ce qu'il contient — ou qu'il manque.
-  craft_atlas_.emplace(pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr,
-                       pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr,
-                       pieces_.skill_tree.has_value() ? &*pieces_.skill_tree : nullptr);
+  craft_atlas_.emplace(
+      pieces_.wardrobe->has_value() ? &(*pieces_.wardrobe)->catalog().items : nullptr,
+      pieces_.item_icons->has_value() ? &**pieces_.item_icons : nullptr,
+      pieces_.skill_tree->has_value() ? &**pieces_.skill_tree : nullptr);
   if (vfs_ != nullptr) {
     craft_atlas_->Load(*vfs_);
   }
   // LES ATELIERS lisent le même livre que l'Atlas, et regardent partir ce que
   // le joueur envoie.
-  pieces_.craft.See(pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr,
-                    &pieces_.item_words,
-                    pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr,
-                    craft_atlas_->book(), creators);
-  pieces_.repair.See(pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr,
-                     &pieces_.item_words,
-                     pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr,
-                     craft_atlas_->book(), creators);
-  pieces_.craft.Watch(link_, world_);
-  pieces_.trade.deal().Watch(link_);
+  pieces_.craft->See(
+      pieces_.wardrobe->has_value() ? &(*pieces_.wardrobe)->catalog().items : nullptr,
+      &*pieces_.item_words, pieces_.item_icons->has_value() ? &**pieces_.item_icons : nullptr,
+      craft_atlas_->book(), creators);
+  pieces_.repair->See(
+      pieces_.wardrobe->has_value() ? &(*pieces_.wardrobe)->catalog().items : nullptr,
+      &*pieces_.item_words, pieces_.item_icons->has_value() ? &**pieces_.item_icons : nullptr,
+      craft_atlas_->book(), creators);
+  pieces_.craft->Watch(link_, world_);
+  pieces_.trade->deal().Watch(link_);
   if (const CraftBook* book = craft_atlas_->book(); book != nullptr) {
     settings_->options().craft_atlas().NoteTally(
         CraftAtlasTally{.available = true,
@@ -692,37 +642,39 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
                         .materials = book->material_count(),
                         .arrows = book->arrows().size()});
   }
-  skill_description_.emplace(pieces_.skill_tree.has_value() ? &*pieces_.skill_tree : nullptr,
-                             pieces_.skill_words.has_value() ? &*pieces_.skill_words : nullptr,
-                             pieces_.skill_icons.has_value() ? &*pieces_.skill_icons : nullptr);
-  dialogue_.emplace(pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr,
-                    pieces_.game_images.has_value() ? &*pieces_.game_images : nullptr,
-                    pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr,
-                    &pieces_.status_table);
-  status_view_.emplace(&pieces_.status_table,
-                       pieces_.status_icons.has_value() ? &*pieces_.status_icons : nullptr);
+  skill_description_.emplace(pieces_.skill_tree->has_value() ? &**pieces_.skill_tree : nullptr,
+                             pieces_.skill_words->has_value() ? &**pieces_.skill_words : nullptr,
+                             pieces_.skill_icons->has_value() ? &**pieces_.skill_icons : nullptr);
+  dialogue_.emplace(pieces_.item_icons->has_value() ? &**pieces_.item_icons : nullptr,
+                    pieces_.game_images->has_value() ? &**pieces_.game_images : nullptr,
+                    pieces_.wardrobe->has_value() ? &**pieces_.wardrobe : nullptr,
+                    &*pieces_.status_table);
+  status_view_.emplace(&*pieces_.status_table,
+                       pieces_.status_icons->has_value() ? &**pieces_.status_icons : nullptr);
   target_hud_.emplace(
-      &pieces_.status_table, pieces_.status_icons.has_value() ? &*pieces_.status_icons : nullptr,
-      pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr, pieces_.item_words);
-  status_portrait_.emplace(pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr,
+      &*pieces_.status_table, pieces_.status_icons->has_value() ? &**pieces_.status_icons : nullptr,
+      pieces_.wardrobe->has_value() ? &**pieces_.wardrobe : nullptr, pieces_.item_words);
+  status_portrait_.emplace(pieces_.wardrobe->has_value() ? &**pieces_.wardrobe : nullptr,
                            pieces_.job_names);
-  shortcuts_.emplace(client_root_, pieces_.skill_tree.has_value() ? &*pieces_.skill_tree : nullptr,
-                     pieces_.skill_icons.has_value() ? &*pieces_.skill_icons : nullptr);
+  shortcuts_.emplace(client_root_,
+                     pieces_.skill_tree->has_value() ? &**pieces_.skill_tree : nullptr,
+                     pieces_.skill_icons->has_value() ? &**pieces_.skill_icons : nullptr);
   // La table des objets et leurs icônes arrivent avec les accessoires, après
   // l'arbre des compétences : la barre les reçoit donc à part.
-  shortcuts_->UseItems(pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr,
-                       pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr);
+  shortcuts_->UseItems(
+      pieces_.wardrobe->has_value() ? &(*pieces_.wardrobe)->catalog().items : nullptr,
+      pieces_.item_icons->has_value() ? &**pieces_.item_icons : nullptr);
   // ⚠ APRÈS LA BARRE : les compétences de guilde s'y posent aussi.
   OpenGuild();
   party_panel_.emplace(PartyPanelPieces{
-      .images = pieces_.game_images.has_value() ? &*pieces_.game_images : nullptr,
-      .jobs = &pieces_.job_names,
-      .map_names = pieces_.map_display_names.has_value() ? &*pieces_.map_display_names : nullptr,
-      .wardrobe = pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr,
+      .images = pieces_.game_images->has_value() ? &**pieces_.game_images : nullptr,
+      .jobs = &*pieces_.job_names,
+      .map_names = pieces_.map_display_names->has_value() ? &**pieces_.map_display_names : nullptr,
+      .wardrobe = pieces_.wardrobe->has_value() ? &**pieces_.wardrobe : nullptr,
       .styles = &styles_,
       .absent_styles = &absent_styles_,
-      .status_table = &pieces_.status_table,
-      .status_icons = pieces_.status_icons.has_value() ? &*pieces_.status_icons : nullptr});
+      .status_table = &*pieces_.status_table,
+      .status_icons = pieces_.status_icons->has_value() ? &**pieces_.status_icons : nullptr});
   // L'onglet retrouvé du fichier, une fois par partie ; la fenêtre le tient ensuite.
   windows_.party->window.tab = settings_->options().pages().party.tab();
 
@@ -742,24 +694,24 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
       .macro_window = &windows_.macros->open,
       .craft_atlas = &windows_.craft_atlas->state,
       .ranking_board_asked = &windows_.ranking_board->open_asked,
-      .market = &pieces_.trade.market(),
+      .market = &pieces_.trade->market(),
       .database = &database_,
       .block_list = &windows_.whispers->blocks,
       .navi = &navi_,
       .navigation = &windows_.navigation->state,
-      .map_names = pieces_.map_display_names.has_value() ? &*pieces_.map_display_names : nullptr,
+      .map_names = pieces_.map_display_names->has_value() ? &**pieces_.map_display_names : nullptr,
       .armed = &armed_chat_,
       .arming = &armed_chat_,
       .chat_tabs = &*chat_tabs_,
       .options = &settings_->options(),
       .option_targets = OptionsTargets(),
-      .chat_rooms = &pieces_.chat_rooms,
-      .whispers = &pieces_.whispers.outbox(),
-      .whisper_blocks = &pieces_.whispers.blocks(),
+      .chat_rooms = &*pieces_.chat_rooms,
+      .whispers = &pieces_.whispers->outbox(),
+      .whisper_blocks = &pieces_.whispers->blocks(),
       .line_preview = &chat_preview_,
       .follow = &world_mouse_.follow,
       .own_config = &own_config_,
-      .banned = &pieces_.banned_words,
+      .banned = &*pieces_.banned_words,
       .player_asks = &player_asks_});
   // ⚠ LA SECONDE PASSE, et la coquille a déjà fait la première.
   //

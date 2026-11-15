@@ -6,8 +6,12 @@
 #include "ro/ui/achievement_window.h"
 #include "ro/ui/character_window.h"
 #include "ro/ui/hotkey_window.h"
+#include "ro/ui/options_window.h"
 #include "ro/ui/party_friend_window.h"
 
+#include "game/achievement_stage.h"
+#include "game/homunculus_stage.h"
+#include "game/mercenary_stage.h"
 #include "game/party_windows.h"
 #include "game/ui_answers.h"
 #include "game/ui_stage.h"
@@ -111,9 +115,9 @@ const SettingDestination* AskedSettingLink(const UiStage::Answers& answers,
 }
 
 SettingReach SettingReachOf(const GamePieces& pieces) {
-  return SettingReach{.homunculus = pieces.homunculus.view().present,
-                      .mercenary = pieces.mercenary.view().present,
-                      .achievements = pieces.achievement_catalog.has_value()};
+  return SettingReach{.homunculus = pieces.homunculus->view().present,
+                      .mercenary = pieces.mercenary->view().present,
+                      .achievements = pieces.achievement_catalog->has_value()};
 }
 
 }  // namespace moonclient

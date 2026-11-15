@@ -3,8 +3,13 @@
 
 #include <SDL3/SDL.h>
 
+#include "game/chat_room_stage.h"
+#include "game/craft_stage.h"
 #include "game/game.h"
+#include "game/homunculus_stage.h"
 #include "game/hud_rounds.h"
+#include "game/mercenary_stage.h"
+#include "game/minigame_stage.h"
 #include "game/navigation_windows.h"
 #include "game/party_windows.h"
 #include "game/ui_stage.h"
@@ -69,14 +74,14 @@ void Game::PumpEvents(std::uint32_t now_ms) {
                 .rig = &camera_rig_,
                 .chat = &windows_.chat->main,
                 .grimoire = &grimoire_,
-                .skill_tree = pieces_.skill_tree.has_value() ? &*pieces_.skill_tree : nullptr,
+                .skill_tree = pieces_.skill_tree->has_value() ? &**pieces_.skill_tree : nullptr,
                 .sheet = &*windows_.character,
                 .status = &windows_.status->state,
                 .basic_info = &windows_.basic_info->state,
-                .grimoire_keys = &pieces_.grimoire_keys,
-                .homunculus_present = pieces_.homunculus.view().present,
-                .mercenary_present = pieces_.mercenary.view().present,
-                .companion_ai = &pieces_.companion_ai,
+                .grimoire_keys = &*pieces_.grimoire_keys,
+                .homunculus_present = pieces_.homunculus->view().present,
+                .mercenary_present = pieces_.mercenary->view().present,
+                .companion_ai = &*pieces_.companion_ai,
                 .pet = &*windows_.pet,
                 .inventory = &*windows_.inventory,
                 .cart = &*windows_.cart,
@@ -84,13 +89,13 @@ void Game::PumpEvents(std::uint32_t now_ms) {
                 .bank = &bank_,
                 .card_album = &card_album_,
                 .card_album_window = &*windows_.card_album,
-                .cash_shop = &pieces_.cash_shop,
-                .mail = &pieces_.mail,
-                .achievements = &pieces_.achievements,
-                .quests = &pieces_.quests,
-                .memorial = &pieces_.memorial,
-                .trade = &pieces_.trade,
-                .chat_rooms = &pieces_.chat_rooms,
+                .cash_shop = &*pieces_.cash_shop,
+                .mail = &*pieces_.mail,
+                .achievements = &*pieces_.achievements,
+                .quests = &*pieces_.quests,
+                .memorial = &*pieces_.memorial,
+                .trade = &*pieces_.trade,
+                .chat_rooms = &*pieces_.chat_rooms,
                 .chat_room_form_open = windows_.chat_room->make.open,
                 .menu = &*windows_.menu,
                 .macros = &*windows_.macros,
@@ -99,7 +104,7 @@ void Game::PumpEvents(std::uint32_t now_ms) {
                 .navigation = &windows_.navigation->state,
                 .world_map = &windows_.navigation->world_map,
                 .minimap_shown = &shell_.layouts().minimap().shown,
-                .mvp_tracker = &pieces_.mvp_tracker,
+                .mvp_tracker = &*pieces_.mvp_tracker,
                 .database_toggle = &windows_.monster_sheet->database.toggle_asked,
                 .bug_report = &*windows_.bug_report,
                 .recorder = &recorder_,
@@ -112,7 +117,7 @@ void Game::PumpEvents(std::uint32_t now_ms) {
                 .entity_menu = &menu_gestures_,
                 .afk_now = &afk_requested_,
                 .shortcuts = &*shortcuts_,
-                .shortcut_wheel = &pieces_.shortcut_wheel,
+                .shortcut_wheel = &*pieces_.shortcut_wheel,
                 .escape_closes_a_window = interface_->escape_has_work(),
                 .enter_claimed = CraftStage::ClaimsEnter(
                                      windows_.make_item, windows_.weapon_refine,

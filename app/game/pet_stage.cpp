@@ -16,8 +16,10 @@
 
 #include "chat/banned_input.h"
 #include "game/game_pieces.h"
+#include "game/mail_stage.h"
 #include "game/pet_staff_words.h"
 #include "game/skin_image_of.h"
+#include "game/trade_stages.h"
 #include "items/creator_names.h"
 
 namespace moonclient {
@@ -70,17 +72,17 @@ constexpr std::uint32_t kPlainColor = 0;
 }
 
 [[nodiscard]] ro::ui::SkinImage IconOf(GamePieces& pieces, std::uint32_t item_id) {
-  if (!pieces.item_icons.has_value() || item_id == 0) {
+  if (!pieces.item_icons->has_value() || item_id == 0) {
     return {};
   }
-  return SkinImageOf(pieces.item_icons->Get(item_id));
+  return SkinImageOf((*pieces.item_icons)->Get(item_id));
 }
 
 [[nodiscard]] std::string ItemName(const GamePieces& pieces, std::uint32_t item_id) {
-  if (!pieces.wardrobe.has_value()) {
+  if (!pieces.wardrobe->has_value()) {
     return {};
   }
-  const ro::vfs::ItemEntry* entry = pieces.wardrobe->catalog().items.Find(item_id);
+  const ro::vfs::ItemEntry* entry = (*pieces.wardrobe)->catalog().items.Find(item_id);
   return entry != nullptr ? entry->name : std::string();
 }
 
@@ -88,11 +90,11 @@ constexpr std::uint32_t kPlainColor = 0;
 // « Beloved ».
 [[nodiscard]] std::string OwnedItemName(const GamePieces& pieces,
                                         const ro::sim::InventoryItem& item) {
-  if (!pieces.wardrobe.has_value()) {
+  if (!pieces.wardrobe->has_value()) {
     return {};
   }
   return ro::vfs::ItemNameText(ro::vfs::ComposeItemName(
-      ItemNameFactsOf(item), pieces.wardrobe->catalog().items, pieces.item_words));
+      ItemNameFactsOf(item), (*pieces.wardrobe)->catalog().items, pieces.item_words));
 }
 
 [[nodiscard]] ro::ui::PetIntimacyLabel LabelOf(ro::sim::PetIntimacyWord word) {
@@ -252,14 +254,14 @@ void PetStage::Stage(ro::vfs::Vfs& vfs, const ro::sim::World& world, GamePieces&
                      ro::ui::PetWindowState& window, ro::ui::PetWindowView& view,
                      ro::ui::PetHatchWindowState& hatch, ro::ui::PetHatchWindowView& hatch_view) {
   LoadTables(vfs);
-  items_ = pieces.wardrobe.has_value() ? &pieces.wardrobe->catalog().items : nullptr;
-  monster_talk_.SeeCatalog(pieces.wardrobe.has_value() ? &pieces.wardrobe->catalog() : nullptr);
-  mail_writing_ = pieces.mail.writing();
-  trading_ = pieces.trade.deal().deal().phase() != ro::sim::DealPhase::kNone;
-  if (pieces.wardrobe.has_value() && !sprite_.has_value()) {
-    sprite_.emplace(*pieces.wardrobe);
-    source_sprite_.emplace(*pieces.wardrobe);
-    target_sprite_.emplace(*pieces.wardrobe);
+  items_ = pieces.wardrobe->has_value() ? &(*pieces.wardrobe)->catalog().items : nullptr;
+  monster_talk_.SeeCatalog(pieces.wardrobe->has_value() ? &(*pieces.wardrobe)->catalog() : nullptr);
+  mail_writing_ = pieces.mail->writing();
+  trading_ = pieces.trade->deal().deal().phase() != ro::sim::DealPhase::kNone;
+  if (pieces.wardrobe->has_value() && !sprite_.has_value()) {
+    sprite_.emplace(**pieces.wardrobe);
+    source_sprite_.emplace(**pieces.wardrobe);
+    target_sprite_.emplace(**pieces.wardrobe);
   }
 
   // L'OUVERTURE FORCÉE, une fois par familier : elle ne referme jamais.

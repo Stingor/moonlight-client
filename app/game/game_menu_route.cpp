@@ -19,6 +19,8 @@
 #include "game/mvp_alert_sound.h"
 #include "game/ui_answers.h"
 #include "game/ui_stage.h"
+#include "game/whisper_stage.h"
+#include "mvp/mvp_tracker_stage.h"
 
 namespace moonclient {
 
@@ -181,9 +183,9 @@ void Game::ApplyCaptureGesture(const UiStage::Answers& answers, std::uint32_t no
   // il ne referme pas ; « Tout remettre au carnet » ne demande rien.
   // « Écouter » joue le son choisi, comme le jouerait l'alerte.
   if (answers.options->changed == MvpTrackerRowId(MvpTrackerRow::kOpen)) {
-    pieces_.mvp_tracker.RequestOpen();
+    pieces_.mvp_tracker->RequestOpen();
   } else if (answers.options->changed == MvpTrackerRowId(MvpTrackerRow::kPutBackAll)) {
-    pieces_.mvp_tracker.PutBackAllLines();
+    pieces_.mvp_tracker->PutBackAllLines();
   } else if (answers.options->changed == MvpTrackerRowId(MvpTrackerRow::kAlertListen)) {
     MvpTrackerOptions& page = settings_->options().pages().mvp_tracker;
     const MvpTrackerSettings hunt = page.settings();
