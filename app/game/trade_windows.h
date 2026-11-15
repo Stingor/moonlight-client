@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "ro/ui/barter_window.h"
+#include "ro/ui/grade_enchant_window.h"
 #include "ro/ui/item_reform_window.h"
 #include "ro/ui/laphine_window.h"
 #include "ro/ui/npc_shop_window.h"
@@ -57,6 +58,14 @@ struct TradeWindows {
     ro::ui::ItemReformWindowAction answer;
   };
   ItemReform item_reform;
+
+  // L'AMÉLIORATION DE GRADE : un PNJ ouvre sa fenêtre. Même contrat.
+  struct GradeEnchant {
+    ro::ui::GradeEnchantWindowState state;
+    const ro::ui::GradeEnchantView* view = nullptr;
+    ro::ui::GradeEnchantWindowAction answer;
+  };
+  GradeEnchant grade_enchant;
 
   // L'ÉCHOPPE D'ACHAT : la préparation, la mienne ouverte, son historique, et
   // celle d'un autre à qui je vends.

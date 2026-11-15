@@ -66,6 +66,11 @@ struct TradeItemGesture {
 // l'ombre rouge du client ; `suffix` s'écrit après le nom (« x3 »).
 TradeItemGesture DrawTradeItem(const TradeItemView& item, std::string_view suffix = {});
 
+// LA MÊME LIGNE, ROGNÉE pour laisser `trailing` pixels au bout : un nom trop long
+// se coupe au bord au lieu de pousser ce qui le suit hors du volet. Le curseur
+// repart sur la même ligne, calé à droite pour `trailing`.
+TradeItemGesture DrawTradeItemBefore(const TradeItemView& item, float trailing);
+
 // L'icône seule, et l'emblème du grade dans son coin bas gauche, à sa taille
 // propre. Une icône absente laisse sa place vide.
 void DrawGradedTradeIcon(const TradeItemView& item, const SkinImage& grade_badge);

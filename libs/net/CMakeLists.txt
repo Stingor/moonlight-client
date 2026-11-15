@@ -21,6 +21,7 @@ add_library(ro_net STATIC
     src/barter.cpp
     src/laphine.cpp
     src/item_reform.cpp
+    src/grade_enchant.cpp
     src/battleground.cpp
     src/card_album.cpp
     src/moonclient_handshake.cpp

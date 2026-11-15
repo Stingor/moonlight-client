@@ -24393,3 +24393,99 @@ tr: Color code
 
 fr: Le code de cette couleur. Copie-le, ou colle un autre code à sa place : 0xRRGGBB, #RRGGBB ou RRGGBB.
 tr: This color's code. Copy it, or paste another code over it: 0xRRGGBB, #RRGGBB or RRGGBB.
+
+fr: %%d dose(s), +%d %% par dose
+tr: %%d dose(s), +%d %% per dose
+
+fr: (aucune arme dans l'inventory)
+tr: (no weapon in the inventory)
+
+fr: Amélioration de grade
+tr: Grade Enhancement
+
+fr: Améliorer %s ? Chance de réussite : %d %%.
+tr: Enhance %s? Success chance: %d %%.
+
+fr: Améliorer le grade
+tr: Enhance grade
+
+fr: Ce niveau d'arme ne prend pas de grade.
+tr: This weapon level cannot take a grade.
+
+fr: Cette arme a déjà le grade le plus haut.
+tr: This weapon already has the highest grade.
+
+fr: Cette arme est portée : ôtez-la d'abord.
+tr: This weapon is equipped: unequip it first.
+
+fr: Cette arme n'est pas identifiée.
+tr: This weapon is not identified.
+
+fr: Chance de réussite : %d %%
+tr: Success chance: %d %%
+
+fr: Choisissez l'arme à améliorer.
+tr: Choose the weapon to enhance.
+
+fr: Choisissez une arme : son grade monte d'un cran, contre un joyau et des zenys.
+tr: Choose a weapon: its grade goes up one step, for a jewel and some zeny.
+
+fr: Choisissez une arme à gauche.
+tr: Choose a weapon on the left.
+
+fr: Choisissez une mise.
+tr: Choose a stake.
+
+fr: En cas d'échec, l'arme est détruite.
+tr: On failure, the weapon is destroyed.
+
+fr: Grade : %s, puis %s
+tr: Grade: %s, then %s
+
+fr: L'amélioration a échoué : l'arme est détruite.
+tr: The enhancement failed: the weapon is destroyed.
+
+fr: L'amélioration a échoué : le raffinement baisse.
+tr: The enhancement failed: the refine level drops.
+
+fr: L'amélioration a échoué, mais l'arme est protégée.
+tr: The enhancement failed, but the weapon is protected.
+
+fr: L'amélioration a échoué.
+tr: The enhancement failed.
+
+fr: L'arme choisie n'est plus dans l'inventory.
+tr: The chosen weapon is no longer in the inventory.
+
+fr: Le grade de l'arme monte !
+tr: The weapon's grade goes up!
+
+fr: Le serveur évalue la pièce…
+tr: The server is assessing the item…
+
+fr: Mise
+tr: Stake
+
+fr: Pas assez de zenys.
+tr: Not enough zeny.
+
+fr: Poussière bénie
+tr: Blessed dust
+
+fr: Raffinement insuffisant pour ce grade.
+tr: Refine level too low for this grade.
+
+fr: Seules les armes prennent un grade.
+tr: Only weapons can take a grade.
+
+fr: Une réussite ramène l'arme à +0.
+tr: A success brings the weapon back to +0.
+
+fr: l'arme est détruite si l'amélioration échoue
+tr: the weapon is destroyed if the enhancement fails
+
+fr: le raffinement baisse si l'amélioration échoue
+tr: the refine level drops if the enhancement fails
+
+fr: sans risque pour l'arme
+tr: no risk to the weapon

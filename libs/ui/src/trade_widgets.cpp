@@ -131,6 +131,19 @@ TradeItemGesture DrawTradeItem(const TradeItemView& item, std::string_view suffi
   return gesture;
 }
 
+TradeItemGesture DrawTradeItemBefore(const TradeItemView& item, float trailing) {
+  const float content_right = ImGui::GetContentRegionMax().x;
+  const float right = content_right - trailing - ImGui::GetStyle().ItemSpacing.x;
+  const ImVec2 start = ImGui::GetCursorScreenPos();
+  const float clip_right = ImGui::GetWindowPos().x + right - ImGui::GetScrollX();
+  ImGui::PushClipRect(start, ImVec2(clip_right, FLT_MAX), true);
+  const TradeItemGesture gesture = DrawTradeItem(item);
+  ImGui::PopClipRect();
+  ImGui::SameLine();
+  ImGui::SetCursorPosX(content_right - trailing);
+  return gesture;
+}
+
 void AddLastItemGesture(TradeItemGesture& gesture) {
   if (!ImGui::IsItemHovered()) {
     return;

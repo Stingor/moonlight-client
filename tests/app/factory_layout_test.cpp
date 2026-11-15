@@ -102,6 +102,7 @@ const std::vector<IconPlace> kIcons = {
     {MenuCommand::kCraftAtlas, 100.0F, 237.0F},  {MenuCommand::kMvpTracker, 132.0F, 237.0F},
     {MenuCommand::kRankingBoard, 4.0F, 271.0F},  {MenuCommand::kPetWindow, 36.0F, 271.0F},
     {MenuCommand::kMarket, 68.0F, 271.0F},       {MenuCommand::kDatabase, 100.0F, 271.0F},
+    {MenuCommand::kReputation, 68.0F, 305.0F},
 };
 
 // LES MINI-JEUX : une place à la suite, mais masqués.

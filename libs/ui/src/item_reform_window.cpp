@@ -34,27 +34,11 @@ constexpr float kFooterLines = 3.0F;
 constexpr const char* kConfirmId = "##item_reform_confirm";
 constexpr const char* kItemMenuId = "##item_reform_item_menu";
 
-// L'ITEM D'UNE LIGNE, ROGNÉ pour laisser `trailing` pixels au bout : un nom trop
-// long se coupe au bord au lieu de pousser ce qui le suit hors du volet. Le
-// curseur repart sur la même ligne, calé à droite pour `trailing`.
-TradeItemGesture DrawItemBefore(const TradeItemView& item, float trailing) {
-  const float content_right = ImGui::GetContentRegionMax().x;
-  const float right = content_right - trailing - ImGui::GetStyle().ItemSpacing.x;
-  const ImVec2 start = ImGui::GetCursorScreenPos();
-  const float clip_right = ImGui::GetWindowPos().x + right - ImGui::GetScrollX();
-  ImGui::PushClipRect(start, ImVec2(clip_right, FLT_MAX), true);
-  const TradeItemGesture gesture = DrawTradeItem(item);
-  ImGui::PopClipRect();
-  ImGui::SameLine();
-  ImGui::SetCursorPosX(content_right - trailing);
-  return gesture;
-}
-
 void DrawCandidate(ItemReformWindowState& state, const ItemReformPieceView& row, bool waiting,
                    const SkinArt& art, ItemReformWindowAction& action) {
   const char* label = row.chosen ? core::Tr("Choisie") : core::Tr("Choisir");
   const float button = ImGui::CalcTextSize(label).x + ImGui::GetStyle().FramePadding.x * 2.0F;
-  NoteItemBySlot(DrawItemBefore(row.item, button), row.item, row.client_slot, state.item_menu,
+  NoteItemBySlot(DrawTradeItemBefore(row.item, button), row.item, row.client_slot, state.item_menu,
                  action);
   const bool held = waiting || row.chosen || !row.refusal.empty();
   if (held) {
@@ -89,8 +73,8 @@ void DrawList(ItemReformWindowState& state, const ItemReformView& view, const Sk
 void DrawMaterial(ItemReformWindowState& state, const ItemReformMaterialView& material,
                   ItemReformWindowAction& action) {
   const std::string count = core::Printed("%d / %d", material.owned, material.needed);
-  NoteItemById(DrawItemBefore(material.item, ImGui::CalcTextSize(count.c_str()).x), material.item,
-               material.item.item_id, state.item_menu, action);
+  NoteItemById(DrawTradeItemBefore(material.item, ImGui::CalcTextSize(count.c_str()).x),
+               material.item, material.item.item_id, state.item_menu, action);
   ImGui::AlignTextToFramePadding();
   if (material.owned < material.needed) {
     ColoredText(kTradeRefusedText, count);

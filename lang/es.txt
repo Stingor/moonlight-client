@@ -24393,3 +24393,99 @@ tr: Código de color
 
 fr: Le code de cette couleur. Copie-le, ou colle un autre code à sa place : 0xRRGGBB, #RRGGBB ou RRGGBB.
 tr: El código de este color. Cópialo, o pega otro código en su lugar: 0xRRGGBB, #RRGGBB o RRGGBB.
+
+fr: %%d dose(s), +%d %% par dose
+tr: %%d dosis, +%d %% por dosis
+
+fr: (aucune arme dans l'inventory)
+tr: (ningún arma en el inventario)
+
+fr: Amélioration de grade
+tr: Mejora de grado
+
+fr: Améliorer %s ? Chance de réussite : %d %%.
+tr: ¿Mejorar %s? Probabilidad de éxito: %d %%.
+
+fr: Améliorer le grade
+tr: Mejorar el grado
+
+fr: Ce niveau d'arme ne prend pas de grade.
+tr: Este nivel de arma no admite grado.
+
+fr: Cette arme a déjà le grade le plus haut.
+tr: Esta arma ya tiene el grado más alto.
+
+fr: Cette arme est portée : ôtez-la d'abord.
+tr: Esta arma está equipada: quítatela primero.
+
+fr: Cette arme n'est pas identifiée.
+tr: Esta arma no está identificada.
+
+fr: Chance de réussite : %d %%
+tr: Probabilidad de éxito: %d %%
+
+fr: Choisissez l'arme à améliorer.
+tr: Elige el arma que mejorar.
+
+fr: Choisissez une arme : son grade monte d'un cran, contre un joyau et des zenys.
+tr: Elige un arma: su grado sube un nivel, a cambio de una joya y zenys.
+
+fr: Choisissez une arme à gauche.
+tr: Elige un arma a la izquierda.
+
+fr: Choisissez une mise.
+tr: Elige una apuesta.
+
+fr: En cas d'échec, l'arme est détruite.
+tr: Si falla, el arma se destruye.
+
+fr: Grade : %s, puis %s
+tr: Grado: %s, luego %s
+
+fr: L'amélioration a échoué : l'arme est détruite.
+tr: La mejora ha fallado: el arma se ha destruido.
+
+fr: L'amélioration a échoué : le raffinement baisse.
+tr: La mejora ha fallado: el refinamiento baja.
+
+fr: L'amélioration a échoué, mais l'arme est protégée.
+tr: La mejora ha fallado, pero el arma está protegida.
+
+fr: L'amélioration a échoué.
+tr: La mejora ha fallado.
+
+fr: L'arme choisie n'est plus dans l'inventory.
+tr: El arma elegida ya no está en el inventario.
+
+fr: Le grade de l'arme monte !
+tr: ¡El grado del arma sube!
+
+fr: Le serveur évalue la pièce…
+tr: El servidor evalúa el objeto…
+
+fr: Mise
+tr: Apuesta
+
+fr: Pas assez de zenys.
+tr: No tienes suficientes zenys.
+
+fr: Poussière bénie
+tr: Polvo bendito
+
+fr: Raffinement insuffisant pour ce grade.
+tr: Refinamiento insuficiente para este grado.
+
+fr: Seules les armes prennent un grade.
+tr: Solo las armas admiten grado.
+
+fr: Une réussite ramène l'arme à +0.
+tr: Un éxito devuelve el arma a +0.
+
+fr: l'arme est détruite si l'amélioration échoue
+tr: el arma se destruye si la mejora falla
+
+fr: le raffinement baisse si l'amélioration échoue
+tr: el refinamiento baja si la mejora falla
+
+fr: sans risque pour l'arme
+tr: sin riesgo para el arma

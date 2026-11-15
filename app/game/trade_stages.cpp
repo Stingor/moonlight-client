@@ -8,6 +8,7 @@
 #include "ro/core/log.h"
 #include "ro/net/barter.h"
 #include "ro/net/buying_store.h"
+#include "ro/net/grade_enchant.h"
 #include "ro/net/item_reform.h"
 #include "ro/net/laphine.h"
 #include "ro/net/market.h"
@@ -31,6 +32,7 @@ void TradeStages::StartSession() {
   barter_.StartSession();
   laphine_.StartSession();
   item_reform_.StartSession();
+  grade_enchant_.StartSession();
   buying_store_.StartSession();
   vending_.StartSession();
   deal_.StartSession();
@@ -91,6 +93,13 @@ ro::net::FrameOutcome TradeStages::ApplyFrame(const ro::net::Frame& frame,
       reformed != ro::net::FrameOutcome::kUnhandled) {
     return reformed;
   }
+  // LES GRADES : l'ouverture de leur interface, la proposition et le résultat ne
+  // sont qu'à eux. ⚠ LE SAC CHANGE AVEC LE RÉSULTAT : la pièce montée revient à +0.
+  if (const ro::net::FrameOutcome graded =
+          ro::net::ApplyGradeEnchantFrame(frame, grade_enchant_.grade(), bag);
+      graded != ro::net::FrameOutcome::kUnhandled) {
+    return graded;
+  }
   // LE TROC D'ABORD : il ne prend le résultat partagé que s'il l'attend.
   if (const ro::net::FrameOutcome bartered = ro::net::ApplyBarterFrame(frame, barter_.barter());
       bartered != ro::net::FrameOutcome::kUnhandled) {
@@ -136,6 +145,9 @@ void TradeStages::Advance(TradeWindows& windows, ro::net::Connection& link, ro::
   item_reform_.Advance(windows.item_reform.state, std::exchange(windows.item_reform.answer, {}),
                        context);
   windows.item_reform.view = item_reform_.view();
+  grade_enchant_.Advance(windows.grade_enchant.state,
+                         std::exchange(windows.grade_enchant.answer, {}), context);
+  windows.grade_enchant.view = grade_enchant_.view();
   buying_store_.Advance(windows.buying_store, context);
   vending_.Advance(windows.vending, context);
   deal_.Advance(windows.deal, context);
@@ -225,8 +237,8 @@ void TradeStages::VisitStore(std::uint32_t owner_id, ro::sim::SignboardKind kind
 
 bool TradeStages::HoldsWorld() const noexcept {
   return npc_shop_.shop().open() || barter_.barter().open() || laphine_.laphine().open() ||
-         item_reform_.reform().open() || buying_store_.HoldsWorld() || vending_.HoldsWorld() ||
-         deal_.HoldsWorld();
+         item_reform_.reform().open() || grade_enchant_.grade().open() ||
+         buying_store_.HoldsWorld() || vending_.HoldsWorld() || deal_.HoldsWorld();
 }
 
 TradeItemFocus TradeStages::hovered() const noexcept {
@@ -253,6 +265,9 @@ TradeItemFocus TradeStages::hovered() const noexcept {
   }
   if (item_reform_.hovered().item_id != 0) {
     return item_reform_.hovered();
+  }
+  if (grade_enchant_.hovered().item_id != 0) {
+    return grade_enchant_.hovered();
   }
   return npc_shop_.hovered();
 }
@@ -282,6 +297,9 @@ std::optional<TradeItemFocus> TradeStages::TakeDescribed() noexcept {
   }
   if (std::optional<TradeItemFocus> reformed = item_reform_.TakeDescribed(); reformed.has_value()) {
     return reformed;
+  }
+  if (std::optional<TradeItemFocus> graded = grade_enchant_.TakeDescribed(); graded.has_value()) {
+    return graded;
   }
   return npc_shop_.TakeDescribed();
 }

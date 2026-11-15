@@ -17,6 +17,7 @@
 #include "game/barter_stage.h"
 #include "game/buying_store_stage.h"
 #include "game/deal_stage.h"
+#include "game/grade_enchant_stage.h"
 #include "game/item_reform_stage.h"
 #include "game/laphine_stage.h"
 #include "game/market_stage.h"
@@ -113,6 +114,7 @@ class TradeStages {
   [[nodiscard]] BarterStage& barter() noexcept { return barter_; }
   [[nodiscard]] LaphineStage& laphine() noexcept { return laphine_; }
   [[nodiscard]] ItemReformStage& item_reform() noexcept { return item_reform_; }
+  [[nodiscard]] GradeEnchantStage& grade_enchant() noexcept { return grade_enchant_; }
   [[nodiscard]] BuyingStoreStage& buying_store() noexcept { return buying_store_; }
   [[nodiscard]] VendingStage& vending() noexcept { return vending_; }
   [[nodiscard]] DealStage& deal() noexcept { return deal_; }
@@ -164,6 +166,7 @@ class TradeStages {
   BarterStage barter_;
   LaphineStage laphine_;
   ItemReformStage item_reform_;
+  GradeEnchantStage grade_enchant_;
   BuyingStoreStage buying_store_;
   VendingStage vending_;
   DealStage deal_;

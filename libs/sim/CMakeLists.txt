@@ -13,6 +13,7 @@ add_library(ro_sim STATIC
     src/barter.cpp
     src/laphine.cpp
     src/item_reform.cpp
+    src/grade_enchant.cpp
     src/battlefield.cpp
     src/entry_queue.cpp
     src/memorial_dungeon.cpp
