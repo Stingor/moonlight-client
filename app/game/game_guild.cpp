@@ -62,10 +62,10 @@ void Game::OpenGuild() {
 
 void Game::RefreshGuild(std::uint32_t now_ms) {
   const bool shown =
-      windows_.character.open && windows_.character.tab == ro::ui::CharacterTab::kGuild;
+      windows_.character->open && windows_.character->tab == ro::ui::CharacterTab::kGuild;
   const GuildPlayer player{.account_id = world_.player_id(), .char_id = ticket_.character_id};
   guild_emblems_->Advance(guild_book_, now_ms);
-  guild_panel_->Settle(windows_.character.guild, guild_book_, *guild_emblems_, link_);
+  guild_panel_->Settle(windows_.character->guild, guild_book_, *guild_emblems_, link_);
   guild_panel_->RequestIfDue(link_, shown && guild_book_.in_guild(), now_ms);
   // « INVITER DANS MON CARNET MVP » : le carnet seul sait qui peut y entrer ;
   // éteint, l'entrée disparaît.
@@ -81,7 +81,7 @@ void Game::RefreshGuild(std::uint32_t now_ms) {
                         .link_ready = pieces_.mvp_tracker.link_ready()},
         same_account);
   });
-  guild_panel_->Refresh(guild_book_, world_, windows_.character.guild, *guild_emblems_, player,
+  guild_panel_->Refresh(guild_book_, world_, windows_.character->guild, *guild_emblems_, player,
                         shown, now_ms);
 }
 
@@ -90,7 +90,7 @@ void Game::ApplyGuildAnswers(const UiStage::Answers& answers, std::uint32_t now_
   // 🔴 UN NOM DE GUILDE OU UN AVIS QUI PORTE UN MOT INTERDIT NE PART PAS : le
   // refus s'écrit dans la conversation, et l'onglet ne voit rien partir. L'avis
   // s'éprouve par son objet, puis par son corps.
-  ro::ui::GuildAction asked = answers.character.guild;
+  ro::ui::GuildAction asked = answers.character->guild;
   std::optional<std::string> refused;
   BannedInput input = BannedInput::kGuildName;
   if (asked.verb == ro::ui::GuildVerb::kCreate) {
@@ -107,11 +107,11 @@ void Game::ApplyGuildAnswers(const UiStage::Answers& answers, std::uint32_t now_
                       BannedInputColor(input));
     asked.verb = ro::ui::GuildVerb::kNothing;
   }
-  const GuildElsewhere elsewhere = guild_panel_->Apply(asked, windows_.character.guild, guild_book_,
-                                                       world_, *guild_emblems_, link_, player);
+  const GuildElsewhere elsewhere = guild_panel_->Apply(
+      asked, windows_.character->guild, guild_book_, world_, *guild_emblems_, link_, player);
   // CHUCHOTER : le nom part dans la case du destinataire, et le clavier dans la
   // phrase — comme un lien qu'on vient de poser, la barre se déplie.
-  ArmWhisper(windows_.chat.main.input, elsewhere.whisper_to);
+  ArmWhisper(windows_.chat->main.input, elsewhere.whisper_to);
   // LA CONVERSATION 1:1 À PART : elle s'ouvre, ou revient devant.
   if (!elsewhere.whisper_window.empty()) {
     pieces_.whispers.Open(elsewhere.whisper_window);

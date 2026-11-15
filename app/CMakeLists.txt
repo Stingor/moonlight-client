@@ -2032,6 +2032,7 @@ add_executable(moonclient
     world/target_hud_view.cpp
     world/status_portrait_view.cpp
     game/game.cpp
+    game/game_option_samples.cpp
     game/game_events.cpp
     game/game_afk.cpp
     game/game_first_person.cpp
@@ -2057,6 +2058,7 @@ add_executable(moonclient
     game/over_world_layer.cpp
     game/game_cursor.cpp
     game/game_entity_menu.cpp
+    game/game_npc_block.cpp
     game/staff_roster_round.cpp
     game/game_network.cpp
     game/game_link_loss.cpp
@@ -2128,6 +2130,7 @@ add_executable(moonclient
     guild/sample_emblem.cpp
     guild/guild_skill_rows.cpp
     game/game_open.cpp
+    game/game_foundation.cpp
     game/game_targeting.cpp
     game/hud_lock.cpp
     game/game_quick_cast.cpp
@@ -2206,6 +2209,8 @@ add_executable(moonclient
     game/ui_layout_factory.cpp
     game/layout_windows.cpp
     game/ui_stage.cpp
+    game/ui_windows.cpp
+    game/ui_answers.cpp
     game/ui_stage_context.cpp
     game/ui_stage_modes.cpp
     game/ui_stage_lobby.cpp
@@ -2348,10 +2353,10 @@ endif()
 
 # LES EN-TÊTES STANDARD ET GLM, PRÉCOMPILÉS POUR L'EXÉCUTABLE.
 #
-# ⚠ AUCUN EN-TÊTE DE `app/` N'Y ENTRE : aucun n'est inclus par le tiers des
-# sources, le seuil que pose `moonclient_precompile_headers`. `game/ui_stage.h`
-# l'a été, quand il tirait toutes les fenêtres ; il ne fait plus que les nommer,
-# et ce qu'elles gardent vit dans `game/ui_windows.h`, lu par une source sur cinq.
+# ⚠ AUCUN EN-TÊTE DE `app/` N'Y ENTRE. `game/ui_stage.h` y était quand il tirait
+# toutes les fenêtres ; il ne fait plus que les nommer. Ceux qui passent
+# aujourd'hui le tiers des sources — `world/map_stage.h`, `effects/effect_view.h`…
+# — ne rendent pas ce qu'ils coûtent : voir l'ADR 0152, qui en tient la mesure.
 # `python scripts/include_graph.py pivots` donne les candidats.
 if(TARGET moonclient)
   moonclient_precompile_headers(moonclient GLM)

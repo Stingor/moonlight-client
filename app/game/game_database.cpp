@@ -12,11 +12,12 @@
 
 #include "game/bug_report_context.h"
 #include "game/game.h"
+#include "game/ui_window_rounds.h"
 
 namespace moonclient {
 
 void Game::AdvanceDatabase(std::uint32_t now_ms) {
-  DatabaseWindows& windows = windows_.monster_sheet.database;
+  DatabaseWindows& windows = windows_.monster_sheet->database;
   // La fiche de monstre était-elle dans le panneau à l'image dessinée ?
   const bool hosted_before = windows.view != nullptr && windows.view->monster != nullptr;
   ro::ui::DatabaseAnswer& answer = windows.answer;
@@ -67,7 +68,7 @@ void Game::AdvanceDatabase(std::uint32_t now_ms) {
                                              .id = std::exchange(monster.open_monster, 0)});
   }
   if (hosted_before) {
-    windows_.monster_sheet.answer = monster;
+    windows_.monster_sheet->answer = monster;
   }
 
   database_.Advance(windows, DatabaseContextNow(now_ms));
@@ -82,7 +83,7 @@ void Game::AdvanceDatabase(std::uint32_t now_ms) {
   // LA FICHE D'UN OBJET ÉDITÉE PAR LE STAFF, que la fiche ouvre dans ses deux
   // hôtes : l'établi la dessine sous le même droit. Son onglet « Serveur » lit
   // la base, qui se demande dès que la fenêtre est ouverte.
-  if (windows_.staff_tools.item_editor.open) {
+  if (windows_.staff_tools->item_editor.open) {
     database_.Read();
   }
   pieces_.item_sheet_editor.Advance(
@@ -126,8 +127,8 @@ void NoteMapDropsOfShown(MonsterSheet& sheet, const DatabaseStage& database) {
 }  // namespace
 
 bool Game::HostMonsterSheet(MonsterSheet& sheet) {
-  DatabaseWindows& database = windows_.monster_sheet.database;
-  ro::ui::MonsterSheetWindowState& state = windows_.monster_sheet.state;
+  DatabaseWindows& database = windows_.monster_sheet->database;
+  ro::ui::MonsterSheetWindowState& state = windows_.monster_sheet->state;
   // La fiche à part a besoin de la base pour ses map drops.
   if (state.open) {
     database_.Read();

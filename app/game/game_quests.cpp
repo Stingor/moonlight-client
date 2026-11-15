@@ -6,6 +6,7 @@
 #include <string>
 
 #include "game/game.h"
+#include "game/ui_window_rounds.h"
 #include "world/monster_sheet.h"
 
 namespace moonclient {
@@ -34,7 +35,7 @@ void Game::AdvanceQuests(std::uint32_t now_ms) {
   }
   if (const std::uint32_t monster = pieces_.quests.TakeMonster();
       monster != 0 && monster_sheet_.has_value()) {
-    monster_sheet_->Open(windows_.monster_sheet.state, monster, /*by_view=*/false);
+    monster_sheet_->Open(windows_.monster_sheet->state, monster, /*by_view=*/false);
   }
   if (pieces_.quests.TakeSettings()) {
     GameSettings::OpenOptionsAt(windows_, OptionSection::kQuestTracker);

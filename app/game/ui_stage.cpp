@@ -18,31 +18,102 @@
 #include "ro/sim/npc_dialog.h"
 #include "ro/ui/afk_clock.h"
 #include "ro/ui/align_grid.h"
+#include "ro/ui/bank_window.h"
+#include "ro/ui/book_window.h"
+#include "ro/ui/bug_report_window.h"
+#include "ro/ui/camera_hud.h"
+#include "ro/ui/card_album_window.h"
+#include "ro/ui/card_insert_window.h"
+#include "ro/ui/cart_choice_window.h"
+#include "ro/ui/cart_window.h"
 #include "ro/ui/cast_bars.h"
 #include "ro/ui/character_create_window.h"
 #include "ro/ui/character_delete_window.h"
 #include "ro/ui/character_select_window.h"
+#include "ro/ui/character_window.h"
 #include "ro/ui/chat_bubble.h"
+#include "ro/ui/chat_macros.h"
+#include "ro/ui/chat_window.h"
+#include "ro/ui/companion_ai_window.h"
+#include "ro/ui/companion_tactic_window.h"
+#include "ro/ui/craft_atlas_window.h"
+#include "ro/ui/damage_meter_window.h"
 #include "ro/ui/damage_texts.h"
+#include "ro/ui/description_window.h"
 #include "ro/ui/entity_bars.h"
+#include "ro/ui/entity_menu.h"
+#include "ro/ui/frame_meter.h"
+#include "ro/ui/game_menu.h"
+#include "ro/ui/hotkey_window.h"
+#include "ro/ui/inventory_window.h"
 #include "ro/ui/item_obtain_toast.h"
+#include "ro/ui/link_notice.h"
 #include "ro/ui/loading_screen.h"
+#include "ro/ui/log_window.h"
 #include "ro/ui/login_window.h"
+#include "ro/ui/make_item_window.h"
+#include "ro/ui/map_sign_banner.h"
+#include "ro/ui/menu_icons.h"
+#include "ro/ui/minimap_settings.h"
+#include "ro/ui/minimap_window.h"
 #include "ro/ui/modal_box.h"
+#include "ro/ui/monster_sheet_window.h"
+#include "ro/ui/npc_dialog_window.h"
 #include "ro/ui/npc_illustration_window.h"
+#include "ro/ui/options_window.h"
+#include "ro/ui/packet_window.h"
+#include "ro/ui/palette_editor.h"
 #include "ro/ui/patch_screen.h"
+#include "ro/ui/pet_hatch_window.h"
+#include "ro/ui/pet_window.h"
+#include "ro/ui/pick_boxes.h"
+#include "ro/ui/player_report_window.h"
 #include "ro/ui/pvp_hud_frames.h"
+#include "ro/ui/repair_window.h"
+#include "ro/ui/shortcut_bar.h"
 #include "ro/ui/skill_window.h"
+#include "ro/ui/sound_zones.h"
+#include "ro/ui/spell_list_window.h"
+#include "ro/ui/staff_tools.h"
 #include "ro/ui/status_bar.h"
 #include "ro/ui/status_preview.h"
+#include "ro/ui/storage_window.h"
+#include "ro/ui/style_preview.h"
+#include "ro/ui/talkbox_window.h"
 #include "ro/ui/unlock_notice.h"
+#include "ro/ui/view_equip_window.h"
+#include "ro/ui/voice_overlay.h"
+#include "ro/ui/warp_list_window.h"
+#include "ro/ui/weapon_refine_window.h"
 
 #include "chat/chat_tab_view.h"
+#include "game/achievement_stage.h"
+#include "game/battleground_stage.h"
+#include "game/cash_shop_windows.h"
 #include "game/character_bug_report.h"
+#include "game/chat_room_stage.h"
+#include "game/database_windows.h"
+#include "game/hud_rounds.h"
+#include "game/mail_stage.h"
+#include "game/memorial_stage.h"
+#include "game/minigame_stage.h"
+#include "game/navigation_windows.h"
+#include "game/party_windows.h"
+#include "game/quest_stage.h"
+#include "game/staff_window_rounds.h"
+#include "game/trade_windows.h"
 #include "game/ui_answers.h"
 #include "game/ui_stage_survivors.h"
 #include "game/ui_stage_views.h"
+#include "game/ui_window_rounds.h"
 #include "game/ui_windows.h"
+#include "game/whisper_stage.h"
+#include "mvp/mvp_tracker_stage.h"
+#include "party/party_booking_board.h"
+#include "world/broadcast_balloons.h"
+#include "world/music_player_stage.h"
+#include "world/ranking_board.h"
+#include "world/reputation_board.h"
 
 namespace moonclient {
 namespace {
@@ -112,14 +183,14 @@ UiStage::Answers UiStage::Draw(
   // LES INCANTATIONS AVEC ELLES, et sous les bulles pour la même raison.
   ro::ui::DrawCastBars(cast_bars, cast_bar_look);
   // L'ICÔNE DE QUI PARLE, sous les bulles : une phrase passe par-dessus.
-  ro::ui::DrawVoiceMarks(windows.voice.marks, windows.voice.mark_icon);
+  ro::ui::DrawVoiceMarks(windows.voice->marks, windows.voice->mark_icon);
   // Les bulles juste apres la grille, sur la MEME liste de fond : elles la
   // recouvrent, et c est l ordre qu on veut -- un quadrillage d alignement n a
   // pas a barrer ce que quelqu un vient de dire.
   // ⚠ AVEC CE QUE LE FIL SAIT PEINDRE : une bulle montre la même phrase que lui.
-  ro::ui::DrawChatBubbles(bubbles, bubble_look, &windows.chat.rich);
+  ro::ui::DrawChatBubbles(bubbles, bubble_look, &windows.chat->rich);
   // LES BULLES D'ANNONCE, sur la même liste et du même texte que le fil.
-  DrawBalloonBoards(windows.balloons, &windows.chat.rich);
+  DrawBalloonBoards(windows.balloons, &windows.chat->rich);
   // CE QUE LA PARTIE PEINT PAR-DESSUS LE MONDE — le voile de ténèbres —, après
   // les barres et les bulles, qui appartiennent au monde, et sous toute
   // fenêtre : la liste de fond passe avant elles.
@@ -135,7 +206,7 @@ UiStage::Answers UiStage::Draw(
   //
   // ⚠ SOUS LE DROIT DE L'ÉTABLI, comme lui : un `open` retenu d'un compte
   // devenu ordinaire est ignoré, pas effacé — le droit peut revenir.
-  if (windows.log.open && rights.staff_tools) {
+  if (windows.log->open && rights.staff_tools) {
     const std::vector<ro::core::LoggedLine> lines = ro::core::RecentLogLines();
     static_cast<void>(ro::ui::DrawLogWindow(windows.log, lines));
   }
@@ -147,23 +218,23 @@ UiStage::Answers UiStage::Draw(
   // Les noms de fichiers de l'éditeur de carte, et du menu d'un modèle, sont
   // coréens : leur police les dessine, quelle que soit celle de l'interface.
   // La ressource de la fiche d'item est un tel nom de fichier.
-  windows.staff_tools.map_editor_panel.names_font = windows.entity_menu.state.hangul_font =
-      windows.staff_tools.item_editor.resource_font =
+  windows.staff_tools->map_editor_panel.names_font = windows.entity_menu->state.hangul_font =
+      windows.staff_tools->item_editor.resource_font =
           ui_->FontNamed(kHangulFontFamily, ro::ui::FontStyle::kRegular);
   const ro::ui::StaffToolsAction staff_action =
       ro::ui::DrawStaffTools(windows.staff_tools, skin_, rights.staff_tools);
   if (staff_action.toggle_log) {
-    windows.log.open = !windows.log.open;
+    windows.log->open = !windows.log->open;
   }
   if (staff_action.toggle_packets) {
-    windows.packets.open = !windows.packets.open;
+    windows.packets->open = !windows.packets->open;
   }
   if (rights.staff_tools) {
-    ro::ui::DrawCameraHud(windows.camera_hud, windows.staff_tools.look.camera_hud);
+    ro::ui::DrawCameraHud(windows.camera_hud, windows.staff_tools->look.camera_hud);
     if (ro::ui::SoundZonesShown(windows.staff_tools)) {
       ro::ui::DrawSoundZones(windows.sound_zones);
     }
-    if (windows.staff_tools.look.picking.boxes_shown) {
+    if (windows.staff_tools->look.picking.boxes_shown) {
       ro::ui::DrawPickBoxes(windows.pick_boxes);
     }
   }
@@ -171,13 +242,13 @@ UiStage::Answers UiStage::Draw(
   // LES DIX MACROS DE CHAT. ⚠ LA DESTINATION VIENT DE LA MÊME VUE QUE LA BARRE
   // DE SAISIE : la macro part là où partirait ce qu'on taperait, et deux calculs
   // de destination finiraient par se contredire.
-  ro::ui::DrawChatMacros(windows.macros, windows.macro_keys, chat_preview.target, macro_commands,
-                         emotions, skin_, &answers.macros);
+  ro::ui::DrawChatMacros(windows.macros, *windows.macro_keys, chat_preview.target, macro_commands,
+                         emotions, skin_, &*answers.macros);
 
   // L'INSPECTEUR DE TRAMES, SOUS LE DROIT DE L'ÉTABLI comme le journal — ou en
   // Debug, où `/trames` l'ouvre à qui développe. Un `open` retenu d'un compte
   // devenu ordinaire est ignoré, pas effacé.
-  if (windows.packets.open && (rights.staff_tools || ro::core::kDevTools)) {
+  if (windows.packets->open && (rights.staff_tools || ro::core::kDevTools)) {
     // LA RECOPIE, et c'est elle qui tient la frontière : `ui` ne connaît pas
     // `net`, donc le relevé traverse en données pures. Elle a un coût, il est
     // borné — le nombre d'opcodes distincts reçus, quelques dizaines — et il
@@ -198,27 +269,29 @@ UiStage::Answers UiStage::Draw(
   DrawConversation(windows, chat_preview, chat_tabs, chat_links, emotions, emojis, answers);
 
   // LA FICHE : le mannequin, les costumes, les nombres, et le grimoire.
-  answers.character = ro::ui::DrawCharacterWindow(
+  *answers.character = ro::ui::DrawCharacterWindow(
       windows.character, windows.character_view, sheet.header, sheet.slots, sheet.stats,
       sheet.presets, sheet.titles, sheet.guild, skills, points, skin_, sheet.companions);
-  if (answers.character.report_bug) {
+  if (answers.character->report_bug) {
     // Les vues mêmes que la fiche vient de dessiner, dans l'ordre de la scène.
-    AskBugReport(windows.bug_report, CharacterBugReport(CharacterBugScene{
-                                         &windows.character, &windows.character_view, &sheet.header,
-                                         sheet.slots, &sheet.stats, &sheet.presets, &sheet.titles,
-                                         &sheet.guild, skills, points, &sheet.companions}));
+    AskBugReport(
+        windows.bug_report,
+        CharacterBugReport(CharacterBugScene{
+            &*windows.character, &*windows.character_view, &sheet.header, sheet.slots, &sheet.stats,
+            &sheet.presets, &sheet.titles, &sheet.guild, skills, points, &sheet.companions}));
   }
   // Échap qui a annulé l'attente d'une touche de preset ne ferme pas la fiche.
-  if (answers.character.presets.escape_spent) {
+  if (answers.character->presets.escape_spent) {
     escape_.Suppress();
   }
   // LE STATUT, puis les préréglages de stats : deux portes, une fenêtre (`hud_rounds.h`).
-  windows.status.answer =
-      ro::ui::DrawStatusWindow(windows.status.state, windows.status.view, skin_);
-  ro::ui::RouteStatPresetDoors(windows.stat_presets.state, {windows.status.answer.toggle_presets,
-                                                            answers.character.toggle_stat_presets});
-  windows.stat_presets.answer =
-      ro::ui::DrawStatPresetWindow(windows.stat_presets.state, windows.stat_presets.view, skin_);
+  windows.status->answer =
+      ro::ui::DrawStatusWindow(windows.status->state, windows.status->view, skin_);
+  ro::ui::RouteStatPresetDoors(
+      windows.stat_presets->state,
+      {windows.status->answer.toggle_presets, answers.character->toggle_stat_presets});
+  windows.stat_presets->answer =
+      ro::ui::DrawStatPresetWindow(windows.stat_presets->state, windows.stat_presets->view, skin_);
   if (!sheet.guild_invitation.empty()) {
     bool accepted = false;
     if (ro::ui::DrawGuildInvitation(sheet.guild_invitation, accepted, skin_)) {
@@ -232,11 +305,11 @@ UiStage::Answers UiStage::Draw(
     }
   }
   // LA FENÊTRE GROUPE / AMIS, avec la fiche : on y passe de l'une à l'autre.
-  if (windows.party.view != nullptr && windows.party.look != nullptr) {
-    windows.party.answer = ro::ui::DrawPartyFriendWindow(windows.party.window, *windows.party.view,
-                                                         *windows.party.look, skin_);
+  if (windows.party->view != nullptr && windows.party->look != nullptr) {
+    windows.party->answer = ro::ui::DrawPartyFriendWindow(
+        windows.party->window, *windows.party->view, *windows.party->look, skin_);
   }
-  if (std::exchange(windows.party.ask_disband, false)) {
+  if (std::exchange(windows.party->ask_disband, false)) {
     ro::ui::AskModal(kPartyDisbandId);
   }
   if (ro::ui::DrawModalBox(kPartyDisbandId,
@@ -244,10 +317,10 @@ UiStage::Answers UiStage::Draw(
                                         "Voulez-vous plutôt dissoudre le groupe ?"),
                            ro::core::Tr("Dissoudre"), ro::core::Tr("Annuler"),
                            skin_) == ro::ui::ModalAnswer::kYes) {
-    windows.party.disband_confirmed = true;
+    windows.party->disband_confirmed = true;
   }
   // LA DEMANDE D'ADOPTION REÇUE : la boîte s'ouvre à son arrivée, et attend.
-  AdoptionBox& adoption = windows.party.adoption;
+  AdoptionBox& adoption = windows.party->adoption;
   if (std::exchange(adoption.ask, false)) {
     ro::ui::AskModal(kAdoptionId);
   }
@@ -262,7 +335,7 @@ UiStage::Answers UiStage::Draw(
 
   // L'ÉDITEUR DE STYLE, juste après la fiche : c'est la même apparence qu'on
   // regarde, par l'autre bout.
-  answers.style = ro::ui::DrawPaletteEditor(windows.style, style, skin_);
+  *answers.style = ro::ui::DrawPaletteEditor(windows.style, style, skin_);
 
   // L'APERÇU D'UN STYLE REÇU, juste après l'éditeur : les deux montrent notre
   // corps, et celui qu'on vient d'ouvrir doit passer devant l'autre.
@@ -270,23 +343,23 @@ UiStage::Answers UiStage::Draw(
 
   // LE SAC. Il suit la fiche : les deux se consultent ensemble, et celui qu'on
   // vient d'ouvrir doit passer devant celle qu'on avait laissee ouverte.
-  answers.inventory =
+  *answers.inventory =
       ro::ui::DrawInventoryWindow(windows.inventory, windows.inventory_view, bag, bag_tally, skin_);
 
   // LE SERTISSAGE APRÈS LE SAC : c'est de lui qu'on l'ouvre, et il passe devant
   // à sa naissance. ⚠ IL NE DÉPEND PAS DU SAC OUVERT : la liste du serveur
   // l'ouvre, et il survit à la fermeture du sac.
-  answers.card_insert =
+  *answers.card_insert =
       ro::ui::DrawCardInsertWindow(windows.card_insert, windows.card_insert_view, skin_);
 
   // LES ATELIERS APRÈS LE SAC : c'est lui qu'on regarde en fabriquant. ⚠ ILS NE
   // DÉPENDENT PAS DU SAC OUVERT : la liste du serveur les ouvre.
   if (windows.make_item_view != nullptr) {
-    answers.make_item =
+    *answers.make_item =
         ro::ui::DrawMakeItemWindow(windows.make_item, *windows.make_item_view, skin_);
   }
   if (windows.weapon_refine_view != nullptr) {
-    answers.weapon_refine =
+    *answers.weapon_refine =
         ro::ui::DrawWeaponRefineWindow(windows.weapon_refine, *windows.weapon_refine_view, skin_);
   }
 
@@ -297,67 +370,68 @@ UiStage::Answers UiStage::Draw(
   // celle du profil de disposition, qu'un personnage sans charrette partage
   // avec celui qui en pousse une. Elle attend que le serveur en annonce une.
   if (cart_tally.exists()) {
-    answers.cart = ro::ui::DrawCartWindow(windows.cart, windows.cart_view, cart, cart_tally, skin_);
+    *answers.cart =
+        ro::ui::DrawCartWindow(windows.cart, windows.cart_view, cart, cart_tally, skin_);
   }
 
   // LE COFFRE APRÈS LES DEUX AUTRES : c'est lui qu'on vient d'ouvrir quand il
   // est là, et les trois se consultent ensemble.
-  answers.storage = ro::ui::DrawStorageWindow(windows.storage, windows.storage_view, storage,
-                                              storage_tally, skin_);
+  *answers.storage = ro::ui::DrawStorageWindow(windows.storage, windows.storage_view, storage,
+                                               storage_tally, skin_);
 
   // LA BANQUE APRÈS LE COFFRE : c'est la dernière des fenêtres qu'un serveur
   // ouvre, et elle échange des zeny avec la poche que le sac affiche.
-  answers.bank = ro::ui::DrawBankWindow(windows.bank, bank, skin_);
+  *answers.bank = ro::ui::DrawBankWindow(windows.bank, bank, skin_);
 
   // LES DESTINATIONS D'UNE COMPÉTENCE DE DÉPLACEMENT : une question du serveur,
   // qui passe au premier plan à son arrivée. ⚠ ELLE PREND ÉCHAP ELLE-MÊME — il
   // vaut « Annuler », qui parle au serveur —, et rien derrière elle ne se ferme
   // alors sur la même touche.
-  answers.warp_list = ro::ui::DrawWarpListWindow(windows.warp_list, windows.warp_list_view, skin_);
-  if (answers.warp_list.escape_spent) {
+  *answers.warp_list = ro::ui::DrawWarpListWindow(windows.warp_list, windows.warp_list_view, skin_);
+  if (answers.warp_list->escape_spent) {
     escape_.Suppress();
   }
 
   // LA LISTE DES CHARRETTES, elle aussi ouverte par une compétence ou par le
   // serveur, et au premier plan à son arrivée.
-  answers.cart_choice =
+  *answers.cart_choice =
       ro::ui::DrawCartChoiceWindow(windows.cart_choice, windows.cart_choice_view, skin_);
   // LA LISTE DES SORTS D'AUTOSPELL, ouverte par le serveur.
-  answers.spell_list =
+  *answers.spell_list =
       ro::ui::DrawSpellListWindow(windows.spell_list, windows.spell_list_view, skin_);
   // LA LISTE DE REPAIR WEAPON, ouverte par le serveur.
-  answers.repair = ro::ui::DrawRepairWindow(windows.repair, windows.repair_view, skin_);
+  *answers.repair = ro::ui::DrawRepairWindow(windows.repair, windows.repair_view, skin_);
   // LA FICHE DU FAMILIER, et la liste d'éclosion que le serveur ouvre.
-  answers.pet = ro::ui::DrawPetWindow(windows.pet, windows.pet_view, skin_);
-  answers.pet_hatch = ro::ui::DrawPetHatchWindow(windows.pet_hatch, windows.pet_hatch_view, skin_);
+  *answers.pet = ro::ui::DrawPetWindow(windows.pet, windows.pet_view, skin_);
+  *answers.pet_hatch = ro::ui::DrawPetHatchWindow(windows.pet_hatch, windows.pet_hatch_view, skin_);
   // LA SAISIE DE TALKIE BOX, ouverte par la pose de la compétence.
-  answers.talkbox = ro::ui::DrawTalkboxWindow(windows.talkbox, windows.talkbox_view, skin_);
+  *answers.talkbox = ro::ui::DrawTalkboxWindow(windows.talkbox, windows.talkbox_view, skin_);
   // LES RÉGLAGES AVANCÉS D'UNE TACTIQUE DE COMPAGNON, ouverts du menu d'entité.
-  answers.companion_tactic = ro::ui::DrawCompanionTacticWindow(
+  *answers.companion_tactic = ro::ui::DrawCompanionTacticWindow(
       windows.companion_tactic, windows.companion_tactic_view, skin_);
-  answers.companion_ai =
+  *answers.companion_ai =
       ro::ui::DrawCompanionAiWindow(windows.companion_ai, windows.companion_ai_view, skin_);
 
   // L'ALBUM DE CARTES APRÈS LES CONTENANTS : c'est le sac qui le remplit, et
   // les deux se consultent ensemble.
   if (windows.card_album_view != nullptr) {
-    answers.card_album =
+    *answers.card_album =
         ro::ui::DrawCardAlbumWindow(windows.card_album, *windows.card_album_view, skin_);
   }
 
   // LA BARRE AVANT LES FENÊTRES : elle se pose sur le monde, et tout panneau
   // qu'on ouvre doit passer devant elle.
-  answers.shortcuts = ro::ui::DrawShortcutBars(shortcut_bars, shortcuts, skin_);
+  *answers.shortcuts = ro::ui::DrawShortcutBars(shortcut_bars, shortcuts, skin_);
   // LA GRILLE D'ICÔNES DE MENU AVEC ELLE, et pour la même raison : elle reste à
   // l'écran, et ce qu'elle ouvre doit passer devant. Elle s'accroche sous la
   // fenêtre « Basic Info », dessinée juste avant.
-  windows.menu_icons.state.dock =
-      ro::ui::DrawBasicInfoWindow(windows.basic_info.state, windows.basic_info.view, skin_).dock;
-  if (windows.menu_icons.look != nullptr) {
+  windows.menu_icons->state.dock =
+      ro::ui::DrawBasicInfoWindow(windows.basic_info->state, windows.basic_info->view, skin_).dock;
+  if (windows.menu_icons->look != nullptr) {
     const ro::ui::MenuIconsAnswer menu =
-        ro::ui::DrawMenuIcons(windows.menu_icons.state, windows.menu_icons.icons,
-                              *windows.menu_icons.look, grid, hud_grip_, skin_);
-    windows.menu_icons.clicked = menu.clicked;
+        ro::ui::DrawMenuIcons(windows.menu_icons->state, windows.menu_icons->icons,
+                              *windows.menu_icons->look, grid, hud_grip_, skin_);
+    windows.menu_icons->clicked = menu.clicked;
     answers.menu_icons_moved = menu.moved;
   }
 
@@ -376,81 +450,81 @@ UiStage::Answers UiStage::Draw(
   answers.pvp_hud_moved = ro::ui::PvpHudFrames(
       pvp_hud, grid, hud_grip_, {ImGui::GetIO().DisplaySize.x, ImGui::GetIO().DisplaySize.y});
   // LA GRILLE DE GROUPE, cadre libre comme les jauges.
-  if (windows.party.grid_view != nullptr && windows.party.grid_look != nullptr) {
-    windows.party.grid_answer =
-        ro::ui::DrawPartyGrid(*windows.party.grid_view, *windows.party.grid_look,
-                              windows.party.grid_state, grid, hud_grip_);
+  if (windows.party->grid_view != nullptr && windows.party->grid_look != nullptr) {
+    windows.party->grid_answer =
+        ro::ui::DrawPartyGrid(*windows.party->grid_view, *windows.party->grid_look,
+                              windows.party->grid_state, grid, hud_grip_);
   }
   // LE HUD DE CIBLE, cadres libres comme les jauges. Sa vue ne descend que sous le mode Ciblage.
-  if (windows.target_hud.view != nullptr && windows.target_hud.look != nullptr) {
-    ro::ui::DrawTargetHud(*windows.target_hud.view, grid, *windows.target_hud.look, hud_grip_,
-                          windows.target_hud.answer);
+  if (windows.target_hud->view != nullptr && windows.target_hud->look != nullptr) {
+    ro::ui::DrawTargetHud(*windows.target_hud->view, grid, *windows.target_hud->look, hud_grip_,
+                          windows.target_hud->answer);
   }
   // LE PORTRAIT DE STATUT, cadres libres comme le HUD de cible.
-  if (windows.status_portrait.view != nullptr && windows.status_portrait.look != nullptr) {
-    ro::ui::DrawStatusPortrait(*windows.status_portrait.view, grid, *windows.status_portrait.look,
-                               hud_grip_, windows.status_portrait.answer);
+  if (windows.status_portrait->view != nullptr && windows.status_portrait->look != nullptr) {
+    ro::ui::DrawStatusPortrait(*windows.status_portrait->view, grid, *windows.status_portrait->look,
+                               hud_grip_, windows.status_portrait->answer);
   }
   // LE MENU DU CLIC DROIT SUR UNE ENTITÉ, après le HUD dont un cadre l'ouvre.
   // ⚠ À CHAQUE IMAGE, MÊME FERMÉ : sa question se pose une fois le menu
   // refermé, et une boîte qu'on cesse de dessiner disparaît sans réponse.
-  windows.entity_menu.answer =
-      ro::ui::DrawEntityMenu(windows.entity_menu.state, windows.entity_menu.view, skin_);
+  windows.entity_menu->answer =
+      ro::ui::DrawEntityMenu(windows.entity_menu->state, windows.entity_menu->view, skin_);
   // L'ÉQUIPEMENT D'UN AUTRE JOUEUR, avant l'aperçu qui survole ses pièces et la
   // description qu'on ouvre depuis elles.
-  if (windows.view_equip.view != nullptr) {
-    windows.view_equip.answer =
-        ro::ui::DrawViewEquipWindow(windows.view_equip.state, *windows.view_equip.view, skin_);
+  if (windows.view_equip->view != nullptr) {
+    windows.view_equip->answer =
+        ro::ui::DrawViewEquipWindow(windows.view_equip->state, *windows.view_equip->view, skin_);
   }
   // LA FICHE D'UN MONSTRE, avant l'aperçu qui survole son butin et la
   // description qu'on ouvre depuis lui.
-  if (windows.monster_sheet.view != nullptr) {
-    windows.monster_sheet.answer = ro::ui::DrawMonsterSheetWindow(
-        windows.monster_sheet.state, *windows.monster_sheet.view, skin_);
+  if (windows.monster_sheet->view != nullptr) {
+    windows.monster_sheet->answer = ro::ui::DrawMonsterSheetWindow(
+        windows.monster_sheet->state, *windows.monster_sheet->view, skin_);
   }
-  if (DatabaseWindows& database = windows.monster_sheet.database; database.view != nullptr) {
+  if (DatabaseWindows& database = windows.monster_sheet->database; database.view != nullptr) {
     database.answer = ro::ui::DrawDatabaseWindow(database.state, *database.view,
-                                                 windows.monster_sheet.state, skin_);
+                                                 windows.monster_sheet->state, skin_);
   }
-  if (windows.entity_inspector.view != nullptr) {
-    windows.entity_inspector.answer = ro::ui::DrawEntityInspectorWindow(
-        windows.entity_inspector.state, *windows.entity_inspector.view, skin_);
+  if (windows.entity_inspector->view != nullptr) {
+    windows.entity_inspector->answer = ro::ui::DrawEntityInspectorWindow(
+        windows.entity_inspector->state, *windows.entity_inspector->view, skin_);
   }
-  if (windows.chat_block_log.view != nullptr) {
-    windows.chat_block_log.answer = ro::ui::DrawChatBlockLogWindow(
-        windows.chat_block_log.state, *windows.chat_block_log.view, skin_);
+  if (windows.chat_block_log->view != nullptr) {
+    windows.chat_block_log->answer = ro::ui::DrawChatBlockLogWindow(
+        windows.chat_block_log->state, *windows.chat_block_log->view, skin_);
   }
   // L'ATLAS DES RECETTES, avant l'aperçu qui survole ses lignes et la
   // description qu'on ouvre depuis son menu.
-  if (windows.craft_atlas.view != nullptr) {
-    windows.craft_atlas.answer =
-        ro::ui::DrawCraftAtlasWindow(windows.craft_atlas.state, *windows.craft_atlas.view, skin_);
+  if (windows.craft_atlas->view != nullptr) {
+    windows.craft_atlas->answer =
+        ro::ui::DrawCraftAtlasWindow(windows.craft_atlas->state, *windows.craft_atlas->view, skin_);
   }
   // LA MINIMAP, puis la navigation qu'elle ouvre.
-  if (windows.minimap.view != nullptr && windows.minimap.settings != nullptr) {
-    windows.minimap.answer = ro::ui::DrawMinimapWindow(
-        *windows.minimap.settings, windows.minimap.state, *windows.minimap.view, skin_);
+  if (windows.minimap->view != nullptr && windows.minimap->settings != nullptr) {
+    windows.minimap->answer = ro::ui::DrawMinimapWindow(
+        *windows.minimap->settings, windows.minimap->state, *windows.minimap->view, skin_);
   }
   DrawNavigationWindows(windows.navigation);
   DrawMvpTrackerWindows(windows.mvp_tracker);
   DrawBattlegroundWindows(windows.battleground);
-  windows.memorial.answer =
-      ro::ui::DrawMemorialDungeonWindow(windows.memorial.window, windows.memorial.view, skin_);
+  windows.memorial->answer =
+      ro::ui::DrawMemorialDungeonWindow(windows.memorial->window, windows.memorial->view, skin_);
   // LA BOUTIQUE DE VOTE, avant la description qu'on ouvre depuis ses cartes.
-  if (windows.cash_shop.view != nullptr) {
-    windows.cash_shop.answer =
-        ro::ui::DrawCashShopWindow(windows.cash_shop.state, *windows.cash_shop.view, skin_);
+  if (windows.cash_shop->view != nullptr) {
+    windows.cash_shop->answer =
+        ro::ui::DrawCashShopWindow(windows.cash_shop->state, *windows.cash_shop->view, skin_);
   }
-  DrawTradeWindows(windows.trade, windows.chat.link_facts);
-  DrawMailWindows(windows.mail, windows.chat.link_facts);
+  DrawTradeWindows(windows.trade, windows.chat->link_facts);
+  DrawMailWindows(windows.mail, windows.chat->link_facts);
   DrawQuestWindows(windows.quests, windows.tracker);
   DrawAchievementWindows(windows.achievements);
   DrawRankingWindows(windows.ranking_board);
   DrawReputationWindows(windows.reputation, skin_, escape_);
   DrawPartyBookingWindows(windows.party_booking);
-  if (windows.music_player.composed) {
-    windows.music_player.answer = ro::ui::DrawMusicPlayerWindow(windows.music_player.window,
-                                                                windows.music_player.view, skin_);
+  if (windows.music_player->composed) {
+    windows.music_player->answer = ro::ui::DrawMusicPlayerWindow(windows.music_player->window,
+                                                                 windows.music_player->view, skin_);
   }
   DrawMinigameWindows(windows.minigames, skin_, escape_);
 
@@ -466,39 +540,39 @@ UiStage::Answers UiStage::Draw(
   // n'apparaît pas avant que la souris se soit arrêtée.
   ro::ui::DrawDescriptionPreview(previewed, skin_);
   // ET CELUI D'UN MONSTRE, au même endroit et pour la même raison.
-  if (windows.monster_sheet.preview != nullptr) {
-    ro::ui::DrawMonsterSheetPreview(windows.monster_sheet.preview_state,
-                                    *windows.monster_sheet.preview, skin_);
+  if (windows.monster_sheet->preview != nullptr) {
+    ro::ui::DrawMonsterSheetPreview(windows.monster_sheet->preview_state,
+                                    *windows.monster_sheet->preview, skin_);
   }
   // ET CELUI D'UNE RECETTE, de même.
-  if (windows.craft_atlas.preview != nullptr) {
-    ro::ui::DrawCraftRecipePreview(*windows.craft_atlas.preview, skin_);
+  if (windows.craft_atlas->preview != nullptr) {
+    ro::ui::DrawCraftRecipePreview(*windows.craft_atlas->preview, skin_);
   }
 
   // LA DESCRIPTION APRÈS LES FENÊTRES D'OBJETS : c'est d'elles qu'on l'ouvre,
   // et elle doit passer devant celle qu'on vient de quitter.
-  answers.description = ro::ui::DrawDescriptionWindow(windows.description, described, skin_);
+  *answers.description = ro::ui::DrawDescriptionWindow(windows.description, described, skin_);
   // ET CELLE D'UNE COMPÉTENCE JUSTE APRÈS : elle s'ouvre depuis le grimoire, qui
   // est un onglet de la fiche — dessinée plus haut, comme les fenêtres d'objets.
-  answers.skill_description =
+  *answers.skill_description =
       ro::ui::DrawSkillDescriptionWindow(windows.skill_description, skill_described, skin_);
   if (windows.book_view != nullptr) {
-    answers.book = ro::ui::DrawBookWindow(windows.book, *windows.book_view, skin_);
+    *answers.book = ro::ui::DrawBookWindow(windows.book, *windows.book_view, skin_);
   }
   ro::ui::DrawBookRecital(windows.book_recital);
 
-  answers.hotkeys = ro::ui::DrawHotkeyWindow(windows.hotkeys, hotkeys, skin_);
+  *answers.hotkeys = ro::ui::DrawHotkeyWindow(windows.hotkeys, hotkeys, skin_);
   // Échap qui a annulé la capture d'une touche ne ferme pas la fenêtre.
-  if (std::exchange(windows.hotkeys.escape_spent, false)) {
+  if (std::exchange(windows.hotkeys->escape_spent, false)) {
     escape_.Suppress();
   }
-  answers.options = ro::ui::DrawOptionsWindow(windows.options, options, skin_);
+  *answers.options = ro::ui::DrawOptionsWindow(windows.options, options, skin_);
   // LE MENU APRÈS SES SOUS-FENÊTRES : il est petit et on l'ouvre pour en sortir,
   // il doit passer devant.
   answers.menu = ro::ui::DrawGameMenu(windows.menu, skin_, menu_facts);
   // LE RAPPORT DE BUG : une boîte modale, qui passe devant tout, et l'accusé.
-  answers.bug_report = ro::ui::DrawBugReportWindow(windows.bug_report, skin_);
-  answers.player_report = ro::ui::DrawPlayerReportWindow(windows.player_report, skin_);
+  *answers.bug_report = ro::ui::DrawBugReportWindow(windows.bug_report, skin_);
+  *answers.player_report = ro::ui::DrawPlayerReportWindow(windows.player_report, skin_);
 
   // LE DIALOGUE EN DERNIER : c'est la seule fenêtre à laquelle le joueur DOIT
   // répondre, et elle doit donc passer devant celles qui servent à bâtir.
@@ -510,7 +584,7 @@ UiStage::Answers UiStage::Draw(
   // recouvrent, comme chez le client d'origine. Elle ne dépend pas de lui — le
   // script l'efface quand il veut, et celle qu'il oublie reste.
   if (talk.illustration.has_value()) {
-    answers.npc_illustration = ro::ui::DrawNpcIllustration(*talk.illustration, skin_);
+    *answers.npc_illustration = ro::ui::DrawNpcIllustration(*talk.illustration, skin_);
   }
   if (talk.view != nullptr) {
     answer = ro::ui::DrawNpcDialogWindow(windows.npc_dialog, *talk.view, skin_, talk.art);
@@ -524,7 +598,7 @@ UiStage::Answers UiStage::Draw(
     // que d'être avalée sans rien faire.
     if (talk.view->prompt == ro::ui::NpcDialogPrompt::kClose ||
         talk.view->prompt == ro::ui::NpcDialogPrompt::kMenu) {
-      escape_.Register(ro::ui::kNpcDialogWindowId, &windows.npc_dialog.open);
+      escape_.Register(ro::ui::kNpcDialogWindowId, &windows.npc_dialog->open);
     }
   } else {
     // 🔴 LA FENÊTRE FERMÉE, SON ÉTAT REPART À BLANC. Une conversation garde une
@@ -532,7 +606,7 @@ UiStage::Answers UiStage::Draw(
     // en place ferait ouvrir la SUIVANTE sur les restes de la précédente — un
     // filtre qui masque des options, une saisie déjà remplie —, et la fenêtre
     // s'ouvrirait là où le joueur avait poussé l'autre.
-    windows.npc_dialog = ro::ui::NpcDialogWindowState{};
+    *windows.npc_dialog = ro::ui::NpcDialogWindowState{};
   }
 
   // LE COMPTEUR EN DERNIER, par-dessus tout : c'est un instrument, et ce qu'il
@@ -543,14 +617,14 @@ UiStage::Answers UiStage::Draw(
   ro::ui::DrawFrameMeter(windows.meter, round_trip_ms);
   // ⚠ APRÈS LES FENÊTRES DE CONVERSATION : lâché sur l'une de leurs bandes, il
   // s'y range, et ce sont les mesures de CETTE image qu'il lit.
-  answers.damage_meter =
-      ro::ui::DrawDamageMeter(windows.damage_meter, windows.damage_meter_view, &windows.chat.board);
+  *answers.damage_meter = ro::ui::DrawDamageMeter(windows.damage_meter, windows.damage_meter_view,
+                                                  &windows.chat->board);
 
   // 🔴 APRÈS TOUTES LES FENÊTRES, ET C'EST TOUT L'INTÉRÊT : un objet lâché sur
   // le monde est un objet qu'AUCUNE cible n'a pris, et on ne peut le savoir
   // qu'une fois toutes les cibles passées. Interroger plus tôt jetterait au sol
   // ce qu'on rangeait dans une fenêtre qui n'a pas encore tourné.
-  answers.dropped_on_nothing = ro::ui::ItemDroppedOnNothing(&answers.dropped_item);
+  answers.dropped_on_nothing = ro::ui::ItemDroppedOnNothing(&*answers.dropped_item);
 
   // ⚠ LES FENÊTRES SE DÉCLARENT ICI, ET NON DANS LEUR DESSIN. Une fenêtre ne
   // connaît pas la pile ; l'étage, lui, sait ce qu'il a ouvert et tient les
@@ -562,44 +636,44 @@ UiStage::Answers UiStage::Draw(
   // elles n'AVALENT pas la touche non plus, si bien qu'Échap continue d'ouvrir
   // le menu quand l'une d'elles est au premier plan.
   escape_.SkipNext();
-  escape_.Register(ro::ui::kPacketWindowId, &windows.packets.open);
+  escape_.Register(ro::ui::kPacketWindowId, &windows.packets->open);
   escape_.SkipNext();
-  escape_.Register(ro::ui::kLogWindowId, &windows.log.open);
+  escape_.Register(ro::ui::kLogWindowId, &windows.log->open);
   escape_.SkipNext();
-  escape_.Register(ro::ui::kStaffToolsId, &windows.staff_tools.open);
-  escape_.Register(ro::ui::kStaffRosterWindowId, &windows.staff_tools.roster.open);
+  escape_.Register(ro::ui::kStaffToolsId, &windows.staff_tools->open);
+  escape_.Register(ro::ui::kStaffRosterWindowId, &windows.staff_tools->roster.open);
   // Les macros, elles, RENTRENT dans la pile : on les ouvre pour écrire une
   // ligne et on les referme, comme toute fenêtre de réglage.
-  escape_.Register(ro::ui::kChatMacroId, &windows.macros.open);
-  if (windows.companion_ai.pinned) {
+  escape_.Register(ro::ui::kChatMacroId, &windows.macros->open);
+  if (windows.companion_ai->pinned) {
     escape_.SkipNext();
   }
-  escape_.Register(ro::ui::kCompanionAiWindowId, &windows.companion_ai.open);
-  if (windows.companion_tactic.pinned) {
+  escape_.Register(ro::ui::kCompanionAiWindowId, &windows.companion_ai->open);
+  if (windows.companion_tactic->pinned) {
     escape_.SkipNext();
   }
-  escape_.Register(ro::ui::kCompanionTacticWindowId, &windows.companion_tactic.open);
+  escape_.Register(ro::ui::kCompanionTacticWindowId, &windows.companion_tactic->open);
   // 🔴 UNE FENÊTRE ÉPINGLÉE SORT DE LA PILE, elle n'y entre pas grisée : elle
   // n'avale donc pas non plus la touche, et le jeu reçoit Échap. C'est bien ce
   // que veut un joueur qui a délibérément cloué une fenêtre à l'écran.
-  if (windows.character.pinned) {
+  if (windows.character->pinned) {
     escape_.SkipNext();
   }
-  escape_.Register(ro::ui::kCharacterWindowId, &windows.character.open);
-  escape_.Register(ro::ui::kStatusWindowId, &windows.status.state.open);
-  if (windows.party.window.pinned) {
+  escape_.Register(ro::ui::kCharacterWindowId, &windows.character->open);
+  escape_.Register(ro::ui::kStatusWindowId, &windows.status->state.open);
+  if (windows.party->window.pinned) {
     escape_.SkipNext();
   }
-  escape_.Register(ro::ui::kPartyFriendWindowId, &windows.party.window.open);
-  if (windows.cart.pinned) {
+  escape_.Register(ro::ui::kPartyFriendWindowId, &windows.party->window.open);
+  if (windows.cart->pinned) {
     escape_.SkipNext();
   }
-  escape_.Register(ro::ui::kCartWindowId, &windows.cart.open);
+  escape_.Register(ro::ui::kCartWindowId, &windows.cart->open);
   // LE COFFRE AUSSI, comme les ateliers : son interrupteur recopie la session
   // du serveur, et la boucle lit un interrupteur BAISSÉ comme sa croix, qu'elle
   // dit au serveur — voir `Game::ApplyContainerAnswers`. Baisser seulement
   // l'interrupteur laisserait le serveur croire le coffre ouvert.
-  escape_.Register(ro::ui::kStorageWindowId, &windows.storage.open);
+  escape_.Register(ro::ui::kStorageWindowId, &windows.storage->open);
   // 🔴 LA BANQUE N'EN EST PAS NON PLUS, pour une raison à elle : son
   // interrupteur ne lui appartient pas. Il RECOPIE `world.bank().open()` à
   // chaque image, si bien qu'un Échap qui le baisserait le verrait relevé
@@ -611,51 +685,51 @@ UiStage::Answers UiStage::Draw(
   // pas : sa barre de titre n'a que sa croix, et le nom d'objet qu'elle porte a
   // besoin de toute la place. Échap la ferme donc toujours — ET D'ABORD : on
   // l'ouvre d'un clic dans l'inventaire, qui garde le focus.
-  escape_.RegisterReading(ro::ui::kDescriptionWindowId, &windows.description.open);
-  escape_.RegisterReading(ro::ui::kSkillDescriptionWindowId, &windows.skill_description.open);
+  escape_.RegisterReading(ro::ui::kDescriptionWindowId, &windows.description->open);
+  escape_.RegisterReading(ro::ui::kSkillDescriptionWindowId, &windows.skill_description->open);
   // La fiche d'un monstre se lit et se referme, comme une description.
-  escape_.RegisterReading(ro::ui::kMonsterSheetWindowId, &windows.monster_sheet.state.open);
-  escape_.Register(ro::ui::kDatabaseWindowId, &windows.monster_sheet.database.state.open);
-  escape_.RegisterReading(ro::ui::kEntityInspectorWindowId, &windows.entity_inspector.state.open);
-  escape_.RegisterReading(ro::ui::kChatBlockLogWindowId, &windows.chat_block_log.state.open);
-  escape_.Register(ro::ui::kPlayerReportWindowId, &windows.player_report.open);
+  escape_.RegisterReading(ro::ui::kMonsterSheetWindowId, &windows.monster_sheet->state.open);
+  escape_.Register(ro::ui::kDatabaseWindowId, &windows.monster_sheet->database.state.open);
+  escape_.RegisterReading(ro::ui::kEntityInspectorWindowId, &windows.entity_inspector->state.open);
+  escape_.RegisterReading(ro::ui::kChatBlockLogWindowId, &windows.chat_block_log->state.open);
+  escape_.Register(ro::ui::kPlayerReportWindowId, &windows.player_report->open);
   // L'Atlas aussi : on le consulte, puis on le referme.
-  escape_.Register(ro::ui::kCraftAtlasWindowId, &windows.craft_atlas.state.open);
+  escape_.Register(ro::ui::kCraftAtlasWindowId, &windows.craft_atlas->state.open);
   RegisterNavigationEscapes(windows.navigation);
   RegisterMvpTrackerEscapes(windows.mvp_tracker);
   RegisterBattlegroundEscapes(windows.battleground);
-  escape_.Register(ro::ui::kMemorialDungeonWindowId, &windows.memorial.window.open);
+  escape_.Register(ro::ui::kMemorialDungeonWindowId, &windows.memorial->window.open);
   RegisterRankingEscapes(windows.ranking_board);
   RegisterPartyBookingEscapes(windows.party_booking);
-  escape_.Register(ro::ui::kMusicPlayerId, &windows.music_player.window.open);
+  escape_.Register(ro::ui::kMusicPlayerId, &windows.music_player->window.open);
   // LES ATELIERS AUSSI : leur interrupteur recopie la session du serveur, mais
   // la boucle lit un interrupteur BAISSÉ comme une fermeture, et répond au
   // serveur — voir `CraftStage::Apply`.
-  escape_.Register(ro::ui::kMakeItemWindowId, &windows.make_item.open);
-  escape_.Register(ro::ui::kWeaponRefineWindowId, &windows.weapon_refine.open);
+  escape_.Register(ro::ui::kMakeItemWindowId, &windows.make_item->open);
+  escape_.Register(ro::ui::kWeaponRefineWindowId, &windows.weapon_refine->open);
   // L'album, lui, EN EST : son interrupteur est au joueur, et la fenêtre rend
   // elle-même le verrou au serveur quand elle se voit fermée.
-  escape_.Register(ro::ui::kCardAlbumWindowId, &windows.card_album.open);
+  escape_.Register(ro::ui::kCardAlbumWindowId, &windows.card_album->open);
   // LA BOUTIQUE DE VOTE AUSSI : son interrupteur recopie la session du serveur,
   // mais la boucle lit un interrupteur BAISSÉ comme une fermeture, et la dit au
   // serveur — voir `CashShopStage::Advance`.
-  escape_.Register(ro::ui::kCashShopWindowId, &windows.cash_shop.state.open);
+  escape_.Register(ro::ui::kCashShopWindowId, &windows.cash_shop->state.open);
   RegisterTradeEscapes(windows.trade);
   RegisterMailEscapes(windows.mail);
   RegisterChatRoomEscapes(windows.chat_room);
   RegisterWhisperEscapes(windows.whispers);
   RegisterAchievementEscapes(windows.achievements);
   RegisterQuestEscapes(windows.quests);
-  if (windows.inventory.pinned) {
+  if (windows.inventory->pinned) {
     escape_.SkipNext();
   }
-  escape_.Register(ro::ui::kInventoryWindowId, &windows.inventory.open);
-  escape_.Register(ro::ui::kHotkeyWindowId, &windows.hotkeys.open);
-  escape_.Register(ro::ui::kOptionsWindowId, &windows.options.open);
+  escape_.Register(ro::ui::kInventoryWindowId, &windows.inventory->open);
+  escape_.Register(ro::ui::kHotkeyWindowId, &windows.hotkeys->open);
+  escape_.Register(ro::ui::kOptionsWindowId, &windows.options->open);
   // La fenêtre d'attente d'une icône se lit et se referme. ⚠ PAS LA GRILLE : elle
   // n'a pas de croix, elle se replie.
-  escape_.Register(ro::ui::kMenuPlaceholderId, &windows.menu_icons.state.placeholder_open);
-  escape_.Register(ro::ui::kGameMenuId, &windows.menu.open);
+  escape_.Register(ro::ui::kMenuPlaceholderId, &windows.menu_icons->state.placeholder_open);
+  escape_.Register(ro::ui::kGameMenuId, &windows.menu->open);
   // ⚠ LA CONVERSATION N'EN EST PAS. Elle se ferme dans les options, comme celle
   // du client : Échap doit rendre le clavier au jeu sans faire disparaître ce
   // qu'on vient de lire.
@@ -673,7 +747,7 @@ UiStage::Answers UiStage::Draw(
   //
   // ⚠ ET AVANT L'ENREGISTREUR : son témoin doit rester au-dessus de ce qu'il
   // filme, bandeau compris.
-  ro::ui::DrawItemObtainToast(obtained, obtained_look, skin_, obtained_grip, &answers.obtained);
+  ro::ui::DrawItemObtainToast(obtained, obtained_look, skin_, obtained_grip, &*answers.obtained);
   ro::ui::DrawShortcutWheel(windows.shortcut_wheel, shortcut_bars, shortcuts);
   if (!windows.unlocked_hud.empty()) {
     const ro::ui::UnlockNoticeAnswer notice = ro::ui::DrawUnlockNotice(windows.unlocked_hud);
@@ -682,10 +756,10 @@ UiStage::Answers UiStage::Draw(
   }
   // LE NOM DE LA CARTE, après les fenêtres comme le client, et pour la même
   // raison que l'enregistreur passe après lui.
-  if (windows.map_sign.has_value()) {
-    ro::ui::DrawMapSign(*windows.map_sign, ui_->MapSignFont());
+  if (windows.map_sign->has_value()) {
+    ro::ui::DrawMapSign(**windows.map_sign, ui_->MapSignFont());
   }
-  ro::ui::DrawZoneSelection(capture, skin_, zone_trace_, &answers.capture);
+  ro::ui::DrawZoneSelection(capture, skin_, zone_trace_, &*answers.capture);
   ro::ui::DrawCaptureBadge(capture, skin_);
   // QUI PARLE, par-dessus les fenêtres mais sous la boîte de liaison perdue.
   ro::ui::DrawVoiceOverlay(windows.voice);

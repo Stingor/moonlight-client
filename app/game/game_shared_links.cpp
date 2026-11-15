@@ -75,7 +75,7 @@ void Game::FollowSharedLink(const ChatLinkTarget& aimed, ro::ui::ChatLinkGesture
     case ro::ui::ChatLinkGesture::kTryStyle:
       // ⚠ LA FENÊTRE S'OUVRE AVEC : ce qu'on reçoit y arrive en proposition, et
       // rien ne change sur le personnage avant « Valider ».
-      windows_.style.open = true;
+      windows_.style->open = true;
       if (outfit) {
         style_view_->FetchOutfit(aimed.code, link_, world_, now_ms);
       } else {

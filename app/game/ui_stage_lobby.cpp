@@ -12,6 +12,8 @@
 // images.
 
 #include "ro/ui/login_window.h"
+#include "ro/ui/map_sign_banner.h"
+#include "ro/ui/options_window.h"
 
 #include "game/ui_answers.h"
 #include "game/ui_stage.h"

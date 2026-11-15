@@ -34,14 +34,17 @@
 #include "ro/sim/movement.h"
 #include "ro/sim/server_clock.h"
 #include "ro/sim/world.h"
+#include "ro/ui/link_notice.h"
 
 #include "game/bug_report_context.h"
+#include "game/cash_shop_windows.h"
 #include "game/connected_session.h"
 #include "game/game.h"
 #include "game/handshake_pump.h"
 #include "game/interface_sound.h"
 #include "game/level_up_cue.h"
 #include "game/survivors_presence_mode.h"
+#include "game/ui_window_rounds.h"
 #include "input/camera_aim.h"
 #include "loading/loading_plans.h"
 #include "loading/loading_presenter.h"
@@ -55,7 +58,7 @@
 namespace moonclient {
 
 void Game::FollowGmOutfit() {
-  windows_.staff_tools.admin = Rights().staff_tools && world_.group_level() >= kAdminMinGroupLevel;
+  windows_.staff_tools->admin = Rights().staff_tools && world_.group_level() >= kAdminMinGroupLevel;
   const bool worn = ro::ui::GmOutfitWorn(windows_.staff_tools);
   // 🔴 LE NÔTRE SUIT LA CASE, ET NON L'ÉCHO DU SERVEUR : il se voit dès le clic,
   // et chaque réapparition le pose de nouveau.
@@ -63,7 +66,7 @@ void Game::FollowGmOutfit() {
   if (link_.is_open()) {
     pieces_.gm_outfit.Pump(link_,
                            handshake_.state() == ro::net::MoonclientHandshakeState::kVerified,
-                           windows_.staff_tools.admin, worn);
+                           windows_.staff_tools->admin, worn);
   }
 }
 
@@ -82,7 +85,7 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
     // zone en cours, qui a son propre délai (`ro::net::ZoneMoveOverdue`), ou
     // une perte déjà dite. La garde repart de zéro avec la liaison suivante.
     link_watch_.Restart(now_ms);
-    windows_.link_notice.unsteady = false;
+    windows_.link_notice->unsteady = false;
     return {};
   }
   // ⚠ AVANT LA LECTURE : c'est l'écart avec l'image précédente qui dit si la
@@ -428,7 +431,7 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
                 .walk_clock = &grimoire_.approach_clock(),
                 .deferred_walk = &world_mouse_.deferred_walk,
                 .player_gesture = scene_actors_.player_gesture,
-                .entity_menu = &windows_.entity_menu.state,
+                .entity_menu = &windows_.entity_menu->state,
                 .in_chat_room = pieces_.chat_rooms.room().in_room(),
                 .left_held = (SDL_GetMouseState(nullptr, nullptr) & SDL_BUTTON_LMASK) != 0,
                 .now_ms = now_ms});
@@ -468,9 +471,10 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
   AdvanceCraftAtlas(now_ms);
   AdvanceNavigation(now_ms);
   // La boutique de vote : ce que sa fenêtre a rendu, et la vue qu'elle dessinera.
-  pieces_.cash_shop.Advance(windows_.cash_shop.state, std::exchange(windows_.cash_shop.answer, {}),
-                            link_, world_, pieces_.item_words, styles_, now_ms);
-  windows_.cash_shop.view = pieces_.cash_shop.view();
+  pieces_.cash_shop.Advance(windows_.cash_shop->state,
+                            std::exchange(windows_.cash_shop->answer, {}), link_, world_,
+                            pieces_.item_words, styles_, now_ms);
+  windows_.cash_shop->view = pieces_.cash_shop.view();
   // MAJ + CLIC SUR UNE CARTE : son lien dans la saisie du chat ; et ce que son
   // menu a choisi d'autre que la description.
   if (const std::optional<ro::vfs::ItemLink> reposted = pieces_.cash_shop.TakeReposted();
@@ -486,8 +490,8 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
   // cartes ; un objet de la boutique, par son seul identifiant.
   // L'ONGLET DE VENTE D'UN PNJ DEMANDE LA BASE DU SERVEUR : « Ajouter par type »
   // range chaque ligne sous le type qu'elle lui donne.
-  if (windows_.trade.npc_shop.state.open &&
-      windows_.trade.npc_shop.state.tab == ro::ui::NpcShopTab::kSell) {
+  if (windows_.trade->npc_shop.state.open &&
+      windows_.trade->npc_shop.state.tab == ro::ui::NpcShopTab::kSell) {
     database_.Read();
   }
   pieces_.trade.deal().RefuseProposals(settings_->options().pages().deal_refusal.refuses_deals());
@@ -498,7 +502,7 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
   // UNE VISITE REFERMÉE D'UN CLIC DROIT EMPORTE LA DESCRIPTION OUVERTE, comme
   // au client d'origine : c'était le plus souvent celle d'un article.
   if (pieces_.trade.TakeClosedVisits()) {
-    windows_.description.open = false;
+    windows_.description->open = false;
   }
   // LE COURRIER : les silences, ce que ses fenêtres ont rendu, les nouvelles,
   // et les vues qu'elles dessineront. Une pièce jointe se décrit comme un

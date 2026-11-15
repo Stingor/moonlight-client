@@ -18,6 +18,7 @@
 #include "ro/sim/inventory.h"
 
 #include "game/game.h"
+#include "game/ui_window_rounds.h"
 #include "options/option_targets.h"
 
 namespace moonclient {
@@ -107,9 +108,9 @@ void Game::ApplyItemTransfer(const ro::ui::ItemTransferAsk& asked) {
       const ro::ui::ItemVerb verb =
           asked.to == ItemHolder::kCart ? ro::ui::ItemVerb::kToCart : ro::ui::ItemVerb::kToStorage;
       if (ask_how_many) {
-        windows_.inventory.asking_slot = asked.client_slot;
-        windows_.inventory.asked_amount = 1;
-        windows_.inventory.asking_verb = verb;
+        windows_.inventory->asking_slot = asked.client_slot;
+        windows_.inventory->asked_amount = 1;
+        windows_.inventory->asking_verb = verb;
       } else {
         ro::ui::InventoryWindowAction moved;
         moved.verb = verb;
@@ -121,9 +122,9 @@ void Game::ApplyItemTransfer(const ro::ui::ItemTransferAsk& asked) {
     }
     case ItemHolder::kCart: {
       if (ask_how_many) {
-        windows_.cart.ask.slot = asked.client_slot;
-        windows_.cart.ask.amount = 1;
-        windows_.cart.ask_to_storage = asked.to == ItemHolder::kStorage;
+        windows_.cart->ask.slot = asked.client_slot;
+        windows_.cart->ask.amount = 1;
+        windows_.cart->ask_to_storage = asked.to == ItemHolder::kStorage;
       } else {
         ro::ui::CartWindowAction moved;
         moved.verb = asked.to == ItemHolder::kStorage ? ro::ui::CartVerb::kToStorage
@@ -136,9 +137,9 @@ void Game::ApplyItemTransfer(const ro::ui::ItemTransferAsk& asked) {
     }
     case ItemHolder::kStorage: {
       if (ask_how_many) {
-        windows_.storage.ask.slot = asked.client_slot;
-        windows_.storage.ask.amount = 1;
-        windows_.storage.ask_to_cart = asked.to == ItemHolder::kCart;
+        windows_.storage->ask.slot = asked.client_slot;
+        windows_.storage->ask.amount = 1;
+        windows_.storage->ask_to_cart = asked.to == ItemHolder::kCart;
       } else {
         ro::ui::StorageWindowAction moved;
         moved.verb = asked.to == ItemHolder::kCart ? ro::ui::StorageVerb::kToCart
@@ -169,7 +170,7 @@ OptionTargets Game::OptionsTargets() {
                        .display = gl_,
                        .effects = effects_.has_value() ? &*effects_ : nullptr,
                        .afk_try_now = &afk_requested_,
-                       .craft_atlas = &windows_.craft_atlas.state,
+                       .craft_atlas = &windows_.craft_atlas->state,
                        .file = &settings_->file()};
 }
 

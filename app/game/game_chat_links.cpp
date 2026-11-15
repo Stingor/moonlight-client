@@ -30,11 +30,14 @@
 #include "chat/chat_item_link.h"
 #include "chat/chat_mention_piece.h"
 #include "chat/chat_setting_link.h"
+#include "game/cash_shop_windows.h"
 #include "game/game.h"
 #include "game/map_plan_tip.h"
+#include "game/navigation_windows.h"
 #include "game/setting_destination_open.h"
 #include "game/ui_answers.h"
 #include "game/ui_stage.h"
+#include "game/ui_window_rounds.h"
 #include "items/inventory_view.h"
 
 namespace moonclient {
@@ -223,7 +226,7 @@ void Game::FollowChatLink(const ro::ui::ChatLinkAsk& asked, std::uint32_t now_ms
     const ChatLinkTarget* hovered =
         AimChatLink(posed, chat_tabs_, asked.hovered_token, asked.hovered_from_input, scratch);
     if (hovered != nullptr && hovered->kind == ro::ui::ChatLinkKind::kMvp) {
-      windows_.mvp_tracker.link_tip = pieces_.mvp_tracker.TipOf(hovered->mvp, LocalUnixSeconds());
+      windows_.mvp_tracker->link_tip = pieces_.mvp_tracker.TipOf(hovered->mvp, LocalUnixSeconds());
     }
   } else if (asked.hovered_id != 0 && asked.hovered_kind == ro::ui::ChatLinkKind::kMonster) {
     // UN MONSTRE S'APERÇOIT PAR SA FICHE : sprite, niveau, race, élément,
@@ -258,7 +261,7 @@ void Game::FollowChatLink(const ro::ui::ChatLinkAsk& asked, std::uint32_t now_ms
     const ChatLinkTarget* hovered =
         AimChatLink(posed, chat_tabs_, asked.hovered_token, asked.hovered_from_input, scratch);
     if (hovered != nullptr && hovered->kind == ro::ui::ChatLinkKind::kPlace)
-      windows_.navigation.place_tip = PlaceTipOf(hovered->place, pieces_);
+      windows_.navigation->place_tip = PlaceTipOf(hovered->place, pieces_);
   }
   // UNE RECHERCHE S'APERÇOIT PAR CE QU'ELLE CHERCHE, et où.
   if (asked.hovering && asked.hovered_kind == ro::ui::ChatLinkKind::kNaviSearch) {
@@ -266,7 +269,7 @@ void Game::FollowChatLink(const ro::ui::ChatLinkAsk& asked, std::uint32_t now_ms
     const ChatLinkTarget* hovered =
         AimChatLink(posed, chat_tabs_, asked.hovered_token, asked.hovered_from_input, scratch);
     if (hovered != nullptr && hovered->kind == ro::ui::ChatLinkKind::kNaviSearch)
-      windows_.navigation.search_tip =
+      windows_.navigation->search_tip =
           SearchTipOf(hovered->navi_search, pieces_, navi_, world_.map_entries(), now_ms);
   }
   // UN RÉGLAGE S'APERÇOIT PAR SON CHEMIN : où il mène, et ses deux gestes.
@@ -279,7 +282,7 @@ void Game::FollowChatLink(const ro::ui::ChatLinkAsk& asked, std::uint32_t now_ms
             ? FindSettingDestination(hovered->setting_key)
             : nullptr;
     if (destination != nullptr) {
-      windows_.chat.setting_tip = SettingDestinationTip(*destination);
+      windows_.chat->setting_tip = SettingDestinationTip(*destination);
     }
   }
   if (asked.gesture == ro::ui::ChatLinkGesture::kNothing) {
@@ -307,7 +310,7 @@ void Game::FollowChatLink(const ro::ui::ChatLinkAsk& asked, std::uint32_t now_ms
   // ── UN PSEUDO DISCORD : il n'existe pas dans le jeu — on le nomme ─────────
   if (aimed->kind == ro::ui::ChatLinkKind::kDiscordName) {
     if (asked.gesture == ro::ui::ChatLinkGesture::kDescribe) {
-      MentionInInput(windows_.chat.main.input, aimed->discord_name);
+      MentionInInput(windows_.chat->main.input, aimed->discord_name);
     } else if (asked.gesture == ro::ui::ChatLinkGesture::kCopyCode) {
       ImGui::SetClipboardText(aimed->discord_name.c_str());
     }
@@ -347,7 +350,7 @@ void Game::FollowChatLink(const ro::ui::ChatLinkAsk& asked, std::uint32_t now_ms
   // ── UNE RECETTE : l'Atlas ouvert sur son produit, ou le lien relayé ───────
   if (aimed->kind == ro::ui::ChatLinkKind::kRecipe) {
     if (asked.gesture == ro::ui::ChatLinkGesture::kDescribe) {
-      ro::ui::OpenCraftAtlasOn(windows_.craft_atlas.state, aimed->recipe.item_id);
+      ro::ui::OpenCraftAtlasOn(windows_.craft_atlas->state, aimed->recipe.item_id);
     } else if (asked.gesture == ro::ui::ChatLinkGesture::kRepost) {
       PostChatLink(aimed->recipe);
     }
@@ -374,12 +377,12 @@ void Game::FollowChatLink(const ro::ui::ChatLinkAsk& asked, std::uint32_t now_ms
       // 🔴 LA RECHERCHE PART SUR LE NOM INTERNE : le nom lisible porte une
       // ponctuation qui casse les morceaux de la recherche. Le guidage part
       // aussi, pour que la fenêtre montre l'itinéraire.
-      ro::ui::OpenNavigationSearch(windows_.navigation.state, place.map, /*monsters_only=*/false);
+      ro::ui::OpenNavigationSearch(windows_.navigation->state, place.map, /*monsters_only=*/false);
       navi_.Search(place.map, /*only_map=*/{}, world_.map_name());
       navi_.GuideToPlace(place.map, place.x, place.y);
     } else if (asked.gesture == ro::ui::ChatLinkGesture::kPlaceContents) {
-      windows_.navigation.state.open = true;
-      windows_.navigation.state.raise = true;
+      windows_.navigation->state.open = true;
+      windows_.navigation->state.raise = true;
       if (const ro::formats::NaviData* data = navi_.data(); data != nullptr)
         navi_.navigation_view.ShowContents(*data, data->FindMap(place.map));
     }
@@ -393,7 +396,7 @@ void Game::FollowChatLink(const ro::ui::ChatLinkAsk& asked, std::uint32_t now_ms
       pieces_.mvp_tracker.Invite(aimed->player, link_);
       return;
     }
-    pieces_.whispers.FollowPlayer(aimed->player, asked.gesture, link_, windows_.chat.main.input);
+    pieces_.whispers.FollowPlayer(aimed->player, asked.gesture, link_, windows_.chat->main.input);
     return;
   }
   // ── UN OBJET : la balise entière voyage ──────────────────────────────────
@@ -458,7 +461,7 @@ void Game::FollowItemGesture(ro::ui::ChatLinkGesture gesture, const ItemGestureT
     case ro::ui::ChatLinkGesture::kVoteShop:
       // Le vote shop : la boutique s'ouvre, l'item au panier.
       static_cast<void>(
-          pieces_.cash_shop.OpenWithItem(item.item_id, windows_.cash_shop.state, link_));
+          pieces_.cash_shop.OpenWithItem(item.item_id, windows_.cash_shop->state, link_));
       break;
     case ro::ui::ChatLinkGesture::kSeeInAlbum:
       ShowCardInAlbum(item.item_id, now_ms);
@@ -526,7 +529,7 @@ void Game::FollowStyleLink(const ChatLinkTarget& aimed, ro::ui::ChatLinkGesture 
     case ro::ui::ChatLinkGesture::kTryStyle:
       // ⚠ LA FENÊTRE S'OUVRE AVEC : charger un code dans un éditeur fermé
       // serait un geste sans réponse visible.
-      windows_.style.open = true;
+      windows_.style->open = true;
       static_cast<void>(style_view_->TryCode(aimed.code, now_ms));
       break;
     case ro::ui::ChatLinkGesture::kCopyCode:
@@ -710,7 +713,7 @@ bool Game::PlaceInChatInput(PendingChatLink link) {
   }
   // ⚠ AU BOUT DE CE QUE LA SAISIE PORTERA, dépôt en attente compris : voir
   // `PlaceChatLinkLabel`.
-  if (!PlaceChatLinkLabel(link.shown, windows_.chat.main.input, &pending_links_)) {
+  if (!PlaceChatLinkLabel(link.shown, windows_.chat->main.input, &pending_links_)) {
     return false;
   }
   pending_links_.push_back(std::move(link));
@@ -720,9 +723,9 @@ bool Game::PlaceInChatInput(PendingChatLink link) {
   // lien atterrit dans un champ que rien ne montre : le joueur ne voit pas ce
   // qu'il vient de poser, et la phrase part au premier Entrée sans qu'il l'ait
   // relue. Tout ce qui écrit dans la saisie doit la déplier.
-  windows_.chat.main.input.unfolded = true;
-  windows_.chat.main.input.focus_on_whisper = false;
-  windows_.chat.main.input.wants_focus = true;
+  windows_.chat->main.input.unfolded = true;
+  windows_.chat->main.input.focus_on_whisper = false;
+  windows_.chat->main.input.wants_focus = true;
   return true;
 }
 
@@ -733,20 +736,20 @@ void Game::PostClickedItemLink(const UiStage::Answers& answers) {
   // qu'une souris. Le coffre n'en est pas — le client ne l'y propose pas non plus.
   // ⚠ ET LA FICHE AUSSI : une pièce PORTÉE vit dans le sac, avec un drapeau, donc
   // sa place est une place de sac — le mannequin n'est pas un contenant.
-  if (answers.inventory.link_slot != 0) {
-    PostItemLink(world_.inventory(), answers.inventory.link_slot);
-  } else if (answers.cart.link_slot != 0) {
-    PostItemLink(world_.cart(), answers.cart.link_slot);
-  } else if (answers.character.link_slot != 0) {
-    PostItemLink(world_.inventory(), answers.character.link_slot);
-  } else if (answers.shortcuts.link >= 0) {
+  if (answers.inventory->link_slot != 0) {
+    PostItemLink(world_.inventory(), answers.inventory->link_slot);
+  } else if (answers.cart->link_slot != 0) {
+    PostItemLink(world_.cart(), answers.cart->link_slot);
+  } else if (answers.character->link_slot != 0) {
+    PostItemLink(world_.inventory(), answers.character->link_slot);
+  } else if (answers.shortcuts->link >= 0) {
     // ⚠ UNE CASE NE CONNAÎT QU'UN IDENTIFIANT, et un lien a besoin d'un
     // EXEMPLAIRE : c'est lui qui porte le raffinement, les cartes et la forge.
     // On cherche donc la place au moment de poser ; sans exemplaire sous la
     // main, rien ne part — un lien qui annoncerait un objet nu mentirait sur ce
     // que le joueur montre.
     std::uint16_t at = 0;
-    if (shortcuts_->DescribedItem(static_cast<std::size_t>(answers.shortcuts.link), world_, &at) !=
+    if (shortcuts_->DescribedItem(static_cast<std::size_t>(answers.shortcuts->link), world_, &at) !=
             0 &&
         at != 0) {
       PostItemLink(world_.inventory(), at);

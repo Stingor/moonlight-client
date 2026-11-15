@@ -5,7 +5,9 @@
 #include <utility>
 
 #include "chat/chat_tab_view.h"
+#include "game/chat_room_stage.h"
 #include "game/ui_answers.h"
+#include "game/ui_chat_ask.h"
 #include "game/ui_stage.h"
 #include "game/ui_stage_views.h"
 #include "game/ui_windows.h"

@@ -32,7 +32,9 @@
 #include "chat/player_link_judge.h"
 #include "game/game.h"
 #include "game/staff_roster_round.h"
+#include "game/staff_window_rounds.h"
 #include "game/ui_answers.h"
+#include "game/ui_window_rounds.h"
 #include "game/whisper_stage.h"
 #include "world/blocked_npcs.h"
 #include "world/click_action.h"
@@ -132,10 +134,10 @@ void Game::AdvanceEntityMenu(std::uint32_t now_ms) {
   menu_gestures_.blocked = &page.blocked();
   menu_gestures_.npc_block = settings.npc_block;
   page.NoteStaff(Rights().staff_tools);
-  windows_.entity_menu.view = &menu_view_;
+  windows_.entity_menu->view = &menu_view_;
   menu_gestures_.staff_models = Rights().staff_tools && stage_.has_value();
 
-  ro::ui::EntityMenuAnswer answer = std::exchange(windows_.entity_menu.answer, {});
+  ro::ui::EntityMenuAnswer answer = std::exchange(windows_.entity_menu->answer, {});
   // LES JOUEURS EN LIGNE DU STAFF, liaison tenue ou non : sans elle, la pièce
   // oublie tout.
   std::optional<StaffRosterMenu> roster_menu = AdvanceStaffRoster(
@@ -153,15 +155,15 @@ void Game::AdvanceEntityMenu(std::uint32_t now_ms) {
     PlayMapGroundVerb(std::exchange(answer.chosen, 0));
   }
   // L'INSPECTEUR DU STAFF : sa fenêtre, puis la demande qu'elle attend.
-  windows_.entity_inspector.view = &pieces_.entity_inspector.view();
-  pieces_.entity_inspector.Advance(windows_.entity_inspector.state,
-                                   std::exchange(windows_.entity_inspector.answer, {}),
+  windows_.entity_inspector->view = &pieces_.entity_inspector.view();
+  pieces_.entity_inspector.Advance(windows_.entity_inspector->state,
+                                   std::exchange(windows_.entity_inspector->answer, {}),
                                    world_.map_name(), now_ms);
   pieces_.entity_inspector.SendRequest(link_);
   // ET SON JOURNAL DES BLOCAGES DE CHAT, de même.
-  windows_.chat_block_log.view = &pieces_.chat_block_log.view();
-  pieces_.chat_block_log.Advance(windows_.chat_block_log.state,
-                                 std::exchange(windows_.chat_block_log.answer, {}), now_ms);
+  windows_.chat_block_log->view = &pieces_.chat_block_log.view();
+  pieces_.chat_block_log.Advance(windows_.chat_block_log->state,
+                                 std::exchange(windows_.chat_block_log->answer, {}), now_ms);
   pieces_.chat_block_log.SendRequest(link_);
 
   // ── CE QUE LE MENU A RENDU À L'IMAGE PRÉCÉDENTE ───────────────────────────
@@ -286,7 +288,7 @@ void Game::AdvanceEntityMenu(std::uint32_t now_ms) {
     menu_view_ = std::move(roster_menu->view);
     menu_model_.reset();
     menu_ground_.reset();
-    windows_.entity_menu.state.open_requested = true;
+    windows_.entity_menu->state.open_requested = true;
     menu_asked_ms_ = now_ms;
   }
 
@@ -302,8 +304,8 @@ void Game::AdvanceEntityMenu(std::uint32_t now_ms) {
     OpenMapGroundMenu(*ground, now_ms);
   }
 
-  if (windows_.entity_menu.state.open_requested && now_ms - menu_asked_ms_ > kMenuAskLifeMs) {
-    windows_.entity_menu.state.open_requested = false;
+  if (windows_.entity_menu->state.open_requested && now_ms - menu_asked_ms_ > kMenuAskLifeMs) {
+    windows_.entity_menu->state.open_requested = false;
   }
 }
 
@@ -424,7 +426,7 @@ void Game::OpenEntityMenu(const ro::sim::Actor& actor, EntityFamily family, std:
   menu_model_.reset();
   menu_ground_.reset();
   menu_view_ = std::move(built);
-  windows_.entity_menu.state.open_requested = true;
+  windows_.entity_menu->state.open_requested = true;
   menu_asked_ms_ = now_ms;
 }
 
@@ -480,7 +482,7 @@ void Game::PlayEntityVerb(EntityVerb verb, std::uint32_t id, int points, std::ui
       ReportRefusal(ro::net::RequestGuildOpposition(link_, id));
       return;
     case EntityVerb::kWhisper:
-      ArmWhisper(windows_.chat.main.input, name);
+      ArmWhisper(windows_.chat->main.input, name);
       return;
     case EntityVerb::kWhisperBlock:
     case EntityVerb::kWhisperAllow:
@@ -622,7 +624,7 @@ void Game::PlayEntityVerb(EntityVerb verb, std::uint32_t id, int points, std::ui
     case EntityVerb::kInspect: {
       // En tête de la fenêtre : la famille, le nom, et l'identifiant demandé.
       pieces_.entity_inspector.Open(
-          windows_.entity_inspector.state, id,
+          windows_.entity_inspector->state, id,
           ro::core::Printed(Tr("%s — %s — identifiant %u"), EntityFamilyLabel(menu_target_.family),
                             name.empty() ? Tr("(nom inconnu)") : name.c_str(), id),
           world_.map_name(), now_ms);
@@ -631,7 +633,7 @@ void Game::PlayEntityVerb(EntityVerb verb, std::uint32_t id, int points, std::ui
     case EntityVerb::kChatBlockLog: {
       // En tête de la fenêtre : le nom du personnage, et l'AID demandé.
       pieces_.chat_block_log.Open(
-          windows_.chat_block_log.state, id,
+          windows_.chat_block_log->state, id,
           ro::core::Printed(Tr("%s — AID %u"), name.empty() ? Tr("(nom inconnu)") : name.c_str(),
                             id),
           now_ms);
@@ -698,7 +700,7 @@ void Game::PlayEntityVerb(EntityVerb verb, std::uint32_t id, int points, std::ui
       // qu'un acteur porte à l'écran — le client n'a pas la base des monstres.
       // Le serveur remonte d'elle à l'identifiant, exactement comme pour Sense.
       if (monster_sheet_.has_value() && menu_target_.job != 0) {
-        monster_sheet_->Open(windows_.monster_sheet.state, menu_target_.job, /*by_view=*/true);
+        monster_sheet_->Open(windows_.monster_sheet->state, menu_target_.job, /*by_view=*/true);
         monster_sheet_->NoteSeenOn(world_.map_name());
       }
       return;
@@ -763,37 +765,20 @@ void Game::PlayEntityVerb(EntityVerb verb, std::uint32_t id, int points, std::ui
     // LE STATUT DE L'HOMONCULE ET DU MERCENAIRE est leur onglet de la fiche,
     // ouvert dessus même s'il était ailleurs.
     case EntityVerb::kHomunculusStatus:
-      windows_.character.open = true;
-      windows_.character.tab = ro::ui::CharacterTab::kHomunculus;
-      windows_.character.tab_request = ro::ui::CharacterTab::kHomunculus;
+      windows_.character->open = true;
+      windows_.character->tab = ro::ui::CharacterTab::kHomunculus;
+      windows_.character->tab_request = ro::ui::CharacterTab::kHomunculus;
       return;
     case EntityVerb::kHomunculusFeed:
       pieces_.homunculus.Feed(link_);
       return;
     case EntityVerb::kMercenaryStatus:
       pieces_.mercenary.RequestInfo(link_);
-      windows_.character.open = true;
-      windows_.character.tab = ro::ui::CharacterTab::kMercenary;
-      windows_.character.tab_request = ro::ui::CharacterTab::kMercenary;
+      windows_.character->open = true;
+      windows_.character->tab = ro::ui::CharacterTab::kMercenary;
+      windows_.character->tab_request = ro::ui::CharacterTab::kMercenary;
       return;
   }
-}
-
-void Game::ToggleNpcBlock(std::uint32_t id, const std::string& name, std::uint32_t now_ms) {
-  const bool blocked = settings_->ToggleBlockedNpc(id, name);
-  const std::string who = BlockedNpcLabel(id, name);
-  std::string line;
-  if (blocked) {
-    // Marqué comme déjà expliqué : la phrase qui suit dit tout, et le premier
-    // clic de vérification ne doit pas la redire deux secondes plus tard.
-    static_cast<void>(settings_->options().context_menu().blocked().FirstExplanation(id));
-    line = ro::core::Printed(Tr("%s : le clic gauche ne fait plus rien sur lui. Clic droit pour le "
-                                "débloquer ou lui parler."),
-                             who.c_str());
-  } else {
-    line = ro::core::Printed(Tr("%s : le clic gauche est de nouveau actif."), who.c_str());
-  }
-  world_.RecordChat(ro::sim::ChatKind::kServer, 0, line, now_ms, kClientSaysColor);
 }
 
 }  // namespace moonclient

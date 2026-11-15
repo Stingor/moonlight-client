@@ -2,6 +2,7 @@
 // qu'un lien du fil lui emprunte — celle d'un lieu et celle d'une recherche —,
 // et la carte du monde.
 
+#include "game/navigation_windows.h"
 #include "game/ui_stage.h"
 #include "game/ui_windows.h"
 

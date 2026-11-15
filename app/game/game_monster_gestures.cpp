@@ -16,6 +16,8 @@
 #include "chat/chat_place_link.h"
 #include "chat/chat_search_gestures.h"
 #include "game/game.h"
+#include "game/navigation_windows.h"
+#include "game/ui_window_rounds.h"
 
 namespace moonclient {
 
@@ -28,7 +30,7 @@ void Game::FollowMonsterGesture(ro::ui::ChatLinkGesture gesture, const MonsterLi
     case ro::ui::ChatLinkGesture::kDescribe:
       // La fiche ; sans elle, la page du bestiaire.
       if (monster_sheet_.has_value()) {
-        monster_sheet_->Open(windows_.monster_sheet.state, monster.monster_id, by_view);
+        monster_sheet_->Open(windows_.monster_sheet->state, monster.monster_id, by_view);
       } else if (database_id != 0) {
         FollowDescriptionLink(
             ro::ui::DescriptionWindowAction{.followed = MonsterBestiaryUrl(database_id)}, now_ms);
@@ -119,8 +121,8 @@ void Game::FollowNaviSearchLink(const ro::ui::ChatLinkAsk& asked, const NaviSear
       }
       break;
     case ro::ui::ChatLinkGesture::kPlaceContents:
-      windows_.navigation.state.open = true;
-      windows_.navigation.state.raise = true;
+      windows_.navigation->state.open = true;
+      windows_.navigation->state.raise = true;
       if (const ro::formats::NaviData* data = navi_.data(); data != nullptr && !link.map.empty())
         navi_.navigation_view.ShowContents(*data, data->FindMap(link.map));
       break;
@@ -171,7 +173,7 @@ void Game::OpenNaviSearch(const NaviSearchLink& link) {
   if (link.term.empty()) {
     return;
   }
-  ro::ui::OpenNavigationSearch(windows_.navigation.state, link.term,
+  ro::ui::OpenNavigationSearch(windows_.navigation->state, link.term,
                                link.family == NaviSearchFamily::kMonster, link.map);
   navi_.Search(link.term, link.map, world_.map_name());
 }

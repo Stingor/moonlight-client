@@ -3,6 +3,7 @@
 // entité, et les textures que la carte quittée a seule réclamées.
 
 #include "game/game.h"
+#include "game/ui_window_rounds.h"
 #include "world/entity_menu.h"
 
 namespace moonclient {
@@ -69,12 +70,12 @@ void Game::ForgetWhatPlayed() {
   // 🔴 LE MENU NE SURVIT PAS À L'ENTITÉ QU'IL DÉSIGNE, ni la question qu'il
   // pose : sur une autre carte, le même GID peut désigner autre chose. Le dessin
   // suivant referme ce qui reste ouvert.
-  windows_.entity_menu.state = ro::ui::EntityMenuState{};
+  windows_.entity_menu->state = ro::ui::EntityMenuState{};
   menu_gestures_.ask.reset();
   // « VOIR L'ÉQUIPEMENT » SE FERME ET OUBLIE : le serveur exige la même carte,
   // et une fiche qu'on ne peut plus redemander serait périmée sans le dire.
   if (viewed_equipment_.has_value()) {
-    viewed_equipment_->Forget(inspected_, windows_.view_equip.state);
+    viewed_equipment_->Forget(inspected_, windows_.view_equip->state);
   }
   // 🔴 LES TEXTURES QUE LA CARTE QUITTÉE A SEULE RÉCLAMÉES S'EN VONT. Les caches
   // des renderers ne se purgent jamais d'eux-mêmes : sans cet appel, chaque

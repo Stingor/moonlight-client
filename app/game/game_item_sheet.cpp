@@ -16,7 +16,9 @@
 #include "ro/sim/inventory.h"
 #include "ro/sim/world.h"
 
+#include "game/cash_shop_windows.h"
 #include "game/game.h"
+#include "game/ui_window_rounds.h"
 
 namespace moonclient {
 
@@ -68,20 +70,21 @@ void Game::AdvanceHoveredDollEffect(std::uint32_t now_ms) {
     return;
   }
   const ro::sim::HatEffectItems& hats = pieces_.cash_shop.hat_effects();
-  ro::ui::DescriptionWindowState& database_sheet = windows_.monster_sheet.database.state.item_sheet;
-  if (windows_.cash_shop.state.doll.wanted) {
+  ro::ui::DescriptionWindowState& database_sheet =
+      windows_.monster_sheet->database.state.item_sheet;
+  if (windows_.cash_shop->state.doll.wanted) {
     pieces_.doll_effects->Advance(
-        windows_.cash_shop.state.doll, hats.OrdinalOf(windows_.cash_shop.state.doll_item),
+        windows_.cash_shop->state.doll, hats.OrdinalOf(windows_.cash_shop->state.doll_item),
         pieces_.cash_shop.doll_framing(), pieces_.cash_shop.doll_body(), world_, *stage_, now_ms);
-  } else if (windows_.description.open && windows_.description.doll.wanted) {
+  } else if (windows_.description->open && windows_.description->doll.wanted) {
     pieces_.doll_effects->Advance(
-        windows_.description.doll, hats.OrdinalOf(windows_.description.item_id),
+        windows_.description->doll, hats.OrdinalOf(windows_.description->item_id),
         item_description_->doll_framing(), item_description_->doll_body(), world_, *stage_, now_ms);
   } else if (const DescriptionView* const shown = database_.item_sheet();
              database_sheet.doll.wanted && shown != nullptr) {
     // LA FICHE D'UN OBJET DANS LA BASE, qui a son propre pantin.
     pieces_.doll_effects->Advance(
-        database_sheet.doll, hats.OrdinalOf(database_.ShownItem(windows_.monster_sheet.database)),
+        database_sheet.doll, hats.OrdinalOf(database_.ShownItem(windows_.monster_sheet->database)),
         shown->doll_framing(), shown->doll_body(), world_, *stage_, now_ms);
   } else {
     pieces_.doll_effects->Rest();
@@ -131,7 +134,7 @@ void Game::RouteItemSheet(const ro::ui::DescriptionWindowAction& asked, std::uin
 
   // LES BOUTONS DE L'OBJET MONTRÉ.
   if (asked.open_vote_shop) {
-    static_cast<void>(pieces_.cash_shop.OpenWithItem(item_id, windows_.cash_shop.state, link_));
+    static_cast<void>(pieces_.cash_shop.OpenWithItem(item_id, windows_.cash_shop->state, link_));
   }
   // Le « @item » du staff : le droit se relit ici, au geste.
   if (asked.staff_item.has_value()) {
@@ -139,10 +142,10 @@ void Game::RouteItemSheet(const ro::ui::DescriptionWindowAction& asked, std::uin
   }
   // « Modifier la fiche » du staff : la fenêtre d'édition, sur l'item décrit.
   if (asked.edit_sheet != 0 && Rights().staff_tools) {
-    ro::ui::OpenItemSheetEditor(windows_.staff_tools.item_editor, asked.edit_sheet);
+    ro::ui::OpenItemSheetEditor(windows_.staff_tools->item_editor, asked.edit_sheet);
   }
   if (asked.open_craft_atlas) {
-    ro::ui::OpenCraftAtlasOn(windows_.craft_atlas.state, item_id);
+    ro::ui::OpenCraftAtlasOn(windows_.craft_atlas->state, item_id);
   }
   if (asked.read_book || asked.recite_book) {
     const bool first_page = settings_->options().descriptions().book_first_page();

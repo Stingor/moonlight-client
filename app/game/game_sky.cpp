@@ -26,10 +26,10 @@ bool Game::SunShadowsAsked(const ro::render::TerrainStages& stages) const {
 
 ro::render::SkyLight Game::SkyOfFrame(std::uint32_t now_ms) {
   const std::optional<std::uint32_t> last_ms = std::exchange(last_sky_ms_, now_ms);
-  ro::ui::StaffSkyClock& clock = windows_.staff_tools.sky;
+  ro::ui::StaffSkyClock& clock = windows_.staff_tools->sky;
   const ro::render::SceneLight& map_light = pieces_.night_light.light();
   // LA COURSE que l'établi règle, pour l'heure forcée comme pour le cycle.
-  const ro::ui::StaffToolsLook& look = windows_.staff_tools.look;
+  const ro::ui::StaffToolsLook& look = windows_.staff_tools->look;
   const ro::render::SkyCourse course =
       Rights().staff_tools && look.sky_course_tuned ? look.sky_course : ro::render::SkyCourse();
   if (!Rights().staff_tools || !clock.forced) {

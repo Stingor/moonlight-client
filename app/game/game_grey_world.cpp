@@ -26,7 +26,7 @@ ro::core::Result<void> Game::FollowGreyWorldRelief() {
   // AVANT QUE LA PAGE NE SE COMPOSE : elle dit sous sa propre couleur que celle
   // de l'établi l'emporte.
   page.NoteStaffGround(
-      StaffGroundWins(windows_.staff_tools.look.flat_ground, Rights().staff_tools));
+      StaffGroundWins(windows_.staff_tools->look.flat_ground, Rights().staff_tools));
 
   // 🔴 TÉMOIN D'ÉTAT, PAS D'ÉVÉNEMENT : c'est la divergence entre ce que la carte
   // affichée a demandé et ce que le réglage veut qui déclenche la relecture.

@@ -91,7 +91,7 @@ bool Game::FirstPersonTakes(const SDL_Event& event) {
   // de saisie gardent la leur, exactement comme pour les barres.
   const auto goes_to_game = [this, &event] {
     const ro::ui::InputGate gate = interface_->gate();
-    const ro::ui::ChatWindowState& chat = windows_.chat.main;
+    const ro::ui::ChatWindowState& chat = windows_.chat->main;
     return KeyGoesToGame({.interface_has_keyboard = gate.keyboard_to_ui,
                           .typing = gate.typing_to_ui,
                           .chat_bar_takes_typing = ro::ui::ChatBarTakesTyping(
@@ -102,7 +102,7 @@ bool Game::FirstPersonTakes(const SDL_Event& event) {
   // l'administrateur décolle, et la caméra qu'il quitte est celle-ci.
   if (event.type == SDL_EVENT_KEY_DOWN && !event.key.repeat &&
       IsBinding(settings_->bindings().Of(GameAction::kFreeFlight), event.key) &&
-      windows_.staff_tools.admin && goes_to_game()) {
+      windows_.staff_tools->admin && goes_to_game()) {
     if (free_flight_.active()) {
       free_flight_.Leave(camera_);
     } else {
@@ -172,7 +172,7 @@ void Game::FrameFirstPerson(std::uint32_t now_ms) {
   // LE PERSONNAGE SE REVOIT EN VOL : l'œil l'a quitté.
   scene_actors_.player_unseen = first_person_.active() && !free_flight_.active();
   // Un rang perdu en plein vol ramène la caméra.
-  if (free_flight_.active() && !windows_.staff_tools.admin) {
+  if (free_flight_.active() && !windows_.staff_tools->admin) {
     free_flight_.Leave(camera_);
   }
   // UNE TOUCHE RELÂCHÉE HORS DE LA FENÊTRE n'envoie aucun événement : l'état
@@ -218,7 +218,7 @@ void Game::FrameFirstPerson(std::uint32_t now_ms) {
   // L'ŒIL SAUTE AVEC LE CORPS. La veille et le vol, eux, gardent leur pose.
   if (!afk_screen_.active() && !free_flight_.active()) {
     // LA HAUTEUR FORCÉE DE L'ÉTABLI, pour qui y a droit.
-    const ro::ui::StaffToolsLook& staff = windows_.staff_tools.look;
+    const ro::ui::StaffToolsLook& staff = windows_.staff_tools->look;
     const int eye_pixels = staff.eye_height_forced && Rights().staff_tools
                                ? staff.eye_height_pixels
                                : ro::render::kStandingEyePixels;

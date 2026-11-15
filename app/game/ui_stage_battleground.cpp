@@ -2,6 +2,7 @@
 // et leur place dans la pile d'Échap. À part de `ui_stage.cpp`, qui n'a plus la
 // place de les porter.
 
+#include "game/battleground_stage.h"
 #include "game/ui_stage.h"
 #include "game/ui_windows.h"
 

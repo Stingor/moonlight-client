@@ -8,8 +8,13 @@
 #include "ro/vfs/cash_shop_words.h"
 
 #include "game/battleground_stage.h"
+#include "game/cash_shop_windows.h"
+#include "game/hud_rounds.h"
+#include "game/navigation_windows.h"
+#include "game/party_windows.h"
 #include "game/skin_image_of.h"
 #include "game/ui_stage.h"
+#include "game/ui_window_rounds.h"
 #include "game/ui_windows.h"
 #include "input/key_action.h"
 #include "world/actor_styles.h"
@@ -45,52 +50,52 @@ MenuIconFacts MenuIconFactsOf(const ro::sim::World& world, const UiStage::Window
   MenuIconFacts facts{
       .doram = self != nullptr && ro::render::IsDoramJob(self->look.job),
       .map_name = world.map_name(),
-      .mvp_tracker_enabled = windows.mvp_tracker.enabled,
+      .mvp_tracker_enabled = windows.mvp_tracker->enabled,
       .status_points_waiting = ro::sim::StatusPointsSpendable(world.player_status()),
       .skill_points_waiting = ro::sim::SkillPointsSpendable(world.player_status()),
-      .battleground_queued = windows.battleground.queued,
-      .battleground_queued_name = windows.battleground.queued_name,
+      .battleground_queued = windows.battleground->queued,
+      .battleground_queued_name = windows.battleground->queued_name,
       .cash_shop_name = cash_shop_name};
   const auto open_when = [&facts](MenuCommand command, bool open) {
     if (open) {
       facts.open.push_back(command);
     }
   };
-  open_when(MenuCommand::kStatus, windows.status.state.open);
-  open_when(MenuCommand::kCraftAtlas, windows.craft_atlas.state.open);
-  open_when(MenuCommand::kNavigation, windows.navigation.state.open);
-  open_when(MenuCommand::kWorldMap, windows.navigation.world_map.open);
-  open_when(MenuCommand::kMvpTracker, windows.mvp_tracker.window.open);
-  open_when(MenuCommand::kCardAlbum, windows.card_album.open);
-  open_when(MenuCommand::kPetWindow, windows.pet.open);
-  open_when(MenuCommand::kRankingBoard, windows.ranking_board.window.open);
-  open_when(MenuCommand::kReputation, windows.reputation.window.open);
-  open_when(MenuCommand::kMarket, windows.trade.market.state.open);
-  open_when(MenuCommand::kDatabase, windows.monster_sheet.database.state.open);
-  open_when(MenuCommand::kRojeweled, windows.minigames.rojeweled.open);
-  open_when(MenuCommand::kRoggle, windows.minigames.roggle.open);
-  open_when(MenuCommand::kSurvivors, windows.minigames.survivors_prepare.open);
-  open_when(MenuCommand::kBooking, windows.party_booking.window.open);
-  open_when(MenuCommand::kCashShop, windows.cash_shop.state.open);
-  open_when(MenuCommand::kMail, windows.mail.box.open);
-  open_when(MenuCommand::kAchievement, windows.achievements.window.open);
-  open_when(MenuCommand::kQuest, windows.quests.window.open);
-  open_when(MenuCommand::kParty, windows.party.window.open);
+  open_when(MenuCommand::kStatus, windows.status->state.open);
+  open_when(MenuCommand::kCraftAtlas, windows.craft_atlas->state.open);
+  open_when(MenuCommand::kNavigation, windows.navigation->state.open);
+  open_when(MenuCommand::kWorldMap, windows.navigation->world_map.open);
+  open_when(MenuCommand::kMvpTracker, windows.mvp_tracker->window.open);
+  open_when(MenuCommand::kCardAlbum, windows.card_album->open);
+  open_when(MenuCommand::kPetWindow, windows.pet->open);
+  open_when(MenuCommand::kRankingBoard, windows.ranking_board->window.open);
+  open_when(MenuCommand::kReputation, windows.reputation->window.open);
+  open_when(MenuCommand::kMarket, windows.trade->market.state.open);
+  open_when(MenuCommand::kDatabase, windows.monster_sheet->database.state.open);
+  open_when(MenuCommand::kRojeweled, windows.minigames->rojeweled.open);
+  open_when(MenuCommand::kRoggle, windows.minigames->roggle.open);
+  open_when(MenuCommand::kSurvivors, windows.minigames->survivors_prepare.open);
+  open_when(MenuCommand::kBooking, windows.party_booking->window.open);
+  open_when(MenuCommand::kCashShop, windows.cash_shop->state.open);
+  open_when(MenuCommand::kMail, windows.mail->box.open);
+  open_when(MenuCommand::kAchievement, windows.achievements->window.open);
+  open_when(MenuCommand::kQuest, windows.quests->window.open);
+  open_when(MenuCommand::kParty, windows.party->window.open);
   open_when(MenuCommand::kBattleground,
-            windows.battleground.window.open || windows.battleground.window.standby_open);
+            windows.battleground->window.open || windows.battleground->window.standby_open);
   const auto lit_when = [&facts](MenuCommand command, bool lit) {
     if (lit) {
       facts.lit.push_back(command);
     }
   };
   // LE COURRIER S'ALLUME : la pastille du serveur, ou un non-lu de la liste.
-  lit_when(MenuCommand::kMail, windows.mail.news_lit);
+  lit_when(MenuCommand::kMail, windows.mail->news_lit);
   // LES SUCCÈS S'ALLUMENT à l'achèvement d'un succès, jusqu'à la réouverture.
-  lit_when(MenuCommand::kAchievement, windows.achievements.news_lit);
+  lit_when(MenuCommand::kAchievement, windows.achievements->news_lit);
   // LES QUÊTES S'ALLUMENT à l'arrivée d'une quête, jusqu'à la réouverture.
-  lit_when(MenuCommand::kQuest, windows.quests.news_lit);
+  lit_when(MenuCommand::kQuest, windows.quests->news_lit);
   // LE CARNET S'ALLUME quand un favori entre dans sa fenêtre.
-  lit_when(MenuCommand::kMvpTracker, windows.mvp_tracker.badge_lit);
+  lit_when(MenuCommand::kMvpTracker, windows.mvp_tracker->badge_lit);
   // LA TÊTE DU STATUT : refaite ici quand elle change, montrée tant qu'elle est
   // rendue. Sans garde-robe, le Statut garde son art.
   if (pieces.status_head.has_value() && pieces.wardrobe.has_value()) {
@@ -106,21 +111,21 @@ void ApplyMenuCommand(MenuCommand command, const MenuIconTargets& to) {
     return;
   }
   if (const std::optional<GameAction> action = ActionOfMenuCommand(command); action.has_value()) {
-    const KeyPress press{.sheet = &to.windows->character,
-                         .status = &to.windows->status.state,
-                         .pet = &to.windows->pet,
-                         .inventory = &to.windows->inventory,
-                         .party = &to.windows->party.window,
+    const KeyPress press{.sheet = &*to.windows->character,
+                         .status = &to.windows->status->state,
+                         .pet = &*to.windows->pet,
+                         .inventory = &*to.windows->inventory,
+                         .party = &to.windows->party->window,
                          .bank = to.bank,
                          .card_album = to.card_album,
-                         .card_album_window = &to.windows->card_album,
+                         .card_album_window = &*to.windows->card_album,
                          .cash_shop = to.cash_shop,
                          .mail = to.mail,
                          .achievements = to.achievements,
                          .quests = to.quests,
-                         .craft_atlas = &to.windows->craft_atlas.state,
-                         .navigation = &to.windows->navigation.state,
-                         .world_map = &to.windows->navigation.world_map,
+                         .craft_atlas = &to.windows->craft_atlas->state,
+                         .navigation = &to.windows->navigation->state,
+                         .world_map = &to.windows->navigation->world_map,
                          .mvp_tracker = to.mvp_tracker,
                          .link = to.link,
                          .world = to.world,
@@ -133,10 +138,10 @@ void ApplyMenuCommand(MenuCommand command, const MenuIconTargets& to) {
   // LES FENÊTRES SANS ACTION DE RACCOURCI : une bascule, comme au clavier.
   switch (command) {
     case MenuCommand::kOption:
-      to.windows->options.open = !to.windows->options.open;
+      to.windows->options->open = !to.windows->options->open;
       break;
     case MenuCommand::kShortcut:
-      to.windows->hotkeys.open = !to.windows->hotkeys.open;
+      to.windows->hotkeys->open = !to.windows->hotkeys->open;
       break;
     case MenuCommand::kBattleground:
       if (to.battleground != nullptr) {
@@ -153,10 +158,10 @@ void ApplyMenuCommand(MenuCommand command, const MenuIconTargets& to) {
       TogglePartyBooking(to.windows->party_booking);
       break;
     case MenuCommand::kMarket:
-      to.windows->trade.market.toggle_asked = true;
+      to.windows->trade->market.toggle_asked = true;
       break;
     case MenuCommand::kDatabase:
-      to.windows->monster_sheet.database.toggle_asked = true;
+      to.windows->monster_sheet->database.toggle_asked = true;
       break;
     // LES MINI-JEUX : ouverts, ils se ferment ; fermés, ils se demandent par le
     // chemin de la salle, qui ferme celle-ci quand l'accueil de Survivants s'ouvre.

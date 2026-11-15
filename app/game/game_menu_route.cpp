@@ -169,21 +169,22 @@ void Game::ApplyCaptureGesture(const UiStage::Answers& answers, std::uint32_t no
   // l'enregistrement d'un film, et la ligne d'à côté prenait une capture.
   // LE BOUTON « OUVRIR L'ALBUM » de sa page : il ouvre, il ne referme pas.
   // « JOUEURS BLOQUÉS… », des pages Conversation et Son.
-  if (answers.options.changed == WhisperOptions::IdOf(WhisperRow::kBlocks) ||
-      answers.options.changed == VoiceRowId(VoiceRow::kBlocks)) {
-    ro::ui::RaiseBlockListWindow(windows_.whispers.blocks);
+  if (answers.options->changed == WhisperOptions::IdOf(WhisperRow::kBlocks) ||
+      answers.options->changed == VoiceRowId(VoiceRow::kBlocks)) {
+    ro::ui::RaiseBlockListWindow(windows_.whispers->blocks);
   }
-  if (answers.options.changed == CardAlbumRowId(CardAlbumRow::kOpen) && !windows_.card_album.open) {
+  if (answers.options->changed == CardAlbumRowId(CardAlbumRow::kOpen) &&
+      !windows_.card_album->open) {
     card_album_.Toggle(windows_.card_album, link_, now_ms);
   }
   // CEUX DU CARNET DE CHASSE MVP : « Ouvrir le carnet » ouvre un carnet allumé,
   // il ne referme pas ; « Tout remettre au carnet » ne demande rien.
   // « Écouter » joue le son choisi, comme le jouerait l'alerte.
-  if (answers.options.changed == MvpTrackerRowId(MvpTrackerRow::kOpen)) {
+  if (answers.options->changed == MvpTrackerRowId(MvpTrackerRow::kOpen)) {
     pieces_.mvp_tracker.RequestOpen();
-  } else if (answers.options.changed == MvpTrackerRowId(MvpTrackerRow::kPutBackAll)) {
+  } else if (answers.options->changed == MvpTrackerRowId(MvpTrackerRow::kPutBackAll)) {
     pieces_.mvp_tracker.PutBackAllLines();
-  } else if (answers.options.changed == MvpTrackerRowId(MvpTrackerRow::kAlertListen)) {
+  } else if (answers.options->changed == MvpTrackerRowId(MvpTrackerRow::kAlertListen)) {
     MvpTrackerOptions& page = settings_->options().pages().mvp_tracker;
     const MvpTrackerSettings hunt = page.settings();
     static_cast<void>(PlayMvpAlertSound({.audio = audio_,
@@ -196,11 +197,11 @@ void Game::ApplyCaptureGesture(const UiStage::Answers& answers, std::uint32_t no
                                          .trouble = &page.alert_trouble()}));
   }
   // LES BOUTONS DE LA CAPTURE : le même aiguillage que l'arène de survivors.
-  if (const std::optional<RecorderVerb> verb = RecorderVerbOfOption(answers.options.changed)) {
+  if (const std::optional<RecorderVerb> verb = RecorderVerbOfOption(answers.options->changed)) {
     PlayRecorderVerb(*verb, recorder_, screenshot_, now_ms);
     return;
   }
-  const std::optional<GameOption> named = NamedOption(answers.options.changed);
+  const std::optional<GameOption> named = NamedOption(answers.options->changed);
   if (!named.has_value()) {
     return;
   }
@@ -209,7 +210,7 @@ void Game::ApplyCaptureGesture(const UiStage::Answers& answers, std::uint32_t no
       // ⚠ UNE DEMANDE POSÉE DANS LA FENÊTRE, que sa table consommera : elle
       // seule peut défaire un ordre qu'ImGui garde pour elle, et le joueur peut
       // la poser coffre fermé.
-      windows_.storage.reset_columns = true;
+      windows_.storage->reset_columns = true;
       break;
     case GameOption::kInventoryForgetPlaces:
       // ⚠ ICI ET NON DANS `GameOptions` : la table vit dans SON fichier, et
@@ -230,8 +231,8 @@ void Game::ApplyMacroAnswers(const ro::ui::ChatMacroAsk& asked, std::uint32_t no
     settings_->NoteChatMacros(windows_);
   }
   if (asked.open_hotkeys) {
-    windows_.hotkeys.open = true;
-    windows_.hotkeys.tab_request = static_cast<int>(HotkeyTab::kMacros);
+    windows_.hotkeys->open = true;
+    windows_.hotkeys->tab_request = static_cast<int>(HotkeyTab::kMacros);
   }
   // LES VALEURS D'USINE : les dix commandes d'émote dont le client remplit ses
   // lignes. ⚠ ELLES REMONTENT DANS LE FICHIER COMME UNE FRAPPE, par le même
@@ -239,7 +240,7 @@ void Game::ApplyMacroAnswers(const ro::ui::ChatMacroAsk& asked, std::uint32_t no
   if (asked.reset) {
     for (std::size_t slot = 0; slot < ro::ui::kChatMacroCount; ++slot) {
       const std::string factory_default = ChatMacroDefault(slot);
-      std::snprintf(windows_.macros.rows[slot].data(), windows_.macros.rows[slot].size(), "%s",
+      std::snprintf(windows_.macros->rows[slot].data(), windows_.macros->rows[slot].size(), "%s",
                     factory_default.c_str());
     }
     settings_->NoteChatMacros(windows_);
@@ -249,7 +250,7 @@ void Game::ApplyMacroAnswers(const ro::ui::ChatMacroAsk& asked, std::uint32_t no
   // chemin d'envoi finirait par se comporter autrement sans que personne ne
   // sache dire pourquoi.
   if (asked.send >= 0 && static_cast<std::size_t>(asked.send) < ro::ui::kChatMacroCount) {
-    const char* line = windows_.macros.rows[static_cast<std::size_t>(asked.send)].data();
+    const char* line = windows_.macros->rows[static_cast<std::size_t>(asked.send)].data();
     if (line[0] != '\0') {
       SubmitChat(*chat_dispatch_, std::string(line), now_ms);
     }

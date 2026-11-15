@@ -31,6 +31,7 @@
 #include "ro/vfs/encoding.h"
 
 #include "game/game.h"
+#include "game/ui_window_rounds.h"
 #include "world/map_editor_cell_marks.h"
 #include "world/map_editor_mesh.h"
 #include "world/map_editor_overlay.h"
@@ -157,7 +158,7 @@ void Game::ServeMapEditor() {
   ServeMapEditorTools();
   // LES LUMIÈRES SE MONTRENT TOUJOURS, quel que soit l'outil : un cercle sur
   // chacune.
-  ro::ui::MapEditorView& view = windows_.staff_tools.map_editor;
+  ro::ui::MapEditorView& view = windows_.staff_tools->map_editor;
   if (!map_editor_.active() || !stage_.has_value()) {
     map_editor_.SetLightDots({});
     map_editor_.SetEffectDots({});
@@ -401,7 +402,7 @@ void Game::ServeMapEditorTools() {
 }
 
 void Game::ServeVertexTool(const ro::render::MapEffectFrame& map_frame, float width, float height) {
-  ro::ui::MapEditorView& view = windows_.staff_tools.map_editor;
+  ro::ui::MapEditorView& view = windows_.staff_tools->map_editor;
   if (vertex_context_.Refresh(stage_->scene, *map_editor_.selected(),
                               map_edits_.Document(stage_->name), *vfs_)) {
     map_editor_.SetVertexContext(vertex_context_.context());
@@ -589,7 +590,7 @@ void Game::OpenMapModelMenu(std::size_t model_index, std::uint32_t now_ms) {
   menu_model_ = model_index;
   menu_ground_.reset();
   menu_view_ = std::move(built);
-  windows_.entity_menu.state.open_requested = true;
+  windows_.entity_menu->state.open_requested = true;
   menu_asked_ms_ = now_ms;
 }
 
@@ -719,7 +720,7 @@ void Game::OpenMapGroundMenu(const std::array<float, 3>& world_point, std::uint3
   menu_model_.reset();
   menu_ground_ = std::array<float, 3>{native.x, native.y, native.z};
   menu_view_ = std::move(built);
-  windows_.entity_menu.state.open_requested = true;
+  windows_.entity_menu->state.open_requested = true;
   menu_asked_ms_ = now_ms;
 }
 

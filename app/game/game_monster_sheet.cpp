@@ -19,6 +19,8 @@
 #include "game/bug_report_context.h"
 #include "game/game.h"
 #include "game/map_plan_tip.h"
+#include "game/navigation_windows.h"
+#include "game/ui_window_rounds.h"
 
 namespace moonclient {
 namespace {
@@ -41,7 +43,7 @@ void Game::FollowMapGestures(std::string_view guide, std::string_view link,
     PostChatLink(PlaceLink{.map = std::string(link)});
   }
   if (!hovered.empty()) {
-    windows_.navigation.place_tip = PlaceTipOf(PlaceLink{.map = std::string(hovered)}, pieces_);
+    windows_.navigation->place_tip = PlaceTipOf(PlaceLink{.map = std::string(hovered)}, pieces_);
   }
 }
 
@@ -50,12 +52,12 @@ void Game::AdvanceMonsterSheet(std::uint32_t now_ms) {
   // qu'on y a faits sur elle sont ceux de cette image.
   AdvanceDatabase(now_ms);
   if (!monster_sheet_.has_value()) {
-    windows_.monster_sheet.view = nullptr;
+    windows_.monster_sheet->view = nullptr;
     return;
   }
   MonsterSheet& sheet = *monster_sheet_;
-  ro::ui::MonsterSheetWindowState& state = windows_.monster_sheet.state;
-  const ro::ui::MonsterSheetAnswer answer = std::exchange(windows_.monster_sheet.answer, {});
+  ro::ui::MonsterSheetWindowState& state = windows_.monster_sheet->state;
+  const ro::ui::MonsterSheetAnswer answer = std::exchange(windows_.monster_sheet->answer, {});
   const MonsterSheetOptions& options = settings_->options().monster_sheet();
 
   // « SIGNALER UN BUG », de la fenêtre comme de la base : le formulaire de tout
@@ -129,8 +131,8 @@ void Game::AdvanceMonsterSheet(std::uint32_t now_ms) {
   }
 
   // L'APERÇU D'UN LIEN SURVOLÉ, que les surfaces ont noté à l'image précédente.
-  windows_.monster_sheet.preview =
-      sheet.Preview(windows_.monster_sheet.preview_state, options.animate(), now_ms);
+  windows_.monster_sheet->preview =
+      sheet.Preview(windows_.monster_sheet->preview_state, options.animate(), now_ms);
 
   // ── LA DEMANDE AU SERVEUR ─────────────────────────────────────────────────
   //
@@ -148,8 +150,8 @@ void Game::AdvanceMonsterSheet(std::uint32_t now_ms) {
   }
 
   if (!state.open && !hosted) {
-    windows_.monster_sheet.view = nullptr;
-    database_.NoteMonsterView(windows_.monster_sheet.database, nullptr);
+    windows_.monster_sheet->view = nullptr;
+    database_.NoteMonsterView(windows_.monster_sheet->database, nullptr);
     return;
   }
   const ro::ui::MonsterSheetView& view =
@@ -157,8 +159,8 @@ void Game::AdvanceMonsterSheet(std::uint32_t now_ms) {
   sheet.NoteLinkFacts(ItemLinkFactsNow());
   // « Base de données » dans la fiche seule, que la base reprendrait.
   sheet.NoteDatabaseLink(state.open && !sheet.shown_by_view());
-  windows_.monster_sheet.view = state.open ? &view : nullptr;
-  database_.NoteMonsterView(windows_.monster_sheet.database, hosted ? &view : nullptr);
+  windows_.monster_sheet->view = state.open ? &view : nullptr;
+  database_.NoteMonsterView(windows_.monster_sheet->database, hosted ? &view : nullptr);
 
   // ── CE QUE LE SPRITE FAIT ENTENDRE ────────────────────────────────────────
   if (MonsterSprite* const sprite = sheet.sprite(); sprite != nullptr) {

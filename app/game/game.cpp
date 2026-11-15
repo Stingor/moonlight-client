@@ -23,6 +23,7 @@
 #include "ro/net/world_update.h"
 #include "ro/sim/damage_meter.h"
 #include "ro/sim/movement.h"
+#include "ro/ui/bank_window.h"
 #include "ro/vfs/item_link.h"
 #include "ro/vfs/item_name.h"
 
@@ -43,18 +44,14 @@
 #include "game/ui_answers.h"
 #include "game/ui_stage.h"
 #include "game/ui_stage_views.h"
+#include "game/ui_window_rounds.h"
 #include "game/warp_list_stage.h"
-#include "guild/sample_emblem.h"
 #include "input/hotkeys.h"
 #include "items/inventory_view.h"
-#include "options/damage_page_names.h"
-#include "options/entity_page_tabs.h"
 #include "voice/voice_keys.h"
 #include "voice/voice_marks.h"
 #include "world/cast_bar_view.h"
 #include "world/click_action.h"
-#include "world/damage_path_sample.h"
-#include "world/hit_popup_rules.h"
 #include "world/npc_talk.h"
 #include "world/sound_zone_view.h"
 
@@ -153,7 +150,7 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
   {
     const VoiceKeys talk = ReadVoiceKeys(settings_->bindings());
     // UN CLIC SUR LA BARRE, à l'image d'avant : un réglage de la page Son.
-    if (const auto asked = VoiceBarAction(windows_.voice.bar_answer,
+    if (const auto asked = VoiceBarAction(windows_.voice->bar_answer,
                                           settings_->options().pages().voice.settings())) {
       settings_->ApplyOptionsAside(*asked, windows_.options, OptionsTargets(), now_ms);
     }
@@ -162,13 +159,14 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
     // LES TOUCHES SE CHOISISSENT AUSSI DANS LA PAGE SON, par la capture des
     // raccourcis : elle attend son geste même fenêtre des raccourcis fermée.
     VoiceOptions& voice_options = settings_->options().pages().voice;
-    voice_options.ShowLive(VoiceLiveView{.talk_keys = talk.labels,
-                                         .capturing = VoiceKeyCapturing(windows_.hotkeys.capturing),
-                                         .input_percent = voice_.input_percent(),
-                                         .icons = icons});
+    voice_options.ShowLive(
+        VoiceLiveView{.talk_keys = talk.labels,
+                      .capturing = VoiceKeyCapturing(windows_.hotkeys->capturing),
+                      .input_percent = voice_.input_percent(),
+                      .icons = icons});
     if (const std::optional<VoiceTalkKey> asked = voice_options.TakeTalkKeyRequest()) {
-      windows_.hotkeys.capturing = VoiceKeyCaptureRank(*asked);
-      windows_.hotkeys.robbed[0] = '\0';
+      windows_.hotkeys->capturing = VoiceKeyCaptureRank(*asked);
+      windows_.hotkeys->robbed[0] = '\0';
     }
     voice_.Pump(
         VoiceFacts{.verified = handshake_.state() == ro::net::MoonclientHandshakeState::kVerified,
@@ -179,9 +177,9 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
                    .spatial = settings_->options().spatial_sound(),
                    .talk_keys = talk.codes,
                    .now_ms = now_ms});
-    windows_.voice = voice_.overlay();
-    windows_.voice.bar.mic_icon = icons[static_cast<std::size_t>(SpeakingIcon::kMicrophone)];
-    windows_.voice.bar.speaker_icon = icons[static_cast<std::size_t>(SpeakingIcon::kSpeaker)];
+    *windows_.voice = voice_.overlay();
+    windows_.voice->bar.mic_icon = icons[static_cast<std::size_t>(SpeakingIcon::kMicrophone)];
+    windows_.voice->bar.speaker_icon = icons[static_cast<std::size_t>(SpeakingIcon::kSpeaker)];
   }
   // LES CLASSEMENTS attendent leurs noms ; les avis d'étoile ont leur son.
   pieces_.rank_notices.Advance(world_, now_ms);
@@ -230,7 +228,7 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
   ServeMapEditor();
   // LA CAMÉRA LIBRE : celle de l'établi, ou celle du mode éditeur.
   camera_rig_.SetBounded(
-      !((windows_.staff_tools.look.free_camera || map_editor_.active()) && Rights().staff_tools));
+      !((windows_.staff_tools->look.free_camera || map_editor_.active()) && Rights().staff_tools));
   camera_rig_.SetExpandedZoom(settings_->options().expanded_zoom());
   // Après le suivi, la secousse et la veille : l'œil de cette image.
   camera_rig_.FloorEye(camera_, *stage_);
@@ -296,7 +294,7 @@ void Game::Close() {
     const ro::ui::ChatAppearance& look = settings_->options().chat_look();
     chat_tabs_->SavePast(look.keep_history, look.kept_lines,
                          chat_preview_.recent_whispers().saved(), look.keep_typed,
-                         windows_.chat.main.input.history.lines);
+                         windows_.chat->main.input.history.lines);
   }
   // Le livre encore ouvert garde sa page, comme s'il venait d'être refermé.
   if (item_description_.has_value()) {
@@ -317,84 +315,25 @@ void Game::Close() {
   gl_->SetTitle(WindowTitle(shell_.TitleMarks()));
 }
 
-void Game::ComposeOptionSamples(std::uint32_t now_ms) {
-  // LES CADRES D'ESSAI, seulement quand leur page est sous les yeux : une
-  // vignette animée se recompose à chaque image. Celui des entités, et celui des
-  // dégâts — sur les onglets de l'allure, des trajectoires et des couleurs.
-  const bool entity_frame =
-      windows_.options.open && settings_->options().entity_bars().tuning &&
-      windows_.options.section == static_cast<int>(Rank(OptionSection::kEntityBars));
-  const bool path_frame =
-      windows_.options.open &&
-      windows_.options.section == static_cast<int>(Rank(OptionSection::kDamage)) &&
-      windows_.options.section_tab != static_cast<int>(DamageTab::kShown);
-  if (!entity_frame && !path_frame) return;
-  const auto width = static_cast<float>(shell_.width());
-  const auto height = static_cast<float>(shell_.height());
-  const float anchor =
-      ro::render::ScreenAnchorScale(height, ro::render::ApparentScale(camera_), 1.0F);
-  // L'ÉCHELLE DU SPRITE SE MESURE SUR LE PERSONNAGE DU JOUEUR, tel que la
-  // carte le dessine ; faute de lui, celle d'ancrage. Ses pieds servent de sol
-  // au cadre des trajectoires.
-  float sprite_scale = anchor;
-  glm::vec3 player_ground = camera_.look_at;
-  for (std::size_t rank = 0; rank < scene_actors_.ids.size() && rank < scene_actors_.drawn.size();
-       ++rank) {
-    if (scene_actors_.ids[rank] == world_.player_id()) {
-      sprite_scale = ro::render::ActorSpriteScreenScale(camera_, aspect_ratio_,
-                                                        scene_actors_.drawn[rank], width, height)
-                         .value_or(anchor);
-      player_ground = scene_actors_.drawn[rank].ground_position;
-    }
-  }
-  if (path_frame) {
-    const HitPopupLook& look = settings_->options().damage_look();
-    const ro::sim::Actor* player = world_.player();
-    DamagePathStage stage;
-    stage.target = pieces_.entity_sampler.Compose(
-        pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr, &styles_,
-        PathTargetShown(DamagePathOf(look.path_shown)), world_, sprite_scale, anchor, now_ms);
-    stage.sprite_scale = sprite_scale;
-    stage.ground = SampleGroundOf(
-        camera_, aspect_ratio_, width, height, player_ground, sprite_scale,
-        player != nullptr ? ClientBodyDegrees(*player, ro::sim::FacingAt(*player, now_ms)) : 0.0F);
-    stage.font = interface_->DamageFont(look.font_name, look.font_bold);
-    settings_->options().pages().damage_path_sample =
-        pieces_.damage_path_sampler.Compose(pieces_.numbers, look, std::move(stage), now_ms);
-  }
-  if (entity_frame) {
-    settings_->options().pages().entity_sample = pieces_.entity_sampler.Compose(
-        pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr, &styles_,
-        EntityPageDrawn(EntityPageTabOf(windows_.options.section_tab)), world_, sprite_scale,
-        anchor, now_ms);
-    // L'EMBLÈME DE SA GUILDE OU DE SON CLAN : le cadre montre son personnage.
-    ro::ui::EntitySample& sample = settings_->options().pages().entity_sample;
-    sample.emblem = SampleEmblem(sample, world_, guild_book_,
-                                 guild_emblems_.has_value() ? &*guild_emblems_ : nullptr,
-                                 pieces_.game_images.has_value() ? &*pieces_.game_images : nullptr,
-                                 settings_->options().entity_names());
-  }
-}
-
 void Game::DrawInterface(std::uint32_t now_ms) {
   // L'INTERFACE APRÈS LE MONDE : rien de ce qu'elle dessine ne doit être masqué
   // par lui, ni par la couche d'écran.
   const ro::ui::SkillPointTally skill_points =
-      sheet_->Refresh(windows_.character.open, world_, now_ms);
+      sheet_->Refresh(windows_.character->open, world_, now_ms);
   // Le droit qui borne la cadence d'item de Quick cast, AVANT que la page ne se
   // compose : il arrive au login et peut changer en cours de session.
   settings_->options().quick_cast().NoteStaff(Rights().staff_tools);
   // L'appel d'urgence, tel que le serveur l'a dit, de même.
   settings_->options().pages().call.NoteCallable(own_config_.callable());
   settings_->Refresh(windows_, now_ms);
-  if (windows_.staff_tools.look.camera_hud) {
-    windows_.camera_hud =
+  if (windows_.staff_tools->look.camera_hud) {
+    *windows_.camera_hud =
         camera_rig_.HudOf(camera_, stage_->name, (SDL_GetModState() & SDL_KMOD_CTRL) != 0);
   }
   // LES ZONES DE SON, composées seulement quand l'établi les montre à qui en a
   // le droit : une carte porte des centaines de sources.
   windows_.sound_zones.clear();
-  windows_.staff_tools.sound_audible = audio_.sound_audible();
+  windows_.staff_tools->sound_audible = audio_.sound_audible();
   if (ro::ui::SoundZonesShown(windows_.staff_tools) && Rights().staff_tools &&
       actor_sounds_.has_value()) {
     windows_.sound_zones = SoundZoneViews(*actor_sounds_, *stage_, camera_, aspect_ratio_,
@@ -442,8 +381,8 @@ void Game::DrawInterface(std::uint32_t now_ms) {
   pieces_.damage_meter.Compose(
       world_, party_, pieces_.skill_tree.has_value() ? &*pieces_.skill_tree : nullptr,
       settings_->options().pages().damage_meter, interface_->DamageFont({}, true), now_ms,
-      &windows_.damage_meter_view);
-  windows_.damage_meter_view.docked = chat_tabs_->meter_docked();
+      &*windows_.damage_meter_view);
+  windows_.damage_meter_view->docked = chat_tabs_->meter_docked();
   // CE QUE L'INTERFACE REND À LA BOUCLE : la réponse au PNJ, ce que le joueur a
   // dit, et ce qu'il a demandé aux réglages. Tout part d'ici, et de nulle part
   // ailleurs.
@@ -463,7 +402,7 @@ void Game::DrawInterface(std::uint32_t now_ms) {
   const ro::ui::ItemLinkFacts link_facts = ItemLinkFactsNow();
   dialogue_->NoteLinkFacts(link_facts);
   dialogue_->SeesSettingReach(SettingReachOf(pieces_));
-  windows_.chat.link_facts = link_facts;
+  windows_.chat->link_facts = link_facts;
   // ⚠ LA PILE SE PREND ICI, ET NON PLUS TÔT : c'est le même appel qui purge les
   // lignes expirées et compose les vues. Les prendre en avance laisserait une
   // ligne morte à l'écran une image de plus, et les vues désigneraient une pile
@@ -505,13 +444,13 @@ void Game::DrawInterface(std::uint32_t now_ms) {
   RefreshGuild(now_ms);
   RefreshParty(now_ms);
   // ⚠ « AUCUNE » ÉTEINT AUSSI UN BANDEAU DÉJÀ LEVÉ.
-  windows_.map_sign =
+  *windows_.map_sign =
       settings_->options().pages().map_sign.mode() != MapSignMode::kNever
           ? pieces_.map_sign.Stage(
                 pieces_.game_images.has_value() ? &*pieces_.game_images : nullptr, now_ms)
           : std::nullopt;
   AdvanceHoveredDollEffect(now_ms);
-  ComposeMenuIcons(windows_.menu_icons.icons,
+  ComposeMenuIcons(windows_.menu_icons->icons,
                    pieces_.game_images.has_value() ? &*pieces_.game_images : nullptr,
                    settings_->bindings(),
                    MenuIconFactsOf(world_, windows_, pieces_, styles_, ticket_.character_id));
@@ -519,9 +458,9 @@ void Game::DrawInterface(std::uint32_t now_ms) {
   // LA PAGE « COMMANDS SETTINGS », seulement quand elle est sous les yeux : sa
   // liste nomme chaque item par la table.
   const bool commands_shown =
-      windows_.options.open &&
-      windows_.options.section == static_cast<int>(Rank(OptionSection::kCommands));
-  pieces_.commands.NoteDescribed(windows_.description.open ? windows_.description.item_id : 0);
+      windows_.options->open &&
+      windows_.options->section == static_cast<int>(Rank(OptionSection::kCommands));
+  pieces_.commands.NoteDescribed(windows_.description->open ? windows_.description->item_id : 0);
   if (commands_shown) {
     pieces_.commands.Compose(
         item_description_.has_value() ? &item_description_->facts() : nullptr,
@@ -529,7 +468,7 @@ void Game::DrawInterface(std::uint32_t now_ms) {
         pieces_.item_words);
   }
   // LE MODE RÉGLAGE DES JAUGES : des valeurs factices, panneau ouvert seulement.
-  const bool tuning = settings_->options().stat_bars().tuning && windows_.options.open;
+  const bool tuning = settings_->options().stat_bars().tuning && windows_.options->open;
   const std::int64_t zeny_reference = settings_->options().stat_bars().zeny_reference;
   // Les onglets des compagnons, et le profil d'IA de chacun.
   ro::ui::CompanionTabsView companion_tabs{.homunculus = pieces_.homunculus.view(),
@@ -550,7 +489,7 @@ void Game::DrawInterface(std::uint32_t now_ms) {
   RelabelEmojiGroups(emojis_);
   ListUnlockedHudShown(settings_->options(), windows_, windows_.unlocked_hud);
   interface_->SetSkinLook(settings_->options().pages().skin_look.look());
-  windows_.shortcut_wheel = pieces_.shortcut_wheel.Compose(settings_->options().shortcut_bars());
+  *windows_.shortcut_wheel = pieces_.shortcut_wheel.Compose(settings_->options().shortcut_bars());
   const UiStage::Answers answers = interface_->Draw(
       frame_tally_, windows_, talk, chat_preview_.preview(), *chat_tabs_, input_links_, emotions_,
       emojis_, sheet_->groups(), skill_points,
@@ -592,8 +531,8 @@ void Game::DrawInterface(std::uint32_t now_ms) {
       // les treize autres, il barre l'écran de quelqu'un venu changer son
       // volume — et rien à l'écran ne dit d'où vient ce rectangle.
       obtained, settings_->options().item_obtain(), toast_grip_,
-      recorder_.view(windows_.options.open &&
-                     windows_.options.section == static_cast<int>(Rank(OptionSection::kCapture))),
+      recorder_.view(windows_.options->open &&
+                     windows_.options->section == static_cast<int>(Rank(OptionSection::kCapture))),
       world_.server_clock().round_trip_ms(), pieces_.over_world.Paint());
   // 🔴 LA LIGNE VALIDÉE D'ABORD, avant tout ce qui écrit dans la saisie — un
   // Maj+clic, un menu, le carnet : voir `SettleChatLine`.
@@ -607,8 +546,8 @@ void Game::DrawInterface(std::uint32_t now_ms) {
   }
   // ⚠ MÊME RÈGLE POUR LA POIGNÉE DU BANDEAU : l'anti-rebond du fichier fait
   // qu'un glisser de deux secondes ne produit qu'une écriture.
-  if (answers.obtained.moved) {
-    settings_->NoteItemObtainAnchor(answers.obtained.pos_x, answers.obtained.pos_y);
+  if (answers.obtained->moved) {
+    settings_->NoteItemObtainAnchor(answers.obtained->pos_x, answers.obtained->pos_y);
   }
   // ⚠ APRÈS LE DESSIN : c'est là que l'établi a coché sa case et posé sa
   // couleur, et c'est la remontée de ce que `Refresh` lui avait descendu.
@@ -622,8 +561,8 @@ void Game::DrawInterface(std::uint32_t now_ms) {
   settings_->NoteCharacterStaffPane(windows_);
   // « Ignoré des monstres » : un souhait, retenu ici et que la mise en scène de
   // la fiche fait valoir auprès du serveur. Voir `KeepBattleIgnore`.
-  if (answers.character.staff.order == ro::ui::StaffOrder::kSetBattleIgnore) {
-    settings_->NoteStaffBattleIgnore(answers.character.staff.amount != 0);
+  if (answers.character->staff.order == ro::ui::StaffOrder::kSetBattleIgnore) {
+    settings_->NoteStaffBattleIgnore(answers.character->staff.amount != 0);
   }
   // ⚠ ET LA POSE DE L'AVATAR, dans le même sens : la molette vient de la
   // tourner, la liste vient peut-être d'en changer.
@@ -632,12 +571,12 @@ void Game::DrawInterface(std::uint32_t now_ms) {
   ApplyMacroAnswers(answers.macros, now_ms);
   // ── ET CE QUE LA CAPTURE A DEMANDÉ ────────────────────────────────────────
   ApplyCaptureGesture(answers, now_ms);
-  sheet_->Apply(answers.character.grimoire, grimoire_, link_, world_, now_ms);
+  sheet_->Apply(answers.character->grimoire, grimoire_, link_, world_, now_ms);
   character_->Apply(answers.character, link_, world_);
   ApplySheetAnswers(answers);
   title_view_->Apply(
       answers.character,
-      windows_.character.open && windows_.character.tab == ro::ui::CharacterTab::kTitles, link_,
+      windows_.character->open && windows_.character->tab == ro::ui::CharacterTab::kTitles, link_,
       world_);
   ApplyGuildAnswers(answers, now_ms);
   // MAJ + CLIC SUR UNE ENTRÉE OU UN ONGLET : son lien dans la saisie du chat.
@@ -648,7 +587,7 @@ void Game::DrawInterface(std::uint32_t now_ms) {
   }
   ApplyPartyAnswers(now_ms);
   ApplyStyleAnswers(answers, now_ms);
-  SendStaffOrder(answers.character.staff, link_, world_);
+  SendStaffOrder(answers.character->staff, link_, world_);
   ApplyContainerAnswers(answers, now_ms);
   PostClickedItemLink(answers);
   ApplyDescriptionAnswers(answers, now_ms);
@@ -666,23 +605,23 @@ void Game::DrawInterface(std::uint32_t now_ms) {
   pieces_.pet.Apply(answers.pet, answers.pet_hatch, windows_.pet, link_, world_, now_ms);
   // LA FICHE DU PET suit son bloc de réglages, et sa puce y mène.
   const PetSettings& pet_page = settings_->options().pages().pet.settings();
-  windows_.pet.confirm_return_to_egg = pet_page.confirm_return_to_egg;
-  windows_.pet.animate_sprite = pet_page.animate_sprite;
-  if (answers.pet.settings_asked) {
+  windows_.pet->confirm_return_to_egg = pet_page.confirm_return_to_egg;
+  windows_.pet->animate_sprite = pet_page.animate_sprite;
+  if (answers.pet->settings_asked) {
     GameSettings::OpenOptionsAt(windows_, OptionSection::kInterface,
                                 PetRowId(PetRow::kConfirmReturnToEgg));
   }
   // « Couleurs » d'une fiche de compagnon : l'éditeur de style, sur son onglet.
-  ro::ui::OpenPaletteTab(windows_.style, answers.pet.colors_asked, ro::ui::PaletteTabKind::kPet);
-  ro::ui::OpenPaletteTab(windows_.style, answers.character.homunculus.colors_asked,
+  ro::ui::OpenPaletteTab(windows_.style, answers.pet->colors_asked, ro::ui::PaletteTabKind::kPet);
+  ro::ui::OpenPaletteTab(windows_.style, answers.character->homunculus.colors_asked,
                          ro::ui::PaletteTabKind::kHomunculus);
   // Les matériaux et les espèces du panneau d'évolution, les œufs de l'éclosion :
   // des items de catalogue, avec les gestes de partout.
-  FollowCatalogItem(answers.pet.link, now_ms);
-  FollowCatalogItem(answers.pet_hatch.link, now_ms);
-  pieces_.homunculus.Apply(answers.character.homunculus, link_, world_, now_ms,
-                           windows_.skill_description, windows_.character.homunculus);
-  pieces_.mercenary.Apply(answers.character.mercenary, link_, world_, now_ms,
+  FollowCatalogItem(answers.pet->link, now_ms);
+  FollowCatalogItem(answers.pet_hatch->link, now_ms);
+  pieces_.homunculus.Apply(answers.character->homunculus, link_, world_, now_ms,
+                           windows_.skill_description, windows_.character->homunculus);
+  pieces_.mercenary.Apply(answers.character->mercenary, link_, world_, now_ms,
                           windows_.skill_description);
   // LA FAIM DU PET ET DE L'HOMONCULE, au palier où ils perdent de l'intimité :
   // dans le bandeau des ramassages, que le joueur a déjà placé et réglé.
@@ -696,35 +635,35 @@ void Game::DrawInterface(std::uint32_t now_ms) {
   pieces_.companion_ai.ApplyTacticWindow(answers.companion_tactic, now_ms);
   // « Régler… » dans l'onglet d'un compagnon, puis ce que la fenêtre de l'IA a
   // demandé.
-  if (answers.character.homunculus.verb == ro::ui::HomunculusVerb::kOpenAi) {
+  if (answers.character->homunculus.verb == ro::ui::HomunculusVerb::kOpenAi) {
     pieces_.companion_ai.OpenAiWindow(ro::sim::AiCompanion::kHomunculus, windows_.companion_ai);
   }
-  if (answers.character.mercenary.open_ai) {
+  if (answers.character->mercenary.open_ai) {
     pieces_.companion_ai.OpenAiWindow(ro::sim::AiCompanion::kMercenary, windows_.companion_ai);
   }
   // LA PROPOSITION DE RECOPIE, répondue depuis l'onglet.
-  if (const ro::ui::HomunculusVerb verb = answers.character.homunculus.verb;
+  if (const ro::ui::HomunculusVerb verb = answers.character->homunculus.verb;
       verb == ro::ui::HomunculusVerb::kAcceptAiProposal ||
       verb == ro::ui::HomunculusVerb::kDeclineAiProposal) {
     pieces_.companion_ai.AnswerProposal(ro::sim::AiCompanion::kHomunculus,
                                         verb == ro::ui::HomunculusVerb::kAcceptAiProposal);
   }
-  if (answers.character.mercenary.ai_proposal_answer.has_value()) {
+  if (answers.character->mercenary.ai_proposal_answer.has_value()) {
     pieces_.companion_ai.AnswerProposal(ro::sim::AiCompanion::kMercenary,
-                                        *answers.character.mercenary.ai_proposal_answer);
+                                        *answers.character->mercenary.ai_proposal_answer);
   }
   pieces_.companion_ai.ApplyAiWindow(answers.companion_ai, windows_.companion_ai, now_ms);
   // SES ZONES AU SOL, pour le dessin qui suit, et la case qui les garde
   // fenêtre fermée : `Touch` arme l'anti-rebond du fichier.
   CompanionZonesMemory& zones_memory = settings_->options().pages().companion_zones;
-  if (zones_memory.Follow(answers.companion_ai.ground_zones_toggled)) settings_->file().Touch();
+  if (zones_memory.Follow(answers.companion_ai->ground_zones_toggled)) settings_->file().Touch();
   pieces_.companion_zones.Compose(
       CompanionZonesFrame{.world = world_,
                           .stage = stage_.has_value() ? &*stage_ : nullptr,
                           .companions = pieces_.companion_ai,
-                          .window = windows_.companion_ai,
-                          .view = windows_.companion_ai_view,
-                          .answer = answers.companion_ai,
+                          .window = *windows_.companion_ai,
+                          .view = *windows_.companion_ai_view,
+                          .answer = *answers.companion_ai,
                           .kept_shown = zones_memory.kept_shown,
                           .now_ms = now_ms});
   ServeDebugConsole(pieces_.debug_console, windows_.staff_tools, Rights().staff_tools, world_,
@@ -752,7 +691,7 @@ void Game::DrawInterface(std::uint32_t now_ms) {
   }
   ApplyMenuGesture(answers.menu, now_ms);
   if (const std::optional<ro::ui::MenuCommand> clicked =
-          std::exchange(windows_.menu_icons.clicked, std::nullopt);
+          std::exchange(windows_.menu_icons->clicked, std::nullopt);
       clicked.has_value()) {
     ApplyMenuCommand(*clicked, MenuIconTargets{.windows = &windows_,
                                                .bank = &bank_,
@@ -776,9 +715,9 @@ void Game::DrawInterface(std::uint32_t now_ms) {
   // avec ce que la réponse PRÉCÉDENTE a rapporté. Un aperçu qui attendrait le
   // clic ne serait plus un aperçu.
   hovered_status_ =
-      answers.npc.hovered.kind == ro::ui::DialogTargetKind::kStatus &&
-              answers.npc.hovered.id <= std::numeric_limits<ro::sim::StatusEffectId>::max()
-          ? static_cast<ro::sim::StatusEffectId>(answers.npc.hovered.id)
+      answers.npc->hovered.kind == ro::ui::DialogTargetKind::kStatus &&
+              answers.npc->hovered.id <= std::numeric_limits<ro::sim::StatusEffectId>::max()
+          ? static_cast<ro::sim::StatusEffectId>(answers.npc->hovered.id)
           : 0;
   ApplyChatAnswers(answers, now_ms);
 

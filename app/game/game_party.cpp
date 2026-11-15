@@ -15,6 +15,7 @@
 #include "chat/player_link_judge.h"
 #include "game/game.h"
 #include "game/party_booking_bug_report.h"
+#include "game/party_windows.h"
 #include "game/survivors_presence_mode.h"
 #include "game/whisper_stage.h"
 #include "options/option_sections.h"
@@ -38,7 +39,7 @@ namespace {
 
 void Game::RefreshParty(std::uint32_t now_ms) {
   PartyOptions& page = settings_->options().pages().party;
-  ro::ui::PartyFriendWindowState& window = windows_.party.window;
+  ro::ui::PartyFriendWindowState& window = windows_.party->window;
   if (page.NoteTab(window.tab)) {
     settings_->file().Touch();
   }
@@ -68,16 +69,16 @@ void Game::RefreshParty(std::uint32_t now_ms) {
     // Les têtes hors de vue que la guilde, le groupe et les amis ont voulues.
     absent_styles_.Pump(link_, world_, now_ms);
   }
-  windows_.party.view = &party_panel_->window();
-  windows_.party.look = &page.window();
-  windows_.party.grid_view = &party_panel_->grid();
-  windows_.party.grid_look = &page.grid();
+  windows_.party->view = &party_panel_->window();
+  windows_.party->look = &page.window();
+  windows_.party->grid_view = &party_panel_->grid();
+  windows_.party->grid_look = &page.grid();
 }
 
 void Game::ApplyPartyAnswers(std::uint32_t now_ms) {
   PartyOptions& page = settings_->options().pages().party;
-  const ro::ui::PartyFriendAction asked = std::exchange(windows_.party.answer, {});
-  ro::ui::PartyGridAnswer tile = std::exchange(windows_.party.grid_answer, {});
+  const ro::ui::PartyFriendAction asked = std::exchange(windows_.party->answer, {});
+  ro::ui::PartyGridAnswer tile = std::exchange(windows_.party->grid_answer, {});
   // Les faux membres du mode réglage n'existent pas chez le serveur.
   if (IsFakeMember(tile.cast_account_id)) {
     tile.cast_account_id = 0;
@@ -99,23 +100,23 @@ void Game::ApplyPartyAnswers(std::uint32_t now_ms) {
   // LA RECHERCHE DE GROUPE : le bouton du groupe l'ouvre, et un chuchotement
   // demandé depuis ses annonces prend le chemin de ceux du groupe.
   if (asked.booking_asked) {
-    windows_.party_booking.open_asked = true;
+    windows_.party_booking->open_asked = true;
   }
   if (asked.blocks_asked) {
-    ro::ui::RaiseBlockListWindow(windows_.whispers.blocks);
+    ro::ui::RaiseBlockListWindow(windows_.whispers->blocks);
   }
   // ⚠ LE RAPPORT AVANT L'AVANCÉE, qui consomme la réponse et refait la vue :
   // il décrit celle que le joueur a vue.
-  if (windows_.party_booking.answer.report_bug && windows_.party_booking.view != nullptr) {
-    AskBugReport(windows_.bug_report, PartyBookingBugReport(windows_.party_booking.window,
-                                                            *windows_.party_booking.view));
+  if (windows_.party_booking->answer.report_bug && windows_.party_booking->view != nullptr) {
+    AskBugReport(windows_.bug_report, PartyBookingBugReport(windows_.party_booking->window,
+                                                            *windows_.party_booking->view));
   }
   pieces_.party_booking.Advance(windows_.party_booking, link_, world_, now_ms);
   if (const std::optional<PartyBookingWhisper> whisper = pieces_.party_booking.TakeWhisper()) {
     if (whisper->own_window) {
       pieces_.whispers.Open(whisper->name);
     } else {
-      ArmWhisper(windows_.chat.main.input, whisper->name);
+      ArmWhisper(windows_.chat->main.input, whisper->name);
     }
   }
   if (asked.grid_toggled) {
@@ -126,14 +127,14 @@ void Game::ApplyPartyAnswers(std::uint32_t now_ms) {
     world_.RecordChat(ro::sim::ChatKind::kParty, ro::sim::ChatType::kPartySetup, 0, asked.chat_line,
                       now_ms, ChatColorOf(ro::ui::kPartyOptionsChatColor));
   }
-  if (std::exchange(windows_.party.disband_confirmed, false) && link_.is_open()) {
+  if (std::exchange(windows_.party->disband_confirmed, false) && link_.is_open()) {
     ReportRefusal(ro::net::RequestPartyLeave(link_));
   }
   if (!link_.is_open()) {
     return;
   }
   // L'ADOPTION : la réponse à la demande reçue, et les refus de la nôtre.
-  pieces_.adoption.Advance(windows_.party.adoption, link_, world_, now_ms);
+  pieces_.adoption.Advance(windows_.party->adoption, link_, world_, now_ms);
 
   // LE NOM CLIQUÉ vise ou frappe comme un clic sur le sprite : voir
   // `world/name_click.h`.
@@ -151,7 +152,7 @@ void Game::ApplyPartyAnswers(std::uint32_t now_ms) {
     case ro::ui::PartyFriendVerb::kNothing:
       break;
     case ro::ui::PartyFriendVerb::kWhisper:
-      ArmWhisper(windows_.chat.main.input, asked.name);
+      ArmWhisper(windows_.chat->main.input, asked.name);
       break;
     case ro::ui::PartyFriendVerb::kWhisperWindow:
       pieces_.whispers.Open(asked.name);
@@ -163,7 +164,7 @@ void Game::ApplyPartyAnswers(std::uint32_t now_ms) {
       ReportRefusal(ro::net::RequestPartyExpel(link_, asked.account_id, asked.name));
       break;
     case ro::ui::PartyFriendVerb::kLeave:
-      windows_.party.ask_disband = LeaveParty(link_, party_, own);
+      windows_.party->ask_disband = LeaveParty(link_, party_, own);
       break;
     case ro::ui::PartyFriendVerb::kRemoveFriend:
       ReportRefusal(ro::net::RequestFriendRemoval(link_, asked.account_id, asked.char_id));
@@ -222,7 +223,7 @@ void Game::ApplyPartyAnswers(std::uint32_t now_ms) {
       open_menu(tile.verb_account_id);
       break;
     case ro::ui::PartyGridVerb::kWhisper:
-      ArmWhisper(windows_.chat.main.input, tile.verb_name);
+      ArmWhisper(windows_.chat->main.input, tile.verb_name);
       break;
     case ro::ui::PartyGridVerb::kWhisperWindow:
       pieces_.whispers.Open(tile.verb_name);

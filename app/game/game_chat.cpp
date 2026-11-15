@@ -39,6 +39,7 @@
 #include "game/game.h"
 #include "game/setting_destination_open.h"
 #include "game/ui_answers.h"
+#include "game/ui_chat_ask.h"
 #include "game/ui_stage.h"
 #include "options/chat_web_options.h"
 #include "options/game_option_ids.h"
@@ -102,7 +103,7 @@ void Game::StageChat(std::uint32_t now_ms) {
   // ⚠ COMPOSÉE À L'IMAGE PRÉCÉDENTE : le compteur se compose après la
   // conversation, et une image de retard ne se voit pas.
   chat_tabs_->HideMeter(!settings_->options().pages().damage_meter.look().shown, windows_.chat);
-  chat_tabs_->FollowMeterDock(windows_.damage_meter.docked, windows_.chat);
+  chat_tabs_->FollowMeterDock(windows_.damage_meter->docked, windows_.chat);
   chat_tabs_->LabelMeter(pieces_.damage_meter.tab_label());
   // LES CONVERSATIONS 1:1 AVANT LE TRI : ce qu'elles prennent au fil n'y paraît
   // pas, et elles le prennent en lisant les lignes neuves. L'alarme sonne pour
@@ -121,17 +122,17 @@ void Game::StageChat(std::uint32_t now_ms) {
     PlayWhisperAlarm(audio_, *vfs_, client_root_, whisper_page.setup().alarm);
   }
   // LES JOUEURS BLOQUÉS : le geste rendu à l'image précédente, puis la vue.
-  FollowBlockListAnswer(std::exchange(windows_.whispers.blocks_answer, {}), link_, pieces_.whispers,
-                        voice_);
-  if (windows_.whispers.blocks.open) {
-    windows_.whispers.blocks_view = ComposeBlockList(pieces_.whispers, voice_, link_.is_open());
+  FollowBlockListAnswer(std::exchange(windows_.whispers->blocks_answer, {}), link_,
+                        pieces_.whispers, voice_);
+  if (windows_.whispers->blocks.open) {
+    windows_.whispers->blocks_view = ComposeBlockList(pieces_.whispers, voice_, link_.is_open());
   }
   // QUI VIENT DE NOUS CHUCHOTER entre dans les récents de la box « Pseudo » :
   // c'est souvent à lui qu'on veut répondre.
   chat_preview_.recent_whispers().FollowChat(world_.chat_lines(), world_.player_name());
   // LA BARRE A REPRIS LE CLAVIER : un lien posé y retourne, plus dans la
   // dernière conversation 1:1.
-  if (windows_.chat.main.input.was_active) {
+  if (windows_.chat->main.input.was_active) {
     pieces_.whispers.ReleaseLinks();
   }
   // ── LE RELAI DISCORD ───────────────────────────────────────────────────
@@ -208,7 +209,7 @@ void Game::StageChat(std::uint32_t now_ms) {
   // L'APPARENCE PRÊTE LE TEXTE RICHE à toutes les fenêtres : une copie, parce
   // que ce pointeur-là n'est pas un réglage.
   ro::ui::ChatAppearance look = settings_->options().chat_look();
-  look.rich = &windows_.chat.rich;
+  look.rich = &windows_.chat->rich;
   look.staff_warp = Rights().staff_tools;
   chat_tabs_->Refresh(windows_.chat, world_.chat_lines(), now_ms, look, look.diagnostic);
   // LE FIL DU SALON, APRÈS : il prend ses jetons de liens à la suite de ceux de
@@ -220,12 +221,12 @@ void Game::StageChat(std::uint32_t now_ms) {
   }
   // LES CONVERSATIONS 1:1, de même.
   chat_tabs_->RefreshWhispers(world_.chat_lines(), pieces_.whispers.desk().conversations());
-  windows_.chat.main.input_lent = pieces_.chat_rooms.LendsInput();
+  windows_.chat->main.input_lent = pieces_.chat_rooms.LendsInput();
   // ⚠ ÉLAGUÉS AVANT D'ÊTRE PEINTS : un libellé que le joueur a effacé de sa
   // saisie n'a plus de pastille à porter, et sa place au plafond se libère.
   // ⚠ CE QUE LA SAISIE PORTERA À CETTE IMAGE, dépôt en attente compris : une
   // ligne retenue pour sa longueur y revient par lui, avec ses liens.
-  const ro::ui::ChatInputState& input = windows_.chat.main.input;
+  const ro::ui::ChatInputState& input = windows_.chat->main.input;
   std::string typed = input.text.data();
   typed += input.pending_insert;
   PruneChatLinks(typed, &pending_links_);
@@ -258,7 +259,7 @@ void Game::StageChat(std::uint32_t now_ms) {
   // codes du fil.
   // ⚠ REFAIT ICI, AVANT TOUT CE QUI LE LIT : la box a pu changer à l'image
   // précédente, et une vue composée une seule fois figerait le destinataire.
-  armed_chat_.whisper_to = windows_.chat.main.input.whisper_to.data();
+  armed_chat_.whisper_to = windows_.chat->main.input.whisper_to.data();
   // ⚠ LA VUE SE REPOSE À CHAQUE IMAGE : la chaîne qui la porte peut avoir
   // déménagé depuis la dernière, et une vue périmée armerait un canal au nom
   // illisible.
@@ -295,7 +296,7 @@ void Game::SendTypedChat(const UiStage::Answers& answers, std::uint32_t now_ms) 
     // ⚠ CE QUI PART N'EST PAS CE QUI EST TAPÉ : chaque libellé de lien y
     // reprend sa balise.
     SettledChatLine settled =
-        SettleChatLine(*ask.asked.said, windows_.chat.main.input, &pending_links_,
+        SettleChatLine(*ask.asked.said, windows_.chat->main.input, &pending_links_,
                        WireSpeakerOf(world_, chat_preview_), armed_chat_);
     if (settled.held_notice.has_value()) {
       world_.RecordChat(ro::sim::ChatKind::kServer, 0, std::move(*settled.held_notice), now_ms,
@@ -320,7 +321,7 @@ void Game::SendTypedChat(const UiStage::Answers& answers, std::uint32_t now_ms) 
       continue;
     }
     SettledChatLine settled =
-        SettleChatLine(ask.asked.sent_emote, windows_.chat.main.input, nullptr,
+        SettleChatLine(ask.asked.sent_emote, windows_.chat->main.input, nullptr,
                        WireSpeakerOf(world_, chat_preview_), armed_chat_);
     if (settled.outgoing.has_value()) {
       SubmitChat(*chat_dispatch_, *settled.outgoing, now_ms);
@@ -342,11 +343,11 @@ void Game::ApplyChatAnswers(const UiStage::Answers& answers, std::uint32_t now_m
   if (pieces_.damage_meter.Apply(answers.damage_meter, world_, meter)) {
     settings_->file().Touch();
   }
-  if (answers.damage_meter.open_settings) {
+  if (answers.damage_meter->open_settings) {
     GameSettings::OpenOptionsAt(windows_, OptionSection::kDamageMeter);
   }
-  if (answers.damage_meter.dock.has_value()) {
-    chat_tabs_->DockMeter(answers.damage_meter.dock->group, answers.damage_meter.dock->rank,
+  if (answers.damage_meter->dock.has_value()) {
+    chat_tabs_->DockMeter(answers.damage_meter->dock->group, answers.damage_meter->dock->rank,
                           windows_.chat);
   }
   // L'ONGLET DU COMPTEUR LÂCHÉ HORS DE TOUTE BANDE redevient sa fenêtre, là
@@ -354,7 +355,7 @@ void Game::ApplyChatAnswers(const UiStage::Answers& answers, std::uint32_t now_m
   const ro::ui::ChatDrop& drop = answers.chat_drop;
   if (drop.asked && drop.to_new_window && chat_tabs_->IsMeter(drop.from_group, drop.from_tab)) {
     chat_tabs_->UndockMeter(windows_.chat);
-    windows_.damage_meter.place_at = drop.at;
+    windows_.damage_meter->place_at = drop.at;
   } else {
     chat_tabs_->ApplyDrop(drop, windows_.chat);
   }
@@ -396,7 +397,7 @@ void Game::ApplyChatAnswers(const UiStage::Answers& answers, std::uint32_t now_m
       GameSettings::OpenOptionsAt(windows_, OptionSection::kChat);
     }
     if (ask.asked.blocks_asked) {
-      ro::ui::RaiseBlockListWindow(windows_.whispers.blocks);
+      ro::ui::RaiseBlockListWindow(windows_.whispers->blocks);
     }
     // ⚠ CE QUE LE SÉLECTEUR REND EST UN RANG, ET UN RANG NE DIT PAS UN CANAL :
     // tous partagent le même genre. C'est la liste de l'image en cours qui
@@ -422,8 +423,8 @@ void Game::ApplyChatAnswers(const UiStage::Answers& answers, std::uint32_t now_m
     }
     // CE QU'UNE FLOTTANTE A PIOCHÉ va dans la saisie de la principale.
     if (!ask.asked.insert_into_main.empty() &&
-        ro::ui::AppendPickedToChatInput(windows_.chat.main.input, ask.asked.insert_into_main)) {
-      windows_.chat.main.input.unfolded = true;
+        ro::ui::AppendPickedToChatInput(windows_.chat->main.input, ask.asked.insert_into_main)) {
+      windows_.chat->main.input.unfolded = true;
     }
   }
   // ── LES ADRESSES ET LES IMAGES, APRÈS LE DESSIN ─────────────────────────

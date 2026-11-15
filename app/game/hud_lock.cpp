@@ -5,6 +5,8 @@
 
 #include "ro/core/i18n.h"
 
+#include "game/hud_rounds.h"
+#include "game/party_windows.h"
 #include "game/ui_stage.h"
 #include "game/ui_windows.h"
 #include "options/damage_meter_options.h"
@@ -36,7 +38,7 @@ void ListUnlockedHudShown(GameOptions& options, const UiStage::Windows& windows,
   // et son verrou, et l'avis la nomme une fois. Le portrait n'a de vue qu'en
   // jeu.
   const bool portrait_on_screen =
-      windows.status_portrait.view != nullptr && options.pages().portrait.look().AnyShown();
+      windows.status_portrait->view != nullptr && options.pages().portrait.look().AnyShown();
   if (!options.stat_bars().locked && (options.stat_bars().shown || portrait_on_screen)) {
     into.push_back(ro::core::Tr("Basic Info"));
   }
@@ -62,10 +64,10 @@ void ListUnlockedHudShown(GameOptions& options, const UiStage::Windows& windows,
   }
   // LE HUD DE CIBLE ET LA GRILLE DE GROUPE n'ont de vue que lorsqu'ils se
   // dessinent : sous le mode Ciblage, dans un groupe.
-  if (windows.target_hud.view != nullptr && !pages.targeting.look().locked) {
+  if (windows.target_hud->view != nullptr && !pages.targeting.look().locked) {
     into.push_back(ro::core::Tr("Fenêtre de cible"));
   }
-  if (windows.party.grid_view != nullptr && pages.party.grid().shown &&
+  if (windows.party->grid_view != nullptr && pages.party.grid().shown &&
       !pages.party.grid().locked) {
     into.push_back(ro::core::Tr("Grille de groupe"));
   }

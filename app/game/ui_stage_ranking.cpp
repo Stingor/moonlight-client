@@ -9,6 +9,7 @@
 
 #include "game/ui_stage.h"
 #include "game/ui_windows.h"
+#include "world/ranking_board.h"
 
 namespace moonclient {
 namespace {

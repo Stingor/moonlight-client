@@ -22,6 +22,7 @@
 
 #include "character/basic_info_compose.h"
 #include "game/game.h"
+#include "game/hud_rounds.h"
 #include "game/ui_stage.h"
 #include "world/armed_cursor.h"
 #include "world/click_action.h"
@@ -43,18 +44,18 @@ constexpr int kCellsPerCube =
 void Game::AdvanceStatusPortrait(std::uint32_t now_ms) {
   // LA FENÊTRE « BASIC INFO », recomposée avec le portrait : même source, même
   // cadence.
-  windows_.basic_info.state.shown =
+  windows_.basic_info->state.shown =
       settings_->options().stat_bars().basic_info_window && link_.is_open() &&
-      ComposeBasicInfo(windows_.basic_info.view, world_, pieces_.job_names,
+      ComposeBasicInfo(windows_.basic_info->view, world_, pieces_.job_names,
                        LabelOfBinding(settings_->bindings().Of(GameAction::kToggleBasicInfo)));
   StatusPortraitOptions& options = settings_->options().pages().portrait;
-  windows_.status_portrait.look = &options.look();
+  windows_.status_portrait->look = &options.look();
   // Un cadre déplacé s'écrit, une fois : `Touch` arme l'anti-rebond du fichier.
-  if (std::exchange(windows_.status_portrait.answer, {}).moved) {
+  if (std::exchange(windows_.status_portrait->answer, {}).moved) {
     settings_->file().Touch();
   }
   if (!link_.is_open() || !status_portrait_.has_value()) {
-    windows_.status_portrait.view = nullptr;
+    windows_.status_portrait->view = nullptr;
     pieces_.portrait_effects.reset();
     return;
   }
@@ -76,20 +77,20 @@ void Game::AdvanceStatusPortrait(std::uint32_t now_ms) {
   if (pieces_.portrait_effects.has_value() && stage_.has_value()) {
     status_portrait_->ShowHatEffects(*pieces_.portrait_effects, world_, *stage_, now_ms);
   }
-  windows_.status_portrait.view = &status_portrait_->view();
+  windows_.status_portrait->view = &status_portrait_->view();
 }
 
 void Game::AdvanceTargeting(std::uint32_t now_ms) {
   AdvanceStatusPortrait(now_ms);
   TargetOptions& options = settings_->options().targeting();
-  windows_.target_hud.look = &options.look();
+  windows_.target_hud->look = &options.look();
   if (!link_.is_open()) {
-    windows_.target_hud.view = nullptr;
+    windows_.target_hud->view = nullptr;
     return;
   }
 
   // Ce que le HUD a reçu à l'image précédente.
-  const ro::ui::TargetHudAnswer answer = std::exchange(windows_.target_hud.answer, {});
+  const ro::ui::TargetHudAnswer answer = std::exchange(windows_.target_hud->answer, {});
   target_hud_hovered_ = answer.hovered;
   targeting_.NoteFrameHover(answer.hovered);
   // Un cadre déplacé s'écrit, une fois : `Touch` arme l'anti-rebond du fichier.
@@ -169,7 +170,7 @@ void Game::AdvanceTargeting(std::uint32_t now_ms) {
                          now_ms);
   }
   // Éteint, le mode ne dessine rien, pas même en placement.
-  windows_.target_hud.view =
+  windows_.target_hud->view =
       targeting_.enabled() && target_hud_.has_value() ? &target_hud_->view() : nullptr;
 }
 
@@ -319,7 +320,7 @@ void Game::DecideSelectionMarker(std::uint32_t now_ms) {
   // cuisine, bombes, pharmacie, forge, ni les runes du Rune Knight : sa
   // fenêtre laisse la souris au monde.
   engagement.trade_freeze = pieces_.trade.HoldsWorld() || pieces_.cash_shop.shop().open() ||
-                            pieces_.mail.HoldsWorld() || windows_.chat_room.make.open;
+                            pieces_.mail.HoldsWorld() || windows_.chat_room->make.open;
 
   const MouseRoute route = MouseRouteOf(world_, grimoire_, engagement, now_ms);
   if (route.runs()) {

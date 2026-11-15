@@ -54,7 +54,7 @@ void Game::ServeGroundPoints(float width, float height) {
     map_editor_.SetGroundDots({});
     return;
   }
-  ro::ui::MapEditorView& view = windows_.staff_tools.map_editor;
+  ro::ui::MapEditorView& view = windows_.staff_tools->map_editor;
   // LES POINTS AUTOUR DE LA SOURIS, ou du point que regarde la caméra quand la
   // souris n'est pas sur le sol, dans le rayon de la brosse.
   const std::array<float, 2> center = map_editor_.ground_pointer().value_or(

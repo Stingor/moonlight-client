@@ -8,14 +8,29 @@
 #include "ro/net/bug_report.h"
 #include "ro/sim/skill_book.h"
 #include "ro/sim/world.h"
+#include "ro/ui/character_window.h"
+#include "ro/ui/companion_ai_window.h"
+#include "ro/ui/companion_tactic_window.h"
+#include "ro/ui/hotkey_window.h"
+#include "ro/ui/npc_dialog_window.h"
+#include "ro/ui/palette_editor.h"
 
+#include "game/achievement_stage.h"
+#include "game/battleground_stage.h"
 #include "game/bug_report_context.h"
 #include "game/card_album_bug_report.h"
 #include "game/cash_shop_bug_report.h"
+#include "game/cash_shop_windows.h"
 #include "game/craft_atlas_bug_report.h"
+#include "game/mail_stage.h"
+#include "game/navigation_windows.h"
+#include "game/quest_stage.h"
 #include "game/ui_answers.h"
 #include "game/ui_stage.h"
+#include "game/ui_window_rounds.h"
 #include "game/ui_windows.h"
+#include "mvp/mvp_tracker_stage.h"
+#include "party/party_booking_board.h"
 
 namespace moonclient {
 namespace {
@@ -47,41 +62,41 @@ void RouteBugReports(const UiStage::Answers& answers, UiStage::Windows& windows,
                      const ro::ui::SkillDescriptionView& skill, bool buttons,
                      ro::net::Connection& link) {
   ro::ui::BugReportWindowState& box = windows.bug_report;
-  if (answers.description.report_bug) {
-    AskBugReport(box, item.BugReport(windows.description.item_id));
+  if (answers.description->report_bug) {
+    AskBugReport(box, item.BugReport(windows.description->item_id));
   }
-  if (answers.skill_description.report_bug) {
-    const ro::sim::KnownSkill* known = world.skill_book().Find(windows.skill_description.skill_id);
-    AskBugReport(box, SkillBugReport(windows.skill_description.skill_id, skill.name,
+  if (answers.skill_description->report_bug) {
+    const ro::sim::KnownSkill* known = world.skill_book().Find(windows.skill_description->skill_id);
+    AskBugReport(box, SkillBugReport(windows.skill_description->skill_id, skill.name,
                                      known != nullptr ? known->level : 0));
   }
-  if (answers.npc.report_bug && world.npc_dialog().has_value()) {
+  if (answers.npc->report_bug && world.npc_dialog().has_value()) {
     const std::uint32_t npc_id = world.npc_dialog()->npc_id;
     const ro::sim::Actor* npc = world.Find(npc_id);
     AskBugReport(box, NpcBugReport(npc_id, npc != nullptr ? npc->name : std::string()));
   }
   // ⚠ L'ÉDITEUR DE STYLE COMPOSE LE SIEN dans son étage : la recette n'est pas
   // dans l'état de sa fenêtre, mais dans la session qui l'écrit.
-  if (answers.companion_ai.report_bug) {
+  if (answers.companion_ai->report_bug) {
     AskBugReport(box, CompanionAiBugReport(windows.companion_ai_view));
   }
-  if (answers.companion_tactic.report_bug) {
+  if (answers.companion_tactic->report_bug) {
     AskBugReport(box, CompanionTacticBugReport(windows.companion_tactic_view));
   }
   // ⚠ COMPOSÉS APRÈS LE DESSIN ET AVANT QUE LEUR ÉTAGE NE CONSOMME LA RÉPONSE :
   // l'état et la vue sont ceux que l'image a montrés.
-  if (answers.card_album.report_bug && windows.card_album_view != nullptr) {
+  if (answers.card_album->report_bug && windows.card_album_view != nullptr) {
     AskBugReport(box, CardAlbumBugReport(windows.card_album, *windows.card_album_view));
   }
-  if (windows.craft_atlas.answer.report_bug && windows.craft_atlas.view != nullptr) {
-    AskBugReport(box, CraftAtlasBugReport(windows.craft_atlas.state, *windows.craft_atlas.view));
+  if (windows.craft_atlas->answer.report_bug && windows.craft_atlas->view != nullptr) {
+    AskBugReport(box, CraftAtlasBugReport(windows.craft_atlas->state, *windows.craft_atlas->view));
   }
-  if (windows.cash_shop.answer.report_bug && windows.cash_shop.view != nullptr) {
-    AskBugReport(box, CashShopBugReport(windows.cash_shop.state, *windows.cash_shop.view));
+  if (windows.cash_shop->answer.report_bug && windows.cash_shop->view != nullptr) {
+    AskBugReport(box, CashShopBugReport(windows.cash_shop->state, *windows.cash_shop->view));
   }
-  if (answers.bug_report.send) {
+  if (answers.bug_report->send) {
     if (const auto sent = ro::net::SendBugReport(link, box.category, box.context_json,
-                                                 answers.bug_report.message);
+                                                 answers.bug_report->message);
         !sent) {
       ro::core::LogWarning("rapport de bug : {} — il n'est pas parti",
                            ro::core::Describe(sent.error()));
@@ -90,28 +105,28 @@ void RouteBugReports(const UiStage::Answers& answers, UiStage::Windows& windows,
 
   // LE BOUTON, POUR L'IMAGE SUIVANTE : un seul réglage pour toutes les fenêtres.
   box.buttons = buttons;
-  windows.description.bug_report = buttons;
-  windows.monster_sheet.database.state.item_sheet.bug_report = buttons;
-  windows.monster_sheet.state.bug_report = buttons;
-  windows.skill_description.bug_report = buttons;
-  windows.npc_dialog.bug_report = buttons;
-  windows.style.bug_report = buttons;
-  windows.navigation.state.bug_report = buttons;
-  windows.achievements.window.bug_report = buttons;
-  windows.quests.window.bug_report = buttons;
-  windows.battleground.window.bug_report = buttons;
-  windows.companion_ai.bug_report = buttons;
-  windows.companion_tactic.bug_report = buttons;
-  windows.options.bug_report = buttons;
-  windows.hotkeys.bug_report = buttons;
-  windows.character.bug_report = buttons;
-  windows.card_album.bug_report = buttons;
-  windows.craft_atlas.state.bug_report = buttons;
-  windows.cash_shop.state.bug_report = buttons;
-  windows.mvp_tracker.window.bug_report = buttons;
-  windows.party_booking.window.bug_report = buttons;
-  windows.mail.box.bug_report = buttons;
-  windows.mail.compose.bug_report = buttons;
+  windows.description->bug_report = buttons;
+  windows.monster_sheet->database.state.item_sheet.bug_report = buttons;
+  windows.monster_sheet->state.bug_report = buttons;
+  windows.skill_description->bug_report = buttons;
+  windows.npc_dialog->bug_report = buttons;
+  windows.style->bug_report = buttons;
+  windows.navigation->state.bug_report = buttons;
+  windows.achievements->window.bug_report = buttons;
+  windows.quests->window.bug_report = buttons;
+  windows.battleground->window.bug_report = buttons;
+  windows.companion_ai->bug_report = buttons;
+  windows.companion_tactic->bug_report = buttons;
+  windows.options->bug_report = buttons;
+  windows.hotkeys->bug_report = buttons;
+  windows.character->bug_report = buttons;
+  windows.card_album->bug_report = buttons;
+  windows.craft_atlas->state.bug_report = buttons;
+  windows.cash_shop->state.bug_report = buttons;
+  windows.mvp_tracker->window.bug_report = buttons;
+  windows.party_booking->window.bug_report = buttons;
+  windows.mail->box.bug_report = buttons;
+  windows.mail->compose.bug_report = buttons;
 }
 
 }  // namespace moonclient

@@ -18,6 +18,7 @@
 #include "ro/render/map_scene.h"
 #include "ro/ui/chat_emote_names.h"
 #include "ro/ui/minimap_window.h"
+#include "ro/ui/packet_window.h"
 #include "ro/ui/system_fonts.h"
 #include "ro/ui/tracker_panel.h"
 
@@ -25,43 +26,23 @@
 #include "chat/chat_tab_file.h"
 #include "chat/emoji_catalog.h"
 #include "chat/emotion_catalog.h"
+#include "game/cash_shop_windows.h"
 #include "game/game.h"
+#include "game/navigation_windows.h"
+#include "game/party_windows.h"
 #include "game/store_search_catalogue.h"
+#include "game/ui_window_rounds.h"
 #include "loading/loading_plans.h"
 #include "loading/loading_presenter.h"
 
 namespace moonclient {
-
-GameFoundation::GameFoundation(ClientShell& shell, ro::net::Connection link, ro::sim::World world,
-                               const ro::net::ZoneTicket& ticket)
-    : shell_(shell),
-      client_root_(shell.client_root()),
-      vfs_(&shell.vfs()),
-      gl_(&shell.gl()),
-      settings_(&shell.settings()),
-      windows_(shell.windows()),
-      interface_(&shell.interface()),
-      pieces_(shell.pieces()),
-      audio_(shell.audio()),
-      link_(std::move(link)),
-      world_(std::move(world)),
-      ticket_(ticket),
-      targeting_(shell.settings().options().targeting().settings()),
-      quick_cast_(shell.settings().options().quick_cast().look()),
-      screenshot_(shell.client_root()) {}
-
-Game::Game(ClientShell& shell, ro::net::Connection link, ro::sim::World world,
-           const ro::net::ZoneTicket& ticket)
-    : GameFoundation(shell, std::move(link), std::move(world), ticket),
-      music_(shell.music()),
-      card_album_(shell.client_root()) {}
 
 ro::core::Result<void> Game::Open(const std::string& map_name) {
   // LE MENU DU CLIC DROIT REPART À BLANC. ⚠ SON ÉTAT SURVIT À LA PARTIE — les
   // fenêtres appartiennent à la coquille —, et sa vue désignait la partie
   // d'avant. Les explications des PNJ bloqués se redisent aussi : c'est une
   // nouvelle session.
-  windows_.entity_menu = UiWindows::EntityMenu{};
+  *windows_.entity_menu = UiWindows::EntityMenu{};
   // Le groupe et la guilde que la visée d'une compétence consulte.
   world_mouse_.ties = SocialTies{.party = &party_, .guild = &guild_book_};
   settings_->options().context_menu().blocked().ForgetExplanations();
@@ -73,7 +54,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   // disposition qui ne le nomme pas encore le garde ainsi tel qu'il était.
   ChatTabs tabs_on_disk;
   LoadChatTabs(client_root_, tabs_on_disk);
-  windows_.damage_meter.docked = tabs_on_disk.MeterRank().has_value();
+  windows_.damage_meter->docked = tabs_on_disk.MeterRank().has_value();
   // LA DISPOSITION ET LES RÉGLAGES DE CE PERSONNAGE, posés dès l'entrée. ⚠ LES
   // RÉGLAGES SANS ÊTRE POUSSÉS : la fin de l'ouverture les applique tous.
   shell_.layouts().EnterCharacter(world_.player_name());
@@ -82,8 +63,8 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   settings_->profiles().AfterPose([this]() {
     camera_rig_.Restore(settings_->camera_memory());
     settings_->RestoreChatMacros(windows_);
-    windows_.view_equip.state.show_empty = settings_->options().view_equip().show_empty;
-    windows_.view_equip.state.compare = settings_->options().view_equip().compare;
+    windows_.view_equip->state.show_empty = settings_->options().view_equip().show_empty;
+    windows_.view_equip->state.compare = settings_->options().view_equip().compare;
   });
   settings_->options().pages().profiles_body =
       [layouts = shell_.layouts().Body(), settings = settings_->profiles().Body()](
@@ -97,13 +78,13 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   };
   // « VOIR L'ÉQUIPEMENT » AUSSI, pour la même raison, avec ses deux cases
   // retenues : elles ne se relisent qu'ici, et la fenêtre les porte ensuite.
-  windows_.view_equip = UiWindows::ViewEquip{};
-  windows_.view_equip.state.show_empty = settings_->options().view_equip().show_empty;
-  windows_.view_equip.state.compare = settings_->options().view_equip().compare;
+  *windows_.view_equip = UiWindows::ViewEquip{};
+  windows_.view_equip->state.show_empty = settings_->options().view_equip().show_empty;
+  windows_.view_equip->state.compare = settings_->options().view_equip().compare;
   // L'ALBUM DE CARTES SE REFERME, SANS UN MOT AU SERVEUR : la session d'avant
   // est finie, et son verrou avec elle. Sa vue et ses réglages, eux, restent.
-  windows_.card_album.open = false;
-  windows_.card_album.shown = false;
+  windows_.card_album->open = false;
+  windows_.card_album->shown = false;
   // CE QUE CHAQUE ÉTAPE DU DÉMARRAGE COÛTE, en millisecondes.
   //
   // ⚠ MÊME RAISON QUE `MapStage::read_ms` : un chargement se VOIT — le jeu
@@ -393,7 +374,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   // ── CE QU'ON AVAIT TAPÉ, REMIS SOUS LA FLÈCHE ↑ ─────────────────────────
   // ⚠ SEULE LA FENÊTRE PRINCIPALE A UNE SAISIE — une flottante renvoie le
   // clavier à celle-ci —, il n'y a donc qu'un historique à remplir.
-  ro::ui::ChatInputHistory& typed = windows_.chat.main.input.history;
+  ro::ui::ChatInputHistory& typed = windows_.chat->main.input.history;
   typed.lines.assign(chat_tabs_->restored_typed().begin(), chat_tabs_->restored_typed().end());
   // ⚠ LE CURSEUR SUR LE PRÉSENT, et non sur la dernière ligne relue : `at`
   // vaut `size()` quand on est sur le brouillon, et c'est de là qu'un premier
@@ -431,7 +412,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   // coquille et survit à la partie, et ce qu'il gardait — grille, pantin,
   // pièce survolée — désignait le personnage d'avant. Sa recette, elle, vit
   // dans la session, qui renaît ici avec la partie.
-  windows_.style = ro::ui::PaletteEditorState{};
+  *windows_.style = ro::ui::PaletteEditorState{};
   style_view_.emplace(pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr, client_root_,
                       ticket_.character_id);
   style_preview_.emplace(pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr);
@@ -477,7 +458,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
                         pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr,
                         pieces_.wardrobe.has_value() ? &*pieces_.wardrobe : nullptr);
   pieces_.cash_shop.StartSession();
-  windows_.cash_shop = CashShopWindows{};
+  *windows_.cash_shop = CashShopWindows{};
   // LES COMMERCES AUSSI : aucune boutique, aucune échoppe ne survit à la partie.
   pieces_.trade.See(pieces_.wardrobe.has_value() ? &pieces_.wardrobe->catalog().items : nullptr,
                     pieces_.item_icons.has_value() ? &*pieces_.item_icons : nullptr,
@@ -521,7 +502,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   // Les paniers d'achat enregistrés, sous l'identifiant du COMPTE.
   pieces_.trade.npc_shop().SeeSaveRoot(client_root_, ticket_.account.account_id);
   pieces_.trade.StartSession();
-  windows_.trade = TradeWindows{};
+  *windows_.trade = TradeWindows{};
   // NI CE QUE LE SERVEUR A DIT DES ÉDITIONS DE CARTE.
   pieces_.map_edit_sync.StartSession();
   // LE COURRIER AUSSI : ni boîte, ni écriture ne survivent à la partie.
@@ -535,15 +516,15 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   // NI LE FAMILIER, NI LE MERCENAIRE du personnage d'avant, ni la fiche
   // ouverte sur l'un d'eux.
   pieces_.pet.StartSession();
-  windows_.pet = ro::ui::PetWindowState{};
+  *windows_.pet = ro::ui::PetWindowState{};
   pieces_.mercenary.StartSession();
   // NI L'ENTITÉ, NI LE JOUEUR QUE LE STAFF CONSULTAIT, NI CELUI QU'ON
   // SIGNALAIT : leurs identifiants étaient ceux d'une autre partie.
   pieces_.entity_inspector = EntityInspector{};
   pieces_.chat_block_log = ChatBlockLog{};
   pieces_.player_report = PlayerReportDesk{};
-  windows_.player_report.open = false;
-  windows_.mail = MailWindows{};
+  windows_.player_report->open = false;
+  *windows_.mail = MailWindows{};
   // LES SALONS : on n'est dans aucun. ⚠ LA SAISIE DU FORMULAIRE SURVIT, elle
   // n'appartient pas au personnage.
   pieces_.chat_rooms.See(client_root_);
@@ -551,16 +532,16 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   // neuf.
   pieces_.companion_ai.See(client_root_, ticket_.character_id);
   pieces_.chat_rooms.StartSession();
-  windows_.chat_room.room = ro::ui::ChatRoomWindowState{};
-  windows_.chat_room.password = ro::ui::ChatRoomPasswordState{};
-  windows_.chat_room.make.open = false;
+  windows_.chat_room->room = ro::ui::ChatRoomWindowState{};
+  windows_.chat_room->password = ro::ui::ChatRoomPasswordState{};
+  windows_.chat_room->make.open = false;
   // LES CONVERSATIONS 1:1 : aucune n'est ouverte, aucun envoi n'attend.
   pieces_.whispers.StartSession(world_.last_chat_seq());
   // Ni les récents de la box « Pseudo » : ce qui a été chuchoté avant n'est
   // pas neuf.
   chat_preview_.recent_whispers().StartSession(world_.last_chat_seq());
   pieces_.banned_words = LoadBannedWords(vfs_);
-  windows_.whispers = WhisperWindows{};
+  *windows_.whispers = WhisperWindows{};
   // LA LISTE DE BLOCAGE DU COMPTE, que le service web garde d'une connexion à
   // l'autre : relue maintenant, rejouée après la première carte.
   pieces_.whispers.RememberBlocks(
@@ -581,9 +562,9 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   pieces_.achievements.SeeSaveRoot(client_root_);
   pieces_.achievements.StartSession();
   // ⚠ L'OUVERTURE SURVIT, elle : le profil de disposition vient de la poser.
-  const bool achievements_open = windows_.achievements.window.open;
-  windows_.achievements = AchievementWindows{};
-  windows_.achievements.window.open = achievements_open;
+  const bool achievements_open = windows_.achievements->window.open;
+  *windows_.achievements = AchievementWindows{};
+  windows_.achievements->window.open = achievements_open;
   // LES QUÊTES DE MÊME : le journal est celui du personnage qui entre, et le
   // serveur le redit à l'entrée sur la carte. Le suivi reprend ses réglages.
   pieces_.quests.See(
@@ -602,12 +583,12 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   });
   pieces_.quests.StartSession();
   // L'ouverture survit, de même.
-  const bool quests_open = windows_.quests.window.open;
-  windows_.quests = QuestWindows{};
-  windows_.quests.window.open = quests_open;
+  const bool quests_open = windows_.quests->window.open;
+  *windows_.quests = QuestWindows{};
+  windows_.quests->window.open = quests_open;
   pieces_.tracker.SeeSaveRoot(client_root_);
   pieces_.tracker.StartSession();
-  windows_.tracker = TrackerWindows{};
+  *windows_.tracker = TrackerWindows{};
   // LE SUIVI AU PANNEAU D'OPTIONS : ses demandes passent là où passent celles du
   // journal, et l'étage du suivi les écrit. Repris à la fin de la partie.
   settings_->options().pages().quest_tracker.Entrust([this](const ro::ui::SkinArt& art) {
@@ -743,7 +724,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
       .status_table = &pieces_.status_table,
       .status_icons = pieces_.status_icons.has_value() ? &*pieces_.status_icons : nullptr});
   // L'onglet retrouvé du fichier, une fois par partie ; la fenêtre le tient ensuite.
-  windows_.party.window.tab = settings_->options().pages().party.tab();
+  windows_.party->window.tab = settings_->options().pages().party.tab();
 
   // ⚠ EN DERNIER : il garde l'adresse de presque tout ce qui précède, et rien de
   // tout cela ne doit encore bouger quand il la prend.
@@ -755,17 +736,17 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
       .stage = &*stage_,
       .planner = &planner_,
       .frames = &frame_tally_,
-      .packet_window = &windows_.packets.open,
-      .skill_window = &windows_.character.open,
-      .inventory_window = &windows_.inventory.open,
-      .macro_window = &windows_.macros.open,
-      .craft_atlas = &windows_.craft_atlas.state,
-      .ranking_board_asked = &windows_.ranking_board.open_asked,
+      .packet_window = &windows_.packets->open,
+      .skill_window = &windows_.character->open,
+      .inventory_window = &windows_.inventory->open,
+      .macro_window = &windows_.macros->open,
+      .craft_atlas = &windows_.craft_atlas->state,
+      .ranking_board_asked = &windows_.ranking_board->open_asked,
       .market = &pieces_.trade.market(),
       .database = &database_,
-      .block_list = &windows_.whispers.blocks,
+      .block_list = &windows_.whispers->blocks,
       .navi = &navi_,
-      .navigation = &windows_.navigation.state,
+      .navigation = &windows_.navigation->state,
       .map_names = pieces_.map_display_names.has_value() ? &*pieces_.map_display_names : nullptr,
       .armed = &armed_chat_,
       .arming = &armed_chat_,

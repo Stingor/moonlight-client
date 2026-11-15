@@ -3,6 +3,7 @@
 // commun aux quêtes, se dessine dans `ui_stage_quests.cpp`. À part de
 // `ui_stage.cpp`, qui n'a plus la place de les porter.
 
+#include "game/achievement_stage.h"
 #include "game/ui_stage.h"
 #include "game/ui_windows.h"
 

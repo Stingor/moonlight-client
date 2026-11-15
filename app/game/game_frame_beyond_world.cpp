@@ -287,8 +287,8 @@ ro::net::FrameOutcome Game::ApplyFrameBeyondWorld(const ro::net::Frame& received
   // ET L'ACCUSÉ D'UN RAPPORT DE BUG, que la boîte montre cinq secondes.
   if (const std::optional<std::uint8_t> ack = ro::net::ReadBugReportAck(received);
       ack.has_value()) {
-    windows_.bug_report.ack_status = *ack;
-    windows_.bug_report.ack_fresh = true;
+    windows_.bug_report->ack_status = *ack;
+    windows_.bug_report->ack_fresh = true;
     if (outcome == ro::net::FrameOutcome::kUnhandled) {
       outcome = ro::net::FrameOutcome::kIgnored;
     }

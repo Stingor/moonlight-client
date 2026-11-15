@@ -22,8 +22,10 @@
 #include "chat/chat_place_link.h"
 #include "game/bug_report_context.h"
 #include "game/game.h"
+#include "game/navigation_windows.h"
 #include "game/skin_image_of.h"
 #include "game/ui_stage.h"
+#include "game/ui_window_rounds.h"
 #include "world/battlefield_view.h"
 #include "world/map_stage.h"
 #include "world/minimap_compose.h"
@@ -198,7 +200,7 @@ void Game::AdvanceNavigation(std::uint32_t now_ms) {
     if (asked.open_monster.has_value() && monster_sheet_.has_value()) {
       if (const auto hit = results.HitAt(*asked.open_monster);
           hit.has_value() && hit->kind == ro::sim::NaviHitKind::kSpawn)
-        monster_sheet_->Open(windows_.monster_sheet.state, data->spawns[hit->rank].sprite_class,
+        monster_sheet_->Open(windows_.monster_sheet->state, data->spawns[hit->rank].sprite_class,
                              /*by_view=*/true);
     }
   }

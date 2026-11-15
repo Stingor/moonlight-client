@@ -5,6 +5,7 @@
 
 #include "game/ui_stage.h"
 #include "game/ui_windows.h"
+#include "mvp/mvp_tracker_stage.h"
 
 namespace moonclient {
 

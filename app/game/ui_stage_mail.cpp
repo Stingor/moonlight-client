@@ -2,6 +2,9 @@
 // leur place dans la pile d'Échap. À part de `ui_stage.cpp`, qui n'a plus la
 // place de les porter.
 
+#include "ro/ui/chat_link.h"
+
+#include "game/mail_stage.h"
 #include "game/ui_stage.h"
 #include "game/ui_windows.h"
 

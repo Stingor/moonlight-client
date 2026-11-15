@@ -19,6 +19,7 @@
 #include "chat/chat_setting_link.h"
 #include "game/game.h"
 #include "game/setting_destination_open.h"
+#include "game/ui_window_rounds.h"
 #include "options/setting_links.h"
 
 namespace moonclient {
@@ -90,7 +91,7 @@ void Game::FollowNpcDialogLink(const ro::ui::NpcDialogAnswer& answer, std::uint3
     // le script l'a écrit, nom compris.
     case ro::ui::DialogTargetKind::kRecipe:
       if (answer.gesture == ro::ui::ChatLinkGesture::kDescribe) {
-        ro::ui::OpenCraftAtlasOn(windows_.craft_atlas.state, answer.target.id);
+        ro::ui::OpenCraftAtlasOn(windows_.craft_atlas->state, answer.target.id);
       } else if (answer.gesture == ro::ui::ChatLinkGesture::kRepost) {
         PostChatLink(RecipeLink{.item_id = answer.target.id, .name = answer.target.label});
       }
@@ -114,7 +115,7 @@ void Game::FollowNpcDialogLink(const ro::ui::NpcDialogAnswer& answer, std::uint3
     // non une classe de sprite : c'est ce que la balise transporte.
     case ro::ui::DialogTargetKind::kMonster:
       if (answer.gesture == ro::ui::ChatLinkGesture::kDescribe && monster_sheet_.has_value()) {
-        monster_sheet_->Open(windows_.monster_sheet.state, answer.target.id, /*by_view=*/false);
+        monster_sheet_->Open(windows_.monster_sheet->state, answer.target.id, /*by_view=*/false);
       } else if (answer.gesture == ro::ui::ChatLinkGesture::kRepost) {
         // Le lien REPOSÉ tel que le script l'a écrit : identifiant, rang, nom.
         PostChatLink(MonsterLink{.monster_id = answer.target.id,

@@ -4,6 +4,7 @@
 
 #include "game/ui_stage.h"
 #include "game/ui_windows.h"
+#include "party/party_booking_board.h"
 
 namespace moonclient {
 

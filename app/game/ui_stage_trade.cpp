@@ -5,7 +5,9 @@
 #include <string>
 
 #include "ro/core/i18n.h"
+#include "ro/ui/chat_link.h"
 
+#include "game/trade_windows.h"
 #include "game/ui_stage.h"
 #include "game/ui_windows.h"
 

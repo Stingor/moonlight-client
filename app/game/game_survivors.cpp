@@ -32,6 +32,7 @@
 #include "game/survivors_mode.h"
 #include "game/survivors_presence_mode.h"
 #include "game/ui_answers.h"
+#include "game/ui_chat_ask.h"
 #include "game/ui_stage.h"
 #include "input/hotkeys.h"
 #include "options/option_sections.h"
@@ -142,7 +143,7 @@ bool Game::SurvivorsTakes(const SDL_Event& event, std::uint32_t now_ms) {
   }
   // 🔴 LE CLAVIER SE PARTAGE AVEC LA CONVERSATION ET LA VOIX. L'interface a
   // déjà vu la frappe ; reste à dire si l'arène la voit aussi.
-  ro::ui::ChatInputState& input = windows_.chat.main.input;
+  ro::ui::ChatInputState& input = windows_.chat->main.input;
   const bool key_event = event.type == SDL_EVENT_KEY_DOWN || event.type == SDL_EVENT_KEY_UP;
   const SurvivorsKeyFacts facts{
       .typing = gate.typing_to_ui,
@@ -160,7 +161,7 @@ bool Game::SurvivorsTakes(const SDL_Event& event, std::uint32_t now_ms) {
       return true;
     case SurvivorsKeyTurn::kOpenChat:
       // Le même dépôt qu'Entrée en jeu : la barre tranche en tête d'image.
-      windows_.chat.main.open = true;
+      windows_.chat->main.open = true;
       input.enter_pending = true;
       return true;
     case SurvivorsKeyTurn::kFoldChat:
@@ -174,18 +175,18 @@ void Game::DrawSurvivorsInterface(std::uint32_t now_ms) {
   ComposeOptionSamples(now_ms);
   SurvivorsFrameView view = survivors_mode_->View(survivors_, survivors_mode_->context());
   view.talk = SurvivorsTalkView{
-      .chat = &windows_.chat,
+      .chat = &*windows_.chat,
       .preview = &chat_preview_.preview(),
       .tabs = &*chat_tabs_,
       .links = input_links_,
       .emotions = emotions_,
       .emojis = emojis_,
-      .meter = windows_.damage_meter_view.look.shown ? &windows_.damage_meter_view : nullptr,
-      .voice = &windows_.voice};
+      .meter = windows_.damage_meter_view->look.shown ? &*windows_.damage_meter_view : nullptr,
+      .voice = &*windows_.voice};
   // Le cadre de repérage ne se montre que sur la section Capture, comme en jeu.
   view.capture =
-      recorder_.view(windows_.options.open &&
-                     windows_.options.section == static_cast<int>(Rank(OptionSection::kCapture)));
+      recorder_.view(windows_.options->open &&
+                     windows_.options->section == static_cast<int>(Rank(OptionSection::kCapture)));
   SurvivorsAsk asked = interface_->DrawSurvivorsOnly(view);
   // LES OPTIONS DU JEU OUVERTES SUR LA PAUSE agissent tout de suite.
   settings_->ApplyOptionsAside(asked.options, windows_.options, OptionsTargets(), now_ms);
@@ -210,7 +211,7 @@ void Game::DrawSurvivorsInterface(std::uint32_t now_ms) {
     // la barre le garde pour la phrase suivante ; ici le héros est sous les
     // coups, et il doit pouvoir marcher dès la ligne partie.
     if (answers.chat.front().asked.said.has_value()) {
-      windows_.chat.main.input.wants_focus = false;
+      windows_.chat->main.input.wants_focus = false;
     }
   }
   survivors_mode_->NoteAsk(asked);
@@ -259,7 +260,7 @@ void Game::FrameSurvivors(std::uint32_t now_ms) {
       .link = &link_,
       .world = &world_,
       .damage_meter = &world_.damage_meter(),
-      .minigames = &windows_.minigames,
+      .minigames = &*windows_.minigames,
       .minigame_stage = &pieces_.minigames,
       .ranking = &survivors_ranking_,
       .coop = &survivors_presence_->coop,
@@ -276,7 +277,7 @@ void Game::FrameSurvivors(std::uint32_t now_ms) {
                           .guild_invited = guild_book_.invitation().has_value(),
                           .friend_invited = friends_.invitation().has_value(),
                           .link_open = link_.is_open()},
-      .options_window = &windows_.options,
+      .options_window = &*windows_.options,
       .option_sections = settings_->options().sections(),
       .graphics = &settings_->options().graphics(),
       .tables =
@@ -301,8 +302,8 @@ void Game::FrameSurvivors(std::uint32_t now_ms) {
       // UNE SAISIE OUVERTE : un champ qui écrit, ou la barre dépliée du battle
       // mode qui réclame les frappes.
       .typing = interface_->gate().text_to_ui ||
-                ro::ui::ChatBarTakesTyping(windows_.chat.main.input.battle_mode,
-                                           windows_.chat.main.input.unfolded,
+                ro::ui::ChatBarTakesTyping(windows_.chat->main.input.battle_mode,
+                                           windows_.chat->main.input.unfolded,
                                            interface_->gate().text_to_ui),
       .say =
           [this, now_ms](std::string text) {

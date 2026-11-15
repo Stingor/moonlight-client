@@ -6,6 +6,7 @@
 #include "ro/ui/craft_atlas_window.h"
 
 #include "game/game.h"
+#include "game/ui_window_rounds.h"
 #include "options/weapon_refine_options.h"
 
 namespace moonclient {
@@ -23,10 +24,10 @@ void Game::FollowCraftGestures(const CraftGestures& asked, std::uint32_t now_ms)
   }
   if (asked.open_atlas) {
     if (asked.atlas_item_id != 0) {
-      ro::ui::OpenCraftAtlasOn(windows_.craft_atlas.state, asked.atlas_item_id);
+      ro::ui::OpenCraftAtlasOn(windows_.craft_atlas->state, asked.atlas_item_id);
     } else {
-      windows_.craft_atlas.state.open = true;
-      windows_.craft_atlas.state.raise = true;
+      windows_.craft_atlas->state.open = true;
+      windows_.craft_atlas->state.raise = true;
     }
   }
 

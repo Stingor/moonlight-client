@@ -23,13 +23,13 @@ void StageWarpList(ro::sim::World& world, const ro::vfs::ItemWords& words,
                    const ro::vfs::MapDisplayNames* map_names, UiStage::Windows& windows) {
   ro::sim::WarpMenu& menu = world.warp_menu();
   menu.CloseIfMapChanged(world.map_entries());
-  windows.warp_list.open = menu.open();
+  windows.warp_list->open = menu.open();
   if (!menu.open()) {
     return;
   }
   // LES LIGNES NE SE RECOMPOSENT QU'À UNE LISTE NOUVELLE : ce sont elles que la
   // vue désigne, et elles ne changent pas tant que la question tient.
-  if (windows.warp_list_view.offer_seq != menu.offer_seq() || windows.warp_list_rows.empty()) {
+  if (windows.warp_list_view->offer_seq != menu.offer_seq() || windows.warp_list_rows.empty()) {
     windows.warp_list_rows.clear();
     for (const std::string& destination : menu.offer().destinations) {
       windows.warp_list_rows.push_back(
@@ -39,9 +39,9 @@ void StageWarpList(ro::sim::World& world, const ro::vfs::ItemWords& words,
     windows.warp_list_rows.push_back(
         ro::vfs::WarpDestinationLabel(words, map_names, ro::net::kWarpCancelName));
   }
-  windows.warp_list_view.title = ro::vfs::WarpListTitle(words);
-  windows.warp_list_view.rows = windows.warp_list_rows;
-  windows.warp_list_view.offer_seq = menu.offer_seq();
+  windows.warp_list_view->title = ro::vfs::WarpListTitle(words);
+  windows.warp_list_view->rows = windows.warp_list_rows;
+  windows.warp_list_view->offer_seq = menu.offer_seq();
 }
 
 void ApplyWarpList(const ro::ui::WarpListWindowAction& asked, ro::net::Connection& link,

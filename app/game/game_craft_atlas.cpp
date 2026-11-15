@@ -10,6 +10,7 @@
 
 #include "game/game.h"
 #include "game/ui_stage.h"
+#include "game/ui_window_rounds.h"
 
 namespace moonclient {
 
@@ -67,7 +68,7 @@ void Game::AdvanceCraftAtlas(std::uint32_t now_ms) {
   craft_atlas_->Refresh(window.state, world_.inventory(),
                         CraftAtlasFilters{.show_unlearnable = options.show_unlearnable(),
                                           .only_craftable = options.only_craftable(),
-                                          .can_share = windows_.chat.main.open});
+                                          .can_share = windows_.chat->main.open});
   craft_atlas_->NoteLinkFacts(ItemLinkFactsNow());
   craft_atlas_->NoteStaff(Rights().staff_tools, pieces_.item_properties.stacking(),
                           StaffFreeBagSlots(world_.inventory()));

@@ -5,8 +5,10 @@
 
 #include "ro/ui/achievement_window.h"
 #include "ro/ui/character_window.h"
+#include "ro/ui/hotkey_window.h"
 #include "ro/ui/party_friend_window.h"
 
+#include "game/party_windows.h"
 #include "game/ui_answers.h"
 #include "game/ui_stage.h"
 #include "game/ui_windows.h"
@@ -34,9 +36,9 @@ void OpenSettingDestination(const SettingDestination& destination, UiStage::Wind
       // ⚠ LES DEUX, ET PAS SEULEMENT LA DEMANDE : `tab` décide des crans de
       // largeur AVANT la barre, la demande la commande PENDANT.
       const auto tab = static_cast<ro::ui::CharacterTab>(destination.tab);
-      windows.character.open = true;
-      windows.character.tab = tab;
-      windows.character.tab_request = tab;
+      windows.character->open = true;
+      windows.character->tab = tab;
+      windows.character->tab_request = tab;
       return;
     }
     case SettingDestinationKind::kAchievements: {
@@ -44,26 +46,26 @@ void OpenSettingDestination(const SettingDestination& destination, UiStage::Wind
       // sélection revient sur sa première rangée : c'est le changement d'onglet
       // que l'étage lit à l'image suivante.
       ro::ui::OpenAchievementTab(
-          windows.achievements.window,
+          windows.achievements->window,
           ro::ui::AchievementTabHit{.tab = destination.tab,
                                     .subtab = destination.subtab == kNoSettingTab
                                                   ? ro::ui::kAchievementWholeTab
                                                   : destination.subtab});
-      windows.achievements.news_lit = false;
-      windows.achievements.answer.tab_changed = true;
+      windows.achievements->news_lit = false;
+      windows.achievements->answer.tab_changed = true;
       return;
     }
     case SettingDestinationKind::kPartyFriend:
-      windows.party.window.open = true;
-      windows.party.window.tab = static_cast<ro::ui::PartyFriendTab>(destination.tab);
+      windows.party->window.open = true;
+      windows.party->window.tab = static_cast<ro::ui::PartyFriendTab>(destination.tab);
       return;
     case SettingDestinationKind::kHotkeys:
       // ⚠ UNE CAPTURE NE SURVIT PAS AU CHANGEMENT D'ONGLET : sa ligne peut n'être
       // plus à l'écran, et la prochaine touche lui irait sans qu'on le voie.
-      windows.hotkeys.capturing = -1;
-      windows.hotkeys.open = true;
-      windows.hotkeys.tab = destination.tab;
-      windows.hotkeys.tab_request = destination.tab;
+      windows.hotkeys->capturing = -1;
+      windows.hotkeys->open = true;
+      windows.hotkeys->tab = destination.tab;
+      windows.hotkeys->tab_request = destination.tab;
       return;
   }
 }
@@ -81,11 +83,11 @@ const SettingDestination* AskedSettingLink(const UiStage::Answers& answers,
         SettingDestinationOf(Kind::kOptions, section, options.link_tab);
     return tab != nullptr ? tab : SettingDestinationOf(Kind::kOptions, section, kNoSettingTab);
   }
-  if (answers.character.link_tab.has_value()) {
+  if (answers.character->link_tab.has_value()) {
     return SettingDestinationOf(Kind::kSheet, OptionSection::kCount,
-                                static_cast<int>(*answers.character.link_tab));
+                                static_cast<int>(*answers.character->link_tab));
   }
-  if (const std::optional<ro::ui::AchievementTabHit>& place = windows.achievements.answer.link_tab;
+  if (const std::optional<ro::ui::AchievementTabHit>& place = windows.achievements->answer.link_tab;
       place.has_value()) {
     // ⚠ UN SOUS-ONGLET SANS CLÉ RETOMBE SUR SON ONGLET, comme un onglet de page
     // sur sa page.
@@ -98,12 +100,12 @@ const SettingDestination* AskedSettingLink(const UiStage::Answers& answers,
                ? subtab
                : SettingDestinationOf(Kind::kAchievements, OptionSection::kCount, place->tab);
   }
-  if (windows.party.answer.link_tab.has_value()) {
+  if (windows.party->answer.link_tab.has_value()) {
     return SettingDestinationOf(Kind::kPartyFriend, OptionSection::kCount,
-                                static_cast<int>(*windows.party.answer.link_tab));
+                                static_cast<int>(*windows.party->answer.link_tab));
   }
-  if (answers.hotkeys.link_tab.has_value()) {
-    return SettingDestinationOf(Kind::kHotkeys, OptionSection::kCount, *answers.hotkeys.link_tab);
+  if (answers.hotkeys->link_tab.has_value()) {
+    return SettingDestinationOf(Kind::kHotkeys, OptionSection::kCount, *answers.hotkeys->link_tab);
   }
   return nullptr;
 }

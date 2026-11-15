@@ -32,6 +32,7 @@
 #include "game/game.h"
 #include "game/ui_answers.h"
 #include "game/ui_stage.h"
+#include "game/ui_window_rounds.h"
 
 namespace moonclient {
 
@@ -94,21 +95,21 @@ void Game::StageDescriptions(std::uint32_t now_ms) {
   // OÙ LES DEUX FENÊTRES S'OUVRENT : le réglage, relu à chaque image — il se
   // change fenêtre ouverte, dans le panneau.
   const ro::ui::DescriptionPlacement placement = settings_->options().descriptions().placement();
-  windows_.description.placement = placement;
-  windows_.skill_description.placement = placement;
-  windows_.description.compare = settings_->options().descriptions().compare();
+  windows_.description->placement = placement;
+  windows_.skill_description->placement = placement;
+  windows_.description->compare = settings_->options().descriptions().compare();
   const ro::ui::RichTextSelect text_select = settings_->options().descriptions().text_select();
-  windows_.description.text_select = text_select;
-  windows_.monster_sheet.database.state.item_sheet.text_select = text_select;
-  windows_.skill_description.text_select = text_select;
+  windows_.description->text_select = text_select;
+  windows_.monster_sheet->database.state.item_sheet.text_select = text_select;
+  windows_.skill_description->text_select = text_select;
   // LE LIVRE : sa fenêtre s'ouvre où les descriptions s'ouvrent, et la
   // récitation avance à chaque image. Une ligne dite rouvre la conversation
   // si le joueur l'avait fermée : c'est là qu'elle s'écrit.
   BookReader& books = item_description_->books();
   if (books.Tick(world_, windows_.book, now_ms)) {
-    windows_.chat.main.open = true;
+    windows_.chat->main.open = true;
   }
-  windows_.book.placement = placement;
+  windows_.book->placement = placement;
   windows_.book_view = &books.view();
   windows_.book_recital = books.recital_line();
   // LA DESCRIPTION SE REFAIT À CHAQUE IMAGE : le nom décoré suit l'objet, qui
@@ -117,27 +118,28 @@ void Game::StageDescriptions(std::uint32_t now_ms) {
   // ⚠ FENÊTRE OUVERTE SEULEMENT : l'objet décrit reste désigné après la
   // fermeture, et sans cette garde son nom se recomposerait à chaque image pour
   // une fenêtre que personne ne voit. Rouverte, elle se refait avant son dessin.
-  if (windows_.description.open) {
-    item_description_->Refresh(world_, windows_.description.item_id,
-                               windows_.description.from_holder, windows_.description.from_slot);
+  if (windows_.description->open) {
+    item_description_->Refresh(world_, windows_.description->item_id,
+                               windows_.description->from_holder, windows_.description->from_slot);
     item_description_->NoteBack(
-        windows_.description.back.empty() ? 0 : windows_.description.back.back());
+        windows_.description->back.empty() ? 0 : windows_.description->back.back());
   }
   // CE QUE LE SERVEUR SEUL SAIT : les sources et le script, demandés dès que la
   // fenêtre est ouverte. ⚠ À CHAQUE IMAGE, fermée comprise : c'est ainsi que la
   // vue voit la RÉOUVERTURE, qui fait redemander les sources.
-  item_description_->AskFacts(link_, windows_.description.open, windows_.description.item_id,
+  item_description_->AskFacts(link_, windows_.description->open, windows_.description->item_id,
                               now_ms);
-  if (windows_.description.open) {
+  if (windows_.description->open) {
     // CE QUE LA BASE DE DONNÉES AJOUTE — « Général », les sources de repli,
     // « Vendu chez » —, puis ce que la boutique, l'Atlas et le staff ajoutent.
-    database_.FillItemSheet(ro::ui::ItemSheetHost::kDescriptionWindow, windows_.description.item_id,
-                            DatabaseContextNow(now_ms), *item_description_);
-    DecorateItemSheet(*item_description_, windows_.description.item_id);
+    database_.FillItemSheet(ro::ui::ItemSheetHost::kDescriptionWindow,
+                            windows_.description->item_id, DatabaseContextNow(now_ms),
+                            *item_description_);
+    DecorateItemSheet(*item_description_, windows_.description->item_id);
     // LE PANTIN DU « VIEWID », quand sa ligne est survolée.
     item_description_->RefreshDoll(
-        world_, windows_.description.doll,
-        pieces_.cash_shop.hat_effects().OrdinalOf(windows_.description.item_id) != 0, styles_,
+        world_, windows_.description->doll,
+        pieces_.cash_shop.hat_effects().OrdinalOf(windows_.description->item_id) != 0, styles_,
         now_ms);
   }
   // ⚠ L'APERÇU NE SE BÂTIT QUE S'IL SE MONTRE : sans le réglage, il n'a rien à
@@ -152,7 +154,7 @@ void Game::StageDescriptions(std::uint32_t now_ms) {
     database_.Read();
   }
   description_preview_->Refresh(world_, hovered_item_, hovered_holder_, hovered_slot_);
-  skill_description_->Refresh(windows_.skill_description.skill_id, world_);
+  skill_description_->Refresh(windows_.skill_description->skill_id, world_);
 }
 
 void Game::ApplyDescriptionAnswers(const UiStage::Answers& answers, std::uint32_t now_ms) {
@@ -164,32 +166,32 @@ void Game::ApplyDescriptionAnswers(const UiStage::Answers& answers, std::uint32_
   // ⚠ ELLE SE REPLACE SOUS LE CURSEUR À CHAQUE DEMANDE, même déjà ouverte : on
   // décrit un objet après l'autre, et une fenêtre restée au loin obligerait à
   // aller la chercher des yeux.
-  std::uint32_t described = answers.inventory.describe_id;
-  std::uint16_t described_slot = answers.inventory.describe_slot;
+  std::uint32_t described = answers.inventory->describe_id;
+  std::uint16_t described_slot = answers.inventory->describe_slot;
   ro::ui::ItemHolder described_holder = ro::ui::ItemHolder::kInventory;
   if (described == 0) {
-    described = answers.cart.describe_id;
-    described_slot = answers.cart.describe_slot;
+    described = answers.cart->describe_id;
+    described_slot = answers.cart->describe_slot;
     described_holder = ro::ui::ItemHolder::kCart;
   }
   if (described == 0) {
-    described = answers.storage.describe_id;
-    described_slot = answers.storage.describe_slot;
+    described = answers.storage->describe_id;
+    described_slot = answers.storage->describe_slot;
     described_holder = ro::ui::ItemHolder::kStorage;
   }
   if (described == 0) {
     // ⚠ LA FICHE REND UNE PLACE DE SAC, pas une place de mannequin : c'est donc
     // bien le sac qu'il faut interroger pour décorer le nom.
-    described = answers.character.describe_id;
-    described_slot = answers.character.describe_slot;
+    described = answers.character->describe_id;
+    described_slot = answers.character->describe_slot;
     described_holder = ro::ui::ItemHolder::kInventory;
   }
-  if (described == 0 && answers.shortcuts.describe >= 0) {
+  if (described == 0 && answers.shortcuts->describe >= 0) {
     // ⚠ UNE CASE NE CONNAÎT PAS DE PLACE, seulement un IDENTIFIANT — c'est ce
     // qui lui permet de survivre à la pile qu'on vide. Le nom décoré, lui, a
     // besoin d'une place : on la cherche donc dans le sac, au moment de décrire.
     // Sans exemplaire sous la main, le nom de base fera l'affaire.
-    described = shortcuts_->DescribedItem(static_cast<std::size_t>(answers.shortcuts.describe),
+    described = shortcuts_->DescribedItem(static_cast<std::size_t>(answers.shortcuts->describe),
                                           world_, &described_slot);
     described_holder = ro::ui::ItemHolder::kInventory;
   }
@@ -197,12 +199,12 @@ void Game::ApplyDescriptionAnswers(const UiStage::Answers& answers, std::uint32_
   // referme, sans aller chercher la croix. Le même OBJET, c'est la même place
   // dans le même contenant — deux exemplaires d'un identifiant diffèrent par
   // leur raffinement et leurs cartes.
-  const bool same_item = windows_.description.open && described != 0 &&
-                         windows_.description.item_id == described &&
-                         windows_.description.from_slot == described_slot &&
-                         windows_.description.from_holder == described_holder;
+  const bool same_item = windows_.description->open && described != 0 &&
+                         windows_.description->item_id == described &&
+                         windows_.description->from_slot == described_slot &&
+                         windows_.description->from_holder == described_holder;
   if (same_item) {
-    windows_.description.open = false;
+    windows_.description->open = false;
   } else if (described != 0) {
     ro::ui::OpenItemDescription(windows_.description, described, described_slot, described_holder);
   }
@@ -210,28 +212,29 @@ void Game::ApplyDescriptionAnswers(const UiStage::Answers& answers, std::uint32_
   //
   // Le grimoire la demande au Ctrl + clic droit, la barre au clic droit ; la
   // redemander pour la compétence qu'elle montre la referme.
-  std::uint16_t described_skill = answers.character.grimoire.describe;
-  if (described_skill == 0 && answers.shortcuts.describe >= 0) {
+  std::uint16_t described_skill = answers.character->grimoire.describe;
+  if (described_skill == 0 && answers.shortcuts->describe >= 0) {
     described_skill =
-        shortcuts_->DescribedSkill(static_cast<std::size_t>(answers.shortcuts.describe));
+        shortcuts_->DescribedSkill(static_cast<std::size_t>(answers.shortcuts->describe));
   }
   ro::ui::AskSkillDescription(windows_.skill_description, described_skill);
   // LA FICHE DE LA FENÊTRE : ce qu'elle a demandé se route comme celle de la
   // base, sur l'objet qu'elle montre.
-  RouteItemSheet(answers.description, windows_.description.item_id, *item_description_,
+  RouteItemSheet(answers.description, windows_.description->item_id, *item_description_,
                  ro::ui::ItemSheetHost::kDescriptionWindow, now_ms);
-  const ro::ui::ChatLinkAsk& odds = answers.description.link;
+  const ro::ui::ChatLinkAsk& odds = answers.description->link;
   // La case « Comparer » de la fenêtre : c'est le réglage lui-même.
-  if (answers.description.compare_changed) {
-    settings_->options().descriptions().SetCompare(answers.description.compare, &settings_->file());
+  if (answers.description->compare_changed) {
+    settings_->options().descriptions().SetCompare(answers.description->compare,
+                                                   &settings_->file());
   }
   RouteBugReports(answers, windows_, world_, *item_description_, skill_description_->view(),
                   settings_->options().bug_report().buttons(), link_);
   // « SIGNALER CE JOUEUR » : l'envoi que sa fenêtre demande.
   pieces_.player_report.Advance(windows_.player_report, answers.player_report, world_.player_id(),
                                 link_);
-  if (answers.book.closed) {
-    item_description_->books().NoteClosed(windows_.book.item_id, answers.book.page);
+  if (answers.book->closed) {
+    item_description_->books().NoteClosed(windows_.book->item_id, answers.book->page);
   }
   FollowSkillDescriptionLink(answers.skill_description, now_ms);
   skill_facts_.Ask(answers.skill_description, world_.skill_facts(), now_ms, link_);
@@ -248,23 +251,23 @@ void Game::ApplyDescriptionAnswers(const UiStage::Answers& answers, std::uint32_
   hovered_item_ = 0;
   hovered_slot_ = 0;
   hovered_holder_ = ro::ui::ItemHolder::kInventory;
-  if (windows_.inventory.hover_preview) {
-    hovered_item_ = answers.inventory.hovered_id;
-    hovered_slot_ = answers.inventory.hovered_slot;
+  if (windows_.inventory->hover_preview) {
+    hovered_item_ = answers.inventory->hovered_id;
+    hovered_slot_ = answers.inventory->hovered_slot;
   }
-  if (hovered_item_ == 0 && windows_.cart.hover_preview) {
-    hovered_item_ = answers.cart.hovered_id;
-    hovered_slot_ = answers.cart.hovered_slot;
+  if (hovered_item_ == 0 && windows_.cart->hover_preview) {
+    hovered_item_ = answers.cart->hovered_id;
+    hovered_slot_ = answers.cart->hovered_slot;
     hovered_holder_ = ro::ui::ItemHolder::kCart;
   }
-  if (hovered_item_ == 0 && windows_.storage.hover_preview) {
-    hovered_item_ = answers.storage.hovered_id;
-    hovered_slot_ = answers.storage.hovered_slot;
+  if (hovered_item_ == 0 && windows_.storage->hover_preview) {
+    hovered_item_ = answers.storage->hovered_id;
+    hovered_slot_ = answers.storage->hovered_slot;
     hovered_holder_ = ro::ui::ItemHolder::kStorage;
   }
-  if (hovered_item_ == 0 && windows_.character.hover_preview) {
-    hovered_item_ = answers.character.hovered_id;
-    hovered_slot_ = answers.character.hovered_slot;
+  if (hovered_item_ == 0 && windows_.character->hover_preview) {
+    hovered_item_ = answers.character->hovered_id;
+    hovered_slot_ = answers.character->hovered_slot;
   }
   // LES COMMERCES, qui montrent leur aperçu comme le sac : un objet du sac
   // par sa case, un objet de la boutique par son identifiant.
@@ -298,8 +301,8 @@ void Game::ApplyDescriptionAnswers(const UiStage::Answers& answers, std::uint32_
     hovered_slot_ = 0;
     hovered_holder_ = ro::ui::ItemHolder::kInventory;
   }
-  if (hovered_item_ == 0 && answers.card_album.hovered_id != 0) {
-    hovered_item_ = answers.card_album.hovered_id;
+  if (hovered_item_ == 0 && answers.card_album->hovered_id != 0) {
+    hovered_item_ = answers.card_album->hovered_id;
     hovered_slot_ = 0;
     hovered_holder_ = ro::ui::ItemHolder::kCardAlbum;
   }

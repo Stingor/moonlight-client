@@ -20,6 +20,7 @@
 #include "game/game.h"
 #include "game/mvp_alert_sound.h"
 #include "game/mvp_tracker_bug_report.h"
+#include "game/ui_window_rounds.h"
 #include "mvp/mvp_tracker_stage.h"
 
 namespace moonclient {
@@ -158,7 +159,7 @@ void Game::FollowMvpLink(const ro::ui::ChatLinkAsk& asked, const MvpLink& link,
       break;
     case ro::ui::ChatLinkGesture::kMonsterSheet:
       if (monster_sheet_.has_value()) {
-        monster_sheet_->Open(windows_.monster_sheet.state, link.monster_id, /*by_view=*/false);
+        monster_sheet_->Open(windows_.monster_sheet->state, link.monster_id, /*by_view=*/false);
       } else {
         FollowDescriptionLink(
             ro::ui::DescriptionWindowAction{.followed = MonsterBestiaryUrl(link.monster_id)},

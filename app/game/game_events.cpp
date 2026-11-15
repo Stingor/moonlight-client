@@ -4,7 +4,11 @@
 #include <SDL3/SDL.h>
 
 #include "game/game.h"
+#include "game/hud_rounds.h"
+#include "game/navigation_windows.h"
+#include "game/party_windows.h"
 #include "game/ui_stage.h"
+#include "game/ui_window_rounds.h"
 #include "game/window_events.h"
 
 namespace moonclient {
@@ -30,7 +34,7 @@ void Game::PumpEvents(std::uint32_t now_ms) {
     // 🔴 LE CARACTÈRE D'UNE MACRO LANCÉE PAR ALT GR N'ENTRE PAS DANS LE CHAMP. Il
     // suit sa touche ; une touche suivante prouve qu'elle n'en composait aucun,
     // et le caractère à venir est alors le sien.
-    ro::ui::ChatInputState& chat_input = windows_.chat.main.input;
+    ro::ui::ChatInputState& chat_input = windows_.chat->main.input;
     if (event.type == SDL_EVENT_KEY_DOWN || event.type == SDL_EVENT_KEY_UP) {
       chat_input.altgr_text_pending = false;
     } else if (event.type == SDL_EVENT_TEXT_INPUT && chat_input.altgr_text_pending) {
@@ -63,23 +67,23 @@ void Game::PumpEvents(std::uint32_t now_ms) {
                 .camera = &camera_,
                 .first_person = &first_person_,
                 .rig = &camera_rig_,
-                .chat = &windows_.chat.main,
+                .chat = &windows_.chat->main,
                 .grimoire = &grimoire_,
                 .skill_tree = pieces_.skill_tree.has_value() ? &*pieces_.skill_tree : nullptr,
-                .sheet = &windows_.character,
-                .status = &windows_.status.state,
-                .basic_info = &windows_.basic_info.state,
+                .sheet = &*windows_.character,
+                .status = &windows_.status->state,
+                .basic_info = &windows_.basic_info->state,
                 .grimoire_keys = &pieces_.grimoire_keys,
                 .homunculus_present = pieces_.homunculus.view().present,
                 .mercenary_present = pieces_.mercenary.view().present,
                 .companion_ai = &pieces_.companion_ai,
-                .pet = &windows_.pet,
-                .inventory = &windows_.inventory,
-                .cart = &windows_.cart,
-                .party = &windows_.party.window,
+                .pet = &*windows_.pet,
+                .inventory = &*windows_.inventory,
+                .cart = &*windows_.cart,
+                .party = &windows_.party->window,
                 .bank = &bank_,
                 .card_album = &card_album_,
-                .card_album_window = &windows_.card_album,
+                .card_album_window = &*windows_.card_album,
                 .cash_shop = &pieces_.cash_shop,
                 .mail = &pieces_.mail,
                 .achievements = &pieces_.achievements,
@@ -87,20 +91,20 @@ void Game::PumpEvents(std::uint32_t now_ms) {
                 .memorial = &pieces_.memorial,
                 .trade = &pieces_.trade,
                 .chat_rooms = &pieces_.chat_rooms,
-                .chat_room_form_open = windows_.chat_room.make.open,
-                .menu = &windows_.menu,
-                .macros = &windows_.macros,
-                .style = &windows_.style,
-                .craft_atlas = &windows_.craft_atlas.state,
-                .navigation = &windows_.navigation.state,
-                .world_map = &windows_.navigation.world_map,
+                .chat_room_form_open = windows_.chat_room->make.open,
+                .menu = &*windows_.menu,
+                .macros = &*windows_.macros,
+                .style = &*windows_.style,
+                .craft_atlas = &windows_.craft_atlas->state,
+                .navigation = &windows_.navigation->state,
+                .world_map = &windows_.navigation->world_map,
                 .minimap_shown = &shell_.layouts().minimap().shown,
                 .mvp_tracker = &pieces_.mvp_tracker,
-                .database_toggle = &windows_.monster_sheet.database.toggle_asked,
-                .bug_report = &windows_.bug_report,
+                .database_toggle = &windows_.monster_sheet->database.toggle_asked,
+                .bug_report = &*windows_.bug_report,
                 .recorder = &recorder_,
                 .screenshot = &screenshot_,
-                .hotkeys = &windows_.hotkeys,
+                .hotkeys = &*windows_.hotkeys,
                 .bindings = &settings_->bindings(),
                 .presets = &*presets_,
                 .targeting = &targeting_,
@@ -120,7 +124,7 @@ void Game::PumpEvents(std::uint32_t now_ms) {
                 .shop_one_click = settings_->options().shops().one_click(),
                 .bench = &effect_bench_,
                 .map_editor = Rights().staff_tools && map_editor_.active() ? &map_editor_ : nullptr,
-                .map_editor_view = &windows_.staff_tools.map_editor,
+                .map_editor_view = &windows_.staff_tools->map_editor,
                 .chat_dispatch = &*chat_dispatch_,
                 .scene_actors = &scene_actors_,
                 .mouse = &mouse_,

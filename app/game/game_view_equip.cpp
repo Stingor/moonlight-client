@@ -22,6 +22,7 @@
 
 #include "chat/chat_view.h"
 #include "game/game.h"
+#include "game/ui_window_rounds.h"
 #include "items/inventory_view.h"
 #include "world/click_action.h"
 
@@ -39,11 +40,11 @@ constexpr std::size_t kCommandBytes = 64;
 
 void Game::AdvanceViewEquip(std::uint32_t now_ms) {
   if (!viewed_equipment_.has_value()) {
-    windows_.view_equip.view = nullptr;
+    windows_.view_equip->view = nullptr;
     return;
   }
-  ro::ui::ViewEquipWindowState& state = windows_.view_equip.state;
-  const ro::ui::ViewEquipAnswer answer = std::exchange(windows_.view_equip.answer, {});
+  ro::ui::ViewEquipWindowState& state = windows_.view_equip->state;
+  const ro::ui::ViewEquipAnswer answer = std::exchange(windows_.view_equip->answer, {});
 
   // LES DEUX CASES DU PIED, retenues d'une séance à l'autre. ⚠ LE FICHIER NE
   // S'ÉCRIT QU'AU CHANGEMENT : `Touch` arme son anti-rebond.
@@ -134,7 +135,7 @@ void Game::AdvanceViewEquip(std::uint32_t now_ms) {
   // ── LA FICHE REÇUE, et la vue qui la montre ───────────────────────────────
   viewed_equipment_->Refresh(inspected_, world_, styles_, Rights().staff_tools, state, now_ms);
   viewed_equipment_->NoteLinkFacts(ItemLinkFactsNow());
-  windows_.view_equip.view = sheet.has_value() ? &viewed_equipment_->view() : nullptr;
+  windows_.view_equip->view = sheet.has_value() ? &viewed_equipment_->view() : nullptr;
 }
 
 // ⚠ UNE LIGNE PAR ANNONCE, à l'entrée comme à chaque écho : le joueur qui

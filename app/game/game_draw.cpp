@@ -59,7 +59,7 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   // curseur —, et la chercher coûte une marche du rayon le long du terrain.
   const std::optional<ro::sim::CellPosition> hovered_cell = HoveredCell();
   const ro::ui::PickTuning pick_tuning = ro::ui::PickTuningOf(
-      windows_.staff_tools.look.picking, Rights().staff_tools, static_cast<float>(shell_.width()),
+      windows_.staff_tools->look.picking, Rights().staff_tools, static_cast<float>(shell_.width()),
       settings_->options().pages().pick_precision.floor_shift());
 
   // LE MONDE, DANS SA CIBLE À LUI quand la page « Graphics » en demande une —
@@ -106,7 +106,7 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   ro::render::TerrainStages stages =
       TerrainStagesOf(graphics, ro::render::GreyWorldHidesLightmap(grey_world));
   stages.flat_color =
-      FlatGroundOf(windows_.staff_tools.look.flat_ground, Rights().staff_tools, grey_world);
+      FlatGroundOf(windows_.staff_tools->look.flat_ground, Rights().staff_tools, grey_world);
   // LE BROUILLARD, pour tout ce que le client peint dessous — voir `SceneFog`.
   const bool fog_shown = graphics.fog();
   const ro::render::SceneFog fog = FogOf(*stage_, fog_shown);
@@ -583,8 +583,8 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
       .book = &grimoire_,
       .bench = &effect_bench_,
       .armed_skill = settings_->options().armed_skill(),
-      .pick_boxes_on_screen = windows_.staff_tools.look.picking.boxes_shown && Rights().staff_tools
-                                  ? &windows_.pick_boxes
+      .pick_boxes_on_screen = windows_.staff_tools->look.picking.boxes_shown && Rights().staff_tools
+                                  ? &*windows_.pick_boxes
                                   : nullptr,
       .bubbles = settings_->options().bubbles(),
       .bubbles_on_screen = &chat_bubbles_,
@@ -595,7 +595,7 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
       .entity_bars_on_screen = &entity_bars_,
       .signboards = settings_->options().pages().signboards.Style(
           settings_->options().shops().signboards_shown()),
-      .options_open = windows_.options.open,
+      .options_open = windows_.options->open,
       .cast_bars_on_screen = &cast_bars_,
       .entity_names = settings_->options().entity_names(),
       .guild = &guild_book_,
@@ -614,7 +614,7 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
       .talkbox_speakers =
           ground_units_.has_value() ? ground_units_->speakers() : std::span<const GroundUnitPick>(),
       .game_hud = &pieces_.over_world.game_hud(),
-      .voice = &windows_.voice,
+      .voice = &*windows_.voice,
       .speaking_icon =
           static_cast<SpeakingIcon>(settings_->options().pages().voice.settings().speaking_icon)};
   // 🔴 ET LA VEILLE LES EFFACE AUSSI, pas seulement les fenêtres. Chez le client

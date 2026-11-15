@@ -13,6 +13,7 @@
 
 #include "chat/chat_tab_view.h"
 #include "game/ui_answers.h"
+#include "game/ui_chat_ask.h"
 #include "game/ui_stage.h"
 #include "game/ui_stage_views.h"
 #include "game/ui_windows.h"
@@ -49,14 +50,14 @@ void UiStage::DrawConversation(Windows& windows, const ro::ui::ChatLinePreview& 
   // LES POLICES DES STYLES DU FIL, reposées à chaque image : la famille peut
   // changer en jeu. ⚠ UNE VARIANTE ABSENTE REND LA POLICE ORDINAIRE, et le fil
   // simule alors le gras ou l'italique.
-  windows.chat.rich.bold = ui_->ChosenFont(ro::ui::FontStyle::kBold);
-  windows.chat.rich.italic = ui_->ChosenFont(ro::ui::FontStyle::kItalic);
-  windows.chat.rich.code = ui_->FontNamed(kChatCodeFontFamily, ro::ui::FontStyle::kRegular);
+  windows.chat->rich.bold = ui_->ChosenFont(ro::ui::FontStyle::kBold);
+  windows.chat->rich.italic = ui_->ChosenFont(ro::ui::FontStyle::kItalic);
+  windows.chat->rich.code = ui_->FontNamed(kChatCodeFontFamily, ro::ui::FontStyle::kRegular);
   // ⚠ LE PLATEAU SE VIDE DE SES MESURES, PAS DE SON GESTE : les rectangles
   // valent pour cette image, la languette qu'on traîne traverse les images.
-  windows.chat.board.strips.clear();
+  windows.chat->board.strips.clear();
   for (const std::uint32_t group : tabs.groups()) {
-    ro::ui::ChatWindowState& state = windows.chat.For(group);
+    ro::ui::ChatWindowState& state = windows.chat->For(group);
     // Une flottante vide ne se dessine pas : elle n'a plus d'onglet, et le tri
     // l'oubliera à la prochaine image.
     if (group != 0 && tabs.tabs(group).empty()) {
@@ -67,32 +68,32 @@ void UiStage::DrawConversation(Windows& windows, const ro::ui::ChatLinePreview& 
         .asked = ro::ui::DrawChatWindow(
             state, tabs.look(group), preview, tabs.lines(group), tabs.layout(group),
             tabs.tabs(group), tabs.count(), tabs.types(group), tabs.tuned_look(group), emotions,
-            emojis, windows.chat.board, skin_,
+            emojis, windows.chat->board, skin_,
             // ⚠ À LA PRINCIPALE SEULEMENT : une flottante n'a pas de saisie, et
             // lui donner les pastilles la ferait peindre par-dessus son fil.
-            group == 0 ? links : std::span<const ro::ui::ChatInputLink>(), windows.chat.link_facts,
-            windows.damage_meter_view.look.shown ? &windows.damage_meter_view : nullptr)});
+            group == 0 ? links : std::span<const ro::ui::ChatInputLink>(), windows.chat->link_facts,
+            windows.damage_meter_view->look.shown ? &*windows.damage_meter_view : nullptr)});
   }
   // 🔴 ICI, ET PAS DANS LA BANDE QUI A VU LE LÂCHER : c'est le seul moment
   // où l'on sait laquelle était sous le curseur, puisque toutes viennent d'être
   // dessinées.
-  answers.chat_drop = ro::ui::DecideChatDrop(windows.chat.board);
-  DrawChatRoomWindows(windows.chat_room, windows.chat.main, preview, tabs, links,
-                      windows.chat.link_facts, answers);
-  DrawWhisperWindows(windows.whispers, tabs, emotions, emojis, windows.chat.link_facts, answers);
+  *answers.chat_drop = ro::ui::DecideChatDrop(windows.chat->board);
+  DrawChatRoomWindows(windows.chat_room, windows.chat->main, preview, tabs, links,
+                      windows.chat->link_facts, answers);
+  DrawWhisperWindows(windows.whispers, tabs, emotions, emojis, windows.chat->link_facts, answers);
   // LES CONFIRMATIONS D'UN LIEN WEB ET LA VISIONNEUSE, après toutes les
   // fenêtres qui portent des liens : elles passent devant celle d'où vient le
   // clic. ⚠ DESSINÉES MÊME SANS QUESTION : une boîte congédiée rend sa réponse
   // ici.
-  ro::ui::DrawChatUrlPrompt(windows.chat.url_prompt, skin_);
-  ro::ui::DrawChatHostPrompt(windows.chat.host_prompt, skin_);
-  ro::ui::DrawChatPictureViewer(windows.chat.viewer, windows.chat.viewer_view, skin_);
-  escape_.Register(ro::ui::kChatPictureViewerId, &windows.chat.viewer.open);
+  ro::ui::DrawChatUrlPrompt(windows.chat->url_prompt, skin_);
+  ro::ui::DrawChatHostPrompt(windows.chat->host_prompt, skin_);
+  ro::ui::DrawChatPictureViewer(windows.chat->viewer, windows.chat->viewer_view, skin_);
+  escape_.Register(ro::ui::kChatPictureViewerId, &windows.chat->viewer.open);
   // L'INFOBULLE D'UN LIEN DE RÉGLAGE, que le survol de l'image d'avant a posée :
   // elle ne vaut que pour une image.
-  if (windows.chat.setting_tip.has_value()) {
-    ro::ui::DrawSettingLinkTip(*windows.chat.setting_tip);
-    windows.chat.setting_tip.reset();
+  if (windows.chat->setting_tip.has_value()) {
+    ro::ui::DrawSettingLinkTip(*windows.chat->setting_tip);
+    windows.chat->setting_tip.reset();
   }
   // 🔴 ÉCHAP QUI A REPLIÉ LA BARRE NE FERME RIEN D'AUTRE. La touche a servi :
   // sans ce mot-là, la même frappe refermerait AUSSI la fenêtre la plus au

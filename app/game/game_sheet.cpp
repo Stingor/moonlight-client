@@ -21,6 +21,7 @@
 #include "character/status_window_view.h"
 #include "game/bug_report_context.h"
 #include "game/game.h"
+#include "game/hud_rounds.h"
 #include "game/ui_answers.h"
 #include "game/ui_stage.h"
 #include "world/actor_view.h"
@@ -32,8 +33,8 @@ void Game::StageCharacterSheet(std::uint32_t now_ms) {
   // veille levé. Le nôtre ferme la fenêtre de guilde : la fiche, quand c'est
   // elle qu'elle montre.
   if (ro::net::SayGuildDepartures(guild_book_, world_, &pieces_.banned_words, now_ms) &&
-      windows_.character.tab == ro::ui::CharacterTab::kGuild) {
-    windows_.character.open = false;
+      windows_.character->tab == ro::ui::CharacterTab::kGuild) {
+    windows_.character->open = false;
   }
   // LA FICHE SE REFAIT AVANT LE DESSIN : l'onglet ouvert décide des
   // emplacements cherchés, et il a pu changer à l'image précédente.
@@ -41,9 +42,9 @@ void Game::StageCharacterSheet(std::uint32_t now_ms) {
   // ⚠ LA PETITE FENÊTRE DE STATUT LIT LES MÊMES NOMBRES : ouverte seule, elle
   // ne fait refaire qu'eux.
   StatusWindowRound& status = windows_.status;
-  character_->Refresh(windows_.character.open, world_,
-                      windows_.character.tab == ro::ui::CharacterTab::kCostume);
-  if (status.state.open && !windows_.character.open) {
+  character_->Refresh(windows_.character->open, world_,
+                      windows_.character->tab == ro::ui::CharacterTab::kCostume);
+  if (status.state.open && !windows_.character->open) {
     character_->RefreshNumbers(world_);
   }
   // LA FLÈCHE CLIQUÉE À L'IMAGE PRÉCÉDENTE part par la route du « + » de la
@@ -66,23 +67,23 @@ void Game::StageCharacterSheet(std::uint32_t now_ms) {
   stat_presets_->Compose(world_, stat_presets.view);
   // Fiche ouverte, et pas seulement sur son onglet : un clic sur l'onglet ne le
   // montre qu'à l'image suivante, que ses lignes doivent déjà servir.
-  presets_->Refresh(windows_.character.open, settings_->bindings());
+  presets_->Refresh(windows_.character->open, settings_->bindings());
   title_view_->Refresh(titles_);
   // LES COMPAGNONS QU'ON PEUT APPELER : la fiche en fait une colonne, et c'est
   // le monde qui les tient.
-  windows_.character_view.companions = character_->companions();
+  windows_.character_view->companions = character_->companions();
   // LES DEUX RÉGLAGES DE LA CASE SOUS LES POSES, tels que le serveur les a dits.
   // ⚠ REPOSÉS À CHAQUE IMAGE : la fenêtre survit à la partie, et un personnage
   // suivant ne doit pas hériter de ceux du précédent.
-  windows_.character_view.equipment_shown = own_config_.equipment_shown();
-  windows_.character_view.costumes_shown = own_config_.costumes_shown();
+  windows_.character_view->equipment_shown = own_config_.equipment_shown();
+  windows_.character_view->costumes_shown = own_config_.costumes_shown();
   // LA SILHOUETTE DE L'AVATAR, composée à la boîte que la fenêtre a mesurée à
   // l'image précédente — et refaite seulement quand son image change.
   //
   // ⚠ SEULEMENT FENÊTRE OUVERTE : la boîte mesurée survit à la fermeture, et
   // sans cette garde une fiche refermée continuerait de composer un personnage
   // que personne ne regarde, image d'animation après image d'animation.
-  if (windows_.character.open) {
+  if (windows_.character->open) {
     // ⚠ LE MÊME REGISTRE QUE LA CARTE : deux registres donneraient deux
     // identifiants pour la même recette, donc deux tenues et deux textures
     // pour un seul personnage.
@@ -95,7 +96,7 @@ void Game::StageCharacterSheet(std::uint32_t now_ms) {
       // CHOSE : une apparence que le serveur impose à une coiffe ou à la cape —
       // le styliste, un événement, `@wings` — reste sur la carte, et l'onglet
       // Équipement dit ce que le personnage porte, pas ce à quoi il ressemble.
-      if (windows_.character.tab == ro::ui::CharacterTab::kEquipment &&
+      if (windows_.character->tab == ro::ui::CharacterTab::kEquipment &&
           !own_config_.costumes_shown().value_or(true)) {
         const WornViews worn = WornPieceViews(world_.inventory());
         dressed.headgears = worn.headgears;
@@ -105,8 +106,8 @@ void Game::StageCharacterSheet(std::uint32_t now_ms) {
         styles_.Dress(world_.player_id(), dressed, *pieces_.wardrobe, world_.styles());
       }
     }
-    character_->RefreshAvatar(world_, windows_.character.avatar,
-                              windows_.character_view.avatar_image, now_ms, dressed);
+    character_->RefreshAvatar(world_, windows_.character->avatar,
+                              windows_.character_view->avatar_image, now_ms, dressed);
     sheet_look_ = dressed;
   }
   // LE GIF DU PANTIN : ce que l'encodage et le dialogue ont rendu, puis ce que
@@ -115,26 +116,26 @@ void Game::StageCharacterSheet(std::uint32_t now_ms) {
   if (const std::optional<std::string> saved = pieces_.doll_gif->Tick(); saved.has_value()) {
     world_.RecordChat(ro::sim::ChatKind::kServer, 0, *saved, now_ms);
   }
-  windows_.character_view.doll_gif = pieces_.doll_gif->view();
+  windows_.character_view->doll_gif = pieces_.doll_gif->view();
   // ⚠ RELU À CHAQUE IMAGE, comme celui de l'établi — voir `StaffToolsAllowed`.
   // Il montre la ligne du staff du grimoire et le volet du mannequin ; le
   // retirer fait disparaître le volet ET son cran de largeur, sans attendre une
   // reconnexion.
-  windows_.character_view.staff_allowed = Rights().staff_tools;
-  if (windows_.character_view.staff_allowed) {
-    FeedStaffPane(world_, staff_.jobs, &pieces_.job_names, windows_.character_view.staff);
+  windows_.character_view->staff_allowed = Rights().staff_tools;
+  if (windows_.character_view->staff_allowed) {
+    FeedStaffPane(world_, staff_.jobs, &pieces_.job_names, windows_.character_view->staff);
     // LA CRÉATION D'UN HOMONCULE, dans la ligne du staff du grimoire : le
     // serveur refuse d'en créer un second. ⚠ `present()` NE DIT QUE CE QUE LE
     // CLIENT A VU : un homoncule accusé reste présent au repos ou mort, mais
     // celui qui l'était déjà à la connexion n'est jamais annoncé, et le serveur
     // le compte quand même. Le bouton reste alors cliquable.
-    windows_.character_view.grimoire_staff = ro::ui::GrimoireStaffView{
+    windows_.character_view->grimoire_staff = ro::ui::GrimoireStaffView{
         .homunculi = staff_.homunculi, .has_homunculus = pieces_.homunculus.homunculus().present()};
     // 🔴 LE SOUHAIT SE REPOSE ICI, SOUS LE DROIT : c'est lui qui dit que le
     // serveur est prêt à l'entendre, et il n'arrive qu'après l'entrée sur la
     // carte. Plus tôt, la commande serait refusée — et notée comme faite.
     const bool ignore_wanted = settings_->options().staff_battle_ignore();
-    windows_.character_view.staff.battle_ignored = ignore_wanted;
+    windows_.character_view->staff.battle_ignored = ignore_wanted;
     KeepBattleIgnore(ignore_wanted, staff_, link_, world_);
   }
 }
@@ -149,7 +150,7 @@ void Game::StageStyle(std::uint32_t now_ms) {
         ro::ui::ClosePaletteEditor(windows_.style);
         break;
       case ro::sim::StyleEditorRequest::kOpen:
-        windows_.style.open = true;
+        windows_.style->open = true;
         break;
       case ro::sim::StyleEditorRequest::kToggle:
         ro::ui::TogglePaletteEditor(windows_.style);
@@ -159,8 +160,8 @@ void Game::StageStyle(std::uint32_t now_ms) {
     // pas retombe sur le corps.
     if (const std::optional<ro::ui::PaletteTabKind> tab =
             ro::ui::PaletteTabOfNumber(world_.styles().TakeTab())) {
-      windows_.style.tab = *tab;
-      windows_.style.tab_asked = true;
+      windows_.style->tab = *tab;
+      windows_.style->tab_asked = true;
     }
   }
 
@@ -173,7 +174,7 @@ void Game::StageStyle(std::uint32_t now_ms) {
   // L'ÉDITEUR DE STYLE : son pantin et ses pièces. ⚠ SEULEMENT FENÊTRE
   // OUVERTE — composer une silhouette que personne ne regarde coûte une
   // palette et une texture par palier de pulsation.
-  if (windows_.style.open) {
+  if (windows_.style->open) {
     // L'onglet des effets lit la table de l'installation et les items qui posent
     // un effet, que le serveur annonce.
     style_view_->SetHatEffectSources(vfs_, &pieces_.cash_shop.hat_effects());
@@ -191,8 +192,8 @@ void Game::StageStyle(std::uint32_t now_ms) {
     if (doll.has_value() && !pieces_.style_effects.has_value()) {
       pieces_.style_effects.emplace(*vfs_);
     }
-    windows_.style.doll.overlay = {};
-    windows_.style.doll.body_overlaid = false;
+    windows_.style->doll.overlay = {};
+    windows_.style->doll.body_overlaid = false;
     if (pieces_.style_effects.has_value() && stage_.has_value()) {
       const std::span<const ro::sim::HatEffectId> worn =
           doll.has_value() ? std::span<const ro::sim::HatEffectId>(doll->worn)
@@ -209,12 +210,12 @@ void Game::StageStyle(std::uint32_t now_ms) {
       pieces_.style_effects->SetColorProbe(style_view_->HatEffectColorProbe());
       const DollEffects::Shown shown = pieces_.style_effects->Advance(
           worn, pose, world_, *stage_, now_ms, &style_view_->HatEffectDollDyes());
-      windows_.style.doll.overlay = shown.overlay;
-      windows_.style.doll.body_overlaid = shown.body_overlaid;
+      windows_.style->doll.overlay = shown.overlay;
+      windows_.style->doll.body_overlaid = shown.body_overlaid;
     }
   } else {
     pieces_.style_effects.reset();
-    windows_.style.doll.overlay = {};
+    windows_.style->doll.overlay = {};
     // ⚠ RENDU ENTRE DEUX IMAGES, et une fois, au passage d'ouverte à fermée :
     // oublier un style détruit les tenues qui le portaient, et une
     // composition en cours les lirait mortes.
@@ -223,7 +224,7 @@ void Game::StageStyle(std::uint32_t now_ms) {
   // L'APERÇU D'UN STYLE REÇU, sous la même règle et pour la même raison : son
   // pantin ne se compose que fenêtre ouverte, et son style retourne à la
   // garde-robe dès qu'elle se ferme.
-  if (windows_.style_preview.open) {
+  if (windows_.style_preview->open) {
     style_preview_->Refresh(world_, windows_.style_preview);
   } else {
     style_preview_->Close();
@@ -235,15 +236,15 @@ void Game::StageStyle(std::uint32_t now_ms) {
 }
 
 void Game::ApplySheetAnswers(const UiStage::Answers& answers) {
-  const ro::ui::PresetAction& asked = answers.character.presets;
+  const ro::ui::PresetAction& asked = answers.character->presets;
   if (asked.toggle_style) {
     ro::ui::TogglePaletteEditor(windows_.style);
   }
-  presets_->Apply(asked, windows_.character.presets, link_, world_);
+  presets_->Apply(asked, windows_.character->presets, link_, world_);
 
   // LE GIF DU PANTIN, figé sur ce que la fiche montrait à ce clic : la pose, la
   // direction, l'échelle et l'apparence habillée avant le dessin.
-  const ro::ui::DollGifVerb gif = answers.character.doll_gif;
+  const ro::ui::DollGifVerb gif = answers.character->doll_gif;
   if (gif == ro::ui::DollGifVerb::kNothing) {
     return;
   }
@@ -254,7 +255,7 @@ void Game::ApplySheetAnswers(const UiStage::Answers& answers) {
   } else if (world_.player() == nullptr) {
     pieces_.doll_gif->Refuse("aucun personnage à photographier");
   } else {
-    const ro::ui::CharacterAvatarState& avatar = windows_.character.avatar;
+    const ro::ui::CharacterAvatarState& avatar = windows_.character->avatar;
     const bool plays = avatar.animated && ro::ui::CharacterPoseAnimates(avatar.pose);
     DollGifOrder order;
     order.verb = gif;
@@ -274,7 +275,7 @@ void Game::ApplySheetAnswers(const UiStage::Answers& answers) {
 void Game::ApplyStyleAnswers(const UiStage::Answers& answers, std::uint32_t now_ms) {
   // LE RAPPORT DE BUG porte la recette que la fenêtre montrait : composé AVANT
   // que les gestes de cette image ne la changent.
-  if (answers.style.report_bug) {
+  if (answers.style->report_bug) {
     AskBugReport(windows_.bug_report,
                  StyleBugReport(style_view_->ReportCode(), style_view_->ReportFields()));
   }
@@ -298,7 +299,7 @@ void Game::ApplyStyleAnswers(const UiStage::Answers& answers, std::uint32_t now_
   // ⚠ « COPIER » A DÉJÀ EU LIEU : la fenêtre seule parle au presse-papiers,
   // comme l'éditeur. Il ne reste que l'essai.
   if (answers.style_preview == ro::ui::StylePreviewVerb::kTry) {
-    windows_.style.open = true;
+    windows_.style->open = true;
     static_cast<void>(style_view_->TryCode(style_preview_->code(), now_ms));
   }
 }

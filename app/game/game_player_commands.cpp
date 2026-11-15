@@ -22,6 +22,7 @@
 
 #include "chat/banned_input.h"
 #include "game/game.h"
+#include "game/party_windows.h"
 #include "party/party_panel.h"
 #include "world/click_action.h"
 #include "world/staff_roster.h"
@@ -123,12 +124,12 @@ void Game::RunPlayerAsks(std::uint32_t now_ms) {
         }
         // 🔴 LA FENÊTRE S'OUVRE, LE NOM POSÉ : c'est elle qui fonde le groupe,
         // comme au client du joueur. Rien ne part avant son bouton.
-        windows_.party.window.open = true;
-        windows_.party.window.tab = ro::ui::PartyFriendTab::kParty;
-        windows_.party.window.new_party_name = {};
+        windows_.party->window.open = true;
+        windows_.party->window.tab = ro::ui::PartyFriendTab::kParty;
+        windows_.party->window.new_party_name = {};
         std::copy_n(name.begin(),
-                    std::min(name.size(), windows_.party.window.new_party_name.size() - 1),
-                    windows_.party.window.new_party_name.begin());
+                    std::min(name.size(), windows_.party->window.new_party_name.size() - 1),
+                    windows_.party->window.new_party_name.begin());
         break;
       case PlayerCommandKind::kInviteToParty:
         if (TooLong(name)) {
@@ -142,7 +143,7 @@ void Game::RunPlayerAsks(std::uint32_t now_ms) {
         break;
       case PlayerCommandKind::kLeaveParty:
         if (party_.in_party() && LeaveParty(link_, party_, world_.player_id())) {
-          windows_.party.ask_disband = true;
+          windows_.party->ask_disband = true;
         }
         break;
       case PlayerCommandKind::kExpelFromParty:
