@@ -7973,6 +7973,241 @@ quests:
     title: "[Daily] Half Flower Gathering"
   5942:
     title: "Flower Room Opening Ceremony"
+  5972:
+    title: Eagle Patrol
+    icon: ep
+    description: 'I joined the Eagle Patrol.
+
+      When you''re ready to go on patrol, let''s go to the <NAVI>[Guard Captain]<INFO>icecastle,23,115,0,101,0</INFO></NAVI>.'
+  5973:
+    title: '[Standby] Patrol with Irwin'
+    icon: dq
+    summary: Reset at 04:00
+    description: 'Together with the Eagle Patrol.
+
+      Finished patrolling Frozen Scale Hill.
+
+      If you want to participate in the patrol tomorrow, go to the <NAVI>[Guard Captain]<INFO>icecastle,23,115,0,101,0</INFO></NAVI>을 찾아가me.'
+  5974:
+    title: Patrol with Irwin(1)
+    icon: dq
+    description: I patrolled the Frozen Scale Hill with the Eagle Patrol.
+  5975:
+    title: Patrol with Irwin(2)
+    icon: dq
+    description: 'Frozen Scale Hill with Eagle Patrol
+
+      Finished patrolling. Let''s get the reward from the patrol leader who came to meet you.'
+  5976:
+    title: Supply Officer Gorir
+    icon: nq
+    description: I met Supply Officer Gorir and asked for a favor.
+  5977:
+    title: '[Standby] Do not feed'
+    icon: dq
+    summary: Reset at 04:00
+    description: 'At the request of the supply officer,
+
+      we retrieved the food of the wild animals that someone had left behind.
+
+      It''s relatively simple and the pay isn''t bad.
+
+      Let''s visit <NAVI>[Supplier Officer Gorir]<INFO>icecastle,97,177,0,101,0</INFO></NAVI> again tomorrow.
+    cooldown: true
+
+
+      ?If you are inside the Memorial Dungeon, the directions may not be smooth.'
+  5978:
+    title: Do not feed(1)
+    icon: dq
+    description: 'I received a request from Supply Officer Gorir.
+
+      Visit while on patrol with the Eagle Patrol,
+
+      or when you have time, at <NAVI>[Frozen Scale Hill]<INFO>jor_back1,380,229,0,101,0</INFO></NAVI>, to retrieve food that someone left for wildlife.'
+  5979:
+    title: Do not feed(2)
+    icon: dq
+    description: 'Retrieved food from wild animals that someone had left behind.
+
+      Report to <NAVI>[Supplier Officer Gorir]<INFO>icecastle,97,177,0,101,0</INFO></NAVI>.
+
+
+      ?If you are inside the Memorial Dungeon, the directions may not be smooth.'
+  5980:
+    title: Secret Fun
+    icon: nq
+    description: I met Private Horilyu at the Eagle Patrol's barracks.
+  5981:
+    title: '[Standby] Secret Fun'
+    icon: dq
+    summary: Reset at 04:00
+    description: 'It is said that the brought feathers
+
+      are secretly exchanged for supplies. Let''s secretly bring it to
+
+      <NAVI>[Private Horilyu]<INFO>icas_in,34,56,0,101,0</INFO></NAVI> tomorrow as well.'
+    cooldown: true
+  5982:
+    title: Secret Fun
+    icon: dq
+    description: '<NAVI>[Private Horilyu]<INFO>icas_in,34,56,0,101,0</INFO></NAVI> seems to need
+
+      warm feathers to withstand the cold. Bring me
+
+      10 feathers of one type from the list below.
+
+
+      <ITEM>[Round Feather]<INFO>6393</INFO></ITEM>
+
+      <ITEM>[Soft Feather]<INFO>7063</INFO></ITEM>
+
+      <ITEM>[Burning Feather]<INFO>6691</INFO></ITEM>
+
+      <ITEM>[Red Feather]<INFO>7440</INFO></ITEM>
+
+      <ITEM>[Feather of Birds]<INFO>916</INFO></ITEM>
+
+      <ITEM>[Cendrawasih Feather]<INFO>6405</INFO></ITEM>
+
+      <ITEM>[PecoPeco Feather]<INFO>7101</INFO></ITEM>
+
+      <ITEM>[Blue Feather]<INFO>7441</INFO></ITEM>
+
+      <ITEM>[Harpy Feather]<INFO>7115</INFO></ITEM>'
+  5983:
+    title: Subject 210426 Encounter
+    icon: ep
+    description: 'While on patrol, I met a mysterious young man,
+
+      but he disappeared immediately. You said you were going in
+
+      the direction of <NAVI>[Frozen Scale Plains]<INFO>jor_back2,250,30,0,101,0</INFO></NAVI>? Let''s visit when the time comes.
+
+
+      ?If you are inside the Memorial Dungeon, the directions may not be smooth.'
+  5984:
+    title: Rgan Transformation Scroll
+    icon: ep
+    summary: To the Ice Castle...
+    description: 'My friend, Nok, I met on the Frozen Scale Plain
+
+      seems to be able to transform into a different appearance.
+
+      The <ITEM>[Rgan Transformation Scroll]<INFO>101162</INFO></ITEM> you got from Nook looks useful,
+
+      let''s go back to the <NAVI>[Ice Castle]<INFO>icecastle,27,126,0,101,0</INFO></NAVI> and report it.'
+  5985:
+    title: '[Standby] Lunch Menu Selection'
+    icon: dq
+    summary: Reset at 04:00
+    description: I took care of <NAVI>[Lunch]<INFO>jor_back2,250,30,0,101,0</INFO></NAVI>'s meal. If you can afford it, wouldn't it be better to take care of it tomorrow as well?
+    npc:
+      sprite: 4_EP19_LUNCH
+      map: jor_back2
+      x: 250
+      y: 30
+    cooldown: true
+  5986:
+    title: Lunch Menu Selection
+    icon: dq
+    summary: Get 10x Broken Liquor Jar
+    description: <NAVI>[Lunch]<INFO>jor_back2,250,30,0,101,0</INFO></NAVI> seems to want to eat Broken Liquor Jars today. Bring 10x <ITEM>[Broken Liquor Jar]<INFO>7158</INFO></ITEM> to him.
+    npc:
+      sprite: 4_EP19_LUNCH
+      map: jor_back2
+      x: 250
+      y: 30
+  5987:
+    title: Lunch Menu Selection
+    icon: dq
+    summary: Get 10x Cloud Crumb
+    description: <NAVI>[Lunch]<INFO>jor_back2,250,30,0,101,0</INFO></NAVI> seems to want to eat Cloud Crumbs today. Bring 10x <ITEM>[Cloud Crumb]<INFO>7162</INFO></ITEM> to him.
+    npc:
+      sprite: 4_EP19_LUNCH
+      map: jor_back2
+      x: 250
+      y: 30
+  5988:
+    title: Lunch Menu Selection
+    icon: dq
+    summary: Get 10x Straw Basket
+    description: <NAVI>[Lunch]<INFO>jor_back2,250,30,0,101,0</INFO></NAVI> seems to want to eat Straw Baskets today. Bring 10x <ITEM>[Straw Basket]<INFO>7299</INFO></ITEM> to him.
+    npc:
+      sprite: 4_EP19_LUNCH
+      map: jor_back2
+      x: 250
+      y: 30
+  5989:
+    title: Lunch Menu Selection
+    icon: dq
+    summary: Get 10x Denture from Dragon Mask
+    description: <NAVI>[Lunch]<INFO>jor_back2,250,30,0,101,0</INFO></NAVI> seems to want to eat Denture from Dragon Masks today. Bring 10x <ITEM>[Denture from Dragon Mask]<INFO>7266</INFO></ITEM> to him.
+    npc:
+      sprite: 4_EP19_LUNCH
+      map: jor_back2
+      x: 250
+      y: 30
+  5990:
+    title: Lunch Menu Selection
+    icon: dq
+    summary: Get 10x Yaga's Pestle
+    description: <NAVI>[Lunch]<INFO>jor_back2,250,30,0,101,0</INFO></NAVI> seems to want to eat Yaga's Pestles today. Bring 10x <ITEM>[Yaga's Pestle]<INFO>7762</INFO></ITEM> to him.
+    npc:
+      sprite: 4_EP19_LUNCH
+      map: jor_back2
+      x: 250
+      y: 30
+  5991:
+    title: Lunch Menu Selection
+    icon: dq
+    summary: Get 10x Leopard Skin
+    description: <NAVI>[Lunch]<INFO>jor_back2,250,30,0,101,0</INFO></NAVI> seems to want to eat Leopard Skins today. Bring 10x <ITEM>[Leopard Skin]<INFO>7171</INFO></ITEM> to him.
+    npc:
+      sprite: 4_EP19_LUNCH
+      map: jor_back2
+      x: 250
+      y: 30
+  5992:
+    title: Lunch Menu Selection
+    icon: dq
+    summary: Get 10x Cendrawasih Feather
+    description: <NAVI>[Lunch]<INFO>jor_back2,250,30,0,101,0</INFO></NAVI> seems to want to eat Cendrawasih Feathers today. Bring 10x <ITEM>[Cendrawasih Feather]<INFO>6405</INFO></ITEM> to him.
+    npc:
+      sprite: 4_EP19_LUNCH
+      map: jor_back2
+      x: 250
+      y: 30
+  5993:
+    title: Lunch Menu Selection
+    icon: dq
+    summary: Get 10x Jejellopy
+    description: <NAVI>[Lunch]<INFO>jor_back2,250,30,0,101,0</INFO></NAVI> seems to want to eat Jejellopies today. Bring 10x <ITEM>[Jejellopy]<INFO>6498</INFO></ITEM> to him.
+    npc:
+      sprite: 4_EP19_LUNCH
+      map: jor_back2
+      x: 250
+      y: 30
+  5994:
+    title: Lunch Menu Selection
+    icon: dq
+    summary: Get 10x Brown Rat Tail
+    description: <NAVI>[Lunch]<INFO>jor_back2,250,30,0,101,0</INFO></NAVI> seems to want to eat Brown Rat Tails today. Bring 10x <ITEM>[Brown Rat Tail]<INFO>25285</INFO></ITEM> to him.
+    npc:
+      sprite: 4_EP19_LUNCH
+      map: jor_back2
+      x: 250
+      y: 30
+  5995:
+    title: Lunch Menu Selection
+    icon: dq
+    summary: Get 10x Piece of Bamboo
+    description: <NAVI>[Lunch]<INFO>jor_back2,250,30,0,101,0</INFO></NAVI> seems to want to eat Piece of Bamboos today. Bring 10x <ITEM>[Piece of Bamboo]<INFO>7150</INFO></ITEM> to him.
+    npc:
+      sprite: 4_EP19_LUNCH
+      map: jor_back2
+      x: 250
+      y: 30
   6000:
     title: Job Change to Taekwon
     description: You've chosen your path to become a Taekwon. You must increase your base level and talk with Phoenix.
@@ -13904,6 +14139,109 @@ quests:
     icon: dq
     summary: "Wait for the reset time"
     description: "Shared Memories - Standby."
+  8784:
+    title: Help Moryara Fishing
+    icon: ep
+    summary: Shining Seaweed Treatment
+    description: In recognition of his good catching in seaweed, he started hunting for Shining Seaweed. After she has killed 20, let her return to <NAVI>[Moryara]<INFO>jor_tail,48,241,0,101,0</INFO></NAVI> in Frozen Tails.
+  8785:
+    title: Help Moryara Fishing
+    icon: dq
+    summary: Reset at 04:00
+    description: This quest is a daily quest, and when the waiting time expires, you can receive it again from <NAVI>[Moryara]<INFO>jor_tail,48,241,0,101,0</INFO></NAVI> and perform it.
+    cooldown: true
+  8786:
+    title: Help Moryara Fishing
+    icon: dq
+    summary: Shining Seaweed Treatment
+    description: In recognition of his good catching in seaweed, he started hunting for Shining Seaweed. After she has killed 20, let her return to <NAVI>[Moryara]<INFO>jor_tail,48,241,0,101,0</INFO></NAVI> in Frozen Tails.
+  8787:
+    title: Fun lunch time with Zoryara
+    icon: ep
+    summary: Procurement of 15x Thin and Tough Skin
+    description: I thought I was going to help Zoryara cook... Irwin got to procure the ice straw shells that the kids love. Bring 15x <ITEM>[Thin and Tough Skin]<INFO>1000830</INFO></ITEM> to <NAVI>[Zoryara]<INFO>icas_in,241,66,0,101,0</INFO></NAVI> in the Ice Castle Restaurant.
+  8788:
+    title: Fun lunch time with Zoryara
+    icon: dq
+    summary: Reset at 04:00
+    description: This quest is a daily quest, and when the waiting time expires, you can receive it again from <NAVI>[Moryara]<INFO>jor_tail,48,241,0,101,0</INFO></NAVI> and perform it.
+    cooldown: true
+  8789:
+    title: Fun lunch time with Zoryara
+    icon: dq
+    summary: Procurement of 15x Thin and Tough Skin
+    description: I thought I was going to help Zoryara cook... Irwin got to procure the ice straw shells that the kids love. Bring 15x <ITEM>[Thin and Tough Skin]<INFO>1000830</INFO></ITEM> to <NAVI>[Zoryara]<INFO>icas_in,241,66,0,101,0</INFO></NAVI> in the Ice Castle Restaurant.
+  8790:
+    title: Priest, have mercy?
+    icon: ep
+    summary: Procurement of 30x Rgan's Shells
+    description: <NAVI>[Pabuya Savigand]<INFO>jor_nest,235,57,0,101,0</INFO></NAVI> in Snake's Nest asks you to get <ITEM>[Rgan's Shell]<INFO>1000822</INFO></ITEM> from the outside. I think I only need about 30.
+  8791:
+    title: Priest, have mercy?
+    icon: dq
+    summary: Reset at 04:00
+    description: This quest is a daily quest, and when the waiting time expires, you can receive it again from <NAVI>[Pabuya Savigand]<INFO>jor_nest,235,57,0,101,0</INFO></NAVI> and perform it.
+    cooldown: true
+  8792:
+    title: Priest, have mercy??
+    icon: dq
+    summary: Procurement of 30x Rgan's Shells
+    description: <NAVI>[Pabuya Savigand]<INFO>jor_nest,235,57,0,101,0</INFO></NAVI> in Snake's Nest asks you to get <ITEM>[Rgan's Shell]<INFO>1000822</INFO></ITEM> from the outside. I think I only need about 30.
+  8793:
+    title: Question
+    icon: ep
+    summary: Speak with Intermediate Rgans
+    description: <NAVI>[Delfanagand]<INFO>jor_nest,239,239,0,101,0</INFO></NAVI> of Snake's Nest asks you to talk to the Intermediate Rgan's who work at the hatchery, <NAVI>[a boy who is a good listener]<INFO>jor_nest,277,257,0,101,0</INFO></NAVI>, <NAVI>[a boy who is not a good listener]<INFO>jor_nest,220,279,0,101,0</INFO></NAVI>, <NAVI>[a boy who doesn't speak well]<INFO>jor_nest,274,199,0,101,0</INFO></NAVI>.
+  8794:
+    title: Old Snake
+    icon: ep
+    summary: Procurement of Rgan's Low Grade Magic Core
+    description: <NAVI>[Arleighand]<INFO>jor_nest,74,100,0,101,0</INFO></NAVI> in the Snake's Nest tells you to bring 15x <ITEM>[Rgan's Low Grade Magic Core]<INFO>1000707</INFO></ITEM>.
+  8795:
+    title: Doctrine and Preaching
+    icon: ep
+    summary: Talk to Yuramigand
+    description: When Bernagand's sermon was finished in the Snake's Nest, <NAVI>[Yuramigand]<INFO>jor_nest,18,92,0,101,0</INFO></NAVI> summoned an adventurer in the form of a rgan.
+  8796:
+    title: The girl I see for the first time
+    icon: ep
+    summary: Hunt Primitive Rgan
+    description: Snake's Nest <NAVI>[Sidrugand]<INFO>jor_nest,239,244,0,101,0</INFO></NAVI> tells you to hunt 20 Primitive Rgan.
+  8797:
+    title: Rgan for Work
+    icon: dq
+    summary: Reset at 04:00
+    description: This quest is a daily quest, and when the waiting time expires, you can receive it again from <NAVI>[Sidrugand]<INFO>jor_nest,239,244,0,101,0</INFO></NAVI> and perform it.
+    cooldown: true
+  8798:
+    title: Rgan for Work
+    icon: dq
+    summary: Hunt Primitive Rgan
+    description: Snake's Nest <NAVI>[Sidrugand]<INFO>jor_nest,239,244,0,101,0</INFO></NAVI> tells you to hunt 20 Primitive Rgan.
+  8799:
+    title: Hatchery Rgan (1)
+    icon: ep
+    summary: Speak with Intermediate Rgans
+    description: In the Snake's Nest, you have to talk to all the <NAVI>[Listen Boy]<INFO>jor_nest,277,257,0,101,0</INFO></NAVI>, <NAVI>[Lazy Kid]<INFO>jor_nest,220,279,0,101,0</INFO></NAVI> and <NAVI>[The Poor Talker]<INFO>jor_nest,274,199,0,101,0</INFO></NAVI>.
+  8800:
+    title: Hatchery Rgan (2)
+    icon: ep
+    summary: Speak with Intermediate Rgans
+    description: In the Snake's Nest, you have to talk to all the <NAVI>[Listen Boy]<INFO>jor_nest,277,257,0,101,0</INFO></NAVI>, <NAVI>[Lazy Kid]<INFO>jor_nest,220,279,0,101,0</INFO></NAVI> and <NAVI>[The Poor Talker]<INFO>jor_nest,274,199,0,101,0</INFO></NAVI>.
+  8801:
+    title: Hatchery Rgan (3)
+    icon: ep
+    summary: Talk to Delfanagand
+    description: All requests from <NAVI>[Delfanagand]<INFO>jor_nest,239,239,0,101,0</INFO></NAVI> in Snake's Nest have been confirmed. You should talk to him again.
+  8802:
+    title: 1st Rgan in the Hatchery
+    icon: ep
+  8803:
+    title: 2nd Rgan in the Hatchery
+    icon: ep
+  8804:
+    title: 3rd Rgan in the Hatchery
+    icon: ep
   9000:
     title: Job Change to Knight
     summary: Talk with other members of Chivalry
@@ -18575,6 +18913,342 @@ quests:
   11739:
     title: "[Cooldown] Oz Labyrinth 2F"
     icon: dq
+  11794:
+    title: Saint of Purification
+    icon: ep
+    summary: Talk to Maram
+    description: Voglinde seems to be looking for some cardinal. Let's ask the whereabouts of Cardinal from the <NAVI>[friends]<INFO>icas_in,130,201,0,101,0</INFO></NAVI> who came to the Ice Castle together.
+  11795:
+    title: Saint of Purification
+    icon: ep
+    summary: Talk to Lehar
+    description: Maram says she didn't see the Cardinal that Voglinde was looking for. Ask <NAVI>[Lehar]<INFO>icas_in,136,197,0,101,0</INFO></NAVI>, who has just returned to the Ice Castle, about Cardinal.
+  11796:
+    title: Saint of Purification
+    icon: ep
+    summary: Talk to Voglinde
+    description: It seems that Lehar also does not know the whereabouts of the saint. Report to <NAVI>[Voglinde]<INFO>icas_in,164,228,0,101,0</INFO></NAVI>.
+  11797:
+    title: Saint of Purification
+    icon: ep
+    summary: Talk to Helock
+    description: You must return to Midgard to find the saint. Let's find <NAVI>[Helock]<INFO>jor_tail,211,63,0,101,0</INFO></NAVI> in the Frozen Tail.
+  11798:
+    title: Saint of Purification
+    icon: ep
+    summary: Talk to Helock
+    description: She arrived in Aldebaran on Helock's sleigh. Talk to <NAVI>[Helock]<INFO>aldebaran,102,103,0,101,0</INFO></NAVI> again.
+  11799:
+    title: Saint of Purification
+    icon: ep
+    summary: Talk to Elise
+    description: Let's meet <NAVI>[Copy Officer Elise]<INFO>prontera,254,309,0,101,0</INFO></NAVI> in Prontera to get information about the saint.
+  11800:
+    title: Saint of Purification
+    icon: ep
+    summary: Finding a Saint
+    description: Follow Elise to <NAVI>[Saint's Residence]<INFO>prt_cas,20,32,0,101,0</INFO></NAVI>.
+  11801:
+    title: Saint of Purification
+    icon: ep
+    summary: Talk to the Saint
+    description: I found the <NAVI>[Saint]<INFO>prt_cas,18,32,0,101,0</INFO></NAVI> in the Royal Palace of Prontera. It looks like she's packing up for Issgard, so let's wait until Elise returns, where she goes to pick up the porter.
+  11802:
+    title: Saint of Purification
+    icon: ep
+    summary: Check the luggage
+    description: Although Elise returned to the Palace of Prontera with her porter, Freiderike's luggage was not organized at all and it seems to be too much. Let's check the <NAVI>[travel bag]<INFO>prt_cas,15,31,0,101,0</INFO></NAVI> to reduce luggage.
+  11803:
+    title: Saint of Purification
+    icon: ep
+    summary: Check the luggage
+    description: Inside the Prontera Palace, let's check out another <NAVI>[travel bag]<INFO>prt_cas,16,27,0,101,0</INFO></NAVI> in Freiderike's residence.
+  11804:
+    title: Saint of Purification
+    icon: ep
+    summary: Check the luggage
+    description: Inside the Prontera Palace, let's check out another <NAVI>[travel bag]<INFO>prt_cas,26,27,0,101,0</INFO></NAVI> in Freiderike's residence.
+  11805:
+    title: Saint of Purification
+    icon: ep
+    summary: Check the luggage
+    description: Inside the Prontera Palace, let's check out another <NAVI>[travel bag]<INFO>prt_cas,23,36,0,101,0</INFO></NAVI> in Freiderike's residence.
+  11806:
+    title: Saint of Purification
+    icon: ep
+    summary: Check the luggage
+    description: Inside the Prontera Palace, let's check out another <NAVI>[travel bag]<INFO>prt_cas,22,30,0,101,0</INFO></NAVI> in Freiderike's residence.
+  11807:
+    title: Saint of Purification
+    icon: ep
+    summary: Talk to Ellis
+    description: Packing has been completed. Talk to <NAVI>[Copy Officer Ellis]<INFO>prt_cas,21,31,0,101,0</INFO></NAVI> in Freiderike's residence inside the Prontera Palace.
+  11808:
+    title: Saint of Purification
+    icon: ep
+    summary: Talk to Helock
+    description: Ready to leave for Issgard. Meet <NAVI>[Helock]<INFO>aldebaran,102,103,0,101,0</INFO></NAVI> in Aldebaran and move to Issgard.
+  11809:
+    title: Saint of Purification
+    icon: ep
+    summary: To the Ice Castle
+    description: She arrived again in Issgard. Let her go to <NAVI>[Ice Castle]<INFO>icecastle,23,123,0,101,0</INFO></NAVI> with Freiderike.
+  11810:
+    title: Saint of Purification
+    icon: ep
+    summary: Talk to Freiderike
+    description: Let's go to <NAVI>[Freiderike]<INFO>icecastle,59,213,0,101,0</INFO></NAVI>'s room in the Ice Castle.
+  11811:
+    title: Saint of Purification
+    icon: ep
+    summary: Talk to Lehar
+    description: Voglinde visited the Ice Castle and Freiderike's room, and returned after confirming that Freiderike had arrived safely. The next task seems to be left to <NAVI>[Lehar]<INFO>icas_in,35,118,0,101,0</INFO></NAVI>, so let's talk.
+  11812:
+    title: Freiderike's Day
+    icon: ep
+    summary: Talk to Freiderike
+    description: <NAVI>[Freiderike]<INFO>icas_in,32,120,0,101,0</INFO></NAVI>, who stayed in Freiderike's room, in the Ice Castle, is said to have been tasked with purifying Rgan's magic core from Voglinde. Let's hear more.
+  11813:
+    title: Freiderike's Day
+    icon: dq
+    summary: Gather Rgan's Magic Core
+    description: In the Snake God's Warmth, kill 10 Primitive and Lowest Rgans each, collect 10 Rgan's Magic Cores, and return to <NAVI>[Freiderike]<INFO>icas_in,32,120,0,101,0</INFO></NAVI>.
+  11814:
+    title: Freiderike's Day
+    icon: dq
+    summary: Reset at 04:00
+    description: Helped with Freiderike's work. Let's try again tomorrow.
+    cooldown: true
+  11815:
+    title: Frozen Sea
+    icon: ep
+    summary: Talk to Tamarin
+    description: Tamarin, which was brought by Surr to Freiderike's room, in the Ice Castle, was healed by Freiderike's power. Let's hear the situation from <NAVI>[Tamarin]<INFO>icas_in,28,119,0,101,0</INFO></NAVI> who has woken up.
+  11816:
+    title: Frozen Sea
+    icon: ep
+    summary: Hunting Trap Investigation
+    description: Tamarin says he should investigate the pit he fell into. Before examining the pit, check the surrounding <NAVI>[Hunting Trap]<INFO>jor_back1,300,272,0,101,0</INFO></NAVI> on the Frozen Scale Hill to see if there are any strange things.
+  11817:
+    title: Frozen Sea
+    icon: ep
+    summary: Hunting Trap Investigation
+    description: There were no problems with the hunting trap. Investigate another <NAVI>[Hunting Trap]<INFO>jor_back2,346,203,0,101,0</INFO></NAVI> on the Frozen Scale Hill to see if there are any strange things.
+  11818:
+    title: Frozen Sea
+    icon: ep
+    summary: Hunting Trap Investigation
+    description: There were no problems with the hunting trap. Investigate <NAVI>[Hunting Trap]<INFO>jor_back2,260,294,0,101,0</INFO></NAVI> in Frozen Scale Plains near the pit.
+  11819:
+    title: Frozen Sea
+    icon: ep
+    summary: Talk to Surr
+    description: Traces of decay were found in the hunting trap. Report the hunting trap to <NAVI>[Surr]<INFO>jor_back2,255,312,0,101,0</INFO></NAVI> near the pit in the Frozen Scale Plains.
+  11820:
+    title: Frozen Sea
+    icon: ep
+    summary: Talk to Freiderike
+    description: It is said that the pit where Tamarin fell was so poisonous that it was impossible to enter even wearing a wetsuit. Return to <NAVI>[Freiderike]<INFO>icas_in,32,120,0,101,0</INFO></NAVI> in Freiderike's room in the Ice Castle and ask for help.
+  11821:
+    title: Frozen Sea
+    icon: ep
+    summary: Back to the Pit
+    description: I persuaded Freiderike. Go back to the <NAVI>[Pit]<INFO>jor_back2,258,314,0,101,0</INFO></NAVI> in the Frozen Scale Plains and purify the poison.
+  11822:
+    title: Frozen Sea
+    icon: ep
+    summary: 3x Frozen Meat
+    description: Cleaned the pit. In case of any danger, Surr, wearing a wet suit, said that he would investigate first. While Surr investigates the pit, to prevent monsters from approaching, kill 10 monsters around the Frozen Scale Plains, collect 3 Frozen Meat, and talk to <NAVI>[Surr]<INFO>jor_back2,255,312,0,101,0</INFO></NAVI> after completing the investigation.
+  11823:
+    title: Frozen Sea
+    icon: ep
+    summary: Go to the Pit
+    description: Surr of the Frozen Scale Plains tells the story of investigating the <NAVI>[Pit]<INFO>jor_back2,258,314,0,101,0</INFO></NAVI> and suggests that we go down together.
+  11824:
+    title: Frozen Sea
+    icon: ep
+    summary: Talk to Alf
+    description: We went down to the pit. Talk to <NAVI>[Alf]<INFO>jor_ab01,115,14,0,101,0</INFO></NAVI> who arrived first.
+  11825:
+    title: Frozen Sea
+    icon: ep
+    summary: Investigate suspicious traces
+    description: Kill 5 monsters around the 1st floor of the Abandoned Pit and investigate the following <NAVI>[suspicious traces]<INFO>jor_ab01,222,107,0,101,0</INFO></NAVI>.
+  11826:
+    title: Frozen Sea
+    icon: ep
+    summary: Investigate suspicious traces
+    description: Kill 5 monsters around the 1st floor of the Abandoned Pit and investigate the following <NAVI>[suspicious traces]<INFO>jor_ab01,104,270,0,101,0</INFO></NAVI>.
+  11827:
+    title: Frozen Sea
+    icon: ep
+    summary: Move to the next area
+    description: I found the passage leading to the second floor of the Abandoned Pit. Defeat 5 monsters on the 1st floor of the Abandoned Pit, gather 2 frozen meat, and then <NAVI>[move to the next area]<INFO>jor_ab01,16,235,0,101,0</INFO></NAVI>.
+  11828:
+    title: Frozen Sea
+    icon: ep
+    summary: Investigate the end of the pit
+    description: Moved to the second floor of the Abandoned Pit. Defeat 10 monsters on the 2nd floor of the Abandoned Pit, gather 2 Frozen Meats, and <NAVI>[check]<INFO>jor_ab02,28,253,0,101,0</INFO></NAVI> if there are any additional connections.
+  11829:
+    title: Frozen Sea
+    icon: ep
+    summary: Talk to Freiderike
+    description: Completed the investigation of the Abandoned Pit. Return to the Ice Castle and deliver the collected items to <NAVI>[Freiderike]<INFO>icas_in,32,120,0,101,0</INFO></NAVI>.
+  11830:
+    title: Abandoned Pit
+    icon: dq
+    summary: Talk to Surr
+    description: <NAVI>[Surr]<INFO>icas_in,27,116,0,101,0</INFO></NAVI> talks about the dangers of the Abandoned Pit and says that further investigation is likely.
+  11831:
+    title: Abandoned Pit
+    icon: dq
+    summary: 20 Frozen Meat
+    description: I was asked to kill ^e5555eabout 40^000000 monsters on the ^e5555e1st floor of the Abandoned Pit^000000 and bring ^e5555about 20 pieces of Frozen Meat^000000 by <NAVI>[Surr]<INFO>icas_in,27,116,0,101,0</INFO></NAVI>.
+  11832:
+    title: Abandoned Pit(1)
+    icon: dq
+    summary: Reset at 04:00
+    description: Helped Surr investigate the pit. Let's do our best again tomorrow!
+    cooldown: true
+  11833:
+    title: Abandoned Pit
+    icon: dq
+    summary: 20 Frozen Meat
+    description: I was asked to kill ^e5555eabout 40^000000 monsters on the ^e5555e2nd floor of the Abandoned Pit^000000 and bring ^e5555about 20 pieces of Frozen Meat^000000 by <NAVI>[Surr]<INFO>icas_in,27,116,0,101,0</INFO></NAVI>.
+  11834:
+    title: Abandoned Pit(2)
+    icon: dq
+    summary: Reset at 04:00
+    description: Helped Surr investigate the pit. Let's do our best again tomorrow!
+    cooldown: true
+  11835:
+    title: Dig and Dig
+    icon: dq
+    summary: Talk to Alf
+    description: It is said that Alf set out first to investigate the Abandoned Pit. Meet <NAVI>[Alf]<INFO>jor_ab01,115,14,0,101,0</INFO></NAVI> in the Abandoned pit and talk.
+  11836:
+    title: Dig and Dig
+    icon: dq
+    summary: Investigate the ominous trail
+    description: Alf asks you to investigate the ominous traces. When the investigation is over, report to <NAVI>[Surr]<INFO>icas_in,27,116,0,101,0</INFO></NAVI>.
+  11837:
+    title: Dig and Dig
+    icon: dq
+    summary: Investigate the ominous trail
+    description: Find and investigate the <NAVI>[ominous trace]<INFO>jor_ab01,163,253,0,101,0</INFO></NAVI> that Alf spoke of in the Abandoned Pit.
+  11838:
+    title: Dig and Dig
+    icon: dq
+    summary: Investigate the ominous trail
+    description: Find and investigate the <NAVI>[ominous trace]<INFO>jor_ab01,117,141,0,101,0</INFO></NAVI> that Alf spoke of in the Abandoned Pit.
+  11839:
+    title: Dig and Dig
+    icon: dq
+    summary: Investigate the ominous trail
+    description: Find and investigate the <NAVI>[ominous trace]<INFO>jor_ab01,222,125,0,101,0</INFO></NAVI> that Alf spoke of in the Abandoned Pit.
+  11840:
+    title: Dig and Dig
+    icon: dq
+    summary: Investigate the ominous trail
+    description: Find and investigate the <NAVI>[ominous trace]<INFO>jor_ab01,196,260,0,101,0</INFO></NAVI> that Alf spoke of in the Abandoned Pit.
+  11841:
+    title: Dig and Dig
+    icon: dq
+    summary: Investigate the ominous trail
+    description: Find and investigate the <NAVI>[ominous trace]<INFO>jor_ab01,112,62,0,101,0</INFO></NAVI> that Alf spoke of in the Abandoned Pit.
+  11842:
+    title: Dig and Dig
+    icon: dq
+    summary: Investigate the ominous trail
+    description: Find and investigate the <NAVI>[ominous trace]<INFO>jor_ab01,25,265,0,101,0</INFO></NAVI> that Alf spoke of in the Abandoned Pit.
+  11843:
+    title: Dig and Dig
+    icon: dq
+    summary: Investigate the ominous trail
+    description: Find and investigate the <NAVI>[ominous trace]<INFO>jor_ab02,151,272,0,101,0</INFO></NAVI> that Alf spoke of in the Abandoned Pit.
+  11844:
+    title: Dig and Dig
+    icon: dq
+    summary: Investigate the ominous trail
+    description: Find and investigate the <NAVI>[ominous trace]<INFO>jor_ab02,139,148,0,101,0</INFO></NAVI> that Alf spoke of in the Abandoned Pit.
+  11845:
+    title: Dig and Dig
+    icon: dq
+    summary: Investigate the ominous trail
+    description: Find and investigate the <NAVI>[ominous trace]<INFO>jor_ab02,182,83,0,101,0</INFO></NAVI> that Alf spoke of in the Abandoned Pit.
+  11846:
+    title: Dig and Dig
+    icon: dq
+    summary: Investigate the ominous trail
+    description: Find and investigate the <NAVI>[ominous trace]<INFO>jor_ab02,48,27,0,101,0</INFO></NAVI> that Alf spoke of in the Abandoned Pit.
+  11847:
+    title: Dig and Dig
+    icon: dq
+    summary: Investigate the ominous trail
+    description: Find and investigate the <NAVI>[ominous trace]<INFO>jor_ab02,208,48,0,101,0</INFO></NAVI> that Alf spoke of in the Abandoned Pit.
+  11848:
+    title: Dig and Dig
+    icon: dq
+    summary: Investigate the ominous trail
+    description: Find and investigate the <NAVI>[ominous trace]<INFO>jor_ab02,201,184,0,101,0</INFO></NAVI> that Alf spoke of in the Abandoned Pit.
+  11849:
+    title: Dig and Dig
+    icon: dq
+    summary: Talk to Surr
+    description: The ominous traces of the Abandoned Pit were investigated. Let's go back to <NAVI>[Surr]<INFO>icas_in,27,116,0,101,0</INFO></NAVI> and report the results of the investigation.
+  11850:
+    title: Dig and Dig
+    icon: dq
+    summary: Reset at 04:00
+    description: Helped Surr investigate the pit. Let's do our best again tomorrow!
+    cooldown: true
+  11851:
+    title: Do you need a refrigerator?
+    icon: dq
+    summary: Talk to Tamarin
+    description: <NAVI>[Tamarin]<INFO>icas_in,28,119,0,101,0</INFO></NAVI> in the Ice Castle seems to be worried about gathering food.
+  11852:
+    title: Do you need a refrigerator?
+    icon: dq
+    summary: 10x Frozen Meat
+    description: Let's help <NAVI>[Tamarin]<INFO>icas_in,28,119,0,101,0</INFO></NAVI> who is sick in the Ice Castle, hunt ^e5555e20 or more^000000 monsters in the ^e5555eFrozen Scale Plains^000000 and collect ^e555510 or more Frozen Meat^000000.
+  11853:
+    title: Do you need a refrigerator?
+    icon: dq
+    summary: Reset at 04:00
+    description: You helped Tamarin gather food for the Ice Castle. Come back tomorrow.
+    cooldown: true
+  11854:
+    title: Crispy Tools
+    icon: dq
+    summary: Check Frozen Trap
+    description: Tamarin of Ice Castle is worried that the hunting trap will be ruined in the cold weather. Check out <NAVI>[Frozen Trap]<INFO>jor_back2,367,36,0,101,0</INFO></NAVI>.
+  11855:
+    title: Crispy Tools
+    icon: dq
+    summary: Check Frozen Trap
+    description: Tamarin of Ice Castle is worried that the hunting trap will be ruined in the cold weather. Check out <NAVI>[Frozen Trap]<INFO>jor_back2,84,88,0,101,0</INFO></NAVI>.
+  11856:
+    title: Crispy Tools
+    icon: dq
+    summary: Check Frozen Trap
+    description: Tamarin of Ice Castle is worried that the hunting trap will be ruined in the cold weather. Check out <NAVI>[Frozen Trap]<INFO>jor_back2,158,320,0,101,0</INFO></NAVI>.
+  11857:
+    title: Crispy Tools
+    icon: dq
+    summary: Check Frozen Trap
+    description: Tamarin of Ice Castle is worried that the hunting trap will be ruined in the cold weather. Check out <NAVI>[Frozen Trap]<INFO>jor_back2,190,184,0,101,0</INFO></NAVI>.
+  11858:
+    title: Crispy Tools
+    icon: dq
+    summary: Talk to Tamarin
+    description: I checked the frozen trap. Let's go back to <NAVI>[Tamarin]<INFO>icas_in,28,119,0,101,0</INFO></NAVI>.
+  11859:
+    title: Crispy Tools
+    icon: dq
+    summary: Reset at 04:00
+    description: Helped Tamarin repair a hunting trap in the Ice Castle. Come back tomorrow.
+    cooldown: true
   12000:
     title: An old friend
     description: Find Maku's old friend and talk with him.
@@ -20781,6 +21455,14 @@ quests:
     title: "Scattered Goods (East)"
   12539:
     title: "Scattered Goods (South)"
+  12560:
+    title: Neutralization of Unfairness
+    summary: Reset at 04:00
+    description: We succeeded in neutralizing the aircraft to the point that it was impossible to operate for a while. If the Airship shows signs of moving again, it may need to re-penetrate.
+  12561:
+    title: Core Disabling
+    summary: Core Disabling
+    description: There is no measure of how much risk there is to completely blow up the aircraft. First, let's disable the core containing the logic that drives the aircraft.
   13000:
     title: RWC 2011Card Gathering
     description: Defeat the Gold Porings that are randomly around Rune Midgard and collect enough Blue Cards to spell out "RWC 2011"
@@ -26278,6 +26960,146 @@ quests:
     title: "The Price of Labor (1)"
   16585:
     title: "The Price of Labor (2)"
+  16636:
+    title: Finding Clues - Juncea's Lab
+    icon: ep
+    summary: Explore Juncea's Lab
+    description: While no one was there, let's go into the <NAVI>[Juncea's Lab]<INFO>jor_nest,51,152,0,101,0</INFO></NAVI> inside the Snake's Nest and explore.
+  16637:
+    title: Finding Clues - Bagot's Lab
+    icon: ep
+    summary: Explore Bagot's Lab
+    description: While no one was there, let's go into the <NAVI>[Bagot's Lab]<INFO>jor_nest,66,260,0,101,0</INFO></NAVI> in the Snake's nest while no one is there.
+  16638:
+    title: Finding Clues - Rgan Guard
+    icon: ep
+    summary: Explore around the Rgan Guards
+    description: Let's explore the surroundings of the <NAVI>[Rgan Guards]<INFO>jor_nest,177,176,0,101,0</INFO></NAVI> in the Snake's Nest while no one is there.
+  16639:
+    title: Juncea's Lab
+    icon: ep
+    summary: Explore the pile of papers
+    description: In the Snake's Nest, in Juncea's lab, search the <NAVI>[Pile of Papers]<INFO>jor_nest,19,142,0,101,0</INFO></NAVI>.
+  16640:
+    title: Juncea's Lab
+    icon: ep
+    summary: Explore the pile of papers
+    description: In the Snake's Nest, in Juncea's lab, search the <NAVI>[Pile of Papers]<INFO>jor_nest,21,195,0,101,0</INFO></NAVI>.
+  16641:
+    title: Bagot's Lab
+    icon: ep
+    summary: Explore the pile of papers
+    description: In the Snake's Nest, in <NAVI>[Bagot's Lab]<INFO>jor_nest,66,260,0,101,0</INFO></NAVI>, let's go through the piles of papers.
+  16642:
+    title: Bagot's Lab
+    icon: ep
+    summary: Explore the pile of papers
+    description: In the Snake's Nest, in <NAVI>[Bagot's Lab]<INFO>jor_nest,66,260,0,101,0</INFO></NAVI>, let's go through the piles of papers.
+  16643:
+    title: Rgan Guard
+    icon: ep
+    summary: Explore the pile of papers
+    description: Inside the Snake's Nest, there are documents that appear to be <NAVI>[books]<INFO>jor_nest,181,173,0,101,0</INFO></NAVI> around the Rgan Guards. Let's take a look.
+  16644:
+    title: Rgan Guard
+    icon: ep
+    summary: Listen to the Guard's Conversation
+    description: Let's sneak peek into the conversations of the <NAVI>[Rgan Guard]<INFO>jor_nest,173,177,0,101,0</INFO></NAVI> in the Snake's Nest.
+  16645:
+    title: Share the clues
+    icon: ep
+    summary: Talk to Reiji
+    description: I gathered some clues. Let's go back to <NAVI>[Reiji]<INFO>jor_nest,127,207,0,101,0</INFO></NAVI> who has been transformed into a Rgan in the Snake's Nest and share the clues and opinions we have gathered.
+  16646:
+    title: Whispering Silently
+    icon: ep
+    summary: Talk to Juncea
+    description: In the snake's nest, go to Juncea's lab and talk to <NAVI>[Juncea]<INFO>jor_nest,31,140,0,101,0</INFO></NAVI> to build intimacy.
+  16647:
+    title: Whispering Silently
+    icon: ep
+    summary: Talk to the adventurer
+    description: It seems that Juncea wants to eat something sweet. Let's go back to the <NAVI>[Ice Castle]<INFO>icas_in,245,197,0,101,0</INFO></NAVI> and find a place to get sweets.
+  16648:
+    title: Whispering Silently
+    icon: ep
+    summary: Talk to Juncea
+    description: Inside the snake's nest, go to Juncea's lab and deliver the ice candy to <NAVI>[Juncea]<INFO>jor_nest,31,140,0,101,0</INFO></NAVI>.
+  16649:
+    title: Whispering Silently
+    icon: ep
+    summary: Grant Juncea's request
+    description: Obtain 1 Ice Cookie from <NAVI>[Ice Castle]<INFO>icas_in,245,197,0,101,0</INFO></NAVI> or 10 <ITEM>[Rgan's Low Grade Magic Core]<INFO>1000707</INFO></ITEM> and bring them to <NAVI>[Juncea]<INFO>jor_nest,31,140,0,101,0</INFO></NAVI> waiting in the snake's nest.
+  16650:
+    title: Whispering Silently
+    icon: ep
+    summary: Grant Juncea's request again
+    description: Obtain 1 Ice Cookie from <NAVI>[Ice Castle]<INFO>icas_in,245,197,0,101,0</INFO></NAVI> or 10 <ITEM>[Rgan's Low Grade Magic Core]<INFO>1000707</INFO></ITEM> and bring them to <NAVI>[Juncea]<INFO>jor_nest,31,140,0,101,0</INFO></NAVI> waiting in the snake's nest.
+  16651:
+    title: Whispering Silently
+    icon: ep
+    summary: Talk to Juncea
+    description: In the Snake's Nest, in Juncea's lab, show <NAVI>[Juncea]<INFO>jor_nest,31,140,0,101,0</INFO></NAVI> the ledger you brought from the Rgan Guards.
+  16652:
+    title: Whispering Silently
+    icon: ep
+    summary: Talk to Juncea
+    description: Inside the Snake's Nest, Bagot appeared in Juncea's laboratory. Let's do it well so that we don't get caught trying to convince <NAVI>[Juncea]<INFO>jor_nest,31,140,0,101,0</INFO></NAVI>.
+  16653:
+    title: Accumulating Doubts
+    icon: ep
+    summary: Talk to Reiji
+    description: Return to the Ice Castle and exchange achievements with <NAVI>[Reiji]<INFO>icas_in,245,197,0,101,0</INFO></NAVI>.
+  16654:
+    title: Accumulating Doubts
+    icon: ep
+    summary: Talk to Miriam
+    description: Let's keep talking with Reiji and <NAVI>[Miriam]<INFO>icas_in,249,199,0,101,0</INFO></NAVI> at the Ice Castle.
+  16655:
+    title: Intermittent difference
+    icon: ep
+    summary: Visit Juncea's lab
+    description: I decided to get things done faster. In the Snake's Nest, go to <NAVI>[Juncea's Lab]<INFO>jor_nest,19,190,0,101,0</INFO></NAVI> and convince Juncea.
+  16656:
+    title: Intermittent difference
+    icon: ep
+    summary: Obtain the Juncea's Test Tube
+    description: Inside the Snake's Nest Juncea's lab, liquid is pouring around the unseen box. Let's find the <NAVI>[courage]<INFO>jor_nest,20,194,0,101,0</INFO></NAVI> to move on.
+  16657:
+    title: Intermittent difference
+    icon: ep
+    summary: Red Liquid Test Tube
+    description: Inside the Snake's Nest Juncea's laboratory, a small amount of liquid was transferred to an empty test tube around the <NAVI>[box]<INFO>jor_nest,19,190,0,101,0</INFO></NAVI>.
+  16658:
+    title: Intermittent difference
+    icon: ep
+    summary: Talk to the Rgan
+    description: While trying to sneak out from the snake's nest Juncea's laboratory, I was caught by a strange <NAVI>[Rgan]<INFO>jor_nest,24,185,0,101,0</INFO></NAVI>. It has something to say, so let's hear it.
+  16659:
+    title: Intermittent difference
+    icon: ep
+    summary: Talk to Juncea
+    description: It is said that Juncea is waiting in the <NAVI>[Bagot's Lab]<INFO>jor_nest,66,260,0,101,0</INFO></NAVI> in the Snake's Nest.
+  16660:
+    title: Intermittent difference
+    icon: ep
+    summary: Talk to Juncea
+    description: In the Snake's Nest, talk to Juncea in <NAVI>[Bagot's Lab]<INFO>jor_nest,66,260,0,101,0</INFO></NAVI>.
+  16661:
+    title: Intermittent difference
+    icon: ep
+    summary: Return to Town
+    description: Take Jung Kea, who has lost her mind by turning into a monster, and go back to the village and talk to <NAVI>[Horr]<INFO>icecastle,27,126,0,101,0</INFO></NAVI>.
+  16662:
+    title: Simulation Battle
+    icon: dq
+    summary: Talk to the adventurer
+    description: If you talk to <NAVI>[Aroon]<INFO>jor_nest,66,260,0,101,0</INFO></NAVI> waiting in front of the Snake's Nest, Bagot's lab, you can battle Juncea, a simulation created based on Juncea's virtual data.
+  16663:
+    title: '[Standby] Simulation Battle'
+    icon: dq
+    summary: Reset at 04:00
+    description: After defeating the Simulation Juncea, take a rest for the day or so. After getting enough rest, you can return to the Snake Nest's <NAVI>[Aroon]<INFO>jor_nest,66,260,0,101,0</INFO></NAVI> waiting in front of Bagot's lab to fight again.
   17000:
     title: Meet with Father Bamph
     icon: ep
@@ -26764,6 +27586,227 @@ quests:
   17527:
     title: "[Cooldown] Sanctuary Purification"
     icon: dq
+  17619:
+    title: Reiji's Plan
+    icon: ep
+    summary: Go to the home of Rgan
+    description: Decided to infiltrate Rgan's <NAVI>[base]<INFO>jor_back3,98,318,0,101,0</INFO></NAVI> using the Rgan Transformation Scroll. Don't forget to bring the Transformation Scroll.
+  17620:
+    title: Snake's Nest Infiltration
+    icon: ep
+    summary: Pretend to be a Baby Rgan
+    description: When you enter the Snake's <NAVI>[Nest]<INFO>jor_dun02,263,170,0,101,0</INFO></NAVI>, pretend to be a newly born Rgan.
+  17621:
+    title: Snake's Nest Infiltration
+    icon: ep
+    summary: Go to the upper level
+    description: You are not meant to be in a place like this. I'll take you to the <NAVI>[upper]<INFO>jor_nest,184,49,0,101,0</INFO></NAVI>nest. You should follow well.
+  17622:
+    title: Snake's Nest Infiltration
+    icon: ep
+    summary: Go to Advanced Egg Hatchery
+    description: On the way to receive blessing baptism from Rasgand, I will first show you the advanced <NAVI>[Egg Hatchery]<INFO>jor_nest,196,202,0,101,0</INFO></NAVI> in the nest.
+  17623:
+    title: Snake's Nest Infiltration
+    icon: ep
+    summary: Abode of an outsider
+    description: On the way you will pass an outsider's <NAVI>[residence]<INFO>jor_nest,115,187,0,101,0</INFO></NAVI> in the nest. I'll tell you where it is, so make sure you don't enter by mistake.
+  17624:
+    title: Snake's Nest Infiltration
+    icon: ep
+    summary: Rasgand's Abode
+    description: Now, I really have to go and receive a baptism of blessings from Rasgand. Let's go <NAVI>[higher]<INFO>jor_nest,53,244,0,101,0</INFO></NAVI> up  the nest.
+  17625:
+    title: Snake's Nest Infiltration
+    icon: ep
+    summary: Go to Juncea
+    description: If you have nowhere else to go, why don't you go to the Illusion lab in the nest? Get a health checkup from <NAVI>[Juncea]<INFO>jor_nest,22,141,0,101,0</INFO></NAVI>.
+  17626:
+    title: Snake's Nest Infiltration
+    icon: ep
+    summary: Talk to Juncea
+    description: Did you rest? So, now let's do our thing. Are you unfamiliar with the Snake's Nest? Come a little closer to <NAVI>[me]<INFO>jor_nest,22,141,0,101,0</INFO></NAVI> for a checkup.
+  17627:
+    title: Snake's Nest Infiltration
+    icon: ep
+    summary: Go to where I was born
+    description: You can use the <NAVI>[Egg]<INFO>jor_dun02,263,170,0,101,0</INFO></NAVI> you came out of. Bring me the eggshell of a high-ranking Rgan. I'll have to study that egg and the magic remaining in it. You said you were born from the Snake God's Warmth, right?
+  17628:
+    title: Snake's Nest Infiltration
+    icon: ep
+    summary: Go to Advanced Egg Hatchery
+    description: It seems that the higher grade eggs are classified separately. Go to <NAVI>[Snake's Nest]<INFO>jor_nest,23,58,0,101,0</INFO></NAVI>.
+  17629:
+    title: Snake's Nest Infiltration
+    icon: ep
+    summary: Talk to Juncea
+    description: You have safely obtained the Eggshell of Senior Rgan. Return to <NAVI>[Juncea]<INFO>jor_nest,22,141,0,101,0</INFO></NAVI> in the Snake's Nest and show her the eggshell.
+  17630:
+    title: Snake's Nest Infiltration
+    icon: ep
+    summary: Talk to Bagot
+    description: Bagot appeared in dwelling place in the Snake's Nest. Let's hear the purpose of <NAVI>[Bagot]<INFO>jor_nest,26,142,0,101,0</INFO></NAVI>.
+  17631:
+    title: Snake's Nest Infiltration
+    icon: ep
+    summary: Talk to Juncea
+    description: <NAVI>[Juncea]<INFO>jor_nest,22,141,0,101,0</INFO></NAVI> is very angry at Bagot's unilateral notification who appeared in the Snake's Nest. For what?
+  17632:
+    title: Infiltration Interim Report
+    icon: ep
+    summary: Go outside
+    description: Nothing more to hear from Juncea. For now, I'll go <NAVI>[outside]<INFO>jor_nest,87,164,0,101,0</INFO></NAVI> the Snake's Nest and talk with Reiji.
+  17633:
+    title: Infiltration Interim Report
+    icon: ep
+    summary: Check the Airship
+    description: For now, let's go check the <NAVI>[Airship]<INFO>jor_nest,24,252,0,101,0</INFO></NAVI>, which is inside the Snake's Nest. I need to figure out the number of guards and their location.
+  17634:
+    title: Infiltration Interim Report
+    icon: ep
+    summary: Rescuing a group of people in a lower area
+    description: Now that we know the location of the airship, let's go back and come up with a countermeasure. Now, should we go to the <NAVI>[Snake God's Warmth]<INFO>jor_dun02,153,239,0,101,0</INFO></NAVI> and save the party?
+  17635:
+    title: Infiltration Interim Report
+    icon: ep
+    summary: Go inside
+    description: Didn't you say that you would take the <NAVI>[priests]<INFO>jor_dun02,150,269,0,101,0</INFO></NAVI> who were in labor were taken from the Snake God's Warmth? Come on, take me.
+  17636:
+    title: Infiltration Interim Report
+    icon: ep
+    summary: Go to the Ice Castle
+    description: I have a lot to do. Let's hurry back to the <NAVI>[Ice Castle]<INFO>icas_in,34,189,0,101,0</INFO></NAVI> and come up with a countermeasure.
+  17637:
+    title: Aircraft Destruction Operation
+    icon: ep
+    summary: Go to the Airship
+    description: They have to neutralize the <NAVI>[Airship]<INFO>jor_nest,22,254,0,101,0</INFO></NAVI> in the Snake's Nest to get them tied up. I'll have to take a closer look.
+  17638:
+    title: Vulnerability Investigation
+    icon: ep
+    summary: Go back to the Snake's Nest
+    description: Let's go back to <NAVI>[Snake's Nest]<INFO>jor_nest,127,207,0,101,0</INFO></NAVI> and examine the vulnerability in more detail.
+  17639:
+    title: Accompany Reconnaissance Report
+    icon: ep
+    summary: Go to the Ice Castle Restaurant
+    description: I am also on my way to the Ice Castle, so I will accompany you. I'm done eating by now, so I'll be at the <NAVI>[restaurant]<INFO>icas_in,34,189,0,101,0</INFO></NAVI>.
+  17640:
+    title: Confused Snake's Nest
+    icon: ep
+    summary: Go to Horr's House
+    description: What is the Rgan you are carrying? My <NAVI>[house]<INFO>icas_in,247,116,0,101,0</INFO></NAVI> in the Ice Castle is close here, so let's go there.
+  17641:
+    title: Confused Snake's Nest
+    icon: ep
+    summary: 20x Rgan's Low-Grade Magic Core
+    description: I will make an antidote, so come to the <NAVI>[Ice Castle]<INFO>icas_in,247,116,0,101,0</INFO></NAVI> with only 20 Rgan's Low-Grade Magic Core.
+  17642:
+    title: Confused Snake's Nest
+    icon: ep
+    summary: Persuade Juncea
+    description: <NAVI>[Juncea]<INFO>icas_in,243,117,0,101,0</INFO></NAVI> wakes up in the Ice Castle, in the house of Horr, and seems to be worried. If this is the case, I think I'm almost convinced.
+  17643:
+    title: Confused Snake's Nest
+    icon: ep
+    summary: Talk to Aurelie
+    description: <NAVI>[Aurelie]<INFO>icas_in,249,113,0,101,0</INFO></NAVI> appeared at Horr's house in the Ice Castle to deliver the news himself. Could it be something big?
+  17644:
+    title: Confused Snake's Nest
+    icon: ep
+    summary: Go to the Snake's Nest
+    description: There was a report from the reconnaissance team that the movements of the Rgans were suspicious. I think it's the right time for us to move. You'd better go to the <NAVI>[Snake's Nest]<INFO>jor_que,271,88,0,101,0</INFO></NAVI>.
+  17645:
+    title: Confused Snake's Nest
+    icon: ep
+    summary: Investigate the Snake's Nest
+    description: Divide the staff and figure out the <NAVI>[Snake God's Warmth]<INFO>jor_que,144,253,0,101,0</INFO></NAVI> side. Because there might be some remaining high-ranking Rgans.
+  17646:
+    title: Confused Snake's Nest
+    icon: ep
+    summary: Someone who knows the situation
+    description: There are only traces of rapid movement here. Wouldn't there be someone who <NAVI>[who]<INFO>jor_que,131,148,0,101,0</INFO></NAVI> the situation somewhere in the Snake God's Warmth?
+  17647:
+    title: Confused Snake's Nest
+    icon: ep
+    summary: Go to the upper level
+    description: Nobles.. all of you... Gather... Not us... Upper <NAVI>[Nest]<INFO>jor_que,32,37,0,101,0</INFO></NAVI>... So come on... Honorables too.
+  17648:
+    title: Confused Snake's Nest
+    icon: ep
+    summary: Enter the Snake's Nest
+    description: You mean you have to break through the wall blocking the <NAVI>[entrance]<INFO>jor_que,32,37,0,101,0</INFO></NAVI> of the nest and defeat Rgan on the other side to meet Rasgand?
+  17649:
+    title: Those who have disappeared
+    icon: ep
+    summary: Go to the Ice Castle
+    description: This door can't be opened no matter how hard you try, so the only thing you can do is set up a watcher and watch. Let's go back to the <NAVI>[Ice Castle]<INFO>icas_in,34,189,0,101,0</INFO></NAVI> for now.
+  17650:
+    title: Find a hiding place on the ground
+    icon: dq
+    summary: Go outside
+    description: Thank you for your willingness to help. Instead of wasting time here, let's go out <NAVI>[outside]<INFO>icecastle,27,126,0,101,0</INFO></NAVI> the Ice Castle and discuss the search method.
+  17651:
+    title: Find a hiding place on the ground
+    icon: dq
+    summary: Bury antennae at the marked place
+    description: Bury this super-powerful antennae in a <NAVI>[place]<INFO>jor_back2,222,123,0,101,0</INFO></NAVI> where Rgans might appear in the Frozen Scale Plains. It's already marked, so it should be easy to find.
+  17652:
+    title: Find a hiding place on the ground
+    icon: dq
+    summary: Bury antennae at the marked place
+    description: Bury this super-powerful antennae in a <NAVI>[place]<INFO>jor_back2,49,175,0,101,0</INFO></NAVI> where Rgans might appear in the Frozen Scale Plains. It's already marked, so it should be easy to find.
+  17653:
+    title: Find a hiding place on the ground
+    icon: dq
+    summary: Bury antennae at the marked place
+    description: Bury this super-powerful antennae in a <NAVI>[place]<INFO>jor_back2,309,99,0,101,0</INFO></NAVI> where Rgans might appear in the Frozen Scale Plains. It's already marked, so it should be easy to find.
+  17654:
+    title: Find a hiding place on the ground
+    icon: dq
+    summary: Bury antennae at the marked place
+    description: Bury this super-powerful antennae in a <NAVI>[place]<INFO>jor_back2,113,235,0,101,0</INFO></NAVI> where Rgans might appear in the Frozen Scale Plains. It's already marked, so it should be easy to find.
+  17655:
+    title: Find a hiding place on the ground
+    icon: dq
+    summary: Bury antennae at the marked place
+    description: Bury this super-powerful antennae in a <NAVI>[place]<INFO>jor_back2,279,307,0,101,0</INFO></NAVI> where Rgans might appear in the Frozen Scale Plains. It's already marked, so it should be easy to find.
+  17656:
+    title: Find a hiding place on the ground
+    icon: dq
+    summary: Bury antennae at the marked place
+    description: Bury this super-powerful antennae in a <NAVI>[place]<INFO>jor_back3,152,359,0,101,0</INFO></NAVI> where Rgans might appear in the Frozen Scale Glacier. It's already marked, so it should be easy to find.
+  17657:
+    title: Find a hiding place on the ground
+    icon: dq
+    summary: Bury antennae at the marked place
+    description: Bury this super-powerful antennae in a <NAVI>[place]<INFO>jor_back3,328,277,0,101,0</INFO></NAVI> where Rgans might appear in the Frozen Scale Glacier. It's already marked, so it should be easy to find.
+  17658:
+    title: Find a hiding place on the ground
+    icon: dq
+    summary: Bury antennae at the marked place
+    description: Bury this super-powerful antennae in a <NAVI>[place]<INFO>jor_back3,128,138,0,101,0</INFO></NAVI> where Rgans might appear in the Frozen Scale Glacier. It's already marked, so it should be easy to find.
+  17659:
+    title: Find a hiding place on the ground
+    icon: dq
+    summary: Bury antennae at the marked place
+    description: Bury this super-powerful antennae in a <NAVI>[place]<INFO>jor_back3,264,133,0,101,0</INFO></NAVI> where Rgans might appear in the Frozen Scale Glacier. It's already marked, so it should be easy to find.
+  17660:
+    title: Find a hiding place on the ground
+    icon: dq
+    summary: Bury antennae at the marked place
+    description: Bury this super-powerful antennae in a <NAVI>[place]<INFO>jor_back3,46,324,0,101,0</INFO></NAVI> where Rgans might appear in the Frozen Scale Glacier. It's already marked, so it should be easy to find.
+  17661:
+    title: Find a hiding place on the ground
+    icon: dq
+    summary: Report to Horr
+    description: Buried all the super strong antennas in the designated places. Let's report back to Mr. <NAVI>[Horr]<INFO>icecastle,27,126,0,101,0</INFO></NAVI> in the Ice Castle.
+  17662:
+    title: '[Standby] Find a hiding place on the ground'
+    icon: dq
+    summary: Reset at 04:00
+    description: After dawn, the battery will be discharged, so you can come back here to the Ice Castle and replace it. Just rest for today. - <NAVI>[Horr]<INFO>icecastle,27,126,0,101,0</INFO></NAVI>
+    cooldown: true
   18000:
     title: "Ready to enter"
     icon: lq
@@ -27129,6 +28172,141 @@ quests:
     title: Shafka
     summary: 20 Nine Tails, 10 Yarn, 10 Soft Silk, 20 Sea-otter Fur, 1 Spool
     description: If you want a Shafka hat, bring the materials that Irina has asked for, so she can make you one!
+  18122:
+    title: Guardian's Box and Invitation 2
+    icon: ep
+    summary: Go to to Varmundt's Mansion
+    description: I got the invitation. Return to the <NAVI>[Varmundt's Mansion]<INFO>ba_maison,186,251,0,101,0</INFO></NAVI> and join the party.
+  18123:
+    title: Guardian's Box and Invitation 3
+    icon: ep
+    summary: Talk to Ginger
+    description: Upon arriving at the Varmundt's Mansion, it is said that you can depart from the <NAVI>[Aircraft Station]<INFO>ba_in01,30,264,0,101,0</INFO></NAVI> at any time. Board the aircraft and deliver the invitation to Ginger.
+  18124:
+    title: Guardian's Box and Invitation 5
+    icon: ep
+    summary: Talk to Lehar
+    description: We boarded the aircraft and laded safely in Issgard duo the protection of the invitation. Get off the plane, look around, and receive the guidance of <NAVI>[Lehar]<INFO>jor_tail,221,53,0,101,0</INFO></NAVI>.
+  18125:
+    title: Into the Ice
+    icon: ep
+    summary: Talk to Lehar
+    description: Under Lehar's guidance, we decided to move to a place called Ice Castle. When you arrive at the Ice Castle, you must be introduced to the Guardian through <NAVI>[Lehar]<INFO>icas_in,141,216,0,101,0</INFO></NAVI>.
+  18126:
+    title: Encounter in the Ice Castle
+    icon: ep
+    summary: Talk to Leon
+    description: In the Ice Castle of Issgard, the guardians Leon and Orelli, along with the Irwins, were monitoring the seal. Let's keep talking with <NAVI>[Leon]<INFO>icas_in,138,220,0,101,0</INFO></NAVI>.
+  18127:
+    title: Meet the Irwin Scouts.
+    icon: ep
+    summary: Talk with the Irwin Scouts
+    description: Leon advised that it would be helpful to meet with the Irwin Scouts, who regularly scout the Issgard area. Meet the <NAVI>[Patrol Leader]<INFO>icecastle,23,115,0,101,0</INFO></NAVI> at the entrance of the Ice Castle.
+  18128:
+    title: Let's meet Voglinde.
+    icon: ep
+    summary: Talk to Voglinde
+    description: Voglinde seems to have a question. Let's meet <NAVI>[Voglinde]<INFO>icas_in,162,224,0,101,0</INFO></NAVI> who will be waiting in the Ice Castle.
+  18129:
+    title: Guardian's Box and Invitation 4
+    icon: ep
+    summary: Talk with our colleagues
+    description: Let's chat with our colleagues on the Airship, until we arrive.
+  18130:
+    title: Procurement of research materials for Vellgunde
+    icon: dq
+    summary: 3 Purified Magic Cores
+    description: Vellgunde, who is researching J?mungandr's curse in the Ice Castle, needs a large amount of Purified Magic Cores as a material. You must purify the Rgan's Low-Grade Magic Cores obtained by killing Rgan through Friederike and then bring it to Vellgunde.
+  18131:
+    title: '[Standby] Procurement of research materials for Vellgunde'
+    icon: dq
+    summary: Reset at 04:00
+    description: This quest is a daily quest, and you can receive it again when the waiting time expires. You can receive the quest orders through  <NAVI>[Vellgunde]<INFO>icas_in,185,63,0,101,0</INFO></NAVI> in the Ice Castle.
+    cooldown: true
+  18132:
+    title: I need someone.
+    icon: ep
+    summary: Talk to Leon
+    description: Lehar, whom he met in the lobby of the Ice Castle, tells him that Leon is looking for someone to help him urgently. Let's meet <NAVI>[Leon]<INFO>icas_in,42,252,0,101,0</INFO></NAVI> and listen to the story.
+  18133:
+    title: Leon's Story
+    icon: ep
+    summary: Talk to Miriam
+    description: Discuss with <NAVI>[Miriam]<INFO>icas_in,48,252,0,101,0</INFO></NAVI> how to rescue the survivors who are wandering through the harsh ice plains of Issgard.
+  18134:
+    title: Search for the Lost - Frozen Glacier
+    icon: dq
+    summary: Find a Survivor
+    description: It was decided to divide the region with Miriam to find and rescue the abducted continental people in Issgard. Find the survivors in the Frozen Scale Glacier.
+  18135:
+    title: Search for the Lost - Frozen Plains
+    icon: dq
+    summary: Find a Survivor
+    description: It was decided to divide the region with Miriam to find and rescue the abducted continental people in Issgard. Find the survivors in the Frozen Scale Plains.
+  18136:
+    title: Rescue of survivors completed
+    icon: dq
+    summary: Talk to Maram
+    description: I found the people of the continent of Midgarts who had been abducted in Issgard and were wandering around. Return to the Ice Castle and hand them over to <NAVI>[Maram]<INFO>icas_in,262,179,0,101,0</INFO></NAVI>.
+  18137:
+    title: '[Standby] Search for the Lost'
+    icon: dq
+    summary: Reset at 04:00
+    description: Finding the abducted continental people in Issgard took a break and decided to continue. After the promised time has passed, go to <NAVI>[Miriam]<INFO>icas_in,48,252,0,101,0</INFO></NAVI> and divide the area to search.
+    cooldown: true
+  18138:
+    title: Special Way to Survive
+    icon: ep
+    summary: 10x Rgan's Low-Grade Magic Core
+    description: <NAVI>[Mimirgand]<INFO>jor_nest,34,79,0,101,0</INFO></NAVI>, whom we met at the Snake's Nest, asks us to retrieve the magical cores from the sin of not receiving grace. Sin seems to refer to the Primitive Rgan and the Lowest Rgan. Let's get rid of the sins and recover 10x Low-Grade Magic Cores of Rgans.
+  18139:
+    title: Our Precious Food
+    icon: dq
+    summary: 10x Rgan's Low-Grade Magic Core
+    description: <NAVI>[Mimirgand]<INFO>jor_nest,34,79,0,101,0</INFO></NAVI>, whom we met at the Snake's Nest, still wants to recover the magic of the evil ones. Sin seems to refer to the Primitive Rgan and the Lowest Rgan. Let's get rid of the sins and recover 30x Low-Grade Magic Cores of Rgans.
+  18140:
+    title: '[Standby] Our Precious Food'
+    icon: dq
+    summary: Reset at 04:00
+    description: In Issgard's Snake's Nest, magic cores are like food, so it seems like they need to be retrieved every day. If you have faith, help <NAVI>[Mimirgand]<INFO>jor_nest,34,79,0,101,0</INFO></NAVI> after some time has passed.
+    cooldown: true
+  18141:
+    title: Elegant Hobbies
+    icon: dq
+    summary: After collecting materials, talk to Berbergand.
+    description: <NAVI>[Berbergand]<INFO>jor_nest,37,75,0,101,0</INFO></NAVI>, who makes jewelry as a hobby in Snake's Nest, asked to gather materials. The materials are as follows. Calapy, Fluorescent Liquid, Bait Bell Flower and 10 Tough Thin Shell each. It can be obtained from monsters in the Frozen Scale Plains.
+  18142:
+    title: '[Standby] Elegant Hobbies'
+    icon: dq
+    summary: Reset at 04:00
+    description: This quest is a daily quest, and you can receive it again when the waiting time expires. You can receive quest orders through <NAVI>[Berbergand]<INFO>jor_nest,37,75,0,101,0</INFO></NAVI> in the Snake's Nest.
+    cooldown: true
+  18143:
+    title: For Safe Work
+    icon: dq
+    summary: Defeat glacier monsters
+    description: <NAVI>[Hanader Saragand]<INFO>jor_nest,257,26,0,101,0</INFO></NAVI>, who is in charge of collecting ice in the Snake's Nest, said that it is difficult to collect ice because external creatures threaten it. Defeat Limacina and Calmaring floating on the glacier.
+  18144:
+    title: '[Standby] For Safe Work'
+    icon: dq
+    summary: Reset at 04:00
+    description: This quest is a daily quest, and you can receive it again when the waiting time expires. You can receive quest orders through <NAVI>[Hanader Saragand]<INFO>jor_nest,257,26,0,101,0</INFO></NAVI> in the Snake's Nest.
+    cooldown: true
+  18145:
+    title: Guest from the North Wind 1
+    icon: ep
+    summary: Go to to Varmundt's Mansion
+    description: Hearing that some information about the northern land seems to have been gathered, Maram and Miriam decided to go to the Varmundt's Mansion. Let's talk about the future schedule with <NAVI>[Ellie]<INFO>ba_in01,384,114,0,101,0</INFO></NAVI> who will be waiting in the drawing room of the Varmundt's Mansion.
+  18146:
+    title: Guest from the North Wind 2
+    icon: ep
+    summary: Go to the Prontera Palace
+    description: I decided to get information about Issgard from the Prontera Palace. Let's go to Prontera Royal Palace under the guidance of <NAVI>[Crookes]<INFO>ba_in01,386,110,0,101,0</INFO></NAVI> at the Varmundt's Mansion.
+  18147:
+    title: Guardian's Box and Invitation 1
+    icon: ep
+    summary: Talk to Nyhill in his room
+    description: Lehar says you need to get permission to visit from the Guardians of Issgard through the Guardian's Box. At the Royal Palace of Prontera, I decided to use the Guardian's Box stored in <NAVI>[Nyhill]<INFO>prt_cas,331,343,0,101,0</INFO></NAVI>'s room to receive an invitation.
   19101:
     title: The Eye of Hellion
     summary: Clanux Heffron
