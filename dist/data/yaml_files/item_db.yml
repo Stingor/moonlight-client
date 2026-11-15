@@ -132229,6 +132229,2684 @@ Body:
          bonus bReduceDamageReturn,5;
       else
          bonus bReduceDamageReturn,3;
+  - Id: 310478
+    AegisName: Wolf_Orb_Str_1
+    Name: Wolf Orb (Str) Level 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bStr,1;
+      if (.@r>=7) {
+         bonus bStr,1;
+         if (.@r>=9) {
+            bonus bStr,1;
+            if (getallrefine() >= 22) {
+               bonus bStr,1;
+            }
+         }
+      }
+  - Id: 310479
+    AegisName: Wolf_Orb_Dex_1
+    Name: Wolf Orb (Dex) Level 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bDex,1;
+      if (.@r>=7) {
+         bonus bDex,1;
+         if (.@r>=9) {
+            bonus bDex,1;
+            if (getallrefine() >= 22) {
+               bonus bDex,1;
+            }
+         }
+      }
+  - Id: 310480
+    AegisName: Wolf_Orb_Agi_1
+    Name: Wolf Orb (Agi) Level 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bAgi,1;
+      if (.@r>=7) {
+         bonus bAgi,1;
+         if (.@r>=9) {
+            bonus bAgi,1;
+            if (getallrefine() >= 22) {
+               bonus bAgi,1;
+            }
+         }
+      }
+  - Id: 310481
+    AegisName: Wolf_Orb_Int_1
+    Name: Wolf Orb (Int) Level 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bInt,1;
+      if (.@r>=7) {
+         bonus bInt,1;
+         if (.@r>=9) {
+            bonus bInt,1;
+            if (getallrefine() >= 22) {
+               bonus bInt,1;
+            }
+         }
+      }
+  - Id: 310482
+    AegisName: Wolf_Orb_Vit_1
+    Name: Wolf Orb (Vit) Level 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bVit,1;
+      if (.@r>=7) {
+         bonus bVit,1;
+         if (.@r>=9) {
+            bonus bVit,1;
+            if (getallrefine() >= 22) {
+               bonus bVit,1;
+            }
+         }
+      }
+  - Id: 310483
+    AegisName: Wolf_Orb_luk_1
+    Name: Wolf Orb (Luk) Level 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bLuk,1;
+      if (.@r>=7) {
+         bonus bLuk,1;
+         if (.@r>=9) {
+            bonus bLuk,1;
+            if (getallrefine() >= 22) {
+               bonus bLuk,1;
+            }
+         }
+      }
+  - Id: 310484
+    AegisName: Wolf_Orb_Str_2
+    Name: Wolf Orb (Str) Level 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bStr,2;
+      if (.@r>=7) {
+         bonus bStr,1;
+         if (.@r>=9) {
+            bonus bStr,1;
+            if (getallrefine() >= 22) {
+               bonus bShortAtkRate,1;
+               bonus bStr,2;
+            }
+         }
+      }
+  - Id: 310485
+    AegisName: Wolf_Orb_Dex_2
+    Name: Wolf Orb (Dex) Level 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bDex,2;
+      if (.@r>=7) {
+         bonus bDex,1;
+         if (.@r>=9) {
+            bonus bDex,1;
+            if (getallrefine() >= 22) {
+               bonus bLongAtkRate,1;
+               bonus bDex,2;
+            }
+         }
+      }
+  - Id: 310486
+    AegisName: Wolf_Orb_Agi_2
+    Name: Wolf Orb (Agi) Level 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bAgi,2;
+      if (.@r>=7) {
+         bonus bAgi,1;
+         if (.@r>=9) {
+            bonus bAgi,1;
+            if (getallrefine() >= 22) {
+               bonus bPerfectHitAddRate,1;
+               bonus bAgi,2;
+            }
+         }
+      }
+  - Id: 310487
+    AegisName: Wolf_Orb_Int_2
+    Name: Wolf Orb (Int) Level 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bInt,2;
+      if (.@r>=7) {
+         bonus bInt,1;
+         if (.@r>=9) {
+            bonus bInt,1;
+            if (getallrefine() >= 22) {
+               bonus2 bMagicAtkEle,Ele_All,1;
+               bonus bInt,2;
+            }
+         }
+      }
+  - Id: 310488
+    AegisName: Wolf_Orb_Vit_2
+    Name: Wolf Orb (Vit) Level 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bVit,2;
+      if (.@r>=7) {
+         bonus bVit,1;
+         if (.@r>=9) {
+            bonus bVit,1;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-1;
+               bonus bVit,2;
+            }
+         }
+      }
+  - Id: 310489
+    AegisName: Wolf_Orb_luk_2
+    Name: Wolf Orb (Luk) Level 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bLuk,2;
+      if (.@r>=7) {
+         bonus bLuk,1;
+         if (.@r>=9) {
+            bonus bLuk,1;
+            if (getallrefine() >= 22) {
+               bonus bCritAtkRate,1;
+               bonus bLuk,2;
+            }
+         }
+      }
+  - Id: 310490
+    AegisName: Wolf_Orb_Str_3
+    Name: Wolf Orb (Str) Level 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bStr,3;
+      if (.@r>=7) {
+         bonus bStr,1;
+         if (.@r>=9) {
+            bonus bStr,1;
+            if (getallrefine() >= 22) {
+               bonus bShortAtkRate,3;
+               bonus bStr,2;
+            }
+         }
+      }
+  - Id: 310491
+    AegisName: Wolf_Orb_Dex_3
+    Name: Wolf Orb (Dex) Level 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bDex,3;
+      if (.@r>=7) {
+         bonus bDex,1;
+         if (.@r>=9) {
+            bonus bDex,1;
+            if (getallrefine() >= 22) {
+               bonus bLongAtkRate,3;
+               bonus bDex,2;
+            }
+         }
+      }
+  - Id: 310492
+    AegisName: Wolf_Orb_Agi_3
+    Name: Wolf Orb (Agi) Level 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bAgi,3;
+      if (.@r>=7) {
+         bonus bAgi,1;
+         if (.@r>=9) {
+            bonus bAgi,1;
+            if (getallrefine() >= 22) {
+               bonus bPerfectHitAddRate,3;
+               bonus bAgi,2;
+            }
+         }
+      }
+  - Id: 310493
+    AegisName: Wolf_Orb_Int_3
+    Name: Wolf Orb (Int) Level 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bInt,3;
+      if (.@r>=7) {
+         bonus bInt,1;
+         if (.@r>=9) {
+            bonus bInt,1;
+            if (getallrefine() >= 22) {
+               bonus2 bMagicAtkEle,Ele_All,3;
+               bonus bInt,2;
+            }
+         }
+      }
+  - Id: 310494
+    AegisName: Wolf_Orb_Vit_3
+    Name: Wolf Orb (Vit) Level 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bVit,3;
+      if (.@r>=7) {
+         bonus bVit,1;
+         if (.@r>=9) {
+            bonus bVit,1;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-3;
+               bonus bVit,2;
+            }
+         }
+      }
+  - Id: 310495
+    AegisName: Wolf_Orb_luk_3
+    Name: Wolf Orb (Luk) Level 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bLuk,3;
+      if (.@r>=7) {
+         bonus bLuk,1;
+         if (.@r>=9) {
+            bonus bLuk,1;
+            if (getallrefine() >= 22) {
+               bonus bCritAtkRate,3;
+               bonus bLuk,2;
+            }
+         }
+      }
+  - Id: 310496
+    AegisName: Wolf_Orb_Def_1
+    Name: Wolf Orb (Physical Defense) Level 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bDef,3;
+      if (.@r>=7) {
+         bonus bDef,1;
+         if (.@r>=9) {
+            bonus bDef,1;
+            if (getallrefine() >= 22) {
+               bonus bDef,1;
+            }
+         }
+      }
+  - Id: 310497
+    AegisName: Wolf_Orb_Mdef_1
+    Name: Wolf Orb (Magical Defense) Level 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMdef,3;
+      if (.@r>=7) {
+         bonus bMdef,1;
+         if (.@r>=9) {
+            bonus bMdef,1;
+            if (getallrefine() >= 22) {
+               bonus bMdef,1;
+            }
+         }
+      }
+  - Id: 310498
+    AegisName: Wolf_Orb_Def_2
+    Name: Wolf Orb (Physical Defense) Level 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bDef,4;
+      if (.@r>=7) {
+         bonus bDef,1;
+         if (.@r>=9) {
+            bonus bDef,1;
+            if (getallrefine() >= 22) {
+               bonus bDef,2;
+            }
+         }
+      }
+  - Id: 310499
+    AegisName: Wolf_Orb_Mdef_2
+    Name: Wolf Orb (Magical Defense) Level 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMdef,4;
+      if (.@r>=7) {
+         bonus bMdef,1;
+         if (.@r>=9) {
+            bonus bMdef,1;
+            if (getallrefine() >= 22) {
+               bonus bMdef,2;
+            }
+         }
+      }
+  - Id: 310500
+    AegisName: Wolf_Orb_Def_3
+    Name: Wolf Orb (Physical Defense) Level 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bDef,5;
+      if (.@r>=7) {
+         bonus bDef,1;
+         if (.@r>=9) {
+            bonus bDef,2;
+            if (getallrefine() >= 22) {
+               bonus bDef,2;
+            }
+         }
+      }
+  - Id: 310501
+    AegisName: Wolf_Orb_Mdef_3
+    Name: Wolf Orb (Magical Defense) Level 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMdef,5;
+      if (.@r>=7) {
+         bonus bMdef,1;
+         if (.@r>=9) {
+            bonus bMdef,2;
+            if (getallrefine() >= 22) {
+               bonus bMdef,2;
+            }
+         }
+      }
+  - Id: 310502
+    AegisName: Wolf_Orb_Ran_1
+    Name: Wolf Orb (Shooter) Level 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bLongAtkRate,3;
+      if (.@r>=7) {
+         bonus bLongAtkRate,3;
+         if (.@r>=9) {
+            bonus bLongAtkRate,3;
+            if (getallrefine() >= 22) {
+               bonus bLongAtkRate,3;
+            }
+         }
+      }
+  - Id: 310503
+    AegisName: Wolf_Orb_War_1
+    Name: Wolf Orb (Warrior) Level 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,2;
+      bonus bBaseAtk,25;
+      if (.@r>=7) {
+         bonus bShortAtkRate,3;
+         if (.@r>=9) {
+            bonus bShortAtkRate,3;
+            if (getallrefine() >= 22) {
+               bonus bShortAtkRate,3;
+            }
+         }
+      }
+  - Id: 310504
+    AegisName: Wolf_Orb_Mag_1
+    Name: Wolf Orb (Mage) Level 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMatkRate,2;
+      bonus bMatk,25;
+      if (.@r>=7) {
+         bonus2 bMagicAtkEle,Ele_All,3;
+         if (.@r>=9) {
+            bonus2 bMagicAtkEle,Ele_All,3;
+            if (getallrefine() >= 22) {
+               bonus2 bMagicAtkEle,Ele_All,3;
+            }
+         }
+      }
+  - Id: 310505
+    AegisName: Wolf_Orb_Ran_2
+    Name: Wolf Orb (Shooter) Level 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bLongAtkRate,5;
+      if (.@r>=7) {
+         bonus bLongAtkRate,3;
+         if (.@r>=9) {
+            bonus bLongAtkRate,3;
+            if (getallrefine() >= 22) {
+               bonus bLongAtkRate,5;
+            }
+         }
+      }
+  - Id: 310506
+    AegisName: Wolf_Orb_War_2
+    Name: Wolf Orb (Warrior) Level 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,4;
+      bonus bBaseAtk,50;
+      if (.@r>=7) {
+         bonus bShortAtkRate,3;
+         if (.@r>=9) {
+            bonus bShortAtkRate,3;
+            if (getallrefine() >= 22) {
+               bonus bShortAtkRate,5;
+            }
+         }
+      }
+  - Id: 310507
+    AegisName: Wolf_Orb_Mag_2
+    Name: Wolf Orb (Mage) Level 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMatkRate,4;
+      bonus bMatk,50;
+      if (.@r>=7) {
+         bonus2 bMagicAtkEle,Ele_All,3;
+         if (.@r>=9) {
+            bonus2 bMagicAtkEle,Ele_All,3;
+            if (getallrefine() >= 22) {
+               bonus2 bMagicAtkEle,Ele_All,5;
+            }
+         }
+      }
+  - Id: 310508
+    AegisName: Wolf_Orb_Ran_3
+    Name: Wolf Orb (Shooter) Level 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bLongAtkRate,5;
+      if (.@r>=7) {
+         bonus bLongAtkRate,5;
+         if (.@r>=9) {
+            bonus bLongAtkRate,5;
+            if (getallrefine() >= 22) {
+               bonus bLongAtkRate,5;
+            }
+         }
+      }
+  - Id: 310509
+    AegisName: Wolf_Orb_War_3
+    Name: Wolf Orb (Warrior) Level 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,6;
+      bonus bBaseAtk,100;
+      if (.@r>=7) {
+         bonus bShortAtkRate,5;
+         if (.@r>=9) {
+            bonus bShortAtkRate,5;
+            if (getallrefine() >= 22) {
+               bonus bShortAtkRate,5;
+            }
+         }
+      }
+  - Id: 310510
+    AegisName: Wolf_Orb_Mag_3
+    Name: Wolf Orb (Mage) Level 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMatkRate,6;
+      bonus bMatk,100;
+      if (.@r>=7) {
+         bonus2 bMagicAtkEle,Ele_All,5;
+         if (.@r>=9) {
+            bonus2 bMagicAtkEle,Ele_All,5;
+            if (getallrefine() >= 22) {
+               bonus2 bMagicAtkEle,Ele_All,5;
+            }
+         }
+      }
+  - Id: 310511
+    AegisName: Wolf_Orb_R_Reject_1
+    Name: Wolf Orb (Reflection Reject) Level 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bReduceDamageReturn,2;
+      if (.@r>=7) {
+         bonus bReduceDamageReturn,2;
+         if (.@r>=9) {
+            bonus bReduceDamageReturn,2;
+            if (getallrefine() >= 22) {
+               bonus bReduceDamageReturn,2;
+            }
+         }
+      }
+  - Id: 310512
+    AegisName: Wolf_Orb_R_Reject_2
+    Name: Wolf Orb (Reflection Reject) Level 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bReduceDamageReturn,3;
+      if (.@r>=7) {
+         bonus bReduceDamageReturn,3;
+         if (.@r>=9) {
+            bonus bReduceDamageReturn,3;
+            if (getallrefine() >= 22) {
+               bonus bReduceDamageReturn,3;
+            }
+         }
+      }
+  - Id: 310513
+    AegisName: Wolf_Orb_R_Reject_3
+    Name: Wolf Orb (Reflection Reject) Level 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bReduceDamageReturn,4;
+      if (.@r>=7) {
+         bonus bReduceDamageReturn,4;
+         if (.@r>=9) {
+            bonus bReduceDamageReturn,4;
+            if (getallrefine() >= 22) {
+               bonus bReduceDamageReturn,4;
+            }
+         }
+      }
+  - Id: 310514
+    AegisName: Wolf_Orb_Force
+    Name: Wolf Orb (Power Force)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMatkRate,2;
+      bonus2 bAddClass,Class_All,2;
+      if (.@r>=7) {
+         bonus bMatkRate,2;
+         bonus2 bAddClass,Class_All,2;
+         if (.@r>=9) {
+            bonus bMatkRate,2;
+            bonus2 bAddClass,Class_All,2;
+            if (getallrefine() >= 22) {
+               bonus bMatkRate,4;
+               bonus2 bAddClass,Class_All,4;
+            }
+         }
+      }
+  - Id: 310515
+    AegisName: Wolf_Orb_S_Delay
+    Name: Wolf Orb (Delay After Skill)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bDelayrate,-4;
+      if (.@r>=7) {
+         bonus bDelayrate,-4;
+         if (.@r>=9) {
+            bonus bDelayrate,-4;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-4;
+            }
+         }
+      }
+  - Id: 310516
+    AegisName: Wolf_Orb_Skill_1
+    Name: Wolf Orb (Dragonic Breath)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"KN_BOWLINGBASH",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"KN_BOWLINGBASH",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"KN_BOWLINGBASH",15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"KN_BOWLINGBASH",15;
+            }
+         }
+      }
+  - Id: 310517
+    AegisName: Wolf_Orb_Skill_2
+    Name: Wolf Orb (Cutter Break)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"KN_BOWLINGBASH",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"KN_BOWLINGBASH",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"KN_BOWLINGBASH",15;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-1;
+               bonus2 bSkillAtk,"KN_BOWLINGBASH",15;
+            }
+         }
+      }
+  - Id: 310518
+    AegisName: Wolf_Orb_Skill_3
+    Name: Wolf Orb (Hundred Wave)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"KN_PIERCE",15;
+      bonus2 bSkillAtk,"LK_SPIRALPIERCE",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"KN_PIERCE",15;
+         bonus2 bSkillAtk,"LK_SPIRALPIERCE",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"KN_PIERCE",15;
+            bonus2 bSkillAtk,"LK_SPIRALPIERCE",15;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-2;
+               bonus2 bSkillAtk,"LK_SPIRALPIERCE",15;
+            }
+         }
+      }
+  - Id: 310519
+    AegisName: Wolf_Orb_Skill_4
+    Name: Wolf Orb (Brand Drive)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"CR_SHIELDBOOMERANG",15;
+      bonus2 bSkillAtk,"KN_BRANDISHSPEAR",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"CR_SHIELDBOOMERANG",15;
+         bonus2 bSkillAtk,"KN_BRANDISHSPEAR",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"CR_SHIELDBOOMERANG",15;
+            bonus2 bSkillAtk,"KN_BRANDISHSPEAR",15;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-5;
+               bonus2 bSkillAtk,"KN_BRANDISHSPEAR",15;
+            }
+         }
+      }
+  - Id: 310520
+    AegisName: Wolf_Orb_Skill_5
+    Name: Wolf Orb (Vanishing Cannon)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"CR_HOLYCROSS",15;
+      bonus2 bSkillAtk,"PA_SHIELDCHAIN",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"CR_HOLYCROSS",15;
+         bonus2 bSkillAtk,"PA_SHIELDCHAIN",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"CR_HOLYCROSS",15;
+            bonus2 bSkillAtk,"PA_SHIELDCHAIN",15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"CR_HOLYCROSS",15;
+               bonus2 bSkillAtk,"PA_SHIELDCHAIN",15;
+            }
+         }
+      }
+  - Id: 310521
+    AegisName: Wolf_Orb_Skill_6
+    Name: Wolf Orb (Genesis Pressure)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"CR_GRANDCROSS",15;
+      bonus2 bSkillAtk,"PA_PRESSURE",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"CR_GRANDCROSS",15;
+         bonus2 bSkillAtk,"PA_PRESSURE",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"CR_GRANDCROSS",15;
+            bonus2 bSkillAtk,"PA_PRESSURE",15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"CR_GRANDCROSS",15;
+               bonus2 bSkillAtk,"PA_PRESSURE",15;
+            }
+         }
+      }
+  - Id: 310522
+    AegisName: Wolf_Orb_Skill_7
+    Name: Wolf Orb (Boost Cannon)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"WS_CARTTERMINATION",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"WS_CARTTERMINATION",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"WS_CARTTERMINATION",15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"WS_CARTTERMINATION",15;
+            }
+         }
+      }
+  - Id: 310523
+    AegisName: Wolf_Orb_Skill_8
+    Name: Wolf Orb (Vulcan Boomerang)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"MC_CARTREVOLUTION",15;
+      bonus2 bSkillAtk,"WS_CARTTERMINATION",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"MC_CARTREVOLUTION",15;
+         bonus2 bSkillAtk,"WS_CARTTERMINATION",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"MC_CARTREVOLUTION",15;
+            bonus2 bSkillAtk,"WS_CARTTERMINATION",15;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-10;
+               bonus2 bSkillAtk,"WS_CARTTERMINATION",15;
+            }
+         }
+      }
+  - Id: 310524
+    AegisName: Wolf_Orb_Skill_9
+    Name: Wolf Orb (Tornado Swing)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"MC_MAMMONITE",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"MC_MAMMONITE",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"MC_MAMMONITE",15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"MC_MAMMONITE",15;
+            }
+         }
+      }
+  - Id: 310525
+    AegisName: Wolf_Orb_Skill_10
+    Name: Wolf Orb (Hell Tornado)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"WS_CARTTERMINATION",15;
+      bonus2 bSkillAtk,"AM_DEMONSTRATION",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"WS_CARTTERMINATION",15;
+         bonus2 bSkillAtk,"AM_DEMONSTRATION",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"WS_CARTTERMINATION",15;
+            bonus2 bSkillAtk,"AM_DEMONSTRATION",15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"WS_CARTTERMINATION",15;
+               bonus2 bSkillAtk,"AM_DEMONSTRATION",15;
+            }
+         }
+      }
+  - Id: 310526
+    AegisName: Wolf_Orb_Skill_11
+    Name: Wolf Orb (Crazy Cannon)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"AM_DEMONSTRATION",15;
+      bonus2 bSkillAtk,"AM_ACIDTERROR",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"AM_DEMONSTRATION",15;
+         bonus2 bSkillAtk,"AM_ACIDTERROR",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"AM_DEMONSTRATION",15;
+            bonus2 bSkillAtk,"AM_ACIDTERROR",15;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-5;
+               bonus2 bSkillAtk,"AM_ACIDTERROR",15;
+            }
+         }
+      }
+  - Id: 310527
+    AegisName: Wolf_Orb_Skill_12
+    Name: Wolf Orb (Acid Explosion)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"CR_ACIDDEMONSTRATION",15;
+      bonus2 bSkillAtk,"AM_ACIDTERROR",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"CR_ACIDDEMONSTRATION",15;
+         bonus2 bSkillAtk,"AM_ACIDTERROR",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"CR_ACIDDEMONSTRATION",15;
+            bonus2 bSkillAtk,"AM_ACIDTERROR",15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"CR_ACIDDEMONSTRATION",15;
+               bonus2 bSkillAtk,"AM_ACIDTERROR",15;
+            }
+         }
+      }
+  - Id: 310528
+    AegisName: Wolf_Orb_Skill_13
+    Name: Wolf Orb (Sonic Impact)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"AS_SONICBLOW",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"AS_SONICBLOW",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"AS_SONICBLOW",15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"AS_SONICBLOW",15;
+            }
+         }
+      }
+  - Id: 310529
+    AegisName: Wolf_Orb_Skill_14
+    Name: Wolf Orb (Cutter Slasher)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"ASC_METEORASSAULT",15;
+      bonus2 bSkillAtk,"AS_GRIMTOOTH",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"ASC_METEORASSAULT",15;
+         bonus2 bSkillAtk,"AS_GRIMTOOTH",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"ASC_METEORASSAULT",15;
+            bonus2 bSkillAtk,"AS_GRIMTOOTH",15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"ASC_METEORASSAULT",15;
+               bonus2 bSkillAtk,"AS_GRIMTOOTH",15;
+            }
+         }
+      }
+  - Id: 310530
+    AegisName: Wolf_Orb_Skill_15
+    Name: Wolf Orb (Berserk Slash)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"AS_SONICBLOW",15;
+      bonus2 bSkillAtk,"ASC_BREAKER",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"AS_SONICBLOW",15;
+         bonus2 bSkillAtk,"ASC_BREAKER",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"AS_SONICBLOW",15;
+            bonus2 bSkillAtk,"ASC_BREAKER",15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"AS_SONICBLOW",15;
+               bonus2 bSkillAtk,"ASC_BREAKER",15;
+            }
+         }
+      }
+  - Id: 310531
+    AegisName: Wolf_Orb_Skill_16
+    Name: Wolf Orb (Fatal Attack)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"RG_BACKSTAP",15;
+      bonus2 bSkillAtk,"RG_RAID",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"RG_BACKSTAP",15;
+         bonus2 bSkillAtk,"RG_RAID",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"RG_BACKSTAP",15;
+            bonus2 bSkillAtk,"RG_RAID",15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"RG_BACKSTAP",15;
+               bonus2 bSkillAtk,"RG_RAID",15;
+            }
+         }
+      }
+  - Id: 310532
+    AegisName: Wolf_Orb_Skill_17
+    Name: Wolf Orb (Shadow Spell)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bMagicAtkEle,Ele_All,15;
+      if (.@r>=7) {
+         bonus2 bMagicAtkEle,Ele_All,15;
+         if (.@r>=9) {
+            bonus2 bMagicAtkEle,Ele_All,15;
+            if (getallrefine() >= 22) {
+               bonus2 bMagicAtkEle,Ele_All,15;
+            }
+         }
+      }
+  - Id: 310533
+    AegisName: Wolf_Orb_Skill_18
+    Name: Wolf Orb (Angle Shot)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bLongAtkRate,5;
+      bonus2 bSkillAtk,"AC_DOUBLE",15;
+      if (.@r>=7) {
+         bonus bLongAtkRate,10;
+         bonus2 bSkillAtk,"AC_DOUBLE",15;
+         if (.@r>=9) {
+            bonus bLongAtkRate,10;
+            bonus2 bSkillAtk,"AC_DOUBLE",15;
+            if (getallrefine() >= 22) {
+               bonus bLongAtkRate,15;
+               bonus2 bSkillAtk,"AC_DOUBLE",15;
+            }
+         }
+      }
+  - Id: 310534
+    AegisName: Wolf_Orb_Skill_19
+    Name: Wolf Orb (Crimson Strain)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"WZ_HEAVENDRIVE",15;
+      bonus2 bSkillAtk,"WZ_METEOR",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"WZ_HEAVENDRIVE",15;
+         bonus2 bSkillAtk,"WZ_METEOR",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"WZ_HEAVENDRIVE",15;
+            bonus2 bSkillAtk,"WZ_METEOR",15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"WZ_HEAVENDRIVE",15;
+               bonus2 bSkillAtk,"WZ_METEOR",15;
+            }
+         }
+      }
+  - Id: 310535
+    AegisName: Wolf_Orb_Skill_20
+    Name: Wolf Orb (Jack Lightning)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"WZ_VERMILION",15;
+      bonus2 bSkillAtk,"WZ_FROSTNOVA",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"WZ_VERMILION",15;
+         bonus2 bSkillAtk,"WZ_FROSTNOVA",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"WZ_VERMILION",15;
+            bonus2 bSkillAtk,"WZ_FROSTNOVA",15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"WZ_VERMILION",15;
+               bonus2 bSkillAtk,"WZ_FROSTNOVA",15;
+            }
+         }
+      }
+  - Id: 310536
+    AegisName: Wolf_Orb_Skill_21
+    Name: Wolf Orb (Comet Vortex)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"WZ_VERMILION",15;
+      bonus2 bSkillAtk,"WZ_METEOR",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"WZ_VERMILION",15;
+         bonus2 bSkillAtk,"WZ_METEOR",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"WZ_VERMILION",15;
+            bonus2 bSkillAtk,"WZ_METEOR",15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"WZ_VERMILION",15;
+               bonus2 bSkillAtk,"WZ_METEOR",15;
+            }
+         }
+      }
+  - Id: 310537
+    AegisName: Wolf_Orb_Skill_22
+    Name: Wolf Orb (Cloud Buster)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"WZ_HEAVENDRIVE",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"WZ_HEAVENDRIVE",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"WZ_HEAVENDRIVE",15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"WZ_HEAVENDRIVE",15;
+            }
+         }
+      }
+  - Id: 310538
+    AegisName: Wolf_Orb_Skill_23
+    Name: Wolf Orb (Varetyr Wave)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"MG_THUNDERSTORM",15;
+      bonus2 bSkillAtk,"PF_SOULBURN",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"MG_THUNDERSTORM",15;
+         bonus2 bSkillAtk,"PF_SOULBURN",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"MG_THUNDERSTORM",15;
+            bonus2 bSkillAtk,"PF_SOULBURN",15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"MG_THUNDERSTORM",15;
+               bonus2 bSkillAtk,"PF_SOULBURN",15;
+            }
+         }
+      }
+  - Id: 310539
+    AegisName: Wolf_Orb_Skill_24
+    Name: Wolf Orb (Diamond Grave)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"MG_COLDBOLT",15;
+      bonus2 bSkillAtk,"WZ_EARTHSPIKE",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"MG_COLDBOLT",15;
+         bonus2 bSkillAtk,"WZ_EARTHSPIKE",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"MG_COLDBOLT",15;
+            bonus2 bSkillAtk,"WZ_EARTHSPIKE",15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"MG_COLDBOLT",15;
+               bonus2 bSkillAtk,"WZ_EARTHSPIKE",15;
+            }
+         }
+      }
+  - Id: 310540
+    AegisName: Wolf_Orb_Skill_25
+    Name: Wolf Orb (Magnusmus)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"PR_MAGNUS",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"PR_MAGNUS",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"PR_MAGNUS",15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"PR_MAGNUS",15;
+            }
+         }
+      }
+  - Id: 310541
+    AegisName: Wolf_Orb_Skill_26
+    Name: Wolf Orb (Holy Judex)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bMagicAtkEle,Ele_Holy,5;
+      bonus2 bSkillAtk,"AL_HOLYLIGHT",15;
+      if (.@r>=7) {
+         bonus2 bMagicAtkEle,Ele_Holy,10;
+         bonus2 bSkillAtk,"AL_HOLYLIGHT",15;
+         if (.@r>=9) {
+            bonus2 bMagicAtkEle,Ele_Holy,10;
+            bonus2 bSkillAtk,"AL_HOLYLIGHT",15;
+            if (getallrefine() >= 22) {
+               bonus2 bMagicAtkEle,Ele_Holy,15;
+               bonus2 bSkillAtk,"AL_HOLYLIGHT",15;
+            }
+         }
+      }
+  - Id: 310542
+    AegisName: Wolf_Orb_Skill_27
+    Name: Wolf Orb (Melee Duple)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bShortAtkRate,5;
+      bonus2 bAddRace,RC_Undead,15;
+      bonus2 bMagicAddRace,RC_Undead,15;
+      if (.@r>=7) {
+         bonus bShortAtkRate,10;
+         bonus2 bAddRace,RC_Undead,15;
+         bonus2 bMagicAddRace,RC_Undead,15;
+         if (.@r>=9) {
+            bonus bShortAtkRate,10;
+            bonus2 bAddRace,RC_Undead,15;
+            bonus2 bMagicAddRace,RC_Undead,15;
+            if (getallrefine() >= 22) {
+               bonus bShortAtkRate,15;
+               bonus2 bAddRace,RC_Undead,15;
+               bonus2 bMagicAddRace,RC_Undead,15;
+            }
+         }
+      }
+  - Id: 310543
+    AegisName: Wolf_Orb_Skill_28
+    Name: Wolf Orb (Tiger Empire)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"MO_CHAINCOMBO",15;
+      bonus2 bSkillAtk,"MO_EXTREMITYFIST",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"MO_CHAINCOMBO",15;
+         bonus2 bSkillAtk,"MO_EXTREMITYFIST",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"MO_CHAINCOMBO",15;
+            bonus2 bSkillAtk,"MO_EXTREMITYFIST",15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"MO_CHAINCOMBO",15;
+               bonus2 bSkillAtk,"MO_EXTREMITYFIST",15;
+            }
+         }
+      }
+  - Id: 310544
+    AegisName: Wolf_Orb_Skill_29
+    Name: Wolf Orb (Rampage Lightning)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"MO_EXTREMITYFIST",15;
+      bonus2 bSkillAtk,"MO_BODYRELOCATION",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"MO_EXTREMITYFIST",15;
+         bonus2 bSkillAtk,"MO_BODYRELOCATION",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"MO_EXTREMITYFIST",15;
+            bonus2 bSkillAtk,"MO_BODYRELOCATION",15;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-2;
+               bonus2 bSkillAtk,"MO_BODYRELOCATION",15;
+            }
+         }
+      }
+  - Id: 310545
+    AegisName: Wolf_Orb_Skill_30
+    Name: Wolf Orb (Hell Arrow)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"MO_EXTREMITYFIST",15;
+      bonus2 bSkillAtk,"MO_FINGEROFFENSIVE",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"MO_EXTREMITYFIST",15;
+         bonus2 bSkillAtk,"MO_FINGEROFFENSIVE",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"MO_EXTREMITYFIST",15;
+            bonus2 bSkillAtk,"MO_FINGEROFFENSIVE",15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"MO_EXTREMITYFIST",15;
+               bonus2 bSkillAtk,"MO_FINGEROFFENSIVE",15;
+            }
+         }
+      }
+  - Id: 310546
+    AegisName: Wolf_Orb_Skill_31
+    Name: Wolf Orb (Cluster)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"HT_BLASTMINE",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"HT_BLASTMINE",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"HT_BLASTMINE",15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"HT_BLASTMINE",15;
+            }
+         }
+      }
+  - Id: 310547
+    AegisName: Wolf_Orb_Skill_32
+    Name: Wolf Orb (Breeze Shooting)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bCritAtkRate,10;
+      bonus2 bSkillAtk,"SN_SHARPSHOOTING",15;
+      if (.@r>=7) {
+         bonus bCritAtkRate,10;
+         bonus2 bSkillAtk,"SN_SHARPSHOOTING",15;
+         if (.@r>=9) {
+            bonus bCritAtkRate,15;
+            bonus2 bSkillAtk,"SN_SHARPSHOOTING",15;
+            if (getallrefine() >= 22) {
+               bonus bCritAtkRate,15;
+               bonus2 bSkillAtk,"SN_SHARPSHOOTING",15;
+            }
+         }
+      }
+  - Id: 310548
+    AegisName: Wolf_Orb_Skill_33
+    Name: Wolf Orb (Aimed Storm)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"AC_SHOWER",15;
+      bonus2 bSkillAtk,"SN_SHARPSHOOTING",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"AC_SHOWER",15;
+         bonus2 bSkillAtk,"SN_SHARPSHOOTING",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"AC_SHOWER",15;
+            bonus2 bSkillAtk,"SN_SHARPSHOOTING",15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"AC_SHOWER",15;
+               bonus2 bSkillAtk,"SN_SHARPSHOOTING",15;
+            }
+         }
+      }
+  - Id: 310549
+    AegisName: Wolf_Orb_Skill_34
+    Name: Wolf Orb (Sound Metal)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bMagicAtkEle,Ele_Neutral,5;
+      bonus2 bSkillAtk,"BA_MUSICALSTRIKE",5;
+      if (.@r>=7) {
+         bonus2 bMagicAtkEle,Ele_Neutral,10;
+         bonus2 bSkillAtk,"BA_MUSICALSTRIKE",10;
+         if (.@r>=9) {
+            bonus2 bMagicAtkEle,Ele_Neutral,10;
+            bonus2 bSkillAtk,"BA_MUSICALSTRIKE",10;
+            if (getallrefine() >= 22) {
+               bonus2 bMagicAtkEle,Ele_Neutral,15;
+               bonus2 bSkillAtk,"BA_MUSICALSTRIKE",15;
+            }
+         }
+      }
+  - Id: 310550
+    AegisName: Wolf_Orb_Skill_35
+    Name: Wolf Orb (Reverb)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bMagicAtkEle,Ele_All,5;
+      bonus2 bSkillAtk,"BA_MUSICALSTRIKE",15;
+      if (.@r>=7) {
+         bonus2 bMagicAtkEle,Ele_All,5;
+         bonus2 bSkillAtk,"BA_MUSICALSTRIKE",15;
+         if (.@r>=9) {
+            bonus2 bMagicAtkEle,Ele_All,5;
+            bonus2 bSkillAtk,"BA_MUSICALSTRIKE",15;
+            if (getallrefine() >= 22) {
+               bonus2 bMagicAtkEle,Ele_All,10;
+               bonus2 bSkillAtk,"BA_MUSICALSTRIKE",15;
+            }
+         }
+      }
+  - Id: 310551
+    AegisName: Wolf_Orb_Skill_36
+    Name: Wolf Orb (Vulcan Severe)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"CG_ARROWVULCAN",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"CG_ARROWVULCAN",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"CG_ARROWVULCAN",15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"CG_ARROWVULCAN",15;
+            }
+         }
+      }
+  - Id: 310552
+    AegisName: Wolf_Orb_Skill_37
+    Name: Wolf Orb (Prominence Burst)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"TK_STORMKICK",15;
+      bonus2 bSkillAtk,"TK_DOWNKICK",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"TK_STORMKICK",15;
+         bonus2 bSkillAtk,"TK_DOWNKICK",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"TK_STORMKICK",15;
+            bonus2 bSkillAtk,"TK_DOWNKICK",15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"TK_STORMKICK",15;
+               bonus2 bSkillAtk,"TK_DOWNKICK",15;
+            }
+         }
+      }
+  - Id: 310553
+    AegisName: Wolf_Orb_Skill_38
+    Name: Wolf Orb (Moon Kick)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"TK_TURNKICK",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"TK_TURNKICK",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"TK_TURNKICK",15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"TK_TURNKICK",15;
+            }
+         }
+      }
+  - Id: 310554
+    AegisName: Wolf_Orb_Skill_39
+    Name: Wolf Orb (Flash Falling)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"TK_COUNTER",15;
+      bonus2 bSkillAtk,"TK_JUMPKICK",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"TK_COUNTER",15;
+         bonus2 bSkillAtk,"TK_JUMPKICK",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"TK_COUNTER",15;
+            bonus2 bSkillAtk,"TK_JUMPKICK",15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"TK_COUNTER",15;
+               bonus2 bSkillAtk,"TK_JUMPKICK",15;
+            }
+         }
+      }
+  - Id: 310555
+    AegisName: Wolf_Orb_Skill_40
+    Name: Wolf Orb (Eswhoo)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"SL_SMA",15;
+      bonus2 bSkillAtk,"SL_STUN",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"SL_SMA",15;
+         bonus2 bSkillAtk,"SL_STUN",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"SL_SMA",15;
+            bonus2 bSkillAtk,"SL_STUN",15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"SL_SMA",15;
+               bonus2 bSkillAtk,"SL_STUN",15;
+            }
+         }
+      }
+  - Id: 310556
+    AegisName: Wolf_Orb_Skill_41
+    Name: Wolf Orb (Espa)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"SL_STIN",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"SL_STIN",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"SL_STIN",15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"SL_STIN",15;
+            }
+         }
+      }
+  - Id: 310557
+    AegisName: Wolf_Orb_Skill_42
+    Name: Wolf Orb (Curse Explosion)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bMagicAtkEle,Ele_Dark,5;
+      bonus2 bSkillAtk,"SL_SMA",15;
+      if (.@r>=7) {
+         bonus2 bMagicAtkEle,Ele_Dark,10;
+         bonus2 bSkillAtk,"SL_SMA",15;
+         if (.@r>=9) {
+            bonus2 bMagicAtkEle,Ele_Dark,10;
+            bonus2 bSkillAtk,"SL_SMA",15;
+            if (getallrefine() >= 22) {
+               bonus2 bMagicAtkEle,Ele_Dark,15;
+               bonus2 bSkillAtk,"SL_SMA",15;
+            }
+         }
+      }
+  - Id: 310558
+    AegisName: Wolf_Orb_Skill_43
+    Name: Wolf Orb (Des Hammer Dance)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"GS_DESPERADO",15;
+      bonus2 bSkillAtk,"GS_RAPIDSHOWER",15;
+      bonus2 bSkillAtk,"GS_DUST",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"GS_DESPERADO",15;
+         bonus2 bSkillAtk,"GS_RAPIDSHOWER",15;
+         bonus2 bSkillAtk,"GS_DUST",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"GS_DESPERADO",15;
+            bonus2 bSkillAtk,"GS_RAPIDSHOWER",15;
+            bonus2 bSkillAtk,"GS_DUST",15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"GS_DESPERADO",15;
+               bonus2 bSkillAtk,"GS_RAPIDSHOWER",15;
+               bonus2 bSkillAtk,"GS_DUST",15;
+            }
+         }
+      }
+  - Id: 310559
+    AegisName: Wolf_Orb_Skill_44
+    Name: Wolf Orb (Fire Howling Tail)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"GS_SPREADATTACK",15;
+      bonus2 bSkillAtk,"GS_DESPERADO",15;
+      bonus2 bSkillAtk,"GS_GROUNDDRIFT",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"GS_SPREADATTACK",15;
+         bonus2 bSkillAtk,"GS_DESPERADO",15;
+         bonus2 bSkillAtk,"GS_GROUNDDRIFT",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"GS_SPREADATTACK",15;
+            bonus2 bSkillAtk,"GS_DESPERADO",15;
+            bonus2 bSkillAtk,"GS_GROUNDDRIFT",15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"GS_SPREADATTACK",15;
+               bonus2 bSkillAtk,"GS_DESPERADO",15;
+               bonus2 bSkillAtk,"GS_GROUNDDRIFT",15;
+            }
+         }
+      }
+  - Id: 310560
+    AegisName: Wolf_Orb_Skill_45
+    Name: Wolf Orb (Storm Buster Trip)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"GS_FULLBUSTER",15;
+      bonus2 bSkillAtk,"GS_SPREADATTACK",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"GS_FULLBUSTER",15;
+         bonus2 bSkillAtk,"GS_SPREADATTACK",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"GS_FULLBUSTER",15;
+            bonus2 bSkillAtk,"GS_SPREADATTACK",15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"GS_FULLBUSTER",15;
+               bonus2 bSkillAtk,"GS_SPREADATTACK",15;
+            }
+         }
+      }
+  - Id: 310561
+    AegisName: Wolf_Orb_Skill_46
+    Name: Wolf Orb (Flame Ice Wind)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"NJ_KOUENKA",15;
+      bonus2 bSkillAtk,"NJ_HYOUSENSOU",15;
+      bonus2 bSkillAtk,"NJ_HUUJIN",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"NJ_KOUENKA",15;
+         bonus2 bSkillAtk,"NJ_HYOUSENSOU",15;
+         bonus2 bSkillAtk,"NJ_HUUJIN",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"NJ_KOUENKA",15;
+            bonus2 bSkillAtk,"NJ_HYOUSENSOU",15;
+            bonus2 bSkillAtk,"NJ_HUUJIN",15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"NJ_KOUENKA",15;
+               bonus2 bSkillAtk,"NJ_HYOUSENSOU",15;
+               bonus2 bSkillAtk,"NJ_HUUJIN",15;
+            }
+         }
+      }
+  - Id: 310562
+    AegisName: Wolf_Orb_Skill_47
+    Name: Wolf Orb (Cross Petal)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"NJ_HUUMA",15;
+      bonus2 bSkillAtk,"NJ_ISSEN",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"NJ_HUUMA",15;
+         bonus2 bSkillAtk,"NJ_ISSEN",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"NJ_HUUMA",15;
+            bonus2 bSkillAtk,"NJ_ISSEN",15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"NJ_HUUMA",15;
+               bonus2 bSkillAtk,"NJ_ISSEN",15;
+            }
+         }
+      }
+  - Id: 310563
+    AegisName: Wolf_Orb_Skill_48
+    Name: Wolf Orb (Exploding Flake Wind)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"NJ_BAKUENRYU",15;
+      bonus2 bSkillAtk,"NJ_HYOUSYOURAKU",15;
+      bonus2 bSkillAtk,"NJ_KAMAITACHI",15;
+      if (.@r>=7) {
+         bonus2 bSkillAtk,"NJ_BAKUENRYU",15;
+         bonus2 bSkillAtk,"NJ_HYOUSYOURAKU",15;
+         bonus2 bSkillAtk,"NJ_KAMAITACHI",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"NJ_BAKUENRYU",15;
+            bonus2 bSkillAtk,"NJ_HYOUSYOURAKU",15;
+            bonus2 bSkillAtk,"NJ_KAMAITACHI",15;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"NJ_BAKUENRYU",15;
+               bonus2 bSkillAtk,"NJ_HYOUSYOURAKU",15;
+               bonus2 bSkillAtk,"NJ_KAMAITACHI",15;
+            }
+         }
+      }
+  - Id: 310567
+    AegisName: Wolf_Orb_Speed_1
+    Name: Wolf Orb (Speed) Level 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bFlee,10;
+      if (.@r>=7) {
+         bonus bAspdRate,6;
+         if (.@r>=9) {
+            bonus bAspdRate,6;
+            if (getallrefine() >= 22) {
+               bonus bAspdRate,8;
+            }
+         }
+      }
+  - Id: 310568
+    AegisName: Wolf_Orb_Caster_1
+    Name: Wolf Orb (Caster) Level 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bVariableCastrate,-6;
+      if (.@r>=7) {
+         bonus bVariableCastrate,-8;
+         if (.@r>=9) {
+            bonus bVariableCastrate,-8;
+            if (getallrefine() >= 22) {
+               bonus bVariableCastrate,-8;
+            }
+         }
+      }
+  - Id: 310569
+    AegisName: Wolf_Orb_Critical_1
+    Name: Wolf Orb (Critical) Level 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bCritical,10;
+      if (.@r>=7) {
+         bonus bCritAtkRate,6;
+         if (.@r>=9) {
+            bonus bCritAtkRate,6;
+            if (getallrefine() >= 22) {
+               bonus bCritAtkRate,8;
+            }
+         }
+      }
+  - Id: 310570
+    AegisName: Wolf_Orb_Guide_1
+    Name: Wolf Orb (Guide Attack) Level 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bHit,20;
+      if (.@r>=7) {
+         bonus bPerfectHitAddRate,6;
+         if (.@r>=9) {
+            bonus bPerfectHitAddRate,6;
+            if (getallrefine() >= 22) {
+               bonus bPerfectHitAddRate,8;
+            }
+         }
+      }
+  - Id: 310571
+    AegisName: Wolf_Orb_Speed_2
+    Name: Wolf Orb (Speed) Level 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bFlee,20;
+      if (.@r>=7) {
+         bonus bAspdRate,6;
+         if (.@r>=9) {
+            bonus bAspdRate,8;
+            if (getallrefine() >= 22) {
+               bonus bAspdRate,8;
+            }
+         }
+      }
+  - Id: 310572
+    AegisName: Wolf_Orb_Caster_2
+    Name: Wolf Orb (Caster) Level 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bVariableCastrate,-8;
+      if (.@r>=7) {
+         bonus bVariableCastrate,-8;
+         if (.@r>=9) {
+            bonus bVariableCastrate,-8;
+            if (getallrefine() >= 22) {
+               bonus bVariableCastrate,-8;
+            }
+         }
+      }
+  - Id: 310573
+    AegisName: Wolf_Orb_Critical_2
+    Name: Wolf Orb (Critical) Level 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bCritical,10;
+      if (.@r>=7) {
+         bonus bCritAtkRate,6;
+         if (.@r>=9) {
+            bonus bCritAtkRate,8;
+            if (getallrefine() >= 22) {
+               bonus bCritAtkRate,8;
+            }
+         }
+      }
+  - Id: 310574
+    AegisName: Wolf_Orb_Guide_2
+    Name: Wolf Orb (Guide Attack) Level 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bHit,20;
+      if (.@r>=7) {
+         bonus bPerfectHitAddRate,6;
+         if (.@r>=9) {
+            bonus bPerfectHitAddRate,8;
+            if (getallrefine() >= 22) {
+               bonus bPerfectHitAddRate,8;
+            }
+         }
+      }
+  - Id: 310575
+    AegisName: Wolf_Orb_Speed_3
+    Name: Wolf Orb (Speed) Level 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bFlee,30;
+      if (.@r>=7) {
+         bonus bAspdRate,8;
+         if (.@r>=9) {
+            bonus bAspdRate,8;
+            if (getallrefine() >= 22) {
+               bonus bAspdRate,8;
+            }
+         }
+      }
+  - Id: 310576
+    AegisName: Wolf_Orb_Caster_3
+    Name: Wolf Orb (Caster) Level 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bVariableCastrate,-8;
+      bonus bMatk,30;
+      if (.@r>=7) {
+         bonus bVariableCastrate,-8;
+         if (.@r>=9) {
+            bonus bVariableCastrate,-8;
+            if (getallrefine() >= 22) {
+               bonus bVariableCastrate,-8;
+            }
+         }
+      }
+  - Id: 310577
+    AegisName: Wolf_Orb_Critical_3
+    Name: Wolf Orb (Critical) Level 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bCritical,15;
+      if (.@r>=7) {
+         bonus bCritAtkRate,8;
+         if (.@r>=9) {
+            bonus bCritAtkRate,8;
+            if (getallrefine() >= 22) {
+               bonus bCritAtkRate,8;
+            }
+         }
+      }
+  - Id: 310578
+    AegisName: Wolf_Orb_Guide_3
+    Name: Wolf Orb (Guide Attack) Level 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bHit,30;
+      if (.@r>=7) {
+         bonus bPerfectHitAddRate,8;
+         if (.@r>=9) {
+            bonus bPerfectHitAddRate,8;
+            if (getallrefine() >= 22) {
+               bonus bPerfectHitAddRate,8;
+            }
+         }
+      }
+  - Id: 310579
+    AegisName: Wolf_Orb_Above_1
+    Name: Wolf Orb (Above All) Level 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSubClass,Class_Normal,3;
+      bonus2 bSubClass,Class_Boss,3;
+      if (.@r>=7) {
+         bonus2 bSubEle,Ele_All,3;
+         if (.@r>=9) {
+            bonus2 bSubSize,Size_All,3;
+            if (getallrefine() >= 22) {
+               bonus2 bSubRace,RC_All,3;
+               bonus2 bSubRace,RC_Player_Human,-3;
+               bonus2 bSubRace,RC_Player_Doram,-3;
+            }
+         }
+      }
+  - Id: 310580
+    AegisName: Wolf_Orb_Above_2
+    Name: Wolf Orb (Above All) Level 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSubClass,Class_Normal,5;
+      bonus2 bSubClass,Class_Boss,5;
+      if (.@r>=7) {
+         bonus2 bSubEle,Ele_All,5;
+         if (.@r>=9) {
+            bonus2 bSubSize,Size_All,5;
+            if (getallrefine() >= 22) {
+               bonus2 bSubRace,RC_All,5;
+               bonus2 bSubRace,RC_Player_Human,-5;
+               bonus2 bSubRace,RC_Player_Doram,-5;
+            }
+         }
+      }
+  - Id: 310581
+    AegisName: Wolf_Orb_Above_3
+    Name: Wolf Orb (Above All) Level 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSubClass,Class_Normal,7;
+      bonus2 bSubClass,Class_Boss,7;
+      if (.@r>=7) {
+         bonus2 bSubEle,Ele_All,7;
+         if (.@r>=9) {
+            bonus2 bSubSize,Size_All,7;
+            if (getallrefine() >= 22) {
+               bonus2 bSubRace,RC_All,7;
+               bonus2 bSubRace,RC_Player_Human,-7;
+               bonus2 bSubRace,RC_Player_Doram,-7;
+            }
+         }
+      }
+  - Id: 310582
+    AegisName: Wolf_Orb_P_Full_1
+    Name: Wolf Orb (Powerful) Level 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bMagicAtkEle,Ele_All,2;
+      bonus bLongAtkRate,2;
+      bonus bShortAtkRate,2;
+      if (.@r>=7) {
+         bonus2 bMagicAtkEle,Ele_All,2;
+         bonus bLongAtkRate,2;
+         bonus bShortAtkRate,2;
+         if (.@r>=9) {
+            bonus2 bMagicAtkEle,Ele_All,2;
+            bonus bLongAtkRate,2;
+            bonus bShortAtkRate,2;
+            if (getallrefine() >= 22) {
+               bonus2 bMagicAtkEle,Ele_All,2;
+               bonus bLongAtkRate,2;
+               bonus bShortAtkRate,2;
+            }
+         }
+      }
+  - Id: 310583
+    AegisName: Wolf_Orb_P_Full_2
+    Name: Wolf Orb (Powerful) Level 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bMagicAtkEle,Ele_All,2;
+      bonus bLongAtkRate,2;
+      bonus bShortAtkRate,2;
+      if (.@r>=7) {
+         bonus2 bMagicAtkEle,Ele_All,2;
+         bonus bLongAtkRate,2;
+         bonus bShortAtkRate,2;
+         if (.@r>=9) {
+            bonus2 bMagicAtkEle,Ele_All,3;
+            bonus bLongAtkRate,3;
+            bonus bShortAtkRate,3;
+            if (getallrefine() >= 22) {
+               bonus2 bMagicAtkEle,Ele_All,3;
+               bonus bLongAtkRate,3;
+               bonus bShortAtkRate,3;
+            }
+         }
+      }
+  - Id: 310584
+    AegisName: Wolf_Orb_P_Full_3
+    Name: Wolf Orb (Powerful) Level 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bMagicAtkEle,Ele_All,3;
+      bonus bLongAtkRate,3;
+      bonus bShortAtkRate,3;
+      if (.@r>=7) {
+         bonus2 bMagicAtkEle,Ele_All,3;
+         bonus bLongAtkRate,3;
+         bonus bShortAtkRate,3;
+         if (.@r>=9) {
+            bonus2 bMagicAtkEle,Ele_All,3;
+            bonus bLongAtkRate,3;
+            bonus bShortAtkRate,3;
+            if (getallrefine() >= 22) {
+               bonus2 bMagicAtkEle,Ele_All,3;
+               bonus bLongAtkRate,3;
+               bonus bShortAtkRate,3;
+            }
+         }
+      }
+  - Id: 310585
+    AegisName: Wolf_Orb_M_Counter_1
+    Name: Wolf Orb (Mirror Counter) Level 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bReduceDamageReturn,2;
+      if (.@r>=7) {
+         bonus bReduceDamageReturn,2;
+         if (.@r>=9) {
+            bonus bReduceDamageReturn,3;
+            if (getallrefine() >= 22) {
+               bonus bReduceDamageReturn,3;
+            }
+         }
+      }
+  - Id: 310586
+    AegisName: Wolf_Orb_M_Counter_2
+    Name: Wolf Orb (Mirror Counter) Level 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bReduceDamageReturn,3;
+      if (.@r>=7) {
+         bonus bReduceDamageReturn,3;
+         if (.@r>=9) {
+            bonus bReduceDamageReturn,4;
+            if (getallrefine() >= 22) {
+               bonus bReduceDamageReturn,4;
+            }
+         }
+      }
+  - Id: 310587
+    AegisName: Wolf_Orb_M_Counter_3
+    Name: Wolf Orb (Mirror Counter) Level 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bReduceDamageReturn,4;
+      if (.@r>=7) {
+         bonus bReduceDamageReturn,4;
+         if (.@r>=9) {
+            bonus bReduceDamageReturn,5;
+            if (getallrefine() >= 22) {
+               bonus bReduceDamageReturn,5;
+            }
+         }
+      }
+  - Id: 310588
+    AegisName: Wolf_Orb_Hp_1
+    Name: Wolf Orb (Vital) Level 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHPrate,5;
+      bonus bMaxHP,1500;
+      if (.@r>=7) {
+         bonus bMaxHPrate,2;
+         if (.@r>=9) {
+            bonus bMaxHPrate,2;
+            if (getallrefine() >= 22) {
+               bonus bMaxHPrate,3;
+            }
+         }
+      }
+  - Id: 310589
+    AegisName: Wolf_Orb_Sp_1
+    Name: Wolf Orb (Mental) Level 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMaxSPrate,5;
+      bonus bMaxSP,300;
+      if (.@r>=7) {
+         bonus bMaxSPrate,2;
+         if (.@r>=9) {
+            bonus bMaxSPrate,2;
+            if (getallrefine() >= 22) {
+               bonus bMaxSPrate,3;
+            }
+         }
+      }
+  - Id: 310590
+    AegisName: Wolf_Orb_Heal_1
+    Name: Wolf Orb (Heal) Level 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bHealPower,3;
+      if (.@r>=7) {
+         bonus bHealPower,4;
+         if (.@r>=9) {
+            bonus bHealPower,5;
+            if (getallrefine() >= 22) {
+               bonus bHealPower,5;
+            }
+         }
+      }
+  - Id: 310591
+    AegisName: Wolf_Orb_Hp_2
+    Name: Wolf Orb (Vital) Level 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHPrate,5;
+      bonus bMaxHP,2000;
+      if (.@r>=7) {
+         bonus bMaxHPrate,3;
+         if (.@r>=9) {
+            bonus bMaxHPrate,4;
+            if (getallrefine() >= 22) {
+               bonus bMaxHPrate,5;
+            }
+         }
+      }
+  - Id: 310592
+    AegisName: Wolf_Orb_Sp_2
+    Name: Wolf Orb (Mental) Level 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMaxSPrate,5;
+      bonus bMaxSP,400;
+      if (.@r>=7) {
+         bonus bMaxSPrate,3;
+         if (.@r>=9) {
+            bonus bMaxSPrate,4;
+            if (getallrefine() >= 22) {
+               bonus bMaxSPrate,5;
+            }
+         }
+      }
+  - Id: 310593
+    AegisName: Wolf_Orb_Heal_2
+    Name: Wolf Orb (Heal) Level 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bHealPower,5;
+      if (.@r>=7) {
+         bonus bHealPower,5;
+         if (.@r>=9) {
+            bonus bHealPower,5;
+            if (getallrefine() >= 22) {
+               bonus bHealPower,5;
+            }
+         }
+      }
+  - Id: 310594
+    AegisName: Wolf_Orb_Hp_3
+    Name: Wolf Orb (Vital) Level 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHPrate,5;
+      bonus bMaxHP,2500;
+      if (.@r>=7) {
+         bonus bMaxHPrate,5;
+         if (.@r>=9) {
+            bonus bMaxHPrate,5;
+            if (getallrefine() >= 22) {
+               bonus bMaxHPrate,5;
+            }
+         }
+      }
+  - Id: 310595
+    AegisName: Wolf_Orb_Sp_3
+    Name: Wolf Orb (Mental) Level 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMaxSPrate,5;
+      bonus bMaxSP,450;
+      if (.@r>=7) {
+         bonus bMaxSPrate,5;
+         if (.@r>=9) {
+            bonus bMaxSPrate,5;
+            if (getallrefine() >= 22) {
+               bonus bMaxSPrate,5;
+            }
+         }
+      }
+  - Id: 310596
+    AegisName: Wolf_Orb_Heal_3
+    Name: Wolf Orb (Heal) Level 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bHealPower,5;
+      if (.@r>=7) {
+         bonus bHealPower,5;
+         if (.@r>=9) {
+            bonus bHealPower,7;
+            if (getallrefine() >= 22) {
+               bonus bHealPower,7;
+            }
+         }
+      }
+  - Id: 310597
+    AegisName: Wolf_Orb_Robust_1
+    Name: Wolf Orb (Robust) Level 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHPrate,5;
+      bonus bMaxSPrate,5;
+      bonus bMaxHP,1200;
+      bonus bMaxSP,250;
+      if (.@r>=7) {
+         bonus bMaxHPrate,1;
+         bonus bMaxSPrate,1;
+         if (.@r>=9) {
+            bonus bMaxHPrate,2;
+            bonus bMaxSPrate,2;
+            if (getallrefine() >= 22) {
+               bonus bMaxHPrate,2;
+               bonus bMaxSPrate,2;
+            }
+         }
+      }
+  - Id: 310598
+    AegisName: Wolf_Orb_Robust_2
+    Name: Wolf Orb (Robust) Level 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHPrate,5;
+      bonus bMaxSPrate,5;
+      bonus bMaxHP,1500;
+      bonus bMaxSP,300;
+      if (.@r>=7) {
+         bonus bMaxHPrate,2;
+         bonus bMaxSPrate,2;
+         if (.@r>=9) {
+            bonus bMaxHPrate,3;
+            bonus bMaxSPrate,3;
+            if (getallrefine() >= 22) {
+               bonus bMaxHPrate,4;
+               bonus bMaxSPrate,4;
+            }
+         }
+      }
+  - Id: 310599
+    AegisName: Wolf_Orb_Robust_3
+    Name: Wolf Orb (Robust) Level 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHPrate,5;
+      bonus bMaxSPrate,5;
+      bonus bMaxHP,2000;
+      bonus bMaxSP,350;
+      if (.@r>=7) {
+         bonus bMaxHPrate,3;
+         bonus bMaxSPrate,3;
+         if (.@r>=9) {
+            bonus bMaxHPrate,4;
+            bonus bMaxSPrate,4;
+            if (getallrefine() >= 22) {
+               bonus bMaxHPrate,5;
+               bonus bMaxSPrate,5;
+            }
+         }
+      }
+  - Id: 310600
+    AegisName: Wolf_Orb_F_Cast_1
+    Name: Wolf Orb (Fixed Casting) Level 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bFixedCast,-500;
+  - Id: 310601
+    AegisName: Wolf_Orb_F_Cast_2
+    Name: Wolf Orb (Fixed Casting) Level 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bFixedCast,-700;
+  - Id: 310602
+    AegisName: Wolf_Orb_F_Cast_3
+    Name: Wolf Orb (Fixed Casting) Level 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bFixedCast,-1000;
+  - Id: 310603
+    AegisName: Wolf_Orb_M_F_1
+    Name: Wolf Orb (Magical Force) Level 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bMagicAddSize,Size_All,2;
+      if (.@r>=7) {
+         bonus2 bMagicAddSize,Size_All,2;
+         if (.@r>=9) {
+            bonus2 bMagicAddSize,Size_All,2;
+            if (getallrefine() >= 22) {
+               bonus2 bMagicAddSize,Size_All,2;
+            }
+         }
+      }
+  - Id: 310604
+    AegisName: Wolf_Orb_P_F_1
+    Name: Wolf Orb (Physical Force) Level 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bAddSize,Size_All,2;
+      if (.@r>=7) {
+         bonus2 bAddSize,Size_All,2;
+         if (.@r>=9) {
+            bonus2 bAddSize,Size_All,2;
+            if (getallrefine() >= 22) {
+               bonus2 bAddSize,Size_All,2;
+            }
+         }
+      }
+  - Id: 310605
+    AegisName: Wolf_Orb_M_F_2
+    Name: Wolf Orb (Magical Force) Level 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bMagicAddSize,Size_All,3;
+      if (.@r>=7) {
+         bonus2 bMagicAddSize,Size_All,3;
+         if (.@r>=9) {
+            bonus2 bMagicAddSize,Size_All,3;
+            if (getallrefine() >= 22) {
+               bonus2 bMagicAddSize,Size_All,3;
+            }
+         }
+      }
+  - Id: 310606
+    AegisName: Wolf_Orb_P_F_2
+    Name: Wolf Orb (Physical Force) Level 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bAddSize,Size_All,3;
+      if (.@r>=7) {
+         bonus2 bAddSize,Size_All,3;
+         if (.@r>=9) {
+            bonus2 bAddSize,Size_All,3;
+            if (getallrefine() >= 22) {
+               bonus2 bAddSize,Size_All,3;
+            }
+         }
+      }
+  - Id: 310607
+    AegisName: Wolf_Orb_M_F_3
+    Name: Wolf Orb (Magical Force) Level 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bMagicAddSize,Size_All,4;
+      if (.@r>=7) {
+         bonus2 bMagicAddSize,Size_All,4;
+         if (.@r>=9) {
+            bonus2 bMagicAddSize,Size_All,4;
+            if (getallrefine() >= 22) {
+               bonus2 bMagicAddSize,Size_All,4;
+            }
+         }
+      }
+  - Id: 310608
+    AegisName: Wolf_Orb_P_F_3
+    Name: Wolf Orb (Physical Force) Level 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bAddSize,Size_All,4;
+      if (.@r>=7) {
+         bonus2 bAddSize,Size_All,4;
+         if (.@r>=9) {
+            bonus2 bAddSize,Size_All,4;
+            if (getallrefine() >= 22) {
+               bonus2 bAddSize,Size_All,4;
+            }
+         }
+      }
+  - Id: 310609
+    AegisName: Wolf_Orb_Un_Vit
+    Name: Wolf Orb (Unlimited Vital)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      autobonus "{ bonus2 bAddClass,Class_All,25; bonus bVit,50; }",30,10000,BF_WEAPON;
+  - Id: 310610
+    AegisName: Wolf_Orb_Sp_Int
+    Name: Wolf Orb (Spell Buster)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      autobonus "{ bonus bMatkRate,25; bonus bInt,50; }",30,10000,BF_MAGIC;
+  - Id: 310611
+    AegisName: Wolf_Orb_Fi_Dex
+    Name: Wolf Orb (Firing Shot)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      autobonus "{ bonus bLongAtkRate,15; bonus bDex,50; }",30,10000,BF_WEAPON;
+  - Id: 310612
+    AegisName: Wolf_Orb_Ov_Str
+    Name: Wolf Orb (Overpower)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      autobonus "{ bonus bShortAtkRate,15; bonus bStr,50; }",30,10000,BF_WEAPON;
+  - Id: 310613
+    AegisName: Wolf_Orb_Fa_Agi
+    Name: Wolf Orb (Fatal Flash)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      autobonus "{ bonus bCritAtkRate,25; bonus bAgi,50; }",30,10000,BF_WEAPON;
+  - Id: 310614
+    AegisName: Wolf_Orb_Lu_Luk
+    Name: Wolf Orb (Lucky Strike)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      autobonus "{ bonus2 bMagicAtkEle,Ele_All,15; bonus bLuk,50; }",30,10000,BF_MAGIC;
+  - Id: 310616
+    AegisName: Wolf_Orb_E_Archer_1
+    Name: Wolf Orb (Expert Archer) Level 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bLongAtkRate,4;
+      bonus bHit,8;
+  - Id: 310617
+    AegisName: Wolf_Orb_Fatal_1
+    Name: Wolf Orb (Fatal) Level 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bCritAtkRate,6;
+      bonus bCritical,6;
+  - Id: 310618
+    AegisName: Wolf_Orb_F_Spirit_1
+    Name: Wolf Orb (Fighting Spirit) Level 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bShortAtkRate,4;
+      bonus bPerfectHitAddRate,2;
+  - Id: 310619
+    AegisName: Wolf_Orb_Spell_1
+    Name: Wolf Orb (Spell) Level 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bVariableCastrate,-4;
+      bonus bMatk,18;
+  - Id: 310620
+    AegisName: Wolf_Orb_A_Delay_2
+    Name: Wolf Orb (Delay After Attack) Level 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bAspdRate,6;
+      bonus bBaseAtk,22;
+  - Id: 310621
+    AegisName: Wolf_Orb_E_Archer_2
+    Name: Wolf Orb (Expert Archer) Level 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bLongAtkRate,6;
+      bonus bHit,12;
+  - Id: 310622
+    AegisName: Wolf_Orb_Fatal_2
+    Name: Wolf Orb (Fatal) Level 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bCritAtkRate,8;
+      bonus bCritical,9;
+  - Id: 310623
+    AegisName: Wolf_Orb_F_Spirit_2
+    Name: Wolf Orb (Fighting Spirit) Level 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bShortAtkRate,6;
+      bonus bPerfectHitAddRate,3;
+  - Id: 310624
+    AegisName: Wolf_Orb_Spell_2
+    Name: Wolf Orb (Spell) Level 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bVariableCastrate,-6;
+      bonus bMatk,22;
+  - Id: 310625
+    AegisName: Wolf_Orb_A_Delay_3
+    Name: Wolf Orb (Delay After Attack) Level 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bAspdRate,8;
+      bonus bBaseAtk,26;
+  - Id: 310626
+    AegisName: Wolf_Orb_E_Archer_3
+    Name: Wolf Orb (Expert Archer) Level 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bLongAtkRate,8;
+      bonus bHit,16;
+  - Id: 310627
+    AegisName: Wolf_Orb_Fatal_3
+    Name: Wolf Orb (Fatal) Level 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bCritAtkRate,10;
+      bonus bCritical,12;
+  - Id: 310628
+    AegisName: Wolf_Orb_F_Spirit_3
+    Name: Wolf Orb (Fighting Spirit) Level 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bShortAtkRate,8;
+      bonus bPerfectHitAddRate,4;
+  - Id: 310629
+    AegisName: Wolf_Orb_Spell_3
+    Name: Wolf Orb (Spell) Level 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bVariableCastrate,-8;
+      bonus bMatk,26;
+  - Id: 310630
+    AegisName: Wolf_Orb_A_Delay_4
+    Name: Wolf Orb (Delay After Attack) Level 4
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bAspdRate,10;
+      bonus bBaseAtk,30;
+  - Id: 310631
+    AegisName: Wolf_Orb_E_Archer_4
+    Name: Wolf Orb (Expert Archer) Level 4
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bLongAtkRate,10;
+      bonus bHit,20;
+  - Id: 310632
+    AegisName: Wolf_Orb_Fatal_4
+    Name: Wolf Orb (Fatal) Level 4
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bCritAtkRate,12;
+      bonus bCritical,15;
+  - Id: 310633
+    AegisName: Wolf_Orb_F_Spirit_4
+    Name: Wolf Orb (Fighting Spirit) Level 4
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bShortAtkRate,10;
+      bonus bPerfectHitAddRate,5;
+  - Id: 310634
+    AegisName: Wolf_Orb_Spell_4
+    Name: Wolf Orb (Spell) Level 4
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bVariableCastrate,-10;
+      bonus bMatk,30;
+  - Id: 310635
+    AegisName: Wolf_Orb_HealHP_1
+    Name: Wolf Orb (HP Recovery) Level 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bHPrecovRate,20;
+  - Id: 310636
+    AegisName: Wolf_Orb_HealSP_1
+    Name: Wolf Orb (SP Recovery) Level 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bSPrecovRate,20;
+  - Id: 310637
+    AegisName: Wolf_Orb_HealHP_2
+    Name: Wolf Orb (HP Recovery) Level 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bHPrecovRate,30;
+  - Id: 310638
+    AegisName: Wolf_Orb_HealSP_2
+    Name: Wolf Orb (SP Recovery) Level 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bSPrecovRate,30;
+  - Id: 310639
+    AegisName: Wolf_Orb_HealHP_3
+    Name: Wolf Orb (HP Recovery) Level 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bHPrecovRate,40;
+  - Id: 310640
+    AegisName: Wolf_Orb_HealSP_3
+    Name: Wolf Orb (SP Recovery) Level 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bSPrecovRate,40;
+  - Id: 310641
+    AegisName: Wolf_Orb_HealHP_4
+    Name: Wolf Orb (HP Recovery) Level 4
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bHPrecovRate,50;
+  - Id: 310642
+    AegisName: Wolf_Orb_HealSP_4
+    Name: Wolf Orb (SP Recovery) Level 4
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bSPrecovRate,50;
+  - Id: 310643
+    AegisName: Wolf_Orb_Life
+    Name: Wolf Orb (Drain Life)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bHPDrainRate,40,2;
+  - Id: 310644
+    AegisName: Wolf_Orb_Soul
+    Name: Wolf Orb (Drain Soul)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bSPDrainRate,10,3;
+  - Id: 310645
+    AegisName: Wolf_Orb_M_Heal
+    Name: Wolf Orb (Magic Healing)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      autobonus "{ bonus2 bHPRegenRate,700,500; }",40,19000,BF_MAGIC;
+  - Id: 310646
+    AegisName: Wolf_Orb_M_Soul
+    Name: Wolf Orb (Magic Soul)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      autobonus "{ bonus2 bSPRegenRate,100,500; }",20,19000,BF_MAGIC;
+  - Id: 310647
+    AegisName: Wolf_Orb_A_Force
+    Name: Wolf Orb (All Force)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAtkEle,Ele_All,7;
+      bonus bLongAtkRate,7;
+      bonus bShortAtkRate,7;
   - Id: 311092
     AegisName: Ice_F_Orb_Str
     Name: Ice Magic Orb (STR)
@@ -133911,6 +136589,1547 @@ Body:
             bonus2 bSkillAtk,"MG_FIREBALL",15;
             bonus2 bSkillAtk,"MG_LIGHTNINGBOLT",15;
           }
+        }
+      }
+  - Id: 311192
+    AegisName: Glacier_F_Orb_1
+    Name: Glacier Magic Orb (Dragon Breath)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"KN_BOWLINGBASH",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"KN_BOWLINGBASH",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"KN_BOWLINGBASH",20;
+        }
+      }
+  - Id: 311193
+    AegisName: Glacier_F_Orb_2
+    Name: Glacier Magic Orb (Wind Cutter)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"KN_BOWLINGBASH",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"KN_BOWLINGBASH",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"KN_BOWLINGBASH",20;
+        }
+      }
+  - Id: 311194
+    AegisName: Glacier_F_Orb_3
+    Name: Glacier Magic Orb (Ignition Break)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"KN_BOWLINGBASH",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus bDelayrate,-5;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"KN_BOWLINGBASH",20;
+        }
+      }
+  - Id: 311195
+    AegisName: Glacier_F_Orb_4
+    Name: Glacier Magic Orb (Hundred Spear)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"KN_PIERCE",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus bDelayrate,-7;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"KN_PIERCE",20;
+        }
+      }
+  - Id: 311196
+    AegisName: Glacier_F_Orb_5
+    Name: Glacier Magic Orb (Sonic Wave)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"LK_SPIRALPIERCE",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus bDelayrate,-7;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"LK_SPIRALPIERCE",20;
+        }
+      }
+  - Id: 311197
+    AegisName: Glacier_F_Orb_6
+    Name: Glacier Magic Orb (Over Brand)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"KN_BRANDISHSPEAR",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillUseSPrate,"KN_BRANDISHSPEAR",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"KN_BRANDISHSPEAR",20;
+        }
+      }
+  - Id: 311198
+    AegisName: Glacier_F_Orb_7
+    Name: Glacier Magic Orb (Hesperus Lit)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"CR_GRANDCROSS",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"CR_GRANDCROSS",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"CR_GRANDCROSS",20;
+        }
+      }
+  - Id: 311199
+    AegisName: Glacier_F_Orb_8
+    Name: Glacier Magic Orb (Banishing Point)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"CR_HOLYCROSS",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"CR_HOLYCROSS",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"CR_HOLYCROSS",20;
+        }
+      }
+  - Id: 311200
+    AegisName: Glacier_F_Orb_9
+    Name: Glacier Magic Orb (Cannon Spear)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"PA_SHIELDCHAIN",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus bDelayrate,-2;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"PA_SHIELDCHAIN",20;
+        }
+      }
+  - Id: 311201
+    AegisName: Glacier_F_Orb_10
+    Name: Glacier Magic Orb (Ray of Genesis)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"CR_GRANDCROSS",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus bDelayrate,-5;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"CR_GRANDCROSS",20;
+        }
+      }
+  - Id: 311202
+    AegisName: Glacier_F_Orb_11
+    Name: Glacier Magic Orb (Shield Press)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"CR_SHIELDCHARGE",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus bDelayrate,-1;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"CR_SHIELDCHARGE",20;
+        }
+      }
+  - Id: 311203
+    AegisName: Glacier_F_Orb_12
+    Name: Glacier Magic Orb (Earth Drive)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"CR_SHIELDBOOMERANG",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus bDelayrate,-6;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"CR_SHIELDBOOMERANG",20;
+        }
+      }
+  - Id: 311204
+    AegisName: Glacier_F_Orb_13
+    Name: Glacier Magic Orb (Boost Knuckle)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"WS_CARTTERMINATION",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"WS_CARTTERMINATION",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"WS_CARTTERMINATION",20;
+        }
+      }
+  - Id: 311205
+    AegisName: Glacier_F_Orb_14
+    Name: Glacier Magic Orb (Arm Cannon)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"WS_CARTTERMINATION",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"WS_CARTTERMINATION",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"WS_CARTTERMINATION",10;
+        }
+      }
+  - Id: 311206
+    AegisName: Glacier_F_Orb_15
+    Name: Glacier Magic Orb (Axe Tornado)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"MC_MAMMONITE",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus bDelayrate,-5;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"MC_MAMMONITE",20;
+        }
+      }
+  - Id: 311207
+    AegisName: Glacier_F_Orb_16
+    Name: Glacier Magic Orb (Power Swing)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"MC_MAMMONITE",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"MC_MAMMONITE",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"MC_MAMMONITE",20;
+        }
+      }
+  - Id: 311208
+    AegisName: Glacier_F_Orb_17
+    Name: Glacier Magic Orb (Vulcan Arm)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"WS_CARTTERMINATION",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"WS_CARTTERMINATION",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"WS_CARTTERMINATION",20;
+        }
+      }
+  - Id: 311209
+    AegisName: Glacier_F_Orb_18
+    Name: Glacier Magic Orb (Axe Boomerang)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"MC_CARTREVOLUTION",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"MC_CARTREVOLUTION",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"MC_CARTREVOLUTION",20;
+        }
+      }
+  - Id: 311210
+    AegisName: Glacier_F_Orb_19
+    Name: Glacier Magic Orb (Cart Tornado)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"WS_CARTTERMINATION",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"WS_CARTTERMINATION",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"WS_CARTTERMINATION",20;
+        }
+      }
+  - Id: 311211
+    AegisName: Glacier_F_Orb_20
+    Name: Glacier Magic Orb (Cart Cannon)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"AM_ACIDTERROR",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"AM_ACIDTERROR",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"AM_ACIDTERROR",20;
+        }
+      }
+  - Id: 311212
+    AegisName: Glacier_F_Orb_21
+    Name: Glacier Magic Orb (Spore Explosion)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"AM_ACIDTERROR",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus bDelayrate,-10;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"AM_ACIDTERROR",20;
+        }
+      }
+  - Id: 311213
+    AegisName: Glacier_F_Orb_22
+    Name: Glacier Magic Orb (Crazy Weed)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"AM_DEMONSTRATION",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus bDelayrate,-12;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"AM_DEMONSTRATION",20;
+        }
+      }
+  - Id: 311214
+    AegisName: Glacier_F_Orb_23
+    Name: Glacier Magic Orb (Cross Ripper Slasher)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"ASC_METEORASSAULT",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"ASC_METEORASSAULT",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"ASC_METEORASSAULT",20;
+        }
+      }
+  - Id: 311215
+    AegisName: Glacier_F_Orb_24
+    Name: Glacier Magic Orb (Rolling Cutter)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"AS_GRIMTOOTH",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"AS_GRIMTOOTH",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"AS_GRIMTOOTH",20;
+        }
+      }
+  - Id: 311216
+    AegisName: Glacier_F_Orb_25
+    Name: Glacier Magic Orb (Counter Slash)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"AS_SONICBLOW",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"AS_SONICBLOW",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"AS_SONICBLOW",20;
+        }
+      }
+  - Id: 311217
+    AegisName: Glacier_F_Orb_26
+    Name: Glacier Magic Orb (Cross Impact)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"AS_SONICBLOW",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillUseSPrate,"AS_SONICBLOW",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"AS_SONICBLOW",20;
+        }
+      }
+  - Id: 311218
+    AegisName: Glacier_F_Orb_27
+    Name: Glacier Magic Orb (Fatal Menace)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"RG_BACKSTAP",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"RG_BACKSTAP",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"RG_BACKSTAP",20;
+        }
+      }
+  - Id: 311219
+    AegisName: Glacier_F_Orb_28
+    Name: Glacier Magic Orb (Triangle Shot)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"AC_DOUBLE",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"AC_DOUBLE",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"AC_DOUBLE",20;
+        }
+      }
+  - Id: 311220
+    AegisName: Glacier_F_Orb_29
+    Name: Glacier Magic Orb (Feint Bomb)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"RG_RAID",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"RG_RAID",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"RG_RAID",20;
+        }
+      }
+  - Id: 311221
+    AegisName: Glacier_F_Orb_30
+    Name: Glacier Magic Orb (Auto Shadow Spell)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus5 bAutoSpell,"WZ_METEOR",7,70,BF_SHORT|BF_NORMAL,0;
+      bonus2 bSkillAtk,"WZ_METEOR",25*(.@r/3);
+      if (.@r>=9) {
+        bonus5 bAutoSpell,"HW_NAPALMVULCAN",5,50,BF_SHORT|BF_NORMAL,0;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"HW_NAPALMVULCAN",40;
+        }
+      }
+  - Id: 311222
+    AegisName: Glacier_F_Orb_31
+    Name: Glacier Magic Orb (Elemental Spell)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"WZ_METEOR",20+10*(.@r/3);
+      bonus2 bSkillAtk,"WZ_FROSTNOVA",20+10*(.@r/3);
+      bonus2 bSkillAtk,"WZ_VERMILION",20+10*(.@r/3);
+      bonus2 bSkillAtk,"WZ_HEAVENDRIVE",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"WZ_METEOR",20;
+        bonus2 bSkillAtk,"WZ_FROSTNOVA",20;
+        bonus2 bSkillAtk,"WZ_VERMILION",20;
+        bonus2 bSkillAtk,"WZ_HEAVENDRIVE",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"WZ_METEOR",20;
+          bonus2 bSkillAtk,"WZ_FROSTNOVA",20;
+          bonus2 bSkillAtk,"WZ_VERMILION",20;
+          bonus2 bSkillAtk,"WZ_HEAVENDRIVE",20;
+        }
+      }
+  - Id: 311223
+    AegisName: Glacier_F_Orb_32
+    Name: Glacier Magic Orb (Soul Expansion)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"MG_SOULSTRIKE",20+10*(.@r/3);
+      if (.@r>=9) {
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"MG_SOULSTRIKE",20;
+        }
+      }
+  - Id: 311224
+    AegisName: Glacier_F_Orb_33
+    Name: Glacier Magic Orb (Comet)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"WZ_METEOR",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillUseSPrate,"WZ_METEOR",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"WZ_METEOR",20;
+        }
+      }
+  - Id: 311225
+    AegisName: Glacier_F_Orb_34
+    Name: Glacier Magic Orb (Psychic Wave)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"PF_SOULBURN",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus bDelayrate,-7;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"PF_SOULBURN",20;
+        }
+      }
+  - Id: 311226
+    AegisName: Glacier_F_Orb_35
+    Name: Glacier Magic Orb (Diamond Dust)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"MG_COLDBOLT",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"MG_COLDBOLT",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"MG_COLDBOLT",20;
+        }
+      }
+  - Id: 311227
+    AegisName: Glacier_F_Orb_36
+    Name: Glacier Magic Orb (Varetyr Spear)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"MG_THUNDERSTORM",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus bDelayrate,-10;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"MG_THUNDERSTORM",20;
+        }
+      }
+  - Id: 311228
+    AegisName: Glacier_F_Orb_37
+    Name: Glacier Magic Orb (Earth Grave)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"WZ_EARTHSPIKE",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus bDelayrate,-10;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"WZ_EARTHSPIKE",20;
+        }
+      }
+  - Id: 311229
+    AegisName: Glacier_F_Orb_38
+    Name: Glacier Magic Orb (Poison Buster)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"WZ_HEAVENDRIVE",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus bDelayrate,-5;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"WZ_HEAVENDRIVE",20;
+        }
+      }
+  - Id: 311230
+    AegisName: Glacier_F_Orb_39
+    Name: Glacier Magic Orb (Adoramus)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"PR_MAGNUS",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"PR_MAGNUS",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"PR_MAGNUS",20;
+        }
+      }
+  - Id: 311231
+    AegisName: Glacier_F_Orb_40
+    Name: Glacier Magic Orb (Judex)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"AL_HOLYLIGHT",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"AL_HOLYLIGHT",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"AL_HOLYLIGHT",20;
+        }
+      }
+  - Id: 311232
+    AegisName: Glacier_F_Orb_41
+    Name: Glacier Magic Orb (Duple Light)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bAddRace,RC_Undead,20+10*(.@r/3);
+      bonus2 bMagicAddRace,RC_Undead,20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bAddRace,RC_Undead,20;
+        bonus2 bMagicAddRace,RC_Undead,20;
+        if (getallrefine() >= 22) {
+          bonus2 bAddRace,RC_Undead,20;
+          bonus2 bMagicAddRace,RC_Undead,20;
+        }
+      }
+  - Id: 311233
+    AegisName: Glacier_F_Orb_42
+    Name: Glacier Magic Orb (Tiger Cannon)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"MO_EXTREMITYFIST",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus bDelayrate,-5;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"MO_EXTREMITYFIST",20;
+        }
+      }
+  - Id: 311234
+    AegisName: Glacier_F_Orb_43
+    Name: Glacier Magic Orb (Rampage Blaster)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"MO_EXTREMITYFIST",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus bDelayrate,-5;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"MO_EXTREMITYFIST",20;
+        }
+      }
+  - Id: 311235
+    AegisName: Glacier_F_Orb_44
+    Name: Glacier Magic Orb (Sky Net Blow)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"MO_CHAINCOMBO",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"MO_CHAINCOMBO",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"MO_CHAINCOMBO",20;
+        }
+      }
+  - Id: 311236
+    AegisName: Glacier_F_Orb_45
+    Name: Glacier Magic Orb (Ride In Lightening)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"MO_BODYRELOCATION",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"MO_BODYRELOCATION",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"MO_BODYRELOCATION",20;
+        }
+      }
+  - Id: 311237
+    AegisName: Glacier_F_Orb_46
+    Name: Glacier Magic Orb (Knuckle Arrow)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"MO_FINGEROFFENSIVE",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"MO_FINGEROFFENSIVE",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"MO_FINGEROFFENSIVE",20;
+        }
+      }
+  - Id: 311238
+    AegisName: Glacier_F_Orb_47
+    Name: Glacier Magic Orb (Aimed Bolt)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"SN_SHARPSHOOTING",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus bDelayrate,-5;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"SN_SHARPSHOOTING",20;
+        }
+      }
+  - Id: 311239
+    AegisName: Glacier_F_Orb_48
+    Name: Glacier Magic Orb (Arrow Storm)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"AC_SHOWER",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus bDelayrate,-6;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"AC_SHOWER",20;
+        }
+      }
+  - Id: 311240
+    AegisName: Glacier_F_Orb_49
+    Name: Glacier Magic Orb (Warg Strike)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"HT_BLITZBEAT",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"HT_BLITZBEAT",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"HT_BLITZBEAT",20;
+        }
+      }
+  - Id: 311241
+    AegisName: Glacier_F_Orb_50
+    Name: Glacier Magic Orb (Severe Rainstorm)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"CG_ARROWVULCAN",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus bDelayrate,-10;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"CG_ARROWVULCAN",20;
+        }
+      }
+  - Id: 311242
+    AegisName: Glacier_F_Orb_51
+    Name: Glacier Magic Orb (Metallic Sound)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"BA_MUSICALSTRIKE",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus bDelayrate,-10;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"BA_MUSICALSTRIKE",20;
+        }
+      }
+  - Id: 311243
+    AegisName: Glacier_F_Orb_52
+    Name: Glacier Magic Orb (Reverberation)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"BA_MUSICALSTRIKE",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"BA_MUSICALSTRIKE",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"BA_MUSICALSTRIKE",20;
+        }
+      }
+  - Id: 311244
+    AegisName: Glacier_F_Orb_53
+    Name: Glacier Magic Orb (Prominence Burst)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"TK_DOWNKICK",20+10*(.@r/3);
+      bonus2 bSkillAtk,"TK_STORMKICK",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"TK_DOWNKICK",20;
+        bonus2 bSkillAtk,"TK_STORMKICK",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"TK_DOWNKICK",20;
+          bonus2 bSkillAtk,"TK_STORMKICK",20;
+        }
+      }
+  - Id: 311245
+    AegisName: Glacier_F_Orb_54
+    Name: Glacier Magic Orb (Moon Kick)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"TK_TURNKICK",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"TK_TURNKICK",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"TK_TURNKICK",20;
+        }
+      }
+  - Id: 311246
+    AegisName: Glacier_F_Orb_55
+    Name: Glacier Magic Orb (Flash Fall)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"TK_JUMPKICK",20+10*(.@r/3);
+      bonus2 bSkillAtk,"TK_COUNTER",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"TK_JUMPKICK",20;
+        bonus2 bSkillAtk,"TK_COUNTER",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"TK_JUMPKICK",20;
+          bonus2 bSkillAtk,"TK_COUNTER",20;
+        }
+      }
+  - Id: 311247
+    AegisName: Glacier_F_Orb_56
+    Name: Glacier Magic Orb (Espa)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"SL_STIN",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"SL_STIN",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"SL_STIN",20;
+        }
+      }
+  - Id: 311248
+    AegisName: Glacier_F_Orb_57
+    Name: Glacier Magic Orb (Eswhoo)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"SL_STUN",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"SL_STUN",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"SL_STUN",20;
+        }
+      }
+  - Id: 311249
+    AegisName: Glacier_F_Orb_58
+    Name: Glacier Magic Orb (Curse Explosion)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"SL_SMA",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"SL_SMA",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"SL_SMA",20;
+        }
+      }
+  - Id: 311250
+    AegisName: Glacier_F_Orb_59
+    Name: Glacier Magic Orb (Fire Dance)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"GS_RAPIDSHOWER",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"GS_RAPIDSHOWER",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"GS_RAPIDSHOWER",20;
+        }
+      }
+  - Id: 311251
+    AegisName: Glacier_F_Orb_60
+    Name: Glacier Magic Orb (Hammer of God)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"GS_DUST",20+10*(.@r/3);
+      if (.@r>=9) {
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"GS_DUST",20;
+        }
+      }
+  - Id: 311252
+    AegisName: Glacier_F_Orb_61
+    Name: Glacier Magic Orb (Dragon Tail)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"GS_DESPERADO",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus bDelayrate,-10;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"GS_DESPERADO",20;
+        }
+      }
+  - Id: 311253
+    AegisName: Glacier_F_Orb_62
+    Name: Glacier Magic Orb (Storm Buster)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"GS_SPREADATTACK",20+10*(.@r/3);
+      bonus2 bSkillAtk,"GS_FULLBUSTER",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus bDelayrate,-5;
+        bonus2 bSkillAtk,"GS_FULLBUSTER",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"GS_SPREADATTACK",20;
+          bonus2 bSkillAtk,"GS_FULLBUSTER",20;
+        }
+      }
+  - Id: 311254
+    AegisName: Glacier_F_Orb_63
+    Name: Glacier Magic Orb (Round Trip)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"GS_FULLBUSTER",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"GS_FULLBUSTER",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"GS_FULLBUSTER",20;
+        }
+      }
+  - Id: 311255
+    AegisName: Glacier_F_Orb_64
+    Name: Glacier Magic Orb (Cross Slash)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"NJ_ISSEN",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus bDelayrate,-10;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"NJ_ISSEN",20;
+        }
+      }
+  - Id: 311256
+    AegisName: Glacier_F_Orb_65
+    Name: Glacier Magic Orb (Flame Wind)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"NJ_BAKUENRYU",20+10*(.@r/3);
+      bonus2 bSkillAtk,"NJ_HYOUSYOURAKU",20+10*(.@r/3);
+      bonus2 bSkillAtk,"NJ_KAMAITACHI",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"NJ_BAKUENRYU",20;
+        bonus2 bSkillAtk,"NJ_HYOUSYOURAKU",20;
+        bonus2 bSkillAtk,"NJ_KAMAITACHI",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"NJ_BAKUENRYU",20;
+          bonus2 bSkillAtk,"NJ_HYOUSYOURAKU",20;
+          bonus2 bSkillAtk,"NJ_KAMAITACHI",20;
+        }
+      }
+  - Id: 311257
+    AegisName: Glacier_F_Orb_66
+    Name: Glacier Magic Orb (Flame Ice Wind)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"NJ_KOUENKA",20+10*(.@r/3);
+      bonus2 bSkillAtk,"NJ_HYOUSENSOU",20+10*(.@r/3);
+      bonus2 bSkillAtk,"NJ_HUUJIN",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"NJ_KOUENKA",20;
+        bonus2 bSkillAtk,"NJ_HYOUSENSOU",20;
+        bonus2 bSkillAtk,"NJ_HUUJIN",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"NJ_KOUENKA",20;
+          bonus2 bSkillAtk,"NJ_HYOUSENSOU",20;
+          bonus2 bSkillAtk,"NJ_HUUJIN",20;
+        }
+      }
+  - Id: 311258
+    AegisName: Glacier_F_Orb_67
+    Name: Glacier Magic Orb (Kunai Explosion)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"NJ_KUNAI",20+10*(.@r/3);
+      bonus2 bSkillAtk,"NJ_BAKUENRYU",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"NJ_KUNAI",20;
+        bonus2 bSkillAtk,"NJ_BAKUENRYU",20;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"NJ_KUNAI",20;
+          bonus2 bSkillAtk,"NJ_BAKUENRYU",20;
+        }
+      }
+  - Id: 311259
+    AegisName: Glacier_F_Orb_68
+    Name: Glacier Magic Orb (Swirling Petal)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"NJ_HUUMA",20+10*(.@r/3);
+      if (.@r>=9) {
+        bonus bDelayrate,-10;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"NJ_HUUMA",20;
+        }
+      }
+  - Id: 311265
+    AegisName: Glacier_F_Orb_74
+    Name: Glacier Magic Orb (Holy Cross)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"CR_HOLYCROSS",20+20*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"CR_HOLYCROSS",30;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"CR_HOLYCROSS",20;
+        }
+      }
+  - Id: 311266
+    AegisName: Glacier_F_Orb_75
+    Name: Glacier Magic Orb (Back Stab)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"RG_BACKSTAP",20+20*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"RG_BACKSTAP",30;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"RG_BACKSTAP",20;
+        }
+      }
+  - Id: 311267
+    AegisName: Glacier_F_Orb_76
+    Name: Glacier Magic Orb (Shield Boomerang)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"CR_SHIELDBOOMERANG",20+20*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"CR_SHIELDBOOMERANG",30;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"CR_SHIELDBOOMERANG",20;
+        }
+      }
+  - Id: 311268
+    AegisName: Glacier_F_Orb_77
+    Name: Glacier Magic Orb (Lord of Vermilion)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"WZ_VERMILION",20+20*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"WZ_VERMILION",30;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"WZ_VERMILION",20;
+        }
+      }
+  - Id: 311269
+    AegisName: Glacier_F_Orb_78
+    Name: Glacier Magic Orb (Jupitel Thunder)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"WZ_JUPITEL",20+20*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"WZ_JUPITEL",30;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"WZ_JUPITEL",20;
+        }
+      }
+  - Id: 311270
+    AegisName: Glacier_F_Orb_79
+    Name: Glacier Magic Orb (Meteor Storm)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"WZ_METEOR",20+20*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"WZ_METEOR",30;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"WZ_METEOR",20;
+        }
+      }
+  - Id: 311271
+    AegisName: Glacier_F_Orb_80
+    Name: Glacier Magic Orb (Storm Gust)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"WZ_STORMGUST",20+20*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"WZ_STORMGUST",30;
+        if (getallrefine() >= 22) {
+          bonus2 bSkillAtk,"WZ_STORMGUST",20;
+        }
+      }
+  - Id: 311275
+    AegisName: Glacier_F_Orb_84
+    Name: Glacier Magic Orb (Storm Slash)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"KN_BOWLINGBASH",10+5*(.@r/4);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"KN_BOWLINGBASH",10;
+      }
+  - Id: 311277
+    AegisName: Glacier_F_Orb_86
+    Name: Glacier Magic Orb (Shield Shooting)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"CR_SHIELDBOOMERANG",10+5*(.@r/4);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"CR_SHIELDBOOMERANG",10;
+      }
+  - Id: 311279
+    AegisName: Glacier_F_Orb_88
+    Name: Glacier Magic Orb (Axe Stomp)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"MC_CARTREVOLUTION",10+5*(.@r/4);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"MC_CARTREVOLUTION",10;
+      }
+  - Id: 311280
+    AegisName: Glacier_F_Orb_89
+    Name: Glacier Magic Orb (Acidified Zone)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"AM_ACIDTERROR",10+5*(.@r/4);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"AM_ACIDTERROR",10;
+      }
+  - Id: 311283
+    AegisName: Glacier_F_Orb_92
+    Name: Glacier Magic Orb (Impact Crater)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"ASC_METEORASSAULT",10+5*(.@r/4);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"ASC_METEORASSAULT",10;
+      }
+  - Id: 311288
+    AegisName: Glacier_F_Orb_96
+    Name: Glacier Magic Orb (Abyss Square)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"RG_RAID",10+5*(.@r/4);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"RG_RAID",10;
+      }
+  - Id: 311291
+    AegisName: Glacier_F_Orb_99
+    Name: Glacier Magic Orb (Crystal Magic)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"WZ_FROSTNOVA",10+5*(.@r/4);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"WZ_FROSTNOVA",10;
+      }
+  - Id: 311296
+    AegisName: Glacier_F_Orb_104
+    Name: Glacier Magic Orb (Conflagration)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"MG_FIREBALL",10+5*(.@r/4);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"MG_FIREBALL",10;
+      }
+  - Id: 311300
+    AegisName: Glacier_F_Orb_108
+    Name: Glacier Magic Orb (Framen)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"PR_MAGNUS",10+5*(.@r/4);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"PR_MAGNUS",10;
+      }
+  - Id: 311303
+    AegisName: Glacier_F_Orb_111
+    Name: Glacier Magic Orb (Faith)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"MO_INVESTIGATE",10+5*(.@r/4);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"MO_INVESTIGATE",10;
+      }
+  - Id: 311304
+    AegisName: Glacier_F_Orb_112
+    Name: Glacier Magic Orb (Judgment)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"MO_FINGEROFFENSIVE",10+5*(.@r/4);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"MO_FINGEROFFENSIVE",10;
+      }
+  - Id: 311308
+    AegisName: Glacier_F_Orb_116
+    Name: Glacier Magic Orb (Gale Storm)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"AC_SHOWER",10+5*(.@r/4);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"AC_SHOWER",10;
+      }
+  - Id: 311313
+    AegisName: Glacier_F_Orb_121
+    Name: Glacier Magic Orb (Sun)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"TK_STORMKICK",10+5*(.@r/4);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"TK_STORMKICK",10;
+      }
+  - Id: 311321
+    AegisName: Glacier_F_Orb_129
+    Name: Glacier Magic Orb (Shadow)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"NJ_KASUMIKIRI",10+5*(.@r/4);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"NJ_KASUMIKIRI",10;
+      }
+  - Id: 311322
+    AegisName: Glacier_F_Orb_130
+    Name: Glacier Magic Orb (Huuma Shuriken)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"NJ_HUUMA",10+5*(.@r/4);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"NJ_HUUMA",10;
+      }
+  - Id: 311324
+    AegisName: Glacier_F_Orb_132
+    Name: Glacier Magic Orb (Inbeoppo)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"NJ_KOUENKA",10+5*(.@r/4);
+      bonus2 bSkillAtk,"NJ_HYOUSENSOU",10+5*(.@r/4);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"NJ_KOUENKA",10;
+        bonus2 bSkillAtk,"NJ_HYOUSENSOU",10;
+      }
+  - Id: 311325
+    AegisName: Glacier_F_Orb_133
+    Name: Glacier Magic Orb (The Vigilant at Night)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"GS_SPREADATTACK",10+5*(.@r/4);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"GS_SPREADATTACK",10;
+      }
+  - Id: 311326
+    AegisName: Glacier_F_Orb_134
+    Name: Glacier Magic Orb (Only One Bullet)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"GS_TRACKING",10+5*(.@r/4);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"GS_TRACKING",10;
+      }
+  - Id: 311327
+    AegisName: Glacier_F_Orb_135
+    Name: Glacier Magic Orb (Spiral Shooting)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"GS_PIERCINGSHOT",10+5*(.@r/4);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"GS_PIERCINGSHOT",10;
+      }
+  - Id: 311328
+    AegisName: Glacier_F_Orb_136
+    Name: Glacier Magic Orb (Magazine for One)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"GS_RAPIDSHOWER",10+5*(.@r/4);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"GS_RAPIDSHOWER",10;
+      }
+  - Id: 311329
+    AegisName: Glacier_F_Orb_137
+    Name: Glacier Magic Orb (Wild Fire)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"GS_GROUNDDRIFT",10+5*(.@r/4);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"GS_GROUNDDRIFT",10;
+      }
+  - Id: 311335
+    AegisName: Glacier_F_Orb_143
+    Name: Glacier Magic Orb (Double Bowling Bash)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"SM_BASH",10+5*(.@r/4);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"SM_BASH",10;
+      }
+  - Id: 311339
+    AegisName: Glacier_F_Orb_147
+    Name: Glacier Magic Orb (Meteor Thunder)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSkillAtk,"MG_FIREBALL",10+5*(.@r/4);
+      bonus2 bSkillAtk,"MG_LIGHTNINGBOLT",10+5*(.@r/4);
+      if (.@r>=9) {
+        bonus2 bSkillAtk,"MG_FIREBALL",10;
+        bonus2 bSkillAtk,"MG_LIGHTNINGBOLT",10;
+      }
+  - Id: 311342
+    AegisName: Glacier_F_Orb_150
+    Name: Glacier Magic Orb (ATK)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,20*(.@r/3);
+      bonus bLongAtkRate,5*(.@r/3);
+      bonus bShortAtkRate,5*(.@r/3);
+      if (.@r>=9) {
+        bonus2 bAddClass,Class_All,10;
+        if (getallrefine() >= 22 ) {
+          bonus bPAtk,5;
+          .@i = getiteminfo(getequipid(EQI_HAND_R), ITEMINFO_VIEW);
+          if (.@i == W_2HSWORD || .@i == W_2HSPEAR || .@i == W_2HSTAFF || .@i == W_2HAXE || .@i == W_KATAR || .@i == W_BOW || .@i == W_HUUMA || .@i == W_REVOLVER || .@i == W_RIFLE || .@i == W_GATLING || .@i == W_SHOTGUN || .@i == W_GRENADE) {
+            bonus bLongAtkRate,10;
+            bonus bShortAtkRate,10;
+          }
+        }
+      }
+  - Id: 311343
+    AegisName: Glacier_F_Orb_151
+    Name: Glacier Magic Orb (MATK)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMatk,20*(.@r/3);
+      bonus2 bMagicAtkEle,Ele_All,5*(.@r/3);
+      if (.@r>=9) {
+        bonus bMatkRate,10;
+        if (getallrefine() >= 22 ) {
+          bonus bSMatk,5;
+          .@i = getiteminfo(getequipid(EQI_HAND_R), ITEMINFO_VIEW);
+          if (.@i == W_2HSWORD || .@i == W_2HSPEAR || .@i == W_2HSTAFF || .@i == W_2HAXE || .@i == W_KATAR || .@i == W_BOW || .@i == W_HUUMA || .@i == W_REVOLVER || .@i == W_RIFLE || .@i == W_GATLING || .@i == W_SHOTGUN || .@i == W_GRENADE) {
+            bonus2 bMagicAtkEle,Ele_All,10;
+          }
+        }
+      }
+  - Id: 311344
+    AegisName: Glacier_F_Orb_152
+    Name: Glacier Magic Orb (CRI)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bCritical,4*(.@r/3);
+      bonus bCritAtkRate,5*(.@r/3);
+      if (.@r>=9) {
+        bonus bCritAtkRate,10;
+        if (getallrefine() >= 22 ) {
+          bonus bCRate,5;
+          .@i = getiteminfo(getequipid(EQI_HAND_R), ITEMINFO_VIEW);
+          if (.@i == W_2HSWORD || .@i == W_2HSPEAR || .@i == W_2HSTAFF || .@i == W_2HAXE || .@i == W_KATAR || .@i == W_BOW || .@i == W_HUUMA || .@i == W_REVOLVER || .@i == W_RIFLE || .@i == W_GATLING || .@i == W_SHOTGUN || .@i == W_GRENADE) {
+            bonus bCritAtkRate,10;
+          }
+        }
+      }
+  - Id: 311345
+    AegisName: Glacier_F_Orb_153
+    Name: Glacier Magic Orb (Variable Casting)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bVariableCastrate,-7;
+      if (.@r>=9) {
+        bonus bVariableCastrate,-8;
+        .@i = getiteminfo(getequipid(EQI_HAND_R), ITEMINFO_VIEW);
+        if (.@i == W_2HSWORD || .@i == W_2HSPEAR || .@i == W_2HSTAFF || .@i == W_2HAXE || .@i == W_KATAR || .@i == W_BOW || .@i == W_HUUMA || .@i == W_REVOLVER || .@i == W_RIFLE || .@i == W_GATLING || .@i == W_SHOTGUN || .@i == W_GRENADE) {
+          bonus bVariableCastrate,-5;
+        }
+      }
+  - Id: 311346
+    AegisName: Glacier_F_Orb_154
+    Name: Glacier Magic Orb (Attack Speed)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bAspdRate,7;
+      if (.@r>=9) {
+        bonus bAspdRate,8;
+        .@i = getiteminfo(getequipid(EQI_HAND_R), ITEMINFO_VIEW);
+        if (.@i == W_2HSWORD || .@i == W_2HSPEAR || .@i == W_2HSTAFF || .@i == W_2HAXE || .@i == W_KATAR || .@i == W_BOW || .@i == W_HUUMA || .@i == W_REVOLVER || .@i == W_RIFLE || .@i == W_GATLING || .@i == W_SHOTGUN || .@i == W_GRENADE) {
+          bonus bAspd,1;
+        }
+      }
+  - Id: 311347
+    AegisName: Glacier_F_Orb_155
+    Name: Glacier Magic Orb (Skill Delay)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bDelayrate,-7;
+      if (.@r>=9) {
+        bonus bDelayrate,-8;
+        .@i = getiteminfo(getequipid(EQI_HAND_R), ITEMINFO_VIEW);
+        if (.@i == W_2HSWORD || .@i == W_2HSPEAR || .@i == W_2HSTAFF || .@i == W_2HAXE || .@i == W_KATAR || .@i == W_BOW || .@i == W_HUUMA || .@i == W_REVOLVER || .@i == W_RIFLE || .@i == W_GATLING || .@i == W_SHOTGUN || .@i == W_GRENADE) {
+          bonus bDelayrate,-5;
+        }
+      }
+  - Id: 311348
+    AegisName: Glacier_F_Orb_156
+    Name: Glacier Magic Orb (Physical-Race)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bAddRace,RC_All,10;
+      bonus2 bAddRace,RC_Player_Human,-10;
+      bonus2 bAddRace,RC_Player_Doram,-10;
+      if (.@r>=9) {
+        bonus2 bAddRace,RC_All,10;
+        bonus2 bAddRace,RC_Player_Human,-10;
+        bonus2 bAddRace,RC_Player_Doram,-10;
+        .@i = getiteminfo(getequipid(EQI_HAND_R), ITEMINFO_VIEW);
+        if (.@i == W_2HSWORD || .@i == W_2HSPEAR || .@i == W_2HSTAFF || .@i == W_2HAXE || .@i == W_KATAR || .@i == W_BOW || .@i == W_HUUMA || .@i == W_REVOLVER || .@i == W_RIFLE || .@i == W_GATLING || .@i == W_SHOTGUN || .@i == W_GRENADE) {
+          bonus2 bAddRace,RC_All,15;
+          bonus2 bAddRace,RC_Player_Human,-15;
+          bonus2 bAddRace,RC_Player_Doram,-15;
+        }
+      }
+  - Id: 311349
+    AegisName: Glacier_F_Orb_157
+    Name: Glacier Magic Orb (Magical-Race)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bMagicAddRace,RC_All,10;
+      if (.@r>=9) {
+         bonus2 bMagicAddRace,RC_All,10;
+         .@i = getiteminfo(getequipid(EQI_HAND_R), ITEMINFO_VIEW);
+         if (.@i == W_2HSWORD || .@i == W_2HSPEAR || .@i == W_2HSTAFF || .@i == W_2HAXE || .@i == W_KATAR || .@i == W_BOW || .@i == W_HUUMA || .@i == W_REVOLVER || .@i == W_RIFLE || .@i == W_GATLING || .@i == W_SHOTGUN || .@i == W_GRENADE)
+            bonus2 bMagicAddRace,RC_All,15;
+      }
+  - Id: 311350
+    AegisName: Glacier_F_Orb_158
+    Name: Glacier Magic Orb (Physical-Size)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bAddSize,Size_All,10;
+      if (.@r>=9) {
+        bonus2 bAddSize,Size_All,10;
+        .@i = getiteminfo(getequipid(EQI_HAND_R), ITEMINFO_VIEW);
+        if (.@i == W_2HSWORD || .@i == W_2HSPEAR || .@i == W_2HSTAFF || .@i == W_2HAXE || .@i == W_KATAR || .@i == W_BOW || .@i == W_HUUMA || .@i == W_REVOLVER || .@i == W_RIFLE || .@i == W_GATLING || .@i == W_SHOTGUN || .@i == W_GRENADE) {
+          bonus2 bAddSize,Size_All,15;
+        }
+      }
+  - Id: 311351
+    AegisName: Glacier_F_Orb_159
+    Name: Glacier Magic Orb (Magical-Size)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bMagicAddSize,Size_All,10;
+      if (.@r>=9) {
+        bonus2 bMagicAddSize,Size_All,10;
+        .@i = getiteminfo(getequipid(EQI_HAND_R), ITEMINFO_VIEW);
+        if (.@i == W_2HSWORD || .@i == W_2HSPEAR || .@i == W_2HSTAFF || .@i == W_2HAXE || .@i == W_KATAR || .@i == W_BOW || .@i == W_HUUMA || .@i == W_REVOLVER || .@i == W_RIFLE || .@i == W_GATLING || .@i == W_SHOTGUN || .@i == W_GRENADE) {
+          bonus2 bMagicAddSize,Size_All,15;
+        }
+      }
+  - Id: 311352
+    AegisName: Glacier_F_Orb_160
+    Name: Glacier Magic Orb (Physical-Element)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bAddEle,Ele_All,10;
+      if (.@r>=9) {
+        bonus2 bAddEle,Ele_All,10;
+        .@i = getiteminfo(getequipid(EQI_HAND_R), ITEMINFO_VIEW);
+        if (.@i == W_2HSWORD || .@i == W_2HSPEAR || .@i == W_2HSTAFF || .@i == W_2HAXE || .@i == W_KATAR || .@i == W_BOW || .@i == W_HUUMA || .@i == W_REVOLVER || .@i == W_RIFLE || .@i == W_GATLING || .@i == W_SHOTGUN || .@i == W_GRENADE) {
+          bonus2 bAddEle,Ele_All,15;
+        }
+      }
+  - Id: 311353
+    AegisName: Glacier_F_Orb_161
+    Name: Glacier Magic Orb (Magical-Element)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bMagicAddEle,Ele_All,10;
+      if (.@r>=9) {
+        bonus2 bMagicAddEle,Ele_All,10;
+        .@i = getiteminfo(getequipid(EQI_HAND_R), ITEMINFO_VIEW);
+        if (.@i == W_2HSWORD || .@i == W_2HSPEAR || .@i == W_2HSTAFF || .@i == W_2HAXE || .@i == W_KATAR || .@i == W_BOW || .@i == W_HUUMA || .@i == W_REVOLVER || .@i == W_RIFLE || .@i == W_GATLING || .@i == W_SHOTGUN || .@i == W_GRENADE) {
+          bonus2 bMagicAddEle,Ele_All,15;
         }
       }
   - Id: 400020
