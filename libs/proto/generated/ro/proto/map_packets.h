@@ -5090,7 +5090,7 @@ struct ZcMoonlightChatBlocks {
 // PACKET_MOONLIGHT_STAFF_ROSTER_ENTRY
 struct MoonlightStaffRosterEntry {
   // Taille sur le fil, en octets.
-  static constexpr std::size_t kWireSize = 185;
+  static constexpr std::size_t kWireSize = 189;
 
   std::uint32_t account_id = 0;
   std::uint32_t char_id = 0;
@@ -5126,6 +5126,7 @@ struct MoonlightStaffRosterEntry {
   std::uint16_t cheat_cadence = 0;
   std::uint16_t cheat_client = 0;
   std::int32_t mute_minutes = 0;
+  std::uint32_t moonlight_id = 0;
 };
 
 // PACKET_CZ_MOONLIGHT_REQ_STAFF_ROSTER

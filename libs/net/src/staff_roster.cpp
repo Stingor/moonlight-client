@@ -111,6 +111,7 @@ constexpr std::uint32_t kNeverAge = 0xFFFFFFFFU;
   player.cheat_cadence = entry.cheat_cadence;
   player.cheat_client = entry.cheat_client;
   player.mute_minutes = entry.mute_minutes;
+  player.moonlight_id = entry.moonlight_id;
   return player;
 }
 

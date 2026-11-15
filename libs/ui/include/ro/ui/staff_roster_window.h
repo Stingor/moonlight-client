@@ -61,6 +61,9 @@ inline constexpr std::size_t kStaffRosterActivityCount = 7;
 struct StaffRosterRow {
   std::uint32_t account_id = 0;
   std::uint32_t char_id = 0;
+  // Le compte Moonlight qui possède ce compte de jeu ; zéro quand aucun ne le
+  // possède.
+  std::uint32_t moonlight_id = 0;
   std::string name;
   // Vides : il n'en a pas.
   std::string guild;
@@ -158,6 +161,7 @@ struct StaffRosterFilters {
 // Les colonnes de la vue « Joueurs », dans leur ordre d'affichage.
 enum class StaffRosterColumn : int {
   kPlayer,
+  kMoonlightId,
   kJob,
   kLevel,
   kMap,
@@ -167,7 +171,7 @@ enum class StaffRosterColumn : int {
   kAction,
   kClient,
 };
-inline constexpr int kStaffRosterColumnCount = 9;
+inline constexpr int kStaffRosterColumnCount = 10;
 
 inline constexpr std::size_t kStaffRosterSearchBytes = 64;
 
@@ -211,13 +215,18 @@ inline constexpr std::uint32_t kStaffRosterIdleSeconds = 300;
 // Il partage sa machine ou son compte Moonlight avec un autre joueur en ligne.
 [[nodiscard]] bool RowIsShared(const StaffRosterRow& row);
 
+// L'ID Moonlight en décimal ; vide quand aucun compte Moonlight ne possède ce
+// compte de jeu.
+[[nodiscard]] std::string MoonlightIdText(const StaffRosterRow& row);
+
 // La ligne porte un signal : un indice de triche, un silence, la prison, un
 // client sans poignée de main ou bâti sur un arbre retouché.
 [[nodiscard]] bool RowIsFlagged(const StaffRosterRow& row);
 
 // La ligne passe les filtres, et `needle` se lit, à la casse près, dans son
-// nom, sa guilde, son groupe, sa carte ou son job. Une recherche vide retient
-// tout.
+// nom, sa guilde, son groupe, sa carte ou son job, ou bien il EST son ID
+// Moonlight écrit en décimal : « 12 » ne retient pas le compte 1234. Une
+// recherche vide retient tout.
 [[nodiscard]] bool RowMatches(const StaffRosterRow& row, std::string_view needle,
                               const StaffRosterFilters& filters);
 

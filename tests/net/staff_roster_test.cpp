@@ -77,6 +77,7 @@ constexpr std::uint32_t kNever = 0xFFFFFFFFU;
   entry.cheat_cadence = 3;
   entry.cheat_client = 2;
   entry.mute_minutes = 34;
+  entry.moonlight_id = 4021;
   return entry;
 }
 
@@ -163,6 +164,7 @@ TEST_CASE("Joueurs en ligne : une entrée se lit champ par champ", "[net][staff_
   CHECK(player.cheat_cadence == 3);
   CHECK(player.cheat_client == 2);
   CHECK(player.mute_minutes == 34);
+  CHECK(player.moonlight_id == 4021);
 }
 
 TEST_CASE("Joueurs en ligne : chaque bit d'état a son drapeau", "[net][staff_roster]") {

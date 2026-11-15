@@ -81,6 +81,7 @@ static_assert(static_cast<int>(ro::net::StaffActivity::kCommand) ==
   row.cheat_cadence = player.cheat_cadence;
   row.cheat_client = player.cheat_client;
   row.mute_minutes = player.mute_minutes;
+  row.moonlight_id = player.moonlight_id;
   return row;
 }
 

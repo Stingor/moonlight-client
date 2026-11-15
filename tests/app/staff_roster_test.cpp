@@ -333,3 +333,15 @@ TEST_CASE("Joueurs en ligne : le job se nomme par sa table, le staff par son niv
   CHECK(rows[1].job_name.empty());
   CHECK_FALSE(rows[1].staff);
 }
+
+TEST_CASE("Joueurs en ligne : l'ID Moonlight passe tel quel du paquet à la ligne",
+          "[app][staff_roster]") {
+  StaffRosterPlayer linked = Player("Aldric", 1, StaffRosterClient::kMoonclient, kOwnPatch);
+  linked.moonlight_id = 4021;
+  const StaffRosterPlayer alone = Player("Corvin", 2, StaffRosterClient::kMoonclient, kOwnPatch);
+  const std::vector<StaffRosterPlayer> players = {linked, alone};
+  const std::vector<ro::ui::StaffRosterRow> rows =
+      StaffRosterRowsOf(players, nullptr, OwnClient{.patch_index = kOwnPatch});
+  CHECK(rows[0].moonlight_id == 4021);
+  CHECK(rows[1].moonlight_id == 0);
+}

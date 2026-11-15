@@ -24028,6 +24028,9 @@ tr: @jumpto: te teletransportas a su celda, esté donde esté.
 fr: @recall : il est téléporté sur votre case, d'où qu'il vienne.
 tr: @recall: es teletransportado a tu celda, venga de donde venga.
 
+fr: ID Moonlight
+tr: ID de Moonlight
+
 fr: AID / CID
 tr: AID / CID
 
@@ -24094,8 +24097,8 @@ tr: Misma máquina
 fr: NPC
 tr: NPC
 
-fr: Nom, guilde ou carte
-tr: Nombre, guild o mapa
+fr: Nom, guilde, carte ou ID Moonlight
+tr: Nombre, guild, mapa o ID de Moonlight
 
 fr: Par carte
 tr: Por mapa

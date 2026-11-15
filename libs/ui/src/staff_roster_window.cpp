@@ -28,11 +28,12 @@ namespace {
 constexpr const char* kTitle = core::TrText("Joueurs en ligne");
 
 // ── LES MESURES ─────────────────────────────────────────────────────────────
-constexpr float kFirstWidthPixels = 880.0F;
+constexpr float kFirstWidthPixels = 960.0F;
 constexpr float kFirstHeightPixels = 460.0F;
 constexpr float kLeastWidthPixels = 520.0F;
 constexpr float kLeastHeightPixels = 260.0F;
-constexpr float kSearchWidthPixels = 170.0F;
+constexpr float kSearchWidthPixels = 230.0F;
+constexpr float kMoonlightIdColumnPixels = 84.0F;
 constexpr float kJobColumnPixels = 104.0F;
 constexpr float kLevelColumnPixels = 52.0F;
 constexpr float kMapColumnPixels = 100.0F;
@@ -220,6 +221,9 @@ void DrawRowTooltip(const StaffRosterView& view, std::size_t rank) {
     FaintText(core::Printed("%s %d/%d", row.job_name.c_str(), row.base_level, row.job_level));
   }
   Pair(core::Tr("AID / CID"), core::Printed("%u / %u", row.account_id, row.char_id));
+  if (const std::string moonlight_id = MoonlightIdText(row); !moonlight_id.empty()) {
+    Pair(core::Tr("ID Moonlight"), moonlight_id);
+  }
   Pair(core::Tr("Carte"), core::Printed("%s (%d, %d)", MapText(row.map, row.instance_id).c_str(),
                                         row.cell_x, row.cell_y));
   if (!row.guild.empty()) {
@@ -333,6 +337,12 @@ void DrawPlayerRow(const StaffRosterView& view, std::size_t rank, StaffRosterAns
   ImGui::TableSetColumnIndex(Rank(StaffRosterColumn::kPlayer));
   DrawNameCell(view, rank, answer, ImGuiSelectableFlags_SpanAllColumns);
 
+  ImGui::TableSetColumnIndex(Rank(StaffRosterColumn::kMoonlightId));
+  if (const std::string moonlight_id = MoonlightIdText(row); moonlight_id.empty()) {
+    FaintText(kNothing);
+  } else {
+    Unformatted(moonlight_id);
+  }
   ImGui::TableSetColumnIndex(Rank(StaffRosterColumn::kJob));
   Unformatted(row.job_name.empty() ? std::string_view(kNothing) : std::string_view(row.job_name));
   ImGui::TableSetColumnIndex(Rank(StaffRosterColumn::kLevel));
@@ -383,6 +393,8 @@ void DrawPlayers(StaffRosterWindowState& state, const StaffRosterView& view, flo
   ImGui::TableSetupScrollFreeze(0, 1);
   ImGui::TableSetupColumn(core::Tr("Joueur"),
                           ImGuiTableColumnFlags_WidthStretch | ImGuiTableColumnFlags_DefaultSort);
+  ImGui::TableSetupColumn(core::Tr("ID Moonlight"), ImGuiTableColumnFlags_WidthFixed,
+                          Px(kMoonlightIdColumnPixels));
   ImGui::TableSetupColumn(core::Tr("Classe"), ImGuiTableColumnFlags_WidthFixed,
                           Px(kJobColumnPixels));
   ImGui::TableSetupColumn(core::Tr("Nv"), ImGuiTableColumnFlags_WidthFixed, Px(kLevelColumnPixels));
@@ -507,8 +519,9 @@ void DrawSummary(const StaffRosterView& view) {
 // La recherche, puis les filtres, qui passent à la ligne quand la place manque.
 void DrawFilters(StaffRosterWindowState& state, const SkinArt& art) {
   ImGui::SetNextItemWidth(Px(kSearchWidthPixels));
-  ImGui::InputTextWithHint("##joueurs_en_ligne_recherche", core::Tr("Nom, guilde ou carte"),
-                           state.search.data(), state.search.size());
+  ImGui::InputTextWithHint("##joueurs_en_ligne_recherche",
+                           core::Tr("Nom, guilde, carte ou ID Moonlight"), state.search.data(),
+                           state.search.size());
   const auto filter = [&art](const char* label, bool* ticked) {
     ImGui::SameLine();
     if (ImGui::GetContentRegionAvail().x < SkinCheckBoxWidth(label, art)) {

@@ -52,6 +52,7 @@ constexpr StaffRosterFilters kNoFilter{.hide_offline_shops = false};
   aldric.online_s = 10920;
   aldric.idle_s = 12;
   aldric.staff = true;
+  aldric.moonlight_id = 1234;
 
   StaffRosterRow mirelle = Row("Mirelle", 2000002);
   mirelle.map = "gl_cas02";
@@ -61,6 +62,7 @@ constexpr StaffRosterFilters kNoFilter{.hide_offline_shops = false};
   mirelle.base_level = 98;
   mirelle.online_s = 6420;
   mirelle.idle_s = 3;
+  mirelle.moonlight_id = 12;
 
   StaffRosterRow ysolde = Row("ysolde", 2000003);
   ysolde.map = "prontera";
@@ -79,6 +81,7 @@ constexpr StaffRosterFilters kNoFilter{.hide_offline_shops = false};
   shop.offline_shop = true;
   shop.vending = true;
   shop.machine_group = 1;
+  shop.moonlight_id = 1234;
   return {aldric, mirelle, ysolde, shop};
 }
 
@@ -163,6 +166,22 @@ TEST_CASE("Joueurs en ligne : la recherche lit le nom, la guilde, le groupe, la 
   CHECK_FALSE(RowMatches(aldric, "geffen", kNoFilter));
 }
 
+TEST_CASE("Joueurs en ligne : la recherche retient l'ID Moonlight entier, pas un morceau",
+          "[ui][staff_roster]") {
+  const std::vector<StaffRosterRow> rows = Town();
+  const auto found = [&rows](std::string_view needle) {
+    return NamesOf(rows, OrderedRows(rows, needle, kNoFilter, StaffRosterColumn::kPlayer, false));
+  };
+  using Names = std::vector<std::string_view>;
+  CHECK(found("1234") == Names{"Aldric", "Petit Lot"});
+  CHECK(found("12") == Names{"Mirelle"});
+  CHECK(found("123").empty());
+  // Sans compte Moonlight, zéro ne se cherche pas.
+  CHECK_FALSE(RowMatches(rows[2], "0", kNoFilter));
+  CHECK(ro::ui::MoonlightIdText(rows[2]).empty());
+  CHECK(ro::ui::MoonlightIdText(rows[0]) == "1234");
+}
+
 TEST_CASE("Joueurs en ligne : chaque filtre écarte ce qu'il nomme", "[ui][staff_roster]") {
   const std::vector<StaffRosterRow> rows = Town();
   const auto kept = [&rows](const StaffRosterFilters& filters) {
@@ -203,6 +222,9 @@ TEST_CASE("Joueurs en ligne : le tri suit la colonne, et le nom départage", "[u
   // Sans guilde, après ceux qui en ont une.
   CHECK(sorted(StaffRosterColumn::kGuild, false) ==
         Names{"Aldric", "Mirelle", "Petit Lot", "ysolde"});
+  // Par numéro, et non par texte : 12 avant 1234 ; sans compte Moonlight, après.
+  CHECK(sorted(StaffRosterColumn::kMoonlightId, false) ==
+        Names{"Mirelle", "Aldric", "Petit Lot", "ysolde"});
 }
 
 TEST_CASE("Joueurs en ligne : deux homonymes gardent leur ordre d'une image à l'autre",

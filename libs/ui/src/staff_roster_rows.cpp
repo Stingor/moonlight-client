@@ -38,6 +38,10 @@ template <typename Value>
   switch (column) {
     case StaffRosterColumn::kPlayer:
       break;
+    case StaffRosterColumn::kMoonlightId:
+      // Sans compte Moonlight, après tous les autres.
+      return Compared(std::tuple(left.moonlight_id == 0, left.moonlight_id),
+                      std::tuple(right.moonlight_id == 0, right.moonlight_id));
     case StaffRosterColumn::kJob:
       return ComparedBlankLast(left.job_name, right.job_name);
     case StaffRosterColumn::kLevel:
@@ -125,6 +129,10 @@ bool RowIsShared(const StaffRosterRow& row) {
   return row.machine_group != 0 || row.account_group != 0;
 }
 
+std::string MoonlightIdText(const StaffRosterRow& row) {
+  return row.moonlight_id == 0 ? std::string() : std::to_string(row.moonlight_id);
+}
+
 bool RowIsFlagged(const StaffRosterRow& row) {
   return row.cheat_clock > 0 || row.cheat_cadence > 0 || row.cheat_client > 0 ||
          row.mute_minutes > 0 || row.jailed || row.tree_modified ||
@@ -142,7 +150,8 @@ bool RowMatches(const StaffRosterRow& row, std::string_view needle,
          core::AsciiContainsFolded(row.guild, needle) ||
          core::AsciiContainsFolded(row.party, needle) ||
          core::AsciiContainsFolded(row.map, needle) ||
-         core::AsciiContainsFolded(row.job_name, needle);
+         core::AsciiContainsFolded(row.job_name, needle) ||
+         (!needle.empty() && needle == MoonlightIdText(row));
 }
 
 std::vector<std::size_t> OrderedRows(std::span<const StaffRosterRow> rows, std::string_view needle,

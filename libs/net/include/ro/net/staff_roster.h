@@ -128,6 +128,9 @@ struct StaffRosterPlayer {
   std::uint16_t cheat_client = 0;
   // Minutes de silence restantes ; zéro quand il peut parler.
   std::int32_t mute_minutes = 0;
+  // Le compte Moonlight qui possède ce compte de jeu ; zéro quand aucun ne le
+  // possède.
+  std::uint32_t moonlight_id = 0;
 };
 
 // Une trame de la réponse.

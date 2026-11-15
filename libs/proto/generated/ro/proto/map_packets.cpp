@@ -1141,6 +1141,7 @@ void ReadMoonlightStaffRosterEntry(ByteReader& reader, MoonlightStaffRosterEntry
   value.cheat_cadence = static_cast<std::uint16_t>(reader.U16());
   value.cheat_client = static_cast<std::uint16_t>(reader.U16());
   value.mute_minutes = static_cast<std::int32_t>(reader.I32());
+  value.moonlight_id = static_cast<std::uint32_t>(reader.U32());
 }
 
 void WriteMoonlightStaffRosterEntry(ByteWriter& writer, const MoonlightStaffRosterEntry& value) {
@@ -1178,6 +1179,7 @@ void WriteMoonlightStaffRosterEntry(ByteWriter& writer, const MoonlightStaffRost
   writer.U16(static_cast<std::uint16_t>(value.cheat_cadence));
   writer.U16(static_cast<std::uint16_t>(value.cheat_client));
   writer.I32(static_cast<std::int32_t>(value.mute_minutes));
+  writer.U32(static_cast<std::uint32_t>(value.moonlight_id));
 }
 
 void ReadMoonlightMarketItemId(ByteReader& reader, MoonlightMarketItemId& value) {
