@@ -35,6 +35,10 @@ void UiStage::DrawTradeWindows(TradeWindows& trade, ro::ui::ItemLinkFacts link_f
     trade.grade_enchant.answer = ro::ui::DrawGradeEnchantWindow(
         trade.grade_enchant.state, *trade.grade_enchant.view, skin_, link_facts);
   }
+  if (trade.item_enchant.view != nullptr) {
+    trade.item_enchant.answer = ro::ui::DrawItemEnchantWindow(
+        trade.item_enchant.state, *trade.item_enchant.view, skin_, link_facts);
+  }
   // L'ÉCHOPPE D'ACHAT : ses quatre fenêtres, chacune seulement quand l'étage
   // lui a composé une vue.
   BuyingStoreWindows& buying = trade.buying_store;
@@ -112,6 +116,8 @@ void UiStage::RegisterTradeEscapes(TradeWindows& trade) {
   // LES GRADES AUSSI : tant que la fermeture n'est pas dite, le serveur garde la
   // fenêtre pour ouverte.
   escape_.Register(ro::ui::kGradeEnchantWindowId, &trade.grade_enchant.state.open);
+  // L'ENCHANTEMENT AUSSI, pour la même raison.
+  escape_.Register(ro::ui::kItemEnchantWindowId, &trade.item_enchant.state.open);
   // L'ÉCHOPPE D'ACHAT. La préparation, l'historique et la vente se ferment sur
   // Échap ; MON ÉCHOPPE, elle, relève son interrupteur et demande confirmation
   // — voir `DrawBuyingStoreOwnWindow`. ⚠ LE NOM INSCRIT EST L'IDENTITÉ « ### »

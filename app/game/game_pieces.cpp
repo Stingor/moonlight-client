@@ -99,6 +99,11 @@ void LoadItemReformBook(ro::vfs::Vfs& vfs, GamePieces& pieces) {
   pieces.item_reform_book = ReadItemReformBook(vfs);
 }
 
+// CE QUE L'ENCHANTEMENT POSE. Absent ou illisible, ses fenêtres se referment.
+void LoadItemEnchantBook(ro::vfs::Vfs& vfs, GamePieces& pieces) {
+  pieces.item_enchant_book = ReadItemEnchantBook(vfs);
+}
+
 // LES RÉPUTATIONS. Absentes ou illisibles, leur fenêtre le dit.
 void LoadReputationBook(ro::vfs::Vfs& vfs, GamePieces& pieces) {
   pieces.reputation_book = ReadReputationBook(vfs);
@@ -736,6 +741,7 @@ void LoadWorldPieces(ro::vfs::Vfs& vfs, GamePieces& pieces, ro::core::LoadProgre
       LoadItemProperties,
       LoadLaphineBook,
       LoadItemReformBook,
+      LoadItemEnchantBook,
       LoadReputationBook,
       LoadMonsterList,
       LoadRandomOptionNames,

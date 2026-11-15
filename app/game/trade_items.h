@@ -62,15 +62,24 @@ class TradeItems {
 // grade, sans images, ou quand l'installation ne l'a pas.
 [[nodiscard]] ro::ui::SkinImage GradeBadgeOf(std::uint8_t grade, ro::render::GameImages* images);
 
+class ItemEnchantBook;
+class ItemReformBook;
+class LaphineBook;
+
+// LES TABLES DES ATELIERS : ce que le Laphine accepte, ce que la réforme change et
+// ce que l'enchantement pose. Chacune peut manquer.
+struct ItemBooks {
+  const LaphineBook* laphine = nullptr;
+  const ItemReformBook* reform = nullptr;
+  const ItemEnchantBook* enchant = nullptr;
+};
+
 // CE QU'UN ÉTAGE DE COMMERCE REÇOIT À CHAQUE IMAGE : le fil, le monde, les mots
 // du jeu, les forgerons connus, l'atelier des noms, et le verrou de vente des
 // favoris — un réglage du joueur, que le serveur ne connaît pas.
 //
 // ⚠ PASSÉ PAR RÉFÉRENCES, et ne vit que le temps de l'appel : l'étage ne
 // retient rien de ce qu'il ne possède pas.
-class LaphineBook;
-class ItemReformBook;
-
 struct TradeContext {
   ro::net::Connection& link;
   ro::sim::World& world;
@@ -99,6 +108,8 @@ struct TradeContext {
   const LaphineBook* laphine_book = nullptr;
   // CE QUE LA RÉFORME CHANGE. Nul : ses fenêtres se referment aussitôt.
   const ItemReformBook* item_reform_book = nullptr;
+  // CE QUE L'ENCHANTEMENT POSE. Nul : ses fenêtres se referment aussitôt.
+  const ItemEnchantBook* item_enchant_book = nullptr;
 };
 
 // Les couleurs des lignes de conversation, celles des commerces : cyan pour ce

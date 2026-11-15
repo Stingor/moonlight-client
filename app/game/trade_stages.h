@@ -18,6 +18,7 @@
 #include "game/buying_store_stage.h"
 #include "game/deal_stage.h"
 #include "game/grade_enchant_stage.h"
+#include "game/item_enchant_stage.h"
 #include "game/item_reform_stage.h"
 #include "game/laphine_stage.h"
 #include "game/market_stage.h"
@@ -57,11 +58,12 @@ class TradeStages {
   void SeeItemProperties(const ro::vfs::ItemProperties* properties) noexcept {
     item_properties_ = properties;
   }
-  // Ce que le Laphine accepte et ce que la réforme change. Même règle : une adresse
-  // donnée une fois.
-  void SeeItemBooks(const LaphineBook* laphine, const ItemReformBook* reform) noexcept {
-    laphine_book_ = laphine;
-    item_reform_book_ = reform;
+  // Ce que le Laphine accepte, ce que la réforme change et ce que l'enchantement
+  // pose. Même règle : une adresse donnée une fois.
+  void SeeItemBooks(const ItemBooks& books) noexcept {
+    laphine_book_ = books.laphine;
+    item_reform_book_ = books.reform;
+    item_enchant_book_ = books.enchant;
   }
   // La base du serveur, lue ou non. Même règle : une adresse donnée une fois.
   void SeeServerDb(const ro::vfs::ServerDb* db) noexcept { server_db_ = db; }
@@ -115,6 +117,7 @@ class TradeStages {
   [[nodiscard]] LaphineStage& laphine() noexcept { return laphine_; }
   [[nodiscard]] ItemReformStage& item_reform() noexcept { return item_reform_; }
   [[nodiscard]] GradeEnchantStage& grade_enchant() noexcept { return grade_enchant_; }
+  [[nodiscard]] ItemEnchantStage& item_enchant() noexcept { return item_enchant_; }
   [[nodiscard]] BuyingStoreStage& buying_store() noexcept { return buying_store_; }
   [[nodiscard]] VendingStage& vending() noexcept { return vending_; }
   [[nodiscard]] DealStage& deal() noexcept { return deal_; }
@@ -159,6 +162,7 @@ class TradeStages {
   const ro::vfs::ItemProperties* item_properties_ = nullptr;
   const LaphineBook* laphine_book_ = nullptr;
   const ItemReformBook* item_reform_book_ = nullptr;
+  const ItemEnchantBook* item_enchant_book_ = nullptr;
   const ro::vfs::ServerDb* server_db_ = nullptr;
   const ro::sim::BannedWords* banned_ = nullptr;
   ro::render::GameImages* images_ = nullptr;
@@ -167,6 +171,7 @@ class TradeStages {
   LaphineStage laphine_;
   ItemReformStage item_reform_;
   GradeEnchantStage grade_enchant_;
+  ItemEnchantStage item_enchant_;
   BuyingStoreStage buying_store_;
   VendingStage vending_;
   DealStage deal_;

@@ -1,0 +1,166 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  L'enchantement : ce que chaque groupe admet, coûte et pose
+#
+#  Exporté de la table item_enchant du serveur Moonlight et résolu sur son item_db
+#  (mode Prerenewal) par scripts/yaml_tables/item_enchant.py. Ne pas éditer à la main :
+#      python scripts/yaml_tables/item_enchant.py --serveur <dépôt moonlight>
+#
+#  groups : id (le numéro que le serveur envoie), targets, least_refine,
+#           least_grade, random_options, order (l'ordre des cases), reset, slots.
+#  reset  : chance (cent-millièmes), zeny, materials [objet, quantité]...
+#  slots  : slot, zeny, materials, chance (la réussite que le serveur tire),
+#           draws (par grade de la pièce : [enchantement, probabilité en
+#           cent-millièmes]...), perfect ([enchantement, zeny, materials]...),
+#           upgrades ([enchantement, amélioration, zeny, materials]...).
+#
+#  Lu par moonclient (app/items/item_enchant_book.h). Absent, une fenêtre
+#  d'enchantement se referme en le disant.
+# ─────────────────────────────────────────────────────────────────────────────
+version: 1
+mode: Prerenewal
+groups:
+  - id: 26
+    targets: [450207, 450206]
+    least_refine: 0
+    least_grade: 0
+    random_options: true
+    order: [3, 2, 1]
+    reset: null
+    slots:
+      - slot: 1
+        zeny: 0
+        materials: []
+        chance: 100000
+        draws: []
+        perfect: [[311138, 0, [[1000757, 1]]], [311139, 0, [[1000758, 1]]], [311140, 0, [[1000759, 1]]], [311141, 0, [[1000760, 1]]], [311142, 0, [[1000761, 1]]], [311143, 0, [[1000762, 1]]], [311144, 0, [[1000763, 1]]], [311145, 0, [[1000764, 1]]], [311146, 0, [[1000765, 1]]], [311147, 0, [[1000766, 1]]], [311148, 0, [[1000767, 1]]], [311149, 0, [[1000768, 1]]], [311150, 0, [[1000769, 1]]], [311151, 0, [[1000770, 1]]], [311152, 0, [[1000771, 1]]], [311153, 0, [[1000772, 1]]], [311154, 0, [[1000773, 1]]], [311155, 0, [[1000774, 1]]], [311156, 0, [[1000775, 1]]], [311157, 0, [[1000776, 1]]], [311158, 0, [[1000777, 1]]], [311159, 0, [[1000778, 1]]], [311160, 0, [[1000779, 1]]], [311161, 0, [[1000780, 1]]], [311162, 0, [[1000781, 1]]], [311163, 0, [[1000782, 1]]], [311164, 0, [[1000783, 1]]], [311165, 0, [[1000784, 1]]], [311166, 0, [[1000785, 1]]], [311167, 0, [[1000786, 1]]], [311168, 0, [[1000787, 1]]], [311169, 0, [[1000788, 1]]], [311170, 0, [[1000789, 1]]], [311171, 0, [[1000790, 1]]], [311172, 0, [[1000791, 1]]], [311173, 0, [[1000792, 1]]], [311174, 0, [[1000793, 1]]], [311175, 0, [[1000794, 1]]], [311176, 0, [[1000795, 1]]], [311177, 0, [[1000796, 1]]], [311178, 0, [[1000797, 1]]], [311179, 0, [[1000798, 1]]], [311180, 0, [[1000799, 1]]], [311181, 0, [[1000800, 1]]], [311182, 0, [[1000801, 1]]], [311183, 0, [[1000802, 1]]], [311184, 0, [[1000803, 1]]], [311185, 0, [[1000804, 1]]], [311189, 0, [[1000808, 1]]], [311190, 0, [[1000809, 1]]], [311191, 0, [[1000810, 1]]]]
+        upgrades: []
+      - slot: 2
+        zeny: 0
+        materials: []
+        chance: 100000
+        draws: []
+        perfect: [[311100, 0, [[1000719, 1]]], [311101, 0, [[1000720, 1]]], [311102, 0, [[1000721, 1]]], [311103, 0, [[1000722, 1]]], [311104, 0, [[1000723, 1]]], [311105, 0, [[1000724, 1]]]]
+        upgrades: []
+      - slot: 3
+        zeny: 0
+        materials: []
+        chance: 100000
+        draws: []
+        perfect: [[311098, 0, [[1000717, 1]]], [311099, 0, [[1000718, 1]]]]
+        upgrades: []
+  - id: 27
+    targets: [480159, 480160]
+    least_refine: 0
+    least_grade: 0
+    random_options: true
+    order: [3, 2, 1]
+    reset: null
+    slots:
+      - slot: 1
+        zeny: 0
+        materials: []
+        chance: 100000
+        draws: []
+        perfect: [[311110, 0, [[1000729, 1]]], [311111, 0, [[1000730, 1]]], [311112, 0, [[1000731, 1]]]]
+        upgrades: []
+      - slot: 2
+        zeny: 0
+        materials: []
+        chance: 100000
+        draws: []
+        perfect: [[311106, 0, [[1000725, 1]]], [311107, 0, [[1000726, 1]]], [311108, 0, [[1000727, 1]]], [311109, 0, [[1000728, 1]]]]
+        upgrades: []
+      - slot: 3
+        zeny: 0
+        materials: []
+        chance: 100000
+        draws: []
+        perfect: [[311092, 0, [[1000711, 1]]], [311093, 0, [[1000712, 1]]], [311094, 0, [[1000713, 1]]], [311095, 0, [[1000714, 1]]], [311096, 0, [[1000715, 1]]], [311097, 0, [[1000716, 1]]], [311098, 0, [[1000717, 1]]], [311099, 0, [[1000718, 1]]]]
+        upgrades: []
+  - id: 28
+    targets: [470115, 470116]
+    least_refine: 0
+    least_grade: 0
+    random_options: true
+    order: [3, 2, 1]
+    reset: null
+    slots:
+      - slot: 1
+        zeny: 0
+        materials: []
+        chance: 100000
+        draws: []
+        perfect: [[311120, 0, [[1000739, 1]]], [311121, 0, [[1000740, 1]]], [311122, 0, [[1000741, 1]]], [311123, 0, [[1000742, 1]]], [311124, 0, [[1000743, 1]]], [311125, 0, [[1000744, 1]]]]
+        upgrades: []
+      - slot: 2
+        zeny: 0
+        materials: []
+        chance: 100000
+        draws: []
+        perfect: [[311117, 0, [[1000736, 1]]], [311118, 0, [[1000737, 1]]], [311119, 0, [[1000738, 1]]]]
+        upgrades: []
+      - slot: 3
+        zeny: 0
+        materials: []
+        chance: 100000
+        draws: []
+        perfect: [[311098, 0, [[1000717, 1]]], [311099, 0, [[1000718, 1]]], [311113, 0, [[1000732, 1]]], [311114, 0, [[1000733, 1]]], [311115, 0, [[1000734, 1]]], [311116, 0, [[1000735, 1]]]]
+        upgrades: []
+  - id: 29
+    targets: [490176, 490178]
+    least_refine: 0
+    least_grade: 0
+    random_options: true
+    order: [3, 2, 1]
+    reset: null
+    slots:
+      - slot: 1
+        zeny: 0
+        materials: []
+        chance: 100000
+        draws: []
+        perfect: [[311126, 0, [[1000745, 1]]], [311127, 0, [[1000746, 1]]], [311128, 0, [[1000747, 1]]], [311129, 0, [[1000748, 1]]], [311130, 0, [[1000749, 1]]]]
+        upgrades: []
+      - slot: 2
+        zeny: 0
+        materials: []
+        chance: 100000
+        draws: []
+        perfect: [[311131, 0, [[1000750, 1]]], [311133, 0, [[1000752, 1]]], [311135, 0, [[1000754, 1]]], [311137, 0, [[1000756, 1]]]]
+        upgrades: []
+      - slot: 3
+        zeny: 0
+        materials: []
+        chance: 100000
+        draws: []
+        perfect: [[311092, 0, [[1000711, 1]]], [311093, 0, [[1000712, 1]]], [311095, 0, [[1000714, 1]]]]
+        upgrades: []
+  - id: 30
+    targets: [490177, 490179]
+    least_refine: 0
+    least_grade: 0
+    random_options: true
+    order: [3, 2, 1]
+    reset: null
+    slots:
+      - slot: 1
+        zeny: 0
+        materials: []
+        chance: 100000
+        draws: []
+        perfect: [[311126, 0, [[1000745, 1]]], [311127, 0, [[1000746, 1]]], [311128, 0, [[1000747, 1]]], [311129, 0, [[1000748, 1]]], [311130, 0, [[1000749, 1]]]]
+        upgrades: []
+      - slot: 2
+        zeny: 0
+        materials: []
+        chance: 100000
+        draws: []
+        perfect: [[311132, 0, [[1000751, 1]]], [311134, 0, [[1000753, 1]]], [311136, 0, [[1000755, 1]]], [311137, 0, [[1000756, 1]]]]
+        upgrades: []
+      - slot: 3
+        zeny: 0
+        materials: []
+        chance: 100000
+        draws: []
+        perfect: [[311094, 0, [[1000713, 1]]], [311096, 0, [[1000715, 1]]], [311097, 0, [[1000716, 1]]]]
+        upgrades: []

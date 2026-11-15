@@ -9,6 +9,7 @@
 #include "ro/net/barter.h"
 #include "ro/net/buying_store.h"
 #include "ro/net/grade_enchant.h"
+#include "ro/net/item_enchant.h"
 #include "ro/net/item_reform.h"
 #include "ro/net/laphine.h"
 #include "ro/net/market.h"
@@ -33,6 +34,7 @@ void TradeStages::StartSession() {
   laphine_.StartSession();
   item_reform_.StartSession();
   grade_enchant_.StartSession();
+  item_enchant_.StartSession();
   buying_store_.StartSession();
   vending_.StartSession();
   deal_.StartSession();
@@ -100,6 +102,14 @@ ro::net::FrameOutcome TradeStages::ApplyFrame(const ro::net::Frame& frame,
       graded != ro::net::FrameOutcome::kUnhandled) {
     return graded;
   }
+  // L'ENCHANTEMENT : l'ouverture de son interface et la réponse ne sont qu'à lui.
+  // ⚠ LE SAC CHANGE AVEC UNE RÉUSSITE : la case reçoit l'enchantement que la réponse
+  // nomme, le serveur ne renvoyant pas la pièce.
+  if (const ro::net::FrameOutcome enchanted =
+          ro::net::ApplyItemEnchantFrame(frame, item_enchant_.enchant(), bag);
+      enchanted != ro::net::FrameOutcome::kUnhandled) {
+    return enchanted;
+  }
   // LE TROC D'ABORD : il ne prend le résultat partagé que s'il l'attend.
   if (const ro::net::FrameOutcome bartered = ro::net::ApplyBarterFrame(frame, barter_.barter());
       bartered != ro::net::FrameOutcome::kUnhandled) {
@@ -124,7 +134,8 @@ void TradeStages::Advance(TradeWindows& windows, ro::net::Connection& link, ro::
                              .banned = banned_,
                              .images = images_,
                              .laphine_book = laphine_book_,
-                             .item_reform_book = item_reform_book_};
+                             .item_reform_book = item_reform_book_,
+                             .item_enchant_book = item_enchant_book_};
   if (in_chat_room) {
     RefuseStoresInChatRoom(windows, context);
   }
@@ -148,6 +159,9 @@ void TradeStages::Advance(TradeWindows& windows, ro::net::Connection& link, ro::
   grade_enchant_.Advance(windows.grade_enchant.state,
                          std::exchange(windows.grade_enchant.answer, {}), context);
   windows.grade_enchant.view = grade_enchant_.view();
+  item_enchant_.Advance(windows.item_enchant.state, std::exchange(windows.item_enchant.answer, {}),
+                        context);
+  windows.item_enchant.view = item_enchant_.view();
   buying_store_.Advance(windows.buying_store, context);
   vending_.Advance(windows.vending, context);
   deal_.Advance(windows.deal, context);
@@ -238,7 +252,8 @@ void TradeStages::VisitStore(std::uint32_t owner_id, ro::sim::SignboardKind kind
 bool TradeStages::HoldsWorld() const noexcept {
   return npc_shop_.shop().open() || barter_.barter().open() || laphine_.laphine().open() ||
          item_reform_.reform().open() || grade_enchant_.grade().open() ||
-         buying_store_.HoldsWorld() || vending_.HoldsWorld() || deal_.HoldsWorld();
+         item_enchant_.enchant().open() || buying_store_.HoldsWorld() || vending_.HoldsWorld() ||
+         deal_.HoldsWorld();
 }
 
 TradeItemFocus TradeStages::hovered() const noexcept {
@@ -268,6 +283,9 @@ TradeItemFocus TradeStages::hovered() const noexcept {
   }
   if (grade_enchant_.hovered().item_id != 0) {
     return grade_enchant_.hovered();
+  }
+  if (item_enchant_.hovered().item_id != 0) {
+    return item_enchant_.hovered();
   }
   return npc_shop_.hovered();
 }
@@ -300,6 +318,10 @@ std::optional<TradeItemFocus> TradeStages::TakeDescribed() noexcept {
   }
   if (std::optional<TradeItemFocus> graded = grade_enchant_.TakeDescribed(); graded.has_value()) {
     return graded;
+  }
+  if (std::optional<TradeItemFocus> enchanted = item_enchant_.TakeDescribed();
+      enchanted.has_value()) {
+    return enchanted;
   }
   return npc_shop_.TakeDescribed();
 }

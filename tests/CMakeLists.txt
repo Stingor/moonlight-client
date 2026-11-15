@@ -160,6 +160,7 @@ add_executable(ro_tests
     net/barter_test.cpp
     net/laphine_test.cpp
     net/item_reform_test.cpp
+    net/item_enchant_test.cpp
     net/grade_enchant_test.cpp
     net/battleground_test.cpp
     net/memorial_dungeon_test.cpp
@@ -281,6 +282,7 @@ add_executable(ro_tests
     sim/barter_test.cpp
     sim/laphine_test.cpp
     sim/item_reform_test.cpp
+    sim/item_enchant_test.cpp
     sim/grade_enchant_test.cpp
     sim/battlefield_test.cpp
     sim/entry_queue_test.cpp
@@ -808,6 +810,7 @@ add_executable(ro_tests
     ui/barter_window_test.cpp
     ui/laphine_window_test.cpp
     ui/item_reform_window_test.cpp
+    ui/item_enchant_window_test.cpp
     ui/grade_enchant_window_test.cpp
     ui/deal_window_test.cpp
     ui/mail_window_test.cpp
@@ -1350,6 +1353,7 @@ if(MOONCLIENT_PLATFORM_LAYERS)
         app/barter_view_test.cpp
         app/laphine_view_test.cpp
         app/item_reform_view_test.cpp
+        app/item_enchant_view_test.cpp
         app/grade_enchant_view_test.cpp
         app/buying_store_rules_test.cpp
         app/vending_test.cpp

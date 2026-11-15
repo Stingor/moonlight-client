@@ -55,6 +55,7 @@ add_library(ro_ui STATIC
     src/barter_window.cpp
     src/laphine_window.cpp
     src/item_reform_window.cpp
+    src/item_enchant_window.cpp
     src/grade_enchant_window.cpp
     src/buying_store_log_window.cpp
     src/buying_store_own_window.cpp

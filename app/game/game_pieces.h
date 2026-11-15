@@ -83,6 +83,7 @@
 #include "game/whisper_stage.h"
 #include "guard/cheat_guard.h"
 #include "items/doll_effects.h"
+#include "items/item_enchant_book.h"
 #include "items/item_reform_book.h"
 #include "items/item_sheet_editor_stage.h"
 #include "items/laphine_book.h"
@@ -451,6 +452,13 @@ struct GamePieces {
   LaphineBook laphine_book;
   // CE QUE CHAQUE DÉCLENCHEUR DE RÉFORME CHANGE. Vide quand la table manque.
   ItemReformBook item_reform_book;
+  // CE QUE CHAQUE GROUPE D'ENCHANTEMENT POSE. Vide quand la table manque.
+  ItemEnchantBook item_enchant_book;
+  // Les trois tables des ateliers, telles que les commerces les lisent.
+  [[nodiscard]] ItemBooks item_books() const noexcept {
+    return ItemBooks{
+        .laphine = &laphine_book, .reform = &item_reform_book, .enchant = &item_enchant_book};
+  }
   // LES FACTIONS DE RÉPUTATION ET LEURS GROUPES. Non lu quand la table manque.
   ReputationBook reputation_book;
   // LES MONSTRES QUE LE SERVEUR CONNAÎT, que la liste « Monstre de la cible »

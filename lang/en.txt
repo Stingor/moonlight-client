@@ -24525,3 +24525,129 @@ tr: Combo with:
 
 fr: Évolue avec :
 tr: Evolves with:
+
+fr: (aucune pièce de ce groupe dans l'inventory)
+tr: (no item of this group in the inventory)
+
+fr: (case de carte, vide)
+tr: (card slot, empty)
+
+fr: (libre — reçoit le prochain enchantement)
+tr: (free — receives the next enchantment)
+
+fr: (libre)
+tr: (free)
+
+fr: Améliorer l'enchantement de la case %d de %s ? Les zenys et les matériaux seront consommés.
+tr: Upgrade the enchantment in slot %d of %s? The zeny and materials will be consumed.
+
+fr: Aucun enchantement à ôter.
+tr: No enchantment to remove.
+
+fr: Aucun tirage pour le grade de cette pièce.
+tr: No draw for this item's grade.
+
+fr: Aucune case libre pour un enchantement.
+tr: No free slot for an enchantment.
+
+fr: Case %d
+tr: Slot %d
+
+fr: Case %d : %s devient %s.
+tr: Slot %d: %s becomes %s.
+
+fr: Case %d : l'enchantement choisi, sans risque.
+tr: Slot %d: the chosen enchantment, without risk.
+
+fr: Case %d : un enchantement tiré au sort parmi %d.
+tr: Slot %d: one enchantment drawn at random among %d.
+
+fr: Ce que le tirage peut poser
+tr: What the draw can give
+
+fr: Cette case ne s'enchante pas ici.
+tr: This slot cannot be enchanted here.
+
+fr: Cette pièce est endommagée : faites-la réparer d'abord.
+tr: This item is damaged: have it repaired first.
+
+fr: Cette pièce ne s'enchante pas ici.
+tr: This item cannot be enchanted here.
+
+fr: Choisissez l'enchantement à poser.
+tr: Choose the enchantment to apply.
+
+fr: Choisissez la case dont l'enchantement doit monter.
+tr: Choose the slot whose enchantment should be upgraded.
+
+fr: Choisissez la pièce à enchanter.
+tr: Choose the item to enchant.
+
+fr: Choisissez une case dont l'enchantement s'améliore.
+tr: Choose a slot whose enchantment can be upgraded.
+
+fr: Choisissez une pièce de l'inventory, ôtée, puis ce qu'il faut y faire. Chaque tentative ferme la séance : parlez de nouveau au PNJ pour la suivante.
+tr: Choose an unequipped item from the inventory, then what to do with it. Each attempt ends the session: talk to the NPC again for the next one.
+
+fr: Choix sûr
+tr: Safe choice
+
+fr: Enchantement amélioré : %s.
+tr: Enchantment upgraded: %s.
+
+fr: Enchantement posé : %s.
+tr: Enchantment applied: %s.
+
+fr: Enchantements au choix
+tr: Enchantments to choose from
+
+fr: Enchanter
+tr: Enchant
+
+fr: L'enchantement a échoué.
+tr: The enchantment failed.
+
+fr: La remise à zéro a échoué : les enchantements restent.
+tr: The reset failed: the enchantments remain.
+
+fr: Le client ne connaît pas encore cet enchantement.
+tr: The client does not know this enchantment yet.
+
+fr: Le grade de cette pièce est trop bas.
+tr: This item's grade is too low.
+
+fr: Pièces enchantables
+tr: Enchantable items
+
+fr: Poser %s sur %s ? Les zenys et les matériaux seront consommés.
+tr: Apply %s to %s? The zeny and materials will be consumed.
+
+fr: Poser l'enchantement
+tr: Apply the enchantment
+
+fr: Réussite : %s
+tr: Success: %s
+
+fr: Réussite assurée.
+tr: Guaranteed success.
+
+fr: Tenter l'enchantement
+tr: Try the enchantment
+
+fr: Tenter un enchantement au hasard sur %s ? Les zenys et les matériaux seront consommés, même en cas d'échec.
+tr: Try a random enchantment on %s? The zeny and materials will be consumed, even on failure.
+
+fr: Tous les enchantements ont été ôtés.
+tr: All enchantments have been removed.
+
+fr: Tout ôter
+tr: Remove all
+
+fr: Une pièce à options aléatoires n'est pas acceptée.
+tr: An item with random options is not accepted.
+
+fr: Ôte les %d enchantement(s) de la pièce ; les cartes restent.
+tr: Removes the item's %d enchantment(s); cards stay.
+
+fr: Ôter tous les enchantements de %s ? Les zenys et les matériaux seront consommés, même en cas d'échec.
+tr: Remove all enchantments from %s? The zeny and materials will be consumed, even on failure.

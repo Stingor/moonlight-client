@@ -567,7 +567,9 @@ target_include_directories(moonclient_laphine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
 # l'installation et ce que la fenêtre en montre s'éprouvent sur un banc.
 add_library(moonclient_itemreform STATIC
     game/item_reform_view.cpp
-    items/item_reform_book.cpp)
+    items/item_reform_book.cpp
+    game/item_enchant_view.cpp
+    items/item_enchant_book.cpp)
 
 target_link_libraries(moonclient_itemreform
     PUBLIC ro_core ro_sim ro_ui ro_vfs
@@ -2098,6 +2100,7 @@ add_executable(moonclient
     game/barter_stage.cpp
     game/laphine_stage.cpp
     game/item_reform_stage.cpp
+    game/item_enchant_stage.cpp
     game/grade_enchant_stage.cpp
     game/buying_store_stage.cpp
     game/buying_store_visit.cpp

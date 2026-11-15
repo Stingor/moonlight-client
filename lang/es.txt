@@ -24525,3 +24525,129 @@ tr: Combo con:
 
 fr: Évolue avec :
 tr: Evoluciona con:
+
+fr: (aucune pièce de ce groupe dans l'inventory)
+tr: (ningún objeto de este grupo en el inventario)
+
+fr: (case de carte, vide)
+tr: (ranura de carta, vacía)
+
+fr: (libre — reçoit le prochain enchantement)
+tr: (libre — recibe el próximo encantamiento)
+
+fr: (libre)
+tr: (libre)
+
+fr: Améliorer l'enchantement de la case %d de %s ? Les zenys et les matériaux seront consommés.
+tr: ¿Mejorar el encantamiento de la ranura %d de %s? Se consumirán los zenys y los materiales.
+
+fr: Aucun enchantement à ôter.
+tr: Ningún encantamiento que quitar.
+
+fr: Aucun tirage pour le grade de cette pièce.
+tr: Ningún sorteo para el grado de este objeto.
+
+fr: Aucune case libre pour un enchantement.
+tr: Ninguna ranura libre para un encantamiento.
+
+fr: Case %d
+tr: Ranura %d
+
+fr: Case %d : %s devient %s.
+tr: Ranura %d: %s se convierte en %s.
+
+fr: Case %d : l'enchantement choisi, sans risque.
+tr: Ranura %d: el encantamiento elegido, sin riesgo.
+
+fr: Case %d : un enchantement tiré au sort parmi %d.
+tr: Ranura %d: un encantamiento sorteado entre %d.
+
+fr: Ce que le tirage peut poser
+tr: Lo que el sorteo puede dar
+
+fr: Cette case ne s'enchante pas ici.
+tr: Esta ranura no se encanta aquí.
+
+fr: Cette pièce est endommagée : faites-la réparer d'abord.
+tr: Este objeto está dañado: hazlo reparar primero.
+
+fr: Cette pièce ne s'enchante pas ici.
+tr: Este objeto no se encanta aquí.
+
+fr: Choisissez l'enchantement à poser.
+tr: Elige el encantamiento que aplicar.
+
+fr: Choisissez la case dont l'enchantement doit monter.
+tr: Elige la ranura cuyo encantamiento debe mejorar.
+
+fr: Choisissez la pièce à enchanter.
+tr: Elige el objeto que encantar.
+
+fr: Choisissez une case dont l'enchantement s'améliore.
+tr: Elige una ranura cuyo encantamiento pueda mejorar.
+
+fr: Choisissez une pièce de l'inventory, ôtée, puis ce qu'il faut y faire. Chaque tentative ferme la séance : parlez de nouveau au PNJ pour la suivante.
+tr: Elige un objeto del inventario, sin equipar, y luego qué hacer con él. Cada intento cierra la sesión: vuelve a hablar con el PNJ para el siguiente.
+
+fr: Choix sûr
+tr: Elección segura
+
+fr: Enchantement amélioré : %s.
+tr: Encantamiento mejorado: %s.
+
+fr: Enchantement posé : %s.
+tr: Encantamiento aplicado: %s.
+
+fr: Enchantements au choix
+tr: Encantamientos a elegir
+
+fr: Enchanter
+tr: Encantar
+
+fr: L'enchantement a échoué.
+tr: El encantamiento ha fallado.
+
+fr: La remise à zéro a échoué : les enchantements restent.
+tr: El reinicio ha fallado: los encantamientos se quedan.
+
+fr: Le client ne connaît pas encore cet enchantement.
+tr: El cliente aún no conoce este encantamiento.
+
+fr: Le grade de cette pièce est trop bas.
+tr: El grado de este objeto es demasiado bajo.
+
+fr: Pièces enchantables
+tr: Objetos encantables
+
+fr: Poser %s sur %s ? Les zenys et les matériaux seront consommés.
+tr: ¿Aplicar %s a %s? Se consumirán los zenys y los materiales.
+
+fr: Poser l'enchantement
+tr: Aplicar el encantamiento
+
+fr: Réussite : %s
+tr: Éxito: %s
+
+fr: Réussite assurée.
+tr: Éxito asegurado.
+
+fr: Tenter l'enchantement
+tr: Intentar el encantamiento
+
+fr: Tenter un enchantement au hasard sur %s ? Les zenys et les matériaux seront consommés, même en cas d'échec.
+tr: ¿Intentar un encantamiento al azar en %s? Se consumirán los zenys y los materiales, incluso si falla.
+
+fr: Tous les enchantements ont été ôtés.
+tr: Se han quitado todos los encantamientos.
+
+fr: Tout ôter
+tr: Quitar todo
+
+fr: Une pièce à options aléatoires n'est pas acceptée.
+tr: No se acepta un objeto con opciones aleatorias.
+
+fr: Ôte les %d enchantement(s) de la pièce ; les cartes restent.
+tr: Quita los %d encantamiento(s) del objeto; las cartas se quedan.
+
+fr: Ôter tous les enchantements de %s ? Les zenys et les matériaux seront consommés, même en cas d'échec.
+tr: ¿Quitar todos los encantamientos de %s? Se consumirán los zenys y los materiales, incluso si falla.
