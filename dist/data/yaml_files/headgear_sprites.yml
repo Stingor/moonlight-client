@@ -7,8 +7,9 @@
 #  Le sprite de chaque accessoire de tête
 #
 #  Tiré de data\luafiles514\lua files\datainfo\accessoryid.lub et
-#  accname.lub que livre moonlight.grf, traduction ROenglishRE : ce dépôt ne
-#  le revendique pas comme sien.
+#  accname.lub que livre l'installation, traduction ROenglishRE : ce dépôt ne
+#  le revendique pas comme sien. Les coiffes propres à Moonlight, à partir de
+#  20000, viennent de scripts/yaml_tables/sprite_customs.yml.
 #
 #  Fichier produit par scripts/yaml_tables/sprite_tables.py. Ne pas éditer à la
 #  main :
@@ -2834,8 +2835,111 @@ headgears:
   2826: {symbol: "ACCESSORY_C_Mask_Of_Fox_YL", sprite: "_C_Mask_Of_Fox_YL"}
   2827: {symbol: "ACCESSORY_C_Joyful_Taogunka", sprite: "_C_Joyful_Taogunka"}
   2828: {symbol: "ACCESSORY_C_Cynic_Guard", sprite: "_C_Cynic_Guard"}
-  2829: {symbol: "ACCESSORY_Two_Side_Wing", sprite: "_Two_Side_Wing"}
   2830: {symbol: "ACCESSORY_Primordial_Weapons", sprite: "_Primordial_Weapons"}
-  2998: {symbol: "ACCESSORY_KA_AW", sprite: "_angelwing"}
-  2999: {symbol: "ACCESSORY_KA_EW", sprite: "_evilwing"}
-  3000: {symbol: "ACCESSORY_TATATA", sprite: "_Tatatatata"}
+  2831: {symbol: "ACCESSORY_Two_Side_Wing", sprite: "_Two_Side_Wing"}
+  2832: {symbol: "ACCESSORY_Pride_A_Helm", sprite: "_Pride_A_Helm"}
+  2833: {symbol: "ACCESSORY_C_CLB_BS_Head", sprite: "_C_CLB_BS_Head"}
+  2834: {symbol: "ACCESSORY_C_CLB_BS_Hood_B", sprite: "_C_CLB_BS_Hood_B"}
+  2835: {symbol: "ACCESSORY_C_CLB_BS_Hood_M", sprite: "_C_CLB_BS_Hood_M"}
+  2836: {symbol: "ACCESSORY_C_CLB_BS_Hood_F", sprite: "_C_CLB_BS_Hood_F"}
+  2837: {symbol: "ACCESSORY_C_CLB_BS_Hood_GM", sprite: "_C_CLB_BS_Hood_GM"}
+  2838: {symbol: "ACCESSORY_C_CLB_BS_Hood_GF", sprite: "_C_CLB_BS_Hood_GF"}
+  2839: {symbol: "ACCESSORY_C_CLB_BS_Pilot_Fish", sprite: "_C_CLB_BS_Pilot_Fish"}
+  2840: {symbol: "ACCESSORY_C_CLB_BS_Mini", sprite: "_C_CLB_BS_Mini"}
+  2841: {symbol: "ACCESSORY_C_Spiritual_Eye_Mask", sprite: "_C_Spiritual_Eye_Mask"}
+  2842: {symbol: "ACCESSORY_C_Water_Elem_Dragon", sprite: "_C_Water_Elem_Dragon"}
+  2843: {symbol: "ACCESSORY_Holy_Rosario_Silver", sprite: "_Holy_Rosario_Silver"}
+  2844: {symbol: "ACCESSORY_C_Culture_Pod", sprite: "_C_Culture_Pod"}
+  2845: {symbol: "ACCESSORY_C_Tarou_Magical_Hat", sprite: "_C_Tarou_Magical_Hat"}
+  2846: {symbol: "ACCESSORY_C_Mask_of_Ifrit", sprite: "_C_Mask_of_Ifrit"}
+  2847: {symbol: "ACCESSORY_C_Fine_Chada", sprite: "_C_Fine_Chada"}
+  2848: {symbol: "ACCESSORY_C_Vibrant_Jeepney", sprite: "_C_Vibrant_Jeepney"}
+  2849: {symbol: "ACCESSORY_C_Swift_Bicycle", sprite: "_C_Swift_Bicycle"}
+  2850: {symbol: "ACCESSORY_C_Giant_Panda", sprite: "_C_Giant_Panda"}
+  2851: {symbol: "ACCESSORY_C_Moonbow_Long_Hair", sprite: "_C_Moonbow_Long_Hair"}
+  2852: {symbol: "ACCESSORY_C_Nf_Stamp", sprite: "_C_Nf_Stamp"}
+  2853: {symbol: "ACCESSORY_Bandana_IL", sprite: "_Bandana_IL"}
+  2854: {symbol: "ACCESSORY_Poporing_SunVisor", sprite: "_Poporing_SunVisor"}
+  2855: {symbol: "ACCESSORY_Pulse_Of_Yggdrasil", sprite: "_Pulse_Of_Yggdrasil"}
+  2856: {symbol: "ACCESSORY_Furios_Orb", sprite: "_Furios_Orb"}
+  2857: {symbol: "ACCESSORY_Dauntless", sprite: "_Dauntless"}
+  2858: {symbol: "ACCESSORY_C_Gerero_Hair", sprite: "_C_Gerero_Hair"}
+  2859: {symbol: "ACCESSORY_C_Hanom_Hair", sprite: "_C_Hanom_Hair"}
+  2860: {symbol: "ACCESSORY_C_Gerero_Hairpin", sprite: "_C_Gerero_Hairpin"}
+  2861: {symbol: "ACCESSORY_C_Sirena_Hairband", sprite: "_C_Sirena_Hairband"}
+  2862: {symbol: "ACCESSORY_C_Blink_Eyes_Hanom", sprite: "_C_Blink_Eyes_Hanom"}
+  2863: {symbol: "ACCESSORY_C_Diosa_Rod", sprite: "_C_Diosa_Rod"}
+  2864: {symbol: "ACCESSORY_C_Bluehole_Bubble", sprite: "_C_Bluehole_Bubble"}
+  2865: {symbol: "ACCESSORY_C_Tassie_Helm", sprite: "_C_Tassie_Helm"}
+  2866: {symbol: "ACCESSORY_C_Aqua_Marin", sprite: "_C_Aqua_Marin"}
+  2867: {symbol: "ACCESSORY_C_Aqua_Marin_N", sprite: "_C_Aqua_Marin_N"}
+  2868: {symbol: "ACCESSORY_C_Angler_Dream", sprite: "_C_Angler_Dream"}
+  2869: {symbol: "ACCESSORY_C_Deepsea_Pearls_Hat", sprite: "_C_Deepsea_Pearls_Hat"}
+  2870: {symbol: "ACCESSORY_Magical_Cape", sprite: "_Magical_Cape"}
+  2871: {symbol: "ACCESSORY_Fan_In_Mouth_PP", sprite: "_Fan_In_Mouth_PP"}
+  2872: {symbol: "ACCESSORY_C_Black_Dragon_Style2", sprite: "_C_Black_Dragon_Style2"}
+  2873: {symbol: "ACCESSORY_C_Black_Dragon_Style3", sprite: "_C_Black_Dragon_Style3"}
+  2874: {symbol: "ACCESSORY_C_Dana_Rabbit_Hat", sprite: "_C_Dana_Rabbit_Hat"}
+  2875: {symbol: "ACCESSORY_C_Momo_Balloon_Hat", sprite: "_C_Momo_Balloon_Hat"}
+  2876: {symbol: "ACCESSORY_C_Boss_Ka_Hairpin", sprite: "_C_Boss_Ka_Hairpin"}
+  2877: {symbol: "ACCESSORY_C_70_Chocolate_Hat", sprite: "_C_70_Chocolate_Hat"}
+  2878: {symbol: "ACCESSORY_Nord_Onyx_Helm", sprite: "_Nord_Onyx_Helm"}
+  2879: {symbol: "ACCESSORY_Nord_Platinum_Helm", sprite: "_Nord_Platinum_Helm"}
+  2880: {symbol: "ACCESSORY_C_K_Shaman_Hat", sprite: "_C_K_Shaman_Hat"}
+  2881: {symbol: "ACCESSORY_C_Gat", sprite: "_C_Gat"}
+  2882: {symbol: "ACCESSORY_C_Neo_Ul_Hat", sprite: "_C_Neo_Ul_Hat"}
+  2883: {symbol: "ACCESSORY_C_Fluffy_Candy_Long", sprite: "_C_Fluffy_Candy_Long"}
+  2884: {symbol: "ACCESSORY_C_Fluffy_Candy_Long_N", sprite: "_C_Fluffy_Candy_Long_N"}
+  2885: {symbol: "ACCESSORY_C_Pitaya_Ramen_Stall", sprite: "_C_Pitaya_Ramen_Stall"}
+  2886: {symbol: "ACCESSORY_C_Grapes_Dresshat_WH", sprite: "_C_Grapes_Dresshat_WH"}
+  2887: {symbol: "ACCESSORY_Rebel_in_Onlooker", sprite: "_Rebel_in_Onlooker"}
+  2888: {symbol: "ACCESSORY_C_Little_Abyss_D_BL", sprite: "_C_Little_Abyss_D_BL"}
+  2889: {symbol: "ACCESSORY_C_Wildrose_Wig", sprite: "_C_Wildrose_Wig"}
+  2890: {symbol: "ACCESSORY_C_Wildrose_Wig_N", sprite: "_C_Wildrose_Wig_N"}
+  2891: {symbol: "ACCESSORY_C_Ghost_Cube_Cloth", sprite: "_C_Ghost_Cube_Cloth"}
+  2892: {symbol: "ACCESSORY_C_Halloween_HD", sprite: "_C_Halloween_HD"}
+  2893: {symbol: "ACCESSORY_Chrono_Alchemia", sprite: "_Chrono_Alchemia"}
+  2894: {symbol: "ACCESSORY_Awakening_Grimoire", sprite: "_Awakening_Grimoire"}
+  2895: {symbol: "ACCESSORY_C_Halloween_Candy_Hair_B", sprite: "_C_Halloween_Candy_Hair"}
+  2896: {symbol: "ACCESSORY_C_HalloCandy_Hair_N_B", sprite: "_C_HalloCandy_Hair_N"}
+  2897: {symbol: "ACCESSORY_C_TW_2th_Balloon_v2", sprite: "_C_TW_2th_Balloon_v2"}
+  2898: {symbol: "ACCESSORY_Romantic_Blue_Flower", sprite: "_Romantic_Blue_Flower"}
+  2899: {symbol: "ACCESSORY_C_Magaleta_Doll_Hat", sprite: "_C_Magaleta_Doll_Hat"}
+  2900: {symbol: "ACCESSORY_C_Seyren_Doll_Hat", sprite: "_C_Seyren_Doll_Hat"}
+  2901: {symbol: "ACCESSORY_C_Shecil_Doll_Hat", sprite: "_C_Shecil_Doll_Hat"}
+  2902: {symbol: "ACCESSORY_C_Eremes_Doll_Hat", sprite: "_C_Eremes_Doll_Hat"}
+  2903: {symbol: "ACCESSORY_C_Katrinn_Doll_Hat", sprite: "_C_Katrinn_Doll_Hat"}
+  2904: {symbol: "ACCESSORY_C_Harword_Doll_Hat", sprite: "_C_Harword_Doll_Hat"}
+  2905: {symbol: "ACCESSORY_C_Gamakkun_Hat", sprite: "_C_Gamakkun_Hat"}
+  2906: {symbol: "ACCESSORY_C_Airy_Feather_Long_BD", sprite: "_C_Airy_Feather_Long_BD"}
+  2907: {symbol: "ACCESSORY_C_Airy_Feather_Long_RBD", sprite: "_C_Airy_Feather_Long_RBD"}
+  2908: {symbol: "ACCESSORY_C_Airy_Feather_Long_SV", sprite: "_C_Airy_Feather_Long_SV"}
+  2909: {symbol: "ACCESSORY_C_Airy_Feather_Long_RSV", sprite: "_C_Airy_Feather_Long_RSV"}
+  2910: {symbol: "ACCESSORY_C_Hoppin_Twin_Pigtail_N", sprite: "_C_Hoppin_Twin_Pigtail_N"}
+  2911: {symbol: "ACCESSORY_C_Bell_Cat_Hair_N", sprite: "_C_Bell_Cat_Hair_N"}
+  2912: {symbol: "ACCESSORY_C_Starry_Long_Wave_N", sprite: "_C_Starry_Long_Wave_N"}
+  2913: {symbol: "ACCESSORY_C_Mermaid_Wig_N", sprite: "_C_Mermaid_Wig_N"}
+  2914: {symbol: "ACCESSORY_C_Flower_L_Knitting_N", sprite: "_C_Flower_L_Knitting_N"}
+  2915: {symbol: "ACCESSORY_C_Snow_Rabbit_Wig_N", sprite: "_C_Snow_Rabbit_Wig_N"}
+  2916: {symbol: "ACCESSORY_C_Shih_Tzu_Long_N", sprite: "_C_Shih_Tzu_Long_N"}
+  2917: {symbol: "ACCESSORY_C_Starry_Ribbon_Twin_N", sprite: "_C_Starry_Ribbon_Twin_N"}
+  2918: {symbol: "ACCESSORY_C_GC_Hair_BG", sprite: "_C_GC_Hair_BG"}
+  2919: {symbol: "ACCESSORY_C_GC_Hair_YL", sprite: "_C_GC_Hair_YL"}
+  2920: {symbol: "ACCESSORY_C_GC_Hair_CB", sprite: "_C_GC_Hair_CB"}
+  2921: {symbol: "ACCESSORY_C_GC_Hair_LB", sprite: "_C_GC_Hair_LB"}
+  2922: {symbol: "ACCESSORY_C_GC_Hair_BL", sprite: "_C_GC_Hair_BL"}
+  2923: {symbol: "ACCESSORY_C_GC_Hair_SV", sprite: "_C_GC_Hair_SV"}
+  2924: {symbol: "ACCESSORY_C_GC_Hair_WH", sprite: "_C_GC_Hair_WH"}
+  2925: {symbol: "ACCESSORY_C_GC_Hair_PP", sprite: "_C_GC_Hair_PP"}
+  2926: {symbol: "ACCESSORY_C_Medium_Wave_BG", sprite: "_C_Medium_Wave_BG"}
+  2927: {symbol: "ACCESSORY_C_Medium_Wave_YL", sprite: "_C_Medium_Wave_YL"}
+  2928: {symbol: "ACCESSORY_C_Medium_Wave_CB", sprite: "_C_Medium_Wave_CB"}
+  2929: {symbol: "ACCESSORY_C_Medium_Wave_LB", sprite: "_C_Medium_Wave_LB"}
+  2930: {symbol: "ACCESSORY_C_Medium_Wave_BL", sprite: "_C_Medium_Wave_BL"}
+  2931: {symbol: "ACCESSORY_C_Medium_Wave_SV", sprite: "_C_Medium_Wave_SV"}
+  2932: {symbol: "ACCESSORY_C_Medium_Wave_WH", sprite: "_C_Medium_Wave_WH"}
+  2933: {symbol: "ACCESSORY_C_Medium_Wave_PP", sprite: "_C_Medium_Wave_PP"}
+  2934: {symbol: "ACCESSORY_Stall_Of_Virtues", sprite: "_Stall_Of_Virtues"}
+  20000: {symbol: "ACCESSORY_KA_AW", sprite: "_angelwing"}
+  20001: {symbol: "ACCESSORY_KA_EW", sprite: "_evilwing"}
+  20002: {symbol: "ACCESSORY_TATATA", sprite: "_Tatatatata"}

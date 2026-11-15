@@ -7,7 +7,7 @@
 #  Le sprite, la famille et le bruit de chaque classe d'arme
 #
 #  Tirés de data\luafiles514\lua files\datainfo\weapontable.lub que livre
-#  moonlight.grf, traduction ROenglishRE : ce dépôt ne le revendique pas comme
+#  l'installation, traduction ROenglishRE : ce dépôt ne le revendique pas comme
 #  sien.
 #
 #  Fichier produit par scripts/yaml_tables/sprite_tables.py. Ne pas éditer à la
@@ -72,7 +72,7 @@ weapons:
   44: {symbol: "WEAPONTYPE_Gaia_Sword", sprite: "_1143", family: 2}
   45: {symbol: "WEAPONTYPE_Twin_Edge_B", sprite: "_13412", family: 2}
   46: {symbol: "WEAPONTYPE_Twin_Edge_R", sprite: "_13413", family: 2}
-  47: {symbol: "WEAPONTYPE_Priest_Sword", sprite: "_프리스트의검", family: 2}
+  47: {symbol: "WEAPONTYPE_Priest_Sword", sprite: "_13428", family: 2}
   48: {symbol: "WEAPONTYPE_Katana", sprite: "_1116", family: 3}
   49: {symbol: "WEAPONTYPE_Bastard_Sword", sprite: "_1154", family: 3}
   50: {symbol: "WEAPONTYPE_Broad_Sword", sprite: "_1160", family: 3}

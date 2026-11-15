@@ -8,12 +8,19 @@
 #
 #  La liste des cartes est celle de db/map_index.yml du serveur Moonlight et
 #  de ses imports. Les noms et les bandeaux viennent de SystemEN\mapInfo.lub
-#  de l'installation, traduction ROenglishRE (mention ci-dessus) ; une carte
-#  que cette table ne nomme pas prend le `Name` du serveur.
+#  de l'installation, traduction ROenglishRE (mention ci-dessus). Un `Name`
+#  qu'un import du serveur pose l'emporte sur la table ; une carte que la
+#  table ne nomme pas prend celui de la base du serveur.
+#
+#  Les BANDEAUX ne suivent pas l'installation : une carte déjà connue garde le
+#  sien (announced, subtitle, title, background), et une carte nouvelle naît
+#  sans annonce. C'est le joueur qui choisit, dans le client, quand ils
+#  s'affichent.
 #
 #  Fichier produit par scripts/yaml_tables/map_names.py. Ne pas éditer à la main :
 #      python scripts/yaml_tables/map_names.py --serveur <dépôt moonlight> \
-#          --client <dossier client> --sortie dist/data/yaml_files/map_names.yml
+#          --client <dossier client> --sortie dist/data/yaml_files/map_names.yml \
+#          --bandeaux dist/data/yaml_files/map_names.yml
 #
 #  maps : carte (son nom au serveur, sans extension) ->
 #    name       : le nom montré au joueur ;
@@ -672,7 +679,7 @@ maps:
     title: Forgotten GlastHeim
     background: noname
   2025arena2:
-    name: Arena NiflHeim, Banquet hall for the dead
+    name: Arena NiflHeim, Banquet Hall of the Dead
     announced: true
     subtitle: Arena
     title: Banquet hall for the dead
@@ -849,22 +856,22 @@ maps:
     title: Cursed Abbey Dungeon B3
     background: dungeon
   abyss_01:
-    name: Abyss Lake Underground Cave 1F
+    name: Abyss Lake Underground Cave F1
     subtitle: Abyss Lake
     title: Underground Cave 1F
     background: dungeon
   abyss_02:
-    name: Abyss Lake Underground Cave 2F
+    name: Abyss Lake Underground Cave F2
     subtitle: Abyss Lake
     title: Underground Cave 2F
     background: dungeon
   abyss_03:
-    name: Abyss Lake Underground Cave 3F
+    name: Abyss Lake Underground Cave F3
     subtitle: Abyss Lake
     title: Underground Cave 3F
     background: dungeon
   abyss_04:
-    name: Abyss Lake Underground Cave 4F
+    name: Abyss Lake Underground Cave F4
     subtitle: Abyss Lake
     title: Underground Cave 4F
     background: dungeon
@@ -1109,12 +1116,12 @@ maps:
   ba_in01:
     name: Inside the Varmundt's Mansion
   ba_lib:
-    name: Library Memory Corridor
+    name: Library's Corridor of Memories
     subtitle: Library
     title: Memory Corridor
     background: dungeon
   ba_lost:
-    name: Lost Farm Valley
+    name: Farm Lost Valley
     title: Lost Farm Valley
     background: dungeon_s2
   ba_maison:
@@ -1373,7 +1380,7 @@ maps:
     title: Recreated Geffen
     background: noname_s2
   ch1fild1:
-    name: Twisted Dark Land - 1 Erosion
+    name: Twisted Land of Darkness - 1 Erosion
     announced: true
     subtitle: Northern Midgard
     title: Twisted Dark Land - 1 Erosion
@@ -1559,19 +1566,19 @@ maps:
   ecl_in04:
     name: Eclage Indoor
   ecl_tdun01:
-    name: Bifrost Tower 1F
+    name: Bifrost Tower F1
     title: Bifrost Tower 1F
     background: dungeon_s2
   ecl_tdun02:
-    name: Bifrost Tower 2F
+    name: Bifrost Tower F2
     title: Bifrost Tower 2F
     background: dungeon_s2
   ecl_tdun03:
-    name: Bifrost Tower 3F
+    name: Bifrost Tower F3
     title: Bifrost Tower 3F
     background: dungeon_s2
   ecl_tdun04:
-    name: Bifrost Tower 4F
+    name: Bifrost Tower F4
     title: Bifrost Tower 4F
     background: dungeon_s2
   eclage:
@@ -1580,7 +1587,7 @@ maps:
     title: Eclage
     background: village
   ein_d02_i:
-    name: Nasarin Empire
+    name: Nasarian Empire
     subtitle: Illusion
     title: Nasarin Empire
     background: dungeon
@@ -1593,7 +1600,7 @@ maps:
     title: Einbroch Mine F2
     background: dungeon_s2
   ein_dun03:
-    name: Einbech Mine 3F
+    name: Einbech Mine F3
     title: Einbech Mine 3F
     background: dungeon_s2
   ein_fild01:
@@ -1951,7 +1958,7 @@ maps:
     title: Guild Dungeon
     background: dungeon
   gld_dun01_2:
-    name: Greenwood Lake Dungeon 2F
+    name: Greenwood Lake Dungeon F2
     subtitle: Greenwood Lake
     title: Guild Dungeon Underground F2
     background: dungeon
@@ -1961,7 +1968,7 @@ maps:
     title: Guild Dungeon
     background: dungeon
   gld_dun02_2:
-    name: Louisa Dungeon 2F
+    name: Louisa Dungeon F2
     subtitle: Louisa
     title: Guild Dungeon Underground F2
     background: dungeon
@@ -1971,7 +1978,7 @@ maps:
     title: Guild Dungeon
     background: dungeon
   gld_dun03_2:
-    name: Valkyrie Realm Dungeon 2F
+    name: Valkyrie Realm Dungeon F2
     subtitle: Valkyrie Realm
     title: Guild Dungeon Underground F2
     background: dungeon
@@ -1981,7 +1988,7 @@ maps:
     title: Guild Dungeon
     background: dungeon
   gld_dun04_2:
-    name: Brittoria Dungeon 2F
+    name: Brittoria Dungeon F2
     subtitle: Brittoria
     title: Guild Dungeon Underground F2
     background: dungeon
@@ -2057,12 +2064,12 @@ maps:
     title: Guild Arena
     background: noname_s2
   gw_fild01:
-    name: Gray Wolf Forest
+    name: Gray Wolf Forest F1
     announced: true
     title: Gray Wolf Forest
     background: field_s2
   gw_fild02:
-    name: Gray Wolf Forest
+    name: Gray Wolf Forest F2
     announced: true
     title: Gray Wolf Forest
     background: field_s2
@@ -2256,15 +2263,15 @@ maps:
     title: Frozen Memory
     background: dungeon
   ice_dun01:
-    name: Rachel Ice Cave 1F
+    name: Rachel Ice Cave F1
     title: Rachel Ice Cave 1F
     background: dungeon_s2
   ice_dun02:
-    name: Rachel Ice Cave 2F
+    name: Rachel Ice Cave F2
     title: Rachel Ice Cave 2F
     background: dungeon_s2
   ice_dun03:
-    name: Rachel Ice Cave 3F
+    name: Rachel Ice Cave F3
     title: Rachel Ice Cave 3F
     background: dungeon_s2
   ice_dun04:
@@ -2571,12 +2578,12 @@ maps:
   job_wizard:
     name: Wizard Academy
   jor_ab01:
-    name: Abandoned Pit 1st Floor
+    name: Abandoned Pit F1
     announced: true
     title: Abandoned Pit 1st Floor
     background: dungeon_s2
   jor_ab02:
-    name: Abandoned Pit 2nd Floor
+    name: Abandoned Pit F2
     announced: true
     title: Abandoned Pit 2nd Floor
     background: dungeon_s2
@@ -2634,12 +2641,12 @@ maps:
     title: Scale Island
     background: noname_s2
   jor_dun01:
-    name: Snake God's Warmth 1st Floor
+    name: Snake God's Warmth F1
     announced: true
     title: Snake God's Warmth 1st Floor
     background: dungeon_s2
   jor_dun02:
-    name: Snake God's Warmth 2nd Floor
+    name: Snake God's Warmth F2
     announced: true
     title: Snake God's Warmth 2nd Floor
     background: dungeon_s2
@@ -2681,12 +2688,12 @@ maps:
     title: Southern Rising Land
     background: field2_s2
   jor_root1:
-    name: Snake God's Root 1F
+    name: Snake God's Root F1
     announced: true
     title: Snake God's Root 1F
     background: dungeon_s2
   jor_root2:
-    name: Snake God's Root 2F
+    name: Snake God's Root F2
     announced: true
     title: Snake God's Root 2F
     background: dungeon_s2
@@ -2712,13 +2719,13 @@ maps:
     title: Sacred Root
     background: noname
   jor_sklf1:
-    name: Jormungand Cult Shrine 1st Floor
+    name: Jormungand Cult Temple F1
     announced: true
     subtitle: Annex of the Jormungand Cult Shrine
     title: Yorscalp 1st Floor
     background: dungeon
   jor_sklf2:
-    name: Jormungand Cult Shrine 2nd Floor
+    name: Jormungand Cult Temple F2
     announced: true
     subtitle: Annex of the Jormungand Cult Shrine
     title: Yorscalp 2nd Floor
@@ -2729,13 +2736,13 @@ maps:
     title: Frozen Tail
     background: field2_s2
   jor_tmple1:
-    name: Jormungand Cult Temple Gimleh 1st Floor
+    name: Jormungand Cult Temple Gimleh F1
     announced: true
     subtitle: Jormungand Cult Temple Gimleh
     title: 1st Floor
     background: dungeon
   jor_tmple2:
-    name: Jormungand Cult Temple Gimleh 2nd Floor
+    name: Jormungand Cult Temple Gimleh F2
     announced: true
     subtitle: Jormungand Cult Temple Gimleh
     title: 2nd Floor
@@ -3080,17 +3087,17 @@ maps:
   mid_campin:
     name: Inside Midgard Expedition Camp
   mjo_dun01:
-    name: Mjolnir Dead Pit F1
+    name: Mjolnir Abandoned Mine F1
     subtitle: North of Mt. Mjolnir
     title: Dead Pit F1
     background: dungeon
   mjo_dun02:
-    name: Mjolnir Dead Pit F2
+    name: Mjolnir Abandoned Mine F2
     subtitle: North of Mt. Mjolnir
     title: Dead Pit F2
     background: dungeon
   mjo_dun03:
-    name: Mjolnir Dead Pit F3
+    name: Mjolnir Abandoned Mine F3
     subtitle: North of Mt. Mjolnir
     title: Dead Pit F3
     background: dungeon
@@ -3532,12 +3539,12 @@ maps:
   ordeal_a02:
     name: Battle Ordeal Mode
   oz_dun01:
-    name: Oz's Labyrinth 1F
+    name: Oz's Labyrinth F1
     announced: true
     title: Oz's Labyrinth 1F
     background: dungeon_s2
   oz_dun02:
-    name: Oz's Labyrinth 2F
+    name: Oz's Labyrinth F2
     announced: true
     title: Oz's Labyrinth 2F
     background: dungeon_s2
@@ -4408,27 +4415,27 @@ maps:
     title: Power Twisted Plains
     background: field2_s2
   ra_san01:
-    name: Rachel Temple Sanctuary North Area 1F
+    name: Rachel Temple Sanctuary F1 North Area
     subtitle: Rachel Temple
     title: Sanctuary North Area 1F
     background: dungeon
   ra_san02:
-    name: Rachel Temple Sanctuary West Area 1F
+    name: Rachel Temple Sanctuary F1 West Area
     subtitle: Rachel Temple
     title: Sanctuary West Area 1F
     background: dungeon
   ra_san03:
-    name: Rachel Temple Sanctuary East Area 1F
+    name: Rachel Temple Sanctuary F1 East Area
     subtitle: Rachel Temple
     title: Sanctuary East Area 1F
     background: dungeon
   ra_san04:
-    name: Rachel Temple Sanctuary South Area 1F
+    name: Rachel Temple Sanctuary F1 South Area
     subtitle: Rachel Temple
     title: Sanctuary South Area 1F
     background: dungeon
   ra_san05:
-    name: Rachel Temple Sanctuary Central Area 2F
+    name: Rachel Temple Sanctuary F2 Central Area
     subtitle: Rachel Temple
     title: Sanctuary Central Area 2F
     background: dungeon
@@ -4725,15 +4732,15 @@ maps:
     title: Thor Volcano Camp
     background: noname_s2
   thor_v01:
-    name: Thor Volcano Dungeon 1F
+    name: Thor Volcano Dungeon F1
     title: Thor Volcano Dungeon 1F
     background: dungeon_s2
   thor_v02:
-    name: Thor Volcano Dungeon 2F
+    name: Thor Volcano Dungeon F2
     title: Thor Volcano Dungeon 2F
     background: dungeon_s2
   thor_v03:
-    name: Thor Volcano Dungeon 3F
+    name: Thor Volcano Dungeon F3
     title: Thor Volcano Dungeon 3F
     background: dungeon_s2
   tra_fild:
@@ -4741,6 +4748,21 @@ maps:
     announced: true
     title: Prontera Outer Training Grounds
     background: field_s2
+  tra_fild01:
+    name: Prontera Outskirts Basic Training Ground
+    subtitle: Prontera Outskirts
+    title: Basic Training Ground
+    background: field
+  tra_fild02:
+    name: Prontera Outskirts 1/10 Training Ground
+    subtitle: Prontera Outskirts
+    title: 1/10 Training Ground
+    background: field
+  tra_fild03:
+    name: Prontera Outskirts 1/100 Training Ground
+    subtitle: Prontera Outskirts
+    title: 1/100 Training Ground
+    background: field
   treasure01:
     name: Sunken Ship B1
     subtitle: Alberta
@@ -5053,7 +5075,7 @@ maps:
     title: Toy Factory Warehouse
     background: dungeon
   xmas_dun02:
-    name: Toy Monitoring Room
+    name: Toy Classification Center
     subtitle: Lutie
     title: Toy Monitoring Room
     background: dungeon
@@ -5068,18 +5090,18 @@ maps:
     title: Yuno Airport
     background: noname_s2
   ygg_edge:
-    name: Water Lily Village
+    name: Ashwood Village
     announced: true
     subtitle: Edge of the World Tree
     title: Water Lily Village
     background: village
   ygg_fruit:
-    name: Inside Water Lily Village
+    name: Inside Ashwood Village
     announced: true
     title: Inside Water Lily Village
     background: village_s2
   ygg_roots:
-    name: Twisted Dark Land
+    name: Twisted Land of Darkness
     announced: true
     subtitle: North of Midgard
     title: Twisted Dark Land

@@ -48,6 +48,15 @@ using lua_internal::OpcodeOf;
 using lua_internal::Prototype;
 using namespace lua_internal::opcodes;
 
+// LA SEULE FONCTION QU'UN CHUNK DE DONNÉES PEUT APPELER. Une table se fait sa
+// propre métatable pour qu'une clé inconnue lève une erreur au jeu : l'appel ne
+// change aucune donnée, il se traverse sans s'exécuter.
+constexpr std::string_view kSetMetatable = "setmetatable";
+// Le B d'un appel à deux arguments, et les C qui gardent zéro ou un résultat.
+constexpr std::uint32_t kSetMetatableCallB = 3;
+constexpr std::uint32_t kCallKeepsNothingC = 1;
+constexpr std::uint32_t kCallKeepsOneC = 2;
+
 // Combien de valeurs SETLIST pose par appel. La constante s'appelle
 // LFIELDS_PER_FLUSH dans lvm.c, et c'est elle qui donne le rang de la première.
 constexpr std::uint32_t kFieldsPerFlush = 50;
@@ -241,6 +250,7 @@ class Evaluator {
 
   [[nodiscard]] core::Result<LuaTable> Run() {
     registers_.assign(prototype_.max_stack, LuaValue{});
+    holds_set_metatable_.assign(prototype_.max_stack, false);
     LuaTable& globals = globals_;
 
     for (std::size_t at = 0; at < prototype_.code.size(); ++at) {
@@ -285,6 +295,26 @@ class Evaluator {
           const LuaValue* found = globals.Find(name.text);
           if (!Store(ArgA(word), found != nullptr ? *found : LuaValue{})) {
             return std::unexpected(OutOfRange());
+          }
+          if (found == nullptr && name.text == kSetMetatable) {
+            holds_set_metatable_[ArgA(word)] = true;
+          }
+          break;
+        }
+        case kOpCall: {
+          // `setmetatable(table, métatable)` seul, deux arguments : il rend sa
+          // table, que l'appel garde ou non.
+          const std::uint32_t function_at = ArgA(word);
+          if (function_at + 1 >= registers_.size() || !holds_set_metatable_[function_at] ||
+              ArgB(word) != kSetMetatableCallB ||
+              (ArgC(word) != kCallKeepsNothingC && ArgC(word) != kCallKeepsOneC)) {
+            return std::unexpected(Refuse(ErrorCode::kUnsupportedVersion,
+                                          "appel hors du cadre : seul setmetatable se traverse"));
+          }
+          if (ArgC(word) == kCallKeepsOneC) {
+            if (!Copy(function_at, function_at + 1)) {
+              return std::unexpected(OutOfRange());
+            }
           }
           break;
         }
@@ -441,6 +471,7 @@ class Evaluator {
       return false;
     }
     registers_[index] = std::move(value);
+    holds_set_metatable_[index] = false;
     return true;
   }
 
@@ -448,12 +479,20 @@ class Evaluator {
     if (source >= registers_.size()) {
       return false;
     }
-    return Store(destination, registers_[source]);
+    const bool set_metatable = holds_set_metatable_[source];
+    if (!Store(destination, registers_[source])) {
+      return false;
+    }
+    holds_set_metatable_[destination] = set_metatable;
+    return true;
   }
 
   const Prototype& prototype_;
   LuaTable globals_;
   std::vector<LuaValue> registers_;
+  // Vrai pour un registre qui tient la fonction `setmetatable` de la
+  // bibliothèque, absente des globales que le chunk reçoit.
+  std::vector<bool> holds_set_metatable_;
   bool registers_valid_ = true;
 };
 

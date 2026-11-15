@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <limits>
+#include <string_view>
 #include <vector>
 
 #include <catch2/catch_test_macros.hpp>
@@ -244,6 +245,64 @@ TEST_CASE("Lua : un chunk qui CALCULE se refuse", "[formats][lua]") {
   builder.RawInstruction(12);  // ADD
   builder.Return();
   CHECK_FALSE(ReadLuaChunk(builder.Build()).has_value());
+}
+
+namespace {
+
+// Un appel CALL : A la fonction, B le nombre d'arguments plus un, C le nombre de
+// résultats gardés plus un.
+constexpr std::uint32_t kOpCall = 28;
+std::uint32_t Call(std::uint32_t a, std::uint32_t b, std::uint32_t c) {
+  return kOpCall | (a << 6) | (c << 14) | (b << 23);
+}
+
+// « T = { champ = 1 } ; setmetatable(T, T) », puis `Garde = setmetatable(T, T)`
+// si `keep_result` : la garde que Gravity pose sur ses tables d'héritage.
+std::vector<std::uint8_t> GuardedChunk(std::string_view function_name, bool keep_result) {
+  LuaChunkBuilder builder;
+  const std::uint32_t name = builder.AddString("T");
+  const std::uint32_t field = builder.AddString("champ");
+  const std::uint32_t one = builder.AddNumber(1.0);
+  const std::uint32_t function = builder.AddString(function_name);
+  const std::uint32_t kept = builder.AddString("Garde");
+
+  builder.set_max_stack(4);
+  builder.NewTable(0);
+  builder.SetTable(0, LuaChunkBuilder::kConstant | field, LuaChunkBuilder::kConstant | one);
+  builder.SetGlobal(0, name);
+  builder.GetGlobal(0, function);
+  builder.GetGlobal(1, name);
+  builder.GetGlobal(2, name);
+  builder.RawInstruction(Call(0, 3, keep_result ? 2 : 1));
+  if (keep_result) {
+    builder.SetGlobal(0, kept);
+  }
+  builder.Return();
+  return builder.Build();
+}
+
+}  // namespace
+
+TEST_CASE("Lua : setmetatable se traverse, et la table garde ses données", "[formats][lua]") {
+  for (const bool keep_result : {false, true}) {
+    const auto globals = ReadLuaChunk(GuardedChunk("setmetatable", keep_result));
+    REQUIRE(globals.has_value());
+    const LuaValue* table = globals->Find("T");
+    REQUIRE(table != nullptr);
+    REQUIRE(table->table != nullptr);
+    const LuaValue* field = table->table->Find("champ");
+    REQUIRE(field != nullptr);
+    CHECK(field->number == 1.0);
+    if (keep_result) {
+      const LuaValue* kept = globals->Find("Garde");
+      REQUIRE(kept != nullptr);
+      CHECK(kept->table == table->table);
+    }
+  }
+}
+
+TEST_CASE("Lua : tout autre appel se refuse", "[formats][lua]") {
+  CHECK_FALSE(ReadLuaChunk(GuardedChunk("print", false)).has_value());
 }
 
 TEST_CASE("Lua : un registre hors de la pile se refuse", "[formats][lua]") {

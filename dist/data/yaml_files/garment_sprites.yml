@@ -8,7 +8,7 @@
 #
 #  Tiré de data\luafiles514\lua files\datainfo\spriterobeid.lub (traduction
 #  ROenglishRE) et spriterobename.lub, et de LayerSizeTypeList de
-#  spreditinfo\2dlayerdir_f.lub, que livre moonlight.grf : ce dépôt ne les
+#  spreditinfo\2dlayerdir_f.lub, que livre l'installation : ce dépôt ne les
 #  revendique pas comme siens.
 #
 #  Fichier produit par scripts/yaml_tables/sprite_tables.py. Ne pas éditer à la
@@ -331,3 +331,30 @@ garments:
   305: {symbol: "ROBE_C_Darklord_Aura", sprite: "C_Darklord_Aura"}
   306: {symbol: "ROBE_C_Garmbebe_Bag", sprite: "C_Garmbebe_Bag"}
   307: {symbol: "ROBE_Magnus_Dominus", sprite: "Magnus_Dominus"}
+  308: {symbol: "ROBE_C_CLB_BS_Bag_B", sprite: "C_CLB_BS_Bag_B"}
+  309: {symbol: "ROBE_C_CLB_BS_Bag_M", sprite: "C_CLB_BS_Bag_M"}
+  310: {symbol: "ROBE_C_CLB_BS_Bag_F", sprite: "C_CLB_BS_Bag_F"}
+  311: {symbol: "ROBE_C_CLB_BS_Bag_GM", sprite: "C_CLB_BS_Bag_GM"}
+  312: {symbol: "ROBE_C_CLB_BS_Bag_GF", sprite: "C_CLB_BS_Bag_GF"}
+  313: {symbol: "ROBE_C_Stylish_Arch_Quiver", sprite: "C_Stylish_Arch_Quiver"}
+  314: {symbol: "ROBE_C_Adventures_Backpack", sprite: "C_Adventures_Backpack"}
+  315: {symbol: "ROBE_C_Mushroom_Umbrella_RD", sprite: "C_Mushroom_Umbrella_RD"}
+  316: {symbol: "ROBE_C_Eddga_Rest", sprite: "C_Eddga_Rest"}
+  317: {symbol: "ROBE_C_Accordion_Bag", sprite: "C_Accordion_Bag"}
+  318: {symbol: "ROBE_C_Panda_Bamboo", sprite: "C_Panda_Bamboo"}
+  319: {symbol: "ROBE_C_Star_Glasspen", sprite: "C_Star_Glasspen"}
+  320: {symbol: "ROBE_C_Thoughts_Window", sprite: "C_Thoughts_Window"}
+  321: {symbol: "ROBE_C_Tassie_Anchor", sprite: "C_Tassie_Anchor"}
+  322: {symbol: "ROBE_C_Gerero_Spear", sprite: "C_Gerero_Spear"}
+  323: {symbol: "ROBE_C_S_Thanatos_Wing", sprite: "C_S_Thanatos_Wing"}
+  324: {symbol: "ROBE_C_Tuna_Fishing", sprite: "C_Tuna_Fishing"}
+  325: {symbol: "ROBE_C_2026RosFesta_1st", sprite: "C_2026RosFesta_1st"}
+  326: {symbol: "ROBE_C_2026RosFesta_2nd", sprite: "C_2026RosFesta_2nd"}
+  327: {symbol: "ROBE_C_2026RosFesta_3rd", sprite: "C_2026RosFesta_3rd"}
+  328: {symbol: "ROBE_C_2026RosFesta_4th", sprite: "C_2026RosFesta_4th"}
+  329: {symbol: "ROBE_C_Han_Do", sprite: "C_Han_Do"}
+  330: {symbol: "ROBE_C_Smokie_Basket", sprite: "C_Smokie_Basket"}
+  331: {symbol: "ROBE_C_Cat_Fryingpan", sprite: "C_Cat_Fryingpan"}
+  332: {symbol: "ROBE_Dimension_Criminal_Arc", sprite: "Dimension_Criminal_Arc"}
+  333: {symbol: "ROBE_C_Rose_Garden_Scythe", sprite: "C_Rose_Garden_Scythe"}
+  334: {symbol: "ROBE_C_Deviling_Little_BP", sprite: "C_Deviling_Little_BP"}
