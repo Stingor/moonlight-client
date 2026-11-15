@@ -82,6 +82,12 @@ constexpr std::array<ClassUnlock, 4> kClassUnlocks{{
   return amount > kMost - total ? kMost : total + amount;
 }
 
+// `zeny` majorés de `pct` %, arrondis vers le bas, sans jamais déborder.
+[[nodiscard]] std::uint64_t MajoredZeny(std::uint64_t zeny, std::uint64_t pct) noexcept {
+  constexpr std::uint64_t kPercent = 100;
+  return SaturatedAdd(zeny, zeny / kPercent * pct + zeny % kPercent * pct / kPercent);
+}
+
 [[nodiscard]] std::int64_t FloorDivide(std::int64_t value, std::int64_t by) noexcept {
   const std::int64_t quotient = value / by;
   return (value % by != 0 && (value < 0) != (by < 0)) ? quotient - 1 : quotient;
@@ -442,13 +448,11 @@ ro::sim::SurvivorsStart ChallengeStartOf(const ro::sim::SurvivorsRules& rules,
 }
 
 std::uint64_t WithoutMinimapZeny(std::uint64_t zeny, bool without_minimap) noexcept {
-  if (!without_minimap) return zeny;
-  constexpr std::uint64_t kPercent = 100;
-  const std::uint64_t bonus = zeny / kPercent * kWithoutMinimapZenyPct +
-                              zeny % kPercent * kWithoutMinimapZenyPct / kPercent;
-  return zeny > std::numeric_limits<std::uint64_t>::max() - bonus
-             ? std::numeric_limits<std::uint64_t>::max()
-             : zeny + bonus;
+  return without_minimap ? MajoredZeny(zeny, kWithoutMinimapZenyPct) : zeny;
+}
+
+std::uint64_t WithoutRecipeHintsZeny(std::uint64_t zeny, bool without_recipe_hints) noexcept {
+  return without_recipe_hints ? MajoredZeny(zeny, kWithoutRecipeHintsZenyPct) : zeny;
 }
 
 SurvivorsCredit CreditRun(const ro::sim::SurvivorsRules& rules, SurvivorsSave& save,
@@ -456,10 +460,13 @@ SurvivorsCredit CreditRun(const ro::sim::SurvivorsRules& rules, SurvivorsSave& s
                           std::int64_t now_utc_s) {
   const ro::sim::SurvivorsTally& tally = ending.tally;
   SurvivorsCredit credit;
-  credit.zeny = WithoutMinimapZeny(
-      ro::sim::CursedWaterZeny(ro::sim::RunZeny(tally, ending.zeny, tally.outcome),
-                               start.cursed_water),
-      ending.board.without_minimap && ending.board.kind == SurvivorsBoardKind::kFree);
+  const bool free_board = ending.board.kind == SurvivorsBoardKind::kFree;
+  credit.zeny = WithoutRecipeHintsZeny(
+      WithoutMinimapZeny(
+          ro::sim::CursedWaterZeny(ro::sim::RunZeny(tally, ending.zeny, tally.outcome),
+                                   start.cursed_water),
+          ending.board.without_minimap && free_board),
+      ending.board.without_recipe_hints && free_board);
   save.meta.zeny = SaturatedAdd(save.meta.zeny, credit.zeny);
   save.meta.zeny_earned = SaturatedAdd(save.meta.zeny_earned, credit.zeny);
   credit.zeny_balance = save.meta.zeny;

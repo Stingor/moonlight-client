@@ -105,8 +105,10 @@ SurvivorsBookMode::Begun SurvivorsBookMode::FreeStart(const ro::sim::SurvivorsRu
     ro::core::LogWarning("survivors : carnet illisible, la partie part sans la méta");
   }
   if (read.damaged_copy.has_value()) damaged_copy_ = read.damaged_copy;
-  return Begun{.start = FreeStartOf(rules, read.save, seed, arena_id, class_id),
-               .board = SurvivorsRunBoard{.without_minimap = read.save.meta.without_minimap}};
+  return Begun{
+      .start = FreeStartOf(rules, read.save, seed, arena_id, class_id),
+      .board = SurvivorsRunBoard{.without_minimap = read.save.meta.without_minimap,
+                                 .without_recipe_hints = read.save.meta.without_recipe_hints}};
 }
 
 const ro::sim::ClassRule* SurvivorsBookMode::ClassAwaiting(

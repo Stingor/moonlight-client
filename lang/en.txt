@@ -24489,3 +24489,24 @@ tr: the refine level drops if the enhancement fails
 
 fr: sans risque pour l'arme
 tr: no risk to the weapon
+
+fr: Montrer combos et évolutions au choix de niveau
+tr: Show combos and evolutions on level-up choices
+
+fr: Décochée : Zeny +%d %%, sans objectif
+tr: Unticked: Zeny +%d %%, no objective
+
+fr: Complète un combo :
+tr: Completes a combo:
+
+fr: Complète une évolution :
+tr: Completes an evolution:
+
+fr: Fait évoluer :
+tr: Evolves:
+
+fr: Combo avec :
+tr: Combo with:
+
+fr: Évolue avec :
+tr: Evolves with:

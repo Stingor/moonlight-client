@@ -145,6 +145,20 @@ void DrawWithoutMinimap(const SurvivorsPrepareMeta& meta, SurvivorsPrepareAsk& a
   if (SkinCheckBox(line.data(), &ticked, art)) asked.choose_without_minimap = ticked;
 }
 
+// LES COMBOS ET LES ÉVOLUTIONS AU CHOIX DE NIVEAU, en partie libre seulement :
+// décochée, ni eux ni objectif, et les Zeny se majorent.
+void DrawRecipeHints(const SurvivorsPrepareMeta& meta, SurvivorsPrepareAsk& asked,
+                     const SkinArt& art) {
+  bool ticked = meta.recipe_hints_shown;
+  if (SkinCheckBox(core::Tr("Montrer combos et évolutions au choix de niveau"), &ticked, art)) {
+    asked.choose_recipe_hints_shown = ticked;
+  }
+  std::array<char, kLineSize> line = {};
+  std::snprintf(line.data(), line.size(), core::Tr("Décochée : Zeny +%d %%, sans objectif"),
+                meta.without_recipe_hints_bonus_pct);
+  FaintText(line.data());
+}
+
 // L'arène nommée, sans choix : celle du défi et de la partie classée.
 void DrawArenaName(const char* name) {
   if (name == nullptr || *name == '\0') return;
@@ -203,6 +217,7 @@ void DrawFreeBoard(const SurvivorsPrepareMeta& meta, SurvivorsPrepareAsk& asked,
   DrawOpening();
   DrawCursedWater(meta, asked, art);
   DrawWithoutMinimap(meta, asked, art);
+  DrawRecipeHints(meta, asked, art);
   ImGui::Separator();
   ImGui::Text(core::Tr("Bénédictions : %d rang(s), %d vie(s), %d charge(s)"), meta.blessing_ranks,
               meta.lives, meta.charges);

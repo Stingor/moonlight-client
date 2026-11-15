@@ -1150,6 +1150,7 @@ if(MOONCLIENT_PLATFORM_LAYERS)
         app/survivors_presence_mode_test.cpp
         app/survivors_presence_labels_test.cpp
         app/survivors_objective_test.cpp
+        app/survivors_offer_recipes_test.cpp
         app/survivors_ranking_desk_test.cpp
         support/survivors_ranking_server.cpp
         app/survivors_book_test.cpp

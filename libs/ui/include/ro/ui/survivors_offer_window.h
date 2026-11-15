@@ -7,6 +7,7 @@
 #include <imgui.h>
 
 #include "ro/ui/skin_art.h"
+#include "ro/ui/survivors_codex_window.h"
 
 namespace ro::ui {
 
@@ -19,6 +20,17 @@ namespace ro::ui {
 // 🔴 LA GARDE (400 ms à l'ouverture) EST CELLE DE L'ÉTAGE : tant que la vue dit
 // `accepts_input` faux, ni touche ni clic ne rend d'intention.
 
+// UNE RECETTE QUE L'OFFRE CONCERNE : l'autre ingrédient — la carte d'une
+// évolution, le second sort d'une union, ou le sort qu'une carte offerte fait
+// évoluer — et l'évolué. Un lien non vu au Codex ne montre que sa silhouette.
+struct SurvivorsOfferRecipe {
+  SurvivorsCodexLink partner;
+  SurvivorsCodexLink result;
+  bool union_of_two = false;  // un combo : deux sorts au niveau maximal
+  bool card_offer = false;    // l'offre est la carte, et `partner` son sort de base
+  bool completes = false;     // le héros a déjà l'autre ingrédient
+};
+
 // Ce qu'une carte offre, déjà résolu par `app`.
 struct SurvivorsOfferCard {
   ImTextureID icon = 0;  // icône de skill ou illustration de carte ; 0 sans image
@@ -29,6 +41,9 @@ struct SurvivorsOfferCard {
   int next_level = 1;
   bool evolves = false;    // la prendre ouvre une évolution
   bool objective = false;  // elle mène au sort épinglé en objectif au Codex
+  // Les combos et les évolutions qu'elle concerne ; vide quand la partie part
+  // sans eux.
+  std::span<const SurvivorsOfferRecipe> recipes;
   // EN COOP : le héros qui la recevra, ses voix, et si le joueur a voté pour elle.
   const char* for_hero = nullptr;
   int votes = 0;

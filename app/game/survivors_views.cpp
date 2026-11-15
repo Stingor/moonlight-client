@@ -12,6 +12,7 @@
 
 #include "game/skin_image_of.h"
 #include "game/survivors_objective.h"
+#include "game/survivors_offer_recipes.h"
 #include "survivors/survivors_minimap_marks.h"
 
 namespace moonclient {
@@ -182,15 +183,25 @@ SurvivorsFrameView SurvivorsViews::Compose(const SurvivorsStage& stage,
     view.hud = &hud_;
   }
   switch (screen) {
-    case SurvivorsScreen::kChoosing:
+    case SurvivorsScreen::kChoosing: {
       if (field == nullptr) break;
-      ComposeOffer(*field, rules, stage.accepts_input(), facts.pressed_card_key, facts.typing,
-                   stage.board().kind != SurvivorsBoardKind::kFree,
-                   facts.options.objective_skill_id, tables);
+      // SANS LES RECETTES, ni combo, ni évolution, ni objectif : le joueur choisit
+      // avec ce qu'il sait.
+      const bool hinted = !stage.board().without_recipe_hints && facts.save != nullptr;
+      const SurvivorsCodexSeen seen =
+          hinted ? CodexSeenOf(rules, *facts.save, &stage.sightings()) : SurvivorsCodexSeen{};
+      const std::vector<std::uint16_t> found_cards =
+          hinted ? FoundCardItemsOf(rules, *facts.save) : std::vector<std::uint16_t>{};
+      ComposeOffer(
+          *field, rules, stage.accepts_input(), facts.pressed_card_key, facts.typing,
+          stage.board().kind != SurvivorsBoardKind::kFree,
+          stage.board().without_recipe_hints ? std::uint16_t{0} : facts.options.objective_skill_id,
+          hinted ? &seen : nullptr, found_cards, tables);
       if (stage.board().coop) ComposeVote(*field, facts.coop_names);
       view.offer = &offer_;
       view.offer_state = &offer_state_;
       break;
+    }
     case SurvivorsScreen::kChest:
       if (field == nullptr) break;
       ComposeChest(stage, tables);
@@ -340,11 +351,19 @@ void SurvivorsViews::ComposeHud(const SurvivorsField& field, const ro::sim::Surv
 void SurvivorsViews::ComposeOffer(const SurvivorsField& field, const ro::sim::SurvivorsRules& rules,
                                   bool accepts_input, int pressed_card_key, bool typing,
                                   bool charges_withheld, std::uint16_t objective_skill_id,
+                                  const SurvivorsCodexSeen* seen,
+                                  std::span<const std::uint16_t> found_cards,
                                   const SurvivorsTables& tables) {
   offer_cards_.clear();
   const SurvivorsObjectivePath objective = SurvivorsObjectivePathOf(rules, objective_skill_id);
   for (const ro::sim::SurvivorsOffer& offer : field.offers) {
     ro::ui::SurvivorsOfferCard card;
+    if (seen != nullptr && offer_cards_.size() < offer_recipes_.size()) {
+      std::vector<ro::ui::SurvivorsOfferRecipe>& shown = offer_recipes_[offer_cards_.size()];
+      ComposeOfferRecipes(rules, ro::sim::HeroAt(field, offer.hero_index), offer, *seen,
+                          found_cards, tables, shown);
+      card.recipes = shown;
+    }
     card.next_level = offer.next_level;
     switch (offer.kind) {
       case ro::sim::OfferKind::kNewSkill:
@@ -388,6 +407,33 @@ void SurvivorsViews::ComposeOffer(const SurvivorsField& field, const ro::sim::Su
                                       .skips = field.skips_left,
                                       .banishes = field.banishes_left,
                                       .charges_withheld = charges_withheld};
+}
+
+void SurvivorsViews::ComposeOfferRecipes(const ro::sim::SurvivorsRules& rules,
+                                         const ro::sim::SurvivorsHero& hero,
+                                         const ro::sim::SurvivorsOffer& offer,
+                                         const SurvivorsCodexSeen& seen,
+                                         std::span<const std::uint16_t> found_cards,
+                                         const SurvivorsTables& tables,
+                                         std::vector<ro::ui::SurvivorsOfferRecipe>& into) {
+  into.clear();
+  const bool card_offer =
+      offer.kind == ro::sim::OfferKind::kNewCard || offer.kind == ro::sim::OfferKind::kCardLevel;
+  for (const SurvivorsOfferRecipe& recipe :
+       SurvivorsOfferRecipesOf(rules, hero, offer, seen, found_cards)) {
+    ro::ui::SurvivorsOfferRecipe shown{
+        .partner =
+            ro::ui::SurvivorsCodexLink{.ro_id = recipe.partner_id, .seen = recipe.partner_seen},
+        .result = ro::ui::SurvivorsCodexLink{.ro_id = recipe.evolved_skill_id,
+                                             .seen = recipe.evolved_seen},
+        .union_of_two = recipe.union_of_two,
+        .card_offer = card_offer,
+        .completes = recipe.completes};
+    NameCodexLink(shown.partner,
+                  recipe.partner_is_skill ? CodexLinkKind::kSkill : CodexLinkKind::kItem, tables);
+    NameCodexLink(shown.result, CodexLinkKind::kSkill, tables);
+    into.push_back(shown);
+  }
 }
 
 void SurvivorsViews::ComposeVote(const SurvivorsField& field, std::span<const std::string> names) {

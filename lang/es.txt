@@ -24489,3 +24489,24 @@ tr: el refinamiento baja si la mejora falla
 
 fr: sans risque pour l'arme
 tr: sin riesgo para el arma
+
+fr: Montrer combos et évolutions au choix de niveau
+tr: Mostrar combos y evoluciones al elegir nivel
+
+fr: Décochée : Zeny +%d %%, sans objectif
+tr: Desmarcada: Zeny +%d %%, sin objetivo
+
+fr: Complète un combo :
+tr: Completa un combo:
+
+fr: Complète une évolution :
+tr: Completa una evolución:
+
+fr: Fait évoluer :
+tr: Hace evolucionar:
+
+fr: Combo avec :
+tr: Combo con:
+
+fr: Évolue avec :
+tr: Evoluciona con:

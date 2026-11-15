@@ -45,6 +45,7 @@ constexpr const char* kSpentField = "spent";
 constexpr const char* kRanksField = "ranks";
 constexpr const char* kCursedWaterField = "cursed_water";
 constexpr const char* kWithoutMinimapField = "without_minimap";
+constexpr const char* kWithoutRecipeHintsField = "without_recipe_hints";
 
 constexpr const char* kAlbumSection = "album";
 constexpr const char* kCardsField = "cards";
@@ -321,6 +322,7 @@ void ReadMeta(const YAML::Node& section, SurvivorsSaveMeta& meta) {
             meta.foreign_kafra_ranks, KafraSlot);
   meta.cursed_water = RankIn(section[kCursedWaterField], ro::sim::kMostCursedWater);
   meta.without_minimap = FlagIn(section, kWithoutMinimapField, false);
+  meta.without_recipe_hints = FlagIn(section, kWithoutRecipeHintsField, false);
 }
 
 void ReadAlbum(const YAML::Node& section, SurvivorsAlbum& album) {
@@ -505,6 +507,7 @@ void WriteMeta(YAML::Emitter& out, const SurvivorsSaveMeta& meta) {
       meta.foreign_kafra_ranks);
   out << YAML::Key << kCursedWaterField << YAML::Value << Number(meta.cursed_water);
   out << YAML::Key << kWithoutMinimapField << YAML::Value << meta.without_minimap;
+  out << YAML::Key << kWithoutRecipeHintsField << YAML::Value << meta.without_recipe_hints;
   out << YAML::EndMap;
 }
 

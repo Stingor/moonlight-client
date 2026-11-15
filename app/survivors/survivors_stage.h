@@ -91,6 +91,10 @@ struct SurvivorsRunBoard {
   // majorent au crédit. Jamais au défi ni en partie classée, où le serveur ne
   // pourrait pas vérifier qu'elle était éteinte.
   bool without_minimap = false;
+  // UNE PARTIE LIBRE PARTIE SANS LES RECETTES : aucune offre ne dit les combos
+  // ni les évolutions qui la concernent, aucun objectif ne se signale, et ses
+  // Zeny se majorent au crédit. Jamais au défi ni en partie classée.
+  bool without_recipe_hints = false;
   // UNE PARTIE EN COOP : hors du classement, des trophées et du dernier journal.
   bool coop = false;
   [[nodiscard]] bool operator==(const SurvivorsRunBoard&) const = default;

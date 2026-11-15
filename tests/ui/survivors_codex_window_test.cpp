@@ -620,3 +620,14 @@ TEST_CASE("Codex : la lecture seule ne rend aucune intention", "[ui][survivors][
   CHECK_FALSE(asked);
   CHECK(drawn.state.open);
 }
+
+TEST_CASE("Codex : sans les recettes, aucun sort ne s'épingle en objectif",
+          "[ui][survivors][codex]") {
+  ro::ui::UiContext ui;
+  SkillsView skills(true);
+  Drawn drawn;
+  drawn.view = skills.view;
+  CHECK(TextOf(ui, drawn).find("Épingler en objectif") != std::string::npos);
+  drawn.view.objective_allowed = false;
+  CHECK(TextOf(ui, drawn).find("Épingler en objectif") == std::string::npos);
+}

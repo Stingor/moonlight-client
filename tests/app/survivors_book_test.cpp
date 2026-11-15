@@ -672,3 +672,32 @@ TEST_CASE("Carnet survivors : chaque exploit a son but dans l'interface", "[app]
   }
   CHECK_FALSE(std::string_view(ro::ui::SurvivorsFeatGoal(moonclient::kMeetingFeat)).empty());
 }
+
+TEST_CASE("Carnet en jeu : partir sans les recettes majore les Zeny de la partie libre seule",
+          "[app][survivors]") {
+  SurvivorsSave save = OpenedSave();
+  save.meta.cursed_water = 2;
+  const SurvivorsStart start = FreeStartOf(Rules(), save, kFreeSeed);
+  const SurvivorsRunBoard blind{.without_recipe_hints = true};
+  const SurvivorsCredit credit =
+      CreditRun(Rules(), save, EndingOf(SurvivorsOutcome::kFell, 9000, 1000, 1000, blind), start,
+                NoonOf(kWeek43));
+  // 1 320 de la Cursed Water 2, puis × 115 / 100.
+  CHECK(credit.zeny == 1518);
+  CHECK(credit.score ==
+        ro::sim::FreeRunScore(EndingOf(SurvivorsOutcome::kFell, 9000, 1000, 1000).tally, 2));
+  // Sans minimap ni recettes, les deux majorations s'enchaînent : 1 518 × 115 / 100.
+  const SurvivorsRunBoard both{.without_minimap = true, .without_recipe_hints = true};
+  CHECK(CreditRun(Rules(), save, EndingOf(SurvivorsOutcome::kFell, 9000, 1000, 1000, both), start,
+                  NoonOf(kWeek43))
+            .zeny == 1745);
+  // Un défi qui porterait le drapeau ne gagne rien.
+  const SurvivorsRunBoard challenge{
+      .kind = SurvivorsBoardKind::kChallenge, .week = kWeek43, .without_recipe_hints = true};
+  CHECK(CreditRun(Rules(), save, EndingOf(SurvivorsOutcome::kFell, 9000, 1000, 1000, challenge),
+                  ChallengeStartOf(Rules(), kWeek43, kMageClassId), NoonOf(kWeek43))
+            .zeny == 1100);
+  CHECK(moonclient::WithoutRecipeHintsZeny(1000, false) == 1000);
+  CHECK(moonclient::WithoutRecipeHintsZeny(std::numeric_limits<std::uint64_t>::max(), true) ==
+        std::numeric_limits<std::uint64_t>::max());
+}

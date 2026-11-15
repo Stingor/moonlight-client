@@ -108,6 +108,7 @@ constexpr std::uint16_t kKnightClass = 2;
   save.meta.foreign_church_ranks.push_back({.key = "lex_aeterna", .yaml = "2"});
   save.meta.cursed_water = 3;
   save.meta.without_minimap = true;
+  save.meta.without_recipe_hints = true;
   save.album.cards.push_back(
       {.key = "hornet_card", .found = 3, .first_found_day = Day(2026, 10, 30)});
   save.album.cards.push_back({.key = "golem_card", .found = 0, .first_found_day = 0});

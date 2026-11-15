@@ -18,6 +18,7 @@
 #include "ro/ui/window_bounds.h"
 #include "ro/ui/window_name.h"
 
+#include "survivors_codex_link.h"
 #include "survivors_codex_text.h"
 #include "survivors_meta_text.h"
 #include "survivors_text.h"
@@ -41,9 +42,6 @@ constexpr float kLinkIconSide = 20.0F;
 // La boîte où `app` cadre le sprite d'un monstre, d'un boss ou d'une plante.
 constexpr float kSpriteBoxWidth = 120.0F;
 constexpr float kSpriteBoxHeight = 140.0F;
-constexpr ImU32 kShownTint = IM_COL32(255, 255, 255, 255);
-// Une silhouette : l'image peinte en noir, sa forme seule.
-constexpr ImU32 kSilhouetteTint = IM_COL32(0, 0, 0, 255);
 constexpr ImU32 kSpriteBoxBack = IM_COL32(0, 0, 0, 40);
 // Les titres de la fiche, en or sombre : le corps est clair.
 constexpr ImU32 kHeadingColor = kSkinGoldTextColor;
@@ -65,27 +63,8 @@ constexpr std::array<SurvivorsCodexTab, kSurvivorsCodexTabCount> kTabs = {
   return kTabs[(RankOf(tab) + 1) % kTabs.size()];
 }
 
-// UNE IMAGE RAMENÉE DANS SA BOÎTE, son rapport gardé, en couleur ou en
-// silhouette ; la boîte vide quand l'image manque.
-void PaintImage(const SkinImage& image, ImVec2 box, bool seen) {
-  const ImVec2 corner = ImGui::GetCursorScreenPos();
-  ImGui::Dummy(box);
-  if (!image.usable()) return;
-  const float scale = std::min(box.x / image.width, box.y / image.height);
-  const ImVec2 size(image.width * scale, image.height * scale);
-  const ImVec2 from(corner.x + (box.x - size.x) * 0.5F, corner.y + (box.y - size.y) * 0.5F);
-  ImGui::GetWindowDrawList()->AddImage(image.id, from, ImVec2(from.x + size.x, from.y + size.y),
-                                       ImVec2(0.0F, 0.0F), ImVec2(1.0F, 1.0F),
-                                       seen ? kShownTint : kSilhouetteTint);
-}
-
-// Une autre entrée nommée par la fiche : son icône et son nom, ou sa
-// silhouette et « ??? » tant qu'elle n'a pas été vue.
-void DrawLink(const SurvivorsCodexLink& link) {
-  PaintImage(link.icon, ImVec2(kLinkIconSide, kLinkIconSide), link.seen);
-  ImGui::SameLine();
-  ImGui::TextUnformatted(CodexLinkName(link));
-}
+// Une autre entrée nommée par la fiche.
+void DrawLink(const SurvivorsCodexLink& link) { DrawCodexLink(link, kLinkIconSide); }
 
 [[nodiscard]] bool ShowsSprite(SurvivorsCodexSheet sheet) {
   return sheet == SurvivorsCodexSheet::kFoe || sheet == SurvivorsCodexSheet::kBoss ||
@@ -97,7 +76,7 @@ void DrawLink(const SurvivorsCodexLink& link) {
 void DrawPortrait(SurvivorsCodexState& state, const SurvivorsCodexEntry& entry) {
   if (!ShowsSprite(entry.sheet)) {
     if (entry.icon.usable()) {
-      PaintImage(entry.icon, ImVec2(kSheetIconSide, kSheetIconSide), entry.seen);
+      PaintCodexImage(entry.icon, ImVec2(kSheetIconSide, kSheetIconSide), entry.seen);
     }
     return;
   }
@@ -107,7 +86,7 @@ void DrawPortrait(SurvivorsCodexState& state, const SurvivorsCodexEntry& entry) 
   const ImVec2 corner = ImGui::GetCursorScreenPos();
   ImGui::GetWindowDrawList()->AddRectFilled(corner, ImVec2(corner.x + box.x, corner.y + box.y),
                                             kSpriteBoxBack);
-  PaintImage(entry.icon, box, entry.seen);
+  PaintCodexImage(entry.icon, box, entry.seen);
 }
 
 // La phrase : celle du catalogue pour un sort, celle de la clé ailleurs.
@@ -165,7 +144,7 @@ void DrawList(SurvivorsCodexState& state, std::span<const SurvivorsCodexEntry> e
     }
     ImGui::PushID(static_cast<int>(index));
     if (ListShowsIcon(entry)) {
-      PaintImage(entry.icon, ImVec2(kListIconSide, kListIconSide), entry.seen);
+      PaintCodexImage(entry.icon, ImVec2(kListIconSide, kListIconSide), entry.seen);
       ImGui::SameLine();
     }
     if (ImGui::Selectable(ListLabel(entry).data(), index == selected, ImGuiSelectableFlags_None,
@@ -409,6 +388,7 @@ void DrawUnseenSheet(SurvivorsCodexState& state, const SurvivorsCodexEntry& entr
 [[nodiscard]] std::optional<std::uint16_t> DrawSheet(SurvivorsCodexState& state,
                                                      const SurvivorsCodexEntry& entry,
                                                      std::span<const SurvivorsFeatEntry> feats,
+                                                     bool objective_allowed,
                                                      std::uint16_t objective_skill_id,
                                                      const SkinArt& art) {
   ImGui::BeginChild("##codex_sheet", ImVec2(0.0F, 0.0F), ImGuiChildFlags_Borders);
@@ -458,7 +438,7 @@ void DrawUnseenSheet(SurvivorsCodexState& state, const SurvivorsCodexEntry& entr
     }
   }
   std::optional<std::uint16_t> objective;
-  if (entry.sheet == SurvivorsCodexSheet::kSkill && entry.ro_id != 0) {
+  if (objective_allowed && entry.sheet == SurvivorsCodexSheet::kSkill && entry.ro_id != 0) {
     objective = DrawObjective(entry, objective_skill_id, art);
   }
   ImGui::PopTextWrapPos();
@@ -612,8 +592,8 @@ SurvivorsCodexAsk DrawSurvivorsCodexWindow(SurvivorsCodexState& state,
   DrawList(state, entries, rows, !classes.empty(), moved, art);
   if (!rows.empty()) {
     ImGui::SameLine();
-    ask.objective_skill_id =
-        DrawSheet(state, entries[selected], album_view.feats, view.objective_skill_id, art);
+    ask.objective_skill_id = DrawSheet(state, entries[selected], album_view.feats,
+                                       view.objective_allowed, view.objective_skill_id, art);
   }
   EndSkinnedWindow();
   return ask;

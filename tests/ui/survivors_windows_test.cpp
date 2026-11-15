@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <functional>
 #include <optional>
+#include <string>
 
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -110,6 +111,24 @@ const std::array<ro::ui::SurvivorsOfferCard, 4> kCards = {
     ro::ui::SurvivorsOfferCard{
         .name = "Fire Wall", .owned_level = 4, .next_level = 5, .evolves = true},
 };
+
+// Le texte que la fenêtre de choix pose à une image, relevé par le journal d'ImGui.
+[[nodiscard]] std::string OfferTextOf(const ro::ui::SurvivorsOfferView& view) {
+  ro::ui::UiContext ui;
+  ro::ui::SurvivorsOfferState state;
+  for (int frame = 0; frame < kSettleFrames; ++frame) {
+    ui.BeginFrame(kViewport, kFrameSeconds);
+    (void)ro::ui::DrawSurvivorsOfferWindow(state, view, kNoArt);
+    ui.EndFrame();
+  }
+  ui.BeginFrame(kViewport, kFrameSeconds);
+  ImGui::LogToBuffer();
+  (void)ro::ui::DrawSurvivorsOfferWindow(state, view, kNoArt);
+  std::string text = ImGui::GetCurrentContext()->LogBuffer.c_str();
+  ImGui::LogFinish();
+  ui.EndFrame();
+  return text;
+}
 
 // Une touche tenue le temps d'une image, la fenêtre de choix dessinée.
 [[nodiscard]] std::optional<ro::ui::SurvivorsOfferAsk> PressInOffer(
@@ -355,4 +374,34 @@ TEST_CASE("Survivors : pendant une saisie, les touches de l'offre se taisent", "
   view.pressed_card_key = 0;
   view.typing = false;
   CHECK(PressInOffer(view, ImGuiKey_R).has_value());
+}
+
+TEST_CASE("Survivors : une offre dit ses recettes, et tait ce que le Codex n'a pas vu",
+          "[ui][survivors]") {
+  const std::array<ro::ui::SurvivorsOfferRecipe, 2> recipes = {
+      ro::ui::SurvivorsOfferRecipe{.partner = {.ro_id = 4072, .seen = true, .name = "Golem Card"},
+                                   .result = {.ro_id = 398, .seen = false, .name = "Head Crush"}},
+      ro::ui::SurvivorsOfferRecipe{.partner = {.ro_id = 13, .seen = true, .name = "Soul Strike"},
+                                   .result = {.ro_id = 400, .seen = true, .name = "Napalm Vulcan"},
+                                   .union_of_two = true,
+                                   .completes = true},
+  };
+  std::array<ro::ui::SurvivorsOfferCard, 1> cards = {
+      ro::ui::SurvivorsOfferCard{.name = "Bash", .owned_level = 0, .next_level = 1}};
+  const ro::ui::SurvivorsOfferView view{.cards = cards, .accepts_input = true};
+
+  // Sans recettes, la carte n'en dit rien.
+  const std::string bare = OfferTextOf(view);
+  CHECK(bare.find("Évolue avec") == std::string::npos);
+  CHECK(bare.find("Golem Card") == std::string::npos);
+
+  cards[0].recipes = recipes;
+  const std::string hinted = OfferTextOf(view);
+  CHECK(hinted.find("Évolue avec") != std::string::npos);
+  CHECK(hinted.find("Golem Card") != std::string::npos);
+  CHECK(hinted.find("Complète un combo") != std::string::npos);
+  CHECK(hinted.find("Napalm Vulcan") != std::string::npos);
+  // L'évolué jamais vu n'est qu'une silhouette : « ??? », pas son nom.
+  CHECK(hinted.find("Head Crush") == std::string::npos);
+  CHECK(hinted.find("???") != std::string::npos);
 }

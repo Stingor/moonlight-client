@@ -178,10 +178,15 @@ struct SurvivorsCredit {
 // partie libre d'autant, après la Cursed Water.
 inline constexpr std::uint64_t kWithoutMinimapZenyPct = 15;
 [[nodiscard]] std::uint64_t WithoutMinimapZeny(std::uint64_t zeny, bool without_minimap) noexcept;
+// PARTIR SANS LES RECETTES (ni combos ni évolutions au choix de niveau, ni
+// objectif) majore à son tour les Zeny de la partie libre, après la minimap.
+inline constexpr std::uint64_t kWithoutRecipeHintsZenyPct = 15;
+[[nodiscard]] std::uint64_t WithoutRecipeHintsZeny(std::uint64_t zeny,
+                                                   bool without_recipe_hints) noexcept;
 
 // CRÉDITE LE CARNET D'UNE PARTIE FINIE, ou interrompue. Toute partie verse ses
 // Zeny (`RunZeny`, majorés par la Cursed Water du départ, puis par une
-// partie sans minimap) et ses cartes
+// partie sans minimap, puis par une partie sans recettes) et ses cartes
 // ramassées, défi, abandon et liaison perdue compris (Q10) ; ses compteurs
 // s'ajoutent, et les exploits qu'ils atteignent s'inscrivent. Seule une partie
 // qui n'est pas abandonnée entre aux records, au tableau de `ending.board` ; au

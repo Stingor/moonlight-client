@@ -97,6 +97,9 @@ struct SurvivorsSaveMeta {
   std::uint8_t cursed_water = 0;  // le dernier rang choisi, 0 à kMostCursedWater
   // La partie libre part sans minimap : voir `kWithoutMinimapZenyPct`.
   bool without_minimap = false;
+  // La partie libre part sans les combos ni les évolutions au choix de niveau,
+  // et sans objectif au Codex : voir `kWithoutRecipeHintsZenyPct`.
+  bool without_recipe_hints = false;
   [[nodiscard]] bool operator==(const SurvivorsSaveMeta&) const = default;
 };
 

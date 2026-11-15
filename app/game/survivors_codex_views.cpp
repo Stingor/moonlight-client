@@ -51,7 +51,10 @@ void SurvivorsViews::ComposeCodex(SurvivorsMetaWindows& windows, const Survivors
                                   const SurvivorsTables& tables, std::uint32_t now_ms) {
   windows.codex_view = ComposeSurvivorsCodex(rules, CodexSeenOf(rules, save, live), codex_rows_,
                                              FoundCardItemsOf(rules, save));
-  windows.codex_view.objective_skill_id = windows.objective_skill_id;
+  // SANS LES RECETTES, le Codex ne propose aucun objectif, et n'en montre aucun.
+  windows.codex_view.objective_allowed = !save.meta.without_recipe_hints;
+  windows.codex_view.objective_skill_id =
+      windows.codex_view.objective_allowed ? windows.objective_skill_id : std::uint16_t{0};
   windows.codex_view.home_class_id = album_class != nullptr ? album_class->class_id : 0;
   // Les noms suivent la langue du joueur : ils se refont à chaque composition.
   card_holders_.clear();

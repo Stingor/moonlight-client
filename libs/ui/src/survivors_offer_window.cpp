@@ -11,6 +11,7 @@
 #include "ro/ui/skinned_window.h"
 #include "ro/ui/window_name.h"
 
+#include "survivors_codex_link.h"
 #include "survivors_text.h"
 #include "ui_text.h"
 
@@ -23,6 +24,7 @@ inline constexpr const char* kOfferId = "survivors_offer";
 constexpr float kCardWidth = 190.0F;
 constexpr float kCardHeight = 250.0F;
 constexpr float kIconSide = 64.0F;
+constexpr float kRecipeIconSide = 16.0F;
 // La carte est posée sur le corps clair : « NEW! » s'y écrit en or sombre.
 constexpr ImU32 kNewColor = kSkinGoldTextColor;
 constexpr ImU32 kEvolveColor = kSkinEvolveTextColor;
@@ -52,6 +54,30 @@ constexpr std::array<ImGuiKey, kMostOfferCards> kPadKeys = {ImGuiKey_Keypad1, Im
     }
   }
   return std::nullopt;
+}
+
+// LES RECETTES DE L'OFFRE : ce qu'elle complète, puis ce qu'elle fait évoluer
+// et avec quoi. L'autre ingrédient, puis « » » et l'évolué ; une entrée que le
+// Codex n'a pas vue n'est qu'une silhouette et « ??? ».
+void DrawRecipes(std::span<const SurvivorsOfferRecipe> recipes) {
+  if (recipes.empty()) return;
+  ImGui::PushTextWrapPos(0.0F);
+  for (const SurvivorsOfferRecipe& recipe : recipes) {
+    if (recipe.completes) {
+      ColoredText(kObjectiveColor, recipe.union_of_two ? core::Tr("Complète un combo :")
+                                                       : core::Tr("Complète une évolution :"));
+    } else if (recipe.card_offer) {
+      ColoredText(kEvolveColor, core::Tr("Fait évoluer :"));
+    } else {
+      ColoredText(kEvolveColor,
+                  recipe.union_of_two ? core::Tr("Combo avec :") : core::Tr("Évolue avec :"));
+    }
+    DrawCodexLink(recipe.partner, kRecipeIconSide);
+    ImGui::TextUnformatted("»");
+    ImGui::SameLine();
+    DrawCodexLink(recipe.result, kRecipeIconSide);
+  }
+  ImGui::PopTextWrapPos();
 }
 
 // Une carte ; vrai quand elle est cliquée.
@@ -95,6 +121,7 @@ constexpr std::array<ImGuiKey, kMostOfferCards> kPadKeys = {ImGuiKey_Keypad1, Im
                   card.votes);
     FaintText(line.data());
   }
+  DrawRecipes(card.recipes);
   ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
   ImGui::TextWrapped("%s", SurvivorsText(card.description));
   ImGui::PopStyleColor();

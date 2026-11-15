@@ -174,10 +174,19 @@ class SurvivorsViews {
   void ComposeHud(const ro::sim::SurvivorsField& field, const ro::sim::SurvivorsRules& rules,
                   std::uint64_t clock_ms, const SurvivorsViewFacts& facts,
                   const SurvivorsTables& tables);
-  // Une offre qui mène au sort `objective_skill_id` (0 : aucun) le dit.
+  // Une offre qui mène au sort `objective_skill_id` (0 : aucun) le dit. Avec
+  // `seen`, le Codex vu, chacune dit aussi ses recettes (`found_cards` : les
+  // cartes de l'Album) ; nul, la partie part sans elles.
   void ComposeOffer(const ro::sim::SurvivorsField& field, const ro::sim::SurvivorsRules& rules,
                     bool accepts_input, int pressed_card_key, bool typing, bool charges_withheld,
-                    std::uint16_t objective_skill_id, const SurvivorsTables& tables);
+                    std::uint16_t objective_skill_id, const SurvivorsCodexSeen* seen,
+                    std::span<const std::uint16_t> found_cards, const SurvivorsTables& tables);
+  // Les recettes d'une offre pour `hero`, nommées comme au Codex.
+  void ComposeOfferRecipes(const ro::sim::SurvivorsRules& rules, const ro::sim::SurvivorsHero& hero,
+                           const ro::sim::SurvivorsOffer& offer, const SurvivorsCodexSeen& seen,
+                           std::span<const std::uint16_t> found_cards,
+                           const SurvivorsTables& tables,
+                           std::vector<ro::ui::SurvivorsOfferRecipe>& into);
   // LE VOTE D'UNE PARTIE COOP, par-dessus les offres composées.
   void ComposeVote(const ro::sim::SurvivorsField& field, std::span<const std::string> names);
   // LES ALLIÉS au HUD d'une partie coop.
@@ -245,6 +254,8 @@ class SurvivorsViews {
   std::vector<ro::ui::SurvivorsEdgeTarget> edge_targets_;
   std::vector<ro::ui::SurvivorsMinimapDot> minimap_dots_;
   std::vector<ro::ui::SurvivorsOfferCard> offer_cards_;
+  // Les recettes de chaque offre, que ses cartes désignent.
+  std::array<std::vector<ro::ui::SurvivorsOfferRecipe>, ro::sim::kMostOffers> offer_recipes_;
   std::vector<ro::ui::SurvivorsOfferRaise> offer_raises_;
   std::vector<ro::ui::SurvivorsHudAlly> hud_allies_;
   std::vector<ro::ui::SurvivorsChestGainRow> chest_gains_;

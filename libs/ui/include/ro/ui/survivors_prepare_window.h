@@ -95,7 +95,11 @@ struct SurvivorsPrepareMeta {
   int cursed_water_bonus_pct = 0;     // le score et les Zeny majorés au rang choisi
   bool without_minimap = false;       // partir sans minimap
   int without_minimap_bonus_pct = 0;  // les Zeny majorés sans elle
-  int blessing_ranks = 0;             // les rangs bénis, toutes Bénédictions confondues
+  // Le choix de niveau dit les combos et les évolutions de chaque offre ; décochée,
+  // la partie part sans eux ni objectif, et ses Zeny se majorent.
+  bool recipe_hints_shown = true;
+  int without_recipe_hints_bonus_pct = 0;
+  int blessing_ranks = 0;  // les rangs bénis, toutes Bénédictions confondues
   int lives = 0;
   int charges = 0;  // les charges Kafra par partie, tous services confondus
   // Défi de la semaine.
@@ -156,6 +160,7 @@ struct SurvivorsPrepareAsk {
   std::optional<std::uint16_t> choose_class_id;
   std::optional<int> choose_cursed_water;
   std::optional<bool> choose_without_minimap;
+  std::optional<bool> choose_recipe_hints_shown;
   std::optional<SurvivorsMetaPlace> open_place;
   bool open_ranking = false;  // le classement mondial
   bool start = false;

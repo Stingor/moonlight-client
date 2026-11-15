@@ -289,6 +289,8 @@ struct SurvivorsCodexView {
   std::array<std::span<const SurvivorsCodexEntry>, kSurvivorsCodexTabCount> entries;
   // Le sort épinglé en objectif ; 0 : aucun.
   std::uint16_t objective_skill_id = 0;
+  // Faux quand la partie libre part sans les recettes : aucun sort ne s'épingle.
+  bool objective_allowed = true;
   // La classe retenue à l'accueil : l'onglet de classe que l'onglet Skills
   // ouvre d'abord. 0, ou une classe absente : la première.
   std::uint16_t home_class_id = 0;
