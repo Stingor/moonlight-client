@@ -20,7 +20,7 @@ namespace {
 constexpr std::size_t kWeaponLevelCount = 2;
 
 // Le trait de baguette du Magicien : un projectile droit, comme la flèche.
-constexpr std::int32_t kRodSpeedCellsPerSecond = 10;
+constexpr std::int32_t kRodSpeedCellsPerSecond = 20;
 constexpr std::int32_t kRodHitRadiusTenths = 4;
 constexpr std::uint32_t kRodCooldownMs = 900;
 

@@ -346,13 +346,22 @@ TEST_CASE("Plantes au fil des tués : cinq minutes du joueur scripté entre les 
           "[sim][survivors]") {
   // Les ors sur piliers jouent les plantes des rulesets antérieurs : ce rejeu
   // éprouve la règle livrée sur une carte bornée. À chaque pas, huit plantes
-  // au plus, sur des cases praticables et distinctes, sous l'oubli.
+  // au plus, sur des cases praticables et distinctes, sous l'oubli à une
+  // bousculade près.
   auto started = SurvivorsRun::Start(
       ShippedOnPillars(), ro::test_support::PillarArena(ro::test_support::kGoldenArenaCells),
       ro::test_support::GoldenStart(ro::test_support::kGoldenSeed));
   REQUIRE(started.has_value());
   ro::sim::SurvivorsPlay play(std::move(*started));
   const SurvivorsRules& rules = *play.run().field().rules;
+  // L'oubli se juge sur le héros qui vient de marcher ; la horde le bouscule
+  // ensuite dans le même pas. Au bout du pas, une plante gardée peut donc se
+  // trouver au-delà de l'oubli, d'une bousculade, bornée ici par le contact du
+  // héros et du plus gros monstre.
+  const std::int64_t shove_units =
+      std::int64_t{rules.tuning.hero_radius_units} +
+      *std::max_element(rules.tuning.foe_radius_units.begin(), rules.tuning.foe_radius_units.end());
+  const std::int64_t kept_units = rules.tuning.plant_forget_units + shove_units;
   bool kept_rule = true;
   for (std::uint32_t step = 0; step < ro::test_support::kGoldenSteps && kept_rule; ++step) {
     ro::test_support::PlayScripted(play, 1);
@@ -362,7 +371,7 @@ TEST_CASE("Plantes au fil des tués : cinq minutes du joueur scripté entre les 
     for (std::size_t first = 0; first < field.plants.size() && kept_rule; ++first) {
       const FieldPoint at = field.plants[first].position;
       kept_rule = field.ground.Passable(CellOf(at.x), CellOf(at.y)) &&
-                  Chebyshev(at, field.hero.position) <= rules.tuning.plant_forget_units;
+                  Chebyshev(at, field.hero.position) <= kept_units;
       for (std::size_t second = first + 1; second < field.plants.size() && kept_rule; ++second) {
         kept_rule = !(field.plants[second].position == at);
       }

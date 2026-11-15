@@ -76,9 +76,12 @@ class EffectNodesInPlay {
   // `ro::render::EffectProjectileScreenAngleDegrees`. Opaque, au mélange
   // ordinaire. Images, horloge, angle ajouté et boule d'énergie qui remplace le
   // sprite suivent `flight` : voir `ro::render::ProjectileFlight`. Faux quand
-  // le sprite ne se lit pas.
+  // le sprite ne se lit pas. `shot_tag` non nul marque tout le vol : `DropShot`.
   bool ShootSprite(std::string_view sprite_base, glm::vec3 from, glm::vec3 to,
-                   std::int32_t life_ticks, const ro::render::ProjectileFlight& flight);
+                   std::int32_t life_ticks, const ro::render::ProjectileFlight& flight,
+                   std::uint32_t shot_tag = 0);
+  // ARRÊTE UN VOL : ce qui a été tiré sous ce numéro disparaît, comme à l'impact.
+  void DropShot(std::uint32_t shot_tag) { pool_.DropShot(shot_tag); }
 
   // JOUE UNE FOIS UNE ACTION D'UN SPRITE D'ACTEUR, aux pieds de `ground_position`
   // — le coup d'une Mandragore, la fumée de Hiding, la glace qui éclate —, à la

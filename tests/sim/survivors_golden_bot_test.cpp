@@ -87,14 +87,14 @@ TEST_CASE("Or long survivors : le robot joue la partie entière, bilan épinglé
         }) == kGoldenBotCards);
 
   // LES TROPHÉES DE LA PARTIE : cinq minutes, une évolution, mille monstres,
-  // une carte et mille gels (Hiver éternel) ; ni la victoire, ni le niveau 40 : le robot
-  // tombe au niveau 37.
+  // le niveau 40, une carte et Water Ball au niveau maximum (Déluge) ; ni la
+  // victoire, ni mille gels : le robot tombe au niveau 44.
   ro::sim::MinigameRecord record;
   CHECK(ro::sim::RecordSurvivors(record, play->run()) ==
         std::vector<MinigameTrophy>{
             MinigameTrophy::kSurvivorsFiveMinutes, MinigameTrophy::kSurvivorsFirstEvolution,
-            MinigameTrophy::kSurvivorsKills1000, MinigameTrophy::kSurvivorsFirstCard,
-            MinigameTrophy::kSurvivorsDeepFreeze});
+            MinigameTrophy::kSurvivorsKills1000, MinigameTrophy::kSurvivorsLevel40,
+            MinigameTrophy::kSurvivorsFirstCard, MinigameTrophy::kSurvivorsWaterBall});
 
   // Le journal du robot se rejoue au même bilan : le robot ne contourne pas
   // le journal.

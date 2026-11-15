@@ -46,49 +46,49 @@ inline constexpr std::uint16_t kGoldenTerrainArenaId = 2;
 // ⚠ LE BILAN EN OR SUR SOL GÉNÉRÉ, épinglé avec sa version : il change quand
 // le catalogue, sa règle de terrain OU le robot changent. Les mêmes valeurs
 // sous MSVC et sous g++-14.
-inline constexpr std::uint16_t kGoldenTerrainRulesetVersion = 7;
+inline constexpr std::uint16_t kGoldenTerrainRulesetVersion = 9;
 inline constexpr sim::SurvivorsTally kGoldenTerrainTally{
-    .survived_steps = 46312,
-    .kills = 10541,
+    .survived_steps = 45480,
+    .kills = 9159,
     .boss_kills = 5,
-    .kill_points = 286201,
-    .level = 67,
-    .exp_total = 181844,
-    .hp_left = 292,
-    .damage_dealt = 1240344,
-    .gems_gathered = 6373,
-    .foes_alive = 10,
+    .kill_points = 225191,
+    .level = 57,
+    .exp_total = 102632,
+    .hp_left = 226,
+    .damage_dealt = 925507,
+    .gems_gathered = 5401,
+    .foes_alive = 183,
     .outcome = sim::SurvivorsOutcome::kVictory,
-    .elite_kills = 11,
-    .chests_opened = 14,
-    .evolutions = 3,
+    .elite_kills = 10,
+    .chests_opened = 12,
+    .evolutions = 1,
 };
-// Le robot l'emporte à 15:26, à quelque 33 cases à l'ouest et 105 au nord de
+// Le robot l'emporte à 15:09, à quelque 43 cases à l'ouest et 150 au nord de
 // son départ.
-inline constexpr sim::FieldPoint kGoldenTerrainHeroPosition{33520740, 33662533};
+inline constexpr sim::FieldPoint kGoldenTerrainHeroPosition{33510414, 33708442};
 // En fin de partie : les plantes encore posées, les tués à la dernière
 // naissance d'une plante, les plantes cassées et le prochain numéro de
 // naissance.
 inline constexpr std::size_t kGoldenTerrainPlants = 0;
-inline constexpr std::uint32_t kGoldenTerrainPlantKillsMark = 10391;
-inline constexpr std::uint32_t kGoldenTerrainPlantsBroken = 94;
-inline constexpr std::uint32_t kGoldenTerrainNextSerial = 20732;
+inline constexpr std::uint32_t kGoldenTerrainPlantKillsMark = 9001;
+inline constexpr std::uint32_t kGoldenTerrainPlantsBroken = 85;
+inline constexpr std::uint32_t kGoldenTerrainNextSerial = 19849;
 inline constexpr std::array<GoldenOwned, kGoldenBotOwnedCount> kGoldenTerrainSkills{{
     {.id = 60001, .level = 2},  // le coup de baguette
-    {.id = 83, .level = 1},     // Meteor Storm
-    {.id = 85, .level = 1},     // Lord of Vermilion
-    {.id = 81, .level = 1},     // Sightrasher
-    {.id = 11, .level = 8},     // Napalm Beat
-    {.id = 87, .level = 8},     // Ice Wall
+    {.id = 19, .level = 6},     // Fire Bolt
+    {.id = 11, .level = 5},     // Napalm Beat
     {.id = 13, .level = 8},     // Soul Strike
+    {.id = 88, .level = 1},     // Frost Nova
+    {.id = 86, .level = 8},     // Water Ball
+    {.id = 14, .level = 6},     // Cold Bolt
 }};
 inline constexpr std::array<GoldenOwned, kGoldenBotOwnedCount> kGoldenTerrainCards{{
-    {.id = 4147, .level = 5},  // Baphomet Card
-    {.id = 4009, .level = 5},  // Chonchon Card
-    {.id = 4197, .level = 2},  // Mastering Card
     {.id = 4019, .level = 5},  // Hornet Card
-    {.id = 4079, .level = 5},  // Mantis Card
-    {.id = 4183, .level = 5},  // Vagabond Wolf Card
+    {.id = 4072, .level = 5},  // Golem Card
+    {.id = 4022, .level = 5},  // Spore Card
+    {.id = 4197, .level = 2},  // Mastering Card
+    {.id = 4266, .level = 5},  // Eclipse Card
+    {.id = 4085, .level = 5},  // Orc Skeleton Card
     {},                        // emplacement libre
 }};
 

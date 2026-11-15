@@ -47,44 +47,44 @@ inline constexpr std::uint32_t kGoldenBotMarginSteps = 100;
 // ⚠ LE BILAN EN OR DU ROBOT, épinglé avec sa version : il change quand le
 // catalogue OU le robot changent. Re-épinglé, il se vérifie sous MSVC et sous
 // g++-14, qui rendent les mêmes valeurs.
-inline constexpr std::uint16_t kGoldenBotRulesetVersion = 7;
+inline constexpr std::uint16_t kGoldenBotRulesetVersion = 9;
 inline constexpr sim::SurvivorsTally kGoldenBotTally{
-    .survived_steps = 44549,
-    .kills = 10545,
+    .survived_steps = 40374,
+    .kills = 8028,
     .boss_kills = 4,
-    .kill_points = 273185,
-    .level = 37,
-    .exp_total = 11285,
+    .kill_points = 166972,
+    .level = 44,
+    .exp_total = 29090,
     .hp_left = 0,
-    .damage_dealt = 1218978,
-    .gems_gathered = 3392,
-    .foes_alive = 308,
+    .damage_dealt = 680265,
+    .gems_gathered = 3243,
+    .foes_alive = 266,
     .outcome = sim::SurvivorsOutcome::kFell,
-    .elite_kills = 11,
-    .chests_opened = 14,
+    .elite_kills = 9,
+    .chests_opened = 11,
     .evolutions = 1,
 };
-inline constexpr sim::FieldPoint kGoldenBotHeroPosition{158478, 163067};
+inline constexpr sim::FieldPoint kGoldenBotHeroPosition{163369, 159260};
 // Ce qu'on épingle des skills et des cartes : un emplacement par entrée, les
 // emplacements libres à vide. Sept, ceux des skills ; les cartes n'en ont que
 // six, et la septième entrée reste vide.
 inline constexpr std::size_t kGoldenBotOwnedCount = 7;
 inline constexpr std::array<GoldenOwned, kGoldenBotOwnedCount> kGoldenBotSkills{{
     {.id = 60001, .level = 2},  // le coup de baguette
-    {.id = 83, .level = 1},     // Meteor Storm
-    {.id = 21, .level = 6},     // Thunderstorm
-    {.id = 10, .level = 4},     // Sight
-    {.id = 11, .level = 6},     // Napalm Beat
-    {.id = 87, .level = 3},     // Ice Wall
-    {.id = 13, .level = 6},     // Soul Strike
+    {.id = 19, .level = 4},     // Fire Bolt
+    {.id = 11, .level = 2},     // Napalm Beat
+    {.id = 13, .level = 8},     // Soul Strike
+    {.id = 88, .level = 1},     // Frost Nova
+    {.id = 86, .level = 8},     // Water Ball
+    {.id = 14, .level = 4},     // Cold Bolt
 }};
 inline constexpr std::array<GoldenOwned, kGoldenBotOwnedCount> kGoldenBotCards{{
-    {.id = 4147, .level = 3},  // Baphomet Card
-    {.id = 4009, .level = 5},  // Chonchon Card
+    {.id = 4019, .level = 5},  // Hornet Card
+    {.id = 4072, .level = 5},  // Golem Card
+    {.id = 4022, .level = 5},  // Spore Card
+    {.id = 4085, .level = 1},  // Orc Skeleton Card
+    {.id = 4179, .level = 2},  // Dragon Fly Card
     {.id = 4197, .level = 2},  // Mastering Card
-    {.id = 4019, .level = 4},  // Hornet Card
-    {.id = 4079, .level = 1},  // Mantis Card
-    {.id = 4183, .level = 4},  // Vagabond Wolf Card
     {},                        // emplacement libre
 }};
 

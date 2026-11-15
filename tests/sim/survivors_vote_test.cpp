@@ -202,7 +202,7 @@ TEST_CASE("un journal coop se code, se relit et se rejoue à l'identique", "[sur
 // sous MSVC et sous g++-14. Elle change avec l'ordre du pas et avec l'échelle
 // d'une équipe ; la corriger, c'est relire ce qui a changé.
 TEST_CASE("la partie coop en or garde son empreinte", "[survivors]") {
-  constexpr std::uint64_t kGoldenDigest = 14836191060566988434ULL;
+  constexpr std::uint64_t kGoldenDigest = 1325364564261613374ULL;
   const SurvivorsRules& rules = ShippedSurvivorsRules();
   auto run = SurvivorsRun::Start(rules, TeamOf(rules, 3));
   REQUIRE(run);

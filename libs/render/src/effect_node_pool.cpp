@@ -113,6 +113,12 @@ void EffectNodePool::CollectBearerIds(std::vector<std::uint32_t>& ids) const {
   }
 }
 
+void EffectNodePool::DropShot(std::uint32_t shot_tag) {
+  if (shot_tag == 0) return;
+  std::erase_if(nodes_,
+                [shot_tag](const PooledEffectNode& node) { return node.shot_tag == shot_tag; });
+}
+
 std::size_t EffectNodePool::DropOldestFromEffect(std::uint32_t effect_id, std::uint32_t anchor_id,
                                                  std::size_t count) {
   // ⚠ LA TROUPE GARDE L'ORDRE DES NAISSANCES : `Add` pousse en queue et le

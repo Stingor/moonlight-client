@@ -662,10 +662,15 @@ void ArenaEffects::LayGroundMarks(const ro::sim::SurvivorsField& field) {
 void ArenaEffects::ShootHeroArrows(const ro::sim::SurvivorsField& field, const GroundOf& ground_of,
                                    const ArenaSight& sight) {
   TeamShotsOf(field, team_shots_);
-  std::erase_if(arrows_, [this](std::uint32_t serial) {
-    return std::ranges::none_of(team_shots_, [serial](const ro::sim::SurvivorsShot& shot) {
-      return shot.serial == serial;
-    });
+  // UN TIR QUE LA PARTIE RETIRE AVANT SON ÉCHÉANCE a touché : son vol s'arrête
+  // là, au lieu de traverser sa cible jusqu'au bout de sa portée.
+  std::erase_if(arrows_, [this, &field](const ArrowInFlight& arrow) {
+    const bool flying = std::ranges::any_of(
+        team_shots_,
+        [&arrow](const ro::sim::SurvivorsShot& shot) { return shot.serial == arrow.serial; });
+    if (flying) return false;
+    if (field.step < arrow.expires_step) nodes_.DropShot(arrow.serial);
+    return true;
   });
   const ro::render::ActorLook bow{
       .player = true, .job = kArrowShooterJob, .weapon = kArrowShooterWeapon};
@@ -674,10 +679,12 @@ void ArenaEffects::ShootHeroArrows(const ro::sim::SurvivorsField& field, const G
   const std::string_view arrow_sprite = ro::render::ArrowSpriteOf(*sprites_, bow, false);
   const std::string_view wand_sprite = ro::render::ArrowSpriteOf(*sprites_, wand, false);
   for (const ro::sim::SurvivorsShot& shot : team_shots_) {
-    if (std::ranges::find(arrows_, shot.serial) != arrows_.end()) continue;
+    if (std::ranges::find(arrows_, shot.serial, &ArrowInFlight::serial) != arrows_.end()) {
+      continue;
+    }
     const SkillLook* look = looks_.Find(shot.skill_id);
     if (look == nullptr || !look->shoots_arrow) continue;
-    arrows_.push_back(shot.serial);
+    arrows_.push_back(ArrowInFlight{.serial = shot.serial, .expires_step = shot.expires_step});
     const ro::render::ActorLook& shooter = look->shoots_wand_bolt ? wand : bow;
     const std::string_view sprite = look->shoots_wand_bolt ? wand_sprite : arrow_sprite;
     if (!switches_.shown || switches_.reduced || sprite.empty()) continue;
@@ -698,7 +705,7 @@ void ArenaEffects::ShootHeroArrows(const ro::sim::SurvivorsField& field, const G
       flight.wand_orb_rgb = ro::render::WandOrbRgb(std::nullopt);
     }
     static_cast<void>(nodes_.ShootSprite(sprite, ground_of(shot.position) + lift,
-                                         ground_of(lands) + lift, life_ticks, flight));
+                                         ground_of(lands) + lift, life_ticks, flight, shot.serial));
     ++launched_total_;
   }
 }

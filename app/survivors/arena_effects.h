@@ -218,8 +218,13 @@ class ArenaEffects {
   ArenaSkillLooks looks_;
   std::vector<ro::sim::SurvivorsZone> team_zones_;
   std::vector<ro::sim::SurvivorsShot> team_shots_;
-  // Les tirs dont la flèche est déjà partie, par numéro.
-  std::vector<std::uint32_t> arrows_;
+  // Les tirs dont la flèche est déjà partie : leur numéro, et le pas où ils
+  // arrivent au bout de leur portée.
+  struct ArrowInFlight {
+    std::uint32_t serial = 0;
+    std::uint32_t expires_step = 0;
+  };
+  std::vector<ArrowInFlight> arrows_;
   ArenaEffectSwitches switches_;
   ArenaEffectBudget budget_;
   ro::render::EffectCatalog catalog_;

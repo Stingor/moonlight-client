@@ -121,7 +121,7 @@ constexpr std::array<PinnedFoe, 45> kPinnedFoes{{
 
 TEST_CASE("Catalogue survivors : le ruleset 8, compte par compte", "[sim][survivors]") {
   const SurvivorsRules& shipped = Shipped();
-  CHECK(shipped.ruleset_version == 8);
+  CHECK(shipped.ruleset_version == 9);
   CHECK(shipped.run_ms == 900000U);
   const ro::core::Result<void> checked = ro::sim::CheckSurvivorsRules(shipped);
   INFO((checked ? std::string_view{} : std::string_view{checked.error().detail}));

@@ -43,25 +43,25 @@ namespace {
 // ⚠ LE RÉCAPITULATIF DE LA PARTIE EN OR COURTE, dans l'ordre de première
 // apparition : les mêmes valeurs sous MSVC et sous g++-14, comme son bilan.
 inline constexpr std::array<SurvivorsCount, 11> kGoldenKillsByFoe{{
-    {.id = 1063, .value = 65},  // Lunatic
-    {.id = 1002, .value = 59},  // Poring
-    {.id = 1007, .value = 55},  // Fabre
-    {.id = 1113, .value = 60},  // Drops
-    {.id = 1011, .value = 31},  // Chonchon
-    {.id = 1008, .value = 21},  // Pupa
-    {.id = 1010, .value = 13},  // Willow
-    {.id = 1004, .value = 5},   // Hornet
-    {.id = 1009, .value = 5},   // Condor
-    {.id = 1052, .value = 1},   // Rocker
-    {.id = 1167, .value = 1},   // Savage Babe
+    {.id = 1063, .value = 67},   // Lunatic
+    {.id = 1007, .value = 99},   // Fabre
+    {.id = 1002, .value = 121},  // Poring
+    {.id = 1113, .value = 73},   // Drops
+    {.id = 1011, .value = 43},   // Chonchon
+    {.id = 1008, .value = 25},   // Pupa
+    {.id = 1010, .value = 32},   // Willow
+    {.id = 1052, .value = 11},   // Rocker
+    {.id = 1009, .value = 9},    // Condor
+    {.id = 1167, .value = 15},   // Savage Babe
+    {.id = 1004, .value = 1},    // Hornet
 }};
 inline constexpr std::array<SurvivorsCount, 6> kGoldenDamageBySkill{{
-    {.id = 19, .value = 4976},     // Fire Bolt
-    {.id = 60001, .value = 1017},  // le coup de baguette
-    {.id = 21, .value = 3331},     // Thunderstorm
-    {.id = 15, .value = 1022},     // Frost Diver
-    {.id = 86, .value = 2488},     // Water Ball
-    {.id = 18, .value = 57},       // Fire Wall
+    {.id = 19, .value = 5596},     // Fire Bolt
+    {.id = 60001, .value = 1108},  // le coup de baguette
+    {.id = 11, .value = 5701},     // Napalm Beat
+    {.id = 15, .value = 894},      // Frost Diver
+    {.id = 14, .value = 2946},     // Cold Bolt
+    {.id = 21, .value = 2906},     // Thunderstorm
 }};
 
 }  // namespace

@@ -337,6 +337,8 @@ struct PooledEffectNode {
   // qui partent du dernier projectile naissent à la place du plus récent qui la
   // porte. Voir `EffectNodeSupplement::records_projectile`.
   std::uint32_t projectile_serial = 0;
+  // LE TIR DONT CE NŒUD DESSINE LE VOL, zéro pour aucun : voir `SowForShot`.
+  std::uint32_t shot_tag = 0;
   // LE PAS DU BRAS REMPLACÉ À UN ÂGE DU NŒUD, moins un pour aucun. Voir
   // `EffectNodeSupplement::orbit_radius_step_switch_tick`.
   std::int32_t orbit_radius_step_switch_tick = -1;
@@ -409,6 +411,7 @@ class EffectNodePool {
     node.bearer_follow = node.stays_where_sown ? kEffectStaysWhereBorn : next_follow_;
     node.sown_at_effect_tick = next_effect_tick_;
     node.followed_through_tick = next_effect_tick_;
+    node.shot_tag = next_shot_tag_;
     // LA PLACE DE L'ANCRE SE PREND ICI : c'est d'elle que se mesurera le PAS du
     // porteur à la première fois qu'on le suivra.
     if (next_anchor_ != 0) {
@@ -457,6 +460,10 @@ class EffectNodePool {
   // À QUEL ÂGE DE LEUR EFFET LES PROCHAINS NŒUDS NAISSENT. Zéro pour le premier
   // semis ; l'horloge le pose à chaque tic où elle sème.
   void SowAtEffectTick(std::int32_t effect_tick) noexcept { next_effect_tick_ = effect_tick; }
+  // LE TIR, numéro opaque de l'appelant, dont les prochains nœuds dessinent le
+  // vol ; zéro pour aucun. `DropShot` retire ce vol entier, éclat à venir compris.
+  void SowForShot(std::uint32_t shot_tag) noexcept { next_shot_tag_ = shot_tag; }
+  void DropShot(std::uint32_t shot_tag);
 
   // SI LES PROCHAINS NŒUDS NAISSENT DE L'INSTANCE D'UN CHAPEAU : le client marque
   // l'instance, et tous ses nœuds en héritent. Voir `PooledEffectNode::from_hat`.
@@ -770,6 +777,7 @@ class EffectNodePool {
   EffectBearerFollow next_follow_ = kEffectFollowsEveryTick;
   // Voir `SowAtEffectTick`.
   std::int32_t next_effect_tick_ = 0;
+  std::uint32_t next_shot_tag_ = 0;  // voir `SowForShot`
   // Voir `SowAsHat`.
   bool next_from_hat_ = false;
   // Voir `AnchorNextTo`. Elle ne sert qu'à prendre l'écart d'un nœud ancré.

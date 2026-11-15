@@ -359,7 +359,7 @@ TEST_CASE("Arène générée : la partie de la graine d'essai, épinglée", "[si
       .level = 1,
       .exp_total = 4,
       .hp_left = 337,
-      .damage_dealt = 555,
+      .damage_dealt = 565,
       .gems_gathered = 4,
       .foes_alive = 59,
       .outcome = ro::sim::SurvivorsOutcome::kRunning,

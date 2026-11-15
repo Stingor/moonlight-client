@@ -25,14 +25,14 @@ namespace ro::test_support {
 //
 // La graine est choisie pour la COUVERTURE : la partie tient ses cinq
 // minutes, voit l'essaim de 1:30, l'anneau de 2:30 et l'essaim de 4:30, tue
-// deux élites et ouvre un coffre, voit naître Mastering, monte Thunderstorm et
-// Frost Diver au niveau 2 et acquiert un mur, Fire Wall, et une barrière, Ice
-// Wall. Un événement compte quand il a fait naître au moins un monstre. Une
-// partie tombée après l'essaim de 4:30 compterait aussi.
+// une élite et ouvre un coffre, voit naître Mastering, monte Napalm Beat, Cold
+// Bolt et Thunderstorm au niveau 2 et acquiert un mur, Fire Wall. Un événement
+// compte quand il a fait naître au moins un monstre. Une partie tombée après
+// l'essaim de 4:30 compterait aussi.
 
 inline constexpr std::int32_t kGoldenArenaCells = 160;
 inline constexpr std::uint16_t kGoldenArenaId = 1;
-inline constexpr std::uint64_t kGoldenSeed = 20261706;
+inline constexpr std::uint64_t kGoldenSeed = 20261713;
 inline constexpr std::uint16_t kGoldenClassId = 1;        // mage
 inline constexpr std::uint16_t kGoldenFirstSkillId = 19;  // Fire Bolt
 // 15 000 pas de 20 ms : les cinq premières minutes de la partie.
@@ -151,43 +151,43 @@ struct GoldenOwned {
 // kSurvivorsRulesetVersion et kGoldenRulesetVersion ensemble, car un journal ne
 // se rejoue que contre les règles qui l'ont produit. Les mêmes valeurs sous
 // MSVC et sous g++-14.
-inline constexpr std::uint16_t kGoldenRulesetVersion = 8;
+inline constexpr std::uint16_t kGoldenRulesetVersion = 9;
 inline constexpr sim::SurvivorsTally kGoldenTally{
     .survived_steps = 15000,
-    .kills = 316,
+    .kills = 496,
     .boss_kills = 0,
-    .kill_points = 871,
-    .level = 9,
-    .exp_total = 404,
-    .hp_left = 360,
-    .damage_dealt = 12891,
-    .gems_gathered = 241,
+    .kill_points = 1358,
+    .level = 12,
+    .exp_total = 675,
+    .hp_left = 328,
+    .damage_dealt = 19151,
+    .gems_gathered = 484,
     .foes_alive = 400,
     .outcome = sim::SurvivorsOutcome::kRunning,
-    .elite_kills = 2,
+    .elite_kills = 1,
     .chests_opened = 1,
     .evolutions = 0,
 };
-inline constexpr sim::FieldPoint kGoldenHeroPosition{83, 114004};
+inline constexpr sim::FieldPoint kGoldenHeroPosition{46952, 130493};
 inline constexpr std::array<GoldenFoe, kGoldenFoeCount> kGoldenFoes{{
-    {.serial = 169, .foe_id = 1007, .position = {37039, 93300}, .hp = 22},
-    {.serial = 170, .foe_id = 1063, .position = {34897, 92380}, .hp = 11},
-    {.serial = 172, .foe_id = 1007, .position = {34517, 95108}, .hp = 22},
-    {.serial = 177, .foe_id = 1007, .position = {23976, 87597}, .hp = 22},
-    {.serial = 182, .foe_id = 1007, .position = {35775, 108512}, .hp = 22},
+    {.serial = 170, .foe_id = 1007, .position = {83252, 121642}, .hp = 22},
+    {.serial = 171, .foe_id = 1063, .position = {72764, 120229}, .hp = 11},
+    {.serial = 172, .foe_id = 1002, .position = {84702, 121277}, .hp = 15},
+    {.serial = 175, .foe_id = 1007, .position = {77359, 127393}, .hp = 2},
+    {.serial = 176, .foe_id = 1063, .position = {72839, 130264}, .hp = 11},
 }};
 inline constexpr std::array<GoldenOwned, 7> kGoldenSkills{{
     {.id = 60001, .level = 1},  // le coup de baguette
     {.id = 19, .level = 1},     // Fire Bolt
+    {.id = 11, .level = 2},     // Napalm Beat
+    {.id = 15, .level = 1},     // Frost Diver
+    {.id = 14, .level = 2},     // Cold Bolt
     {.id = 21, .level = 2},     // Thunderstorm
-    {.id = 15, .level = 2},     // Frost Diver
     {.id = 18, .level = 1},     // Fire Wall
-    {.id = 86, .level = 1},     // Water Ball
-    {.id = 87, .level = 1},     // Ice Wall
 }};
 inline constexpr std::array<GoldenOwned, 2> kGoldenCards{{
-    {.id = 4003, .level = 1},  // Pupa Card
-    {.id = 4019, .level = 1},  // Hornet Card
+    {.id = 4266, .level = 3},  // Eclipse Card
+    {.id = 4044, .level = 1},  // Smokie Card
 }};
 
 }  // namespace ro::test_support

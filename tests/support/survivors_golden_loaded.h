@@ -58,48 +58,48 @@ inline constexpr std::uint16_t kGoldenLoadedLockedCardId = 4072;  // Golem Card
 // ⚠ LE BILAN EN OR À DÉPART CHARGÉ, épinglé avec la version des règles : il
 // change quand le catalogue, le catalogue de la méta OU le robot changent.
 // Les mêmes valeurs sous MSVC et sous g++-14.
-inline constexpr std::uint16_t kGoldenLoadedRulesetVersion = 7;
+inline constexpr std::uint16_t kGoldenLoadedRulesetVersion = 9;
 inline constexpr sim::SurvivorsTally kGoldenLoadedTally{
-    .survived_steps = 41731,
-    .kills = 8408,
-    .boss_kills = 4,
-    .kill_points = 186614,
-    .level = 36,
-    .exp_total = 10310,
-    .hp_left = 0,
-    .damage_dealt = 1232961,
-    .gems_gathered = 2506,
-    .foes_alive = 377,
-    .outcome = sim::SurvivorsOutcome::kFell,
-    .elite_kills = 10,
-    .chests_opened = 12,
-    .evolutions = 1,
+    .survived_steps = 46428,
+    .kills = 7657,
+    .boss_kills = 5,
+    .kill_points = 234996,
+    .level = 56,
+    .exp_total = 98119,
+    .hp_left = 289,
+    .damage_dealt = 1512054,
+    .gems_gathered = 2636,
+    .foes_alive = 0,
+    .outcome = sim::SurvivorsOutcome::kVictory,
+    .elite_kills = 11,
+    .chests_opened = 13,
+    .evolutions = 2,
 };
-inline constexpr sim::FieldPoint kGoldenLoadedHeroPosition{73003, 98662};
-// Le robot se relève une fois, sa vie de réserve, puis tombe à 13:55. Six
-// cartes tombent, dont celles que les mini-boss lâchent à coup sûr, et le
-// robot en ramasse cinq ; aucun monstre n'est glacé.
+inline constexpr sim::FieldPoint kGoldenLoadedHeroPosition{123781, 137880};
+// Le robot dépense sa vie de réserve et l'emporte à 15:28. Dix cartes
+// tombent, dont celles que les mini-boss lâchent à coup sûr, et le robot en
+// ramasse quatre ; aucun monstre n'est glacé.
 inline constexpr std::uint8_t kGoldenLoadedLivesLeft = 0;
-inline constexpr std::uint32_t kGoldenLoadedCardsDropped = 6;
-inline constexpr std::array<std::uint16_t, 5> kGoldenLoadedCardsFound{4197, 4266, 4179, 4183, 4085};
+inline constexpr std::uint32_t kGoldenLoadedCardsDropped = 10;
+inline constexpr std::array<std::uint16_t, 4> kGoldenLoadedCardsFound{4266, 4183, 4179, 4147};
 inline constexpr std::uint64_t kGoldenLoadedChills = 0;
 inline constexpr std::array<GoldenOwned, kGoldenBotOwnedCount> kGoldenLoadedSkills{{
     {.id = 60001, .level = 2},  // le coup de baguette
     {.id = 83, .level = 1},     // Meteor Storm
-    {.id = 21, .level = 4},     // Thunderstorm
-    {.id = 15, .level = 5},     // Frost Diver
-    {.id = 17, .level = 8},     // Fire Ball
-    {.id = 86, .level = 8},     // Water Ball
-    {.id = 18, .level = 3},     // Fire Wall
+    {.id = 18, .level = 8},     // Fire Wall
+    {.id = 21, .level = 8},     // Thunderstorm
+    {.id = 15, .level = 8},     // Frost Diver
+    {.id = 81, .level = 1},     // Sightrasher
+    {.id = 20, .level = 8},     // Lightning Bolt
 }};
 // Golem Card verrouillée n'est jamais prise.
 inline constexpr std::array<GoldenOwned, kGoldenBotOwnedCount> kGoldenLoadedCards{{
+    {.id = 4019, .level = 5},  // Hornet Card
+    {.id = 4147, .level = 4},  // Baphomet Card
+    {.id = 4009, .level = 2},  // Chonchon Card
+    {.id = 4179, .level = 3},  // Dragon Fly Card
     {.id = 4197, .level = 2},  // Mastering Card
     {.id = 4003, .level = 3},  // Pupa Card
-    {.id = 4019, .level = 4},  // Hornet Card
-    {.id = 4147, .level = 1},  // Baphomet Card
-    {.id = 4179, .level = 2},  // Dragon Fly Card
-    {.id = 4022, .level = 1},  // Spore Card
     {},                        // emplacement libre
 }};
 

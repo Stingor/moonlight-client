@@ -16,12 +16,12 @@ using ro::test_support::kGoldenBotTally;
 namespace {
 
 // Le score de la partie en or longue, que le serveur refera tel quel.
-constexpr std::uint64_t kGoldenBotScore = 285785;
+constexpr std::uint64_t kGoldenBotScore = 179442;
 
 }  // namespace
 
 TEST_CASE("Score survivors : la formule serveur ne bouge pas avec la méta", "[sim][survivors]") {
-  // 273 185 points de tués + 10 × 890 secondes entières + 100 × niveau 37 ;
+  // 166 972 points de tués + 10 × 807 secondes entières + 100 × niveau 44 ;
   // rien pour une chute.
   CHECK(SurvivorsScore(kGoldenBotTally) == kGoldenBotScore);
 }

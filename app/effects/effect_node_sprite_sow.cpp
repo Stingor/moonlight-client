@@ -328,7 +328,19 @@ bool EffectNodesInPlay::Play(std::string_view sprite_base, glm::vec3 ground_posi
 
 bool EffectNodesInPlay::ShootSprite(std::string_view sprite_base, glm::vec3 from, glm::vec3 to,
                                     std::int32_t life_ticks,
-                                    const ro::render::ProjectileFlight& flight) {
+                                    const ro::render::ProjectileFlight& flight,
+                                    std::uint32_t shot_tag) {
+  // TOUT LE VOL PORTE LE NUMÉRO DU TIR, et aucun semis après lui.
+  struct ShotTagScope {
+    ro::render::EffectNodePool& pool;
+    ShotTagScope(ro::render::EffectNodePool& sown, std::uint32_t tag) : pool(sown) {
+      pool.SowForShot(tag);
+    }
+    ShotTagScope(const ShotTagScope&) = delete;
+    ShotTagScope& operator=(const ShotTagScope&) = delete;
+    ~ShotTagScope() { pool.SowForShot(0); }
+  };
+  const ShotTagScope tag_scope(pool_, shot_tag);
   // 🔴 UNE HORLOGE DIVISÉE ALLONGE TOUT ENSEMBLE : la vie, donc le vol, et la
   // tenue de chaque image. Le pas reste la distance divisée par la vie, si bien
   // que le projectile va d'autant moins vite sans arriver ailleurs.

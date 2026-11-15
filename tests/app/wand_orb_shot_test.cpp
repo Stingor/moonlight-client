@@ -271,3 +271,30 @@ TEST_CASE("tir de baguette : entre deux tics, le cœur, le halo et l'ombre se pe
   REQUIRE(casters.GroundShadows(false).size() == 1);
   CHECK(SamePoint(casters.GroundShadows(false).front().ground_position, middle));
 }
+
+TEST_CASE("tir de baguette : un tir arrêté emporte tout son vol, et lui seul", "[wand_orb_shot]") {
+  constexpr std::uint32_t kStoppedShot = 7;
+  constexpr std::uint32_t kOtherShot = 8;
+  const TempDirectory client;
+  FillClient(client);
+  auto vfs = ro::vfs::Vfs::Mount({.root = client.path(), .archives = {"baguette.grf"}});
+  REQUIRE(vfs.has_value());
+  moonclient::EffectNodesInPlay nodes(*vfs);
+  REQUIRE(nodes.ShootSprite(ro::render::kWandBoltSpriteBase, kShooter, kTarget, kFlightTicks,
+                            WandFlight(ro::render::kWandOrbArcaneRgb), kStoppedShot));
+  const std::size_t one_flight = nodes.living_nodes().size();
+  REQUIRE(one_flight > 1);
+  REQUIRE(nodes.ShootSprite(ro::render::kWandBoltSpriteBase, kShooter, kTarget, kFlightTicks,
+                            WandFlight(ro::render::kWandOrbArcaneRgb), kOtherShot));
+  // Un semis sans numéro, après eux, n'hérite d'aucun.
+  REQUIRE(nodes.ShootSprite(ro::render::kWandBoltSpriteBase, kShooter, kTarget, kFlightTicks,
+                            WandFlight(std::nullopt)));
+  const std::size_t all_flights = nodes.living_nodes().size();
+  nodes.DropShot(kStoppedShot);
+  CHECK(nodes.living_nodes().size() == all_flights - one_flight);
+  nodes.DropShot(0);
+  CHECK(nodes.living_nodes().size() == all_flights - one_flight);
+  nodes.DropShot(kOtherShot);
+  REQUIRE(nodes.living_nodes().size() == 1);
+  CHECK(nodes.living_nodes().front().shot_tag == 0);
+}
