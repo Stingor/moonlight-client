@@ -261,6 +261,17 @@ class ActorWardrobe {
   // alors.
   [[nodiscard]] BodyRamps LayerRampsFor(const ActorLook& look, ActorPart part);
 
+  // L'IMAGE D'UN ACCESSOIRE DESSINÉ SUR LA CARTE — l'oiseau, le chariot —,
+  // teinte par le style de son porteur sous ce calque et cette clé : le sprite,
+  // la palette peinte et son numéro de série, la section et l'image restant à
+  // l'appelant. Un style nul, inconnu ou sans teinture de cette clé rend le
+  // sprite dans ses couleurs.
+  //
+  // ⚠ LE SPRITE DOIT VIVRE AUSSI LONGTEMPS QUE LA GARDE-ROBE : la palette
+  // peinte se range sous son adresse.
+  [[nodiscard]] SpriteImageKey AccessoryImage(std::uint32_t style, const formats::SprSprite& sprite,
+                                              StyleLayer layer, std::uint32_t key);
+
   // UN ENSEMBLE sous cet identifiant : la recette du corps et les teintures de
   // calques, chacune cherchée par sa clé quand la garde-robe habille une pièce
   // — voir `ro/render/style_set.h`. Mêmes règles que `SetStyle`.

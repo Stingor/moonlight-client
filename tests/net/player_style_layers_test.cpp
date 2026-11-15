@@ -260,9 +260,9 @@ TEST_CASE("Une teinture incohérente ne part pas", "[net][style_layers]") {
                         .slot = StyleSlot::kHeadTop}};
     CHECK_FALSE(EncodeStyleLayers(twice, false).has_value());
   }
-  SECTION("une trame au-delà de quatre kilo-octets") {
+  SECTION("une trame au-delà de cinq kilo-octets") {
     std::vector<StyleLayerOrder> many;
-    for (std::uint32_t style = 1; style <= 90; ++style) {
+    for (std::uint32_t style = 1; style <= 120; ++style) {
       StyleLayerOrder order{.recipe = Recipe(StyleLayerKind::kHead, (style << 16U) | 1U)};
       for (std::size_t rank = 0; rank < 8; ++rank) {
         order.recipe.adjusts[rank].hue = 1;

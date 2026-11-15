@@ -128,6 +128,12 @@ std::optional<ro::render::LayerDye> FromWire(const ro::sim::StyleLayerRecipe& to
     case ro::sim::StyleLayerKind::kCompanion:
       dye.layer = ro::render::StyleLayer::kCompanion;
       break;
+    case ro::sim::StyleLayerKind::kFalcon:
+      dye.layer = ro::render::StyleLayer::kFalcon;
+      break;
+    case ro::sim::StyleLayerKind::kCart:
+      dye.layer = ro::render::StyleLayer::kCart;
+      break;
     default:
       return std::nullopt;
   }
@@ -188,6 +194,13 @@ std::vector<ro::render::LayerDye> WornDyes(std::span<const ro::sim::StyleLayerRe
       // et une teinture faite pour une autre classe peindrait d'autres rampes.
       case ro::render::StyleLayer::kCompanion:
         return !look.player && !look.item && dye.key != 0 && dye.key == look.job;
+      // ⚠ TOUS LES OISEAUX ET TOUS LES CHARIOTS d'un joueur : l'apparence ne dit
+      // ni l'oiseau ni le chariot qu'il traîne, et leur dessin choisit sa
+      // teinture par la clé de l'image qu'il charge. Le serveur ne diffuse que
+      // celle du sprite porté.
+      case ro::render::StyleLayer::kFalcon:
+      case ro::render::StyleLayer::kCart:
+        return look.player && dye.key != 0;
       case ro::render::StyleLayer::kBody:
         break;
     }

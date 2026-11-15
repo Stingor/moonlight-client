@@ -131,6 +131,10 @@ inline constexpr std::size_t kStyleLayerAdjustCount = 13;
 // d'effet de chapeau : un seul réglage (teinte, saturation, clarté, et
 // « assombrir » à la place de l'absolu). Il appartient à l'exemplaire de l'objet
 // qui pose l'effet ; le serveur le retrouve parmi ce que l'émetteur porte.
+// `kFalcon` et `kCart` sont l'oiseau et le chariot du joueur, sous le numéro de
+// leur fichier d'image (voir `ro/render/companion_falcon.h`, `companion_cart.h`),
+// dans le bloc du joueur. Ils appartiennent au personnage. De 10 à 17, le CZ
+// désigne des emplacements d'équipement : ces deux calques viennent après.
 enum class StyleLayerKind : std::uint8_t {
   kHead = 1,
   kHeadgear = 2,
@@ -139,7 +143,9 @@ enum class StyleLayerKind : std::uint8_t {
   kBodyMore = 5,
   kBodySkin = 6,
   kCompanion = 7,
-  kHatEffect = 8
+  kHatEffect = 8,
+  kFalcon = 18,
+  kCart = 19
 };
 
 // UNE RETOUCHE : la couleur exacte d'un index de la palette du calque.

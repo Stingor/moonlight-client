@@ -10,6 +10,7 @@
 
 #include "ro/core/error.h"
 #include "ro/formats/monster_skill_info.h"
+#include "ro/render/accessory_look.h"
 #include "ro/render/actor_layers.h"
 #include "ro/render/body_sprite_key.h"
 #include "ro/render/sprite_tables.h"
@@ -106,6 +107,10 @@ struct ActorLook {
   // rien. Il ne pose pas de coiffe : il remplace le .act du corps — voir
   // `PetAccessoryAnimationPath`. Ignoré hors d'un pet.
   std::uint16_t pet_accessory = 0;
+  // L'ACCESSOIRE MONTRÉ SEUL, à la place du corps : l'oiseau ou le chariot de
+  // cette clé de teinture. Hors d'un joueur seulement ; `job` reste nul.
+  AccessoryKind accessory = AccessoryKind::kNone;
+  std::uint8_t accessory_key = 0;
 };
 
 // Ce qui traduit une apparence en fichiers.

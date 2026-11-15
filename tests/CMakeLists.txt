@@ -104,6 +104,7 @@ add_executable(ro_tests
     net/command_settings_test.cpp
     net/discord_relay_test.cpp
     net/character_select_return_test.cpp
+    net/accessory_style_layers_test.cpp
     net/companion_style_layers_test.cpp
     net/hat_effect_style_layers_test.cpp
     net/player_style_layers_test.cpp
@@ -415,6 +416,7 @@ add_executable(ro_tests
     render/actor_sprite_test.cpp
     render/actor_wardrobe_test.cpp
     render/actor_wardrobe_palette_test.cpp
+    render/actor_wardrobe_accessory_test.cpp
     render/actor_wardrobe_companion_test.cpp
     render/actor_wardrobe_layers_test.cpp
     render/actor_wardrobe_dual_test.cpp

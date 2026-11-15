@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <functional>
 #include <optional>
+#include <span>
 #include <string_view>
 
 #include "ro/formats/act.h"
@@ -22,17 +23,24 @@ namespace ro::render {
 
 // ── LA RECETTE : quel sprite pour quel type ────────────────────────────────
 
+// Le plus grand type que la table du client connaisse. Au-delà, elle lirait
+// hors de ses bornes : ici, rien ne se dessine.
+inline constexpr std::int32_t kMostCartType = 13;
+
 // Les deux fichiers d'une charrette, sous `data\sprite\`. ⚠ DEUX CHEMINS ET NON
 // UN : la charrette d'un bébé prend souvent l'image de celle de l'adulte et ses
 // propres mouvements, plus bas et plus près.
 struct CartArt {
   std::string_view spr_path;
   std::string_view act_path;
+  // LA CLÉ DE TEINTURE du chariot : le type annoncé, et
+  // `kSuperNoviceCartDyeKey` pour celui du super novice, qui n'en a qu'un. Le
+  // chariot d'un bébé a les couleurs de celui de l'adulte, index par index :
+  // il partage sa clé. Jamais nulle : le fil réserve la clé zéro à la peau.
+  std::uint8_t dye_key = 0;
 };
 
-// Le plus grand type que la table du client connaisse. Au-delà, elle lirait
-// hors de ses bornes : ici, rien ne se dessine.
-inline constexpr std::int32_t kMostCartType = 13;
+inline constexpr std::uint8_t kSuperNoviceCartDyeKey = kMostCartType + 1;
 
 // LA CHARRETTE D'UN ACTEUR, d'après son type et le métier qu'il MONTRE.
 //
@@ -44,6 +52,14 @@ inline constexpr std::int32_t kMostCartType = 13;
 // Vide pour un type nul, négatif ou inconnu de la table.
 [[nodiscard]] std::optional<CartArt> CartArtFor(std::int32_t cart_type, std::uint32_t job_id,
                                                 std::uint32_t option) noexcept;
+
+// TOUTE LA TABLE, l'adulte puis le bébé de chaque rang, celui du super novice
+// en tête : ce qu'un relevé ou un éditeur parcourt. Un même fichier peut y
+// paraître plusieurs fois.
+[[nodiscard]] std::span<const CartArt> AllCartArts() noexcept;
+
+// Le chariot de l'adulte sous cette clé de teinture, ou rien.
+[[nodiscard]] std::optional<CartArt> CartArtOfDyeKey(std::uint32_t dye_key) noexcept;
 
 // VRAI QUAND L'ACTEUR TRAÎNE SA CHARRETTE : un type annoncé, et l'acteur se
 // voit. Caché, camouflé ou invisible, il la perd, et la retrouve en

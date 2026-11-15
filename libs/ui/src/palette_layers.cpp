@@ -112,6 +112,45 @@ void DrawItemNotes(const PaletteTab& tab, const PaletteEditorView& view, const S
   }
 }
 
+// L'OISEAU OU LE CHARIOT TEINT : la teinture appartient au personnage, et vaut
+// pour ce sprite.
+void DrawAccessoryNotes(const PaletteTab& tab, const PaletteEditorView& view, const SkinArt& art,
+                        PaletteEditorAction& action) {
+  const bool cart = tab.kind == PaletteTabKind::kCart;
+  Wrapped(cart ? core::Tr("Cette teinture appartient à ton personnage, et vaut pour ce "
+                          "chariot : chaque chariot garde la sienne.")
+               : core::Tr("Cette teinture appartient à ton personnage, et vaut pour cet "
+                          "oiseau : chaque oiseau garde la sienne."));
+  Explain(cart ? core::Tr("Change de chariot : celui-ci reprend ses couleurs d'origine, et "
+                          "retrouve sa teinture quand tu le reprends.")
+               : core::Tr("Un autre job ou une autre tenue peut changer d'oiseau : celui-ci "
+                          "retrouve sa teinture quand il revient."));
+  if (!view.atelier_open) {
+    ImGui::TextDisabled("%s", core::Tr("Cette teinture se valide auprès du styliste."));
+  }
+  if (!tab.dyed) {
+    return;
+  }
+  ImGui::BeginDisabled(!view.connected || !view.atelier_open);
+  if (SkinSmallButton(core::Tr("Retirer cette teinture"), art)) {
+    ImGui::OpenPopup("retirer_accessoire");
+  }
+  ImGui::EndDisabled();
+  Explain(core::Tr("Il retrouve ses couleurs d'origine, pour toi comme pour les autres."));
+  if (BeginSkinPopup("retirer_accessoire")) {
+    Wrapped(core::Tr("Retirer cette teinture ?"));
+    if (SkinButton(core::Tr("Retirer"), art)) {
+      action.clear_item_dye = true;
+      ImGui::CloseCurrentPopup();
+    }
+    ImGui::SameLine();
+    if (SkinButton(core::Tr("Annuler"), art)) {
+      ImGui::CloseCurrentPopup();
+    }
+    EndSkinPopup();
+  }
+}
+
 // LE COMPAGNON TEINT : la teinture lui appartient, pour sa forme d'aujourd'hui.
 void DrawCompanionNotes(const PaletteTab& tab, const PaletteEditorView& view, const SkinArt& art,
                         PaletteEditorAction& action) {
@@ -300,6 +339,10 @@ const char* PaletteTabName(PaletteTabKind kind) {
       return core::Tr("Familier");
     case PaletteTabKind::kEffects:
       return core::Tr("Effets");
+    case PaletteTabKind::kFalcon:
+      return core::Tr("Faucon");
+    case PaletteTabKind::kCart:
+      return core::Tr("Chariot");
   }
   return "";
 }
@@ -368,6 +411,10 @@ const char* TabBlockReason(PaletteTabBlock blocked) {
       return core::Tr("Le serveur ne range pas encore la peau du corps : il suit celle du visage.");
     case PaletteTabBlock::kCompanionNotServed:
       return core::Tr("Le serveur ne range pas encore la teinture des compagnons.");
+    case PaletteTabBlock::kAccessoryNotServed:
+      return core::Tr("Le serveur ne range pas encore la teinture du faucon et du chariot.");
+    case PaletteTabBlock::kAccessoryAbsent:
+      return core::Tr("Sors ton faucon ou pousse ton chariot pour le teindre.");
   }
   return "";
 }
@@ -470,6 +517,8 @@ void DrawLayerChoice(PaletteEditorState& state, const PaletteEditorView& view, c
                    "corps choisi."));
     } else if (entry.tab != nullptr && entry.tab->item) {
       Explain(core::Tr("La teinture de cet onglet appartient à l'item porté."));
+    } else if (entry.tab != nullptr && entry.tab->accessory) {
+      Explain(core::Tr("La teinture de cet onglet appartient à ton personnage."));
     } else if (entry.tab != nullptr && entry.tab->companion) {
       Explain(core::Tr("La teinture de cet onglet appartient à ce compagnon."));
     } else if (entry.kind == PaletteTabKind::kEffects) {
@@ -488,7 +537,9 @@ void DrawLayerNotes(const PaletteEditorView& view, const SkinArt& art,
   if (tab->item) {
     DrawItemNotes(*tab, view, art, action);
   }
-  if (tab->companion) {
+  if (tab->accessory) {
+    DrawAccessoryNotes(*tab, view, art, action);
+  } else if (tab->companion) {
     DrawCompanionNotes(*tab, view, art, action);
   }
   if (tab->kind == PaletteTabKind::kHair) {

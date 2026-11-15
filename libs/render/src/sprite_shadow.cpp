@@ -14,6 +14,10 @@ float ShadowScaleFor(const SpriteCatalog& catalog, const ActorLook& look) {
   // UN OBJET AU SOL porte une petite ombre, sans regarder aucune table : son
   // numéro est celui d'un objet, pas d'une classe.
   constexpr float kItemShadow = 0.4F;
+  // Un accessoire montré seul n'a pas d'ombre : sur la carte, il porte la sienne.
+  if (look.accessory != AccessoryKind::kNone) {
+    return 0.0F;
+  }
   if (look.item) {
     return kItemShadow;
   }

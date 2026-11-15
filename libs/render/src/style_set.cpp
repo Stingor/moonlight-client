@@ -94,6 +94,8 @@ std::optional<RampLayer> RampLayerOf(StyleLayer layer) noexcept {
     // Un compagnon est un sprite à palette embarquée, comme une coiffe : même
     // seuil, aucune peau.
     case StyleLayer::kCompanion:
+    case StyleLayer::kFalcon:
+    case StyleLayer::kCart:
       return RampLayer::kHeadgear;
     case StyleLayer::kBody:
     case StyleLayer::kSkin:

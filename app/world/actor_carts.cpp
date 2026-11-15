@@ -11,6 +11,7 @@
 #include "ro/sim/movement.h"
 #include "ro/sim/world.h"
 
+#include "world/actor_styles.h"
 #include "world/hit_popup_rules.h"
 
 namespace moonclient {
@@ -115,6 +116,7 @@ void ActorCarts::Census(const CartFrame& frame) {
     born.cart = ro::render::BornCart(MasterAt(frame, actor, frame.now_ms));
     born.art =
         wanted.has_value() ? ArtFor(*frame.vfs, wanted->spr_path, wanted->act_path) : nullptr;
+    born.dye_key = wanted.has_value() ? wanted->dye_key : std::uint8_t{0};
     born.type = type;
     carts_.emplace(id, std::move(born));
   }
@@ -183,10 +185,17 @@ std::span<const ro::render::DrawnActor> ActorCarts::Update(const CartFrame& fram
         kept.cart.frame >= animation.actions()[action].frames.size()) {
       continue;
     }
+    // LA CHARRETTE PREND LA TEINTURE DE SON MAÎTRE, sous la clé de son image.
+    ro::render::SpriteImageKey image{&*kept.art->sprite};
+    if (frame.wardrobe != nullptr && frame.styles != nullptr) {
+      image = frame.wardrobe->AccessoryImage(frame.styles->Worn(id), *kept.art->sprite,
+                                             ro::render::StyleLayer::kCart, kept.dye_key);
+    }
     for (const ro::render::SpriteQuad& quad :
          ro::render::BuildFrameQuads(*kept.art->sprite, animation, action, kept.cart.frame)) {
-      kept.frame.sources.push_back(
-          ro::render::SpriteImageKey{&*kept.art->sprite, nullptr, quad.section, quad.image_index});
+      image.section = quad.section;
+      image.image_index = quad.image_index;
+      kept.frame.sources.push_back(image);
       kept.frame.quads.push_back(quad);
     }
     if (kept.frame.quads.empty()) {

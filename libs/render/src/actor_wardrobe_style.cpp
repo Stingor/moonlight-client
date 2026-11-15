@@ -154,6 +154,13 @@ void ActorWardrobe::Tint(const ActorLook& look, ActorPart part, const formats::P
         if (look.item) {
           return;
         }
+        wanted.skin = false;
+        if (look.accessory != AccessoryKind::kNone) {
+          wanted.layer =
+              look.accessory == AccessoryKind::kFalcon ? StyleLayer::kFalcon : StyleLayer::kCart;
+          wanted.key = look.accessory_key;
+          break;
+        }
         wanted.layer = StyleLayer::kCompanion;
         wanted.key = look.job;
         wanted.skin = false;
@@ -203,6 +210,25 @@ void ActorWardrobe::Tint(const ActorLook& look, ActorPart part, const formats::P
   }
   piece.palette_serial = styled->serial;
   piece.tint = styled->tint.has_value() ? &*styled->tint : nullptr;
+}
+
+SpriteImageKey ActorWardrobe::AccessoryImage(std::uint32_t style, const formats::SprSprite& sprite,
+                                             StyleLayer layer, std::uint32_t key) {
+  SpriteImageKey image{&sprite, nullptr};
+  if (style == 0) {
+    return image;
+  }
+  const ActorPalettes::StyledPalette* styled = actor_palettes_.StyledFor(
+      style, sprite, nullptr, ActorPalettes::Piece{.layer = layer, .key = key});
+  if (styled == nullptr) {
+    return image;
+  }
+  if (sprite.palette().has_value()) {
+    image.palette = &styled->palette;
+  }
+  image.palette_serial = styled->serial;
+  image.tint = styled->tint.has_value() ? &*styled->tint : nullptr;
+  return image;
 }
 
 }  // namespace ro::render

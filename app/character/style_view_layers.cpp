@@ -49,10 +49,6 @@ constexpr std::int8_t kClassSaturation = 65;
 constexpr int kHueClassDegrees = 30;
 constexpr std::array<std::uint8_t, 3> kGreySeed = {178, 178, 178};
 
-// Le calque des compagnons sur le fil : un serveur qui annonce un dernier calque
-// plus petit (règle 25) ne le connaît pas, et refuserait la trame entière.
-constexpr int kCompanionWireLayer = static_cast<int>(ro::sim::StyleLayerKind::kCompanion);
-
 // Le mot bas d'une clé de tête : la couleur de cheveux.
 constexpr std::uint32_t kHairPaletteMask = 0xFFFFU;
 constexpr unsigned kHairStyleShift = 16;
@@ -312,11 +308,13 @@ void StyleView::RefreshTabs(const ro::render::ActorLook& look, const ro::sim::Wo
                              : (tab.item_id != 0 ? "#" + std::to_string(tab.item_id) : "");
       }
     }
-    // Un serveur qui ne connaît pas le calque 7 refuserait la trame entière.
+    // Un serveur dont le dernier calque (règle 25) est plus petit que celui de
+    // l'onglet ne le connaît pas, et refuserait la trame entière.
     if (tab.shown.companion && !tab.ramps.empty()) {
-      tab.shown.blocked = server_layer_last_ >= kCompanionWireLayer
+      tab.shown.blocked = server_layer_last_ >= static_cast<int>(tab.at.layer)
                               ? PaletteTabBlock::kNone
-                              : PaletteTabBlock::kCompanionNotServed;
+                          : tab.shown.accessory ? PaletteTabBlock::kAccessoryNotServed
+                                                : PaletteTabBlock::kCompanionNotServed;
     }
     const ro::render::LayerDye* worn = layers_.Worn(tab.at);
     tab.shown.dyed = worn != nullptr && !NeutralDye(*worn);

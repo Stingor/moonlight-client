@@ -3,6 +3,8 @@
 #include <cstddef>
 #include <cstdint>
 #include <functional>
+#include <optional>
+#include <span>
 #include <string_view>
 
 #include "ro/render/shown_job.h"
@@ -32,7 +34,20 @@ struct FalconPoint {
 struct FalconArt {
   std::string_view spr_path;
   std::string_view act_path;
+  // LA CLÉ DE TEINTURE de l'oiseau : un numéro par fichier d'IMAGE, que chaque
+  // client tire du style de corps annoncé. Le faucon du bébé chasseur a l'image
+  // du faucon ordinaire, donc sa clé. Le serveur range la teinture sous ce
+  // numéro : il ne change jamais.
+  std::uint8_t dye_key = 0;
 };
+
+inline constexpr std::uint8_t kFalconDyeHawk = 1;
+inline constexpr std::uint8_t kFalconDyeSniperHawk = 2;
+inline constexpr std::uint8_t kFalconDyeOwl = 3;
+inline constexpr std::uint8_t kFalconDyeWindHawk = 4;
+inline constexpr std::uint8_t kFalconDyePungus = 5;
+inline constexpr std::uint8_t kFalconDyeExplosion = 6;
+inline constexpr std::uint8_t kFalconDyeLude = 7;
 
 // Le bit d'option du faucon, dans `e_option`. Ceux qui changent le corps sont
 // dans `shown_job.h`.
@@ -62,6 +77,14 @@ inline constexpr std::uint32_t kOptionFalcon = 0x10;
 // aussi le faucon ordinaire — pas le Wind Hawk, dont le corps monté garde son
 // épervier.
 [[nodiscard]] FalconArt FalconArtFor(std::uint32_t job_id, std::uint32_t option) noexcept;
+
+// TOUS LES OISEAUX que les deux recettes ci-dessus savent rendre, chacun une
+// fois : ce qu'un relevé ou un éditeur parcourt.
+[[nodiscard]] std::span<const FalconArt> AllFalconArts() noexcept;
+
+// L'oiseau de cette clé de teinture, l'adulte quand deux la partagent ; rien
+// pour une clé inconnue.
+[[nodiscard]] std::optional<FalconArt> FalconArtOfDyeKey(std::uint32_t dye_key) noexcept;
 
 // LE MÉTIER QU'UN ACTEUR MONTRE (`ShownJobFor`), réduit à ce que les
 // compagnons distinguent : `kShownCostumeJob` pour un corps de costume, le

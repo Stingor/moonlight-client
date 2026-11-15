@@ -25,7 +25,8 @@ namespace ro::render {
 //     mais le serveur la remet sous l'apparence avant de l'envoyer ;
 //   * cape : la robe affichée, de même ;
 //   * peau du visage : zéro, une seule par personnage ;
-//   * peau du corps, corps, suite : la clé du corps, celle de la recette v7.
+//   * peau du corps, corps, suite : la clé du corps, celle de la recette v7 ;
+//   * oiseau, chariot : le numéro de leur fichier d'image.
 // La garde-robe cherche ainsi la teinture de chaque pièce qu'elle habille, et
 // une pièce sans teinture garde ses couleurs.
 //
@@ -57,7 +58,18 @@ enum class StyleLayer : std::uint8_t {
   // ⚠ LA TEINTURE APPARTIENT À L'ACTEUR, jamais au fichier : un familier
   // porte le sprite de son monstre, et seul l'acteur qui reçoit ce style est
   // teint.
-  kCompanion = 7
+  kCompanion = 7,
+  // L'OISEAU ET LE CHARIOT DU JOUEUR, sous leur clé de teinture (`FalconArt::
+  // dye_key`, `CartArt::dye_key`) : un numéro par fichier d'image, que chaque
+  // observateur tire de ce qu'il reçoit déjà — le style de corps, le type de
+  // chariot. Ils se découpent comme une coiffe, sur la palette embarquée de
+  // leur sprite. Le 8 est l'effet de chapeau, qui ne passe pas par ici ; de 10
+  // à 17, le CZ désigne des emplacements d'équipement.
+  //
+  // ⚠ LA TEINTURE APPARTIENT AU PORTEUR, jamais au fichier : trois oiseaux
+  // sont des monstres, et le monstre sauvage garde ses couleurs.
+  kFalcon = 18,
+  kCart = 19
 };
 
 // Le nombre de réglages d'une teinture : un par classe de teinte au profil 2,

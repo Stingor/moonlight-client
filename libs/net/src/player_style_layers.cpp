@@ -36,17 +36,24 @@ constexpr std::uint8_t kPayloadZipped = 0x01;
 // Le calque d'une entrée, tel que le fil le numérote.
 constexpr std::uint8_t kWireHead = static_cast<std::uint8_t>(sim::StyleLayerKind::kHead);
 constexpr std::uint8_t kWireLayerLast = static_cast<std::uint8_t>(sim::StyleLayerKind::kHatEffect);
+// L'oiseau et le chariot, après les emplacements d'équipement du CZ.
+constexpr std::uint8_t kWireFalcon = static_cast<std::uint8_t>(sim::StyleLayerKind::kFalcon);
+constexpr std::uint8_t kWireCart = static_cast<std::uint8_t>(sim::StyleLayerKind::kCart);
 
 static_assert(proto::CzMoonclientStyleLayers::kWireSize == 6,
               "l'en-tête du CZ des calques ne vaut plus ce que le serveur déclare");
 static_assert(proto::ZcMoonclientStyleLayers::kWireSize == 7,
               "l'en-tête du ZC des calques ne vaut plus ce que le serveur déclare");
 static_assert(kStyleLayerEntryMost <= UINT8_MAX, "une entrée doit tenir sa taille sur un octet");
-// Le pire CZ : tête, peau du visage, quatre suites, huit emplacements, plus la
-// peau de chacun des quatre corps et les effets de chapeau, d'un réglage chacun.
+// Le pire CZ : tête, peau du visage, quatre suites, huit emplacements, les deux
+// compagnons, l'oiseau et le chariot, plus la peau de chacun des quatre corps et
+// les effets de chapeau, d'un réglage chacun.
+constexpr std::size_t kRequestCompanionsMost = 2;
+constexpr std::size_t kRequestAccessoriesMost = 2;
 constexpr std::size_t kRequestEntriesWorst = 1 + 1 + sim::kStyleBodyVariantsMost +
                                              (static_cast<std::size_t>(StyleSlot::kCostumeGarment) -
-                                              static_cast<std::size_t>(StyleSlot::kHeadTop) + 1);
+                                              static_cast<std::size_t>(StyleSlot::kHeadTop) + 1) +
+                                             kRequestCompanionsMost + kRequestAccessoriesMost;
 static_assert(proto::CzMoonclientStyleLayers::kWireSize +
                       kRequestEntriesWorst * kStyleLayerEntryMost +
                       (sim::kStyleBodyVariantsMost + kStyleHatEffectsMost) * kStyleSkinEntryMost <=
@@ -92,8 +99,10 @@ static_assert(proto::CzMoonclientStyleLayers::kWireSize +
       return profile == kStyleLayerBodyMoreProfile ? kStyleLayerBodyMoreRanks : 0;
     case sim::StyleLayerKind::kHeadgear:
     case sim::StyleLayerKind::kGarment:
-    // Un compagnon se découpe comme une coiffe.
+    // Un compagnon, un oiseau, un chariot se découpent comme une coiffe.
     case sim::StyleLayerKind::kCompanion:
+    case sim::StyleLayerKind::kFalcon:
+    case sim::StyleLayerKind::kCart:
       return RanksOf(profile);
     case sim::StyleLayerKind::kHatEffect:
       return profile == kStyleLayerEffectProfile ? 1 : 0;
@@ -163,11 +172,14 @@ void WriteAdjust(core::ByteWriter& writer, const sim::StyleAdjust& adjust) {
   } else if (recipe.layer == sim::StyleLayerKind::kHead || IsSkin(recipe.layer) ||
              recipe.layer == sim::StyleLayerKind::kBodyMore ||
              recipe.layer == sim::StyleLayerKind::kCompanion ||
-             recipe.layer == sim::StyleLayerKind::kHatEffect) {
+             recipe.layer == sim::StyleLayerKind::kHatEffect ||
+             recipe.layer == sim::StyleLayerKind::kFalcon ||
+             recipe.layer == sim::StyleLayerKind::kCart) {
     // 🔴 UN COMPAGNON NE SE DÉSIGNE PAS : la clé est la classe ATTENDUE, et le
     // serveur lit lui-même le compagnon actif de la session. Un effet de
     // chapeau non plus : la clé est son numéro, et le serveur cherche parmi ce
-    // que l'émetteur porte l'objet qui le pose.
+    // que l'émetteur porte l'objet qui le pose. L'oiseau et le chariot sont
+    // ceux que la session porte, sous la clé de leur image.
     wire_layer = static_cast<std::uint8_t>(recipe.layer);
   } else {
     return core::Fail(core::ErrorCode::kInvalidArgument,
@@ -307,7 +319,8 @@ void ReadTail(core::ByteReader& reader, std::size_t end, sim::StyleLayerRecipe& 
     return {};
   }
   ReadEntry read{.ok = true};
-  const bool known_layer = wire_layer >= kWireHead && wire_layer <= kWireLayerLast;
+  const bool known_layer = (wire_layer >= kWireHead && wire_layer <= kWireLayerLast) ||
+                           wire_layer == kWireFalcon || wire_layer == kWireCart;
   if (known_layer) {
     sim::StyleLayerRecipe recipe;
     recipe.layer = static_cast<sim::StyleLayerKind>(wire_layer);

@@ -28,6 +28,10 @@
 #include "character/style_skin.h"
 #include "character/style_store.h"
 
+namespace ro::sim {
+struct Actor;
+}  // namespace ro::sim
+
 namespace moonclient {
 
 // LA RECETTE TELLE QU'ELLE DOIT VOYAGER SANS SON PORTEUR : code copié,
@@ -296,6 +300,9 @@ class StyleView {
   };
   // Nos compagnons sortis : l'homoncule, puis le familier.
   [[nodiscard]] static std::vector<SeenCompanion> CompanionsOf(const ro::sim::World& world);
+  // L'oiseau et le chariot du joueur, en queue de `found`.
+  static void AppendAccessories(const ro::sim::World& world, const ro::sim::Actor& self,
+                                std::vector<SeenCompanion>& found);
   // ── LES COMPAGNONS — voir `style_view_companions.cpp` ───────────────────
   // Un onglet par compagnon sorti, mesuré sur son sprite.
   void AppendCompanionTabs(std::span<const SeenCompanion> companions, const ro::sim::World& world);

@@ -11,6 +11,7 @@
 
 #include "ro/formats/act.h"
 #include "ro/formats/spr.h"
+#include "ro/render/actor_wardrobe.h"
 #include "ro/render/companion_cart.h"
 #include "ro/render/ground_light.h"
 #include "ro/render/sprite_renderer.h"
@@ -26,6 +27,8 @@
 // en pousse une, et qu'il traîne. La mécanique vit dans
 // `ro/render/companion_cart.h` ; ici, on la nourrit du monde et on la dessine.
 namespace moonclient {
+
+class ActorStyles;
 
 // L'ÉTAT « POUSSE UNE CHARRETTE », et sa valeur est le TYPE de la charrette.
 //
@@ -56,6 +59,11 @@ struct CartFrame {
   // L'INTERPOLATION D'IMAGES du joueur : la charrette se peint entre ses deux
   // derniers tics. Voir `ro/render/tick_blend.h`.
   bool blended = false;
+  // LES COULEURS DES MAÎTRES : la garde-robe, et le style que chaque acteur
+  // porte en ce moment (`ActorStyles::Worn`). Nuls, tout se dessine dans ses
+  // couleurs.
+  ro::render::ActorWardrobe* wardrobe = nullptr;
+  const ActorStyles* styles = nullptr;
 };
 
 class ActorCarts {
@@ -93,6 +101,8 @@ class ActorCarts {
     const Art* art = nullptr;
     // Le type à la naissance : un autre type fait renaître la charrette.
     std::int32_t type = 0;
+    // La clé de teinture de la charrette choisie, celle de son image.
+    std::uint8_t dye_key = 0;
     ro::render::ComposedActor frame;
   };
 

@@ -159,19 +159,20 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   // l'ombre du soleil, avant qu'elles ne se peignent avec les corps.
   std::span<const ro::render::DrawnActor> carts;
   if (link_.is_open() && pieces_.wardrobe->has_value()) {
-    carts = pieces_.carts->Update(CartFrame{&world_, &planner_, &*stage_, vfs_, camera_.yaw_degrees,
-                                            now_ms, graphics.summon_translucent(), actor_ground,
-                                            graphics.cold_light(), !sun_asked,
-                                            graphics.frame_interpolation()});
+    carts = pieces_.carts->Update(
+        CartFrame{&world_, &planner_, &*stage_, vfs_, camera_.yaw_degrees, now_ms,
+                  graphics.summon_translucent(), actor_ground, graphics.cold_light(), !sun_asked,
+                  graphics.frame_interpolation(), &**pieces_.wardrobe, &styles_});
   }
   // LES FAUCONS AUSSI, avant les ombres : leur silhouette en porte une, comme
   // celle d'une charrette. Ils se peignent plus bas, après les corps.
   std::span<const ro::render::DrawnActor> falcons;
   if (link_.is_open()) {
-    falcons =
-        pieces_.falcons->Update(FalconFrame{&world_, &planner_, &*stage_, vfs_, camera_.yaw_degrees,
-                                            now_ms, graphics.summon_translucent(), actor_ground,
-                                            graphics.cold_light(), graphics.frame_interpolation()});
+    falcons = pieces_.falcons->Update(
+        FalconFrame{&world_, &planner_, &*stage_, vfs_, camera_.yaw_degrees, now_ms,
+                    graphics.summon_translucent(), actor_ground, graphics.cold_light(),
+                    graphics.frame_interpolation(),
+                    pieces_.wardrobe->has_value() ? &**pieces_.wardrobe : nullptr, &styles_});
   }
   // LES SPRITES DE DÉCOR du document d'édition : peints avec les corps, ombrés
   // comme eux, et portant ombre comme une charrette.

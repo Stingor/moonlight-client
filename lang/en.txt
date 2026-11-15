@@ -24651,3 +24651,39 @@ tr: Removes the item's %d enchantment(s); cards stay.
 
 fr: Ôter tous les enchantements de %s ? Les zenys et les matériaux seront consommés, même en cas d'échec.
 tr: Remove all enchantments from %s? The zeny and materials will be consumed, even on failure.
+
+fr: Faucon
+tr: Falcon
+
+fr: Chariot
+tr: Cart
+
+fr: Le serveur ne range pas encore la teinture du faucon et du chariot.
+tr: The server does not store falcon and cart dyes yet.
+
+fr: Sors ton faucon ou pousse ton chariot pour le teindre.
+tr: Call your falcon or push your cart to dye it.
+
+fr: La teinture de cet onglet appartient à ton personnage.
+tr: This tab's dye belongs to your character.
+
+fr: Cette teinture appartient à ton personnage, et vaut pour ce chariot : chaque chariot garde la sienne.
+tr: This dye belongs to your character and applies to this cart: each cart keeps its own.
+
+fr: Cette teinture appartient à ton personnage, et vaut pour cet oiseau : chaque oiseau garde la sienne.
+tr: This dye belongs to your character and applies to this bird: each bird keeps its own.
+
+fr: Change de chariot : celui-ci reprend ses couleurs d'origine, et retrouve sa teinture quand tu le reprends.
+tr: Change carts: this one goes back to its original colors, and gets its dye back when you take it again.
+
+fr: Un autre job ou une autre tenue peut changer d'oiseau : celui-ci retrouve sa teinture quand il revient.
+tr: Another job or outfit can change the bird: this one gets its dye back when it returns.
+
+fr: Cette teinture se valide auprès du styliste.
+tr: This dye is confirmed at the stylist.
+
+fr: Retirer cette teinture
+tr: Remove this dye
+
+fr: Retirer cette teinture ?
+tr: Remove this dye?

@@ -24651,3 +24651,39 @@ tr: Quita los %d encantamiento(s) del objeto; las cartas se quedan.
 
 fr: Ôter tous les enchantements de %s ? Les zenys et les matériaux seront consommés, même en cas d'échec.
 tr: ¿Quitar todos los encantamientos de %s? Se consumirán los zenys y los materiales, incluso si falla.
+
+fr: Faucon
+tr: Halcón
+
+fr: Chariot
+tr: Carro
+
+fr: Le serveur ne range pas encore la teinture du faucon et du chariot.
+tr: El servidor aún no guarda el tinte del halcón ni del carro.
+
+fr: Sors ton faucon ou pousse ton chariot pour le teindre.
+tr: Saca tu halcón o empuja tu carro para teñirlo.
+
+fr: La teinture de cet onglet appartient à ton personnage.
+tr: El tinte de esta pestaña pertenece a tu personaje.
+
+fr: Cette teinture appartient à ton personnage, et vaut pour ce chariot : chaque chariot garde la sienne.
+tr: Este tinte pertenece a tu personaje y vale para este carro: cada carro conserva el suyo.
+
+fr: Cette teinture appartient à ton personnage, et vaut pour cet oiseau : chaque oiseau garde la sienne.
+tr: Este tinte pertenece a tu personaje y vale para este pájaro: cada pájaro conserva el suyo.
+
+fr: Change de chariot : celui-ci reprend ses couleurs d'origine, et retrouve sa teinture quand tu le reprends.
+tr: Cambia de carro: este recupera sus colores originales, y vuelve a tener su tinte cuando lo retomes.
+
+fr: Un autre job ou une autre tenue peut changer d'oiseau : celui-ci retrouve sa teinture quand il revient.
+tr: Otro job u otro atuendo puede cambiar de pájaro: este recupera su tinte cuando vuelve.
+
+fr: Cette teinture se valide auprès du styliste.
+tr: Este tinte se confirma con el estilista.
+
+fr: Retirer cette teinture
+tr: Quitar este tinte
+
+fr: Retirer cette teinture ?
+tr: ¿Quitar este tinte?

@@ -190,6 +190,29 @@ TEST_CASE("Styles des calques : un compagnon prend la teinture de SA classe, un 
   CHECK(wild.style == 0);
 }
 
+TEST_CASE("Styles des calques : l'oiseau et le chariot suivent le joueur, toutes clés",
+          "[app][styles][layers][accessory]") {
+  constexpr std::uint32_t kOwl = 3;
+  constexpr std::uint32_t kHawk = 1;
+  constexpr std::uint32_t kCartThree = 3;
+  const std::vector<StyleLayerRecipe> told = {
+      Told(StyleLayerKind::kFalcon, kOwl),
+      Told(StyleLayerKind::kFalcon, kHawk),
+      Told(StyleLayerKind::kCart, kCartThree),
+      Told(StyleLayerKind::kCart, 0),
+  };
+  // ⚠ TOUTES LES CLÉS : le dessin de l'oiseau choisit la sienne par son image.
+  const std::vector<ro::render::LayerDye> worn = WornDyes(told, Dressed());
+  REQUIRE(worn.size() == 3);
+  CHECK(worn[0].layer == StyleLayer::kFalcon);
+  CHECK(worn[0].key == kHawk);
+  CHECK(worn[1].key == kOwl);
+  CHECK(worn[2].layer == StyleLayer::kCart);
+  CHECK(worn[2].key == kCartThree);
+  // Un compagnon ne les porte jamais.
+  CHECK(WornDyes(told, ro::test_support::Poring()).empty());
+}
+
 TEST_CASE("Styles des calques : une tête de groupe emprunte le style que la carte a posé",
           "[app][styles][layers]") {
   Fixture fixture;

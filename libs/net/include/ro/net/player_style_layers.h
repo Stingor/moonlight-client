@@ -78,10 +78,10 @@ inline constexpr std::size_t kStyleLayerEntryMost =
 // La plus grosse entrée d'une peau : un seul réglage, sans queue.
 inline constexpr std::size_t kStyleSkinEntryMost = kStyleLayerEntryHead + kStyleLayerAdjustBytes;
 // LE PLUS GROS CZ que le serveur accepte : la tête, la peau du visage, les
-// quatre suites du corps et les huit emplacements, chacun à sa plus grosse
-// entrée, et les peaux des quatre corps, tiennent
-// dans 4 Kio.
-inline constexpr std::size_t kStyleLayersRequestMost = 4096;
+// quatre suites du corps, les huit emplacements, les deux compagnons, l'oiseau
+// et le chariot, chacun à sa plus grosse entrée, et les peaux des quatre corps,
+// tiennent dans 5 Kio.
+inline constexpr std::size_t kStyleLayersRequestMost = 5120;
 
 // L'EMPLACEMENT D'ÉQUIPEMENT de l'émetteur qu'une teinture d'objet vise.
 enum class StyleSlot : std::uint8_t {

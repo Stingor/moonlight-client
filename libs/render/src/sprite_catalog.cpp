@@ -403,6 +403,16 @@ bool DrawnAsModel(const SpriteCatalog& catalog, const ActorLook& look) {
 }
 
 std::optional<std::string> BodySpritePath(const SpriteCatalog& catalog, const ActorLook& look) {
+  // L'accessoire montré seul : son image, sans l'extension que le chargeur pose.
+  if (look.accessory != AccessoryKind::kNone) {
+    constexpr std::string_view kSprExtension = ".spr";
+    std::optional<std::string_view> path = AccessorySpritePath(look.accessory, look.accessory_key);
+    if (!path.has_value() || !path->ends_with(kSprExtension)) {
+      return std::nullopt;
+    }
+    path->remove_suffix(kSprExtension.size());
+    return std::string(*path);
+  }
   if (look.item) {
     // Un objet au sol se dessine par sa ressource, sous le dossier des objets.
     const std::string_view named = catalog.items.ResourceOf(look.job);

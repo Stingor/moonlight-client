@@ -11,6 +11,7 @@
 
 #include "ro/formats/act.h"
 #include "ro/formats/spr.h"
+#include "ro/render/actor_wardrobe.h"
 #include "ro/render/companion_falcon.h"
 #include "ro/render/ground_light.h"
 #include "ro/render/sprite_renderer.h"
@@ -27,6 +28,8 @@
 // Assault, vers sa cible. La mécanique vit dans
 // `ro/render/companion_falcon.h` ; ici, on la nourrit du monde et on la dessine.
 namespace moonclient {
+
+class ActorStyles;
 
 // La compétence qui lance le faucon du lanceur vers le piège qu'elle vise.
 //
@@ -50,6 +53,11 @@ struct FalconFrame {
   // L'INTERPOLATION D'IMAGES du joueur : le faucon se peint entre ses deux
   // derniers tics. Voir `ro/render/tick_blend.h`.
   bool blended = false;
+  // LES COULEURS DES MAÎTRES : la garde-robe, et le style que chaque acteur
+  // porte en ce moment (`ActorStyles::Worn`). Nuls, tout se dessine dans ses
+  // couleurs.
+  ro::render::ActorWardrobe* wardrobe = nullptr;
+  const ActorStyles* styles = nullptr;
 };
 
 class ActorFalcons {
@@ -83,6 +91,8 @@ class ActorFalcons {
   struct Kept {
     ro::render::Falcon falcon;
     const Art* art = nullptr;
+    // La clé de teinture de l'oiseau choisi, celle de son image.
+    std::uint8_t dye_key = 0;
     // L'instant du dernier lancer SUIVI : un lancer plus ancien que le faucon,
     // ou déjà joué, ne le relance pas.
     std::uint32_t launched_ms = 0;

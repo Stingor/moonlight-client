@@ -6,6 +6,7 @@
 #include <cstddef>
 #include <numbers>
 #include <optional>
+#include <span>
 
 #include "ro/render/actor_sprite.h"
 
@@ -36,44 +37,57 @@ struct CartRecipe {
   CartArt baby;
 };
 constexpr std::array<CartRecipe, kMostCartType + 1> kRecipes = {
+    CartRecipe{{"data\\sprite\\이팩트\\슈노손수레.spr", "data\\sprite\\이팩트\\슈노손수레.act",
+                kSuperNoviceCartDyeKey},
+               {"data\\sprite\\이팩트\\슈노손수레.spr",
+                "data\\sprite\\이팩트\\베이비슈노손수레.act", kSuperNoviceCartDyeKey}},
+    CartRecipe{{"data\\sprite\\이팩트\\손수레.spr", "data\\sprite\\이팩트\\손수레.act", 1},
+               {"data\\sprite\\이팩트\\손수레.spr", "data\\sprite\\이팩트\\베이비손수레.act", 1}},
+    CartRecipe{{"data\\sprite\\이팩트\\손수레1.spr", "data\\sprite\\이팩트\\손수레1.act", 2},
+               {"data\\sprite\\이팩트\\손수레1.spr", "data\\sprite\\이팩트\\베이비손수레1.act", 2}},
+    CartRecipe{{"data\\sprite\\이팩트\\손수레2.spr", "data\\sprite\\이팩트\\손수레2.act", 3},
+               {"data\\sprite\\이팩트\\손수레2.spr", "data\\sprite\\이팩트\\베이비손수레2.act", 3}},
+    CartRecipe{{"data\\sprite\\이팩트\\손수레3.spr", "data\\sprite\\이팩트\\손수레3.act", 4},
+               {"data\\sprite\\이팩트\\손수레3.spr", "data\\sprite\\이팩트\\베이비손수레3.act", 4}},
+    CartRecipe{{"data\\sprite\\이팩트\\손수레4.spr", "data\\sprite\\이팩트\\손수레4.act", 5},
+               {"data\\sprite\\이팩트\\손수레4.spr", "data\\sprite\\이팩트\\베이비손수레4.act", 5}},
     CartRecipe{
-        {"data\\sprite\\이팩트\\슈노손수레.spr", "data\\sprite\\이팩트\\슈노손수레.act"},
-        {"data\\sprite\\이팩트\\슈노손수레.spr", "data\\sprite\\이팩트\\베이비슈노손수레.act"}},
-    CartRecipe{{"data\\sprite\\이팩트\\손수레.spr", "data\\sprite\\이팩트\\손수레.act"},
-               {"data\\sprite\\이팩트\\손수레.spr", "data\\sprite\\이팩트\\베이비손수레.act"}},
-    CartRecipe{{"data\\sprite\\이팩트\\손수레1.spr", "data\\sprite\\이팩트\\손수레1.act"},
-               {"data\\sprite\\이팩트\\손수레1.spr", "data\\sprite\\이팩트\\베이비손수레1.act"}},
-    CartRecipe{{"data\\sprite\\이팩트\\손수레2.spr", "data\\sprite\\이팩트\\손수레2.act"},
-               {"data\\sprite\\이팩트\\손수레2.spr", "data\\sprite\\이팩트\\베이비손수레2.act"}},
-    CartRecipe{{"data\\sprite\\이팩트\\손수레3.spr", "data\\sprite\\이팩트\\손수레3.act"},
-               {"data\\sprite\\이팩트\\손수레3.spr", "data\\sprite\\이팩트\\베이비손수레3.act"}},
-    CartRecipe{{"data\\sprite\\이팩트\\손수레4.spr", "data\\sprite\\이팩트\\손수레4.act"},
-               {"data\\sprite\\이팩트\\손수레4.spr", "data\\sprite\\이팩트\\베이비손수레4.act"}},
+        {"data\\sprite\\이팩트\\손수레5.spr", "data\\sprite\\이팩트\\손수레5.act", 6},
+        {"data\\sprite\\이팩트\\손수레5베이비.spr", "data\\sprite\\이팩트\\손수레5베이비.act", 6}},
     CartRecipe{
-        {"data\\sprite\\이팩트\\손수레5.spr", "data\\sprite\\이팩트\\손수레5.act"},
-        {"data\\sprite\\이팩트\\손수레5베이비.spr", "data\\sprite\\이팩트\\손수레5베이비.act"}},
+        {"data\\sprite\\이팩트\\손수레6.spr", "data\\sprite\\이팩트\\손수레6.act", 7},
+        {"data\\sprite\\이팩트\\손수레6베이비.spr", "data\\sprite\\이팩트\\손수레6베이비.act", 7}},
     CartRecipe{
-        {"data\\sprite\\이팩트\\손수레6.spr", "data\\sprite\\이팩트\\손수레6.act"},
-        {"data\\sprite\\이팩트\\손수레6베이비.spr", "data\\sprite\\이팩트\\손수레6베이비.act"}},
+        {"data\\sprite\\이팩트\\손수레7.spr", "data\\sprite\\이팩트\\손수레7.act", 8},
+        {"data\\sprite\\이팩트\\손수레7베이비.spr", "data\\sprite\\이팩트\\손수레7베이비.act", 8}},
     CartRecipe{
-        {"data\\sprite\\이팩트\\손수레7.spr", "data\\sprite\\이팩트\\손수레7.act"},
-        {"data\\sprite\\이팩트\\손수레7베이비.spr", "data\\sprite\\이팩트\\손수레7베이비.act"}},
+        {"data\\sprite\\이팩트\\손수레8.spr", "data\\sprite\\이팩트\\손수레8.act", 9},
+        {"data\\sprite\\이팩트\\손수레8베이비.spr", "data\\sprite\\이팩트\\손수레8베이비.act", 9}},
     CartRecipe{
-        {"data\\sprite\\이팩트\\손수레8.spr", "data\\sprite\\이팩트\\손수레8.act"},
-        {"data\\sprite\\이팩트\\손수레8베이비.spr", "data\\sprite\\이팩트\\손수레8베이비.act"}},
-    CartRecipe{{"data\\sprite\\이팩트\\선물상자카트.spr", "data\\sprite\\이팩트\\선물상자카트.act"},
-               {"data\\sprite\\이팩트\\선물상자카트_미니.spr",
-                "data\\sprite\\이팩트\\선물상자카트_미니.act"}},
-    CartRecipe{{"data\\sprite\\이팩트\\포링싣은카트.spr", "data\\sprite\\이팩트\\포링싣은카트.act"},
-               {"data\\sprite\\이팩트\\포링싣은카트_미니.spr",
-                "data\\sprite\\이팩트\\포링싣은카트_미니.act"}},
+        {"data\\sprite\\이팩트\\선물상자카트.spr", "data\\sprite\\이팩트\\선물상자카트.act", 10},
+        {"data\\sprite\\이팩트\\선물상자카트_미니.spr",
+         "data\\sprite\\이팩트\\선물상자카트_미니.act", 10}},
     CartRecipe{
-        {"data\\sprite\\이팩트\\포링카트.spr", "data\\sprite\\이팩트\\포링카트.act"},
-        {"data\\sprite\\이팩트\\포링카트_미니.spr", "data\\sprite\\이팩트\\포링카트_미니.act"}},
+        {"data\\sprite\\이팩트\\포링싣은카트.spr", "data\\sprite\\이팩트\\포링싣은카트.act", 11},
+        {"data\\sprite\\이팩트\\포링싣은카트_미니.spr",
+         "data\\sprite\\이팩트\\포링싣은카트_미니.act", 11}},
     CartRecipe{
-        {"data\\sprite\\이팩트\\마도카트.spr", "data\\sprite\\이팩트\\마도카트.act"},
-        {"data\\sprite\\이팩트\\마도카트_미니.spr", "data\\sprite\\이팩트\\마도카트_미니.act"}},
+        {"data\\sprite\\이팩트\\포링카트.spr", "data\\sprite\\이팩트\\포링카트.act", 12},
+        {"data\\sprite\\이팩트\\포링카트_미니.spr", "data\\sprite\\이팩트\\포링카트_미니.act", 12}},
+    CartRecipe{
+        {"data\\sprite\\이팩트\\마도카트.spr", "data\\sprite\\이팩트\\마도카트.act", 13},
+        {"data\\sprite\\이팩트\\마도카트_미니.spr", "data\\sprite\\이팩트\\마도카트_미니.act", 13}},
 };
+
+// La table à plat : l'adulte puis le bébé de chaque rang.
+constexpr std::array<CartArt, 2 * kRecipes.size()> kAllCartArts = [] {
+  std::array<CartArt, 2 * kRecipes.size()> flat{};
+  for (std::size_t rank = 0; rank < kRecipes.size(); ++rank) {
+    flat[2 * rank] = kRecipes[rank].adult;
+    flat[(2 * rank) + 1] = kRecipes[rank].baby;
+  }
+  return flat;
+}();
 
 constexpr std::uint32_t kOptionHide = 0x2;
 constexpr std::uint32_t kOptionCloak = 0x4;
@@ -179,6 +193,18 @@ std::optional<CartArt> CartListArtFor(std::int32_t cart_type) noexcept {
     return std::nullopt;
   }
   return kRecipes[static_cast<std::size_t>(cart_type)].adult;
+}
+
+std::span<const CartArt> AllCartArts() noexcept { return kAllCartArts; }
+
+std::optional<CartArt> CartArtOfDyeKey(std::uint32_t dye_key) noexcept {
+  if (dye_key == kSuperNoviceCartDyeKey) {
+    return kRecipes.front().adult;
+  }
+  if (dye_key == 0 || dye_key >= kRecipes.size()) {
+    return std::nullopt;
+  }
+  return kRecipes[dye_key].adult;
 }
 
 bool CarriesCart(std::int32_t cart_type, std::uint32_t option) noexcept {

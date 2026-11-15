@@ -11,6 +11,7 @@
 #include "ro/sim/movement.h"
 #include "ro/sim/world.h"
 
+#include "world/actor_styles.h"
 #include "world/actor_view.h"
 #include "world/hit_popup_rules.h"
 
@@ -86,9 +87,11 @@ void ActorFalcons::Census(const FalconFrame& frame) {
     // sur le style de corps pour un joueur, sur le métier montré sinon.
     Kept born;
     born.falcon = ro::render::BornFalcon(MasterAt(frame, actor, frame.now_ms));
-    born.art = ArtFor(*frame.vfs, ComposedAsPlayer(actor)
-                                      ? ro::render::PlayerFalconArtFor(actor.look.body_style)
-                                      : ro::render::FalconArtFor(actor.look.job, actor.option));
+    const ro::render::FalconArt wanted =
+        ComposedAsPlayer(actor) ? ro::render::PlayerFalconArtFor(actor.look.body_style)
+                                : ro::render::FalconArtFor(actor.look.job, actor.option);
+    born.art = ArtFor(*frame.vfs, wanted);
+    born.dye_key = wanted.dye_key;
     born.launched_ms = frame.now_ms;
     falcons_.emplace(id, std::move(born));
   }
@@ -220,10 +223,17 @@ std::span<const ro::render::DrawnActor> ActorFalcons::Update(const FalconFrame& 
         kept.falcon.frame >= animation.actions()[action].frames.size()) {
       continue;
     }
+    // L'OISEAU PREND LA TEINTURE DE SON MAÎTRE, sous la clé de son image.
+    ro::render::SpriteImageKey image{&*kept.art->sprite};
+    if (frame.wardrobe != nullptr && frame.styles != nullptr) {
+      image = frame.wardrobe->AccessoryImage(frame.styles->Worn(id), *kept.art->sprite,
+                                             ro::render::StyleLayer::kFalcon, kept.dye_key);
+    }
     for (const ro::render::SpriteQuad& quad :
          ro::render::BuildFrameQuads(*kept.art->sprite, animation, action, kept.falcon.frame)) {
-      kept.frame.sources.push_back(
-          ro::render::SpriteImageKey{&*kept.art->sprite, nullptr, quad.section, quad.image_index});
+      image.section = quad.section;
+      image.image_index = quad.image_index;
+      kept.frame.sources.push_back(image);
       kept.frame.quads.push_back(quad);
     }
     if (kept.frame.quads.empty()) {

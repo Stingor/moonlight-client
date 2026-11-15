@@ -231,11 +231,18 @@ void StyleView::RefreshDoll(const ro::render::ActorLook& look,
   // attaque. Il ne s'assoit pas : sa pose « assis » est le repos.
   constexpr std::array<std::size_t, ro::ui::kPaletteDollPoses.size()> kCompanionPoses = {0, 1, 0,
                                                                                          2};
+  // L'OISEAU plane ou vole ; LE CHARIOT n'a qu'une pose, qui roule.
+  constexpr std::array<std::size_t, ro::ui::kPaletteDollPoses.size()> kFalconPoses = {0, 1, 0, 0};
+  constexpr std::array<std::size_t, ro::ui::kPaletteDollPoses.size()> kCartPoses = {0, 0, 0, 0};
   const auto pose_rank = static_cast<std::size_t>(
       std::clamp(state.doll.pose, 0, static_cast<int>(ro::ui::kPaletteDollPoses.size()) - 1));
-  const std::size_t pose = tab != nullptr && tab->companion_look.has_value()
-                               ? kCompanionPoses[pose_rank]
-                               : ro::ui::kPaletteDollPoses[pose_rank];
+  std::size_t pose = ro::ui::kPaletteDollPoses[pose_rank];
+  if (tab != nullptr && tab->companion_look.has_value()) {
+    const ro::ui::PaletteTabKind kind = tab->shown.kind;
+    pose = kind == ro::ui::PaletteTabKind::kFalcon ? kFalconPoses[pose_rank]
+           : kind == ro::ui::PaletteTabKind::kCart ? kCartPoses[pose_rank]
+                                                   : kCompanionPoses[pose_rank];
+  }
   // LES TEINTURES DE CALQUES : ce qu'on compose, ou ce qu'on porte tant que
   // « avant / après » est tenu.
   if (shown_key_.source == kShowsWorn) {

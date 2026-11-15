@@ -4,6 +4,8 @@
 #include <array>
 #include <cmath>
 #include <numbers>
+#include <optional>
+#include <span>
 
 #include "ro/render/shown_job.h"
 #include "ro/render/sprite_frame.h"
@@ -29,19 +31,26 @@ constexpr std::uint32_t kJobWindHawkRiding = 4278;
 // La tenue alternative du ranger, que le style de corps peut porter.
 constexpr std::uint32_t kRangerAlternateOutfit = 4337;
 
-constexpr FalconArt kHawk = {"data\\sprite\\이팩트\\매.spr", "data\\sprite\\이팩트\\매.act"};
-constexpr FalconArt kSniperHawk = {"data\\sprite\\이팩트\\매2.spr",
-                                   "data\\sprite\\이팩트\\매2.act"};
+constexpr FalconArt kHawk = {"data\\sprite\\이팩트\\매.spr", "data\\sprite\\이팩트\\매.act",
+                             kFalconDyeHawk};
+constexpr FalconArt kSniperHawk = {"data\\sprite\\이팩트\\매2.spr", "data\\sprite\\이팩트\\매2.act",
+                                   kFalconDyeSniperHawk};
 constexpr FalconArt kBabyHawk = {"data\\sprite\\이팩트\\매.spr",
-                                 "data\\sprite\\이팩트\\베이비매.act"};
+                                 "data\\sprite\\이팩트\\베이비매.act", kFalconDyeHawk};
 constexpr FalconArt kPungus = {"data\\sprite\\몬스터\\demon_pungus.spr",
-                               "data\\sprite\\몬스터\\demon_pungus.act"};
+                               "data\\sprite\\몬스터\\demon_pungus.act", kFalconDyePungus};
 constexpr FalconArt kExplosion = {"data\\sprite\\몬스터\\explosion.spr",
-                                  "data\\sprite\\몬스터\\explosion.act"};
-constexpr FalconArt kLude = {"data\\sprite\\몬스터\\lude.spr", "data\\sprite\\몬스터\\lude.act"};
-constexpr FalconArt kOwl = {"data\\sprite\\이팩트\\OWL.spr", "data\\sprite\\이팩트\\OWL.act"};
+                                  "data\\sprite\\몬스터\\explosion.act", kFalconDyeExplosion};
+constexpr FalconArt kLude = {"data\\sprite\\몬스터\\lude.spr", "data\\sprite\\몬스터\\lude.act",
+                             kFalconDyeLude};
+constexpr FalconArt kOwl = {"data\\sprite\\이팩트\\OWL.spr", "data\\sprite\\이팩트\\OWL.act",
+                            kFalconDyeOwl};
 constexpr FalconArt kWindHawk = {"data\\sprite\\이팩트\\WINDHAWK_HAWK.spr",
-                                 "data\\sprite\\이팩트\\WINDHAWK_HAWK.act"};
+                                 "data\\sprite\\이팩트\\WINDHAWK_HAWK.act", kFalconDyeWindHawk};
+
+// Tous les oiseaux que les recettes savent montrer, chacun une fois.
+constexpr auto kAllFalconArts = std::to_array<FalconArt>(
+    {kHawk, kSniperHawk, kBabyHawk, kPungus, kExplosion, kLude, kOwl, kWindHawk});
 
 // Les compétences de dégâts dont le coup envoie le faucon de l'auteur.
 constexpr std::uint32_t kSkillBlitzBeat = 129;       // HT_BLITZBEAT
@@ -137,6 +146,13 @@ void Flap(Falcon& falcon, std::size_t rest_frame_count) noexcept {
 std::uint32_t CompanionShownJob(std::uint32_t job_id, std::uint32_t option) noexcept {
   const std::uint32_t shown = ShownJobFor(job_id, option);
   return IsCostumeJob(shown) ? kShownCostumeJob : shown;
+}
+
+std::span<const FalconArt> AllFalconArts() noexcept { return kAllFalconArts; }
+
+std::optional<FalconArt> FalconArtOfDyeKey(std::uint32_t dye_key) noexcept {
+  const auto found = std::ranges::find(kAllFalconArts, dye_key, &FalconArt::dye_key);
+  return found != kAllFalconArts.end() ? std::optional(*found) : std::nullopt;
 }
 
 FalconArt FalconArtFor(std::uint32_t job_id, std::uint32_t option) noexcept {
