@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
 #include <map>
 
 #include "ro/render/terrain_relief.h"
@@ -108,9 +109,35 @@ std::vector<std::uint8_t> FindInvisibleTiles(const GndMap& gnd,
   return invisible;
 }
 
-TerrainMesh BuildTerrainMesh(const GndMap& gnd, const LightmapAtlas& atlas,
-                             std::span<const std::uint8_t> invisible_tiles,
-                             std::int32_t subdivisions) {
+namespace {
+
+// L'emprise d'une carte dont le sol n'a aucune surface — tout son plancher est
+// fait de modèles. Sans elle, les bornes se réduiraient à l'origine, et le
+// cadrage comme l'ombre du soleil viseraient un point.
+void LayFootprintBounds(const GndMap& gnd, TerrainMesh& mesh) {
+  if (gnd.cubes().empty()) {
+    return;
+  }
+  float lowest_file_height = std::numeric_limits<float>::max();
+  float highest_file_height = std::numeric_limits<float>::lowest();
+  for (const formats::GndCube& cube : gnd.cubes()) {
+    for (const float corner : cube.corner_height) {
+      lowest_file_height = std::min(lowest_file_height, corner);
+      highest_file_height = std::max(highest_file_height, corner);
+    }
+  }
+  // Le repère des sommets : les rangées de cubes s'empilent en Z à rebours, du
+  // premier cube à `depth` jusqu'au dernier à une largeur de cube ; la hauteur
+  // du fichier descend quand celle du monde monte.
+  const float depth = static_cast<float>(gnd.height()) * kWorldUnitsPerCube;
+  mesh.bounds_min = {0.0F, -highest_file_height, kWorldUnitsPerCube};
+  mesh.bounds_max = {static_cast<float>(gnd.width()) * kWorldUnitsPerCube, -lowest_file_height,
+                     depth + kWorldUnitsPerCube};
+}
+
+TerrainMesh BuildTerrainFaces(const GndMap& gnd, const LightmapAtlas& atlas,
+                              std::span<const std::uint8_t> invisible_tiles,
+                              std::int32_t subdivisions) {
   const TerrainFaces faces(gnd, atlas, invisible_tiles);
   if (subdivisions > kFlatGroundSubdivisions) {
     return BuildRoundedTerrainMesh(gnd, faces, invisible_tiles, subdivisions);
@@ -137,6 +164,18 @@ TerrainMesh BuildTerrainMesh(const GndMap& gnd, const LightmapAtlas& atlas,
     }
   }
   return AssembleTerrainMesh(by_texture);
+}
+
+}  // namespace
+
+TerrainMesh BuildTerrainMesh(const GndMap& gnd, const LightmapAtlas& atlas,
+                             std::span<const std::uint8_t> invisible_tiles,
+                             std::int32_t subdivisions) {
+  TerrainMesh mesh = BuildTerrainFaces(gnd, atlas, invisible_tiles, subdivisions);
+  if (mesh.empty()) {
+    LayFootprintBounds(gnd, mesh);
+  }
+  return mesh;
 }
 
 float GroundHeightAt(const formats::GndMap& gnd, float world_x, float world_z) {

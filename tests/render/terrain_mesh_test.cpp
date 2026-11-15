@@ -242,9 +242,12 @@ TEST_CASE("Terrain : un cube sans face du dessus ne produit rien", "[render][ter
   const TerrainMesh mesh = MeshOf(options);
   CHECK(mesh.empty());
   CHECK(mesh.surfaces.empty());
-  // Une emprise nulle plutôt que les sentinelles de calcul, qui donneraient un
-  // centre absurde à l'appelant.
-  CHECK(mesh.center() == std::array<float, 3>{0.0F, 0.0F, 0.0F});
+  // L'emprise de la carte plutôt que les sentinelles de calcul : un sol fait
+  // de modèles se cadre comme un autre. Les hauteurs du fichier vont de 1 à 16
+  // et descendent quand celles du monde montent.
+  CHECK(mesh.bounds_min == std::array<float, 3>{0.0F, -16.0F, kWorldUnitsPerCube});
+  CHECK(mesh.bounds_max ==
+        std::array<float, 3>{2.0F * kWorldUnitsPerCube, -1.0F, 3.0F * kWorldUnitsPerCube});
 }
 
 TEST_CASE("Terrain : les sommets sont groupés par texture", "[render][terrain]") {

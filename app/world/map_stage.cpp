@@ -97,10 +97,8 @@ ro::core::Result<MapStage> LoadMapStage(ro::vfs::Vfs& vfs, std::string_view map_
   if (!scene) {
     return std::unexpected(scene.error());
   }
-  if (scene->terrain.empty()) {
-    return ro::core::Fail(ro::core::ErrorCode::kCorruptData,
-                          std::string(map_name) + " : la carte ne produit aucune géométrie");
-  }
+  // UN SOL SANS SURFACE EST UNE CARTE VALIDE : celui de dali n'a ni texture ni
+  // carreau, tout son plancher est fait de modèles.
 
   // La scène ne se construit pas vide — sa carte de hauteurs n'a pas de valeur
   // par défaut —, d'où l'agrégation d'un seul tenant.
