@@ -7,6 +7,7 @@
 
 #include "ro/core/error.h"
 #include "ro/formats/image.h"
+#include "ro/render/actor_layers.h"
 #include "ro/render/actor_sprite.h"
 #include "ro/render/actor_wardrobe.h"
 
@@ -135,6 +136,10 @@ struct DollShot {
   // [kSmallestDollGifScale, kLargestDollGifScale].
   int scale = kSmallestDollGifScale;
   int margin_px = kDollGifMarginPx;
+  // LES PARTIES PEINTES, toutes par défaut. Les autres se composent quand même
+  // — le corps place la tête, la tête ses coiffes —, puis sortent de chaque
+  // pose AVANT la mesure de l'enveloppe : l'image se rogne sur ce qui reste.
+  ActorPartSet parts = kAllActorParts;
 };
 
 // LES POSES COMPOSÉES, une par instant du plan, et leur enveloppe commune.

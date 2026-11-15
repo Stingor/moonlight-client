@@ -5,6 +5,8 @@
 #include <cstdint>
 #include <numeric>
 #include <optional>
+#include <utility>
+#include <vector>
 
 #include <glm/glm.hpp>
 
@@ -47,6 +49,28 @@ struct Cycle {
 // tiennent sur son image zéro.
 [[nodiscard]] bool BodyPlays(const DollClocks& clocks) {
   return clocks.body_plays && clocks.body_frames > 1 && Believable(clocks.body_frame_ms);
+}
+
+// Ne garde de la pose que les quads de ces parties, leurs sources et leurs
+// parties avec eux : les trois listes vont du même pas.
+void KeepParts(ComposedActor& pose, ActorPartSet parts) {
+  std::vector<SpriteQuad> quads;
+  std::vector<SpriteImageKey> sources;
+  std::vector<ActorPart> kept;
+  for (std::size_t index = 0; index < pose.quads.size(); ++index) {
+    const ActorPart part = PartOfQuad(pose, index);
+    if ((parts & PartBit(part)) == 0) {
+      continue;
+    }
+    quads.push_back(pose.quads[index]);
+    if (index < pose.sources.size()) {
+      sources.push_back(pose.sources[index]);
+    }
+    kept.push_back(part);
+  }
+  pose.quads = std::move(quads);
+  pose.sources = std::move(sources);
+  pose.parts = std::move(kept);
 }
 
 [[nodiscard]] std::vector<Cycle> CyclesOf(const DollClocks& clocks) {
@@ -270,6 +294,9 @@ core::Result<DollPoses> ComposeDollPoses(ActorOutfit& outfit, const DollShot& sh
     }
     poses.push_back(
         outfit.Composed(shot.animation, shot.direction, elapsed_ms, /*loop=*/true, held));
+    if (shot.parts != kAllActorParts) {
+      KeepParts(poses.back(), shot.parts);
+    }
   }
 
   bool grown = false;
