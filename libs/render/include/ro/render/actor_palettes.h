@@ -53,7 +53,15 @@ class ActorPalettes {
     // L'emploi des index du sprite, que garde le cache : de quoi mesurer le
     // reste.
     const std::array<int, formats::kPaletteEntryCount>* usage = nullptr;
+    // LA PEAU DU CORPS, cherchée sur la palette du sprite comme chez un
+    // humain : voir `DetectBodySkin`. Un Doram n'en a pas : `BodySkin` l'écarte.
+    SkinSet human_skin;
   };
+
+  // L'ensemble de peau d'un corps pour un porteur de cette race.
+  [[nodiscard]] static SkinSet BodySkin(const Analysis& analysis, SkinRace race) {
+    return race == SkinRace::kHuman ? analysis.human_skin : SkinSet{};
+  }
 
   // Ce qu'un style peint sur une pièce, et son numéro de série.
   struct StyledPalette {

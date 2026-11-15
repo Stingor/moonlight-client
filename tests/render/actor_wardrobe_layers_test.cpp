@@ -99,13 +99,14 @@ std::vector<std::uint8_t> LayeredSpriteBytes() {
     const auto level = static_cast<std::uint8_t>(240 - shade * 25);
     options.palette[kRampFirst + shade] = {level, static_cast<std::uint8_t>(level / 6), 0};
   }
-  // Le dégradé chair, du clair au foncé.
+  // Le dégradé chair des sprites humains, du clair au foncé : c'est à ses
+  // couleurs qu'un corps se reconnaît une peau.
   constexpr std::array<std::array<std::uint8_t, 3>, kSkinShades> kSkin = {{{255, 225, 207},
-                                                                           {240, 200, 180},
-                                                                           {225, 175, 155},
-                                                                           {200, 140, 120},
-                                                                           {175, 110, 95},
-                                                                           {150, 85, 75},
+                                                                           {255, 198, 178},
+                                                                           {246, 174, 159},
+                                                                           {220, 144, 132},
+                                                                           {189, 115, 107},
+                                                                           {158, 86, 82},
                                                                            {130, 63, 59}}};
   for (std::uint8_t shade = 0; shade < kSkinShades; ++shade) {
     options.palette[kSkinFirst + shade] = {kSkin[shade][0], kSkin[shade][1], kSkin[shade][2]};

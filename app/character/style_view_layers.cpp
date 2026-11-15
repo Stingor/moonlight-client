@@ -458,7 +458,7 @@ void StyleView::ReadPipette(const ro::ui::PaletteEditorState& state) {
     view_.pipette_ramp = view_.pipette.piece;
     return;
   }
-  const std::optional<SkinLine> skin = SkinLineUnder(pick->part, pick->index);
+  const std::optional<SkinLine> skin = SkinLineUnder(pick->part, pick->index, doll_->body().skin);
   if (skin.has_value() && SkinAdjustable(*skin)) {
     found = {.found = true,
              .tab = *skin == SkinLine::kFace ? PaletteTabKind::kHair : PaletteTabKind::kBody,

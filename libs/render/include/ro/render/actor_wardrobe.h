@@ -244,6 +244,9 @@ class ActorWardrobe {
     // classe de teinte. Pour un corps, les pièces sont les huit de la v7 et la
     // suite ; pour une tête, la peau est hors du reste.
     RestMeasure rest;
+    // La peau de ce sprite : celle que son corps range où il veut (voir
+    // `DetectBodySkin`), l'ensemble fixe pour une tête. Vide sans peau.
+    SkinSet skin;
   };
   [[nodiscard]] BodyRamps BodyRampsFor(const ActorLook& look);
 

@@ -330,7 +330,26 @@ struct ExactHsv {
   return degrees >= kDegreesInTurn ? degrees - kDegreesInTurn : degrees;
 }
 
-constexpr std::array<std::uint8_t, 7> kHumanSkin = {129, 130, 131, 132, 133, 134, 135};
+constexpr std::array<std::uint8_t, kSkinLength> kHumanSkin = {129, 130, 131, 132, 133, 134, 135};
+
+// LE DÉGRADÉ CHAIR DE RÉFÉRENCE, du clair au foncé : celui que portent les
+// corps humains et les têtes, en rouge, vert, bleu.
+constexpr std::array<std::array<int, 3>, kSkinLength> kHumanSkinColors = {{
+    {255, 225, 207},
+    {255, 198, 178},
+    {246, 174, 159},
+    {220, 144, 132},
+    {189, 115, 107},
+    {158, 86, 82},
+    {130, 63, 59},
+}};
+
+[[nodiscard]] SkinSet SkinFrom(std::span<const std::uint8_t> indices) {
+  SkinSet skin;
+  skin.count = static_cast<std::uint8_t>(std::min(indices.size(), kSkinLength));
+  std::copy_n(indices.begin(), skin.count, skin.entries.begin());
+  return skin;
+}
 
 }  // namespace
 
@@ -497,6 +516,51 @@ std::vector<PaletteRamp> DetectBodyContinuation(const formats::Palette& palette,
 std::span<const std::uint8_t> SkinIndices(SkinRace race) {
   return race == SkinRace::kHuman ? std::span<const std::uint8_t>(kHumanSkin)
                                   : std::span<const std::uint8_t>();
+}
+
+SkinSet HeadSkin(SkinRace race) { return SkinFrom(SkinIndices(race)); }
+
+SkinSet DetectBodySkin(const formats::Palette& sprite_palette, std::span<const int> usage,
+                       SkinRace race) {
+  if (race != SkinRace::kHuman || usage.size() < formats::kPaletteEntryCount) {
+    return {};
+  }
+  struct Candidate {
+    int gap = 0;
+    int pixels = 0;
+    std::size_t start = 0;
+  };
+  std::optional<Candidate> best;
+  // L'index zéro est le transparent : aucune fenêtre ne le prend.
+  for (std::size_t start = 1; start + kSkinLength <= formats::kPaletteEntryCount; ++start) {
+    Candidate candidate{.start = start};
+    for (std::size_t offset = 0; offset < kSkinLength; ++offset) {
+      const std::size_t index = start + offset;
+      candidate.pixels += usage[index];
+      const auto& entry = sprite_palette.entries[index];
+      for (std::size_t channel = 0; channel < kHumanSkinColors[offset].size(); ++channel) {
+        candidate.gap +=
+            std::abs(static_cast<int>(entry[channel]) - kHumanSkinColors[offset][channel]);
+      }
+    }
+    if (candidate.pixels == 0) {
+      continue;
+    }
+    // La plus basse l'emporte à égalité : on ne remplace que sur strictement mieux.
+    if (!best.has_value() || candidate.gap < best->gap ||
+        (candidate.gap == best->gap && candidate.pixels > best->pixels)) {
+      best = candidate;
+    }
+  }
+  if (!best.has_value() || best->gap > kBodySkinTolerance) {
+    return {};
+  }
+  SkinSet skin;
+  skin.count = static_cast<std::uint8_t>(kSkinLength);
+  for (std::size_t offset = 0; offset < kSkinLength; ++offset) {
+    skin.entries[offset] = static_cast<std::uint8_t>(best->start + offset);
+  }
+  return skin;
 }
 
 std::optional<LayerRampProfile> LayerProfile(std::uint8_t profile_number, RampLayer layer,

@@ -404,6 +404,7 @@ add_executable(ro_tests
     render/decor_vignette_test.cpp
     render/decor_vignette_cache_test.cpp
     render/actor_palettes_test.cpp
+    render/body_skin_test.cpp
     render/palette_rest_test.cpp
     render/actor_pick_test.cpp
     render/actor_effect_body_test.cpp

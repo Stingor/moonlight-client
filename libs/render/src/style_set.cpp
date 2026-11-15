@@ -40,7 +40,7 @@ HueClassAdjusts LayerHueClasses(const LayerDye& dye) {
 
 void ApplyBodyMore(formats::Palette& painted, const formats::Palette& base,
                    std::span<const PaletteRamp> v7, std::span<const PaletteRamp> continuation,
-                   SkinRace race, const LayerDye& more) {
+                   std::span<const std::uint8_t> skin, const LayerDye& more) {
   // ⚠ LA SUITE PART DE LA BASE, comme la recette : ses rampes ne recouvrent
   // aucune des huit premières, et chacune se calcule sur ses propres index.
   const formats::Palette continued = ApplyRecipe(base, continuation, BodyContinuationRecipe(more));
@@ -54,7 +54,7 @@ void ApplyBodyMore(formats::Palette& painted, const formats::Palette& base,
       cover[index] = true;
     }
   }
-  Cover(cover, SkinIndices(race));
+  Cover(cover, skin);
   ApplyRest(painted, base, cover, more.rest);
 }
 
@@ -135,9 +135,9 @@ bool SkinAdjustable(std::string_view body_sprite_path) {
       [body_sprite_path](std::string_view ending) { return body_sprite_path.ends_with(ending); });
 }
 
-void ApplySkin(formats::Palette& painted, const formats::Palette& base, SkinRace race,
-               const RampAdjust& adjust) {
-  for (const std::uint8_t index : SkinIndices(race)) {
+void ApplySkin(formats::Palette& painted, const formats::Palette& base,
+               std::span<const std::uint8_t> skin, const RampAdjust& adjust) {
+  for (const std::uint8_t index : skin) {
     if (adjust.neutral()) {
       painted.entries[index] = base.entries[index];
     } else {

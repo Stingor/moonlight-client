@@ -260,6 +260,50 @@ struct LayerRampProfile {
 // visage reste une pièce de sa tête.
 [[nodiscard]] std::span<const std::uint8_t> SkinIndices(SkinRace race);
 
+// Le dégradé chair humain compte sept index consécutifs.
+inline constexpr std::size_t kSkinLength = 7;
+
+// L'ENSEMBLE DE PEAU D'UN SPRITE : au plus `kSkinLength` index consécutifs,
+// vide quand le sprite n'a pas de peau.
+struct SkinSet {
+  std::array<std::uint8_t, kSkinLength> entries{};
+  std::uint8_t count = 0;
+
+  [[nodiscard]] std::span<const std::uint8_t> indices() const noexcept {
+    return std::span<const std::uint8_t>(entries).first(count);
+  }
+  [[nodiscard]] bool empty() const noexcept { return count == 0; }
+  [[nodiscard]] friend bool operator==(const SkinSet&, const SkinSet&) = default;
+};
+
+// L'ensemble fixe d'une tête : celui de `SkinIndices(race)`.
+[[nodiscard]] SkinSet HeadSkin(SkinRace race);
+
+// L'ENSEMBLE DE PEAU D'UN CORPS, cherché dans la palette de SON sprite.
+//
+// 🔴 UN CORPS NE RANGE PAS SA PEAU À UN INDEX FIXE. D'un sprite à l'autre, le
+// même dégradé chair occupe 129 à 135, 33 à 39, 49 à 55 ou 17 à 23 : le corps
+// la porte où son graphiste l'a posée. On cherche donc, parmi les fenêtres de
+// sept index consécutifs dont un au moins est peint, celle dont les couleurs
+// s'écartent le moins du dégradé chair de référence — la somme des écarts
+// absolus, canal par canal, en entiers. Ex æquo : la plus peinte, puis la plus
+// basse.
+//
+// Au-delà de `kBodySkinTolerance`, le corps n'a pas de peau : une armure
+// intégrale, un loup-garou. L'ensemble est alors vide, et la peau ne s'y pose
+// pas. Celui du Doram l'est toujours : voir `SkinIndices`.
+//
+// ⚠ LA PALETTE EST CELLE DU SPRITE, jamais la base fusionnée : la peau ne
+// dépend pas de la teinte officielle portée, et tous les clients la trouvent
+// au même endroit.
+[[nodiscard]] SkinSet DetectBodySkin(const formats::Palette& sprite_palette,
+                                     std::span<const int> usage, SkinRace race);
+
+// L'écart le plus grand qu'on accepte encore pour une peau, sur les sept index
+// et les trois canaux. Les corps peints de la peau de référence s'en écartent
+// de 9 au plus ; ceux qui n'en ont pas, de 200 au moins.
+inline constexpr int kBodySkinTolerance = 64;
+
 // La détection d'un calque : celle de `DetectRamps`, réglée par `profile`.
 [[nodiscard]] std::vector<PaletteRamp> DetectLayerRamps(const formats::Palette& palette,
                                                         std::span<const int> usage,

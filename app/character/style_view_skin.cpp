@@ -44,8 +44,8 @@ constexpr int kFullValue = 255;
 
 // La couleur de la peau du dessin, réglée.
 [[nodiscard]] std::array<std::uint8_t, 3> Painted(const ro::formats::Palette& base,
+                                                  const ro::render::PaletteRamp& ramp,
                                                   const ro::render::RampAdjust& adjust) {
-  const ro::render::PaletteRamp ramp = SkinRamp();
   const std::array<std::uint8_t, 3> drawn = ro::render::RampColor(base, ramp);
   if (adjust.neutral()) {
     return drawn;
@@ -110,6 +110,7 @@ void StyleView::RefreshSkinLine() {
     return;
   }
   const ro::formats::Palette& base = doll_->body().base;
+  const ro::render::PaletteRamp ramp = SkinRamp(doll_->body().skin);
   const ro::render::RampAdjust face = SkinAdjust(SkinLine::kFace);
   const ro::render::RampAdjust own = *line == SkinLine::kBody ? SkinAdjust(SkinLine::kBody) : face;
   const bool body = *line == SkinLine::kBody;
@@ -121,8 +122,8 @@ void StyleView::RefreshSkinLine() {
   view_.skin.own = body && !follows_face;
   view_.skin.blocked = ToBlock(SkinRefusalOf(*line));
   view_.skin.adjust = own;
-  view_.skin.base_color = ToColor(ro::render::RampColor(base, SkinRamp()));
-  view_.skin.color = ToColor(Painted(base, follows_face ? face : own));
+  view_.skin.base_color = ToColor(ro::render::RampColor(base, ramp));
+  view_.skin.color = ToColor(Painted(base, ramp, follows_face ? face : own));
 }
 
 void StyleView::ApplySkinLine(const ro::ui::PaletteEditorAction& asked) {
@@ -132,9 +133,10 @@ void StyleView::ApplySkinLine(const ro::ui::PaletteEditorAction& asked) {
   }
   const LayerAt at = SkinAt(*line);
   const ro::formats::Palette& base = doll_->body().base;
-  const auto reach = [&base](std::array<std::uint8_t, 3> target) {
+  const ro::render::PaletteRamp ramp = SkinRamp(doll_->body().skin);
+  const auto reach = [&base, &ramp](std::array<std::uint8_t, 3> target) {
     return std::array<LayerEdit, 1>{
-        LayerEdit{.rank = 0, .adjust = ro::render::AdjustToReach(base, SkinRamp(), target)}};
+        LayerEdit{.rank = 0, .adjust = ro::render::AdjustToReach(base, ramp, target)}};
   };
   if (asked.skin_tone >= 0 && static_cast<std::size_t>(asked.skin_tone) < kSkinTones.size()) {
     layers_.Set(at, ro::render::kLayerProfileNumber,

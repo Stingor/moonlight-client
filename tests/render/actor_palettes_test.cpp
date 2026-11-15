@@ -313,7 +313,7 @@ TEST_CASE("Palettes : le reste du corps évite pièces et peau, les retouches pa
           "[render][palette][rest]") {
   constexpr std::uint32_t kBodyKey = 0xC0FFEE;
   // Un index de la vingtième pièce, impaire donc peu peinte : hors des douze
-  // que règlent la v7 et la suite, hors de la peau (129 à 135).
+  // que règlent la v7 et la suite.
   constexpr std::uint8_t kRestIndex = 115;
   constexpr std::uint8_t kSkinIndex = 130;
   constexpr std::array<std::uint8_t, 3> kExact = {10, 200, 30};
@@ -351,10 +351,10 @@ TEST_CASE("Palettes : le reste du corps évite pièces et peau, les retouches pa
     CHECK(painted->palette.entries[index][1] == kExact[1]);
     CHECK(painted->palette.entries[index][2] == kExact[2]);
   }
-  // Un autre index de peau a pris la peau, pas le reste.
-  Palette skinned = base;
-  ro::render::ApplySkin(skinned, base, ro::render::SkinRace::kHuman, skin.adjusts[0]);
-  CHECK(painted->palette.entries[kSkinIndex + 1] == skinned.entries[kSkinIndex + 1]);
+  // Ce corps ne porte aucun dégradé chair : il n'a pas de peau, et 129 à 135 y
+  // sont un index comme un autre, que le reste atteint.
+  CHECK(analysis.human_skin.empty());
+  CHECK(painted->palette.entries[kSkinIndex + 1] != base.entries[kSkinIndex + 1]);
   // L'index zéro reste le transparent.
   CHECK(painted->palette.entries[0] == base.entries[0]);
 }
@@ -380,4 +380,89 @@ TEST_CASE("Palettes : la palette toute faite reçoit la suite et le reste du cor
       ActorPalettes::Piece{.layer = ro::render::StyleLayer::kBody, .key = kBodyKey});
   REQUIRE(painted != nullptr);
   CHECK(painted->palette.entries[kRestIndex] != base.entries[kRestIndex]);
+}
+
+// ── LA PEAU D'UN CORPS, LÀ OÙ SON SPRITE LA RANGE ───────────────────────────
+
+namespace {
+
+constexpr std::size_t kFleshFirst = 33;
+constexpr std::size_t kHeadSkinFirst = 129;
+constexpr std::size_t kSkinRun = 7;
+
+// Un corps qui range sa peau en 33 à 39, et peint en 129 à 135 un dégradé
+// bleu : un vêtement, là où une tête aurait sa peau.
+[[nodiscard]] std::vector<std::uint8_t> FleshAt33Bytes() {
+  SprBuildOptions options;
+  options.palette.resize(ro::formats::kPaletteEntryCount);
+  constexpr std::array<std::array<std::uint8_t, 3>, kSkinRun> kFlesh = {{
+      {255, 225, 207},
+      {255, 198, 178},
+      {246, 174, 159},
+      {220, 144, 132},
+      {189, 115, 107},
+      {158, 86, 82},
+      {130, 63, 59},
+  }};
+  std::vector<std::uint8_t> painted;
+  for (std::size_t offset = 0; offset < kSkinRun; ++offset) {
+    options.palette[kFleshFirst + offset] = {kFlesh[offset][0], kFlesh[offset][1],
+                                             kFlesh[offset][2]};
+    const auto blue = static_cast<std::uint8_t>(kTiedBrightest - offset * kTiedShadeStep);
+    options.palette[kHeadSkinFirst + offset] = {0, 0, blue};
+    painted.insert(painted.end(), kPixelsPerIndex, static_cast<std::uint8_t>(kFleshFirst + offset));
+    painted.insert(painted.end(), kPixelsPerIndex,
+                   static_cast<std::uint8_t>(kHeadSkinFirst + offset));
+  }
+  SprIndexedFrameSpec frame;
+  frame.width = static_cast<std::int32_t>(kPixelsPerIndex);
+  frame.height = static_cast<std::int32_t>(painted.size() / kPixelsPerIndex);
+  frame.indices = std::move(painted);
+  options.indexed.push_back(std::move(frame));
+  return BuildSpr(options);
+}
+
+}  // namespace
+
+TEST_CASE("Palettes : la peau d'un corps se pose là où son sprite la range",
+          "[render][palette][skin]") {
+  const SprSprite body = SpriteOf(FleshAt33Bytes());
+  ActorPalettes palettes;
+  const Palette& base = *palettes.Analyze(body, nullptr).base;
+  REQUIRE(palettes.Analyze(body, nullptr).human_skin.indices().front() == kFleshFirst);
+
+  ro::render::StyleSet set;
+  ro::render::LayerDye skin;
+  skin.layer = ro::render::StyleLayer::kSkin;
+  skin.adjusts[0] = RampAdjust{.hue = 200, .saturation = 50, .absolute = true};
+  set.layers.push_back(skin);
+  const std::uint32_t style = palettes.NewStyleId();
+  REQUIRE(palettes.SetStyle(style, set));
+
+  // Sur le corps : 33 à 39 prennent la peau, le vêtement bleu reste tel quel.
+  const ActorPalettes::StyledPalette* as_body = palettes.StyledFor(
+      style, body, nullptr,
+      ActorPalettes::Piece{.layer = ro::render::StyleLayer::kBody, .key = 1, .skin = true});
+  REQUIRE(as_body != nullptr);
+  for (std::size_t offset = 0; offset < kSkinRun; ++offset) {
+    CHECK(as_body->palette.entries[kFleshFirst + offset] != base.entries[kFleshFirst + offset]);
+    CHECK(as_body->palette.entries[kHeadSkinFirst + offset] ==
+          base.entries[kHeadSkinFirst + offset]);
+  }
+  // Un Doram n'a pas de peau : rien ne bouge.
+  const ActorPalettes::StyledPalette* doram =
+      palettes.StyledFor(style, body, nullptr,
+                         ActorPalettes::Piece{.layer = ro::render::StyleLayer::kBody,
+                                              .key = 1,
+                                              .race = ro::render::SkinRace::kDoram,
+                                              .skin = true});
+  REQUIRE(doram != nullptr);
+  CHECK(doram->palette.entries == base.entries);
+  // Une tête garde l'ensemble fixe, 129 à 135.
+  const ActorPalettes::StyledPalette* as_head = palettes.StyledFor(
+      style, body, nullptr,
+      ActorPalettes::Piece{.layer = ro::render::StyleLayer::kHead, .skin = true});
+  REQUIRE(as_head != nullptr);
+  CHECK(as_head->palette.entries[kHeadSkinFirst] != base.entries[kHeadSkinFirst]);
+  CHECK(as_head->palette.entries[kFleshFirst] == base.entries[kFleshFirst]);
 }

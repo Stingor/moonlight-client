@@ -78,6 +78,7 @@ const ActorPalettes::Analysis& ActorPalettes::Analyze(const formats::SprSprite& 
   const std::array<int, formats::kPaletteEntryCount>& usage = Usage(sprite);
   Analysis analysis = Measured(base, DetectRamps(base, usage), usage);
   analysis.continuation = DetectBodyContinuation(base, usage);
+  analysis.human_skin = DetectBodySkin(*sprite.palette(), usage, SkinRace::kHuman);
   for (const PaletteRamp& ramp : analysis.continuation) {
     analysis.continuation_pixels += ramp.pixels;
   }
@@ -195,11 +196,16 @@ std::optional<ActorPalettes::StyledPalette> ActorPalettes::Paint(const StyleSet&
   // touchent une pièce v7.
   if (more != nullptr) {
     const Analysis& analysis = Analyze(sprite, official);
-    ApplyBodyMore(styled.palette, base, analysis.ramps, analysis.continuation, piece.race, *more);
+    ApplyBodyMore(styled.palette, base, analysis.ramps, analysis.continuation,
+                  BodySkin(analysis, piece.race).indices(), *more);
   }
-  // 🔴 LA PEAU APRÈS LES PIÈCES ET LE RESTE : elle l'emporte sur eux.
+  // 🔴 LA PEAU APRÈS LES PIÈCES ET LE RESTE : elle l'emporte sur eux. Celle
+  // d'un corps est là où son sprite la range.
   if (skin != nullptr) {
-    ApplySkin(styled.palette, base, piece.race, skin->adjusts.front());
+    const SkinSet indices = piece.layer == StyleLayer::kBody
+                                ? BodySkin(Analyze(sprite, official), piece.race)
+                                : HeadSkin(piece.race);
+    ApplySkin(styled.palette, base, indices.indices(), skin->adjusts.front());
   }
   // 🔴 LES RETOUCHES EN TOUT DERNIER : une couleur exacte, que rien ne repeint.
   const LayerDye* touched = dye != nullptr ? dye : more;

@@ -40,9 +40,12 @@ inline constexpr std::array<std::array<std::uint8_t, 3>, kSkinToneCount> kSkinTo
 [[nodiscard]] LayerAt SkinLayerAt(SkinLine line, std::uint32_t body_key) noexcept;
 
 // LA LIGNE QUE LA PIPETTE DÉSIGNE : un index de peau sur la tête désigne le
-// visage, sur le corps les bras ; rien ailleurs.
-[[nodiscard]] std::optional<SkinLine> SkinLineUnder(ro::render::ActorPart part,
-                                                    std::uint8_t index) noexcept;
+// visage, un index de `body_skin` sur le corps les bras ; rien ailleurs.
+//
+// 🔴 LA PEAU DU CORPS EST CELLE DE SON SPRITE : chaque corps range la sienne où
+// il veut, et la tête garde l'ensemble fixe.
+[[nodiscard]] std::optional<SkinLine> SkinLineUnder(ro::render::ActorPart part, std::uint8_t index,
+                                                    const ro::render::SkinSet& body_skin) noexcept;
 
 // POURQUOI LES PEAUX NE SE RÈGLENT PAS.
 enum class SkinRefusal : std::uint8_t {
@@ -63,7 +66,8 @@ enum class SkinRefusal : std::uint8_t {
                                          std::span<const std::string> body_paths,
                                          int server_layer_last);
 
-// La pièce que règle une ligne : l'ensemble de peau humain, comme une rampe.
-[[nodiscard]] ro::render::PaletteRamp SkinRamp();
+// LA PIÈCE QUE RÈGLENT LES LIGNES, comme une rampe, sur la base du corps : la
+// peau que ce corps porte, ou à défaut l'ensemble d'une tête humaine.
+[[nodiscard]] ro::render::PaletteRamp SkinRamp(const ro::render::SkinSet& body_skin);
 
 }  // namespace moonclient

@@ -114,11 +114,11 @@ struct LayerDye {
 
 // LA SUITE ET LE RESTE DU CORPS, posés sur `painted` : les rampes de
 // `continuation` reprennent la base réglée par la suite, puis chaque index hors
-// des pièces v7, de la suite et de la peau reçoit le réglage de sa classe. La
-// peau et les retouches viennent après, à l'appelant.
+// des pièces v7, de la suite et de la peau `skin` reçoit le réglage de sa
+// classe. La peau et les retouches viennent après, à l'appelant.
 void ApplyBodyMore(formats::Palette& painted, const formats::Palette& base,
                    std::span<const PaletteRamp> v7, std::span<const PaletteRamp> continuation,
-                   SkinRace race, const LayerDye& more);
+                   std::span<const std::uint8_t> skin, const LayerDye& more);
 
 // LE RESTE D'UN CALQUE au profil 1, posé sur `painted` : hors de ses pièces et,
 // pour une tête, hors de la peau. Sans effet pour une teinture qui n'en prend
@@ -164,13 +164,14 @@ struct StyleSet {
 // deux peaux ne s'y règle.
 [[nodiscard]] bool SkinAdjustable(std::string_view body_sprite_path);
 
-// LA PEAU, appliquée EN DERNIER : les index de `SkinIndices(race)` de
-// `painted` reprennent la couleur de `base` réglée par `adjust`.
+// LA PEAU, appliquée EN DERNIER : les index `skin` de `painted` reprennent la
+// couleur de `base` réglée par `adjust`. Pour une tête, `HeadSkin` ; pour un
+// corps, celle que `DetectBodySkin` a trouvée sur son sprite.
 //
 // 🔴 ELLE L'EMPORTE SUR TOUT CE QUI A ÉTÉ PEINT AVANT, recette du corps ou
 // rampes de la tête : c'est le seul réglage de ces index. Un réglage neutre
 // rend donc la peau du dessin.
-void ApplySkin(formats::Palette& painted, const formats::Palette& base, SkinRace race,
-               const RampAdjust& adjust);
+void ApplySkin(formats::Palette& painted, const formats::Palette& base,
+               std::span<const std::uint8_t> skin, const RampAdjust& adjust);
 
 }  // namespace ro::render

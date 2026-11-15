@@ -19,15 +19,19 @@ LayerAt SkinLayerAt(SkinLine line, std::uint32_t body_key) noexcept {
   return LayerAt{.layer = ro::render::StyleLayer::kSkin, .key = 0};
 }
 
-std::optional<SkinLine> SkinLineUnder(ro::render::ActorPart part, std::uint8_t index) noexcept {
-  if (!std::ranges::contains(ro::render::SkinIndices(ro::render::SkinRace::kHuman), index)) {
-    return std::nullopt;
-  }
+std::optional<SkinLine> SkinLineUnder(ro::render::ActorPart part, std::uint8_t index,
+                                      const ro::render::SkinSet& body_skin) noexcept {
   switch (part) {
     case ro::render::ActorPart::kHead:
-      return SkinLine::kFace;
+      if (std::ranges::contains(ro::render::SkinIndices(ro::render::SkinRace::kHuman), index)) {
+        return SkinLine::kFace;
+      }
+      return std::nullopt;
     case ro::render::ActorPart::kBody:
-      return SkinLine::kBody;
+      if (std::ranges::contains(body_skin.indices(), index)) {
+        return SkinLine::kBody;
+      }
+      return std::nullopt;
     default:
       return std::nullopt;
   }
@@ -48,9 +52,10 @@ SkinRefusal SkinRefusalFor(SkinLine line, bool gm_outfit, std::span<const std::s
   return SkinRefusal::kNone;
 }
 
-ro::render::PaletteRamp SkinRamp() {
+ro::render::PaletteRamp SkinRamp(const ro::render::SkinSet& body_skin) {
   const std::span<const std::uint8_t> indices =
-      ro::render::SkinIndices(ro::render::SkinRace::kHuman);
+      body_skin.empty() ? ro::render::SkinIndices(ro::render::SkinRace::kHuman)
+                        : body_skin.indices();
   if (indices.empty()) {
     return {};
   }

@@ -235,7 +235,7 @@ void StyleView::RefreshBodyMore(const ro::render::ActorWardrobe::BodyRamps& body
     return;
   }
   ro::formats::Palette painted = ro::render::ApplyRecipe(body.base, body.ramps, session_.recipe());
-  ro::render::ApplyBodyMore(painted, body.base, body.ramps, body.continuation, body_more_.race,
+  ro::render::ApplyBodyMore(painted, body.base, body.ramps, body.continuation, body.skin.indices(),
                             more);
   ro::render::ApplyRetouches(painted, more.retouches);
   palette_colors_.reserve(ro::formats::kPaletteEntryCount);
