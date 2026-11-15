@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "game/game_settings.h"
-#include "game/ui_stage.h"
+#include "game/ui_stage_fwd.h"
 #include "options/game_options.h"
 #include "options/option_targets.h"
 
@@ -25,7 +25,7 @@ namespace moonclient {
 // par défaut sur des éléments éteints par défaut (jauges, compteur de dégâts,
 // grille de groupe) : l'avis paraîtrait chez tout le monde pour des cadres que
 // personne ne voit.
-void ListUnlockedHudShown(GameOptions& options, const UiStage::Windows& windows,
+void ListUnlockedHudShown(GameOptions& options, const UiWindows& windows,
                           std::vector<const char*>& into);
 
 // Verrouille tous les éléments, montrés ou non, par le même chemin que le

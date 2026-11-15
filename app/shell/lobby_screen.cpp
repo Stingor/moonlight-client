@@ -30,6 +30,8 @@
 #include "character/recent_characters.h"
 #include "game/connected_session.h"
 #include "game/skin_image_of.h"
+#include "game/ui_stage.h"
+#include "game/ui_stage_views.h"
 #include "loading/loading_plans.h"
 #include "loading/loading_presenter.h"
 #include "options/game_options.h"

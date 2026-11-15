@@ -23,6 +23,7 @@
 #include "game/bug_report_context.h"
 #include "game/game.h"
 #include "game/skin_image_of.h"
+#include "game/ui_stage.h"
 #include "world/battlefield_view.h"
 #include "world/map_stage.h"
 #include "world/minimap_compose.h"

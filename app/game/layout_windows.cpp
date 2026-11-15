@@ -22,6 +22,9 @@
 #include "ro/ui/status_window.h"
 #include "ro/ui/world_map_window.h"
 
+#include "game/ui_stage.h"
+#include "game/ui_windows.h"
+
 namespace moonclient {
 namespace {
 

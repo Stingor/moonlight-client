@@ -7,8 +7,12 @@
 #include "ro/ui/item_obtain_toast.h"
 
 #include "game/settings_file.h"
-#include "game/ui_stage.h"
+#include "game/ui_stage_fwd.h"
 #include "world/map_music.h"
+
+namespace ro::ui {
+struct CraftAtlasWindowState;
+}  // namespace ro::ui
 
 namespace moonclient {
 

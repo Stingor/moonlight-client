@@ -11,6 +11,7 @@
 #include "ro/ui/loading_screen.h"
 
 #include "game/skin_image_of.h"
+#include "game/ui_stage.h"
 #include "loading/loading_art.h"
 #include "loading/loading_plans.h"
 

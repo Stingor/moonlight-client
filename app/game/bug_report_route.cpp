@@ -13,6 +13,9 @@
 #include "game/card_album_bug_report.h"
 #include "game/cash_shop_bug_report.h"
 #include "game/craft_atlas_bug_report.h"
+#include "game/ui_answers.h"
+#include "game/ui_stage.h"
+#include "game/ui_windows.h"
 
 namespace moonclient {
 namespace {

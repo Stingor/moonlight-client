@@ -32,6 +32,7 @@
 #include "chat/player_link_judge.h"
 #include "game/game.h"
 #include "game/staff_roster_round.h"
+#include "game/ui_answers.h"
 #include "game/whisper_stage.h"
 #include "world/blocked_npcs.h"
 #include "world/click_action.h"

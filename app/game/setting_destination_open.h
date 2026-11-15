@@ -1,7 +1,7 @@
 #pragma once
 
 #include "game/game_pieces.h"
-#include "game/ui_stage.h"
+#include "game/ui_stage_fwd.h"
 #include "options/setting_links.h"
 
 namespace moonclient {
@@ -15,7 +15,7 @@ namespace moonclient {
 // suivre deux fois ne doit pas cacher ce qu'il montre.
 //
 // ⚠ LA DESTINATION A ÉTÉ JUGÉE OFFERTE À L'ANALYSE : on n'y revient pas ici.
-void OpenSettingDestination(const SettingDestination& destination, UiStage::Windows& windows);
+void OpenSettingDestination(const SettingDestination& destination, UiWindows& windows);
 
 // LA DESTINATION DONT UN MAJ + CLIC DE CETTE IMAGE DEMANDE LE LIEN — une entrée
 // ou un onglet du panneau, un onglet de la fiche, des succès, de Groupe / Amis
@@ -23,8 +23,8 @@ void OpenSettingDestination(const SettingDestination& destination, UiStage::Wind
 //
 // ⚠ À LIRE AVANT QUE LES RÉPONSES DES SUCCÈS ET DU GROUPE NE SOIENT CONSOMMÉES :
 // elles vivent dans `windows`, et leur étage les vide en les appliquant.
-[[nodiscard]] const SettingDestination* AskedSettingLink(const UiStage::Answers& answers,
-                                                         const UiStage::Windows& windows);
+[[nodiscard]] const SettingDestination* AskedSettingLink(const UiAnswers& answers,
+                                                         const UiWindows& windows);
 
 // CE QUE LE LECTEUR A À CETTE IMAGE : ses compagnons, et le catalogue des
 // succès.

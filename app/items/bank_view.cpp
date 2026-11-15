@@ -14,6 +14,7 @@
 #include "ro/sim/player_status.h"
 #include "ro/sim/session_settings.h"
 #include "ro/sim/world.h"
+#include "ro/ui/bank_window.h"
 #include "ro/ui/inventory_window.h"
 
 namespace moonclient {

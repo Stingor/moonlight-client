@@ -33,6 +33,8 @@
 #include "game/game.h"
 #include "game/map_plan_tip.h"
 #include "game/setting_destination_open.h"
+#include "game/ui_answers.h"
+#include "game/ui_stage.h"
 #include "items/inventory_view.h"
 
 namespace moonclient {

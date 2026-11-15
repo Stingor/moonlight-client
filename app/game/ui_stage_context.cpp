@@ -13,6 +13,7 @@
 
 #include <SDL3/SDL_events.h>
 
+#include "ro/render/skin_textures.h"
 #include "ro/ui/system_fonts.h"
 
 #include "game/layout_windows.h"

@@ -7,6 +7,7 @@
 #include "ro/core/i18n.h"
 
 #include "game/ui_stage.h"
+#include "game/ui_windows.h"
 
 namespace moonclient {
 

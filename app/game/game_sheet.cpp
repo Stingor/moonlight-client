@@ -21,6 +21,8 @@
 #include "character/status_window_view.h"
 #include "game/bug_report_context.h"
 #include "game/game.h"
+#include "game/ui_answers.h"
+#include "game/ui_stage.h"
 #include "world/actor_view.h"
 
 namespace moonclient {

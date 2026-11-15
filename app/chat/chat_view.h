@@ -35,7 +35,7 @@
 #include "chat/player_command.h"
 #include "chat/setting_toggle_command.h"
 #include "effects/effect_view.h"
-#include "game/ui_stage.h"
+#include "game/ui_stage_fwd.h"
 #include "options/game_options.h"
 #include "options/setting_links.h"
 #include "world/map_music.h"
@@ -52,11 +52,18 @@ namespace ro::sim {
 class SkillTree;
 }  // namespace ro::sim
 
+namespace ro::ui {
+struct BlockListWindowState;
+struct CraftAtlasWindowState;
+struct NavigationWindowState;
+}  // namespace ro::ui
+
 namespace moonclient {
 
 class ChatLinePreviewMaker;
 class ChatRoomStage;
 class DatabaseStage;
+class MarketStage;
 class ChatTabsView;
 struct FollowState;
 class NaviSession;

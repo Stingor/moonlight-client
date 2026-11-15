@@ -7,6 +7,9 @@
 
 #include "game/hotkey_bug_report.h"
 #include "game/options_bug_report.h"
+#include "game/ui_answers.h"
+#include "game/ui_stage.h"
+#include "game/ui_windows.h"
 #include "input/hotkey_file.h"
 #include "items/item_layout_file.h"
 

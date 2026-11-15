@@ -11,7 +11,12 @@
 // d'interface, ce serait deux atlas — et ImGui grave ses textures au fil des
 // images.
 
+#include "ro/ui/login_window.h"
+
+#include "game/ui_answers.h"
 #include "game/ui_stage.h"
+#include "game/ui_stage_views.h"
+#include "game/ui_windows.h"
 
 namespace moonclient {
 

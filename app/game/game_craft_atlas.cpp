@@ -9,6 +9,7 @@
 #include <utility>
 
 #include "game/game.h"
+#include "game/ui_stage.h"
 
 namespace moonclient {
 

@@ -17,6 +17,8 @@
 #include "game/connected_session.h"
 #include "game/game.h"
 #include "game/mvp_alert_sound.h"
+#include "game/ui_answers.h"
+#include "game/ui_stage.h"
 
 namespace moonclient {
 

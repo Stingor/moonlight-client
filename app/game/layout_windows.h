@@ -4,7 +4,7 @@
 
 #include "ro/ui/ui_context.h"
 
-#include "game/ui_stage.h"
+#include "game/ui_stage_fwd.h"
 
 namespace moonclient {
 
@@ -25,6 +25,6 @@ inline constexpr std::string_view kDamageMeterDockedKey = "damage_meter.docked";
 // ⚠ L'IDENTITÉ, PAS LE TITRE : une clé est l'identité ImGui de la fenêtre, ou
 // une clé qui en dérive. Un titre traduit rangerait la place sous un nom et
 // l'ouverture sous un autre.
-void RememberLayoutWindows(ro::ui::UiContext& ui, UiStage::Windows& windows);
+void RememberLayoutWindows(ro::ui::UiContext& ui, UiWindows& windows);
 
 }  // namespace moonclient

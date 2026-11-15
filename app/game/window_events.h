@@ -31,7 +31,7 @@
 #include "chat/chat_view.h"
 #include "effects/effect_bench_view.h"
 #include "effects/effect_view.h"
-#include "game/ui_stage.h"
+#include "game/ui_stage_fwd.h"
 #include "input/camera_rig.h"
 #include "input/first_person.h"
 #include "input/hotkeys.h"
@@ -45,6 +45,22 @@
 #include "world/quick_cast.h"
 #include "world/targeting.h"
 
+namespace ro::ui {
+struct BugReportWindowState;
+struct CardAlbumWindowState;
+struct CartWindowState;
+struct ChatWindowState;
+struct CharacterWindowState;
+struct CraftAtlasWindowState;
+struct GameMenuState;
+struct HotkeyWindowState;
+struct InputGate;
+struct InventoryWindowState;
+struct NavigationWindowState;
+struct PartyFriendWindowState;
+struct WorldMapWindowState;
+}  // namespace ro::ui
+
 namespace moonclient {
 
 class CashShopStage;
@@ -54,6 +70,7 @@ class MemorialStage;
 class MailStage;
 class ChatRoomStage;
 class CompanionAiStage;
+class MvpTrackerStage;
 class TradeStages;
 
 // À QUI REVIENT LE GESTE, hors de la boucle qui le reçoit.

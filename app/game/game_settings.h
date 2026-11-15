@@ -13,7 +13,7 @@
 
 #include "game/settings_file.h"
 #include "game/settings_profiles.h"
-#include "game/ui_stage.h"
+#include "game/ui_stage_fwd.h"
 #include "input/camera_rules.h"
 #include "input/hotkeys.h"
 #include "items/item_layout.h"
@@ -89,7 +89,7 @@ class GameSettings {
   // Refait les lignes que les fenêtres montrent. ⚠ SEULEMENT CELLES QUI SONT
   // OUVERTES : composer des libellés pour une fenêtre fermée serait du temps
   // donné à rien.
-  void Refresh(UiStage::Windows& windows, std::uint32_t now_ms);
+  void Refresh(UiWindows& windows, std::uint32_t now_ms);
 
   [[nodiscard]] ro::ui::HotkeyWindowView hotkey_view() const noexcept {
     return ro::ui::HotkeyWindowView{.rows = rows_, .tabs = tab_names_};
@@ -99,8 +99,8 @@ class GameSettings {
   //
   // ⚠ ENREGISTRE DÈS QUE QUELQUE CHOSE BOUGE. Un réglage qu'il faut penser à
   // enregistrer est un réglage qu'on perd.
-  void Apply(const UiStage::Answers& answers, const OptionTargets& to, UiStage::Windows& windows,
-             bool* running, std::uint32_t now_ms);
+  void Apply(const UiAnswers& answers, const OptionTargets& to, UiWindows& windows, bool* running,
+             std::uint32_t now_ms);
 
   // LES OPTIONS DU JEU OUVERTES PAR-DESSUS UNE AUTRE IMAGE — la pause d'une
   // partie de survivors : leur réponse s'applique par le même chemin que le
@@ -120,8 +120,8 @@ class GameSettings {
   // frappe en cours. La remontée, elle, se fait sur DEMANDE de la fenêtre —
   // comparer dix chaînes par image coûterait plus que le drapeau qu'elle rend
   // déjà.
-  void RestoreChatMacros(UiStage::Windows& windows) const;
-  void NoteChatMacros(const UiStage::Windows& windows);
+  void RestoreChatMacros(UiWindows& windows) const;
+  void NoteChatMacros(const UiWindows& windows);
 
   // CE QUE L'ÉTABLI DU STAFF VIENT DE RÉGLER, remonté dans le fichier.
   //
@@ -133,14 +133,14 @@ class GameSettings {
   //
   // ⚠ L'ÉCRITURE EST DIFFÉRÉE : `Touch` relance l'anti-rebond, si bien qu'un
   // nuancier qu'on promène ne produit qu'une écriture.
-  void NoteStaffTools(const UiStage::Windows& windows);
+  void NoteStaffTools(const UiWindows& windows);
 
   // LA CASE « LISSER LES ICÔNES » DE L'EN-TÊTE DU GRIMOIRE, remontée dans le
   // fichier. Même aller-retour que l'établi : `Refresh` descend la valeur du
   // fichier dans l'état de la fenêtre, le dessin la laisse cocher, et ceci la
   // remonte — dans cet ordre, sinon la descente de l'image suivante effacerait
   // le clic avant qu'on l'ait lu.
-  void NoteGrimoireIcons(const UiStage::Windows& windows);
+  void NoteGrimoireIcons(const UiWindows& windows);
 
   // Recul et inclinaison du joueur, dehors et dedans, d'une partie à l'autre.
   [[nodiscard]] const CameraMemory& camera_memory() const noexcept { return camera_memory_; }
@@ -157,7 +157,7 @@ class GameSettings {
 
   // RETIENT SI LE VOLET DU STAFF ÉTAIT OUVERT. ⚠ MUET SANS LE DROIT : le volet
   // est alors caché par force, et l'enregistrer effacerait le souvenir.
-  void NoteCharacterStaffPane(const UiStage::Windows& windows);
+  void NoteCharacterStaffPane(const UiWindows& windows);
 
   // RETIENT SI LE STAFF VEUT ÊTRE IGNORÉ DES MONSTRES, d'une connexion à l'autre.
   void NoteStaffBattleIgnore(bool wanted);
@@ -165,7 +165,7 @@ class GameSettings {
   // RETIENT LA POSE DE L'AVATAR ET SA DIRECTION. ⚠ SANS GARDE, contrairement au
   // volet : elles ne dépendent d'aucun droit, et une fiche jamais ouverte les
   // laisse telles qu'elles étaient.
-  void NoteCharacterAvatar(const UiStage::Windows& windows);
+  void NoteCharacterAvatar(const UiWindows& windows);
 
   // 🔴 LE FILET SE DÉTEND MÊME SI PERSONNE NE REGARDE. La boîte qui pose la
   // question n'est dessinée que si le panneau est ouvert ; l'échéance, elle,
@@ -195,7 +195,7 @@ class GameSettings {
   //
   // `row`, quand la fenêtre n'est qu'un bloc de la section : la rangée qui
   // porte son intertitre, amenée en haut de la page.
-  static void OpenOptionsAt(UiStage::Windows& windows, OptionSection section, int row = -1);
+  static void OpenOptionsAt(UiWindows& windows, OptionSection section, int row = -1);
 
   // BASCULE UN INTERRUPTEUR DEPUIS AILLEURS QUE LE PANNEAU — le pied d'une
   // fenêtre, un raccourci.

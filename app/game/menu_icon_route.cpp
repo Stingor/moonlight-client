@@ -9,6 +9,8 @@
 
 #include "game/battleground_stage.h"
 #include "game/skin_image_of.h"
+#include "game/ui_stage.h"
+#include "game/ui_windows.h"
 #include "input/key_action.h"
 #include "world/actor_styles.h"
 #include "world/actor_view.h"

@@ -8,6 +8,7 @@
 #include "ro/ui/modal_box.h"
 
 #include "game/ui_stage.h"
+#include "game/ui_windows.h"
 
 namespace moonclient {
 namespace {

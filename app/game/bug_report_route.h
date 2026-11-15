@@ -4,7 +4,7 @@
 #include "ro/sim/world_fwd.h"
 #include "ro/ui/description_window.h"
 
-#include "game/ui_stage.h"
+#include "game/ui_stage_fwd.h"
 #include "items/description_view.h"
 
 namespace moonclient {
@@ -14,9 +14,8 @@ namespace moonclient {
 // serveur. Voir l'ADR 0052.
 //
 // ⚠ POSE AUSSI LE BOUTON des fenêtres pour l'image suivante, selon le réglage.
-void RouteBugReports(const UiStage::Answers& answers, UiStage::Windows& windows,
-                     const ro::sim::World& world, const DescriptionView& item,
-                     const ro::ui::SkillDescriptionView& skill, bool buttons,
-                     ro::net::Connection& link);
+void RouteBugReports(const UiAnswers& answers, UiWindows& windows, const ro::sim::World& world,
+                     const DescriptionView& item, const ro::ui::SkillDescriptionView& skill,
+                     bool buttons, ro::net::Connection& link);
 
 }  // namespace moonclient

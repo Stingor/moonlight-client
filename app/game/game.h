@@ -29,6 +29,7 @@
 #include "ro/sim/player_config.h"
 #include "ro/sim/walk_path.h"
 #include "ro/sim/world.h"
+#include "ro/ui/afk_clock.h"
 #include "ro/ui/staff_tools.h"
 #include "ro/vfs/vfs.h"
 
@@ -62,7 +63,7 @@
 #include "game/game_settings.h"
 #include "game/game_ui_buffers.h"
 #include "game/item_gesture.h"
-#include "game/ui_stage.h"
+#include "game/ui_stage_fwd.h"
 #include "guild/guild_emblems.h"
 #include "guild/guild_panel.h"
 #include "input/camera_aim.h"
@@ -356,29 +357,29 @@ class Game : public Screen,
   //
   // La conversation, dans `game_chat.cpp`.
   void StageChat(std::uint32_t now_ms);
-  void SendTypedChat(const UiStage::Answers& answers, std::uint32_t now_ms);
-  void ApplyChatAnswers(const UiStage::Answers& answers, std::uint32_t now_ms);
+  void SendTypedChat(const UiAnswers& answers, std::uint32_t now_ms);
+  void ApplyChatAnswers(const UiAnswers& answers, std::uint32_t now_ms);
   // Les commandes du joueur que le routage a confiées : `game_player_commands.cpp`.
   void RunPlayerAsks(std::uint32_t now_ms);
   // Le sac, la charrette, le coffre, la banque et l'album : `game_containers.cpp`.
   void StageContainers();
-  void ApplyContainerAnswers(const UiStage::Answers& answers, std::uint32_t now_ms);
-  void ApplyContainerSwitches(const UiStage::Answers& answers, std::uint32_t now_ms);
-  void ApplyBankAnswers(const UiStage::Answers& answers, std::uint32_t now_ms);
+  void ApplyContainerAnswers(const UiAnswers& answers, std::uint32_t now_ms);
+  void ApplyContainerSwitches(const UiAnswers& answers, std::uint32_t now_ms);
+  void ApplyBankAnswers(const UiAnswers& answers, std::uint32_t now_ms);
   // Les bulles d'annonce : ce que le monde a déposé, puis ce que leurs bandeaux
   // peindront, et la place d'une poignée tirée : `game_balloons.cpp`.
   void StageBalloons(std::uint32_t now_ms);
   // La fiche, ses presets, l'éditeur de style et son aperçu : `game_sheet.cpp`.
   void StageCharacterSheet(std::uint32_t now_ms);
   void StageStyle(std::uint32_t now_ms);
-  void ApplyStyleAnswers(const UiStage::Answers& answers, std::uint32_t now_ms);
+  void ApplyStyleAnswers(const UiAnswers& answers, std::uint32_t now_ms);
   // Les presets, puis le GIF du pantin : ce que la fiche a demandé après le dessin.
-  void ApplySheetAnswers(const UiStage::Answers& answers);
+  void ApplySheetAnswers(const UiAnswers& answers);
   // Les descriptions et le survol, dans `game_description.cpp`.
   void StageDescriptions(std::uint32_t now_ms);
-  void ApplyDescriptionAnswers(const UiStage::Answers& answers, std::uint32_t now_ms);
+  void ApplyDescriptionAnswers(const UiAnswers& answers, std::uint32_t now_ms);
   // Le lien que Maj + clic pose dans la saisie, dans `game_chat_links.cpp`.
-  void PostClickedItemLink(const UiStage::Answers& answers);
+  void PostClickedItemLink(const UiAnswers& answers);
   void AdvanceCraftAtlas(std::uint32_t now_ms);  // l'Atlas : `game_craft_atlas.cpp`
   void AdvanceNavigation(std::uint32_t now_ms);  // minimap, navigation : `game_navigation.cpp`
   void AdvanceMvpTracker(std::uint32_t now_ms);  // le carnet MVP : `game_mvp_tracker.cpp`
@@ -401,9 +402,9 @@ class Game : public Screen,
   // survolée. ⚠ APRÈS LE RELEVÉ DU SURVOL : il le complète, il ne le remplace
   // pas. Voir `items/card_insert_view.h`.
   void StageCardInsert();
-  void ApplyCardInsert(const UiStage::Answers& answers, std::uint32_t now_ms);
+  void ApplyCardInsert(const UiAnswers& answers, std::uint32_t now_ms);
   // Une carte glissée sur une pièce : voir `items/card_drop.h`.
-  void ApplyCardDrop(const UiStage::Answers& answers, std::uint32_t now_ms);
+  void ApplyCardDrop(const UiAnswers& answers, std::uint32_t now_ms);
 
   // SUIVRE UN LIEN D'UNE DESCRIPTION.
   //
@@ -462,7 +463,7 @@ class Game : public Screen,
   // ⚠ ICI ET NON DANS LES RÉGLAGES, comme les trois gestes du menu d'Échap : ces
   // boutons-là parlent à une machine qui tient l'écran et une horloge, et
   // les réglages ne possèdent ni l'une ni l'autre.
-  void ApplyCaptureGesture(const UiStage::Answers& answers, std::uint32_t now_ms);
+  void ApplyCaptureGesture(const UiAnswers& answers, std::uint32_t now_ms);
 
   // ── LA GUILDE, LE GROUPE ET LES AMIS ──────────────────────────────────────
   //
@@ -470,7 +471,7 @@ class Game : public Screen,
   // rafraîchir avant le dessin, appliquer après — c'est tout ce qu'ils coûtent.
   void OpenGuild();
   void RefreshGuild(std::uint32_t now_ms);
-  void ApplyGuildAnswers(const UiStage::Answers& answers, std::uint32_t now_ms);
+  void ApplyGuildAnswers(const UiAnswers& answers, std::uint32_t now_ms);
   void RefreshParty(std::uint32_t now_ms);
   void ApplyPartyAnswers(std::uint32_t now_ms);
 

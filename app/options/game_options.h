@@ -30,7 +30,7 @@
 #include "ro/ui/zone_capture.h"
 
 #include "game/settings_file.h"
-#include "game/ui_stage.h"
+#include "game/ui_stage_fwd.h"
 #include "options/damage_page_names.h"
 #include "options/display_options.h"
 #include "options/factory_layout.h"

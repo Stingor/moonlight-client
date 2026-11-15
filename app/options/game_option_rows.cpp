@@ -19,6 +19,7 @@
 #include "ro/ui/commands_page.h"
 #include "ro/ui/system_fonts.h"
 
+#include "chat/chat_history_file.h"
 #include "options/bubble_samples.h"
 #include "options/bubble_text_options.h"
 #include "options/entity_page_tabs.h"
@@ -396,13 +397,9 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar, bool searching) {
              Tr("Prend effet au prochain démarrage. Le fichier contient les chuchotements "
                 "EN CLAIR ; décocher l'efface."),
              nullptr, chat_look_.keep_history));
-  chat_rows_.push_back(OptionRowView{.id = static_cast<int>(GameOption::kChatKeptLines),
-                                     .label = Tr("Lignes gardées"),
-                                     .kind = OptionKind::kSlider,
-                                     .value = static_cast<float>(chat_look_.kept_lines),
-                                     .lowest = static_cast<float>(kSmallestChatHistory),
-                                     .highest = static_cast<float>(kLargestChatHistory),
-                                     .format = "%.0f"});
+  chat_rows_.push_back(WholeSlider(GameOption::kChatKeptLines, Tr("Lignes gardées"), nullptr,
+                                   chat_look_.kept_lines, kSmallestChatHistory, kLargestChatHistory,
+                                   "%.0f"));
   // ⚠ LA SEULE DES TROIS QUI PART COCHÉE, et le prix est dit dans son aide :
   // ce qu'on retape le plus sont les `@commandes`, et un service qu'il faut
   // d'abord aller cocher n'existe pas pour qui ignore qu'il existe.

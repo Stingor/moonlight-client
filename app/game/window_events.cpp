@@ -15,6 +15,8 @@
 #include "game/companion_gestures.h"
 #include "game/map_editor_keys.h"
 #include "game/trade_stages.h"
+#include "game/ui_stage.h"
+#include "game/ui_windows.h"
 #include "input/key_action.h"
 #include "input/key_gate.h"
 #include "world/attack_intent.h"

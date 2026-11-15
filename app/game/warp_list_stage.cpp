@@ -14,6 +14,9 @@
 #include "ro/sim/world.h"
 #include "ro/vfs/warp_list_words.h"
 
+#include "game/ui_stage.h"
+#include "game/ui_windows.h"
+
 namespace moonclient {
 
 void StageWarpList(ro::sim::World& world, const ro::vfs::ItemWords& words,

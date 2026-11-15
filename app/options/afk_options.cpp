@@ -11,6 +11,7 @@
 #include "options/afk_options.h"
 
 #include "ro/core/i18n.h"
+#include "ro/ui/afk_clock.h"
 
 #include "options/option_row_kinds.h"
 

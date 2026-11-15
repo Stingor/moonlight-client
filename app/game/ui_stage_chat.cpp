@@ -11,7 +11,11 @@
 #include "ro/ui/chat_url_prompt.h"
 #include "ro/ui/font_setup.h"
 
+#include "chat/chat_tab_view.h"
+#include "game/ui_answers.h"
 #include "game/ui_stage.h"
+#include "game/ui_stage_views.h"
+#include "game/ui_windows.h"
 
 namespace moonclient {
 namespace {

@@ -2346,24 +2346,13 @@ if(MOONCLIENT_DEPLOY_DIR AND EXISTS "${CMAKE_SOURCE_DIR}/scripts/deploy_client.p
     endif()
 endif()
 
-# LES FENÊTRES DE L'INTERFACE, PRÉCOMPILÉES AVEC LES EN-TÊTES STANDARD.
+# LES EN-TÊTES STANDARD ET GLM, PRÉCOMPILÉS POUR L'EXÉCUTABLE.
 #
-# `game/ui_stage.h` tire les en-têtes de toutes les fenêtres et de leurs étapes,
-# plus de quatre cents, et plus du tiers des sources de l'exécutable l'incluent :
-# c'est le seuil que pose `moonclient_precompile_headers`. Une source qui
-# l'inclut y passait l'essentiel de son temps de compilation.
-#
-# ⚠ AUCUN AUTRE EN-TÊTE DE `app/` N'ATTEINT CE SEUIL. `game/game.h` en tire deux
-# fois plus, mais une source sur six seulement l'inclut : précompilé, il ferait
-# recompiler tout l'exécutable à chaque retouche de ce que lisent ces seules
-# sources.
-#
-# ⚠ LE PROLOGUE DE CMake EST RETIRÉ, et c'est ce qui garde les avertissements.
-# CMake coiffe l'en-tête précompilé d'un `#pragma system_header`, et sous
-# `/external:W0` MSVC étend ce statut à tout ce que le fichier inclut : `/W4` et
-# `/WX` se tairaient dans nos propres en-têtes. Les en-têtes entre chevrons
-# n'en ont pas besoin, `/external:anglebrackets` les couvre déjà.
+# ⚠ AUCUN EN-TÊTE DE `app/` N'Y ENTRE : aucun n'est inclus par le tiers des
+# sources, le seuil que pose `moonclient_precompile_headers`. `game/ui_stage.h`
+# l'a été, quand il tirait toutes les fenêtres ; il ne fait plus que les nommer,
+# et ce qu'elles gardent vit dans `game/ui_windows.h`, lu par une source sur cinq.
+# `python scripts/include_graph.py pivots` donne les candidats.
 if(TARGET moonclient)
-  set(CMAKE_PCH_PROLOGUE "")
-  moonclient_precompile_headers(moonclient GLM HEADERS game/ui_stage.h)
+  moonclient_precompile_headers(moonclient GLM)
 endif()

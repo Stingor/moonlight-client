@@ -19,7 +19,9 @@
 #include "ro/ui/ui_context.h"
 
 #include "chat/chat_history_file.h"
+#include "chat/chat_tab_view.h"
 #include "effects/effect_view.h"
+#include "game/ui_stage.h"
 #include "options/display_options.h"
 #include "options/game_options.h"
 

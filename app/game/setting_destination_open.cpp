@@ -7,6 +7,10 @@
 #include "ro/ui/character_window.h"
 #include "ro/ui/party_friend_window.h"
 
+#include "game/ui_answers.h"
+#include "game/ui_stage.h"
+#include "game/ui_windows.h"
+
 namespace moonclient {
 
 void OpenSettingDestination(const SettingDestination& destination, UiStage::Windows& windows) {

@@ -38,6 +38,8 @@
 #include "chat/chat_view.h"
 #include "game/game.h"
 #include "game/setting_destination_open.h"
+#include "game/ui_answers.h"
+#include "game/ui_stage.h"
 #include "options/chat_web_options.h"
 #include "options/game_option_ids.h"
 #include "world/click_action.h"

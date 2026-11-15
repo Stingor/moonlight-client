@@ -16,6 +16,8 @@
 #include "game/game.h"
 #include "game/save_folder.h"
 #include "game/survivors_presence_mode.h"
+#include "game/ui_answers.h"
+#include "game/ui_stage.h"
 #include "game/whisper_stage.h"
 
 namespace moonclient {

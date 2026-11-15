@@ -23,6 +23,7 @@
 
 #include "game/client_shell.h"
 #include "game/skin_image_of.h"
+#include "game/ui_stage.h"
 #include "patcher/http_patch_fetcher.h"
 #include "patcher/install_lock.h"
 #include "patcher/install_path.h"

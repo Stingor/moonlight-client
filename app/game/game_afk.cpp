@@ -18,6 +18,7 @@
 #include "ro/net/action.h"
 #include "ro/net/player_settings.h"
 #include "ro/sim/pvp_rank.h"
+#include "ro/ui/afk_clock.h"
 
 #include "game/game.h"
 

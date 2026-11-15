@@ -7,6 +7,8 @@
 #include <cstdint>
 
 #include "game/game.h"
+#include "game/ui_answers.h"
+#include "game/ui_stage.h"
 
 namespace moonclient {
 

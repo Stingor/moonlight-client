@@ -15,6 +15,8 @@
 
 #include "game/game.h"
 #include "game/message_language.h"
+#include "game/ui_answers.h"
+#include "game/ui_stage.h"
 #include "game/warp_list_stage.h"
 #include "items/transfer_hold.h"
 #include "world/click_action.h"

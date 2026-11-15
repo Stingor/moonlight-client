@@ -22,6 +22,7 @@
 
 #include "character/basic_info_compose.h"
 #include "game/game.h"
+#include "game/ui_stage.h"
 #include "world/armed_cursor.h"
 #include "world/click_action.h"
 #include "world/click_rules.h"

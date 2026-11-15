@@ -18,6 +18,7 @@
 #include "ro/sim/inventory.h"
 
 #include "game/game.h"
+#include "options/option_targets.h"
 
 namespace moonclient {
 

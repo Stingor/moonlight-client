@@ -18,7 +18,7 @@
 #include "game/game_pieces.h"
 #include "game/game_settings.h"
 #include "game/ui_layouts.h"
-#include "game/ui_stage.h"
+#include "game/ui_stage_fwd.h"
 #include "game/zone_stream_capture.h"
 #include "loading/loading_screens.h"
 #include "options/frame_pacer.h"
@@ -93,7 +93,7 @@ class ClientShell {
   ClientShell& operator=(const ClientShell&) = delete;
   ClientShell(ClientShell&&) = delete;
   ClientShell& operator=(ClientShell&&) = delete;
-  ~ClientShell() = default;
+  ~ClientShell();
 
   // Lit les réglages, pose la langue, ouvre la fenêtre et l'interface — tout
   // ce qui ne demande AUCUNE archive.
@@ -157,7 +157,7 @@ class ClientShell {
   [[nodiscard]] ro::vfs::Vfs& vfs() noexcept { return *vfs_; }
   [[nodiscard]] ro::render::GlContext& gl() noexcept { return *gl_; }
   [[nodiscard]] GameSettings& settings() noexcept { return *settings_; }
-  [[nodiscard]] UiStage::Windows& windows() noexcept { return windows_; }
+  [[nodiscard]] UiWindows& windows() noexcept { return *windows_; }
   [[nodiscard]] UiStage& interface() noexcept { return *interface_; }
   // Les profils de disposition. Voir `UiLayouts`.
   [[nodiscard]] UiLayouts& layouts() noexcept { return layouts_; }
@@ -263,8 +263,12 @@ class ClientShell {
   std::optional<GameSettings> settings_;
   std::unique_ptr<ro::render::GlContext> gl_;
   // ⚠ AVANT L'INTERFACE : voir l'ordre de destruction, en tête.
-  UiStage::Windows windows_;
-  std::optional<UiStage> interface_;
+  //
+  // ⚠ PAR POINTEUR, et c'est ce qui garde cet en-tête léger : ses lecteurs
+  // n'ont pas à relire chaque fenêtre. Les fenêtres naissent avec la coquille,
+  // l'interface à `OpenWindow`.
+  std::unique_ptr<UiWindows> windows_;
+  std::unique_ptr<UiStage> interface_;
   UiLayouts layouts_;
   // ⚠ APRÈS LE CONTEXTE GRAPHIQUE, donc détruits avant lui : ils portent des
   // textures.

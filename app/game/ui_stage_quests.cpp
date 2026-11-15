@@ -4,6 +4,7 @@
 
 #include "game/tracker_stage.h"
 #include "game/ui_stage.h"
+#include "game/ui_windows.h"
 
 namespace moonclient {
 

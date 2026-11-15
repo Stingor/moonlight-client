@@ -27,7 +27,8 @@
 #include "game/game_pieces.h"
 #include "game/game_settings.h"
 #include "game/interface_sound.h"
-#include "game/ui_stage.h"
+#include "game/ui_stage_fwd.h"
+#include "game/ui_windows.h"
 #include "voice/voice_mode.h"
 #include "world/entity_menu.h"
 #include "world/native_marker.h"
@@ -74,7 +75,9 @@ class GameFoundation {
   ro::vfs::Vfs* vfs_;
   ro::render::GlContext* gl_;
   GameSettings* settings_;
-  UiStage::Windows& windows_;
+  // ⚠ SA DÉFINITION EST INCLUSE, et non seulement nommée : presque chaque source
+  // de la partie lit ces fenêtres. C'est ici qu'elles entrent, une fois.
+  UiWindows& windows_;
   UiStage* interface_;
   GamePieces& pieces_;
   ro::audio::AudioEngine& audio_;

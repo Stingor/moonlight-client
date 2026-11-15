@@ -4,11 +4,18 @@
 
 #include <cstdint>
 
+#include "ro/ui/afk_clock.h"
 #include "ro/ui/loading_screen.h"
+#include "ro/ui/patch_screen.h"
 #include "ro/ui/survivors_church_window.h"
 #include "ro/ui/survivors_ranking_window.h"
 
+#include "chat/chat_tab_view.h"
+#include "game/ui_answers.h"
 #include "game/ui_stage.h"
+#include "game/ui_stage_survivors.h"
+#include "game/ui_stage_views.h"
+#include "game/ui_windows.h"
 
 namespace moonclient {
 

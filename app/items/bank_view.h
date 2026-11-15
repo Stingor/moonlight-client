@@ -4,7 +4,14 @@
 
 #include "ro/net/connection.h"
 #include "ro/sim/world_fwd.h"
-#include "ro/ui/bank_window.h"
+
+// La fenêtre n'est que NOMMÉE ici : `game/game.h` tient cette classe, et ses
+// lecteurs n'ont pas à se recompiler quand la fenêtre change.
+namespace ro::ui {
+struct BankWindowAction;
+struct BankWindowState;
+struct BankWindowView;
+}  // namespace ro::ui
 
 namespace moonclient {
 

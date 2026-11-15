@@ -11,6 +11,7 @@
 #include "ro/render/actor_pick.h"
 
 #include "game/game.h"
+#include "game/ui_stage.h"
 #include "world/click_action.h"
 #include "world/map_stage.h"
 #include "world/mouse_engagement.h"

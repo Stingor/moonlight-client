@@ -4,6 +4,7 @@
 #include <SDL3/SDL.h>
 
 #include "game/game.h"
+#include "game/ui_stage.h"
 #include "game/window_events.h"
 
 namespace moonclient {

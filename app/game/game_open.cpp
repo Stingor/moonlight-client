@@ -61,7 +61,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   // fenêtres appartiennent à la coquille —, et sa vue désignait la partie
   // d'avant. Les explications des PNJ bloqués se redisent aussi : c'est une
   // nouvelle session.
-  windows_.entity_menu = UiStage::Windows::EntityMenu{};
+  windows_.entity_menu = UiWindows::EntityMenu{};
   // Le groupe et la guilde que la visée d'une compétence consulte.
   world_mouse_.ties = SocialTies{.party = &party_, .guild = &guild_book_};
   settings_->options().context_menu().blocked().ForgetExplanations();
@@ -97,7 +97,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   };
   // « VOIR L'ÉQUIPEMENT » AUSSI, pour la même raison, avec ses deux cases
   // retenues : elles ne se relisent qu'ici, et la fenêtre les porte ensuite.
-  windows_.view_equip = UiStage::Windows::ViewEquip{};
+  windows_.view_equip = UiWindows::ViewEquip{};
   windows_.view_equip.state.show_empty = settings_->options().view_equip().show_empty;
   windows_.view_equip.state.compare = settings_->options().view_equip().compare;
   // L'ALBUM DE CARTES SE REFERME, SANS UN MOT AU SERVEUR : la session d'avant

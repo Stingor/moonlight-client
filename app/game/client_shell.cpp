@@ -23,6 +23,7 @@
 #include "game/game.h"
 #include "game/save_folder.h"
 #include "game/skin_reload.h"
+#include "game/ui_stage.h"
 #include "loading/loading_plans.h"
 #include "loading/loading_presenter.h"
 #include "options/screen_choice.h"
@@ -54,7 +55,10 @@ ClientShell::ClientShell(std::filesystem::path client_root, std::filesystem::pat
       archive_root_(std::move(archive_root)),
       archives_(std::move(archives)),
       web_(std::move(web)),
+      windows_(std::make_unique<UiWindows>()),
       layouts_(client_root_) {}
+
+ClientShell::~ClientShell() = default;
 
 WindowTitleMarks ClientShell::TitleMarks() {
   return WindowTitleMarks{
@@ -135,12 +139,12 @@ ro::core::Result<void> ClientShell::OpenWindow(int width, int height) {
   // PRÉCÉDENTE, réussie.
   ro::core::LogInfo("démarrage : interface");
   auto opened =
-      UiStage::Open(gl_->window(), windows_, settings_->options().font_family(),
+      UiStage::Open(gl_->window(), *windows_, settings_->options().font_family(),
                     client_root_ / ro::ui::kLooseFontFolder, InterfaceSettingsFile(client_root_));
   if (!opened) {
     return std::unexpected(opened.error());
   }
-  interface_.emplace(std::move(*opened));
+  interface_ = std::make_unique<UiStage>(std::move(*opened));
   // LA DISPOSITION « Default », avant la première image : les fenêtres naissent
   // à leur place.
   layouts_.Start(*interface_);
@@ -196,7 +200,7 @@ ro::core::Result<void> ClientShell::OpenArchives() {
   // coquille, et l'écran de connexion en joue avant qu'aucune partie n'existe.
   settings_->ApplyOptions(OptionTargets{.audio = &audio_,
                                         .music = &*music_,
-                                        .interface = &*interface_,
+                                        .interface = interface_.get(),
                                         .display = gl_.get(),
                                         .file = &settings_->file()});
   return {};
@@ -231,7 +235,7 @@ void ClientShell::EnsureWorldPieces(ro::core::LoadProgress* progress) {
 
 bool ClientShell::FollowSkinChoice() {
   const std::string_view chosen = settings_->options().pages().skin.active();
-  if (!vfs_.has_value() || !interface_.has_value() || chosen == skin_shown_) {
+  if (!vfs_.has_value() || interface_ == nullptr || chosen == skin_shown_) {
     return false;
   }
   skin_shown_ = std::string(chosen);
@@ -248,7 +252,7 @@ bool ClientShell::FollowSkinChoice() {
 
 void ClientShell::DrawLoadingFrame(const ro::core::LoadProgress* progress, float opacity,
                                    std::uint32_t now_ms) {
-  if (!interface_.has_value()) {
+  if (interface_ == nullptr) {
     return;
   }
   loading_screens_.Draw(*interface_, vfs_.has_value() ? &*vfs_ : nullptr,

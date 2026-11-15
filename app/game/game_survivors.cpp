@@ -31,6 +31,8 @@
 #include "game/game.h"
 #include "game/survivors_mode.h"
 #include "game/survivors_presence_mode.h"
+#include "game/ui_answers.h"
+#include "game/ui_stage.h"
 #include "input/hotkeys.h"
 #include "options/option_sections.h"
 #include "survivors/arena_choice.h"

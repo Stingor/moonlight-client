@@ -14,6 +14,7 @@
 #include "ro/sim/world.h"
 
 #include "game/game.h"
+#include "game/ui_stage.h"
 #include "world/armed_cursor.h"
 #include "world/click_action.h"
 #include "world/ground_unit_view.h"

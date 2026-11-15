@@ -11,7 +11,7 @@
 
 #include "game/game_pieces.h"
 #include "game/menu_icon_compose.h"
-#include "game/ui_stage.h"
+#include "game/ui_stage_fwd.h"
 #include "items/bank_view.h"
 #include "items/card_album_view.h"
 
@@ -38,9 +38,9 @@ class MvpTrackerStage;
 //
 // 🔴 ELLE REFAIT LA TÊTE DU STATUT quand l'apparence de `character_id` a changé
 // — voir `StatusHeadKeyOf` —, et seulement alors.
-[[nodiscard]] MenuIconFacts MenuIconFactsOf(const ro::sim::World& world,
-                                            const UiStage::Windows& windows, GamePieces& pieces,
-                                            const ActorStyles& styles, std::uint32_t character_id);
+[[nodiscard]] MenuIconFacts MenuIconFactsOf(const ro::sim::World& world, const UiWindows& windows,
+                                            GamePieces& pieces, const ActorStyles& styles,
+                                            std::uint32_t character_id);
 
 // CE QUI DÉCIDE DE LA TÊTE DU STATUT : celle du personnage du joueur, avec la
 // coiffure et la couleur que son acteur porte, comme sur la carte. Rien tant
@@ -58,7 +58,7 @@ class MvpTrackerStage;
 
 // Ce qu'un clic peut toucher.
 struct MenuIconTargets {
-  UiStage::Windows* windows = nullptr;
+  UiWindows* windows = nullptr;
   BankView* bank = nullptr;
   CardAlbumView* card_album = nullptr;
   CashShopStage* cash_shop = nullptr;

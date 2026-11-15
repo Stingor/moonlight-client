@@ -7,6 +7,7 @@
 #include "ro/sim/world.h"
 #include "ro/ui/chat_bar.h"
 
+#include "game/ui_stage.h"
 #include "game/window_events.h"
 #include "input/key_gate.h"
 

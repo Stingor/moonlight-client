@@ -10,7 +10,7 @@
 #include "ro/vfs/item_words.h"
 #include "ro/vfs/map_display_names.h"
 
-#include "game/ui_stage.h"
+#include "game/ui_stage_fwd.h"
 
 namespace moonclient {
 
@@ -19,7 +19,7 @@ namespace moonclient {
 // ⚠ UN CHANGEMENT DE CARTE EMPORTE LA QUESTION, sans un mot au serveur : c'est
 // ici qu'on le constate, avant de dessiner.
 void StageWarpList(ro::sim::World& world, const ro::vfs::ItemWords& words,
-                   const ro::vfs::MapDisplayNames* map_names, UiStage::Windows& windows);
+                   const ro::vfs::MapDisplayNames* map_names, UiWindows& windows);
 
 // Envoie la destination choisie, ou l'annulation, et ferme la question.
 void ApplyWarpList(const ro::ui::WarpListWindowAction& asked, ro::net::Connection& link,

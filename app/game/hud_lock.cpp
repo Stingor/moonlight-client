@@ -5,6 +5,8 @@
 
 #include "ro/core/i18n.h"
 
+#include "game/ui_stage.h"
+#include "game/ui_windows.h"
 #include "options/damage_meter_options.h"
 #include "options/game_option_ids.h"
 #include "options/menu_icons_options.h"

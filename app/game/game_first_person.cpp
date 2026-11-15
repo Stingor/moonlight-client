@@ -27,6 +27,7 @@
 #include "character/staff_view.h"
 #include "game/game.h"
 #include "game/game_settings.h"
+#include "game/ui_stage.h"
 #include "input/first_person.h"
 #include "input/free_flight.h"
 #include "input/hotkeys.h"
