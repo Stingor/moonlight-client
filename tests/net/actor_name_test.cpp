@@ -272,6 +272,92 @@ TEST_CASE("Nom d'acteur : la carte SURVIT à une réannonce", "[net][name]") {
   CHECK(actor->card->banner == "Moonlight-Destiny");
 }
 
+namespace {
+
+constexpr std::uint32_t kMonster = 110034;
+// Plus long que les 23 octets du champ d'origine.
+constexpr const char* kLongName = "Mana Overloaded Superior Rgan";
+
+[[nodiscard]] Frame LongNameFrame(std::uint32_t gid, std::uint8_t form, std::string name) {
+  ro::proto::ZcMoonlightLongName packet;
+  packet.gid = gid;
+  packet.form = form;
+  packet.party_name = "Lv. 238 | HP: 100%";
+  packet.guild_name = "Formless";
+  packet.position_name = "Neutral";
+  packet.title = "Gardien";
+  packet.name = std::move(name);
+  return Frame{.opcode = ro::proto::ZcMoonlightLongName::kOpcode,
+               .bytes = ro::proto::Encode(packet)};
+}
+
+}  // namespace
+
+TEST_CASE("Nom d'acteur : 0x0F69 pose le nom entier d'un monstre et la carte de 0x0A30",
+          "[net][name]") {
+  World world = WithActor(kMonster, ActorKind::kMonster, "Mana Overloaded Superio");
+  CHECK(ApplyActorNameFrame(LongNameFrame(kMonster, 0, kLongName), world) ==
+        FrameOutcome::kApplied);
+
+  const Actor* actor = world.Find(kMonster);
+  REQUIRE(actor != nullptr);
+  CHECK(actor->name == kLongName);
+  REQUIRE(actor->card.has_value());
+  CHECK(actor->card->aside == "Lv. 238 | HP: 100%");
+  CHECK(actor->card->banner == "Formless");
+  CHECK(actor->card->badge == "Neutral");
+  CHECK(actor->card->title.empty());
+}
+
+TEST_CASE("Nom d'acteur : 0x0F69 en forme PNJ ne porte que le titre", "[net][name]") {
+  World world = WithActor(kMonster, ActorKind::kMonster, "Mana Overloaded Superio");
+  CHECK(ApplyActorNameFrame(LongNameFrame(kMonster, 1, kLongName), world) ==
+        FrameOutcome::kApplied);
+
+  const Actor* actor = world.Find(kMonster);
+  REQUIRE(actor != nullptr);
+  CHECK(actor->name == kLongName);
+  REQUIRE(actor->card.has_value());
+  CHECK(actor->card->title == "Gardien");
+  CHECK(actor->card->aside.empty());
+  CHECK(actor->card->banner.empty());
+}
+
+TEST_CASE("Nom d'acteur : une réannonce tronquée ne coupe pas le nom entier", "[net][name]") {
+  // Le serveur réannonce un monstre à chaque pas, avec les 23 premiers octets
+  // de son nom. Le nom entier de 0x0F69 doit survivre au premier pas.
+  World world = WithActor(kMonster, ActorKind::kMonster, "Mana Overloaded Superio");
+  CHECK(ApplyActorNameFrame(LongNameFrame(kMonster, 0, kLongName), world) ==
+        FrameOutcome::kApplied);
+
+  Actor again;
+  again.id = kMonster;
+  again.kind = ActorKind::kMonster;
+  again.name = "Mana Overloaded Superio";
+  world.Spawn(std::move(again));
+
+  const Actor* actor = world.Find(kMonster);
+  REQUIRE(actor != nullptr);
+  CHECK(actor->name == kLongName);
+}
+
+TEST_CASE("Nom d'acteur : une réannonce sous un autre nom le remplace", "[net][name]") {
+  // Un nom qui ne remplit pas le champ n'est pas une coupe : c'est un nom neuf.
+  World world = WithActor(kMonster, ActorKind::kMonster, "Mana Overloaded Superio");
+  CHECK(ApplyActorNameFrame(LongNameFrame(kMonster, 0, kLongName), world) ==
+        FrameOutcome::kApplied);
+
+  Actor again;
+  again.id = kMonster;
+  again.kind = ActorKind::kMonster;
+  again.name = "Mana";
+  world.Spawn(std::move(again));
+
+  const Actor* actor = world.Find(kMonster);
+  REQUIRE(actor != nullptr);
+  CHECK(actor->name == "Mana");
+}
+
 TEST_CASE("Nom d'acteur : un autre opcode ne lui appartient pas", "[net][name]") {
   World world = WithActor(kPlayer, ActorKind::kPlayer, "Stingor");
   const Frame frame{.opcode = 0x0000, .bytes = {}};

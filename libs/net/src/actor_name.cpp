@@ -30,6 +30,10 @@ constexpr std::string_view kAbsenceTag = "[AFK] ";
 // codes du jeu y occupe un octet : on compte donc en caractères.
 constexpr std::size_t kNameFieldChars = 23;
 
+// `ZC 0x0F69` : la carte de `0x0ADF` (titre seul) — `MOONLIGHT_LONG_NAME_NPC`
+// du serveur. Toute autre valeur porte la carte de `0x0A30`.
+constexpr std::uint8_t kLongNameNpcForm = 1;
+
 // Vrai quand `shown` est `known` derrière l'étiquette d'absence, tronqué comme
 // le serveur le compose.
 //
@@ -101,6 +105,25 @@ FrameOutcome ApplyActorNameFrame(const Frame& frame, sim::World& world) {
     card.title = Said(packet.title);
     return Posted(world, static_cast<std::uint32_t>(packet.gid), Said(packet.name),
                   std::move(card));
+  }
+
+  if (frame.opcode == proto::ZcMoonlightLongName::kOpcode) {
+    proto::ZcMoonlightLongName packet;
+    if (!proto::Decode(frame.bytes, packet)) {
+      return FrameOutcome::kUndecodable;
+    }
+    // LA MÊME CARTE que la trame qu'elle remplace, et le nom entier. `form` dit
+    // laquelle : un PNJ (0x0ADF) n'a que son titre en toutes lettres.
+    sim::NameCard card;
+    if (packet.form == kLongNameNpcForm) {
+      card.title = Said(packet.title);
+    } else {
+      card.aside = Said(packet.party_name);
+      card.banner = Said(packet.guild_name);
+      card.badge = Said(packet.position_name);
+      card.title_id = packet.title_id;
+    }
+    return Posted(world, packet.gid, Said(packet.name), std::move(card));
   }
 
   return FrameOutcome::kUnhandled;

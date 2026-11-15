@@ -5,8 +5,10 @@
 #include <cstdint>
 #include <optional>
 #include <string>
+#include <string_view>
 #include <utility>
 
+#include "ro/core/text.h"
 #include "ro/sim/actor_traces.h"
 #include "ro/sim/motion_events.h"
 #include "ro/sim/movement.h"
@@ -24,6 +26,24 @@ float CellDistance(CellPosition from, CellPosition to) {
   const auto dx = static_cast<float>(static_cast<int>(to.x) - static_cast<int>(from.x));
   const auto dy = static_cast<float>(static_cast<int>(to.y) - static_cast<int>(from.y));
   return std::sqrt(dx * dx + dy * dy);
+}
+
+// Ce que le champ de nom d'une apparition porte, zéro final non compris
+// (`NAME_LENGTH` moins un) : des octets de la page de codes du jeu, donc
+// autant de caractères.
+constexpr std::size_t kSpawnNameFieldChars = 23;
+
+// Vrai quand `announced` est `known` coupé au champ plein d'une apparition :
+// le nom entier d'un monstre (`ZC 0x0F69`) qu'une réannonce redit tronqué.
+[[nodiscard]] bool IsSpawnNameCut(std::string_view announced, std::string_view known) {
+  if (announced.empty() || known.size() <= announced.size() || !known.starts_with(announced)) {
+    return false;
+  }
+  std::size_t chars = 0;
+  for (std::size_t at = 0; at < announced.size(); ++chars) {
+    static_cast<void>(core::NextCodePoint(announced, at));
+  }
+  return chars == kSpawnNameFieldChars;
 }
 
 }  // namespace
@@ -141,6 +161,11 @@ void World::Spawn(Actor actor) {
     // qu'une réannonce ne redit pas. Un joueur qui fait un pas perdrait sa
     // guilde, et plus rien ne la redirait tant qu'il reste en vue.
     actor.card = std::move(found->second.card);
+    // ET LE NOM ENTIER d'un monstre, pour la même raison : la réannonce n'en
+    // porte que les 23 premiers octets, et le nom se couperait au premier pas.
+    if (IsSpawnNameCut(actor.name, found->second.name)) {
+      actor.name = std::move(found->second.name);
+    }
     // ET SON RANG PVP, pour la même raison : il vient d'un paquet à lui, que la
     // réannonce ne redit pas. Le perdre ferait tomber l'anneau des dix premiers
     // au premier pas de celui qui le porte, et rien ne le remettrait avant que

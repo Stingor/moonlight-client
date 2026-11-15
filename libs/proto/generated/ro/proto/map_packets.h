@@ -5151,6 +5151,22 @@ struct ZcMoonlightStaffRoster {
   std::vector<MoonlightStaffRosterEntry> entries;
 };
 
+// PACKET_ZC_MOONLIGHT_LONG_NAME
+struct ZcMoonlightLongName {
+  static constexpr std::uint16_t kOpcode = 0x0f69;
+  // Taille sur le fil SANS la queue variable, qui la porte elle-même.
+  static constexpr std::size_t kWireSize = 109;
+
+  std::uint32_t gid = 0;
+  std::uint8_t form = 0;
+  std::int32_t title_id = 0;
+  std::string party_name;
+  std::string guild_name;
+  std::string position_name;
+  std::string title;
+  std::string name;
+};
+
 // PACKET_ZC_MOONLIGHT_INSTANCE_INFO
 struct ZcMoonlightInstanceInfo {
   static constexpr std::uint16_t kOpcode = 0x0f40;
@@ -8802,6 +8818,7 @@ struct CzMoveItemToPersonal {
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightChatBlocks& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzMoonlightReqStaffRoster& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightStaffRoster& packet);
+[[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightLongName& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightInstanceInfo& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzMoonlightMarketReq& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightMarket& packet);
@@ -9447,6 +9464,7 @@ struct CzMoveItemToPersonal {
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightChatBlocks& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonlightReqStaffRoster& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightStaffRoster& packet);
+[[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightLongName& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightInstanceInfo& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonlightMarketReq& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightMarket& packet);

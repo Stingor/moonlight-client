@@ -32,6 +32,11 @@ namespace ro::net {
 //     élémentaire, et un monstre quand `show_mob_info` est à zéro. Nom et
 //     titre en toutes lettres, rien d'autre.
 //
+// UN TROISIÈME, À LA PLACE DES DEUX, pour un monstre dont le nom dépasse leur
+// champ de 24 octets : `ZC 0x0F69` (`ZC_MOONLIGHT_LONG_NAME`), la même carte et
+// le nom entier, à qui annonce `kUiCapLongMobName`. `World::Spawn` garde ce nom
+// quand une réannonce n'en redit que les 23 premiers octets.
+//
 // ⚠ CE SERVEUR-CI POSE `show_mob_info: 6` : ses monstres passent donc par
 // 0x0A30, et leur niveau et leur vie arrivent DANS LE CHAMP DU GROUPE. Voir
 // `sim::NameCard`, qui nomme ces champs par leur PLACE et non par leur sens.

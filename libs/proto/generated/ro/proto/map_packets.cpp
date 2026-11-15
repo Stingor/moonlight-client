@@ -12139,6 +12139,49 @@ std::vector<std::uint8_t> Encode(const ZcMoonlightStaffRoster& packet) {
   return out;
 }
 
+bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightLongName& packet) {
+  if (frame.size() < ZcMoonlightLongName::kWireSize) {
+    return false;
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != ZcMoonlightLongName::kOpcode) {
+    return false;
+  }
+  // La longueur est déjà connue : c'est celle de la trame.
+  reader.Skip(2);
+  packet.gid = static_cast<std::uint32_t>(reader.U32());
+  packet.form = static_cast<std::uint8_t>(reader.U8());
+  packet.title_id = static_cast<std::int32_t>(reader.I32());
+  packet.party_name = reader.FixedString(24);
+  packet.guild_name = reader.FixedString(24);
+  packet.position_name = reader.FixedString(24);
+  packet.title = reader.FixedString(24);
+  packet.name = reader.TailString();
+  return reader.ok();
+}
+
+std::vector<std::uint8_t> Encode(const ZcMoonlightLongName& packet) {
+  std::vector<std::uint8_t> out;
+  out.reserve(ZcMoonlightLongName::kWireSize);
+  ByteWriter writer(out);
+  writer.U16(ZcMoonlightLongName::kOpcode);
+  // Réservée : la longueur ne sera connue qu'une fois la queue écrite.
+  writer.U16(0);
+  writer.U32(static_cast<std::uint32_t>(packet.gid));
+  writer.U8(static_cast<std::uint8_t>(packet.form));
+  writer.I32(static_cast<std::int32_t>(packet.title_id));
+  writer.FixedString(packet.party_name, 24);
+  writer.FixedString(packet.guild_name, 24);
+  writer.FixedString(packet.position_name, 24);
+  writer.FixedString(packet.title, 24);
+  writer.Text(packet.name);
+  if (writer.size() > kMaxFrameSize ||
+      !writer.PatchU16(kLengthOffset, static_cast<std::uint16_t>(writer.size()))) {
+    return {};
+  }
+  return out;
+}
+
 bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightInstanceInfo& packet) {
   if (frame.size() < ZcMoonlightInstanceInfo::kWireSize) {
     return false;

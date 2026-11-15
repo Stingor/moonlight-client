@@ -30,7 +30,8 @@ namespace moonclient {
 // Et le Marché, qu'un catalogue ouvre à la place de la recherche d'échoppes,
 // l'habit du GM d'un administrateur, qu'il sait dessiner, et les éditions de
 // carte que le serveur tient. Et l'élément d'attaque des joueurs, même lueur
-// élémentaire éteinte. Et la parole d'un PNJ au-delà du tampon de chat du serveur.
+// élémentaire éteinte. Et la parole d'un PNJ au-delà du tampon de chat du serveur,
+// et le nom entier d'un monstre au-delà du champ de 24 octets.
 inline constexpr std::uint32_t kAlwaysShownSurfaces =
     ro::net::kUiCapNpcDialog | ro::net::kUiCapChat | ro::net::kUiCapCardAlbum |
     ro::net::kUiCapCardAlbumDropper | ro::net::kUiCapFlagGraffiti | ro::net::kUiCapUnitMaster |
@@ -38,7 +39,7 @@ inline constexpr std::uint32_t kAlwaysShownSurfaces =
     ro::net::kUiCapCompanionMaster | ro::net::kUiCapChatAuthor | ro::net::kUiCapDiscordRich |
     ro::net::kUiCapEquipAttributes | ro::net::kUiCapInstanceInfo | ro::net::kUiCapMarket |
     ro::net::kUiCapGmOutfit | ro::net::kUiCapMapEdits | ro::net::kUiCapAttackElement |
-    ro::net::kUiCapLongNpcTalk;
+    ro::net::kUiCapLongNpcTalk | ro::net::kUiCapLongMobName;
 [[nodiscard]] constexpr std::uint32_t ShownSurfaces(bool mvp_tracker_enabled) noexcept {
   return kAlwaysShownSurfaces | (mvp_tracker_enabled ? ro::net::kUiCapMvpTracker : 0U);
 }

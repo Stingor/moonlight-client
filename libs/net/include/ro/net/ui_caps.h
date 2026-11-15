@@ -104,6 +104,11 @@ inline constexpr std::uint32_t kUiCapLongNpcTalk = 0x00800000;
 // `player_style_layers.h`. Elle n'entre dans le masque que si la table des
 // longueurs connaît ces deux ZC.
 inline constexpr std::uint32_t kUiCapStyleLayers = 0x01000000;
+// 🔴 UNE CAPACITÉ DE LECTURE : ce client lit le nom ENTIER d'un monstre
+// (`ZC 0x0F69`, voir `actor_name.h`), que le serveur lui envoie à la place de
+// `0x0A30` ou `0x0ADF` quand ce nom dépasse leur champ de 24 octets. Sans elle,
+// il reçoit le nom tronqué à 23 octets, comme avant.
+inline constexpr std::uint32_t kUiCapLongMobName = 0x02000000;
 
 [[nodiscard]] core::Result<void> AnnounceUiCaps(Connection& link, std::uint32_t caps);
 
