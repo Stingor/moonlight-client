@@ -39,6 +39,7 @@ add_library(ro_formats STATIC
     src/named_effects.cpp
     src/navi_tables.cpp
     src/grf.cpp
+    src/grf_delta.cpp
     src/grf_merge.cpp
     src/grf_writer.cpp
     src/icon_tint.cpp

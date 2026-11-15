@@ -69,6 +69,13 @@ struct GrfListing {
 // ne se paie qu'au moment de fusionner un patch.
 [[nodiscard]] core::Result<GrfListing> ListGrfEntries(core::ByteSource& source);
 
+// Décompresse une entrée de l'archive que porte `source`. Erreur si l'entrée
+// est chiffrée, ou si le flux ne rend pas la taille annoncée. `reported_path`
+// ne sert qu'aux messages d'erreur.
+[[nodiscard]] core::Result<std::vector<std::uint8_t>> ReadGrfEntry(core::ByteSource& source,
+                                                                   const GrfEntry& entry,
+                                                                   std::string_view reported_path);
+
 // Minuscules ASCII et séparateurs en antislash, comme le client normalise ses
 // chemins d'archive. Seul A-Z est abaissé : un second octet CP949 peut tomber
 // dans cette plage, et le toucher casserait le nom coréen.

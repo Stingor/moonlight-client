@@ -66,6 +66,7 @@ add_executable(ro_tests
     formats/gnd_test.cpp
     formats/gr2_test.cpp
     formats/grf_test.cpp
+    formats/grf_delta_test.cpp
     formats/grf_merge_test.cpp
     formats/lua_source_test.cpp
     formats/lua_table_test.cpp

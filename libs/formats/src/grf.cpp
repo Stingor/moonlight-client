@@ -366,6 +366,11 @@ Result<std::vector<std::uint8_t>> GrfArchive::Read(std::string_view path) {
 
 Result<std::vector<std::uint8_t>> GrfArchive::Read(const GrfEntry& entry,
                                                    std::string_view reported_path) {
+  return ReadGrfEntry(*source_, entry, reported_path);
+}
+
+Result<std::vector<std::uint8_t>> ReadGrfEntry(core::ByteSource& source, const GrfEntry& entry,
+                                               std::string_view reported_path) {
   if (entry.is_encrypted()) {
     return Fail(ErrorCode::kEncrypted,
                 std::string(reported_path) + " (flags " + std::to_string(entry.flags) + ")");
@@ -377,13 +382,13 @@ Result<std::vector<std::uint8_t>> GrfArchive::Read(const GrfEntry& entry,
   if (entry.real_size == 0) {
     return std::vector<std::uint8_t>{};
   }
-  if (entry.data_offset > source_->size()) {
+  if (entry.data_offset > source.size()) {
     return Fail(ErrorCode::kCorruptData, std::string(reported_path) + " : offset " +
                                              std::to_string(entry.data_offset) +
                                              " au-delà du fichier");
   }
 
-  auto compressed = source_->ReadBlock(kGrfHeaderSize + entry.data_offset, entry.compressed_size);
+  auto compressed = source.ReadBlock(kGrfHeaderSize + entry.data_offset, entry.compressed_size);
   if (!compressed) {
     return std::unexpected(compressed.error());
   }
