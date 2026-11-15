@@ -28,6 +28,9 @@
 #include "loading/loading_plans.h"
 #include "loading/loading_presenter.h"
 #include "options/screen_choice.h"
+#include "options/skin_look_options.h"
+#include "options/skin_options.h"
+#include "options/window_title_options.h"
 #include "shell/skin_folder.h"
 #include "world/map_music.h"
 #include "world/map_stage.h"
@@ -63,7 +66,7 @@ ClientShell::~ClientShell() = default;
 
 WindowTitleMarks ClientShell::TitleMarks() {
   return WindowTitleMarks{
-      .revision_shown = settings_->options().pages().window_title.revision_shown(),
+      .revision_shown = settings_->options().pages().window_title->revision_shown(),
       .test_server = test_server_};
 }
 
@@ -93,10 +96,10 @@ ro::core::Result<void> ClientShell::OpenWindow(int width, int height) {
   ro::core::LogInfo("démarrage : lecture des réglages");
   settings_.emplace(client_root_);
   // LES SKINS INSTALLÉS, pour la liste des options et pour le choix lu ici.
-  settings_->options().pages().skin.SeeInstalled(InstalledSkins(client_root_));
+  settings_->options().pages().skin->SeeInstalled(InstalledSkins(client_root_));
   // L'HABILLAGE DU SKIN, rangé dans son dossier.
-  settings_->options().pages().skin_look.Open(
-      SkinFolder(client_root_, settings_->options().pages().skin.active()),
+  settings_->options().pages().skin_look->Open(
+      SkinFolder(client_root_, settings_->options().pages().skin->active()),
       SkinLookProfilePath(client_root_));
   // ⚠ LA LANGUE DÈS MAINTENANT : l'écran de mise à jour parle avant que le
   // reste des réglages s'applique. SANS CIBLE, donc sans rien enregistrer ;
@@ -164,7 +167,7 @@ ro::core::Result<void> ClientShell::OpenArchives() {
   }
   vfs_.emplace(std::move(*vfs));
   SeedDefaultSkin(*vfs_, client_root_);
-  skin_shown_ = std::string(settings_->options().pages().skin.active());
+  skin_shown_ = std::string(settings_->options().pages().skin->active());
   UseSkin(*vfs_, client_root_, skin_shown_);
   ReportStage("archives");
 
@@ -175,7 +178,7 @@ ro::core::Result<void> ClientShell::OpenArchives() {
   ro::core::BeginLoadStep(loading.progress(), ro::core::LoadStep::kInterface);
   LoadShellPieces(*vfs_, pieces_);
   interface_->UseSkin(pieces_.skin);
-  interface_->SetSkinLook(settings_->options().pages().skin_look.look());
+  interface_->SetSkinLook(settings_->options().pages().skin_look->look());
   ReportStage("pièces de la coquille");
 
   // Le SON. Une machine sans carte son ne doit pas empêcher de jouer : on le
@@ -235,7 +238,7 @@ void ClientShell::EnsureWorldPieces(ro::core::LoadProgress* progress) {
 }
 
 bool ClientShell::FollowSkinChoice() {
-  const std::string_view chosen = settings_->options().pages().skin.active();
+  const std::string_view chosen = settings_->options().pages().skin->active();
   if (!vfs_.has_value() || interface_ == nullptr || chosen == skin_shown_) {
     return false;
   }

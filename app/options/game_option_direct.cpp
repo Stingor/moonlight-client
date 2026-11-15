@@ -30,6 +30,9 @@
 #include "ro/ui/system_fonts.h"
 
 #include "options/game_options.h"
+#include "options/graphics_options.h"
+#include "options/menu_icons_options.h"
+#include "options/shop_options.h"
 
 namespace moonclient {
 namespace {
@@ -117,19 +120,19 @@ bool GameOptions::ToggleExpandedZoom(const OptionTargets& to) {
 }
 
 bool GameOptions::ToggleLightmaps(const OptionTargets& to) {
-  const bool on = pages_.graphics.ToggleLightmaps();
+  const bool on = pages_.graphics->ToggleLightmaps();
   Record(to);
   return on;
 }
 
 bool GameOptions::ToggleFog(const OptionTargets& to) {
-  const bool on = pages_.graphics.ToggleFog();
+  const bool on = pages_.graphics->ToggleFog();
   Record(to);
   return on;
 }
 
 bool GameOptions::ToggleShopSetting(ShopRow row, const OptionTargets& to) {
-  const bool on = pages_.shops.Toggle(row);
+  const bool on = pages_.shops->Toggle(row);
   Record(to);
   return on;
 }
@@ -143,7 +146,7 @@ bool GameOptions::ToggleNoCtrl(const OptionTargets& to) {
 
 // ⚠ RIEN À POUSSER : les icônes dessinent la place même que la page tient.
 bool GameOptions::ToggleCashShopButton(const OptionTargets& to) {
-  const bool shown = pages_.menu_icons.ToggleCashShopButton();
+  const bool shown = pages_.menu_icons->ToggleCashShopButton();
   Record(to);
   return shown;
 }

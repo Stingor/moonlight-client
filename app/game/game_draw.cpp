@@ -36,6 +36,11 @@
 #include "game/ui_answers.h"
 #include "game/ui_stage.h"
 #include "game/ui_stage_views.h"
+#include "options/grey_world_options.h"
+#include "options/pick_precision_options.h"
+#include "options/shop_options.h"
+#include "options/signboard_options.h"
+#include "options/sprite_sound_options.h"
 #include "world/actor_carts.h"
 #include "world/actor_falcons.h"
 #include "world/actor_models.h"
@@ -71,7 +76,7 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   const std::optional<ro::sim::CellPosition> hovered_cell = HoveredCell();
   const ro::ui::PickTuning pick_tuning = ro::ui::PickTuningOf(
       windows_.staff_tools->look.picking, Rights().staff_tools, static_cast<float>(shell_.width()),
-      settings_->options().pages().pick_precision.floor_shift());
+      settings_->options().pages().pick_precision->floor_shift());
 
   // LE MONDE, DANS SA CIBLE À LUI quand la page « Graphics » en demande une —
   // MSAA, échelle de rendu, post-traitement, flou de rotation ; droit dans la fenêtre sinon.
@@ -113,7 +118,7 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
   pieces_.music_player->Advance(windows_.music_player, music_, audio_, stage_->name);
 
   // LE SOL UNI, quand l'établi ou GreyWorld le demandent : voir `FlatGroundOf`.
-  const ro::render::GreyWorldLook& grey_world = settings_->options().pages().grey_world.look();
+  const ro::render::GreyWorldLook& grey_world = settings_->options().pages().grey_world->look();
   ro::render::TerrainStages stages =
       TerrainStagesOf(graphics, ro::render::GreyWorldHidesLightmap(grey_world));
   stages.flat_color =
@@ -437,7 +442,7 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
                          now_ms,
                          pieces_.wardrobe->has_value() ? &**pieces_.wardrobe : nullptr,
                          effects_.has_value() ? &*effects_ : nullptr,
-                         settings_->options().pages().sprite_sounds.mutes(),
+                         settings_->options().pages().sprite_sounds->mutes(),
                          &scene_actors_.head_shifts,
                          &scene_actors_.hover_pixels,
                          ProjectileLooksOf(settings_->options().graphics()),
@@ -607,7 +612,7 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
       .setting_reach = SettingReachOf(pieces_),
       .entity_bars = settings_->options().entity_bars(),
       .entity_bars_on_screen = &entity_bars_,
-      .signboards = settings_->options().pages().signboards.Style(
+      .signboards = settings_->options().pages().signboards->Style(
           settings_->options().shops().signboards_shown()),
       .options_open = windows_.options->open,
       .cast_bars_on_screen = &cast_bars_,
@@ -616,7 +621,7 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
       .emblems = guild_emblems_.has_value() ? &guild_emblems_->plates() : nullptr,
       .arena_status = &survivors_presence_->labels,
       .pvp_hud = settings_->options().pvp_hud(),
-      .battleground = settings_->options().pages().battleground.settings(),
+      .battleground = settings_->options().pages().battleground->settings(),
       // L'ADMINISTRATEUR comme le menu d'entité le reconnaît : le niveau de
       // groupe que le serveur nous annonce.
       .sees_concealed_enemies = Rights().staff_tools && world_.group_level() >= kAdminMinGroupLevel,
@@ -630,7 +635,7 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
       .game_hud = &pieces_.over_world->game_hud(),
       .voice = &*windows_.voice,
       .speaking_icon =
-          static_cast<SpeakingIcon>(settings_->options().pages().voice.settings().speaking_icon)};
+          static_cast<SpeakingIcon>(settings_->options().pages().voice->settings().speaking_icon)};
   // 🔴 ET LA VEILLE LES EFFACE AUSSI, pas seulement les fenêtres. Chez le client
   // d'origine, les étiquettes de nom et les bulles sortent du MÊME appel que
   // les fenêtres. Ici ce sont deux chemins, et n'en couper qu'un laisserait les

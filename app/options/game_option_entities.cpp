@@ -25,9 +25,12 @@
 #include "ro/ui/entity_bars.h"
 #include "ro/ui/entity_sample.h"
 
+#include "options/cast_bar_options.h"
 #include "options/entity_page_tabs.h"
 #include "options/game_options.h"
 #include "options/option_row_kinds.h"
+#include "options/pick_precision_options.h"
+#include "options/signboard_options.h"
 
 namespace moonclient {
 namespace {
@@ -153,7 +156,7 @@ void GameOptions::BuildEntityBarRows(int shown_tab) {
 
   const bool bars_off = !entity_bars_.shown;
   entity_bar_rows_.clear();
-  pages_.cast_bars.Compose(settles.bars);
+  pages_.cast_bars->Compose(settles.bars);
 
   // 🔴 NI UN `static`, NI UN LOCAL : une rangée ne COPIE pas ses choix, elle en
   // garde un `span`. Un `static` les capture une fois et le catalogue qui les
@@ -191,11 +194,11 @@ void GameOptions::BuildEntityBarRows(int shown_tab) {
     const ro::ui::EntitySample* sample = &pages_.entity_sample;
     const ro::ui::EntityBarsLook bars = entity_bars_;
     const ro::render::EntityNamesLook names = entity_names_;
-    const ro::ui::CastBarsLook cast = pages_.cast_bars.look();
+    const ro::ui::CastBarsLook cast = pages_.cast_bars->look();
     const ro::ui::EntitySampleShown drawn = EntityPageDrawn(tab);
     // LA ZONE QUI RÉPOND AU CLIC, du plancher de la famille : un item au sol a
     // le sien, plus petit que celui d'un acteur.
-    const ro::ui::EntityPickZones zones = pages_.pick_precision.ZonesFor(
+    const ro::ui::EntityPickZones zones = pages_.pick_precision->ZonesFor(
         tab == EntityPageTab::kGroundItem ? ro::render::kGroundPickFloorFactor
                                           : ro::render::kActorPickFloorFactor,
         ImGui::GetIO().DisplaySize.x);
@@ -452,7 +455,7 @@ void GameOptions::BuildEntityBarRows(int shown_tab) {
   }
 
   // ── LE CAST ───────────────────────────────────────────────────────────────
-  const std::span<const OptionRowView> cast = pages_.cast_bars.rows();
+  const std::span<const OptionRowView> cast = pages_.cast_bars->rows();
   if (!cast.empty()) {
     const std::size_t cast_first = entity_bar_rows_.size();
     entity_bar_rows_.insert(entity_bar_rows_.end(), cast.begin(), cast.end());
@@ -461,14 +464,14 @@ void GameOptions::BuildEntityBarRows(int shown_tab) {
 
   // ── LES ENSEIGNES ─────────────────────────────────────────────────────────
   if (signboards) {
-    pages_.signboards.ComposeInto(entity_bar_rows_, pages_.shops);
+    pages_.signboards->ComposeInto(entity_bar_rows_, pages_.shops);
   }
 
   // ── CE QUI VAUT POUR TOUS LES ONGLETS : barres, noms, cast ───────────────
   entity_name_shared_rows_.front().heading = Tr("Noms");
   entity_bar_shared_rows_.insert(entity_bar_shared_rows_.end(), entity_name_shared_rows_.begin(),
                                  entity_name_shared_rows_.end());
-  const std::span<const OptionRowView> cast_shared = pages_.cast_bars.shared_rows();
+  const std::span<const OptionRowView> cast_shared = pages_.cast_bars->shared_rows();
   const std::size_t cast_shared_first = entity_bar_shared_rows_.size();
   entity_bar_shared_rows_.insert(entity_bar_shared_rows_.end(), cast_shared.begin(),
                                  cast_shared.end());
@@ -477,7 +480,7 @@ void GameOptions::BuildEntityBarRows(int shown_tab) {
   }
   // ET LA ZONE QUI RÉPOND AU CLIC, dans son bloc : elle aussi vaut pour toutes
   // les espèces, et le cadre la montre autour de l'entité.
-  const std::span<const OptionRowView> pick = pages_.pick_precision.rows();
+  const std::span<const OptionRowView> pick = pages_.pick_precision->rows();
   const std::size_t pick_first = entity_bar_shared_rows_.size();
   entity_bar_shared_rows_.insert(entity_bar_shared_rows_.end(), pick.begin(), pick.end());
   if (pick_first < entity_bar_shared_rows_.size()) {

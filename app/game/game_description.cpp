@@ -37,6 +37,8 @@
 #include "game/ui_answers.h"
 #include "game/ui_stage.h"
 #include "game/ui_window_rounds.h"
+#include "options/bug_report_options.h"
+#include "options/description_options.h"
 #include "world/player_report.h"
 
 namespace moonclient {

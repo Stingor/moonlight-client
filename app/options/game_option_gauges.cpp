@@ -76,7 +76,7 @@ void GameOptions::BuildStatBarShared(bool gauge_tab) {
          "ou un coin pour retailler. CTRL déplace d'un bloc les cadres qui se touchent."),
       nullptr, stat_bars_.locked));
   // Grisé seulement quand il ne fige plus rien à l'écran.
-  stat_bar_shared_rows_.back().disabled = bars_off && !pages_.portrait.look().AnyShown();
+  stat_bar_shared_rows_.back().disabled = bars_off && !pages_.portrait->look().AnyShown();
   // ⚠ SUR TOUS LES ONGLETS, comme le verrou : la fenêtre n'est à aucun.
   stat_bar_shared_rows_.push_back(
       Toggle(GameOption::kBasicInfoWindowShown, Tr("Montrer la fenêtre Basic Info du jeu"),
@@ -148,8 +148,8 @@ void GameOptions::BuildStatBarRows(int shown_bar) {
   if (portrait_tab) {
     const auto tab = static_cast<PortraitTab>(shown_bar - static_cast<int>(kPortraitTab));
     // Chaque onglet n'a que ses lignes : la recherche ne voit aucun doublon.
-    pages_.portrait.Compose(tab, stat_bars_.locked);
-    const std::span<const OptionRowView> portrait = pages_.portrait.rows();
+    pages_.portrait->Compose(tab, stat_bars_.locked);
+    const std::span<const OptionRowView> portrait = pages_.portrait->rows();
     stat_bar_rows_.assign(portrait.begin(), portrait.end());
     return;
   }

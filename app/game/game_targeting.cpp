@@ -29,6 +29,7 @@
 #include "game/trade_stages.h"
 #include "game/ui_stage.h"
 #include "items/doll_effects.h"
+#include "options/graphics_options.h"
 #include "world/armed_cursor.h"
 #include "world/click_action.h"
 #include "world/click_rules.h"

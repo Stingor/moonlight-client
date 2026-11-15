@@ -12,6 +12,9 @@
 
 #include "game/game.h"
 #include "options/game_options.h"
+#include "options/grey_world_options.h"
+#include "options/map_sign_options.h"
+#include "world/map_sign_stage.h"
 #include "world/scene_graphics.h"
 
 namespace moonclient {
@@ -32,7 +35,7 @@ void Game::RaiseMapSky(std::uint32_t now_ms) {
   GameOptions& options = settings_->options();
   const bool sky_cut = !options.sky_shown();
   const bool hide_sky =
-      sky_cut || ro::render::GreyWorldHidesMapEffects(options.pages().grey_world.look());
+      sky_cut || ro::render::GreyWorldHidesMapEffects(options.pages().grey_world->look());
   const bool hide_weather = sky_cut;
   if (sky_raised_ && hide_sky == sky_hidden_ && hide_weather == weather_hidden_) {
     return;
@@ -121,7 +124,7 @@ void Game::AdvanceMapEffects(std::uint32_t now_ms) {
     pieces_.map_sign->Enter(pieces_.map_display_names->has_value()
                                 ? (*pieces_.map_display_names)->SignOf(MapSignFileOf(stage_->name))
                                 : nullptr,
-                            settings_->options().pages().map_sign.mode(), now_ms);
+                            settings_->options().pages().map_sign->mode(), now_ms);
     map_effects_raised_ = true;
   }
   // LES CHEMINÉES QU'UN EFFET ANNONCÉ A DEMANDÉES rejoignent celles du RSW, et
@@ -177,7 +180,7 @@ void Game::AdvanceMapEffects(std::uint32_t now_ms) {
   // GREYWORLD TAIT LES SEMEURS sans les arrêter : ils gardent leur cadence, et
   // reprennent au même pas quand le réglage les rend.
   if (effects_.has_value() &&
-      !ro::render::GreyWorldHidesMapEffects(settings_->options().pages().grey_world.look())) {
+      !ro::render::GreyWorldHidesMapEffects(settings_->options().pages().grey_world->look())) {
     for (const ro::render::MapEffectSowing& sowing : map_effects_.sown()) {
       effects_->PlayById(static_cast<std::uint32_t>(sowing.effect_id), sowing.world_position,
                          now_ms, 0, false, 0, true, 0, sowing.instance_scale,
@@ -189,7 +192,7 @@ void Game::AdvanceMapEffects(std::uint32_t now_ms) {
 void Game::DrawMapEffects() {
   map_effect_quads_.clear();
   const bool hides_map_effects =
-      ro::render::GreyWorldHidesMapEffects(settings_->options().pages().grey_world.look());
+      ro::render::GreyWorldHidesMapEffects(settings_->options().pages().grey_world->look());
   for (const ro::render::MapEffectLot& lot : map_effects_.Lots(
            camera_,
            stage_->scene.chimney_smoke.has_value() ? &*stage_->scene.chimney_smoke : nullptr)) {

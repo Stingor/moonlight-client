@@ -1,0 +1,53 @@
+#pragma once
+
+// TOUTES LES PAGES DE RÉGLAGES, complètes : pour les sources qui les composent
+// toutes à la fois — le panneau, ses rangées, la lecture et l'application des
+// réglages.
+//
+// ⚠ UNE SOURCE QUI N'EN LIT QUE QUELQUES-UNES INCLUT LEURS SEULS EN-TÊTES :
+// celui-ci fait relire chaque page, et la recompile quand l'une d'elles change.
+
+#include "options/afk_options.h"
+#include "options/battleground_options.h"
+#include "options/broadcast_balloon_options.h"
+#include "options/bug_report_options.h"
+#include "options/call_options.h"
+#include "options/card_album_options.h"
+#include "options/cast_bar_options.h"
+#include "options/chat_web_options.h"
+#include "options/companion_zones_memory.h"
+#include "options/context_menu_options.h"
+#include "options/craft_atlas_options.h"
+#include "options/damage_meter_options.h"
+#include "options/deal_refusal_options.h"
+#include "options/description_options.h"
+#include "options/factory_layout.h"
+#include "options/graphics_options.h"
+#include "options/grey_world_options.h"
+#include "options/grimoire_key_options.h"
+#include "options/make_item_options.h"
+#include "options/map_sign_options.h"
+#include "options/menu_icons_options.h"
+#include "options/minimap_panel_options.h"
+#include "options/monster_sheet_options.h"
+#include "options/mvp_tracker_options.h"
+#include "options/option_pages.h"
+#include "options/pet_options.h"
+#include "options/pick_precision_options.h"
+#include "options/quest_tracker_options.h"
+#include "options/quick_cast_options.h"
+#include "options/shop_options.h"
+#include "options/signboard_options.h"
+#include "options/skill_view_options.h"
+#include "options/skin_look_options.h"
+#include "options/skin_options.h"
+#include "options/sprite_sound_options.h"
+#include "options/status_portrait_options.h"
+#include "options/talk_filter_options.h"
+#include "options/target_options.h"
+#include "options/view_equip_memory.h"
+#include "options/voice_options.h"
+#include "options/weapon_refine_options.h"
+#include "options/whisper_options.h"
+#include "options/window_title_options.h"
+#include "party/party_options.h"

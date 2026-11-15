@@ -28,6 +28,7 @@
 #include "game/ui_stage.h"
 #include "game/ui_window_rounds.h"
 #include "mvp/mvp_tracker_stage.h"
+#include "options/battleground_options.h"
 #include "world/battlefield_view.h"
 #include "world/map_stage.h"
 #include "world/minimap_compose.h"
@@ -287,11 +288,12 @@ void Game::AdvanceNavigation(std::uint32_t now_ms) {
     sources.store_search = &pieces_.trade->store_search().search();
     // LES TOMBES DU CARNET DE CHASSE, que son interrupteur et son réglage
     // éteignent ensemble.
-    const MvpTrackerSettings hunt = settings_->options().pages().mvp_tracker.settings();
+    const MvpTrackerSettings hunt = settings_->options().pages().mvp_tracker->settings();
     sources.tombs =
         pieces_.mvp_tracker->TombsOn(here, hunt.enabled && hunt.show_tombs, LocalUnixSeconds());
     // LES COÉQUIPIERS DU CHAMP DE BATAILLE, dans la couleur de notre camp.
-    sources.battle_mates_shown = settings_->options().pages().battleground.settings().minimap_mates;
+    sources.battle_mates_shown =
+        settings_->options().pages().battleground->settings().minimap_mates;
     sources.battle_mate_color = BattleSideColor(world_.battlefield().own_side());
     sources.image_at = image_at;
     // L'HEURE DU SERVEUR, dans le fuseau que `moonclient.yml` lui donne.

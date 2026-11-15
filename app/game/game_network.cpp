@@ -59,6 +59,9 @@
 #include "input/camera_aim.h"
 #include "loading/loading_plans.h"
 #include "loading/loading_presenter.h"
+#include "options/deal_refusal_options.h"
+#include "options/grey_world_options.h"
+#include "options/mvp_tracker_options.h"
 #include "world/attack_intent.h"
 #include "world/battle_log.h"
 #include "world/click_action.h"
@@ -284,7 +287,7 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
     // Les bits du classement survivors, de la voix et des calques n'y entrent que si la
     // table des longueurs connaît leurs ZC.
     PumpHandshake(link_, handshake_, reported_handshake_, pieces_,
-                  settings_->options().pages().mvp_tracker.settings().enabled,
+                  settings_->options().pages().mvp_tracker->settings().enabled,
                   survivors_ranking_.caps() | survivors_presence_->mode.caps() |
                       survivors_presence_->coop.caps() | voice_.caps() | ro::net::StyleLayerCaps(),
                   now_ms);
@@ -342,7 +345,7 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
     }
     const std::string left_map = stage_->name;
     const bool flatten =
-        ro::render::GreyWorldFlattens(settings_->options().pages().grey_world.look());
+        ro::render::GreyWorldFlattens(settings_->options().pages().grey_world->look());
     const bool rounded = settings_->options().graphics().rounded_ground();
     // L'ÉCRAN DE CHARGEMENT, POUR UNE AUTRE CARTE SEULEMENT : la même ne se
     // relit pas, et rien ne s'afficherait qu'un clignotement.
@@ -509,7 +512,7 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
       windows_.trade->npc_shop.state.tab == ro::ui::NpcShopTab::kSell) {
     database_.Read();
   }
-  pieces_.trade->deal().RefuseProposals(settings_->options().pages().deal_refusal.refuses_deals());
+  pieces_.trade->deal().RefuseProposals(settings_->options().pages().deal_refusal->refuses_deals());
   pieces_.trade->Advance(
       windows_.trade, link_, world_, pieces_.item_words,
       item_description_.has_value() ? item_description_->creator_names() : CreatorNames(),

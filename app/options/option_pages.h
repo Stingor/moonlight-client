@@ -1,5 +1,9 @@
 #pragma once
 
+// ⚠ CET EN-TÊTE NE TIRE AUCUNE PAGE : chacune est tenue par `Held`, et une
+// source qui en lit une inclut son en-tête. Constructeur et destructeur vivent
+// dans `option_pages.cpp`, seule source où elles sont toutes complètes.
+
 #include <array>
 #include <cstdint>
 #include <functional>
@@ -11,52 +15,54 @@
 #include "ro/ui/options_window.h"
 #include "ro/ui/path_canvas.h"
 
-#include "options/afk_options.h"
-#include "options/battleground_options.h"
-#include "options/broadcast_balloon_options.h"
-#include "options/bug_report_options.h"
-#include "options/call_options.h"
-#include "options/card_album_options.h"
-#include "options/cast_bar_options.h"
-#include "options/chat_web_options.h"
-#include "options/companion_zones_memory.h"
-#include "options/context_menu_options.h"
-#include "options/craft_atlas_options.h"
-#include "options/damage_meter_options.h"
-#include "options/deal_refusal_options.h"
-#include "options/description_options.h"
-#include "options/factory_layout.h"
-#include "options/graphics_options.h"
-#include "options/grey_world_options.h"
-#include "options/grimoire_key_options.h"
-#include "options/make_item_options.h"
-#include "options/map_sign_options.h"
-#include "options/menu_icons_options.h"
-#include "options/minimap_panel_options.h"
-#include "options/monster_sheet_options.h"
-#include "options/mvp_tracker_options.h"
+#include "game/held.h"
 #include "options/option_sections.h"
-#include "options/pet_options.h"
-#include "options/pick_precision_options.h"
-#include "options/quest_tracker_options.h"
-#include "options/quick_cast_options.h"
-#include "options/shop_options.h"
-#include "options/signboard_options.h"
-#include "options/skill_view_options.h"
-#include "options/skin_look_options.h"
-#include "options/skin_options.h"
-#include "options/sprite_sound_options.h"
-#include "options/status_portrait_options.h"
-#include "options/talk_filter_options.h"
-#include "options/target_options.h"
-#include "options/view_equip_memory.h"
-#include "options/voice_options.h"
-#include "options/weapon_refine_options.h"
-#include "options/whisper_options.h"
-#include "options/window_title_options.h"
-#include "party/party_options.h"
 
 namespace moonclient {
+
+class SettingsFile;
+class AfkOptions;
+class BattlegroundOptions;
+class BroadcastBalloonOptions;
+class BugReportOptions;
+class CallOptions;
+class CardAlbumOptions;
+class CastBarOptions;
+class ChatWebOptions;
+struct CompanionZonesMemory;
+class ContextMenuOptions;
+class CraftAtlasOptions;
+class DamageMeterOptions;
+class DealRefusalOptions;
+class DescriptionOptions;
+class GraphicsOptions;
+class GreyWorldOptions;
+class GrimoireKeyOptions;
+class MakeItemOptions;
+class MapSignOptions;
+class MenuIconsOptions;
+class MinimapPanelOptions;
+class MonsterSheetOptions;
+class MvpTrackerOptions;
+class PartyOptions;
+class PetOptions;
+class PickPrecisionOptions;
+class QuestTrackerOptions;
+class QuickCastOptions;
+class ShopOptions;
+class SignboardOptions;
+class SkillViewOptions;
+class SkinLookOptions;
+class SkinOptions;
+class SpriteSoundOptions;
+class StatusPortraitOptions;
+class TalkFilterOptions;
+class TargetOptions;
+struct ViewEquipMemory;
+class VoiceOptions;
+class WeaponRefineOptions;
+class WhisperOptions;
+class WindowTitleOptions;
 
 // CE QUE REND « RÉTABLIR CETTE PAGE ». ⚠ LES RÉGLAGES DU LOGIN N'EN MONTRENT
 // QU'UNE PARTIE, et un rétablissement n'y touche qu'à ce qu'on voit.
@@ -66,84 +72,68 @@ enum class PageRestore : std::uint8_t {
   kShownAtLogin,
 };
 
-static_assert(kPartyGridRowBase + static_cast<int>(PartyGridRow::kCount) <= kMakeItemRowBase,
-              "la plage de la grille de groupe chevauche celle de la fabrication");
-static_assert(kMakeItemRowBase + static_cast<int>(MakeItemRow::kCount) <= kWeaponRefineRowBase,
-              "la plage de la fabrication chevauche celle du refine");
-static_assert(kMapSignRowBase + static_cast<int>(MapSignRow::kCount) <= kPartyFriendRowBase,
-              "la plage du bandeau de carte chevauche celle de la fenêtre Groupe / Amis");
-static_assert(kBalloonRowBase + static_cast<int>(BalloonRow::kCount) <= kDealRefusalRowBase,
-              "la plage du refus des échanges chevauche celle des bulles d'annonce");
-static_assert(kGreyWorldRowBase + static_cast<int>(GreyWorldRow::kCount) <= kCallRowBase,
-              "la plage de l'appel d'urgence chevauche celle de GreyWorld");
-static_assert(kSpriteSoundRowBase + static_cast<int>(SpriteSoundRow::kCount) <= kMvpTrackerRowBase,
-              "la plage du carnet MVP chevauche celle des sons de sprite");
-static_assert(kMvpTrackerRowBase + static_cast<int>(MvpTrackerRow::kCount) <= kBattlegroundRowBase,
-              "la plage du champ de bataille chevauche celle du carnet MVP");
-static_assert(kBattlegroundRowBase + static_cast<int>(BattlegroundRow::kCount) <= kPetRowBase,
-              "la plage du pet chevauche celle du champ de bataille");
-static_assert(kSkinLookRowBase + static_cast<int>(SkinLookRow::kCount) <= kChatWebRowBase,
-              "la plage des liens du chat chevauche celle de l'habillage");
-static_assert(kTalkFilterRowBase + static_cast<int>(TalkFilterRow::kCount) <= kPortraitRowBase,
-              "la plage du portrait chevauche celle de la parole tue");
-
 // LES PAGES DE RÉGLAGES QUI TIENNENT LEUR PROPRE CLASSE — leurs réglages, leurs
 // lignes, leurs listes.
 //
 // ⚠ UN SEUL MEMBRE DE `GameOptions`, et c'est la raison de ce fichier : la
 // classe touche ses huit cents lignes. Une page de plus s'ajoute ici, sans elle.
 struct OptionPages {
-  AfkOptions afk;
-  TargetOptions targeting;
+  OptionPages();
+  ~OptionPages();
+  OptionPages(const OptionPages&) = delete;
+  OptionPages& operator=(const OptionPages&) = delete;
+
+  Held<AfkOptions> afk;
+  Held<TargetOptions> targeting;
   // Les onglets « Portrait » et « Étiquettes » de la page « Basic Info »,
   // nés dans la disposition d'usine.
-  StatusPortraitOptions portrait{FactoryStatusPortrait()};
-  ContextMenuOptions context_menu;
-  ViewEquipMemory view_equip;
-  CompanionZonesMemory companion_zones;
-  GraphicsOptions graphics;
-  MonsterSheetOptions monster_sheet;
-  CraftAtlasOptions craft_atlas;
-  MakeItemOptions make_item;
-  WeaponRefineOptions weapon_refine;
-  QuickCastOptions quick_cast;
-  CardAlbumOptions card_album;
-  DescriptionOptions descriptions;
-  BugReportOptions bug_report;
-  MenuIconsOptions menu_icons;
-  MapSignOptions map_sign;
-  WindowTitleOptions window_title;
+  Held<StatusPortraitOptions> portrait;
+  Held<ContextMenuOptions> context_menu;
+  Held<ViewEquipMemory> view_equip;
+  Held<CompanionZonesMemory> companion_zones;
+  Held<GraphicsOptions> graphics;
+  Held<MonsterSheetOptions> monster_sheet;
+  Held<CraftAtlasOptions> craft_atlas;
+  Held<MakeItemOptions> make_item;
+  Held<WeaponRefineOptions> weapon_refine;
+  Held<QuickCastOptions> quick_cast;
+  Held<CardAlbumOptions> card_album;
+  Held<DescriptionOptions> descriptions;
+  Held<BugReportOptions> bug_report;
+  Held<MenuIconsOptions> menu_icons;
+  Held<MapSignOptions> map_sign;
+  Held<WindowTitleOptions> window_title;
   // Les deux bandeaux de bulles du haut de l'écran : annonces et chasses.
-  BroadcastBalloonOptions balloons;
-  MinimapPanelOptions minimap_panel;
-  SkinOptions skin;
-  SkinLookOptions skin_look;
-  PartyOptions party;
-  CastBarOptions cast_bars;
-  PickPrecisionOptions pick_precision;
-  DamageMeterOptions damage_meter;
-  ShopOptions shops;
+  Held<BroadcastBalloonOptions> balloons;
+  Held<MinimapPanelOptions> minimap_panel;
+  Held<SkinOptions> skin;
+  Held<SkinLookOptions> skin_look;
+  Held<PartyOptions> party;
+  Held<CastBarOptions> cast_bars;
+  Held<PickPrecisionOptions> pick_precision;
+  Held<DamageMeterOptions> damage_meter;
+  Held<ShopOptions> shops;
   // L'onglet « Enseignes » de la page « Entités ».
-  SignboardOptions signboards;
-  WhisperOptions whispers;
-  GreyWorldOptions grey_world;
-  GrimoireKeyOptions grimoire_keys;
-  SkillViewOptions skill_views;
-  SpriteSoundOptions sprite_sounds;
-  MvpTrackerOptions mvp_tracker;
-  BattlegroundOptions battleground;
-  PetOptions pet;
+  Held<SignboardOptions> signboards;
+  Held<WhisperOptions> whispers;
+  Held<GreyWorldOptions> grey_world;
+  Held<GrimoireKeyOptions> grimoire_keys;
+  Held<SkillViewOptions> skill_views;
+  Held<SpriteSoundOptions> sprite_sounds;
+  Held<MvpTrackerOptions> mvp_tracker;
+  Held<BattlegroundOptions> battleground;
+  Held<PetOptions> pet;
   // La voix en jeu, dans la page Son.
-  VoiceOptions voice;
-  QuestTrackerOptions quest_tracker;
+  Held<VoiceOptions> voice;
+  Held<QuestTrackerOptions> quest_tracker;
   // ⚠ SANS DÉCLARATION AU FICHIER : c'est le serveur qui tient ce réglage.
-  CallOptions call;
+  Held<CallOptions> call;
   // `/notrade` : les demandes d'échange refusées d'office.
-  DealRefusalOptions deal_refusal;
+  Held<DealRefusalOptions> deal_refusal;
   // Les liens, les images et les mentions du chat.
-  ChatWebOptions chat_web;
+  Held<ChatWebOptions> chat_web;
   // `/notalkmsg` et `/notalkmsg2`.
-  TalkFilterOptions talk_filter;
+  Held<TalkFilterOptions> talk_filter;
   // L'ENTITÉ DU CADRE D'ESSAI des barres d'entité, composée par la partie avant
   // la page — voir `world/entity_sample.h`. ⚠ PAS UN RÉGLAGE : une vignette.
   ro::ui::EntitySample entity_sample;

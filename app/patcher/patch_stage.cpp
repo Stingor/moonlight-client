@@ -24,6 +24,7 @@
 #include "game/client_shell.h"
 #include "game/skin_image_of.h"
 #include "game/ui_stage.h"
+#include "options/skin_options.h"
 #include "patcher/http_patch_fetcher.h"
 #include "patcher/install_lock.h"
 #include "patcher/install_path.h"
@@ -137,7 +138,7 @@ ro::core::Result<PatchStageEnd> RunPatchStage(ClientShell& shell,
   // ⚠ LUE AVANT LE FIL, et sur le disque : aucune archive n'est ouverte
   // pendant qu'on les réécrit.
   const ro::render::IconTexture backdrop =
-      LoadSkinBackdrop(shell.client_root(), shell.settings().options().pages().skin.active());
+      LoadSkinBackdrop(shell.client_root(), shell.settings().options().pages().skin->active());
   const ro::ui::SkinImage backdrop_image = SkinImageOf(backdrop);
   while (true) {
     PatchProgressBoard board;

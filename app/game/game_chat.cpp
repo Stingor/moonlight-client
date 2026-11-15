@@ -49,6 +49,7 @@
 #include "mvp/mvp_tracker_stage.h"
 #include "options/chat_web_options.h"
 #include "options/game_option_ids.h"
+#include "options/whisper_options.h"
 #include "world/click_action.h"
 
 namespace moonclient {
@@ -108,7 +109,7 @@ void Game::StageChat(std::uint32_t now_ms) {
   // sans qu'il sorte. Elle porte ce que le joueur a choisi d'y lire.
   // ⚠ COMPOSÉE À L'IMAGE PRÉCÉDENTE : le compteur se compose après la
   // conversation, et une image de retard ne se voit pas.
-  chat_tabs_->HideMeter(!settings_->options().pages().damage_meter.look().shown, windows_.chat);
+  chat_tabs_->HideMeter(!settings_->options().pages().damage_meter->look().shown, windows_.chat);
   chat_tabs_->FollowMeterDock(windows_.damage_meter->docked, windows_.chat);
   chat_tabs_->LabelMeter(pieces_.damage_meter->tab_label());
   // LES CONVERSATIONS 1:1 AVANT LE TRI : ce qu'elles prennent au fil n'y paraît
@@ -148,7 +149,7 @@ void Game::StageChat(std::uint32_t now_ms) {
   // ── LES ADRESSES, LES IMAGES ET LES MENTIONS ───────────────────────────
   // ⚠ AVANT LE TRI : le cache libère ses textures ici, et la décoration lit
   // les faits que `Compose` a pu oublier.
-  const ChatWebSetup& web = settings_->options().pages().chat_web.setup();
+  const ChatWebSetup& web = settings_->options().pages().chat_web->setup();
   pieces_.chat_web->Configure(web);
   pieces_.chat_web->Compose(windows_.chat, now_ms);
   const ro::sim::MentionRules& mention_rules =
@@ -193,7 +194,7 @@ void Game::StageChat(std::uint32_t now_ms) {
         .book = pieces_.mvp_tracker->book(),
         .guild = guild_book_,
         .friends = friends_,
-        .enabled = settings_->options().pages().mvp_tracker.settings().enabled,
+        .enabled = settings_->options().pages().mvp_tracker->settings().enabled,
         .link_ready = pieces_.mvp_tracker->link_ready()};
     return JudgePlayerLink(name, PlayerLinkCircle{.party = party_,
                                                   .guild = guild_book_,

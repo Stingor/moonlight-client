@@ -71,7 +71,7 @@ void Game::RefreshGuild(std::uint32_t now_ms) {
   guild_panel_->RequestIfDue(link_, shown && guild_book_.in_guild(), now_ms);
   // « INVITER DANS MON CARNET MVP » : le carnet seul sait qui peut y entrer ;
   // éteint, l'entrée disparaît.
-  guild_panel_->WithdrawsMvpInvites(!settings_->options().pages().mvp_tracker.settings().enabled);
+  guild_panel_->WithdrawsMvpInvites(!settings_->options().pages().mvp_tracker->settings().enabled);
   guild_panel_->ShowsArenaStatus(&survivors_presence_->labels);
   guild_panel_->JudgesMvpInvites([this](std::string_view name, bool same_account) {
     return JudgeMvpInvite(
@@ -79,7 +79,7 @@ void Game::RefreshGuild(std::uint32_t now_ms) {
         MvpInviteCircle{.book = pieces_.mvp_tracker->book(),
                         .guild = guild_book_,
                         .friends = friends_,
-                        .enabled = settings_->options().pages().mvp_tracker.settings().enabled,
+                        .enabled = settings_->options().pages().mvp_tracker->settings().enabled,
                         .link_ready = pieces_.mvp_tracker->link_ready()},
         same_account);
   });

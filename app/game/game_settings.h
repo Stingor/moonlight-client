@@ -8,6 +8,7 @@
 #include <string_view>
 #include <vector>
 
+#include "ro/ui/broadcast_balloon.h"
 #include "ro/ui/game_menu.h"
 #include "ro/ui/hotkey_window.h"
 

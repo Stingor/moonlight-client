@@ -24,6 +24,7 @@
 #include "game/game.h"
 #include "game/ui_window_rounds.h"
 #include "items/inventory_view.h"
+#include "options/view_equip_memory.h"
 #include "world/click_action.h"
 
 namespace moonclient {

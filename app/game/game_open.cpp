@@ -61,6 +61,14 @@
 #include "loading/loading_presenter.h"
 #include "mvp/mvp_tracker_stage.h"
 #include "options/commands_page.h"
+#include "options/context_menu_options.h"
+#include "options/craft_atlas_options.h"
+#include "options/graphics_options.h"
+#include "options/grey_world_options.h"
+#include "options/minimap_panel_options.h"
+#include "options/quest_tracker_options.h"
+#include "options/talk_filter_options.h"
+#include "options/view_equip_memory.h"
 #include "party/party_booking_board.h"
 #include "quest/quest_catalog.h"
 #include "quest/recommended_catalog.h"
@@ -154,7 +162,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   auto first_map = LoadMapStage(
       *vfs_, map_name,
       MapStageRead{.flatten_relief = ro::render::GreyWorldFlattens(
-                       settings_->options().pages().grey_world.look()),
+                       settings_->options().pages().grey_world->look()),
                    .edits = &map_edits_,
                    .real_time_shadows = settings_->options().graphics().real_time_shadows(),
                    .rounded_ground = rounded,
@@ -424,7 +432,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   pieces_.talkbox->SeeBannedWords(&*pieces_.banned_words);
   pieces_.battleground->SeeBannedWords(&*pieces_.banned_words);
   // `/notalkmsg` ET `/notalkmsg2`, lus à chaque parole : un réglage basculé vaut aussitôt.
-  const ro::sim::TalkMute* talk_mute = &settings_->options().pages().talk_filter.mute();
+  const ro::sim::TalkMute* talk_mute = &settings_->options().pages().talk_filter->mute();
   pieces_.whispers->SeeTalkMute(talk_mute);
   pieces_.battleground->SeeTalkMute(talk_mute);
   pieces_.pet->SeeTalkMute(talk_mute);
@@ -526,7 +534,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   // LES RÉGLAGES DE LA MINIMAP AU PANNEAU D'OPTIONS : ceux du profil de
   // disposition, par le dessin du sous-menu de la minimap. Repris à la fin de la
   // partie.
-  settings_->options().pages().minimap_panel.Entrust([this](const ro::ui::SkinArt& art) {
+  settings_->options().pages().minimap_panel->Entrust([this](const ro::ui::SkinArt& art) {
     return ro::ui::DrawMinimapSettings(shell_.layouts().minimap().settings, art);
   });
   pieces_.quests->StartSession();
@@ -539,7 +547,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   *windows_.tracker = TrackerWindows{};
   // LE SUIVI AU PANNEAU D'OPTIONS : ses demandes passent là où passent celles du
   // journal, et l'étage du suivi les écrit. Repris à la fin de la partie.
-  settings_->options().pages().quest_tracker.Entrust([this](const ro::ui::SkinArt& art) {
+  settings_->options().pages().quest_tracker->Entrust([this](const ro::ui::SkinArt& art) {
     TrackerWindows& tracker = windows_.tracker;
     const ro::ui::TrackerOptionsAnswer answer =
         ro::ui::DrawTrackerOptions(tracker.shown, tracker.look, art);
@@ -676,7 +684,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
       .status_table = &*pieces_.status_table,
       .status_icons = pieces_.status_icons->has_value() ? &**pieces_.status_icons : nullptr});
   // L'onglet retrouvé du fichier, une fois par partie ; la fenêtre le tient ensuite.
-  windows_.party->window.tab = settings_->options().pages().party.tab();
+  windows_.party->window.tab = settings_->options().pages().party->tab();
 
   // ⚠ EN DERNIER : il garde l'adresse de presque tout ce qui précède, et rien de
   // tout cela ne doit encore bouger quand il la prend.

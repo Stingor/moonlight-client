@@ -4,6 +4,7 @@
 #include <utility>
 
 #include "game/game.h"
+#include "options/quick_cast_options.h"
 
 namespace moonclient {
 

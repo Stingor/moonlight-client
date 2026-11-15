@@ -38,7 +38,7 @@ void ListUnlockedHudShown(GameOptions& options, const UiStage::Windows& windows,
   // et son verrou, et l'avis la nomme une fois. Le portrait n'a de vue qu'en
   // jeu.
   const bool portrait_on_screen =
-      windows.status_portrait->view != nullptr && options.pages().portrait.look().AnyShown();
+      windows.status_portrait->view != nullptr && options.pages().portrait->look().AnyShown();
   if (!options.stat_bars().locked && (options.stat_bars().shown || portrait_on_screen)) {
     into.push_back(ro::core::Tr("Basic Info"));
   }
@@ -55,20 +55,20 @@ void ListUnlockedHudShown(GameOptions& options, const UiStage::Windows& windows,
   }
   OptionPages& pages = options.pages();
   // La grille d'icônes de menu est toujours à l'écran.
-  if (!pages.menu_icons.look().locked) {
+  if (!pages.menu_icons->look().locked) {
     into.push_back(ro::core::Tr("Icônes de menu"));
   }
-  const ro::ui::DamageMeterLook meter = pages.damage_meter.look();
+  const ro::ui::DamageMeterLook meter = pages.damage_meter->look();
   if (meter.shown && !meter.locked) {
     into.push_back(ro::core::Tr("Compteur de dégâts"));
   }
   // LE HUD DE CIBLE ET LA GRILLE DE GROUPE n'ont de vue que lorsqu'ils se
   // dessinent : sous le mode Ciblage, dans un groupe.
-  if (windows.target_hud->view != nullptr && !pages.targeting.look().locked) {
+  if (windows.target_hud->view != nullptr && !pages.targeting->look().locked) {
     into.push_back(ro::core::Tr("Fenêtre de cible"));
   }
-  if (windows.party->grid_view != nullptr && pages.party.grid().shown &&
-      !pages.party.grid().locked) {
+  if (windows.party->grid_view != nullptr && pages.party->grid().shown &&
+      !pages.party->grid().locked) {
     into.push_back(ro::core::Tr("Grille de groupe"));
   }
 }
@@ -98,16 +98,16 @@ void LockWholeHud(GameSettings& settings, const OptionTargets& to, std::uint32_t
     settings.SetSwitch(GameOption::kFrameMeterLocked, true, to, now_ms);
   }
   OptionPages& pages = options.pages();
-  if (!pages.menu_icons.look().locked) {
+  if (!pages.menu_icons->look().locked) {
     settings.SetRowSwitch(MenuIconsRowId(MenuIconsRow::kLocked), true, to, now_ms);
   }
-  if (!pages.damage_meter.look().locked) {
+  if (!pages.damage_meter->look().locked) {
     settings.SetRowSwitch(DamageMeterRowId(DamageMeterRow::kLocked), true, to, now_ms);
   }
-  if (!pages.targeting.look().locked) {
+  if (!pages.targeting->look().locked) {
     settings.SetRowSwitch(TargetRowId(TargetRow::kLocked), true, to, now_ms);
   }
-  if (!pages.party.grid().locked) {
+  if (!pages.party->grid().locked) {
     settings.SetRowSwitch(PartyGridRowId(PartyGridRow::kLocked), true, to, now_ms);
   }
 }

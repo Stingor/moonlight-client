@@ -26,7 +26,9 @@
 #include "ro/core/log.h"
 #include "ro/core/text.h"
 #include "ro/render/overlay_renderer.h"
+#include "ro/ui/map_sign_banner.h"
 #include "ro/ui/system_fonts.h"
+#include "ro/vfs/map_display_names.h"
 
 #include "character/recent_characters.h"
 #include "game/connected_session.h"
@@ -36,8 +38,11 @@
 #include "loading/loading_plans.h"
 #include "loading/loading_presenter.h"
 #include "options/game_options.h"
+#include "options/map_sign_options.h"
 #include "options/option_targets.h"
+#include "options/skin_look_options.h"
 #include "world/map_edit_store.h"
+#include "world/map_sign_stage.h"
 #include "world/overlay_view.h"
 #include "world/server_sky_hour.h"
 
@@ -229,7 +234,7 @@ void LobbyScreen::MountNow(const PendingMount& mount) {
   pieces.map_sign->Enter(pieces.map_display_names->has_value()
                              ? (*pieces.map_display_names)->SignOf(MapSignFileOf(mount.map_name))
                              : nullptr,
-                         shell_.settings().options().pages().map_sign.mode(),
+                         shell_.settings().options().pages().map_sign->mode(),
                          static_cast<std::uint32_t>(SDL_GetTicks()));
   if (mount.live) {
     backdrop_.WatchCell(ro::sim::UnpackPosition(flow_.backdrop().spawn().packed_position));
@@ -493,7 +498,7 @@ void LobbyScreen::FollowSettings(std::uint32_t now_ms) {
   if (shell_.FollowSkinChoice()) {
     backdrop_.ForgetEffectTextures();
   }
-  shell_.interface().SetSkinLook(settings.options().pages().skin_look.look());
+  shell_.interface().SetSkinLook(settings.options().pages().skin_look->look());
   settings.TickDisplayRevert(SettingsTargets(), now_ms);
   settings.Tick(now_ms);
 }
@@ -694,7 +699,7 @@ ro::core::Result<void> LobbyScreen::Frame(std::uint32_t now_ms) {
       // quand elle se voit, et que le joueur veut le bandeau.
       GamePieces& pieces = shell_.pieces();
       const std::optional<ro::ui::MapSignView> sign =
-          show_city && shell_.settings().options().pages().map_sign.mode() != MapSignMode::kNever
+          show_city && shell_.settings().options().pages().map_sign->mode() != MapSignMode::kNever
               ? pieces.map_sign->Stage(
                     pieces.game_images->has_value() ? &**pieces.game_images : nullptr, now_ms)
               : std::nullopt;

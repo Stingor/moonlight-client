@@ -2,6 +2,8 @@
 // arrondi aussi.
 
 #include "game/game.h"
+#include "options/graphics_options.h"
+#include "options/grey_world_options.h"
 #include "world/grey_world_view.h"
 
 namespace moonclient {

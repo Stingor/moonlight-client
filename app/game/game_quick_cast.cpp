@@ -147,7 +147,7 @@ void Game::AdvanceQuickCast(std::uint32_t now_ms) {
                  : game_.targeting_.SkillTargetId(game_.world_, AimKindOf(aim));
     }
     [[nodiscard]] bool TileCastArmed() const override {
-      const ro::ui::PartyGridLook& grid = game_.settings_->options().pages().party.grid();
+      const ro::ui::PartyGridLook& grid = game_.settings_->options().pages().party->grid();
       return grid.shown && grid.cast_on_tile;
     }
     [[nodiscard]] std::uint32_t TileTarget() const override {

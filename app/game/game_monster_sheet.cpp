@@ -21,6 +21,7 @@
 #include "game/map_plan_tip.h"
 #include "game/navigation_windows.h"
 #include "game/ui_window_rounds.h"
+#include "options/monster_sheet_options.h"
 
 namespace moonclient {
 namespace {

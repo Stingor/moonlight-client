@@ -7,7 +7,6 @@
 #include <string_view>
 #include <vector>
 
-#include "ro/audio/audio_engine.h"
 #include "ro/render/armed_skill.h"
 #include "ro/render/entity_names.h"
 #include "ro/render/gl_context.h"
@@ -30,7 +29,6 @@
 #include "ro/ui/zone_capture.h"
 
 #include "game/settings_file.h"
-#include "game/ui_stage_fwd.h"
 #include "options/damage_page_names.h"
 #include "options/display_options.h"
 #include "options/factory_layout.h"
@@ -44,6 +42,8 @@
 #include "world/hit_popup_look.h"
 
 namespace moonclient {
+
+enum class ShopRow : int;
 
 // LES OPTIONS DU JOUEUR : ce qu'il règle, et où ça s'applique.
 //
@@ -198,7 +198,7 @@ class GameOptions {
   [[nodiscard]] const ro::render::SkillAreaLook& skill_area() const noexcept { return skill_area_; }
 
   // Ce que l'écran de veille fait, et au bout de combien de temps.
-  [[nodiscard]] const AfkSettings& afk() const noexcept { return pages_.afk.settings(); }
+  [[nodiscard]] const struct AfkSettings& afk() const noexcept;
   // Ce que le moteur fait de l'image : lumière de la carte, post-traitement.
   [[nodiscard]] const GraphicsOptions& graphics() const noexcept { return pages_.graphics; }
   [[nodiscard]] TargetOptions& targeting() noexcept { return pages_.targeting; }

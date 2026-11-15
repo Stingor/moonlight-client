@@ -43,6 +43,7 @@
 #include "game/ui_window_rounds.h"
 #include "game/whisper_stage.h"
 #include "mvp/mvp_tracker_stage.h"
+#include "options/context_menu_options.h"
 #include "world/blocked_npcs.h"
 #include "world/chat_block_log.h"
 #include "world/click_action.h"
@@ -395,7 +396,7 @@ void Game::OpenEntityMenu(const ro::sim::Actor& actor, EntityFamily family, std:
         .book = pieces_.mvp_tracker->book(),
         .guild = guild_book_,
         .friends = friends_,
-        .enabled = settings_->options().pages().mvp_tracker.settings().enabled,
+        .enabled = settings_->options().pages().mvp_tracker->settings().enabled,
         .link_ready = pieces_.mvp_tracker->link_ready()};
     facts.mvp_invite_withdrawn = !hunt.enabled;
     if (const char* refusal = JudgeMvpInvite(actor.name, hunt); refusal != nullptr) {

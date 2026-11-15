@@ -15,6 +15,9 @@
 #include "game/ui_stage.h"
 #include "game/ui_window_rounds.h"
 #include "game/window_events.h"
+#include "options/make_item_options.h"
+#include "options/shop_options.h"
+#include "options/weapon_refine_options.h"
 
 namespace moonclient {
 
@@ -121,8 +124,8 @@ void Game::PumpEvents(std::uint32_t now_ms) {
                 .escape_closes_a_window = interface_->escape_has_work(),
                 .enter_claimed = CraftStage::ClaimsEnter(
                                      windows_.make_item, windows_.weapon_refine,
-                                     settings_->options().pages().make_item.settings(),
-                                     settings_->options().pages().weapon_refine.settings()) ||
+                                     settings_->options().pages().make_item->settings(),
+                                     settings_->options().pages().weapon_refine->settings()) ||
                                  SurvivorsClaimsEnter(windows_.minigames),
                 .no_shift = settings_->options().no_shift(),
                 .no_ctrl = settings_->options().no_ctrl(),

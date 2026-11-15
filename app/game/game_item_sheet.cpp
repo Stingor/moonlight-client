@@ -22,6 +22,7 @@
 #include "game/trade_stages.h"
 #include "game/ui_window_rounds.h"
 #include "items/doll_effects.h"
+#include "options/description_options.h"
 
 namespace moonclient {
 

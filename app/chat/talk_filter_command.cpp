@@ -50,7 +50,7 @@ std::optional<TalkFilterRow> ReadTalkFilterCommand(std::string_view line) {
 
 std::string ToggleTalkFilter(TalkFilterRow row, GameOptions& options, const OptionTargets& to,
                              std::uint32_t now_ms) {
-  const bool hidden = !options.pages().talk_filter.IsOn(row);
+  const bool hidden = !options.pages().talk_filter->IsOn(row);
   options.Change(ro::ui::OptionsWindowAction{.changed = TalkFilterOptions::IdOf(row), .on = hidden},
                  to, now_ms);
   return EchoOf(row, hidden);

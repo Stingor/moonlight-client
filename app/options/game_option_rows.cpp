@@ -24,6 +24,7 @@
 #include "options/bubble_text_options.h"
 #include "options/entity_page_tabs.h"
 #include "options/game_options.h"
+#include "options/option_pages_all.h"
 #include "options/option_row_kinds.h"
 
 namespace moonclient {
@@ -91,7 +92,7 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar, bool searching) {
              Tr("Un bruit s'entend du côté d'où il vient. Le client d'origine ne le dit pas : "
                 "il n'atténue qu'avec la distance, et celle-ci reste dans les deux cas."),
              "", sound_options_.spatial_sound));
-  pages_.voice.ComposeInto(sound_rows_);
+  pages_.voice->ComposeInto(sound_rows_);
 
   display_rows_.clear();
   language_names_.clear();
@@ -221,9 +222,9 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar, bool searching) {
   // `game_option_pvp.cpp` — une famille, un fichier, comme les jauges.
   ComposePvpHudRows();
   // LE BANDEAU DU NOM DE LA CARTE, sous son propre intertitre.
-  pages_.map_sign.ComposeInto(display_rows_);
+  pages_.map_sign->ComposeInto(display_rows_);
   display_rows_.back().heading = Tr("Arrivée sur une carte");
-  pages_.window_title.ComposeInto(display_rows_);
+  pages_.window_title->ComposeInto(display_rows_);
   // LES FENÊTRES QUI N'ONT QUE QUELQUES RÉGLAGES, un bloc chacune : voir
   // `OptionSection::kInterface`. Leur puce mène à leur intertitre.
   display_rows_.push_back(
@@ -232,9 +233,9 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar, bool searching) {
                 "seul nom. Elle REMPLACE l'infobulle de nom, elle ne s'y ajoute pas."),
              nullptr, character_hover_description_));
   display_rows_.back().heading = Tr("Fiche du personnage");
-  pages_.pet.ComposeInto(display_rows_);
+  pages_.pet->ComposeInto(display_rows_);
   // LE RENONCEMENT AU RAPPORT DE BUG, en fin d'interface.
-  pages_.bug_report.AppendRows(display_rows_);
+  pages_.bug_report->AppendRows(display_rows_);
 
   // ⚠ LEUR PROPRE SECTION, et non celle de la conversation : une bulle n'est pas la chatbox. L'une
   // se lit à son rythme, l'autre passe au-dessus d'une tête et disparaît ; les ranger ensemble
@@ -515,7 +516,7 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar, bool searching) {
                                  "réutilisation ne s'écrivent plus dans la discussion."),
                               "/skillfail", skill_fail_shown_));
   // LES ÉCHOPPES DES AUTRES : leur ouverture, et leurs enseignes.
-  pages_.shops.ComposeInto(game_rows_);
+  pages_.shops->ComposeInto(game_rows_);
 
   // LES DEUX RÉPLIQUES FORCÉES. ⚠ ELLES PARTENT AU SERVEUR, sous NOTRE nom :
   // c'est notre personnage qui parle quand un autre crie ou plaisante. Éteintes
@@ -532,9 +533,9 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar, bool searching) {
                 "plaisanterie tirée au sort. Décoché, il se tait."),
              nullptr, speak_frost_joke_));
   // L'APPEL D'URGENCE : un réglage que le serveur tient — voir `call_options.h`.
-  pages_.call.ComposeInto(game_rows_);
-  pages_.deal_refusal.ComposeInto(game_rows_);
-  pages_.battleground.ComposeInto(game_rows_);
+  pages_.call->ComposeInto(game_rows_);
+  pages_.deal_refusal->ComposeInto(game_rows_);
+  pages_.battleground->ComposeInto(game_rows_);
 
   game_rows_.push_back(
       Toggle(GameOption::kItemDropArc, Tr("Butin qui jaillit"),
@@ -597,7 +598,7 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar, bool searching) {
   // page : voir `BuildEntityBarRows`. La zone se compose AVANT, puisqu'elle y
   // est ajoutée. ⚠ LA LARGEUR DE LA FENÊTRE EST CELLE D'IMGUI, relevée à
   // l'image : les planchers que la page annonce sont ceux de cet écran-là.
-  pages_.pick_precision.Compose(ImGui::GetIO().DisplaySize.x);
+  pages_.pick_precision->Compose(ImGui::GetIO().DisplaySize.x);
   CopyTabsForSearch(searching, kEntityPageTabCount, pages_.entity_search, entity_bar_rows_,
                     [this](int tab) { BuildEntityBarRows(tab); });
   BuildEntityBarRows(shown_bar);
@@ -627,12 +628,12 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar, bool searching) {
   sections_[Rank(OptionSection::kDisplay)] =
       ro::ui::OptionSectionView{.title = Tr("Display"), .group = Tr("Core"), .rows = screen_rows_};
   // ⚠ COMPOSÉE AVANT la vue qui la désigne : elle n'en garde qu'un span.
-  pages_.graphics.Compose();
+  pages_.graphics->Compose();
   sections_[Rank(OptionSection::kGraphics)] =
-      ro::ui::OptionSectionView{.title = Tr("Graphics"), .rows = pages_.graphics.rows()};
+      ro::ui::OptionSectionView{.title = Tr("Graphics"), .rows = pages_.graphics->rows()};
   // LES SONS DES MONSTRES ET DES PETS EN DERNIER : leur bloc repliable court
   // jusqu'à la fin de la section.
-  pages_.sprite_sounds.ComposeInto(sound_rows_);
+  pages_.sprite_sounds->ComposeInto(sound_rows_);
   sections_[Rank(OptionSection::kSound)] =
       ro::ui::OptionSectionView{.title = Tr("Sound"), .rows = sound_rows_};
   // ⚠ « GAMEPLAY » GARDE SA SECTION malgré son unique réglage : c'est là que
@@ -642,19 +643,19 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar, bool searching) {
   // qu'un span, et pousser ensuite le réallouerait sous elle.
   BuildSkillAreaRows();
   // Quick cast, sous la zone des sorts, dans le même « Gameplay ».
-  pages_.quick_cast.ComposeInto(game_rows_);
+  pages_.quick_cast->ComposeInto(game_rows_);
   // GREYWORLD EN DERNIER : il ouvre un bloc repliable, qui court jusqu'à la fin
   // de la section.
-  pages_.grey_world.ComposeInto(game_rows_);
+  pages_.grey_world->ComposeInto(game_rows_);
   sections_[Rank(OptionSection::kGameplay)] =
       ro::ui::OptionSectionView{.title = Tr("Gameplay"), .rows = game_rows_};
   // ⚠ CONTRE « GAMEPLAY », ET DANS « CORE » : l'écran de veille ne règle aucune
   // fenêtre — il prend la caméra, éteint tout le reste et teinte l'image.
   // ⚠ COMPOSÉ AVANT la vue qui le désigne : elle n'en garde qu'un span, et
   // pousser ensuite le réallouerait sous elle.
-  pages_.afk.Compose();
+  pages_.afk->Compose();
   sections_[Rank(OptionSection::kAfkScreen)] =
-      ro::ui::OptionSectionView{.title = Tr("Écran de veille"), .rows = pages_.afk.rows()};
+      ro::ui::OptionSectionView{.title = Tr("Écran de veille"), .rows = pages_.afk->rows()};
   // ⚠ DANS « CORE », CONTRE « GAMEPLAY » : les nombres sont posés SUR LE MONDE
   // par le renderer, pas par une fenêtre — et c'est la première chose qu'un
   // joueur qui trouve ses chiffres trop petits vient chercher. Quatre onglets
@@ -698,12 +699,12 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar, bool searching) {
                                 .body = pages_.profiles_body,
                                 .body_terms = pages_.interface_terms};
   sections_[Rank(OptionSection::kSkin)] = pages_.ComposeSkinSection();
-  pages_.minimap_panel.Compose();
+  pages_.minimap_panel->Compose();
   sections_[Rank(OptionSection::kMinimap)] =
-      ro::ui::OptionSectionView{.title = Tr("Minimap"), .rows = pages_.minimap_panel.rows()};
-  pages_.menu_icons.Compose();
+      ro::ui::OptionSectionView{.title = Tr("Minimap"), .rows = pages_.minimap_panel->rows()};
+  pages_.menu_icons->Compose();
   sections_[Rank(OptionSection::kMenuIcons)] =
-      ro::ui::OptionSectionView{.title = Tr("Icônes du menu"), .rows = pages_.menu_icons.rows()};
+      ro::ui::OptionSectionView{.title = Tr("Icônes du menu"), .rows = pages_.menu_icons->rows()};
   sections_[Rank(OptionSection::kShortcutBars)] =
       ro::ui::OptionSectionView{.title = Tr("Barres de raccourcis"),
                                 .rows = shortcut_rows_,
@@ -722,29 +723,29 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar, bool searching) {
   sections_[Rank(OptionSection::kStatuses)] =
       ro::ui::OptionSectionView{.title = Tr("États"), .rows = status_rows_};
   // ⚠ COMPOSÉ AVANT la vue qui le désigne : elle n'en garde qu'un span.
-  pages_.damage_meter.Compose();
+  pages_.damage_meter->Compose();
   sections_[Rank(OptionSection::kDamageMeter)] = ro::ui::OptionSectionView{
-      .title = Tr("Compteur de dégâts"), .rows = pages_.damage_meter.rows()};
+      .title = Tr("Compteur de dégâts"), .rows = pages_.damage_meter->rows()};
   // ⚠ COMPOSÉ AVANT la vue qui le désigne, comme l'écran de veille.
-  pages_.targeting.Compose();
+  pages_.targeting->Compose();
   sections_[Rank(OptionSection::kTarget)] =
-      ro::ui::OptionSectionView{.title = Tr("Fenêtre de cible"), .rows = pages_.targeting.rows()};
-  pages_.monster_sheet.Compose();
+      ro::ui::OptionSectionView{.title = Tr("Fenêtre de cible"), .rows = pages_.targeting->rows()};
+  pages_.monster_sheet->Compose();
   sections_[Rank(OptionSection::kMonsterSheet)] = ro::ui::OptionSectionView{
-      .title = Tr("Fiche de monstre"), .rows = pages_.monster_sheet.rows()};
-  pages_.mvp_tracker.Compose();
+      .title = Tr("Fiche de monstre"), .rows = pages_.monster_sheet->rows()};
+  pages_.mvp_tracker->Compose();
   sections_[Rank(OptionSection::kMvpTracker)] = ro::ui::OptionSectionView{
-      .title = Tr("Carnet de chasse MVP"), .rows = pages_.mvp_tracker.rows()};
+      .title = Tr("Carnet de chasse MVP"), .rows = pages_.mvp_tracker->rows()};
   // LE MENU DU CLIC DROIT, contre la fenêtre de cible : le clic droit d'un cadre
   // de la fenêtre ouvre ce menu. ⚠ COMPOSÉ AVANT la vue, comme elle.
-  pages_.context_menu.Compose();
-  sections_[Rank(OptionSection::kContextMenu)] =
-      ro::ui::OptionSectionView{.title = Tr("Menu contextuel"), .rows = pages_.context_menu.rows()};
-  pages_.party.Compose();
+  pages_.context_menu->Compose();
+  sections_[Rank(OptionSection::kContextMenu)] = ro::ui::OptionSectionView{
+      .title = Tr("Menu contextuel"), .rows = pages_.context_menu->rows()};
+  pages_.party->Compose();
   sections_[Rank(OptionSection::kPartyGrid)] =
-      ro::ui::OptionSectionView{.title = Tr("Groupe (grille)"), .rows = pages_.party.grid_rows()};
+      ro::ui::OptionSectionView{.title = Tr("Groupe (grille)"), .rows = pages_.party->grid_rows()};
   sections_[Rank(OptionSection::kPartyFriend)] =
-      ro::ui::OptionSectionView{.title = Tr("Groupe / Amis"), .rows = pages_.party.window_rows()};
+      ro::ui::OptionSectionView{.title = Tr("Groupe / Amis"), .rows = pages_.party->window_rows()};
   sections_[Rank(OptionSection::kChat)] =
       ro::ui::OptionSectionView{.title = Tr("Conversation"), .rows = chat_rows_};
   pages_.bubble_pinned_rows.assign(1, ChatBubbleSampleRow(bubbles_));
@@ -752,11 +753,11 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar, bool searching) {
       ro::ui::OptionSectionView{.title = Tr("Bulles de chat"),
                                 .rows = bubble_rows_,
                                 .pinned_rows = pages_.bubble_pinned_rows};
-  pages_.balloons.Compose();
+  pages_.balloons->Compose();
   sections_[Rank(OptionSection::kBroadcastBalloons)] =
       ro::ui::OptionSectionView{.title = Tr("Bulles d'annonces"),
-                                .rows = pages_.balloons.rows(),
-                                .pinned_rows = pages_.balloons.pinned_rows()};
+                                .rows = pages_.balloons->rows(),
+                                .pinned_rows = pages_.balloons->pinned_rows()};
   // ⚠ « INVENTORY », « CART » ET « STORAGE » RESTENT EN ANGLAIS : c'est le
   // vocabulaire de jeu, que les joueurs lisent ainsi depuis des années.
   sections_[Rank(OptionSection::kItemObtain)] =
@@ -767,24 +768,24 @@ void GameOptions::Refresh(bool a_panel_is_open, int shown_bar, bool searching) {
       ro::ui::OptionSectionView{.title = Tr("Cart"), .rows = cart_rows_};
   sections_[Rank(OptionSection::kStorage)] =
       ro::ui::OptionSectionView{.title = Tr("Storage"), .rows = storage_rows_};
-  pages_.craft_atlas.Compose();
+  pages_.craft_atlas->Compose();
   sections_[Rank(OptionSection::kCraftAtlas)] =
-      ro::ui::OptionSectionView{.title = Tr("Recettes"), .rows = pages_.craft_atlas.rows()};
-  pages_.make_item.Compose();
+      ro::ui::OptionSectionView{.title = Tr("Recettes"), .rows = pages_.craft_atlas->rows()};
+  pages_.make_item->Compose();
   sections_[Rank(OptionSection::kMakeItem)] =
-      ro::ui::OptionSectionView{.title = Tr("Fabrication"), .rows = pages_.make_item.rows()};
-  pages_.weapon_refine.Compose();
+      ro::ui::OptionSectionView{.title = Tr("Fabrication"), .rows = pages_.make_item->rows()};
+  pages_.weapon_refine->Compose();
   sections_[Rank(OptionSection::kWeaponRefine)] =
-      ro::ui::OptionSectionView{.title = Tr("Refine"), .rows = pages_.weapon_refine.rows()};
-  pages_.card_album.Compose();
+      ro::ui::OptionSectionView{.title = Tr("Refine"), .rows = pages_.weapon_refine->rows()};
+  pages_.card_album->Compose();
   sections_[Rank(OptionSection::kCardAlbum)] =
-      ro::ui::OptionSectionView{.title = Tr("Album de cartes"), .rows = pages_.card_album.rows()};
-  pages_.descriptions.Compose();
+      ro::ui::OptionSectionView{.title = Tr("Album de cartes"), .rows = pages_.card_album->rows()};
+  pages_.descriptions->Compose();
   sections_[Rank(OptionSection::kDescriptions)] =
-      ro::ui::OptionSectionView{.title = Tr("Descriptions"), .rows = pages_.descriptions.rows()};
-  pages_.quest_tracker.Compose();
+      ro::ui::OptionSectionView{.title = Tr("Descriptions"), .rows = pages_.descriptions->rows()};
+  pages_.quest_tracker->Compose();
   sections_[Rank(OptionSection::kQuestTracker)] = ro::ui::OptionSectionView{
-      .title = Tr("Quêtes et suivi"), .rows = pages_.quest_tracker.rows()};
+      .title = Tr("Quêtes et suivi"), .rows = pages_.quest_tracker->rows()};
   // ⚠ AUCUNE RANGÉE : la page se dessine elle-même. Voir `options/commands_page.h`.
   sections_[Rank(OptionSection::kCommands)] =
       ro::ui::OptionSectionView{.title = Tr("Commands Settings"),

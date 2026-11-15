@@ -21,6 +21,7 @@
 #include "ro/render/ground_pick.h"
 
 #include "game/game.h"
+#include "options/graphics_options.h"
 #include "world/map_editor_gizmo.h"
 #include "world/map_editor_overlay.h"
 

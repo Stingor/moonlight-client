@@ -19,6 +19,7 @@
 #include "chat/emotion_commands.h"
 #include "chat/setting_toggle_command.h"
 #include "options/deal_refusal_options.h"
+#include "options/graphics_options.h"
 #include "options/percent.h"
 #include "world/click_action.h"
 
@@ -120,7 +121,7 @@ void ToggleDealRefusal(const ChatDispatch& to, std::uint32_t said_ms) {
   if (to.options == nullptr) {
     return;
   }
-  const bool refuses = !to.options->pages().deal_refusal.refuses_deals();
+  const bool refuses = !to.options->pages().deal_refusal->refuses_deals();
   to.options->Change(
       ro::ui::OptionsWindowAction{.changed = DealRefusalRowId(DealRefusalRow::kRefuseDeals),
                                   .on = refuses},

@@ -37,6 +37,7 @@
 #include "game/ui_chat_ask.h"
 #include "game/ui_stage.h"
 #include "input/hotkeys.h"
+#include "options/map_sign_options.h"
 #include "options/option_sections.h"
 #include "survivors/arena_choice.h"
 #include "survivors/survivors_route.h"
@@ -295,7 +296,7 @@ void Game::FrameSurvivors(std::uint32_t now_ms) {
                   pieces_.map_display_names->has_value() ? &**pieces_.map_display_names : nullptr},
       .map_names = pieces_.map_display_names->has_value() ? &**pieces_.map_display_names : nullptr,
       .images = pieces_.game_images->has_value() ? &**pieces_.game_images : nullptr,
-      .sign_mode = settings_->options().pages().map_sign.mode(),
+      .sign_mode = settings_->options().pages().map_sign->mode(),
       .client_root = client_root_,
       .key_namer = KeyNameOf,
       .width = static_cast<float>(shell_.width()),

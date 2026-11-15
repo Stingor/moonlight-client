@@ -28,6 +28,7 @@
 #include "ro/sim/skill_banner.h"
 #include "ro/sim/skill_tree.h"
 #include "ro/sim/world.h"
+#include "ro/ui/craft_atlas_window.h"
 
 #include "chat/announce_command.h"
 #include "chat/chat_line_color.h"
@@ -45,6 +46,8 @@
 #include "chat/whisper_block_command.h"
 #include "game/chat_room_stage.h"
 #include "items/warp_memo_report.h"
+#include "options/call_options.h"
+#include "options/shop_options.h"
 #include "world/click_action.h"
 #include "world/follow_action.h"
 #include "world/navi_session.h"
@@ -553,7 +556,7 @@ void SubmitChat(const ChatDispatch& to, const std::string& line, std::uint32_t s
     return;
   }
   if (line == kCallCommand && to.options != nullptr) {
-    if (!to.options->pages().call.RequestToggle()) {
+    if (!to.options->pages().call->RequestToggle()) {
       to.world->RecordChat(ro::sim::ChatKind::kCall, 0,
                            ro::core::Tr("Le serveur n'a pas encore dit si l'appel d'urgence "
                                         "vous atteint : réessayez une fois en jeu. (/call)"),

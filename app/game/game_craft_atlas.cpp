@@ -11,6 +11,7 @@
 #include "game/game.h"
 #include "game/ui_stage.h"
 #include "game/ui_window_rounds.h"
+#include "options/craft_atlas_options.h"
 
 namespace moonclient {
 

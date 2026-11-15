@@ -6,6 +6,7 @@
 
 #include "game/game.h"
 #include "game/setting_destination_open.h"
+#include "options/broadcast_balloon_options.h"
 #include "world/broadcast_balloons.h"
 
 namespace moonclient {
@@ -23,7 +24,7 @@ void Game::StageBalloons(std::uint32_t now_ms) {
   boards.announcement_ask = {};
   boards.hunt_ask = {};
 
-  const ro::ui::BroadcastBalloonLook& look = settings_->options().pages().balloons.look();
+  const ro::ui::BroadcastBalloonLook& look = settings_->options().pages().balloons->look();
   pieces_.balloons->Notice(world_, look);
   const SettingReach reach = SettingReachOf(pieces_);
   // UN ITEM FORGÉ LIÉ se nomme par son forgeron, comme dans le fil.

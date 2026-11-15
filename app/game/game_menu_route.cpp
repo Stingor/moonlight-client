@@ -21,6 +21,8 @@
 #include "game/ui_stage.h"
 #include "game/whisper_stage.h"
 #include "mvp/mvp_tracker_stage.h"
+#include "options/card_album_options.h"
+#include "options/whisper_options.h"
 
 namespace moonclient {
 

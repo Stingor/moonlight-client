@@ -9,6 +9,7 @@
 #include "ro/sim/chat_line.h"
 
 #include "game/game.h"
+#include "options/context_menu_options.h"
 #include "world/blocked_npcs.h"
 
 namespace moonclient {

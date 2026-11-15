@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <utility>
 
 namespace moonclient {
 
@@ -22,6 +23,10 @@ template <typename T>
 class Held {
  public:
   Held() : held_(std::make_unique<T>()) {}
+  // Un objet qui naît d'arguments, passés tels quels à son constructeur.
+  template <typename... Arguments>
+  explicit Held(std::in_place_t /*marque*/, Arguments&&... arguments)
+      : held_(std::make_unique<T>(std::forward<Arguments>(arguments)...)) {}
   ~Held() = default;
 
   Held(const Held&) = delete;

@@ -63,7 +63,18 @@
 #include "game/warp_list_stage.h"
 #include "input/hotkeys.h"
 #include "items/inventory_view.h"
+#include "options/call_options.h"
 #include "options/commands_page.h"
+#include "options/companion_zones_memory.h"
+#include "options/grey_world_options.h"
+#include "options/make_item_options.h"
+#include "options/map_sign_options.h"
+#include "options/minimap_panel_options.h"
+#include "options/pet_options.h"
+#include "options/quest_tracker_options.h"
+#include "options/quick_cast_options.h"
+#include "options/skin_look_options.h"
+#include "options/window_title_options.h"
 #include "voice/voice_keys.h"
 #include "voice/voice_marks.h"
 #include "world/cast_bar_view.h"
@@ -97,7 +108,7 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
   }
   // LE TITRE, après le réseau qui a pu changer la carte. ⚠ À CHAQUE IMAGE, et
   // sans coût : la fenêtre ne change que si le texte a changé.
-  gl_->SetTitle(WindowTitle(settings_->options().pages().window_title.names_shown(), world_,
+  gl_->SetTitle(WindowTitle(settings_->options().pages().window_title->names_shown(), world_,
                             shell_.TitleMarks()));
   // 🔴 LE CARNET MVP AVANCE À CHAQUE IMAGE, LIAISON FERMÉE COMPRISE : sa
   // fenêtre et ses lignes détachées se dessinent hors ligne, leurs gestes sont
@@ -176,7 +187,7 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
     const VoiceKeys talk = ReadVoiceKeys(settings_->bindings());
     // UN CLIC SUR LA BARRE, à l'image d'avant : un réglage de la page Son.
     if (const auto asked = VoiceBarAction(windows_.voice->bar_answer,
-                                          settings_->options().pages().voice.settings())) {
+                                          settings_->options().pages().voice->settings())) {
       settings_->ApplyOptionsAside(*asked, windows_.options, OptionsTargets(), now_ms);
     }
     const auto icons =
@@ -198,7 +209,7 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
                    .account_id = ticket_.account.account_id,
                    .character_id = ticket_.character_id,
                    .login_id1 = ticket_.account.login_id1,
-                   .settings = settings_->options().pages().voice.settings(),
+                   .settings = settings_->options().pages().voice->settings(),
                    .spatial = settings_->options().spatial_sound(),
                    .talk_keys = talk.codes,
                    .now_ms = now_ms});
@@ -261,7 +272,7 @@ ro::core::Result<void> Game::Frame(std::uint32_t now_ms) {
   // ⚠ ÉTEINT QUAND GREYWORLD ÔTE LES DÉCORS : il les repeindrait en translucide.
   pieces_.decor_veil->Advance(DecorVeilFrame{
       .enabled = settings_->options().graphics().decor_veil() &&
-                 !ro::render::GreyWorldHidesModels(settings_->options().pages().grey_world.look()),
+                 !ro::render::GreyWorldHidesModels(settings_->options().pages().grey_world->look()),
       .world = &world_,
       .planner = &planner_,
       .stage = &*stage_,
@@ -333,9 +344,9 @@ void Game::Close() {
   survivors_mode_->Freeze(survivors_, pieces_.minigames, client_root_);
   pieces_.minigames->Leave(client_root_);
   // La minimap quitte le panneau d'options : ses réglages vivent avec la partie.
-  settings_->options().pages().minimap_panel.Entrust(nullptr);
+  settings_->options().pages().minimap_panel->Entrust(nullptr);
   // Le suivi des quêtes aussi : ses réglages vivent avec la partie.
-  settings_->options().pages().quest_tracker.Entrust(nullptr);
+  settings_->options().pages().quest_tracker->Entrust(nullptr);
   // Le pseudo et la carte quittent le titre avec la partie.
   gl_->SetTitle(WindowTitle(shell_.TitleMarks()));
 }
@@ -349,7 +360,7 @@ void Game::DrawInterface(std::uint32_t now_ms) {
   // compose : il arrive au login et peut changer en cours de session.
   settings_->options().quick_cast().NoteStaff(Rights().staff_tools);
   // L'appel d'urgence, tel que le serveur l'a dit, de même.
-  settings_->options().pages().call.NoteCallable(own_config_.callable());
+  settings_->options().pages().call->NoteCallable(own_config_.callable());
   settings_->Refresh(windows_, now_ms);
   if (windows_.staff_tools->look.camera_hud) {
     *windows_.camera_hud =
@@ -381,8 +392,8 @@ void Game::DrawInterface(std::uint32_t now_ms) {
   StageDescriptions(now_ms);
   StageContainers();
   pieces_.craft->Stage(world_, link_, windows_.make_item, windows_.weapon_refine,
-                       settings_->options().pages().make_item.settings(),
-                       settings_->options().pages().weapon_refine.settings(), now_ms);
+                       settings_->options().pages().make_item->settings(),
+                       settings_->options().pages().weapon_refine->settings(), now_ms);
   windows_.make_item_view = pieces_.craft->make_view();
   windows_.weapon_refine_view = pieces_.craft->refine_view();
   StageCharacterSheet(now_ms);
@@ -470,7 +481,7 @@ void Game::DrawInterface(std::uint32_t now_ms) {
   RefreshParty(now_ms);
   // ⚠ « AUCUNE » ÉTEINT AUSSI UN BANDEAU DÉJÀ LEVÉ.
   *windows_.map_sign =
-      settings_->options().pages().map_sign.mode() != MapSignMode::kNever
+      settings_->options().pages().map_sign->mode() != MapSignMode::kNever
           ? pieces_.map_sign->Stage(
                 pieces_.game_images->has_value() ? &**pieces_.game_images : nullptr, now_ms)
           : std::nullopt;
@@ -513,7 +524,7 @@ void Game::DrawInterface(std::uint32_t now_ms) {
   companion_tabs.mercenary.staff_allowed = Rights().staff_tools;
   RelabelEmojiGroups(emojis_);
   ListUnlockedHudShown(settings_->options(), windows_, windows_.unlocked_hud);
-  interface_->SetSkinLook(settings_->options().pages().skin_look.look());
+  interface_->SetSkinLook(settings_->options().pages().skin_look->look());
   *windows_.shortcut_wheel = pieces_.shortcut_wheel->Compose(settings_->options().shortcut_bars());
   const UiStage::Answers answers = interface_->Draw(
       frame_tally_, windows_, talk, chat_preview_.preview(), *chat_tabs_, input_links_, emotions_,
@@ -544,7 +555,7 @@ void Game::DrawInterface(std::uint32_t now_ms) {
       settings_->options().sections(), item_description_->view(), description_preview_->view(),
       skill_description_->view(), settings_->options().align_grid(), chat_bubbles_,
       settings_->options().bubbles(), entity_bars_, settings_->options().entity_bars(), cast_bars_,
-      settings_->options().pages().cast_bars.look(),
+      settings_->options().pages().cast_bars->look(),
       ro::ui::DamageTexts{.texts = pieces_.numbers->has_value() && link_.is_open()
                                        ? (*pieces_.numbers)->texts_on_screen()
                                        : std::span<const ro::ui::DamageTextView>(),
@@ -619,8 +630,8 @@ void Game::DrawInterface(std::uint32_t now_ms) {
   ApplyCardInsert(answers, now_ms);
   FollowCraftGestures(pieces_.craft->Apply(answers.make_item, answers.weapon_refine,
                                            windows_.make_item, windows_.weapon_refine,
-                                           settings_->options().pages().make_item.settings(),
-                                           settings_->options().pages().weapon_refine.settings(),
+                                           settings_->options().pages().make_item->settings(),
+                                           settings_->options().pages().weapon_refine->settings(),
                                            link_, world_, now_ms),
                       now_ms);
   ApplyWarpList(answers.warp_list, link_, world_);
@@ -629,7 +640,7 @@ void Game::DrawInterface(std::uint32_t now_ms) {
   pieces_.repair->Apply(answers.repair, link_);
   pieces_.pet->Apply(answers.pet, answers.pet_hatch, windows_.pet, link_, world_, now_ms);
   // LA FICHE DU PET suit son bloc de réglages, et sa puce y mène.
-  const PetSettings& pet_page = settings_->options().pages().pet.settings();
+  const PetSettings& pet_page = settings_->options().pages().pet->settings();
   windows_.pet->confirm_return_to_egg = pet_page.confirm_return_to_egg;
   windows_.pet->animate_sprite = pet_page.animate_sprite;
   if (answers.pet->settings_asked) {
@@ -710,7 +721,7 @@ void Game::DrawInterface(std::uint32_t now_ms) {
     settings_->SetSwitch(GameOption::kUnlockNotice, false, OptionsTargets(), now_ms);
   }
   // LA CASE DE L'APPEL D'URGENCE DEMANDE, ET C'EST TOUT : la case suit l'écho.
-  if (const std::optional<bool> callable = settings_->options().pages().call.TakeRequest();
+  if (const std::optional<bool> callable = settings_->options().pages().call->TakeRequest();
       callable.has_value()) {
     ReportRefusal(ro::net::RequestCallable(link_, *callable));
   }

@@ -4,6 +4,7 @@
 
 #include "ro/audio/voice_devices.h"
 #include "ro/core/i18n.h"
+#include "ro/ui/card_album_window.h"
 #include "ro/ui/cart_window.h"
 #include "ro/ui/frame_meter.h"
 #include "ro/ui/palette_editor.h"
@@ -20,6 +21,16 @@
 #include "input/hotkey_file.h"
 #include "items/item_layout_file.h"
 #include "mvp/mvp_tracker_stage.h"
+#include "options/broadcast_balloon_options.h"
+#include "options/card_album_options.h"
+#include "options/context_menu_options.h"
+#include "options/grimoire_key_options.h"
+#include "options/menu_icons_options.h"
+#include "options/quick_cast_options.h"
+#include "options/shop_options.h"
+#include "options/skill_view_options.h"
+#include "options/skin_look_options.h"
+#include "options/voice_options.h"
 #include "world/music_player_stage.h"
 
 namespace moonclient {
@@ -40,7 +51,7 @@ GameSettings::GameSettings(std::filesystem::path client_root)
   // ⚠ DÉCLARER PUIS LIRE, DANS CET ORDRE : la valeur présente au moment de la
   // déclaration est ce qui sert de défaut.
   options_.Declare(file_);
-  options_.pages().voice.ListDevicesWith(
+  options_.pages().voice->ListDevicesWith(
       [] { return ro::audio::VoiceDevices::DeviceNames(ro::audio::VoiceDeviceKind::kMicrophone); },
       [] { return ro::audio::VoiceDevices::DeviceNames(ro::audio::VoiceDeviceKind::kSpeakers); });
   LoadBlockedNpcs(client_root_, options_.context_menu().blocked());
@@ -115,13 +126,13 @@ void GameSettings::Refresh(UiStage::Windows& windows, std::uint32_t now_ms) {
   // ⚠ AVANT LA COMPOSITION : la page de l'album écrit la touche qui l'ouvre, et
   // elle ne connaît pas les raccourcis.
   options_.card_album().NoteOpenKey(LabelOfBinding(bindings_.Of(GameAction::kOpenCardAlbum)));
-  options_.pages().mvp_tracker.NoteOpenKey(
+  options_.pages().mvp_tracker->NoteOpenKey(
       LabelOfBinding(bindings_.Of(GameAction::kOpenMvpTracker)));
   options_.Refresh(windows.options->open, windows.options->section_tab,
                    windows.options->filter.front() != '\0');
   windows.card_album->look = options_.card_album().look();
-  windows.mvp_tracker->window.look = options_.pages().mvp_tracker.look();
-  windows.menu_icons->look = &options_.pages().menu_icons.look();
+  windows.mvp_tracker->window.look = options_.pages().mvp_tracker->look();
+  windows.menu_icons->look = &options_.pages().menu_icons->look();
   // ⚠ LES RÉGLAGES DESCENDENT DANS L'ÉTAT DE LA FENÊTRE, jamais l'inverse :
   // `ui` ne lit aucun fichier et ne connaît pas les options.
   windows.inventory->filter_shown = options_.inventory_filter_shown();
@@ -173,9 +184,9 @@ void GameSettings::Refresh(UiStage::Windows& windows, std::uint32_t now_ms) {
   // ⚠ DESCENDU AVANT LE DESSIN, remonté après par `NoteGrimoireIcons` : la copie
   // posée ici est celle que l'en-tête du grimoire cochera dans la même image.
   windows.character->grimoire.smooth_icons = options_.grimoire_smooth_icons();
-  windows.character->grimoire.keyboard_layout = options_.pages().grimoire_keys.keyboard_layout();
-  windows.character->grimoire.grid = options_.pages().skill_views.grimoire_grid();
-  windows.character->guild.skill_grid = options_.pages().skill_views.guild_grid();
+  windows.character->grimoire.keyboard_layout = options_.pages().grimoire_keys->keyboard_layout();
+  windows.character->grimoire.grid = options_.pages().skill_views->grimoire_grid();
+  windows.character->guild.skill_grid = options_.pages().skill_views->guild_grid();
   // 🔴 LE SOUVENIR DU VOLET DU STAFF, et il ne peut PAS vivre dans `imgui.ini`.
   // Le droit n'arrive qu'après l'entrée sur la carte : les premières images
   // posent un plafond de largeur SANS volet, ImGui y rabote la fenêtre
@@ -303,14 +314,14 @@ void GameSettings::NoteGrimoireIcons(const UiStage::Windows& windows) {
   if (options_.NoteGrimoireSmoothIcons(windows.character->grimoire.smooth_icons)) {
     file_.Touch();
   }
-  if (options_.pages().grimoire_keys.NoteKeyboardLayout(
+  if (options_.pages().grimoire_keys->NoteKeyboardLayout(
           windows.character->grimoire.keyboard_layout)) {
     file_.Touch();
   }
-  if (options_.pages().skill_views.NoteGrimoireGrid(windows.character->grimoire.grid)) {
+  if (options_.pages().skill_views->NoteGrimoireGrid(windows.character->grimoire.grid)) {
     file_.Touch();
   }
-  if (options_.pages().skill_views.NoteGuildGrid(windows.character->guild.skill_grid)) {
+  if (options_.pages().skill_views->NoteGuildGrid(windows.character->guild.skill_grid)) {
     file_.Touch();
   }
 }
@@ -355,7 +366,7 @@ void GameSettings::NoteItemObtainAnchor(int pos_x, int pos_y) {
 }
 
 void GameSettings::NoteBalloonAnchor(bool hunts, const ro::ui::BalloonAnchorAsk& asked) {
-  options_.pages().balloons.NoteAnchor(hunts, asked);
+  options_.pages().balloons->NoteAnchor(hunts, asked);
   file_.Touch();
 }
 
@@ -503,13 +514,13 @@ void GameSettings::SetValue(GameOption which, float value, const OptionTargets& 
 
 void GameSettings::Tick(std::uint32_t now_ms) {
   file_.Tick(now_ms);
-  options_.pages().skin_look.Tick(now_ms);
+  options_.pages().skin_look->Tick(now_ms);
 }
 
 void GameSettings::Flush() {
   profiles_.Flush();
   file_.Flush();
-  options_.pages().skin_look.Flush();
+  options_.pages().skin_look->Flush();
 }
 
 }  // namespace moonclient

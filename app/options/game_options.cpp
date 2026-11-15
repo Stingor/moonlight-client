@@ -18,12 +18,16 @@
 #include "ro/ui/system_fonts.h"
 #include "ro/ui/ui_context.h"
 
+#include "afk/afk_settings.h"
 #include "chat/chat_history_file.h"
 #include "options/bubble_text_options.h"
 #include "options/display_options.h"
+#include "options/option_pages_all.h"
 #include "options/option_row_kinds.h"
 
 namespace moonclient {
+
+const AfkSettings& GameOptions::afk() const noexcept { return pages_.afk->settings(); }
 
 void GameOptions::Record(const OptionTargets& to) {
   if (to.file != nullptr) {
@@ -72,12 +76,12 @@ void GameOptions::Change(const ro::ui::OptionsWindowAction& asked, const OptionT
   // CHAQUE PAGE PREND CE QUI EST À ELLE, dans cet ordre, et la première qui
   // répond arrête la recherche.
   if (ChangeEntityBar(asked) || ChangeEntityName(asked) || ChangeShortcutBar(asked) ||
-      ChangeArmedSkill(asked) || pages_.targeting.Change(asked) ||
-      pages_.context_menu.Change(asked) || pages_.graphics.Change(asked) ||
-      pages_.monster_sheet.Change(asked) || pages_.craft_atlas.Change(asked, to.craft_atlas) ||
-      pages_.make_item.Change(asked) || pages_.weapon_refine.Change(asked) ||
-      pages_.quick_cast.Change(asked) || pages_.card_album.Change(asked) ||
-      pages_.descriptions.Change(asked) || pages_.bug_report.Change(asked) ||
+      ChangeArmedSkill(asked) || pages_.targeting->Change(asked) ||
+      pages_.context_menu->Change(asked) || pages_.graphics->Change(asked) ||
+      pages_.monster_sheet->Change(asked) || pages_.craft_atlas->Change(asked, to.craft_atlas) ||
+      pages_.make_item->Change(asked) || pages_.weapon_refine->Change(asked) ||
+      pages_.quick_cast->Change(asked) || pages_.card_album->Change(asked) ||
+      pages_.descriptions->Change(asked) || pages_.bug_report->Change(asked) ||
       pages_.ChangeSetting(asked)) {
     Record(to);
     return;
@@ -749,7 +753,7 @@ void GameOptions::Change(const ro::ui::OptionsWindowAction& asked, const OptionT
       // dégâts : vingt-trois réglages d'un seul objet, et l'aiguillage qui les
       // écrit vit avec leurs lignes. Voir `AfkOptions::Change` — le bouton
       // d'essai y passe aussi, en armant une demande.
-      pages_.afk.Change(which, asked, to);
+      pages_.afk->Change(which, asked, to);
       break;
     case GameOption::kCount:
       return;

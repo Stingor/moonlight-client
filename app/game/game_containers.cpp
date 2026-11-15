@@ -33,6 +33,7 @@
 #include "game/ui_stage.h"
 #include "game/warp_list_stage.h"
 #include "items/transfer_hold.h"
+#include "options/companion_zones_memory.h"
 #include "world/click_action.h"
 
 namespace moonclient {
@@ -105,7 +106,7 @@ void Game::StageContainers() {
   windows_.companion_ai_view->staff_allowed = Rights().staff_tools;
   // La case « Montrer les zones au sol », tenue par les réglages.
   windows_.companion_ai_view->ground_zones_shown =
-      settings_->options().pages().companion_zones.kept_shown;
+      settings_->options().pages().companion_zones->kept_shown;
   // 🔴 LE COFFRE MANGE L'ÉCHANGE SAC <-> CHARRETTE, et le serveur le refuse
   // sans un mot (`pc_cant_act2` compte `storage_flag`). Les deux fenêtres
   // doivent donc le savoir : l'une grise son entrée, l'autre change de

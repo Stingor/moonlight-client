@@ -2,17 +2,45 @@
 
 #include <utility>
 
+#include "options/option_pages_all.h"
 #include "options/option_sections.h"
 #include "options/skin_look_profiles.h"
 
 namespace moonclient {
+
+// LES PLAGES DE RANGÉES DES PAGES NE SE CHEVAUCHENT PAS : chacune numérote les
+// siennes à partir de sa base.
+static_assert(kPartyGridRowBase + static_cast<int>(PartyGridRow::kCount) <= kMakeItemRowBase,
+              "la plage de la grille de groupe chevauche celle de la fabrication");
+static_assert(kMakeItemRowBase + static_cast<int>(MakeItemRow::kCount) <= kWeaponRefineRowBase,
+              "la plage de la fabrication chevauche celle du refine");
+static_assert(kMapSignRowBase + static_cast<int>(MapSignRow::kCount) <= kPartyFriendRowBase,
+              "la plage du bandeau de carte chevauche celle de la fenêtre Groupe / Amis");
+static_assert(kBalloonRowBase + static_cast<int>(BalloonRow::kCount) <= kDealRefusalRowBase,
+              "la plage du refus des échanges chevauche celle des bulles d'annonce");
+static_assert(kGreyWorldRowBase + static_cast<int>(GreyWorldRow::kCount) <= kCallRowBase,
+              "la plage de l'appel d'urgence chevauche celle de GreyWorld");
+static_assert(kSpriteSoundRowBase + static_cast<int>(SpriteSoundRow::kCount) <= kMvpTrackerRowBase,
+              "la plage du carnet MVP chevauche celle des sons de sprite");
+static_assert(kMvpTrackerRowBase + static_cast<int>(MvpTrackerRow::kCount) <= kBattlegroundRowBase,
+              "la plage du champ de bataille chevauche celle du carnet MVP");
+static_assert(kBattlegroundRowBase + static_cast<int>(BattlegroundRow::kCount) <= kPetRowBase,
+              "la plage du pet chevauche celle du champ de bataille");
+static_assert(kSkinLookRowBase + static_cast<int>(SkinLookRow::kCount) <= kChatWebRowBase,
+              "la plage des liens du chat chevauche celle de l'habillage");
+static_assert(kTalkFilterRowBase + static_cast<int>(TalkFilterRow::kCount) <= kPortraitRowBase,
+              "la plage du portrait chevauche celle de la parole tue");
+
+OptionPages::OptionPages() : portrait(std::in_place, FactoryStatusPortrait()) {}
+OptionPages::~OptionPages() = default;
+
 namespace {
 
 // Déclare les réglages d'une page sous la section du panneau qui les montre.
 template <typename Page>
-void DeclareOn(SettingsFile& into, OptionSection section, Page& page) {
+void DeclareOn(SettingsFile& into, OptionSection section, Held<Page>& page) {
   const SettingsFile::PageScope scope(into, SettingsPage(section));
-  page.Declare(into);
+  page->Declare(into);
 }
 
 }  // namespace
@@ -28,9 +56,9 @@ void OptionPages::Declare(SettingsFile& into) {
   DeclareOn(into, OptionSection::kContextMenu, context_menu);
   // AUCUNE PAGE : ce que la fenêtre retient d'une ouverture à l'autre.
   into.Section("La fenêtre « Voir l'équipement »");
-  view_equip.Declare(into);
+  view_equip->Declare(into);
   into.Section("Les zones de l'IA du compagnon");
-  companion_zones.Declare(into);
+  companion_zones->Declare(into);
   into.Section("La fiche d'un monstre");
   DeclareOn(into, OptionSection::kMonsterSheet, monster_sheet);
   into.Section("L'atlas des recettes");
@@ -62,11 +90,11 @@ void OptionPages::Declare(SettingsFile& into) {
   into.Section("Le groupe, les amis et la grille de groupe");
   {
     const SettingsFile::PageScope scope(into, SettingsPage(OptionSection::kPartyFriend));
-    party.DeclareWindow(into);
+    party->DeclareWindow(into);
   }
   {
     const SettingsFile::PageScope scope(into, SettingsPage(OptionSection::kPartyGrid));
-    party.DeclareGrid(into);
+    party->DeclareGrid(into);
   }
   into.Section("Les barres d'incantation");
   DeclareOn(into, OptionSection::kEntityBars, cast_bars);
@@ -79,8 +107,8 @@ void OptionPages::Declare(SettingsFile& into) {
   into.Section("Les enseignes des salons et des échoppes");
   {
     const SettingsFile::PageScope scope(into, SettingsPage(OptionSection::kEntityBars));
-    shops.DeclareSignboards(into);
-    signboards.Declare(into);
+    shops->DeclareSignboards(into);
+    signboards->Declare(into);
   }
   into.Section("La parole tue dans la conversation");
   DeclareOn(into, OptionSection::kChat, talk_filter);
@@ -92,12 +120,12 @@ void OptionPages::Declare(SettingsFile& into) {
   DeclareOn(into, OptionSection::kGameplay, grey_world);
   // AUCUNE PAGE : le mode et la vue d'un arbre se choisissent dans l'arbre.
   into.Section("Le grimoire");
-  grimoire_keys.Declare(into);
-  skill_views.Declare(into);
+  grimoire_keys->Declare(into);
+  skill_views->Declare(into);
   into.Section("Les sons des monstres et des pets");
   {
     const SettingsFile::PageScope scope(into, kSpriteSoundsSettingsPage);
-    sprite_sounds.Declare(into);
+    sprite_sounds->Declare(into);
   }
   into.Section("Le carnet de chasse MVP");
   DeclareOn(into, OptionSection::kMvpTracker, mvp_tracker);
@@ -115,11 +143,11 @@ void OptionPages::Declare(SettingsFile& into) {
 
 ro::ui::OptionSectionView OptionPages::ComposeSkinSection() {
   skin_rows.clear();
-  skin.ComposeInto(skin_rows);
-  skin_look.ComposeInto(skin_rows);
+  skin->ComposeInto(skin_rows);
+  skin_look->ComposeInto(skin_rows);
   skin_pinned_rows.clear();
-  skin_look.ComposeSample(skin_pinned_rows);
-  ro::ui::OptionSectionBody profiles = skin_look.ProfilesBody();
+  skin_look->ComposeSample(skin_pinned_rows);
+  ro::ui::OptionSectionBody profiles = skin_look->ProfilesBody();
   // LE TITRE DES PROFILS D'HABILLAGE, pour la recherche : la page les dessine
   // elle-même. Refait à chaque image, comme la langue peut changer.
   skin_terms.clear();
@@ -152,30 +180,30 @@ void OptionPages::RestorePage(int page, SettingsFile& file, PageRestore reach) {
     file.RestoreDefaults(kSpriteSoundsSettingsPage);
   }
   if (page == SettingsPage(OptionSection::kSkin)) {
-    skin_look.RestoreDefaults();
+    skin_look->RestoreDefaults();
   }
 }
 
 bool OptionPages::ChangeSetting(const ro::ui::OptionsWindowAction& asked) {
-  return menu_icons.Change(asked) || map_sign.Change(asked) || window_title.Change(asked) ||
-         minimap_panel.Change(asked) || skin.Change(asked) || skin_look.Change(asked) ||
-         party.Change(asked) || cast_bars.Change(asked) || pick_precision.Change(asked) ||
-         damage_meter.Change(asked) || shops.Change(asked) || whispers.Change(asked) ||
-         grey_world.Change(asked) || sprite_sounds.Change(asked) || mvp_tracker.Change(asked) ||
-         battleground.Change(asked) || pet.Change(asked) || quest_tracker.Change(asked) ||
-         chat_web.Change(asked) || talk_filter.Change(asked) || portrait.Change(asked) ||
-         balloons.Change(asked) || signboards.Change(asked) || deal_refusal.Change(asked) ||
-         voice.Change(asked);
+  return menu_icons->Change(asked) || map_sign->Change(asked) || window_title->Change(asked) ||
+         minimap_panel->Change(asked) || skin->Change(asked) || skin_look->Change(asked) ||
+         party->Change(asked) || cast_bars->Change(asked) || pick_precision->Change(asked) ||
+         damage_meter->Change(asked) || shops->Change(asked) || whispers->Change(asked) ||
+         grey_world->Change(asked) || sprite_sounds->Change(asked) || mvp_tracker->Change(asked) ||
+         battleground->Change(asked) || pet->Change(asked) || quest_tracker->Change(asked) ||
+         chat_web->Change(asked) || talk_filter->Change(asked) || portrait->Change(asked) ||
+         balloons->Change(asked) || signboards->Change(asked) || deal_refusal->Change(asked) ||
+         voice->Change(asked);
 }
 
 void OptionPages::ComposeChatExtras(std::vector<ro::ui::OptionRowView>& rows) {
-  talk_filter.ComposeInto(rows);
-  whispers.ComposeInto(rows);
-  chat_web.ComposeInto(rows);
+  talk_filter->ComposeInto(rows);
+  whispers->ComposeInto(rows);
+  chat_web->ComposeInto(rows);
 }
 
 bool OptionPages::ChangeServerHeld(const ro::ui::OptionsWindowAction& asked) {
-  return call.Change(asked);
+  return call->Change(asked);
 }
 
 }  // namespace moonclient
