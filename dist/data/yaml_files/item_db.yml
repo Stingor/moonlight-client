@@ -23990,7 +23990,7 @@ Body:
     Buy: 500
     Sell: 250
     Locations: {Both_Accessory: true}
-    Trade: {NoDrop: true, NoTrade: true, NoSell: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Trade: {NoDrop: true, NoTrade: true, NoSell: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
   - Id: 2643
     AegisName: Serin's_Gold_Ring_
     Name: Serin's Gold Ring
@@ -122298,7 +122298,7 @@ Body:
     Slots: 3
     Locations: {Head_Low: true, Head_Mid: true, Head_Top: true}
     Refineable: true
-    View: 3000
+    View: 20002
     Script: |
       bonus bAllStats,10; bonus bMaxHPrate,5; bonus bMaxSPrate,5; bonus2 bAddClass,Class_All,10; bonus bMatkRate,10; bonus2 bSubRace,RC_All,10; bonus bDelayrate2,-5; bonus bAspd2,1; bonus bNoWalkDelay; bonus bSpeedAddRate,20;
   - Id: 30001
@@ -129209,6 +129209,14 @@ Body:
     Flags: {BuyingStore: true}
     Script: |
       laphine_upgrade();
+  - Id: 100655
+    AegisName: Blue_Prints_Scroll
+    Name: Cleansing Blueprint Bundle
+    Type: Usable
+    Weight: 10
+    Flags: {BuyingStore: true, Container: true}
+    Script: |
+      getgroupitem(IG_BLUE_PRINTS_SCROLL);
   - Id: 100699
     AegisName: Twins_Box_IL
     Name: Twins Refinement Box
@@ -129223,6 +129231,13 @@ Body:
     Weight: 10
     Script: |
       laphine_upgrade();
+  - Id: 100900
+    AegisName: Teleport_Ep19_01
+    Name: Ice Castle Transport Wing
+    Type: Usable
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      warp "icas_in",175,63;
   - Id: 100902
     AegisName: Teleport_Ep17_02
     Name: Varmundt Mansion Teleport Wing
@@ -129237,6 +129252,56 @@ Body:
     Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
     Script: |
       warp "sp_cor",152,158;
+  - Id: 101162
+    AegisName: Ep19_Rgan_Scroll
+    Name: Rgan Transformation Scroll
+    Type: Usable
+    Buy: 20
+    Sell: 10
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      specialeffect2 EF_CLOAKING;
+      transform 21530,1200000;
+  - Id: 101187
+    AegisName: Snow_F_Refine
+    Name: Snow Flower Armor +9 Refinement Cube
+    Type: DelayConsume
+    Weight: 10
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      laphine_upgrade();
+  - Id: 101188
+    AegisName: Glacier_W_Refine
+    Name: Glacier Weapon +9 Refinement Cube
+    Type: DelayConsume
+    Weight: 10
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      laphine_upgrade();
+  - Id: 102562
+    AegisName: Demi_Freyja_Antiquity
+    Name: Antiquity Villa (Twisted God)
+    Type: Usable
+    Weight: 200
+    Flags: {Container: true, DropEffect: CLIENT}
+    Script: |
+      getgroupitem(IG_DEMI_FREYJA_ANTIQUITY,true);
+  - Id: 102564
+    AegisName: Aquila_Antiquity
+    Name: Antiquity Issgard (Aquila)
+    Type: Usable
+    Weight: 200
+    Flags: {Container: true, DropEffect: CLIENT}
+    Script: |
+      getgroupitem(IG_AQUILA_ANTIQUITY,true);
+  - Id: 102565
+    AegisName: Aquila_Antiquity2
+    Name: Antiquity Issgard (Aquila (First Class))
+    Type: Usable
+    Weight: 200
+    Flags: {Container: true, DropEffect: CLIENT}
+    Script: |
+      getgroupitem(IG_AQUILA_ANTIQUITY2,true);
   - Id: 300001
     AegisName: Poisonous_Card
     Name: Poisonous Card
@@ -138701,6 +138766,50 @@ Body:
             }
          }
       }
+  - Id: 450206
+    AegisName: Snowflower_Armor
+    Name: "Snowflower Armor [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Weight: 800
+    Defense: 12
+    Slots: 1
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 210
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,130+15*(.@r/2);
+      if (.@r>=7) {
+        bonus bAspdRate,15;
+        if (.@r>=9) {
+          bonus bPAtk,2;
+        }
+      }
+  - Id: 450207
+    AegisName: Snowflower_Robe
+    Name: "Snowflower Robe [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Weight: 800
+    Defense: 12
+    Slots: 1
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 210
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMatk,130+15*(.@r/2);
+      if (.@r>=7) {
+        bonus bVariableCastrate,-15;
+        if (.@r>=9) {
+          bonus bSMatk,2;
+        }
+      }
   - Id: 460017
     AegisName: Guard_IL
     Name: "Illusion Guard [1]"
@@ -138881,6 +138990,53 @@ Body:
       bonus bMaxSP,250+20*(.@r/2);
       if (.@r>=7) {
          bonus2 bMagicAtkEle,Ele_All,7;
+      }
+  - Id: 470115
+    AegisName: Snowflower_Boots
+    Name: "Snowflower Boots [1]"
+    Type: Armor
+    Buy: 45000
+    Sell: 11250
+    Weight: 500
+    Defense: 6
+    Slots: 1
+    Locations: {Shoes: true}
+    ArmorLevel: 1
+    EquipLevelMin: 210
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHPrate,8;
+      bonus bMaxSPrate,4+1*(.@r/2);
+      if (.@r>=7) {
+        bonus bShortAtkRate,7;
+        bonus bLongAtkRate,7;
+        if (.@r>=9) {
+          bonus bPAtk,2;
+        }
+      }
+  - Id: 470116
+    AegisName: Snowflower_Shoes
+    Name: "Snowflower Shoes [1]"
+    Type: Armor
+    Buy: 45000
+    Sell: 11250
+    Weight: 500
+    Defense: 6
+    Slots: 1
+    Locations: {Shoes: true}
+    ArmorLevel: 1
+    EquipLevelMin: 210
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHPrate,6;
+      bonus bMaxSPrate,6+1*(.@r/2);
+      if (.@r>=7) {
+        bonus2 bMagicAtkEle,Ele_All,7;
+        if (.@r>=9) {
+          bonus bSMatk,2;
+        }
       }
   - Id: 480018
     AegisName: Grace_Attack_Manteau
@@ -139233,6 +139389,52 @@ Body:
     Type: Armor
     Locations: {Costume_Garment: true}
     View: 123
+  - Id: 480159
+    AegisName: Snowflower_Manteau
+    Name: "Snow Flower Manteau [1]"
+    Type: Armor
+    Buy: 57000
+    Sell: 14250
+    Weight: 900
+    Defense: 6
+    Slots: 1
+    Locations: {Garment: true}
+    ArmorLevel: 1
+    EquipLevelMin: 210
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHP,2500+200*(.@r/2);
+      bonus bMaxSP,500+50*(.@r/2);
+      if (.@r>=7) {
+        bonus bAspdRate,7;
+        if (.@r>=9) {
+          bonus bPow,3;
+        }
+      }
+  - Id: 480160
+    AegisName: Snowflower_Muffler
+    Name: "Snowflower Muffler [1]"
+    Type: Armor
+    Buy: 57000
+    Sell: 14250
+    Weight: 900
+    Defense: 6
+    Slots: 1
+    Locations: {Garment: true}
+    ArmorLevel: 1
+    EquipLevelMin: 210
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHP,2000+150*(.@r/2);
+      bonus bMaxSP,1000+100*(.@r/2);
+      if (.@r>=7) {
+        bonus bVariableCastrate,-7;
+        if (.@r>=9) {
+          bonus bSpl,3;
+        }
+      }
   - Id: 480167
     AegisName: C_Heart_Stick_Choco
     Name: Costume Heart Stick Chocolate
@@ -140474,6 +140676,62 @@ Body:
     EquipLevelMin: 130
     Script: |
       bonus bDelayrate,-3;
+  - Id: 490176
+    AegisName: Snowflower_Pendant
+    Name: "Snowflake Pendant [1]"
+    Type: Armor
+    Buy: 5500
+    Sell: 2750
+    Weight: 100
+    Slots: 1
+    Locations: {Right_Accessory: true}
+    ArmorLevel: 1
+    EquipLevelMin: 210
+    Script: |
+      bonus2 bAddClass,Class_All,7;
+      bonus bMaxHPrate,7;
+  - Id: 490177
+    AegisName: Snowflower_Ring
+    Name: "Snowflake Ring [1]"
+    Type: Armor
+    Buy: 5500
+    Sell: 2750
+    Weight: 100
+    Slots: 1
+    Locations: {Left_Accessory: true}
+    ArmorLevel: 1
+    EquipLevelMin: 210
+    Script: |
+      bonus2 bAddClass,Class_All,7;
+      bonus bMaxSPrate,7;
+  - Id: 490178
+    AegisName: Snowflower_Necklace
+    Name: "Snowflake Necklace [1]"
+    Type: Armor
+    Buy: 5500
+    Sell: 2750
+    Weight: 100
+    Slots: 1
+    Locations: {Right_Accessory: true}
+    ArmorLevel: 1
+    EquipLevelMin: 210
+    Script: |
+      bonus bMatkRate,7;
+      bonus bMaxHPrate,7;
+  - Id: 490179
+    AegisName: Snowflower_Earring
+    Name: "Snowflake Earring [1]"
+    Type: Armor
+    Buy: 5500
+    Sell: 2750
+    Weight: 100
+    Slots: 1
+    Locations: {Left_Accessory: true}
+    ArmorLevel: 1
+    EquipLevelMin: 210
+    Script: |
+      bonus bMatkRate,7;
+      bonus bMaxSPrate,7;
   - Id: 490242
     AegisName: C_Valkyrie_Hair
     Name: Costume Valkyrie Hair
@@ -140745,6 +141003,40 @@ Body:
             }
          }
       }
+  - Id: 500049
+    AegisName: Glacier_Sword
+    Name: Glacier Sword
+    Type: Weapon
+    SubType: 1hSword
+    Buy: 10200000
+    Sell: 102000
+    Weight: 1600
+    Attack: 220
+    Range: 1
+    Jobs: {Alchemist: true, Blacksmith: true, Crusader: true, Knight: true, Merchant: true, Swordman: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Script: |
+      bonus bMatk,210;
+  - Id: 500050
+    AegisName: Glacier_B_Sword
+    Name: Glacier Basic Sword
+    Type: Weapon
+    SubType: 1hSword
+    Buy: 10200000
+    Sell: 102000
+    Weight: 1400
+    Attack: 220
+    Range: 1
+    Jobs: {Novice: true, SuperNovice: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Script: |
+      bonus bMatk,210;
   - Id: 510008
     AegisName: Ep172_1h_Dagger
     Name: Wrath Rack
@@ -140988,6 +141280,40 @@ Body:
       .@r = getrefine();
       bonus2 bSkillAtk,"NJ_KASUMIKIRI",4*(.@r/2);
       bonus bShortAtkRate,2*(.@r/4);
+  - Id: 510061
+    AegisName: Glacier_R_Knife
+    Name: Glacier Rogue Knife
+    Type: Weapon
+    SubType: Dagger
+    Buy: 10100000
+    Sell: 101000
+    Weight: 1400
+    Attack: 210
+    Range: 1
+    Jobs: {Rogue: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Script: |
+      bonus bMatk,210;
+  - Id: 510062
+    AegisName: Glacier_B_Knife
+    Name: Glacier Basic Knife
+    Type: Weapon
+    SubType: Dagger
+    Buy: 10100000
+    Sell: 101000
+    Weight: 1200
+    Attack: 210
+    Range: 1
+    Jobs: {Novice: true, SuperNovice: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Script: |
+      bonus bMatk,210;
   - Id: 520002
     AegisName: Ep172_1h_Axe
     Name: Pride Steel
@@ -141089,6 +141415,24 @@ Body:
             }
          }
       }
+  - Id: 520017
+    AegisName: Glacier_Axe
+    Name: Glacier Axe
+    Type: Weapon
+    SubType: 1hAxe
+    Buy: 10400000
+    Sell: 104000
+    Weight: 5000
+    Attack: 240
+    Range: 1
+    Jobs: {Alchemist: true, Blacksmith: true, Crusader: true, Knight: true, Merchant: true, Swordman: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Script: |
+      bonus bMatk,210;
+      bonus bUnbreakableWeapon;
   - Id: 530002
     AegisName: Ep172_1h_Spear
     Name: Gluttony Stick
@@ -141245,6 +141589,23 @@ Body:
             }
          }
       }
+  - Id: 530025
+    AegisName: Glacier_Spear
+    Name: Glacier Spear
+    Type: Weapon
+    SubType: 1hSpear
+    Buy: 10200000
+    Sell: 102000
+    Weight: 2100
+    Attack: 220
+    Range: 3
+    Jobs: {Crusader: true, Knight: true, Swordman: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Script: |
+      bonus bMatk,210;
   - Id: 540004
     AegisName: Ep172_1h_Book
     Name: Sloth Text
@@ -141758,6 +142119,24 @@ Body:
             }
          }
       }
+  - Id: 540049
+    AegisName: Glacier_Book
+    Name: Glacier Book
+    Type: Weapon
+    SubType: Book
+    Buy: 10100000
+    Sell: 101000
+    Weight: 1200
+    Attack: 210
+    Range: 1
+    Jobs: {Priest: true, Sage: true, StarGladiator: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Script: |
+      bonus bMatk,210;
+      bonus bUnbreakableWeapon;
   - Id: 550008
     AegisName: Ep172_1h_Wand
     Name: Greed Wand
@@ -142166,6 +142545,24 @@ Body:
             }
          }
       }
+  - Id: 550069
+    AegisName: Glacier_Wand
+    Name: Glacier Wand
+    Type: Weapon
+    SubType: Staff
+    Buy: 9500000
+    Sell: 95000
+    Weight: 1300
+    Attack: 150
+    Range: 1
+    Jobs: {Novice: true, Mage: true, Acolyte: true, Priest: true, Wizard: true, Monk: true, Sage: true, SuperNovice: true, SoulLinker: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Script: |
+      bonus bMatk,230;
+      bonus bUnbreakableWeapon;
   - Id: 560004
     AegisName: Ep172_Bh_Knuck
     Name: Ira Fist
@@ -142365,6 +142762,23 @@ Body:
             }
          }
       }
+  - Id: 560032
+    AegisName: Glacier_Knuckle
+    Name: Glacier Knuckle
+    Type: Weapon
+    SubType: Knuckle
+    Buy: 10400000
+    Sell: 104000
+    Weight: 1500
+    Attack: 240
+    Range: 1
+    Jobs: {Monk: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Script: |
+      bonus bMatk,220;
   - Id: 570005
     AegisName: Ep172_1h_Inst
     Name: Pigritia Wave
@@ -142609,6 +143023,24 @@ Body:
             }
          }
       }
+  - Id: 570029
+    AegisName: Glacier_Violin
+    Name: Glacier Violin
+    Type: Weapon
+    SubType: Musical
+    Buy: 10100000
+    Sell: 101000
+    Weight: 1500
+    Attack: 210
+    Range: 1
+    Jobs: {BardDancer: true}
+    Gender: Male
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Script: |
+      bonus bMatk,210;
   - Id: 580005
     AegisName: Ep172_1h_Whip
     Name: Pigritia Spark
@@ -142853,6 +143285,24 @@ Body:
             }
          }
       }
+  - Id: 580030
+    AegisName: Glacier_Whip
+    Name: Glacier Whip
+    Type: Weapon
+    SubType: Whip
+    Buy: 10100000
+    Sell: 101000
+    Weight: 1500
+    Attack: 210
+    Range: 2
+    Jobs: {BardDancer: true}
+    Gender: Female
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Script: |
+      bonus bMatk,210;
   - Id: 590006
     AegisName: Ep172_1h_Hammer
     Name: Envy Blunt
@@ -143063,6 +143513,42 @@ Body:
             }
          }
       }
+  - Id: 590038
+    AegisName: Glacier_Mace
+    Name: Glacier Mace
+    Type: Weapon
+    SubType: Mace
+    Buy: 10100000
+    Sell: 101000
+    Weight: 1800
+    Attack: 210
+    Range: 1
+    Jobs: {Acolyte: true, Alchemist: true, Blacksmith: true, Crusader: true, Knight: true, Merchant: true, Monk: true, Priest: true, Swordman: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Script: |
+      bonus bMatk,210;
+      bonus bUnbreakableWeapon;
+  - Id: 590039
+    AegisName: Glacier_M_Mace
+    Name: Glacier Mechanic Mace
+    Type: Weapon
+    SubType: Mace
+    Buy: 12000000
+    Sell: 120000
+    Weight: 4000
+    Attack: 400
+    Range: 1
+    Jobs: {Blacksmith: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Script: |
+      bonus bMatk,160;
+      bonus bUnbreakableWeapon;
   - Id: 600008
     AegisName: Ep172_Bh_Sword
     Name: Hypocrisy Edge
@@ -143218,6 +143704,23 @@ Body:
             }
          }
       }
+  - Id: 600027
+    AegisName: Glacier_T_Sword
+    Name: Glacier Two-Handed Sword
+    Type: Weapon
+    SubType: 2hSword
+    Buy: 11000000
+    Sell: 110000
+    Weight: 4000
+    Attack: 300
+    Range: 1
+    Jobs: {Knight: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Script: |
+      bonus bMatk,270;
   - Id: 610006
     AegisName: Ep172_Bh_Katar
     Name: Avaritia Metal
@@ -143446,6 +143949,23 @@ Body:
             }
          }
       }
+  - Id: 610037
+    AegisName: Glacier_Katar
+    Name: Glacier Katar
+    Type: Weapon
+    SubType: Katar
+    Buy: 10400000
+    Sell: 104000
+    Weight: 1200
+    Attack: 240
+    Range: 1
+    Jobs: {Assassin: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Script: |
+      bonus bMatk,220;
   - Id: 620005
     AegisName: Fourth_Bh_Axe
     Name: "Relapse Axe [2]"
@@ -143501,6 +144021,24 @@ Body:
          }
       }
       bonus bVariableCastrate,-5;
+  - Id: 620017
+    AegisName: Glacier_T_Axe
+    Name: Glacier Two-Handed Axe
+    Type: Weapon
+    SubType: 2hAxe
+    Buy: 11500000
+    Sell: 115000
+    Weight: 7000
+    Attack: 350
+    Range: 1
+    Jobs: {Blacksmith: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Script: |
+      bonus bMatk,180;
+      bonus bUnbreakableWeapon;
   - Id: 630003
     AegisName: Ep172_Bh_Spear
     Name: Luxuria Pierce
@@ -143661,6 +144199,23 @@ Body:
             }
          }
       }
+  - Id: 630018
+    AegisName: Glacier_Lance
+    Name: Glacier Lance
+    Type: Weapon
+    SubType: 2hSpear
+    Buy: 11000000
+    Sell: 110000
+    Weight: 4500
+    Attack: 300
+    Range: 3
+    Jobs: {Knight: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Script: |
+      bonus bMatk,270;
   - Id: 640005
     AegisName: Ep172_Bh_Staff
     Name: Pride Stone
@@ -143873,6 +144428,24 @@ Body:
             }
          }
       }
+  - Id: 640033
+    AegisName: Glacier_Staff
+    Name: Glacier Staff
+    Type: Weapon
+    SubType: 2hStaff
+    Buy: 9500000
+    Sell: 95000
+    Weight: 2400
+    Attack: 150
+    Range: 1
+    Jobs: {Acolyte: true, Mage: true, Monk: true, Priest: true, Sage: true, SoulLinker: true, Wizard: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Script: |
+      bonus bMatk,290;
+      bonus bUnbreakableWeapon;
   - Id: 650003
     AegisName: Ep172_Bh_Huuma
     Name: Wrath Wheel
@@ -144079,6 +144652,24 @@ Body:
             }
          }
       }
+  - Id: 650025
+    AegisName: Glacier_Humma
+    Name: Glacier Huuma
+    Type: Weapon
+    SubType: Huuma
+    Buy: 12000000
+    Sell: 120000
+    Weight: 3000
+    Attack: 400
+    Range: 1
+    Jobs: {Ninja: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Script: |
+      bonus bMatk,370;
+      bonus bUnbreakableWeapon;
   - Id: 700007
     AegisName: Ep172_Bh_Bow
     Name: Superbia String
@@ -144401,6 +144992,23 @@ Body:
             }
          }
       }
+  - Id: 700052
+    AegisName: Glacier_Bow
+    Name: Glacier Bow
+    Type: Weapon
+    SubType: Bow
+    Buy: 10400000
+    Sell: 104000
+    Weight: 1500
+    Attack: 240
+    Range: 5
+    Jobs: {Archer: true, BardDancer: true, Hunter: true, Rogue: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Script: |
+      bonus bMatk,220;
   - Id: 800003
     AegisName: Adulter_F_Revolver
     Name: "Adulter Fides Revolver [2]"
@@ -144507,6 +145115,23 @@ Body:
             }
          }
       }
+  - Id: 800014
+    AegisName: Glacier_Revolver
+    Name: Glacier Revolver
+    Type: Weapon
+    SubType: Revolver
+    Buy: 10300000
+    Sell: 103000
+    Weight: 2200
+    Attack: 230
+    Range: 7
+    Jobs: {Gunslinger: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Script: |
+      bonus bMatk,230;
   - Id: 810000
     AegisName: Ep172_1h_Rifle
     Name: Lust Pointer
@@ -144628,6 +145253,23 @@ Body:
             }
          }
       }
+  - Id: 810010
+    AegisName: Glacier_Rifle
+    Name: Glacier Rifle
+    Type: Weapon
+    SubType: Rifle
+    Buy: 10800000
+    Sell: 108000
+    Weight: 2600
+    Attack: 280
+    Range: 9
+    Jobs: {Gunslinger: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Script: |
+      bonus bMatk,230;
   - Id: 820000
     AegisName: Ep172_1h_Shotgun
     Name: Lust Shatter
@@ -144751,6 +145393,24 @@ Body:
             }
          }
       }
+  - Id: 820008
+    AegisName: Glacier_Shotgun
+    Name: Glacier Shotgun
+    Type: Weapon
+    SubType: Shotgun
+    Buy: 11000000
+    Sell: 110000
+    Weight: 2600
+    Attack: 300
+    Range: 9
+    Jobs: {Gunslinger: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Script: |
+      bonus bMatk,200;
+      bonus bSplashRange,1;
   - Id: 830001
     AegisName: Ep172_1h_Gatling
     Name: Lust Crusher
@@ -144870,6 +145530,23 @@ Body:
             }
          }
       }
+  - Id: 830013
+    AegisName: Glacier_Gatling
+    Name: Glacier Gatling
+    Type: Weapon
+    SubType: Gatling
+    Buy: 11500000
+    Sell: 115000
+    Weight: 3500
+    Attack: 350
+    Range: 9
+    Jobs: {Gunslinger: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Script: |
+      bonus bMatk,200;
   - Id: 840000
     AegisName: Ep172_1h_Grenade
     Name: Lust Boom
@@ -144989,6 +145666,23 @@ Body:
             }
          }
       }
+  - Id: 840009
+    AegisName: Glacier_Launcher
+    Name: Glacier Launcher
+    Type: Weapon
+    SubType: Grenade
+    Buy: 11000000
+    Sell: 110000
+    Weight: 3000
+    Attack: 300
+    Range: 9
+    Jobs: {Gunslinger: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 210
+    Refineable: true
+    Script: |
+      bonus bMatk,200;
   - Id: 1000092
     AegisName: ELYUMINA_RADAR
     Name: Elyumina Radar
@@ -145454,6 +146148,12 @@ Body:
     AegisName: Autodoll_Communicator
     Name: Communication Chip of Automatic Doll
     Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+  - Id: 1000321
+    AegisName: Amber
+    Name: Amber
+    Buy: 45000
+    Sell: 22500
+    Weight: 100
   - Id: 1000322
     AegisName: Etel_Dust
     Name: Etel Dust
@@ -145464,6 +146164,31 @@ Body:
     Name: Etel Stone
     Weight: 10
     Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1000325
+    AegisName: Etel_Skyblue_Jewel
+    Name: Etel Aquamarine
+    Weight: 10
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1000326
+    AegisName: Etel_Topaz
+    Name: Etel Topaz
+    Weight: 10
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1000327
+    AegisName: Etel_Violet_Jewel
+    Name: Etel Amethyst
+    Weight: 10
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1000328
+    AegisName: Etel_Amber
+    Name: Etel Amber
+    Weight: 10
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1000337
+    AegisName: Blessed_Etel_Dust
+    Name: Blessed Etel Dust
+    Weight: 10
+    Flags: {BuyingStore: true}
   - Id: 1000405
     AegisName: Ep18_Amethyst_Fragment
     Name: Amethyst Fragment
@@ -145508,6 +146233,110 @@ Body:
     AegisName: Vila_Basement_Key
     Name: Villa Basement Key
     Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1000475
+    AegisName: Conse_F_T_Sword
+    Name: Fides Two-Handed Sword Blueprint
+    Flags: {BuyingStore: true}
+  - Id: 1000476
+    AegisName: Conse_F_Lance
+    Name: Fides Lance Blueprint
+    Flags: {BuyingStore: true}
+  - Id: 1000477
+    AegisName: Conse_F_G_Sword
+    Name: Fides Guardian Sword Blueprint
+    Flags: {BuyingStore: true}
+  - Id: 1000478
+    AegisName: Conse_F_G_Spear
+    Name: Fides Guardian Spear Blueprint
+    Flags: {BuyingStore: true}
+  - Id: 1000479
+    AegisName: Conse_F_Axe
+    Name: Fides Axe Blueprint
+    Flags: {BuyingStore: true}
+  - Id: 1000480
+    AegisName: Conse_F_Mace
+    Name: Fides Mace Blueprint
+    Flags: {BuyingStore: true}
+  - Id: 1000481
+    AegisName: Conse_F_Lapier
+    Name: Fides Rapier Blueprint
+    Flags: {BuyingStore: true}
+  - Id: 1000482
+    AegisName: Conse_F_Hall
+    Name: Fides Hall Blueprint
+    Flags: {BuyingStore: true}
+  - Id: 1000483
+    AegisName: Conse_F_Cakram
+    Name: Fides Chakram Blueprint
+    Flags: {BuyingStore: true}
+  - Id: 1000484
+    AegisName: Conse_F_Katar
+    Name: Fides Katar Blueprint
+    Flags: {BuyingStore: true}
+  - Id: 1000485
+    AegisName: Conse_F_Dagger
+    Name: Fides Dagger Blueprint
+    Flags: {BuyingStore: true}
+  - Id: 1000486
+    AegisName: Conse_F_C_Bow
+    Name: Fides Crossbow Blueprint
+    Flags: {BuyingStore: true}
+  - Id: 1000487
+    AegisName: Conse_F_T_Staff
+    Name: Fides Two-Handed Staff Blueprint
+    Flags: {BuyingStore: true}
+  - Id: 1000488
+    AegisName: Conse_F_Rod
+    Name: Fides Rod Blueprint
+    Flags: {BuyingStore: true}
+  - Id: 1000489
+    AegisName: Conse_F_M_Book
+    Name: Fides Magic Book Blueprint
+    Flags: {BuyingStore: true}
+  - Id: 1000490
+    AegisName: Conse_F_P_Book
+    Name: Fides Poison Book Blueprint
+    Flags: {BuyingStore: true}
+  - Id: 1000491
+    AegisName: Conse_F_Bible
+    Name: Fides Bible Blueprint
+    Flags: {BuyingStore: true}
+  - Id: 1000492
+    AegisName: Conse_F_Wand
+    Name: Fides Wand Blueprint
+    Flags: {BuyingStore: true}
+  - Id: 1000493
+    AegisName: Conse_F_Knuckle
+    Name: Fides Knuckle Blueprint
+    Flags: {BuyingStore: true}
+  - Id: 1000494
+    AegisName: Conse_F_Claw
+    Name: Fides Claw Blueprint
+    Flags: {BuyingStore: true}
+  - Id: 1000495
+    AegisName: Conse_F_Ballista
+    Name: Fides Ballista Blueprint
+    Flags: {BuyingStore: true}
+  - Id: 1000496
+    AegisName: Conse_F_A_Bow
+    Name: Fides Aiming Bow Blueprint
+    Flags: {BuyingStore: true}
+  - Id: 1000497
+    AegisName: Conse_F_Violin
+    Name: Fides Violin Blueprint
+    Flags: {BuyingStore: true}
+  - Id: 1000498
+    AegisName: Conse_F_C_Rope
+    Name: Fides Chain Rope Blueprint
+    Flags: {BuyingStore: true}
+  - Id: 1000499
+    AegisName: Conse_F_Harp
+    Name: Fides Harp Blueprint
+    Flags: {BuyingStore: true}
+  - Id: 1000500
+    AegisName: Conse_F_Ribbon
+    Name: Fides Ribbon Blueprint
     Flags: {BuyingStore: true}
   - Id: 1000501
     AegisName: Purificatory_Holy_O
@@ -145591,6 +146420,228 @@ Body:
     Name: Maya's Crown
     Weight: 10
     Flags: {BuyingStore: true}
+  - Id: 1000604
+    AegisName: Ep19_Juncea_Tube
+    Name: Juncea Test Tube
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+  - Id: 1000605
+    AegisName: Ep19_Red_Tube
+    Name: Red Liquid Test Tube
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+  - Id: 1000606
+    AegisName: Ep19_Rgans_Egg_Shell
+    Name: Greater Rgan Eggshell
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+  - Id: 1000607
+    AegisName: Ep19_Letter
+    Name: Guardian Invitation
+    Trade: {NoDrop: true, NoTrade: true, NoSell: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+  - Id: 1000608
+    AegisName: Ep19_Snow_Flower
+    Name: Snow Flower
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1000685
+    AegisName: Conse_F_Humma
+    Name: Fides Huuma Shuriken Blueprint
+    Flags: {BuyingStore: true}
+  - Id: 1000686
+    AegisName: Conse_F_C_Humma
+    Name: Fides Cross-Shaped Huuma Shuriken Blueprint
+    Flags: {BuyingStore: true}
+  - Id: 1000687
+    AegisName: Conse_F_Revolver
+    Name: Fides Revolver Blueprint
+    Flags: {BuyingStore: true}
+  - Id: 1000688
+    AegisName: Conse_F_Shotgun
+    Name: Fides Shotgun Blueprint
+    Flags: {BuyingStore: true}
+  - Id: 1000689
+    AegisName: Conse_F_Rifle
+    Name: Fides Rifle Blueprint
+    Flags: {BuyingStore: true}
+  - Id: 1000690
+    AegisName: Conse_F_Gatling
+    Name: Fides Gatling Gun Blueprint
+    Flags: {BuyingStore: true}
+  - Id: 1000691
+    AegisName: Conse_F_Launcher
+    Name: Fides Launcher Blueprint
+    Flags: {BuyingStore: true}
+  - Id: 1000692
+    AegisName: Conse_F_Moon_B
+    Name: Fides Moon Book Blueprint
+    Flags: {BuyingStore: true}
+  - Id: 1000693
+    AegisName: Conse_F_Star_B
+    Name: Fides Stardust Book Blueprint
+    Flags: {BuyingStore: true}
+  - Id: 1000694
+    AegisName: Conse_F_S_Stick
+    Name: Fides Soul Stick Blueprint
+    Flags: {BuyingStore: true}
+  - Id: 1000695
+    AegisName: Conse_F_D_Wand
+    Name: Fides Dark Wand Blueprint
+    Flags: {BuyingStore: true}
+  - Id: 1000705
+    AegisName: Ep19_Rgan_Core
+    Name: Rgan's Magic Core
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+  - Id: 1000706
+    AegisName: Ep19_Purified_Core
+    Name: Purified Magic Core
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+  - Id: 1000707
+    AegisName: Ep19_Rgan_Core_F
+    Name: Low-quality Rgan Magic Core
+    Buy: 525
+    Sell: 262
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1000708
+    AegisName: Ep19_Ice_Meat
+    Name: Frozen Meat
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+  - Id: 1000811
+    AegisName: Snow_F_Ore
+    Name: Snow Flower Ore
+    Weight: 1
+    Flags: {BuyingStore: true}
+  - Id: 1000812
+    AegisName: Snow_F_Stone1
+    Name: Snowflower Gem
+    Weight: 1
+    Flags: {BuyingStore: true}
+  - Id: 1000813
+    AegisName: Snow_F_Stone2
+    Name: Shining Snowflower Gem
+    Weight: 1
+    Flags: {BuyingStore: true}
+  - Id: 1000814
+    AegisName: Snow_F_Stone3
+    Name: Brilliant Snow Flower Manastone
+    Weight: 1
+    Flags: {BuyingStore: true}
+  - Id: 1000822
+    AegisName: EP19_Shell_Of_Rgan
+    Name: Rgan Shell
+    Buy: 920
+    Sell: 460
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1000823
+    AegisName: EP19_Unknown_Cell
+    Name: Monstrous Cell
+    Buy: 960
+    Sell: 480
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1000824
+    AegisName: EP19_Calapy
+    Name: Calapy
+    Buy: 800
+    Sell: 400
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1000825
+    AegisName: EP19_CaCalapy
+    Name: Cacalapy
+    Buy: 1000
+    Sell: 500
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1000826
+    AegisName: EP19_Prickle_Shell
+    Name: Prickly Shell
+    Buy: 880
+    Sell: 440
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1000827
+    AegisName: EP19_Thin_Nipper
+    Name: Thin Nipper
+    Buy: 840
+    Sell: 420
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1000828
+    AegisName: EP19_Transparency_Shell
+    Name: Transparent Shell
+    Buy: 920
+    Sell: 460
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1000829
+    AegisName: EP19_Bell_Flower
+    Name: Bait Bellflower
+    Buy: 1080
+    Sell: 540
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1000830
+    AegisName: EP19_Thin_Shell
+    Name: Thin Tough Shell
+    Buy: 920
+    Sell: 460
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1000831
+    AegisName: EP19_Shiny_Seaweed
+    Name: Shiny Seaweed Stem
+    Buy: 880
+    Sell: 440
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1000832
+    AegisName: EP19_Frozen_Shell
+    Name: Frozen Insect Shell
+    Buy: 900
+    Sell: 450
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1000833
+    AegisName: EP19_Luminant
+    Name: Mysterious Luminant
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1000834
+    AegisName: EP19_Sharp_Bone
+    Name: Sharp Bone Fragment
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1000842
+    AegisName: Ep19_HS_FEELER
+    Name: High-sensitivity Feeler
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+  - Id: 1000845
+    AegisName: Ep19_Ledger
+    Name: Ledger
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+  - Id: 1000846
+    AegisName: Ep19_Ice_Cookie
+    Name: Ice Cookie
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+  - Id: 1001029
+    AegisName: EP19_D_P_Ore
+    Name: Encroached Magical Ore
+    Weight: 30
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1001030
+    AegisName: EP19_N_P_Ore
+    Name: Neutralized Magical Ore
+    Weight: 30
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1001031
+    AegisName: EP19_D_P_Crystal
+    Name: Encroached Magical Crystal
+    Weight: 50
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1001032
+    AegisName: EP19_N_P_Crystal
+    Name: Neutralized Magical Crystal
+    Weight: 50
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
   - Id: 1001072
     AegisName: Evil_Black_Bid
     Name: Evil Orb
@@ -145699,3 +146750,27 @@ Body:
     Buy: 1680
     Sell: 840
     Weight: 10
+  - Id: 1001478
+    AegisName: Cubic_Dia
+    Name: Pure Diamond
+    Buy: 200000
+    Sell: 100000
+    Weight: 300
+    Flags: {DropEffect: CLIENT}
+  - Id: 1001479
+    AegisName: Black_Dia
+    Name: Black Diamond
+    Buy: 400000
+    Sell: 200000
+    Weight: 300
+    Flags: {DropEffect: CLIENT}
+  - Id: 1100006
+    AegisName: Ep19_Dry_Icegangu
+    Name: Dried Ice Gangu
+    Type: Healing
+    Buy: 10
+    Sell: 5
+    Weight: 5
+    EquipLevelMin: 200
+    Script: |
+      itemheal 1925,0;

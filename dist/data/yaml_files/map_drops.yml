@@ -46,6 +46,8 @@ Body:
       - {Item: Purificatory_Holy_O, Rate: 50000}
       - {Item: Purificatory_Holy_W, Rate: 50000}
       - {Item: Sanctuary_Sudarium, Rate: 50000}
+      - {Item: Blue_Prints_Scroll, Rate: 50000}
+      - {Item: Demi_Freyja_Antiquity, Rate: 1000}
   - Map: "1@advs"
     Monster: EP18_MD_DEMI_FREYJA_R
     Drops:
@@ -80,6 +82,7 @@ Body:
       - {Item: Purificatory_Holy_O, Rate: 2000}
       - {Item: Purificatory_Holy_W, Rate: 2000}
       - {Item: Sanctuary_Sudarium, Rate: 2000}
+      - {Item: Blue_Prints_Scroll, Rate: 67}
   - Map: "1@advs"
     Monster: EP18_MD_HEARTHUNTER_R2
     Drops:
@@ -93,6 +96,7 @@ Body:
       - {Item: Purificatory_Holy_O, Rate: 2000}
       - {Item: Purificatory_Holy_W, Rate: 2000}
       - {Item: Sanctuary_Sudarium, Rate: 2000}
+      - {Item: Blue_Prints_Scroll, Rate: 67}
   - Map: "1@advs"
     Monster: EP18_MD_SANARE_R
     Drops:
@@ -125,6 +129,7 @@ Body:
       - {Item: Purificatory_Holy_O, Rate: 50000}
       - {Item: Purificatory_Holy_W, Rate: 50000}
       - {Item: Sanctuary_Sudarium, Rate: 50000}
+      - {Item: Blue_Prints_Scroll, Rate: 50000}
   - Map: "1@advs"
     Monster: EP18_MD_SCHULANG_R
     Drops:
