@@ -15,12 +15,14 @@
 
 #include "ro/net/free_flight.h"
 #include "ro/net/movement.h"
+#include "ro/render/sprite_billboard.h"
 #include "ro/render/terrain_mesh.h"
 #include "ro/sim/actor.h"
 #include "ro/sim/jump.h"
 #include "ro/sim/movement.h"
 #include "ro/ui/character_staff.h"
 #include "ro/ui/chat_bar.h"
+#include "ro/ui/staff_tools.h"
 
 #include "character/staff_view.h"
 #include "game/game.h"
@@ -214,8 +216,14 @@ void Game::FrameFirstPerson(std::uint32_t now_ms) {
   const std::array<float, 3> ground = GroundPositionAt(*stage_, cell.x, cell.y);
   // L'ŒIL SAUTE AVEC LE CORPS. La veille et le vol, eux, gardent leur pose.
   if (!afk_screen_.active() && !free_flight_.active()) {
+    // LA HAUTEUR FORCÉE DE L'ÉTABLI, pour qui y a droit.
+    const ro::ui::StaffToolsLook& staff = windows_.staff_tools.look;
+    const int eye_pixels = staff.eye_height_forced && Rights().staff_tools
+                               ? staff.eye_height_pixels
+                               : ro::render::kStandingEyePixels;
     first_person_.Aim(
-        camera_, glm::vec3(ground[0], ground[1] + ro::sim::JumpLiftAt(*self, now_ms), ground[2]));
+        camera_, glm::vec3(ground[0], ground[1] + ro::sim::JumpLiftAt(*self, now_ms), ground[2]),
+        eye_pixels);
   }
   if (!link_.is_open()) {
     return;

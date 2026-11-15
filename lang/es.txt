@@ -8848,6 +8848,18 @@ tr: PNJ
 fr: Relevé de la caméra
 tr: Lectura de la cámara
 
+fr: Forcer la hauteur de l'œil
+tr: Forzar la altura del ojo
+
+fr: Hauteur de l'œil (px)
+tr: Altura del ojo (px)
+
+fr: Place l'œil de la vue à la première personne à cette hauteur au-dessus des pieds, en pixels de sprite.
+tr: Coloca el ojo de la vista en primera persona a esta altura sobre los pies, en píxeles de sprite.
+
+fr: Sept pixels valent une unité du monde ; une case en vaut trente-cinq.
+tr: Siete píxeles de sprite equivalen a una unidad del mundo; una casilla, a treinta y cinco.
+
 fr: Remettre l'inclinaison
 tr: Restablecer la inclinación
 

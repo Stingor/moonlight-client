@@ -25,12 +25,6 @@
 // l'œil, à la distance qui laisse l'œil exactement où il doit être.
 namespace moonclient {
 
-// La hauteur des yeux d'un personnage debout, en pixels de sprite au-dessus des
-// pieds : quatre cinquièmes des cent cinq pixels qu'il mesure chapeau compris.
-inline constexpr float kFirstPersonEyePixels = 84.0F;
-// La même, en unités du monde : douze.
-inline constexpr float kFirstPersonEyeUnits =
-    kFirstPersonEyePixels / ro::render::kSpritePixelsPerWorldUnit;
 // Le champ vertical, en degrés : celui d'un jeu de tir, et non le champ étroit
 // qui donne à la vue du jeu son aspect presque orthographique.
 inline constexpr float kFirstPersonFovDegrees = 75.0F;
@@ -103,8 +97,10 @@ class FirstPersonView {
   // recoupe donc chaque image avec l'état réel du clavier.
   [[nodiscard]] const StrideKeys& held() const noexcept { return held_; }
 
-  // Pose la caméra sur l'œil du personnage dont les pieds sont à `feet`.
-  void Aim(ro::render::Camera& camera, const glm::vec3& feet) const;
+  // Pose la caméra sur l'œil du personnage dont les pieds sont à `feet`, à
+  // `eye_pixels` pixels de sprite au-dessus d'eux.
+  void Aim(ro::render::Camera& camera, const glm::vec3& feet,
+           int eye_pixels = ro::render::kStandingEyePixels) const;
 
   [[nodiscard]] float yaw_degrees() const noexcept { return yaw_degrees_; }
 

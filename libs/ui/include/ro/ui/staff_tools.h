@@ -12,6 +12,7 @@
 #include "ro/core/i18n.h"
 #include "ro/render/actor_pick.h"
 #include "ro/render/sky_clock.h"
+#include "ro/render/sprite_billboard.h"
 #include "ro/ui/item_sheet_editor.h"
 #include "ro/ui/map_editor_panel.h"
 #include "ro/ui/quick_cast_look.h"
@@ -136,6 +137,10 @@ struct StaffToolsLook {
   FlatGroundLook flat_ground;
   bool free_camera = false;
   bool camera_hud = false;
+  // LA HAUTEUR DE L'ŒIL À LA PREMIÈRE PERSONNE, en pixels de sprite, quand
+  // `eye_height_forced` ; sinon celle d'un personnage debout.
+  bool eye_height_forced = false;
+  int eye_height_pixels = render::kStandingEyePixels;
   // LES ZONES DE SON D'AMBIANCE, dessinées sur le monde. Voir `sound_zones.h`.
   bool sound_zones = false;
   // LES ZONES CLIQUABLES, et ce qui les règle. Voir `pick_boxes.h` et

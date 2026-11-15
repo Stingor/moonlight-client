@@ -24,6 +24,7 @@
 #include "options/bubble_text_options.h"
 #include "options/display_options.h"
 #include "options/game_options.h"
+#include "options/staff_camera_keys.h"
 #include "options/staff_sky_keys.h"
 
 namespace moonclient {
@@ -232,8 +233,6 @@ constexpr const char* kCaptureWidthKey = "capture_width_max";
 constexpr const char* kCaptureDelayKey = "capture_delay";
 constexpr const char* kFixedCameraKey = "camera_fixed";
 constexpr const char* kExpandedZoomKey = "camera_zoom_extended";
-constexpr const char* kStaffFreeCameraKey = "staff_camera_free";
-constexpr const char* kStaffCameraHudKey = "staff_camera_raised";
 constexpr const char* kStaffSoundZonesKey = "staff_zones_sound";
 constexpr const char* kStaffGmOutfitKey = "staff_gm_outfit";
 constexpr const char* kStaffPickBoxesKey = "staff_zones_clickable";
@@ -704,8 +703,7 @@ void GameOptions::Declare(SettingsFile& into) {
   into.Section("Les outils du staff");
   into.Declare(kStaffFlatGroundKey, &staff_tools_.flat_ground.on);
   into.Declare(kStaffFlatGroundColorKey, &staff_tools_.flat_ground.color);
-  into.Declare(kStaffFreeCameraKey, &staff_tools_.free_camera);
-  into.Declare(kStaffCameraHudKey, &staff_tools_.camera_hud);
+  DeclareStaffCamera(into, staff_tools_);
   into.Declare(kStaffSoundZonesKey, &staff_tools_.sound_zones);
   into.Declare(kStaffGmOutfitKey, &staff_tools_.gm_outfit);
   into.Declare(kStaffPickBoxesKey, &staff_tools_.picking.boxes_shown);

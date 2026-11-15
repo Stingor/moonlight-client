@@ -29,6 +29,10 @@ namespace ro::render {
 // dixièmes.
 inline constexpr float kSpritePixelsPerWorldUnit = 7.0F;
 
+// LA HAUTEUR DES YEUX d'un personnage debout, en pixels de sprite au-dessus des
+// pieds : quatre cinquièmes des cent cinq pixels qu'il mesure chapeau compris.
+inline constexpr int kStandingEyePixels = 84;
+
 // Les axes dans lesquels s'inscrit un panneau, plus la visée.
 //
 // La visée ne sert pas à la FORME du panneau — elle lui est perpendiculaire —
