@@ -7,7 +7,6 @@
 
 #include "ro/render/palette_ramps.h"
 #include "ro/render/shown_job.h"
-#include "ro/render/sprite_catalog.h"
 #include "ro/sim/style_code.h"
 #include "ro/sim/world.h"
 #include "ro/ui/character_window.h"
@@ -200,17 +199,16 @@ void StyleView::RefreshBodies(const ro::render::ActorLook& worn_body, std::uint3
                                   : ro::core::TrText("Tenue ordinaire"),
         variant);
 
-  // LA TÊTE A SON ENTRÉE SUR UN CORPS OÙ LA PEAU DU VISAGE SE RÈGLE AUTREMENT :
-  // une autruche la fige, le corps à pied non.
+  // LA TÊTE A SON ENTRÉE SUR CHAQUE AUTRE MONTURE, ou à pied quand on est
+  // monté : la teinture est la même, mais le joueur choisit où il la regarde.
+  // Une tenue alternative ne change rien à la tête, et n'en a pas.
   head_bodies_.clear();
-  const auto face_refusal = [this](const ro::render::ActorLook& body_look) {
-    return SkinRefusalFor(SkinLine::kFace, body_look.player && body_look.gm_outfit,
-                          ro::render::BodySpritePaths(wardrobe_->catalog(), body_look),
-                          server_layer_last_);
+  const auto mounted = [](const ro::render::ActorLook& body_look) {
+    return body_look.cash_mount || ro::render::FootJobOf(body_look.job) != body_look.job;
   };
-  const SkinRefusal worn_refusal = face_refusal(worn_body);
   for (std::size_t rank = 1; rank < bodies_.size(); ++rank) {
-    if (face_refusal(bodies_[rank].look) != worn_refusal) {
+    const ro::render::ActorLook& other = bodies_[rank].look;
+    if (other.body_style == worn_body.body_style && (mounted(other) || mounted(worn_body))) {
       head_bodies_.push_back(static_cast<int>(rank));
     }
   }

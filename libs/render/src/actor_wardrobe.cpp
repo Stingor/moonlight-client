@@ -342,8 +342,11 @@ ActorOutfit* ActorWardrobe::OutfitFor(const ActorLook& look) {
 
 std::vector<ActorPiece> ActorWardrobe::Dress(const ActorLook& look) {
   std::vector<ActorPiece> pieces;
-  // La peau se décide sur le corps, qui vient en premier : elle vaut ensuite
-  // pour la tête.
+  // 🔴 LA PEAU SE DÉCIDE PIÈCE PAR PIÈCE : la tête la prend chez tout joueur
+  // humain hors de l'habit du GM, le corps seulement si son sprite la règle.
+  // Sur une autruche, le visage se teint, et les bras du cavalier, qui
+  // peignent aussi l'animal, suivent le reste du corps.
+  const bool face_skin = look.player && !look.gm_outfit && !IsDoramJob(look.job);
   bool skin = false;
   for (const ActorPieceFiles& files : ActorFiles(catalog_, look)) {
     // Une pièce facultative — ce que les mains tiennent, la cape — manque sans
@@ -364,8 +367,9 @@ std::vector<ActorPiece> ActorWardrobe::Dress(const ActorLook& look) {
       continue;
     }
     if (files.part == ActorPart::kBody) {
-      skin = look.player && !look.gm_outfit && !IsDoramJob(look.job) &&
-             SkinAdjustable(files.candidates[found.rank]);
+      skin = face_skin && SkinAdjustable(files.candidates[found.rank]);
+    } else if (files.part == ActorPart::kHead) {
+      skin = face_skin;
     }
     const formats::Palette* official =
         files.palette_path.empty() ? nullptr : Palette(files.palette_path);

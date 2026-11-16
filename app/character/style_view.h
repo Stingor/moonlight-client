@@ -449,8 +449,8 @@ class StyleView {
   std::uint32_t bodies_for_ = 0;
   // Le rang du corps réglé ; zéro : le corps porté.
   int edited_body_ = 0;
-  // Les rangs des corps où la peau du visage se règle autrement que sur le
-  // corps porté : la tête y a sa propre entrée.
+  // Les rangs des corps montés, ou à pied quand on est monté : la tête y a sa
+  // propre entrée.
   std::vector<int> head_bodies_;
 
   // ── CE QUE LE PANTIN MONTRE ─────────────────────────────────────────────

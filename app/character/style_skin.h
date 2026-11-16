@@ -52,8 +52,8 @@ enum class SkinRefusal : std::uint8_t {
   kNone,
   // L'habit du GM garde les couleurs de ses sprites.
   kGmOutfit,
-  // Une monture listée : la peau y peint aussi l'animal. Les deux peaux s'y
-  // figent, sans quoi le visage se désassortirait du cavalier.
+  // Une monture listée : la peau du corps y peint aussi l'animal, et ses index
+  // se règlent avec le reste du corps. Le visage, lui, reste réglable.
   kOnMount,
   // Le serveur ne range pas la peau du corps : elle suit celle du visage.
   kNoBodySkinServer,

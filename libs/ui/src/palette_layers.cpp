@@ -470,9 +470,9 @@ void DrawLayerChoice(PaletteEditorState& state, const PaletteEditorView& view, c
       entries.push_back(Entry{.label = std::move(label), .kind = tab.kind, .tab = &tab});
       continue;
     }
-    // 🔴 LA TÊTE SE RÈGLE SUR UN CORPS NOMMÉ : celle du corps porté, puis une
-    // entrée par corps où elle se règle autrement. Choisir la Tête ne garde
-    // jamais en silence la monture que l'onglet Corps réglait.
+    // 🔴 LA TÊTE SE REGARDE SUR UN CORPS NOMMÉ : celle du corps porté, puis une
+    // entrée par monture. Choisir la Tête ne garde jamais en silence la
+    // monture que l'onglet Corps réglait.
     entries.push_back(Entry{.label = std::move(label), .kind = tab.kind, .body = 0, .tab = &tab});
     for (const int rank : view.head_bodies) {
       if (rank <= 0 || static_cast<std::size_t>(rank) >= view.bodies.size()) {
@@ -544,9 +544,9 @@ void DrawLayerChoice(PaletteEditorState& state, const PaletteEditorView& view, c
     if (blocked) {
       Explain(TabBlockReason(entry.tab->blocked));
     } else if (entry.kind == PaletteTabKind::kHair) {
-      Explain(entry.body > 0 ? core::Tr("La même teinture de cheveux, vue sur cette monture : la "
-                                        "peau du visage s'y règle autrement.")
-                             : core::Tr("La tête sur le corps que tu portes."));
+      Explain(entry.body > 0
+                  ? core::Tr("La même teinture de tête, vue sur ce corps : elle vaut partout.")
+                  : core::Tr("La tête sur le corps que tu portes."));
     } else if (entry.body > 0) {
       Explain(
           core::Tr("Règle une monture ou une tenue sans la porter. Valider ne change que le "

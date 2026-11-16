@@ -87,9 +87,13 @@ TEST_CASE("Peaux : chaque ligne dit pourquoi elle ne se règle pas", "[app][styl
   for (const SkinLine line : {SkinLine::kFace, SkinLine::kBody}) {
     CHECK(SkinRefusalFor(line, false, kOnFoot, kServerWithBodySkin) == SkinRefusal::kNone);
     CHECK(SkinRefusalFor(line, true, kOnFoot, kServerWithBodySkin) == SkinRefusal::kGmOutfit);
-    // 🔴 SUR UNE AUTRUCHE, LES DEUX SE FIGENT : la peau y peint l'animal.
-    CHECK(SkinRefusalFor(line, false, kOstrich, kServerWithBodySkin) == SkinRefusal::kOnMount);
   }
+  // 🔴 SUR UNE AUTRUCHE, SEULE LA PEAU DU CORPS SE FIGE : elle y peint
+  // l'animal. Le visage se règle.
+  CHECK(SkinRefusalFor(SkinLine::kBody, false, kOstrich, kServerWithBodySkin) ==
+        SkinRefusal::kOnMount);
+  CHECK(SkinRefusalFor(SkinLine::kFace, false, kOstrich, kServerWithBodySkin) ==
+        SkinRefusal::kNone);
   // Un serveur qui ne range pas la peau du corps : le visage reste réglable.
   CHECK(SkinRefusalFor(SkinLine::kFace, false, kOnFoot, kServerBefore) == SkinRefusal::kNone);
   CHECK(SkinRefusalFor(SkinLine::kBody, false, kOnFoot, kServerBefore) ==

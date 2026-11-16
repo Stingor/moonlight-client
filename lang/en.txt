@@ -593,8 +593,8 @@ tr: Trigger both powers of a Roggle board.
 fr: Hautes performances
 tr: High performance
 
-fr: La même teinture de cheveux, vue sur cette monture : la peau du visage s'y règle autrement.
-tr: The same hair dye, seen on this mount: the face skin is set differently there.
+fr: La même teinture de tête, vue sur ce corps : elle vaut partout.
+tr: The same head dye, seen on this body: it applies everywhere.
 
 fr: La tête sur le corps que tu portes.
 tr: The head on the body you wear.

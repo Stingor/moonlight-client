@@ -581,6 +581,21 @@ TEST_CASE("Calques : sur une autruche, la peau rejoint le reste du corps",
   };
   const std::array<std::uint8_t, 3> ridden = painted_skin(ostrich);
   CHECK(ridden[2] > ridden[0]);
+
+  // 🔴 LE VISAGE SE TEINT SUR L'AUTRUCHE ; les bras du cavalier, qui peignent
+  // aussi l'animal, ne suivent pas la peau du visage.
+  ActorLook faced = ostrich;
+  faced.hair = kHair;
+  faced.style = Registered(wardrobe, StyleSet{.layers = {GreenSkin()}});
+  ActorOutfit* outfit = wardrobe.OutfitFor(faced);
+  REQUIRE(outfit != nullptr);
+  const ActorPiece* head = PieceOf(*outfit, ActorPart::kHead);
+  const ActorPiece* body = PieceOf(*outfit, ActorPart::kBody);
+  REQUIRE(head != nullptr);
+  REQUIRE(body != nullptr);
+  const std::array<std::uint8_t, 3> face = ColorOf(*head, kSkinFirst);
+  CHECK(face[1] > face[0]);
+  CHECK(ColorOf(*body, kSkinFirst) == kSkinGradient[0]);
 }
 
 TEST_CASE("Calques : un profil inconnu laisse la pièce dans ses couleurs",

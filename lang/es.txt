@@ -593,8 +593,8 @@ tr: Activa los dos poderes de un tablero de Roggle.
 fr: Hautes performances
 tr: Alto rendimiento
 
-fr: La même teinture de cheveux, vue sur cette monture : la peau du visage s'y règle autrement.
-tr: El mismo tinte de pelo, visto sobre esta montura: la piel de la cara se ajusta allí de otro modo.
+fr: La même teinture de tête, vue sur ce corps : elle vaut partout.
+tr: El mismo tinte de cabeza, visto sobre este cuerpo: vale en todas partes.
 
 fr: La tête sur le corps que tu portes.
 tr: La cabeza sobre el cuerpo que llevas.

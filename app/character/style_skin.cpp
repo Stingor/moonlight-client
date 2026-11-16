@@ -42,8 +42,9 @@ SkinRefusal SkinRefusalFor(SkinLine line, bool gm_outfit, std::span<const std::s
   if (gm_outfit) {
     return SkinRefusal::kGmOutfit;
   }
-  if (std::ranges::any_of(
-          body_paths, [](const std::string& path) { return !ro::render::SkinAdjustable(path); })) {
+  if (line == SkinLine::kBody && std::ranges::any_of(body_paths, [](const std::string& path) {
+        return !ro::render::SkinAdjustable(path);
+      })) {
     return SkinRefusal::kOnMount;
   }
   if (line == SkinLine::kBody && server_layer_last < kBodySkinLayer) {
