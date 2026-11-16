@@ -1,10 +1,16 @@
 #include "ro/ui/hotkey_window.h"
 
+#include <algorithm>
 #include <array>
+#include <cstdint>
 #include <cstdio>
+#include <string>
 #include <string_view>
+#include <utility>
+#include <vector>
 
 #include "ro/core/ascii.h"
+#include "ro/core/search_key.h"
 #include "ro/ui/bug_report_window.h"
 #include "ro/ui/chat_link_offer.h"
 #include "ro/ui/skin_art.h"
@@ -54,6 +60,92 @@ void TabItem(HotkeyWindowState& state, int tab, std::string_view label, HotkeyWi
     state.capturing = -1;
   }
   ImGui::EndTabItem();
+}
+
+enum class HotkeyColumn : std::uint8_t { kAction, kKey };
+
+// Une ligne à ranger, avec ses clés de tri déjà calculées.
+struct SortedRow {
+  int rank = 0;
+  // Le rang de sa famille — onglet et intertitre — dans l'ordre de la table.
+  int family = 0;
+  std::string action_key;
+  std::string key_key;
+};
+
+// L'ORDRE DES LIGNES SELON L'EN-TÊTE CHOISI, par défaut l'action de A à Z.
+//
+// ⚠ LE TRI SE FAIT DANS CHAQUE FAMILLE. Les intertitres — « Barre 3 » — ne se
+// posent que là où la famille change : mêlées, les cases de deux barres en
+// feraient surgir un à chaque ligne.
+//
+// ⚠ L'ORDRE DE LA LANGUE MONTRÉE : les clés sont celles des libellés traduits,
+// sans casse ni accents, et leurs nombres se lisent comme des nombres —
+// « case 2 » avant « case 10 ». Une action sans touche se range toujours en
+// fin de famille quand on trie par touche : « (aucune) » n'est pas un nom.
+//
+// Recalculé à chaque image : un peu plus de cent lignes, et un ordre qui ne
+// dépend que de la vue — la touche d'une ligne change sous le tri.
+[[nodiscard]] std::vector<int> SortedRanks(const HotkeyWindowView& view) {
+  HotkeyColumn column = HotkeyColumn::kAction;
+  bool ascending = true;
+  if (ImGuiTableSortSpecs* const specs = ImGui::TableGetSortSpecs(); specs != nullptr) {
+    if (specs->SpecsCount > 0) {
+      column = specs->Specs[0].ColumnIndex == static_cast<int>(HotkeyColumn::kKey)
+                   ? HotkeyColumn::kKey
+                   : HotkeyColumn::kAction;
+      ascending = specs->Specs[0].SortDirection != ImGuiSortDirection_Descending;
+    }
+    specs->SpecsDirty = false;
+  }
+
+  std::vector<std::pair<int, std::string_view>> families;
+  std::vector<SortedRow> rows;
+  rows.reserve(view.rows.size());
+  for (int rank = 0; rank < static_cast<int>(view.rows.size()); ++rank) {
+    const HotkeyRowView& row = view.rows[static_cast<std::size_t>(rank)];
+    const std::pair<int, std::string_view> family(row.tab, row.group);
+    auto known = std::ranges::find(families, family);
+    if (known == families.end()) {
+      known = families.insert(families.end(), family);
+    }
+    rows.push_back(SortedRow{.rank = rank,
+                             .family = static_cast<int>(known - families.begin()),
+                             .action_key = core::SearchKey(row.action),
+                             .key_key = core::SearchKey(row.key)});
+  }
+
+  std::ranges::sort(rows, [&](const SortedRow& left, const SortedRow& right) {
+    if (left.family != right.family) {
+      return left.family < right.family;
+    }
+    int order = 0;
+    if (column == HotkeyColumn::kKey) {
+      if (left.key_key.empty() != right.key_key.empty()) {
+        return right.key_key.empty();
+      }
+      order = core::CompareSearchKeys(left.key_key, right.key_key);
+    } else {
+      order = core::CompareSearchKeys(left.action_key, right.action_key);
+    }
+    if (order != 0) {
+      return ascending ? order < 0 : order > 0;
+    }
+    if (column == HotkeyColumn::kKey) {
+      if (const int by_action = core::CompareSearchKeys(left.action_key, right.action_key);
+          by_action != 0) {
+        return by_action < 0;
+      }
+    }
+    return left.rank < right.rank;
+  });
+
+  std::vector<int> ranks;
+  ranks.reserve(rows.size());
+  for (const SortedRow& row : rows) {
+    ranks.push_back(row.rank);
+  }
+  return ranks;
 }
 
 }  // namespace
@@ -113,17 +205,19 @@ HotkeyWindowAction DrawHotkeyWindow(HotkeyWindowState& state, const HotkeyWindow
 
   const float footer = SkinFooterHeight(art);
   if (ImGui::BeginChild("lignes", ImVec2(0.0F, -footer), ImGuiChildFlags_None)) {
-    constexpr ImGuiTableFlags kFlags =
-        ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_SizingStretchProp;
+    constexpr ImGuiTableFlags kFlags = ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersInnerH |
+                                       ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_Sortable;
     const std::string_view tab_label = state.tab == kAllHotkeyTabs
                                            ? std::string_view()
                                            : view.tabs[static_cast<std::size_t>(state.tab)];
     bool any_shown = false;
     if (ImGui::BeginTable("raccourcis", 2, kFlags)) {
-      ImGui::TableSetupColumn(core::Tr("Action"), ImGuiTableColumnFlags_WidthStretch);
+      ImGui::TableSetupColumn(core::Tr("Action"), ImGuiTableColumnFlags_WidthStretch |
+                                                      ImGuiTableColumnFlags_DefaultSort);
       ImGui::TableSetupColumn(core::Tr("Touche"), ImGuiTableColumnFlags_WidthFixed,
                               Px(kKeyColumnPixels));
       ImGui::TableHeadersRow();
+      const std::vector<int> ranks = SortedRanks(view);
 
       // La famille de la dernière ligne MONTRÉE. ⚠ CELLE QUI EST MONTRÉE, et
       // non celle de la ligne précédente : avec un filtre en cours, la première
@@ -131,7 +225,7 @@ HotkeyWindowAction DrawHotkeyWindow(HotkeyWindowState& state, const HotkeyWindow
       // autres sont écartées.
       std::string_view shown_group;
       const ImU32 group_ink = InkOn(kGroupTextColor, PaintingLook().body);
-      for (int rank = 0; rank < static_cast<int>(view.rows.size()); ++rank) {
+      for (const int rank : ranks) {
         const HotkeyRowView& row = view.rows[static_cast<std::size_t>(rank)];
         if (row.hidden || (state.tab != kAllHotkeyTabs && row.tab != state.tab)) {
           continue;

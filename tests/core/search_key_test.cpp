@@ -7,6 +7,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+using ro::core::CompareSearchKeys;
 using ro::core::SearchKey;
 using ro::core::SearchKeyContains;
 
@@ -49,4 +50,15 @@ TEST_CASE("Clé de recherche : une clé dans une autre", "[core][search_key]") {
   CHECK(SearchKeyContains(SearchKey("Échelle de l'interface"), SearchKey("echelle")));
   CHECK(SearchKeyContains(SearchKey("Bulles"), ""));
   CHECK_FALSE(SearchKeyContains(SearchKey("Bulles"), SearchKey("son")));
+}
+
+TEST_CASE("Clé de recherche : les nombres se comparent comme des nombres", "[core][search_key]") {
+  CHECK(CompareSearchKeys(SearchKey("Barre 1, case 2"), SearchKey("Barre 1, case 10")) < 0);
+  CHECK(CompareSearchKeys(SearchKey("Barre 10, case 1"), SearchKey("Barre 9, case 12")) > 0);
+  CHECK(CompareSearchKeys(SearchKey("Écran de veille"), SearchKey("Entités")) < 0);
+  CHECK(CompareSearchKeys(SearchKey("F2"), SearchKey("f2")) == 0);
+  CHECK(CompareSearchKeys("case", "case 1") < 0);
+  // À nombre égal, les zéros de tête départagent sans brouiller l'ordre.
+  CHECK(CompareSearchKeys("a07", "a7") != 0);
+  CHECK(CompareSearchKeys("a07", "a8") < 0);
 }

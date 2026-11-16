@@ -26,4 +26,11 @@ namespace ro::core {
 // une clé vide se trouve partout.
 [[nodiscard]] bool SearchKeyContains(std::string_view haystack_key, std::string_view needle_key);
 
+// L'ORDRE DE DEUX CLÉS, chiffres lus comme des nombres : « case 2 » avant
+// « case 10 ». Négatif, nul ou positif, comme `std::string_view::compare` ; nul
+// seulement pour deux clés identiques.
+//
+// ⚠ DEUX CLÉS, PAS DEUX TEXTES : c'est `SearchKey` qui range « É » avec « e ».
+[[nodiscard]] int CompareSearchKeys(std::string_view left_key, std::string_view right_key);
+
 }  // namespace ro::core
