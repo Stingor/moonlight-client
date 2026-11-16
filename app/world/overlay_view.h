@@ -63,7 +63,9 @@ enum class GroundHover : std::uint8_t {
   kUnknown,
 };
 
-// Ce que le sol permet sur la case désignée.
+// Ce que le sol permet sur la case désignée, d'après la grille de marche de la
+// carte : le curseur refuse ce que le clic refuserait, une case bloquée par le
+// document d'édition comme un mur du fichier.
 //
 // La case est DONNÉE, et non cherchée ici : la retrouver soi-même relancerait
 // la marche du rayon le long du terrain, que la même image a déjà payée pour le

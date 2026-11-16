@@ -250,6 +250,17 @@ bool BlockStageCells(MapStage& stage, std::span<const ro::mapedit::BlockedCell> 
   return true;
 }
 
+void ComposeStageGreyWorld(const MapStage& stage, std::int32_t center_x, std::int32_t center_y,
+                           const ro::render::GreyWorldLook& look,
+                           std::vector<ro::render::GroundQuad>& quads) {
+  quads.clear();
+  if (!stage.gat.has_value()) {
+    return;
+  }
+  ro::render::ComposeGreyWorldCells(stage.scene.gnd, *stage.gat, stage.blocked_cells, center_x,
+                                    center_y, look, quads);
+}
+
 std::span<const ro::mapedit::GroundEdit> ShownGroundEdits(const ro::mapedit::MapEdit& document,
                                                           bool real_time_shadows) {
   if (!real_time_shadows) {

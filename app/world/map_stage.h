@@ -12,7 +12,9 @@
 #include "ro/core/load_progress.h"
 #include "ro/formats/gat.h"
 #include "ro/mapedit/map_edit.h"
+#include "ro/render/grey_world.h"
 #include "ro/render/ground_light.h"
+#include "ro/render/ground_quad.h"
 #include "ro/render/map_scene.h"
 #include "ro/render/model_renderer.h"
 #include "ro/render/scene_fog.h"
@@ -50,8 +52,9 @@ struct MapStage {
   // cellule, avant les retouches du relief — aplanies si la carte l'est. Voir
   // `ReshapeStageGround`.
   std::vector<std::array<float, 4>> file_walk_heights;
-  // LES CASES BLOQUÉES QUE `walk_map` PORTE, celles du document : voir
-  // `BlockStageCells`.
+  // LES CASES BLOQUÉES QUE `walk_map` PORTE, celles du document, dans son
+  // ordre : voir `BlockStageCells`. `gat` garde les types du fichier, et qui
+  // peint la marchabilité les lit avec lui.
   std::vector<ro::mapedit::BlockedCell> blocked_cells;
   // LE MAILLAGE DU SOL NE PORTE PAS ENCORE le relief des hauteurs : un glissé
   // de brosse trop coûteux à remailler image par image attend son relâcher.
@@ -142,9 +145,19 @@ bool ReshapeStageGround(MapStage& stage, std::span<const ro::mapedit::GroundEdit
 // LES CASES BLOQUÉES SELON L'ÉDITION : quand `cells` diffère de ce que la grille
 // de marche porte, la refait depuis la grille lue, puis y bloque `cells`
 // (docs/adr/0131). La grille se refait EN PLACE : le planificateur et le monde,
-// qui la désignent, la suivent sans qu'on la leur redonne. La grille lue, que
-// le dessin consulte, ne change pas. Rend vrai quand la grille a changé.
+// qui la désignent, la suivent sans qu'on la leur redonne. La grille lue garde
+// les types du fichier : le quadrillage de GreyWorld lit `blocked_cells` avec
+// elle, et le curseur lit la grille de marche. `cells` est la liste du
+// document, dans son ordre. Rend vrai quand la grille a changé.
 bool BlockStageCells(MapStage& stage, std::span<const ro::mapedit::BlockedCell> cells);
+
+// LE QUADRILLAGE DE GREYWORLD SUR CETTE CARTE, autour de la case
+// (center_x, center_y) : la grille lue ET les cases que le document y bloque,
+// puisque c'est sur les deux que l'on marche. `quads` est vidé puis rempli, et
+// reste vide sans grille. Voir `ro::render::ComposeGreyWorldCells`.
+void ComposeStageGreyWorld(const MapStage& stage, std::int32_t center_x, std::int32_t center_y,
+                           const ro::render::GreyWorldLook& look,
+                           std::vector<ro::render::GroundQuad>& quads);
 
 // LES RETOUCHES DU RELIEF QUI SE VOIENT : celles du document sous « Ombres en
 // temps réel », aucune sinon. L'ombre cuite de la carte est peinte pour le sol

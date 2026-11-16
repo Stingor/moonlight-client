@@ -10,10 +10,11 @@ std::optional<GroundQuad> ComposeGroundCursor(const formats::GndMap& gnd,
   if (!gat.InBounds(cell_x, cell_y)) {
     return std::nullopt;
   }
-  // La MÊME règle que celle qui décide de la forme du curseur de souris : une
-  // case interdite montre le panneau d'interdiction, et ne montre pas de cadre.
-  // Les séparer permettrait au client d'annoncer un pas et de le refuser du
-  // même geste.
+  // Une case interdite montre le panneau d'interdiction, et ne montre pas de
+  // cadre : annoncer un pas et le refuser du même geste serait mentir. Ici, c'est
+  // le type du FICHIER qui refuse ; ce que la grille de marche bloque en plus —
+  // une case du document d'édition, un mur de script — est écarté par l'appelant,
+  // qui tient cette grille.
   if (CellRefusesWalk(gat.at(cell_x, cell_y).type)) {
     return std::nullopt;
   }

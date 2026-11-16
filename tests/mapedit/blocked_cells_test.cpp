@@ -5,6 +5,7 @@
 
 #include <array>
 #include <cstdint>
+#include <span>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -127,4 +128,76 @@ TEST_CASE("Cases bloquées : posées sur la grille, elles ne font que bloquer", 
   CHECK(gat.at(2, 0).type == kFenceType);
   CHECK(gat.at(3, 3).type == kWallType);
   CHECK(gat.at(3, 0).type == 0);
+}
+
+TEST_CASE("Cases bloquées : le type d'une case bloquée, sans réécrire la grille", "[mapedit]") {
+  using ro::mapedit::BlockedGatType;
+  CHECK(BlockedGatType(0, CellBlock::kWall) == kWallType);
+  CHECK(BlockedGatType(0, CellBlock::kFence) == kFenceType);
+  // On ne fait que bloquer : un mur le reste, une crevasse devient un mur.
+  CHECK(BlockedGatType(kWallType, CellBlock::kFence) == kWallType);
+  CHECK(BlockedGatType(kFenceType, CellBlock::kWall) == kWallType);
+  CHECK(BlockedGatType(kFenceType, CellBlock::kFence) == kFenceType);
+  // Le drapeau d'eau ne dit rien de ce que la case arrête.
+  CHECK(BlockedGatType(static_cast<std::int32_t>(kWaterFlag | 1U), CellBlock::kFence) == kWallType);
+  CHECK(BlockedGatType(static_cast<std::int32_t>(kWaterFlag), CellBlock::kFence) == kFenceType);
+
+  // ET C'EST CE QUE LA GRILLE PREND, sorte par sorte, sur chaque case de la
+  // grille d'essai : qui lit une case sans réécrire la grille y voit ce que la
+  // marche y voit.
+  for (const CellBlock block : {CellBlock::kWall, CellBlock::kFence}) {
+    const ro::formats::GatMap file = Walk();
+    ro::formats::GatMap blocked = Walk();
+    std::vector<BlockedCell> cells;
+    for (std::int32_t y = 0; y < kSide; ++y) {
+      for (std::int32_t x = 0; x < kSide; ++x) {
+        cells.push_back({.cell_x = x, .cell_y = y, .block = block});
+      }
+    }
+    static_cast<void>(ro::mapedit::BlockGatCells(cells, blocked));
+    for (const BlockedCell& cell : cells) {
+      const auto server_type = static_cast<std::int32_t>(
+          static_cast<std::uint32_t>(blocked.at(cell.cell_x, cell.cell_y).type) & ~kWaterFlag);
+      CHECK(BlockedGatType(file.at(cell.cell_x, cell.cell_y).type, block) == server_type);
+    }
+  }
+}
+
+TEST_CASE("Cases bloquées : une case se cherche dans la liste rangée, entière ou par rangées",
+          "[mapedit]") {
+  using ro::mapedit::BlockedCellsInRows;
+  using ro::mapedit::FindBlockedCell;
+  MapEdit edit;
+  edit.BlockCell({.cell_x = 3, .cell_y = 1});
+  edit.BlockCell({.cell_x = 0, .cell_y = 2, .block = CellBlock::kFence});
+  edit.BlockCell({.cell_x = 5, .cell_y = 2});
+  edit.BlockCell({.cell_x = 1, .cell_y = 7});
+  const std::span<const BlockedCell> cells = edit.blocked_cells();
+
+  const BlockedCell* found = FindBlockedCell(cells, 0, 2);
+  REQUIRE(found != nullptr);
+  CHECK(found->block == CellBlock::kFence);
+  // La colonne et la rangée ne s'échangent pas.
+  CHECK(FindBlockedCell(cells, 2, 0) == nullptr);
+  CHECK(FindBlockedCell(cells, 1, 3) == nullptr);
+  CHECK(FindBlockedCell({}, 0, 2) == nullptr);
+
+  // Les rangées 2 à 6 : les deux cases de la rangée 2, dans l'ordre de la liste.
+  const std::span<const BlockedCell> rows = BlockedCellsInRows(cells, 2, 6);
+  REQUIRE(rows.size() == 2);
+  CHECK(rows[0] == BlockedCell{0, 2, CellBlock::kFence});
+  CHECK(rows[1] == BlockedCell{5, 2, CellBlock::kWall});
+  // Une case s'y cherche comme dans la liste entière.
+  CHECK(FindBlockedCell(rows, 5, 2) != nullptr);
+  CHECK(FindBlockedCell(rows, 3, 1) == nullptr);
+  // Les bornes sont comprises.
+  CHECK(BlockedCellsInRows(cells, 1, 7).size() == 4);
+  CHECK(BlockedCellsInRows(cells, 7, 7).size() == 1);
+  // Entre deux rangées bloquées, avant la première, après la dernière : rien.
+  CHECK(BlockedCellsInRows(cells, 3, 6).empty());
+  CHECK(BlockedCellsInRows(cells, -4, 0).empty());
+  CHECK(BlockedCellsInRows(cells, 8, 20).empty());
+  // Des bornes croisées ne désignent rien.
+  CHECK(BlockedCellsInRows(cells, 7, 1).empty());
+  CHECK(BlockedCellsInRows({}, 0, 7).empty());
 }

@@ -22,8 +22,9 @@ namespace moonclient {
 
 // LE QUADRILLAGE DE GREYWORLD, posé sur le relief autour du joueur.
 //
-// La figure (`ro::render::ComposeGreyWorldCells`) sait quelles cases peindre ;
-// ici on sait où est le joueur et où lire l'image du motif.
+// La figure (`ro::render::ComposeGreyWorldCells`) sait quelles cases peindre,
+// la carte (`ComposeStageGreyWorld`) sur quelle grille ; ici on sait où est le
+// joueur et où lire l'image du motif.
 class GreyWorldGrid {
  public:
   // CE QUI SE PEINT CETTE IMAGE : un seul lot, une seule image. Vide quand le

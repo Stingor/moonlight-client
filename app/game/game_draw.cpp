@@ -53,6 +53,7 @@
 #include "world/hit_popups.h"
 #include "world/map_sprites.h"
 #include "world/music_player_stage.h"
+#include "world/overlay_view.h"
 #include "world/pick_box_view.h"
 #include "world/scene_graphics.h"
 #include "world/screen_overlays.h"
@@ -280,8 +281,10 @@ ro::core::Result<void> Game::DrawWorld(std::uint32_t now_ms) {
       case GroundPaint::kCellCursor:
         // Le cadre sur la case désignée : il couvre le sol, et ce qui se tient
         // dessus le couvre à son tour — la planche d'un piège comme un
-        // personnage.
-        if (stage_->gat.has_value() && marked_cell.has_value() && pieces_.ground_cursor->ready()) {
+        // personnage. ⚠ PAS SUR UNE CASE QUE LA GRILLE DE MARCHE REFUSE : le
+        // cadre promet un pas, et le curseur y montre déjà l'interdiction.
+        if (stage_->gat.has_value() && marked_cell.has_value() && pieces_.ground_cursor->ready() &&
+            GroundHoverOn(*stage_, marked_cell) != GroundHover::kRefused) {
           if (const std::optional<ro::render::GroundQuad> marked = ro::render::ComposeGroundCursor(
                   stage_->scene.gnd, *stage_->gat, static_cast<std::int32_t>(marked_cell->x),
                   static_cast<std::int32_t>(marked_cell->y));

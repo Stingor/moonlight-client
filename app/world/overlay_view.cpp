@@ -61,19 +61,19 @@ constexpr std::array<std::uint8_t, 4> kOpaqueWhite = {255, 255, 255, 255};
 }  // namespace
 
 GroundHover GroundHoverOn(const MapStage& stage, const std::optional<ro::sim::CellPosition>& cell) {
-  if (!stage.gat.has_value()) {
+  // LA GRILLE DE MARCHE DÉCIDE, et non le seul fichier : elle porte en plus les
+  // cases que le document d'édition bloque et celles qu'un script change, et
+  // c'est elle que le clic consulte. Hors de la carte, elle refuse.
+  const ro::sim::WalkMap* walk = PlannedMapOf(stage);
+  if (walk == nullptr) {
     return GroundHover::kUnknown;
   }
   if (!cell.has_value()) {
     return GroundHover::kRefused;
   }
-  const auto cell_x = static_cast<std::int32_t>(cell->x);
-  const auto cell_y = static_cast<std::int32_t>(cell->y);
-  if (!stage.gat->InBounds(cell_x, cell_y)) {
-    return GroundHover::kRefused;
-  }
-  return ro::render::CellRefusesWalk(stage.gat->at(cell_x, cell_y).type) ? GroundHover::kRefused
-                                                                         : GroundHover::kOpen;
+  return walk->Passable(static_cast<std::int32_t>(cell->x), static_cast<std::int32_t>(cell->y))
+             ? GroundHover::kOpen
+             : GroundHover::kRefused;
 }
 
 ro::render::CursorShape CursorShapeOver(const ro::sim::Actor* hovered, GroundHover ground,

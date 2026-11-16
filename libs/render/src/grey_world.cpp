@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 
+#include "ro/mapedit/blocked_cells.h"
 #include "ro/render/map_effect_math.h"
 #include "ro/render/terrain_mesh.h"
 
@@ -20,22 +21,42 @@ constexpr std::size_t kPixelChannels = 4;
 constexpr std::uint8_t kOpaque = 255;
 // L'alpha d'une couleur empaquetée, dans l'ordre de `SkillAreaColorBytes`.
 constexpr std::size_t kAlphaByte = 3;
+// Jusqu'où le contour regarde autour d'une case, en cellules : ses quatre
+// voisines directes.
+constexpr std::int32_t kContourReach = 1;
 
-// La famille d'une cellule, ou rien hors de la grille : le bord de la carte
-// est un changement de terrain comme un autre, et le contour le garde.
-[[nodiscard]] std::optional<CellFamily> FamilyAt(const formats::GatMap& gat, std::int32_t x,
-                                                 std::int32_t y) {
-  if (!gat.InBounds(x, y)) {
-    return std::nullopt;
+// LA GRILLE DE MARCHE, telle que le quadrillage la lit : les types du fichier,
+// et les cases que le document d'édition y bloque.
+struct WalkGrid {
+  const formats::GatMap& gat;
+  std::span<const mapedit::BlockedCell> blocked_cells;
+};
+
+// La famille d'une cellule de la grille : celle de son type, ou celle du type
+// qu'elle prend sous une case bloquée du document.
+[[nodiscard]] CellFamily FamilyIn(const WalkGrid& grid, std::int32_t x, std::int32_t y) {
+  const std::int32_t file_type = grid.gat.at(x, y).type;
+  if (const mapedit::BlockedCell* blocked = mapedit::FindBlockedCell(grid.blocked_cells, x, y)) {
+    return CellFamilyOf(mapedit::BlockedGatType(file_type, blocked->block));
   }
-  return CellFamilyOf(gat.at(x, y).type);
+  return CellFamilyOf(file_type);
 }
 
-[[nodiscard]] bool BordersOtherTerrain(const formats::GatMap& gat, std::int32_t x, std::int32_t y,
+// La même, ou rien hors de la grille : le bord de la carte est un changement
+// de terrain comme un autre, et le contour le garde.
+[[nodiscard]] std::optional<CellFamily> FamilyAt(const WalkGrid& grid, std::int32_t x,
+                                                 std::int32_t y) {
+  if (!grid.gat.InBounds(x, y)) {
+    return std::nullopt;
+  }
+  return FamilyIn(grid, x, y);
+}
+
+[[nodiscard]] bool BordersOtherTerrain(const WalkGrid& grid, std::int32_t x, std::int32_t y,
                                        CellFamily family) {
   const std::optional<CellFamily> own = family;
-  return FamilyAt(gat, x - 1, y) != own || FamilyAt(gat, x + 1, y) != own ||
-         FamilyAt(gat, x, y - 1) != own || FamilyAt(gat, x, y + 1) != own;
+  return FamilyAt(grid, x - 1, y) != own || FamilyAt(grid, x + 1, y) != own ||
+         FamilyAt(grid, x, y - 1) != own || FamilyAt(grid, x, y + 1) != own;
 }
 
 }  // namespace
@@ -126,6 +147,7 @@ bool GroundHasSurface(const formats::GndMap& gnd, std::int32_t cell_x,
 }
 
 void ComposeGreyWorldCells(const formats::GndMap& gnd, const formats::GatMap& gat,
+                           std::span<const mapedit::BlockedCell> blocked_cells,
                            std::int32_t center_x, std::int32_t center_y, const GreyWorldLook& look,
                            std::vector<GroundQuad>& quads) {
   quads.clear();
@@ -135,6 +157,11 @@ void ComposeGreyWorldCells(const formats::GndMap& gnd, const formats::GatMap& ga
   const std::int32_t first_y = std::max(center_y - radius, 0);
   const std::int32_t last_x = std::min(center_x + radius, gat.width() - 1);
   const std::int32_t last_y = std::min(center_y + radius, gat.height() - 1);
+  // LES SEULES CASES BLOQUÉES À PORTÉE : les rangées du carré, et une de chaque
+  // côté pour les voisines que le contour consulte. Loin de toute case bloquée,
+  // il ne reste rien à chercher.
+  const WalkGrid grid{gat, mapedit::BlockedCellsInRows(blocked_cells, first_y - kContourReach,
+                                                       last_y + kContourReach)};
   const float fill = GreyWorldCellFill(look);
   const std::array<std::uint8_t, 4> walk = SkillAreaColorBytes(look.walk_color);
   const std::array<std::uint8_t, 4> wall = SkillAreaColorBytes(look.wall_color);
@@ -151,8 +178,8 @@ void ComposeGreyWorldCells(const formats::GndMap& gnd, const formats::GatMap& ga
       if (ground_known && !GroundHasSurface(gnd, x, y)) {
         continue;
       }
-      const CellFamily family = CellFamilyOf(gat.at(x, y).type);
-      if (look.fill == GreyWorldFill::kOutline && !BordersOtherTerrain(gat, x, y, family)) {
+      const CellFamily family = FamilyIn(grid, x, y);
+      if (look.fill == GreyWorldFill::kOutline && !BordersOtherTerrain(grid, x, y, family)) {
         continue;
       }
       const std::array<std::uint8_t, 4>& color = family == CellFamily::kWall        ? wall

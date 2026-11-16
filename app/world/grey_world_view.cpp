@@ -49,9 +49,8 @@ std::span<const ro::render::DrawnGroundQuads> GreyWorldGrid::Cells(
   }
   const ro::sim::FractionalCell cell =
       ro::sim::InterpolatedCell(*player, planner.PathFor(*player), now_ms);
-  ro::render::ComposeGreyWorldCells(stage.scene.gnd, *stage.gat,
-                                    static_cast<std::int32_t>(std::lround(cell.x)),
-                                    static_cast<std::int32_t>(std::lround(cell.y)), look, quads_);
+  ComposeStageGreyWorld(stage, static_cast<std::int32_t>(std::lround(cell.x)),
+                        static_cast<std::int32_t>(std::lround(cell.y)), look, quads_);
   if (quads_.empty()) {
     return lots_;
   }

@@ -13,7 +13,10 @@
 #include "ro/formats/gat.h"
 #include "ro/formats/gnd.h"
 #include "ro/formats/rsw.h"
+#include "ro/mapedit/blocked_cells.h"
+#include "ro/mapedit/map_edit.h"
 #include "ro/render/ground_quad.h"
+#include "ro/render/skill_area.h"
 #include "ro/render/terrain_mesh.h"
 
 #include "support/map_builder.h"
@@ -21,6 +24,8 @@
 using ro::formats::GatMap;
 using ro::formats::GndMap;
 using ro::formats::RswScene;
+using ro::mapedit::CellBlock;
+using ro::mapedit::MapEdit;
 using ro::render::CellFamily;
 using ro::render::CellFamilyOf;
 using ro::render::ComposeGreyWorldCells;
@@ -261,7 +266,7 @@ TEST_CASE("GreyWorld : toutes les cases avec du sol, une par cellule", "[render]
   const GndMap gnd = FourByFourGnd();
   const GatMap gat = FlatGat();
   std::vector<GroundQuad> quads;
-  ComposeGreyWorldCells(gnd, gat, 3, 3, EnabledLook(), quads);
+  ComposeGreyWorldCells(gnd, gat, {}, 3, 3, EnabledLook(), quads);
   // Soixante-quatre cellules, moins les quatre du cube sans sol.
   CHECK(quads.size() == 60);
   CHECK_FALSE(Paints(gnd, quads, 6, 6));
@@ -285,7 +290,7 @@ TEST_CASE("GreyWorld : une famille transparente ne pose aucune case", "[render][
   GreyWorldLook look = EnabledLook();
   look.walk_color = 0x00FFFFFFU;
   std::vector<GroundQuad> quads;
-  ComposeGreyWorldCells(gnd, gat, 3, 3, look, quads);
+  ComposeGreyWorldCells(gnd, gat, {}, 3, 3, look, quads);
   CHECK(quads.size() == 2);
   CHECK(Paints(gnd, quads, 2, 2));
   CHECK(Paints(gnd, quads, 5, 2));
@@ -297,7 +302,7 @@ TEST_CASE("GreyWorld : le contour garde les bords, jamais l'intérieur", "[rende
   GreyWorldLook look = EnabledLook();
   look.fill = GreyWorldFill::kOutline;
   std::vector<GroundQuad> quads;
-  ComposeGreyWorldCells(gnd, gat, 3, 3, look, quads);
+  ComposeGreyWorldCells(gnd, gat, {}, 3, 3, look, quads);
   // Le mur et ses quatre voisins.
   CHECK(Paints(gnd, quads, 2, 2));
   CHECK(Paints(gnd, quads, 1, 2));
@@ -318,7 +323,7 @@ TEST_CASE("GreyWorld : la portée borne le carré autour du joueur", "[render][g
   // toute la carte.
   look.radius_cells = 1;
   std::vector<GroundQuad> quads;
-  ComposeGreyWorldCells(gnd, gat, 0, 0, look, quads);
+  ComposeGreyWorldCells(gnd, gat, {}, 0, 0, look, quads);
   CHECK(quads.size() == 60);
   // Le joint rétrécit chaque carreau depuis son centre.
   const GroundQuad& first = quads.front();
@@ -380,6 +385,148 @@ TEST_CASE("GreyWorld : un objet d'effet au-dessus du vide ne bouge pas", "[rende
 TEST_CASE("GreyWorld : sans aucune face de sol, le quadrillage couvre tout",
           "[render][greyworld]") {
   std::vector<GroundQuad> quads;
-  ComposeGreyWorldCells(EastwardSlopeGnd(false), FlatGat(), 3, 3, EnabledLook(), quads);
+  ComposeGreyWorldCells(EastwardSlopeGnd(false), FlatGat(), {}, 3, 3, EnabledLook(), quads);
   CHECK(quads.size() == kCellsPerSide * kCellsPerSide);
+}
+
+// ── LES CASES BLOQUÉES DU DOCUMENT D'ÉDITION ────────────────────────────────
+
+namespace {
+
+// Ce que le document bloque sur la grille d'essai : un mur et une barrière en
+// terrain marchable, une barrière sur le mur du fichier, un mur sur sa falaise,
+// un mur au-dessus du vide et un autre hors de la grille.
+constexpr std::int32_t kAddedWallX = 4;
+constexpr std::int32_t kAddedWallY = 4;
+constexpr std::int32_t kAddedFenceX = 1;
+constexpr std::int32_t kAddedFenceY = 5;
+
+MapEdit BlockingDocument() {
+  MapEdit edit;
+  edit.BlockCell({.cell_x = kAddedWallX, .cell_y = kAddedWallY, .block = CellBlock::kWall});
+  edit.BlockCell({.cell_x = kAddedFenceX, .cell_y = kAddedFenceY, .block = CellBlock::kFence});
+  edit.BlockCell({.cell_x = 2, .cell_y = 2, .block = CellBlock::kFence});
+  edit.BlockCell({.cell_x = 5, .cell_y = 2, .block = CellBlock::kWall});
+  edit.BlockCell({.cell_x = 6, .cell_y = 6, .block = CellBlock::kWall});
+  edit.BlockCell({.cell_x = 3, .cell_y = 40, .block = CellBlock::kWall});
+  return edit;
+}
+
+// La couleur du quad posé sur cette cellule, ou rien quand aucun ne s'y pose.
+[[nodiscard]] std::optional<std::array<std::uint8_t, 4>> ColorAt(
+    const GndMap& gnd, const std::vector<GroundQuad>& quads, std::int32_t cell_x,
+    std::int32_t cell_y) {
+  const std::array<float, 3> center =
+      ro::render::CellPositionAt(gnd, static_cast<float>(cell_x), static_cast<float>(cell_y));
+  for (const GroundQuad& quad : quads) {
+    const std::array<float, 2> drawn = CenterOf(quad);
+    if (drawn[0] == Catch::Approx(center[0]) && drawn[1] == Catch::Approx(center[2])) {
+      return quad.color;
+    }
+  }
+  return std::nullopt;
+}
+
+[[nodiscard]] bool SameQuads(const std::vector<GroundQuad>& left,
+                             const std::vector<GroundQuad>& right) {
+  return std::ranges::equal(left, right, [](const GroundQuad& one, const GroundQuad& other) {
+    return one.corners == other.corners && one.texture_uv == other.texture_uv &&
+           one.color == other.color;
+  });
+}
+
+}  // namespace
+
+TEST_CASE("GreyWorld : une case que le document bloque prend la famille de sa sorte",
+          "[render][greyworld]") {
+  const GndMap gnd = FourByFourGnd();
+  const GatMap gat = FlatGat();
+  const MapEdit document = BlockingDocument();
+  const GreyWorldLook look = EnabledLook();
+  const auto walk = ro::render::SkillAreaColorBytes(look.walk_color);
+  const auto wall = ro::render::SkillAreaColorBytes(look.wall_color);
+  const auto snipe = ro::render::SkillAreaColorBytes(look.snipe_color);
+  std::vector<GroundQuad> quads;
+  ComposeGreyWorldCells(gnd, gat, document.blocked_cells(), 3, 3, look, quads);
+  // Autant de cases qu'avant : bloquer change une couleur, pas le sol.
+  CHECK(quads.size() == 60);
+  CHECK(ColorAt(gnd, quads, kAddedWallX, kAddedWallY) == wall);
+  CHECK(ColorAt(gnd, quads, kAddedFenceX, kAddedFenceY) == snipe);
+  // On ne fait que bloquer : le mur du fichier le reste sous une barrière, et
+  // sa falaise devient un mur.
+  CHECK(ColorAt(gnd, quads, 2, 2) == wall);
+  CHECK(ColorAt(gnd, quads, 5, 2) == wall);
+  // Les voisines gardent leur famille.
+  CHECK(ColorAt(gnd, quads, kAddedWallX + 1, kAddedWallY) == walk);
+  CHECK(ColorAt(gnd, quads, kAddedFenceY, kAddedFenceX) == walk);
+  // Au-dessus du vide, bloquée ou non, il n'y a pas de sol où poser la case.
+  CHECK_FALSE(ColorAt(gnd, quads, 6, 6).has_value());
+
+  // SANS LE DOCUMENT, les mêmes cases sont celles du fichier.
+  ComposeGreyWorldCells(gnd, gat, {}, 3, 3, look, quads);
+  CHECK(ColorAt(gnd, quads, kAddedWallX, kAddedWallY) == walk);
+  CHECK(ColorAt(gnd, quads, kAddedFenceX, kAddedFenceY) == walk);
+  CHECK(ColorAt(gnd, quads, 5, 2) == snipe);
+}
+
+TEST_CASE("GreyWorld : le quadrillage peint ce que la grille de marche bloque",
+          "[render][greyworld]") {
+  const GndMap gnd = FourByFourGnd();
+  const GatMap gat = FlatGat();
+  const MapEdit document = BlockingDocument();
+  // LA GRILLE TELLE QUE LA MARCHE LA TIENT : celle du fichier, où les cases du
+  // document sont posées pour de bon.
+  GatMap walked = FlatGat();
+  static_cast<void>(ro::mapedit::BlockGatCells(document.blocked_cells(), walked));
+
+  for (const GreyWorldFill fill : {GreyWorldFill::kAll, GreyWorldFill::kOutline}) {
+    GreyWorldLook look = EnabledLook();
+    look.fill = fill;
+    std::vector<GroundQuad> read;
+    std::vector<GroundQuad> written;
+    ComposeGreyWorldCells(gnd, gat, document.blocked_cells(), 3, 3, look, read);
+    ComposeGreyWorldCells(gnd, walked, {}, 3, 3, look, written);
+    CHECK_FALSE(read.empty());
+    CHECK(SameQuads(read, written));
+  }
+}
+
+TEST_CASE("GreyWorld : le contour suit une case que le document bloque", "[render][greyworld]") {
+  const GndMap gnd = FourByFourGnd();
+  const GatMap gat = FlatGat();
+  GreyWorldLook look = EnabledLook();
+  look.fill = GreyWorldFill::kOutline;
+  std::vector<GroundQuad> quads;
+  // Dans le fichier, la case et ses voisines sont de l'intérieur marchable.
+  ComposeGreyWorldCells(gnd, gat, {}, 3, 3, look, quads);
+  CHECK_FALSE(Paints(gnd, quads, kAddedWallX, kAddedWallY));
+  CHECK_FALSE(Paints(gnd, quads, kAddedWallX, kAddedWallY + 1));
+
+  // Bloquée, elle devient un bord, et ses quatre voisines avec elle.
+  MapEdit document;
+  document.BlockCell({.cell_x = kAddedWallX, .cell_y = kAddedWallY, .block = CellBlock::kWall});
+  ComposeGreyWorldCells(gnd, gat, document.blocked_cells(), 3, 3, look, quads);
+  CHECK(Paints(gnd, quads, kAddedWallX, kAddedWallY));
+  CHECK(Paints(gnd, quads, kAddedWallX - 1, kAddedWallY));
+  CHECK(Paints(gnd, quads, kAddedWallX + 1, kAddedWallY));
+  CHECK(Paints(gnd, quads, kAddedWallX, kAddedWallY - 1));
+  CHECK(Paints(gnd, quads, kAddedWallX, kAddedWallY + 1));
+  // Une case plus loin, l'intérieur reste de l'intérieur.
+  CHECK_FALSE(Paints(gnd, quads, kAddedWallX - 1, kAddedWallY + 1));
+}
+
+TEST_CASE("GreyWorld : marchable éteint, les cases du document restent des obstacles",
+          "[render][greyworld]") {
+  const GndMap gnd = FourByFourGnd();
+  const GatMap gat = FlatGat();
+  const MapEdit document = BlockingDocument();
+  GreyWorldLook look = EnabledLook();
+  look.walk_color = 0x00FFFFFFU;
+  std::vector<GroundQuad> quads;
+  ComposeGreyWorldCells(gnd, gat, document.blocked_cells(), 3, 3, look, quads);
+  // Les deux obstacles du fichier, et les deux que le document ajoute sur du
+  // sol marchable.
+  CHECK(quads.size() == 4);
+  CHECK(Paints(gnd, quads, kAddedWallX, kAddedWallY));
+  CHECK(Paints(gnd, quads, kAddedFenceX, kAddedFenceY));
 }

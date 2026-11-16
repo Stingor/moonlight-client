@@ -37,12 +37,7 @@ constexpr std::size_t kLeastHullPoints = 3;
 }  // namespace
 
 const BlockedCell* MapEdit::BlockedCellAt(std::int32_t cell_x, std::int32_t cell_y) const {
-  const BlockedCell probe{.cell_x = cell_x, .cell_y = cell_y};
-  const auto place = std::ranges::lower_bound(blocked_cells_, probe, Before);
-  if (place != blocked_cells_.end() && place->cell_x == cell_x && place->cell_y == cell_y) {
-    return &*place;
-  }
-  return nullptr;
+  return FindBlockedCell(blocked_cells_, cell_x, cell_y);
 }
 
 void MapEdit::BlockCell(const BlockedCell& cell) {
@@ -71,19 +66,42 @@ MapEditReport BlockGatCells(std::span<const BlockedCell> cells, formats::GatMap&
                                            cell.cell_x, cell.cell_y, gat.width(), gat.height()));
       continue;
     }
-    const std::uint8_t current = ServerType(gat.at(cell.cell_x, cell.cell_y).type);
-    if (current == kGatWall) {
-      ++report.applied;
-      continue;
-    }
-    if (cell.block == CellBlock::kWall) {
-      gat.SetType(cell.cell_x, cell.cell_y, kGatWall);
-    } else if (current != kGatFence) {
-      gat.SetType(cell.cell_x, cell.cell_y, kGatFence);
+    // Une case qui porte déjà son type garde son type brut, drapeau d'eau
+    // compris.
+    const std::int32_t raw_type = gat.at(cell.cell_x, cell.cell_y).type;
+    const std::int32_t blocked_type = BlockedGatType(raw_type, cell.block);
+    if (ServerType(raw_type) != blocked_type) {
+      gat.SetType(cell.cell_x, cell.cell_y, blocked_type);
     }
     ++report.applied;
   }
   return report;
+}
+
+std::int32_t BlockedGatType(std::int32_t raw_type, CellBlock block) {
+  return ServerType(raw_type) == kGatWall || block == CellBlock::kWall ? kGatWall : kGatFence;
+}
+
+const BlockedCell* FindBlockedCell(std::span<const BlockedCell> cells, std::int32_t cell_x,
+                                   std::int32_t cell_y) {
+  const BlockedCell probe{.cell_x = cell_x, .cell_y = cell_y};
+  const auto place = std::ranges::lower_bound(cells, probe, Before);
+  if (place != cells.end() && place->cell_x == cell_x && place->cell_y == cell_y) {
+    return &*place;
+  }
+  return nullptr;
+}
+
+std::span<const BlockedCell> BlockedCellsInRows(std::span<const BlockedCell> cells,
+                                                std::int32_t first_y, std::int32_t last_y) {
+  if (first_y > last_y) {
+    return {};
+  }
+  const auto first = std::ranges::lower_bound(cells, first_y, {},
+                                              [](const BlockedCell& cell) { return cell.cell_y; });
+  const auto last = std::ranges::upper_bound(first, cells.end(), last_y, {},
+                                             [](const BlockedCell& cell) { return cell.cell_y; });
+  return {first, last};
 }
 
 std::vector<std::array<std::int32_t, 2>> CellsUnderFootprint(

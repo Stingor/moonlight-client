@@ -1088,6 +1088,7 @@ if(MOONCLIENT_PLATFORM_LAYERS)
         app/map_editor_ground_test.cpp
         app/map_edit_sync_test.cpp
         app/map_edit_store_test.cpp
+        app/blocked_cells_stage_test.cpp
         app/preview_cache_test.cpp
         app/versus_gate_test.cpp
         app/target_facts_test.cpp

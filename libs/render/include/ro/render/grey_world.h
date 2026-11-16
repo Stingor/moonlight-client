@@ -3,6 +3,7 @@
 #include <array>
 #include <cstdint>
 #include <optional>
+#include <span>
 #include <string_view>
 #include <vector>
 
@@ -10,6 +11,7 @@
 #include "ro/formats/gnd.h"
 #include "ro/formats/image.h"
 #include "ro/formats/rsw.h"
+#include "ro/mapedit/map_edit.h"
 #include "ro/render/ground_quad.h"
 #include "ro/render/skill_area.h"
 
@@ -164,7 +166,14 @@ struct GreyWorldLook {
 // Une famille dont la couleur est TRANSPARENTE ne produit aucune case : mettre
 // « marchable » à zéro ne laisse que les obstacles, et c'est la façon la moins
 // chère d'afficher le quadrillage.
+//
+// 🔴 LA FAMILLE EST CELLE DE LA GRILLE DE MARCHE, PAS DU SEUL FICHIER : le type
+// de la grille, puis ce que le document d'édition y bloque — `blocked_cells`,
+// rangées comme il les tient. Le serveur bloque les mêmes cases
+// (docs/adr/0131), et un quadrillage qui les peindrait marchables mentirait sur
+// le terrain. Les hauteurs, elles, restent celles de `gat`.
 void ComposeGreyWorldCells(const formats::GndMap& gnd, const formats::GatMap& gat,
+                           std::span<const mapedit::BlockedCell> blocked_cells,
                            std::int32_t center_x, std::int32_t center_y, const GreyWorldLook& look,
                            std::vector<GroundQuad>& quads);
 
