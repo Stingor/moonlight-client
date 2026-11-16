@@ -245,7 +245,9 @@ class ActorWardrobe {
     // suite ; pour une tête, la peau est hors du reste.
     RestMeasure rest;
     // La peau de ce sprite : celle que son corps range où il veut (voir
-    // `DetectBodySkin`), l'ensemble fixe pour une tête. Vide sans peau.
+    // `DetectBodySkin`), l'ensemble fixe pour une tête. Vide sans peau, et
+    // vide sur un corps dont la peau ne se règle pas (`SkinAdjustable`) : ses
+    // index font alors partie du reste.
     SkinSet skin;
   };
   [[nodiscard]] BodyRamps BodyRampsFor(const ActorLook& look);

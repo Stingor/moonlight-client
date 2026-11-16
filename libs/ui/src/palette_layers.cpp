@@ -466,7 +466,27 @@ void DrawLayerChoice(PaletteEditorState& state, const PaletteEditorView& view, c
     }
     std::string label = TabLabel(tab);
     label.erase(label.find("###"));
-    entries.push_back(Entry{.label = std::move(label), .kind = tab.kind, .tab = &tab});
+    if (tab.kind != PaletteTabKind::kHair) {
+      entries.push_back(Entry{.label = std::move(label), .kind = tab.kind, .tab = &tab});
+      continue;
+    }
+    // 🔴 LA TÊTE SE RÈGLE SUR UN CORPS NOMMÉ : celle du corps porté, puis une
+    // entrée par corps où elle se règle autrement. Choisir la Tête ne garde
+    // jamais en silence la monture que l'onglet Corps réglait.
+    entries.push_back(Entry{.label = std::move(label), .kind = tab.kind, .body = 0, .tab = &tab});
+    for (const int rank : view.head_bodies) {
+      if (rank <= 0 || static_cast<std::size_t>(rank) >= view.bodies.size()) {
+        continue;
+      }
+      std::string variant = PaletteTabName(PaletteTabKind::kHair);
+      variant += " : ";
+      variant += SkinComboItemText(view.bodies[static_cast<std::size_t>(rank)]);
+      if (tab.edited) {
+        variant += " *";
+      }
+      entries.push_back(
+          Entry{.label = std::move(variant), .kind = tab.kind, .body = rank, .tab = &tab});
+    }
   }
   // ⚠ UN CALQUE OUVERT QUI DEVIENT NON RÉGLABLE — on enfile l'habit du GM sous
   // la Tête — REND LA MAIN À CELUI QUE LA VUE MONTRE.
@@ -476,13 +496,25 @@ void DrawLayerChoice(PaletteEditorState& state, const PaletteEditorView& view, c
       state.tab = view.tab;
     }
   }
+  // ⚠ UNE TÊTE OUVERTE SUR UN CORPS SANS ENTRÉE À LUI — la pipette l'a ouverte
+  // depuis un corps où elle se règle comme sur le corps porté — SE MONTRE
+  // SOUS « TÊTE ».
   int current = -1;
+  int head_fallback = -1;
   for (std::size_t rank = 0; rank < entries.size(); ++rank) {
     const Entry& entry = entries[rank];
-    if (entry.kind == state.tab &&
-        (entry.kind != PaletteTabKind::kBody || entry.body == view.edited_body)) {
-      current = static_cast<int>(rank);
+    if (entry.kind != state.tab) {
+      continue;
     }
+    const bool bound = entry.kind == PaletteTabKind::kBody || entry.kind == PaletteTabKind::kHair;
+    if (!bound || entry.body == view.edited_body) {
+      current = static_cast<int>(rank);
+    } else if (entry.kind == PaletteTabKind::kHair && entry.body == 0) {
+      head_fallback = static_cast<int>(rank);
+    }
+  }
+  if (current < 0) {
+    current = head_fallback;
   }
   float widest = 0.0F;
   for (const Entry& entry : entries) {
@@ -511,6 +543,10 @@ void DrawLayerChoice(PaletteEditorState& state, const PaletteEditorView& view, c
     ImGui::PopID();
     if (blocked) {
       Explain(TabBlockReason(entry.tab->blocked));
+    } else if (entry.kind == PaletteTabKind::kHair) {
+      Explain(entry.body > 0 ? core::Tr("La même teinture de cheveux, vue sur cette monture : la "
+                                        "peau du visage s'y règle autrement.")
+                             : core::Tr("La tête sur le corps que tu portes."));
     } else if (entry.body > 0) {
       Explain(
           core::Tr("Règle une monture ou une tenue sans la porter. Valider ne change que le "

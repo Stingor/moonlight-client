@@ -370,7 +370,9 @@ PieceLabel LabelOf(const PieceShown& piece) {
   PieceLabel made;
   char* const label = made.text.data();
   const std::size_t size = made.text.size();
-  const char* kind = piece.rest ? core::Tr("Reste") : core::Tr("Pièce");
+  // ⚠ « LE RESTE » ET NON « RESTE » : cette clé-là dit ce qui reste en
+  // boutique, et sa traduction serait « restant ».
+  const char* kind = piece.rest ? core::Tr("Le reste") : core::Tr("Pièce");
   int written = 0;
   if (!piece.adjust.neutral()) {
     written = piece.rest ? std::snprintf(label, size, "%s", kind)

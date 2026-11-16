@@ -194,10 +194,14 @@ std::optional<ActorPalettes::StyledPalette> ActorPalettes::Paint(const StyleSet&
   // ⚠ LA SUITE ET LE RESTE se posent aussi sur la palette toute faite de
   // l'aperçu, qui ne peint que les huit premières : ni l'une ni l'autre n'y
   // touchent une pièce v7.
+  //
+  // 🔴 UN CORPS DONT LA PEAU NE SE RÈGLE PAS LA RANGE DANS SON RESTE : ces index
+  // peignent aussi la monture, et les tenir hors de tout réglage les figerait.
   if (more != nullptr) {
     const Analysis& analysis = Analyze(sprite, official);
-    ApplyBodyMore(styled.palette, base, analysis.ramps, analysis.continuation,
-                  BodySkin(analysis, piece.race).indices(), *more);
+    const SkinSet kept_skin = piece.skin ? BodySkin(analysis, piece.race) : SkinSet{};
+    ApplyBodyMore(styled.palette, base, analysis.ramps, analysis.continuation, kept_skin.indices(),
+                  *more);
   }
   // 🔴 LA PEAU APRÈS LES PIÈCES ET LE RESTE : elle l'emporte sur eux. Celle
   // d'un corps est là où son sprite la range.

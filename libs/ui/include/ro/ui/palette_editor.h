@@ -281,6 +281,9 @@ struct PaletteEditorView {
   std::span<const char* const> bodies;
   // Le rang de celui qu'on règle.
   int edited_body = 0;
+  // LES CORPS, par rang dans `bodies`, où la tête se règle autrement que sur le
+  // corps porté : chacun a son entrée « Tête : … », à côté de « Tête ».
+  std::span<const int> head_bodies;
 
   // ── CE QUE LES GRILLES MONTRENT ─────────────────────────────────────────
 

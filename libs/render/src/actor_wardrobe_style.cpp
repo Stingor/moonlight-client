@@ -92,7 +92,11 @@ ActorWardrobe::BodyRamps ActorWardrobe::BodyRampsFor(const ActorLook& look) {
   PaletteCover cover{};
   Cover(cover, analysis.ramps);
   Cover(cover, analysis.continuation);
-  found.skin = ActorPalettes::BodySkin(analysis, RaceOf(look));
+  // 🔴 LA MÊME PEAU QUE CELLE QUE `Dress` POSE : sur une monture dont la peau
+  // ne se règle pas, ses index rejoignent le reste du corps.
+  if (look.player && !look.gm_outfit && SkinAdjustable(body.path)) {
+    found.skin = ActorPalettes::BodySkin(analysis, RaceOf(look));
+  }
   Cover(cover, found.skin.indices());
   found.rest = MeasureRest(*analysis.base, *analysis.usage, cover);
   return found;

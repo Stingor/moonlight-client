@@ -7,6 +7,7 @@
 
 #include "ro/render/palette_ramps.h"
 #include "ro/render/shown_job.h"
+#include "ro/render/sprite_catalog.h"
 #include "ro/sim/style_code.h"
 #include "ro/sim/world.h"
 #include "ro/ui/character_window.h"
@@ -198,6 +199,21 @@ void StyleView::RefreshBodies(const ro::render::ActorLook& worn_body, std::uint3
   offer(worn_body.body_style == 0 ? ro::core::TrText("Tenue alternative")
                                   : ro::core::TrText("Tenue ordinaire"),
         variant);
+
+  // LA TÊTE A SON ENTRÉE SUR UN CORPS OÙ LA PEAU DU VISAGE SE RÈGLE AUTREMENT :
+  // une autruche la fige, le corps à pied non.
+  head_bodies_.clear();
+  const auto face_refusal = [this](const ro::render::ActorLook& body_look) {
+    return SkinRefusalFor(SkinLine::kFace, body_look.player && body_look.gm_outfit,
+                          ro::render::BodySpritePaths(wardrobe_->catalog(), body_look),
+                          server_layer_last_);
+  };
+  const SkinRefusal worn_refusal = face_refusal(worn_body);
+  for (std::size_t rank = 1; rank < bodies_.size(); ++rank) {
+    if (face_refusal(bodies_[rank].look) != worn_refusal) {
+      head_bodies_.push_back(static_cast<int>(rank));
+    }
+  }
 }
 
 const ro::render::PaletteRecipe& StyleView::Shown(const ro::ui::PaletteEditorState& state) {
@@ -533,6 +549,7 @@ void StyleView::Refresh(const ro::sim::World& world, ro::ui::PaletteEditorState&
   view_.send = ToView(session_.send_state());
   view_.bodies = body_names_;
   view_.edited_body = edited_body_;
+  view_.head_bodies = head_bodies_;
   view_.tabs = tab_views_;
   view_.tab = view_tab_;
   view_.atelier_open = atelier_open_;

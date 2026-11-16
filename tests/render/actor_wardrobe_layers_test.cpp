@@ -77,6 +77,15 @@ constexpr std::uint8_t kShades = 8;
 constexpr std::uint8_t kRampFirst = 1;
 constexpr std::uint8_t kSkinFirst = 129;
 constexpr std::uint8_t kSkinShades = 7;
+// Le dégradé chair des sprites humains, du clair au foncé : c'est à ses
+// couleurs qu'un corps se reconnaît une peau.
+constexpr std::array<std::array<std::uint8_t, 3>, kSkinShades> kSkinGradient = {{{255, 225, 207},
+                                                                                 {255, 198, 178},
+                                                                                 {246, 174, 159},
+                                                                                 {220, 144, 132},
+                                                                                 {189, 115, 107},
+                                                                                 {158, 86, 82},
+                                                                                 {130, 63, 59}}};
 // La coupe du novice d'essai, et sa couleur de cheveux : aucune.
 constexpr std::uint16_t kHair = 1;
 
@@ -99,17 +108,32 @@ std::vector<std::uint8_t> LayeredSpriteBytes() {
     const auto level = static_cast<std::uint8_t>(240 - shade * 25);
     options.palette[kRampFirst + shade] = {level, static_cast<std::uint8_t>(level / 6), 0};
   }
-  // Le dégradé chair des sprites humains, du clair au foncé : c'est à ses
-  // couleurs qu'un corps se reconnaît une peau.
-  constexpr std::array<std::array<std::uint8_t, 3>, kSkinShades> kSkin = {{{255, 225, 207},
-                                                                           {255, 198, 178},
-                                                                           {246, 174, 159},
-                                                                           {220, 144, 132},
-                                                                           {189, 115, 107},
-                                                                           {158, 86, 82},
-                                                                           {130, 63, 59}}};
   for (std::uint8_t shade = 0; shade < kSkinShades; ++shade) {
-    options.palette[kSkinFirst + shade] = {kSkin[shade][0], kSkin[shade][1], kSkin[shade][2]};
+    options.palette[kSkinFirst + shade] = {kSkinGradient[shade][0], kSkinGradient[shade][1],
+                                           kSkinGradient[shade][2]};
+  }
+  return BuildSpr(options);
+}
+
+// LE MÊME, OÙ LA PEAU NE PÈSE QU'UN PIXEL PAR TEINTE : trop peu pour qu'une
+// rampe la prenne, comme les épaules d'un cavalier sur sa monture.
+std::vector<std::uint8_t> ThinSkinSpriteBytes() {
+  SprBuildOptions options;
+  SprIndexedFrameSpec spec{.width = kSide, .height = kSide, .indices = {}};
+  for (std::int32_t pixel = 0; pixel < kSide * kSide; ++pixel) {
+    spec.indices.push_back(pixel < kSkinShades
+                               ? static_cast<std::uint8_t>(kSkinFirst + pixel)
+                               : static_cast<std::uint8_t>(kRampFirst + pixel % kShades));
+  }
+  options.indexed = {spec, spec};
+  options.palette.assign(ro::formats::kPaletteEntryCount, {0, 0, 0});
+  for (std::uint8_t shade = 0; shade < kShades; ++shade) {
+    const auto level = static_cast<std::uint8_t>(240 - shade * 25);
+    options.palette[kRampFirst + shade] = {level, static_cast<std::uint8_t>(level / 6), 0};
+  }
+  for (std::uint8_t shade = 0; shade < kSkinShades; ++shade) {
+    options.palette[kSkinFirst + shade] = {kSkinGradient[shade][0], kSkinGradient[shade][1],
+                                           kSkinGradient[shade][2]};
   }
   return BuildSpr(options);
 }
@@ -155,6 +179,10 @@ void MakeLayeredClient(const TempDirectory& client) {
     files.push_back(Entry(std::string(base) + ".spr", LayeredSpriteBytes()));
     files.push_back(Entry(std::string(base) + ".act", AnimationBytes(2)));
   }
+  // L'autruche du Sniper, dont la peau ne se règle pas.
+  files.push_back(
+      Entry("data\\sprite\\인간족\\몸통\\남\\타조스나이퍼_남.spr", ThinSkinSpriteBytes()));
+  files.push_back(Entry("data\\sprite\\인간족\\몸통\\남\\타조스나이퍼_남.act", AnimationBytes(2)));
   files.push_back(Entry("data\\sprite\\로브\\ailes\\ailes.spr", LayeredSpriteBytes()));
   // La coiffe abîmée du client partagé devient une coiffe en couleurs vraies.
   files.push_back(Entry("data\\sprite\\악세사리\\남\\남_casse.spr", TrueColorSpriteBytes()));
@@ -514,6 +542,45 @@ TEST_CASE("Calques : la peau ne se règle ni sur les montures listées ni sur un
   const ActorPiece* body = PieceOf(*outfit, ActorPart::kBody);
   REQUIRE(body != nullptr);
   CHECK(body->palette_serial == 0);
+}
+
+TEST_CASE("Calques : sur une autruche, la peau rejoint le reste du corps",
+          "[render][wardrobe][layers]") {
+  // Le corps monté du Sniper sur l'autruche de la boutique.
+  constexpr std::uint32_t kOstrichSniper = 4150;
+  Fixture fixture;
+  ActorWardrobe& wardrobe = *fixture.wardrobe;
+  ActorLook ostrich = Novice();
+  ostrich.job = kOstrichSniper;
+
+  // 🔴 LA MESURE DE L'ÉDITEUR : pas de peau, et ses pixels passent au reste.
+  // Le sprite en a bien une, que les rampes ne prennent pas.
+  const ActorWardrobe::BodyRamps mounted = wardrobe.BodyRampsFor(ostrich);
+  REQUIRE(mounted.rest.total > 0);
+  CHECK(mounted.skin.empty());
+  for (const ro::render::PaletteRamp& ramp : mounted.ramps) {
+    CHECK(ramp.start + ramp.length <= kSkinFirst);
+  }
+  CHECK(mounted.rest.covered + kSkinShades * 2 <= mounted.rest.total);
+
+  // 🔴 LE DESSIN : le reste réglé atteint la peau de l'autruche.
+  const auto painted_skin = [&wardrobe](ActorLook look) {
+    LayerDye more{.layer = StyleLayer::kBodyMore,
+                  .key = wardrobe.BodyKeyFor(look),
+                  .profile = ro::render::kBodyContinuationProfileNumber,
+                  .adjusts = {}};
+    for (RampAdjust& adjust : more.rest) {
+      adjust = RampAdjust{.hue = 240, .saturation = 100, .absolute = true};
+    }
+    look.style = Registered(wardrobe, StyleSet{.layers = {more}});
+    ActorOutfit* outfit = wardrobe.OutfitFor(look);
+    REQUIRE(outfit != nullptr);
+    const ActorPiece* body = PieceOf(*outfit, ActorPart::kBody);
+    REQUIRE(body != nullptr);
+    return ColorOf(*body, kSkinFirst);
+  };
+  const std::array<std::uint8_t, 3> ridden = painted_skin(ostrich);
+  CHECK(ridden[2] > ridden[0]);
 }
 
 TEST_CASE("Calques : un profil inconnu laisse la pièce dans ses couleurs",
