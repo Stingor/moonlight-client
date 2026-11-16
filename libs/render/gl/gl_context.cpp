@@ -396,6 +396,12 @@ void GlContext::SetSize(Resolution wanted) const {
 
 void GlContext::SetResizable(bool resizable) const { SDL_SetWindowResizable(window_, resizable); }
 
+bool GlContext::sized_by_hand() const {
+  const SDL_WindowFlags flags = SDL_GetWindowFlags(window_);
+  return (flags & SDL_WINDOW_RESIZABLE) != 0 &&
+         (flags & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_MAXIMIZED | SDL_WINDOW_MINIMIZED)) == 0;
+}
+
 core::Result<void> GlContext::SetDisplayMode(DisplayMode mode, Resolution wanted) const {
   // 🔴 LE MODE VIDÉO SE POSE AVANT LE PLEIN ÉCRAN, jamais après : c'est lui qui
   // dit CE QUE le plein écran doit prendre. Nul = « celui du bureau », et c'est

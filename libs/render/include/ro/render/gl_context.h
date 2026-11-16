@@ -209,6 +209,11 @@ class GlContext {
   // la perdre d'un glissement.
   void SetResizable(bool resizable) const;
 
+  // La taille courante est-elle celle que le joueur choisit au bord ? Vrai
+  // seulement en fenêtré, poignée libre, et ni agrandie ni en plein écran :
+  // ailleurs c'est le système qui la décide.
+  [[nodiscard]] bool sized_by_hand() const;
+
   // 🔴 LE MODE CHANGE LA TAILLE SOUS LES PIEDS DE L'APPELANT. Passer en plein
   // écran redimensionne la fenêtre ; tout ce qui a mémorisé une taille doit la
   // relire après. C'est `drawable_size` qui fait foi, jamais ce qu'on a demandé.

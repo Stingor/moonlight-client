@@ -406,13 +406,12 @@ class GameOptions {
   // cacher la question.
   void ArmDisplayRevert(std::uint32_t now_ms, const DisplayRevert& before, const OptionTargets& to);
 
-  // LA FENÊTRE VIENT DE BOUGER. ⚠ APPELÉE À CHAQUE DÉPLACEMENT, donc plusieurs
-  // fois par seconde pendant un glisser : c'est l'anti-rebond du fichier qui
-  // encaisse, et c'est exactement ce pour quoi il existe.
-  //
-  // Rend vrai si la place a changé — l'appelant n'a alors qu'à toucher le
-  // fichier. ⚠ L'ÉCRAN SUIT : glisser la fenêtre sur un autre écran le choisit.
-  [[nodiscard]] bool NoteWindowMoved(const ro::render::GlContext& display);
+  // RETIENT LA PLACE ET LA TAILLE DE LA FENÊTRE. ⚠ À CHAQUE IMAGE, glisser
+  // compris : l'anti-rebond du fichier encaisse. Rend vrai si l'une a changé.
+  // ⚠ L'ÉCRAN SUIT la place. La taille tirée au bord devient la résolution que
+  // reposent le reverrouillage et le lancement suivant — seulement quand le
+  // joueur la tient (`sized_by_hand`) : agrandie, elle est celle du système.
+  [[nodiscard]] bool NoteWindowFrame(const OptionTargets& to);
   // LA CARTE AU LANCEMENT : la préférence que le pilote a vue, et la carte qui a
   // répondu. ⚠ AVANT LA PREMIÈRE COMPOSITION du panneau, qui part de là.
   void NoteGraphicsCard(GpuPreference at_launch, std::string in_use);

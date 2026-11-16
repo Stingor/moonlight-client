@@ -45,21 +45,42 @@ constexpr std::array<const char*, 6> kFrameLimitLabels = {"", "30", "60", "120",
 
 }  // namespace
 
-bool GameOptions::NoteWindowMoved(const ro::render::GlContext& display) {
-  std::string written = PlaceText(display.position());
-  if (written == window_place_) {
+bool GameOptions::NoteWindowFrame(const OptionTargets& to) {
+  if (to.display == nullptr) {
     return false;
   }
-  window_place_ = std::move(written);
-  // 🔴 L'ÉCRAN SUIT LA PLACE. Sans lui, la fenêtre glissée sur un autre écran
-  // renaîtrait sur l'ancien, et sa place gardée — qui n'y tombe pas — n'y
-  // serait pas rendue.
-  const int rank = display.screen_rank();
-  const std::vector<ro::render::ScreenInfo> screens = ro::render::GlContext::ConnectedScreens();
-  if (rank >= 0 && rank < static_cast<int>(screens.size())) {
-    screen_ = ScreenChoice{.name = screens[static_cast<std::size_t>(rank)].name, .rank = rank};
+  const ro::render::GlContext& display = *to.display;
+  // ⚠ LA PLACE ET LA TAILLE SANS COURT-CIRCUIT : tirer le bord gauche ou haut
+  // déplace ET redimensionne dans le même geste.
+  bool changed = false;
+  if (std::string place = PlaceText(display.position()); place != window_place_) {
+    window_place_ = std::move(place);
+    changed = true;
+    // 🔴 L'ÉCRAN SUIT LA PLACE. Sans lui, la fenêtre glissée sur un autre écran
+    // renaîtrait sur l'ancien, et sa place gardée — qui n'y tombe pas — n'y
+    // serait pas rendue.
+    const int rank = display.screen_rank();
+    const std::vector<ro::render::ScreenInfo> screens = ro::render::GlContext::ConnectedScreens();
+    if (rank >= 0 && rank < static_cast<int>(screens.size())) {
+      screen_ = ScreenChoice{.name = screens[static_cast<std::size_t>(rank)].name, .rank = rank};
+    }
   }
-  return true;
+  const ro::render::Resolution now = display.size();
+  if (!display.sized_by_hand() || now.width <= 0 || now.height <= 0) {
+    return changed;
+  }
+  if (std::string size = ResolutionText(now); size != resolution_) {
+    resolution_ = std::move(size);
+    changed = true;
+    // ⚠ LA LISTE SE RELIT : la taille tirée n'y figure pas encore, et la ligne
+    // « Résolution » n'aurait sinon rien en face d'elle. Le panneau recompose
+    // ses lignes avant de se dessiner : les libellés remplacés ici ne sont plus
+    // désignés par personne.
+    if (std::ranges::find(resolutions_, now) == resolutions_.end()) {
+      ReadResolutions(to);
+    }
+  }
+  return changed;
 }
 
 void GameOptions::NoteGraphicsCard(GpuPreference at_launch, std::string in_use) {
