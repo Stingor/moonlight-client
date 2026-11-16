@@ -30,8 +30,8 @@ namespace ro::render {
 inline constexpr float kSpritePixelsPerWorldUnit = 7.0F;
 
 // LA HAUTEUR DES YEUX d'un personnage debout, en pixels de sprite au-dessus des
-// pieds : quatre cinquièmes des cent cinq pixels qu'il mesure chapeau compris.
-inline constexpr int kStandingEyePixels = 84;
+// pieds, choisie à l'œil en vue à la première personne.
+inline constexpr int kStandingEyePixels = 64;
 
 // Les axes dans lesquels s'inscrit un panneau, plus la visée.
 //

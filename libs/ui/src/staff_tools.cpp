@@ -69,16 +69,6 @@ void DrawCaptureBackdrop(FlatGroundLook& flat, const SkinArt& art) {
   ImGui::EndDisabled();
 }
 
-constexpr std::array<const char*, 2> kEyeHeightHelp = {
-    core::TrText("Place l'œil de la vue à la première personne à cette hauteur au-dessus des "
-                 "pieds, en pixels de sprite."),
-    core::TrText("Sept pixels valent une unité du monde ; une case en vaut trente-cinq."),
-};
-// Les bornes du curseur, en pixels de sprite : du ras du sol à trois hauteurs
-// de personnage.
-constexpr int kLeastEyePixels = 10;
-constexpr int kMostEyePixels = 315;
-
 constexpr std::array<const char*, 3> kFreeCameraHelp = {
     core::TrText("Retire les bornes du jeu : recul, inclinaison et rotation vont aussi loin qu'on "
                  "veut."),
@@ -100,16 +90,6 @@ void DrawDebugCamera(StaffToolsLook& look, const SkinArt& art) {
   static_cast<void>(SkinCheckBox(core::Tr("Relevé de la caméra"), &look.camera_hud, art));
   ImGui::SameLine();
   SkinHelpMarker(core::Tr("Relevé de la caméra"), kCameraHudHelp);
-  static_cast<void>(
-      SkinCheckBox(core::Tr("Forcer la hauteur de l'œil"), &look.eye_height_forced, art));
-  ImGui::SameLine();
-  SkinHelpMarker(core::Tr("Forcer la hauteur de l'œil"), kEyeHeightHelp);
-  ImGui::SameLine();
-  ImGui::TextDisabled(core::Tr("jeu : %d px"), render::kStandingEyePixels);
-  ImGui::BeginDisabled(!look.eye_height_forced);
-  static_cast<void>(SkinSliderInt(core::Tr("Hauteur de l'œil (px)"), &look.eye_height_pixels,
-                                  kLeastEyePixels, kMostEyePixels, art));
-  ImGui::EndDisabled();
 }
 
 constexpr std::array<const char*, 3> kGmOutfitHelp = {

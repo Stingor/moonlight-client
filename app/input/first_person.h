@@ -97,10 +97,8 @@ class FirstPersonView {
   // recoupe donc chaque image avec l'état réel du clavier.
   [[nodiscard]] const StrideKeys& held() const noexcept { return held_; }
 
-  // Pose la caméra sur l'œil du personnage dont les pieds sont à `feet`, à
-  // `eye_pixels` pixels de sprite au-dessus d'eux.
-  void Aim(ro::render::Camera& camera, const glm::vec3& feet,
-           int eye_pixels = ro::render::kStandingEyePixels) const;
+  // Pose la caméra sur l'œil du personnage dont les pieds sont à `feet`.
+  void Aim(ro::render::Camera& camera, const glm::vec3& feet) const;
 
   [[nodiscard]] float yaw_degrees() const noexcept { return yaw_degrees_; }
 

@@ -117,8 +117,9 @@ bool FirstPersonView::TakeStrideEnd() {
   return ended;
 }
 
-void FirstPersonView::Aim(ro::render::Camera& camera, const glm::vec3& feet, int eye_pixels) const {
-  const float eye_units = static_cast<float>(eye_pixels) / ro::render::kSpritePixelsPerWorldUnit;
+void FirstPersonView::Aim(ro::render::Camera& camera, const glm::vec3& feet) const {
+  const float eye_units =
+      static_cast<float>(ro::render::kStandingEyePixels) / ro::render::kSpritePixelsPerWorldUnit;
   AimFirstPersonCamera(camera, feet + glm::vec3(0.0F, eye_units, 0.0F), yaw_degrees_,
                        pitch_degrees_);
 }
