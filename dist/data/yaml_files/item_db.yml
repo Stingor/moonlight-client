@@ -129145,6 +129145,35 @@ Body:
     Weight: 10
     Script: |
       laphine_upgrade();
+  - Id: 100460
+    AegisName: MD_Airboat_Bexp
+    Name: Purified Growth Elixier
+    Type: Usable
+    EquipLevelMin: 200
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+  - Id: 100462
+    AegisName: MD_Airboat_Reward
+    Name: Contaminated Card Book
+    Type: Usable
+    Weight: 15
+    Flags: {Container: true}
+    Script: |
+      getgroupitem(IG_MD_AIRBOAT_REWARD);
+  - Id: 100475
+    AegisName: MD_Airboat_Expbox
+    Name: Purple Special Storage Device
+    Type: Usable
+    Flags: {Container: true}
+    Script: |
+      getgroupitem(IG_MD_AIRBOAT_EXPBOX);
+  - Id: 100476
+    AegisName: MD_Airboat_Random
+    Name: Ymir Beads
+    Type: DelayConsume
+    Weight: 10
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      laphine_upgrade();
   - Id: 100477
     AegisName: Poenetentia_Box1
     Name: Poenitentia Gladius Set Box
@@ -129355,6 +129384,14 @@ Body:
     Flags: {Container: true, DropEffect: CLIENT}
     Script: |
       getgroupitem(IG_AQUILA_ANTIQUITY2,true);
+  - Id: 102573
+    AegisName: Airboat_Antiquity
+    Name: Antiquity Crash Site (Unidentified Creature)
+    Type: Usable
+    Weight: 200
+    Flags: {Container: true, DropEffect: CLIENT}
+    Script: |
+      getgroupitem(IG_AIRBOAT_ANTIQUITY,true);
   - Id: 300001
     AegisName: Poisonous_Card
     Name: Poisonous Card
@@ -130322,6 +130359,93 @@ Body:
     Script: |
       bonus bLongAtkRate,25;
       bonus bPerfectHitAddRate,5;
+  - Id: 300170
+    AegisName: MD_Airboat_Card
+    Name: Rotten Tree Card
+    Type: Card
+    Weight: 10
+    Locations: {Armor: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bHPrecovRate,100;
+      bonus2 bAddRace,RC_Insect,10;
+      bonus2 bMagicAddRace,RC_Insect,10;
+  - Id: 300171
+    AegisName: MD_Airboat_Card2
+    Name: Grave Worm Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Hand: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      if (getiteminfo(getequipid(EQI_HAND_R),11) == W_STAFF || getiteminfo(getequipid(EQI_HAND_R),11) == W_2HSTAFF) {
+         .@r = 2*(getrefine()/4);
+         bonus2 bIgnoreMdefRaceRate,RC_All,10+.@r;
+         bonus2 bIgnoreMdefRaceRate,RC_Player_Human,-10-.@r;
+         bonus2 bIgnoreMdefRaceRate,RC_Player_Doram,-10-.@r;
+         bonus3 bSubRace,RC_All,-.@r,BF_NORMAL;
+      }
+  - Id: 300172
+    AegisName: MD_Airboat_Card3
+    Name: Brain Sucker Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Hand: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bMaxHPrate,-15;
+      bonus bSPDrainValue,-2;
+      bonus2 bHPDrainRate,10,20;
+  - Id: 300173
+    AegisName: MD_Airboat_Card4
+    Name: Mosquilo Card
+    Type: Card
+    Weight: 10
+    Locations: {Both_Accessory: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bVariableCastrate,-7;
+      bonus bAspdRate,-3;
+  - Id: 300174
+    AegisName: MD_Airboat_Card5
+    Name: Melted Poring Card
+    Type: Card
+    Weight: 10
+    Locations: {Head_Top: true, Head_Mid: true, Head_Low: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bMaxHPrate,10;
+      if (readparam(bVit)>=100) {
+         bonus2 bSubEle,Ele_Poison,1;
+         bonus2 bSubEle,Ele_Earth,1;
+         if (readparam(bVit)>=130) {
+            bonus2 bSubEle,Ele_Poison,3;
+            bonus2 bSubEle,Ele_Earth,3;
+         }
+      }
+  - Id: 300175
+    AegisName: MD_Airboat_Card6
+    Name: Unknown Creature Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Accessory: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bMagicAtkEle,Ele_Poison,30;
+      bonus2 bMagicAtkEle,Ele_Dark,30;
+      bonus2 bSubEle,Ele_Holy,-10;
+  - Id: 300176
+    AegisName: MD_Airboat_Card7
+    Name: Unidentified Creature card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Hand: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      if (getiteminfo(getequipid(EQI_HAND_R),11) == W_2HSWORD) {
+         bonus bShortAtkRate,10+(getrefine()/2);
+         bonus bAspd,1;
+      }
   - Id: 300211
     AegisName: EP18_Ash_Toad_Card
     Name: Ash Toad Card
@@ -146089,6 +146213,180 @@ Body:
             }
          }
       }
+  - Id: 470071
+    AegisName: MD_Airboat_Boots
+    Name: "Unknown Strength Boots [1]"
+    Type: Armor
+    Buy: 45000
+    Sell: 11250
+    Weight: 700
+    Defense: 6
+    Slots: 1
+    Locations: {Shoes: true}
+    ArmorLevel: 1
+    EquipLevelMin: 230
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,15*(.@r/2);
+      bonus bMaxHP,120*(.@r/3);
+      bonus bMaxSP,8*(.@r/3);
+      if (.@r>=9) {
+         bonus bAspdRate,7;
+         if (getallrefine() >= 22) {
+            autobonus "{ .@g = getenchantgrade(); if (.@g >= ENCHANTGRADE_D) { .@val = 25; if (.@g >= ENCHANTGRADE_C) { .@val += 25; } } bonus bStr,175+.@val; }",1,10000,BF_WEAPON;
+            if (getallrefine() >= 26) {
+               bonus bShortAtkRate,7;
+            }
+         }
+      }
+  - Id: 470072
+    AegisName: MD_Airboat_Boots2
+    Name: "Unknown Dexterity Boots [1]"
+    Type: Armor
+    Buy: 45000
+    Sell: 11250
+    Weight: 700
+    Defense: 6
+    Slots: 1
+    Locations: {Shoes: true}
+    ArmorLevel: 1
+    EquipLevelMin: 230
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,15*(.@r/2);
+      bonus bMaxHP,110*(.@r/3);
+      bonus bMaxSP,10*(.@r/3);
+      if (.@r>=9) {
+         bonus bAspdRate,7;
+         if (getallrefine() >= 22) {
+            autobonus "{ .@g = getenchantgrade(); if (.@g >= ENCHANTGRADE_D) { .@val = 25; if (.@g >= ENCHANTGRADE_C) { .@val += 25; } } bonus bDex,175+.@val; }",1,10000,BF_WEAPON|BF_MAGIC;
+            if (getallrefine() >= 26) {
+               bonus bFixedCast,-500;
+            }
+         }
+      }
+  - Id: 470073
+    AegisName: MD_Airboat_Boots3
+    Name: "Unknown Vitality Boots [1]"
+    Type: Armor
+    Buy: 45000
+    Sell: 11250
+    Weight: 750
+    Defense: 6
+    Slots: 1
+    Locations: {Shoes: true}
+    ArmorLevel: 1
+    EquipLevelMin: 230
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMatk,10*(.@r/2);
+      bonus bBaseAtk,10*(.@r/2);
+      bonus bMaxHP,150*(.@r/3);
+      bonus bMaxSP,15*(.@r/3);
+      if (.@r>=9) {
+         bonus bAspdRate,5;
+         bonus bVariableCastrate,-5;
+         if (getallrefine() >= 22) {
+            autobonus "{ .@g = getenchantgrade(); if (.@g >= ENCHANTGRADE_D) { .@val = 25; if (.@g >= ENCHANTGRADE_C) { .@val += 25; } } bonus bVit,175+.@val; }",1,10000,BF_WEAPON|BF_MAGIC;
+            if (getallrefine() >= 26) {
+               bonus bDelayrate,-5;
+            }
+         }
+      }
+  - Id: 470074
+    AegisName: MD_Airboat_Boots4
+    Name: "Unknown Intelligence Boots [1]"
+    Type: Armor
+    Buy: 45000
+    Sell: 11250
+    Weight: 650
+    Defense: 6
+    Slots: 1
+    Locations: {Shoes: true}
+    ArmorLevel: 1
+    EquipLevelMin: 230
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMatk,15*(.@r/2);
+      bonus bHealPower,2*(.@r/2);
+      bonus bMaxHP,80*(.@r/3);
+      bonus bMaxSP,20*(.@r/3);
+      if (.@r>=9) {
+         bonus bVariableCastrate,-7;
+         if (getallrefine() >= 22) {
+            autobonus "{ .@g = getenchantgrade(); if (.@g >= ENCHANTGRADE_D) { .@val = 25; if (.@g >= ENCHANTGRADE_C) { .@val += 25; } } bonus bInt,175+.@val; }",1,10000,BF_MAGIC;
+            if (getallrefine() >= 26) {
+               bonus2 bMagicAtkEle,Ele_All,7;
+            }
+         }
+      }
+  - Id: 470076
+    AegisName: MD_Airboat_Boots5
+    Name: "Unknown Agility Boots [1]"
+    Type: Armor
+    Buy: 45000
+    Sell: 11250
+    Weight: 700
+    Defense: 6
+    Slots: 1
+    Locations: {Shoes: true}
+    ArmorLevel: 1
+    EquipLevelMin: 230
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,15*(.@r/2);
+      bonus bMaxHP,120*(.@r/3);
+      bonus bMaxSP,8*(.@r/3);
+      if (.@r>=9) {
+         bonus bAspdRate,7;
+         if (getallrefine() >= 22) {
+            autobonus "{ .@g = getenchantgrade(); if (.@g >= ENCHANTGRADE_D) { .@val = 25; if (.@g >= ENCHANTGRADE_C) { .@val += 25; } } bonus bAgi,175+.@val; }",1,10000,BF_WEAPON;
+            if (getallrefine() >= 26) {
+               bonus bLongAtkRate,4;
+               bonus bShortAtkRate,4;
+            }
+         }
+      }
+  - Id: 470077
+    AegisName: MD_Airboat_Boots6
+    Name: "Unknown Luck Boots [1]"
+    Type: Armor
+    Buy: 45000
+    Sell: 11250
+    Weight: 720
+    Defense: 6
+    Slots: 1
+    Locations: {Shoes: true}
+    ArmorLevel: 1
+    EquipLevelMin: 230
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,15*(.@r/2);
+      bonus bMaxHP,100*(.@r/3);
+      bonus bMaxSP,8*(.@r/3);
+      if (.@r>=9) {
+         bonus bAspdRate,7;
+         if (getallrefine() >= 22) {
+            autobonus "{ .@g = getenchantgrade(); if (.@g >= ENCHANTGRADE_D) { .@val = 25; if (.@g >= ENCHANTGRADE_C) { .@val += 25; } } bonus bLuk,175+.@val; }",1,10000,BF_WEAPON;
+            if (getallrefine() >= 26) {
+               bonus bCritAtkRate,7;
+               bonus bCritical,7;
+               bonus2 bAddClass,Class_All,7;
+            }
+         }
+      }
   - Id: 470087
     AegisName: Gray_W_Boots
     Name: "Gray Wolf Boots [1]"
@@ -155918,6 +156216,11 @@ Body:
     Name: Blessed Etel Dust
     Weight: 10
     Flags: {BuyingStore: true}
+  - Id: 1000363
+    AegisName: MD_Airboat_Tokken
+    Name: Ymir Fragment
+    Weight: 1
+    Flags: {BuyingStore: true}
   - Id: 1000367
     AegisName: Mine_As
     Name: Minneas
@@ -156850,6 +157153,13 @@ Body:
     Name: Black Diamond
     Buy: 400000
     Sell: 200000
+    Weight: 300
+    Flags: {DropEffect: CLIENT}
+  - Id: 1001480
+    AegisName: Brown_Dia
+    Name: Golden Diamond
+    Buy: 600000
+    Sell: 300000
     Weight: 300
     Flags: {DropEffect: CLIENT}
   - Id: 1100006

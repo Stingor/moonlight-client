@@ -423,6 +423,14 @@ upgrade:
       400053, 450144, 450145, 450146, 480054, 570008, 580008, 600011, 610012, 630006,
       630007
     ]
+  - item: 100476
+    least_refine: 0
+    most_refine: 10
+    least_options: 0
+    cards_allowed: false
+    targets: [
+      470071, 470072, 470073, 470074, 470076, 470077
+    ]
   - item: 100626
     least_refine: 0
     most_refine: 6
