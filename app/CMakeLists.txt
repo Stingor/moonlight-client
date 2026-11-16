@@ -254,6 +254,7 @@ target_include_directories(moonclient_titles PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 add_library(moonclient_display STATIC
     options/display_options.cpp
     options/frame_pacer.cpp
+    options/gpu_choice.cpp
     options/screen_choice.cpp)
 
 target_link_libraries(moonclient_display
@@ -2189,6 +2190,7 @@ add_executable(moonclient
     items/doll_effects.cpp
     options/target_options.cpp
     game/display_settings.cpp
+    game/gpu_preference_store.cpp
     options/game_options.cpp
     options/sound_options.cpp
     game/game_settings.cpp

@@ -21,6 +21,7 @@
 #include "chat/chat_history_file.h"
 #include "chat/chat_tab_view.h"
 #include "effects/effect_view.h"
+#include "game/gpu_preference_store.h"
 #include "game/ui_stage.h"
 #include "options/display_options.h"
 #include "options/game_options.h"
@@ -46,6 +47,7 @@ namespace {
     case GameOption::kLockWindowSize:
     case GameOption::kVerticalSync:
     case GameOption::kFrameLimit:
+    case GameOption::kGraphicsCard:
     case GameOption::kInterfaceScale:
       return true;
     default:
@@ -179,6 +181,16 @@ void GameOptions::Apply(GameOption which, const OptionTargets& to) {
       break;
     case GameOption::kFrameLimit:
       // Rien à pousser : la boucle relit `frame_limit()` à chaque image.
+      break;
+    case GameOption::kGraphicsCard:
+      // ⚠ POUR LE LANCEMENT SUIVANT : le contexte ouvert garde sa carte. Voir
+      // `gpu_preference_store.h`.
+      if (!gpu_.read) {
+        break;
+      }
+      if (const ro::core::Result<void> written = WriteWindowsGpuPreference(gpu_.wanted); !written) {
+        ro::core::LogWarning("carte graphique : {}", ro::core::Describe(written.error()));
+      }
       break;
     case GameOption::kFrameMeter:
     case GameOption::kFrameMeterLocked:

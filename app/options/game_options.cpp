@@ -197,6 +197,9 @@ void GameOptions::Change(const ro::ui::OptionsWindowAction& asked, const OptionT
     case GameOption::kFrameLimit:
       frame_limit_ = FrameLimitAt(asked.chosen);
       break;
+    case GameOption::kGraphicsCard:
+      gpu_.wanted = GpuPreferenceAt(asked.chosen, gpu_.wanted);
+      break;
     case GameOption::kFrameMeter:
       frame_meter_ = asked.on;
       break;

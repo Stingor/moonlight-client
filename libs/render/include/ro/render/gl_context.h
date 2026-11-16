@@ -229,6 +229,11 @@ class GlContext {
   // été demandé à la carte : elle ne se fait pas à chaque image.
   [[nodiscard]] static std::optional<std::int64_t> FreeVideoMemoryKib();
 
+  // LA CARTE QUI A RÉPONDU, « fabricant — nom », telle que le pilote la dit à
+  // la création du contexte. Sur une machine à deux cartes, c'est elle qui dit
+  // si la préférence du joueur a pris.
+  [[nodiscard]] const std::string& graphics_card() const noexcept { return graphics_card_; }
+
  private:
   GlContext() = default;
 
@@ -239,6 +244,7 @@ class GlContext {
 
   SDL_Window* window_ = nullptr;
   SDL_GLContextState* context_ = nullptr;
+  std::string graphics_card_;
 };
 
 }  // namespace ro::render

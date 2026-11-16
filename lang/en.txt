@@ -401,6 +401,12 @@ tr: Notebook (%d)
 fr: Carnet de Roggle
 tr: Roggle notebook
 
+fr: Carte en service :
+tr: Card in use:
+
+fr: Carte graphique
+tr: Graphics card
+
 fr: Cascade ×%d
 tr: Cascade ×%d
 
@@ -583,6 +589,12 @@ tr: Sand thrown ahead of you blinds the horde.
 
 fr: Déclencher les deux pouvoirs d'un plateau de Roggle.
 tr: Trigger both powers of a Roggle board.
+
+fr: Hautes performances
+tr: High performance
+
+fr: Le changement prendra effet au prochain lancement du jeu.
+tr: The change takes effect the next time the game starts.
 
 fr: Les couleurs d'origine sont décalées ensemble : la pièce garde ses reflets et ses ombres colorées. Un gris reste gris.
 tr: The original colors are shifted together: the part keeps its highlights and its colored shadows. A grey stays grey.
@@ -829,6 +841,9 @@ tr: Range (cells)
 
 fr: Pour %s
 tr: For %s
+
+fr: Pour une machine à deux cartes graphiques, souvent un portable : la puce intégrée ménage la batterie, la carte dédiée dessine plus vite. C'est le réglage de Windows pour ce jeu, celui de Paramètres, Affichage, Graphiques. Sur un PC de bureau, c'est en général la carte reliée à l'écran qui dessine.
+tr: For a computer with two graphics cards, often a laptop: the integrated chip saves battery, the dedicated card draws faster. This is the Windows setting for this game, the one under Settings, Display, Graphics. On a desktop PC, the card connected to the screen usually does the drawing.
 
 fr: pour vos prochaines parties
 tr: for your next runs
@@ -4415,6 +4430,9 @@ tr: On foot
 
 fr: Échec du GIF
 tr: GIF failed
+
+fr: Économie d'énergie
+tr: Power saving
 
 fr: Écraser##profile
 tr: Overwrite##profile

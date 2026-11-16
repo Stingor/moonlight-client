@@ -8,6 +8,7 @@
 
 #include "ro/render/gl_context.h"
 
+#include "options/gpu_choice.h"
 #include "options/screen_choice.h"
 
 // CE QUE L'AFFICHAGE ÉCRIT DANS LE FICHIER, ET COMMENT ON LE RELIT.

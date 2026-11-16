@@ -62,6 +62,13 @@ bool GameOptions::NoteWindowMoved(const ro::render::GlContext& display) {
   return true;
 }
 
+void GameOptions::NoteGraphicsCard(GpuPreference at_launch, std::string in_use) {
+  gpu_.at_launch = at_launch;
+  gpu_.wanted = at_launch;
+  gpu_.read = true;
+  gpu_.in_use = std::move(in_use);
+}
+
 ro::render::Resolution GameOptions::saved_resolution() const { return ResolutionOf(resolution_); }
 
 void GameOptions::PlaceWindow(const OptionTargets& to) const {
@@ -291,6 +298,30 @@ void GameOptions::ComposeScreenRows() {
                                    "lancement, un écran débranché laisse place au principal."),
                                 screens_.choices,
                                 std::max(PickScreen(screen_, screens_.screens), 0)));
+#if defined(_WIN32)
+  // LA CARTE GRAPHIQUE. ⚠ SOUS WINDOWS SEULEMENT : c'est sa préférence par
+  // exécutable que la rangée règle, et ailleurs il n'y a rien à régler.
+  gpu_.names.clear();
+  gpu_.names.push_back(Tr("Automatique"));
+  gpu_.names.push_back(Tr("Économie d'énergie"));
+  gpu_.names.push_back(Tr("Hautes performances"));
+  gpu_.help =
+      Tr("Pour une machine à deux cartes graphiques, souvent un portable : la puce "
+         "intégrée ménage la batterie, la carte dédiée dessine plus vite. C'est le "
+         "réglage de Windows pour ce jeu, celui de Paramètres, Affichage, Graphiques. Sur "
+         "un PC de bureau, c'est en général la carte reliée à l'écran qui dessine.");
+  gpu_.help += "\n\n";
+  gpu_.help += Tr("Carte en service :");
+  gpu_.help += " " + gpu_.in_use;
+  // ⚠ LE CONTEXTE OUVERT GARDE SA CARTE : tant que le choix diffère de celui
+  // du lancement, la rangée le dit.
+  if (gpu_.wanted != gpu_.at_launch) {
+    gpu_.help += "\n\n";
+    gpu_.help += Tr("Le changement prendra effet au prochain lancement du jeu.");
+  }
+  screen_rows_.push_back(Choice(GameOption::kGraphicsCard, Tr("Carte graphique"), gpu_.help.c_str(),
+                                gpu_.names, static_cast<int>(gpu_.wanted)));
+#endif
   screen_rows_.push_back(
       Choice(GameOption::kDisplayMode, Tr("Mode d'affichage"),
              Tr("Fenêtré laisse le bureau accessible. Sans bordure occupe tout "

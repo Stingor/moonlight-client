@@ -21,6 +21,7 @@
 #include "ro/ui/system_fonts.h"
 
 #include "game/game.h"
+#include "game/gpu_preference_store.h"
 #include "game/save_folder.h"
 #include "game/skin_reload.h"
 #include "game/ui_stage.h"
@@ -121,6 +122,9 @@ ro::core::Result<void> ClientShell::OpenWindow(int width, int height) {
   // carte ; la partie le renomme à chaque image. Voir `WindowTitle`.
   // ⚠ ET SUR L'ÉCRAN CHOISI, ou le principal s'il a été débranché.
   const ScreenChoice saved_screen = settings_->options().saved_screen();
+  // ⚠ LA CARTE SE DEMANDE AVANT LE CONTEXTE : le pilote la choisit en l'ouvrant.
+  const GpuPreference gpu_at_launch = ReadWindowsGpuPreference();
+  RequestHighPerformanceGpu(gpu_at_launch == GpuPreference::kHighPerformance);
   auto context = ro::render::GlContext::CreateWindowed(
       WindowTitle(TitleMarks()), first_width, first_height,
       [&saved_screen](std::span<const ro::render::ScreenInfo> connected) {
@@ -130,6 +134,7 @@ ro::core::Result<void> ClientShell::OpenWindow(int width, int height) {
     return std::unexpected(context.error());
   }
   gl_ = std::move(*context);
+  settings_->options().NoteGraphicsCard(gpu_at_launch, gl_->graphics_card());
   ReportStage("fenêtre");
   // LE GARDE observe dès que la fenêtre existe : son crochet lit les messages
   // qu'elle reçoit.

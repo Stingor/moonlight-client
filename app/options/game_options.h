@@ -413,6 +413,9 @@ class GameOptions {
   // Rend vrai si la place a changé — l'appelant n'a alors qu'à toucher le
   // fichier. ⚠ L'ÉCRAN SUIT : glisser la fenêtre sur un autre écran le choisit.
   [[nodiscard]] bool NoteWindowMoved(const ro::render::GlContext& display);
+  // LA CARTE AU LANCEMENT : la préférence que le pilote a vue, et la carte qui a
+  // répondu. ⚠ AVANT LA PREMIÈRE COMPOSITION du panneau, qui part de là.
+  void NoteGraphicsCard(GpuPreference at_launch, std::string in_use);
 
   // Rend à la fenêtre la place qu'elle avait. ⚠ TOUJOURS RABATTUE DANS L'ÉCRAN :
   // l'écran où elle était a pu être débranché, et une place relue telle quelle
@@ -555,18 +558,15 @@ class GameOptions {
   bool frame_meter_locked_ = true;
   bool frame_meter_graph_ = false;
   bool frame_meter_ping_ = false;
+  // La carte graphique réclamée à Windows. Voir `GpuOffer`.
+  GpuOffer gpu_;
 
   // Le filet de l'affichage. Voir `DisplayRevert`.
   DisplayRevert revert_;
 
-  // ── OÙ LA FENÊTRE ÉTAIT LA DERNIÈRE FOIS ──────────────────────────────────
-  //
-  // ⚠ AUCUNE LIGNE NE LE MONTRE, et c'est voulu : ce n'est pas un choix qu'on
-  // présente mais un souvenir qu'on rend. Le joueur place sa fenêtre à la
-  // souris ; le panneau n'aurait rien à lui demander.
-  //
-  // Vide = jamais placée. Le système choisit alors, comme au tout premier
-  // démarrage.
+  // OÙ LA FENÊTRE ÉTAIT LA DERNIÈRE FOIS. ⚠ AUCUNE LIGNE NE LE MONTRE : le joueur
+  // la place à la souris, et le panneau n'aurait rien à lui demander. Vide =
+  // jamais placée ; le système choisit alors.
   std::string window_place_;
   // ⚠ ZÉRO EST MALGUN GOTHIC, le seul choix complet : latin accentué,
   // ponctuation typographique ET coréen. Voir `system_fonts.h`.

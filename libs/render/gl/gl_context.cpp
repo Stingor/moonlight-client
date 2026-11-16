@@ -210,16 +210,16 @@ core::Result<std::unique_ptr<GlContext>> GlContext::Create(const std::string& ti
   if (gladLoadGLLoader(reinterpret_cast<GLADloadproc>(SDL_GL_GetProcAddress)) == 0) {
     return Fail(ErrorCode::kIoFailure, "chargement des fonctions OpenGL impossible");
   }
+  // QUELLE CARTE A RÉPONDU : sur un portable à deux cartes, la puce intégrée
+  // répond souvent à la place de l'autre, et c'est d'elle que viennent les
+  // pannes.
+  const auto text_of = [](GLenum name) {
+    const auto* text = reinterpret_cast<const char*>(glGetString(name));
+    return std::string(text == nullptr ? "(inconnu)" : text);
+  };
+  context->graphics_card_ = text_of(GL_VENDOR) + " — " + text_of(GL_RENDERER);
   if (visible) {
-    // QUELLE CARTE A RÉPONDU : sur un portable à deux cartes, la puce intégrée
-    // répond souvent à la place de l'autre, et c'est d'elle que viennent les
-    // pannes.
-    const auto text_of = [](GLenum name) {
-      const auto* text = reinterpret_cast<const char*>(glGetString(name));
-      return std::string(text == nullptr ? "(inconnu)" : text);
-    };
-    core::LogInfo("vidéo : {} — {} — OpenGL {}", text_of(GL_VENDOR), text_of(GL_RENDERER),
-                  text_of(GL_VERSION));
+    core::LogInfo("vidéo : {} — OpenGL {}", context->graphics_card_, text_of(GL_VERSION));
   }
   // Un contexte 4.3 core demandé peut être honoré par un pilote qui rend moins :
   // mieux vaut le constater ici que sur un shader qui refuse de compiler.

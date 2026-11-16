@@ -1257,6 +1257,7 @@ if(MOONCLIENT_PLATFORM_LAYERS)
         app/chat_history_test.cpp
         app/display_options_test.cpp
         app/screen_choice_test.cpp
+        app/gpu_choice_test.cpp
         app/call_options_test.cpp
         app/debug_console_test.cpp
         app/glide_watch_test.cpp

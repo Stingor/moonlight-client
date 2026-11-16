@@ -50,6 +50,8 @@ enum class GameOption : std::uint8_t {
   kLockWindowSize,
   kVerticalSync,
   kFrameLimit,
+  // La carte graphique, au lancement suivant. Voir `gpu_choice.h`.
+  kGraphicsCard,
   kFrameMeter,
   kFrameMeterLocked,
   kFrameMeterGraph,

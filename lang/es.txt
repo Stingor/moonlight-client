@@ -401,6 +401,12 @@ tr: Cuaderno (%d)
 fr: Carnet de Roggle
 tr: Cuaderno de Roggle
 
+fr: Carte en service :
+tr: Tarjeta en uso:
+
+fr: Carte graphique
+tr: Tarjeta gráfica
+
 fr: Cascade ×%d
 tr: Cascada ×%d
 
@@ -583,6 +589,12 @@ tr: Arena lanzada ante ti ciega a la horda.
 
 fr: Déclencher les deux pouvoirs d'un plateau de Roggle.
 tr: Activa los dos poderes de un tablero de Roggle.
+
+fr: Hautes performances
+tr: Alto rendimiento
+
+fr: Le changement prendra effet au prochain lancement du jeu.
+tr: El cambio se aplicará la próxima vez que se inicie el juego.
 
 fr: Les couleurs d'origine sont décalées ensemble : la pièce garde ses reflets et ses ombres colorées. Un gris reste gris.
 tr: Los colores originales se desplazan juntos: la pieza conserva sus brillos y sus sombras de color. Un gris sigue gris.
@@ -829,6 +841,9 @@ tr: Alcance (celdas)
 
 fr: Pour %s
 tr: Para %s
+
+fr: Pour une machine à deux cartes graphiques, souvent un portable : la puce intégrée ménage la batterie, la carte dédiée dessine plus vite. C'est le réglage de Windows pour ce jeu, celui de Paramètres, Affichage, Graphiques. Sur un PC de bureau, c'est en général la carte reliée à l'écran qui dessine.
+tr: Para un equipo con dos tarjetas gráficas, a menudo un portátil: el chip integrado ahorra batería, la tarjeta dedicada dibuja más rápido. Es el ajuste de Windows para este juego, el de Configuración, Pantalla, Gráficos. En un PC de sobremesa, suele dibujar la tarjeta conectada a la pantalla.
 
 fr: pour vos prochaines parties
 tr: para tus próximas partidas
@@ -4415,6 +4430,9 @@ tr: A pie
 
 fr: Échec du GIF
 tr: Error al crear el GIF
+
+fr: Économie d'énergie
+tr: Ahorro de energía
 
 fr: Écraser##profile
 tr: Sobrescribir##profile
