@@ -611,6 +611,12 @@ tr: Ventana de equipo del juego
 fr: Hautes performances
 tr: Alto rendimiento
 
+fr: La fiche montre le mannequin et ses nombres ; la fenêtre du jeu est celle d'équipement, onglets Général et Costume.
+tr: La ficha muestra el maniquí y sus números; la ventana del juego es la de equipo, pestañas General y Disfraz.
+
+fr: La fiche montre les caractéristiques à côté du mannequin ; la fenêtre du jeu est la petite fenêtre de statut.
+tr: La ficha muestra los atributos junto al maniquí; la ventana del juego es la pequeña ventana de estado.
+
 fr: La même teinture de tête, vue sur ce corps : elle vaut partout.
 tr: El mismo tinte de cabeza, visto sobre este cuerpo: vale en todas partes.
 
@@ -844,6 +850,12 @@ tr: Naranja
 
 fr: Oublie la saisie : revient au bon en attente, sinon à la table.
 tr: Descarta lo escrito: vuelve a la orden pendiente o, si no la hay, a la tabla.
+
+fr: Ouvre la fenêtre du jeu
+tr: Abre la ventana del juego
+
+fr: Ouvre la fiche
+tr: Abre la ficha
 
 fr: Ouvre la fiche de l'item à l'édition : nom, ressource, teinte de l'icône, description. Le changement part en bon de travail.
 tr: Abre la ficha del item para editarla: nombre, recurso, tinte del icono, descripción. El cambio sale como orden de trabajo.

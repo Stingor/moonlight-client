@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <span>
 #include <vector>
 
@@ -26,6 +27,9 @@ enum class MenuIconsRow : int {
   kLocked = 0,
   kSticky,
   kForgetPlaces,
+  // Ce qu'ouvrent le Statut et l'Équipement, à la suite de leur case.
+  kStatusOpens,
+  kEquipmentOpens,
   // Puis une case par commande du catalogue, au rang de la commande.
   kFirstIcon,
   kCount = kFirstIcon + static_cast<int>(ro::ui::kMenuCommandCount),
@@ -61,6 +65,9 @@ class MenuIconsOptions {
  private:
   ro::ui::MenuIconsLook look_ = FactoryMenuIcons();
   std::vector<ro::ui::OptionRowView> rows_;
+  // Les deux entrées des listes « ouvre », traduites à chaque composition : les
+  // rangées pointent dedans.
+  std::array<const char*, 2> opener_choices_{};
 };
 
 }  // namespace moonclient

@@ -246,3 +246,18 @@ TEST_CASE("Icônes de menu : le Statut montre la tête du personnage quand elle 
   REQUIRE(none != nullptr);
   CHECK_FALSE(none->normal.usable());
 }
+
+TEST_CASE("Icônes de menu : le Statut et l'Équipement ouvrent la fiche ou la fenêtre du jeu",
+          "[app][menu]") {
+  using moonclient::GameAction;
+  using moonclient::MenuIconOpeners;
+  // D'usine : la petite fenêtre de statut, et la fiche.
+  CHECK(moonclient::ActionOfMenuCommand(MenuCommand::kStatus) == GameAction::kOpenStatus);
+  CHECK(moonclient::ActionOfMenuCommand(MenuCommand::kEquipment) ==
+        GameAction::kOpenCharacterEquipment);
+  const MenuIconOpeners swapped{.status_game_window = false, .equipment_game_window = true};
+  CHECK(moonclient::ActionOfMenuCommand(MenuCommand::kStatus, swapped) ==
+        GameAction::kOpenCharacterEquipment);
+  CHECK(moonclient::ActionOfMenuCommand(MenuCommand::kEquipment, swapped) ==
+        GameAction::kToggleEquipWindow);
+}

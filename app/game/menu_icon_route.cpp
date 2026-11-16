@@ -34,6 +34,15 @@ namespace moonclient {
 
 using ro::ui::MenuCommand;
 
+namespace {
+
+[[nodiscard]] MenuIconOpeners OpenersOf(const ro::ui::MenuIconsLook& look) {
+  return MenuIconOpeners{.status_game_window = look.status_opens_game_window,
+                         .equipment_game_window = look.equipment_opens_game_window};
+}
+
+}  // namespace
+
 std::optional<ro::render::StatusHeadKey> StatusHeadKeyOf(const ro::sim::World& world,
                                                          const ActorStyles& styles,
                                                          std::uint32_t character_id) {
@@ -71,7 +80,16 @@ MenuIconFacts MenuIconFactsOf(const ro::sim::World& world, const UiStage::Window
       facts.open.push_back(command);
     }
   };
-  open_when(MenuCommand::kStatus, windows.status->state.open);
+  // LE STATUT ET L'ÉQUIPEMENT S'ENFONCENT SUR CE QU'ILS OUVRENT : la fenêtre du
+  // jeu, ou la fiche.
+  if (windows.menu_icons->look != nullptr) {
+    facts.openers = OpenersOf(*windows.menu_icons->look);
+  }
+  open_when(MenuCommand::kStatus, facts.openers.status_game_window ? windows.status->state.open
+                                                                   : windows.character->open);
+  open_when(MenuCommand::kEquipment, facts.openers.equipment_game_window
+                                         ? windows.equip_window->state.open
+                                         : windows.character->open);
   open_when(MenuCommand::kCraftAtlas, windows.craft_atlas->state.open);
   open_when(MenuCommand::kNavigation, windows.navigation->state.open);
   open_when(MenuCommand::kWorldMap, windows.navigation->world_map.open);
@@ -120,9 +138,14 @@ void ApplyMenuCommand(MenuCommand command, const MenuIconTargets& to) {
   if (to.windows == nullptr) {
     return;
   }
-  if (const std::optional<GameAction> action = ActionOfMenuCommand(command); action.has_value()) {
+  const MenuIconOpeners openers = to.windows->menu_icons->look != nullptr
+                                      ? OpenersOf(*to.windows->menu_icons->look)
+                                      : MenuIconOpeners{};
+  if (const std::optional<GameAction> action = ActionOfMenuCommand(command, openers);
+      action.has_value()) {
     const KeyPress press{.sheet = &*to.windows->character,
                          .status = &to.windows->status->state,
+                         .equip_window = &to.windows->equip_window->state,
                          .pet = &*to.windows->pet,
                          .inventory = &*to.windows->inventory,
                          .party = &to.windows->party->window,

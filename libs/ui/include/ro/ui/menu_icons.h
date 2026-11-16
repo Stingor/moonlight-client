@@ -321,6 +321,12 @@ struct MenuIconsLook {
   // mêlée est une icône perdue.
   bool locked = true;
   bool sticky = true;
+  // CE QU'OUVRENT LE STATUT ET L'ÉQUIPEMENT : la fenêtre du jeu, ou la fiche de
+  // personnage. ⚠ LA GRILLE NE LES LIT PAS : c'est `app` qui route le clic.
+  // D'usine, chacune garde ce qu'elle ouvrait : la petite fenêtre de statut,
+  // et la fiche.
+  bool status_opens_game_window = true;
+  bool equipment_opens_game_window = false;
   // Une place par commande du catalogue, indexée par son rang.
   std::array<MenuIconPlace, kMenuCommandCount> places{};
 };

@@ -68,12 +68,14 @@ void PreferStatusHead(ro::ui::MenuIconView& icon, const MenuIconFacts& facts) {
 
 }  // namespace
 
-std::optional<GameAction> ActionOfMenuCommand(MenuCommand command) {
+std::optional<GameAction> ActionOfMenuCommand(MenuCommand command, MenuIconOpeners openers) {
   switch (command) {
     case MenuCommand::kStatus:
-      return GameAction::kOpenStatus;
+      return openers.status_game_window ? GameAction::kOpenStatus
+                                        : GameAction::kOpenCharacterEquipment;
     case MenuCommand::kEquipment:
-      return GameAction::kOpenCharacterEquipment;
+      return openers.equipment_game_window ? GameAction::kToggleEquipWindow
+                                           : GameAction::kOpenCharacterEquipment;
     case MenuCommand::kItem:
       return GameAction::kOpenInventory;
     case MenuCommand::kSkill:
@@ -204,7 +206,7 @@ void ComposeMenuIcons(std::vector<ro::ui::MenuIconView>& into, ro::render::GameI
       icon.news_pressed =
           ImageOf(images, entry.command, facts.doram, ro::ui::MenuIconArt::kNewsPressed);
     }
-    if (const std::optional<GameAction> action = ActionOfMenuCommand(entry.command);
+    if (const std::optional<GameAction> action = ActionOfMenuCommand(entry.command, facts.openers);
         action.has_value()) {
       icon.shortcut = LabelOfBinding(bindings.Of(*action));
     }

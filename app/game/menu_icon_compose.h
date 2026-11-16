@@ -16,11 +16,21 @@
 
 namespace moonclient {
 
+// CE QU'OUVRENT LE STATUT ET L'ÉQUIPEMENT : la fenêtre du jeu, ou la fiche de
+// personnage — réglé dans la page « Icônes du menu ». D'usine, la petite
+// fenêtre de statut et la fiche.
+struct MenuIconOpeners {
+  bool status_game_window = true;
+  bool equipment_game_window = false;
+};
+
 // L'ACTION DE RACCOURCI QUE CETTE ICÔNE DÉCLENCHE, ou rien.
 //
-// ⚠ LE STATUT ET L'ÉQUIPEMENT OUVRENT LE MÊME ONGLET : ce client montre les
-// caractéristiques À CÔTÉ du mannequin, là où le jeu en fait deux fenêtres.
-[[nodiscard]] std::optional<GameAction> ActionOfMenuCommand(ro::ui::MenuCommand command);
+// ⚠ VERS LA FICHE, LE STATUT ET L'ÉQUIPEMENT OUVRENT LE MÊME ONGLET : ce client
+// montre les caractéristiques À CÔTÉ du mannequin, là où le jeu en fait deux
+// fenêtres.
+[[nodiscard]] std::optional<GameAction> ActionOfMenuCommand(ro::ui::MenuCommand command,
+                                                            MenuIconOpeners openers = {});
 
 // LA FENÊTRE DE CETTE ICÔNE EXISTE-T-ELLE DANS CE CLIENT ? Faux, son clic ouvre
 // la fenêtre d'attente.
@@ -33,6 +43,8 @@ struct MenuIconFacts {
   std::string_view map_name;
   // Le carnet de chasse MVP, éteint, n'a pas d'icône.
   bool mvp_tracker_enabled = false;
+  // Ce qu'ouvrent le Statut et l'Équipement : la touche montrée en suit.
+  MenuIconOpeners openers;
   // Les bascules dont la fenêtre est ouverte : leur icône reste enfoncée.
   std::vector<ro::ui::MenuCommand> open;
   // Les icônes qui s'allument : du nouveau les attend.

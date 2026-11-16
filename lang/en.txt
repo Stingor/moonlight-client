@@ -611,6 +611,12 @@ tr: Game equipment window
 fr: Hautes performances
 tr: High performance
 
+fr: La fiche montre le mannequin et ses nombres ; la fenêtre du jeu est celle d'équipement, onglets Général et Costume.
+tr: The sheet shows the doll and its numbers; the game window is the equipment one, with General and Costume tabs.
+
+fr: La fiche montre les caractéristiques à côté du mannequin ; la fenêtre du jeu est la petite fenêtre de statut.
+tr: The sheet shows the stats next to the doll; the game window is the small status window.
+
 fr: La même teinture de tête, vue sur ce corps : elle vaut partout.
 tr: The same head dye, seen on this body: it applies everywhere.
 
@@ -844,6 +850,12 @@ tr: Orange
 
 fr: Oublie la saisie : revient au bon en attente, sinon à la table.
 tr: Discards the input: back to the pending order, otherwise to the table.
+
+fr: Ouvre la fenêtre du jeu
+tr: Opens the game window
+
+fr: Ouvre la fiche
+tr: Opens the sheet
 
 fr: Ouvre la fiche de l'item à l'édition : nom, ressource, teinte de l'icône, description. Le changement part en bon de travail.
 tr: Opens the item's sheet for editing: name, resource, icon tint, description. The change goes out as a work order.

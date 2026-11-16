@@ -22,6 +22,12 @@ using ro::ui::OptionRowView;
 // réglages d'origine, sans que rien ne le dise.
 constexpr const char* kLockedKey = "menu_icons_locked";
 constexpr const char* kStickyKey = "menu_icons_snapped";
+constexpr const char* kStatusOpensKey = "menu_icon_status_opens_game_window";
+constexpr const char* kEquipmentOpensKey = "menu_icon_equipment_opens_game_window";
+
+// Le rang de chaque entrée des listes « ouvre ».
+constexpr int kOpensSheet = 0;
+constexpr int kOpensGameWindow = 1;
 
 // La clé d'une propriété d'une icône : `menu_icon_<nom du bitmap>_<propriété>`.
 // ⚠ LE NOM DU CATALOGUE, qui est celui du fichier du jeu : il ne bouge pas quand
@@ -48,6 +54,8 @@ constexpr const char* kStickyKey = "menu_icons_snapped";
 void MenuIconsOptions::Declare(SettingsFile& into) {
   into.Declare(kLockedKey, &look_.locked);
   into.Declare(kStickyKey, &look_.sticky);
+  into.Declare(kStatusOpensKey, &look_.status_opens_game_window);
+  into.Declare(kEquipmentOpensKey, &look_.equipment_opens_game_window);
   // ⚠ SEULES LES ICÔNES QUE LE CATALOGUE MONTRE : les autres n'ont ni place ni
   // case, et leurs clés ne seraient que du bruit dans un fichier qu'on relit.
   for (const ro::ui::MenuIconEntry& entry : ro::ui::MenuIconCatalogue()) {
@@ -84,6 +92,7 @@ void MenuIconsOptions::Compose() {
       .kind = OptionKind::kAction,
       .confirm = Tr("Remettre toutes les icônes à leur place d'origine ?")});
 
+  opener_choices_ = {Tr("Ouvre la fiche"), Tr("Ouvre la fenêtre du jeu")};
   bool first = true;
   for (const ro::ui::MenuIconEntry& entry : ro::ui::MenuIconCatalogue()) {
     if (!entry.shown) {
@@ -100,6 +109,24 @@ void MenuIconsOptions::Compose() {
     if (first) {
       rows_.back().heading = Tr("Icônes montrées");
       first = false;
+    }
+    // LE STATUT ET L'ÉQUIPEMENT DISENT, À LA SUITE DE LEUR CASE, CE QU'ILS
+    // OUVRENT : la fiche de personnage, ou la fenêtre du jeu.
+    if (entry.command == MenuCommand::kStatus || entry.command == MenuCommand::kEquipment) {
+      const bool status = entry.command == MenuCommand::kStatus;
+      const bool game_window =
+          status ? look_.status_opens_game_window : look_.equipment_opens_game_window;
+      rows_.push_back(OptionRowView{
+          .id = MenuIconsRowId(status ? MenuIconsRow::kStatusOpens : MenuIconsRow::kEquipmentOpens),
+          .label = status ? "##statut_ouvre" : "##equipement_ouvre",
+          .help = status ? Tr("La fiche montre les caractéristiques à côté du mannequin ; la "
+                              "fenêtre du jeu est la petite fenêtre de statut.")
+                         : Tr("La fiche montre le mannequin et ses nombres ; la fenêtre du jeu "
+                              "est celle d'équipement, onglets Général et Costume."),
+          .kind = OptionKind::kChoice,
+          .chosen = game_window ? kOpensGameWindow : kOpensSheet,
+          .choices = opener_choices_,
+          .same_line = true});
     }
   }
 }
@@ -121,6 +148,12 @@ bool MenuIconsOptions::Change(const ro::ui::OptionsWindowAction& asked) {
       break;
     case MenuIconsRow::kSticky:
       look_.sticky = asked.on;
+      break;
+    case MenuIconsRow::kStatusOpens:
+      look_.status_opens_game_window = asked.chosen == kOpensGameWindow;
+      break;
+    case MenuIconsRow::kEquipmentOpens:
+      look_.equipment_opens_game_window = asked.chosen == kOpensGameWindow;
       break;
     case MenuIconsRow::kForgetPlaces: {
       // LES PLACES D'USINE, et elles seules : une icône masquée le reste.
