@@ -74431,6 +74431,27 @@ Body:
     ClientAttackMotion: 300
     DamageMotion: 360
     Ai: 17
+  - Id: 20562
+    AegisName: HIDDEN_MOB8
+    Name: Hidden Mob
+    Level: 170
+    Hp: 22007
+    Attack2: 1
+    Defense: 44
+    MagicDefense: 28
+    Str: 200
+    Agi: 200
+    Vit: 200
+    Int: 200
+    Dex: 200
+    Luk: 200
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    ElementLevel: 4
+    WalkSpeed: 1000
+    AttackMotion: 1000
+    Modes: {IgnoreMagic: true, IgnoreMelee: true, IgnoreMisc: true, IgnoreRanged: true}
   - Id: 20570
     AegisName: SAECOM
     Name: Seacom
@@ -79466,6 +79487,308 @@ Body:
     DamageMotion: 1
     Class: Boss
     Modes: {IgnoreMagic: true, IgnoreMelee: true, IgnoreMisc: true, IgnoreRanged: true}
+  - Id: 20892
+    AegisName: MD_SAKRAY
+    Name: Magic Swordsman Sakray
+    Level: 240
+    Hp: 20171364
+    BaseExp: 32274182
+    JobExp: 20978218
+    Attack: 19155
+    Attack2: 14550
+    Defense: 65
+    MagicDefense: 44
+    Resistance: 200
+    MagicResistance: 150
+    Str: 362
+    Agi: 198
+    Vit: 140
+    Int: 526
+    Dex: 356
+    Luk: 121
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Demihuman
+    Element: Holy
+    ElementLevel: 2
+    AttackDelay: 492
+    AttackMotion: 635
+    DamageMotion: 688
+    Ai: 09
+    Class: Boss
+    Modes: {Mvp: true}
+    MvpDrops:
+      - {Item: Mine_As, Rate: 5000}
+    Drops:
+      - {Item: Mine_As, Rate: 1000}
+      - {Item: Mine_As, Rate: 2000}
+  - Id: 20893
+    AegisName: MD_TIARA
+    Name: Princess Tiara
+    Level: 240
+    Hp: 15225297
+    BaseExp: 24360475
+    JobExp: 15834309
+    Attack: 17446
+    Attack2: 8874
+    Defense: 66
+    MagicDefense: 44
+    Resistance: 200
+    MagicResistance: 150
+    Str: 287
+    Agi: 186
+    Vit: 156
+    Int: 524
+    Dex: 355
+    Luk: 121
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Undead
+    Element: Holy
+    ElementLevel: 4
+    WalkSpeed: 200
+    AttackDelay: 1464
+    AttackMotion: 467
+    DamageMotion: 826
+    Ai: 09
+    Class: Boss
+    Modes: {Mvp: true}
+    MvpDrops:
+      - {Item: Mine_As, Rate: 5000}
+    Drops:
+      - {Item: Mine_As, Rate: 1000}
+      - {Item: Mine_As, Rate: 2000}
+  - Id: 20894
+    AegisName: MD_UNDEAD_KNIGHT
+    Name: Undead Knight
+    Level: 237
+    Hp: 520091
+    BaseExp: 832146
+    JobExp: 540895
+    Attack: 12324
+    Attack2: 9614
+    Defense: 51
+    MagicDefense: 37
+    Resistance: 150
+    MagicResistance: 75
+    Str: 241
+    Agi: 148
+    Vit: 80
+    Int: 216
+    Dex: 289
+    Luk: 72
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    Race: Undead
+    Element: Undead
+    ElementLevel: 2
+    WalkSpeed: 350
+    AttackDelay: 228
+    AttackMotion: 1000
+    DamageMotion: 396
+    Ai: 09
+    Drops:
+      - {Item: Mine_As, Rate: 300}
+  - Id: 20895
+    AegisName: MD_UNDEAD_SOLDIER
+    Name: Undead Soldier
+    Level: 230
+    Hp: 520617
+    BaseExp: 832987
+    JobExp: 541442
+    Attack: 9014
+    Attack2: 7096
+    Defense: 54
+    MagicDefense: 35
+    Resistance: 150
+    MagicResistance: 75
+    Str: 229
+    Agi: 178
+    Vit: 155
+    Int: 183
+    Dex: 276
+    Luk: 79
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Race: Undead
+    Element: Undead
+    ElementLevel: 2
+    AttackDelay: 524
+    AttackMotion: 780
+    DamageMotion: 420
+    Ai: 09
+    Drops:
+      - {Item: Mine_As, Rate: 300}
+  - Id: 20896
+    AegisName: MD_UNDEAD_ARCHER
+    Name: Undead Archer
+    Level: 233
+    Hp: 520359
+    BaseExp: 832574
+    JobExp: 541173
+    Attack: 9150
+    Attack2: 7645
+    Defense: 51
+    MagicDefense: 34
+    Resistance: 150
+    MagicResistance: 75
+    Str: 153
+    Agi: 246
+    Vit: 86
+    Int: 155
+    Dex: 272
+    Luk: 78
+    AttackRange: 9
+    SkillRange: 10
+    ChaseRange: 12
+    Race: Undead
+    Element: Undead
+    ElementLevel: 2
+    WalkSpeed: 200
+    AttackDelay: 870
+    AttackMotion: 752
+    DamageMotion: 480
+    Ai: 05
+    Modes: {Detector: true}
+    Drops:
+      - {Item: Mine_As, Rate: 300}
+  - Id: 20897
+    AegisName: MD_UNDEAD_WIZARD
+    Name: Undead Wizard
+    Level: 238
+    Hp: 519976
+    BaseExp: 831962
+    JobExp: 540775
+    Attack: 5682
+    Attack2: 4485
+    Defense: 54
+    MagicDefense: 41
+    Resistance: 75
+    MagicResistance: 100
+    Str: 162
+    Agi: 117
+    Vit: 125
+    Int: 305
+    Dex: 285
+    Luk: 90
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Race: Demihuman
+    Element: Ghost
+    ElementLevel: 2
+    AttackDelay: 1056
+    AttackMotion: 1056
+    DamageMotion: 336
+    Ai: 04
+    Modes: {Detector: true}
+    Drops:
+      - {Item: Mine_As, Rate: 300}
+  - Id: 20898
+    AegisName: MD_UNDEAD_MAGICIAN
+    Name: Undead Magician
+    Level: 235
+    Hp: 520204
+    BaseExp: 832326
+    JobExp: 541012
+    Attack: 7610
+    Attack2: 5854
+    Defense: 54
+    MagicDefense: 41
+    Resistance: 75
+    MagicResistance: 100
+    Str: 209
+    Agi: 152
+    Vit: 147
+    Int: 325
+    Dex: 309
+    Luk: 78
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Race: Undead
+    Element: Dark
+    ElementLevel: 2
+    WalkSpeed: 175
+    AttackDelay: 1214
+    AttackMotion: 576
+    DamageMotion: 240
+    Ai: 21
+    Drops:
+      - {Item: Mine_As, Rate: 300}
+  - Id: 20899
+    AegisName: MD_UNDEAD_NOBLE
+    Name: Undead Noble
+    Level: 239
+    Hp: 519940
+    BaseExp: 831904
+    JobExp: 540738
+    Attack: 12334
+    Attack2: 5336
+    Defense: 56
+    MagicDefense: 39
+    Resistance: 100
+    MagicResistance: 80
+    Str: 281
+    Agi: 150
+    Vit: 164
+    Int: 256
+    Dex: 327
+    Luk: 123
+    AttackRange: 9
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Undead
+    Element: Undead
+    ElementLevel: 3
+    AttackDelay: 1240
+    AttackMotion: 576
+    DamageMotion: 420
+    Ai: 21
+    Modes: {Detector: true}
+    Drops:
+      - {Item: Mine_As, Rate: 300}
+  - Id: 20900
+    AegisName: MD_UNDEAD_SERVANT
+    Name: Undead Servant
+    Level: 234
+    Hp: 520310
+    BaseExp: 832496
+    JobExp: 541122
+    Attack: 8446
+    Attack2: 6335
+    Defense: 53
+    MagicDefense: 32
+    Resistance: 100
+    MagicResistance: 50
+    Str: 215
+    Agi: 118
+    Vit: 127
+    Int: 90
+    Dex: 315
+    Luk: 95
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Race: Undead
+    Element: Undead
+    ElementLevel: 2
+    WalkSpeed: 400
+    AttackDelay: 1100
+    AttackMotion: 912
+    DamageMotion: 288
+    Ai: 05
+    Modes: {ChangeTargetMelee: true}
+    Drops:
+      - {Item: Mine_As, Rate: 300}
   - Id: 20920
     AegisName: CHIMERA_LAVA
     Name: Lavaeter

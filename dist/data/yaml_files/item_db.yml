@@ -129145,6 +129145,22 @@ Body:
     Weight: 10
     Script: |
       laphine_upgrade();
+  - Id: 100477
+    AegisName: Poenetentia_Box1
+    Name: Poenitentia Gladius Set Box
+    Type: Usable
+    Flags: {Container: true}
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      getgroupitem(IG_POENETENTIA_BOX1);
+  - Id: 100478
+    AegisName: Poenetentia_Box2
+    Name: Poenitentia Asta Set Box
+    Type: Usable
+    Flags: {Container: true}
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      getgroupitem(IG_POENETENTIA_BOX2);
   - Id: 100591
     AegisName: Thanos_W_Reform_1
     Name: Thanos Weapon Reform Cube (Lower)
@@ -145102,6 +145118,40 @@ Body:
           bonus bSMatk,2;
         }
       }
+  - Id: 460013
+    AegisName: Poenetentia_Aegis
+    Name: "Poenitentia Aegis [1]"
+    Type: Armor
+    Buy: 133000
+    Sell: 26600
+    Weight: 1500
+    Defense: 8
+    Slots: 1
+    Jobs: {Crusader: true}
+    Locations: {Left_Hand: true}
+    ArmorLevel: 1
+    EquipLevelMin: 230
+    Refineable: true
+    Gradable: true
+    View: 2
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus bMaxHPrate,5;
+      bonus bMaxSPrate,5;
+      bonus bMdef,10*(.@r/3);
+      bonus bDef,50*(.@r/3);
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus2 bSkillAtk,"CR_SHIELDBOOMERANG",5;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus2 bSkillAtk,"CR_SHIELDBOOMERANG",8;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bPow,1;
+               bonus bSpl,1;
+               bonus2 bSkillAtk,"CR_SHIELDBOOMERANG",15;
+            }
+         }
+      }
   - Id: 460017
     AegisName: Guard_IL
     Name: "Illusion Guard [1]"
@@ -147099,6 +147149,87 @@ Body:
       .@r = getrefine();
       bonus2 bSkillAtk,"AM_ACIDTERROR",5*(.@r/2);
       bonus2 bAddClass,Class_All,3*(.@r/4);
+  - Id: 500019
+    AegisName: Poenitentia_Gladius
+    Name: "Poenitentia Gladius [2]"
+    Type: Weapon
+    SubType: 1hSword
+    Buy: 10250000
+    Sell: 102500
+    Weight: 1800
+    Attack: 195
+    Range: 1
+    Slots: 2
+    Jobs: {Crusader: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Gradable: true
+    Script: |
+      bonus bMatk,250;
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus bMatkRate,10;
+      bonus2 bSkillAtk,"CR_GRANDCROSS",4*(.@r/2);
+      if (.@r>=7) {
+         bonus bVariableCastrate,-10;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"CR_GRANDCROSS",25;
+            if (getallrefine() >= 22) {
+               bonus2 bMagicAtkEle,Ele_Holy,10;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bSMatk,1;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bSpl,1;
+            }
+         }
+      }
+  - Id: 500020
+    AegisName: Poenitentia_Ligula
+    Name: "Poenitentia Ligula [2]"
+    Type: Weapon
+    SubType: 1hSword
+    Buy: 10150000
+    Sell: 101500
+    Weight: 1800
+    Attack: 185
+    Range: 1
+    Slots: 2
+    Jobs: {Alchemist: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,10;
+      bonus2 bSkillAtk,"AM_ACIDTERROR",10+3*(.@r/2);
+      if (.@r>=7) {
+         bonus bVariableCastrate,-10;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"AM_ACIDTERROR",25;
+            if (getallrefine() >= 22) {
+               bonus bLongAtkRate,10;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus2 bSkillAtk,"AM_ACIDTERROR",5;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bPAtk,1;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bPow,2;
+               bonus2 bSkillAtk,"AM_ACIDTERROR",10;
+            }
+         }
+      }
   - Id: 500024
     AegisName: Thanos_Sword_AD
     Name: "Thanos Sword-AD [2]"
@@ -147475,6 +147606,84 @@ Body:
       .@r = getrefine();
       bonus2 bSkillAtk,"RG_RAID",5*(.@r/2);
       bonus2 bMagicAtkEle,Ele_All,2*(.@r/4);
+  - Id: 510027
+    AegisName: Poenitentia_Mucro
+    Name: "Poenitentia Mucro [2]"
+    Type: Weapon
+    SubType: Dagger
+    Buy: 10200000
+    Sell: 102000
+    Weight: 900
+    Attack: 190
+    Range: 1
+    Slots: 2
+    Jobs: {Assassin: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,10;
+      bonus2 bSkillAtk,"AS_SONICBLOW",3*(.@r/2);
+      if (.@r>=7) {
+         bonus bCritAtkRate,15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"AS_SONICBLOW",30;
+            if (getallrefine() >= 22) {
+               bonus2 bAddSize,Size_All,15;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bPAtk,1;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bPow,1;
+            }
+         }
+      }
+  - Id: 510028
+    AegisName: Poenetentia_Dilacero
+    Name: "Poenitentia Dilacero [2]"
+    Type: Weapon
+    SubType: Dagger
+    Buy: 10200000
+    Sell: 102000
+    Weight: 900
+    Attack: 190
+    Range: 1
+    Slots: 2
+    Jobs: {Rogue: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,10;
+      bonus2 bSkillAtk,"RG_BACKSTAP",3*(.@r/2);
+      if (.@r>=7) {
+         bonus bAspdRate,10;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"RG_BACKSTAP",30;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-12;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bPAtk,1;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bPow,1;
+            }
+         }
+      }
   - Id: 510030
     AegisName: Thanos_Dagger_AD
     Name: "Thanos Dagger-AD [2]"
@@ -147931,6 +148140,45 @@ Body:
       .@r = getrefine();
       bonus2 bSkillAtk,"CR_SHIELDBOOMERANG",5*(.@r/2);
       bonus bLongAtkRate,2*(.@r/4);
+  - Id: 530010
+    AegisName: Poenitentia_Hasta
+    Name: "Poenitentia Hasta [2]"
+    Type: Weapon
+    SubType: 1hSpear
+    Buy: 10350000
+    Sell: 103500
+    Weight: 1900
+    Attack: 205
+    Range: 3
+    Slots: 2
+    Jobs: {Crusader: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,10;
+      bonus2 bSkillAtk,"KN_BRANDISHSPEAR",3*(.@r/2);
+      if (.@r>=7) {
+         bonus bVariableCastrate,-10;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"KN_BRANDISHSPEAR",25;
+            if (getallrefine() >= 22) {
+               bonus bShortAtkRate,10;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bPAtk,1;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bPow,1;
+            }
+         }
+      }
   - Id: 530012
     AegisName: Thanos_Spear_AD
     Name: "Thanos Spear-AD [2]"
@@ -148209,6 +148457,94 @@ Body:
       bonus bUnbreakableWeapon;
       bonus2 bSkillAtk,"MG_FIREBALL",5*(.@r/2);
       bonus2 bMagicAtkEle,Ele_All,2*(.@r/4);
+  - Id: 540014
+    AegisName: Poenitentia_Codex
+    Name: "Poenitentia Codex [2]"
+    Type: Weapon
+    SubType: Book
+    Buy: 9800000
+    Sell: 98000
+    Weight: 1600
+    Attack: 150
+    Range: 1
+    Slots: 2
+    Jobs: {Sage: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Gradable: true
+    Script: |
+      bonus bMatk,215;
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus bMatkRate,10;
+      bonus2 bSkillAtk,"MG_COLDBOLT",3*(.@r/2);
+      bonus2 bSkillAtk,"WZ_EARTHSPIKE",3*(.@r/2);
+      if (.@r>=7) {
+         bonus bVariableCastrate,-10;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"MG_COLDBOLT",25;
+            bonus2 bSkillAtk,"WZ_EARTHSPIKE",25;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-10;
+               bonus bDelayrate,-10;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bSMatk,1;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bSpl,1;
+            }
+         }
+      }
+  - Id: 540015
+    AegisName: Poenitentia_Liber
+    Name: "Poenitentia Liber [2]"
+    Type: Weapon
+    SubType: Book
+    Buy: 10600000
+    Sell: 106000
+    Weight: 1000
+    Attack: 230
+    Range: 1
+    Slots: 2
+    Jobs: {Priest: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Gradable: true
+    Script: |
+      bonus bMatk,215;
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus bMatkRate,5;
+      bonus2 bAddClass,Class_All,5;
+      bonus2 bAddRace,RC_Undead,3*(.@r/2);
+      bonus2 bMagicAddRace,RC_Undead,3*(.@r/2);
+      if (.@r>=7) {
+         bonus bAspdRate,10;
+         if (.@r>=9) {
+            bonus2 bAddRace,RC_Undead,30;
+            bonus2 bMagicAddRace,RC_Undead,30;
+            if (getallrefine() >= 22) {
+               bonus2 bMagicAtkEle,Ele_Holy,15;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bSMatk,1;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bSpl,1;
+            }
+         }
+      }
   - Id: 540019
     AegisName: Adulter_F_M_Book
     Name: "Adulter Fides Magic Book [2]"
@@ -148718,6 +149054,100 @@ Body:
       bonus bMatkRate,2*.@r;
       if (.@r>=9) {
          bonus bVariableCastrate,-10;
+      }
+  - Id: 550019
+    AegisName: Poenitentia_Scipio
+    Name: "Poenitentia Scipio [2]"
+    Type: Weapon
+    SubType: Staff
+    Buy: 9800000
+    Sell: 98000
+    Weight: 1600
+    Attack: 150
+    Range: 1
+    Slots: 2
+    Jobs: {Sage: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Gradable: true
+    Script: |
+      bonus bMatk,215;
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus bMatkRate,10;
+      bonus2 bSkillAtk,"MG_FIREBALL",10;
+      bonus2 bSkillAtk,"MG_THUNDERSTORM",3*(.@r/2);
+      bonus2 bSkillAtk,"PF_SOULBURN",3*(.@r/2);
+      if (.@r>=7) {
+         bonus bVariableCastrate,-10;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"MG_THUNDERSTORM",25;
+            bonus2 bSkillAtk,"PF_SOULBURN",25;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-7;
+               bonus bDelayrate,-10;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus2 bSkillAtk,"MG_FIREBALL",5;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bSMatk,1;
+            bonus2 bSkillAtk,"MG_FIREBALL",8;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bSpl,1;
+               bonus2 bSkillAtk,"MG_FIREBALL",12;
+            }
+         }
+      }
+  - Id: 550020
+    AegisName: Poenitentia_Crystallum
+    Name: "Poenitentia Crystallum [2]"
+    Type: Weapon
+    SubType: Staff
+    Buy: 9800000
+    Sell: 98000
+    Weight: 1000
+    Attack: 150
+    Range: 1
+    Slots: 2
+    Jobs: {Priest: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Gradable: true
+    Script: |
+      bonus bMatk,250;
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus bMatkRate,10;
+      bonus2 bSkillAtk,"PR_MAGNUS",10+3*(.@r/2);
+      if (.@r>=7) {
+         bonus bVariableCastrate,-10;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"PR_MAGNUS",30;
+            if (getallrefine() >= 22) {
+               bonus2 bMagicAddRace,RC_All,15;
+               bonus2 bMagicAddRace,RC_Player_Human,-15;
+               bonus2 bMagicAddRace,RC_Player_Doram,-15;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus2 bSkillAtk,"PR_MAGNUS",5;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bSMatk,1;
+            bonus2 bSkillAtk,"PR_MAGNUS",8;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bSpl,1;
+               bonus2 bSkillAtk,"PR_MAGNUS",12;
+            }
+         }
       }
   - Id: 550023
     AegisName: Thanos_Staff_AD
@@ -149237,6 +149667,88 @@ Body:
       bonus2 bSkillAtk,"MO_INVESTIGATE",5*(.@r/2);
       bonus2 bSkillAtk,"MO_FINGEROFFENSIVE",5*(.@r/2);
       bonus bShortAtkRate,2*(.@r/4);
+  - Id: 560012
+    AegisName: Poenitentia_Caestus
+    Name: "Poenitentia Caestus [2]"
+    Type: Weapon
+    SubType: Knuckle
+    Buy: 10600000
+    Sell: 106000
+    Weight: 1500
+    Attack: 230
+    Range: 1
+    Slots: 2
+    Jobs: {Monk: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,10;
+      bonus2 bSkillAtk,"MO_INVESTIGATE",10;
+      bonus2 bSkillAtk,"MO_EXTREMITYFIST",3*(.@r/2);
+      if (.@r>=7) {
+         bonus bMaxHPrate,10;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"MO_EXTREMITYFIST",30;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-5;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus2 bSkillAtk,"MO_INVESTIGATE",5;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bPAtk,1;
+            bonus2 bSkillAtk,"MO_INVESTIGATE",8;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bPow,1;
+               bonus2 bSkillAtk,"MO_INVESTIGATE",12;
+            }
+         }
+      }
+  - Id: 560013
+    AegisName: Poenitentia_Ungula
+    Name: "Poenitentia Ungula [2]"
+    Type: Weapon
+    SubType: Knuckle
+    Buy: 10600000
+    Sell: 106000
+    Weight: 1500
+    Attack: 230
+    Range: 1
+    Slots: 2
+    Jobs: {Monk: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,10;
+      bonus2 bSkillAtk,"MO_EXTREMITYFIST",3*(.@r/2);
+      if (.@r>=7) {
+         bonus2 bSkillUseSPrate,"MO_EXTREMITYFIST",15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"MO_EXTREMITYFIST",30;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-5;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bPAtk,1;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bPow,1;
+            }
+         }
+      }
   - Id: 560017
     AegisName: Thanos_Knuckle_AD
     Name: "Thanos Knuckle-AD [2]"
@@ -149564,6 +150076,47 @@ Body:
       .@r = getrefine();
       bonus2 bSkillAtk,"BA_MUSICALSTRIKE",5*(.@r/2);
       bonus bLongAtkRate,2*(.@r/4);
+  - Id: 570013
+    AegisName: Poenitentia_Chorda
+    Name: "Poenitentia Chorda [2]"
+    Type: Weapon
+    SubType: Musical
+    Buy: 10500000
+    Sell: 105000
+    Weight: 1100
+    Attack: 220
+    Range: 1
+    Slots: 2
+    Jobs: {BardDancer: true}
+    Gender: Male
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Gradable: true
+    Script: |
+      bonus bMatk,250;
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus bMatkRate,10;
+      bonus2 bSkillAtk,"BA_MUSICALSTRIKE",3*(.@r/2);
+      if (.@r>=7) {
+         bonus bVariableCastrate,-10;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"BA_MUSICALSTRIKE",30;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillFixedCast,"BA_MUSICALSTRIKE",-500;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bSMatk,1;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bSpl,1;
+            }
+         }
+      }
   - Id: 570016
     AegisName: Thanos_Violin_AD
     Name: "Thanos Violin-AD [2]"
@@ -149869,6 +150422,47 @@ Body:
       .@r = getrefine();
       bonus2 bSkillAtk,"DC_THROWARROW",5*(.@r/2);
       bonus bLongAtkRate,2*(.@r/4);
+  - Id: 580013
+    AegisName: Poenitentia_Flagellum
+    Name: "Poenitentia Flagellum [2]"
+    Type: Weapon
+    SubType: Whip
+    Buy: 10500000
+    Sell: 105000
+    Weight: 1100
+    Attack: 220
+    Range: 2
+    Slots: 2
+    Jobs: {BardDancer: true}
+    Gender: Female
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Gradable: true
+    Script: |
+      bonus bMatk,250;
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus bMatkRate,10;
+      bonus2 bSkillAtk,"BA_MUSICALSTRIKE",3*(.@r/2);
+      if (.@r>=7) {
+         bonus bVariableCastrate,-10;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"BA_MUSICALSTRIKE",30;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillFixedCast,"BA_MUSICALSTRIKE",-500;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bSMatk,1;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bSpl,1;
+            }
+         }
+      }
   - Id: 580016
     AegisName: Thanos_Whip_AD
     Name: "Thanatos Whip-AD [2]"
@@ -150142,6 +150736,91 @@ Body:
       bonus2 bSkillAtk,"PR_MAGNUS",5*(.@r/2);
       bonus bHealPower,5*(.@r/2);
       bonus2 bMagicAtkEle,Ele_All,2*(.@r/4);
+  - Id: 590016
+    AegisName: Poenitentia_Clava
+    Name: "Poenitentia Clava [2]"
+    Type: Weapon
+    SubType: Mace
+    Buy: 10350000
+    Sell: 103500
+    Weight: 1800
+    Attack: 205
+    Range: 1
+    Slots: 2
+    Jobs: {Blacksmith: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bAddClass,Class_All,10;
+      bonus2 bSkillAtk,"MC_CARTREVOLUTION",10;
+      bonus2 bSkillAtk,"WS_CARTTERMINATION",(.@r/2)*5;
+      if (.@r>=7) {
+         bonus bVariableCastrate,-10;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"WS_CARTTERMINATION",25;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"WS_CARTTERMINATION",25;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus bLongAtkRate,2;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bLongAtkRate,3;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bPAtk,1;
+               bonus2 bSkillAtk,"WS_CARTTERMINATION",10;
+            }
+         }
+      }
+  - Id: 590017
+    AegisName: Poenitentia_Pendulus
+    Name: "Poenitentia Pendulus [2]"
+    Type: Weapon
+    SubType: Mace
+    Buy: 10250000
+    Sell: 102500
+    Weight: 1650
+    Attack: 195
+    Range: 1
+    Slots: 2
+    Jobs: {Alchemist: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,10;
+      bonus2 bSkillAtk,"AM_ACIDTERROR",10;
+      bonus2 bSkillAtk,"WS_CARTTERMINATION",3*(.@r/2);
+      if (.@r>=7) {
+         bonus bVariableCastrate,-10;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"WS_CARTTERMINATION",25;
+            if (getallrefine() >= 22) {
+               bonus bShortAtkRate,10;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus2 bSkillAtk,"AM_ACIDTERROR",5;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bPAtk,1;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bPow,2;
+               bonus2 bSkillAtk,"AM_ACIDTERROR",10;
+            }
+         }
+      }
   - Id: 590020
     AegisName: Thanos_Hammer_AD
     Name: "Thanos Hammer-AD [2]"
@@ -150528,6 +151207,48 @@ Body:
       .@r = getrefine();
       bonus2 bSkillAtk,"KN_BOWLINGBASH",5*(.@r/2);
       bonus bShortAtkRate,2*(.@r/4);
+  - Id: 600014
+    AegisName: Poenitentia_Ensis
+    Name: "Poenitentia Ensis [2]"
+    Type: Weapon
+    SubType: 2hSword
+    Buy: 11450000
+    Sell: 114500
+    Weight: 2200
+    Attack: 315
+    Range: 1
+    Slots: 2
+    Jobs: {Knight: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,10;
+      bonus2 bSkillAtk,"KN_BOWLINGBASH",10+3*(.@r/2);
+      if (.@r>=7) {
+         bonus bVariableCastrate,-10;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"KN_BOWLINGBASH",25;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-3;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus2 bSkillAtk,"KN_BOWLINGBASH",5;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bPAtk,1;
+            bonus2 bSkillAtk,"KN_BOWLINGBASH",8;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bPow,2;
+               bonus2 bSkillAtk,"KN_BOWLINGBASH",12;
+            }
+         }
+      }
   - Id: 600016
     AegisName: Thanos_TSword_AD
     Name: "Thanatos Great Sword-AD [2]"
@@ -150767,6 +151488,49 @@ Body:
       .@r = getrefine();
       bonus2 bSkillAtk,"ASC_METEORASSAULT",5*(.@r/2);
       bonus bShortAtkRate,2*(.@r/4);
+  - Id: 610016
+    AegisName: Poenitentia_Manus
+    Name: "Poenitentia Manus [2]"
+    Type: Weapon
+    SubType: Katar
+    Buy: 11100000
+    Sell: 111000
+    Weight: 1900
+    Attack: 280
+    Range: 1
+    Slots: 2
+    Jobs: {Assassin: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,10;
+      bonus2 bSkillAtk,"ASC_METEORASSAULT",10;
+      bonus2 bSkillAtk,"AS_GRIMTOOTH",3*(.@r/2);
+      if (.@r>=7) {
+         bonus bAspdRate,10;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"AS_GRIMTOOTH",30;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-12;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus2 bSkillAtk,"ASC_METEORASSAULT",5;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bPAtk,1;
+            bonus2 bSkillAtk,"ASC_METEORASSAULT",8;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bPow,1;
+               bonus2 bSkillAtk,"ASC_METEORASSAULT",12;
+            }
+         }
+      }
   - Id: 610019
     AegisName: Thanos_Katar_AD
     Name: "Thanatos Katar-AD [2]"
@@ -151042,6 +151806,50 @@ Body:
       bonus bUnbreakableWeapon;
       bonus2 bSkillAtk,"MC_CARTREVOLUTION",5*(.@r/2);
       bonus bShortAtkRate,2*(.@r/4);
+  - Id: 620006
+    AegisName: Poenitentia_Ascia
+    Name: "Poenitentia Ascia [2]"
+    Type: Weapon
+    SubType: 2hAxe
+    Buy: 11550000
+    Sell: 115500
+    Weight: 3200
+    Attack: 325
+    Range: 1
+    Slots: 2
+    Jobs: {Blacksmith: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bAddClass,Class_All,10;
+      bonus2 bSkillAtk,"MC_CARTREVOLUTION",10;
+      bonus2 bSkillAtk,"MC_MAMMONITE",3*(.@r/2);
+      if (.@r>=7) {
+         bonus bAspdRate,10;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"MC_MAMMONITE",25;
+            if (getallrefine() >= 22) {
+               bonus2 bAddSize,Size_All,15;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus2 bSkillAtk,"MC_CARTREVOLUTION",5;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bPAtk,1;
+            bonus2 bSkillAtk,"MC_CARTREVOLUTION",8;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bPow,2;
+               bonus2 bSkillAtk,"MC_CARTREVOLUTION",12;
+            }
+         }
+      }
   - Id: 620009
     AegisName: Thanos_Axe_AD
     Name: "Thanatos Axe-AD [2]"
@@ -151254,6 +152062,45 @@ Body:
          bonus2 bAddSize,Size_Large,10;
          bonus bHit,10;
       }
+  - Id: 630009
+    AegisName: Poenitentia_Catapulta
+    Name: "Poenitentia Catapulta [2]"
+    Type: Weapon
+    SubType: 2hSpear
+    Buy: 11500000
+    Sell: 115000
+    Weight: 2300
+    Attack: 320
+    Range: 3
+    Slots: 2
+    Jobs: {Knight: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,10;
+      bonus2 bSkillAtk,"KN_PIERCE",3*(.@r/2);
+      if (.@r>=7) {
+         bonus bVariableCastrate,-10;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"KN_PIERCE",25;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-10;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bPAtk,1;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bPow,2;
+            }
+         }
+      }
   - Id: 630012
     AegisName: Adulter_F_Lance
     Name: "Adulter Fides Lance [2]"
@@ -151395,6 +152242,98 @@ Body:
       bonus bUnbreakableWeapon;
       bonus2 bSkillAtk,"WZ_FROSTNOVA",5*(.@r/2);
       bonus2 bMagicAtkEle,Ele_All,2*(.@r/4);
+  - Id: 640014
+    AegisName: Poenitentia_Termes
+    Name: "Poenitentia Termes [2]"
+    Type: Weapon
+    SubType: 2hStaff
+    Buy: 10000000
+    Sell: 100000
+    Weight: 2000
+    Attack: 170
+    Range: 1
+    Slots: 2
+    Jobs: {Wizard: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Gradable: true
+    Script: |
+      bonus bMatk,300;
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus bMatkRate,10;
+      bonus2 bSkillAtk,"WZ_FROSTNOVA",10;
+      bonus2 bSkillAtk,"WZ_STORMGUST",3*(.@r/2);
+      bonus2 bSkillAtk,"WZ_METEOR",3*(.@r/2);
+      if (.@r>=7) {
+         bonus bVariableCastrate,-10;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"WZ_STORMGUST",25;
+            bonus2 bSkillAtk,"WZ_METEOR",25;
+            if (getallrefine() >= 22) {
+               bonus2 bMagicAtkEle,Ele_Fire,10;
+               bonus2 bMagicAtkEle,Ele_Water,10;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus2 bSkillAtk,"WZ_FROSTNOVA",5;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bSMatk,1;
+            bonus2 bSkillAtk,"WZ_FROSTNOVA",8;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bSpl,2;
+               bonus2 bSkillAtk,"WZ_FROSTNOVA",12;
+            }
+         }
+      }
+  - Id: 640015
+    AegisName: Poenitentia_Virga
+    Name: "Poenitentia Virga [2]"
+    Type: Weapon
+    SubType: 2hStaff
+    Buy: 10000000
+    Sell: 100000
+    Weight: 2000
+    Attack: 170
+    Range: 1
+    Slots: 2
+    Jobs: {Wizard: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Gradable: true
+    Script: |
+      bonus bMatk,300;
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus bMatkRate,10;
+      bonus2 bSkillAtk,"WZ_HEAVENDRIVE",3*(.@r/2);
+      bonus2 bSkillAtk,"WZ_VERMILION",3*(.@r/2);
+      if (.@r>=7) {
+         bonus bVariableCastrate,-10;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"WZ_HEAVENDRIVE",25;
+            bonus2 bSkillAtk,"WZ_VERMILION",25;
+            if (getallrefine() >= 22) {
+               bonus2 bMagicAtkEle,Ele_Earth,10;
+               bonus2 bMagicAtkEle,Ele_Wind,10;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bSMatk,1;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bSpl,2;
+            }
+         }
+      }
   - Id: 640017
     AegisName: Thanos_Rod_AD
     Name: "Thanatos Two-handed Staff-AD [2]"
@@ -151930,6 +152869,165 @@ Body:
       .@r = getrefine();
       bonus2 bSkillAtk,"AC_SHOWER",5*(.@r/2);
       bonus bLongAtkRate,2*(.@r/4);
+  - Id: 700022
+    AegisName: Poenitentia_Tenon
+    Name: "Poenitentia Tenon [2]"
+    Type: Weapon
+    SubType: Bow
+    Buy: 10800000
+    Sell: 108000
+    Weight: 1400
+    Attack: 250
+    Range: 5
+    Slots: 2
+    Jobs: {Rogue: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,10;
+      bonus2 bSkillAtk,"AC_DOUBLE",3*(.@r/2);
+      if (.@r>=7) {
+         bonus bCritAtkRate,15;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"AC_DOUBLE",30;
+            if (getallrefine() >= 22) {
+               bonus bLongAtkRate,15;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bPAtk,1;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bCon,1;
+            }
+         }
+      }
+  - Id: 700023
+    AegisName: Poenitentia_Nervus
+    Name: "Poenitentia Nervus [2]"
+    Type: Weapon
+    SubType: Bow
+    Buy: 10800000
+    Sell: 108000
+    Weight: 1400
+    Attack: 250
+    Range: 5
+    Slots: 2
+    Jobs: {Hunter: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,10;
+      bonus2 bSkillAtk,"SN_SHARPSHOOTING",3*(.@r/2);
+      if (.@r>=7) {
+         bonus bLongAtkRate,10;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"SN_SHARPSHOOTING",30;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-5;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bPAtk,1;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bCon,1;
+            }
+         }
+      }
+  - Id: 700024
+    AegisName: Poenetentia_Attendo
+    Name: "Poenitentia Attendo [2]"
+    Type: Weapon
+    SubType: Bow
+    Buy: 10800000
+    Sell: 108000
+    Weight: 1400
+    Attack: 250
+    Range: 5
+    Slots: 2
+    Jobs: {Hunter: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,10;
+      bonus2 bSkillAtk,"AC_SHOWER",10+3*(.@r/2);
+      if (.@r>=7) {
+         bonus bLongAtkRate,10;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"AC_SHOWER",30;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-3;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus2 bSkillAtk,"AC_SHOWER",5;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bPAtk,1;
+            bonus2 bSkillAtk,"AC_SHOWER",8;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bCon,1;
+               bonus2 bSkillAtk,"AC_SHOWER",12;
+            }
+         }
+      }
+  - Id: 700025
+    AegisName: Poenetentia_Vatia
+    Name: "Poenitentia Vatia [2]"
+    Type: Weapon
+    SubType: Bow
+    Buy: 10800000
+    Sell: 108000
+    Weight: 1000
+    Attack: 250
+    Range: 5
+    Slots: 2
+    Jobs: {BardDancer: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,10;
+      bonus2 bSkillAtk,"CG_ARROWVULCAN",3*(.@r/2);
+      if (.@r>=7) {
+         bonus bLongAtkRate,10;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"CG_ARROWVULCAN",30;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-10;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bPAtk,1;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bCon,1;
+            }
+         }
+      }
   - Id: 700029
     AegisName: Thanos_Bow_AD
     Name: "Thanatos Bow-AD [2]"
@@ -153527,6 +154625,10 @@ Body:
     Name: Blessed Etel Dust
     Weight: 10
     Flags: {BuyingStore: true}
+  - Id: 1000367
+    AegisName: Mine_As
+    Name: Minneas
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
   - Id: 1000405
     AegisName: Ep18_Amethyst_Fragment
     Name: Amethyst Fragment
