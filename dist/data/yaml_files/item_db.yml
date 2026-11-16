@@ -122252,6 +122252,266 @@ Body:
     SubType: Enchant
     Buy: 20
     Sell: 10
+  - Id: 29672
+    AegisName: Time_Jewely_Str_1
+    Name: Temporal Jewel (STR) Lv 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getequiprefinerycnt(EQI_HEAD_TOP);
+      bonus bBaseAtk,2*(.@r/2);
+      bonus bHit,3*(.@r/2);
+      bonus2 bAddClass,Class_All,(.@r/5);
+  - Id: 29673
+    AegisName: Time_Jewely_Str_2
+    Name: Temporal Jewel (STR) Lv 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getequiprefinerycnt(EQI_HEAD_TOP);
+      bonus bBaseAtk,4*(.@r/2);
+      bonus bHit,5*(.@r/2);
+      bonus2 bAddClass,Class_All,2*(.@r/5);
+  - Id: 29674
+    AegisName: Time_Jewely_Str_3
+    Name: Temporal Jewel (STR) Lv 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getequiprefinerycnt(EQI_HEAD_TOP);
+      bonus bBaseAtk,7*(.@r/2);
+      bonus bHit,7*(.@r/2);
+      bonus2 bAddClass,Class_All,3*(.@r/5);
+  - Id: 29675
+    AegisName: Time_Jewely_Agi_1
+    Name: Temporal Jewel (AGI) Lv 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getequiprefinerycnt(EQI_HEAD_TOP);
+      bonus bAspdRate,(.@r/2);
+      bonus bFlee,4*(.@r/2);
+      bonus bAspd,(.@r/5);
+  - Id: 29676
+    AegisName: Time_Jewely_Agi_2
+    Name: Temporal Jewel (AGI) Lv 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getequiprefinerycnt(EQI_HEAD_TOP);
+      bonus bAspdRate,3*(.@r/2);
+      bonus bFlee,5*(.@r/2);
+      bonus bAspd,(.@r/5);
+  - Id: 29677
+    AegisName: Time_Jewely_Agi_3
+    Name: Temporal Jewel (AGI) Lv 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getequiprefinerycnt(EQI_HEAD_TOP);
+      bonus bAspdRate,5*(.@r/2);
+      bonus bFlee,7*(.@r/2);
+      bonus bAspd,(.@r/5);
+  - Id: 29678
+    AegisName: Time_Jewely_Vit_1
+    Name: Temporal Jewel (VIT) Lv 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getequiprefinerycnt(EQI_HEAD_TOP);
+      bonus bDef,5*(.@r/2);
+      bonus bMaxHP,200*(.@r/2);
+      bonus bMaxHPrate,(.@r/5);
+  - Id: 29679
+    AegisName: Time_Jewely_Vit_2
+    Name: Temporal Jewel (VIT) Lv 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getequiprefinerycnt(EQI_HEAD_TOP);
+      bonus bDef,7*(.@r/2);
+      bonus bMaxHP,300*(.@r/2);
+      bonus bMaxHPrate,2*(.@r/5);
+  - Id: 29680
+    AegisName: Time_Jewely_Vit_3
+    Name: Temporal Jewel (VIT) Lv 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getequiprefinerycnt(EQI_HEAD_TOP);
+      bonus bDef,10*(.@r/2);
+      bonus bMaxHP,500*(.@r/2);
+      bonus bMaxHPrate,3*(.@r/5);
+  - Id: 29681
+    AegisName: Time_Jewely_Int_1
+    Name: Temporal Jewel (INT) Lv 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getequiprefinerycnt(EQI_HEAD_TOP);
+      bonus bHealPower,(.@r/2);
+      bonus bMatk,2*(.@r/2);
+      bonus bMatkRate,(.@r/5);
+  - Id: 29682
+    AegisName: Time_Jewely_Int_2
+    Name: Temporal Jewel (INT) Lv 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getequiprefinerycnt(EQI_HEAD_TOP);
+      bonus bHealPower,3*(.@r/2);
+      bonus bMatk,4*(.@r/2);
+      bonus bMatkRate,2*(.@r/5);
+  - Id: 29683
+    AegisName: Time_Jewely_Int_3
+    Name: Temporal Jewel (INT) Lv 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getequiprefinerycnt(EQI_HEAD_TOP);
+      bonus bHealPower,5*(.@r/2);
+      bonus bMatk,7*(.@r/2);
+      bonus bMatkRate,3*(.@r/5);
+  - Id: 29684
+    AegisName: Time_Jewely_Dex_1
+    Name: Temporal Jewel (DEX) Lv 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getequiprefinerycnt(EQI_HEAD_TOP);
+      bonus2 bWeaponDamageRate,W_BOW,(.@r/2);
+      bonus bHit,2*(.@r/2);
+      bonus2 bAddClass,Class_All,(.@r/5);
+  - Id: 29685
+    AegisName: Time_Jewely_Dex_2
+    Name: Temporal Jewel (DEX) Lv 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getequiprefinerycnt(EQI_HEAD_TOP);
+      bonus2 bWeaponDamageRate,W_BOW,2*(.@r/2);
+      bonus bHit,5*(.@r/2);
+      bonus2 bAddClass,Class_All,2*(.@r/5);
+  - Id: 29686
+    AegisName: Time_Jewely_Dex_3
+    Name: Temporal Jewel (DEX) Lv 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getequiprefinerycnt(EQI_HEAD_TOP);
+      bonus2 bWeaponDamageRate,W_BOW,3*(.@r/2);
+      bonus bHit,7*(.@r/2);
+      bonus2 bAddClass,Class_All,3*(.@r/5);
+  - Id: 29687
+    AegisName: Time_Jewely_Luk_1
+    Name: Temporal Jewel (LUK) Lv 1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getequiprefinerycnt(EQI_HEAD_TOP);
+      bonus bCritAtkRate,3*(.@r/2);
+      bonus bCritical,(.@r/2);
+      bonus2 bAddClass,Class_All,(.@r/5);
+  - Id: 29688
+    AegisName: Time_Jewely_Luk_2
+    Name: Temporal Jewel (LUK) Lv 2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getequiprefinerycnt(EQI_HEAD_TOP);
+      bonus bCritAtkRate,6*(.@r/2);
+      bonus bCritical,2*(.@r/2);
+      bonus2 bAddClass,Class_All,2*(.@r/5);
+  - Id: 29689
+    AegisName: Time_Jewely_Luk_3
+    Name: Temporal Jewel (LUK) Lv 3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getequiprefinerycnt(EQI_HEAD_TOP);
+      bonus bCritAtkRate,9*(.@r/2);
+      bonus bCritical,3*(.@r/2);
+      bonus2 bAddClass,Class_All,3*(.@r/5);
+  - Id: 29706
+    AegisName: Tenacity1
+    Name: Tenacity Lv1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bShortAtkRate,4;
+      bonus bPerfectHitAddRate,1;
+  - Id: 29707
+    AegisName: Tenacity2
+    Name: Tenacity Lv2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bShortAtkRate,8;
+      bonus bPerfectHitAddRate,2;
+  - Id: 29708
+    AegisName: Tenacity3
+    Name: Tenacity Lv3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bShortAtkRate,12;
+      bonus bPerfectHitAddRate,3;
+  - Id: 29709
+    AegisName: Tenacity4
+    Name: Tenacity Lv4
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bShortAtkRate,16;
+      bonus bPerfectHitAddRate,4;
+  - Id: 29710
+    AegisName: Tenacity5
+    Name: Tenacity Lv5
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bShortAtkRate,20;
+      bonus bPerfectHitAddRate,5;
+  - Id: 29711
+    AegisName: Tenacity6
+    Name: Tenacity Lv6
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bShortAtkRate,24;
+      bonus bPerfectHitAddRate,6;
+  - Id: 29712
+    AegisName: Tenacity7
+    Name: Tenacity Lv7
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bShortAtkRate,28;
+      bonus bPerfectHitAddRate,7;
+  - Id: 29713
+    AegisName: Tenacity8
+    Name: Tenacity Lv8
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bShortAtkRate,32;
+      bonus bPerfectHitAddRate,8;
+  - Id: 29714
+    AegisName: Tenacity9
+    Name: Tenacity Lv9
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bShortAtkRate,36;
+      bonus bPerfectHitAddRate,9;
+  - Id: 29715
+    AegisName: Tenacity10
+    Name: Tenacity Lv10
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bShortAtkRate,44;
+      bonus bPerfectHitAddRate,10;
   - Id: 29995
     AegisName: C_Sakura_Fes_TW
     Name: Sakura Festival
@@ -146235,7 +146495,7 @@ Body:
       if (.@r>=9) {
          bonus bAspdRate,7;
          if (getallrefine() >= 22) {
-            autobonus "{ .@g = getenchantgrade(); if (.@g >= ENCHANTGRADE_D) { .@val = 25; if (.@g >= ENCHANTGRADE_C) { .@val += 25; } } bonus bStr,175+.@val; }",1,10000,BF_WEAPON;
+            autobonus "{ .@g = getenchantgrade(); if (.@g >= ENCHANTGRADE_D) { .@val = 25; if (.@g >= ENCHANTGRADE_C) { .@val += 25; } } bonus bStr,75+.@val; }",1,10000,BF_WEAPON;
             if (getallrefine() >= 26) {
                bonus bShortAtkRate,7;
             }
@@ -146263,7 +146523,7 @@ Body:
       if (.@r>=9) {
          bonus bAspdRate,7;
          if (getallrefine() >= 22) {
-            autobonus "{ .@g = getenchantgrade(); if (.@g >= ENCHANTGRADE_D) { .@val = 25; if (.@g >= ENCHANTGRADE_C) { .@val += 25; } } bonus bDex,175+.@val; }",1,10000,BF_WEAPON|BF_MAGIC;
+            autobonus "{ .@g = getenchantgrade(); if (.@g >= ENCHANTGRADE_D) { .@val = 25; if (.@g >= ENCHANTGRADE_C) { .@val += 25; } } bonus bDex,75+.@val; }",1,10000,BF_WEAPON|BF_MAGIC;
             if (getallrefine() >= 26) {
                bonus bFixedCast,-500;
             }
@@ -146293,7 +146553,7 @@ Body:
          bonus bAspdRate,5;
          bonus bVariableCastrate,-5;
          if (getallrefine() >= 22) {
-            autobonus "{ .@g = getenchantgrade(); if (.@g >= ENCHANTGRADE_D) { .@val = 25; if (.@g >= ENCHANTGRADE_C) { .@val += 25; } } bonus bVit,175+.@val; }",1,10000,BF_WEAPON|BF_MAGIC;
+            autobonus "{ .@g = getenchantgrade(); if (.@g >= ENCHANTGRADE_D) { .@val = 25; if (.@g >= ENCHANTGRADE_C) { .@val += 25; } } bonus bVit,75+.@val; }",1,10000,BF_WEAPON|BF_MAGIC;
             if (getallrefine() >= 26) {
                bonus bDelayrate,-5;
             }
@@ -146322,7 +146582,7 @@ Body:
       if (.@r>=9) {
          bonus bVariableCastrate,-7;
          if (getallrefine() >= 22) {
-            autobonus "{ .@g = getenchantgrade(); if (.@g >= ENCHANTGRADE_D) { .@val = 25; if (.@g >= ENCHANTGRADE_C) { .@val += 25; } } bonus bInt,175+.@val; }",1,10000,BF_MAGIC;
+            autobonus "{ .@g = getenchantgrade(); if (.@g >= ENCHANTGRADE_D) { .@val = 25; if (.@g >= ENCHANTGRADE_C) { .@val += 25; } } bonus bInt,75+.@val; }",1,10000,BF_MAGIC;
             if (getallrefine() >= 26) {
                bonus2 bMagicAtkEle,Ele_All,7;
             }
@@ -146350,7 +146610,7 @@ Body:
       if (.@r>=9) {
          bonus bAspdRate,7;
          if (getallrefine() >= 22) {
-            autobonus "{ .@g = getenchantgrade(); if (.@g >= ENCHANTGRADE_D) { .@val = 25; if (.@g >= ENCHANTGRADE_C) { .@val += 25; } } bonus bAgi,175+.@val; }",1,10000,BF_WEAPON;
+            autobonus "{ .@g = getenchantgrade(); if (.@g >= ENCHANTGRADE_D) { .@val = 25; if (.@g >= ENCHANTGRADE_C) { .@val += 25; } } bonus bAgi,75+.@val; }",1,10000,BF_WEAPON;
             if (getallrefine() >= 26) {
                bonus bLongAtkRate,4;
                bonus bShortAtkRate,4;
@@ -146379,7 +146639,7 @@ Body:
       if (.@r>=9) {
          bonus bAspdRate,7;
          if (getallrefine() >= 22) {
-            autobonus "{ .@g = getenchantgrade(); if (.@g >= ENCHANTGRADE_D) { .@val = 25; if (.@g >= ENCHANTGRADE_C) { .@val += 25; } } bonus bLuk,175+.@val; }",1,10000,BF_WEAPON;
+            autobonus "{ .@g = getenchantgrade(); if (.@g >= ENCHANTGRADE_D) { .@val = 25; if (.@g >= ENCHANTGRADE_C) { .@val += 25; } } bonus bLuk,75+.@val; }",1,10000,BF_WEAPON;
             if (getallrefine() >= 26) {
                bonus bCritAtkRate,7;
                bonus bCritical,7;
