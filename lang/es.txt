@@ -1235,11 +1235,11 @@ tr: ¡Has ganado!
 fr: Gras
 tr: Negrita
 
-fr: HP %d / %d
-tr: HP %d / %d
+fr: HP %d/%d
+tr: HP %d/%d
 
-fr: HP. %d / %d
-tr: HP. %d / %d
+fr: HP. %d/%d
+tr: HP. %d/%d
 
 fr: Hauteur de midi (°)
 tr: Altura de mediodía (°)
@@ -2192,11 +2192,11 @@ tr: Restablecer el recorrido
 fr: S'assied, ou se relève.
 tr: Se sienta, o se levanta.
 
-fr: SP %d / %d
-tr: SP %d / %d
+fr: SP %d/%d
+tr: SP %d/%d
 
-fr: SP. %d / %d
-tr: SP. %d / %d
+fr: SP. %d/%d
+tr: SP. %d/%d
 
 fr: Sans bavure
 tr: Sin fallos

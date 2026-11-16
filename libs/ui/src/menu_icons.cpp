@@ -93,6 +93,9 @@ constexpr ImU32 kDotRing = IM_COL32(255, 255, 255, 255);
 constexpr unsigned kUtf8LeadMask = 0xC0U;
 constexpr unsigned kUtf8Continuation = 0x80U;
 
+// Le milieu d'une ligne de texture, en lignes depuis son bord haut.
+constexpr float kTexelCenter = 0.5F;
+
 // L'IMAGE À PEINDRE pour cet état, et si c'est le « nouveau ». Elle est vide
 // quand l'installation n'a pas l'icône.
 //
@@ -252,6 +255,35 @@ struct GridRanks {
               (kMenuIconsDockTop - kMenuGridAboveDock - kMenuIconNewsLift) * scale};
 }
 
+// LE PANNEAU SOMBRE, du dessous du bandeau jusqu'au bas de la grille.
+//
+// L'image du jeu couvre cinq rangées. Une grille plus courte la coupe à son
+// bas, sans liseré. Une grille plus haute l'allonge par son corps : une ligne
+// de ce corps s'étire jusqu'au pied, posé tel quel contre le bas.
+//
+// ⚠ UNE SEULE LIGNE, PRISE EN SON MILIEU : étiré entre deux lignes, le corps
+// prendrait un peu du pied sous un échantillonnage lissé.
+void PaintGridPanel(const achievement::Painter& paint, const SkinImage& panel, float height) {
+  if (!panel.usable()) {
+    return;
+  }
+  const float room = height - kMenuGridBackgroundTop;
+  if (room <= panel.height) {
+    paint.PushClip(0.0F, kMenuGridBackgroundTop, kMenuGridWidth, room);
+    paint.Image(panel, 0.0F, kMenuGridBackgroundTop);
+    paint.PopClip();
+    return;
+  }
+  const float foot_top = height - kMenuGridPanelFoot;
+  const float body_v = kTexelCenter / panel.height;
+  const float foot_v = (panel.height - kMenuGridPanelFoot) / panel.height;
+  ImDrawList* const into = paint.into();
+  into->AddImage(panel.id, paint.At(0.0F, kMenuGridBackgroundTop), paint.At(panel.width, foot_top),
+                 ImVec2(0.0F, body_v), ImVec2(1.0F, body_v));
+  into->AddImage(panel.id, paint.At(0.0F, foot_top), paint.At(panel.width, height),
+                 ImVec2(0.0F, foot_v), ImVec2(1.0F, 1.0F));
+}
+
 // LA GRILLE ACCROCHÉE : son panneau sombre et son bandeau de tête, dans une
 // fenêtre à elle, posée sous les icônes. Rend vrai quand les icônes s'y montrent.
 //
@@ -260,7 +292,7 @@ struct GridRanks {
 [[nodiscard]] bool DrawDockedGrid(MenuIconsState& state, std::span<const MenuIconView> icons,
                                   std::size_t grid_count, const SkinArt& art, float scale) {
   const ImVec2 top_left(state.dock->x, state.dock->y - kMenuGridAboveDock * scale);
-  const float height = grid_count > kMenuGridTallAfter ? kMenuGridTallHeight : kMenuGridHeight;
+  const float height = MenuGridHeight(grid_count);
   const bool news = std::ranges::any_of(icons, [](const MenuIconView& icon) {
     return icon.news_lit && !MenuIconOf(icon.command).off_grid;
   });
@@ -285,10 +317,7 @@ struct GridRanks {
     ImGui::BringWindowToDisplayBack(ImGui::GetCurrentWindow());
     const achievement::Painter paint(ImGui::GetWindowDrawList(), top_left, scale);
     if (state.grid_open) {
-      // LE PANNEAU COUPÉ au bas de la grille : l'image est plus haute qu'elle.
-      paint.PushClip(0.0F, kMenuGridBackgroundTop, kMenuGridWidth, height - kMenuGridBackgroundTop);
-      paint.Image(art.Get(render::SkinPiece::kMenuGridBackground), 0.0F, kMenuGridBackgroundTop);
-      paint.PopClip();
+      PaintGridPanel(paint, art.Get(render::SkinPiece::kMenuGridBackground), height);
       // Le reste du rectangle arrête les clics : rien ne passe au monde.
       static_cast<void>(paint.Hit("##panneau", 0.0F, band_top + band_height, kMenuGridWidth,
                                   height - band_top - band_height));
@@ -554,6 +583,14 @@ ImVec2 DefaultMenuButtonCorner(std::size_t grid_count, float scale) {
 
 float MenuIconsHomeRight(float scale) {
   return (kMenuIconsScreenMargin + MenuIconsGridSize(kMenuIconsPerRow).x) * scale;
+}
+
+float MenuGridHeight(std::size_t grid_count) {
+  if (grid_count <= kMenuGridTallAfter) {
+    return kMenuGridHeight;
+  }
+  const std::size_t rows = (grid_count + kMenuIconsPerRow - 1) / kMenuIconsPerRow;
+  return kMenuIconsDockTop + static_cast<float>(rows) * kMenuIconRowPitch;
 }
 
 MenuIconsAnswer DrawMenuIcons(MenuIconsState& state, std::span<const MenuIconView> icons,

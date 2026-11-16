@@ -1235,11 +1235,11 @@ tr: You win!
 fr: Gras
 tr: Bold
 
-fr: HP %d / %d
-tr: HP %d / %d
+fr: HP %d/%d
+tr: HP %d/%d
 
-fr: HP. %d / %d
-tr: HP. %d / %d
+fr: HP. %d/%d
+tr: HP. %d/%d
 
 fr: Hauteur de midi (°)
 tr: Noon altitude (°)
@@ -2192,11 +2192,11 @@ tr: Reset the course
 fr: S'assied, ou se relève.
 tr: Sits down, or stands up.
 
-fr: SP %d / %d
-tr: SP %d / %d
+fr: SP %d/%d
+tr: SP %d/%d
 
-fr: SP. %d / %d
-tr: SP. %d / %d
+fr: SP. %d/%d
+tr: SP. %d/%d
 
 fr: Sans bavure
 tr: Clean Sweep

@@ -54,6 +54,10 @@ void Game::AdvanceStatusPortrait(std::uint32_t now_ms) {
       settings_->options().stat_bars().basic_info_window && link_.is_open() &&
       ComposeBasicInfo(windows_.basic_info->view, world_, pieces_.job_names,
                        LabelOfBinding(settings_->bindings().Of(GameAction::kToggleBasicInfo)));
+  // Sa puce mène à la page « Basic Info » des options, où elle se règle.
+  if (std::exchange(windows_.basic_info->settings_asked, false)) {
+    GameSettings::OpenOptionsAt(windows_, OptionSection::kStatBars);
+  }
   StatusPortraitOptions& options = settings_->options().pages().portrait;
   windows_.status_portrait->look = &options.look();
   // Un cadre déplacé s'écrit, une fois : `Touch` arme l'anti-rebond du fichier.

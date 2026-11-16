@@ -57,7 +57,7 @@ constexpr float kTitleTilePixels = 12.0F;
 // noir par-dessus.
 constexpr float kTitleLeft = 17.0F;
 constexpr float kTitleTop = 2.0F;
-// Les deux boutons de la barre : la puce, qui ne fait rien, et le repli.
+// Les deux boutons de la barre : la puce, qui mène aux réglages, et le repli.
 constexpr float kButtonPixels = 11.0F;
 constexpr float kButtonTop = 3.0F;
 constexpr float kBulletLeft = 3.0F;
@@ -279,15 +279,19 @@ void PaintFolded(const Painter& paint, const BasicInfoView& view) {
 
   // LA LIGNE DES JAUGES : la vie, un séparateur, la magie. ⚠ LE POINT APRÈS
   // « HP » ET « SP » TOMBE avec la forme courte de la ligne du dessus.
+  //
+  // 🔴 SANS ESPACE AUTOUR DE LA BARRE, à l'écart du jeu, qui écrit « 900 / 1000 » :
+  // avec des millions de HP, sa ligne sort de la fenêtre et la fin des SP se
+  // perd. Écart choisi par le joueur.
   const bool narrow = shortened;
   Line text{};
   float x = left;
   if (view.max_hp != 0) {
     if (narrow) {
-      std::snprintf(text.data(), text.size(), core::Tr("HP %d / %d"), static_cast<int>(view.hp),
+      std::snprintf(text.data(), text.size(), core::Tr("HP %d/%d"), static_cast<int>(view.hp),
                     static_cast<int>(view.max_hp));
     } else {
-      std::snprintf(text.data(), text.size(), core::Tr("HP. %d / %d"), static_cast<int>(view.hp),
+      std::snprintf(text.data(), text.size(), core::Tr("HP. %d/%d"), static_cast<int>(view.hp),
                     static_cast<int>(view.max_hp));
     }
     paint.Text(x - kGlyphBearing, kFoldedGaugesTop, text.data(), kTextBody,
@@ -299,10 +303,10 @@ void PaintFolded(const Painter& paint, const BasicInfoView& view) {
   }
   if (view.max_sp >= 0) {
     if (narrow) {
-      std::snprintf(text.data(), text.size(), core::Tr("SP %d / %d"), static_cast<int>(view.sp),
+      std::snprintf(text.data(), text.size(), core::Tr("SP %d/%d"), static_cast<int>(view.sp),
                     static_cast<int>(view.max_sp));
     } else {
-      std::snprintf(text.data(), text.size(), core::Tr("SP. %d / %d"), static_cast<int>(view.sp),
+      std::snprintf(text.data(), text.size(), core::Tr("SP. %d/%d"), static_cast<int>(view.sp),
                     static_cast<int>(view.max_sp));
     }
     paint.Text(x - kGlyphBearing, kFoldedGaugesTop, text.data(), kTextBody,
@@ -487,9 +491,14 @@ BasicInfoAnswer DrawBasicInfoWindow(BasicInfoWindowState& state, const BasicInfo
     // ⚠ LES DEUX BOUTONS AVANT LA PRISE : ImGui donne le survol au premier
     // posé, et la prise couvre toute la barre.
     //
-    // La puce ne fait rien, mais elle s'allume au survol comme partout.
-    static_cast<void>(TitleButton(paint, art, "##puce", kBulletLeft, SkinPiece::kBulletOff,
-                                  SkinPiece::kBulletOn));
+    // LA PUCE MÈNE À LA PAGE DE RÉGLAGES, comme celle des autres fenêtres. ⚠ SON
+    // DESSIN NE LE DIT PAS : la main qui pointe et l'infobulle l'annoncent.
+    answer.settings_asked =
+        TitleButton(paint, art, "##puce", kBulletLeft, SkinPiece::kBulletOff, SkinPiece::kBulletOn);
+    if (ImGui::IsItemHovered()) {
+      ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
+      SkinTooltipFormat("%s", core::Tr("Réglages de cette fenêtre"));
+    }
     bool toggle = TitleButton(paint, art, "##replier", kCollapseLeft, SkinPiece::kCollapseOff,
                               SkinPiece::kCollapseOn);
     if (ImGui::IsItemHovered() && !view.toggle_keys.empty()) {

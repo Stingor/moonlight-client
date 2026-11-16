@@ -425,8 +425,10 @@ UiStage::Answers UiStage::Draw(
   // LA GRILLE D'ICÔNES DE MENU AVEC ELLE, et pour la même raison : elle reste à
   // l'écran, et ce qu'elle ouvre doit passer devant. Elle s'accroche sous la
   // fenêtre « Basic Info », dessinée juste avant.
-  windows.menu_icons->state.dock =
-      ro::ui::DrawBasicInfoWindow(windows.basic_info->state, windows.basic_info->view, skin_).dock;
+  const ro::ui::BasicInfoAnswer basic_info =
+      ro::ui::DrawBasicInfoWindow(windows.basic_info->state, windows.basic_info->view, skin_);
+  windows.menu_icons->state.dock = basic_info.dock;
+  windows.basic_info->settings_asked = basic_info.settings_asked;
   if (windows.menu_icons->look != nullptr) {
     const ro::ui::MenuIconsAnswer menu =
         ro::ui::DrawMenuIcons(windows.menu_icons->state, windows.menu_icons->icons,

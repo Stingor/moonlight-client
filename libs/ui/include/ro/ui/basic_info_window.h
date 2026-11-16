@@ -24,7 +24,8 @@ namespace ro::ui {
 // double-clic dessus la replie ou la déplie, comme son bouton.
 //
 // ⚠ ELLE NE POSSÈDE AUCUN ÉTAT DE JEU : elle reçoit des nombres et des noms, et
-// ne rend que le coin sous lequel la grille d'icônes de menu s'accroche.
+// ne rend que le coin sous lequel la grille d'icônes de menu s'accroche, et le
+// clic sur sa puce.
 
 // L'IDENTITÉ DE LA FENÊTRE, qui porte sa place. ⚠ ELLE NE SE TRADUIT PAS.
 inline constexpr const char* kBasicInfoWindowId = "basic_info";
@@ -104,6 +105,9 @@ struct BasicInfoAnswer {
   // LE COIN BAS-GAUCHE DE LA FENÊTRE, à l'écran, quand elle est montrée : la
   // grille d'icônes de menu s'y accroche.
   std::optional<ImVec2> dock;
+  // La puce de la barre de titre a été cliquée : le joueur veut la page de
+  // réglages de la fenêtre.
+  bool settings_asked = false;
 };
 
 // ── LES RÈGLES, séparées du dessin pour s'éprouver sans écran ──────────────

@@ -383,3 +383,22 @@ TEST_CASE("Icônes accrochées : le panneau de la grille reste derrière les ic�
   // Dessiné d'abord, il est en dessous : il n'assombrit ni ne couvre rien.
   CHECK(rank_of("##grille_accrochee") < rank_of("##menu_icon_status"));
 }
+
+TEST_CASE("Icônes accrochées : la grille prend la hauteur de ses rangées", "[ui][menu_icons]") {
+  // L'image du panneau, haute de 225, finit avec la cinquième rangée.
+  constexpr float kPanelImageHeight = 225.0F;
+  constexpr float kFiveRowsHeight = ro::ui::kMenuGridBackgroundTop + kPanelImageHeight;
+  constexpr std::size_t kFiveRows = 5 * ro::ui::kMenuIconsPerRow;
+  // Jusqu'à vingt icônes, les quatre rangées du jeu.
+  CHECK(ro::ui::MenuGridHeight(0) == ro::ui::kMenuGridHeight);
+  CHECK(ro::ui::MenuGridHeight(ro::ui::kMenuGridTallAfter) == ro::ui::kMenuGridHeight);
+  CHECK(ro::ui::MenuGridHeight(ro::ui::kMenuGridTallAfter + 1) == kFiveRowsHeight);
+  CHECK(ro::ui::MenuGridHeight(kFiveRows) == kFiveRowsHeight);
+  // 🔴 AU-DELÀ, CHAQUE RANGÉE ALLONGE LA GRILLE D'UN PAS : aucune icône ne reste
+  // sous le panneau, quel que soit leur nombre.
+  CHECK(ro::ui::MenuGridHeight(kFiveRows + 1) == kFiveRowsHeight + ro::ui::kMenuIconRowPitch);
+  CHECK(ro::ui::MenuGridHeight(kFiveRows + ro::ui::kMenuIconsPerRow) ==
+        kFiveRowsHeight + ro::ui::kMenuIconRowPitch);
+  CHECK(ro::ui::MenuGridHeight(kFiveRows + ro::ui::kMenuIconsPerRow + 1) ==
+        kFiveRowsHeight + 2.0F * ro::ui::kMenuIconRowPitch);
+}

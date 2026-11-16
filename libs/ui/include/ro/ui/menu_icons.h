@@ -261,9 +261,9 @@ struct MenuIconsState {
 // bas de la fenêtre : son bandeau de tête recouvre le bas de « Basic Info ».
 inline constexpr float kMenuGridAboveDock = 4.0F;
 inline constexpr float kMenuGridWidth = 220.0F;
-// Haute de quatre rangées, de cinq au-delà de vingt icônes.
+// Haute de quatre rangées jusqu'à vingt icônes ; au-delà, de ses rangées
+// entières — voir `MenuGridHeight`.
 inline constexpr float kMenuGridHeight = 197.0F;
-inline constexpr float kMenuGridTallHeight = 238.0F;
 inline constexpr std::size_t kMenuGridTallAfter = 20;
 // Le bandeau : 219 × 9, quatre pixels sous le haut ; celui du « nouveau »
 // déborde de quatre pixels au-dessus et se pose au haut même.
@@ -273,9 +273,22 @@ inline constexpr float kMenuGridBandHeight = 9.0F;
 inline constexpr float kMenuGridNewsBandHeight = 13.0F;
 // Le panneau sombre commence sous le bandeau.
 inline constexpr float kMenuGridBackgroundTop = 13.0F;
+// LE PIED DU PANNEAU : ses cinq dernières lignes, qui portent le liseré du bas,
+// son ombre et le coin arrondi. Au-dessus de lui, toutes les lignes de l'image
+// sont la même.
+inline constexpr float kMenuGridPanelFoot = 5.0F;
 // La première icône, depuis le coin de la grille.
 inline constexpr float kMenuIconsDockLeft = 9.0F;
 inline constexpr float kMenuIconsDockTop = 23.0F;
+
+// LA HAUTEUR DE LA GRILLE ACCROCHÉE pour ce nombre de cases, en pixels d'art.
+//
+// 🔴 LE PANNEAU COUVRE TOUTES LES RANGÉES, y compris celles que le jeu n'a pas :
+// son image s'arrête à la cinquième, et ce client en montre davantage. Au-delà
+// de vingt icônes, la grille prend donc la hauteur de ses rangées entières —
+// cinq font exactement celle où l'image du jeu finit —, et chaque rangée de
+// plus l'allonge d'un pas.
+[[nodiscard]] float MenuGridHeight(std::size_t grid_count);
 
 inline constexpr const char* kMenuPlaceholderId = "menu_placeholder";
 

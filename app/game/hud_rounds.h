@@ -31,11 +31,14 @@ struct StatusPortraitRound {
 };
 
 // LA FENÊTRE « BASIC INFO » DU JEU : sa vue est recomposée par `app` à chaque
-// image, et elle ne rend que le coin où la grille d'icônes s'accroche. Sa taille
-// repliée ou dépliée est retenue avec la disposition du personnage.
+// image, et elle rend le coin où la grille d'icônes s'accroche et le clic sur
+// sa puce. Sa taille repliée ou dépliée est retenue avec la disposition du
+// personnage.
 struct BasicInfoRound {
   ro::ui::BasicInfoWindowState state;
   ro::ui::BasicInfoView view;
+  // Sa puce a été cliquée : `app` ouvre sa page de réglages à l'image suivante.
+  bool settings_asked = false;
 };
 
 // LA PETITE FENÊTRE DE STATUT, à côté de la fiche, même aller-retour : sa vue
