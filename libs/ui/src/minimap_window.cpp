@@ -149,8 +149,13 @@ void Engage(MinimapWindowState& state, const MinimapSettings& settings, ImVec2 c
   // LE RAPPEL DU GESTE, après un temps de survol : rien d'autre à l'écran ne
   // dit que la carte redevient saisissable. Sans Maj la souris traverse, donc
   // la bulle ne recouvre que ce qu'on regardait déjà.
+  //
+  // Une fenêtre posée sur la carte prend la souris : la bulle se tait, sans
+  // quoi elle se fondrait dans l'infobulle de cette fenêtre, ImGui n'en
+  // tenant qu'une par image.
   const bool engaged = state.shift_engaged || state.menu_open;
-  if (settings.click_through && over && !engaged) {
+  const bool covered = ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow);
+  if (settings.click_through && over && !engaged && !covered) {
     state.hint_hover_seconds += io.DeltaTime;
     if (state.hint_hover_seconds >= kHintHoverSeconds) {
       SkinTooltipFormat("%s",
