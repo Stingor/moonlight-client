@@ -135787,6 +135787,1058 @@ Body:
       bonus2 bMagicAtkEle,Ele_All,7;
       bonus bLongAtkRate,7;
       bonus bShortAtkRate,7;
+  - Id: 310674
+    AegisName: Star_Cluster_Of_Pow1
+    Name: Star Cluster of Power Lv1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@param = (readparam(bPow)/15);
+      .@g = getenchantgrade();
+      bonus bShortAtkRate,.@param;
+      bonus bBaseAtk,5*.@param;
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus bShortAtkRate,.@param;
+         bonus2 bAddClass,Class_All,.@param;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bShortAtkRate,.@param;
+            bonus2 bAddClass,Class_All,.@param;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bShortAtkRate,.@param;
+               bonus2 bAddClass,Class_All,.@param;
+               if (.@g >= ENCHANTGRADE_A) {
+                  bonus bShortAtkRate,.@param;
+                  bonus2 bAddClass,Class_All,.@param;
+               }
+            }
+         }
+      }
+  - Id: 310675
+    AegisName: Star_Cluster_Of_Pow2
+    Name: Star Cluster of Power Lv2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@param = (readparam(bPow)/15);
+      .@g = getenchantgrade();
+      bonus bShortAtkRate,.@param;
+      bonus bBaseAtk,7*.@param;
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus bShortAtkRate,.@param;
+         bonus2 bAddClass,Class_All,.@param;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bShortAtkRate,.@param;
+            bonus2 bAddClass,Class_All,.@param;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bShortAtkRate,.@param;
+               bonus2 bAddClass,Class_All,2*.@param;
+               if (.@g >= ENCHANTGRADE_A) {
+                  bonus bShortAtkRate,2*.@param;
+                  bonus2 bAddClass,Class_All,2*.@param;
+               }
+            }
+         }
+      }
+  - Id: 310676
+    AegisName: Star_Cluster_Of_Pow3
+    Name: Star Cluster of Power Lv3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@param = (readparam(bPow)/15);
+      .@g = getenchantgrade();
+      bonus bShortAtkRate,2*.@param;
+      bonus bBaseAtk,15*.@param;
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus bShortAtkRate,.@param;
+         bonus2 bAddClass,Class_All,.@param;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bShortAtkRate,.@param;
+            bonus2 bAddClass,Class_All,2*.@param;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bShortAtkRate,2*.@param;
+               bonus2 bAddClass,Class_All,2*.@param;
+               if (.@g >= ENCHANTGRADE_A) {
+                  bonus bShortAtkRate,3*.@param;
+                  bonus2 bAddClass,Class_All,3*.@param;
+               }
+            }
+         }
+      }
+  - Id: 310677
+    AegisName: Star_Cluster_Of_Sta1
+    Name: Star Cluster of Stamina Lv1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@param = (readparam(bSta)/15);
+      .@g = getenchantgrade();
+      bonus bMaxHPrate,.@param;
+      bonus bNearAtkDef,80*(.@param)/((.@param)+400); bonus bLongAtkDef,80*(.@param)/((.@param)+400);
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus bMaxHPrate,.@param;
+         bonus bNearAtkDef,80*(.@param)/((.@param)+400); bonus bLongAtkDef,80*(.@param)/((.@param)+400);
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bMaxHPrate,.@param;
+            bonus bNearAtkDef,80*(.@param)/((.@param)+400); bonus bLongAtkDef,80*(.@param)/((.@param)+400);
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bMaxHPrate,.@param;
+               bonus bNearAtkDef,80*(.@param)/((.@param)+400); bonus bLongAtkDef,80*(.@param)/((.@param)+400);
+               if (.@g >= ENCHANTGRADE_A) {
+                  bonus bMaxHPrate,.@param;
+                  bonus bNearAtkDef,80*(2*.@param)/((2*.@param)+400); bonus bLongAtkDef,80*(2*.@param)/((2*.@param)+400);
+               }
+            }
+         }
+      }
+  - Id: 310678
+    AegisName: Star_Cluster_Of_Sta2
+    Name: Star Cluster of Stamina Lv2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@param = (readparam(bSta)/15);
+      .@g = getenchantgrade();
+      bonus bMaxHPrate,2*.@param;
+      bonus bNearAtkDef,80*(2*.@param)/((2*.@param)+400); bonus bLongAtkDef,80*(2*.@param)/((2*.@param)+400);
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus bMaxHPrate,.@param;
+         bonus bNearAtkDef,80*(.@param)/((.@param)+400); bonus bLongAtkDef,80*(.@param)/((.@param)+400);
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bMaxHPrate,.@param;
+            bonus bNearAtkDef,80*(.@param)/((.@param)+400); bonus bLongAtkDef,80*(.@param)/((.@param)+400);
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bMaxHPrate,2*.@param;
+               bonus bNearAtkDef,80*(.@param)/((.@param)+400); bonus bLongAtkDef,80*(.@param)/((.@param)+400);
+               if (.@g >= ENCHANTGRADE_A) {
+                  bonus bMaxHPrate,2*.@param;
+                  bonus bNearAtkDef,80*(2*.@param)/((2*.@param)+400); bonus bLongAtkDef,80*(2*.@param)/((2*.@param)+400);
+               }
+            }
+         }
+      }
+  - Id: 310679
+    AegisName: Star_Cluster_Of_Sta3
+    Name: Star Cluster of Stamina Lv3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@param = (readparam(bSta)/15);
+      .@g = getenchantgrade();
+      bonus bMaxHPrate,3*.@param;
+      bonus bNearAtkDef,80*(4*.@param)/((4*.@param)+400); bonus bLongAtkDef,80*(4*.@param)/((4*.@param)+400);
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus bMaxHPrate,.@param;
+         bonus bNearAtkDef,80*(.@param)/((.@param)+400); bonus bLongAtkDef,80*(.@param)/((.@param)+400);
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bMaxHPrate,2*.@param;
+            bonus bNearAtkDef,80*(2*.@param)/((2*.@param)+400); bonus bLongAtkDef,80*(2*.@param)/((2*.@param)+400);
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bMaxHPrate,2*.@param;
+               bonus bNearAtkDef,80*(2*.@param)/((2*.@param)+400); bonus bLongAtkDef,80*(2*.@param)/((2*.@param)+400);
+               if (.@g >= ENCHANTGRADE_A) {
+                  bonus bMaxHPrate,3*.@param;
+                  bonus bNearAtkDef,80*(3*.@param)/((3*.@param)+400); bonus bLongAtkDef,80*(3*.@param)/((3*.@param)+400);
+               }
+            }
+         }
+      }
+  - Id: 310680
+    AegisName: Star_Cluster_Of_Con1
+    Name: Star Cluster of Concentration Lv1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@param = (readparam(bCon)/15);
+      .@g = getenchantgrade();
+      bonus bLongAtkRate,.@param;
+      bonus bBaseAtk,5*.@param;
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus bLongAtkRate,.@param;
+         bonus2 bAddClass,Class_All,.@param;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bLongAtkRate,.@param;
+            bonus2 bAddClass,Class_All,.@param;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bLongAtkRate,.@param;
+               bonus2 bAddClass,Class_All,.@param;
+               if (.@g >= ENCHANTGRADE_A) {
+                  bonus bLongAtkRate,.@param;
+                  bonus2 bAddClass,Class_All,2*.@param;
+               }
+            }
+         }
+      }
+  - Id: 310681
+    AegisName: Star_Cluster_Of_Con2
+    Name: Star Cluster of Concentration Lv2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@param = (readparam(bCon)/15);
+      .@g = getenchantgrade();
+      bonus bLongAtkRate,2*.@param;
+      bonus bBaseAtk,7*.@param;
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus bLongAtkRate,.@param;
+         bonus2 bAddClass,Class_All,.@param;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bLongAtkRate,.@param;
+            bonus2 bAddClass,Class_All,.@param;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bLongAtkRate,.@param;
+               bonus2 bAddClass,Class_All,2*.@param;
+               if (.@g >= ENCHANTGRADE_A) {
+                  bonus bLongAtkRate,2*.@param;
+                  bonus2 bAddClass,Class_All,2*.@param;
+               }
+            }
+         }
+      }
+  - Id: 310682
+    AegisName: Star_Cluster_Of_Con3
+    Name: Star Cluster of Concentration Lv3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@param = (readparam(bCon)/15);
+      .@g = getenchantgrade();
+      bonus bLongAtkRate,2*.@param;
+      bonus bBaseAtk,15*.@param;
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus bLongAtkRate,.@param;
+         bonus2 bAddClass,Class_All,.@param;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bLongAtkRate,2*.@param;
+            bonus2 bAddClass,Class_All,2*.@param;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bLongAtkRate,2*.@param;
+               bonus2 bAddClass,Class_All,2*.@param;
+               if (.@g >= ENCHANTGRADE_A) {
+                  bonus bLongAtkRate,3*.@param;
+                  bonus2 bAddClass,Class_All,3*.@param;
+               }
+            }
+         }
+      }
+  - Id: 310683
+    AegisName: Star_Cluster_Of_Crt1
+    Name: Star Cluster of Creative Lv1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@param = (readparam(bCrt)/15);
+      .@g = getenchantgrade();
+      bonus bCritAtkRate,.@param;
+      bonus bBaseAtk,5*.@param;
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus bCritAtkRate,.@param;
+         bonus2 bAddClass,Class_All,.@param;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bCritAtkRate,.@param;
+            bonus2 bAddClass,Class_All,.@param;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bCritAtkRate,.@param;
+               bonus2 bAddClass,Class_All,.@param;
+               if (.@g >= ENCHANTGRADE_A) {
+                  bonus bCritAtkRate,.@param;
+                  bonus2 bAddClass,Class_All,.@param;
+               }
+            }
+         }
+      }
+  - Id: 310684
+    AegisName: Star_Cluster_Of_Crt2
+    Name: Star Cluster of Creative Lv2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@param = (readparam(bCrt)/15);
+      .@g = getenchantgrade();
+      bonus bCritAtkRate,2*.@param;
+      bonus bBaseAtk,7*.@param;
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus bCritAtkRate,.@param;
+         bonus2 bAddClass,Class_All,.@param;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bCritAtkRate,.@param;
+            bonus2 bAddClass,Class_All,.@param;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bCritAtkRate,.@param;
+               bonus2 bAddClass,Class_All,2*.@param;
+               if (.@g >= ENCHANTGRADE_A) {
+                  bonus bCritAtkRate,2*.@param;
+                  bonus2 bAddClass,Class_All,2*.@param;
+               }
+            }
+         }
+      }
+  - Id: 310685
+    AegisName: Star_Cluster_Of_Crt3
+    Name: Star Cluster of Creative Lv3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@param = (readparam(bCrt)/15);
+      .@g = getenchantgrade();
+      bonus bCritAtkRate,3*.@param;
+      bonus bBaseAtk,15*.@param;
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus bCritAtkRate,.@param;
+         bonus2 bAddClass,Class_All,.@param;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bCritAtkRate,.@param;
+            bonus2 bAddClass,Class_All,.@param;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bCritAtkRate,2*.@param;
+               bonus2 bAddClass,Class_All,3*.@param;
+               if (.@g >= ENCHANTGRADE_A) {
+                  bonus bCritAtkRate,3*.@param;
+                  bonus2 bAddClass,Class_All,3*.@param;
+               }
+            }
+         }
+      }
+  - Id: 310686
+    AegisName: Star_Cluster_Of_Spl1
+    Name: Star Cluster of Spell Lv1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@param = (readparam(bSpl)/15);
+      .@g = getenchantgrade();
+      bonus2 bMagicAtkEle,Ele_All,.@param;
+      bonus bMatk,5*.@param;
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus2 bMagicAtkEle,Ele_All,.@param;
+         bonus2 bMagicAddClass,Class_All,.@param;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus2 bMagicAtkEle,Ele_All,.@param;
+            bonus2 bMagicAddClass,Class_All,.@param;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus2 bMagicAtkEle,Ele_All,.@param;
+               bonus2 bMagicAddClass,Class_All,.@param;
+               if (.@g >= ENCHANTGRADE_A) {
+                  bonus2 bMagicAtkEle,Ele_All,.@param;
+                  bonus2 bMagicAddClass,Class_All,.@param;
+               }
+            }
+         }
+      }
+  - Id: 310687
+    AegisName: Star_Cluster_Of_Spl2
+    Name: Star Cluster of Spell Lv2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@param = (readparam(bSpl)/15);
+      .@g = getenchantgrade();
+      bonus2 bMagicAtkEle,Ele_All,2*.@param;
+      bonus bMatk,7*.@param;
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus2 bMagicAtkEle,Ele_All,.@param;
+         bonus2 bMagicAddClass,Class_All,.@param;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus2 bMagicAtkEle,Ele_All,.@param;
+            bonus2 bMagicAddClass,Class_All,.@param;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus2 bMagicAtkEle,Ele_All,2*.@param;
+               bonus2 bMagicAddClass,Class_All,.@param;
+               if (.@g >= ENCHANTGRADE_A) {
+                  bonus2 bMagicAtkEle,Ele_All,2*.@param;
+                  bonus2 bMagicAddClass,Class_All,2*.@param;
+               }
+            }
+         }
+      }
+  - Id: 310688
+    AegisName: Star_Cluster_Of_Spl3
+    Name: Star Cluster of Spell Lv3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@param = (readparam(bSpl)/15);
+      .@g = getenchantgrade();
+      bonus2 bMagicAtkEle,Ele_All,3*.@param;
+      bonus bMatk,15*.@param;
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus2 bMagicAtkEle,Ele_All,.@param;
+         bonus2 bMagicAddClass,Class_All,.@param;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus2 bMagicAtkEle,Ele_All,.@param;
+            bonus2 bMagicAddClass,Class_All,.@param;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus2 bMagicAtkEle,Ele_All,2*.@param;
+               bonus2 bMagicAddClass,Class_All,2*.@param;
+               if (.@g >= ENCHANTGRADE_A) {
+                  bonus2 bMagicAtkEle,Ele_All,3*.@param;
+                  bonus2 bMagicAddClass,Class_All,2*.@param;
+               }
+            }
+         }
+      }
+  - Id: 310689
+    AegisName: Star_Cluster_Of_Wis1
+    Name: Star Cluster of Wisdom Lv1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@param = (readparam(bWis)/15);
+      .@g = getenchantgrade();
+      bonus bMaxSPrate,.@param;
+      bonus bHealPower,.@param;
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus bMaxSPrate,.@param;
+         bonus bHealPower,.@param;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bSPrecovRate,.@param;
+            bonus bMaxSPrate,.@param;
+            bonus bHealPower,2*.@param;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bSPrecovRate,2*.@param;
+               bonus bMaxSPrate,.@param;
+               bonus bHealPower,2*.@param;
+               if (.@g >= ENCHANTGRADE_A) {
+                  bonus bHealPower,.@param;
+                  bonus bMaxSPrate,.@param;
+               }
+            }
+         }
+      }
+  - Id: 310690
+    AegisName: Star_Cluster_Of_Wis2
+    Name: Star Cluster of Wisdom Lv2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@param = (readparam(bWis)/15);
+      .@g = getenchantgrade();
+      bonus bMaxSPrate,.@param;
+      bonus bHealPower,3*.@param;
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus bMaxSPrate,.@param;
+         bonus bHealPower,2*.@param;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bSPrecovRate,.@param;
+            bonus bMaxSPrate,.@param;
+            bonus bHealPower,2*.@param;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bSPrecovRate,2*.@param;
+               bonus bHealPower,.@param;
+               bonus bMaxSPrate,.@param;
+               if (.@g >= ENCHANTGRADE_A) {
+                  bonus bHealPower,2*.@param;
+                  bonus bMaxSPrate,2*.@param;
+               }
+            }
+         }
+      }
+  - Id: 310691
+    AegisName: Star_Cluster_Of_Wis3
+    Name: Star Cluster of Wisdom Lv3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@param = (readparam(bWis)/15);
+      .@g = getenchantgrade();
+      bonus bMaxSPrate,2*.@param;
+      bonus bHealPower,5*.@param;
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus bMaxSPrate,.@param;
+         bonus bHealPower,2*.@param;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bSPrecovRate,2*.@param;
+            bonus bMaxSPrate,.@param;
+            bonus bHealPower,2*.@param;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bSPrecovRate,3*.@param;
+               bonus bHealPower,2*.@param;
+               bonus bMaxSPrate,2*.@param;
+               if (.@g >= ENCHANTGRADE_A) {
+                  bonus bHealPower,3*.@param;
+                  bonus bMaxSPrate,2*.@param;
+               }
+            }
+         }
+      }
+  - Id: 310692
+    AegisName: Star_Of_Mettle1
+    Name: Star of Mettle Lv1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,3;
+      bonus bHit,10;
+  - Id: 310693
+    AegisName: Star_Of_Mettle2
+    Name: Star of Mettle Lv2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,5;
+      bonus bHit,15;
+  - Id: 310694
+    AegisName: Star_Of_Mettle3
+    Name: Star of Mettle Lv3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,7;
+      bonus bHit,20;
+      bonus2 bAddClass,Class_All,1;
+  - Id: 310695
+    AegisName: Star_Of_Mettle4
+    Name: Star of Mettle Lv4
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,10;
+      bonus bHit,25;
+      bonus2 bAddClass,Class_All,2;
+  - Id: 310696
+    AegisName: Star_Of_Mettle5
+    Name: Star of Mettle Lv5
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,15;
+      bonus bHit,30;
+      bonus2 bAddClass,Class_All,4;
+  - Id: 310697
+    AegisName: Star_Of_MasterArcher1
+    Name: Star of Master Archer Lv1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bLongAtkRate,2;
+      bonus2 bAddClass,Class_All,2;
+  - Id: 310698
+    AegisName: Star_Of_MasterArcher2
+    Name: Star of Master Archer Lv2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bLongAtkRate,3;
+      bonus2 bAddClass,Class_All,3;
+  - Id: 310699
+    AegisName: Star_Of_MasterArcher3
+    Name: Star of Master Archer Lv3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bLongAtkRate,5;
+      bonus2 bAddClass,Class_All,5;
+      bonus2 bAddClass,Class_All,1;
+  - Id: 310700
+    AegisName: Star_Of_MasterArcher4
+    Name: Star of Master Archer Lv4
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bLongAtkRate,7;
+      bonus2 bAddClass,Class_All,6;
+      bonus2 bAddClass,Class_All,2;
+  - Id: 310701
+    AegisName: Star_Of_MasterArcher5
+    Name: Star of Master Archer Lv5
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bLongAtkRate,10;
+      bonus2 bAddClass,Class_All,7;
+      bonus2 bAddClass,Class_All,4;
+  - Id: 310702
+    AegisName: Star_Of_Sharp1
+    Name: Star of Sharp Lv1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bCritAtkRate,2;
+      bonus bCritical,2;
+  - Id: 310703
+    AegisName: Star_Of_Sharp2
+    Name: Star of Sharp Lv2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bCritAtkRate,3;
+      bonus bCritical,3;
+  - Id: 310704
+    AegisName: Star_Of_Sharp3
+    Name: Star of Sharp Lv3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bCritAtkRate,5;
+      bonus bCritical,5;
+      bonus2 bAddClass,Class_All,1;
+  - Id: 310705
+    AegisName: Star_Of_Sharp4
+    Name: Star of Sharp Lv4
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bCritAtkRate,10;
+      bonus bCritical,6;
+      bonus2 bAddClass,Class_All,2;
+  - Id: 310706
+    AegisName: Star_Of_Sharp5
+    Name: Star of Sharp Lv5
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bCritAtkRate,15;
+      bonus bCritical,8;
+      bonus bCritAtkRate,1;
+      bonus2 bAddClass,Class_All,2;
+  - Id: 310707
+    AegisName: Star_Of_Spell1
+    Name: Star of Spell Lv1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bVariableCastrate,-5;
+      bonus bMatk,5;
+  - Id: 310708
+    AegisName: Star_Of_Spell2
+    Name: Star of Spell Lv2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bVariableCastrate,-5;
+      bonus bMatk,7;
+  - Id: 310709
+    AegisName: Star_Of_Spell3
+    Name: Star of Spell Lv3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bVariableCastrate,-7;
+      bonus bMatk,11;
+      bonus2 bMagicAddClass,Class_All,1;
+  - Id: 310710
+    AegisName: Star_Of_Spell4
+    Name: Star of Spell Lv4
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bVariableCastrate,-10;
+      bonus bMatk,17;
+      bonus2 bMagicAddClass,Class_All,2;
+  - Id: 310711
+    AegisName: Star_Of_Spell5
+    Name: Star of Spell Lv5
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bVariableCastrate,-15;
+      bonus bMatk,25;
+      bonus2 bMagicAddClass,Class_All,4;
+  - Id: 310712
+    AegisName: Star_Of_Speed1
+    Name: Star of Speed Lv1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bFlee,5;
+      bonus bAspdRate,5;
+  - Id: 310713
+    AegisName: Star_Of_Speed2
+    Name: Star of Speed Lv2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bFlee,10;
+      bonus bAspdRate,7;
+  - Id: 310714
+    AegisName: Star_Of_Speed3
+    Name: Star of Speed Lv3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bFlee,15;
+      bonus bAspdRate,7;
+  - Id: 310715
+    AegisName: Star_Of_Speed4
+    Name: Star of Speed Lv4
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bFlee,20;
+      bonus bAspdRate,10;
+      bonus bAspd,1;
+  - Id: 310716
+    AegisName: Star_Of_Speed5
+    Name: Star of Speed Lv5
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bFlee,30;
+      bonus bAspdRate,15;
+      bonus bAspd,2;
+  - Id: 310717
+    AegisName: Star_Of_Vital1
+    Name: Star of Vital Lv1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMaxHPrate,2;
+      bonus bNearAtkDef,1; bonus bLongAtkDef,1;
+      bonus bMagicAtkDef,1;
+  - Id: 310718
+    AegisName: Star_Of_Vital2
+    Name: Star of Vital Lv2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMaxHPrate,3;
+      bonus bNearAtkDef,1; bonus bLongAtkDef,1;
+      bonus bMagicAtkDef,1;
+  - Id: 310719
+    AegisName: Star_Of_Vital3
+    Name: Star of Vital Lv3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMaxHPrate,5;
+      bonus bNearAtkDef,1; bonus bLongAtkDef,1;
+      bonus bMagicAtkDef,1;
+  - Id: 310720
+    AegisName: Star_Of_Vital4
+    Name: Star of Vital Lv4
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMaxHPrate,7;
+      bonus bNearAtkDef,1; bonus bLongAtkDef,1;
+      bonus bMagicAtkDef,1;
+  - Id: 310721
+    AegisName: Star_Of_Vital5
+    Name: Star of Vital Lv5
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMaxHPrate,10;
+      bonus bNearAtkDef,2; bonus bLongAtkDef,2;
+      bonus bMagicAtkDef,2;
+  - Id: 310722
+    AegisName: Star_Of_Spirit1
+    Name: Star of Spirit Lv1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bHealPower,5;
+      bonus bMaxSPrate,3;
+      bonus bSPrecovRate,10;
+  - Id: 310723
+    AegisName: Star_Of_Spirit2
+    Name: Star of Spirit Lv2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bHealPower,7;
+      bonus bMaxSPrate,5;
+      bonus bSPrecovRate,15;
+  - Id: 310724
+    AegisName: Star_Of_Spirit3
+    Name: Star of Spirit Lv3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bHealPower,10;
+      bonus bMaxSPrate,5;
+      bonus bHealPower,1;
+      bonus bSPrecovRate,15;
+  - Id: 310725
+    AegisName: Star_Of_Spirit4
+    Name: Star of Spirit Lv4
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bHealPower,10;
+      bonus bMaxSPrate,7;
+      bonus bHealPower,3;
+      bonus bSPrecovRate,15;
+  - Id: 310726
+    AegisName: Star_Of_Spirit5
+    Name: Star of Spirit Lv5
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bHealPower,15;
+      bonus bMaxSPrate,10;
+      bonus bHealPower,5;
+      bonus bSPrecovRate,20;
+  - Id: 310727
+    AegisName: Nebula_Of_FS1
+    Name: Nebula of Fighting Spirit Lv1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,10;
+      if (.@r>=9) {
+         bonus bBaseAtk,10;
+         if (getallrefine() >= 22) {
+            bonus bBaseAtk,15;
+         }
+      }
+  - Id: 310728
+    AegisName: Nebula_Of_FS2
+    Name: Nebula of Fighting Spirit Lv2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,15;
+      if (.@r>=9) {
+         bonus bBaseAtk,15;
+         if (getallrefine() >= 22) {
+            bonus bBaseAtk,30;
+         }
+      }
+  - Id: 310729
+    AegisName: Nebula_Of_FS3
+    Name: Nebula of Fighting Spirit Lv3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,20;
+      if (.@r>=9) {
+         bonus bBaseAtk,20;
+         if (getallrefine() >= 22) {
+            bonus bBaseAtk,40;
+         }
+      }
+  - Id: 310730
+    AegisName: Nebula_Of_EA1
+    Name: Nebula of Expert Archer Lv1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bLongAtkRate,3;
+      if (.@r>=9) {
+         bonus bLongAtkRate,3;
+         if (getallrefine() >= 22) {
+            bonus bLongAtkRate,4;
+         }
+      }
+  - Id: 310731
+    AegisName: Nebula_Of_EA2
+    Name: Nebula of Expert Archer Lv2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bLongAtkRate,5;
+      if (.@r>=9) {
+         bonus bLongAtkRate,5;
+         if (getallrefine() >= 22) {
+            bonus bLongAtkRate,7;
+         }
+      }
+  - Id: 310732
+    AegisName: Nebula_Of_EA3
+    Name: Nebula of Expert Archer Lv3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bLongAtkRate,7;
+      if (.@r>=9) {
+         bonus bLongAtkRate,7;
+         if (getallrefine() >= 22) {
+            bonus bLongAtkRate,15;
+         }
+      }
+  - Id: 310733
+    AegisName: Nebula_Of_SH1
+    Name: Nebula of Sharp Lv1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bCritAtkRate,5;
+      if (.@r>=9) {
+         bonus bCritAtkRate,5;
+         if (getallrefine() >= 22) {
+            bonus bCritAtkRate,7;
+         }
+      }
+  - Id: 310734
+    AegisName: Nebula_Of_SH2
+    Name: Nebula of Sharp Lv2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bCritAtkRate,7;
+      if (.@r>=9) {
+         bonus bCritAtkRate,7;
+         if (getallrefine() >= 22) {
+            bonus bCritAtkRate,12;
+         }
+      }
+  - Id: 310735
+    AegisName: Nebula_Of_SH3
+    Name: Nebula of Sharp Lv3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bCritAtkRate,10;
+      if (.@r>=9) {
+         bonus bCritAtkRate,10;
+         if (getallrefine() >= 22) {
+            bonus bCritAtkRate,15;
+         }
+      }
+  - Id: 310736
+    AegisName: Nebula_Of_SP1
+    Name: Nebula of Spell Lv1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMatk,10;
+      if (.@r>=9) {
+         bonus bMatk,10;
+         if (getallrefine() >= 22) {
+            bonus bMatk,15;
+         }
+      }
+  - Id: 310737
+    AegisName: Nebula_Of_SP2
+    Name: Nebula of Spell Lv2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMatk,15;
+      if (.@r>=9) {
+         bonus bMatk,15;
+         if (getallrefine() >= 22) {
+            bonus bMatk,30;
+         }
+      }
+  - Id: 310738
+    AegisName: Nebula_Of_SP3
+    Name: Nebula of Spell Lv3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMatk,20;
+      if (.@r>=9) {
+         bonus bMatk,20;
+         if (getallrefine() >= 22) {
+            bonus bMatk,40;
+         }
+      }
+  - Id: 310739
+    AegisName: Nebula_Of_HL1
+    Name: Nebula of Healing Lv1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMaxSPrate,3;
+      bonus bHealPower,5;
+      if (.@r>=9) {
+         bonus bMaxSPrate,2;
+         bonus bHealPower,3;
+         if (getallrefine() >= 22) {
+            bonus bMaxSPrate,3;
+            bonus bHealPower,5;
+         }
+      }
+  - Id: 310740
+    AegisName: Nebula_Of_HL2
+    Name: Nebula of Healing Lv2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMaxSPrate,5;
+      bonus bHealPower,7;
+      if (.@r>=9) {
+         bonus bMaxSPrate,3;
+         bonus bHealPower,5;
+         if (getallrefine() >= 22) {
+            bonus bMaxSPrate,5;
+            bonus bHealPower,7;
+         }
+      }
+  - Id: 310741
+    AegisName: Nebula_Of_HL3
+    Name: Nebula of Healing Lv3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMaxSPrate,5;
+      bonus bHealPower,10;
+      if (.@r>=9) {
+         bonus bMaxSPrate,4;
+         bonus bHealPower,7;
+         if (getallrefine() >= 22) {
+            bonus bMaxSPrate,7;
+            bonus bHealPower,10;
+         }
+      }
+  - Id: 310742
+    AegisName: Nebula_Of_HP1
+    Name: Nebula of Health Lv1
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHPrate,3;
+      bonus bDef,1;
+      if (.@r>=9) {
+         bonus bMaxHPrate,3;
+         bonus bDef,1;
+         if (getallrefine() >= 22) {
+            bonus bMaxHPrate,5;
+            bonus bDef,1;
+         }
+      }
+  - Id: 310743
+    AegisName: Nebula_Of_HP2
+    Name: Nebula of Health Lv2
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHPrate,5;
+      bonus bDef,1;
+      if (.@r>=9) {
+         bonus bMaxHPrate,4;
+         bonus bDef,1;
+         if (getallrefine() >= 22) {
+            bonus bMaxHPrate,6;
+            bonus bDef,1;
+         }
+      }
+  - Id: 310744
+    AegisName: Nebula_Of_HP3
+    Name: Nebula of Health Lv3
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHPrate,7;
+      bonus bDef,1;
+      if (.@r>=9) {
+         bonus bMaxHPrate,5;
+         bonus bDef,1;
+         if (getallrefine() >= 22) {
+            bonus bMaxHPrate,8;
+            bonus bDef,1;
+         }
+      }
   - Id: 311092
     AegisName: Ice_F_Orb_Str
     Name: Ice Magic Orb (STR)
@@ -139165,6 +140217,49 @@ Body:
     SubType: Enchant
     Script: |
       bonus bVariableCastrate,-10;
+  - Id: 313024
+    AegisName: Star_Cluster_Of_Str1
+    Name: Star Cluster of Strength 1Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddRace,RC_All,5;
+      bonus2 bAddRace,RC_Player_Human,-5;
+      bonus2 bAddRace,RC_Player_Doram,-5;
+      bonus2 bAddClass,Class_All,(readparam(bPow)/20);
+      bonus bBaseAtk,5*(readparam(bCon)/20);
+  - Id: 313029
+    AegisName: Star_Cluster_Of_Luk1
+    Name: Star Cluster of Luck 1Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddRace,RC_All,5;
+      bonus2 bAddRace,RC_Player_Human,-5;
+      bonus2 bAddRace,RC_Player_Doram,-5;
+      bonus2 bAddClass,Class_All,(readparam(bPow)/20);
+      bonus bBaseAtk,5*(readparam(bCrt)/20);
+  - Id: 313034
+    AegisName: Star_Cluster_Of_Int1
+    Name: Star Cluster of Intelligence 1Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAddRace,RC_All,5;
+      bonus2 bMagicAddRace,RC_Player_Human,-5;
+      bonus2 bMagicAddRace,RC_Player_Doram,-5;
+      bonus2 bMagicAddClass,Class_All,(readparam(bSpl)/20);
+      bonus bMatk,5*(readparam(bCon)/20);
+  - Id: 313039
+    AegisName: Star_Cluster_Of_Res1
+    Name: Star Cluster of Resistance 1Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMagicAtkDef,2;
+      bonus bNearAtkDef,2; bonus bLongAtkDef,2;
+      bonus bDef,10*(readparam(bSta)/20);
+      bonus bMdef,5*(readparam(bWis)/20);
   - Id: 400020
     AegisName: C_BeachBall
     Name: Costume Beachball
@@ -156589,6 +157684,36 @@ Body:
     AegisName: Armor_Stone_2
     Name: Armor Upgrade Stone(Intermediate)
     Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1000442
+    AegisName: Pow_Meteorite_Fragment
+    Name: Power Meteorite Fragment
+    Weight: 1
+    Flags: {BuyingStore: true}
+  - Id: 1000443
+    AegisName: Sta_Meteorite_Fragment
+    Name: Stamina Meteorite Fragment
+    Weight: 1
+    Flags: {BuyingStore: true}
+  - Id: 1000444
+    AegisName: Con_Meteorite_Fragment
+    Name: Agile Meteorite Fragment
+    Weight: 1
+    Flags: {BuyingStore: true}
+  - Id: 1000445
+    AegisName: Crt_Meteorite_Fragment
+    Name: Lucky Meteorite Fragment
+    Weight: 1
+    Flags: {BuyingStore: true}
+  - Id: 1000446
+    AegisName: Spl_Meteorite_Fragment
+    Name: Meteorite Fragment of Spell
+    Weight: 1
+    Flags: {BuyingStore: true}
+  - Id: 1000447
+    AegisName: Wis_Meteorite_Fragment
+    Name: Meteorite Fragment of Wisdom
+    Weight: 1
+    Flags: {BuyingStore: true}
   - Id: 1000471
     AegisName: Vila_Basement_Key
     Name: Villa Basement Key
@@ -157422,6 +158547,51 @@ Body:
     Sell: 300000
     Weight: 300
     Flags: {DropEffect: CLIENT}
+  - Id: 1001599
+    AegisName: Unknown_Meteorite_F
+    Name: Unknown Meteorite Fragment
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1002137
+    AegisName: Pow_Meteor_Extract
+    Name: Power Meteorite Extract
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1002138
+    AegisName: Wis_Meteor_Extract
+    Name: Spirit Meteorite Extract
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1002139
+    AegisName: Spl_Meteor_Extract
+    Name: Wisdom Meteorite Extract
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1002140
+    AegisName: Sta_Meteor_Extract
+    Name: Stamina Meteorite Extract
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1002141
+    AegisName: Con_Meteor_Extract
+    Name: Agility Meteorite Extract
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1002142
+    AegisName: Crt_Meteor_Extract
+    Name: Luck Meteorite Extract
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1002143
+    AegisName: Frontier_Extract_BL
+    Name: Azure Light Boundary Magic Extract
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1002144
+    AegisName: Frontier_Extract_YL
+    Name: Sunset Light Boundary Magic Extract
+    Weight: 10
+    Flags: {BuyingStore: true}
   - Id: 1100006
     AegisName: Ep19_Dry_Icegangu
     Name: Dried Ice Gangu
