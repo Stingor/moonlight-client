@@ -171,7 +171,12 @@ void EquipWindowCompose::RefreshAvatar(const ro::sim::World& world, ImVec2 box,
   pose.look = dressed;
   pose.animation = ro::render::kAnimationIdle;
   pose.direction = 0;
-  pose.animated = true;
+  // 🔴 FIGÉE SUR L'IMAGE ZÉRO, la tête de face, comme le jeu la montre : sur un
+  // joueur, les images de l'attente sont les directions de la TÊTE, et les
+  // faire défiler la ferait tourner sans arrêt. Ce qu'il porte vit toujours —
+  // une coiffe animée bouge sur un personnage immobile.
+  pose.animated = false;
+  pose.held_frame = 0;
   pose.elapsed_ms = static_cast<float>(now_ms);
   pose.box.width = static_cast<std::int32_t>(box.x);
   pose.box.height = static_cast<std::int32_t>(box.y);
