@@ -301,6 +301,38 @@ upgrade:
     targets: [
       450127, 450128, 470022, 470023, 480020, 480021
     ]
+  - item: 100365
+    least_refine: 0
+    most_refine: 10
+    least_options: 0
+    cards_allowed: true
+    targets: [
+      450149, 450150
+    ]
+  - item: 100366
+    least_refine: 0
+    most_refine: 10
+    least_options: 0
+    cards_allowed: true
+    targets: [
+      480065, 480066, 480067, 480068
+    ]
+  - item: 100367
+    least_refine: 0
+    most_refine: 10
+    least_options: 0
+    cards_allowed: true
+    targets: [
+      490077, 490078
+    ]
+  - item: 100368
+    least_refine: 0
+    most_refine: 10
+    least_options: 0
+    cards_allowed: true
+    targets: [
+      460005, 460006
+    ]
   - item: 100391
     least_refine: 4
     most_refine: 9

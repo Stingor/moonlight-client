@@ -129300,6 +129300,38 @@ Body:
     Trade: {NoDrop: true, NoTrade: true, NoSell: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
     Script: |
       laphine_upgrade();
+  - Id: 100365
+    AegisName: MD_Geffen_Rarmor
+    Name: MD Geffen Refine Armor
+    Type: DelayConsume
+    Weight: 10
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      laphine_upgrade();
+  - Id: 100366
+    AegisName: MD_Geffen_Rhood
+    Name: MD Geffen Refine Hood
+    Type: DelayConsume
+    Weight: 10
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      laphine_upgrade();
+  - Id: 100367
+    AegisName: MD_Geffen_Racc
+    Name: MD Geffen Refine Accessory
+    Type: DelayConsume
+    Weight: 10
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      laphine_upgrade();
+  - Id: 100368
+    AegisName: MD_Geffen_Rsheild
+    Name: MD Geffen Refine Shield
+    Type: DelayConsume
+    Weight: 10
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      laphine_upgrade();
   - Id: 100391
     AegisName: Moonlight_Box_IL
     Name: Moonlight Refine Box
@@ -130706,6 +130738,171 @@ Body:
          bonus bShortAtkRate,10+(getrefine()/2);
          bonus bAspd,1;
       }
+  - Id: 300177
+    AegisName: MD_Geffen_Archi_Card
+    Name: Arena Arhi Card
+    Type: Card
+    Weight: 10
+    Locations: {Shoes: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus2 bAddSize,Size_All,5;
+      bonus2 bMagicAddSize,Size_All,5;
+      bonus bMaxHP,1000;
+      bonus bFlee,35;
+  - Id: 300178
+    AegisName: MD_Geffen_Dio_Card
+    Name: Arena Dio Anemos Card
+    Type: Card
+    Weight: 10
+    Locations: {Shoes: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus2 bMagicAtkEle,Ele_Neutral,10;
+      bonus2 bMagicAtkEle,Ele_Earth,10;
+  - Id: 300179
+    AegisName: MD_Geffen_Thief_Card
+    Name: Arena Shoplifter Card
+    Type: Card
+    Weight: 10
+    Locations: {Shoes: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus2 bMagicAtkEle,Ele_Holy,10;
+      bonus2 bMagicAtkEle,Ele_Fire,10;
+  - Id: 300180
+    AegisName: MD_Geffen_Gang_Card
+    Name: Arena Gangster Card
+    Type: Card
+    Weight: 10
+    Locations: {Shoes: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bAspdRate,10;
+      bonus bCritAtkRate,7;
+  - Id: 300181
+    AegisName: MD_Geffen_Thug_Card
+    Name: Arena Bully Card
+    Type: Card
+    Weight: 10
+    Locations: {Shoes: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bAspdRate,7;
+      bonus bCritAtkRate,10;
+  - Id: 300182
+    AegisName: MD_Geffen_Monk_Card
+    Name: Arena Faymont Card
+    Type: Card
+    Weight: 10
+    Locations: {Shoes: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bMaxSPrate,20;
+      bonus5 bAutoSpellWhenHit,"CH_SOULCOLLECT",1,1,BF_WEAPON,0;
+  - Id: 300183
+    AegisName: MD_Geffen_Ordre_Card
+    Name: Arena Ordre Card
+    Type: Card
+    Weight: 10
+    Locations: {Shoes: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus2 bMagicAtkEle,Ele_Wind,10;
+      bonus2 bMagicAtkEle,Ele_Water,10;
+  - Id: 300184
+    AegisName: MD_Geffen_Blut_Card
+    Name: Arena Blut Hase Card
+    Type: Card
+    Weight: 10
+    Locations: {Shoes: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus2 bAddClass,Class_All,5;
+      bonus bLongAtkRate,7;
+  - Id: 300185
+    AegisName: MD_Geffen_Akuma_Card
+    Name: Arena Kuro Akuma Card
+    Type: Card
+    Weight: 10
+    Locations: {Shoes: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bVariableCastrate,-10;
+      bonus2 bSkillAtk,"NJ_KOUENKA",15;
+      bonus2 bSkillAtk,"NJ_HYOUSENSOU",15;
+      bonus2 bSkillAtk,"NJ_HUUJIN",15;
+      bonus bLongAtkRate,8;
+  - Id: 300186
+    AegisName: MD_Geffen_Hyper_Card
+    Name: Arena Ifodes Card
+    Type: Card
+    Weight: 10
+    Locations: {Shoes: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bAspdRate,7;
+      bonus bShortAtkRate,7;
+  - Id: 300187
+    AegisName: MD_Geffen_Odorico_Card
+    Name: Arena Odoric Card
+    Type: Card
+    Weight: 10
+    Locations: {Shoes: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bAspdRate,7;
+      bonus bLongAtkRate,7;
+  - Id: 300188
+    AegisName: MD_Geffen_Reche_Card
+    Name: Arena Licheniyes Card
+    Type: Card
+    Weight: 10
+    Locations: {Shoes: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus2 bMagicAtkEle,Ele_Holy,10;
+      bonus bHealPower,20;
+  - Id: 300189
+    AegisName: MD_Geffen_Jew_Card
+    Name: Arena Ju Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Hand: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      .@val = 15;
+      if (getiteminfo(getequipid(EQI_HAND_R), ITEMINFO_VIEW) == W_BOOK) {
+         .@val += 20;
+      }
+      if (getallrefine() >= 28) {
+         .@val += 30;
+      }
+      bonus2 bSkillAtk,"MG_LIGHTNINGBOLT",.@val;
+      bonus2 bSkillAtk,"MG_FIREBOLT",.@val;
+      bonus2 bSkillAtk,"MG_COLDBOLT",.@val;
+  - Id: 300190
+    AegisName: MD_Geffen_Fei_Card
+    Name: Arena Fay Kanavian Card
+    Type: Card
+    Weight: 10
+    Locations: {Shoes: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus2 bMagicAtkEle,Ele_Neutral,10;
+      bonus2 bMagicAtkEle,Ele_Earth,10;
+      autobonus "{ bonus bDef,10; }",1,5000,BF_WEAPON,"{ active_transform 1040,5000; /*GOLEM*/ }";
+  - Id: 300191
+    AegisName: MD_Geffen_Dy_Card
+    Name: Arena Dwigh Card
+    Type: Card
+    Weight: 10
+    Locations: {Both_Accessory: true}
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus2 bMagicAtkEle,Ele_Neutral,20;
+      bonus2 bMagicAtkEle,Ele_Undead,20;
+      bonus2 bMagicAtkEle,Ele_Dark,20;
   - Id: 300211
     AegisName: EP18_Ash_Toad_Card
     Name: Ash Toad Card
@@ -146911,6 +147108,69 @@ Body:
       if (getallrefine() >= 22) {
          bonus bAspdRate,10;
       }
+  - Id: 450149
+    AegisName: MD_Geffen_Suits
+    Name: "Anti Conjurer Suit [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Weight: 900
+    Defense: 12
+    Slots: 1
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 230
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bHealPower2,10;
+      bonus bUseSPrate,-10;
+      bonus bMaxHPrate,3;
+      bonus bStr,3;
+      bonus bAgi,3;
+      bonus bBaseAtk,10*.@r;
+      bonus bAspdRate,2*(.@r/2);
+      if (.@r>=9) {
+         bonus bLongAtkRate,10;
+         bonus bShortAtkRate,10;
+         if (getallrefine() >= 22) {
+            bonus bAspdRate,7;
+            if (getallrefine() >= 26) {
+               bonus bBaseAtk,60;
+            }
+         }
+      }
+  - Id: 450150
+    AegisName: MD_Geffen_Robe
+    Name: "Magic Protector Robe [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Weight: 800
+    Defense: 12
+    Slots: 1
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 230
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bHealPower2,10;
+      bonus bUseSPrate,-10;
+      bonus bMaxHPrate,3;
+      bonus bInt,3;
+      bonus bDex,3;
+      bonus bMatk,10*.@r;
+      bonus bVariableCastrate,-2*(.@r/2);
+      if (.@r>=9) {
+         bonus2 bMagicAtkEle,Ele_All,10;
+         if (getallrefine() >= 22) {
+            bonus bVariableCastrate,-7;
+            if (getallrefine() >= 26) {
+               bonus bMatk,60;
+            }
+         }
+      }
   - Id: 450166
     AegisName: Vague_Star_Robe
     Name: "Faint Star's Robe [1]"
@@ -147390,6 +147650,62 @@ Body:
         if (.@r>=9) {
           bonus2 bMagicAddClass,Class_All,2;
         }
+      }
+  - Id: 460005
+    AegisName: MD_Geffen_Shield
+    Name: "Magic Absorber [1]"
+    Type: Armor
+    Buy: 133000
+    Sell: 26600
+    Weight: 500
+    Defense: 8
+    Slots: 1
+    Locations: {Left_Hand: true}
+    ArmorLevel: 1
+    EquipLevelMin: 230
+    Refineable: true
+    View: 1
+    Script: |
+      .@r = getrefine();
+      bonus2 bMagicAtkEle,Ele_All,3;
+      bonus bMdef,3;
+      if (.@r>=7) {
+         bonus bMatk,25;
+         if (.@r>=9) {
+            bonus bVariableCastrate,-5;
+            if (getallrefine() >= 24) {
+               bonus2 bMagicAtkEle,Ele_All,7;
+            }
+         }
+      }
+  - Id: 460006
+    AegisName: MD_Geffen_Shield2
+    Name: "Encyclopedia Complete Edition [1]"
+    Type: Armor
+    Buy: 133000
+    Sell: 26600
+    Weight: 1500
+    Defense: 8
+    Slots: 1
+    Locations: {Left_Hand: true}
+    ArmorLevel: 1
+    EquipLevelMin: 230
+    Refineable: true
+    View: 1
+    Script: |
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,3;
+      bonus bMdef,2;
+      if (.@r>=7) {
+         bonus bCritical,3;
+         bonus bBaseAtk,25;
+         if (.@r>=9) {
+            bonus bAspdRate,5;
+            if (getallrefine() >= 24) {
+               bonus bCritAtkRate,10;
+               bonus2 bAddClass,Class_All,7;
+            }
+         }
       }
   - Id: 460013
     AegisName: Poenetentia_Aegis
@@ -147961,6 +148277,105 @@ Body:
     Type: Armor
     Locations: {Costume_Garment: true}
     View: 78
+  - Id: 480065
+    AegisName: MD_Geffen_Hood
+    Name: "Magic Barrier Manteau [1]"
+    Type: Armor
+    Buy: 57000
+    Sell: 14250
+    Weight: 700
+    Defense: 6
+    Slots: 1
+    Locations: {Garment: true}
+    ArmorLevel: 1
+    EquipLevelMin: 230
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHP,1500;
+      bonus bMaxHPrate,(.@r/2);
+      bonus bAspdRate,2*(.@r/3);
+      if (.@r>=9) {
+         bonus bShortAtkRate,5;
+         if (getallrefine() >= 22) {
+            bonus bShortAtkRate,7;
+         }
+      }
+  - Id: 480066
+    AegisName: MD_Geffen_Hood2
+    Name: "Magic Barrier Muffler [1]"
+    Type: Armor
+    Buy: 57000
+    Sell: 14250
+    Weight: 650
+    Defense: 6
+    Slots: 1
+    Locations: {Garment: true}
+    ArmorLevel: 1
+    EquipLevelMin: 230
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHP,1500;
+      bonus bMaxHPrate,(.@r/2);
+      bonus bVariableCastrate,-2*(.@r/3);
+      if (.@r>=9) {
+         bonus bMatkRate,7;
+         bonus bHealPower,15;
+         if (getallrefine() >= 22) {
+            bonus2 bMagicAtkEle,Ele_All,7;
+         }
+      }
+  - Id: 480067
+    AegisName: MD_Geffen_Hood3
+    Name: "Ravage Magic Manteau [1]"
+    Type: Armor
+    Buy: 57000
+    Sell: 14250
+    Weight: 650
+    Defense: 6
+    Slots: 1
+    Locations: {Garment: true}
+    ArmorLevel: 1
+    EquipLevelMin: 230
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHP,1200;
+      bonus bMaxHPrate,(.@r/2);
+      bonus bAspdRate,2*(.@r/3);
+      if (.@r>=9) {
+         bonus bLongAtkRate,5;
+         if (getallrefine() >= 22) {
+            bonus bLongAtkRate,7;
+         }
+      }
+  - Id: 480068
+    AegisName: MD_Geffen_Hood4
+    Name: "Ravage Magic Muffler [1]"
+    Type: Armor
+    Buy: 57000
+    Sell: 14250
+    Weight: 800
+    Defense: 6
+    Slots: 1
+    Locations: {Garment: true}
+    ArmorLevel: 1
+    EquipLevelMin: 230
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHP,2000;
+      bonus bMaxHPrate,(.@r/2);
+      bonus bAspdRate,(.@r/3);
+      bonus bVariableCastrate,-(.@r/3);
+      if (.@r>=9) {
+         bonus2 bAddSize,Size_All,3;
+         bonus2 bMagicAddSize,Size_All,3;
+         if (getallrefine() >= 22) {
+            autobonus "{ bonus2 bHPRegenRate,350,1000; bonus2 bSPRegenRate,20,1000; }",1,10000,BF_WEAPON|BF_MAGIC;
+         }
+      }
   - Id: 480069
     AegisName: C_Wing_Of_Angel_Move
     Name: Costume Heavenly Angel Wings
@@ -149727,6 +150142,36 @@ Body:
     Script: |
       bonus bCritical,5;
       bonus bBaseAtk,20;
+  - Id: 490077
+    AegisName: MD_Geffen_Ring
+    Name: "Force Condenser [1]"
+    Type: Armor
+    Buy: 20500
+    Sell: 10250
+    Weight: 100
+    Defense: 15
+    Slots: 1
+    Locations: {Both_Accessory: true}
+    ArmorLevel: 1
+    EquipLevelMin: 230
+    Script: |
+      bonus bMaxHPrate,5;
+      bonus2 bAddClass,Class_All,8;
+  - Id: 490078
+    AegisName: MD_Geffen_Ring2
+    Name: "Mental Condenser [1]"
+    Type: Armor
+    Buy: 20500
+    Sell: 10250
+    Weight: 100
+    Defense: 15
+    Slots: 1
+    Locations: {Both_Accessory: true}
+    ArmorLevel: 1
+    EquipLevelMin: 230
+    Script: |
+      bonus bMaxHPrate,5;
+      bonus bMatkRate,8;
   - Id: 490106
     AegisName: Gray_W_Pendant
     Name: "Gray Wolf Pendant [1]"
@@ -157530,6 +157975,14 @@ Body:
     AegisName: Fate_Fragment
     Name: Fragment of Good Will
     Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1000316
+    AegisName: MD_Geffen_Coin
+    Name: Geffen Arena Coin
+    Flags: {BuyingStore: true}
+  - Id: 1000317
+    AegisName: MD_Geffen_Cert
+    Name: Geffen Arena Certificate
+    Flags: {BuyingStore: true}
   - Id: 1000321
     AegisName: Amber
     Name: Amber
@@ -157576,6 +158029,10 @@ Body:
     Name: Ymir Fragment
     Weight: 1
     Flags: {BuyingStore: true}
+  - Id: 1000366
+    AegisName: MD_Geffen_Win
+    Name: Geffen Arena Championship
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
   - Id: 1000367
     AegisName: Mine_As
     Name: Minneas
