@@ -2,7 +2,7 @@
 
 #include <algorithm>
 #include <cstdint>
-#include <utility>
+#include <string>
 
 #include "ro/sim/actor.h"
 #include "ro/sim/player_status.h"
@@ -17,7 +17,7 @@ namespace {
 }  // namespace
 
 bool ComposeBasicInfo(ro::ui::BasicInfoView& into, const ro::sim::World& world,
-                      const ro::vfs::JobNames& jobs, std::string toggle_keys) {
+                      const ro::vfs::JobNames& jobs) {
   into = ro::ui::BasicInfoView();
   const ro::sim::Actor* self = world.player();
   if (self == nullptr) {
@@ -43,7 +43,6 @@ bool ComposeBasicInfo(ro::ui::BasicInfoView& into, const ro::sim::World& world,
   into.weight_tenths = Said(status.weight);
   into.max_weight_tenths = Said(status.max_weight);
   into.overweight_percent = Said(status.overweight_percent);
-  into.toggle_keys = std::move(toggle_keys);
   return true;
 }
 

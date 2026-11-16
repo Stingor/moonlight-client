@@ -18,6 +18,7 @@
 
 #include "ro/render/skin_pieces.h"
 #include "ro/ui/skin_art.h"
+#include "ro/ui/skinned_window.h"
 #include "ro/ui/stat_bars.h"
 #include "ro/ui/ui_context.h"
 
@@ -31,12 +32,8 @@ constexpr int kSettleFrames = 4;
 constexpr const char* kWindowName = "###basic_info";
 constexpr float kLargeScale = 1.5F;
 constexpr float kPlainPiecePixels = 8.0F;
-// Le milieu du bouton de repli, en pixels d'art : la règle de la barre.
-constexpr float kCollapseCenterX = 211.0F;
-constexpr float kCollapseCenterY = 8.0F;
-// Un point de la barre de titre loin des deux boutons.
+// Un point de la barre de titre loin des boutons, en pixels d'art.
 constexpr float kTitleBarX = 110.0F;
-constexpr float kTitleBarY = 8.0F;
 
 [[nodiscard]] ro::ui::SkinArt BasicInfoArt() {
   ro::ui::SkinArt art;
@@ -78,11 +75,33 @@ struct BasicInfoProbe {
     }
   }
 
-  [[nodiscard]] static ImVec2 At(float x, float y) {
+  [[nodiscard]] static const ImGuiWindow& Window() {
     const ImGuiWindow* window = ImGui::FindWindowByName(kWindowName);
     REQUIRE(window != nullptr);
+    return *window;
+  }
+
+  // Un point de la barre de titre réelle, à `x` pixels d'art du bord gauche.
+  [[nodiscard]] static ImVec2 OnBar(float x) {
+    const ImGuiWindow& window = Window();
+    return {window.Pos.x + x * ImGui::GetStyle().FontScaleMain,
+            window.Pos.y + window.TitleBarHeight / 2.0F};
+  }
+
+  // LE BOUTON DE RÉDUCTION DE LA BARRE COMMUNE : sans croix ni épingle, c'est
+  // le premier posé depuis le bord droit.
+  [[nodiscard]] static ImVec2 CollapseButton() {
+    const ImGuiWindow& window = Window();
     const float scale = ImGui::GetStyle().FontScaleMain;
-    return {window->Pos.x + x * scale, window->Pos.y + y * scale};
+    return {window.Pos.x + window.Size.x -
+                (ro::ui::kSystemEdgePixels + kPlainPiecePixels / 2.0F) * scale,
+            window.Pos.y + window.TitleBarHeight / 2.0F};
+  }
+
+  // La hauteur attendue : la barre réelle, puis le corps du jeu sous elle.
+  [[nodiscard]] static float HeightFor(float game_pixels) {
+    return Window().TitleBarHeight + std::ceil((game_pixels - ro::ui::kBasicInfoTitleBarPixels) *
+                                               ImGui::GetStyle().FontScaleMain);
   }
 
   void Click(ImVec2 at) {
@@ -104,10 +123,9 @@ TEST_CASE("Basic Info : dépliée, la fenêtre fait 220 sur 146, une ligne de pl
     BasicInfoProbe probe;
     probe.ui.SetInterfaceScale(scale);
     probe.Settle();
-    const ImGuiWindow* window = ImGui::FindWindowByName(kWindowName);
-    REQUIRE(window != nullptr);
-    CHECK(window->Size.x == ro::ui::kBasicInfoWidthPixels * scale);
-    CHECK(window->Size.y == std::ceil(ro::ui::kBasicInfoExpandedPixels * scale));
+    const ImGuiWindow& window = BasicInfoProbe::Window();
+    CHECK(window.Size.x == ro::ui::kBasicInfoWidthPixels * scale);
+    CHECK(window.Size.y == BasicInfoProbe::HeightFor(ro::ui::kBasicInfoExpandedPixels));
   }
 }
 
@@ -115,9 +133,8 @@ TEST_CASE("Basic Info : repliée, elle fait 220 sur 55", "[ui][basic_info]") {
   BasicInfoProbe probe;
   probe.state.expanded = false;
   probe.Settle();
-  const ImGuiWindow* window = ImGui::FindWindowByName(kWindowName);
-  REQUIRE(window != nullptr);
-  CHECK(window->Size.y == ro::ui::kBasicInfoCollapsedPixels);
+  CHECK(BasicInfoProbe::Window().Size.y ==
+        BasicInfoProbe::HeightFor(ro::ui::kBasicInfoCollapsedPixels));
 }
 
 TEST_CASE("Basic Info : la grille s'accroche sous son bord bas-gauche", "[ui][basic_info]") {
@@ -125,10 +142,15 @@ TEST_CASE("Basic Info : la grille s'accroche sous son bord bas-gauche", "[ui][ba
   probe.Settle();
   const ro::ui::BasicInfoAnswer answer = probe.Frame();
   REQUIRE(answer.dock.has_value());
-  const ImGuiWindow* window = ImGui::FindWindowByName(kWindowName);
-  REQUIRE(window != nullptr);
-  CHECK(answer.dock->x == window->Pos.x);
-  CHECK(answer.dock->y == window->Pos.y + ro::ui::kBasicInfoExpandedPixels);
+  const ImGuiWindow& window = BasicInfoProbe::Window();
+  CHECK(answer.dock->x == window.Pos.x);
+  CHECK(answer.dock->y == window.Pos.y + window.Size.y);
+}
+
+TEST_CASE("Basic Info : elle se traîne par ImGui, donc par l'aimant", "[ui][basic_info]") {
+  BasicInfoProbe probe;
+  probe.Settle();
+  CHECK((BasicInfoProbe::Window().Flags & ImGuiWindowFlags_NoMove) == 0);
 }
 
 TEST_CASE("Basic Info : éteinte, elle ne dessine rien et n'accroche rien", "[ui][basic_info]") {
@@ -141,19 +163,24 @@ TEST_CASE("Basic Info : éteinte, elle ne dessine rien et n'accroche rien", "[ui
 TEST_CASE("Basic Info : son bouton la replie, puis la déplie", "[ui][basic_info]") {
   BasicInfoProbe probe;
   probe.Settle();
-  probe.Click(BasicInfoProbe::At(kCollapseCenterX, kCollapseCenterY));
+  probe.Click(BasicInfoProbe::CollapseButton());
   CHECK_FALSE(probe.state.expanded);
-  probe.Click(BasicInfoProbe::At(kCollapseCenterX, kCollapseCenterY));
+  // ⚠ JAMAIS RÉDUITE PAR IMGUI : repliée, elle garde ses deux lignes.
+  probe.Settle();
+  CHECK_FALSE(BasicInfoProbe::Window().Collapsed);
+  CHECK_FALSE(probe.state.expanded);
+  probe.Click(BasicInfoProbe::CollapseButton());
   CHECK(probe.state.expanded);
 }
 
 TEST_CASE("Basic Info : un double-clic sur la barre de titre la replie", "[ui][basic_info]") {
   BasicInfoProbe probe;
   probe.Settle();
-  probe.Click(BasicInfoProbe::At(kTitleBarX, kTitleBarY));
+  probe.Click(BasicInfoProbe::OnBar(kTitleBarX));
   REQUIRE(probe.state.expanded);
-  probe.Click(BasicInfoProbe::At(kTitleBarX, kTitleBarY));
+  probe.Click(BasicInfoProbe::OnBar(kTitleBarX));
   CHECK_FALSE(probe.state.expanded);
+  CHECK_FALSE(BasicInfoProbe::Window().Collapsed);
 }
 
 TEST_CASE("Basic Info : le pour cent d'EXP se tronque au dixième", "[ui][basic_info]") {

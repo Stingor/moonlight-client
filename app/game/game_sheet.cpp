@@ -138,8 +138,6 @@ void Game::StageCharacterSheet(std::uint32_t now_ms) {
     // comme ceux de la fiche.
     round.view.equipment_shown = own_config_.equipment_shown();
     round.view.costumes_shown = own_config_.costumes_shown();
-    round.view.toggle_keys =
-        LabelOfBinding(settings_->bindings().Of(GameAction::kToggleEquipWindow));
     const std::string cart_keys = LabelOfBinding(settings_->bindings().Of(GameAction::kOpenCart));
     round.view.cart_tooltip = ro::core::Tr("Items du cart");
     if (!cart_keys.empty()) {

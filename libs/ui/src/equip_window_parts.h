@@ -102,16 +102,6 @@ inline constexpr ImU32 kNameShadow = IM_COL32(0xE0, 0xE0, 0xE0, 0xFF);
 // Le gris des onglets et de leur filet.
 inline constexpr ImU32 kTabBorder = IM_COL32(0xC3, 0xC3, 0xC3, 0xFF);
 
-// LA BARRE DE TITRE : le titre en blanc, puis en noir un pixel plus haut et à
-// gauche ; les trois boutons système.
-inline constexpr float kTitleLeft = 16.0F;
-inline constexpr float kTitleTop = 3.0F;
-inline constexpr float kSystemButtonTop = 3.0F;
-inline constexpr float kSystemButtonPixels = 11.0F;
-inline constexpr float kBulletLeft = 3.0F;
-inline constexpr float kMinimizeFromRight = 28.0F;
-inline constexpr float kCloseFromRight = 14.0F;
-
 // LE BAS : la case à cocher et « tout retirer ».
 inline constexpr float kCheckLeft = 10.0F;
 inline constexpr float kCheckFromBottom = 15.0F;

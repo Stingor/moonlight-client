@@ -44,11 +44,13 @@ inline constexpr const char* kEquipWindowMinimizedKey = "equip.minimized";
 
 // ── LA GÉOMÉTRIE, EN PIXELS D'ART ───────────────────────────────────────────
 //
-// L'origine est le coin haut-gauche de la fenêtre, barre de titre comprise.
+// L'origine est le coin haut-gauche de la fenêtre du jeu, barre de titre
+// comprise. ⚠ LA BARRE DESSINÉE EST CELLE DES FENÊTRES HABILLÉES : le corps se
+// cale sous elle, quelle que soit sa hauteur réelle.
 
 // La largeur du jeu, et celle de la fenêtre quand le fond manque.
 inline constexpr float kEquipWindowGameWidthPixels = 280.0F;
-// La hauteur entière, et celle d'une fenêtre réduite à sa barre.
+// La hauteur entière, et celle de la barre de titre du jeu.
 inline constexpr float kEquipWindowHeightPixels = 187.0F;
 inline constexpr float kEquipWindowTitleBarPixels = 17.0F;
 
@@ -148,9 +150,6 @@ struct EquipWindowView {
   // Le chariot est attelé : le bouton qui ouvre son contenu se montre.
   bool cart = false;
   std::string cart_tooltip;
-  // LA TOUCHE QUI OUVRE ET FERME LA FENÊTRE, dite par la bulle de la croix.
-  // Vide sans touche.
-  std::string toggle_keys;
 };
 
 // Ce que la fenêtre garde d'une image à l'autre.
@@ -159,9 +158,6 @@ struct EquipWindowState {
   // RÉDUITE À SA BARRE, par le bouton ou d'un double-clic sur la barre.
   bool minimized = false;
   EquipWindowTab tab = EquipWindowTab::kGeneral;
-  // LE COIN HAUT-GAUCHE À GARDER à l'image qui suit une réduction : la fenêtre
-  // grandit et rétrécit par le bas.
-  std::optional<ImVec2> keep_top_left;
   // ⚠ UN RELEVÉ, PAS UN RÉGLAGE : la boîte de la silhouette, mesurée au dessin
   // — elle dépend de la largeur du fond — et lue par `app` à l'image suivante.
   ImVec2 avatar_box = ImVec2(0.0F, 0.0F);

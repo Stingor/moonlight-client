@@ -17,6 +17,7 @@
 
 #include "ro/render/skin_pieces.h"
 #include "ro/ui/skin_art.h"
+#include "ro/ui/skinned_window.h"
 #include "ro/ui/ui_context.h"
 
 using ro::render::SkinPiece;
@@ -83,11 +84,13 @@ struct EquipProbe {
     }
   }
 
+  // Un point en pixels d'art du jeu : le corps se cale sous la barre réelle.
   [[nodiscard]] static ImVec2 At(float x, float y) {
     const ImGuiWindow* window = ImGui::FindWindowByName(kWindowName);
     REQUIRE(window != nullptr);
     const float scale = ImGui::GetStyle().FontScaleMain;
-    return {window->Pos.x + x * scale, window->Pos.y + y * scale};
+    return {window->Pos.x + x * scale, window->Pos.y + window->TitleBarHeight +
+                                           (y - ro::ui::kEquipWindowTitleBarPixels) * scale};
   }
 
   // Ce que l'image de l'appui, puis celle du relâché, ont demandé : une case à
@@ -118,7 +121,9 @@ TEST_CASE("Équipement : la fenêtre prend la largeur de son fond, 280 sans lui"
   const ImGuiWindow* window = ImGui::FindWindowByName(kWindowName);
   REQUIRE(window != nullptr);
   CHECK(window->Size.x == kMoonlightWidth);
-  CHECK(window->Size.y == ro::ui::kEquipWindowHeightPixels);
+  // LE CORPS DU JEU SOUS LA BARRE RÉELLE, que règlent l'art et la police.
+  CHECK(window->Size.y == window->TitleBarHeight + ro::ui::kEquipWindowHeightPixels -
+                              ro::ui::kEquipWindowTitleBarPixels);
   CHECK(probe.state.avatar_box.x == kMoonlightWidth);
   CHECK(probe.state.avatar_box.y == ro::ui::kEquipWindowAvatarFeetPixels);
 
@@ -217,5 +222,28 @@ TEST_CASE("Équipement : réduite, elle ne garde que sa barre", "[ui][equip_wind
   probe.Settle();
   const ImGuiWindow* window = ImGui::FindWindowByName(kWindowName);
   REQUIRE(window != nullptr);
-  CHECK(window->Size.y == ro::ui::kEquipWindowTitleBarPixels);
+  CHECK(window->Collapsed);
+  CHECK(window->Size.y == window->TitleBarHeight);
+  CHECK(probe.state.minimized);
+
+  // Son bouton la rouvre, et l'état retenu suit.
+  const float scale = ImGui::GetStyle().FontScaleMain;
+  // Le bouton de réduction : à gauche de la croix, depuis le bord droit.
+  const ImVec2 minimize(window->Pos.x + window->Size.x -
+                            (ro::ui::kSystemEdgePixels + kPlainPiecePixels +
+                             ro::ui::kSystemButtonGapPixels + kPlainPiecePixels / 2.0F) *
+                                scale,
+                        window->Pos.y + window->TitleBarHeight / 2.0F);
+  static_cast<void>(probe.Click(minimize));
+  probe.Settle();
+  CHECK_FALSE(probe.state.minimized);
+  CHECK_FALSE(window->Collapsed);
+}
+
+TEST_CASE("Équipement : la fenêtre se traîne par ImGui, donc par l'aimant", "[ui][equip_window]") {
+  EquipProbe probe;
+  probe.Settle();
+  const ImGuiWindow* window = ImGui::FindWindowByName(kWindowName);
+  REQUIRE(window != nullptr);
+  CHECK((window->Flags & ImGuiWindowFlags_NoMove) == 0);
 }

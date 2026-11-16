@@ -13,6 +13,7 @@
 
 #include "ro/core/i18n.h"
 #include "ro/ui/skin_tooltip.h"
+#include "ro/ui/skinned_window.h"
 #include "ro/ui/stat_bars.h"
 
 #include "achievement_paint.h"
@@ -22,7 +23,6 @@ namespace ro::ui {
 namespace {
 
 using achievement::kBlack;
-using achievement::kOnRelease;
 using achievement::kWhite;
 using achievement::Painter;
 using render::SkinPiece;
@@ -41,33 +41,15 @@ constexpr ImU32 kAlertRed = IM_COL32(0xFF, 0x00, 0x00, 0xFF);
 //
 // Celles qui donnent au texte la LARGEUR qu'il a dans le jeu, mesurée sur une
 // capture côte à côte : la police du jeu n'est pas celle de ce client, et sa
-// taille nominale ne se recopie pas. Le titre et le pseudo s'écrivent plus
-// grand que le reste ; la classe, les libellés, les nombres et le texte des
-// jauges, tous au même corps.
+// taille nominale ne se recopie pas. Le pseudo s'écrit plus grand que le
+// reste ; la classe, les libellés, les nombres et le texte des jauges, tous au
+// même corps.
 constexpr float kTextTitle = 13.3F;
 constexpr float kTextBody = 11.4F;
 
-// ── LA BARRE DE TITRE ───────────────────────────────────────────────────────
-//
-// Un bout gauche, un bout droit, et la tranche du milieu répétée DEPUIS le bout
-// gauche jusqu'à couvrir la largeur. ⚠ LA DERNIÈRE TRANCHE DÉBORDE SUR LE BOUT
-// DROIT, posé avant elle : c'est ainsi que le jeu la montre.
-constexpr float kTitleTilePixels = 12.0F;
-// Le titre, écrit deux fois : en blanc un pixel plus bas et à droite, puis en
-// noir par-dessus.
-constexpr float kTitleLeft = 17.0F;
-constexpr float kTitleTop = 2.0F;
-// Les deux boutons de la barre : la puce, qui mène aux réglages, et le repli.
-constexpr float kButtonPixels = 11.0F;
-constexpr float kButtonTop = 3.0F;
-constexpr float kBulletLeft = 3.0F;
-constexpr float kCollapseLeft = 206.0F;
-
 // ── LA BARRE REPLIÉE ────────────────────────────────────────────────────────
 //
-// Le pseudo se pose sur la barre de titre ; dessous, deux lignes.
-constexpr float kFoldedNameLeft = 17.0F;
-constexpr float kFoldedNameTop = 3.0F;
+// Le pseudo devient le titre de la barre ; dessous, deux lignes.
 constexpr float kFoldedLeft = 9.0F;
 constexpr float kFoldedLevelsTop = 20.0F;
 constexpr float kFoldedGaugesTop = 36.0F;
@@ -107,9 +89,7 @@ constexpr float kBackgroundResume = kBackgroundSplit - kBasicInfoPurseLinePixels
 // droite que le jeu, mesuré sur une capture côte à côte. Un texte calé à gauche
 // recule d'autant ; calé à droite ou centré, il tombe déjà juste.
 constexpr float kGlyphBearing = 2.0F;
-// Le pseudo s'arrête avant le bord droit, plus tôt sur la barre repliée, où le
-// bouton de repli le borne.
-constexpr float kFoldedNameRoom = 30.0F;
+// Le pseudo s'arrête avant le bord droit.
 constexpr float kNameRoom = 20.0F;
 
 // Les deux jauges de vie et de magie : leur gouttière fait 135 × 9, et le
@@ -139,29 +119,6 @@ constexpr std::int64_t kTenthsPerUnit = 10;
 constexpr std::size_t kDigitsPerGroup = 3;
 
 using Line = std::array<char, 128>;
-
-// ── LA BARRE DE TITRE ───────────────────────────────────────────────────────
-
-void PaintTitleBar(const Painter& paint, const SkinArt& art) {
-  paint.Art(art.Get(SkinPiece::kTitleBarLeft), 0.0F, 0.0F);
-  paint.Art(art.Get(SkinPiece::kTitleBarRight), kBasicInfoWidthPixels - kTitleTilePixels, 0.0F);
-  const SkinImage& middle = art.Get(SkinPiece::kTitleBarMiddle);
-  const float span = kBasicInfoWidthPixels - 2.0F * kTitleTilePixels;
-  const int tiles = static_cast<int>(std::ceil(span / kTitleTilePixels));
-  for (int tile = 0; tile < tiles; ++tile) {
-    paint.Art(middle, kTitleTilePixels + static_cast<float>(tile) * kTitleTilePixels, 0.0F);
-  }
-}
-
-// Un bouton de la barre : éteint au repos, allumé survolé ou enfoncé. Rend vrai
-// au relâché sur lui.
-[[nodiscard]] bool TitleButton(const Painter& paint, const SkinArt& art, const char* id, float left,
-                               SkinPiece off, SkinPiece on) {
-  const achievement::HitResult hit =
-      paint.Hit(id, left, kButtonTop, kButtonPixels, kButtonPixels, kOnRelease);
-  paint.Art(art.Get(hit.hovered || hit.held ? on : off), left, kButtonTop);
-  return hit.pressed;
-}
 
 // ── LES JAUGES ──────────────────────────────────────────────────────────────
 
@@ -223,8 +180,8 @@ void PaintExpBar(const Painter& paint, float top, std::int64_t exp, std::int64_t
 
 // ── LE PSEUDO ───────────────────────────────────────────────────────────────
 
-// LE PSEUDO, coupé à DROITE seulement : un nom long ne passe pas sous le bouton
-// de repli. `room` est ce que la case laisse à droite de la fenêtre.
+// LE PSEUDO, coupé à DROITE seulement : un nom long ne déborde pas du panneau.
+// `room` est ce que la case laisse à droite de la fenêtre.
 //
 // ⚠ JAMAIS EN BAS : la case du jeu fait quinze pixels de haut, et la ligne de
 // cette police est plus haute — la coupe y mangeait la queue d'un « g ».
@@ -257,7 +214,6 @@ void PaintFoldedBody(const Painter& paint, float height) {
 void PaintFolded(const Painter& paint, const BasicInfoView& view) {
   const ImU32 ink = paint.Ink(kBlack);
   const ImU32 alert = paint.Ink(kAlertRed);
-  PaintName(paint, kFoldedNameLeft, kFoldedNameTop, kFoldedNameRoom, view.name);
 
   // LA LIGNE DES NIVEAUX, raccourcie et centrée quand elle déborde.
   const double percent = BasicInfoExpPercent(view.base_exp, view.next_base_exp);
@@ -450,96 +406,80 @@ BasicInfoAnswer DrawBasicInfoWindow(BasicInfoWindowState& state, const BasicInfo
   }
   const float scale = Scale();
   const float height = state.expanded ? kBasicInfoExpandedPixels : kBasicInfoCollapsedPixels;
+  const float body = height - kBasicInfoTitleBarPixels;
   // AU COIN HAUT-GAUCHE DE L'ÉCRAN, la première fois : la place du jeu.
   ImGui::SetNextWindowPos(ImGui::GetMainViewport()->WorkPos, ImGuiCond_FirstUseEver);
-  // ⚠ APRÈS UN REPLI, LE HAUT RESTE OÙ IL ÉTAIT : posée dans le bas de l'écran,
-  // la fenêtre s'ancrerait sinon par son bord bas, et sa barre sauterait.
-  if (state.keep_top_left.has_value()) {
-    ImGui::SetNextWindowPos(*state.keep_top_left, ImGuiCond_Always);
-    state.keep_top_left.reset();
-  }
-  ImGui::SetNextWindowSize(ImVec2(kBasicInfoWidthPixels * scale, std::ceil(height * scale)),
-                           ImGuiCond_Always);
+  // ⚠ LA LARGEUR SE POSE, LA HAUTEUR S'AJUSTE AU CORPS : la barre de titre suit
+  // son art et la police. Le repli rétrécit donc par le bas, le haut sur place.
+  ImGui::SetNextWindowSize(ImVec2(kBasicInfoWidthPixels * scale, 0.0F), ImGuiCond_Always);
+  // 🔴 LE REPLI N'EST PAS CELUI D'IMGUI : replié, le jeu garde DEUX LIGNES sous
+  // la barre. La fenêtre n'est donc jamais réduite ; le bouton de réduction et
+  // le double-clic de la barre, qui la réduiraient, basculent le panneau.
+  ImGui::SetNextWindowCollapsed(false, ImGuiCond_Always);
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0F, 0.0F));
-  ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0F);
-  // ⚠ SANS DÉPLACEMENT D'IMGUI : seule la barre de titre emporte la fenêtre,
-  // et c'est elle qui le fait.
-  constexpr ImGuiWindowFlags kFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
-                                      ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
+  // 🔴 LA FENÊTRE HABILLÉE COMMUNE : sa barre, sa police de titre, la teinte du
+  // thème, et le glisser d'ImGui — par lequel passent l'aimant et la grille.
+  constexpr ImGuiWindowFlags kFlags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar |
                                       ImGuiWindowFlags_NoScrollWithMouse |
-                                      ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoCollapse |
-                                      ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
-  std::array<char, 32> name{};
-  std::snprintf(name.data(), name.size(), "###%s", kBasicInfoWindowId);
-  if (ImGui::Begin(name.data(), nullptr, kFlags)) {
-    ImGuiWindow* const window = ImGui::GetCurrentWindow();
-    const Painter paint(window->DrawList, window->Pos, scale, PaintingLook().paper);
-    paint.PushClip(0.0F, 0.0F, kBasicInfoWidthPixels, height);
-
+                                      ImGuiWindowFlags_NoFocusOnAppearing;
+  // LE TITRE : « Basic Info » dépliée ; repliée, le PSEUDO, comme le jeu l'écrit
+  // sur sa barre. ⚠ RECOMPOSÉ SANS ALLOUER : la chaîne garde sa capacité.
+  static std::string name;
+  name.assign(state.expanded ? std::string_view(core::Tr("Basic Info")) : view.name);
+  name.append("###").append(kBasicInfoWindowId);
+  // LA PUCE MÈNE À LA PAGE DE RÉGLAGES, comme celle des autres fenêtres.
+  SetNextWindowBulletClickable(core::Tr("Réglages de cette fenêtre"));
+  const bool shown = BeginSkinnedWindow(name.c_str(), nullptr, art, SkinnedTitle::kBar, kFlags);
+  ImGuiWindow* const window = ImGui::GetCurrentWindow();
+  answer.settings_asked = TitleBulletClicked();
+  // ⚠ DEUX FORMES DE LA MÊME DEMANDE : le double-clic a déjà réduit la fenêtre
+  // dans `Begin`, le bouton n'a fait que la mettre en attente pour l'image
+  // suivante. L'attente s'efface ; la réduction, elle, se défait à la
+  // prochaine ouverture, que `SetNextWindowCollapsed` force dépliée.
+  const bool toggle = window->Collapsed || window->WantCollapseToggle;
+  window->WantCollapseToggle = false;
+  // ⚠ UNE IMAGE SANS CORPS au double-clic : ImGui a déjà réduit la fenêtre, qui
+  // ne se rouvre qu'à la suivante.
+  if (shown && !toggle) {
+    // L'ORIGINE EST CELLE DE LA FENÊTRE DU JEU, barre comprise : le corps se
+    // mesure depuis là, et la barre réelle peut être plus haute que la sienne.
+    const Painter paint(window->DrawList,
+                        ImVec2(window->Pos.x, window->Pos.y + window->TitleBarHeight -
+                                                  kBasicInfoTitleBarPixels * scale),
+                        scale, PaintingLook().paper);
+    paint.PushClip(0.0F, kBasicInfoTitleBarPixels, kBasicInfoWidthPixels, body);
     const SkinImage& background = art.Get(SkinPiece::kBasicInfoBackground);
-    if (state.expanded) {
-      if (background.usable()) {
-        PaintExpandedBackground(paint, background);
-      } else {
-        PaintFoldedBody(paint, height);
-      }
+    if (state.expanded && background.usable()) {
+      PaintExpandedBackground(paint, background);
     } else {
       PaintFoldedBody(paint, height);
     }
-    PaintTitleBar(paint, art);
-
-    // ⚠ LES DEUX BOUTONS AVANT LA PRISE : ImGui donne le survol au premier
-    // posé, et la prise couvre toute la barre.
-    //
-    // LA PUCE MÈNE À LA PAGE DE RÉGLAGES, comme celle des autres fenêtres. ⚠ SON
-    // DESSIN NE LE DIT PAS : la main qui pointe et l'infobulle l'annoncent.
-    answer.settings_asked =
-        TitleButton(paint, art, "##puce", kBulletLeft, SkinPiece::kBulletOff, SkinPiece::kBulletOn);
-    if (ImGui::IsItemHovered()) {
-      ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
-      SkinTooltipFormat("%s", core::Tr("Réglages de cette fenêtre"));
-    }
-    bool toggle = TitleButton(paint, art, "##replier", kCollapseLeft, SkinPiece::kCollapseOff,
-                              SkinPiece::kCollapseOn);
-    if (ImGui::IsItemHovered() && !view.toggle_keys.empty()) {
-      SkinTooltipFormat("%s", view.toggle_keys.c_str());
-    }
-    const achievement::HitResult grip =
-        paint.Hit("##prise", 0.0F, 0.0F, kBasicInfoWidthPixels, kBasicInfoTitleBarPixels);
-    if (grip.held && ImGui::IsMouseDragging(ImGuiMouseButton_Left, 0.0F)) {
-      const ImVec2 delta = ImGui::GetIO().MouseDelta;
-      ImGui::SetWindowPos(ImVec2(window->Pos.x + delta.x, window->Pos.y + delta.y));
-    }
-    if (grip.hovered && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-      toggle = true;
-    }
-
     if (state.expanded) {
-      // LE TITRE, que le jeu écrit en blanc puis en noir par-dessus.
-      const char* const title = core::Tr("Basic Info");
-      paint.Text(kTitleLeft - kGlyphBearing + 1.0F, kTitleTop + 1.0F, title, kTextTitle, kWhite);
-      paint.Text(kTitleLeft - kGlyphBearing, kTitleTop, title, kTextTitle, kBlack);
       PaintExpanded(paint, view, art);
       ShowWeightTip(paint, view);
     } else {
       PaintFolded(paint, view);
     }
     paint.PopClip();
-    // LE CORPS ARRÊTE LES CLICS : sous la barre, la fenêtre ne s'emporte pas et
+    // LE CORPS ARRÊTE LES CLICS : la fenêtre ne s'emporte que par sa barre, et
     // ne laisse rien passer au monde.
-    static_cast<void>(paint.Hit("##corps", 0.0F, kBasicInfoTitleBarPixels, kBasicInfoWidthPixels,
-                                height - kBasicInfoTitleBarPixels));
-    if (toggle) {
-      state.expanded = !state.expanded;
-      state.keep_top_left = window->Pos;
-    }
-    // LE COIN DE LA TAILLE QUI VIENT, repli compris : la grille ne traîne pas
-    // une image derrière.
-    const float next = state.expanded ? kBasicInfoExpandedPixels : kBasicInfoCollapsedPixels;
-    answer.dock = ImVec2(window->Pos.x, window->Pos.y + std::ceil(next * scale));
+    static_cast<void>(
+        paint.Hit("##corps", 0.0F, kBasicInfoTitleBarPixels, kBasicInfoWidthPixels, body));
+    // LE CONTENU VAUT LE CORPS, sous la barre réelle : c'est lui que la hauteur
+    // ajustée mesure. ⚠ ARRONDI AU PIXEL SUPÉRIEUR, qu'ImGui tronquerait.
+    ImGui::SetCursorScreenPos(ImVec2(window->Pos.x, window->Pos.y + window->TitleBarHeight));
+    ImGui::Dummy(ImVec2(kBasicInfoWidthPixels * scale, std::ceil(body * scale)));
   }
-  ImGui::End();
-  ImGui::PopStyleVar(2);
+  if (toggle) {
+    state.expanded = !state.expanded;
+  }
+  // LE COIN DE LA TAILLE QUI VIENT, repli compris : la grille ne traîne pas
+  // une image derrière.
+  const float next = state.expanded ? kBasicInfoExpandedPixels : kBasicInfoCollapsedPixels;
+  answer.dock = ImVec2(window->Pos.x, window->Pos.y + window->TitleBarHeight +
+                                          std::ceil((next - kBasicInfoTitleBarPixels) * scale));
+  EndSkinnedWindow();
+  ImGui::PopStyleVar();
   return answer;
 }
 

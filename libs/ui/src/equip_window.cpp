@@ -17,6 +17,8 @@
 #include "ro/ui/skin_popup.h"
 #include "ro/ui/skin_tooltip.h"
 #include "ro/ui/skin_widgets.h"
+#include "ro/ui/skinned_window.h"
+#include "ro/ui/window_name.h"
 
 #include "achievement_paint.h"
 #include "equip_window_parts.h"
@@ -257,38 +259,6 @@ ImVec2 EquipWindowAvatarBox(const SkinArt& art) {
 
 namespace {
 
-// ── LA BARRE DE TITRE ───────────────────────────────────────────────────────
-
-// La tranche du milieu de la barre en trois morceaux, quand celle d'un tenant
-// manque.
-constexpr float kTitleTilePixels = 12.0F;
-
-void PaintTitleBar(const Painter& paint, const EquipWindowLayout& layout, const SkinArt& art) {
-  if (const SkinImage& whole = art.Get(SkinPiece::kEquipTitleBar); whole.usable()) {
-    paint.Art(whole, 0.0F, 0.0F);
-  } else {
-    paint.Art(art.Get(SkinPiece::kTitleBarLeft), 0.0F, 0.0F);
-    const SkinImage& middle = art.Get(SkinPiece::kTitleBarMiddle);
-    for (float left = kTitleTilePixels; left < layout.width - kTitleTilePixels;
-         left += kTitleTilePixels) {
-      paint.Art(middle, left, 0.0F);
-    }
-    paint.Art(art.Get(SkinPiece::kTitleBarRight), layout.width - kTitleTilePixels, 0.0F);
-  }
-  const char* const title = core::Tr("Équipement");
-  paint.Text(kTitleLeft + 1.0F - kGlyphBearing, kTitleTop + 1.0F, title, kTextBody, kWhite);
-  paint.Text(kTitleLeft - kGlyphBearing, kTitleTop, title, kTextBody, kBlack);
-}
-
-// Un bouton système : éteint au repos, allumé survolé ou enfoncé.
-[[nodiscard]] bool SystemButton(const Painter& paint, const SkinArt& art, const char* id,
-                                float left, SkinPiece off, SkinPiece on) {
-  const achievement::HitResult hit =
-      paint.Hit(id, left, kSystemButtonTop, kSystemButtonPixels, kSystemButtonPixels, kOnRelease);
-  paint.Art(art.Get(hit.hovered || hit.held ? on : off), left, kSystemButtonTop);
-  return hit.pressed;
-}
-
 // ── LE CORPS ────────────────────────────────────────────────────────────────
 
 void PaintAvatar(const Painter& paint, const EquipWindowLayout& layout, const SkinImage& avatar) {
@@ -358,68 +328,47 @@ EquipWindowAction DrawEquipWindow(EquipWindowState& state, const EquipWindowView
   const float scale = Scale();
   const EquipWindowLayout layout = EquipWindowLayoutFor(EquipWindowWidth(art));
   state.avatar_box = EquipWindowAvatarBox(art);
-  const float height = state.minimized ? kEquipWindowTitleBarPixels : kEquipWindowHeightPixels;
+  const float body = kEquipWindowHeightPixels - kEquipWindowTitleBarPixels;
   ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_FirstUseEver,
                           ImVec2(0.5F, 0.5F));
-  // ⚠ APRÈS UNE RÉDUCTION, LE HAUT RESTE OÙ IL ÉTAIT.
-  if (state.keep_top_left.has_value()) {
-    ImGui::SetNextWindowPos(*state.keep_top_left, ImGuiCond_Always);
-    state.keep_top_left.reset();
-  }
-  ImGui::SetNextWindowSize(ImVec2(layout.width * scale, std::ceil(height * scale)),
-                           ImGuiCond_Always);
+  // ⚠ LA LARGEUR SE POSE, LA HAUTEUR S'AJUSTE AU CORPS : la barre de titre suit
+  // son art et la police, et une hauteur totale imposée rognerait le bas.
+  ImGui::SetNextWindowSize(ImVec2(layout.width * scale, 0.0F), ImGuiCond_Always);
+  // ⚠ LA RÉDUCTION EST CELLE D'IMGUI, reposée depuis l'état retenu à chaque
+  // image puis relue : le bouton et le double-clic de la barre la basculent.
+  ImGui::SetNextWindowCollapsed(state.minimized, ImGuiCond_Always);
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0F, 0.0F));
-  ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0F);
-  // ⚠ RÉDUITE, ELLE NE FAIT QUE SA BARRE : dix-sept pixels, sous le plancher
-  // qu'ImGui impose aux fenêtres.
-  ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(1.0F, 1.0F));
-  // ⚠ SANS DÉPLACEMENT D'IMGUI : seule la barre de titre emporte la fenêtre.
+  // 🔴 LA FENÊTRE HABILLÉE COMMUNE : sa barre, sa police de titre, la teinte du
+  // thème, et le glisser d'ImGui — par lequel passent l'aimant et la grille.
   constexpr ImGuiWindowFlags kFlags =
-      ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
-      ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse |
-      ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNav;
-  std::array<char, 32> name{};
-  std::snprintf(name.data(), name.size(), "###%s", kEquipWindowId);
-  if (ImGui::Begin(name.data(), nullptr, kFlags)) {
-    ImGuiWindow* const window = ImGui::GetCurrentWindow();
-    const Painter paint(window->DrawList, window->Pos, scale, PaintingLook().paper);
-    paint.PushClip(0.0F, 0.0F, layout.width, height);
-    PaintTitleBar(paint, layout, art);
-    // ⚠ LES BOUTONS AVANT LA PRISE : ImGui donne le survol au premier posé.
-    static_cast<void>(SystemButton(paint, art, "##puce", kBulletLeft, SkinPiece::kBulletOff,
-                                   SkinPiece::kBulletOn));
-    bool minimize = SystemButton(paint, art, "##reduire", layout.width - kMinimizeFromRight,
-                                 SkinPiece::kCollapseOff, SkinPiece::kCollapseOn);
-    if (SystemButton(paint, art, "##fermer", layout.width - kCloseFromRight, SkinPiece::kCloseOff,
-                     SkinPiece::kCloseOn)) {
-      state.open = false;
-    }
-    if (ImGui::IsItemHovered() && !view.toggle_keys.empty()) {
-      SkinTooltip(view.toggle_keys.c_str());
-    }
-    const achievement::HitResult grip =
-        paint.Hit("##prise", 0.0F, 0.0F, layout.width, kEquipWindowTitleBarPixels);
-    if (grip.held && ImGui::IsMouseDragging(ImGuiMouseButton_Left, 0.0F)) {
-      const ImVec2 delta = ImGui::GetIO().MouseDelta;
-      ImGui::SetWindowPos(ImVec2(window->Pos.x + delta.x, window->Pos.y + delta.y));
-    }
-    if (grip.hovered && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-      minimize = true;
-    }
-    if (!state.minimized) {
-      DrawBody(paint, layout, state, view, art, action);
-      // LE CORPS ARRÊTE LES CLICS : rien ne passe au monde sous la fenêtre.
-      static_cast<void>(paint.Hit("##corps", 0.0F, kEquipWindowTitleBarPixels, layout.width,
-                                  kEquipWindowHeightPixels - kEquipWindowTitleBarPixels));
-    }
+      ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
+  static WindowName name("Équipement", kEquipWindowId);
+  const bool shown = BeginSkinnedWindow(name.Get(), &state.open, art, SkinnedTitle::kBar, kFlags);
+  // ⚠ LE BOUTON NE RÉDUIT QU'À L'IMAGE SUIVANTE — il met la bascule en
+  // attente —, le double-clic tout de suite : l'état voulu compte les deux.
+  ImGuiWindow* const current = ImGui::GetCurrentWindow();
+  state.minimized = current->Collapsed != current->WantCollapseToggle;
+  if (shown) {
+    ImGuiWindow* const window = current;
+    // L'ORIGINE EST CELLE DE LA FENÊTRE DU JEU, barre comprise : le corps se
+    // mesure depuis là, et la barre réelle peut être plus haute que la sienne.
+    const Painter paint(window->DrawList,
+                        ImVec2(window->Pos.x, window->Pos.y + window->TitleBarHeight -
+                                                  kEquipWindowTitleBarPixels * scale),
+                        scale, PaintingLook().paper);
+    paint.PushClip(0.0F, kEquipWindowTitleBarPixels, layout.width, body);
+    DrawBody(paint, layout, state, view, art, action);
+    // LE CORPS ARRÊTE LES CLICS : rien ne passe au monde sous la fenêtre, et
+    // elle ne s'emporte que par sa barre.
+    static_cast<void>(paint.Hit("##corps", 0.0F, kEquipWindowTitleBarPixels, layout.width, body));
     paint.PopClip();
-    if (minimize) {
-      state.minimized = !state.minimized;
-      state.keep_top_left = window->Pos;
-    }
+    // LE CONTENU VAUT LE CORPS, sous la barre réelle : c'est lui que la hauteur
+    // ajustée mesure. ⚠ ARRONDI AU PIXEL SUPÉRIEUR, qu'ImGui tronquerait.
+    ImGui::SetCursorScreenPos(ImVec2(window->Pos.x, window->Pos.y + window->TitleBarHeight));
+    ImGui::Dummy(ImVec2(layout.width * scale, std::ceil(body * scale)));
   }
-  ImGui::End();
-  ImGui::PopStyleVar(3);
+  EndSkinnedWindow();
+  ImGui::PopStyleVar();
   return action;
 }
 

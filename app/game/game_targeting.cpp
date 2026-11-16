@@ -52,8 +52,7 @@ void Game::AdvanceStatusPortrait(std::uint32_t now_ms) {
   // cadence.
   windows_.basic_info->state.shown =
       settings_->options().stat_bars().basic_info_window && link_.is_open() &&
-      ComposeBasicInfo(windows_.basic_info->view, world_, pieces_.job_names,
-                       LabelOfBinding(settings_->bindings().Of(GameAction::kToggleBasicInfo)));
+      ComposeBasicInfo(windows_.basic_info->view, world_, pieces_.job_names);
   // Sa puce mène à la page « Basic Info » des options, où elle se règle.
   if (std::exchange(windows_.basic_info->settings_asked, false)) {
     GameSettings::OpenOptionsAt(windows_, OptionSection::kStatBars);

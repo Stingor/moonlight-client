@@ -20,8 +20,9 @@ namespace ro::ui {
 // existent à côté pour qui veut un autre écran ; celle-ci est pour qui veut
 // retrouver le sien.
 //
-// ⚠ LA BARRE DE TITRE EST LA SEULE PRISE : on déplace la fenêtre par elle, et un
-// double-clic dessus la replie ou la déplie, comme son bouton.
+// ⚠ LA BARRE DE TITRE EST CELLE DES FENÊTRES HABILLÉES, et la seule prise : on
+// déplace la fenêtre par elle — l'aimant compris —, et un double-clic dessus la
+// replie ou la déplie, comme son bouton de réduction.
 //
 // ⚠ ELLE NE POSSÈDE AUCUN ÉTAT DE JEU : elle reçoit des nombres et des noms, et
 // ne rend que le coin sous lequel la grille d'icônes de menu s'accroche, et le
@@ -83,10 +84,6 @@ struct BasicInfoView {
   // Le pour cent de charge où le poids passe au rouge ; zéro tant que le
   // serveur ne l'a pas dit.
   std::int64_t overweight_percent = 0;
-
-  // LA TOUCHE QUI REPLIE ET DÉPLIE, dite par la bulle du bouton. Vide sans
-  // touche.
-  std::string toggle_keys;
 };
 
 // Ce que la fenêtre garde d'une image à l'autre.
@@ -96,9 +93,6 @@ struct BasicInfoWindowState {
   bool shown = false;
   // ⚠ DÉPLIÉE D'ABORD : c'est sous cette forme qu'un joueur la reconnaît.
   bool expanded = true;
-  // LE COIN HAUT-GAUCHE À GARDER à l'image qui suit un repli : la fenêtre
-  // grandit et rétrécit par le bas, où qu'elle soit posée.
-  std::optional<ImVec2> keep_top_left;
 };
 
 struct BasicInfoAnswer {
