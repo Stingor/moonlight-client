@@ -138,6 +138,12 @@ référence sont peintes sur une installation synthétique.
   **catalogue**, une liste d'entrées indépendantes où l'on cherche sans jamais
   lire de bout en bout.
 
+## Pièges connus
+
+`docs/pitfalls.md` tient les défauts que ce code a déjà payés, et la règle qui
+les évite : MSVC contre g++, ImGui, durées de vie, protocole, mesure. À lire
+avant de toucher à l'un de ces sujets.
+
 ## Données
 
 Aucune donnée du jeu (archives, sprites, cartes, musiques) n'est dans ce dépôt
