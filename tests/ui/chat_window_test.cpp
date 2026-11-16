@@ -694,3 +694,71 @@ TEST_CASE("Bande : un onglet qui a du neuf porte son point", "[ui][chatbox]") {
   CHECK(strip_painted(true));
   CHECK_FALSE(strip_painted(false));
 }
+
+TEST_CASE("Saisie : ↑ remonte l'historique même depuis une coupure de ligne", "[ui][chatbox]") {
+  // 🔴 LE CURSEUR QUE ↑ POSE EN BOUT DE PREMIÈRE RANGÉE est aussi au début de la
+  // seconde. ImGui le montre en haut — il n'a plus rien au-dessus — et la
+  // flèche suivante doit donc rappeler la ligne d'avant.
+  ro::ui::UiContext ui;
+  ro::ui::ChatInputState state;
+  state.wants_focus = true;
+  const ro::ui::ChatLinePreview preview{.target = "Alentour"};
+
+  const auto open = []() {
+    ImGui::SetNextWindowPos(ImVec2(0.0F, 0.0F));
+    ImGui::SetNextWindowSize(ImVec2(kNarrowWindow, kViewport.height_px));
+    ImGui::Begin("essai");
+  };
+  const auto frame = [&]() {
+    ui.BeginFrame(kViewport, kFrameSeconds);
+    open();
+    static_cast<void>(ro::ui::ChatInputHeight(state, preview, kRoomForInput, kNoArt));
+    ro::ui::ChatInputAsk asked;
+    static_cast<void>(ro::ui::DrawChatInput(state, preview, &asked, kNoArt));
+    ImGui::End();
+    ui.EndFrame();
+  };
+
+  // Le plus long mot qui tient seul sur une rangée : précédé d'un mot court, il
+  // passe à la seconde, et sa fin y est plus à droite que celle de la première.
+  std::string longest;
+  ui.BeginFrame(kViewport, kFrameSeconds);
+  open();
+  for (std::string word = "b";; word += 'b') {
+    Fill(state, word);
+    static_cast<void>(ro::ui::ChatInputHeight(state, preview, kRoomForInput, kNoArt));
+    if (state.rows_wanted > 1) {
+      break;
+    }
+    longest = word;
+  }
+  ImGui::End();
+  ui.EndFrame();
+  REQUIRE_FALSE(longest.empty());
+  const std::string wrapped = "aaa " + longest;
+  Fill(state, "");
+  state.history.lines = {"premier", wrapped};
+  state.history.at = static_cast<int>(state.history.lines.size());
+
+  ImGuiIO& io = ImGui::GetIO();
+  frame();
+  io.AddMousePosEvent(kInTheField, kOnTheRow);
+  io.AddMouseButtonEvent(0, true);
+  frame();
+  io.AddMouseButtonEvent(0, false);
+  frame();
+
+  const auto press_up = [&io, &frame]() {
+    io.AddKeyEvent(ImGuiKey_UpArrow, true);
+    frame();
+    io.AddKeyEvent(ImGuiKey_UpArrow, false);
+    frame();
+  };
+  press_up();  // la ligne repliée, curseur en fin de seconde rangée
+  REQUIRE(std::string(state.text.data()) == wrapped);
+  REQUIRE(state.rows_drawn == 2);
+  press_up();  // sur la première rangée, en butée sur la coupure
+  CHECK(std::string(state.text.data()) == wrapped);
+  press_up();  // plus rien au-dessus : la ligne d'avant
+  CHECK(std::string(state.text.data()) == "premier");
+}

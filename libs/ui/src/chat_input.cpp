@@ -65,7 +65,15 @@ struct WrappedFieldHooks {
 // saute un saut de ligne après chaque coupe. Le reproduire plutôt que
 // l'approcher : une coupure de différence, et la hauteur réservée n'a plus le
 // même nombre de lignes que le widget — une rangée déborde, ou reste vide.
-[[nodiscard]] int WrapRows(const char* text, float wrap_width, int cursor, int* cursor_row) {
+//
+// 🔴 UN CURSEUR POSÉ SUR UNE COUPURE est à la fois en fin de rangée et en début
+// de la suivante. ImGui tranche par le dernier déplacement : arrivé par la
+// droite — ↑ ou ↓ qui butent en bout de rangée, Fin, un clic au-delà du texte —
+// il le montre EN HAUT, et ↑ part de là. Le compter en bas, c'est croire ↑ hors
+// de la première rangée alors qu'ImGui n'a plus rien au-dessus : l'historique ne
+// remonte plus jusqu'à ce que le curseur quitte la coupure.
+[[nodiscard]] int WrapRows(const char* text, float wrap_width, int cursor, int* cursor_row,
+                           bool boundary_on_upper_row) {
   ImFont* font = ImGui::GetFont();
   const float font_size = ImGui::GetFontSize();
   const char* const end = text + std::strlen(text);
@@ -73,10 +81,13 @@ struct WrappedFieldHooks {
   if (cursor_row != nullptr) {
     *cursor_row = 0;
   }
+  bool after_wrap = false;  // la rangée précédente s'est coupée, sans saut de ligne
   for (const char* at = text; at < end;) {
     // La rangée qui CONTIENT l'octet du curseur — la dernière dont le début ne
     // le dépasse pas. Un curseur en fin de texte tombe donc sur la dernière.
-    if (cursor_row != nullptr && cursor >= static_cast<int>(at - text)) {
+    const int row_start = static_cast<int>(at - text);
+    const bool kept_above = boundary_on_upper_row && after_wrap && cursor == row_start;
+    if (cursor_row != nullptr && cursor >= row_start && !kept_above) {
       *cursor_row = rows;
     }
     ++rows;
@@ -85,7 +96,8 @@ struct WrappedFieldHooks {
     if (next <= at) {
       next = at + 1;  // garde-fou : ne jamais rester sur place
     }
-    at = (next < end && *next == '\n') ? next + 1 : next;
+    after_wrap = !(next < end && *next == '\n');
+    at = after_wrap ? next : next + 1;
   }
   return std::max(rows, 1);  // un texte vide fait une rangée, comme chez ImGui
 }
@@ -366,7 +378,7 @@ float ChatInputHeight(ChatInputState& state, const ChatLinePreview& preview, flo
   // donc un champ qui déborde de la place qu'on lui a réservée.
   const float field =
       FieldWidthFor(ImGui::GetContentRegionAvail().x, ChatTargetBoxWidth(preview, art));
-  state.rows_wanted = WrapRows(state.text.data(), WrapWidthFor(field), 0, nullptr);
+  state.rows_wanted = WrapRows(state.text.data(), WrapWidthFor(field), 0, nullptr, false);
   // Le plafond, c'est ce que l'appelant peut céder ; au-delà le champ défile en
   // interne. Jamais moins d'une rangée.
   state.rows_allowed = std::max(1, 1 + static_cast<int>(std::floor((most - one) / line)));
@@ -537,7 +549,10 @@ std::optional<std::string> DrawChatInput(ChatInputState& state, const ChatLinePr
       }
       if (data->EventFlag == ImGuiInputTextFlags_CallbackAlways) {
         CursorProbe& probe = wrapped->probe;
-        probe.rows = WrapRows(data->Buf, probe.wrap_width, data->CursorPos, &probe.row);
+        // Le rappel tourne pendant l'édition : l'état de saisie unique est celui
+        // de ce champ.
+        const bool upper = data->Ctx->InputTextState.LastMoveDirectionLR == ImGuiDir_Right;
+        probe.rows = WrapRows(data->Buf, probe.wrap_width, data->CursorPos, &probe.row, upper);
       }
       return 0;
     };
