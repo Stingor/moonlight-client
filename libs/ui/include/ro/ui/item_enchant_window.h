@@ -40,6 +40,10 @@ struct ItemEnchantPieceView {
   TradeItemView item;
   // Pourquoi elle ne se choisit pas, déjà traduit ; vide si elle le peut.
   std::string_view refusal;
+  // Où en sont ses cases, déjà écrit (« 1/3 enchantée(s) », « pleine »).
+  std::string_view progress;
+  // Plus aucune case à remplir : l'état se dit en couleur.
+  bool full = false;
   bool chosen = false;
 };
 
@@ -63,6 +67,8 @@ struct ItemEnchantOptionView {
   TradeItemView item;
   // La probabilité du tirage, déjà écrite ; vide hors tirage.
   std::string_view odds;
+  // Ce qu'il donne, en une ligne tirée de sa fiche ; vide sans fiche.
+  std::string_view effect;
   // Le joueur peut la choisir, et l'a choisie.
   bool selectable = false;
   bool chosen = false;
@@ -76,6 +82,24 @@ struct ItemEnchantMaterialView {
   // Ce que le serveur compte, et ce qu'il demande.
   int owned = 0;
   int needed = 0;
+};
+
+// UNE CASE QUE LA TENTATIVE CHANGERAIT : ce qu'elle porte, et ce qu'elle porterait.
+struct ItemEnchantPreviewView {
+  std::uint8_t slot = 0;
+  // `item_id` nul : la case est (ou serait) vide.
+  TradeItemView before;
+  TradeItemView after;
+  // Un tirage : ce qu'elle porterait n'est pas encore connu.
+  bool drawn = false;
+  // Ce que porterait la case, en une ligne tirée de sa fiche.
+  std::string_view effect;
+};
+
+// UNE TENTATIVE DÉJÀ FAITE, dite comme le serveur l'a dite.
+struct ItemEnchantHistoryView {
+  std::string_view text;
+  bool good = false;
 };
 
 struct ItemEnchantView {
@@ -95,6 +119,16 @@ struct ItemEnchantView {
   // Le titre de la liste, déjà écrit, et ses lignes.
   std::string_view options_title;
   std::span<const ItemEnchantOptionView> options;
+  // LE TIRAGE D'UN AUTRE GRADE : le libellé de la case à cocher, vide quand le grade
+  // suivant tire la même chose ou rien. Coché, la liste montre son tirage, que la
+  // tentative ne fait pas.
+  std::string_view other_grade_label;
+  // La pièce avant et après la tentative ; vide sans rien à changer.
+  std::span<const ItemEnchantPreviewView> preview;
+  // Les tentatives de la partie, la plus récente en tête.
+  std::span<const ItemEnchantHistoryView> history;
+  // La séance est close et le PNJ connu : « Recommencer » lui reparle.
+  bool retry_open = false;
   std::span<const ItemEnchantMaterialView> materials;
   // Les zenys demandés, et la bourse ; une bourse inconnue vaut `-1`.
   std::int64_t zeny = 0;
@@ -133,6 +167,8 @@ struct ItemEnchantWindowState {
   std::uint32_t enchant_item_id = 0;
   // Page Améliorer : la case visée, `kItemEnchantNoSlot` pour aucune.
   std::uint8_t upgrade_slot = kItemEnchantNoSlot;
+  // Page Enchanter, tirage : montrer celui du grade suivant.
+  bool other_grade = false;
   // La confirmation attendue, et le rang du choix qu'elle regarde.
   bool asking = false;
   std::uint32_t asked_choice_seq = 0;
@@ -143,8 +179,11 @@ struct ItemEnchantWindowState {
 struct ItemEnchantWindowAction {
   // La croix, Échap ou « Fermer ». ⚠ AUSSI ÉCRITE DANS `state.open`.
   bool close = false;
-  // La case du sac à choisir ; zéro pour rien.
+  // La case du sac à choisir ; zéro pour rien. Le bouton « Choisir » et une pièce
+  // lâchée depuis le sac la donnent tous deux.
   std::uint16_t choose_slot = 0;
+  // « Recommencer » : reparler au PNJ de la séance close.
+  bool retry = false;
   // La tentative confirmée, sur le choix de ce rang, avec la page et ce que l'état
   // désigne.
   bool enchant = false;

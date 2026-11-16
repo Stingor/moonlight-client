@@ -7,13 +7,19 @@
 
 #include "ro/core/i18n.h"
 #include "ro/core/log.h"
+#include "ro/core/printed.h"
 #include "ro/net/item_enchant.h"
+#include "ro/net/npc_dialog.h"
 #include "ro/sim/world.h"
+#include "ro/vfs/item_table.h"
 
 #include "items/item_enchant_book.h"
 
 namespace moonclient {
 namespace {
+
+// Ce que l'historique retient au plus.
+constexpr std::size_t kHistoryKept = 20;
 
 [[nodiscard]] std::uint8_t CardSlotsOf(const TradeContext& context, std::uint32_t item_id) {
   const int slots = context.items.CardSlotsOf(item_id);
@@ -29,6 +35,9 @@ void ItemEnchantStage::StartSession() {
   notice_good_ = false;
   concluded_ = false;
   shown_group_ = 0;
+  last_dialog_npc_ = 0;
+  session_npc_ = 0;
+  history_.clear();
   hovered_ = {};
   described_.reset();
   view_ = nullptr;
@@ -95,6 +104,12 @@ void ItemEnchantStage::Follow(ro::ui::ItemEnchantWindowState& state,
   if (concluded_ && !enchant_.open()) {
     if (answer.close || !state.open) {
       concluded_ = false;
+    } else if (answer.retry && session_npc_ != 0) {
+      // RECOMMENCER : le PNJ rouvre une séance par son dialogue, comme au premier
+      // clic. La fenêtre reste jusque-là ; trop loin, le serveur ne répond rien.
+      if (auto talked = ro::net::ContactNpc(context.link, session_npc_); !talked) {
+        ro::core::LogError("item_enchant : {}", ro::core::Describe(talked.error()));
+      }
     }
     return;
   }
@@ -131,6 +146,19 @@ void ItemEnchantStage::ReadResult(const TradeContext& context) {
   notice_ = ItemEnchantResultText(result, named != 0 ? context.items.NameOf(named) : std::string());
   notice_good_ = result.succeeded();
   Say(context, notice_, notice_good_ ? kTradeSucceededColor : kTradeFailedColor);
+  // L'HISTORIQUE nomme la pièce : plusieurs se suivent dans la même partie.
+  const ro::sim::InventoryItem* piece = context.world.inventory().Find(result.client_slot);
+  const std::string named_piece =
+      piece != nullptr ? context.items.NameOf(*piece, context.creators) : std::string();
+  history_.insert(history_.begin(),
+                  ItemEnchantAttempt{.text = named_piece.empty()
+                                                 ? notice_
+                                                 : ro::core::Printed("%s — %s", named_piece.c_str(),
+                                                                     notice_.c_str()),
+                                     .good = notice_good_});
+  if (history_.size() > kHistoryKept) {
+    history_.resize(kHistoryKept);
+  }
   // LA SÉANCE EST CLOSE, LA FENÊTRE RESTE pour montrer la pièce telle qu'elle est.
   concluded_ = true;
   shown_group_ = enchant_.group_id();
@@ -139,6 +167,10 @@ void ItemEnchantStage::ReadResult(const TradeContext& context) {
 void ItemEnchantStage::Advance(ro::ui::ItemEnchantWindowState& state,
                                const ro::ui::ItemEnchantWindowAction& answer,
                                const TradeContext& context) {
+  // LE PNJ QUI PARLE : celui dont le script ouvrira la séance.
+  if (const auto& dialog = context.world.npc_dialog(); dialog.has_value() && dialog->npc_id != 0) {
+    last_dialog_npc_ = dialog->npc_id;
+  }
   Follow(state, answer, context);
   ReadResult(context);
   // 🔴 UN GROUPE INCONNU NE LAISSE PAS LA SÉANCE OUVERTE : la fenêtre se referme, et
@@ -160,6 +192,7 @@ void ItemEnchantStage::Advance(ro::ui::ItemEnchantWindowState& state,
   view_ = nullptr;
   if (enchant_.open() && enchant_.opening_seq() != state.opening_seen) {
     ro::ui::OpenItemEnchantOn(state, enchant_.opening_seq());
+    session_npc_ = last_dialog_npc_;
     notice_.clear();
     notice_good_ = false;
     concluded_ = false;
@@ -183,7 +216,13 @@ void ItemEnchantStage::Advance(ro::ui::ItemEnchantWindowState& state,
           },
       .name_of_id = [&context](std::uint32_t item_id) { return context.items.NameOf(item_id); },
       .icon_of = [&context](std::uint32_t item_id) { return context.items.IconOf(item_id); },
-      .card_slots_of = [&context](std::uint32_t item_id) { return CardSlotsOf(context, item_id); }};
+      .card_slots_of = [&context](std::uint32_t item_id) { return CardSlotsOf(context, item_id); },
+      .effect_of =
+          [&context](std::uint32_t item_id) {
+            const ro::vfs::ItemTable* table = context.items.table();
+            const ro::vfs::ItemEntry* entry = table != nullptr ? table->Find(item_id) : nullptr;
+            return entry != nullptr ? ItemEffectLine(entry->description) : std::string();
+          }};
   const std::int64_t zeny = context.world.player_status().zeny;
   // UNE SÉANCE CLOSE MONTRE ENCORE LA PIÈCE QU'ELLE A TOUCHÉE.
   const std::optional<std::uint16_t> chosen =
@@ -199,7 +238,9 @@ void ItemEnchantStage::Advance(ro::ui::ItemEnchantWindowState& state,
                                               .zeny_known = zeny != ro::sim::kUnknownStat,
                                               .notice = notice_,
                                               .notice_good = notice_good_,
-                                              .concluded = concluded_ && !enchant_.open()});
+                                              .concluded = concluded_ && !enchant_.open(),
+                                              .history = history_,
+                                              .npc_known = session_npc_ != 0});
 }
 
 }  // namespace moonclient

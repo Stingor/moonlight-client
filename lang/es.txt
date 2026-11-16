@@ -24586,8 +24586,8 @@ tr: Elige el objeto que encantar.
 fr: Choisissez une case dont l'enchantement s'améliore.
 tr: Elige una ranura cuyo encantamiento pueda mejorar.
 
-fr: Choisissez une pièce de l'inventory, ôtée, puis ce qu'il faut y faire. Chaque tentative ferme la séance : parlez de nouveau au PNJ pour la suivante.
-tr: Elige un objeto del inventario, sin equipar, y luego qué hacer con él. Cada intento cierra la sesión: vuelve a hablar con el PNJ para el siguiente.
+fr: Choisissez une pièce de l'inventory, ôtée, ou glissez-la sur la fenêtre, puis ce qu'il faut y faire. Chaque tentative ferme la séance : « Recommencer » reparle au PNJ pour la suivante.
+tr: Elige una pieza del inventario, sin equipar, o arrástrala a la ventana, y luego qué hacer con ella. Cada intento cierra la sesión: «Reintentar» vuelve a hablar con el PNJ para el siguiente.
 
 fr: Choix sûr
 tr: Elección segura
@@ -24652,38 +24652,29 @@ tr: Quita los %d encantamiento(s) del objeto; las cartas se quedan.
 fr: Ôter tous les enchantements de %s ? Les zenys et les matériaux seront consommés, même en cas d'échec.
 tr: ¿Quitar todos los encantamientos de %s? Se consumirán los zenys y los materiales, incluso si falla.
 
-fr: Faucon
-tr: Halcón
+fr: %d/%d enchantée(s)
+tr: %d/%d encantada(s)
 
-fr: Chariot
-tr: Carro
+fr: (un enchantement tiré au sort)
+tr: (un encantamiento al azar)
 
-fr: Le serveur ne range pas encore la teinture du faucon et du chariot.
-tr: El servidor aún no guarda el tinte del halcón ni del carro.
+fr: Après la tentative
+tr: Tras el intento
 
-fr: Sors ton faucon ou pousse ton chariot pour le teindre.
-tr: Saca tu halcón o empuja tu carro para teñirlo.
+fr: Ce que le tirage poserait au grade suivant (pas cette tentative)
+tr: Lo que daría el sorteo en el grado siguiente (no en este intento)
 
-fr: La teinture de cet onglet appartient à ton personnage.
-tr: El tinte de esta pestaña pertenece a tu personaje.
+fr: Dernières tentatives
+tr: Últimos intentos
 
-fr: Cette teinture appartient à ton personnage, et vaut pour ce chariot : chaque chariot garde la sienne.
-tr: Este tinte pertenece a tu personaje y vale para este carro: cada carro conserva el suyo.
+fr: Recommencer
+tr: Reintentar
 
-fr: Cette teinture appartient à ton personnage, et vaut pour cet oiseau : chaque oiseau garde la sienne.
-tr: Este tinte pertenece a tu personaje y vale para este pájaro: cada pájaro conserva el suyo.
+fr: Reparler au PNJ pour une nouvelle tentative.
+tr: Volver a hablar con el PNJ para un nuevo intento.
 
-fr: Change de chariot : celui-ci reprend ses couleurs d'origine, et retrouve sa teinture quand tu le reprends.
-tr: Cambia de carro: este recupera sus colores originales, y vuelve a tener su tinte cuando lo retomes.
+fr: Voir le tirage du grade suivant
+tr: Ver el sorteo del grado siguiente
 
-fr: Un autre job ou une autre tenue peut changer d'oiseau : celui-ci retrouve sa teinture quand il revient.
-tr: Otro job u otro atuendo puede cambiar de pájaro: este recupera su tinte cuando vuelve.
-
-fr: Cette teinture se valide auprès du styliste.
-tr: Este tinte se confirma con el estilista.
-
-fr: Retirer cette teinture
-tr: Quitar este tinte
-
-fr: Retirer cette teinture ?
-tr: ¿Quitar este tinte?
+fr: pleine
+tr: llena

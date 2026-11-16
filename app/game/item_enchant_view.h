@@ -10,6 +10,7 @@
 #include <deque>
 #include <functional>
 #include <optional>
+#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -35,12 +36,26 @@ namespace moonclient {
 [[nodiscard]] ro::sim::ItemEnchantRequest ItemEnchantRequestOf(
     const ro::ui::ItemEnchantWindowState& state);
 
-// D'où viennent les noms, les icônes et les cases de carte des pièces.
+// CE QU'UN ENCHANTEMENT DONNE, EN UNE LIGNE, tiré de sa fiche : couleurs et traits
+// ôtés, paliers gardés (« STR +1 · Refine Level +7: STR +1 »), arrêté à la première
+// rubrique (« [Enchantable Equipment] »), au trait de séparation ou à `max_bytes`.
+[[nodiscard]] std::string ItemEffectLine(std::span<const std::string> description,
+                                         std::size_t max_bytes = 160);
+
+// D'où viennent les noms, les icônes, les cases de carte et les effets des pièces.
 struct ItemEnchantLooks {
   std::function<std::string(const ro::sim::InventoryItem&)> name_of_held;
   std::function<std::string(std::uint32_t)> name_of_id;
   std::function<ro::ui::SkinImage(std::uint32_t)> icon_of;
   std::function<std::uint8_t(std::uint32_t)> card_slots_of;
+  // Vide : aucune ligne d'effet ne se montre.
+  std::function<std::string(std::uint32_t)> effect_of;
+};
+
+// UNE TENTATIVE DÉJÀ FAITE : le mot du serveur, et s'il dit une réussite.
+struct ItemEnchantAttempt {
+  std::string text;
+  bool good = false;
 };
 
 struct ItemEnchantScene {
@@ -61,6 +76,10 @@ struct ItemEnchantScene {
   // La séance est close par une réponse : la fenêtre montre ce qu'elle a donné, et
   // tout se retient jusqu'à ce que le PNJ la rouvre.
   bool concluded = false;
+  // Les tentatives de la partie, la plus récente en tête.
+  std::span<const ItemEnchantAttempt> history;
+  // Le PNJ de la séance est connu : la séance close offre « Recommencer ».
+  bool npc_known = false;
 };
 
 // Compose la vue, et garde ce vers quoi elle pointe jusqu'à la prochaine.
@@ -73,7 +92,9 @@ class ItemEnchantViewComposer {
   [[nodiscard]] ro::ui::TradeItemView HeldOf(const ItemEnchantScene& scene,
                                              const ro::sim::InventoryItem& item);
   [[nodiscard]] ro::ui::TradeItemView ItemOf(const ItemEnchantScene& scene, std::uint32_t item_id);
+  [[nodiscard]] std::string_view EffectOf(const ItemEnchantScene& scene, std::uint32_t item_id);
   void ComposeCandidates(const ItemEnchantScene& scene);
+  void ComposePreview(const ItemEnchantScene& scene, const ro::sim::InventoryItem& item);
   void ComposeChoice(const ItemEnchantScene& scene, const ro::sim::InventoryItem& item);
   void ComposeOperation(const ItemEnchantScene& scene, const ro::sim::InventoryItem& item);
   void ComposeCost(const ItemEnchantScene& scene, const ro::sim::ItemEnchantCost& cost);
@@ -85,6 +106,8 @@ class ItemEnchantViewComposer {
   std::vector<ro::ui::ItemEnchantSlotView> slots_;
   std::vector<ro::ui::ItemEnchantOptionView> options_;
   std::vector<ro::ui::ItemEnchantMaterialView> materials_;
+  std::vector<ro::ui::ItemEnchantPreviewView> preview_;
+  std::vector<ro::ui::ItemEnchantHistoryView> history_;
   std::vector<std::string_view> blockers_;
   ro::ui::ItemEnchantView view_;
 };

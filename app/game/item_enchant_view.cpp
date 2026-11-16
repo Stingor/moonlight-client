@@ -9,6 +9,7 @@
 
 #include "ro/core/i18n.h"
 #include "ro/core/printed.h"
+#include "ro/core/text.h"
 #include "ro/sim/item_reform.h"
 
 namespace moonclient {
@@ -29,7 +30,76 @@ constexpr double kPercentScale = 1000.0;
   return Printed("%.2f %%", static_cast<double>(chance) / kPercentScale);
 }
 
+// Deux tirages qui posent la même chose, aux mêmes chances.
+[[nodiscard]] bool SameDraws(const ro::sim::ItemEnchantDrawGrade& left,
+                             const ro::sim::ItemEnchantDrawGrade& right) {
+  return std::ranges::equal(
+      left.enchants, right.enchants,
+      [](const ro::sim::ItemEnchantDraw& a, const ro::sim::ItemEnchantDraw& b) {
+        return a.item_id == b.item_id && a.odds == b.odds;
+      });
+}
+
+// LE TIRAGE DU GRADE SUIVANT, quand il diffère de celui de la pièce ; nul sinon.
+[[nodiscard]] const ro::sim::ItemEnchantDrawGrade* OtherGradeDraws(
+    const ro::sim::ItemEnchantSlot& entry, std::uint8_t grade) {
+  if (grade == std::numeric_limits<std::uint8_t>::max()) {
+    return nullptr;
+  }
+  const ro::sim::ItemEnchantDrawGrade* next = entry.DrawsFor(static_cast<std::uint8_t>(grade + 1));
+  const ro::sim::ItemEnchantDrawGrade* now = entry.DrawsFor(grade);
+  if (next == nullptr || (now != nullptr && SameDraws(*now, *next))) {
+    return nullptr;
+  }
+  return next;
+}
+
+// Les octets d'un caractère UTF-8 qui suivent le premier.
+constexpr unsigned char kUtf8ContinuationMask = 0xC0;
+constexpr unsigned char kUtf8Continuation = 0x80;
+
+void CutAtCharacter(std::string& text, std::size_t at) {
+  while (at > 0 &&
+         (static_cast<unsigned char>(text[at]) & kUtf8ContinuationMask) == kUtf8Continuation) {
+    --at;
+  }
+  text.resize(at);
+}
+
 }  // namespace
+
+std::string ItemEffectLine(std::span<const std::string> description, std::size_t max_bytes) {
+  std::string out;
+  for (const std::string& raw : description) {
+    std::string plain;
+    for (const ro::core::ColorRun& run : ro::core::SplitColorRuns(std::string_view(raw))) {
+      plain += run.text;
+    }
+    // Le « # » de fin de ligne vaut un trait : il ne dit rien de l'effet.
+    while (!plain.empty() && (plain.back() == '#' || plain.back() == ' ')) {
+      plain.pop_back();
+    }
+    const std::size_t first = plain.find_first_not_of(' ');
+    if (first == std::string::npos) {
+      continue;
+    }
+    plain.erase(0, first);
+    // LA PREMIÈRE RUBRIQUE CLÔT L'EFFET : ce qui suit dit où il se pose, pas ce qu'il donne.
+    if (plain.starts_with('[') || plain.starts_with("____")) {
+      break;
+    }
+    if (!out.empty()) {
+      out += out.back() == ':' ? " " : " · ";
+    }
+    out += plain;
+    if (out.size() > max_bytes) {
+      CutAtCharacter(out, max_bytes);
+      out += "…";
+      break;
+    }
+  }
+  return out;
+}
 
 std::string ItemEnchantRefusalText(ItemEnchantRefusal refusal,
                                    const ro::sim::ItemEnchantGroup* group,
@@ -136,6 +206,14 @@ ro::ui::TradeItemView ItemEnchantViewComposer::ItemOf(const ItemEnchantScene& sc
   return view;
 }
 
+std::string_view ItemEnchantViewComposer::EffectOf(const ItemEnchantScene& scene,
+                                                   std::uint32_t item_id) {
+  if (!scene.looks.effect_of || item_id == 0) {
+    return {};
+  }
+  return Keep(scene.looks.effect_of(item_id));
+}
+
 void ItemEnchantViewComposer::ComposeCandidates(const ItemEnchantScene& scene) {
   for (const InventoryItem& item : scene.inventory.items()) {
     if (!scene.group.Targets(item.item_id)) {
@@ -147,7 +225,71 @@ void ItemEnchantViewComposer::ComposeCandidates(const ItemEnchantScene& scene) {
     row.refusal = Keep(
         ItemEnchantRefusalText(ro::sim::JudgeItemEnchantPiece(scene.group, item), &scene.group));
     row.chosen = scene.chosen_slot == item.client_slot;
+    // OÙ EN SONT SES CASES : celles que le groupe remplit, hors cases de carte. Un
+    // objet forgé n'en a aucune, et ne dit rien.
+    const std::uint8_t card_slots = scene.looks.card_slots_of(item.item_id);
+    const auto total = std::ranges::count_if(scene.group.order, [card_slots](std::uint8_t slot) {
+      return slot >= card_slots && slot < ro::sim::kItemCardSlots;
+    });
+    if (total > 0 && !ro::sim::ItemIsForged(item)) {
+      const auto done = static_cast<int>(ro::sim::EnchantedSlots(item, card_slots).size());
+      row.full = done > 0 && !ro::sim::NextEnchantSlot(scene.group, item, card_slots).has_value();
+      row.progress = row.full
+                         ? Keep(Tr("pleine"))
+                         : Keep(Printed(Tr("%d/%d enchantée(s)"), done, static_cast<int>(total)));
+    }
     candidates_.push_back(row);
+  }
+}
+
+// LA PIÈCE AVANT ET APRÈS : les seules cases que la tentative changerait.
+void ItemEnchantViewComposer::ComposePreview(const ItemEnchantScene& scene,
+                                             const InventoryItem& item) {
+  const std::uint8_t card_slots = scene.looks.card_slots_of(item.item_id);
+  const ro::sim::ItemEnchantRequest request = ItemEnchantRequestOf(scene.state);
+  const std::optional<std::uint8_t> next = ro::sim::NextEnchantSlot(scene.group, item, card_slots);
+  switch (request.mode) {
+    case ItemEnchantMode::kRandom:
+      if (next.has_value() && view_.random_open) {
+        preview_.push_back(ro::ui::ItemEnchantPreviewView{.slot = *next, .drawn = true});
+      }
+      break;
+    case ItemEnchantMode::kPerfect: {
+      const ro::sim::ItemEnchantSlot* entry =
+          next.has_value() ? scene.group.FindSlot(*next) : nullptr;
+      if (entry != nullptr && entry->FindPerfect(request.enchant_item_id) != nullptr) {
+        preview_.push_back(
+            ro::ui::ItemEnchantPreviewView{.slot = *next,
+                                           .after = ItemOf(scene, request.enchant_item_id),
+                                           .effect = EffectOf(scene, request.enchant_item_id)});
+      }
+      break;
+    }
+    case ItemEnchantMode::kUpgrade: {
+      if (request.slot >= ro::sim::kItemCardSlots) {
+        break;
+      }
+      const ro::sim::ItemEnchantSlot* entry = scene.group.FindSlot(request.slot);
+      const ro::sim::ItemEnchantUpgrade* upgrade =
+          entry != nullptr ? entry->FindUpgrade(item.cards[request.slot]) : nullptr;
+      if (upgrade != nullptr) {
+        preview_.push_back(
+            ro::ui::ItemEnchantPreviewView{.slot = request.slot,
+                                           .before = ItemOf(scene, upgrade->from_item_id),
+                                           .after = ItemOf(scene, upgrade->to_item_id),
+                                           .effect = EffectOf(scene, upgrade->to_item_id)});
+      }
+      break;
+    }
+    case ItemEnchantMode::kReset:
+      if (!view_.reset_open) {
+        break;
+      }
+      for (const std::uint8_t slot : ro::sim::EnchantedSlots(item, card_slots)) {
+        preview_.push_back(ro::ui::ItemEnchantPreviewView{
+            .slot = slot, .before = ItemOf(scene, item.cards[slot])});
+      }
+      break;
   }
 }
 
@@ -211,10 +353,23 @@ void ItemEnchantViewComposer::ComposeOperation(const ItemEnchantScene& scene,
       view_.summary = Keep(Printed(Tr("Case %d : un enchantement tiré au sort parmi %d."),
                                    shown_next, static_cast<int>(count)));
       view_.options_title = Keep(Tr("Ce que le tirage peut poser"));
+      // LE GRADE SUIVANT TIRE AUTRE CHOSE : la case à cocher le montre, sans que la
+      // tentative change — elle tire toujours au grade de la pièce.
+      const ro::sim::ItemEnchantDrawGrade* other = OtherGradeDraws(*entry, item.grade);
+      if (other != nullptr) {
+        view_.other_grade_label = Keep(Tr("Voir le tirage du grade suivant"));
+        if (scene.state.other_grade) {
+          draws = other;
+          view_.options_title =
+              Keep(Tr("Ce que le tirage poserait au grade suivant (pas cette tentative)"));
+        }
+      }
       if (draws != nullptr) {
         for (const ro::sim::ItemEnchantDraw& draw : draws->enchants) {
-          options_.push_back(ro::ui::ItemEnchantOptionView{.item = ItemOf(scene, draw.item_id),
-                                                           .odds = Keep(PercentText(draw.odds))});
+          options_.push_back(
+              ro::ui::ItemEnchantOptionView{.item = ItemOf(scene, draw.item_id),
+                                            .odds = Keep(PercentText(draw.odds)),
+                                            .effect = EffectOf(scene, draw.item_id)});
         }
       }
       view_.chance = entry->chance < ro::sim::kItemEnchantCertain
@@ -235,6 +390,7 @@ void ItemEnchantViewComposer::ComposeOperation(const ItemEnchantScene& scene,
             ro::sim::MissingEnchantMaterial(perfect.cost, scene.inventory) != nullptr;
         options_.push_back(
             ro::ui::ItemEnchantOptionView{.item = ItemOf(scene, perfect.item_id),
+                                          .effect = EffectOf(scene, perfect.item_id),
                                           .selectable = true,
                                           .chosen = scene.state.enchant_item_id == perfect.item_id,
                                           .short_of = short_of});
@@ -257,7 +413,9 @@ void ItemEnchantViewComposer::ComposeOperation(const ItemEnchantScene& scene,
                                    scene.looks.name_of_id(upgrade->from_item_id).c_str(),
                                    scene.looks.name_of_id(upgrade->to_item_id).c_str()));
       view_.options_title = Keep(Tr("Devient"));
-      options_.push_back(ro::ui::ItemEnchantOptionView{.item = ItemOf(scene, upgrade->to_item_id)});
+      options_.push_back(
+          ro::ui::ItemEnchantOptionView{.item = ItemOf(scene, upgrade->to_item_id),
+                                        .effect = EffectOf(scene, upgrade->to_item_id)});
       view_.chance = Keep(Tr("Réussite assurée."));
       break;
     }
@@ -287,8 +445,9 @@ void ItemEnchantViewComposer::ComposeTexts(const ItemEnchantScene& scene,
                                            const InventoryItem* item) {
   view_.title = Keep(Tr("Enchantement"));
   view_.instruction = Keep(
-      Tr("Choisissez une pièce de l'inventory, ôtée, puis ce qu'il faut y faire. Chaque tentative "
-         "ferme la séance : parlez de nouveau au PNJ pour la suivante."));
+      Tr("Choisissez une pièce de l'inventory, ôtée, ou glissez-la sur la fenêtre, puis ce qu'il "
+         "faut y faire. Chaque tentative ferme la séance : « Recommencer » reparle au PNJ pour la "
+         "suivante."));
   view_.notice = Keep(std::string(scene.notice));
   view_.notice_good = scene.notice_good;
   const ro::sim::ItemEnchantRequest request = ItemEnchantRequestOf(scene.state);
@@ -345,6 +504,8 @@ const ro::ui::ItemEnchantView& ItemEnchantViewComposer::Compose(const ItemEnchan
   slots_.clear();
   options_.clear();
   materials_.clear();
+  preview_.clear();
+  history_.clear();
   view_ = ro::ui::ItemEnchantView{};
 
   ComposeCandidates(scene);
@@ -353,6 +514,10 @@ const ro::ui::ItemEnchantView& ItemEnchantViewComposer::Compose(const ItemEnchan
   if (item != nullptr && scene.group.Targets(item->item_id)) {
     ComposeChoice(scene, *item);
     ComposeOperation(scene, *item);
+    // UNE SÉANCE CLOSE N'A PLUS RIEN À PRÉVOIR : la pièce montrée est déjà l'« après ».
+    if (!scene.concluded) {
+      ComposePreview(scene, *item);
+    }
   } else {
     item = nullptr;
   }
@@ -361,6 +526,12 @@ const ro::ui::ItemEnchantView& ItemEnchantViewComposer::Compose(const ItemEnchan
   view_.slots = slots_;
   view_.options = options_;
   view_.materials = materials_;
+  view_.preview = preview_;
+  for (const ItemEnchantAttempt& attempt : scene.history) {
+    history_.push_back(ro::ui::ItemEnchantHistoryView{.text = attempt.text, .good = attempt.good});
+  }
+  view_.history = history_;
+  view_.retry_open = scene.concluded && scene.npc_known;
   view_.blockers = blockers_;
   view_.purse = scene.zeny_known ? scene.zeny : -1;
   view_.choice_seq = scene.enchant.choice_seq();

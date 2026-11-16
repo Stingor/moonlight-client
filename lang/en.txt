@@ -24586,8 +24586,8 @@ tr: Choose the item to enchant.
 fr: Choisissez une case dont l'enchantement s'améliore.
 tr: Choose a slot whose enchantment can be upgraded.
 
-fr: Choisissez une pièce de l'inventory, ôtée, puis ce qu'il faut y faire. Chaque tentative ferme la séance : parlez de nouveau au PNJ pour la suivante.
-tr: Choose an unequipped item from the inventory, then what to do with it. Each attempt ends the session: talk to the NPC again for the next one.
+fr: Choisissez une pièce de l'inventory, ôtée, ou glissez-la sur la fenêtre, puis ce qu'il faut y faire. Chaque tentative ferme la séance : « Recommencer » reparle au PNJ pour la suivante.
+tr: Choose an unequipped piece from the inventory, or drag it onto the window, then what to do with it. Each attempt ends the session: "Retry" talks to the NPC again for the next one.
 
 fr: Choix sûr
 tr: Safe choice
@@ -24652,38 +24652,29 @@ tr: Removes the item's %d enchantment(s); cards stay.
 fr: Ôter tous les enchantements de %s ? Les zenys et les matériaux seront consommés, même en cas d'échec.
 tr: Remove all enchantments from %s? The zeny and materials will be consumed, even on failure.
 
-fr: Faucon
-tr: Falcon
+fr: %d/%d enchantée(s)
+tr: %d/%d enchanted
 
-fr: Chariot
-tr: Cart
+fr: (un enchantement tiré au sort)
+tr: (a randomly drawn enchantment)
 
-fr: Le serveur ne range pas encore la teinture du faucon et du chariot.
-tr: The server does not store falcon and cart dyes yet.
+fr: Après la tentative
+tr: After the attempt
 
-fr: Sors ton faucon ou pousse ton chariot pour le teindre.
-tr: Call your falcon or push your cart to dye it.
+fr: Ce que le tirage poserait au grade suivant (pas cette tentative)
+tr: What the draw would give at the next grade (not this attempt)
 
-fr: La teinture de cet onglet appartient à ton personnage.
-tr: This tab's dye belongs to your character.
+fr: Dernières tentatives
+tr: Latest attempts
 
-fr: Cette teinture appartient à ton personnage, et vaut pour ce chariot : chaque chariot garde la sienne.
-tr: This dye belongs to your character and applies to this cart: each cart keeps its own.
+fr: Recommencer
+tr: Retry
 
-fr: Cette teinture appartient à ton personnage, et vaut pour cet oiseau : chaque oiseau garde la sienne.
-tr: This dye belongs to your character and applies to this bird: each bird keeps its own.
+fr: Reparler au PNJ pour une nouvelle tentative.
+tr: Talk to the NPC again for a new attempt.
 
-fr: Change de chariot : celui-ci reprend ses couleurs d'origine, et retrouve sa teinture quand tu le reprends.
-tr: Change carts: this one goes back to its original colors, and gets its dye back when you take it again.
+fr: Voir le tirage du grade suivant
+tr: Show the next grade's draw
 
-fr: Un autre job ou une autre tenue peut changer d'oiseau : celui-ci retrouve sa teinture quand il revient.
-tr: Another job or outfit can change the bird: this one gets its dye back when it returns.
-
-fr: Cette teinture se valide auprès du styliste.
-tr: This dye is confirmed at the stylist.
-
-fr: Retirer cette teinture
-tr: Remove this dye
-
-fr: Retirer cette teinture ?
-tr: Remove this dye?
+fr: pleine
+tr: full

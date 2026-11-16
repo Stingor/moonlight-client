@@ -105,6 +105,44 @@ TEST_CASE("Fenêtre d'enchantement : une case sans tirage prend le choix sûr d'
   CHECK_FALSE(probe.state.perfect);
 }
 
+TEST_CASE("Fenêtre d'enchantement : aperçu, historique, effets et Recommencer se dessinent",
+          "[ui][item_enchant]") {
+  Probe probe;
+  probe.candidates[0].progress = "1/3 enchantée(s)";
+  const std::array<ro::ui::ItemEnchantOptionView, 1> options{ro::ui::ItemEnchantOptionView{
+      .item = {.item_id = 311092, .name = "Ice Magic Orb (STR)"}, .effect = "STR +3"}};
+  const std::array<ro::ui::ItemEnchantPreviewView, 1> preview{
+      ro::ui::ItemEnchantPreviewView{.slot = 3, .drawn = true}};
+  const std::array<ro::ui::ItemEnchantHistoryView, 1> history{
+      ro::ui::ItemEnchantHistoryView{.text = "Enchantement posé.", .good = true}};
+  probe.view.options_title = "Ce que le tirage peut poser";
+  probe.view.options = options;
+  probe.view.preview = preview;
+  probe.view.history = history;
+  probe.view.retry_open = true;
+  for (int frame = 0; frame < 3; ++frame) {
+    const ItemEnchantWindowAction action = probe.Frame();
+    CHECK_FALSE(action.retry);
+    CHECK_FALSE(action.enchant);
+  }
+}
+
+TEST_CASE("Fenêtre d'enchantement : le tirage d'un autre grade se décoche sans libellé",
+          "[ui][item_enchant]") {
+  Probe probe;
+  probe.state.other_grade = true;
+  probe.view.other_grade_label = "Voir le tirage du grade suivant";
+  static_cast<void>(probe.Frame());
+  CHECK(probe.state.other_grade);
+  probe.view.other_grade_label = {};
+  static_cast<void>(probe.Frame());
+  CHECK_FALSE(probe.state.other_grade);
+  // Une ouverture neuve le remet aussi à zéro.
+  probe.state.other_grade = true;
+  ro::ui::OpenItemEnchantOn(probe.state, 2);
+  CHECK_FALSE(probe.state.other_grade);
+}
+
 TEST_CASE("Fenêtre d'enchantement : l'état baissé se dit comme une fermeture",
           "[ui][item_enchant]") {
   Probe probe;

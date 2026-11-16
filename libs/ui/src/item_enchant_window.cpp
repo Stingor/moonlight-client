@@ -1,11 +1,15 @@
 #include "ro/ui/item_enchant_window.h"
 
+#include <algorithm>
 #include <cfloat>
 #include <string>
+
+#include <imgui_internal.h>
 
 #include "ro/core/i18n.h"
 #include "ro/core/printed.h"
 #include "ro/ui/modal_box.h"
+#include "ro/ui/shortcut_bar.h"
 #include "ro/ui/skin_widgets.h"
 #include "ro/ui/skinned_window.h"
 
@@ -32,6 +36,9 @@ constexpr float kFooterLines = 3.0F;
 constexpr int kSlotIdBase = 1000;
 constexpr int kOptionIdBase = 2000;
 constexpr int kMaterialIdBase = 3000;
+constexpr int kPreviewIdBase = 4000;
+// Ce que l'historique montre au plus.
+constexpr std::size_t kHistoryShown = 8;
 // Les cases s'affichent numérotées à partir de un, comme dans le jeu.
 constexpr int kShownSlotOffset = 1;
 
@@ -61,6 +68,33 @@ void DrawCandidate(ItemEnchantWindowState& state, const ItemEnchantPieceView& ro
   if (!row.refusal.empty() && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
     SkinTooltip(std::string(row.refusal).c_str());
   }
+  // OÙ EN SONT SES CASES, sous son nom : de quoi choisir sans ouvrir chaque pièce.
+  if (!row.progress.empty()) {
+    ImGui::Indent();
+    if (row.full) {
+      ColoredText(kGoodText, row.progress);
+    } else {
+      ImGui::TextDisabled("%.*s", static_cast<int>(row.progress.size()), row.progress.data());
+    }
+    ImGui::Unindent();
+  }
+}
+
+// LES TENTATIVES DE LA PARTIE, la plus récente en tête.
+void DrawHistory(const ItemEnchantView& view) {
+  if (view.history.empty()) {
+    return;
+  }
+  ImGui::Spacing();
+  ImGui::TextUnformatted(core::Tr("Dernières tentatives"));
+  ImGui::Separator();
+  const std::size_t shown = std::min(view.history.size(), kHistoryShown);
+  for (std::size_t index = 0; index < shown; ++index) {
+    const ItemEnchantHistoryView& entry = view.history[index];
+    ImGui::PushStyleColor(ImGuiCol_Text, entry.good ? kGoodText : kTradeRefusedText);
+    ImGui::TextWrapped("%.*s", static_cast<int>(entry.text.size()), entry.text.data());
+    ImGui::PopStyleColor();
+  }
 }
 
 void DrawList(ItemEnchantWindowState& state, const ItemEnchantView& view, const SkinArt& art,
@@ -75,6 +109,7 @@ void DrawList(ItemEnchantWindowState& state, const ItemEnchantView& view, const 
   if (view.candidates.empty()) {
     ImGui::TextDisabled("%s", core::Tr("(aucune pièce de ce groupe dans l'inventory)"));
   }
+  DrawHistory(view);
   PaintWindowScrollbar(art);
 }
 
@@ -169,6 +204,14 @@ void DrawPages(ItemEnchantWindowState& state, const ItemEnchantView& view, const
   if (perfect_held) {
     ImGui::EndDisabled();
   }
+  // LE TIRAGE DU GRADE SUIVANT, pour savoir s'il vaut la peine de monter la pièce
+  // d'abord. Sans lui, la case se décoche : elle ne montrerait plus rien.
+  if (view.other_grade_label.empty()) {
+    state.other_grade = false;
+  } else if (!state.perfect) {
+    const std::string label(view.other_grade_label);
+    static_cast<void>(SkinCheckBox(label.c_str(), &state.other_grade, art));
+  }
 }
 
 void DrawOption(ItemEnchantWindowState& state, const ItemEnchantView& view,
@@ -195,6 +238,65 @@ void DrawOption(ItemEnchantWindowState& state, const ItemEnchantView& view,
   if (!option.odds.empty()) {
     ImGui::AlignTextToFramePadding();
     ImGui::TextUnformatted(option.odds.data(), option.odds.data() + option.odds.size());
+  }
+  // CE QU'IL DONNE, sous son nom : choisir sans ouvrir la fiche.
+  if (!option.effect.empty()) {
+    ImGui::Indent();
+    ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
+    ImGui::TextWrapped("%.*s", static_cast<int>(option.effect.size()), option.effect.data());
+    ImGui::PopStyleColor();
+    ImGui::Unindent();
+  }
+}
+
+// UNE CASE AVANT ET APRÈS : « Case 4 : (libre) → Orbe de FOR ».
+void DrawPreviewRow(ItemEnchantWindowState& state, const ItemEnchantPreviewView& row,
+                    ItemEnchantWindowAction& action) {
+  const std::string number = core::Printed(core::Tr("Case %d"), row.slot + kShownSlotOffset);
+  ImGui::AlignTextToFramePadding();
+  ImGui::TextUnformatted(number.c_str());
+  ImGui::SameLine();
+  if (row.before.item_id != 0) {
+    ImGui::PushID("before");
+    NoteItemById(DrawTradeItem(row.before), row.before, row.before.item_id, state.item_menu,
+                 action);
+    ImGui::PopID();
+  } else {
+    ImGui::TextDisabled("%s", core::Tr("(libre)"));
+  }
+  ImGui::Indent();
+  ImGui::AlignTextToFramePadding();
+  ImGui::TextUnformatted("→");
+  ImGui::SameLine();
+  if (row.drawn) {
+    ColoredText(kNextSlotText, core::Tr("(un enchantement tiré au sort)"));
+  } else if (row.after.item_id != 0) {
+    ImGui::PushID("after");
+    NoteItemById(DrawTradeItem(row.after), row.after, row.after.item_id, state.item_menu, action);
+    ImGui::PopID();
+  } else {
+    ImGui::TextDisabled("%s", core::Tr("(libre)"));
+  }
+  if (!row.effect.empty()) {
+    ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
+    ImGui::TextWrapped("%.*s", static_cast<int>(row.effect.size()), row.effect.data());
+    ImGui::PopStyleColor();
+  }
+  ImGui::Unindent();
+}
+
+void DrawPreview(ItemEnchantWindowState& state, const ItemEnchantView& view,
+                 ItemEnchantWindowAction& action) {
+  if (view.preview.empty()) {
+    return;
+  }
+  ImGui::Spacing();
+  ImGui::TextUnformatted(core::Tr("Après la tentative"));
+  ImGui::Separator();
+  for (std::size_t index = 0; index < view.preview.size(); ++index) {
+    ImGui::PushID(kPreviewIdBase + static_cast<int>(index));
+    DrawPreviewRow(state, view.preview[index], action);
+    ImGui::PopID();
   }
 }
 
@@ -228,6 +330,7 @@ void DrawOperation(ItemEnchantWindowState& state, const ItemEnchantView& view, c
       ImGui::PopID();
     }
   }
+  DrawPreview(state, view, action);
   ImGui::Spacing();
   ImGui::TextUnformatted(core::Tr("Coût"));
   ImGui::Separator();
@@ -333,6 +436,49 @@ void DrawBody(ItemEnchantWindowState& state, const ItemEnchantView& view, const 
   if (SkinButton(core::Tr("Fermer"), art, ImVec2(kCloseButtonPixels * Scale(), 0.0F))) {
     state.open = false;
   }
+  // RECOMMENCER : la séance est close, le PNJ seul en rouvre une. Le bouton lui
+  // reparle ; son dialogue reprend comme au premier clic.
+  if (view.retry_open) {
+    ImGui::SameLine();
+    if (SkinButton(core::Tr("Recommencer"), art)) {
+      action.retry = true;
+    }
+    if (ImGui::IsItemHovered()) {
+      SkinTooltip(core::Tr("Reparler au PNJ pour une nouvelle tentative."));
+    }
+  }
+}
+
+// UNE PIÈCE LÂCHÉE DEPUIS LE SAC, n'importe où sur la fenêtre : la choisir.
+// ⚠ TOUTE LA FENÊTRE EST CIBLE, comme l'album : viser la liste serait trop étroit.
+void TakeHandDrop(const ItemEnchantView& view, ItemEnchantWindowAction& action) {
+  ImGuiWindow* window = ImGui::GetCurrentWindow()->RootWindow;
+  if (!ImGui::BeginDragDropTargetCustom(window->Rect(), window->ID)) {
+    return;
+  }
+  const ImGuiPayload* payload = ImGui::GetDragDropPayload();
+  const ItemEnchantPieceView* piece = nullptr;
+  bool from_bag = false;
+  if (payload != nullptr && payload->IsDataType(kItemDragPayload) &&
+      payload->DataSize == static_cast<int>(sizeof(ItemDrag))) {
+    const auto& carried = *static_cast<const ItemDrag*>(payload->Data);
+    from_bag = carried.from == ItemHolder::kInventory;
+    const auto found = std::ranges::find_if(view.candidates, [&](const ItemEnchantPieceView& row) {
+      return row.client_slot == carried.client_slot;
+    });
+    piece = from_bag && found != view.candidates.end() ? &*found : nullptr;
+  }
+  // PENDANT LE SURVOL, ce qui ne se choisira pas se dit : on peut encore renoncer.
+  if (piece == nullptr) {
+    SkinTooltip(core::Tr("Cette pièce ne s'enchante pas ici."));
+  } else if (!piece->refusal.empty()) {
+    SkinTooltip(std::string(piece->refusal).c_str());
+  }
+  if (const ImGuiPayload* dropped = ImGui::AcceptDragDropPayload(kItemDragPayload);
+      dropped != nullptr && piece != nullptr && piece->refusal.empty() && !view.waiting) {
+    action.choose_slot = piece->client_slot;
+  }
+  ImGui::EndDragDropTarget();
 }
 
 }  // namespace
@@ -344,6 +490,7 @@ void OpenItemEnchantOn(ItemEnchantWindowState& state, std::uint32_t opening_seq)
   state.perfect = false;
   state.enchant_item_id = 0;
   state.upgrade_slot = kItemEnchantNoSlot;
+  state.other_grade = false;
   state.asking = false;
   state.asked_choice_seq = 0;
 }
@@ -370,6 +517,7 @@ ItemEnchantWindowAction DrawItemEnchantWindow(ItemEnchantWindowState& state,
     ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, kChildRoundingPixels * scale);
     DrawBody(state, view, art, action);
     DrawConfirmation(state, view, art, action);
+    TakeHandDrop(view, action);
     if (const ChatLinkAsk chosen = DrawTradeItemMenu(kItemMenuId, state.item_menu, link_facts);
         chosen.gesture != ChatLinkGesture::kNothing) {
       action.describe_id = chosen.item_id;

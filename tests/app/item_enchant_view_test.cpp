@@ -5,6 +5,7 @@
 
 #include <cstdint>
 #include <string>
+#include <vector>
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -186,6 +187,185 @@ TEST_CASE("Vue de l'enchantement : une séance close se montre sans se toucher",
   CHECK(shown.blockers.empty());
   CHECK(shown.chosen.item_id == kArmorId);
   CHECK(shown.notice == "posé");
+}
+
+TEST_CASE("Vue de l'enchantement : chaque pièce dit où en sont ses cases", "[app][item_enchant]") {
+  const auto book = ItemEnchantBook::Parse(kBookText);
+  REQUIRE(book.has_value());
+  const ItemEnchantLooks looks = TestLooks();
+  ItemEnchant enchant;
+  enchant.TellOpening(kGroupId);
+  const ro::ui::ItemEnchantWindowState state;
+  ItemEnchantViewComposer composer;
+  const auto compose = [&](const Inventory& bag) -> const ro::ui::ItemEnchantView& {
+    return composer.Compose(ItemEnchantScene{.enchant = enchant,
+                                             .group = *book->Find(kGroupId),
+                                             .inventory = bag,
+                                             .looks = looks,
+                                             .state = state});
+  };
+
+  const Inventory blank = Bag();
+  REQUIRE(compose(blank).candidates.size() == 1);
+  CHECK(compose(blank).candidates[0].progress == "0/2 enchantée(s)");
+  CHECK_FALSE(compose(blank).candidates[0].full);
+
+  InventoryItem half{
+      .client_slot = kArmorSlot, .item_id = kArmorId, .amount = 1, .identified = true};
+  half.cards[3] = kStrOrbId;
+  Inventory one;
+  one.Put(half);
+  CHECK(compose(one).candidates[0].progress == "1/2 enchantée(s)");
+
+  half.cards[2] = kDexOrbId;
+  Inventory both;
+  both.Put(half);
+  CHECK(compose(both).candidates[0].progress == "pleine");
+  CHECK(compose(both).candidates[0].full);
+}
+
+TEST_CASE("Vue de l'enchantement : l'effet en une ligne, tiré de la fiche", "[app][item_enchant]") {
+  const std::vector<std::string> description{"STR +1#", "^0000FFRefine Level +7:^000000", "STR +1#",
+                                             "^000088[Enchantable Equipment]^000000",
+                                             "Gray Wolf Suits"};
+  CHECK(moonclient::ItemEffectLine(description) == "STR +1 · Refine Level +7: STR +1");
+  // Trop longue : coupée sur un caractère entier, et marquée.
+  const std::string cut = moonclient::ItemEffectLine(description, 8);
+  CHECK(cut.starts_with("STR +1"));
+  CHECK(cut.ends_with("…"));
+  CHECK(moonclient::ItemEffectLine({}).empty());
+}
+
+TEST_CASE("Vue de l'enchantement : l'aperçu montre la case avant et après", "[app][item_enchant]") {
+  const auto book = ItemEnchantBook::Parse(kBookText);
+  REQUIRE(book.has_value());
+  ItemEnchantLooks looks = TestLooks();
+  looks.effect_of = [](std::uint32_t item_id) { return "effet " + std::to_string(item_id); };
+  const Inventory bag = Bag();
+  ItemEnchant enchant;
+  enchant.TellOpening(kGroupId);
+  REQUIRE(enchant.Choose(kArmorSlot));
+  ro::ui::ItemEnchantWindowState state;
+  ro::ui::OpenItemEnchantOn(state, enchant.opening_seq());
+  ItemEnchantViewComposer composer;
+  const auto compose = [&]() -> const ro::ui::ItemEnchantView& {
+    return composer.Compose(ItemEnchantScene{.enchant = enchant,
+                                             .group = *book->Find(kGroupId),
+                                             .inventory = bag,
+                                             .looks = looks,
+                                             .state = state,
+                                             .chosen_slot = enchant.chosen_slot(),
+                                             .zeny = 1000000});
+  };
+
+  // Tirage : la case suivante, sans savoir ce qu'elle recevra.
+  REQUIRE(compose().preview.size() == 1);
+  CHECK(compose().preview[0].slot == 3);
+  CHECK(compose().preview[0].drawn);
+  REQUIRE(compose().options.size() == 2);
+  CHECK(compose().options[0].effect == "effet 311092");
+
+  // Choix sûr : rien tant que rien n'est choisi, puis l'orbe et son effet.
+  state.perfect = true;
+  CHECK(compose().preview.empty());
+  state.enchant_item_id = kStrOrbId;
+  REQUIRE(compose().preview.size() == 1);
+  CHECK(compose().preview[0].after.item_id == kStrOrbId);
+  CHECK(compose().preview[0].effect == "effet 311092");
+}
+
+TEST_CASE("Vue de l'enchantement : le tirage du grade suivant se montre à part",
+          "[app][item_enchant]") {
+  constexpr const char* kGradedText = R"(
+version: 1
+mode: Prerenewal
+groups:
+  - id: 26
+    targets: [450206]
+    least_refine: 0
+    least_grade: 0
+    random_options: true
+    order: [3]
+    slots:
+      - slot: 3
+        zeny: 0
+        materials: []
+        chance: 100000
+        draws:
+          - {grade: 0, enchants: [[311092, 100000]]}
+          - {grade: 1, enchants: [[311093, 100000]]}
+        perfect: []
+        upgrades: []
+)";
+  const auto book = ItemEnchantBook::Parse(kGradedText);
+  REQUIRE(book.has_value());
+  const ItemEnchantLooks looks = TestLooks();
+  const Inventory bag = Bag();
+  ItemEnchant enchant;
+  enchant.TellOpening(kGroupId);
+  REQUIRE(enchant.Choose(kArmorSlot));
+  ro::ui::ItemEnchantWindowState state;
+  ro::ui::OpenItemEnchantOn(state, enchant.opening_seq());
+  ItemEnchantViewComposer composer;
+  const auto compose = [&]() -> const ro::ui::ItemEnchantView& {
+    return composer.Compose(ItemEnchantScene{.enchant = enchant,
+                                             .group = *book->Find(kGroupId),
+                                             .inventory = bag,
+                                             .looks = looks,
+                                             .state = state,
+                                             .chosen_slot = enchant.chosen_slot()});
+  };
+  CHECK_FALSE(compose().other_grade_label.empty());
+  REQUIRE(compose().options.size() == 1);
+  CHECK(compose().options[0].item.item_id == kStrOrbId);
+  state.other_grade = true;
+  REQUIRE(compose().options.size() == 1);
+  CHECK(compose().options[0].item.item_id == kDexOrbId);
+  // La tentative, elle, tire toujours au grade de la pièce.
+  CHECK(moonclient::ItemEnchantRequestOf(state).mode == ro::sim::ItemEnchantMode::kRandom);
+
+  // Un groupe qui tire la même chose à chaque grade n'offre rien.
+  const auto plain = ItemEnchantBook::Parse(kBookText);
+  REQUIRE(plain.has_value());
+  const auto& same = composer.Compose(ItemEnchantScene{.enchant = enchant,
+                                                       .group = *plain->Find(kGroupId),
+                                                       .inventory = bag,
+                                                       .looks = looks,
+                                                       .state = state,
+                                                       .chosen_slot = enchant.chosen_slot()});
+  CHECK(same.other_grade_label.empty());
+}
+
+TEST_CASE("Vue de l'enchantement : historique, et Recommencer quand la séance est close",
+          "[app][item_enchant]") {
+  const auto book = ItemEnchantBook::Parse(kBookText);
+  REQUIRE(book.has_value());
+  const ItemEnchantLooks looks = TestLooks();
+  const Inventory bag = Bag();
+  ItemEnchant enchant;
+  const ro::ui::ItemEnchantWindowState state;
+  const std::vector<moonclient::ItemEnchantAttempt> history{{.text = "posé", .good = true},
+                                                            {.text = "raté", .good = false}};
+  ItemEnchantViewComposer composer;
+  const auto compose = [&](bool concluded, bool npc_known) -> const ro::ui::ItemEnchantView& {
+    return composer.Compose(ItemEnchantScene{.enchant = enchant,
+                                             .group = *book->Find(kGroupId),
+                                             .inventory = bag,
+                                             .looks = looks,
+                                             .state = state,
+                                             .chosen_slot = kArmorSlot,
+                                             .concluded = concluded,
+                                             .history = history,
+                                             .npc_known = npc_known});
+  };
+  REQUIRE(compose(true, true).history.size() == 2);
+  CHECK(compose(true, true).history[0].text == "posé");
+  CHECK(compose(true, true).history[0].good);
+  CHECK(compose(true, true).retry_open);
+  // Une séance close n'a plus rien à prévoir.
+  CHECK(compose(true, true).preview.empty());
+  CHECK_FALSE(compose(true, false).retry_open);
+  CHECK_FALSE(compose(false, true).retry_open);
 }
 
 TEST_CASE("Vue de l'enchantement : le résultat se dit", "[app][item_enchant]") {

@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <optional>
 #include <string>
+#include <vector>
 
 #include "ro/sim/item_enchant.h"
 #include "ro/ui/item_enchant_window.h"
@@ -58,6 +59,12 @@ class ItemEnchantStage {
   // 🔴 LA RÉPONSE CLÔT LA SÉANCE, PAS LA FENÊTRE : elle reste pour dire ce qui est
   // arrivé, tout retenu, jusqu'à ce que le joueur la ferme ou que le PNJ la rouvre.
   bool concluded_ = false;
+  // LE PNJ DE LA SÉANCE : le dernier dont un dialogue s'est montré, retenu à
+  // l'ouverture ; « Recommencer » lui reparle. Zéro : inconnu, pas de bouton.
+  std::uint32_t last_dialog_npc_ = 0;
+  std::uint32_t session_npc_ = 0;
+  // Les tentatives de la partie, la plus récente en tête.
+  std::vector<ItemEnchantAttempt> history_;
   TradeItemFocus hovered_;
   std::optional<TradeItemFocus> described_;
   ItemEnchantViewComposer composer_;
