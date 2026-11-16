@@ -60,12 +60,6 @@ constexpr float kPercent = 100.0F;
 // La bulle d'aide du plafond, traduite et le plafond inséré.
 constexpr std::size_t kHelpBytes = 384;
 
-// LES DEUX TEINTES DU MESSAGE D'ÉTAT. ⚠ ELLES NE SONT PAS DANS LA PALETTE : la
-// palette dit ce qu'est une fenêtre du jeu, et ces deux-là ne servent qu'ici —
-// le client d'origine n'a pas de message vert du tout.
-constexpr ImVec4 kStatusErrorColor(0.85F, 0.15F, 0.15F, 1.0F);
-constexpr ImVec4 kStatusDoneColor(0.15F, 0.55F, 0.20F, 1.0F);
-
 // LES PALIERS, dans l'ordre de la rangée. Voir `kBankStepCount`.
 struct BankStep {
   const char* label;
@@ -99,8 +93,13 @@ constexpr std::array<BankStep, kBankStepCount> kSteps = {
 // si bien qu'elle n'est étirée que lorsque le bloc, lui, ne tient plus dans
 // quarante-huit lignes. Les deux tranches rayées, elles, s'étirent sans qu'on
 // le voie : huit valeurs sur deux cent cinquante-cinq séparent leurs rayures.
-void DrawBankBackground(const SkinImage& background, ImDrawList* into, float left, float right,
-                        float body_top, float body_bottom, float band_top, float band_bottom) {
+//
+// 🔴 LE BITMAP EST PEINT SUR DU BLANC, ET SE POSE SUR LE PAPIER DU THÈME : tel
+// sous le classique, assombri sous un thème sombre — sans quoi le texte clair
+// de ce thème se perdrait sur ses rayures presque blanches.
+void DrawBankBackground(const SkinImage& background, ImDrawList* into, ImU32 paper, float left,
+                        float right, float body_top, float body_bottom, float band_top,
+                        float band_bottom) {
   if (!background.usable() || background.height <= 0.0F) {
     return;
   }
@@ -111,8 +110,8 @@ void DrawBankBackground(const SkinImage& background, ImDrawList* into, float lef
     if (bottom <= top) {
       return;
     }
-    into->AddImage(background.id, ImVec2(left, top), ImVec2(right, bottom),
-                   ImVec2(0.0F, from / texture), ImVec2(1.0F, to / texture));
+    PaintOnPaper(into, background, ImVec2(left, top), ImVec2(right, bottom), paper,
+                 ImVec2(0.0F, from / texture), ImVec2(1.0F, to / texture));
   };
   slice(0.0F, kBandTopPixels, body_top, band_top);
   slice(kBandTopPixels, kBandBottomPixels, band_top, band_bottom);
@@ -213,8 +212,10 @@ BankWindowAction DrawBankWindow(BankWindowState& state, const BankWindowView& vi
 
   static WindowName name(kBankWindowTitle, kBankWindowId);
   bool open = true;
-  const bool begun = BeginSkinnedWindow(name.Get(), &open, art, SkinnedTitle::kBar,
-                                        ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+  const bool begun =
+      BeginSkinnedWindow(name.Get(), &open, art, SkinnedTitle::kBar,
+                         ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse |
+                             ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
   if (!open) {
     action.verb = BankVerb::kClose;
   }
@@ -230,6 +231,14 @@ BankWindowAction DrawBankWindow(BankWindowState& state, const BankWindowView& vi
   // ⚠ AUCUN RETOUR ANTICIPÉ ENTRE LE SPLIT ET LA FUSION : le dessin de la
   // fenêtre resterait coupé en deux.
   ImDrawList* const into = ImGui::GetWindowDrawList();
+  // ⚠ LE CONTENU S'ÉCRIT À L'ENCRE DU PAPIER, puisque c'est sur lui qu'il se
+  // lit ; sans le bitmap, il garde celle du corps.
+  const SkinLook& look = art.look();
+  const bool has_background = background.usable();
+  const ImU32 paper = has_background ? look.paper : look.body;
+  if (has_background) {
+    PushPaperStyle(look);
+  }
   into->ChannelsSplit(2);
   into->ChannelsSetCurrent(1);
 
@@ -298,7 +307,6 @@ BankWindowAction DrawBankWindow(BankWindowState& state, const BankWindowView& vi
   // ⚠ UNE SEULE COLONNE POUR LE CHAMP ET POUR LA RANGÉE DES PALIERS : le sac
   // occupe le début de la bande, et tout ce qui porte un montant démarre après
   // lui. Deux variables dériveraient l'une de l'autre.
-  const bool has_background = background.usable();
   const float amount_column = kBagRightPixels * scale + ImGui::GetStyle().ItemSpacing.x;
 
   // ⚠ AUCUN CALAGE VERTICAL ICI, et c'est délibéré : le champ tombe où le flux
@@ -323,8 +331,10 @@ BankWindowAction DrawBankWindow(BankWindowState& state, const BankWindowView& vi
   // ligne : un texte trop long est rogné au bord.
   if (state.status[0] != '\0') {
     ImGui::SameLine();
-    ImGui::TextColored(state.status_error ? kStatusErrorColor : kStatusDoneColor, "%s",
-                       state.status);
+    const ImU32 tone = look.Tone(state.status_error ? SkinTone::kBad : SkinTone::kGood);
+    ImGui::PushStyleColor(ImGuiCol_Text, ReadableOn(tone, paper));
+    ImGui::TextUnformatted(state.status);
+    ImGui::PopStyleColor();
   }
 
   DrawStepRow(state, art, has_background, amount_column);
@@ -419,9 +429,12 @@ BankWindowAction DrawBankWindow(BankWindowState& state, const BankWindowView& vi
   // la première image la donnerait fausse.
   const float body_bottom = ImGui::GetCursorScreenPos().y + ImGui::GetStyle().WindowPadding.y;
   into->ChannelsSetCurrent(0);
-  DrawBankBackground(background, into, body_left, body_right, body_top, body_bottom, band_top,
-                     band_bottom);
+  DrawBankBackground(background, into, paper, body_left, body_right, body_top, body_bottom,
+                     band_top, band_bottom);
   into->ChannelsMerge();
+  if (has_background) {
+    ImGui::PopStyleColor(kPaperStyleColors);
+  }
 
   EndSkinnedWindow();
   return action;
