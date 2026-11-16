@@ -18,17 +18,15 @@ constexpr int kTextColors = 2;
 // LE CORPS DU SURGISSANT, posé AVANT son ouverture — c'est `Begin` qui peint
 // le fond et le liseré — et retiré APRÈS sa fermeture : ImGui exige qu'une
 // fenêtre retrouve en se fermant la pile qu'elle avait en s'ouvrant.
-constexpr auto kBodyColors = std::to_array<std::pair<ImGuiCol, ImU32>>({
-    {ImGuiCol_PopupBg, kSkinPopupColor},
-    {ImGuiCol_Border, kSkinBorderColor},
-    {ImGuiCol_Separator, kSkinBorderColor},
-    {ImGuiCol_Header, kSkinSelectionColor},
-    {ImGuiCol_HeaderHovered, kSkinSelectionHoverColor},
-    {ImGuiCol_HeaderActive, kSkinSelectionActiveColor},
-});
-
-// LE CORPS DANS UNE FENÊTRE HABILLÉE : celui que le joueur a réglé — « Menus
-// et listes », la bordure, la sélection —, qu'il soit sombre ou clair.
+//
+// Celui d'une fenêtre habillée est celui que le joueur a réglé — « Menus et
+// listes », la bordure, la sélection, les champs —, qu'il soit sombre ou clair.
+// Hors d'elle, celui du jeu : l'habillage par défaut.
+//
+// 🔴 LES CHAMPS AVEC LE TEXTE : le surgissant écrit dans la couleur de
+// l'habillage, et ses champs — ceux d'un sélecteur de couleur — garderaient
+// sinon le fond de l'endroit d'où il s'ouvre. Celui de la conversation est gris
+// clair : le texte clair d'un thème sombre s'y effaçait.
 [[nodiscard]] auto BodyOf(const SkinLook& look) {
   return std::to_array<std::pair<ImGuiCol, ImU32>>({
       {ImGuiCol_PopupBg, look.popup},
@@ -37,11 +35,14 @@ constexpr auto kBodyColors = std::to_array<std::pair<ImGuiCol, ImU32>>({
       {ImGuiCol_Header, look.selection},
       {ImGuiCol_HeaderHovered, look.SelectionHover()},
       {ImGuiCol_HeaderActive, look.SelectionActive()},
+      {ImGuiCol_FrameBg, look.input},
+      {ImGuiCol_FrameBgHovered, look.InputHover()},
+      {ImGuiCol_FrameBgActive, look.InputActive()},
   });
 }
 
-// ⚠ LE MÊME COMPTE DANS LES DEUX CAS : la fermeture dépile sans savoir lequel.
-static_assert(std::tuple_size_v<decltype(BodyOf(SkinLook{}))> == kBodyColors.size());
+// ⚠ LE MÊME COMPTE DANS TOUS LES CAS : la fermeture dépile sans savoir lequel.
+constexpr int kBodyColors = std::tuple_size_v<decltype(BodyOf(SkinLook{}))>;
 
 // Le corps : celui de l'habillage de la fenêtre en cours. Hors d'une fenêtre
 // habillée, celui du jeu si l'endroit en impose un sombre, sinon celui de
@@ -59,7 +60,7 @@ void PushBody() {
   }
   const bool dark = SkinPopupNeedsBody(
       ImGui::ColorConvertFloat4ToU32(ImGui::GetStyleColorVec4(ImGuiCol_PopupBg)));
-  for (const auto& [which, skin] : kBodyColors) {
+  for (const auto& [which, skin] : BodyOf(SkinLook{})) {
     if (dark) {
       ImGui::PushStyleColor(which, skin);
     } else {
@@ -68,7 +69,7 @@ void PushBody() {
   }
 }
 
-void PopBody() { ImGui::PopStyleColor(static_cast<int>(kBodyColors.size())); }
+void PopBody() { ImGui::PopStyleColor(kBodyColors); }
 
 // Le texte : celui de l'habillage de la fenêtre en cours, sinon celui du jeu —
 // le corps est alors le sien, ou un corps clair posé exprès.

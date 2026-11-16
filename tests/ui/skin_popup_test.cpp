@@ -169,6 +169,37 @@ TEST_CASE("Surgissant habillé : un cadre non habillé prête son habillage, le 
   CHECK(ro::ui::PaintingSkinArt() == nullptr);
 }
 
+TEST_CASE("Surgissant habillé : ses champs prennent ceux de l'habillage, pas ceux de l'hôte",
+          "[ui][popup]") {
+  // 🔴 LE SÉLECTEUR DU FOND D'UN ONGLET : la conversation pose ses champs gris
+  // clair, et les cases du sélecteur les gardaient sous le texte clair du thème
+  // sombre.
+  constexpr ImU32 kHostField = IM_COL32(206, 206, 206, 255);
+  ro::ui::SkinLook look;
+  look.popup = IM_COL32(44, 46, 54, 255);
+  look.text = IM_COL32(226, 228, 235, 255);
+  look.input = IM_COL32(30, 32, 38, 255);
+  const ro::ui::SkinArt art = DressedArt(look);
+  const OneFrame frame;
+  const ro::ui::LentSkinArt lent(art);
+  ImGui::PushStyleColor(ImGuiCol_FrameBg, kHostField);
+  ImU32 field = 0;
+  ImU32 hovered = 0;
+  ImGui::Begin("##cadre");
+  ImGui::OpenPopup("##menu");
+  if (ro::ui::BeginSkinPopup("##menu")) {
+    field = StyleColorNow(ImGuiCol_FrameBg);
+    hovered = StyleColorNow(ImGuiCol_FrameBgHovered);
+    ro::ui::EndSkinPopup();
+  }
+  ImGui::End();
+  CHECK(field == look.input);
+  CHECK(hovered == look.InputHover());
+  // Et la pile est rendue : l'hôte retrouve son champ.
+  CHECK(StyleColorNow(ImGuiCol_FrameBg) == kHostField);
+  ImGui::PopStyleColor();
+}
+
 namespace {
 
 // UN CONTEXTE QUI VIT PLUSIEURS IMAGES : un clic s'étale sur deux, l'enfoncement

@@ -6,6 +6,8 @@
 
 #include "ro/core/ink.h"
 
+#include "ui_color.h"
+
 namespace ro::ui {
 namespace {
 
@@ -35,6 +37,10 @@ constexpr unsigned kHoverOpacitySixteenths = 11U;
 constexpr unsigned kActiveOpacitySixteenths = 21U;
 // Ce qu'un appui retire à chaque canal : 156, 184, 234 deviennent 126, 160, 224.
 constexpr ImU32 kSelectionActiveShade = IM_COL32(206, 222, 244, 255);
+
+// Ce qu'un champ survolé, puis appuyé, gagne sur chaque canal.
+constexpr int kInputHoverLift = 10;
+constexpr int kInputActiveLift = 22;
 
 // Une couleur dont l'opacité passe à tant de seizièmes, plafonnée à l'opaque.
 [[nodiscard]] ImU32 WithOpacitySixteenths(ImU32 color, unsigned sixteenths) {
@@ -190,6 +196,10 @@ ImU32 SkinLook::SelectionActive() const {
   return WithOpacitySixteenths(MultiplyTint(selection, kSelectionActiveShade),
                                kActiveOpacitySixteenths);
 }
+
+ImU32 SkinLook::InputHover() const { return Lighter(input, kInputHoverLift); }
+
+ImU32 SkinLook::InputActive() const { return Lighter(input, kInputActiveLift); }
 
 ImU32 PaintedTint(ImU32 tint, bool disabled) {
   const ImGuiStyle& style = ImGui::GetStyle();

@@ -11,8 +11,6 @@
 namespace ro::ui {
 namespace {
 
-constexpr int kHoverLift = 10;
-constexpr int kActiveLift = 22;
 constexpr int kTabHoverLift = 14;
 
 // Ce que rien ne doit peindre, parce que NOUS le peignons : la barre de titre,
@@ -48,8 +46,8 @@ constexpr ImU32 kPaintedByUs = IM_COL32(0, 0, 0, 0);
       {ImGuiCol_ResizeGripHovered, kPaintedByUs},
       {ImGuiCol_ResizeGripActive, kPaintedByUs},
       {ImGuiCol_FrameBg, look.input},
-      {ImGuiCol_FrameBgHovered, Lighter(look.input, kHoverLift)},
-      {ImGuiCol_FrameBgActive, Lighter(look.input, kActiveLift)},
+      {ImGuiCol_FrameBgHovered, look.InputHover()},
+      {ImGuiCol_FrameBgActive, look.InputActive()},
       {ImGuiCol_Tab, look.idle_tab},
       {ImGuiCol_TabHovered, Lighter(look.idle_tab, kTabHoverLift)},
       {ImGuiCol_TabSelected, look.active_tab},

@@ -248,6 +248,9 @@ struct SkinLook {
   // d'origine rend exactement les siennes.
   [[nodiscard]] ImU32 SelectionHover() const;
   [[nodiscard]] ImU32 SelectionActive() const;
+  // LE CHAMP SURVOLÉ, ET APPUYÉ : un cran plus clair, puis deux.
+  [[nodiscard]] ImU32 InputHover() const;
+  [[nodiscard]] ImU32 InputActive() const;
 
   bool operator==(const SkinLook&) const = default;
 };
