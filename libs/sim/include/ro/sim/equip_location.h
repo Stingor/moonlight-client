@@ -42,16 +42,25 @@ inline constexpr std::uint32_t kEquipCostumeMask = 0x003C00;
 
 inline constexpr std::uint32_t kEquipAmmo = 0x008000;
 
-// L'ÉQUIPEMENT D'OMBRE, et il ne se montre nulle part chez nous.
+// L'ÉQUIPEMENT D'OMBRE : la fiche ne le montre pas, la fenêtre d'équipement du
+// jeu le montre sur son onglet Costume.
 //
-// 🔴 IL DOIT SE RECONNAÎTRE POUR ÊTRE ÉCARTÉ. Le client d'origine range ces
-// pièces sur les MÊMES places que les costumes, où elles en couvrent un sans
-// rien annoncer. Les ignorer par distraction donnerait le même écran ; les
-// ignorer nommément est ce qui empêche qu'on les y remette un jour.
+// 🔴 IL DOIT SE RECONNAÎTRE POUR ÊTRE ÉCARTÉ. Le jeu range ces pièces sur les
+// places ordinaires qu'elles doublent — armure, arme, bouclier, chaussures,
+// accessoires —, mais dans l'onglet des costumes. La fiche, qui n'a que quatre
+// cases d'apparat, les écarte nommément.
 //
 // ⚠ `0x004000` EST COMPTÉ ICI et le serveur le tient pour un emplacement de
-// costume au sol, en commentaire, sans l'employer. Aucune pièce n'en porte ; il
-// tombe du côté des ombres, c'est-à-dire du côté où on ne le montre pas.
+// costume au sol, en commentaire, sans l'employer. Aucune pièce n'en porte ; le
+// jeu le range avec l'arme d'ombre. Les autres, chacune sur son bit :
+// `EQP_SHADOW_*`, `src/common/mmo.hpp`.
+inline constexpr std::uint32_t kEquipCostumeFloor = 0x004000;
+inline constexpr std::uint32_t kEquipShadowArmor = 0x010000;
+inline constexpr std::uint32_t kEquipShadowWeapon = 0x020000;
+inline constexpr std::uint32_t kEquipShadowShield = 0x040000;
+inline constexpr std::uint32_t kEquipShadowShoes = 0x080000;
+inline constexpr std::uint32_t kEquipShadowAccessoryRight = 0x100000;  // EQP_SHADOW_ACC_R
+inline constexpr std::uint32_t kEquipShadowAccessoryLeft = 0x200000;   // EQP_SHADOW_ACC_L
 inline constexpr std::uint32_t kEquipShadowMask = 0x3F4000;
 
 // LES DEUX MAINS ENSEMBLE — `EQP_ARMS`, `src/map/pc.hpp`.

@@ -42,6 +42,7 @@
 #include "ro/ui/description_window.h"
 #include "ro/ui/entity_bars.h"
 #include "ro/ui/entity_menu.h"
+#include "ro/ui/equip_window.h"
 #include "ro/ui/frame_meter.h"
 #include "ro/ui/game_menu.h"
 #include "ro/ui/hotkey_window.h"
@@ -86,6 +87,7 @@
 #include "ro/ui/warp_list_window.h"
 #include "ro/ui/weapon_refine_window.h"
 
+#include "character/equip_window_places.h"
 #include "chat/chat_tab_view.h"
 #include "game/achievement_stage.h"
 #include "game/battleground_stage.h"
@@ -284,6 +286,11 @@ UiStage::Answers UiStage::Draw(
   if (answers.character->presets.escape_spent) {
     escape_.Suppress();
   }
+  // LA FENÊTRE D'ÉQUIPEMENT DU JEU : ses gestes communs rejoignent ceux de la
+  // fiche, qui les joue (`MergeSheetGestures`) ; le reste remonte par son porteur.
+  windows.equip_window->answer =
+      ro::ui::DrawEquipWindow(windows.equip_window->state, windows.equip_window->view, skin_);
+  MergeSheetGestures(*answers.character, windows.equip_window->answer.sheet);
   // LE STATUT, puis les préréglages de stats : deux portes, une fenêtre (`hud_rounds.h`).
   windows.status->answer =
       ro::ui::DrawStatusWindow(windows.status->state, windows.status->view, skin_);
@@ -663,6 +670,7 @@ UiStage::Answers UiStage::Draw(
   }
   escape_.Register(ro::ui::kCharacterWindowId, &windows.character->open);
   escape_.Register(ro::ui::kStatusWindowId, &windows.status->state.open);
+  escape_.Register(ro::ui::kEquipWindowId, &windows.equip_window->state.open);
   if (windows.party->window.pinned) {
     escape_.SkipNext();
   }

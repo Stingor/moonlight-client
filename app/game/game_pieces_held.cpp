@@ -45,6 +45,7 @@
 #include "ro/vfs/world_view.h"
 
 #include "character/doll_gif_export.h"
+#include "character/equip_window_compose.h"
 #include "character/grimoire_keys.h"
 #include "character/shortcut_wheel.h"
 #include "chat/chat_mentions.h"

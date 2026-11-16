@@ -42,6 +42,13 @@ core::Result<void> RequestUnequip(Connection& link, std::uint16_t client_slot) {
   return SendEncoded(link, proto::Encode(request));
 }
 
+core::Result<void> RequestTakeOffAll(Connection& link, std::uint32_t worn_at) {
+  proto::CzReqTakeoffEquipAll request;
+  request.location = worn_at;
+  link.Send(proto::Encode(request));
+  return {};
+}
+
 core::Result<void> RequestDropItem(Connection& link, std::uint16_t client_slot,
                                    std::uint16_t amount) {
   proto::DropItemRequest request;

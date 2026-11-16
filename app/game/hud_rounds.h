@@ -3,6 +3,7 @@
 #include <string>
 
 #include "ro/ui/basic_info_window.h"
+#include "ro/ui/equip_window.h"
 #include "ro/ui/stat_preset_window.h"
 #include "ro/ui/status_portrait.h"
 #include "ro/ui/status_window.h"
@@ -52,6 +53,15 @@ struct StatusWindowRound {
   // LE NOM DE GUILDE QUE LA VUE DÉSIGNE, copié à chaque composition : la vue
   // ne pointe jamais dans le livre de guilde, que le réseau réécrit.
   std::string guild_name;
+};
+
+// LA FENÊTRE D'ÉQUIPEMENT DU JEU, même aller-retour : sa vue est recomposée par
+// `app` à chaque image où elle est ouverte, et ce qu'elle a demandé remonte à la
+// suivante. Son interrupteur et sa place sont retenus comme ceux de la fiche.
+struct EquipWindowRound {
+  ro::ui::EquipWindowState state;
+  ro::ui::EquipWindowView view;
+  ro::ui::EquipWindowAction answer;
 };
 
 // LA FENÊTRE DES PRÉRÉGLAGES DE STATS, même aller-retour. ⚠ ELLE N'EST NI AU

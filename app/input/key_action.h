@@ -18,6 +18,7 @@
 #include "ro/ui/chat_macros.h"
 #include "ro/ui/chat_window.h"
 #include "ro/ui/craft_atlas_window.h"
+#include "ro/ui/equip_window.h"
 #include "ro/ui/game_menu.h"
 #include "ro/ui/hotkey_window.h"
 #include "ro/ui/navigation_window.h"
@@ -83,6 +84,8 @@ struct KeyPress {
   ro::ui::StatusWindowState* status = nullptr;
   // LA FENÊTRE « BASIC INFO » : Alt+V la replie ou la déplie.
   ro::ui::BasicInfoWindowState* basic_info = nullptr;
+  // LA FENÊTRE D'ÉQUIPEMENT DU JEU, que sa touche ouvre et ferme.
+  ro::ui::EquipWindowState* equip_window = nullptr;
   // L'IA DES DEUX COMPAGNONS : Alt+T et Ctrl+T basculent leur attente, et Échap
   // désarme le skill de compagnon qui attend sa cible.
   CompanionAiStage* companion_ai = nullptr;

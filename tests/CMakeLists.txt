@@ -808,6 +808,7 @@ add_executable(ro_tests
     ui/bank_window_test.cpp
     ui/status_window_test.cpp
     ui/basic_info_window_test.cpp
+    ui/equip_window_test.cpp
     ui/stat_preset_doors_test.cpp
     ui/barter_window_test.cpp
     ui/laphine_window_test.cpp
@@ -1278,6 +1279,7 @@ if(MOONCLIENT_PLATFORM_LAYERS)
         app/equip_attribute_lines_test.cpp
         app/equip_change_line_test.cpp
         app/equip_slot_map_test.cpp
+        app/equip_window_places_test.cpp
         app/equip_preset_file_test.cpp
         app/equip_presets_test.cpp
         app/stat_preset_file_test.cpp

@@ -204,7 +204,8 @@ add_library(moonclient_equip STATIC
     character/stat_bar_values.cpp
     character/status_window_view.cpp
     character/basic_info_compose.cpp
-    character/equip_slot_map.cpp)
+    character/equip_slot_map.cpp
+    character/equip_window_places.cpp)
 
 target_link_libraries(moonclient_equip
     PUBLIC ro_sim ro_ui ro_vfs
@@ -2011,6 +2012,7 @@ add_executable(moonclient
     items/storage_view.cpp
     items/view_equip_view.cpp
     character/character_view.cpp
+    character/equip_window_compose.cpp
     character/doll_gif_export.cpp
     character/preset_view.cpp
     character/stat_preset_desk.cpp

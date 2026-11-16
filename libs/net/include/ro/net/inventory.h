@@ -44,6 +44,11 @@ struct EquipChange {
 // trame illisible.
 [[nodiscard]] std::optional<EquipChange> GrantedEquipChangeOf(const Frame& frame);
 
+// L'ACCUSÉ DE « TOUT RETIRER » (`ZC 0x0BAE`) : son résultat tel que le serveur
+// l'écrit — zéro quand il a retiré, non nul quand il a refusé —, ou rien pour
+// une autre trame.
+[[nodiscard]] std::optional<std::uint8_t> TakeOffAllAnswerOf(const Frame& frame);
+
 // ── Les opcodes que la structure ne porte pas ────────────────────────────────
 //
 // ⚠ CES TROIS-LÀ NE SE DÉDUISENT D'AUCUNE STRUCTURE, et c'est pour cela qu'ils
@@ -84,6 +89,13 @@ inline constexpr std::uint16_t kOverweightPercentOpcode = 0x0ADE;
                                               std::uint32_t wearable_at);
 
 [[nodiscard]] core::Result<void> RequestUnequip(Connection& link, std::uint16_t client_slot);
+
+// « Ôte tout ce que je porte à ces places. » `CZ 0x0BF5`.
+//
+// ⚠ LE SERVEUR REFUSE QUI NE PEUT PAS AGIR, et le dit par son accusé. Il retire
+// une pièce à la fois, chacune avec son propre accusé de retrait : c'est par
+// eux que le sac bouge, pas par celui-ci.
+[[nodiscard]] core::Result<void> RequestTakeOffAll(Connection& link, std::uint32_t worn_at);
 
 [[nodiscard]] core::Result<void> RequestDropItem(Connection& link, std::uint16_t client_slot,
                                                  std::uint16_t amount);

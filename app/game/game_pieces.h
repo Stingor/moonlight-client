@@ -102,6 +102,7 @@ class DebugConsole;
 class DecorVeilView;
 class DollEffects;
 class DollGifExport;
+class EquipWindowCompose;
 class EmotionBubbles;
 class EntityInspector;
 class EntitySampler;
@@ -197,6 +198,10 @@ struct GamePieces {
   // NON DANS LA PARTIE, pour survivre à un changement de partie pendant que le
   // dialogue est ouvert. Un pointeur, parce que son fil en garde l'adresse.
   Held<DollGifExport> doll_gif;
+  // LA FENÊTRE D'ÉQUIPEMENT DU JEU, à côté de la fiche : ses places, sa
+  // silhouette, et « tout retirer ». Bâtie à l'ouverture de la partie, avec les
+  // mêmes tables que la fiche — voir `character/equip_window_compose.h`.
+  Held<std::optional<EquipWindowCompose>> equip_window;
   // L'ENTITÉ DU CADRE D'ESSAI de la page des barres d'entité.
   Held<EntitySampler> entity_sampler;
 

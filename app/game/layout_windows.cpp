@@ -11,6 +11,7 @@
 #include "ro/ui/companion_ai_window.h"
 #include "ro/ui/companion_tactic_window.h"
 #include "ro/ui/craft_atlas_window.h"
+#include "ro/ui/equip_window.h"
 #include "ro/ui/inventory_window.h"
 #include "ro/ui/log_window.h"
 #include "ro/ui/mvp_tracker_window.h"
@@ -67,6 +68,7 @@ void RememberLayoutWindows(ro::ui::UiContext& ui, UiStage::Windows& windows) {
   ui.RememberWindow(ro::ui::kInventoryWindowId, &windows.inventory->open);
   ui.RememberWindow(ro::ui::kCharacterWindowId, &windows.character->open);
   ui.RememberWindow(ro::ui::kStatusWindowId, &windows.status->state.open);
+  ui.RememberWindow(ro::ui::kEquipWindowId, &windows.equip_window->state.open);
   // ⚠ LA CHARRETTE NE SE MONTRE QUE PORTÉE : ouverte par le profil d'un
   // personnage qui n'en a pas, elle attend sans paraître.
   ui.RememberWindow(ro::ui::kCartWindowId, &windows.cart->open);
@@ -89,6 +91,7 @@ void RememberLayoutWindows(ro::ui::UiContext& ui, UiStage::Windows& windows) {
 
   // ── LES REPLIS ET LE RANGEMENT ─────────────────────────────────────────
   ui.RememberWindow(ro::ui::kBasicInfoExpandedKey, &windows.basic_info->state.expanded);
+  ui.RememberWindow(ro::ui::kEquipWindowMinimizedKey, &windows.equip_window->state.minimized);
   ui.RememberWindow(kHomunculusSkillsKey, &windows.character->homunculus.skills_open);
   ui.RememberWindow(kMercenarySkillsKey, &windows.character->mercenary.skills_open);
   // La partie en fait la vérité des onglets : voir `ChatTabsView::FollowMeterDock`.

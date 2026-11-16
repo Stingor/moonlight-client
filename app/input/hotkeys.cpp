@@ -69,6 +69,7 @@ constexpr std::array<ActionSavedNames, kNamedActionCount> kActionSavedNames = {{
     {GameAction::kOpenCharacterMercenary, "sheet_mercenary"},
     {GameAction::kOpenStatus, "status"},
     {GameAction::kToggleBasicInfo, "basic_info"},
+    {GameAction::kToggleEquipWindow, "equip_window"},
     {GameAction::kOpenPetWindow, "sheet_pet"},
     {GameAction::kOpenInventory, "inventory"},
     {GameAction::kOpenCart, "cart"},
@@ -273,6 +274,7 @@ HotkeyTab TabOfAction(ActionRef action) {
     case GameAction::kOpenCharacterMercenary:
     case GameAction::kOpenStatus:
     case GameAction::kToggleBasicInfo:
+    case GameAction::kToggleEquipWindow:
     case GameAction::kOpenPetWindow:
     case GameAction::kOpenInventory:
     case GameAction::kOpenCart:
@@ -408,6 +410,8 @@ std::string NameOfAction(ActionRef action) {
       return ro::core::Tr("Statut");
     case GameAction::kToggleBasicInfo:
       return ro::core::Tr("Basic Info : replier ou déplier");
+    case GameAction::kToggleEquipWindow:
+      return ro::core::Tr("Fenêtre d'équipement du jeu");
     case GameAction::kOpenPetWindow:
       return ro::core::Tr("Fiche du pet");
     case GameAction::kOpenInventory:

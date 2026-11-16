@@ -16,6 +16,7 @@
 
 #include <SDL3/SDL.h>
 
+#include "ro/core/i18n.h"
 #include "ro/core/log.h"
 #include "ro/net/movement.h"
 #include "ro/net/player_config.h"
@@ -28,6 +29,7 @@
 #include "ro/vfs/item_link.h"
 #include "ro/vfs/item_name.h"
 
+#include "character/equip_window_compose.h"
 #include "character/grimoire_keys.h"
 #include "character/shortcut_wheel.h"
 #include "character/staff_view.h"
@@ -44,6 +46,7 @@
 #include "game/debug_console_route.h"
 #include "game/homunculus_stage.h"
 #include "game/hud_lock.h"
+#include "game/hud_rounds.h"
 #include "game/interface_sound.h"
 #include "game/menu_icon_route.h"
 #include "game/mercenary_stage.h"
@@ -610,6 +613,19 @@ void Game::DrawInterface(std::uint32_t now_ms) {
   sheet_->Apply(answers.character->grimoire, grimoire_, link_, world_, now_ms);
   character_->Apply(answers.character, link_, world_);
   ApplySheetAnswers(answers);
+  // LA FENÊTRE D'ÉQUIPEMENT DU JEU : ses autres gestes sont passés par la fiche.
+  // ⚠ CONSOMMÉ : laissé en place, « tout retirer » repartirait à chaque image.
+  const ro::ui::EquipWindowAction equip_asked = std::exchange(windows_.equip_window->answer, {});
+  (*pieces_.equip_window)->Apply(equip_asked, link_, world_);
+  // LE CONTENU DU CHARIOT, par la règle de sa touche.
+  if (equip_asked.toggle_cart) {
+    if (world_.cart().capacity() > 0) {
+      windows_.cart->open = !windows_.cart->open;
+    } else {
+      world_.RecordChat(ro::sim::ChatKind::kServer, 0,
+                        ro::core::Tr("Vous ne possédez pas de Cart."), now_ms);
+    }
+  }
   title_view_->Apply(
       answers.character,
       windows_.character->open && windows_.character->tab == ro::ui::CharacterTab::kTitles, link_,

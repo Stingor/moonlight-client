@@ -25,6 +25,7 @@
 #include "ro/ui/tracker_panel.h"
 #include "ro/vfs/achievement_catalog.h"
 
+#include "character/equip_window_compose.h"
 #include "chat/banned_input.h"
 #include "chat/chat_mentions.h"
 #include "chat/chat_tab_file.h"
@@ -353,6 +354,11 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
       &*pieces_.job_names, pieces_.skill_tree->has_value() ? &**pieces_.skill_tree : nullptr,
       &*pieces_.status_table, pieces_.skill_icons->has_value() ? &**pieces_.skill_icons : nullptr,
       pieces_.wardrobe->has_value() ? &**pieces_.wardrobe : nullptr);
+  pieces_.equip_window->emplace(
+      pieces_.wardrobe->has_value() ? &(*pieces_.wardrobe)->catalog().items : nullptr,
+      &*pieces_.item_words, pieces_.item_icons->has_value() ? &**pieces_.item_icons : nullptr,
+      pieces_.wardrobe->has_value() ? &**pieces_.wardrobe : nullptr,
+      pieces_.game_images->has_value() ? &**pieces_.game_images : nullptr);
   // Les presets se rangent sous l'identifiant du personnage.
   presets_.emplace(pieces_.wardrobe->has_value() ? &(*pieces_.wardrobe)->catalog().items : nullptr,
                    &*pieces_.item_words,
@@ -606,6 +612,7 @@ ro::core::Result<void> Game::Open(const std::string& map_name) {
   storage_->SeeCreators(creators);
   card_insert_->SeeCreators(creators);
   character_->SeeCreators(creators);
+  (*pieces_.equip_window)->SeeCreators(creators);
   viewed_equipment_->SeeCreators(creators);
   chat_tabs_->SeeCreators(creators);
   monster_sheet_.emplace(pieces_.wardrobe->has_value() ? &**pieces_.wardrobe : nullptr,

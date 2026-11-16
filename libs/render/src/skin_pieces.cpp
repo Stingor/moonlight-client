@@ -181,6 +181,17 @@ constexpr std::array<std::string_view, kSkinPieceCount> kPaths = {
     "menu_icon\\bt_menu_close_normal.bmp",
     "menu_icon\\bt_menu_close_over.bmp",
     "menu_icon\\bt_menu_close_press.bmp",
+    // La fenêtre d'équipement du jeu.
+    "basic_interface\\titlebar_fix.bmp",
+    "basic_interface\\equipwin_bg2.bmp",
+    "basic_interface\\equipwin_special.bmp",
+    "basic_interface\\item_invert.bmp",
+    "basic_interface\\btn_e_off_a.bmp",
+    "basic_interface\\btn_e_off_b.bmp",
+    "basic_interface\\btn_e_off_c.bmp",
+    "basic_interface\\btn_off.bmp",
+    "basic_interface\\btn_items_off.bmp",
+    "basic_interface\\btn_items_on.bmp",
 };
 
 }  // namespace

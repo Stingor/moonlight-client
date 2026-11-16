@@ -184,6 +184,9 @@ tr: %s - %s: %s | %s: %s | %s: %s
 fr: %s : %d demandés, %d dans l'inventory
 tr: %s: %d pedidos, %d en el inventory
 
+fr: %s : %d ex.
+tr: %s: %d ud.
+
 fr: %s : %s
 tr: %s: %s
 
@@ -210,6 +213,9 @@ tr: %s: has bloqueado el clic izquierdo en este NPC. Clic derecho para desbloque
 
 fr: %s : échec, matériaux perdus.
 tr: %s: fallo, materiales perdidos.
+
+fr: %s [%d option(s)] : %d exemplaires
+tr: %s [%d opción(es)]: %d unidades
 
 fr: %s a accepté votre invitation de groupe.
 tr: %s aceptó su invitación de grupo.
@@ -584,11 +590,23 @@ tr: Cuchillos rectos atraviesan la fila y la envenenan.
 fr: Des éclats d'esprit frappent là où les monstres se pressent.
 tr: Estallidos de espíritu golpean donde se agolpan los monstruos.
 
+fr: Descendre de monture
+tr: Desmontar
+
+fr: Descendre du dragon
+tr: Bajar del dragón
+
+fr: Descendre du griffon
+tr: Bajar del grifo
+
 fr: Du sable jeté devant vous aveugle la horde.
 tr: Arena lanzada ante ti ciega a la horda.
 
 fr: Déclencher les deux pouvoirs d'un plateau de Roggle.
 tr: Activa los dos poderes de un tablero de Roggle.
+
+fr: Fenêtre d'équipement du jeu
+tr: Ventana de equipo del juego
 
 fr: Hautes performances
 tr: Alto rendimiento
@@ -767,6 +785,9 @@ tr: Los colores que ninguna pieza ajusta, por familia de tono: cada muestra tiñ
 fr: Le corps seul
 tr: Solo el cuerpo
 
+fr: Libérer le faucon
+tr: Liberar el halcón
+
 fr: Libérer pour l'inspiration
 tr: Liberar para la inspiración
 
@@ -796,6 +817,9 @@ tr: Conservar los matices
 
 fr: Modifier la fiche
 tr: Editar ficha
+
+fr: Monter / descendre
+tr: Montar / desmontar
 
 fr: Monture de boutique
 tr: Montura de tienda
@@ -850,6 +874,15 @@ tr: Para %s
 
 fr: Pour une machine à deux cartes graphiques, souvent un portable : la puce intégrée ménage la batterie, la carte dédiée dessine plus vite. C'est le réglage de Windows pour ce jeu, celui de Paramètres, Affichage, Graphiques. Sur un PC de bureau, c'est en général la carte reliée à l'écran qui dessine.
 tr: Para un equipo con dos tarjetas gráficas, a menudo un portátil: el chip integrado ahorra batería, la tarjeta dedicada dibuja más rápido. Es el ajuste de Windows para este juego, el de Configuración, Pantalla, Gráficos. En un PC de sobremesa, suele dibujar la tarjeta conectada a la pantalla.
+
+fr: Quitter le Mado Gear
+tr: Bajar del Mado Gear
+
+fr: Retirer le cart
+tr: Quitar el cart
+
+fr: Réessaie dans 10 secondes.
+tr: Inténtalo de nuevo en 10 segundos.
 
 fr: pour vos prochaines parties
 tr: para tus próximas partidas

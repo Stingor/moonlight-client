@@ -301,4 +301,18 @@ std::string ItemNameText(std::span<const ItemNameSegment> segments) {
   return text;
 }
 
+std::uint8_t CardsPastSlots(const ItemNameFacts& facts, const ItemTable& items,
+                            const ItemWords& words) {
+  if (!HasCardWords(facts, words)) {
+    return 0;
+  }
+  std::uint8_t count = 0;
+  for (std::size_t slot = SlotCountOf(items, facts.item_id); slot < kItemNameCardSlots; ++slot) {
+    if (words.FindCard(facts.cards[slot]) != nullptr) {
+      ++count;
+    }
+  }
+  return count;
+}
+
 }  // namespace ro::vfs

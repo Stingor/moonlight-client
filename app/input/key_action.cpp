@@ -429,6 +429,11 @@ std::optional<std::string> TriggerAction(const KeyPress& to, ActionRef action_re
         to.basic_info->expanded = !to.basic_info->expanded;
       }
       break;
+    case GameAction::kToggleEquipWindow:
+      if (Wired(to.equip_window, "fenêtre d'équipement")) {
+        to.equip_window->open = !to.equip_window->open;
+      }
+      break;
     case GameAction::kOpenPetWindow:
       if (to.pet != nullptr) {
         to.pet->toggle_requested = true;

@@ -104,6 +104,7 @@ struct PartyWindows;
 struct QuestWindows;
 struct RankingBoardWindows;
 struct ReputationWindows;
+struct EquipWindowRound;
 struct StatPresetRound;
 struct StatusPortraitRound;
 struct StatusWindowRound;
@@ -256,6 +257,8 @@ struct UiWindows {
   Held<StatusWindowRound> status;
   Held<StatPresetRound> stat_presets;
   Held<BasicInfoRound> basic_info;
+  // LA FENÊTRE D'ÉQUIPEMENT DU JEU, à côté de la fiche : `game/hud_rounds.h`.
+  Held<EquipWindowRound> equip_window;
   // LE MENU DU CLIC DROIT SUR UNE ENTITÉ, même aller-retour : sa vue descend
   // d'`app` à l'ouverture, sa réponse remonte à l'image suivante.
   struct EntityMenu;

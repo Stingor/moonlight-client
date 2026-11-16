@@ -308,6 +308,8 @@ add_library(ro_ui STATIC
     src/mail_window.cpp
     src/mail_compose_window.cpp
     src/entity_menu.cpp
+    src/equip_window.cpp
+    src/equip_window_gestures.cpp
     src/store_search_window.cpp
     src/target_hud.cpp
     src/hud_caption.cpp

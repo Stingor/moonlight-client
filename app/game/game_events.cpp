@@ -81,6 +81,7 @@ void Game::PumpEvents(std::uint32_t now_ms) {
                 .sheet = &*windows_.character,
                 .status = &windows_.status->state,
                 .basic_info = &windows_.basic_info->state,
+                .equip_window = &windows_.equip_window->state,
                 .grimoire_keys = &*pieces_.grimoire_keys,
                 .homunculus_present = pieces_.homunculus->view().present,
                 .mercenary_present = pieces_.mercenary->view().present,

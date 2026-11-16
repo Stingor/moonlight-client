@@ -329,10 +329,30 @@ enum class SkinPiece : std::uint8_t {
   kMenuGridCloseOut,
   kMenuGridCloseOver,
   kMenuGridCloseDown,
+
+  // ── LA FENÊTRE D'ÉQUIPEMENT DU JEU ─────────────────────────────────────
+  //
+  // Sa barre de titre d'un tenant, son fond — qui peint les places et leurs
+  // libellés —, le cadre posé dessus par l'onglet Costume, et le liseré d'une
+  // place où la pièce traînée peut aller.
+  //
+  // ⚠ LA LARGEUR DU FOND EST CELLE DE LA FENÊTRE : Moonlight le livre en 340.
+  kEquipTitleBar,
+  kEquipBackground,
+  kEquipCostumeFrame,
+  kEquipSlotHighlight,
+  // « Tout retirer » : au repos, survolé ou enfoncé, éteint.
+  kEquipTakeOffAllOut,
+  kEquipTakeOffAllOver,
+  kEquipTakeOffAllOff,
+  // Le bouton de monture, d'une seule image, puis celui du chariot.
+  kEquipRiderOff,
+  kEquipCartOut,
+  kEquipCartOver,
 };
 
 inline constexpr std::size_t kSkinPieceCount =
-    static_cast<std::size_t>(SkinPiece::kMenuGridCloseDown) + 1;
+    static_cast<std::size_t>(SkinPiece::kEquipCartOver) + 1;
 
 // LE NOMBRE DE CHEMINS DÉCLARÉS, pour que la table et l'énumération ne puissent
 // pas diverger. ⚠ UN `std::array` SOUS-REMPLI EST LÉGAL : ajouter une pièce sans

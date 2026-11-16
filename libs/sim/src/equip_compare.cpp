@@ -5,14 +5,6 @@
 namespace ro::sim {
 namespace {
 
-// Les pièces d'ombre, chacune sur son bit — `EQP_SHADOW_*`, `src/common/mmo.hpp`.
-constexpr std::uint32_t kEquipShadowArmor = 0x010000;
-constexpr std::uint32_t kEquipShadowWeapon = 0x020000;
-constexpr std::uint32_t kEquipShadowShield = 0x040000;
-constexpr std::uint32_t kEquipShadowShoes = 0x080000;
-constexpr std::uint32_t kEquipShadowAccessoryRight = 0x100000;
-constexpr std::uint32_t kEquipShadowAccessoryLeft = 0x200000;
-
 constexpr std::uint32_t kBothAccessories = kEquipAccessoryRight | kEquipAccessoryLeft;
 
 }  // namespace

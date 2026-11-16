@@ -16,6 +16,7 @@
 #include "ro/sim/world_fwd.h"
 #include "ro/ui/basic_info_window.h"
 #include "ro/ui/chat_macros.h"
+#include "ro/ui/equip_window.h"
 #include "ro/ui/palette_editor.h"
 #include "ro/ui/pet_window.h"
 #include "ro/ui/skill_window.h"
@@ -119,6 +120,8 @@ struct EventRouting {
   ro::ui::StatusWindowState* status = nullptr;
   // La fenêtre « Basic Info », qu'Alt+V replie.
   ro::ui::BasicInfoWindowState* basic_info = nullptr;
+  // La fenêtre d'équipement du jeu, que sa touche ouvre et ferme.
+  ro::ui::EquipWindowState* equip_window = nullptr;
   // Le mode clavier du grimoire : il prend la touche avant qu'elle n'agisse.
   GrimoireKeys* grimoire_keys = nullptr;
   // L'homoncule et le mercenaire existent : leurs touches ouvrent leur onglet.

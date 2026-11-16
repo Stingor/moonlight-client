@@ -543,6 +543,17 @@ std::optional<EquipChange> GrantedEquipChangeOf(const Frame& frame) {
   return std::nullopt;
 }
 
+std::optional<std::uint8_t> TakeOffAllAnswerOf(const Frame& frame) {
+  if (frame.opcode != proto::ZcAckTakeoffEquipAll::kOpcode) {
+    return std::nullopt;
+  }
+  proto::ZcAckTakeoffEquipAll packet;
+  if (!proto::Decode(frame.bytes, packet)) {
+    return std::nullopt;
+  }
+  return packet.result;
+}
+
 FrameOutcome ApplyViewEquipFrame(const Frame& frame, sim::ViewedEquipmentBook& book) {
   // LE REFUS passe par le canal des messages du client, qui en porte bien
   // d'autres : seul celui-ci est à nous.

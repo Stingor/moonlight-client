@@ -11,12 +11,15 @@
 #include <string>
 #include <utility>
 
+#include "ro/core/i18n.h"
 #include "ro/net/guild.h"
 #include "ro/render/doll_animation.h"
+#include "ro/sim/world.h"
 
 #include "character/character_view.h"
 #include "character/doll_gif_export.h"
 #include "character/equip_slot_map.h"
+#include "character/equip_window_compose.h"
 #include "character/staff_view.h"
 #include "character/status_window_view.h"
 #include "game/bug_report_context.h"
@@ -26,6 +29,7 @@
 #include "game/hud_rounds.h"
 #include "game/ui_answers.h"
 #include "game/ui_stage.h"
+#include "input/hotkeys.h"
 #include "items/doll_effects.h"
 #include "world/actor_view.h"
 
@@ -120,6 +124,48 @@ void Game::StageCharacterSheet(std::uint32_t now_ms) {
     world_.RecordChat(ro::sim::ChatKind::kServer, 0, *saved, now_ms);
   }
   windows_.character_view->doll_gif = pieces_.doll_gif->view();
+  // LA FENÊTRE D'ÉQUIPEMENT DU JEU : ses places, ses boutons et sa silhouette,
+  // composés avant le dessin comme ceux de la fiche.
+  const auto stage_equip_window = [&] {
+    EquipWindowRound& round = *windows_.equip_window;
+    // ⚠ SEULEMENT FENÊTRE OUVERTE, comme la fiche : composer vingt noms et une
+    // silhouette que personne ne regarde coûte une texture par image d'animation.
+    if (!round.state.open) {
+      return;
+    }
+    (*pieces_.equip_window)->Refresh(world_, round.view);
+    // LES DEUX RÉGLAGES TELS QUE LE SERVEUR LES A DITS, reposés à chaque image
+    // comme ceux de la fiche.
+    round.view.equipment_shown = own_config_.equipment_shown();
+    round.view.costumes_shown = own_config_.costumes_shown();
+    round.view.toggle_keys =
+        LabelOfBinding(settings_->bindings().Of(GameAction::kToggleEquipWindow));
+    const std::string cart_keys = LabelOfBinding(settings_->bindings().Of(GameAction::kOpenCart));
+    round.view.cart_tooltip = ro::core::Tr("Items du cart");
+    if (!cart_keys.empty()) {
+      round.view.cart_tooltip += " [" + cart_keys + "]";
+    }
+    // LA SILHOUETTE DE L'ONGLET MONTRÉ : le corps de la carte, ses couleurs, et
+    // les coiffes et la cape de ses places — sans arme ni bouclier, comme le jeu
+    // la montre.
+    const ro::sim::Actor* me = world_.player();
+    if (me == nullptr) {
+      round.view.avatar = {};
+      return;
+    }
+    ro::render::ActorLook dressed = LookOf(*me);
+    const WornViews worn = EquipWindowWornViews(world_.inventory(), round.state.tab);
+    dressed.headgears = worn.headgears;
+    dressed.robe = worn.robe;
+    dressed.weapon = 0;
+    dressed.shield = 0;
+    if (pieces_.wardrobe->has_value()) {
+      styles_.Dress(world_.player_id(), dressed, **pieces_.wardrobe, world_.styles());
+    }
+    (*pieces_.equip_window)
+        ->RefreshAvatar(world_, round.state.avatar_box, dressed, now_ms, round.view.avatar);
+  };
+  stage_equip_window();
   // ⚠ RELU À CHAQUE IMAGE, comme celui de l'établi — voir `StaffToolsAllowed`.
   // Il montre la ligne du staff du grimoire et le volet du mannequin ; le
   // retirer fait disparaître le volet ET son cran de largeur, sans attendre une

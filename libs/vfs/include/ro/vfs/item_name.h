@@ -87,4 +87,15 @@ enum class ItemNameSlots { kShown, kHidden };
 // Le même nom, aplati — pour une infobulle, un journal, un relevé.
 [[nodiscard]] std::string ItemNameText(std::span<const ItemNameSegment> segments);
 
+// LES CARTES POSÉES AU-DELÀ DES EMPLACEMENTS DE L'OBJET, de zéro à quatre.
+//
+// 🔴 CE SONT LES ENCHANTEMENTS QUE LE SERVEUR RANGE PARMI LES CARTES : une pièce
+// à deux emplacements qui porte une carte au troisième en a un. La fenêtre
+// d'équipement du jeu colore le nom d'après ce compte.
+//
+// ⚠ ZÉRO POUR UN OBJET QUI NE SE DÉCORE PAS DE CARTES, sous la même règle que le
+// nom : un œuf, une pièce forgée, une carte inconnue de la table des mots.
+[[nodiscard]] std::uint8_t CardsPastSlots(const ItemNameFacts& facts, const ItemTable& items,
+                                          const ItemWords& words);
+
 }  // namespace ro::vfs

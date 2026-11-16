@@ -184,6 +184,9 @@ tr: %s - %s: %s | %s: %s | %s: %s
 fr: %s : %d demandés, %d dans l'inventory
 tr: %s: %d requested, %d in inventory
 
+fr: %s : %d ex.
+tr: %s: %d ea.
+
 fr: %s : %s
 tr: %s: %s
 
@@ -210,6 +213,9 @@ tr: %s: you blocked left-click on this NPC. Right-click it to unblock.
 
 fr: %s : échec, matériaux perdus.
 tr: %s: failed, materials lost.
+
+fr: %s [%d option(s)] : %d exemplaires
+tr: %s [%d option(s)]: %d quantity
 
 fr: %s a accepté votre invitation de groupe.
 tr: %s accepted your party invitation.
@@ -584,11 +590,23 @@ tr: Straight knives pass through the line and poison it.
 fr: Des éclats d'esprit frappent là où les monstres se pressent.
 tr: Spirit bursts strike where monsters crowd together.
 
+fr: Descendre de monture
+tr: Dismount
+
+fr: Descendre du dragon
+tr: Dismount dragon
+
+fr: Descendre du griffon
+tr: Dismount from gryphon
+
 fr: Du sable jeté devant vous aveugle la horde.
 tr: Sand thrown ahead of you blinds the horde.
 
 fr: Déclencher les deux pouvoirs d'un plateau de Roggle.
 tr: Trigger both powers of a Roggle board.
+
+fr: Fenêtre d'équipement du jeu
+tr: Game equipment window
 
 fr: Hautes performances
 tr: High performance
@@ -767,6 +785,9 @@ tr: The colours no part adjusts, by hue family: each swatch dyes all of its fami
 fr: Le corps seul
 tr: Body only
 
+fr: Libérer le faucon
+tr: Release falcon
+
 fr: Libérer pour l'inspiration
 tr: Release for inspiration
 
@@ -796,6 +817,9 @@ tr: Keep the shades
 
 fr: Modifier la fiche
 tr: Edit sheet
+
+fr: Monter / descendre
+tr: Mount / dismount
 
 fr: Monture de boutique
 tr: Shop mount
@@ -850,6 +874,15 @@ tr: For %s
 
 fr: Pour une machine à deux cartes graphiques, souvent un portable : la puce intégrée ménage la batterie, la carte dédiée dessine plus vite. C'est le réglage de Windows pour ce jeu, celui de Paramètres, Affichage, Graphiques. Sur un PC de bureau, c'est en général la carte reliée à l'écran qui dessine.
 tr: For a computer with two graphics cards, often a laptop: the integrated chip saves battery, the dedicated card draws faster. This is the Windows setting for this game, the one under Settings, Display, Graphics. On a desktop PC, the card connected to the screen usually does the drawing.
+
+fr: Quitter le Mado Gear
+tr: Dismount Mado Gear
+
+fr: Retirer le cart
+tr: Remove cart
+
+fr: Réessaie dans 10 secondes.
+tr: Please try again in 10 seconds.
 
 fr: pour vos prochaines parties
 tr: for your next runs

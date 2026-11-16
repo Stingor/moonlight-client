@@ -50,6 +50,7 @@
 #include "ro/sim/world.h"
 #include "ro/vfs/warp_memo_words.h"
 
+#include "character/equip_window_compose.h"
 #include "game/achievement_stage.h"
 #include "game/adoption_stage.h"
 #include "game/battleground_stage.h"
@@ -147,6 +148,7 @@ ro::net::FrameOutcome Game::ApplyFrameBeyondWorld(const ro::net::Frame& received
         character_->SayEquipSwitch(received, world_, now_ms),
         character_->SayEquipChange(received, world_, now_ms),
         character_->SayEquipAttributes(received, world_, now_ms),
+        (*pieces_.equip_window)->HearTakeOffAll(received, world_, now_ms),
         pieces_.map_edit_sync->ApplyFrame(received)}) {
     if (outcome == ro::net::FrameOutcome::kUnhandled) {
       outcome = told;
