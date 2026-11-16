@@ -148,6 +148,25 @@ TEST_CASE("Minimap : l'heure du serveur se montre sous la carte quand on la dema
   CHECK(probe.logged.find("Serveur") == std::string::npos);
 }
 
+// 🔴 SANS LÉGENDE, le curseur ramené sous le carré n'est suivi d'aucun item :
+// ImGui y voit une extension de la fenêtre par le curseur, et le signale.
+TEST_CASE("Minimap : sans nom, ni coordonnées, ni heure, aucune erreur d'ImGui", "[ui][minimap]") {
+  MinimapProbe probe;
+  ImGuiIO& io = ImGui::GetIO();
+  io.ConfigErrorRecoveryEnableAssert = false;
+  io.ConfigErrorRecoveryEnableTooltip = false;
+  probe.view.display_name = "Prontera";
+  probe.settings.show_map_name = false;
+  probe.settings.show_coords = false;
+  probe.settings.show_server_clock = false;
+  ImGuiContext& context = *ImGui::GetCurrentContext();
+  context.DebugLogBuf.clear();
+  probe.Settle();
+  INFO(context.DebugLogBuf.c_str());
+  CHECK(std::string(context.DebugLogBuf.c_str()).find("SetCursorPos") == std::string::npos);
+  CHECK(probe.logged.find("prontera") == std::string::npos);
+}
+
 TEST_CASE("Minimap : sans image, elle dessine et garde ses marqueurs", "[ui][minimap]") {
   MinimapProbe probe;
   REQUIRE_FALSE(probe.view.map_image.usable());

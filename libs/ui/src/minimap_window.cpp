@@ -478,6 +478,10 @@ MinimapAnswer DrawMinimapWindow(MinimapSettings& settings, MinimapWindowState& s
     }
     state.menu_open = menu_open_now;
     DrawCaption(settings, view, named, frame.located, side);
+    // 🔴 UN ITEM CLÔT LE CORPS : les calques et le bouton de réglages ramènent
+    // le curseur sous le carré, et sans légende rien ne le suit. ImGui prend
+    // alors ce curseur pour une extension de la fenêtre et le signale à `End`.
+    ImGui::Dummy(ImVec2(0.0F, 0.0F));
   }
   ImGui::End();
   ImGui::PopStyleColor(kGripColorCount);
