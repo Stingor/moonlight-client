@@ -17,6 +17,218 @@ version: 1
 mode: Prerenewal
 refine_cap: 10
 triggers:
+  - item: 100591
+    recipes:
+      - base: 1438
+        result: 530012
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[6672, 100], [1000430, 100]]
+      - base: 1669
+        result: 550023
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[6672, 100], [1000430, 100]]
+      - base: 1836
+        result: 560017
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[6672, 100], [1000430, 100]]
+      - base: 1933
+        result: 570016
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[6672, 100], [1000430, 100]]
+      - base: 1988
+        result: 580016
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[6672, 100], [1000430, 100]]
+      - base: 2023
+        result: 640017
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[6672, 100], [1000430, 100]]
+      - base: 13093
+        result: 510030
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[6672, 100], [1000430, 100]]
+      - base: 13441
+        result: 500024
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[6672, 100], [1000430, 100]]
+      - base: 16028
+        result: 590020
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[6672, 100], [1000430, 100]]
+      - base: 18119
+        result: 700029
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[6672, 100], [1000430, 100]]
+      - base: 21009
+        result: 600016
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[6672, 100], [1000430, 100]]
+      - base: 28000
+        result: 610019
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[6672, 100], [1000430, 100]]
+      - base: 28100
+        result: 620009
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -5
+        materials: [[6672, 100], [1000430, 100]]
+  - item: 100592
+    recipes:
+      - base: 1438
+        result: 530012
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[6672, 300], [1000431, 100]]
+      - base: 1669
+        result: 550023
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[6672, 300], [1000431, 100]]
+      - base: 1836
+        result: 560017
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[6672, 300], [1000431, 100]]
+      - base: 1933
+        result: 570016
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[6672, 300], [1000431, 100]]
+      - base: 1988
+        result: 580016
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[6672, 300], [1000431, 100]]
+      - base: 2023
+        result: 640017
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[6672, 300], [1000431, 100]]
+      - base: 13093
+        result: 510030
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[6672, 300], [1000431, 100]]
+      - base: 13441
+        result: 500024
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[6672, 300], [1000431, 100]]
+      - base: 16028
+        result: 590020
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[6672, 300], [1000431, 100]]
+      - base: 18119
+        result: 700029
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[6672, 300], [1000431, 100]]
+      - base: 21009
+        result: 600016
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[6672, 300], [1000431, 100]]
+      - base: 28000
+        result: 610019
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[6672, 300], [1000431, 100]]
+      - base: 28100
+        result: 620009
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: -1
+        materials: [[6672, 300], [1000431, 100]]
   - item: 100648
     recipes:
       - base: 500025
@@ -613,3 +825,193 @@ triggers:
         cards_allowed: true
         refine_change: -1
         materials: [[1000405, 400], [1000501, 200], [1000502, 200], [1000503, 200], [1000691, 30]]
+  - item: 100694
+    recipes:
+      - base: 5360
+        result: 400153
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: false
+        refine_change: -5
+        materials: [[7206, 50], [1000434, 100]]
+      - base: 5464
+        result: 400246
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: false
+        refine_change: -5
+        materials: [[7165, 200], [7166, 100], [1000434, 100]]
+      - base: 5497
+        result: 400245
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: false
+        refine_change: -5
+        materials: [[1030, 40], [1000434, 100]]
+      - base: 5658
+        result: 400156
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: false
+        refine_change: -5
+        materials: [[7122, 150], [1000434, 100]]
+  - item: 100695
+    recipes:
+      - base: 5360
+        result: 400153
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: false
+        refine_change: -1
+        materials: [[7206, 100], [1000435, 100]]
+      - base: 5464
+        result: 400246
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: false
+        refine_change: -1
+        materials: [[7165, 400], [7166, 200], [1000435, 100]]
+      - base: 5497
+        result: 400245
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: false
+        refine_change: -1
+        materials: [[1030, 80], [1000435, 100]]
+      - base: 5658
+        result: 400156
+        least_refine: 9
+        most_refine: 10
+        least_options: 0
+        cards_allowed: false
+        refine_change: -1
+        materials: [[7122, 300], [1000435, 100]]
+  - item: 101355
+    recipes:
+      - base: 1862
+        result: 560034
+        least_refine: 7
+        most_refine: 10
+        least_options: 0
+        cards_allowed: false
+        refine_change: 0
+        materials: [[25669, 200], [25723, 40], [1000430, 70]]
+      - base: 13493
+        result: 500051
+        least_refine: 7
+        most_refine: 10
+        least_options: 0
+        cards_allowed: false
+        refine_change: 0
+        materials: [[25669, 200], [25723, 40], [1000430, 70]]
+      - base: 16088
+        result: 590043
+        least_refine: 7
+        most_refine: 10
+        least_options: 0
+        cards_allowed: false
+        refine_change: 0
+        materials: [[25669, 200], [25723, 40], [1000430, 70]]
+      - base: 16089
+        result: 590044
+        least_refine: 7
+        most_refine: 10
+        least_options: 0
+        cards_allowed: false
+        refine_change: 0
+        materials: [[25669, 200], [25723, 40], [1000430, 70]]
+      - base: 18178
+        result: 700054
+        least_refine: 7
+        most_refine: 10
+        least_options: 0
+        cards_allowed: false
+        refine_change: 0
+        materials: [[25669, 200], [25723, 40], [1000430, 70]]
+      - base: 18179
+        result: 700055
+        least_refine: 7
+        most_refine: 10
+        least_options: 0
+        cards_allowed: false
+        refine_change: 0
+        materials: [[25669, 200], [25723, 40], [1000430, 70]]
+      - base: 18180
+        result: 700056
+        least_refine: 7
+        most_refine: 10
+        least_options: 0
+        cards_allowed: false
+        refine_change: 0
+        materials: [[25669, 200], [25723, 40], [1000430, 70]]
+      - base: 21047
+        result: 600028
+        least_refine: 7
+        most_refine: 10
+        least_options: 0
+        cards_allowed: false
+        refine_change: 0
+        materials: [[25669, 200], [25723, 40], [1000430, 70]]
+      - base: 26151
+        result: 550075
+        least_refine: 7
+        most_refine: 10
+        least_options: 0
+        cards_allowed: false
+        refine_change: 0
+        materials: [[25669, 200], [25723, 40], [1000430, 70]]
+      - base: 28038
+        result: 610039
+        least_refine: 7
+        most_refine: 10
+        least_options: 0
+        cards_allowed: false
+        refine_change: 0
+        materials: [[25669, 200], [25723, 40], [1000430, 70]]
+      - base: 28136
+        result: 620018
+        least_refine: 7
+        most_refine: 10
+        least_options: 0
+        cards_allowed: false
+        refine_change: 0
+        materials: [[25669, 200], [25723, 40], [1000430, 70]]
+      - base: 28253
+        result: 810013
+        least_refine: 7
+        most_refine: 10
+        least_options: 0
+        cards_allowed: false
+        refine_change: 0
+        materials: [[25669, 200], [25723, 40], [1000430, 70]]
+      - base: 28629
+        result: 540051
+        least_refine: 7
+        most_refine: 10
+        least_options: 0
+        cards_allowed: false
+        refine_change: 0
+        materials: [[25669, 200], [25723, 40], [1000430, 70]]
+      - base: 28755
+        result: 510066
+        least_refine: 7
+        most_refine: 10
+        least_options: 0
+        cards_allowed: false
+        refine_change: 0
+        materials: [[25669, 200], [25723, 40], [1000430, 70]]
+      - base: 32019
+        result: 530031
+        least_refine: 7
+        most_refine: 10
+        least_options: 0
+        cards_allowed: false
+        refine_change: 0
+        materials: [[25669, 200], [25723, 40], [1000430, 70]]

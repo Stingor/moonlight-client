@@ -129145,6 +129145,18 @@ Body:
     Weight: 10
     Script: |
       laphine_upgrade();
+  - Id: 100591
+    AegisName: Thanos_W_Reform_1
+    Name: Thanos Weapon Reform Cube (Lower)
+    Type: DelayConsume
+    Script: |
+      item_reform();
+  - Id: 100592
+    AegisName: Thanos_W_Reform_2
+    Name: Thanos Weapon Reform Cube (Middle)
+    Type: DelayConsume
+    Script: |
+      item_reform();
   - Id: 100626
     AegisName: GrayWolf_7_Ticket
     Name: Gray Wolf +7 Refinement Box
@@ -129217,6 +129229,18 @@ Body:
     Flags: {BuyingStore: true, Container: true}
     Script: |
       getgroupitem(IG_BLUE_PRINTS_SCROLL);
+  - Id: 100694
+    AegisName: C_Armor_Reform_1
+    Name: Armor Modification Box (Lower)
+    Type: DelayConsume
+    Script: |
+      item_reform();
+  - Id: 100695
+    AegisName: C_Armor_Reform_2
+    Name: Armor Modification Box (Middle)
+    Type: DelayConsume
+    Script: |
+      item_reform();
   - Id: 100699
     AegisName: Twins_Box_IL
     Name: Twins Refinement Box
@@ -129285,6 +129309,12 @@ Body:
     Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
     Script: |
       laphine_upgrade();
+  - Id: 101355
+    AegisName: OS_Weapon_Reform
+    Name: OS Weapon Modification Box
+    Type: DelayConsume
+    Script: |
+      item_reform();
   - Id: 102562
     AegisName: Demi_Freyja_Antiquity
     Name: Antiquity Villa (Twisted God)
@@ -138132,6 +138162,159 @@ Body:
           bonus2 bMagicAddEle,Ele_All,15;
         }
       }
+  - Id: 311384
+    AegisName: Expert_Fighter1
+    Name: Expert Fighter 1Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bShortAtkRate,2;
+  - Id: 311385
+    AegisName: Expert_Fighter2
+    Name: Expert Fighter 2Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bShortAtkRate,4;
+  - Id: 311386
+    AegisName: Expert_Fighter3
+    Name: Expert Fighter 3Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bShortAtkRate,6;
+  - Id: 311387
+    AegisName: Expert_Fighter4
+    Name: Expert Fighter 4Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bShortAtkRate,8;
+  - Id: 311388
+    AegisName: Expert_Fighter5
+    Name: Expert Fighter 5Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bShortAtkRate,10;
+  - Id: 311389
+    AegisName: Expert_Magician1
+    Name: Expert Magician 1Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAtkEle,Ele_All,2;
+  - Id: 311390
+    AegisName: Expert_Magician2
+    Name: Expert Magician 2Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAtkEle,Ele_All,4;
+  - Id: 311391
+    AegisName: Expert_Magician3
+    Name: Expert Magician 3Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAtkEle,Ele_All,6;
+  - Id: 311392
+    AegisName: Expert_Magician4
+    Name: Expert Magician 4Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAtkEle,Ele_All,8;
+  - Id: 311393
+    AegisName: Expert_Magician5
+    Name: Expert Magician 5Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAtkEle,Ele_All,10;
+  - Id: 311394
+    AegisName: Attack_Delay_5
+    Name: Attack Delay 5Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bAspdRate,10;
+      bonus bAspd,1;
+  - Id: 311395
+    AegisName: Hit_Plus1
+    Name: Hit Plus 1Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bPerfectHitAddRate,3;
+      bonus bHit,5;
+  - Id: 311396
+    AegisName: Hit_Plus2
+    Name: Hit Plus 2Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bPerfectHitAddRate,6;
+      bonus bHit,10;
+  - Id: 311397
+    AegisName: Hit_Plus3
+    Name: Hit Plus 3Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bPerfectHitAddRate,9;
+      bonus bHit,15;
+  - Id: 311398
+    AegisName: Hit_Plus4
+    Name: Hit Plus 4Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bPerfectHitAddRate,12;
+      bonus bHit,20;
+  - Id: 311399
+    AegisName: Hit_Plus5
+    Name: Hit Plus 5Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bPerfectHitAddRate,15;
+      bonus bHit,25;
+  - Id: 311400
+    AegisName: Caster1
+    Name: Caster 1Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bVariableCastrate,-2;
+  - Id: 311401
+    AegisName: Caster2
+    Name: Caster 2Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bVariableCastrate,-4;
+  - Id: 311402
+    AegisName: Caster3
+    Name: Caster 3Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bVariableCastrate,-6;
+  - Id: 311403
+    AegisName: Caster4
+    Name: Caster 4Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bVariableCastrate,-8;
+  - Id: 311404
+    AegisName: Caster5
+    Name: Caster 5Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bVariableCastrate,-10;
   - Id: 400020
     AegisName: C_BeachBall
     Name: Costume Beachball
@@ -138374,6 +138557,106 @@ Body:
       hateffect(HAT_EF_BLACK_THUNDER,true);
     UnEquipScript: |
       hateffect(HAT_EF_BLACK_THUNDER,false);
+  - Id: 400153
+    AegisName: Whikebain_Ears_K_LT
+    Name: "Wickebine's Black Cat Ears-LT [1]"
+    Type: Armor
+    Buy: 10500
+    Sell: 3500
+    Weight: 200
+    Slots: 1
+    Locations: {Head_Top: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Gradable: true
+    View: 368
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus bFlee,20;
+      bonus2 bMagicAtkEle,Ele_All,15;
+      bonus bCritAtkRate,15;
+      if (BaseLevel>=210) {
+         bonus bPAtk,2;
+         bonus bSMatk,2;
+      }
+      if (.@r>=7) {
+         bonus bCritAtkRate,10;
+         bonus2 bMagicAtkEle,Ele_All,10;
+         if (.@r>=9) {
+            bonus2 bAddClass,Class_All,5;
+            bonus bMatkRate,5;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-5;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         if (getallrefine() >= 22) {
+            bonus bDelayrate,-5;
+         }
+      }
+      if (.@g >= ENCHANTGRADE_C) {
+         bonus bPAtk,2;
+         bonus bSMatk,2;
+         if (.@g >= ENCHANTGRADE_B) {
+            if (getallrefine() >= 24) {
+               bonus bFixedCast,-500;
+            }
+         }
+      }
+      autobonus "{ bonus bCritical,30; }",1,10000,BF_WEAPON;
+      autobonus "{ bonus2 bIgnoreMdefRaceRate,RC_All,100; bonus2 bIgnoreMdefRaceRate,RC_Player_Human,-100; bonus2 bIgnoreMdefRaceRate,RC_Player_Doram,-100; }",1,10000,BF_MAGIC;
+  - Id: 400156
+    AegisName: Imp_Hat_LT
+    Name: "Imp Hat-LT [1]"
+    Type: Armor
+    Buy: 13500
+    Sell: 4500
+    Weight: 400
+    Defense: 1
+    Slots: 1
+    Locations: {Head_Top: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Gradable: true
+    View: 589
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      if (BaseLevel>=210) {
+         bonus bPAtk,2;
+         bonus bSMatk,2;
+      }
+      if (.@r>=7) {
+         bonus2 bMagicAtkEle,Ele_Fire,10;
+         bonus bShortAtkRate,10;
+         if (.@r>=9) {
+            bonus2 bAddClass,Class_All,5;
+            bonus bMatkRate,5;
+            if (getallrefine() >= 22) {
+               bonus2 bMagicAddEle,Ele_Earth,20;
+               bonus2 bAddEle,Ele_Earth,20;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus2 bMagicAtkEle,Ele_Fire,5;
+         bonus bShortAtkRate,5;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bPAtk,2;
+            bonus bSMatk,2;
+            if (.@g >= ENCHANTGRADE_B) {
+               if (getallrefine() >= 24) {
+                  bonus bFixedCast,-500;
+               }
+            }
+         }
+      }
+      autobonus "{ bonus bAtkEle,Ele_Fire; }",1,60000,BF_WEAPON;
+      autobonus "{ bonus2 bMagicAtkEle,Ele_Fire,20; }",1,60000,BF_MAGIC;
   - Id: 400157
     AegisName: C_Astrologer_T_Hat
     Name: Costume Astrologer's Cap
@@ -138638,6 +138921,105 @@ Body:
     Type: Armor
     Locations: {Costume_Head: true}
     View: 2204
+  - Id: 400245
+    AegisName: King_Tiger_Doll_Hat_LT
+    Name: "Tiger King Doll Hat-LT [1]"
+    Type: Armor
+    Buy: 28500
+    Sell: 9500
+    Weight: 400
+    Defense: 6
+    Slots: 1
+    Locations: {Head_Top: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Gradable: true
+    View: 495
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus bStr,2;
+      bonus bDex,2;
+      bonus bPow,2;
+      bonus bCon,2;
+      bonus bAspdRate,10;
+      bonus2 bAddRace,RC_Brute,10;
+      bonus2 bAddRace,RC_Player_Doram,10;
+      autobonus "{ .@r = getrefine(); bonus bBaseAtk,35*.@r; if (.@r>=10) { bonus bPAtk,20; } }",1,7000,BF_WEAPON;
+      if (.@r>=7) {
+         bonus bShortAtkRate,15;
+         if (.@r>=9) {
+            bonus2 bAddClass,Class_All,10;
+            if (getallrefine() >= 22) {
+               bonus bShortAtkRate,10;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus2 bAddClass,Class_All,5;
+         bonus bPow,3;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bFixedCast,-500;
+            bonus bSta,2;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bPAtk,2;
+               bonus bRes,20;
+               if (.@g >= ENCHANTGRADE_A) {
+                  bonus bPAtk,7;
+               }
+            }
+         }
+      }
+  - Id: 400246
+    AegisName: Baksojin_Hat_LT
+    Name: "Bacsojin Hat-LT [1]"
+    Type: Armor
+    Buy: 28500
+    Sell: 9500
+    Weight: 400
+    Defense: 6
+    Slots: 1
+    Locations: {Head_Top: true}
+    ArmorLevel: 1
+    EquipLevelMin: 150
+    Refineable: true
+    Gradable: true
+    View: 461
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus bInt,2;
+      bonus bDex,2;
+      bonus bSpl,2;
+      bonus bCon,2;
+      bonus bVariableCastrate,-10;
+      bonus2 bMagicAddRace,RC_Undead,10;
+      autobonus "{ .@r = getrefine(); bonus bMatk,35*.@r; if (.@r>=10) { bonus bSMatk,20; } }",1,7000,BF_MAGIC;
+      if (.@r>=7) {
+         bonus2 bMagicAtkEle,Ele_All,15;
+         if (.@r>=9) {
+            bonus bMatkRate,10;
+            if (getallrefine() >= 22) {
+               bonus2 bMagicAtkEle,Ele_All,10;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus bMatkRate,5;
+         bonus bSpl,3;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bFixedCast,-500;
+            bonus bWis,2;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus bSMatk,3;
+               bonus bMRes,20;
+               if (.@g >= ENCHANTGRADE_A) {
+                  bonus bSMatk,7;
+               }
+            }
+         }
+      }
   - Id: 400250
     AegisName: C_RTC2021_Reward_1_TH
     Name: Costume The Winner of RTC 2021
@@ -146717,6 +147099,52 @@ Body:
       .@r = getrefine();
       bonus2 bSkillAtk,"AM_ACIDTERROR",5*(.@r/2);
       bonus2 bAddClass,Class_All,3*(.@r/4);
+  - Id: 500024
+    AegisName: Thanos_Sword_AD
+    Name: "Thanos Sword-AD [2]"
+    Type: Weapon
+    SubType: 1hSword
+    Buy: 10200000
+    Sell: 102000
+    Weight: 1000
+    Attack: 190
+    Range: 1
+    Slots: 2
+    Jobs: {Alchemist: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 190
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      autobonus "{ bonus2 bHPRegenRate,2500,1000; }",1,4000,BF_WEAPON;
+      bonus bBaseAtk,10*(.@r/2);
+      bonus bLongAtkRate,4*(.@r/3);
+      if (.@r>=7) {
+         bonus bVariableCastrate,-15;
+         bonus2 bAddClass,Class_All,5;
+         if (.@r>=9) {
+            bonus bAspdRate,10;
+            bonus2 bSkillAtk,"AM_ACIDTERROR",15;
+            if (getallrefine() >= 22) {
+               bonus2 bAddSize,Size_All,15;
+               bonus2 bSkillAtk,"AM_ACIDTERROR",15;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus2 bAddClass,Class_All,2;
+         bonus2 bSkillAtk,"AM_ACIDTERROR",10;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bPAtk,1;
+            bonus2 bAddClass,Class_All,3;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus2 bSkillAtk,"AM_ACIDTERROR",10;
+            }
+         }
+      }
   - Id: 500025
     AegisName: Adulter_F_G_Sword
     Name: "Adulter Fides Guardian Sword [2]"
@@ -146947,6 +147375,37 @@ Body:
     Refineable: true
     Script: |
       bonus bMatk,210;
+  - Id: 500051
+    AegisName: Cannon_Rapier_AD
+    Name: "Cannon Rapier-OSAD [2]"
+    Type: Weapon
+    SubType: 1hSword
+    Buy: 9900000
+    Sell: 99000
+    Weight: 800
+    Attack: 160
+    Range: 1
+    Slots: 2
+    Jobs: {Novice: true, Swordman: true, Merchant: true, Thief: true, Knight: true, Blacksmith: true, Assassin: true, Crusader: true, Rogue: true, Alchemist: true, SuperNovice: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      bonus bMatk,150;
+      .@r = getrefine();
+      bonus3 bAutoSpell,"MG_FIREBOLT",min(.@r,10),80;
+      bonus3 bAutoSpell,"MG_FIREBALL",min(.@r,10),80;
+      if (.@r>=7) {
+         bonus bAspdRate,10;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"MG_FIREBOLT",60;
+            bonus2 bSkillAtk,"MG_FIREBALL",60;
+            if (getallrefine() >= 22) {
+               bonus3 bAutoSpell,"WZ_FIREPILLAR",4,40;
+            }
+         }
+      }
   - Id: 510008
     AegisName: Ep172_1h_Dagger
     Name: Wrath Rack
@@ -147016,6 +147475,52 @@ Body:
       .@r = getrefine();
       bonus2 bSkillAtk,"RG_RAID",5*(.@r/2);
       bonus2 bMagicAtkEle,Ele_All,2*(.@r/4);
+  - Id: 510030
+    AegisName: Thanos_Dagger_AD
+    Name: "Thanos Dagger-AD [2]"
+    Type: Weapon
+    SubType: Dagger
+    Buy: 9800000
+    Sell: 98000
+    Weight: 1400
+    Attack: 150
+    Range: 1
+    Slots: 2
+    Jobs: {Rogue: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 190
+    Refineable: true
+    Gradable: true
+    Script: |
+      bonus bMatk,160;
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      autobonus "{ bonus2 bHPRegenRate,1000,1000; bonus2 bSPRegenRate,100,1000; }",10,4000,BF_MAGIC;
+      bonus bMatk,10*(.@r/2);
+      bonus2 bMagicAtkEle,Ele_Neutral,4*(.@r/3);
+      bonus2 bMagicAtkEle,Ele_Fire,4*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bMagicAtkEle,Ele_Neutral,10;
+         bonus2 bMagicAtkEle,Ele_Fire,10;
+         bonus bMatkRate,5;
+         if (.@r>=9) {
+            bonus5 bAutoSpell,"HW_NAPALMVULCAN",4,100,BF_SHORT|BF_WEAPON,1;
+            bonus5 bAutoSpell,"WZ_METEOR",4,100,BF_SHORT|BF_WEAPON,1;
+            if (getallrefine() >= 22) {
+               bonus2 bMagicAddSize,Size_All,15;
+               bonus2 bMagicAtkEle,Ele_Neutral,15;
+               bonus2 bMagicAtkEle,Ele_Fire,15;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus bMatkRate,2;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bSMatk,1;
+            bonus bMatkRate,3;
+         }
+      }
   - Id: 510032
     AegisName: Adulter_F_Dagger
     Name: "Adulter Fides Dagger [2]"
@@ -147224,6 +147729,47 @@ Body:
     Refineable: true
     Script: |
       bonus bMatk,210;
+  - Id: 510066
+    AegisName: Kuroiro_AD
+    Name: "Kuroiro-OSAD [2]"
+    Type: Weapon
+    SubType: Dagger
+    Buy: 9800000
+    Sell: 98000
+    Weight: 900
+    Attack: 150
+    Range: 1
+    Slots: 2
+    Jobs: {KagerouOboro: true, Ninja: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      bonus bMatk,150;
+      .@r = getrefine();
+      bonus2 bMagicAddEle,Ele_Undead,7;
+      bonus2 bAddEle,Ele_Undead,7;
+      bonus2 bMagicAddEle,Ele_Dark,7;
+      bonus2 bAddEle,Ele_Dark,7;
+      if (.@r>=7) {
+         bonus2 bAddEle,Ele_Undead,13;
+         bonus2 bMagicAddEle,Ele_Undead,13;
+         bonus2 bAddEle,Ele_Dark,13;
+         bonus2 bMagicAddEle,Ele_Dark,13;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"NJ_KUNAI",35;
+            bonus2 bSkillAtk,"NJ_KOUENKA",20;
+            bonus2 bSkillAtk,"NJ_HYOUSENSOU",20;
+            bonus2 bSkillAtk,"NJ_HUUJIN",20;
+            if (getallrefine() >= 22) {
+               bonus2 bAddRace,RC_Undead,15;
+               bonus2 bMagicAddRace,RC_Undead,15;
+               bonus2 bAddRace,RC_Demon,15;
+               bonus2 bMagicAddRace,RC_Demon,15;
+            }
+         }
+      }
   - Id: 520002
     AegisName: Ep172_1h_Axe
     Name: Pride Steel
@@ -147385,6 +147931,48 @@ Body:
       .@r = getrefine();
       bonus2 bSkillAtk,"CR_SHIELDBOOMERANG",5*(.@r/2);
       bonus bLongAtkRate,2*(.@r/4);
+  - Id: 530012
+    AegisName: Thanos_Spear_AD
+    Name: "Thanos Spear-AD [2]"
+    Type: Weapon
+    SubType: 1hSpear
+    Buy: 10200000
+    Sell: 102000
+    Weight: 1800
+    Attack: 190
+    Range: 3
+    Slots: 2
+    Jobs: {Crusader: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 190
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      autobonus "{ bonus2 bHPRegenRate,2500,1000; }",1,4000,BF_WEAPON;
+      bonus bBaseAtk,10*(.@r/2);
+      bonus2 bSkillAtk,"CR_GRANDCROSS",10*(.@r/3);
+      if (.@r>=7) {
+         bonus bDelayrate,-10;
+         bonus2 bSkillAtk,"CR_GRANDCROSS",15;
+         if (.@r>=9) {
+            bonus bVariableCastrate,-10;
+            bonus2 bSkillAtk,"KN_BRANDISHSPEAR",25;
+            if (getallrefine() >= 22) {
+               bonus2 bAddSize,Size_All,15;
+               bonus bShortAtkRate,15;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus2 bAddClass,Class_All,2;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bPAtk,1;
+            bonus2 bAddClass,Class_All,3;
+         }
+      }
   - Id: 530013
     AegisName: Adulter_F_G_Spear
     Name: "Adulter Fides Guardian Spear [2]"
@@ -147516,6 +148104,35 @@ Body:
     Refineable: true
     Script: |
       bonus bMatk,210;
+  - Id: 530031
+    AegisName: Boost_Lance_AD
+    Name: "Boost Lance-OSAD [2]"
+    Type: Weapon
+    SubType: 1hSpear
+    Buy: 10200000
+    Sell: 102000
+    Weight: 1000
+    Attack: 190
+    Range: 3
+    Slots: 2
+    Jobs: {Crusader: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bAspdRate,5;
+      if (.@r>=7) {
+         bonus bAspdRate,10;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"PA_SHIELDCHAIN",20;
+            bonus2 bSkillAtk,"CR_HOLYCROSS",20;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"CR_HOLYCROSS",25;
+            }
+         }
+      }
   - Id: 540004
     AegisName: Ep172_1h_Book
     Name: Sloth Text
@@ -148047,6 +148664,38 @@ Body:
     Script: |
       bonus bMatk,210;
       bonus bUnbreakableWeapon;
+  - Id: 540051
+    AegisName: Circuit_Board_AD
+    Name: "Circuit Board-OSAD [2]"
+    Type: Weapon
+    SubType: Book
+    Buy: 10100000
+    Sell: 101000
+    Weight: 1200
+    Attack: 180
+    Range: 1
+    Slots: 2
+    Jobs: {Priest: true, Sage: true, StarGladiator: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,5;
+      if (.@r>=7) {
+         bonus bAspdRate,10;
+         if (.@r>=9) {
+            bonus2 bAddSize,Size_Small,30;
+            bonus2 bMagicAddSize,Size_Small,30;
+            bonus2 bAddSize,Size_Medium,30;
+            bonus2 bMagicAddSize,Size_Medium,30;
+            if (getallrefine() >= 22) {
+               bonus bCritAtkRate,20;
+               bonus bShortAtkRate,10;
+            }
+         }
+      }
   - Id: 550008
     AegisName: Ep172_1h_Wand
     Name: Greed Wand
@@ -148069,6 +148718,50 @@ Body:
       bonus bMatkRate,2*.@r;
       if (.@r>=9) {
          bonus bVariableCastrate,-10;
+      }
+  - Id: 550023
+    AegisName: Thanos_Staff_AD
+    Name: "Thanos Staff-AD [2]"
+    Type: Weapon
+    SubType: Staff
+    Buy: 9300000
+    Sell: 93000
+    Weight: 1400
+    Attack: 100
+    Range: 1
+    Slots: 2
+    Jobs: {Sage: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 190
+    Refineable: true
+    Gradable: true
+    Script: |
+      bonus bMatk,180;
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      autobonus "{ bonus2 bHPRegenRate,1000,1000; bonus2 bSPRegenRate,100,1000; }",10,4000,BF_MAGIC;
+      bonus bMatk,10*(.@r/2);
+      bonus2 bSkillAtk,"MG_THUNDERSTORM",10*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bMagicAtkEle,Ele_Wind,15;
+         bonus2 bSkillAtk,"MG_THUNDERSTORM",15;
+         if (.@r>=9) {
+            bonus bDelayrate,-12;
+            bonus bVariableCastrate,-10;
+            if (getallrefine() >= 22) {
+               bonus2 bMagicAddSize,Size_All,15;
+               bonus bDelayrate,-5;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus bMatkRate,2;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bSMatk,1;
+            bonus bMatkRate,3;
+         }
       }
   - Id: 550024
     AegisName: Adulter_F_Wand
@@ -148473,6 +149166,38 @@ Body:
     Script: |
       bonus bMatk,230;
       bonus bUnbreakableWeapon;
+  - Id: 550075
+    AegisName: Rutilus_Stick_AD
+    Name: "Rutilus Stick-OSAD [2]"
+    Type: Weapon
+    SubType: Staff
+    Buy: 9100000
+    Sell: 91000
+    Weight: 900
+    Attack: 80
+    Range: 1
+    Slots: 2
+    Jobs: {Acolyte: true, Mage: true, Monk: true, Novice: true, SuperNovice: true, Priest: true, Sage: true, SoulLinker: true, Wizard: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      bonus bMatk,175;
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bMagicAddEle,Ele_Neutral,10;
+      bonus2 bMagicAddEle,Ele_Earth,10;
+      if (.@r>=7) {
+         bonus bVariableCastrate,-10;
+         if (.@r>=9) {
+            bonus2 bMagicAtkEle,Ele_Fire,30;
+            bonus2 bMagicAtkEle,Ele_Neutral,30;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-15;
+            }
+         }
+      }
   - Id: 560004
     AegisName: Ep172_Bh_Knuck
     Name: Ira Fist
@@ -148512,6 +149237,48 @@ Body:
       bonus2 bSkillAtk,"MO_INVESTIGATE",5*(.@r/2);
       bonus2 bSkillAtk,"MO_FINGEROFFENSIVE",5*(.@r/2);
       bonus bShortAtkRate,2*(.@r/4);
+  - Id: 560017
+    AegisName: Thanos_Knuckle_AD
+    Name: "Thanos Knuckle-AD [2]"
+    Type: Weapon
+    SubType: Knuckle
+    Buy: 10300000
+    Sell: 103000
+    Weight: 1200
+    Attack: 200
+    Range: 1
+    Slots: 2
+    Jobs: {Monk: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 190
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      autobonus "{ bonus2 bHPRegenRate,2500,1000; }",1,4000,BF_WEAPON;
+      bonus bBaseAtk,10*(.@r/2);
+      bonus2 bSkillAtk,"MO_EXTREMITYFIST",5*(.@r/3);
+      if (.@r>=7) {
+         bonus bMaxHPrate,5;
+         bonus bDelayrate,-5;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"MO_CHAINCOMBO",25;
+            bonus2 bSkillAtk,"MO_EXTREMITYFIST",15;
+            if (getallrefine() >= 22) {
+               bonus2 bAddSize,Size_All,15;
+               bonus bShortAtkRate,15;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus2 bAddClass,Class_All,2;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bPAtk,1;
+            bonus2 bAddClass,Class_All,3;
+         }
+      }
   - Id: 560018
     AegisName: Adulter_F_Knuckle
     Name: "Adulter Fides Knuckle [2]"
@@ -148689,6 +149456,36 @@ Body:
     Refineable: true
     Script: |
       bonus bMatk,220;
+  - Id: 560034
+    AegisName: Burning_Knuckle_AD
+    Name: "Burning Knuckle-OSAD [2]"
+    Type: Weapon
+    SubType: Knuckle
+    Buy: 10050000
+    Sell: 100500
+    Weight: 900
+    Attack: 175
+    Range: 1
+    Slots: 2
+    Jobs: {Monk: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,5;
+      if (.@r>=7) {
+         bonus bDelayrate,-5;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"MO_EXTREMITYFIST",30;
+            if (getallrefine() >= 22) {
+               bonus2 bAddSize,Size_Medium,20;
+               bonus2 bAddSize,Size_Large,20;
+               bonus2 bSkillAtk,"MO_EXTREMITYFIST",45;
+            }
+         }
+      }
   - Id: 570005
     AegisName: Ep172_1h_Inst
     Name: Pigritia Wave
@@ -148767,6 +149564,49 @@ Body:
       .@r = getrefine();
       bonus2 bSkillAtk,"BA_MUSICALSTRIKE",5*(.@r/2);
       bonus bLongAtkRate,2*(.@r/4);
+  - Id: 570016
+    AegisName: Thanos_Violin_AD
+    Name: "Thanos Violin-AD [2]"
+    Type: Weapon
+    SubType: Musical
+    Buy: 10500000
+    Sell: 105000
+    Weight: 1000
+    Attack: 220
+    Range: 1
+    Slots: 2
+    Jobs: {BardDancer: true}
+    Gender: Male
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 190
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      autobonus "{ bonus2 bHPRegenRate,2500,1000; }",1,4000,BF_WEAPON;
+      bonus bBaseAtk,10*(.@r/2);
+      bonus2 bSkillAtk,"CG_ARROWVULCAN",10*(.@r/3);
+      if (.@r>=7) {
+         bonus bVariableCastrate,-10;
+         bonus2 bSkillAtk,"CG_ARROWVULCAN",15;
+         if (.@r>=9) {
+            bonus bDelayrate,-10;
+            bonus bDelayrate,-10;
+            if (getallrefine() >= 22) {
+               bonus2 bAddSize,Size_All,15;
+               bonus bLongAtkRate,15;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus2 bAddClass,Class_All,2;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bPAtk,1;
+            bonus2 bAddClass,Class_All,3;
+         }
+      }
   - Id: 570017
     AegisName: Adulter_F_Violin
     Name: "Adulter Fides Violin [2]"
@@ -149029,6 +149869,49 @@ Body:
       .@r = getrefine();
       bonus2 bSkillAtk,"DC_THROWARROW",5*(.@r/2);
       bonus bLongAtkRate,2*(.@r/4);
+  - Id: 580016
+    AegisName: Thanos_Whip_AD
+    Name: "Thanatos Whip-AD [2]"
+    Type: Weapon
+    SubType: Whip
+    Buy: 10500000
+    Sell: 105000
+    Weight: 1000
+    Attack: 220
+    Range: 2
+    Slots: 2
+    Jobs: {BardDancer: true}
+    Gender: Female
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 190
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      autobonus "{ bonus2 bHPRegenRate,2500,1000; }",1,4000,BF_WEAPON;
+      bonus bBaseAtk,10*(.@r/2);
+      bonus2 bSkillAtk,"CG_ARROWVULCAN",10*(.@r/3);
+      if (.@r>=7) {
+         bonus bVariableCastrate,-10;
+         bonus2 bSkillAtk,"CG_ARROWVULCAN",15;
+         if (.@r>=9) {
+            bonus bDelayrate,-10;
+            bonus bDelayrate,-10;
+            if (getallrefine() >= 22) {
+               bonus2 bAddSize,Size_All,15;
+               bonus bLongAtkRate,15;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus2 bAddClass,Class_All,2;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bPAtk,1;
+            bonus2 bAddClass,Class_All,3;
+         }
+      }
   - Id: 580017
     AegisName: Adulter_F_C_Rope
     Name: "Adulter Fides Chain Rope [2]"
@@ -149259,6 +150142,55 @@ Body:
       bonus2 bSkillAtk,"PR_MAGNUS",5*(.@r/2);
       bonus bHealPower,5*(.@r/2);
       bonus2 bMagicAtkEle,Ele_All,2*(.@r/4);
+  - Id: 590020
+    AegisName: Thanos_Hammer_AD
+    Name: "Thanos Hammer-AD [2]"
+    Type: Weapon
+    SubType: Mace
+    Buy: 10300000
+    Sell: 103000
+    Weight: 1000
+    Attack: 200
+    Range: 1
+    Slots: 2
+    Jobs: {Priest: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 190
+    Refineable: true
+    Gradable: true
+    Script: |
+      bonus bMatk,190;
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      autobonus "{ bonus2 bHPRegenRate,2500,1000; }",1,4000,BF_WEAPON;
+      bonus bMatk,10*(.@r/2);
+      bonus bBaseAtk,10*(.@r/2);
+      bonus2 bAddRace,RC_Undead,18*(.@r/3);
+      bonus2 bMagicAddRace,RC_Undead,18*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bMagicAtkEle,Ele_Holy,15;
+         bonus bAspdRate,10;
+         if (.@r>=9) {
+            bonus bMatkRate,5;
+            bonus2 bAddClass,Class_All,5;
+            bonus2 bAddRace,RC_Undead,30;
+            bonus2 bMagicAddRace,RC_Undead,30;
+            if (getallrefine() >= 22) {
+               bonus2 bAddSize,Size_All,15;
+               bonus2 bMagicAddSize,Size_All,15;
+               bonus bShortAtkRate,15;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus2 bAddClass,Class_All,3;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bLongAtkRate,15;
+            bonus bPAtk,1;
+         }
+      }
   - Id: 590021
     AegisName: Adulter_F_Mace
     Name: "Adulter Fides Mace [2]"
@@ -149459,6 +150391,68 @@ Body:
     Script: |
       bonus bMatk,160;
       bonus bUnbreakableWeapon;
+  - Id: 590043
+    AegisName: Saphir_Hall_AD
+    Name: "Saphir Mace-OSAD [2]"
+    Type: Weapon
+    SubType: Mace
+    Buy: 10150000
+    Sell: 101500
+    Weight: 800
+    Attack: 185
+    Range: 1
+    Slots: 2
+    Jobs: {Alchemist: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bAddClass,Class_All,5;
+      if (.@r>=7) {
+         bonus bVariableCastrate,-10;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"AM_ACIDTERROR",25;
+            if (getallrefine() >= 22) {
+               bonus bLongAtkRate,15;
+               bonus2 bSkillAtk,"AM_ACIDTERROR",20;
+            }
+         }
+      }
+  - Id: 590044
+    AegisName: Ultio_Spes_AD
+    Name: "Ultio-OSAD [2]"
+    Type: Weapon
+    SubType: Mace
+    Buy: 9800000
+    Sell: 98000
+    Weight: 1200
+    Attack: 150
+    Range: 1
+    Slots: 2
+    Jobs: {Priest: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      bonus bMatk,170;
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus bMatkRate,5;
+      if (.@r>=7) {
+         bonus bVariableCastrate,-10;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"AL_HOLYLIGHT",25;
+            bonus2 bSkillAtk,"PR_MAGNUS",30;
+            if (getallrefine() >= 22) {
+               bonus2 bMagicAtkEle,Ele_Holy,15;
+               bonus bDelayrate,-15;
+            }
+         }
+      }
   - Id: 600008
     AegisName: Ep172_Bh_Sword
     Name: Hypocrisy Edge
@@ -149534,6 +150528,47 @@ Body:
       .@r = getrefine();
       bonus2 bSkillAtk,"KN_BOWLINGBASH",5*(.@r/2);
       bonus bShortAtkRate,2*(.@r/4);
+  - Id: 600016
+    AegisName: Thanos_TSword_AD
+    Name: "Thanatos Great Sword-AD [2]"
+    Type: Weapon
+    SubType: 2hSword
+    Buy: 10700000
+    Sell: 107000
+    Weight: 2500
+    Attack: 240
+    Range: 1
+    Slots: 2
+    Jobs: {Knight: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 190
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      autobonus "{ bonus2 bHPRegenRate,2500,1000; }",1,4000,BF_WEAPON;
+      bonus bBaseAtk,10*(.@r/2);
+      bonus2 bSkillAtk,"KN_BOWLINGBASH",10*(.@r/3);
+      if (.@r>=7) {
+         bonus bAspdRate,10;
+         bonus2 bSkillAtk,"KN_BOWLINGBASH",20;
+         if (.@r>=9) {
+            bonus2 bAddClass,Class_All,5;
+            if (getallrefine() >= 22) {
+               bonus2 bAddSize,Size_All,15;
+               bonus bShortAtkRate,15;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus2 bAddClass,Class_All,2;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bPAtk,1;
+            bonus2 bAddClass,Class_All,3;
+         }
+      }
   - Id: 600017
     AegisName: Adulter_F_T_Sword
     Name: "Adulter Fides Two-Handed Sword [2]"
@@ -149631,6 +150666,39 @@ Body:
     Refineable: true
     Script: |
       bonus bMatk,270;
+  - Id: 600028
+    AegisName: Beam_Claymore_AD
+    Name: "Beam Claymore-OSAD [2]"
+    Type: Weapon
+    SubType: 2hSword
+    Buy: 10800000
+    Sell: 108000
+    Weight: 1800
+    Attack: 250
+    Range: 1
+    Slots: 2
+    Jobs: {Crusader: true, Knight: true, Swordman: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus bCritical,10;
+      if (.@r>=7) {
+         bonus bAspdRate,10;
+         if (.@r>=9) {
+            bonus bCritAtkRate,20;
+            bonus2 bSkillAtk,"KN_BOWLINGBASH",25;
+            if (getallrefine() >= 22) {
+               bonus2 bAddSize,Size_Small,25;
+               bonus2 bMagicAddSize,Size_Small,25;
+               bonus2 bAddSize,Size_Medium,25;
+               bonus2 bMagicAddSize,Size_Medium,25;
+            }
+         }
+      }
   - Id: 610006
     AegisName: Ep172_Bh_Katar
     Name: Avaritia Metal
@@ -149699,6 +150767,52 @@ Body:
       .@r = getrefine();
       bonus2 bSkillAtk,"ASC_METEORASSAULT",5*(.@r/2);
       bonus bShortAtkRate,2*(.@r/4);
+  - Id: 610019
+    AegisName: Thanos_Katar_AD
+    Name: "Thanatos Katar-AD [2]"
+    Type: Weapon
+    SubType: Katar
+    Buy: 10800000
+    Sell: 108000
+    Weight: 2000
+    Attack: 250
+    Range: 1
+    Slots: 2
+    Jobs: {Assassin: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 190
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      autobonus "{ bonus2 bHPRegenRate,2500,1000; }",1,4000,BF_WEAPON;
+      bonus bBaseAtk,10*(.@r/2);
+      bonus2 bSkillAtk,"AS_SONICBLOW",7*(.@r/3);
+      if (.@r>=7) {
+         bonus bDelayrate,-10;
+         bonus2 bSkillAtk,"AS_SONICBLOW",15;
+         if (.@r>=9) {
+            bonus2 bAddClass,Class_All,5;
+            bonus2 bSkillAtk,"AS_GRIMTOOTH",25;
+            if (getallrefine() >= 22) {
+               bonus2 bAddSize,Size_All,15;
+               bonus bShortAtkRate,15;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus2 bAddClass,Class_All,3;
+         bonus2 bSkillAtk,"ASC_METEORASSAULT",10;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bDelayrate,-5;
+            bonus bPAtk,1;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus2 bSkillAtk,"ASC_METEORASSAULT",10;
+            }
+         }
+      }
   - Id: 610020
     AegisName: Adulter_F_Cakram
     Name: "Adulter Fides Chakram [2]"
@@ -149876,6 +150990,37 @@ Body:
     Refineable: true
     Script: |
       bonus bMatk,220;
+  - Id: 610039
+    AegisName: Meuchler_AD
+    Name: "Meuchler-OSAD [2]"
+    Type: Weapon
+    SubType: Katar
+    Buy: 10200000
+    Sell: 102000
+    Weight: 1300
+    Attack: 190
+    Range: 1
+    Slots: 2
+    Jobs: {Assassin: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,5;
+      if (.@r>=7) {
+         bonus bLongAtkRate,10;
+         bonus bAspdRate,7;
+         if (.@r>=9) {
+            bonus bDelayrate,-15;
+            bonus2 bSkillAtk,"ASC_METEORASSAULT",45;
+            if (getallrefine() >= 22) {
+               bonus2 bAddSize,Size_Small,20;
+               bonus2 bAddSize,Size_Medium,20;
+            }
+         }
+      }
   - Id: 620005
     AegisName: Fourth_Bh_Axe
     Name: "Relapse Axe [2]"
@@ -149897,6 +151042,53 @@ Body:
       bonus bUnbreakableWeapon;
       bonus2 bSkillAtk,"MC_CARTREVOLUTION",5*(.@r/2);
       bonus bShortAtkRate,2*(.@r/4);
+  - Id: 620009
+    AegisName: Thanos_Axe_AD
+    Name: "Thanatos Axe-AD [2]"
+    Type: Weapon
+    SubType: 2hAxe
+    Buy: 11500000
+    Sell: 115000
+    Weight: 6000
+    Attack: 320
+    Range: 1
+    Slots: 2
+    Jobs: {Blacksmith: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 190
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      autobonus "{ bonus2 bHPRegenRate,2500,1000; }",1,4000,BF_WEAPON;
+      bonus bBaseAtk,10*(.@r/2);
+      bonus2 bSkillAtk,"MC_MAMMONITE",7*(.@r/3);
+      if (.@r>=7) {
+         bonus bDelayrate,-10;
+         bonus bDelayrate,-5;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"MC_CARTREVOLUTION",45;
+            bonus2 bSkillAtk,"MC_MAMMONITE",15;
+            if (getallrefine() >= 22) {
+               bonus2 bAddSize,Size_All,15;
+               bonus bShortAtkRate,15;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus2 bAddClass,Class_All,2;
+         bonus2 bSkillAtk,"MC_CARTREVOLUTION",10;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bPAtk,1;
+            bonus2 bAddClass,Class_All,3;
+            if (.@g >= ENCHANTGRADE_B) {
+               bonus2 bSkillAtk,"MC_CARTREVOLUTION",10;
+            }
+         }
+      }
   - Id: 620010
     AegisName: Doom_Slayer_IL
     Name: "Illusion Doom Slayer [2]"
@@ -149949,6 +151141,39 @@ Body:
     Script: |
       bonus bMatk,180;
       bonus bUnbreakableWeapon;
+  - Id: 620018
+    AegisName: Blasti_AD
+    Name: "Blasti-OSAD [2]"
+    Type: Weapon
+    SubType: 2hAxe
+    Buy: 12300000
+    Sell: 123000
+    Weight: 4500
+    Attack: 400
+    Range: 1
+    Slots: 2
+    Jobs: {Blacksmith: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      bonus2 bSubSize,Size_Medium,15;
+      bonus2 bSubSize,Size_Large,15;
+      if (.@r>=7) {
+         bonus2 bSubSize,Size_Medium,15;
+         bonus2 bSubSize,Size_Large,15;
+         bonus2 bAddClass,Class_All,5;
+         if (.@r>=9) {
+            bonus bLongAtkRate,15;
+            bonus2 bSkillAtk,"WS_CARTTERMINATION",25;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-15;
+            }
+         }
+      }
   - Id: 630003
     AegisName: Ep172_Bh_Spear
     Name: Luxuria Pierce
@@ -150170,6 +151395,51 @@ Body:
       bonus bUnbreakableWeapon;
       bonus2 bSkillAtk,"WZ_FROSTNOVA",5*(.@r/2);
       bonus2 bMagicAtkEle,Ele_All,2*(.@r/4);
+  - Id: 640017
+    AegisName: Thanos_Rod_AD
+    Name: "Thanatos Two-handed Staff-AD [2]"
+    Type: Weapon
+    SubType: 2hStaff
+    Buy: 9800000
+    Sell: 98000
+    Weight: 1400
+    Attack: 150
+    Range: 1
+    Slots: 2
+    Jobs: {Wizard: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 190
+    Refineable: true
+    Gradable: true
+    Script: |
+      bonus bMatk,300;
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      bonus bUnbreakableWeapon;
+      autobonus "{ bonus2 bHPRegenRate,1000,1000; bonus2 bSPRegenRate,100,1000; }",10,4000,BF_MAGIC;
+      bonus bMatk,10*(.@r/2);
+      bonus2 bSkillAtk,"WZ_METEOR",10*(.@r/3);
+      if (.@r>=7) {
+         bonus2 bMagicAtkEle,Ele_Earth,15;
+         bonus2 bMagicAtkEle,Ele_Fire,15;
+         bonus bDelayrate,-10;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"WZ_HEAVENDRIVE",40;
+            bonus2 bSkillAtk,"WZ_METEOR",15;
+            if (getallrefine() >= 22) {
+               bonus2 bMagicAddSize,Size_All,15;
+               bonus2 bSubEle,Ele_All,15;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus bMatkRate,2;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bSMatk,1;
+            bonus bMatkRate,3;
+         }
+      }
   - Id: 640019
     AegisName: Adulter_F_T_Staff
     Name: "Adulter Fides Two-Handed Staff [2]"
@@ -150660,6 +151930,48 @@ Body:
       .@r = getrefine();
       bonus2 bSkillAtk,"AC_SHOWER",5*(.@r/2);
       bonus bLongAtkRate,2*(.@r/4);
+  - Id: 700029
+    AegisName: Thanos_Bow_AD
+    Name: "Thanatos Bow-AD [2]"
+    Type: Weapon
+    SubType: Bow
+    Buy: 10600000
+    Sell: 106000
+    Weight: 2000
+    Attack: 230
+    Range: 5
+    Slots: 2
+    Jobs: {Hunter: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 190
+    Refineable: true
+    Gradable: true
+    Script: |
+      .@g = getenchantgrade();
+      .@r = getrefine();
+      autobonus "{ bonus2 bHPRegenRate,2500,1000; }",1,4000,BF_WEAPON;
+      bonus bBaseAtk,10*(.@r/2);
+      bonus2 bSkillAtk,"SN_SHARPSHOOTING",5*(.@r/3);
+      if (.@r>=7) {
+         bonus bCritAtkRate,15;
+         bonus2 bSkillAtk,"SN_SHARPSHOOTING",10;
+         if (.@r>=9) {
+            bonus bVariableCastrate,-10;
+            bonus bCritical,15;
+            if (getallrefine() >= 22) {
+               bonus2 bAddSize,Size_All,15;
+               bonus bLongAtkRate,15;
+            }
+         }
+      }
+      if (.@g >= ENCHANTGRADE_D) {
+         bonus2 bAddClass,Class_All,3;
+         if (.@g >= ENCHANTGRADE_C) {
+            bonus bDelayrate,-5;
+            bonus bPAtk,1;
+         }
+      }
   - Id: 700030
     AegisName: Adulter_F_C_Bow
     Name: "Adulter Fides Crossbow [2]"
@@ -150919,6 +152231,94 @@ Body:
     Refineable: true
     Script: |
       bonus bMatk,220;
+  - Id: 700054
+    AegisName: Virtual_Bow_AD
+    Name: "Virtual Bow-OSAD [2]"
+    Type: Weapon
+    SubType: Bow
+    Buy: 10300000
+    Sell: 103000
+    Weight: 1200
+    Attack: 200
+    Range: 5
+    Slots: 2
+    Jobs: {Hunter: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,5;
+      if (.@r>=7) {
+         bonus bLongAtkRate,7;
+         bonus bCritical,8;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"SN_SHARPSHOOTING",20;
+            bonus2 bSkillAtk,"AC_SHOWER",40;
+            if (getallrefine() >= 22) {
+               bonus bCritical,7;
+               bonus2 bSkillAtk,"AC_SHOWER",30;
+            }
+         }
+      }
+  - Id: 700055
+    AegisName: MH_P89_AD
+    Name: "MH-P89-OSAD [2]"
+    Type: Weapon
+    SubType: Bow
+    Buy: 10000000
+    Sell: 100000
+    Weight: 1200
+    Attack: 170
+    Range: 5
+    Slots: 2
+    Jobs: {BardDancer: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,5;
+      if (.@r>=7) {
+         bonus bLongAtkRate,10;
+         if (.@r>=9) {
+            bonus bDelayrate,-10;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"CG_ARROWVULCAN",40;
+            }
+         }
+      }
+  - Id: 700056
+    AegisName: AC_B44_AD
+    Name: "AC-B44-OSAD [2]"
+    Type: Weapon
+    SubType: Bow
+    Buy: 10200000
+    Sell: 102000
+    Weight: 600
+    Attack: 190
+    Range: 5
+    Slots: 2
+    Jobs: {Rogue: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMatk,135;
+      bonus bLongAtkRate,7;
+      if (.@r>=7) {
+         bonus bAspdRate,10;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"AC_DOUBLE",25;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"AC_DOUBLE",20;
+            }
+         }
+      }
   - Id: 800003
     AegisName: Adulter_F_Revolver
     Name: "Adulter Fides Revolver [2]"
@@ -151180,6 +152580,34 @@ Body:
     Refineable: true
     Script: |
       bonus bMatk,230;
+  - Id: 810013
+    AegisName: HR_S55_AD
+    Name: "HR-55-OSAD [2]"
+    Type: Weapon
+    SubType: Rifle
+    Buy: 10800000
+    Sell: 108000
+    Weight: 1000
+    Attack: 250
+    Range: 9
+    Slots: 2
+    Jobs: {Gunslinger: true, Rebellion: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 170
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,5;
+      if (.@r>=7) {
+         bonus bLongAtkRate,10;
+         if (.@r>=9) {
+            bonus2 bSkillAtk,"GS_DUST",30;
+            if (getallrefine() >= 22) {
+               bonus2 bSkillAtk,"GS_DUST",20;
+            }
+         }
+      }
   - Id: 820000
     AegisName: Ep172_1h_Shotgun
     Name: Lust Shatter
@@ -152139,6 +153567,22 @@ Body:
     AegisName: Ep18_Trapped03
     Name: Trapped Pear
     Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+  - Id: 1000430
+    AegisName: Weapon_Stone_1
+    Name: Weapon Upgrade Stone(Lower)
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1000431
+    AegisName: Weapon_Stone_2
+    Name: Weapon Upgrade Stone(Intermediate)
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1000434
+    AegisName: Armor_Stone_1
+    Name: Armor Upgrade Stone(Lower)
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1000435
+    AegisName: Armor_Stone_2
+    Name: Armor Upgrade Stone(Intermediate)
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
   - Id: 1000471
     AegisName: Vila_Basement_Key
     Name: Villa Basement Key
