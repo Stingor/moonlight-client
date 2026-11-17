@@ -332,10 +332,10 @@ class GameOptions {
     return entity_names_;
   }
 
-  // COMBIEN DE FAUX ÉTATS MONTRER, zéro quand l'aperçu est éteint. ⚠ LE PLAFOND
-  // DE LA BARRE, et non un nombre à part : l'aperçu sert à voir la barre PLEINE.
+  // COMBIEN DE FAUX ÉTATS MONTRER, zéro quand l'aperçu est éteint. ⚠ LA GRILLE
+  // ENTIÈRE, et non un nombre à part : l'aperçu sert à voir la barre PLEINE.
   [[nodiscard]] int status_preview() const noexcept {
-    return status_preview_ ? status_bar_.most : 0;
+    return status_preview_ ? ro::ui::StatusBarCapacity(status_bar_) : 0;
   }
 
   // Le ciel, que `/effect` coupe aussi, les longs menus de PNJ, et l'avis de pose.
@@ -688,12 +688,13 @@ class GameOptions {
   // déjà `status_anchor_names_` et ses voisines.
   std::vector<const char*> stat_bar_text_names_;
   std::vector<const char*> stat_bar_shape_names_;
-  // Les trois listes déroulantes de la barre d'états. ⚠ REFAITES À CHAQUE IMAGE
+  // Les quatre listes déroulantes de la barre d'états. ⚠ REFAITES À CHAQUE IMAGE
   // comme les noms de langue : un texte traduit ne se garde pas d'une image à
   // l'autre, son pointeur meurt au changement de langue.
   std::vector<const char*> status_anchor_names_;
   std::vector<const char*> status_sort_names_;
   std::vector<const char*> status_sweep_names_;
+  std::vector<const char*> status_fill_names_;
   std::vector<ro::ui::OptionRowView> shortcut_rows_;
   // Ce qui vaut pour les HUIT barres, dessine au-dessus des onglets : voir
   // `OptionSectionView::shared_rows`.

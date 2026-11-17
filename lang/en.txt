@@ -494,6 +494,12 @@ tr: Collection
 fr: Collectionneur
 tr: Collector
 
+fr: Colonne par colonne
+tr: Column by column
+
+fr: Colonne par colonne, chaque nouvel état se pose SOUS le précédent, et la colonne voisine ne s'entame qu'une fois celle-ci pleine : la barre verticale, le long d'un bord d'écran.
+tr: Column by column, each new state goes BELOW the previous one, and the next column only starts once this one is full: the vertical bar, along a screen edge.
+
 fr: Commandes du client
 tr: Client commands
 
@@ -610,6 +616,9 @@ tr: Game equipment window
 
 fr: Hautes performances
 tr: High performance
+
+fr: La barre montre au plus colonnes × lignes états. Au-delà, ceux en trop sont écartés — ce sont les DERNIERS du rangement ci-dessous, qui décide donc de ce qu'on perd.\n\nUne seule colonne fait une barre verticale.
+tr: The bar shows at most columns × rows states. Beyond that, the extra ones are dropped — the LAST ones of the sorting below, which therefore decides what you lose.\n\nA single column makes a vertical bar.
 
 fr: La fiche montre le mannequin et ses nombres ; la fenêtre du jeu est celle d'équipement, onglets Général et Costume.
 tr: The sheet shows the doll and its numbers; the game window is the equipment one, with General and Costume tabs.
@@ -796,6 +805,9 @@ tr: Release falcon
 
 fr: Libérer pour l'inspiration
 tr: Release for inspiration
+
+fr: Ligne par ligne
+tr: Row by row
 
 fr: Loup
 tr: Wolf
@@ -10987,9 +10999,6 @@ tr: The panel of tracked quests and achievements, over the game
 fr: Le paquet du serveur porte les 4 cartes de chaque arme — la fenêtre du jeu les jette, deux armes identiques dont une sertie y sont donc indistinguables.
 tr: The server packet carries the 4 cards of each weapon — the game's window throws them away, so two identical weapons, one of them socketed, are indistinguishable there.
 
-fr: Le plafond ci-dessus réparti sur autant de lignes : une barre haute et étroite plutôt que longue et plate.
-tr: The cap above split over that many rows: a tall narrow bar rather than a long flat one.
-
 fr: Le poids seul
 tr: Weight only
 
@@ -11382,9 +11391,6 @@ tr: Exact name of the character to invite (they must be online).
 
 fr: Nom, droits et part d'exp de chaque poste. Le serveur plafonne la part d'exp à %d %%.
 tr: Name, rights and exp share of each position. The server caps the exp share at %d %%.
-
-fr: Nombre maximum
-tr: Most icons
 
 fr: Non
 tr: No

@@ -494,6 +494,12 @@ tr: Colección
 fr: Collectionneur
 tr: Coleccionista
 
+fr: Colonne par colonne
+tr: Columna por columna
+
+fr: Colonne par colonne, chaque nouvel état se pose SOUS le précédent, et la colonne voisine ne s'entame qu'une fois celle-ci pleine : la barre verticale, le long d'un bord d'écran.
+tr: Columna por columna, cada nuevo estado se coloca DEBAJO del anterior, y la columna contigua solo se empieza cuando esta está llena: la barra vertical, a lo largo de un borde de la pantalla.
+
 fr: Commandes du client
 tr: Comandos del cliente
 
@@ -610,6 +616,9 @@ tr: Ventana de equipo del juego
 
 fr: Hautes performances
 tr: Alto rendimiento
+
+fr: La barre montre au plus colonnes × lignes états. Au-delà, ceux en trop sont écartés — ce sont les DERNIERS du rangement ci-dessous, qui décide donc de ce qu'on perd.\n\nUne seule colonne fait une barre verticale.
+tr: La barra muestra como máximo columnas × filas estados. Más allá, los sobrantes se descartan — son los ÚLTIMOS del orden de abajo, que decide pues lo que se pierde.\n\nUna sola columna forma una barra vertical.
 
 fr: La fiche montre le mannequin et ses nombres ; la fenêtre du jeu est celle d'équipement, onglets Général et Costume.
 tr: La ficha muestra el maniquí y sus números; la ventana del juego es la de equipo, pestañas General y Disfraz.
@@ -796,6 +805,9 @@ tr: Liberar el halcón
 
 fr: Libérer pour l'inspiration
 tr: Liberar para la inspiración
+
+fr: Ligne par ligne
+tr: Fila por fila
 
 fr: Loup
 tr: Lobo
@@ -10987,9 +10999,6 @@ tr: El panel de misiones y logros seguidos, sobre el juego
 fr: Le paquet du serveur porte les 4 cartes de chaque arme — la fenêtre du jeu les jette, deux armes identiques dont une sertie y sont donc indistinguables.
 tr: El paquete del servidor incluye las 4 cartas de cada arma; la ventana del juego las descarta, así que dos armas idénticas, una de ellas con cartas, no se distinguen ahí.
 
-fr: Le plafond ci-dessus réparti sur autant de lignes : une barre haute et étroite plutôt que longue et plate.
-tr: El tope de arriba repartido en tantas líneas: una barra alta y estrecha en vez de larga y plana.
-
 fr: Le poids seul
 tr: Solo el peso
 
@@ -11382,9 +11391,6 @@ tr: Nombre exacto del personaje al que invitar (debe estar en línea).
 
 fr: Nom, droits et part d'exp de chaque poste. Le serveur plafonne la part d'exp à %d %%.
 tr: Nombre, derechos y reparto de exp de cada puesto. El servidor limita el reparto de exp al %d %%.
-
-fr: Nombre maximum
-tr: Número máximo
 
 fr: Non
 tr: No

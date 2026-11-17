@@ -297,8 +297,9 @@ void GameOptions::Apply(GameOption which, const OptionTargets& to) {
     case GameOption::kStatusBarPreview:
     case GameOption::kStatusBarSide:
     case GameOption::kStatusBarGap:
-    case GameOption::kStatusBarMost:
+    case GameOption::kStatusBarColumns:
     case GameOption::kStatusBarRows:
+    case GameOption::kStatusBarFill:
     case GameOption::kStatusBarAnchor:
     case GameOption::kStatusBarSort:
     case GameOption::kStatusBarCountdown:

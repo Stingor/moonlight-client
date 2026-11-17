@@ -386,11 +386,14 @@ void GameOptions::Change(const ro::ui::OptionsWindowAction& asked, const OptionT
     case GameOption::kStatusBarGap:
       status_bar_.gap_px = asked.value;
       break;
-    case GameOption::kStatusBarMost:
-      status_bar_.most = static_cast<int>(asked.value);
+    case GameOption::kStatusBarColumns:
+      status_bar_.columns = static_cast<int>(asked.value);
       break;
     case GameOption::kStatusBarRows:
       status_bar_.rows = static_cast<int>(asked.value);
+      break;
+    case GameOption::kStatusBarFill:
+      status_bar_.fill = asked.chosen;
       break;
     case GameOption::kStatusBarAnchor:
       status_bar_.anchor = asked.chosen;

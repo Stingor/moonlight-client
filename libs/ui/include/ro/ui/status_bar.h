@@ -41,15 +41,29 @@ enum class StatusAnchor : std::uint8_t {
   kBottomRight,
 };
 
+// LE SENS DANS LEQUEL LA GRILLE SE REMPLIT.
+//
+// ⚠ PAR COLONNE, l'état suivant se pose SOUS le précédent, et la colonne
+// d'à côté ne s'entame qu'une fois celle-ci pleine : c'est la barre verticale,
+// le long d'un bord d'écran. L'ancrage décide toujours du coin de départ.
+//
+// ⚠ L'ORDRE DE CES VALEURS EST PERSISTÉ : ne pas les intercaler.
+enum class StatusFill : std::uint8_t {
+  kByRow = 0,
+  kByColumn,
+};
+
 // Les bornes offertes. ⚠ LES RÉGLAGES VIENNENT D'UN FICHIER QUE LE JOUEUR PEUT
 // ÉCRIRE : zéro ligne diviserait par zéro au placement, et deux mille icônes
 // réserveraient un pan d'écran entier. On borne ici, une fois.
 inline constexpr float kSmallestStatusSidePixels = 8.0F;
 inline constexpr float kLargestStatusSidePixels = 48.0F;
 inline constexpr float kLargestStatusGapPixels = 12.0F;
-inline constexpr int kFewestStatusIcons = 1;
-inline constexpr int kMostStatusIcons = 100;
-inline constexpr int kMostStatusRows = 6;
+// ⚠ LA CAPACITÉ EST LE PRODUIT DES DEUX : il n'y a pas de plafond à part, qui
+// ne pourrait que contredire la grille — trop haut, il laisserait des états
+// hors de la grille ; trop bas, des cases que rien ne remplit jamais.
+inline constexpr int kMostStatusColumns = 20;
+inline constexpr int kMostStatusRows = 20;
 inline constexpr float kSmallestStatusCountdownPixels = 7.0F;
 inline constexpr float kLargestStatusCountdownPixels = 20.0F;
 // ⚠ PAS ZÉRO : une barre parfaitement transparente est une barre qu'on croit en
@@ -100,9 +114,10 @@ struct StatusBarLayout {
 
   float side_px = 24.0F;
   float gap_px = 2.0F;
-  // Le plafond TOTAL, toutes lignes confondues.
-  int most = 40;
+  // LA GRILLE : sa capacité est `columns × rows`.
+  int columns = 20;
   int rows = 2;
+  int fill = static_cast<int>(StatusFill::kByRow);
 
   int anchor = static_cast<int>(StatusAnchor::kTopLeft);
   int sort = static_cast<int>(StatusSort::kArrival);
@@ -124,11 +139,11 @@ struct StatusBarLayout {
 [[nodiscard]] StatusAnchor StatusAnchorOf(int stored) noexcept;
 [[nodiscard]] StatusSort StatusSortOf(int stored) noexcept;
 [[nodiscard]] StatusSweep StatusSweepOf(int stored) noexcept;
+[[nodiscard]] StatusFill StatusFillOf(int stored) noexcept;
 
 // LA GRILLE DE LA BARRE, une fois ses réglages bornés.
 //
-// 🔴 SES COLONNES SONT CELLES DE `PlaceStatusRow`, ET LA FORMULE EST LA MÊME :
-// le plafond réparti sur les lignes, arrondi vers le haut. Si les deux
+// 🔴 C'EST ELLE QUE `PlaceStatusRow` REMPLIT, case pour case. Si les deux
 // divergeaient, l'emprise réservée ne serait plus celle qu'on dessine — la
 // dernière colonne tomberait hors du cadre, ou le cadre traînerait une colonne
 // vide. Un essai les compare.
@@ -138,6 +153,9 @@ struct StatusBarGrid {
 };
 
 [[nodiscard]] StatusBarGrid GridOfStatusBar(const StatusBarLayout& look);
+
+// Combien d'états la barre peut montrer : sa grille entière.
+[[nodiscard]] int StatusBarCapacity(const StatusBarLayout& look);
 
 // L'EMPRISE DE LA BARRE : la grille ENTIÈRE, et non ce qu'elle porte aujourd'hui.
 //

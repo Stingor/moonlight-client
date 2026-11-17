@@ -25,7 +25,7 @@ using ro::core::Tr;
 using ro::ui::OptionKind;
 using ro::ui::OptionRowView;
 
-// LES TROIS LISTES DE LA BARRE D'ÉTATS, REFAITES À CHAQUE IMAGE.
+// LES QUATRE LISTES DE LA BARRE D'ÉTATS, REFAITES À CHAQUE IMAGE.
 //
 // 🔴 ET SURTOUT PAS DANS UN `static`. Le pointeur que `Tr` rend appartient au
 // catalogue et MEURT au changement de langue — `ro/core/i18n.h` le dit à la
@@ -37,7 +37,7 @@ using ro::ui::OptionRowView;
 // fichier de réglages : un libellé intercalé décalerait tout ce qu'un joueur a
 // déjà choisi.
 void FillStatusChoices(std::vector<const char*>& anchors, std::vector<const char*>& sorts,
-                       std::vector<const char*>& sweeps) {
+                       std::vector<const char*>& sweeps, std::vector<const char*>& fills) {
   anchors.clear();
   anchors.push_back(Tr("Haut gauche"));
   anchors.push_back(Tr("Haut droite"));
@@ -53,6 +53,10 @@ void FillStatusChoices(std::vector<const char*>& anchors, std::vector<const char
   sweeps.push_back(Tr("Aucun"));
   sweeps.push_back(Tr("Balayage horaire"));
   sweeps.push_back(Tr("Voile descendant"));
+
+  fills.clear();
+  fills.push_back(Tr("Ligne par ligne"));
+  fills.push_back(Tr("Colonne par colonne"));
 }
 
 }  // namespace
@@ -67,7 +71,8 @@ void GameOptions::ComposeStatusBarRows() {
   // 🔴 QUINZE RÉGLAGES EN COLONNE NE SE LISENT PAS. Trois intertitres, les
   // dépendants indentés sous leur maître, et le reste GRISÉ quand la barre est
   // éteinte : c'est ce qui sépare un formulaire d'une liste.
-  FillStatusChoices(status_anchor_names_, status_sort_names_, status_sweep_names_);
+  FillStatusChoices(status_anchor_names_, status_sort_names_, status_sweep_names_,
+                    status_fill_names_);
   const bool bar_off = !status_bar_.shown;
   status_rows_.clear();
   status_rows_.push_back(
@@ -111,18 +116,26 @@ void GameOptions::ComposeStatusBarRows() {
                                  status_bar_.gap_px, 0.0F, ro::ui::kLargestStatusGapPixels,
                                  "%.0f px"));
   status_rows_.back().disabled = bar_off;
+  // ⚠ PAS DE « NOMBRE MAXIMUM » : la grille EST le plafond. Un nombre à part
+  // ne pourrait que la contredire.
   status_rows_.push_back(
-      Measure(GameOption::kStatusBarMost, Tr("Nombre maximum"),
-              Tr("Au-delà, les états en trop sont écartés — ce sont les DERNIERS du "
-                 "rangement ci-dessous, qui décide donc de ce qu'on perd."),
-              static_cast<float>(status_bar_.most), static_cast<float>(ro::ui::kFewestStatusIcons),
-              static_cast<float>(ro::ui::kMostStatusIcons), "%.0f"));
+      Measure(GameOption::kStatusBarColumns, Tr("Colonnes"),
+              Tr("La barre montre au plus colonnes × lignes états. Au-delà, ceux en trop sont "
+                 "écartés — ce sont les DERNIERS du rangement ci-dessous, qui décide donc de ce "
+                 "qu'on perd.\n\nUne seule colonne fait une barre verticale."),
+              static_cast<float>(status_bar_.columns), 1.0F,
+              static_cast<float>(ro::ui::kMostStatusColumns), "%.0f"));
   status_rows_.back().disabled = bar_off;
-  status_rows_.push_back(Measure(GameOption::kStatusBarRows, Tr("Lignes"),
-                                 Tr("Le plafond ci-dessus réparti sur autant de lignes : une barre "
-                                    "haute et étroite plutôt que longue et plate."),
+  status_rows_.push_back(Measure(GameOption::kStatusBarRows, Tr("Lignes"), nullptr,
                                  static_cast<float>(status_bar_.rows), 1.0F,
                                  static_cast<float>(ro::ui::kMostStatusRows), "%.0f"));
+  status_rows_.back().disabled = bar_off;
+  status_rows_.push_back(
+      Choice(GameOption::kStatusBarFill, Tr("Remplissage"),
+             Tr("Colonne par colonne, chaque nouvel état se pose SOUS le précédent, et la colonne "
+                "voisine ne s'entame qu'une fois celle-ci pleine : la barre verticale, le long "
+                "d'un bord d'écran."),
+             status_fill_names_, status_bar_.fill));
   status_rows_.back().disabled = bar_off;
   status_rows_.push_back(
       Choice(GameOption::kStatusBarAnchor, Tr("Ancrage"),

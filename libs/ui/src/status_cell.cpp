@@ -327,6 +327,21 @@ std::vector<ImVec2> PlaceStatusRow(std::size_t count, ImVec2 origin,
   // réservée sous chaque case, faute de quoi le compte à rebours d'une ligne
   // tomberait sur les icônes de la suivante.
   const float down = layout.side + layout.gap + layout.below;
+  const auto place = [&](std::size_t column, std::size_t row) {
+    const float x = layout.right_to_left
+                        ? origin.x - static_cast<float>(column + 1) * step + layout.gap
+                        : origin.x + static_cast<float>(column) * step;
+    const float y = layout.upward ? origin.y - static_cast<float>(row + 1) * down + layout.gap
+                                  : origin.y + static_cast<float>(row) * down;
+    places.emplace_back(x, y);
+  };
+  if (layout.by_column) {
+    const auto per_column = static_cast<std::size_t>(rows);
+    for (std::size_t rank = 0; rank < kept; ++rank) {
+      place(rank / per_column, rank % per_column);
+    }
+    return places;
+  }
   // La ligne se compte à part : quand c'est le bord qui force le retour, une
   // ligne se termine avant son quota.
   std::size_t row = 0;
@@ -346,12 +361,7 @@ std::vector<ImVec2> PlaceStatusRow(std::size_t count, ImVec2 origin,
       ++row;
       column = 0;
     }
-    const float x = layout.right_to_left
-                        ? origin.x - static_cast<float>(column + 1) * step + layout.gap
-                        : origin.x + static_cast<float>(column) * step;
-    const float y = layout.upward ? origin.y - static_cast<float>(row + 1) * down + layout.gap
-                                  : origin.y + static_cast<float>(row) * down;
-    places.emplace_back(x, y);
+    place(column, row);
     ++column;
   }
   return places;

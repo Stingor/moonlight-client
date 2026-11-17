@@ -25,6 +25,7 @@ using ro::ui::StatusBarGrid;
 using ro::ui::StatusBarLayout;
 using ro::ui::StatusBarOrigin;
 using ro::ui::StatusBarSize;
+using ro::ui::StatusFill;
 using ro::ui::StatusSort;
 using ro::ui::StatusSortOf;
 using ro::ui::StatusSweep;
@@ -36,11 +37,11 @@ namespace {
 //
 // ⚠ SANS COMPTE À REBOURS, pour que la géométrie se lise en nombres ronds : il
 // RÉSERVE de la place sous chaque case, et l'essai qui suit s'en occupe à part.
-[[nodiscard]] StatusBarLayout Bar(int most, int rows, StatusAnchor anchor) {
+[[nodiscard]] StatusBarLayout Bar(int columns, int rows, StatusAnchor anchor) {
   StatusBarLayout look;
   look.side_px = 10.0F;
   look.gap_px = 2.0F;
-  look.most = most;
+  look.columns = columns;
   look.rows = rows;
   look.anchor = static_cast<int>(anchor);
   look.show_countdown = false;
@@ -57,18 +58,19 @@ namespace {
 }  // namespace
 
 TEST_CASE("Barre d'états : l'emprise est celle de la grille entière", "[ui][etats]") {
-  // Huit cases sur trois lignes font trois colonnes, et l'emprise les porte
-  // toutes — pas seulement les états du moment.
-  const StatusBarGrid grid = GridOfStatusBar(Bar(8, 3, StatusAnchor::kTopLeft));
+  // Trois colonnes sur trois lignes, et l'emprise les porte toutes — pas
+  // seulement les états du moment.
+  const StatusBarGrid grid = GridOfStatusBar(Bar(3, 3, StatusAnchor::kTopLeft));
   CHECK(grid.columns == 3);
   CHECK(grid.rows == 3);
+  CHECK(ro::ui::StatusBarCapacity(Bar(3, 3, StatusAnchor::kTopLeft)) == 9);
 
-  const ImVec2 size = StatusBarSize(Bar(8, 3, StatusAnchor::kTopLeft), 1.0F);
+  const ImVec2 size = StatusBarSize(Bar(3, 3, StatusAnchor::kTopLeft), 1.0F);
   CHECK(size.x == 34.0F);
   CHECK(size.y == 34.0F);
 
   // Et l'échelle d'interface la multiplie en entier, gouttières comprises.
-  const ImVec2 doubled = StatusBarSize(Bar(8, 3, StatusAnchor::kTopLeft), 2.0F);
+  const ImVec2 doubled = StatusBarSize(Bar(3, 3, StatusAnchor::kTopLeft), 2.0F);
   CHECK(doubled.x == 68.0F);
   CHECK(doubled.y == 68.0F);
 }
@@ -78,25 +80,55 @@ TEST_CASE("Barre d'états : l'emprise et le placement parlent de la même grille
   // l'emprise et celle du retour à la ligne. Si elles divergeaient d'une colonne,
   // la dernière icône tomberait hors du cadre qu'on a réservé — et le cadre ne se
   // voit qu'une fois la barre déverrouillée.
-  const StatusBarLayout look = Bar(10, 3, StatusAnchor::kTopLeft);
-  const StatusBarGrid grid = GridOfStatusBar(look);
-  const ImVec2 size = StatusBarSize(look, 1.0F);
-  const std::vector<ImVec2> places = PlaceStatusRow(static_cast<std::size_t>(look.most),
-                                                    ImVec2(0.0F, 0.0F), RowOfStatusBar(look, 1.0F));
-  REQUIRE(places.size() == static_cast<std::size_t>(look.most));
+  //
+  // ⚠ DANS LES DEUX SENS DE REMPLISSAGE : par colonne, c'est l'autre boucle qui
+  // pose les cases.
+  for (const StatusFill fill : {StatusFill::kByRow, StatusFill::kByColumn}) {
+    StatusBarLayout look = Bar(4, 3, StatusAnchor::kTopLeft);
+    look.fill = static_cast<int>(fill);
+    const auto capacity = static_cast<std::size_t>(ro::ui::StatusBarCapacity(look));
+    const ImVec2 size = StatusBarSize(look, 1.0F);
+    // Un état de plus que la grille : il est écarté, et non posé hors du cadre.
+    const std::vector<ImVec2> places =
+        PlaceStatusRow(capacity + 1, ImVec2(0.0F, 0.0F), RowOfStatusBar(look, 1.0F));
+    REQUIRE(places.size() == capacity);
 
-  const float below = ro::ui::StatusCountdownRoom(look, 1.0F);
-  float widest = 0.0F;
-  float lowest = 0.0F;
-  for (const ImVec2& place : places) {
-    widest = std::max(widest, place.x + look.side_px);
-    lowest = std::max(lowest, place.y + look.side_px + below);
+    const float below = ro::ui::StatusCountdownRoom(look, 1.0F);
+    float widest = 0.0F;
+    float lowest = 0.0F;
+    for (const ImVec2& place : places) {
+      widest = std::max(widest, place.x + look.side_px);
+      lowest = std::max(lowest, place.y + look.side_px + below);
+    }
+    CHECK(widest == size.x);
+    CHECK(lowest == size.y);
   }
-  CHECK(widest == size.x);
-  CHECK(lowest == size.y);
-  // Et la dernière ligne n'est pas vide : la grille ne réserve pas plus qu'il
-  // n'en faut.
-  CHECK(lowest == static_cast<float>(grid.rows) * 12.0F - 2.0F);
+}
+
+TEST_CASE("Barre d'états : par colonne, l'état suivant se pose dessous", "[ui][etats]") {
+  // La barre verticale : trois cases l'une sous l'autre, puis la colonne
+  // voisine.
+  StatusBarLayout look = Bar(2, 3, StatusAnchor::kTopLeft);
+  look.fill = static_cast<int>(StatusFill::kByColumn);
+  const std::vector<ImVec2> places =
+      PlaceStatusRow(4, ImVec2(0.0F, 0.0F), RowOfStatusBar(look, 1.0F));
+  REQUIRE(places.size() == 4);
+  CHECK(places[1].x == 0.0F);
+  CHECK(places[1].y == 12.0F);
+  CHECK(places[2].y == 24.0F);
+  CHECK(places[3].x == 12.0F);
+  CHECK(places[3].y == 0.0F);
+
+  // Ancrée en bas à droite, elle monte et part vers la gauche.
+  look.anchor = static_cast<int>(StatusAnchor::kBottomRight);
+  const std::vector<ImVec2> rising =
+      PlaceStatusRow(4, ImVec2(100.0F, 100.0F), RowOfStatusBar(look, 1.0F));
+  REQUIRE(rising.size() == 4);
+  CHECK(rising[0].x == 90.0F);
+  CHECK(rising[0].y == 90.0F);
+  CHECK(rising[1].y == 78.0F);
+  CHECK(rising[3].x == 78.0F);
+  CHECK(rising[3].y == 90.0F);
 }
 
 TEST_CASE("Barre d'états : la première case touche le coin ancré", "[ui][etats]") {
@@ -105,23 +137,23 @@ TEST_CASE("Barre d'états : la première case touche le coin ancré", "[ui][etat
   // état qui tombe et toutes les icônes glisseraient sous le curseur.
   const ImVec2 at(100.0F, 200.0F);
   // Quatre colonnes, deux lignes : une emprise de 46 sur 22.
-  const ImVec2 size = StatusBarSize(Bar(8, 2, StatusAnchor::kTopLeft), 1.0F);
+  const ImVec2 size = StatusBarSize(Bar(4, 2, StatusAnchor::kTopLeft), 1.0F);
   REQUIRE(size.x == 46.0F);
   REQUIRE(size.y == 22.0F);
 
-  const ImVec2 top_left = FirstCell(Bar(8, 2, StatusAnchor::kTopLeft), at);
+  const ImVec2 top_left = FirstCell(Bar(4, 2, StatusAnchor::kTopLeft), at);
   CHECK(top_left.x == 100.0F);
   CHECK(top_left.y == 200.0F);
 
-  const ImVec2 top_right = FirstCell(Bar(8, 2, StatusAnchor::kTopRight), at);
+  const ImVec2 top_right = FirstCell(Bar(4, 2, StatusAnchor::kTopRight), at);
   CHECK(top_right.x == 100.0F + 46.0F - 10.0F);
   CHECK(top_right.y == 200.0F);
 
-  const ImVec2 bottom_left = FirstCell(Bar(8, 2, StatusAnchor::kBottomLeft), at);
+  const ImVec2 bottom_left = FirstCell(Bar(4, 2, StatusAnchor::kBottomLeft), at);
   CHECK(bottom_left.x == 100.0F);
   CHECK(bottom_left.y == 200.0F + 22.0F - 10.0F);
 
-  const ImVec2 bottom_right = FirstCell(Bar(8, 2, StatusAnchor::kBottomRight), at);
+  const ImVec2 bottom_right = FirstCell(Bar(4, 2, StatusAnchor::kBottomRight), at);
   CHECK(bottom_right.x == 100.0F + 46.0F - 10.0F);
   CHECK(bottom_right.y == 200.0F + 22.0F - 10.0F);
 }
@@ -137,16 +169,19 @@ TEST_CASE("Barre d'états : un réglage venu du fichier reste dans ses valeurs",
   CHECK(StatusSortOf(9) == StatusSort::kArrival);
   CHECK(StatusSweepOf(2) == StatusSweep::kVertical);
   CHECK(StatusSweepOf(99) == StatusSweep::kNone);
+  CHECK(ro::ui::StatusFillOf(1) == StatusFill::kByColumn);
+  CHECK(ro::ui::StatusFillOf(7) == StatusFill::kByRow);
 }
 
-TEST_CASE("Barre d'états : zéro ligne ne divise pas par zéro", "[ui][etats]") {
+TEST_CASE("Barre d'états : une grille vide garde une case", "[ui][etats]") {
   StatusBarLayout broken = Bar(8, 0, StatusAnchor::kTopLeft);
   const StatusBarGrid grid = GridOfStatusBar(broken);
   CHECK(grid.rows == 1);
   CHECK(grid.columns == 8);
 
-  broken.most = 0;
+  broken.columns = 0;
   CHECK(GridOfStatusBar(broken).columns == 1);
+  CHECK(ro::ui::StatusBarCapacity(broken) == 1);
 }
 
 TEST_CASE("Barre d'états : le compte à rebours a sa place réservée", "[ui][etats]") {
@@ -154,7 +189,7 @@ TEST_CASE("Barre d'états : le compte à rebours a sa place réservée", "[ui][e
   // La fenêtre découpe à son bord : sans cette réserve, la dernière ligne de
   // chiffres serait simplement invisible, et l'avant-dernière tomberait sur les
   // icônes du dessous.
-  StatusBarLayout look = Bar(8, 2, StatusAnchor::kTopLeft);
+  StatusBarLayout look = Bar(4, 2, StatusAnchor::kTopLeft);
   look.show_countdown = true;
   look.countdown_px = 11.0F;
 

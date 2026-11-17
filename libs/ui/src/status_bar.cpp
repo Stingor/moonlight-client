@@ -51,15 +51,18 @@ StatusSort StatusSortOf(int stored) noexcept { return Bounded(stored, StatusSort
 
 StatusSweep StatusSweepOf(int stored) noexcept { return Bounded(stored, StatusSweep::kVertical); }
 
+StatusFill StatusFillOf(int stored) noexcept { return Bounded(stored, StatusFill::kByColumn); }
+
 StatusBarGrid GridOfStatusBar(const StatusBarLayout& look) {
   StatusBarGrid grid;
-  const int most = std::clamp(look.most, kFewestStatusIcons, kMostStatusIcons);
-  const int rows = std::clamp(look.rows, 1, kMostStatusRows);
-  grid.rows = static_cast<std::size_t>(rows);
-  // La MÊME formule que `PlaceStatusRow` : le plafond réparti sur les lignes,
-  // arrondi vers le haut.
-  grid.columns = static_cast<std::size_t>((most + rows - 1) / rows);
+  grid.columns = static_cast<std::size_t>(std::clamp(look.columns, 1, kMostStatusColumns));
+  grid.rows = static_cast<std::size_t>(std::clamp(look.rows, 1, kMostStatusRows));
   return grid;
+}
+
+int StatusBarCapacity(const StatusBarLayout& look) {
+  const StatusBarGrid grid = GridOfStatusBar(look);
+  return static_cast<int>(grid.columns * grid.rows);
 }
 
 float StatusCountdownRoom(const StatusBarLayout& look, float scale) {
@@ -94,8 +97,9 @@ StatusRowLayout RowOfStatusBar(const StatusBarLayout& look, float scale) {
   StatusRowLayout row;
   row.side = std::clamp(look.side_px, kSmallestStatusSidePixels, kLargestStatusSidePixels) * scale;
   row.gap = std::clamp(look.gap_px, 0.0F, kLargestStatusGapPixels) * scale;
-  row.most = std::clamp(look.most, kFewestStatusIcons, kMostStatusIcons);
-  row.rows = std::clamp(look.rows, 1, kMostStatusRows);
+  row.most = StatusBarCapacity(look);
+  row.rows = static_cast<int>(GridOfStatusBar(look).rows);
+  row.by_column = StatusFillOf(look.fill) == StatusFill::kByColumn;
   row.below = StatusCountdownRoom(look, scale);
   row.sort = StatusSortOf(look.sort);
   row.right_to_left = anchor == StatusAnchor::kTopRight || anchor == StatusAnchor::kBottomRight;

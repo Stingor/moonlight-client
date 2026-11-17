@@ -158,6 +158,9 @@ struct StatusRowLayout {
   bool right_to_left = false;
   // Vers le HAUT : l'origine est alors le coin BAS. Même raison, sur l'autre axe.
   bool upward = false;
+  // Colonne par colonne : `rows` cases l'une sous l'autre, puis la colonne
+  // suivante. ⚠ LE BORD (`limit`) N'Y JOUE PAS : il replie une LIGNE.
+  bool by_column = false;
   // Le bord à ne pas franchir, zéro pour aucun. Une case qui le passerait part
   // à la ligne suivante, ou n'est pas posée s'il n'en reste plus.
   float limit = 0.0F;
