@@ -5168,6 +5168,15 @@ struct ZcMoonlightLongName {
   std::string name;
 };
 
+// PACKET_ZC_MOONLIGHT_FAIR_PLAY
+struct ZcMoonlightFairPlay {
+  static constexpr std::uint16_t kOpcode = 0x0f6a;
+  // Taille sur le fil, en octets.
+  static constexpr std::size_t kWireSize = 36;
+
+  std::string tool_name;
+};
+
 // PACKET_ZC_MOONLIGHT_INSTANCE_INFO
 struct ZcMoonlightInstanceInfo {
   static constexpr std::uint16_t kOpcode = 0x0f40;
@@ -8820,6 +8829,7 @@ struct CzMoveItemToPersonal {
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzMoonlightReqStaffRoster& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightStaffRoster& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightLongName& packet);
+[[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightFairPlay& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightInstanceInfo& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, CzMoonlightMarketReq& packet);
 [[nodiscard]] bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightMarket& packet);
@@ -9466,6 +9476,7 @@ struct CzMoveItemToPersonal {
 [[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonlightReqStaffRoster& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightStaffRoster& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightLongName& packet);
+[[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightFairPlay& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightInstanceInfo& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const CzMoonlightMarketReq& packet);
 [[nodiscard]] std::vector<std::uint8_t> Encode(const ZcMoonlightMarket& packet);

@@ -51,7 +51,7 @@ TEST_CASE("Surfaces : le carnet MVP suit son interrupteur, le reste est toujours
       ro::net::kUiCapCompanionMaster | ro::net::kUiCapChatAuthor | ro::net::kUiCapDiscordRich |
       ro::net::kUiCapEquipAttributes | ro::net::kUiCapInstanceInfo | ro::net::kUiCapMarket |
       ro::net::kUiCapGmOutfit | ro::net::kUiCapMapEdits | ro::net::kUiCapAttackElement |
-      ro::net::kUiCapLongNpcTalk | ro::net::kUiCapLongMobName;
+      ro::net::kUiCapLongNpcTalk | ro::net::kUiCapLongMobName | ro::net::kUiCapFairPlay;
   STATIC_CHECK(ShownSurfaces(false) == kAlways);
   // Le Marché aussi : sans lui, un catalogue ouvrirait la recherche d'origine.
   STATIC_CHECK((ShownSurfaces(false) & ro::net::kUiCapMarket) != 0);

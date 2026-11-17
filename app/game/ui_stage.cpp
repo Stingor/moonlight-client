@@ -773,6 +773,7 @@ UiStage::Answers UiStage::Draw(
   ro::ui::DrawCaptureBadge(capture, skin_);
   // QUI PARLE, par-dessus les fenêtres mais sous la boîte de liaison perdue.
   ro::ui::DrawVoiceOverlay(windows.voice);
+  DrawFairPlayNotice(windows.fair_play);
   // LA LIAISON PERDUE, EN DERNIER : la boîte passe devant tout, et Échap lui
   // revient avant la pile — voir juste dessous.
   ro::ui::DrawLinkNotice(windows.link_notice, skin_);

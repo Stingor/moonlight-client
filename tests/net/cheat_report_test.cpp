@@ -4,8 +4,11 @@
 
 #include "ro/net/cheat_report.h"
 
+#include <algorithm>
 #include <cstdint>
+#include <optional>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <catch2/catch_test_macros.hpp>
@@ -69,4 +72,38 @@ TEST_CASE("un texte trop long est tronqué sans déborder sur le champ suivant",
   CHECK(FieldAt(sent, kToolAt, ro::net::kCheatToolBytes) ==
         std::string(ro::net::kCheatToolBytes, 'T'));
   CHECK(FieldAt(sent, kDetailAt, ro::net::kCheatDetailBytes) == "d");
+}
+
+namespace {
+
+// La disposition déclarée par le serveur, `PACKET_ZC_MOONLIGHT_FAIR_PLAY` :
+//   [packetType:2][packetLength:2][tool_name:32]
+constexpr std::uint16_t kFairPlayOpcode = 0x0F6A;
+constexpr std::size_t kFairPlayWireSize = 36;
+
+[[nodiscard]] ro::net::Frame FairPlayFrame(const std::string& tool) {
+  std::vector<std::uint8_t> bytes(kFairPlayWireSize, 0);
+  bytes[0] = static_cast<std::uint8_t>(kFairPlayOpcode & 0xFFU);
+  bytes[1] = static_cast<std::uint8_t>(kFairPlayOpcode >> 8U);
+  bytes[kLengthAt] = static_cast<std::uint8_t>(kFairPlayWireSize);
+  std::copy(tool.begin(), tool.end(), bytes.begin() + kToolAt);
+  return ro::net::Frame{.opcode = kFairPlayOpcode, .bytes = std::move(bytes)};
+}
+
+}  // namespace
+
+TEST_CASE("le rappel de fair-play rend l'outil qu'il nomme", "[net][guard]") {
+  const std::optional<std::string> tool = ro::net::ReadFairPlayNotice(FairPlayFrame("PostMessage"));
+  REQUIRE(tool.has_value());
+  CHECK(*tool == "PostMessage");
+}
+
+TEST_CASE("le rappel de fair-play ne lit ni une autre trame ni une trame courte", "[net][guard]") {
+  ro::net::Frame other = FairPlayFrame("PostMessage");
+  other.opcode = kCheatReportOpcode;
+  CHECK_FALSE(ro::net::ReadFairPlayNotice(other).has_value());
+
+  ro::net::Frame cut = FairPlayFrame("PostMessage");
+  cut.bytes.resize(kFairPlayWireSize - 1);
+  CHECK_FALSE(ro::net::ReadFairPlayNotice(cut).has_value());
 }

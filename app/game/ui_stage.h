@@ -101,6 +101,7 @@ class ChatTabsView;
 struct AchievementWindows;
 struct BattlegroundWindows;
 struct ChatRoomWindows;
+struct FairPlayBox;
 struct MailWindows;
 struct MvpTrackerWindows;
 struct NavigationWindows;
@@ -376,6 +377,7 @@ class UiStage {
   void DrawBattlegroundWindows(BattlegroundWindows& battleground);  // `ui_stage_battleground.cpp`
   void RegisterBattlegroundEscapes(BattlegroundWindows& battleground);
   void DrawRankingWindows(RankingBoardWindows& ranking);  // `ui_stage_ranking.cpp`
+  void DrawFairPlayNotice(FairPlayBox& box);              // `ui_stage_fair_play.cpp`
   void RegisterRankingEscapes(RankingBoardWindows& ranking);
   void DrawPartyBookingWindows(PartyBookingWindows& booking);  // `ui_stage_party_booking.cpp`
   void RegisterPartyBookingEscapes(PartyBookingWindows& booking);

@@ -12184,6 +12184,35 @@ std::vector<std::uint8_t> Encode(const ZcMoonlightLongName& packet) {
   return out;
 }
 
+bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightFairPlay& packet) {
+  if (frame.size() < ZcMoonlightFairPlay::kWireSize) {
+    return false;
+  }
+  ByteReader reader(frame);
+  if (reader.U16() != ZcMoonlightFairPlay::kOpcode) {
+    return false;
+  }
+  // La longueur est déjà connue : c'est celle de la trame.
+  reader.Skip(2);
+  packet.tool_name = reader.FixedString(32);
+  return reader.ok();
+}
+
+std::vector<std::uint8_t> Encode(const ZcMoonlightFairPlay& packet) {
+  std::vector<std::uint8_t> out;
+  out.reserve(ZcMoonlightFairPlay::kWireSize);
+  ByteWriter writer(out);
+  writer.U16(ZcMoonlightFairPlay::kOpcode);
+  // Réservée : la longueur ne sera connue qu'une fois la queue écrite.
+  writer.U16(0);
+  writer.FixedString(packet.tool_name, 32);
+  if (writer.size() > kMaxFrameSize ||
+      !writer.PatchU16(kLengthOffset, static_cast<std::uint16_t>(writer.size()))) {
+    return {};
+  }
+  return out;
+}
+
 bool Decode(std::span<const std::uint8_t> frame, ZcMoonlightInstanceInfo& packet) {
   if (frame.size() < ZcMoonlightInstanceInfo::kWireSize) {
     return false;

@@ -116,6 +116,15 @@ struct WhisperWindows;
 // Ce que les fenêtres gardent d'une image à l'autre. Groupé plutôt qu'énuméré
 // en paramètres : chaque fenêtre nouvelle en ajouterait un, et l'ordre de
 // quatre booléens voisins devient vite un piège.
+// LE RAPPEL DE FAIR-PLAY EN GUERRE DE GUILDE : la boîte que le serveur ouvre
+// (`ZC_MOONLIGHT_FAIR_PLAY`). Voir `ui_stage_fair_play.cpp`.
+struct FairPlayBox {
+  // Le texte, DÉJÀ TRADUIT et complété ; vide tant qu'aucun rappel n'attend.
+  std::string text;
+  // Un rappel vient d'arriver : la boîte s'ouvre.
+  bool ask = false;
+};
+
 struct UiWindows {
   UiWindows();
   ~UiWindows();
@@ -165,6 +174,7 @@ struct UiWindows {
   Held<ro::ui::CardAlbumWindowState> card_album;
   // LE RAPPORT DE BUG : sa boîte, son contexte, son accusé. Voir l'ADR 0052.
   Held<ro::ui::BugReportWindowState> bug_report;
+  FairPlayBox fair_play;
   // « SIGNALER CE JOUEUR » : voir `world/player_report.h`.
   Held<ro::ui::PlayerReportWindowState> player_report;
   // LE LIVRE QU'ON LIT, et ce que `app` en montre : ses lignes, et la ligne

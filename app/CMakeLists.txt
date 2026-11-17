@@ -2233,6 +2233,7 @@ add_executable(moonclient
     game/achievement_stage.cpp
     game/ui_stage_achievements.cpp
     game/ui_stage_ranking.cpp
+    game/ui_stage_fair_play.cpp
     game/ui_stage_party_booking.cpp
     game/game_memorial.cpp
     game/game_quests.cpp

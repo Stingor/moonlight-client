@@ -22,6 +22,7 @@
 #include "ro/net/cart_choice.h"
 #include "ro/net/cash_shop.h"
 #include "ro/net/character_ledger.h"
+#include "ro/net/cheat_report.h"
 #include "ro/net/command_settings.h"
 #include "ro/net/friends.h"
 #include "ro/net/guild.h"
@@ -54,6 +55,7 @@
 #include "game/achievement_stage.h"
 #include "game/adoption_stage.h"
 #include "game/battleground_stage.h"
+#include "game/braces_filled.h"
 #include "game/cart_choice_stage.h"
 #include "game/cash_shop_stage.h"
 #include "game/chat_room_stage.h"
@@ -321,6 +323,19 @@ ro::net::FrameOutcome Game::ApplyFrameBeyondWorld(const ro::net::Frame& received
     if (outcome == ro::net::FrameOutcome::kUnhandled) {
       outcome = ro::net::FrameOutcome::kIgnored;
     }
+  }
+  // ET LE RAPPEL DE FAIR-PLAY, sur un château pendant une guerre de guilde. Un
+  // second rappel remplace le premier s'il n'a pas encore été lu.
+  if (const std::optional<std::string> tool = ro::net::ReadFairPlayNotice(received);
+      tool.has_value()) {
+    windows_.fair_play.text = BracesFilled(
+        ro::core::Tr("Un outil de confort a été repéré sur votre poste : {}.\n\nPendant la "
+                     "WoE, le fair-play impose de renoncer aux macros et aux outils "
+                     "d'automatisation : la victoire doit revenir au talent des joueurs.\n\nSi "
+                     "vous l'avez déjà fermé, ignorez ce rappel."),
+        {*tool});
+    windows_.fair_play.ask = true;
+    outcome = ro::net::FrameOutcome::kApplied;
   }
   // ET L'ALBUM DE CARTES. ⚠ SA RÉPONSE PEUT ÉMETTRE : un sacrifice réussi range
   // aussitôt le reste de la pile dans la pochette qu'il vient d'ouvrir.

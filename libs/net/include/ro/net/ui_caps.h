@@ -109,6 +109,10 @@ inline constexpr std::uint32_t kUiCapStyleLayers = 0x01000000;
 // `0x0A30` ou `0x0ADF` quand ce nom dépasse leur champ de 24 octets. Sans elle,
 // il reçoit le nom tronqué à 23 octets, comme avant.
 inline constexpr std::uint32_t kUiCapLongMobName = 0x02000000;
+// 🔴 UNE CAPACITÉ DE LECTURE : ce client ouvre le rappel de fair-play en guerre
+// de guilde (`ZC 0x0F6A`, voir `cheat_report.h`). Sans elle, le serveur ne
+// répond à la garde du client que par son journal.
+inline constexpr std::uint32_t kUiCapFairPlay = 0x04000000;
 
 [[nodiscard]] core::Result<void> AnnounceUiCaps(Connection& link, std::uint32_t caps);
 

@@ -1,6 +1,7 @@
 #include "ro/net/cheat_report.h"
 
 #include <string>
+#include <utility>
 
 #include "ro/proto/map_packets.h"
 
@@ -13,6 +14,17 @@ void SendCheatReport(Connection& link, std::string_view tool, std::string_view d
   report.tool_name = std::string(tool.substr(0, kCheatToolBytes));
   report.detail = std::string(detail.substr(0, kCheatDetailBytes));
   link.Send(proto::Encode(report));
+}
+
+std::optional<std::string> ReadFairPlayNotice(const Frame& frame) {
+  if (frame.opcode != proto::ZcMoonlightFairPlay::kOpcode) {
+    return std::nullopt;
+  }
+  proto::ZcMoonlightFairPlay packet;
+  if (!proto::Decode(frame.bytes, packet)) {
+    return std::nullopt;
+  }
+  return std::move(packet.tool_name);
 }
 
 }  // namespace ro::net

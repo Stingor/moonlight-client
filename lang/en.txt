@@ -24777,3 +24777,9 @@ tr: Remove this dye
 
 fr: Retirer cette teinture ?
 tr: Remove this dye?
+
+fr: Un outil de confort a été repéré sur votre poste : {}.\n\nPendant la WoE, le fair-play impose de renoncer aux macros et aux outils d'automatisation : la victoire doit revenir au talent des joueurs.\n\nSi vous l'avez déjà fermé, ignorez ce rappel.
+tr: A convenience tool was detected on your computer: {}.\n\nDuring WoE, fair play means giving up macros and automation tools: victory must go to the players' skill.\n\nIf you have already closed it, ignore this reminder.
+
+fr: J'ai compris
+tr: Got it

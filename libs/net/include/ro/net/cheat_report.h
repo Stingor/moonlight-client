@@ -2,9 +2,12 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <optional>
+#include <string>
 #include <string_view>
 
 #include "ro/net/connection.h"
+#include "ro/net/world_update.h"
 
 namespace ro::net {
 
@@ -23,5 +26,14 @@ inline constexpr std::size_t kCheatDetailBytes = 64;
 inline constexpr std::uint32_t kCheatReportIntervalMs = 60'000;
 
 void SendCheatReport(Connection& link, std::string_view tool, std::string_view detail);
+
+// LE RAPPEL DE FAIR-PLAY, `ZC_MOONLIGHT_FAIR_PLAY` : la seule réponse du serveur
+// à ces signalements. Il ne part que sur un château pendant une guerre de
+// guilde, et seulement à qui annonce `kUiCapFairPlay`. Il nomme l'outil du
+// dernier signalement, tel que le client l'a écrit.
+//
+// Rend ce nom, s'il s'agit de ce paquet ; rien sinon, ou une trame qui ne se
+// lit pas.
+[[nodiscard]] std::optional<std::string> ReadFairPlayNotice(const Frame& frame);
 
 }  // namespace ro::net
