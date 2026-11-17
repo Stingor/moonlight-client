@@ -129676,6 +129676,14 @@ Body:
     Flags: {Container: true, DropEffect: CLIENT}
     Script: |
       getgroupitem(IG_AQUILA_ANTIQUITY2,true);
+  - Id: 102566
+    AegisName: F_Iceslug_Antiquiy
+    Name: Antiquity Issgard (Fallen Angel Slug)
+    Type: Usable
+    Weight: 200
+    Flags: {Container: true, DropEffect: CLIENT}
+    Script: |
+      getgroupitem(IG_F_ICESLUG_ANTIQUIY,true);
   - Id: 102573
     AegisName: Airboat_Antiquity
     Name: Antiquity Crash Site (Unidentified Creature)
@@ -147651,6 +147659,145 @@ Body:
           bonus2 bMagicAddClass,Class_All,2;
         }
       }
+  - Id: 450264
+    AegisName: Glacier_Armor
+    Name: "Glacier Armor [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Weight: 2400
+    Defense: 12
+    Slots: 1
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 230
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,120+15*(.@r/2);
+      bonus bDef,15*(.@r/2)/50;
+      if (.@r>=7) {
+         bonus bLongAtkRate,5;
+         bonus bShortAtkRate,5;
+         bonus bAspdRate,10;
+         if (.@r>=9) {
+            bonus bAspdRate,5;
+            bonus2 bAddClass,Class_All,3;
+            if (.@r>=10) {
+               bonus bDelayrate,-5;
+               bonus bDef,2;
+            }
+         }
+      }
+  - Id: 450265
+    AegisName: Glacier_Robe
+    Name: "Glacier Robe [1]"
+    Type: Armor
+    Buy: 141000
+    Sell: 28200
+    Weight: 1200
+    Defense: 12
+    Slots: 1
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 230
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMatk,120+15*(.@r/2);
+      bonus bDef,15*(.@r/2)/50;
+      if (.@r>=7) {
+         bonus2 bMagicAtkEle,Ele_All,5;
+         bonus bVariableCastrate,-10;
+         if (.@r>=9) {
+            bonus bVariableCastrate,-5;
+            bonus2 bMagicAddClass,Class_All,3;
+            if (.@r>=10) {
+               bonus bDelayrate,-5;
+               bonus bDef,2;
+            }
+         }
+      }
+  - Id: 450266
+    AegisName: Glacier_Manteau
+    Name: "Glacier Manteau [1]"
+    Type: Armor
+    Buy: 57000
+    Sell: 14250
+    Weight: 1600
+    Defense: 6
+    Slots: 1
+    Locations: {Garment: true}
+    ArmorLevel: 1
+    EquipLevelMin: 230
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHP,2500+200*(.@r/2);
+      bonus bMaxSP,500+50*(.@r/2);
+      if (.@r>=7) {
+         bonus bAspdRate,7;
+         if (.@r>=9) {
+            bonus bStr,3;
+            if (.@r>=10) {
+               bonus bVariableCastrate,-5;
+            }
+         }
+      }
+  - Id: 450267
+    AegisName: Glacier_Muffler
+    Name: "Glacier Muffler [1]"
+    Type: Armor
+    Buy: 57000
+    Sell: 14250
+    Weight: 800
+    Defense: 6
+    Slots: 1
+    Locations: {Garment: true}
+    ArmorLevel: 1
+    EquipLevelMin: 230
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHP,2000+150*(.@r/2);
+      bonus bMaxSP,1000+100*(.@r/2);
+      if (.@r>=7) {
+         bonus bVariableCastrate,-7;
+         if (.@r>=9) {
+            bonus bInt,3;
+            if (.@r>=10) {
+               bonus bAspdRate,5;
+            }
+         }
+      }
+  - Id: 450268
+    AegisName: Glacier_Shoes
+    Name: "Glacier Shoes [1]"
+    Type: Armor
+    Buy: 45000
+    Sell: 11250
+    Weight: 1000
+    Defense: 6
+    Slots: 1
+    Locations: {Shoes: true}
+    ArmorLevel: 1
+    EquipLevelMin: 230
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHPrate,6;
+      bonus bMaxSPrate,6+(.@r/2);
+      bonus bDef,15*(.@r/2)/50;
+      if (.@r>=7) {
+         bonus2 bMagicAtkEle,Ele_All,7;
+         if (.@r>=9) {
+            bonus2 bMagicAddClass,Class_All,3;
+            if (.@r>=10) {
+               bonus bVariableCastrate,-7;
+               bonus bDef,2;
+            }
+         }
+      }
   - Id: 460005
     AegisName: MD_Geffen_Shield
     Name: "Magic Absorber [1]"
@@ -147775,6 +147922,36 @@ Body:
     Script: |
       bonus bVariableCastrate,-7;
       bonus bDelayrate,-(min(getrefine(),12)/2);
+  - Id: 460040
+    AegisName: Glacier_Guard
+    Name: "Glacier Guard [1]"
+    Type: Armor
+    Buy: 113000
+    Sell: 22600
+    Weight: 3500
+    Defense: 6
+    Slots: 1
+    Locations: {Left_Hand: true}
+    ArmorLevel: 1
+    EquipLevelMin: 230
+    Refineable: true
+    View: 1
+    Script: |
+      .@r = getrefine();
+      bonus bMagicAtkDef,3;
+      bonus bNearAtkDef,3; bonus bLongAtkDef,3;
+      bonus bMdef,2*(.@r/2)/5;
+      bonus bDef,10*(.@r/2)/50;
+      if (.@r>=7) {
+         bonus bAspdRate,15;
+         if (.@r>=9) {
+            bonus bVariableCastrate,-10;
+            if (.@r>=10) {
+               bonus bMdef,2;
+               bonus bDef,1;
+            }
+         }
+      }
   - Id: 470020
     AegisName: Grace_Attack_Boots
     Name: "Grace Attack Boots [1]"
@@ -148142,6 +148319,35 @@ Body:
         if (.@r>=9) {
           bonus2 bMagicAddClass,Class_All,2;
         }
+      }
+  - Id: 470196
+    AegisName: Glacier_Boots
+    Name: "Glacier Boots [1]"
+    Type: Armor
+    Buy: 45000
+    Sell: 11250
+    Weight: 2000
+    Defense: 6
+    Slots: 1
+    Locations: {Shoes: true}
+    ArmorLevel: 1
+    EquipLevelMin: 230
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHPrate,8;
+      bonus bMaxSPrate,4+(.@r/2);
+      bonus bDef,15*(.@r/2)/50;
+      if (.@r>=7) {
+         bonus bLongAtkRate,7;
+         bonus bShortAtkRate,7;
+         if (.@r>=9) {
+            bonus2 bAddClass,Class_All,3;
+            if (.@r>=10) {
+               bonus bAspdRate,7;
+               bonus bDef,2;
+            }
+         }
       }
   - Id: 480018
     AegisName: Grace_Attack_Manteau
@@ -150423,6 +150629,62 @@ Body:
     Type: Armor
     Locations: {Costume_Head: true}
     View: 2311
+  - Id: 490327
+    AegisName: Glacier_Ring
+    Name: "Glacier Ring [1]"
+    Type: Armor
+    Buy: 5500
+    Sell: 2750
+    Weight: 100
+    Slots: 1
+    Locations: {Left_Accessory: true}
+    ArmorLevel: 1
+    EquipLevelMin: 230
+    Script: |
+      bonus2 bAddClass,Class_All,8;
+      bonus bMaxSPrate,7;
+  - Id: 490328
+    AegisName: Glacier_Pendant
+    Name: "Glacier Pendant [1]"
+    Type: Armor
+    Buy: 5500
+    Sell: 2750
+    Weight: 100
+    Slots: 1
+    Locations: {Right_Accessory: true}
+    ArmorLevel: 1
+    EquipLevelMin: 230
+    Script: |
+      bonus2 bAddClass,Class_All,8;
+      bonus bMaxHPrate,7;
+  - Id: 490329
+    AegisName: Glacier_Earring
+    Name: "Glacier Earring [1]"
+    Type: Armor
+    Buy: 5500
+    Sell: 2750
+    Weight: 100
+    Slots: 1
+    Locations: {Left_Accessory: true}
+    ArmorLevel: 1
+    EquipLevelMin: 230
+    Script: |
+      bonus bMatkRate,8;
+      bonus bMaxSPrate,7;
+  - Id: 490330
+    AegisName: Glacier_Necklace
+    Name: "Glacier Necklace [1]"
+    Type: Armor
+    Buy: 5500
+    Sell: 2750
+    Weight: 100
+    Slots: 1
+    Locations: {Right_Accessory: true}
+    ArmorLevel: 1
+    EquipLevelMin: 230
+    Script: |
+      bonus bMatkRate,8;
+      bonus bMaxHPrate,7;
   - Id: 500007
     AegisName: Ep172_1h_Sword
     Name: Hypocrisy Machine
