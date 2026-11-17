@@ -107,6 +107,15 @@ TEST_CASE("Apparences du mode : chaque monstre qui tire a un projectile à dessi
   CHECK(shooters > 0);
 }
 
+TEST_CASE("Apparences du mode : l'invocation, le hurlement et le séisme d'un boss ont leur effet",
+          "[app][survivors]") {
+  CHECK(moonclient::BossMoveEffectOf(ro::sim::BossMoveKind::kSummon).has_value());
+  CHECK(moonclient::BossMoveEffectOf(ro::sim::BossMoveKind::kHowl).has_value());
+  CHECK(moonclient::BossMoveEffectOf(ro::sim::BossMoveKind::kQuake).has_value());
+  // Le corps du boss montre son bond, sa charge et sa fuite.
+  CHECK_FALSE(moonclient::BossMoveEffectOf(ro::sim::BossMoveKind::kLeap).has_value());
+}
+
 TEST_CASE("Apparences du mode : chaque objet au sol, coffre et gemme a son sprite",
           "[app][survivors]") {
   const ro::sim::SurvivorsRules& rules = ro::sim::ShippedSurvivorsRules();

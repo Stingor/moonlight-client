@@ -260,6 +260,14 @@ void CollectArenaLaunches(const ro::sim::SurvivorsNews& news, const ro::sim::Sur
                           const ArenaSkillLooks& looks, ArenaEffectSwitches switches,
                           std::vector<ArenaLaunch>& out);
 
+// LES GESTES DES BOSS, ajoutés à `out` : l'invocation et le hurlement sur le
+// boss qui les lance, le séisme sur chaque cercle armé après le pas
+// `read_until_step`, que la fonction avance au pas courant — une image peut
+// couvrir plusieurs pas.
+void CollectBossLaunches(const ro::sim::SurvivorsNews& news, const ro::sim::SurvivorsField& field,
+                         ArenaEffectSwitches switches, std::uint32_t& read_until_step,
+                         std::vector<ArenaLaunch>& out);
+
 // LE BUDGET TRANCHE : les candidats se rangent par rang, dans l'ordre où ils
 // sont venus pour un même rang ; ceux hors du cadre s'écartent « hors champ »,
 // les autres passent par `budget`. Ne restent dans `launches` que les admis.

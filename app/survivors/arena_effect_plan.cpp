@@ -325,4 +325,32 @@ void PlanArenaZoneGrounds(std::span<const ro::sim::SurvivorsZone> zones,
   }
 }
 
+void CollectBossLaunches(const ro::sim::SurvivorsNews& news, const ro::sim::SurvivorsField& field,
+                         ArenaEffectSwitches switches, std::uint32_t& read_until_step,
+                         std::vector<ArenaLaunch>& out) {
+  const std::uint32_t read_from_step = read_until_step;
+  read_until_step = field.step;
+  if (!switches.shown) return;
+  for (const ro::sim::SurvivorsBossMoveNews& move : news.boss_moves) {
+    const std::optional<std::uint32_t> effect = BossMoveEffectOf(move.kind);
+    if (!effect.has_value() || move.kind == ro::sim::BossMoveKind::kQuake) continue;
+    const auto boss = std::ranges::find(field.foes, move.serial, &ro::sim::SurvivorsFoe::serial);
+    if (boss == field.foes.end()) continue;
+    out.push_back(ArenaLaunch{.effect_id = *effect,
+                              .kind = ArenaLaunchKind::kOnGround,
+                              .at = boss->position,
+                              .rank = ArenaEffectRank::kNearHit});
+  }
+  const std::optional<std::uint32_t> quake = BossMoveEffectOf(ro::sim::BossMoveKind::kQuake);
+  if (!quake.has_value()) return;
+  for (const ro::sim::SurvivorsHazard& hazard : field.hazards) {
+    if (hazard.kind != ro::sim::HazardKind::kQuake) continue;
+    if (hazard.armed_step <= read_from_step || hazard.armed_step > field.step) continue;
+    out.push_back(ArenaLaunch{.effect_id = *quake,
+                              .kind = ArenaLaunchKind::kOnGround,
+                              .at = hazard.center,
+                              .rank = ArenaEffectRank::kNearHit});
+  }
+}
+
 }  // namespace moonclient

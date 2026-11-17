@@ -10,6 +10,7 @@
 #include "ro/render/effect_node_pattern_table.h"
 #include "ro/render/skill_effect_table.h"
 #include "ro/render/skill_hit_effect.h"
+#include "ro/render/skill_suite_table.h"
 #include "ro/render/skill_unit_table.h"
 #include "ro/render/sprite_frame.h"
 
@@ -286,6 +287,32 @@ ro::render::ActorLook FoeShooterLookOf(std::uint16_t foe_id) noexcept {
     default:
       return FoeLook(foe_id);
   }
+}
+
+std::optional<std::uint32_t> BossMoveEffectOf(ro::sim::BossMoveKind kind) {
+  constexpr std::uint16_t kSummonSlaveSkill = 196;
+  constexpr std::uint16_t kPowerUpSkill = 349;
+  constexpr std::uint16_t kEarthquakeSkill = 653;
+  switch (kind) {
+    case ro::sim::BossMoveKind::kSummon:
+      return TabledEffectOf(kSummonSlaveSkill);
+    case ro::sim::BossMoveKind::kHowl:
+      return TabledEffectOf(kPowerUpSkill);
+    case ro::sim::BossMoveKind::kQuake:
+      // Le client joue le séisme des monstres à son impact, dans sa suite.
+      for (const ro::render::SkillSuiteStep& step :
+           ro::render::SkillSuiteOf(kEarthquakeSkill, ro::render::SkillSuiteMoment::kImpact)) {
+        if (step.kind == ro::render::SkillSuiteKind::kEffect && step.effect_id != 0) {
+          return step.effect_id;
+        }
+      }
+      return TabledEffectOf(kEarthquakeSkill);
+    case ro::sim::BossMoveKind::kLeap:
+    case ro::sim::BossMoveKind::kCharge:
+    case ro::sim::BossMoveKind::kFlee:
+      return std::nullopt;
+  }
+  return std::nullopt;
 }
 
 std::optional<std::uint32_t> FoeShotEffectOf(std::uint16_t foe_id) noexcept {

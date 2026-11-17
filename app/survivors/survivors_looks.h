@@ -35,6 +35,12 @@ inline constexpr std::uint16_t kGazetiFoe = 1778;
 inline constexpr std::uint32_t kFrostDiverBoltEffect = 27;
 [[nodiscard]] std::optional<std::uint32_t> FoeShotEffectOf(std::uint16_t foe_id) noexcept;
 
+// LE GESTE D'UN BOSS : l'effet de la compétence de monstre qui le joue au
+// client — l'invocation de ses serviteurs, la montée en puissance pour un
+// hurlement, le séisme pour chaque cercle qui s'arme. Rien pour un bond, une
+// charge ou une fuite, que le corps du boss montre.
+[[nodiscard]] std::optional<std::uint32_t> BossMoveEffectOf(ro::sim::BossMoveKind kind);
+
 // UN MONSTRE QUI NE SE MONTRE QU'EN ATTAQUANT : l'Iceicle n'a qu'une ombre au
 // repos, et son glaçon ne paraît que dans sa chute d'attaque. Il se tient sur
 // l'image `standing_frame` de son attaque, planté au sol, et meurt en rejouant

@@ -248,6 +248,7 @@ void ArenaEffects::Restart() {
   if (stage_ != nullptr) nodes_.NoticeWorld(EffectScatterWorldOf(*stage_));
   flames_.clear();
   shots_.clear();
+  boss_read_until_step_ = 0;
   warnings_.clear();
   trap_marks_.clear();
   mark_quads_.clear();
@@ -489,6 +490,7 @@ void ArenaEffects::Advance(const ro::sim::SurvivorsNews& news, const ro::sim::Su
   // LES SORTS ET LES FLAMMES DES MURS AU RANG DU HÉROS, devant les impacts : le
   // budget tranche sur tous les candidats de l'image à la fois.
   CollectArenaLaunches(news, field, looks_, switches_, plan_);
+  CollectBossLaunches(news, field, switches_, boss_read_until_step_, plan_);
   KeepZones(field, now_ms);
   if (stage_ != nullptr) trap_models_.Follow(world_, team_zones_, *stage_, origin_cells_, now_ms);
   AdmitArenaLaunches(sight, budget_, plan_);

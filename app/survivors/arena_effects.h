@@ -245,6 +245,7 @@ class ArenaEffects {
   glm::ivec2 origin_cells_{0};
   std::optional<ro::sim::WalkPlanner> planner_;
   std::vector<ArenaLaunch> plan_;
+  std::uint32_t boss_read_until_step_ = 0;  // voir `CollectBossLaunches`
   std::vector<ArenaOrbLook> orbs_;
   // L'effet que porte l'acteur de chaque orbe allumée, dans l'ordre des orbes,
   // et l'heure avant laquelle un semis refusé ne se retente pas.
