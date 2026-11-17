@@ -328,3 +328,59 @@ TEST_CASE("Boutique PNJ : l'onglet de vente se dessine, favoris masqués compté
   CHECK_FALSE(drawn.close);
   CHECK(state.tab == NpcShopTab::kSell);
 }
+
+TEST_CASE("Boutique PNJ : le panier de vente se dessine, l'item avec son icône", "[ui][npc_shop]") {
+  ro::ui::UiContext ui;
+  const ro::ui::SkinArt art;
+  const std::array<NpcShopSellView, 1> sells = {
+      NpcShopSellView{.item = {.item_id = 909, .name = "Jellopy"},
+                      .client_slot = 4,
+                      .amount = 10,
+                      .price = 3,
+                      .kind = "Butin"}};
+  NpcShopView view;
+  view.can_buy = false;
+  view.sells = sells;
+  view.sells_listed = true;
+  view.unit = "z";
+  NpcShopWindowState state;
+  ro::ui::OpenNpcShopOn(state, 1, false);
+  AddToNpcShopCart(state.cart,
+                   {.item_id = 909, .client_slot = 4, .amount = 2, .unit_price = 3, .most = 10});
+  // Une ligne dont la liste ne tient plus l'objet se dessine sans lui.
+  AddToNpcShopCart(state.cart, {.item_id = 512, .client_slot = 9, .amount = 1, .most = 1});
+  for (int frame = 0; frame < 2; ++frame) {
+    ui.BeginFrame(kViewport, kFrameSeconds);
+    const NpcShopWindowAction drawn = ro::ui::DrawNpcShopWindow(state, view, art);
+    ui.EndFrame();
+    CHECK_FALSE(drawn.close);
+    CHECK(drawn.sell.empty());
+    CHECK_FALSE(drawn.drop_refused);
+  }
+  CHECK(state.cart.size() == 2);
+}
+
+TEST_CASE("Commerce : une encre se lit sur le corps sombre, et ne bouge pas sur le clair",
+          "[ui][npc_shop]") {
+  ro::ui::UiContext ui;
+  ui.BeginFrame(kViewport, kFrameSeconds);
+  const ImU32 dark = IM_COL32(40, 42, 50, 255);
+  const ImU32 light = IM_COL32(243, 245, 250, 255);
+  const ImU32 clear = IM_COL32(0, 0, 0, 0);
+  const ImU32 black = ImGui::ColorConvertFloat4ToU32(ro::ui::kTradeBlackText);
+  ImGui::PushStyleColor(ImGuiCol_ChildBg, clear);
+  ImGui::PushStyleColor(ImGuiCol_WindowBg, dark);
+  for (const ImVec4& ink : {ro::ui::kTradeBlackText, ro::ui::kTradeRefusedText,
+                            ro::ui::kTradeDoneText, ro::ui::kTradeUnaffordableText}) {
+    const ImU32 written = ImGui::ColorConvertFloat4ToU32(ro::ui::TradeInk(ink));
+    CHECK(ro::ui::ContrastRatio(written, dark) >= ro::ui::kSkinLeastContrast);
+  }
+  ImGui::PushStyleColor(ImGuiCol_WindowBg, light);
+  CHECK(ImGui::ColorConvertFloat4ToU32(ro::ui::TradeInk(ro::ui::kTradeBlackText)) == black);
+  // Un cadre enfant qui peint son fond clair l'emporte sur le corps sombre.
+  ImGui::PushStyleColor(ImGuiCol_WindowBg, dark);
+  ImGui::PushStyleColor(ImGuiCol_ChildBg, light);
+  CHECK(ImGui::ColorConvertFloat4ToU32(ro::ui::TradeInk(ro::ui::kTradeBlackText)) == black);
+  ImGui::PopStyleColor(5);
+  ui.EndFrame();
+}

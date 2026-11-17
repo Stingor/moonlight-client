@@ -94,7 +94,7 @@ void DrawPrice(const BarterPriceView& price, std::int64_t needed, ItemLinkMenu& 
     SkinTooltip(tip.data());
   }
   ImGui::SameLine();
-  ImGui::TextColored(price.held >= needed ? kEnoughText : kLackingText, "%s",
+  ImGui::TextColored(price.held >= needed ? TradeInk(kEnoughText) : TradeInk(kLackingText), "%s",
                      HeldText(price.held).c_str());
   if (ImGui::IsItemHovered()) {
     SkinTooltip(
@@ -103,7 +103,7 @@ void DrawPrice(const BarterPriceView& price, std::int64_t needed, ItemLinkMenu& 
   }
   if (price.may_take_higher_refine) {
     ImGui::SameLine();
-    ImGui::TextColored(kLackingText, "%s", kHigherRefineMark);
+    ImGui::TextColored(TradeInk(kLackingText), "%s", kHigherRefineMark);
     if (ImGui::IsItemHovered()) {
       SkinTooltip(core::Tr("Un exemplaire raffiné plus haut que l'exigence peut partir."));
     }
@@ -112,7 +112,7 @@ void DrawPrice(const BarterPriceView& price, std::int64_t needed, ItemLinkMenu& 
 
 void DrawZeny(std::int64_t zeny) {
   ImGui::AlignTextToFramePadding();
-  ImGui::TextColored(kTradeBlackText, "+ %s", TradeAmountText(zeny, "z").c_str());
+  ImGui::TextColored(TradeInk(kTradeBlackText), "+ %s", TradeAmountText(zeny, "z").c_str());
 }
 
 void AskExchange(BarterWindowState& state, std::vector<BarterLine> lines, bool immediate,
@@ -143,12 +143,12 @@ void DrawOfferRow(BarterWindowState& state, const BarterView& view, const Barter
   } else if (offer.stock == 0) {
     ImGui::TextDisabled("%s", core::Tr("épuisé"));
   } else {
-    ImGui::TextColored(kTradeBlackText, "%s", TradeAmountText(offer.stock, {}).c_str());
+    ImGui::TextColored(TradeInk(kTradeBlackText), "%s", TradeAmountText(offer.stock, {}).c_str());
   }
 
   ImGui::TableNextColumn();
   ImGui::AlignTextToFramePadding();
-  ImGui::TextColored(kTradeBlackText, "%s", WeightText(offer.weight_tenths).c_str());
+  ImGui::TextColored(TradeInk(kTradeBlackText), "%s", WeightText(offer.weight_tenths).c_str());
 
   ImGui::TableNextColumn();
   // 🔴 UN AJOUT QUE LE PANIER REFUSERAIT NE SE PROPOSE PAS : les paliers sont
@@ -299,7 +299,7 @@ void DrawCart(BarterWindowState& state, const BarterView& view, const SkinArt& a
   // 🔴 LE BOUTON SE RETIENT tant qu'une raison ferait refuser l'échange. La
   // première s'écrit au-dessus ; toutes se lisent au survol du bouton.
   if (!view.blockers.empty()) {
-    ColoredText(kTradeRefusedText, view.blockers[0]);
+    ColoredText(TradeInk(kTradeRefusedText), view.blockers[0]);
   }
   const bool blocked = view.cart.empty() || !view.blockers.empty();
   if (blocked) {
@@ -458,7 +458,7 @@ BarterWindowAction DrawBarterWindow(BarterWindowState& state, const BarterView& 
   if (body_shown && state.open) {
     ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, kChildRoundingPixels * scale);
     if (!view.purse_line.empty()) {
-      ColoredText(kTradeBlackText, view.purse_line);
+      ColoredText(TradeInk(kTradeBlackText), view.purse_line);
     }
     ImGui::SetNextItemWidth(-1.0F);
     if (ImGui::InputTextWithHint("##barter_filter", core::Tr("Filtrer..."), state.filter.InputBuf,

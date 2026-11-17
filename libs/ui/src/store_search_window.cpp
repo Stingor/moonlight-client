@@ -239,7 +239,7 @@ void DrawResults(StoreSearchWindowState& state, const StoreSearchView& view,
 void DrawFooter(StoreSearchWindowState& state, const StoreSearchView& view, const SkinArt& art,
                 StoreSearchAction& action) {
   if (!view.status.empty()) {
-    ColoredText(kTradeRefusedText, view.status);
+    ColoredText(TradeInk(kTradeRefusedText), view.status);
   } else {
     ImGui::NewLine();
   }

@@ -77,7 +77,7 @@ void DrawMaterial(ItemReformWindowState& state, const ItemReformMaterialView& ma
                material.item, material.item.item_id, state.item_menu, action);
   ImGui::AlignTextToFramePadding();
   if (material.owned < material.needed) {
-    ColoredText(kTradeRefusedText, count);
+    ColoredText(TradeInk(kTradeRefusedText), count);
   } else {
     ImGui::TextUnformatted(count.c_str());
   }
@@ -117,10 +117,10 @@ void DrawDetail(ItemReformWindowState& state, const ItemReformView& view, const 
 void DrawReformButton(ItemReformWindowState& state, const ItemReformView& view,
                       const SkinArt& art) {
   if (!view.notice.empty()) {
-    ColoredText(kTradeRefusedText, view.notice);
+    ColoredText(TradeInk(kTradeRefusedText), view.notice);
   }
   if (!view.blockers.empty()) {
-    ColoredText(kTradeRefusedText, view.blockers[0]);
+    ColoredText(TradeInk(kTradeRefusedText), view.blockers[0]);
   }
   const bool held = view.waiting || !view.blockers.empty();
   if (held) {

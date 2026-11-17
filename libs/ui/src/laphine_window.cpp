@@ -48,7 +48,7 @@ void DrawWarningMark(std::string_view warning) {
     return;
   }
   ImGui::SameLine();
-  ImGui::TextColored(kTradeRefusedText, "(!)");
+  ImGui::TextColored(TradeInk(kTradeRefusedText), "(!)");
   if (ImGui::IsItemHovered()) {
     SkinTooltip(std::string(warning).c_str());
   }
@@ -137,10 +137,10 @@ void DrawDeposited(LaphineWindowState& state, const LaphineView& view, const Ski
 
 void DrawMakeButton(LaphineWindowState& state, const LaphineView& view, const SkinArt& art) {
   if (!view.notice.empty()) {
-    ColoredText(kTradeRefusedText, view.notice);
+    ColoredText(TradeInk(kTradeRefusedText), view.notice);
   }
   if (!view.blockers.empty()) {
-    ColoredText(kTradeRefusedText, view.blockers[0]);
+    ColoredText(TradeInk(kTradeRefusedText), view.blockers[0]);
   }
   const bool held = view.waiting || !view.blockers.empty();
   if (held) {

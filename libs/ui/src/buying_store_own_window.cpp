@@ -56,7 +56,7 @@ BuyingStoreOwnAction DrawBuyingStoreOwnWindow(BuyingStoreOwnState& state,
                          ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
   if (body_shown && keep) {
     if (!view.store_title.empty()) {
-      ColoredText(kTradeBlackText, view.store_title);
+      ColoredText(TradeInk(kTradeBlackText), view.store_title);
       ImGui::Separator();
     }
     if (view.lines.empty()) {
@@ -85,8 +85,8 @@ BuyingStoreOwnAction DrawBuyingStoreOwnWindow(BuyingStoreOwnState& state,
           action.item_gesture = ChatLinkGesture::kRepost;
         }
         // Une ligne pleine reste, grisée : le serveur la liste encore.
-        const ImVec4 color =
-            line.wanted == 0 ? ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled) : kTradeBlackText;
+        const ImVec4 color = line.wanted == 0 ? ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled)
+                                              : TradeInk(kTradeBlackText);
         ImGui::TableNextColumn();
         ImGui::AlignTextToFramePadding();
         ImGui::TextColored(color, "%d", line.wanted);

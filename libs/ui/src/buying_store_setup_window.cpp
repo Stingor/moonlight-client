@@ -102,7 +102,7 @@ void DrawCandidates(BuyingStoreSetupState& state, const BuyingStoreSetupView& vi
                    state.item_menu, action);
       ImGui::TableNextColumn();
       ImGui::AlignTextToFramePadding();
-      ImGui::TextColored(kTradeBlackText, "%d", candidate.owned);
+      ImGui::TextColored(TradeInk(kTradeBlackText), "%d", candidate.owned);
       ImGui::TableNextColumn();
       const bool placed = Placed(state, candidate.item.item_id);
       const bool barred = full || placed || view.awaiting;
@@ -165,7 +165,7 @@ void DrawLines(BuyingStoreSetupState& state, const BuyingStoreSetupView& view, c
       // sans dire laquelle.
       if (rank < view.line_notes.size() && !view.line_notes[rank].empty()) {
         ImGui::SameLine();
-        ImGui::TextColored(kTradeRefusedText, "(!)");
+        ImGui::TextColored(TradeInk(kTradeRefusedText), "(!)");
         if (ImGui::IsItemHovered()) {
           const std::string note(view.line_notes[rank]);
           SkinTooltip(note.c_str());
@@ -173,7 +173,8 @@ void DrawLines(BuyingStoreSetupState& state, const BuyingStoreSetupView& view, c
       }
       ImGui::TableNextColumn();
       ImGui::AlignTextToFramePadding();
-      ImGui::TextColored(kTradeBlackText, "%d", candidate != nullptr ? candidate->owned : 0);
+      ImGui::TextColored(TradeInk(kTradeBlackText), "%d",
+                         candidate != nullptr ? candidate->owned : 0);
       ImGui::TableNextColumn();
       ImGui::SetNextItemWidth(-1.0F);
       if (ImGui::InputInt("##amount", &line.amount, 0, 0)) {
@@ -187,7 +188,7 @@ void DrawLines(BuyingStoreSetupState& state, const BuyingStoreSetupView& view, c
       ImGui::TableNextColumn();
       ImGui::AlignTextToFramePadding();
       ImGui::TextColored(
-          kTradeBlackText, "%s",
+          TradeInk(kTradeBlackText), "%s",
           TradeAmountText(static_cast<std::int64_t>(line.price) * line.amount, "z").c_str());
       ImGui::TableNextColumn();
       if (view.awaiting) {
@@ -239,7 +240,7 @@ void DrawFooter(BuyingStoreSetupState& state, const BuyingStoreSetupView& view, 
   // UNE LIGNE TOUJOURS ÉMISE, pour que le pied garde sa hauteur : le premier
   // refus en rouge, sinon l'avertissement, sinon rien.
   if (!view.blockers.empty()) {
-    ColoredText(kTradeRefusedText, view.blockers[0]);
+    ColoredText(TradeInk(kTradeRefusedText), view.blockers[0]);
   } else if (!view.warnings.empty()) {
     ColoredText(kTradeWarningText, view.warnings[0]);
   } else if (view.awaiting) {

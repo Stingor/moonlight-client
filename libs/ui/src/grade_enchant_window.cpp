@@ -87,7 +87,7 @@ void DrawCountedItem(GradeEnchantWindowState& state, const TradeItemView& item, 
                state.item_menu, action);
   ImGui::AlignTextToFramePadding();
   if (owned < needed) {
-    ColoredText(kTradeRefusedText, count);
+    ColoredText(TradeInk(kTradeRefusedText), count);
   } else {
     ImGui::TextUnformatted(count.c_str());
   }
@@ -107,7 +107,7 @@ void DrawStakes(GradeEnchantWindowState& state, const GradeEnchantView& view, co
       state.stake = index;
     }
     ImGui::SameLine();
-    ColoredText(stake.risky ? kTradeRefusedText : kGoodText, stake.risk);
+    ColoredText(stake.risky ? TradeInk(kTradeRefusedText) : kGoodText, stake.risk);
     ImGui::Indent(Px(kStakeIndentPixels));
     DrawCountedItem(state, stake.item, stake.owned, stake.needed, action);
     ImGui::Unindent(Px(kStakeIndentPixels));
@@ -161,7 +161,7 @@ void DrawDetail(GradeEnchantWindowState& state, const GradeEnchantView& view, co
     return;
   }
   if (!view.offer_refusal.empty()) {
-    ColoredText(kTradeRefusedText, view.offer_refusal);
+    ColoredText(TradeInk(kTradeRefusedText), view.offer_refusal);
     PaintWindowScrollbar(art);
     return;
   }
@@ -178,10 +178,10 @@ void DrawDetail(GradeEnchantWindowState& state, const GradeEnchantView& view, co
 void DrawEnchantButton(GradeEnchantWindowState& state, const GradeEnchantView& view,
                        const SkinArt& art) {
   if (!view.notice.empty()) {
-    ColoredText(view.notice_good ? kGoodText : kTradeRefusedText, view.notice);
+    ColoredText(view.notice_good ? kGoodText : TradeInk(kTradeRefusedText), view.notice);
   }
   if (!view.blockers.empty()) {
-    ColoredText(kTradeRefusedText, view.blockers[0]);
+    ColoredText(TradeInk(kTradeRefusedText), view.blockers[0]);
   }
   const bool held = view.waiting || !view.blockers.empty();
   if (held) {

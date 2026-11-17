@@ -183,7 +183,7 @@ void DrawLine(const DealLineView& line, DealLineRef ref, ItemLinkMenu& menu,
 
 void DrawLamp(bool locked, bool sent) {
   if (locked) {
-    ImGui::TextColored(kLockedText, "%s", core::Tr("Verrouillé"));
+    ImGui::TextColored(TradeInk(kLockedText), "%s", core::Tr("Verrouillé"));
   } else if (sent) {
     ImGui::TextDisabled("%s", core::Tr("Verrouillage…"));
   } else {
@@ -245,7 +245,7 @@ void DrawMyZeny(DealWindowState& state, const DealView& view, const SkinArt& art
     action.zeny = *typed.amount;
   }
   if (!typed.refusal.empty()) {
-    TextOf(kAlertText, typed.refusal);
+    TextOf(TradeInk(kAlertText), typed.refusal);
   }
   const std::string offered = TradeAmountText(view.my_zeny, "z");
   ImGui::TextDisabled(core::Tr("Offert : %s"), offered.c_str());
@@ -295,13 +295,14 @@ void DrawPartnerZeny(const DealView& view) {
     ImGui::TextDisabled("%s", core::Tr("Zeny : aucun"));
     return;
   }
-  const ImVec4 color = view.partner_zeny_changed_after_my_lock ? kAlertText : kTradeBlackText;
+  const ImVec4 color =
+      view.partner_zeny_changed_after_my_lock ? TradeInk(kAlertText) : TradeInk(kTradeBlackText);
   ImGui::PushFont(nullptr, ImGui::GetFontSize() * kPartnerZenyFontScale);
   ImGui::TextColored(color, "%s", TradeAmountText(view.partner_zeny, "z").c_str());
   ImGui::PopFont();
   TextOf(color, SpelledTradeAmount(view.partner_zeny));
   if (view.partner_zeny_changed_after_my_lock) {
-    TextOf(kAlertText, core::Tr("Ce montant a changé après votre verrou."));
+    TextOf(TradeInk(kAlertText), core::Tr("Ce montant a changé après votre verrou."));
   }
 }
 
@@ -488,7 +489,7 @@ void DrawExecuteButton(DealWindowState& state, const DealView& view, const SkinA
 void DrawStatus(const DealWindowState& state, const DealView& view) {
   if (!view.lock_sent) {
     for (const std::string_view reason : view.lock_blockers) {
-      TextOf(kAlertText, reason);
+      TextOf(TradeInk(kAlertText), reason);
     }
   }
   const std::string status = DealStatusText(view);
@@ -499,13 +500,13 @@ void DrawStatus(const DealWindowState& state, const DealView& view) {
     std::snprintf(alert.data(), alert.size(),
                   core::Tr("%.*s a changé son offre après votre verrou : relisez-la."),
                   static_cast<int>(name.size()), name.data());
-    TextOf(kAlertText, alert.data());
+    TextOf(TradeInk(kAlertText), alert.data());
   }
   if (!view.last_refusal.empty()) {
-    TextOf(kTradeRefusedText, view.last_refusal);
+    TextOf(TradeInk(kTradeRefusedText), view.last_refusal);
   }
   if (!state.flash.empty()) {
-    TextOf(kTradeRefusedText, state.flash);
+    TextOf(TradeInk(kTradeRefusedText), state.flash);
   }
 }
 

@@ -89,7 +89,7 @@ void DrawName(VendingSetupWindowState& state, const VendingSetupView& view) {
   // 🔴 LE TITRE TEL QU'IL PARTIRA : le fil le coupe à quatre-vingts octets, et
   // l'enseigne montrera la coupe, pas ce qu'on a tapé.
   if (view.title_cut) {
-    ImGui::TextColored(kTradeRefusedText, core::Tr("Coupé à : « %.*s »"),
+    ImGui::TextColored(TradeInk(kTradeRefusedText), core::Tr("Coupé à : « %.*s »"),
                        static_cast<int>(view.fitted_title.size()), view.fitted_title.data());
   } else {
     ImGui::TextDisabled(core::Tr("%zu octet(s) restant(s) pour le nom"), view.title_bytes_left);
@@ -256,7 +256,7 @@ void DrawLines(VendingSetupWindowState& state, const VendingSetupView& view, con
     // pas laquelle des douze corriger.
     if (rank < view.line_faults.size() && !view.line_faults[rank].empty()) {
       ImGui::SameLine();
-      ImGui::TextColored(kTradeRefusedText, "(!)");
+      ImGui::TextColored(TradeInk(kTradeRefusedText), "(!)");
       if (ImGui::IsItemHovered()) {
         SkinTooltip(std::string(view.line_faults[rank]).c_str());
       }
@@ -271,7 +271,7 @@ void DrawLines(VendingSetupWindowState& state, const VendingSetupView& view, con
     const std::optional<std::int64_t> price = VendingLinePrice(line);
     const bool unreadable = !price.has_value() && line.price_text[0] != '\0';
     if (unreadable) {
-      ImGui::PushStyleColor(ImGuiCol_Text, kTradeRefusedText);
+      ImGui::PushStyleColor(ImGuiCol_Text, TradeInk(kTradeRefusedText));
     }
     ImGui::SetNextItemWidth(-1.0F);
     ImGui::InputTextWithHint("##price", "0", line.price_text.data(), line.price_text.size());
@@ -284,7 +284,7 @@ void DrawLines(VendingSetupWindowState& state, const VendingSetupView& view, con
     ImGui::TableNextColumn();
     ImGui::AlignTextToFramePadding();
     if (price.has_value()) {
-      ImGui::TextColored(kTradeBlackText, "%s",
+      ImGui::TextColored(TradeInk(kTradeBlackText), "%s",
                          TradeAmountText(*price * line.amount, kZenySuffix).c_str());
     } else {
       ImGui::TextDisabled("-");
@@ -429,7 +429,7 @@ void DrawFooter(VendingSetupWindowState& state, const VendingSetupView& view, co
   // 🔴 LE BOUTON SE RETIENT tant que le serveur refuserait, ou fausserait : la
   // première raison s'écrit ici, toutes se lisent au survol du bouton.
   if (!view.blockers.empty()) {
-    ColoredText(kTradeRefusedText, view.blockers[0]);
+    ColoredText(TradeInk(kTradeRefusedText), view.blockers[0]);
   } else if (view.awaiting) {
     ImGui::TextDisabled("%s", core::Tr("Demande envoyée : en attente du serveur..."));
   } else {

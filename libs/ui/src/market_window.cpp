@@ -357,7 +357,7 @@ void DrawResults(MarketWindowState& state, const MarketView& view, const SkinArt
 
 void DrawFooter(MarketWindowState& state, const MarketView& view, const SkinArt& art) {
   if (!view.status.empty()) {
-    ColoredText(kTradeRefusedText, view.status);
+    ColoredText(TradeInk(kTradeRefusedText), view.status);
   } else {
     Unformatted(view.summary);
   }

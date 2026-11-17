@@ -32,6 +32,11 @@ inline constexpr ImVec4 kTradeRefusedText = ImVec4(0.80F, 0.15F, 0.15F, 1.0F);
 // Un prix qu'on ne peut pas payer.
 inline constexpr ImVec4 kTradeUnaffordableText = ImVec4(0.75F, 0.15F, 0.15F, 1.0F);
 
+// 🔴 CES ENCRES SONT CHOISIES POUR UN CORPS CLAIR : elles s'écrivent par
+// `TradeInk`, qui les rend lisibles sur le fond où l'on écrit. Le noir d'un prix
+// disparaissait sur le corps d'un thème sombre ; sur le clair, rien ne bouge.
+[[nodiscard]] ImVec4 TradeInk(const ImVec4& ink);
+
 // UN OBJET À MONTRER DANS UNE LIGNE.
 struct TradeItemView {
   std::uint32_t item_id = 0;

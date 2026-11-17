@@ -84,7 +84,7 @@ void DrawByteCounter(std::size_t used, std::size_t most) {
 
 void DrawRecipient(MailComposeWindowState& state, const MailComposeView& view, const SkinArt& art,
                    MailComposeAction& action) {
-  ImGui::TextColored(kTradeBlackText, "%s", core::Tr("Destinataire"));
+  ImGui::TextColored(TradeInk(kTradeBlackText), "%s", core::Tr("Destinataire"));
   ImGui::SetNextItemWidth(kRecipientFieldPixels * Scale());
   ImGui::InputText("##rodex_to", state.recipient.data(), state.recipient.size());
   // Le nom se vérifie aussi tout seul, quand on quitte le champ après l'avoir
@@ -106,7 +106,7 @@ void DrawRecipient(MailComposeWindowState& state, const MailComposeView& view, c
       break;
     case MailRecipientCheck::kFound: {
       const std::string who = WhoLine(state, view);
-      ColoredText(kTradeBlackText, who.c_str());
+      ColoredText(TradeInk(kTradeBlackText), who.c_str());
       break;
     }
     case MailRecipientCheck::kNone:
@@ -115,18 +115,18 @@ void DrawRecipient(MailComposeWindowState& state, const MailComposeView& view, c
 }
 
 void DrawTexts(MailComposeWindowState& state, const MailComposeView& view) {
-  ImGui::TextColored(kTradeBlackText, "%s", core::Tr("Sujet"));
+  ImGui::TextColored(TradeInk(kTradeBlackText), "%s", core::Tr("Sujet"));
   ImGui::SetNextItemWidth(-1.0F);
   ImGui::InputText("##rodex_subject", state.subject.data(), state.subject.size());
   DrawByteCounter(view.subject_wire_bytes, view.subject_max_bytes);
-  ImGui::TextColored(kTradeBlackText, "%s", core::Tr("Message"));
+  ImGui::TextColored(TradeInk(kTradeBlackText), "%s", core::Tr("Message"));
   ImGui::InputTextMultiline("##rodex_body", state.message.data(), state.message.size(),
                             ImVec2(-1.0F, kMessageHeightPixels * Scale()));
   DrawByteCounter(view.message_wire_bytes, view.message_max_bytes);
 }
 
 void DrawZeny(MailComposeWindowState& state, const MailComposeView& view) {
-  ImGui::TextColored(kTradeBlackText, "%s", core::Tr("Zeny à joindre"));
+  ImGui::TextColored(TradeInk(kTradeBlackText), "%s", core::Tr("Zeny à joindre"));
   ImGui::SetNextItemWidth(kZenyFieldPixels * Scale());
   ImGui::InputScalar("##rodex_zeny", ImGuiDataType_S64, &state.zeny);
   state.zeny = std::max<std::int64_t>(state.zeny, 0);
@@ -171,7 +171,7 @@ void AcceptBagDrop(MailComposeWindowState& state, const MailComposeView& view,
 
 void DrawAttachments(MailComposeWindowState& state, const MailComposeView& view, const SkinArt& art,
                      MailComposeAction& action) {
-  ImGui::TextColored(kTradeBlackText, core::Tr("Pièces jointes (%d/%d)"),
+  ImGui::TextColored(TradeInk(kTradeBlackText), core::Tr("Pièces jointes (%d/%d)"),
                      static_cast<int>(view.attachments.size()), view.attachment_capacity);
   ImGui::BeginChild("rodex_attach", ImVec2(0.0F, kAttachmentsHeightPixels * Scale()),
                     ImGuiChildFlags_Borders);

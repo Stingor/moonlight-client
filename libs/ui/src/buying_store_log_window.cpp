@@ -67,7 +67,7 @@ BuyingStoreLogAction DrawBuyingStoreLogWindow(BuyingStoreLogState& state,
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
         ImGui::AlignTextToFramePadding();
-        ColoredText(kTradeBlackText, line.clock);
+        ColoredText(TradeInk(kTradeBlackText), line.clock);
         ImGui::TableNextColumn();
         const TradeItemGesture gesture = DrawTradeItem(line.item);
         if (gesture.hovered) {
@@ -79,25 +79,26 @@ BuyingStoreLogAction DrawBuyingStoreLogWindow(BuyingStoreLogState& state,
         }
         ImGui::TableNextColumn();
         ImGui::AlignTextToFramePadding();
-        ImGui::TextColored(kTradeBlackText, "#%u", line.seller_char_id);
+        ImGui::TextColored(TradeInk(kTradeBlackText), "#%u", line.seller_char_id);
         if (ImGui::IsItemHovered()) {
           SkinTooltip(core::Tr("Le numéro du personnage vendeur : le serveur ne dit pas son nom."));
         }
         ImGui::TableNextColumn();
         ImGui::AlignTextToFramePadding();
-        ImGui::TextColored(kTradeBlackText, "%d", line.amount);
+        ImGui::TextColored(TradeInk(kTradeBlackText), "%d", line.amount);
         ImGui::TableNextColumn();
         ImGui::AlignTextToFramePadding();
         // LE PRIX SE DÉDUIT : le serveur ne donne que le montant de la ligne.
         if (line.amount > 0) {
-          ImGui::TextColored(kTradeBlackText, "%s",
+          ImGui::TextColored(TradeInk(kTradeBlackText), "%s",
                              TradeAmountText(line.zeny / line.amount, "z").c_str());
         } else {
           ImGui::TextDisabled("-");
         }
         ImGui::TableNextColumn();
         ImGui::AlignTextToFramePadding();
-        ImGui::TextColored(kTradeBlackText, "%s", TradeAmountText(line.zeny, "z").c_str());
+        ImGui::TextColored(TradeInk(kTradeBlackText), "%s",
+                           TradeAmountText(line.zeny, "z").c_str());
         ImGui::PopID();
       }
       ImGui::EndTable();

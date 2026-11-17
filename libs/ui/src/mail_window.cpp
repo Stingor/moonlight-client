@@ -125,7 +125,7 @@ void DrawCarried(const MailRowView& row, const MailCarriedIcons& icons) {
     const float width = height * icon->width / icon->height;
     ImGui::Image(icon->id, ImVec2(width, height));
   } else if (what != nullptr) {
-    ImGui::TextColored(kTradeBlackText, "%s", mark);
+    ImGui::TextColored(TradeInk(kTradeBlackText), "%s", mark);
   } else {
     ImGui::TextDisabled("%s", mark);
   }
@@ -170,7 +170,7 @@ void DrawRow(MailboxWindowState& state, const MailRowView& row, const MailCarrie
   if (row.read) {
     FaintText(row.title);
   } else {
-    ColoredText(kTradeBlackText, row.title);
+    ColoredText(TradeInk(kTradeBlackText), row.title);
   }
 
   ImGui::TableNextColumn();
@@ -311,7 +311,7 @@ void DrawAttachments(const MailRowView& row, const MailContentView* content, con
   // Le DÉTAIL n'existe qu'une fois le contenu reçu : avant, seul le masque dit
   // qu'il transporte quelque chose, et aucune valeur ne s'invente.
   if (has_zeny && content != nullptr) {
-    ImGui::TextColored(kTradeBlackText, core::Tr("Zeny joint : %lld z"),
+    ImGui::TextColored(TradeInk(kTradeBlackText), core::Tr("Zeny joint : %lld z"),
                        static_cast<long long>(content->zeny));
   } else if (has_zeny) {
     ImGui::TextDisabled("%s", core::Tr("Zeny joint (ouvre le courrier pour voir le montant)"));
@@ -353,8 +353,8 @@ void DrawDetail(MailboxWindowState& state, const MailboxView& view, const SkinAr
   const float scale = Scale();
 
   const std::string_view sender = row->sender;
-  ImGui::TextColored(kTradeBlackText, core::Tr("De : %.*s"), static_cast<int>(sender.size()),
-                     sender.data());
+  ImGui::TextColored(TradeInk(kTradeBlackText), core::Tr("De : %.*s"),
+                     static_cast<int>(sender.size()), sender.data());
   SystemBadge(*row);
   const std::string expiry = MailExpiryLabel(row->expire_seconds_left);
   if (!expiry.empty()) {
@@ -364,8 +364,8 @@ void DrawDetail(MailboxWindowState& state, const MailboxView& view, const SkinAr
     ImGui::TextColored(color, core::Tr("(expire : %s)"), expiry.c_str());
   }
   const std::string_view title = row->title;
-  ImGui::TextColored(kTradeBlackText, core::Tr("Sujet : %.*s"), static_cast<int>(title.size()),
-                     title.data());
+  ImGui::TextColored(TradeInk(kTradeBlackText), core::Tr("Sujet : %.*s"),
+                     static_cast<int>(title.size()), title.data());
 
   ImGui::BeginChild("rodex_body", ImVec2(0.0F, kBodyHeightPixels * scale), ImGuiChildFlags_Borders);
   if (content == nullptr && row->content_unanswered) {
@@ -530,7 +530,7 @@ namespace mail {
 
 TradeItemGesture DrawItemRow(const MailItemView& line) {
   ImGui::BeginGroup();
-  ImGui::PushStyleColor(ImGuiCol_Text, kTradeBlackText);
+  ImGui::PushStyleColor(ImGuiCol_Text, TradeInk(kTradeBlackText));
   TradeItemGesture gesture = DrawTradeItem(line.item);
   ImGui::PopStyleColor();
   if (line.amount > 1) {

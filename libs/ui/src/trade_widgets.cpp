@@ -80,6 +80,16 @@ using StepLabel = std::array<char, kStepLabelBytes>;
 
 }  // namespace
 
+// LE PAPIER : le fond d'un cadre enfant quand il en peint un — la carte d'une
+// boutique —, sinon le corps de la fenêtre. L'habillage laisse les cadres
+// enfants transparents.
+ImVec4 TradeInk(const ImVec4& ink) {
+  const ImVec4& child = ImGui::GetStyleColorVec4(ImGuiCol_ChildBg);
+  const ImVec4& paper = child.w >= 1.0F ? child : ImGui::GetStyleColorVec4(ImGuiCol_WindowBg);
+  return ImGui::ColorConvertU32ToFloat4(
+      ReadableOn(ImGui::ColorConvertFloat4ToU32(ink), ImGui::ColorConvertFloat4ToU32(paper)));
+}
+
 void DrawGradedTradeIcon(const TradeItemView& item, const SkinImage& grade_badge) {
   const float scale = Scale();
   const float side = kTradeIconPixels * scale;

@@ -101,7 +101,8 @@ void DrawOffers(VendingVisitWindowState& state, const VendingVisitView& view, co
     ImGui::TableNextColumn();
     ImGui::AlignTextToFramePadding();
     const bool affordable = view.zeny == kTradeNoPurse || offer.price <= view.zeny;
-    DrawTradePrice(offer.price, offer.price, affordable ? kTradeBlackText : kTradeUnaffordableText,
+    DrawTradePrice(offer.price, offer.price,
+                   affordable ? TradeInk(kTradeBlackText) : TradeInk(kTradeUnaffordableText),
                    kZenySuffix);
     ImGui::TableNextColumn();
     int& amount = OfferAmountFor(state, offer.shop_slot, offer.stock);
@@ -313,10 +314,10 @@ VendingVisitAction DrawVendingVisitWindow(VendingVisitWindowState& state,
                                              ImGuiWindowFlags_NoCollapse);
   if (body_shown && state.open) {
     if (!view.title.empty()) {
-      ColoredText(kTradeBlackText, view.title);
+      ColoredText(TradeInk(kTradeBlackText), view.title);
     }
     if (!view.outcome.empty()) {
-      ColoredText(kTradeRefusedText, view.outcome);
+      ColoredText(TradeInk(kTradeRefusedText), view.outcome);
     }
     if (view.offers.empty()) {
       ImGui::TextDisabled("%s", core::Tr("Le shop est vide."));
@@ -336,7 +337,7 @@ VendingVisitAction DrawVendingVisitWindow(VendingVisitWindowState& state,
     // 🔴 « ACHETER » SE RETIENT tant que le serveur refuserait, ou ignorerait
     // l'achat sans un mot. La première raison s'écrit ici, toutes au survol.
     if (!state.basket.empty() && !view.blockers.empty()) {
-      ColoredText(kTradeRefusedText, view.blockers[0]);
+      ColoredText(TradeInk(kTradeRefusedText), view.blockers[0]);
     } else if (view.awaiting) {
       ImGui::TextDisabled("%s", core::Tr("Achat envoyé : en attente de la liste..."));
     }

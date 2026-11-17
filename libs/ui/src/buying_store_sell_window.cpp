@@ -106,10 +106,10 @@ void DrawWanted(const BuyingStoreSellView& view, const SkinArt& art, float heigh
       NoteItem(DrawTradeItem(line.item), line.item, line.item.item_id, 0, menu, action);
       ImGui::TableNextColumn();
       ImGui::AlignTextToFramePadding();
-      ImGui::TextColored(kTradeBlackText, "%d", line.wanted);
+      ImGui::TextColored(TradeInk(kTradeBlackText), "%d", line.wanted);
       ImGui::TableNextColumn();
       ImGui::AlignTextToFramePadding();
-      ImGui::TextColored(kTradeBlackText, "%s", TradeAmountText(line.price, "z").c_str());
+      ImGui::TextColored(TradeInk(kTradeBlackText), "%s", TradeAmountText(line.price, "z").c_str());
       ImGui::PopID();
     }
     ImGui::EndTable();
@@ -151,7 +151,7 @@ void DrawOffers(BuyingStoreSellState& state, const BuyingStoreSellView& view, co
       }
       ImGui::TableNextColumn();
       ImGui::AlignTextToFramePadding();
-      ImGui::TextColored(kTradeBlackText, "%d", offer.owned);
+      ImGui::TextColored(TradeInk(kTradeBlackText), "%d", offer.owned);
       ImGui::TableNextColumn();
       const bool sellable = offer.barred.empty() && addable > 0 && !view.awaiting;
       if (sellable) {
@@ -224,10 +224,10 @@ void DrawCart(BuyingStoreSellState& state, const BuyingStoreSellView& view, cons
       NoteItem(DrawTradeItem(item), item, line.item_id, line.client_slot, state.item_menu, action);
       ImGui::TableNextColumn();
       ImGui::AlignTextToFramePadding();
-      ImGui::TextColored(kTradeBlackText, "%d", line.amount);
+      ImGui::TextColored(TradeInk(kTradeBlackText), "%d", line.amount);
       ImGui::TableNextColumn();
       ImGui::AlignTextToFramePadding();
-      ImGui::TextColored(kTradeBlackText, "%s",
+      ImGui::TextColored(TradeInk(kTradeBlackText), "%s",
                          TradeAmountText(UnitPrice(view, line) * line.amount, "z").c_str());
       ImGui::TableNextColumn();
       if (view.awaiting) {
@@ -256,7 +256,7 @@ void DrawFooter(BuyingStoreSellState& state, const BuyingStoreSellView& view, co
   // UNE LIGNE TOUJOURS ÉMISE : le pied a une hauteur réservée, une ligne qui
   // apparaîtrait décalerait les boutons.
   if (!view.blockers.empty() && !state.cart.empty()) {
-    ColoredText(kTradeRefusedText, view.blockers[0]);
+    ColoredText(TradeInk(kTradeRefusedText), view.blockers[0]);
   } else if (view.awaiting) {
     ImGui::TextDisabled("%s", core::Tr("En attente du serveur..."));
   } else {
@@ -404,13 +404,14 @@ BuyingStoreSellAction DrawBuyingStoreSellWindow(BuyingStoreSellState& state,
                                              ImGuiWindowFlags_NoCollapse);
   if (body_shown && state.open) {
     if (!view.store_title.empty()) {
-      ColoredText(kTradeBlackText, view.store_title);
+      ColoredText(TradeInk(kTradeBlackText), view.store_title);
     }
     if (!view.outcome.empty()) {
       if (!view.store_title.empty()) {
         ImGui::SameLine();
       }
-      ColoredText(view.outcome_done ? kTradeDoneText : kTradeRefusedText, view.outcome);
+      ColoredText(view.outcome_done ? TradeInk(kTradeDoneText) : TradeInk(kTradeRefusedText),
+                  view.outcome);
     }
     const float pane = ImGui::GetTextLineHeightWithSpacing() * kPaneRows;
     const float footer =

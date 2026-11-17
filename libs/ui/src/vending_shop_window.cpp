@@ -97,7 +97,7 @@ VendingShopAction DrawVendingShopWindow(VendingShopWindowState& state, const Ven
                          ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
   if (body_shown) {
     if (!view.title.empty()) {
-      ColoredText(kTradeBlackText, view.title);
+      ColoredText(TradeInk(kTradeBlackText), view.title);
       ImGui::Separator();
     }
     if (view.lines.empty()) {

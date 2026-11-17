@@ -91,7 +91,7 @@ void DrawHistory(const ItemEnchantView& view) {
   const std::size_t shown = std::min(view.history.size(), kHistoryShown);
   for (std::size_t index = 0; index < shown; ++index) {
     const ItemEnchantHistoryView& entry = view.history[index];
-    ImGui::PushStyleColor(ImGuiCol_Text, entry.good ? kGoodText : kTradeRefusedText);
+    ImGui::PushStyleColor(ImGuiCol_Text, entry.good ? kGoodText : TradeInk(kTradeRefusedText));
     ImGui::TextWrapped("%.*s", static_cast<int>(entry.text.size()), entry.text.data());
     ImGui::PopStyleColor();
   }
@@ -307,7 +307,7 @@ void DrawMaterial(ItemEnchantWindowState& state, const ItemEnchantMaterialView& 
                material.item, material.item.item_id, state.item_menu, action);
   ImGui::AlignTextToFramePadding();
   if (material.owned < material.needed) {
-    ColoredText(kTradeRefusedText, count);
+    ColoredText(TradeInk(kTradeRefusedText), count);
   } else {
     ImGui::TextUnformatted(count.c_str());
   }
@@ -341,7 +341,7 @@ void DrawOperation(ItemEnchantWindowState& state, const ItemEnchantView& view, c
   }
   const std::string zeny = TradeAmountText(view.zeny, "z");
   if (view.purse >= 0 && view.purse < view.zeny) {
-    ColoredText(kTradeRefusedText, zeny);
+    ColoredText(TradeInk(kTradeRefusedText), zeny);
   } else {
     ImGui::TextUnformatted(zeny.c_str());
   }
@@ -371,10 +371,10 @@ void DrawDetail(ItemEnchantWindowState& state, const ItemEnchantView& view, cons
 void DrawActionButton(ItemEnchantWindowState& state, const ItemEnchantView& view,
                       const SkinArt& art) {
   if (!view.notice.empty()) {
-    ColoredText(view.notice_good ? kGoodText : kTradeRefusedText, view.notice);
+    ColoredText(view.notice_good ? kGoodText : TradeInk(kTradeRefusedText), view.notice);
   }
   if (!view.blockers.empty()) {
-    ColoredText(kTradeRefusedText, view.blockers[0]);
+    ColoredText(TradeInk(kTradeRefusedText), view.blockers[0]);
   }
   const bool held = view.waiting || !view.blockers.empty();
   if (held) {

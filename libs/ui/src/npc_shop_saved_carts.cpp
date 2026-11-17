@@ -225,7 +225,7 @@ void DrawNpcShopSavedCarts(NpcShopWindowState& state, const NpcShopView& view, c
   } else {
     DrawSaveRow(state, view, art, action);
     if (!view.saved_cart_report.empty()) {
-      ColoredText(kTradeRefusedText, view.saved_cart_report);
+      ColoredText(TradeInk(kTradeRefusedText), view.saved_cart_report);
     }
     ImGui::Separator();
     DrawList(state, view, art, action);

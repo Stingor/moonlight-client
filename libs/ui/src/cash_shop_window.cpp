@@ -464,7 +464,8 @@ void DrawCard(CashShopWindowState& state, const CashShopView& view, const CashSh
       ImVec2(column_x + (column_width > price_width ? (column_width - price_width) * 0.5F : 0.0F),
              column_y));
   // Un prix hors de portée s'écrit en rouge, comme dans tout commerce.
-  ImGui::TextColored(affordable ? kTradeBlackText : kTradeUnaffordableText, "%s", price.data());
+  ImGui::TextColored(affordable ? TradeInk(kTradeBlackText) : TradeInk(kTradeUnaffordableText),
+                     "%s", price.data());
 
   const bool event_helps = !state.use_event_points && static_cast<long long>(card.price) <= both;
   const char* why =

@@ -139,11 +139,11 @@ void NoteItem(const TradeItemGesture& gesture, const TradeItemView& item, std::u
 }
 
 void DrawHeader(const NpcShopView& view) {
-  ColoredText(kTradeBlackText, view.purse_line);
+  ColoredText(TradeInk(kTradeBlackText), view.purse_line);
   if (!view.outcome.empty()) {
     ImGui::SameLine();
-    ImGui::TextColored(view.outcome_done ? kTradeDoneText : kTradeRefusedText, "  %.*s",
-                       static_cast<int>(view.outcome.size()), view.outcome.data());
+    ImGui::TextColored(view.outcome_done ? TradeInk(kTradeDoneText) : TradeInk(kTradeRefusedText),
+                       "  %.*s", static_cast<int>(view.outcome.size()), view.outcome.data());
   }
 }
 
@@ -226,7 +226,8 @@ void DrawBuyList(NpcShopWindowState& state, const NpcShopView& view, const SkinA
     ImGui::AlignTextToFramePadding();
     const bool affordable = view.purse == kTradeNoPurse || offer.price <= view.purse;
     DrawTradePrice(offer.base_price, offer.price,
-                   affordable ? kTradeBlackText : kTradeUnaffordableText, view.unit);
+                   affordable ? TradeInk(kTradeBlackText) : TradeInk(kTradeUnaffordableText),
+                   view.unit);
     if (market) {
       ImGui::TableNextColumn();
       ImGui::AlignTextToFramePadding();
@@ -235,7 +236,8 @@ void DrawBuyList(NpcShopWindowState& state, const NpcShopView& view, const SkinA
       } else if (offer.stock == kNpcShopNoStock) {
         ImGui::TextDisabled("-");
       } else {
-        ImGui::TextColored(kTradeBlackText, "%s", TradeAmountText(offer.stock, {}).c_str());
+        ImGui::TextColored(TradeInk(kTradeBlackText), "%s",
+                           TradeAmountText(offer.stock, {}).c_str());
       }
     }
     ImGui::TableNextColumn();
@@ -372,7 +374,7 @@ void DrawSellList(NpcShopWindowState& state, const NpcShopView& view, const Skin
     NoteItem(DrawTradeItem(sold.item, count.data()), sold.item, sold.client_slot, state, action);
     ImGui::TableNextColumn();
     ImGui::AlignTextToFramePadding();
-    DrawTradePrice(sold.base_price, sold.price, kTradeBlackText, view.unit);
+    DrawTradePrice(sold.base_price, sold.price, TradeInk(kTradeBlackText), view.unit);
     ImGui::TableNextColumn();
     if (!view.awaiting) {
       const TradeStepClick click =
@@ -403,9 +405,9 @@ void DrawSellList(NpcShopWindowState& state, const NpcShopView& view, const Skin
   ImGui::EndTable();
 }
 
-// UN ITEM DU SAC LÂCHÉ SUR LA LISTE DE VENTE : toute sa pile entre au panier,
-// si le PNJ l'achète. Le geste que le client d'origine attend de sa fenêtre
-// de vente.
+// UN ITEM DU SAC LÂCHÉ SUR LA LISTE DE VENTE OU SUR LE PANIER : toute sa pile
+// entre au panier, si le PNJ l'achète. Le geste que le client d'origine attend
+// de sa fenêtre de vente. La cible est le DERNIER cadre dessiné.
 //
 // ⚠ LA LISTE DU SERVEUR RESTE LA SEULE PORTE : une case qu'il n'a pas mise en
 // vente ne s'ajoute pas — il refuserait la vente entière —, et le refus se dit.
@@ -428,23 +430,24 @@ void AcceptBagDrop(NpcShopWindowState& state, const NpcShopView& view,
   ImGui::EndDragDropTarget();
 }
 
-// Le nom d'une ligne du panier : celui de la liste qui l'a fournie.
-std::string_view CartName(const NpcShopView& view, const NpcShopWindowState& state,
-                          const NpcShopCartLine& line) {
+// L'objet d'une ligne du panier : celui de la liste qui l'a fournie, ou aucun
+// si elle ne le tient plus.
+const TradeItemView* CartItem(const NpcShopView& view, const NpcShopWindowState& state,
+                              const NpcShopCartLine& line) {
   if (state.tab == NpcShopTab::kSell) {
     for (const NpcShopSellView& sold : view.sells) {
       if (sold.client_slot == line.client_slot) {
-        return sold.item.name;
+        return &sold.item;
       }
     }
   } else {
     for (const NpcShopOfferView& offer : view.offers) {
       if (offer.item.item_id == line.item_id) {
-        return offer.item.name;
+        return &offer.item;
       }
     }
   }
-  return "?";
+  return nullptr;
 }
 
 void DrawCart(NpcShopWindowState& state, const NpcShopView& view, const SkinArt& art, float width,
@@ -467,12 +470,19 @@ void DrawCart(NpcShopWindowState& state, const NpcShopView& view, const SkinArt&
   for (std::size_t index = 0; index < state.cart.size(); ++index) {
     NpcShopCartLine& line = state.cart[index];
     ImGui::PushID(kCartIdBase + static_cast<int>(index));
-    const std::string_view name = CartName(view, state, line);
-    ImGui::TextWrapped("%.*s", static_cast<int>(name.size()), name.data());
+    // L'icône et le nom, comme dans la liste, et maniés comme elle : un nom trop
+    // long se rogne au bord du panier, l'aperçu au survol le dit en entier.
+    if (const TradeItemView* item = CartItem(view, state, line); item != nullptr) {
+      NoteItem(DrawTradeItemBefore(*item, 0.0F), *item, selling ? line.client_slot : 0, state,
+               action);
+      ImGui::NewLine();
+    } else {
+      ImGui::TextUnformatted("?");
+    }
     DrawTradeQuantity(line.amount, line.most, art);
     ImGui::SameLine();
     ImGui::AlignTextToFramePadding();
-    ImGui::TextColored(kTradeBlackText, "%s",
+    ImGui::TextColored(TradeInk(kTradeBlackText), "%s",
                        TradeAmountText(line.unit_price * line.amount, view.unit).c_str());
     ImGui::SameLine();
     const float step = ImGui::GetFrameHeight();
@@ -505,7 +515,7 @@ void DrawCart(NpcShopWindowState& state, const NpcShopView& view, const SkinArt&
   // serveur refuse l'achat ENTIER, ou tronque la recette. La première raison
   // s'écrit sous le total ; toutes se lisent au survol du bouton.
   if (!view.blockers.empty()) {
-    ColoredText(kTradeRefusedText, view.blockers[0]);
+    ColoredText(TradeInk(kTradeRefusedText), view.blockers[0]);
   }
   const bool blocked = state.cart.empty() || !view.blockers.empty() || view.awaiting;
   if (blocked) {
@@ -680,6 +690,9 @@ NpcShopWindowAction DrawNpcShopWindow(NpcShopWindowState& state, const NpcShopVi
     }
     if (show_cart) {
       DrawCart(state, view, art, cart_width, footer, action);
+      if (state.tab == NpcShopTab::kSell && !view.awaiting) {
+        AcceptBagDrop(state, view, action);
+      }
     }
 
     ImGui::Separator();
