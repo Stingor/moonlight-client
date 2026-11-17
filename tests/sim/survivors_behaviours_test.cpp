@@ -311,12 +311,15 @@ TEST_CASE("Comportements survivors : Smokie caché n'est ni visé, ni touché, n
   const std::uint32_t smokie = PlaceReady(field, kContentSmokieId, East(Cells(1) / 2));
   const std::int32_t hero_hp = field.hero.hp;
   const std::int32_t smokie_hp = FoeOf(field, smokie).hp;
+  // Ni blessé, ni bousculé : le héros immobile reste où il est.
+  const ro::sim::FieldPoint hero_at = field.hero.position;
   while (field.step < hidden_from + kSmokieHideSteps) {
     const SurvivorsNews news = StepNews(run);
     for (const ro::sim::SurvivorsCast& cast : news.casts) CHECK(cast.target_serial != smokie);
     CHECK(news.hits.empty());
     CHECK(FoeOf(field, smokie).hp == smokie_hp);
     CHECK(field.hero.hp == hero_hp);
+    CHECK(field.hero.position == hero_at);
   }
   CHECK(FoeOf(field, smokie).act_until_step == hidden_from + kSmokieHideSteps);
   // Ressorti, il touche et se fait viser.

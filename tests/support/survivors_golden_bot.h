@@ -47,7 +47,7 @@ inline constexpr std::uint32_t kGoldenBotMarginSteps = 100;
 // ⚠ LE BILAN EN OR DU ROBOT, épinglé avec sa version : il change quand le
 // catalogue OU le robot changent. Re-épinglé, il se vérifie sous MSVC et sous
 // g++-14, qui rendent les mêmes valeurs.
-inline constexpr std::uint16_t kGoldenBotRulesetVersion = 9;
+inline constexpr std::uint16_t kGoldenBotRulesetVersion = 10;
 inline constexpr sim::SurvivorsTally kGoldenBotTally{
     .survived_steps = 40374,
     .kills = 8028,

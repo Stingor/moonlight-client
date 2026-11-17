@@ -46,7 +46,7 @@ inline constexpr std::uint16_t kGoldenTerrainArenaId = 2;
 // ⚠ LE BILAN EN OR SUR SOL GÉNÉRÉ, épinglé avec sa version : il change quand
 // le catalogue, sa règle de terrain OU le robot changent. Les mêmes valeurs
 // sous MSVC et sous g++-14.
-inline constexpr std::uint16_t kGoldenTerrainRulesetVersion = 9;
+inline constexpr std::uint16_t kGoldenTerrainRulesetVersion = 10;
 inline constexpr sim::SurvivorsTally kGoldenTerrainTally{
     .survived_steps = 45480,
     .kills = 9159,

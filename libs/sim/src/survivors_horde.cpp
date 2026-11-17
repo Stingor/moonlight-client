@@ -281,12 +281,13 @@ void Separate(SurvivorsField& field) {
 
 // LA POUSSÉE DU HÉROS : un monstre qui le chevauche recule de (100 − part du
 // héros) % du recouvrement, le héros de sa part ; contre un monstre immobile,
-// le héros prend tout.
+// le héros prend tout. Un monstre caché est intangible : il ne pousse pas.
 void ShoveHero(SurvivorsField& field) {
   const SurvivorsTuning& tuning = field.rules->tuning;
   const std::int64_t hero_pct = std::clamp<std::int64_t>(tuning.hero_shove_pct, 0, kPercent);
   SurvivorsHero& hero = field.hero;
   for (SurvivorsFoe& foe : field.foes) {
+    if (Hidden(field, foe)) continue;
     const std::int64_t reach =
         std::int64_t{tuning.hero_radius_units} + FoeRadius(*field.rules, foe);
     const std::int64_t distance_squared = DistanceSquared(hero.position, foe.position);

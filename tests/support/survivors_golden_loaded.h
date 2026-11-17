@@ -58,7 +58,7 @@ inline constexpr std::uint16_t kGoldenLoadedLockedCardId = 4072;  // Golem Card
 // ⚠ LE BILAN EN OR À DÉPART CHARGÉ, épinglé avec la version des règles : il
 // change quand le catalogue, le catalogue de la méta OU le robot changent.
 // Les mêmes valeurs sous MSVC et sous g++-14.
-inline constexpr std::uint16_t kGoldenLoadedRulesetVersion = 9;
+inline constexpr std::uint16_t kGoldenLoadedRulesetVersion = 10;
 inline constexpr sim::SurvivorsTally kGoldenLoadedTally{
     .survived_steps = 46428,
     .kills = 7657,
