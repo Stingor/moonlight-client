@@ -569,23 +569,29 @@ void ArenaEffects::KeepZones(const ro::sim::SurvivorsField& field, std::uint32_t
 
 void ArenaEffects::ShootFoeShots(const ro::sim::SurvivorsField& field, const GroundOf& ground_of,
                                  const ArenaSight& sight, std::uint32_t now_ms) {
-  std::erase_if(shots_, [&field](const ShotSeen& seen) {
-    return std::ranges::none_of(field.foe_shots, [&seen](const ro::sim::SurvivorsFoeShot& shot) {
-      return shot.from_serial == seen.from_serial && shot.expires_step == seen.expires_step;
-    });
+  // Un tir retiré avant son échéance a touché le héros ou un mur : son vol s'arrête là.
+  std::erase_if(shots_, [this, &field](const ShotSeen& seen) {
+    const bool gone =
+        std::ranges::none_of(field.foe_shots, [&seen](const ro::sim::SurvivorsFoeShot& shot) {
+          return shot.from_serial == seen.from_serial && shot.expires_step == seen.expires_step;
+        });
+    if (gone && field.step < seen.expires_step) nodes_.DropShot(seen.shot_tag);
+    return gone;
   });
   for (const ro::sim::SurvivorsFoeShot& shot : field.foe_shots) {
     const bool seen = std::ranges::any_of(shots_, [&shot](const ShotSeen& known) {
       return known.from_serial == shot.from_serial && known.expires_step == shot.expires_step;
     });
     if (seen) continue;
-    shots_.push_back(ShotSeen{.from_serial = shot.from_serial, .expires_step = shot.expires_step});
+    const std::uint32_t tag = next_foe_shot_tag_++;
+    shots_.push_back(ShotSeen{
+        .from_serial = shot.from_serial, .expires_step = shot.expires_step, .shot_tag = tag});
     if (!switches_.shown || switches_.reduced) continue;
     // LA FLÈCHE DU TIREUR, selon son espèce : un tireur déjà mort n'en a plus.
     const auto shooter =
         std::ranges::find(field.foes, shot.from_serial, &ro::sim::SurvivorsFoe::serial);
     if (shooter == field.foes.end()) continue;
-    const ro::render::ActorLook look = FoeLook(shooter->foe_id);
+    const ro::render::ActorLook look = FoeShooterLookOf(shooter->foe_id);
     const std::string_view sprite = ro::render::ArrowSpriteOf(*sprites_, look, false);
     const std::optional<std::uint32_t> bolt = FoeShotEffectOf(shooter->foe_id);
     if (sprite.empty() && !bolt.has_value()) continue;
@@ -614,7 +620,7 @@ void ArenaEffects::ShootFoeShots(const ro::sim::SurvivorsField& field, const Gro
         flight_ms / static_cast<std::uint32_t>(ro::render::kEffectTickMs), 1));
     static_cast<void>(nodes_.ShootSprite(sprite, ground_of(shot.position) + lift,
                                          ground_of(lands) + lift, life_ticks,
-                                         ro::render::ProjectileFlightOf(*sprites_, look)));
+                                         ro::render::ProjectileFlightOf(*sprites_, look), tag));
     ++launched_total_;
   }
 }

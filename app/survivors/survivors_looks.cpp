@@ -265,6 +265,29 @@ ro::render::ActorLook FoeLook(std::uint16_t foe_id) noexcept {
   return ro::render::ActorLook{.job = foe_id};
 }
 
+ro::render::ActorLook FoeShooterLookOf(std::uint16_t foe_id) noexcept {
+  constexpr std::uint16_t kStemWorm = 1215;
+  constexpr std::uint16_t kParasite = 1500;
+  constexpr std::uint16_t kCecilDamon = 1638;
+  constexpr std::uint16_t kKavachIcarus = 1656;
+  constexpr std::uint16_t kKathryneKeyron = 1639;
+  constexpr std::uint16_t kLaurellWeinder = 1657;
+  switch (foe_id) {
+    case kStemWorm:
+      return FoeLook(kParasite);
+    case kCecilDamon:
+    case kKavachIcarus:
+      return ro::render::ActorLook{
+          .player = true, .job = kArrowShooterJob, .weapon = kArrowShooterWeapon};
+    case kKathryneKeyron:
+    case kLaurellWeinder:
+      return ro::render::ActorLook{
+          .player = true, .job = kWandShooterJob, .weapon = kWandShooterWeapon};
+    default:
+      return FoeLook(foe_id);
+  }
+}
+
 std::optional<std::uint32_t> FoeShotEffectOf(std::uint16_t foe_id) noexcept {
   if (foe_id == kGazetiFoe) return kFrostDiverBoltEffect;
   return std::nullopt;

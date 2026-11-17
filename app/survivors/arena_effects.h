@@ -164,10 +164,15 @@ class ArenaEffects {
     std::uint32_t relaunch_ms = 0;
   };
   // Un tir de monstre déjà parti.
+  // Un tir de monstre vu, et le numéro de son vol (`EffectNodesInPlay::DropShot`),
+  // compté à part des tirs du héros, depuis `kFoeShotTagBase`.
   struct ShotSeen {
     std::uint32_t from_serial = 0;
     std::uint32_t expires_step = 0;
+    std::uint32_t shot_tag = 0;
   };
+  static constexpr std::uint32_t kFoeShotTagBase = 0x8000'0000U;
+  std::uint32_t next_foe_shot_tag_ = kFoeShotTagBase;
   // UN PIÈGE POSÉ, que sa marque montre au moins un instant : posé dans la horde,
   // il saute au pas même de sa pose, et sa zone n'est jamais lue.
   struct TrapMark {

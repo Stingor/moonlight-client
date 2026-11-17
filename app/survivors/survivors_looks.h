@@ -22,6 +22,12 @@ namespace moonclient {
 // Un monstre ou une plante : un sprite unique, nommé par sa classe.
 [[nodiscard]] ro::render::ActorLook FoeLook(std::uint16_t foe_id) noexcept;
 
+// LE TIREUR DONT UN MONSTRE EMPRUNTE LE PROJECTILE, quand le client ne lui en
+// donne aucun : les archers du Laboratoire tirent la flèche d'un arc, ses
+// mages le trait d'une baguette, et Stem Worm crache comme Parasite. Les
+// autres gardent `FoeLook`.
+[[nodiscard]] ro::render::ActorLook FoeShooterLookOf(std::uint16_t foe_id) noexcept;
+
 // LE TIR D'UN MONSTRE QUE LE CLIENT NE MUNIT PAS : l'effet qui vole de lui au
 // point visé. Le Gazeti lance l'éclat de glace de Frost Diver ; rien pour les
 // autres, que leur flèche dessine.

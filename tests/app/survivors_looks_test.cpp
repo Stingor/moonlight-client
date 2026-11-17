@@ -7,6 +7,7 @@
 #include "survivors/survivors_looks.h"
 
 #include <algorithm>
+#include <cstddef>
 #include <cstdint>
 #include <filesystem>
 #include <fstream>
@@ -39,12 +40,15 @@ namespace {
   return text.str();
 }
 
-// Le catalogue des tables livrées : les classes et les objets.
+// Le catalogue des tables livrées : les classes, les armes et les objets.
 [[nodiscard]] const ro::render::SpriteCatalog& ShippedCatalog() {
   static const ro::render::SpriteCatalog kCatalog = [] {
     ro::render::SpriteCatalog catalog;
     REQUIRE(ro::render::ParseSpriteTableText(ro::render::SpriteTableFile::kClasses,
                                              ShippedTable("class_sprites.yml"), catalog.tables)
+                .has_value());
+    REQUIRE(ro::render::ParseSpriteTableText(ro::render::SpriteTableFile::kWeapons,
+                                             ShippedTable("weapon_sprites.yml"), catalog.tables)
                 .has_value());
     auto items = ro::vfs::ParseItemTable(ShippedTable("item_info.yml"));
     REQUIRE(items.has_value());
@@ -86,6 +90,21 @@ TEST_CASE("Apparences du mode : chaque espèce et chaque plante a son sprite", "
   const ro::sim::SurvivorsRules& rules = ro::sim::ShippedSurvivorsRules();
   for (const ro::sim::FoeRule& foe : rules.foes) RequireClassSprite(foe.foe_id);
   for (const ro::sim::PlantRule& plant : rules.plants) RequireClassSprite(plant.foe_id);
+}
+
+TEST_CASE("Apparences du mode : chaque monstre qui tire a un projectile à dessiner",
+          "[app][survivors]") {
+  const ro::sim::SurvivorsRules& rules = ro::sim::ShippedSurvivorsRules();
+  std::size_t shooters = 0;
+  for (const ro::sim::FoeRule& foe : rules.foes) {
+    if (foe.behaviour.move != ro::sim::FoeMove::kRanged) continue;
+    ++shooters;
+    INFO("classe " << foe.foe_id);
+    const std::string_view sprite = ro::render::ArrowSpriteOf(
+        ShippedCatalog(), moonclient::FoeShooterLookOf(foe.foe_id), false);
+    CHECK((!sprite.empty() || moonclient::FoeShotEffectOf(foe.foe_id).has_value()));
+  }
+  CHECK(shooters > 0);
 }
 
 TEST_CASE("Apparences du mode : chaque objet au sol, coffre et gemme a son sprite",
