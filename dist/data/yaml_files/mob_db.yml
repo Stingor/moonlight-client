@@ -87461,6 +87461,33 @@ Body:
     Ai: 21
     Class: Boss
     Modes: {Mvp: true}
+  - Id: 21589
+    AegisName: G_EP19_LIMACINA
+    Name: Limacina
+    Level: 213
+    Hp: 517785
+    Attack: 4792
+    Attack2: 1079
+    Defense: 46
+    MagicDefense: 28
+    Str: 61
+    Agi: 50
+    Vit: 58
+    Int: 61
+    Dex: 75
+    Luk: 58
+    AttackRange: 7
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    Race: Fish
+    Element: Water
+    ElementLevel: 2
+    WalkSpeed: 175
+    AttackDelay: 384
+    AttackMotion: 768
+    DamageMotion: 576
+    Ai: 04
   - Id: 21590
     AegisName: EP19_MD_RGAN_ES
     Name: Mana Overloaded Superior Rgan
