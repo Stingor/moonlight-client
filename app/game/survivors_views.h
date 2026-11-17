@@ -181,8 +181,10 @@ class SurvivorsViews {
                     bool accepts_input, int pressed_card_key, bool typing, bool charges_withheld,
                     std::uint16_t objective_skill_id, const SurvivorsCodexSeen* seen,
                     std::span<const std::uint16_t> found_cards, const SurvivorsTables& tables);
-  // Les recettes d'une offre pour `hero`, nommées comme au Codex.
+  // Les recettes d'une offre pour `hero`, de classe `hero_class`, nommées comme
+  // au Codex.
   void ComposeOfferRecipes(const ro::sim::SurvivorsRules& rules, const ro::sim::SurvivorsHero& hero,
+                           const ro::sim::ClassRule* hero_class,
                            const ro::sim::SurvivorsOffer& offer, const SurvivorsCodexSeen& seen,
                            std::span<const std::uint16_t> found_cards,
                            const SurvivorsTables& tables,

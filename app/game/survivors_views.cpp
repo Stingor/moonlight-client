@@ -360,8 +360,9 @@ void SurvivorsViews::ComposeOffer(const SurvivorsField& field, const ro::sim::Su
     ro::ui::SurvivorsOfferCard card;
     if (seen != nullptr && offer_cards_.size() < offer_recipes_.size()) {
       std::vector<ro::ui::SurvivorsOfferRecipe>& shown = offer_recipes_[offer_cards_.size()];
-      ComposeOfferRecipes(rules, ro::sim::HeroAt(field, offer.hero_index), offer, *seen,
-                          found_cards, tables, shown);
+      ComposeOfferRecipes(rules, ro::sim::HeroAt(field, offer.hero_index),
+                          ro::sim::ClassAt(field, offer.hero_index), offer, *seen, found_cards,
+                          tables, shown);
       card.recipes = shown;
     }
     card.next_level = offer.next_level;
@@ -409,18 +410,16 @@ void SurvivorsViews::ComposeOffer(const SurvivorsField& field, const ro::sim::Su
                                       .charges_withheld = charges_withheld};
 }
 
-void SurvivorsViews::ComposeOfferRecipes(const ro::sim::SurvivorsRules& rules,
-                                         const ro::sim::SurvivorsHero& hero,
-                                         const ro::sim::SurvivorsOffer& offer,
-                                         const SurvivorsCodexSeen& seen,
-                                         std::span<const std::uint16_t> found_cards,
-                                         const SurvivorsTables& tables,
-                                         std::vector<ro::ui::SurvivorsOfferRecipe>& into) {
+void SurvivorsViews::ComposeOfferRecipes(
+    const ro::sim::SurvivorsRules& rules, const ro::sim::SurvivorsHero& hero,
+    const ro::sim::ClassRule* hero_class, const ro::sim::SurvivorsOffer& offer,
+    const SurvivorsCodexSeen& seen, std::span<const std::uint16_t> found_cards,
+    const SurvivorsTables& tables, std::vector<ro::ui::SurvivorsOfferRecipe>& into) {
   into.clear();
   const bool card_offer =
       offer.kind == ro::sim::OfferKind::kNewCard || offer.kind == ro::sim::OfferKind::kCardLevel;
   for (const SurvivorsOfferRecipe& recipe :
-       SurvivorsOfferRecipesOf(rules, hero, offer, seen, found_cards)) {
+       SurvivorsOfferRecipesOf(rules, hero, offer, seen, found_cards, hero_class)) {
     ro::ui::SurvivorsOfferRecipe shown{
         .partner =
             ro::ui::SurvivorsCodexLink{.ro_id = recipe.partner_id, .seen = recipe.partner_seen},

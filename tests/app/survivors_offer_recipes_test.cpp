@@ -5,6 +5,7 @@
 #include "game/survivors_offer_recipes.h"
 
 #include <algorithm>
+#include <cstddef>
 #include <cstdint>
 #include <optional>
 #include <vector>
@@ -133,4 +134,32 @@ TEST_CASE("Recettes survivors : un soin ni des zenys n'ont aucune recette", "[ap
   CHECK(moonclient::SurvivorsOfferRecipesOf(rules, hero, SurvivorsOffer{.kind = OfferKind::kZeny},
                                             seen, {})
             .empty());
+}
+
+TEST_CASE("Recettes survivors : une carte ne nomme que les sorts que la classe peut obtenir",
+          "[app][survivors]") {
+  const ro::sim::SurvivorsRules& rules = ro::sim::ShippedSurvivorsRules();
+  const ro::sim::SurvivorsHero hero;
+  const SurvivorsCodexSeen seen;
+  std::size_t hidden = 0;
+  for (const ro::sim::ClassRule& hero_class : rules.classes) {
+    const auto pooled = [&hero_class](std::uint16_t skill_id) {
+      return skill_id == hero_class.weapon_skill_id ||
+             std::ranges::find(hero_class.skill_pool, skill_id) != hero_class.skill_pool.end() ||
+             std::ranges::find(hero_class.starter_skills, skill_id) !=
+                 hero_class.starter_skills.end();
+    };
+    for (const ro::sim::CardRule& card : rules.cards) {
+      const SurvivorsOffer offer{
+          .kind = OfferKind::kNewCard, .id = card.card_item_id, .next_level = 1};
+      const std::vector<SurvivorsOfferRecipe> every =
+          moonclient::SurvivorsOfferRecipesOf(rules, hero, offer, seen, {});
+      const std::vector<SurvivorsOfferRecipe> mine =
+          moonclient::SurvivorsOfferRecipesOf(rules, hero, offer, seen, {}, &hero_class);
+      for (const SurvivorsOfferRecipe& recipe : mine) CHECK(pooled(recipe.partner_id));
+      hidden += every.size() - mine.size();
+    }
+  }
+  // Les sorts d'une classe ne s'offrent pas aux autres : le tri retire des recettes.
+  CHECK(hidden > 0);
 }

@@ -27,12 +27,26 @@ namespace {
   });
 }
 
+// L'ingrédient peut échoir au héros : il le tient, ou sa classe l'offre.
+[[nodiscard]] bool WithinReach(const ro::sim::SurvivorsHero& hero,
+                               const ro::sim::ClassRule* hero_class,
+                               const SurvivorsOfferRecipe& recipe) {
+  if (hero_class == nullptr) return true;
+  const auto listed = [&recipe](std::span<const std::uint16_t> pool) {
+    return std::ranges::find(pool, recipe.partner_id) != pool.end();
+  };
+  if (!recipe.partner_is_skill)
+    return HoldsCard(hero, recipe.partner_id) || listed(hero_class->card_pool);
+  return HoldsSkill(hero, recipe.partner_id) || recipe.partner_id == hero_class->weapon_skill_id ||
+         listed(hero_class->skill_pool) || listed(hero_class->starter_skills);
+}
+
 }  // namespace
 
 std::vector<SurvivorsOfferRecipe> SurvivorsOfferRecipesOf(
     const ro::sim::SurvivorsRules& rules, const ro::sim::SurvivorsHero& hero,
     const ro::sim::SurvivorsOffer& offer, const SurvivorsCodexSeen& seen,
-    std::span<const std::uint16_t> found_cards) {
+    std::span<const std::uint16_t> found_cards, const ro::sim::ClassRule* hero_class) {
   std::vector<SurvivorsOfferRecipe> recipes;
   const bool skill_offer =
       offer.kind == ro::sim::OfferKind::kNewSkill || offer.kind == ro::sim::OfferKind::kSkillLevel;
@@ -56,6 +70,7 @@ std::vector<SurvivorsOfferRecipe> SurvivorsOfferRecipesOf(
     } else {
       continue;
     }
+    if (!WithinReach(hero, hero_class, recipe)) continue;
     if (recipe.partner_is_skill) {
       recipe.completes = HoldsSkill(hero, recipe.partner_id);
       recipe.partner_seen = SkillSeen(rules, seen, recipe.partner_id);

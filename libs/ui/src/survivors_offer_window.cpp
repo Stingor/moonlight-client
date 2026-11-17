@@ -87,12 +87,19 @@ void DrawRecipes(std::span<const SurvivorsOfferRecipe> recipes) {
                             const SkinArt& art) {
   std::array<char, kLineSize> line = {};
   ImGui::PushID(static_cast<int>(index));
-  ImGui::BeginChild("##card", ImVec2(kCardWidth, kCardHeight), ImGuiChildFlags_Borders);
+  ImGui::BeginChild("##card", ImVec2(kCardWidth, kCardHeight), ImGuiChildFlags_Borders,
+                    ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+  // Le texte défile dans son cadre, au-dessus du bouton : il ne passe jamais dessous.
+  const ImGuiStyle& style = ImGui::GetStyle();
+  const float body_height =
+      kCardHeight - 2.0F * style.WindowPadding.y - SkinButtonHeight(art) - style.ItemSpacing.y;
+  ImGui::BeginChild("##body", ImVec2(0.0F, body_height));
   if (card.icon != 0) {
     const float wide = card.icon_size.x > 0.0F ? card.icon_size.x : kIconSide;
     const float high = card.icon_size.y > 0.0F ? card.icon_size.y : kIconSide;
     const float scale = std::min(kIconSide / wide, kIconSide / high);
-    ImGui::SetCursorPosX((kCardWidth - wide * scale) * 0.5F);
+    ImGui::SetCursorPosX(ImGui::GetCursorPosX() +
+                         (ImGui::GetContentRegionAvail().x - wide * scale) * 0.5F);
     ImGui::Image(card.icon, ImVec2(wide * scale, high * scale));
   }
   ImGui::TextWrapped("%s", card.name);
@@ -125,13 +132,13 @@ void DrawRecipes(std::span<const SurvivorsOfferRecipe> recipes) {
   ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
   ImGui::TextWrapped("%s", SurvivorsText(card.description));
   ImGui::PopStyleColor();
+  // Une description trop longue fait défiler le texte : l'ascenseur se voit.
+  PaintWindowScrollbar(art);
+  ImGui::EndChild();
   std::snprintf(line.data(), line.size(),
                 banishing ? core::Tr("%d — Bannir") : core::Tr("%d — Prendre"),
                 static_cast<int>(index + 1));
-  ImGui::SetCursorPosY(kCardHeight - SkinButtonHeight(art) - ImGui::GetStyle().WindowPadding.y);
   const bool taken = SkinButton(line.data(), art, ImVec2(-1.0F, 0.0F));
-  // Une description trop longue fait défiler la carte : l'ascenseur se voit.
-  PaintWindowScrollbar(art);
   ImGui::EndChild();
   ImGui::PopID();
   return taken;

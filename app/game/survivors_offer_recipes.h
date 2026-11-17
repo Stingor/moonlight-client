@@ -36,9 +36,13 @@ struct SurvivorsOfferRecipe {
 // recette dont le héros tient déjà l'évolué est faite : elle ne paraît plus.
 // Rien pour un soin ni des zenys. `found_cards` : les cartes de l'Album, par
 // objet de carte, vues comme au Codex.
+//
+// `hero_class` : la classe du héros. Une recette dont l'autre ingrédient n'est
+// ni tenu ni dans les réserves de cette classe ne s'offrira jamais à lui : elle
+// ne paraît pas. Nulle : aucun tri par classe.
 [[nodiscard]] std::vector<SurvivorsOfferRecipe> SurvivorsOfferRecipesOf(
     const ro::sim::SurvivorsRules& rules, const ro::sim::SurvivorsHero& hero,
     const ro::sim::SurvivorsOffer& offer, const SurvivorsCodexSeen& seen,
-    std::span<const std::uint16_t> found_cards);
+    std::span<const std::uint16_t> found_cards, const ro::sim::ClassRule* hero_class = nullptr);
 
 }  // namespace moonclient
