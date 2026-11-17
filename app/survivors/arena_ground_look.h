@@ -120,6 +120,10 @@ struct SeedLook {
   std::string_view model;
   float scale = 1.0F;
   std::uint32_t weight = 1;
+  // L'ÉLÉVATION au-dessus du sol, en unités du monde. Un modèle se pose par le
+  // bas de sa boîte : un modèle plat (une feuille) tomberait DANS le plan du
+  // sol, et les deux se disputeraient la profondeur, par plaques.
+  float lift_units = 0.0F;
 };
 
 // LA NUIT D'UN BIOME : le ciel qui tombe, ou le courant qui se coupe.

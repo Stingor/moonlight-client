@@ -245,6 +245,7 @@ class Planner {
                         .north = static_cast<float>(y) + kSeedInset + kSeedSpan * (1.0F - offset),
                         .yaw_degrees = static_cast<float>(yaw),
                         .scale = seed->scale,
+                        .sink_units = -seed->lift_units,
                         .piece = kSeedPose});
       }
     }
@@ -337,6 +338,7 @@ class Planner {
                                kSeedSpan * (1.0F - offset),
                       .yaw_degrees = static_cast<float>(yaw),
                       .scale = seed->scale,
+                      .sink_units = -seed->lift_units,
                       .piece = kSeedPose});
     }
   }

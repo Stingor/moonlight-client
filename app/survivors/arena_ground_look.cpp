@@ -447,7 +447,7 @@ constexpr std::array<GroundTextureLook, 7> kLabTextures{{
 constexpr std::array<SeedLook, 3> kLabSeeds{{
     {.model = "흑마법사방\\비이커1.rsm", .scale = 0.8F, .weight = 3},
     {.model = "외부소품\\해골_팔.rsm", .scale = 0.8F, .weight = 1},
-    {.model = "흑마법사방\\마법방_책종이1.rsm", .scale = 1.0F, .weight = 2},
+    {.model = "흑마법사방\\마법방_책종이1.rsm", .scale = 1.0F, .weight = 2, .lift_units = 0.5F},
 }};
 
 constexpr std::array<BiomeLook, 4> kBiomes{{
