@@ -115,12 +115,16 @@ std::string PlaceLinkLabel(const PlaceLink& link, const ro::vfs::MapDisplayNames
   return PlaceLinkLabel(link, PlaceShownName(names, link.map));
 }
 
-std::string PlaceDestinationLine(const PlaceLink& link, const ro::vfs::MapDisplayNames* names) {
+std::string PlaceDestinationLine(const PlaceLink& link) {
   // ⚠ L'ESPACE EST POSÉE ICI, PAS DANS LE TEXTE : un catalogue rogne les espaces
   // de bord, et « Destination : » les perdrait à la relecture.
   std::string line(ro::core::Tr("Destination :"));
   line.push_back(' ');
-  line += PlaceLinkLabel(link, names);
+  // 🔴 LA BALISE, PAS SON LIBELLÉ : le fil la rend cliquable et la nomme dans
+  // la langue du lecteur. Une carte que la balise ne peut pas porter s'écrit
+  // par son libellé, inerte.
+  const std::string tag = BuildPlaceLink(link);
+  line += tag.empty() ? PlaceLinkLabel(link, std::string_view()) : tag;
   return line;
 }
 

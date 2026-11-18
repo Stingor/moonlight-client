@@ -367,11 +367,7 @@ void Game::FollowChatLink(const ro::ui::ChatLinkAsk& asked, std::uint32_t now_ms
     if (asked.gesture == ro::ui::ChatLinkGesture::kDescribe) {
       // Le trajet se lit sur la minimap et au sol, la destination reste écrite.
       navi_.GuideToPlace(place.map, place.x, place.y);
-      world_.RecordChat(ro::sim::ChatKind::kServer, 0,
-                        PlaceDestinationLine(place, pieces_.map_display_names->has_value()
-                                                        ? &**pieces_.map_display_names
-                                                        : nullptr),
-                        now_ms);
+      world_.RecordChat(ro::sim::ChatKind::kServer, 0, PlaceDestinationLine(place), now_ms);
     } else if (asked.gesture == ro::ui::ChatLinkGesture::kRepost) {
       PostChatLink(place);
     } else if (asked.gesture == ro::ui::ChatLinkGesture::kCopyCode) {

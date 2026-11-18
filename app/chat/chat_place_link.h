@@ -74,11 +74,11 @@ struct PlaceLink {
 [[nodiscard]] std::string PlaceLinkLabel(const PlaceLink& link,
                                          const ro::vfs::MapDisplayNames* names);
 
-// La ligne que la conversation écrit quand un guidage part : « Destination :
-// [Prontera 150,180] ». Le trajet se lit sur la minimap et au sol, la
-// destination reste écrite.
-[[nodiscard]] std::string PlaceDestinationLine(const PlaceLink& link,
-                                               const ro::vfs::MapDisplayNames* names);
+// La ligne que la conversation écrit quand un guidage part : « Destination : »
+// suivi de la balise du lieu, que le fil montre « [Prontera 150,180] » et rend
+// cliquable. Le trajet se lit sur la minimap et au sol, la destination reste
+// écrite, et un clic relance le guidage.
+[[nodiscard]] std::string PlaceDestinationLine(const PlaceLink& link);
 
 // L'INFOBULLE D'UN LIEU, sans son plan : le nom lisible chez le lecteur — vide
 // quand la table ne le connaît pas, et l'infobulle montre alors le nom

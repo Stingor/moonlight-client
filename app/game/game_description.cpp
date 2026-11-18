@@ -28,6 +28,7 @@
 #include "ro/sim/world.h"
 #include "ro/ui/rich_text.h"
 
+#include "chat/chat_place_link.h"
 #include "game/bug_report_route.h"
 #include "game/cash_shop_stage.h"
 #include "game/game.h"
@@ -71,16 +72,18 @@ void Game::FollowDescriptionLink(const ro::ui::DescriptionWindowAction& asked,
     return;
   }
   if (asked.followed_kind == ro::ui::RichLinkKind::kPlace) {
-    // LE LIEU LANCE LE GUIDAGE, et la conversation dit vers où : le trajet se
-    // lit sur la minimap et au sol, la destination reste écrite.
-    // ⚠ L'ESPACE EST POSÉE ICI, PAS DANS LE TEXTE : un catalogue rogne les
-    // espaces de bord, et « Destination : » les perdrait à la relecture.
-    if (const std::optional<ro::ui::RichPlace> place = ro::ui::ReadRichPlace(asked.followed))
-      navi_.GuideToPlace(place->map, place->x, place->y);
-    std::string where(ro::core::Tr("Destination :"));
-    where += ' ';
-    where += asked.followed;
-    world_.RecordChat(ro::sim::ChatKind::kServer, 0, where, now_ms);
+    // LE LIEU LANCE LE GUIDAGE, et la conversation dit vers où, comme pour un
+    // lieu partagé : le trajet se lit sur la minimap et au sol, la destination
+    // reste écrite et cliquable.
+    const std::optional<ro::ui::RichPlace> place = ro::ui::ReadRichPlace(asked.followed);
+    if (!place) {
+      ro::core::LogWarning("description : lieu illisible — {}", asked.followed);
+      return;
+    }
+    navi_.GuideToPlace(place->map, place->x, place->y);
+    world_.RecordChat(
+        ro::sim::ChatKind::kServer, 0,
+        PlaceDestinationLine(PlaceLink{.map = place->map, .x = place->x, .y = place->y}), now_ms);
     return;
   }
   // 🔴 UNE ADRESSE OUVRE UN PROGRAMME DU SYSTÈME, et elle vient d'une DONNÉE du

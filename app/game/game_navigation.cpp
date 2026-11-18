@@ -81,11 +81,7 @@ void Game::AdvanceNavigation(std::uint32_t now_ms) {
   if (const std::optional<MarketDestination> shop = pieces_.trade->market().TakeGoTo()) {
     const PlaceLink place{.map = shop->map_name, .x = shop->cell_x, .y = shop->cell_y};
     navi_.GuideToPlace(place.map, place.x, place.y);
-    world_.RecordChat(
-        ro::sim::ChatKind::kServer, 0,
-        PlaceDestinationLine(
-            place, pieces_.map_display_names->has_value() ? &**pieces_.map_display_names : nullptr),
-        now_ms);
+    world_.RecordChat(ro::sim::ChatKind::kServer, 0, PlaceDestinationLine(place), now_ms);
   }
 
   // ── Ce que la minimap a rendu ──────────────────────────────────────────────

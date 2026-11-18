@@ -160,3 +160,21 @@ TEST_CASE("Lien de lieu : le fil le rend cliquable", "[app][chat][navi]") {
         "q2U2");
   CHECK(cut.links.empty());
 }
+
+TEST_CASE("Lien de lieu : la ligne de destination se clique et relance le guidage",
+          "[app][chat][navi]") {
+  const ro::vfs::ItemTable items;
+  const ro::vfs::ItemWords words;
+  const ro::vfs::MapDisplayNames names = Names();
+  const std::string line =
+      moonclient::PlaceDestinationLine({.map = "prontera", .x = kProntera150, .y = kProntera180});
+  moonclient::DecoratedChatLine out;
+  REQUIRE(moonclient::DecorateChatLine(line, items, words, &out, nullptr, &names));
+  REQUIRE(out.links.size() == 1);
+  CHECK(out.text.substr(out.links[0].offset, out.links[0].length) == "[Prontera 150,180]");
+  REQUIRE(out.carried.size() == 1);
+  CHECK(out.carried[0].place.map == "prontera");
+  CHECK(out.carried[0].place.y == kProntera180);
+  // Une carte que la balise ne peut pas porter reste écrite, inerte.
+  CHECK(moonclient::PlaceDestinationLine({.map = "a<b"}).ends_with("[a<b]"));
+}

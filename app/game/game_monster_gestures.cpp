@@ -112,12 +112,8 @@ void Game::FollowNaviSearchLink(const ro::ui::ChatLinkAsk& asked, const NaviSear
       // comme pour un lieu partagé.
       if (const std::string map = NaviSearchDestination(link); !map.empty()) {
         navi_.GuideToPlace(map, 0, 0);
-        world_.RecordChat(
-            ro::sim::ChatKind::kServer, 0,
-            PlaceDestinationLine(PlaceLink{.map = map}, pieces_.map_display_names->has_value()
-                                                            ? &**pieces_.map_display_names
-                                                            : nullptr),
-            now_ms);
+        world_.RecordChat(ro::sim::ChatKind::kServer, 0,
+                          PlaceDestinationLine(PlaceLink{.map = map}), now_ms);
       }
       break;
     case ro::ui::ChatLinkGesture::kPlaceContents:

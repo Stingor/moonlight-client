@@ -222,8 +222,8 @@ namespace {
   switch (command.kind) {
     case NavigationCommandKind::kGuide:
       to.navi->GuideToPlace(command.place.map, command.place.x, command.place.y);
-      to.world->RecordChat(ro::sim::ChatKind::kServer, 0,
-                           PlaceDestinationLine(command.place, to.map_names), said_ms);
+      to.world->RecordChat(ro::sim::ChatKind::kServer, 0, PlaceDestinationLine(command.place),
+                           said_ms);
       break;
     case NavigationCommandKind::kSearch: {
       ro::ui::OpenNavigationSearch(*to.navigation, command.term, /*monsters_only=*/false);
