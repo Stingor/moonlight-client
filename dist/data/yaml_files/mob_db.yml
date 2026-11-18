@@ -87035,6 +87035,7 @@ Body:
       - {Item: Snow_F_Stone1, Rate: 2500}
       - {Item: Snow_F_Ore, Rate: 5000}
       - {Item: Snow_F_Ore, Rate: 3000}
+      - {Item: Aquila_Card, Rate: 1, StealProtected: true}
   - Id: 21532
     AegisName: EP19_MD_JUNCEA
     Name: Monster Juncea
@@ -88307,6 +88308,7 @@ Body:
       - {Item: EP20_D_P_Ore, Rate: 4000}
       - {Item: EP20_D_P_Ore, Rate: 2500}
       - {Item: EP20_D_P_Crystal, Rate: 1000}
+      - {Item: Rgan_Chief_Clean_Card, Rate: 1, StealProtected: true}
   - Id: 21981
     AegisName: MD_EP20_BOSS_LASGAND
     Name: Ultimate Lasgand
@@ -88825,6 +88827,7 @@ Body:
       - {Item: EP20_D_P_Ore, Rate: 4000}
       - {Item: EP20_D_P_Ore, Rate: 2500}
       - {Item: EP20_D_P_Crystal, Rate: 1000}
+      - {Item: Snow_Angel_Card, Rate: 1, StealProtected: true}
   - Id: 21997
     AegisName: G_EP20_JORMUNGUARD1
     Name: Jormungand Guardian-P
