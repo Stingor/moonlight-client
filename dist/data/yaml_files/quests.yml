@@ -7950,6 +7950,32 @@ quests:
   5900:
     title: "[Waiting] Cleaning the first power plant."
     icon: dq
+  5908:
+    title: Unfair Crash Site
+    icon: nq
+    description: Dry Circle Dr. Strong told me about the Airship Crash Site.
+  5909:
+    title: '[Standby] Airplane Crash Site'
+    icon: nq
+    summary: Reset at 04:00 after 3 days
+    description: You can enter the Airship Crash Site once every 3 days. If you want to go back to Airship Crash Site, go to <NAVI>[Dr. Dry Circle Strong]<INFO>dali02,137,86,0,101,0</INFO></NAVI> after a while.
+    npc:
+      sprite: 4_M_FAIRYANG
+      map: dali02
+      x: 137
+      y: 86
+  5910:
+    title: Forgotten Joint Research(1)
+    icon: nq
+    description: Professor Taeguto asked graduate student Marata to listen to the explanation. Let's hear the explanation of the Forgotten Cavity.
+  5911:
+    title: Forgotten Joint Research(2)
+    icon: nq
+    description: The last explanation seems to be listened to by graduate student Saseong. Let's hear the last explanation.
+  5915:
+    title: Compensation for helping the Wounded
+    icon: nq
+    description: He was rewarded by Pelok for helping find the wounded caused by the plane crash.
   5932:
     title: "Abused Child"
   5933:
@@ -21720,6 +21746,35 @@ quests:
   12500:
     title: "Red Pepper - Lambda Suppression"
     summary: "Hunt 1 Senior Red Pepper"
+  12513:
+    title: The reason the tower was destroyed
+    summary: New Tower Owner
+    description: The main character of this commotion seems to have settled in the half-flying tower. Let's check out what it really is.
+  12514:
+    title: Aftermath of entering the tower
+    summary: Re-entry at 4 am after 3 days
+    description: It takes a lot of mental energy to get in and out of this place. Even if there are still things to do, it is better to visit again after 3 days have passed.
+    cooldown: true
+  12515:
+    title: Confrontation with the owner of the new tower
+    summary: Let's get our body private.
+    description: The new tower's owner did not kill all the tower's inhabitants. He's really generous, but on the other hand, watching the monsters coming down, you can't imagine how strong he is.
+  12516:
+    title: Fountain's Secret 1
+    summary: Reinforcement of designated stats
+    description: Win by amplifying Betelgeuse's strength by 300% or more. The ability to increase the specific difficulty to the limit using <ITEM>[Meteorite Powder]<INFO>1000372</INFO></ITEM> has been added.
+  12517:
+    title: Fountain's Secret 1
+    summary: Specified ability seal
+    description: Win by amplifying Betelgeuse's strength by 600% or more. The ability to seal a specific difficulty level to 0 using <ITEM>[Meteorite Powder]<INFO>1000372</INFO></ITEM> has been added.
+  12518:
+    title: Exiled Being
+    summary: Please get out
+    description: It is clear that a tectonic shift has occurred in the tower's ecosystem. Before you can determine who owns the changed throne, you'll need a tidy up.
+  12519:
+    title: Original Owner's whereabouts
+    summary: It might not matter now
+    description: If the tower had become like this, the beings that originally ruled this place would not be able to survive.
   12520:
     title: "[Normal] Villa of Deception"
   12521:
@@ -27136,6 +27191,35 @@ quests:
     title: "I would like to know what it is"
   16453:
     title: "I would like to know what it is"
+  16461:
+    title: Tomb of Remorse
+    icon: nq
+    summary: Talk to Princess Tiara
+    description: <NAVI>[Princess Tiara]<INFO>dali,124,88,0,101,0</INFO></NAVI>of an unfamiliar kingdom seems to have something she wants to ask an adventurer.
+  16462:
+    title: Tomb of Remorse
+    icon: nq
+    summary: Talk to Princess Tiara
+    description: To hear more about the princess, let's follow <NAVI>[her]<INFO>dali,79,112,0,101,0</INFO></NAVI>.
+  16463:
+    title: Tomb of Remorse
+    icon: nq
+    summary: Talk to Princess Tiara
+    description: After hearing the story of the <NAVI>[Princess]<INFO>dali02,78,116,0,101,0</INFO></NAVI> let's head to the Tomb of Remorse.
+  16464:
+    title: Tomb of Remorse
+    icon: nq
+    summary: Reset at 04:00
+    description: This quest is a daily quest, and you can receive it again when the waiting time expires. You can receive quest orders through <NAVI>[Princess Tiara]<INFO>dali02,78,116,0,101,0</INFO></NAVI>.
+    cooldown: true
+  16469:
+    title: Fragmented Memory
+    icon: dq
+    description: <NAVI>[Marquess]<INFO>dali02,78,112,0,101,0</INFO></NAVI> wants to know the full story of the incident, and is hoping to collect 3 pieces of Memory.
+  16471:
+    title: Fragmented Past
+    icon: dq
+    description: <NAVI>[Marquess]<INFO>dali02,78,112,0,101,0</INFO></NAVI> wants to collect 10 Fragment of the Past so that the fact that they exist is not forgotten.
   16521:
     title: "4th floor of Rudus, an organic field for waste specimens"
   16522:
@@ -27916,6 +28000,63 @@ quests:
     icon: dq
   17381:
     title: "Joining the company"
+  17415:
+    title: Request accepted
+    icon: dq
+    summary: Request accepted
+    description: You have accepted Solis' request.
+  17416:
+    title: Monsters on the 9th floor
+    icon: dq
+    summary: 10x Fragment of Misery
+    description: On the 9th floor of Thanatos Tower, fight 20 Crow Dukes and 20 Crow Barons each. If you bring 10 Fragment of Misery, we'll give you an extra reward. - <NAVI>[Solis]<INFO>tha_t01,161,78,0,101,0</INFO></NAVI>
+  17417:
+    title: Monsters on the 10th floor
+    icon: dq
+    summary: 10x Fragment of Despair
+    description: On the 10th floor of Thanatos Tower, you have to deal with 15 each of Void Mimic, Book of Death, and Eldest. If you bring 10 Fragments of Despair, I'll give you an extra reward. - <NAVI>[Solis]<INFO>tha_t01,161,78,0,101,0</INFO></NAVI>
+  17418:
+    title: Monsters on the 11th floor
+    icon: dq
+    summary: 10x Fragment of Hatred
+    description: On the 11th floor of Thanatos Tower, you can deal with 15 Empathizer and 15 Happiness Giver each. If you bring 10 Fragment of Hatred, I'll give you an extra bonus. - <NAVI>[Solis]<INFO>tha_t01,161,78,0,101,0</INFO></NAVI>
+  17419:
+    title: Monsters on the 11th floor
+    icon: dq
+    description: On the 11th floor of Thanatos Tower, you have to deal with 15 of each of Pray Giver and Smile Giver. - <NAVI>[Solis]<INFO>tha_t01,161,78,0,101,0</INFO></NAVI>
+  17420:
+    title: Monsters on the 12th floor
+    icon: dq
+    summary: 10x Fragment of Agony
+    description: On the 12th floor of Thanatos Tower, you have to deal with 10 of each of Anger of Thanatos and Horror of Thanatos. If you bring 10 Fragment of Agony, I'll give you an extra reward. - <NAVI>[Solis]<INFO>tha_t01,161,78,0,101,0</INFO></NAVI>
+  17421:
+    title: Monsters on the 12th floor
+    icon: dq
+    description: On the 12th floor of Thanatos Tower, you have to deal with 10 each of Regret of Thanatos and Resentment of Thanatos. - <NAVI>[Solis]<INFO>tha_t01,161,78,0,101,0</INFO></NAVI>
+  17422:
+    title: '[Standby] Thanatos Tower 9th Floor'
+    icon: dq
+    summary: Reset at 04:00
+    description: We need to organize the materials, so please come back after dawn. - <NAVI>[Solis]<INFO>tha_t01,161,78,0,101,0</INFO></NAVI>
+    cooldown: true
+  17423:
+    title: '[Standby] Thanatos Tower 10th Floor'
+    icon: dq
+    summary: Reset at 04:00
+    description: We need to organize the materials, so please come back after dawn. - <NAVI>[Solis]<INFO>tha_t01,161,78,0,101,0</INFO></NAVI>
+    cooldown: true
+  17424:
+    title: '[Standby] Thanatos Tower 11th Floor'
+    icon: dq
+    summary: Reset at 04:00
+    description: We need to organize the materials, so please come back after dawn. - <NAVI>[Solis]<INFO>tha_t01,161,78,0,101,0</INFO></NAVI>
+    cooldown: true
+  17425:
+    title: '[Standby] Thanatos Tower 12th Floor'
+    icon: dq
+    summary: Reset at 04:00
+    description: We need to organize the materials, so please come back after dawn. - <NAVI>[Solis]<INFO>tha_t01,161,78,0,101,0</INFO></NAVI>
+    cooldown: true
   17504:
     title: "Where is My Home (1)"
   17505:
@@ -28448,6 +28589,37 @@ quests:
   18025:
     title: "Core collection - Waiting"
     icon: dq
+  18026:
+    title: Memory of Magic Swordsman Thanatos
+    icon: dq
+    summary: Defeat Thanatos' Memory
+    description: It is said that the Magic Swordsman Thanatos, who had opposed Morroc in the past, was seen in the tower. Let's explore the upper floors of Thanatos Tower on behalf of Lumine, who came to check the truth of the rumor, and find the Magic Swordsman Thanatos.
+    npc:
+      sprite: 4_M_AC_RUMIN
+      map: thana_step
+      x: 154
+      y: 367
+  18027:
+    title: Memory of Magic Swordsman Thanatos
+    icon: dq
+    summary: Defeat the Broken Memory of Thanatos
+    description: It is said that the Magic Swordsman Thanatos, who had opposed Morroc in the past, was seen in the tower. Let's explore the upper floors of Thanatos Tower on behalf of Lumine, who came to check the truth of the rumor, and find the Magic Swordsman Thanatos.
+    npc:
+      sprite: 5_M_AC_RUMIN
+      map: thana_step
+      x: 154
+      y: 367
+  18028:
+    title: '[Standby] Memory of Magic Swordsman Thanatos'
+    icon: dq
+    summary: Reset at 04:00
+    description: You can receive the quest again through <NAVI>[Lumine]<INFO>thana_step,154,367,0,101,0</INFO></NAVI> in the Thanatos Tower after the waiting time has passed.
+    npc:
+      sprite: 6_M_AC_RUMIN
+      map: thana_step
+      x: 154
+      y: 367
+    cooldown: true
   18030:
     title: Geoborg Family Curse
     summary: Mr. Karlomoff
@@ -36917,6 +37089,10 @@ quests:
     title: Poring Con - Help Cosplayer Freya
     summary: Come back to help Freya again!
     description: There is a 22 hour cooldown on this quest.
+  69990:
+    title: Geffen Night Arena Access
+    icon: lq
+    description: Access to the Geffen Night Arena has been granted.
   70001:
     title: Searching for the Treasure Map
     description: Search the inside areas of Izlude for signs of the treasure map. You must search 4 areas for traces of the map and then return to Mikey.
