@@ -129703,6 +129703,18 @@ Body:
     Flags: {BuyingStore: true, DropEffect: CLIENT}
     Script: |
       item_reform();
+  - Id: 102433
+    AegisName: Unsealing_Scroll
+    Name: Unsealing Scroll
+    Type: Usable
+    Weight: 100
+    Flags: {BuyingStore: true}
+  - Id: 102434
+    AegisName: Warm_Shield_Scroll
+    Name: Warm Shield Scroll
+    Type: Usable
+    Weight: 100
+    Flags: {BuyingStore: true}
   - Id: 102562
     AegisName: Demi_Freyja_Antiquity
     Name: Antiquity Villa (Twisted God)
@@ -129743,6 +129755,32 @@ Body:
     Flags: {Container: true, DropEffect: CLIENT}
     Script: |
       getgroupitem(IG_AIRBOAT_ANTIQUITY,true);
+  - Id: 102795
+    AegisName: Forgotten_Crystal_1
+    Name: Crystal of Forgotten Time (Area 1)
+    Type: Usable
+    Weight: 30
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      if (strcharinfo(3) == "for_dun01")
+         warp "for_dun01",0,0;
+      else {
+         specialeffect2 EF_FREEZING;
+         showscript "It doesn't seem to have any effect here.", playerattached(), SELF;
+      }
+  - Id: 102796
+    AegisName: Forgotten_Crystal_2
+    Name: Crystal of Forgotten Time (Area 2)
+    Type: Usable
+    Weight: 30
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      if (strcharinfo(3) == "for_dun02")
+         warp "for_dun02",0,0;
+      else {
+         specialeffect2 EF_FREEZING;
+         showscript "It doesn't seem to have any effect here.", playerattached(), SELF;
+      }
   - Id: 300001
     AegisName: Poisonous_Card
     Name: Poisonous Card
@@ -142397,6 +142435,11 @@ Body:
       bonus2 bAddRace,RC_All,10;
       bonus2 bAddRace,RC_Player_Human,-10;
       bonus2 bAddRace,RC_Player_Doram,-10;
+  - Id: 312453
+    AegisName: MD_Hol_Barrier_1
+    Name: Constellation's Barrier (1)
+    Type: Card
+    SubType: Enchant
   - Id: 313024
     AegisName: Star_Cluster_Of_Str1
     Name: Star Cluster of Strength 1Lv
@@ -146914,6 +146957,16 @@ Body:
     Type: Armor
     Locations: {Costume_Garment: true}
     View: 2396
+  - Id: 420231
+    AegisName: MD_Hol_Protection
+    Name: Constellation's Protection
+    Type: Armor
+    Buy: 100
+    Sell: 50
+    Locations: {Head_Low: true}
+    ArmorLevel: 1
+    EquipLevelMin: 250
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
   - Id: 420232
     AegisName: C_Cheesy_Snack_In_Mouth
     Name: Costume Cheese Stick
@@ -151376,6 +151429,129 @@ Body:
     Type: Armor
     Locations: {Costume_Garment: true}
     View: 189
+  - Id: 480345
+    AegisName: Season_Hood_Spring
+    Name: "Manteau of Mystical Beast: Spring [1]"
+    Type: Armor
+    Buy: 62000
+    Sell: 15500
+    Weight: 700
+    Defense: 7
+    Slots: 1
+    Locations: {Garment: true}
+    ArmorLevel: 1
+    EquipLevelMin: 250
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bCritical,-20;
+      bonus bStr,2;
+      bonus bDex,2;
+      bonus bBaseAtk,5*(.@r/2);
+      bonus bShortAtkRate,2*(.@r/3);
+      if (.@r>=7) {
+         bonus bVariableCastrate,-10;
+         if (.@r>=9) {
+            bonus bAspdRate,10;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-10;
+               bonus2 bAddClass,Class_All,2;
+            }
+         }
+      }
+  - Id: 480346
+    AegisName: Season_Hood_Summer
+    Name: "Manteau of Mystical Beast: Summer [1]"
+    Type: Armor
+    Buy: 62000
+    Sell: 15500
+    Weight: 700
+    Defense: 7
+    Slots: 1
+    Locations: {Garment: true}
+    ArmorLevel: 1
+    EquipLevelMin: 250
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bCritical,-20;
+      bonus bStr,2;
+      bonus bDex,2;
+      bonus bBaseAtk,5*(.@r/2);
+      bonus bLongAtkRate,2*(.@r/3);
+      if (.@r>=7) {
+         bonus bVariableCastrate,-10;
+         if (.@r>=9) {
+            bonus bAspdRate,10;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-10;
+               bonus2 bAddClass,Class_All,2;
+            }
+         }
+      }
+  - Id: 480347
+    AegisName: Season_Hood_Autumn
+    Name: "Manteau of Mystical Beast: Autumn [1]"
+    Type: Armor
+    Buy: 62000
+    Sell: 15500
+    Weight: 700
+    Defense: 7
+    Slots: 1
+    Locations: {Garment: true}
+    ArmorLevel: 1
+    EquipLevelMin: 250
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bInt,2;
+      bonus bDex,2;
+      bonus bUseSPrate,15;
+      bonus bMatk,5*(.@r/2);
+      bonus2 bMagicAtkEle,Ele_All,2*(.@r/3);
+      if (.@r>=7) {
+         bonus bVariableCastrate,-10;
+         if (.@r>=9) {
+            bonus bAspdRate,5;
+            bonus bVariableCastrate,-5;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-10;
+               bonus2 bMagicAddClass,Class_All,2;
+            }
+         }
+      }
+  - Id: 480348
+    AegisName: Season_Hood_Winter
+    Name: "Manteau of Mystical Beast: Winter [1]"
+    Type: Armor
+    Buy: 62000
+    Sell: 15500
+    Weight: 700
+    Defense: 7
+    Slots: 1
+    Locations: {Garment: true}
+    ArmorLevel: 1
+    EquipLevelMin: 250
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bCritical,4;
+      bonus bStr,1;
+      bonus bDex,1;
+      bonus bBaseAtk,4*(.@r/2);
+      bonus bCritAtkRate,(.@r/3);
+      bonus bLuk,(.@r/3);
+      if (.@r>=7) {
+         bonus bVariableCastrate,-5;
+         bonus bCritAtkRate,3;
+         if (.@r>=9) {
+            bonus bAspdRate,10;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-10;
+               bonus2 bAddClass,Class_All,2;
+            }
+         }
+      }
   - Id: 480360
     AegisName: C_Big_Shuriken
     Name: Costume Giant Shuriken
@@ -152829,6 +153005,66 @@ Body:
     Script: |
       bonus bMatkRate,8;
       bonus bMaxHPrate,7;
+  - Id: 490483
+    AegisName: Signet_Of_Spring
+    Name: "Signet of Circulation: Spring [1]"
+    Type: Armor
+    Buy: 5500
+    Sell: 2750
+    Weight: 500
+    Slots: 1
+    Locations: {Left_Accessory: true}
+    ArmorLevel: 1
+    EquipLevelMin: 250
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      bonus bShortAtkRate,10;
+      bonus bVariableCastrate,-10;
+  - Id: 490484
+    AegisName: Signet_Of_Summer
+    Name: "Signet of Circulation: Summer [1]"
+    Type: Armor
+    Buy: 5500
+    Sell: 2750
+    Weight: 500
+    Slots: 1
+    Locations: {Left_Accessory: true}
+    ArmorLevel: 1
+    EquipLevelMin: 250
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      bonus bLongAtkRate,10;
+      bonus bVariableCastrate,-10;
+  - Id: 490485
+    AegisName: Signet_Of_Autumn
+    Name: "Signet of Circulation: Autumn [1]"
+    Type: Armor
+    Buy: 5500
+    Sell: 2750
+    Weight: 500
+    Slots: 1
+    Locations: {Left_Accessory: true}
+    ArmorLevel: 1
+    EquipLevelMin: 250
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      bonus2 bMagicAtkEle,Ele_All,10;
+      bonus bVariableCastrate,-10;
+  - Id: 490486
+    AegisName: Signet_Of_Winter
+    Name: "Signet of Circulation: Winter [1]"
+    Type: Armor
+    Buy: 5500
+    Sell: 2750
+    Weight: 500
+    Slots: 1
+    Locations: {Left_Accessory: true}
+    ArmorLevel: 1
+    EquipLevelMin: 250
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      bonus bCritAtkRate,10;
+      bonus bVariableCastrate,-10;
   - Id: 500007
     AegisName: Ep172_1h_Sword
     Name: Hypocrisy Machine
@@ -162088,6 +162324,196 @@ Body:
     AegisName: Ep20_Ymir_Heart
     Name: Corrupted Heart Fragment of Ymir
     Trade: {NoDrop: true, NoTrade: true, NoSell: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+  - Id: 1001414
+    AegisName: MD_Hol_Fragment
+    Name: Dimensional Crystal Fragment
+    Weight: 1
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1001415
+    AegisName: MD_Hol_Key
+    Name: Hall of Life Key
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001424
+    AegisName: Hot_Water_Drop_Gem
+    Name: Hot Water Droplet Gem
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001425
+    AegisName: Ice_Water_Drop_Gem
+    Name: Cold Water Droplet Gem
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001426
+    AegisName: Dry_Wind_Leaf_Gem
+    Name: Dry Wind Leaf Gem
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001427
+    AegisName: Storm_Wind_Leaf_Gem
+    Name: Strong Wind Leaf Gem
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001428
+    AegisName: Red_Flame_Heart_Gem
+    Name: Red Flame Heart Gem
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001429
+    AegisName: Blue_Flame_Heart_Gem
+    Name: Blue Flame Heart Gem
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001430
+    AegisName: Firm_Land_Crystal
+    Name: Firm Land Crystal
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001431
+    AegisName: Green_Land_Crystal
+    Name: Green Land Crystal
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001432
+    AegisName: Contored_Spi_Wrath
+    Name: Wrath of Polluted Spirit
+    Weight: 10
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1001433
+    AegisName: Contored_Agn_Wrath
+    Name: Wrath of Polluted Agni
+    Weight: 10
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1001434
+    AegisName: Contored_Aqu_Wrath
+    Name: Wrath of Polluted Aqua
+    Weight: 10
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1001435
+    AegisName: Contored_Ven_Wrath
+    Name: Wrath of Polluted Ventus
+    Weight: 10
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1001436
+    AegisName: Contored_Ter_Wrath
+    Name: Wrath of Polluted Tera
+    Weight: 10
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1001440
+    AegisName: Energy_Of_Spring
+    Name: Energy of Spring
+    Weight: 10
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1001441
+    AegisName: Energy_Of_Summer
+    Name: Energy of Summer
+    Weight: 10
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1001442
+    AegisName: Energy_Of_Autumn
+    Name: Energy of Autumn
+    Weight: 10
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1001443
+    AegisName: Energy_Of_Winter
+    Name: Energy of Winter
+    Weight: 10
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1001444
+    AegisName: Spring_Material_1
+    Name: Mane Hair of Floral Pegasus
+    Weight: 10
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1001445
+    AegisName: Spring_Material_2
+    Name: Emblem of Floral Pegasus
+    Weight: 10
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1001446
+    AegisName: Spring_Material_3
+    Name: Wing Feather of Floral Pegasus
+    Weight: 10
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1001447
+    AegisName: Summer_Material_1
+    Name: Tail of Coral Marine
+    Weight: 10
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1001448
+    AegisName: Summer_Material_2
+    Name: Coral of Coral Marine
+    Weight: 10
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1001449
+    AegisName: Summer_Material_3
+    Name: Fin of Coral Marine
+    Weight: 10
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1001450
+    AegisName: Autumn_Material_1
+    Name: Leaf of Maple Tree
+    Weight: 10
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1001451
+    AegisName: Autumn_Material_2
+    Name: Branch of Maple Tree
+    Weight: 10
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1001452
+    AegisName: Autumn_Material_3
+    Name: Bark Piece of Maple Tree
+    Weight: 10
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1001453
+    AegisName: Winter_Material_1
+    Name: Coat of Monarch Penguin
+    Weight: 10
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1001454
+    AegisName: Winter_Material_2
+    Name: Ice Crystal of Monarch Penguin
+    Weight: 10
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1001455
+    AegisName: Winter_Material_3
+    Name: Emblem of Monarch Penguin
+    Weight: 10
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1001457
+    AegisName: Fruit_Of_Birth
+    Name: Fruit of Birth
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001458
+    AegisName: Fruit_Of_Extinction
+    Name: Fruit of Extinction
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001461
+    AegisName: Energy_Of_Flame
+    Name: Energy of Fire
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001462
+    AegisName: Energy_Of_Water
+    Name: Energy of Water
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001463
+    AegisName: Energy_Of_Wind
+    Name: Energy of Wind
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001464
+    AegisName: Energy_Of_Ground
+    Name: Energy of Earth
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001465
+    AegisName: Grace_Of_Spirit
+    Name: Grace of Spirit
+    Weight: 10
+    Flags: {BuyingStore: true}
   - Id: 1001478
     AegisName: Cubic_Dia
     Name: Pure Diamond
@@ -162112,6 +162538,11 @@ Body:
   - Id: 1001599
     AegisName: Unknown_Meteorite_F
     Name: Unknown Meteorite Fragment
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001600
+    AegisName: Energy_Of_Elemental
+    Name: Energy of Elemental
     Weight: 10
     Flags: {BuyingStore: true}
   - Id: 1002137

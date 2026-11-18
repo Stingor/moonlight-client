@@ -21830,6 +21830,191 @@ quests:
     icon: ep
     summary: Neutralizing Lasgand
     description: It's said that killing Lasgand is impossible, but it seems like we can somehow make him powerless for a while.
+  12592:
+    title: Garden of Time
+    icon: nq
+    summary: Discover the Garden of Time
+    description: After passing through the twisted dimension gap, I found myself in the Garden of Time...
+  12593:
+    title: Helping Leticia
+    icon: nq
+    summary: Helping Leticia
+    description: Leticia has declared that she will clear the Garden of Time of any areas that might pose a threat to her, and Oscar has asked her to help her as she will be working alone. Let's go see <NAVI>[Leticia]<INFO>t_garden,118,92,0,101,0</INFO></NAVI> and see if there's anything we can do to help her..
+  12594:
+    title: Watch Rigel
+    icon: nq
+    summary: Visit Rigel
+    description: Rigel is trying to build a prison to imprison dimensional criminals. Oscar has asked me to check Rigel's work. Let's visit <NAVI>[Rigel]<INFO>t_garden,165,215,0,101,0</INFO></NAVI> and check her work..
+  12595:
+    title: Western Barrier
+    icon: nq
+    summary: Craft the Western Barrier
+    description: Leticia sensed a force pushing her from her unfamiliar dimension into the Garden of Time. She must create an entrance to it and make it a controllable place. Let's create a passage through the <NAVI>[time barrier]<INFO>t_garden,82,92,0,101,0</INFO></NAVI> to an unfamiliar dimension...
+  12596:
+    title: Eastern Barrier
+    icon: nq
+    summary: Craft the Eastern Barrier
+    description: Leticia sensed a force pushing her from her unfamiliar dimension into the Garden of Time. She must create an entrance to it and make it a controllable place. Let's create a passage through the <NAVI>[time barrier]<INFO>t_garden,149,92,0,101,0</INFO></NAVI> to an unfamiliar dimension...
+  12597:
+    title: Entry Log Registration
+    icon: nq
+    summary: Obtain access to the prison
+    description: Rigel is trying to create a huge prison in the twisted space beneath the Garden of Time. In order to enter and exit the prison, you must register with the <NAVI>[prison guidebook]<INFO>t_garden,165,232,0,101,0</INFO></NAVI>.
+  12598:
+    title: '[Standby] Water'
+    icon: dq
+    summary: Resets at 4 AM
+    description: I accepted Diluvio's request. Even if you complete a request, you cannot receive additional requests until the waiting state passes. Also, if the request cannot be completed and the waiting state passes, the request will be processed as a failure.
+    cooldown: true
+  12599:
+    title: '[Standby] Earth'
+    icon: dq
+    summary: Resets at 4 AM
+    description: I accepted Terremotus' request. Even if you complete a request, you cannot receive additional requests until the waiting state passes. Also, if the request cannot be completed and the waiting state passes, the request will be processed as a failure.
+    cooldown: true
+  12600:
+    title: '[Standby] Deadly Poison'
+    icon: dq
+    summary: Resets at 4 AM
+    description: I accepted Serpens' request. Even if you complete a request, you cannot receive additional requests until the waiting state passes. Also, if the request cannot be completed and the waiting state passes, the request will be processed as a failure.
+    cooldown: true
+  12601:
+    title: '[Standby] Wind'
+    icon: dq
+    summary: Resets at 4 AM
+    description: I accepted Procella's request. Even if you complete a request, you cannot receive additional requests until the waiting state passes. Also, if the request cannot be completed and the waiting state passes, the request will be processed as a failure.
+    cooldown: true
+  12602:
+    title: '[Standby] Fire'
+    icon: dq
+    summary: Resets at 4 AM
+    description: I accepted Ardor's request. Even if you complete a request, you cannot receive additional requests until the waiting state passes. Also, if the request cannot be completed and the waiting state passes, the request will be processed as a failure.
+    cooldown: true
+  12618:
+    title: Face to face with Oscar
+    icon: nq
+    summary: Go to Oscar standing in front of the mansion
+    description: Let's check to see if Oscar, who is standing at the <NAVI>[mansion entrance]<INFO>t_garden,117,140,0,101,0</INFO></NAVI>, needs any help.
+  12620:
+    title: Meeting with Spirits
+    icon: nq
+    summary: Go listen to the spirits' grievances
+    description: Let's meet the spirits gathered in <NAVI>[northwest of the square]<INFO>t_garden,106,118,0,101,0</INFO></NAVI>.
+  12621:
+    title: Terremotus Request 1
+    icon: dq
+    summary: Small Blue Earth Spirit/Mutant Blue Earth Spirit
+    description: I received a request to kill 50 Small Blue Earth Spirits and 50 Mutant Blue Earth Spirits located in Forgotten Memories Area 1. After completing the request, I think you can report it to the <NAVI>[Spirit Complaint Terminal]<INFO>t_garden,124,122,0,101,0</INFO></NAVI>.
+  12622:
+    title: Terremotus Request 2
+    icon: dq
+    summary: Blue Earth Spirit/Giant Blue Earth Spirit
+    description: I received a request to kill 50 Blue Earth Spirits and 50 Giant Blue Earth Spirits located in Forgotten Memories Area 1. After completing the request, I think you can report it to the <NAVI>[Spirit Complaint Terminal]<INFO>t_garden,124,122,0,101,0</INFO></NAVI>.
+  12623:
+    title: Terremotus Request 3
+    icon: dq
+    summary: Small Solid Earth Spirit/Mutant Solid Earth Spirit
+    description: I received a request to kill 50 Small Solid Earth Spirits and 50 Mutant Solid Earth Spirits located in Forgotten Memories Area 2. After completing the request, I think you can report it to the <NAVI>[Spirit Complaint Terminal]<INFO>t_garden,124,122,0,101,0</INFO></NAVI>.
+  12624:
+    title: Terremotus Request 4
+    icon: dq
+    summary: Solid Earth Spirit/Giant Solid Earth Spirit
+    description: I received a request to kill 50 Solid Earth Spirits and 50 Giant Solid Earth Spirits located in Forgotten Memories Area 2. After completing the request, I think you can report it to the <NAVI>[Spirit Complaint Terminal]<INFO>t_garden,124,122,0,101,0</INFO></NAVI>.
+  12625:
+    title: Ardor's Instructions 1
+    icon: dq
+    summary: Small Blue Flame Spirit/Mutant Blue Flame Spirit
+    description: I received a request to kill 50 Small Blue Flame Spirits and 50 Mutant Blue Flame Spirits located in Forgotten Memories Area 1. After completing the request, I think you can report it to the <NAVI>[Spirit Complaint Terminal]<INFO>t_garden,124,122,0,101,0</INFO></NAVI>.
+  12626:
+    title: Ardor's Instructions 2
+    icon: dq
+    summary: Blue Flame Spirit/Giant Blue Flame Spirit
+    description: I received a request to kill 50 Blue Flame Spirits and 50 Giant Blue Flame Spirits located in Forgotten Memories Area 1. After completing the request, I think you can report it to the <NAVI>[Spirit Complaint Terminal]<INFO>t_garden,124,122,0,101,0</INFO></NAVI>.
+  12627:
+    title: Ardor's Instructions 3
+    icon: dq
+    summary: Small Red Flame Spirit/Mutant Red Flame Spirit
+    description: I received a request to kill 50 Small Blue Flame Spirits and 50 Mutant Blue Flame Spirits located in Forgotten Memories Area 2. After completing the request, I think you can report it to the <NAVI>[Spirit Complaint Terminal]<INFO>t_garden,124,122,0,101,0</INFO></NAVI>.
+  12628:
+    title: Ardor's Instructions 4
+    icon: dq
+    summary: Red Flame Spirit/Giant Blue Flame Spirit
+    description: I received a request to kill 50 Blue Flame Spirits and 50 Giant Blue Flame Spirits located in Forgotten Memories Area 2. After completing the request, I think you can report it to the <NAVI>[Spirit Complaint Terminal]<INFO>t_garden,124,122,0,101,0</INFO></NAVI>.
+  12629:
+    title: Procella's Request 1
+    icon: dq
+    summary: Small Strong Wind Spirit/Mutant Strong Wind Spirit
+    description: I received a request to kill 50 Small Strong Wind Spirits and 50 Mutant Strong Wind Spirits located in Forgotten Memories Area 1. After completing the request, I think you can report it to the <NAVI>[Spirit Complaint Terminal]<INFO>t_garden,124,122,0,101,0</INFO></NAVI>.
+  12630:
+    title: Procella's Request 2
+    icon: dq
+    summary: Strong Wind Spirit/Giant Strong Wind Spirit
+    description: I received a request to kill 50 Strong Wind Spirits and 50 Giant Strong Wind Spirits located in Forgotten Memories Area 1. After completing the request, I think you can report it to the <NAVI>[Spirit Complaint Terminal]<INFO>t_garden,124,122,0,101,0</INFO></NAVI>.
+  12631:
+    title: Procella's Request 3
+    icon: dq
+    summary: Small Dry Wind Spirit/Mutant Dry Wind Spirit
+    description: I received a request to kill 50 Small Dry Wind Spirits and 50 Mutant Dry Wind Spirits located in Forgotten Memories Area 2. After completing the request, I think you can report it to the <NAVI>[Spirit Complaint Terminal]<INFO>t_garden,124,122,0,101,0</INFO></NAVI>.
+  12632:
+    title: Procella's Request 4
+    icon: dq
+    summary: Dry Wind Spirit/Giant Dry Wind Spirit
+    description: I received a request to kill 50 Dry Wind Spirits and 50 Giant Dry Wind Spirits located in Forgotten Memories Area 2. After completing the request, I think you can report it to the <NAVI>[Spirit Complaint Terminal]<INFO>t_garden,124,122,0,101,0</INFO></NAVI>.
+  12633:
+    title: Diluvio's Request 1
+    icon: dq
+    summary: Small Cold Water Spirit/Mutant Cold Water Spirit
+    description: I received a request to kill 50 Small Cold Water Spirits and 50 Mutant Cold Water Spirits located in Forgotten Memories Area 1. After completing the request, I think you can report it to the <NAVI>[Spirit Complaint Terminal]<INFO>t_garden,124,122,0,101,0</INFO></NAVI>.
+  12634:
+    title: Diluvio's Request 2
+    icon: dq
+    summary: Cold Water Spirit/Giant Cold Water Spirit
+    description: I received a request to kill 50 Cold Water Spirits and 50 Giant Cold Water Spirits located in Forgotten Memories Area 1. After completing the request, I think you can report it to the <NAVI>[Spirit Complaint Terminal]<INFO>t_garden,124,122,0,101,0</INFO></NAVI>.
+  12635:
+    title: Diluvio's Request 3
+    icon: dq
+    summary: Small Hot Water Spirit/Mutant Hot Water Spirit
+    description: I received a request to kill 50 Small Hot Water Spirits and 50 Mutant Hot Water Spirits located in Forgotten Memories Area 2. After completing the request, I think you can report it to the <NAVI>[Spirit Complaint Terminal]<INFO>t_garden,124,122,0,101,0</INFO></NAVI>.
+  12636:
+    title: Diluvio's Request 4
+    icon: dq
+    summary: Hot Water Spirit/Giant Hot Water Spirit
+    description: I received a request to kill 50 Small Hot Water Spirits and 50 Mutant Hot Water Spirits located in Forgotten Memories Area 2. After completing the request, I think you can report it to the <NAVI>[Spirit Complaint Terminal]<INFO>t_garden,124,122,0,101,0</INFO></NAVI>.
+  12637:
+    title: Serpen's Request 1
+    icon: dq
+    summary: Forgotten Memories, Area 1, Defeat Contaminated Spirits
+    description: I received a request to kill 150 contaminated spirits, which are rapidly increasing in Forgotten Memories Area 1, regardless of their type. I think you can report it to the <NAVI>[Spirit Complaint Terminal]<INFO>t_garden,124,122,0,101,0</INFO></NAVI>.
+  12638:
+    title: Serpen's Request 2
+    icon: dq
+    summary: Forgotten Memories, Area 2, Defeat Contaminated Spirits
+    description: I received a request to kill 150 contaminated spirits, which are rapidly increasing in Forgotten Memories Area 2, regardless of their type. I think you can report it to the <NAVI>[Spirit Complaint Terminal]<INFO>t_garden,124,122,0,101,0</INFO></NAVI>.
+  12639:
+    title: Serpen's Request 3
+    icon: dq
+    summary: Obtain 10 Wrath of Polluted Agni
+    description: After obtaining 10 Wrath of Polluted Agni, I was asked to seal them inside the <NAVI>[Spirit Complaint Terminal]<INFO>t_garden,124,122,0,101,0</INFO></NAVI>. Let뭩 go around each area of forgotten memories and search for them.
+  12640:
+    title: Serpen's Request 4
+    icon: dq
+    summary: Obtain 10 Wrath of Polluted Aqua
+    description: After obtaining 10 Wrath of Polluted Aqua, I was asked to seal them inside the <NAVI>[Spirit Complaint Terminal]<INFO>t_garden,124,122,0,101,0</INFO></NAVI>. Let뭩 go around each area of forgotten memories and search for them.
+  12641:
+    title: Serpen's Request 5
+    icon: dq
+    summary: Obtain 10 Wrath of Polluted Ventus
+    description: After obtaining 10 Wrath of Polluted Ventus, I was asked to seal them inside the <NAVI>[Spirit Complaint Terminal]<INFO>t_garden,124,122,0,101,0</INFO></NAVI>. Let뭩 go around each area of forgotten memories and search for them.
+  12642:
+    title: Serpen's Request 6
+    icon: dq
+    summary: Obtain 10 Wrath of Polluted Tera
+    description: After obtaining 10 Wrath of Polluted Tera, I was asked to seal them inside the <NAVI>[Spirit Complaint Terminal]<INFO>t_garden,124,122,0,101,0</INFO></NAVI>. Let뭩 go around each area of forgotten memories and search for them.
+  12643:
+    title: Serpen's Request 7
+    icon: dq
+    summary: Obtain 20 Wrath of Polluted Spirit
+    description: After obtaining 10 Wrath of Polluted Spirit, I was asked to seal them inside the <NAVI>[Spirit Complaint Terminal]<INFO>t_garden,124,122,0,101,0</INFO></NAVI>. Let뭩 go around each area of forgotten memories and search for them.
   13000:
     title: RWC 2011Card Gathering
     description: Defeat the Gold Porings that are randomly around Rune Midgard and collect enough Blue Cards to spell out "RWC 2011"
