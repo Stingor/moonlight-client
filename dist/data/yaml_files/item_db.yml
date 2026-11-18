@@ -129656,6 +129656,21 @@ Body:
     Type: DelayConsume
     Script: |
       item_reform();
+  - Id: 101637
+    AegisName: EP19_DGW_Refine
+    Name: Dim Glacier Reinforcement Device
+    Type: DelayConsume
+    Weight: 200
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      item_reform();
+  - Id: 101639
+    AegisName: D_Gw_Extractor
+    Name: Dim Glacier Extractor
+    Type: DelayConsume
+    Trade: {NoDrop: true, NoTrade: true, NoSell: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      laphine_synthesis();
   - Id: 102202
     AegisName: Ep20_Fatty_Icegangu
     Name: Chubby Ice Gangu
@@ -129672,6 +129687,14 @@ Body:
     Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
     Script: |
       laphine_upgrade();
+  - Id: 102228
+    AegisName: EP20_DGA_Refine
+    Name: Dim Glaceon Armor Enhancer
+    Type: DelayConsume
+    Weight: 200
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      item_reform();
   - Id: 102562
     AegisName: Demi_Freyja_Antiquity
     Name: Antiquity Villa (Twisted God)
@@ -131498,6 +131521,23 @@ Body:
       bonus bMatkRate,10;
       bonus2 bMagicAddRace,RC_Fish,50;
       bonus2 bMagicAddRace,RC_Insect,50;
+  - Id: 300454
+    AegisName: Ice_C_Orb_Hp
+    Name: Glacier Flower Meow Power (Vital)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHP,2500;
+      if (.@r>=7) {
+         bonus bMaxHPrate,5;
+         if (.@r>=9) {
+            bonus bMaxHPrate,5;
+            if (getallrefine() >= 22) {
+               bonus bMaxHPrate,5;
+            }
+         }
+      }
   - Id: 310076
     AegisName: Cassock_Str
     Name: STR Blessing
@@ -140442,6 +140482,1278 @@ Body:
     SubType: Enchant
     Script: |
       bonus bVariableCastrate,-10;
+  - Id: 312050
+    AegisName: Ice_C_Orb_Str
+    Name: Glacier Flower Meow Power (STR)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bStr,5;
+      if (readparam(bStr)>=120) {
+         bonus bStr,5;
+      }
+  - Id: 312051
+    AegisName: Ice_C_Orb_Dex
+    Name: Glacier Flower Meow Power (DEX)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDex,5;
+      if (readparam(bDex)>=120) {
+         bonus bDex,5;
+      }
+  - Id: 312052
+    AegisName: Ice_C_Orb_Agi
+    Name: Glacier Flower Meow Power (AGI)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bAgi,5;
+      if (readparam(bAgi)>=120) {
+         bonus bAgi,5;
+      }
+  - Id: 312053
+    AegisName: Ice_C_Orb_Int
+    Name: Glacier Flower Meow Power (INT)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bInt,5;
+      if (readparam(bInt)>=120) {
+         bonus bInt,5;
+      }
+  - Id: 312054
+    AegisName: Ice_C_Orb_Vit
+    Name: Glacier Flower Meow Power (VIT)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bVit,5;
+      if (readparam(bVit)>=120) {
+         bonus bVit,5;
+      }
+  - Id: 312055
+    AegisName: Ice_C_Orb_Luk
+    Name: Glacier Flower Meow Power (LUK)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bLuk,5;
+      if (readparam(bLuk)>=120) {
+         bonus bLuk,5;
+      }
+  - Id: 312056
+    AegisName: Ice_C_Orb_Def
+    Name: Glacier Flower Meow Power (Physical Defense)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bDef,5;
+      bonus bNearAtkDef,9; bonus bLongAtkDef,9;
+      if (.@r>=7) {
+         bonus bDef,2;
+         bonus bNearAtkDef,3; bonus bLongAtkDef,3;
+         if (.@r>=9) {
+            bonus bDef,2;
+            bonus bNearAtkDef,3; bonus bLongAtkDef,3;
+         }
+      }
+  - Id: 312057
+    AegisName: Ice_C_Orb_Mdef
+    Name: Glacier Flower Meow Power (Magical Defense)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMdef,5;
+      bonus bMagicAtkDef,5;
+      if (.@r>=7) {
+         bonus bMdef,2;
+         bonus bMagicAtkDef,1;
+         if (.@r>=9) {
+            bonus bMdef,3;
+            bonus bMagicAtkDef,2;
+         }
+      }
+  - Id: 312058
+    AegisName: Ice_C_Orb_Pow_S
+    Name: Glacier Flower Meow Power (POW & STA)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bStr,3;
+      bonus bVit,3;
+      if (.@r>=9) {
+         bonus bStr,1;
+         bonus bVit,1;
+      }
+  - Id: 312059
+    AegisName: Ice_C_Orb_Spl_W
+    Name: Glacier Flower Meow Power (SPL & WIS)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bInt,3;
+      bonus bInt,3;
+      if (.@r>=9) {
+         bonus bInt,1;
+         bonus bInt,1;
+      }
+  - Id: 312060
+    AegisName: Ice_C_Orb_Con_C
+    Name: Glacier Flower Meow Power (CON & CRT)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bDex,3;
+      bonus bLuk,3;
+      if (.@r>=9) {
+         bonus bDex,1;
+         bonus bLuk,1;
+      }
+  - Id: 312061
+    AegisName: Ice_C_Orb_War
+    Name: Glacier Flower Meow Power (Warrior)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,50;
+      if (.@r>=7) {
+         bonus bShortAtkRate,5;
+         if (.@r>=9) {
+            bonus bShortAtkRate,7;
+         }
+      }
+  - Id: 312062
+    AegisName: Ice_C_Orb_Ran
+    Name: Glacier Flower Meow Power (Shooter)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,50;
+      if (.@r>=7) {
+         bonus bLongAtkRate,5;
+         if (.@r>=9) {
+            bonus bLongAtkRate,7;
+         }
+      }
+  - Id: 312063
+    AegisName: Ice_C_Orb_Mag
+    Name: Glacier Flower Meow Power (Mage)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMatk,50;
+      if (.@r>=7) {
+         bonus2 bMagicAtkEle,Ele_All,5;
+         if (.@r>=9) {
+            bonus2 bMagicAtkEle,Ele_All,7;
+         }
+      }
+  - Id: 312064
+    AegisName: Ice_C_Orb_War2
+    Name: Glacier Flower Meow Power (Berserker)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,5;
+      bonus bBaseAtk,75;
+      if (.@r>=7) {
+         bonus bShortAtkRate,5;
+         if (.@r>=9) {
+            bonus bShortAtkRate,5;
+         }
+      }
+  - Id: 312065
+    AegisName: Ice_C_Orb_Ran2
+    Name: Glacier Flower Meow Power (Marksman)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,5;
+      bonus bBaseAtk,75;
+      if (.@r>=7) {
+         bonus bLongAtkRate,5;
+         if (.@r>=9) {
+            bonus bLongAtkRate,5;
+         }
+      }
+  - Id: 312066
+    AegisName: Ice_C_Orb_Mag2
+    Name: Glacier Flower Meow Power (Grand Mage)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMatkRate,5;
+      bonus bMatk,75;
+      if (.@r>=7) {
+         bonus2 bMagicAtkEle,Ele_All,5;
+         if (.@r>=9) {
+            bonus2 bMagicAtkEle,Ele_All,5;
+         }
+      }
+  - Id: 312067
+    AegisName: Ice_C_Orb_Force
+    Name: Glacier Flower Meow Power (Power Force)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMatkRate,2;
+      bonus2 bAddClass,Class_All,2;
+      if (.@r>=7) {
+         bonus bMatkRate,3;
+         bonus2 bAddClass,Class_All,3;
+         if (.@r>=9) {
+            bonus bMatkRate,3;
+            bonus2 bAddClass,Class_All,3;
+            if (getallrefine() >= 22) {
+               bonus2 bAddClass,Class_All,3;
+               bonus2 bMagicAddClass,Class_All,3;
+            }
+         }
+      }
+  - Id: 312068
+    AegisName: Ice_C_Orb_S_Delay
+    Name: Glacier Flower Meow Power (Global Cooldown)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bDelayrate,-4;
+      if (.@r>=7) {
+         bonus bDelayrate,-4;
+         if (.@r>=9) {
+            bonus bDelayrate,-4;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-4;
+            }
+         }
+      }
+  - Id: 312069
+    AegisName: Ice_C_Orb_Speed
+    Name: Glacier Flower Meow Power (Fast)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bFlee,30;
+      if (.@r>=7) {
+         bonus bAspdRate,8;
+         if (.@r>=9) {
+            bonus bAspdRate,8;
+            if (getallrefine() >= 22) {
+               bonus bAspdRate,8;
+            }
+         }
+      }
+  - Id: 312070
+    AegisName: Ice_C_Orb_Caster
+    Name: Glacier Flower Meow Power (Caster)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bVariableCastrate,-8;
+      bonus bMatk,30;
+      if (.@r>=7) {
+         bonus bVariableCastrate,-8;
+         if (.@r>=9) {
+            bonus bVariableCastrate,-8;
+            if (getallrefine() >= 22) {
+               bonus bVariableCastrate,-8;
+            }
+         }
+      }
+  - Id: 312071
+    AegisName: Ice_C_Orb_Guide
+    Name: Glacier Flower Meow Power (Guide Attack)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bHit,30;
+      if (.@r>=7) {
+         bonus bPerfectHitAddRate,8;
+         if (.@r>=9) {
+            bonus bPerfectHitAddRate,8;
+            if (getallrefine() >= 22) {
+               bonus bPerfectHitAddRate,8;
+            }
+         }
+      }
+  - Id: 312072
+    AegisName: Ice_C_Orb_Above
+    Name: Glacier Flower Meow Power (Above All)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bSubSize,Size_All,3;
+      bonus2 bSubEle,Ele_All,3;
+      if (.@r>=7) {
+         bonus2 bSubEle,Ele_All,7;
+         if (.@r>=9) {
+            bonus2 bSubSize,Size_All,7;
+         }
+      }
+  - Id: 312073
+    AegisName: Ice_C_Orb_P_Full
+    Name: Glacier Flower Meow Power (Powerful)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bLongAtkRate,3;
+      bonus bShortAtkRate,3;
+      bonus2 bMagicAtkEle,Ele_All,3;
+      if (.@r>=7) {
+         bonus bLongAtkRate,3;
+         bonus bShortAtkRate,3;
+         bonus2 bMagicAtkEle,Ele_All,3;
+         if (.@r>=9) {
+            bonus bLongAtkRate,3;
+            bonus bShortAtkRate,3;
+            bonus2 bMagicAtkEle,Ele_All,3;
+         }
+      }
+  - Id: 312074
+    AegisName: Ice_C_Orb_Sp
+    Name: Glacier Flower Meow Power (Mental)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMaxSP,450;
+      if (.@r>=7) {
+         bonus bMaxSPrate,5;
+         if (.@r>=9) {
+            bonus bMaxSPrate,5;
+            if (getallrefine() >= 22) {
+               bonus bMaxSPrate,5;
+            }
+         }
+      }
+  - Id: 312075
+    AegisName: Ice_C_Orb_Robust
+    Name: Glacier Flower Meow Power (Robust)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMaxHPrate,2;
+      bonus bMaxSPrate,2;
+      if (.@r>=7) {
+         bonus bMaxHPrate,1;
+         bonus bMaxSPrate,1;
+         if (.@r>=9) {
+            bonus bMaxHPrate,1;
+            bonus bMaxSPrate,1;
+            if (getallrefine() >= 22) {
+               bonus bMaxHPrate,2;
+               bonus bMaxSPrate,2;
+            }
+         }
+      }
+  - Id: 312076
+    AegisName: Ice_C_Orb_F_Cast
+    Name: Glacier Flower Meow Power (Fixed Casting)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bFixedCast,-1000;
+  - Id: 312077
+    AegisName: Ice_C_Orb_P_F
+    Name: Glacier Flower Meow Power (Physical Force)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bAddSize,Size_All,5;
+      if (.@r>=7) {
+         bonus2 bAddSize,Size_All,3;
+         if (.@r>=9) {
+            bonus2 bAddSize,Size_All,2;
+            if (getallrefine() >= 22) {
+               bonus2 bAddSize,Size_All,2;
+            }
+         }
+      }
+  - Id: 312078
+    AegisName: Ice_C_Orb_M_F
+    Name: Glacier Flower Meow Power (Magical Force)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bMagicAddSize,Size_All,5;
+      if (.@r>=7) {
+         bonus2 bMagicAddSize,Size_All,3;
+         if (.@r>=9) {
+            bonus2 bMagicAddSize,Size_All,2;
+            if (getallrefine() >= 22) {
+               bonus2 bMagicAddSize,Size_All,2;
+            }
+         }
+      }
+  - Id: 312079
+    AegisName: Ice_C_Orb_Ov_Pow
+    Name: Glacier Flower Meow Power (Over Power)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMaxHPrate,-5;
+      bonus bMaxSPrate,-5;
+      autobonus "{ bonus bStr,50; bonus bStr,15; bonus bVit,15; }",30,10000,BF_WEAPON,"{ specialeffect2 EF_POTION_BERSERK; }";
+  - Id: 312080
+    AegisName: Ice_C_Orb_Bu_Spl
+    Name: Glacier Flower Meow Power (Spell Buster)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMaxHPrate,-5;
+      bonus bMaxSPrate,-5;
+      autobonus "{ bonus bInt,50; bonus bInt,15; bonus bInt,15; }",30,10000,BF_MAGIC,"{ specialeffect2 EF_POTION_BERSERK; }";
+  - Id: 312081
+    AegisName: Ice_C_Orb_Fi_Con
+    Name: Glacier Flower Meow Power (Firing Shot)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMaxHPrate,-5;
+      bonus bMaxSPrate,-5;
+      autobonus "{ bonus bDex,50; bonus bDex,15; bonus bLuk,15; }",30,10000,BF_WEAPON,"{ specialeffect2 EF_POTION_BERSERK; }";
+  - Id: 312082
+    AegisName: Ice_C_Orb_Spd
+    Name: Glacier Flower Meow Power (Speed)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bAspdRate,10;
+      bonus bVariableCastrate,-10;
+  - Id: 312083
+    AegisName: Ice_C_Orb_F_Spirit
+    Name: Glacier Flower Meow Power (Fighting Spirit)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bShortAtkRate,12;
+  - Id: 312084
+    AegisName: Ice_C_Orb_E_Archer
+    Name: Glacier Flower Meow Power (Expert Archer)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bLongAtkRate,12;
+  - Id: 312085
+    AegisName: Ice_C_Orb_Spell
+    Name: Glacier Flower Meow Power (Spell)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAtkEle,Ele_All,12;
+  - Id: 312086
+    AegisName: Ice_C_Orb_Fatal
+    Name: Glacier Flower Meow Power (Fatal)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bCritAtkRate,12;
+  - Id: 312087
+    AegisName: Ice_C_Orb_P_P
+    Name: Glacier Flower Meow Power (Physical Power)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddEle,Ele_All,4;
+      bonus2 bAddClass,Class_All,3;
+  - Id: 312088
+    AegisName: Ice_C_Orb_M_P
+    Name: Glacier Flower Meow Power (Magical Power)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAddEle,Ele_All,4;
+      bonus2 bMagicAddClass,Class_All,3;
+  - Id: 312089
+    AegisName: Ice_C_Orb_A_Force
+    Name: Glacier Flower Meow Power (All Force)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAtkEle,Ele_All,7;
+      bonus bLongAtkRate,7;
+      bonus bShortAtkRate,7;
+  - Id: 312090
+    AegisName: Ice_C_Orb_D
+    Name: Glacier Flower Meow Power (Defense)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMdef,4;
+      bonus bDef,2;
+      if (.@r>=7) {
+         bonus bMdef,2;
+         bonus bDef,1;
+         if (.@r>=9) {
+            bonus bMdef,1;
+            bonus bDef,1;
+         }
+      }
+  - Id: 312091
+    AegisName: Ice_C_Orb_A
+    Name: Glacier Flower Meow Power (Attack)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,3;
+      bonus bMatkRate,3;
+      if (.@r>=7) {
+         bonus bMatk,20;
+         bonus bBaseAtk,20;
+         if (.@r>=9) {
+            bonus bMatk,10;
+            bonus bBaseAtk,10;
+         }
+      }
+  - Id: 312092
+    AegisName: Ice_C_Orb_Res
+    Name: Glacier Flower Meow Power (Physical Resistance)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bNearAtkDef,5; bonus bLongAtkDef,5;
+      if (.@r>=7) {
+         bonus bNearAtkDef,3; bonus bLongAtkDef,3;
+         if (.@r>=9) {
+            bonus bNearAtkDef,2; bonus bLongAtkDef,2;
+         }
+      }
+  - Id: 312093
+    AegisName: Ice_C_Orb_Mres
+    Name: Glacier Flower Meow Power (Magical Resistance)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bMagicAtkDef,3;
+      if (.@r>=7) {
+         bonus bMagicAtkDef,2;
+         if (.@r>=9) {
+            bonus bMagicAtkDef,1;
+         }
+      }
+  - Id: 312094
+    AegisName: Ice_C_Orb_Guard
+    Name: Glacier Flower Meow Power (Guardian)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus bDef,2;
+      bonus bNearAtkDef,9; bonus bLongAtkDef,9;
+      if (.@r>=7) {
+         bonus2 bSubEle,Ele_All,5;
+         if (.@r>=9) {
+            bonus2 bSubSize,Size_All,5;
+         }
+      }
+  - Id: 312095
+    AegisName: Ice_C_Orb_Intel
+    Name: Glacier Flower Meow Power (Intelligence)
+    Type: Card
+    SubType: Enchant
+    Script: |
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,1;
+      bonus2 bMagicAddClass,Class_All,1;
+      if (.@r>=7) {
+         bonus2 bMagicAddEle,Ele_All,3;
+         bonus2 bAddEle,Ele_All,3;
+         if (.@r>=9) {
+            bonus2 bAddSize,Size_All,3;
+            bonus2 bMagicAddSize,Size_All,3;
+            if (getallrefine() >= 22) {
+               bonus2 bMagicAddRace,RC_All,3;
+               bonus2 bMagicAddRace,RC_Player_Human,-3;
+               bonus2 bMagicAddRace,RC_Player_Doram,-3;
+               bonus2 bAddRace,RC_All,3;
+               bonus2 bAddRace,RC_Player_Human,-3;
+               bonus2 bAddRace,RC_Player_Doram,-3;
+            }
+         }
+      }
+  - Id: 312096
+    AegisName: Snake_A_Def_1
+    Name: Warmth of the Snake God (Def) 1Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDef,1;
+  - Id: 312097
+    AegisName: Snake_A_Def_2
+    Name: Warmth of the Snake God (Def) 2Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDef,1;
+  - Id: 312098
+    AegisName: Snake_A_Def_3
+    Name: Warmth of the Snake God (Def) 3Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDef,1;
+  - Id: 312099
+    AegisName: Snake_A_Def_4
+    Name: Warmth of the Snake God (Def) 4Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDef,1;
+  - Id: 312100
+    AegisName: Snake_A_Def_5
+    Name: Warmth of the Snake God (Def) 5Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDef,1;
+  - Id: 312101
+    AegisName: Snake_A_Def_6
+    Name: Warmth of the Snake God (Def) 6Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDef,1;
+  - Id: 312102
+    AegisName: Snake_A_Def_7
+    Name: Warmth of the Snake God (Def) 7Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDef,1;
+  - Id: 312103
+    AegisName: Snake_A_Def_8
+    Name: Warmth of the Snake God (Def) 8Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDef,2;
+  - Id: 312104
+    AegisName: Snake_A_Def_9
+    Name: Warmth of the Snake God (Def) 9Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDef,2;
+  - Id: 312105
+    AegisName: Snake_A_Def_10
+    Name: Warmth of the Snake God (Def) 10Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDef,3;
+  - Id: 312106
+    AegisName: Snake_A_Atk_1
+    Name: Warmth of the Snake God (Atk) 1Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,1;
+  - Id: 312107
+    AegisName: Snake_A_Atk_2
+    Name: Warmth of the Snake God (Atk) 2Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,3;
+  - Id: 312108
+    AegisName: Snake_A_Atk_3
+    Name: Warmth of the Snake God (Atk) 3Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,6;
+  - Id: 312109
+    AegisName: Snake_A_Atk_4
+    Name: Warmth of the Snake God (Atk) 4Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,10;
+  - Id: 312110
+    AegisName: Snake_A_Atk_5
+    Name: Warmth of the Snake God (Atk) 5Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,15;
+  - Id: 312111
+    AegisName: Snake_A_Atk_6
+    Name: Warmth of the Snake God (Atk) 6Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,21;
+  - Id: 312112
+    AegisName: Snake_A_Atk_7
+    Name: Warmth of the Snake God (Atk) 7Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,28;
+  - Id: 312113
+    AegisName: Snake_A_Atk_8
+    Name: Warmth of the Snake God (Atk) 8Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,36;
+  - Id: 312114
+    AegisName: Snake_A_Atk_9
+    Name: Warmth of the Snake God (Atk) 9Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,45;
+  - Id: 312115
+    AegisName: Snake_A_Atk_10
+    Name: Warmth of the Snake God (Atk) 10Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,55;
+  - Id: 312116
+    AegisName: Snake_A_Matk_1
+    Name: Warmth of the Snake God (Matk) 1Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,1;
+  - Id: 312117
+    AegisName: Snake_A_Matk_2
+    Name: Warmth of the Snake God (Matk) 2Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,3;
+  - Id: 312118
+    AegisName: Snake_A_Matk_3
+    Name: Warmth of the Snake God (Matk) 3Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,6;
+  - Id: 312119
+    AegisName: Snake_A_Matk_4
+    Name: Warmth of the Snake God (Matk) 4Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,10;
+  - Id: 312120
+    AegisName: Snake_A_Matk_5
+    Name: Warmth of the Snake God (Matk) 5Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,15;
+  - Id: 312121
+    AegisName: Snake_A_Matk_6
+    Name: Warmth of the Snake God (Matk) 6Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,21;
+  - Id: 312122
+    AegisName: Snake_A_Matk_7
+    Name: Warmth of the Snake God (Matk) 7Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,28;
+  - Id: 312123
+    AegisName: Snake_A_Matk_8
+    Name: Warmth of the Snake God (Matk) 8Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,36;
+  - Id: 312124
+    AegisName: Snake_A_Matk_9
+    Name: Warmth of the Snake God (Matk) 9Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,45;
+  - Id: 312125
+    AegisName: Snake_A_Matk_10
+    Name: Warmth of the Snake God (Matk) 10Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,55;
+  - Id: 312126
+    AegisName: Snake_G_Blessing
+    Name: Blessing of the Snake God
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddSize,Size_All,10;
+      bonus2 bMagicAddSize,Size_All,10;
+  - Id: 312127
+    AegisName: Snake_H_Def_1
+    Name: Malice of the Snake God (Def) 1Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDef,1;
+  - Id: 312128
+    AegisName: Snake_H_Def_2
+    Name: Malice of the Snake God (Def) 2Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDef,1;
+  - Id: 312129
+    AegisName: Snake_H_Def_3
+    Name: Malice of the Snake God (Def) 3Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDef,1;
+  - Id: 312130
+    AegisName: Snake_H_Def_4
+    Name: Malice of the Snake God (Def) 4Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDef,1;
+  - Id: 312131
+    AegisName: Snake_H_Def_5
+    Name: Malice of the Snake God (Def) 5Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDef,1;
+  - Id: 312132
+    AegisName: Snake_H_Def_6
+    Name: Malice of the Snake God (Def) 6Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDef,1;
+  - Id: 312133
+    AegisName: Snake_H_Def_7
+    Name: Malice of the Snake God (Def) 7Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDef,1;
+  - Id: 312134
+    AegisName: Snake_H_Def_8
+    Name: Malice of the Snake God (Def) 8Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDef,2;
+  - Id: 312135
+    AegisName: Snake_H_Def_9
+    Name: Malice of the Snake God (Def) 9Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDef,2;
+  - Id: 312136
+    AegisName: Snake_H_Def_10
+    Name: Malice of the Snake God (Def) 10Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDef,3;
+  - Id: 312137
+    AegisName: Snake_H_Atk_1
+    Name: Malice of the Snake God (Atk) 1Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,1;
+  - Id: 312138
+    AegisName: Snake_H_Atk_2
+    Name: Malice of the Snake God (Atk) 2Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,3;
+  - Id: 312139
+    AegisName: Snake_H_Atk_3
+    Name: Malice of the Snake God (Atk) 3Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,6;
+  - Id: 312140
+    AegisName: Snake_H_Atk_4
+    Name: Malice of the Snake God (Atk) 4Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,10;
+  - Id: 312141
+    AegisName: Snake_H_Atk_5
+    Name: Malice of the Snake God (Atk) 5Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,15;
+  - Id: 312142
+    AegisName: Snake_H_Atk_6
+    Name: Malice of the Snake God (Atk) 6Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,21;
+  - Id: 312143
+    AegisName: Snake_H_Atk_7
+    Name: Malice of the Snake God (Atk) 7Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,28;
+  - Id: 312144
+    AegisName: Snake_H_Atk_8
+    Name: Malice of the Snake God (Atk) 8Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,36;
+  - Id: 312145
+    AegisName: Snake_H_Atk_9
+    Name: Malice of the Snake God (Atk) 9Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,45;
+  - Id: 312146
+    AegisName: Snake_H_Atk_10
+    Name: Malice of the Snake God (Atk) 10Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,55;
+  - Id: 312147
+    AegisName: Snake_H_Matk_1
+    Name: Malice of the Snake God (Matk) 1Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,1;
+  - Id: 312148
+    AegisName: Snake_H_Matk_2
+    Name: Malice of the Snake God (Matk) 2Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,3;
+  - Id: 312149
+    AegisName: Snake_H_Matk_3
+    Name: Malice of the Snake God (Matk) 3Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,6;
+  - Id: 312150
+    AegisName: Snake_H_Matk_4
+    Name: Malice of the Snake God (Matk) 4Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,10;
+  - Id: 312151
+    AegisName: Snake_H_Matk_5
+    Name: Malice of the Snake God (Matk) 5Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,15;
+  - Id: 312152
+    AegisName: Snake_H_Matk_6
+    Name: Malice of the Snake God (Matk) 6Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,21;
+  - Id: 312153
+    AegisName: Snake_H_Matk_7
+    Name: Malice of the Snake God (Matk) 7Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,28;
+  - Id: 312154
+    AegisName: Snake_H_Matk_8
+    Name: Malice of the Snake God (Matk) 8Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,36;
+  - Id: 312155
+    AegisName: Snake_H_Matk_9
+    Name: Malice of the Snake God (Matk) 9Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,45;
+  - Id: 312156
+    AegisName: Snake_H_Matk_10
+    Name: Malice of the Snake God (Matk) 10Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,55;
+  - Id: 312157
+    AegisName: Snake_G_Grace
+    Name: Grace of the Snake God
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAddEle,Ele_All,10;
+      bonus2 bAddEle,Ele_All,10;
+  - Id: 312158
+    AegisName: Snake_S_Def_1
+    Name: Mystery of the Snake God (Def) 1Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDef,1;
+  - Id: 312159
+    AegisName: Snake_S_Def_2
+    Name: Mystery of the Snake God (Def) 2Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDef,1;
+  - Id: 312160
+    AegisName: Snake_S_Def_3
+    Name: Mystery of the Snake God (Def) 3Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDef,1;
+  - Id: 312161
+    AegisName: Snake_S_Def_4
+    Name: Mystery of the Snake God (Def) 4Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDef,1;
+  - Id: 312162
+    AegisName: Snake_S_Def_5
+    Name: Mystery of the Snake God (Def) 5Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDef,1;
+  - Id: 312163
+    AegisName: Snake_S_Def_6
+    Name: Mystery of the Snake God (Def) 6Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDef,1;
+  - Id: 312164
+    AegisName: Snake_S_Def_7
+    Name: Mystery of the Snake God (Def) 7Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDef,1;
+  - Id: 312165
+    AegisName: Snake_S_Def_8
+    Name: Mystery of the Snake God (Def) 8Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDef,2;
+  - Id: 312166
+    AegisName: Snake_S_Def_9
+    Name: Mystery of the Snake God (Def) 9Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDef,2;
+  - Id: 312167
+    AegisName: Snake_S_Def_10
+    Name: Mystery of the Snake God (Def) 10Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDef,3;
+  - Id: 312168
+    AegisName: Snake_S_Atk_1
+    Name: Mystery of the Snake God (Atk) 1Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,1;
+  - Id: 312169
+    AegisName: Snake_S_Atk_2
+    Name: Mystery of the Snake God (Atk) 2Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,3;
+  - Id: 312170
+    AegisName: Snake_S_Atk_3
+    Name: Mystery of the Snake God (Atk) 3Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,6;
+  - Id: 312171
+    AegisName: Snake_S_Atk_4
+    Name: Mystery of the Snake God (Atk) 4Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,10;
+  - Id: 312172
+    AegisName: Snake_S_Atk_5
+    Name: Mystery of the Snake God (Atk) 5Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,15;
+  - Id: 312173
+    AegisName: Snake_S_Atk_6
+    Name: Mystery of the Snake God (Atk) 6Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,21;
+  - Id: 312174
+    AegisName: Snake_S_Atk_7
+    Name: Mystery of the Snake God (Atk) 7Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,28;
+  - Id: 312175
+    AegisName: Snake_S_Atk_8
+    Name: Mystery of the Snake God (Atk) 8Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,36;
+  - Id: 312176
+    AegisName: Snake_S_Atk_9
+    Name: Mystery of the Snake God (Atk) 9Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,45;
+  - Id: 312177
+    AegisName: Snake_S_Atk_10
+    Name: Mystery of the Snake God (Atk) 10Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,55;
+  - Id: 312178
+    AegisName: Snake_S_Matk_1
+    Name: Mystery of the Snake God (Matk) 1Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,1;
+  - Id: 312179
+    AegisName: Snake_S_Matk_2
+    Name: Mystery of the Snake God (Matk) 2Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,3;
+  - Id: 312180
+    AegisName: Snake_S_Matk_3
+    Name: Mystery of the Snake God (Matk) 3Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,6;
+  - Id: 312181
+    AegisName: Snake_S_Matk_4
+    Name: Mystery of the Snake God (Matk) 4Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,10;
+  - Id: 312182
+    AegisName: Snake_S_Matk_5
+    Name: Mystery of the Snake God (Matk) 5Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,15;
+  - Id: 312183
+    AegisName: Snake_S_Matk_6
+    Name: Mystery of the Snake God (Matk) 6Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,21;
+  - Id: 312184
+    AegisName: Snake_S_Matk_7
+    Name: Mystery of the Snake God (Matk) 7Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,28;
+  - Id: 312185
+    AegisName: Snake_S_Matk_8
+    Name: Mystery of the Snake God (Matk) 8Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,36;
+  - Id: 312186
+    AegisName: Snake_S_Matk_9
+    Name: Mystery of the Snake God (Matk) 9Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,45;
+  - Id: 312187
+    AegisName: Snake_S_Matk_10
+    Name: Mystery of the Snake God (Matk) 10Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,55;
+  - Id: 312188
+    AegisName: Snake_G_Glory
+    Name: Glory of the Snake God
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAddRace,RC_All,10;
+      bonus2 bMagicAddRace,RC_Player_Human,-10;
+      bonus2 bMagicAddRace,RC_Player_Doram,-10;
+      bonus2 bAddRace,RC_All,10;
+      bonus2 bAddRace,RC_Player_Human,-10;
+      bonus2 bAddRace,RC_Player_Doram,-10;
   - Id: 313024
     AegisName: Star_Cluster_Of_Str1
     Name: Star Cluster of Strength 1Lv
@@ -147817,6 +149129,67 @@ Body:
             }
          }
       }
+  - Id: 450270
+    AegisName: D_Glacier_Armor
+    Name: "Dim Glacier Armor [1]"
+    Type: Armor
+    Buy: 157000
+    Sell: 31400
+    Weight: 2400
+    Defense: 14
+    Slots: 1
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 230
+    Refineable: true
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      .@r = getrefine();
+      bonus bBaseAtk,140;
+      bonus bStr,(.@r/2);
+      bonus bDex,(.@r/2);
+      if (.@r>=7) {
+         bonus2 bAddClass,Class_All,2;
+         bonus2 bAddClass,Class_All,3;
+         if (.@r>=9) {
+            bonus bDelayrate,-5;
+            bonus bVariableCastrate,-5;
+            if (getallrefine() >= 22) {
+               bonus bLongAtkRate,10;
+               bonus bShortAtkRate,10;
+            }
+         }
+      }
+  - Id: 450271
+    AegisName: D_Glacier_Robe
+    Name: "Dim Glacier Robe [1]"
+    Type: Armor
+    Buy: 157000
+    Sell: 31400
+    Weight: 1200
+    Defense: 14
+    Slots: 1
+    Locations: {Armor: true}
+    ArmorLevel: 1
+    EquipLevelMin: 230
+    Refineable: true
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      .@r = getrefine();
+      bonus bMatk,140;
+      bonus bInt,(.@r/2);
+      bonus bDex,(.@r/2);
+      if (.@r>=7) {
+         bonus2 bMagicAddClass,Class_All,2;
+         bonus bMatkRate,3;
+         if (.@r>=9) {
+            bonus bDelayrate,-5;
+            bonus bVariableCastrate,-5;
+            if (getallrefine() >= 22) {
+               bonus2 bMagicAtkEle,Ele_All,10;
+            }
+         }
+      }
   - Id: 460005
     AegisName: MD_Geffen_Shield
     Name: "Magic Absorber [1]"
@@ -148362,6 +149735,63 @@ Body:
             if (.@r>=10) {
                bonus bAspdRate,7;
                bonus bDef,2;
+            }
+         }
+      }
+  - Id: 470197
+    AegisName: D_Glacier_Boots
+    Name: "Dim Glacier Boots [1]"
+    Type: Armor
+    Buy: 49000
+    Sell: 12250
+    Weight: 2000
+    Defense: 7
+    Slots: 1
+    Locations: {Shoes: true}
+    ArmorLevel: 1
+    EquipLevelMin: 230
+    Refineable: true
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      .@r = getrefine();
+      bonus bStr,2;
+      bonus bDex,2;
+      if (.@r>=7) {
+         bonus2 bAddClass,Class_All,2;
+         bonus2 bAddClass,Class_All,5;
+         if (.@r>=9) {
+            bonus bVariableCastrate,-10;
+            if (getallrefine() >= 22) {
+               bonus bLongAtkRate,10;
+               bonus bShortAtkRate,10;
+            }
+         }
+      }
+  - Id: 470198
+    AegisName: D_Glacier_Shoes
+    Name: "Dim Glacier Shoes [1]"
+    Type: Armor
+    Buy: 49000
+    Sell: 12250
+    Weight: 1000
+    Defense: 7
+    Slots: 1
+    Locations: {Shoes: true}
+    ArmorLevel: 1
+    EquipLevelMin: 230
+    Refineable: true
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      .@r = getrefine();
+      bonus bInt,2;
+      bonus bDex,2;
+      if (.@r>=7) {
+         bonus2 bMagicAddClass,Class_All,2;
+         bonus bMatkRate,5;
+         if (.@r>=9) {
+            bonus bVariableCastrate,-10;
+            if (getallrefine() >= 22) {
+               bonus2 bMagicAtkEle,Ele_All,10;
             }
          }
       }
@@ -149095,6 +150525,61 @@ Body:
     Type: Armor
     Locations: {Costume_Garment: true}
     View: 162
+  - Id: 480283
+    AegisName: D_Glacier_Manteau
+    Name: "Dim Glacier Manteau [1]"
+    Type: Armor
+    Buy: 62000
+    Sell: 15500
+    Weight: 1600
+    Defense: 7
+    Slots: 1
+    Locations: {Garment: true}
+    ArmorLevel: 1
+    EquipLevelMin: 230
+    Refineable: true
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      .@r = getrefine();
+      bonus bStr,1;
+      bonus bDex,1;
+      if (.@r>=7) {
+         bonus bVariableCastrate,-10;
+         if (.@r>=9) {
+            bonus bLongAtkRate,10;
+            bonus bShortAtkRate,10;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-10;
+            }
+         }
+      }
+  - Id: 480284
+    AegisName: D_Glacier_Muffler
+    Name: "Dim Glacier Muffler [1]"
+    Type: Armor
+    Buy: 62000
+    Sell: 15500
+    Weight: 800
+    Defense: 7
+    Slots: 1
+    Locations: {Garment: true}
+    ArmorLevel: 1
+    EquipLevelMin: 230
+    Refineable: true
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      .@r = getrefine();
+      bonus bInt,1;
+      bonus bDex,1;
+      if (.@r>=7) {
+         bonus bVariableCastrate,-10;
+         if (.@r>=9) {
+            bonus2 bMagicAtkEle,Ele_All,10;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-10;
+            }
+         }
+      }
   - Id: 480286
     AegisName: C_Serpent_Shadow
     Name: Costume Serpentine Vision
@@ -151158,6 +152643,44 @@ Body:
             }
          }
       }
+  - Id: 500054
+    AegisName: D_Glacier_Sword
+    Name: "Dim Glacier Sword [1]"
+    Type: Weapon
+    SubType: 1hSword
+    Buy: 10350000
+    Sell: 103500
+    Weight: 1600
+    Attack: 220
+    Range: 1
+    Slots: 1
+    Jobs: {Alchemist: true, Blacksmith: true, Crusader: true, Knight: true, Merchant: true, Swordman: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bMatk,210;
+  - Id: 500055
+    AegisName: D_Glacier_B_Sword
+    Name: "Dim Glacier Basic Sword [1]"
+    Type: Weapon
+    SubType: 1hSword
+    Buy: 10350000
+    Sell: 103500
+    Weight: 1400
+    Attack: 220
+    Range: 1
+    Slots: 1
+    Jobs: {Novice: true, SuperNovice: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bMatk,210;
   - Id: 510008
     AegisName: Ep172_1h_Dagger
     Name: Wrath Rack
@@ -151600,6 +153123,44 @@ Body:
             }
          }
       }
+  - Id: 510075
+    AegisName: D_Glacier_R_Knife
+    Name: "Dim Glacier Rogue Knife [1]"
+    Type: Weapon
+    SubType: Dagger
+    Buy: 10250000
+    Sell: 102500
+    Weight: 1400
+    Attack: 210
+    Range: 1
+    Slots: 1
+    Jobs: {Rogue: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bMatk,210;
+  - Id: 510076
+    AegisName: D_Glacier_B_Knife
+    Name: "Dim Glacier Basic Knife [1]"
+    Type: Weapon
+    SubType: Dagger
+    Buy: 10250000
+    Sell: 102500
+    Weight: 1200
+    Attack: 210
+    Range: 1
+    Slots: 1
+    Jobs: {Novice: true, SuperNovice: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bMatk,210;
   - Id: 520002
     AegisName: Ep172_1h_Axe
     Name: Pride Steel
@@ -151716,6 +153277,26 @@ Body:
     WeaponLevel: 4
     EquipLevelMin: 210
     Refineable: true
+    Script: |
+      bonus bMatk,210;
+      bonus bUnbreakableWeapon;
+  - Id: 520021
+    AegisName: D_Glacier_Axe
+    Name: "Dim Glacier Axe [1]"
+    Type: Weapon
+    SubType: 1hAxe
+    Buy: 10550000
+    Sell: 105500
+    Weight: 5000
+    Attack: 240
+    Range: 1
+    Slots: 1
+    Jobs: {Alchemist: true, Blacksmith: true, Crusader: true, Knight: true, Merchant: true, Swordman: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Flags: {DropEffect: CLIENT}
     Script: |
       bonus bMatk,210;
       bonus bUnbreakableWeapon;
@@ -152002,6 +153583,25 @@ Body:
             }
          }
       }
+  - Id: 530034
+    AegisName: D_Glacier_Spear
+    Name: "Dim Glacier Spear [1]"
+    Type: Weapon
+    SubType: 1hSpear
+    Buy: 10350000
+    Sell: 103500
+    Weight: 2100
+    Attack: 220
+    Range: 3
+    Slots: 1
+    Jobs: {Crusader: true, Knight: true, Swordman: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bMatk,210;
   - Id: 540004
     AegisName: Ep172_1h_Book
     Name: Sloth Text
@@ -152653,6 +154253,26 @@ Body:
             }
          }
       }
+  - Id: 540056
+    AegisName: D_Glacier_Book
+    Name: "Dim Glacier Book [1]"
+    Type: Weapon
+    SubType: Book
+    Buy: 10250000
+    Sell: 102500
+    Weight: 1200
+    Attack: 210
+    Range: 1
+    Slots: 1
+    Jobs: {Priest: true, Sage: true, StarGladiator: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bMatk,210;
+      bonus bUnbreakableWeapon;
   - Id: 550008
     AegisName: Ep172_1h_Wand
     Name: Greed Wand
@@ -153249,6 +154869,26 @@ Body:
             }
          }
       }
+  - Id: 550089
+    AegisName: D_Glacier_Wand
+    Name: "Dim Glacier Wand [1]"
+    Type: Weapon
+    SubType: Staff
+    Buy: 9650000
+    Sell: 96500
+    Weight: 1300
+    Attack: 150
+    Range: 1
+    Slots: 1
+    Jobs: {Novice: true, Mage: true, Acolyte: true, Priest: true, Wizard: true, Monk: true, Sage: true, SuperNovice: true, SoulLinker: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bMatk,230;
+      bonus bUnbreakableWeapon;
   - Id: 560004
     AegisName: Ep172_Bh_Knuck
     Name: Ira Fist
@@ -153619,6 +155259,25 @@ Body:
             }
          }
       }
+  - Id: 560037
+    AegisName: D_Glacier_Knuckle
+    Name: "Dim Glacier Knuckle [1]"
+    Type: Weapon
+    SubType: Knuckle
+    Buy: 10550000
+    Sell: 105500
+    Weight: 1500
+    Attack: 240
+    Range: 1
+    Slots: 1
+    Jobs: {Monk: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bMatk,220;
   - Id: 570005
     AegisName: Ep172_1h_Inst
     Name: Pigritia Wave
@@ -153965,6 +155624,26 @@ Body:
     Refineable: true
     Script: |
       bonus bMatk,210;
+  - Id: 570032
+    AegisName: D_Glacier_Violin
+    Name: "Dim Glacier Violin [1]"
+    Type: Weapon
+    SubType: Musical
+    Buy: 10250000
+    Sell: 102500
+    Weight: 1500
+    Attack: 210
+    Range: 1
+    Slots: 1
+    Jobs: {BardDancer: true}
+    Gender: Male
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bMatk,210;
   - Id: 580005
     AegisName: Ep172_1h_Whip
     Name: Pigritia Spark
@@ -154309,6 +155988,26 @@ Body:
     WeaponLevel: 4
     EquipLevelMin: 210
     Refineable: true
+    Script: |
+      bonus bMatk,210;
+  - Id: 580033
+    AegisName: D_Glacier_Whip
+    Name: "Dim Glacier Whip [1]"
+    Type: Weapon
+    SubType: Whip
+    Buy: 10250000
+    Sell: 102500
+    Weight: 1500
+    Attack: 210
+    Range: 2
+    Slots: 1
+    Jobs: {BardDancer: true}
+    Gender: Female
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Flags: {DropEffect: CLIENT}
     Script: |
       bonus bMatk,210;
   - Id: 590006
@@ -154753,6 +156452,46 @@ Body:
             }
          }
       }
+  - Id: 590047
+    AegisName: D_Glacier_Mace
+    Name: "Dim Glacier Mace [1]"
+    Type: Weapon
+    SubType: Mace
+    Buy: 10250000
+    Sell: 102500
+    Weight: 1800
+    Attack: 210
+    Range: 1
+    Slots: 1
+    Jobs: {Acolyte: true, Alchemist: true, Blacksmith: true, Crusader: true, Knight: true, Merchant: true, Monk: true, Priest: true, Swordman: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bMatk,210;
+      bonus bUnbreakableWeapon;
+  - Id: 590048
+    AegisName: D_Glacier_M_Mace
+    Name: "Dim Glacier Mechanic Mace [1]"
+    Type: Weapon
+    SubType: Mace
+    Buy: 12150000
+    Sell: 121500
+    Weight: 4000
+    Attack: 400
+    Range: 1
+    Slots: 1
+    Jobs: {Blacksmith: true}
+    Locations: {Right_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bMatk,160;
+      bonus bUnbreakableWeapon;
   - Id: 600008
     AegisName: Ep172_Bh_Sword
     Name: Hypocrisy Edge
@@ -155041,6 +156780,25 @@ Body:
             }
          }
       }
+  - Id: 600030
+    AegisName: D_Glacier_T_Sword
+    Name: "Dim Glacier Two-handed Sword [1]"
+    Type: Weapon
+    SubType: 2hSword
+    Buy: 11150000
+    Sell: 111500
+    Weight: 4000
+    Attack: 300
+    Range: 1
+    Slots: 1
+    Jobs: {Knight: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bMatk,270;
   - Id: 610006
     AegisName: Ep172_Bh_Katar
     Name: Avaritia Metal
@@ -155406,6 +157164,25 @@ Body:
             }
          }
       }
+  - Id: 610041
+    AegisName: D_Glacier_Katar
+    Name: "Dim Glacier Katar [1]"
+    Type: Weapon
+    SubType: Katar
+    Buy: 10550000
+    Sell: 105500
+    Weight: 1200
+    Attack: 240
+    Range: 1
+    Slots: 1
+    Jobs: {Assassin: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bMatk,220;
   - Id: 620005
     AegisName: Fourth_Bh_Axe
     Name: "Relapse Axe [2]"
@@ -155603,6 +157380,26 @@ Body:
             }
          }
       }
+  - Id: 620019
+    AegisName: D_Glacier_T_Axe
+    Name: "Dim Glacier Mechanic Axe [1]"
+    Type: Weapon
+    SubType: 2hAxe
+    Buy: 11650000
+    Sell: 116500
+    Weight: 7000
+    Attack: 350
+    Range: 1
+    Slots: 1
+    Jobs: {Blacksmith: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bMatk,180;
+      bonus bUnbreakableWeapon;
   - Id: 630003
     AegisName: Ep172_Bh_Spear
     Name: Luxuria Pierce
@@ -155817,6 +157614,25 @@ Body:
     WeaponLevel: 4
     EquipLevelMin: 210
     Refineable: true
+    Script: |
+      bonus bMatk,270;
+  - Id: 630019
+    AegisName: D_Glacier_Lance
+    Name: "Dim Glacier Lance [1]"
+    Type: Weapon
+    SubType: 2hSpear
+    Buy: 11150000
+    Sell: 111500
+    Weight: 4500
+    Attack: 300
+    Range: 3
+    Slots: 1
+    Jobs: {Knight: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Flags: {DropEffect: CLIENT}
     Script: |
       bonus bMatk,270;
   - Id: 640005
@@ -156186,6 +158002,26 @@ Body:
     Script: |
       bonus bMatk,290;
       bonus bUnbreakableWeapon;
+  - Id: 640034
+    AegisName: D_Glacier_Staff
+    Name: "Dim Glacier Staff [1]"
+    Type: Weapon
+    SubType: 2hStaff
+    Buy: 9650000
+    Sell: 96500
+    Weight: 2400
+    Attack: 150
+    Range: 1
+    Slots: 1
+    Jobs: {Acolyte: true, Mage: true, Monk: true, Priest: true, Sage: true, SoulLinker: true, Wizard: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bMatk,290;
+      bonus bUnbreakableWeapon;
   - Id: 650003
     AegisName: Ep172_Bh_Huuma
     Name: Wrath Wheel
@@ -156407,6 +158243,26 @@ Body:
     WeaponLevel: 4
     EquipLevelMin: 210
     Refineable: true
+    Script: |
+      bonus bMatk,370;
+      bonus bUnbreakableWeapon;
+  - Id: 650028
+    AegisName: D_Glacier_Humma
+    Name: "Dim Glacier Huuma Shuriken [1]"
+    Type: Weapon
+    SubType: Huuma
+    Buy: 12150000
+    Sell: 121500
+    Weight: 3000
+    Attack: 400
+    Range: 1
+    Slots: 1
+    Jobs: {Ninja: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Flags: {DropEffect: CLIENT}
     Script: |
       bonus bMatk,370;
       bonus bUnbreakableWeapon;
@@ -157038,6 +158894,25 @@ Body:
             }
          }
       }
+  - Id: 700059
+    AegisName: D_Glacier_Bow
+    Name: "Dim Glacier Bow [1]"
+    Type: Weapon
+    SubType: Bow
+    Buy: 10550000
+    Sell: 105500
+    Weight: 1500
+    Attack: 240
+    Range: 5
+    Slots: 1
+    Jobs: {Archer: true, BardDancer: true, Hunter: true, Rogue: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bMatk,220;
   - Id: 800003
     AegisName: Adulter_F_Revolver
     Name: "Adulter Fides Revolver [2]"
@@ -157159,6 +159034,25 @@ Body:
     WeaponLevel: 4
     EquipLevelMin: 210
     Refineable: true
+    Script: |
+      bonus bMatk,230;
+  - Id: 800015
+    AegisName: D_Glacier_Revolver
+    Name: "Dim Glacier Pistol [1]"
+    Type: Weapon
+    SubType: Revolver
+    Buy: 10450000
+    Sell: 104500
+    Weight: 2200
+    Attack: 230
+    Range: 7
+    Slots: 1
+    Jobs: {Gunslinger: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Flags: {DropEffect: CLIENT}
     Script: |
       bonus bMatk,230;
   - Id: 810000
@@ -157327,6 +159221,25 @@ Body:
             }
          }
       }
+  - Id: 810015
+    AegisName: D_Glacier_Rifle
+    Name: "Dim Glacier Rifle [1]"
+    Type: Weapon
+    SubType: Rifle
+    Buy: 10950000
+    Sell: 109500
+    Weight: 2600
+    Attack: 280
+    Range: 9
+    Slots: 1
+    Jobs: {Gunslinger: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bMatk,230;
   - Id: 820000
     AegisName: Ep172_1h_Shotgun
     Name: Lust Shatter
@@ -157468,6 +159381,26 @@ Body:
     Script: |
       bonus bMatk,200;
       bonus bSplashRange,1;
+  - Id: 820011
+    AegisName: D_Glacier_Shotgun
+    Name: "Dim Glacier Shotgun [1]"
+    Type: Weapon
+    SubType: Shotgun
+    Buy: 11150000
+    Sell: 111500
+    Weight: 2600
+    Attack: 300
+    Range: 9
+    Slots: 1
+    Jobs: {Gunslinger: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bMatk,200;
+      bonus bSplashRange,1;
   - Id: 830001
     AegisName: Ep172_1h_Gatling
     Name: Lust Crusher
@@ -157604,6 +159537,25 @@ Body:
     Refineable: true
     Script: |
       bonus bMatk,200;
+  - Id: 830015
+    AegisName: D_Glacier_Gatling
+    Name: "Dim Glacier Gatling Gun [1]"
+    Type: Weapon
+    SubType: Gatling
+    Buy: 11650000
+    Sell: 116500
+    Weight: 3500
+    Attack: 350
+    Range: 9
+    Slots: 1
+    Jobs: {Gunslinger: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Flags: {DropEffect: CLIENT}
+    Script: |
+      bonus bMatk,200;
   - Id: 840000
     AegisName: Ep172_1h_Grenade
     Name: Lust Boom
@@ -157738,6 +159690,25 @@ Body:
     WeaponLevel: 4
     EquipLevelMin: 210
     Refineable: true
+    Script: |
+      bonus bMatk,200;
+  - Id: 840010
+    AegisName: D_Glacier_Launcher
+    Name: "Dim Glacier Grenade Launcher [1]"
+    Type: Weapon
+    SubType: Grenade
+    Buy: 11150000
+    Sell: 111500
+    Weight: 3000
+    Attack: 300
+    Range: 9
+    Slots: 1
+    Jobs: {Gunslinger: true}
+    Locations: {Both_Hand: true}
+    WeaponLevel: 4
+    EquipLevelMin: 230
+    Refineable: true
+    Flags: {DropEffect: CLIENT}
     Script: |
       bonus bMatk,200;
   - Id: 1000092
@@ -159152,6 +161123,31 @@ Body:
     AegisName: EP19_N_P_Crystal
     Name: Neutralized Magical Crystal
     Weight: 50
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1001033
+    AegisName: EP19_D_P_Stone
+    Name: Miasmal Spell
+    Weight: 50
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1001034
+    AegisName: EP19_S_F_1_Extract
+    Name: Snow Flower Magic Stone Extract
+    Weight: 30
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1001035
+    AegisName: EP19_S_F_2_Extract
+    Name: Shining Snow Flower Magic Stone Extract
+    Weight: 30
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1001036
+    AegisName: EP19_S_F_3_Extract
+    Name: Brilliant Snow Flower Magic Stone Extract
+    Weight: 30
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1001037
+    AegisName: EP19_Gla_Extract
+    Name: Glacier Extract
+    Weight: 30
     Flags: {BuyingStore: true, DropEffect: CLIENT}
   - Id: 1001072
     AegisName: Evil_Black_Bid

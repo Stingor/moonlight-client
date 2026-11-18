@@ -158,6 +158,8 @@ Body:
   - Map: "1@slug"
     Monster: MD_EP20_FALLENANGEL
     Drops:
+      - {Item: EP19_S_F_1_Extract, Rate: 10000}
+      - {Item: EP19_Gla_Extract, Rate: 10000}
       - {Item: EP20_D_P_Crystal, Rate: 10000}
       - {Item: EP19_N_P_Ore, Rate: 50000}
       - {Item: EP19_D_P_Crystal, Rate: 50000}
@@ -172,6 +174,8 @@ Body:
   - Map: "1@twbs"
     Monster: EP20_MD_BOX1
     Drops:
+      - {Item: EP19_S_F_1_Extract, Rate: 10000}
+      - {Item: EP19_Gla_Extract, Rate: 10000}
       - {Item: EP20_D_P_Crystal, Rate: 10000}
       - {Item: EP19_N_P_Ore, Rate: 50000}
       - {Item: EP19_D_P_Crystal, Rate: 50000}
@@ -183,9 +187,17 @@ Body:
       - {Item: EP20_D_P_Ore, Rate: 90000}
       - {Item: EP20_D_P_Ore, Rate: 90000}
       - {Item: C_Serpent_Shadow, Rate: 10}
+      - {Item: D_Glacier_Armor, Rate: 1000}
+      - {Item: D_Glacier_Boots, Rate: 1000}
+      - {Item: D_Glacier_Manteau, Rate: 1000}
+      - {Item: D_Glacier_Robe, Rate: 1000}
+      - {Item: D_Glacier_Shoes, Rate: 1000}
+      - {Item: D_Glacier_Muffler, Rate: 1000}
   - Map: "1@twbs"
     Monster: EP20_MD_BOX2
     Drops:
+      - {Item: EP19_S_F_1_Extract, Rate: 10000}
+      - {Item: EP19_Gla_Extract, Rate: 10000}
       - {Item: EP20_D_P_Crystal, Rate: 10000}
       - {Item: EP19_N_P_Ore, Rate: 50000}
       - {Item: EP19_D_P_Crystal, Rate: 50000}
@@ -197,9 +209,17 @@ Body:
       - {Item: EP20_D_P_Ore, Rate: 90000}
       - {Item: EP20_D_P_Ore, Rate: 90000}
       - {Item: C_Serpent_Shadow, Rate: 10}
+      - {Item: D_Glacier_Armor, Rate: 1000}
+      - {Item: D_Glacier_Boots, Rate: 1000}
+      - {Item: D_Glacier_Manteau, Rate: 1000}
+      - {Item: D_Glacier_Robe, Rate: 1000}
+      - {Item: D_Glacier_Shoes, Rate: 1000}
+      - {Item: D_Glacier_Muffler, Rate: 1000}
   - Map: "1@twbs"
     Monster: MD_EP20_BOSS_LASGAND
     Drops:
+      - {Item: EP19_S_F_1_Extract, Rate: 10000}
+      - {Item: EP19_Gla_Extract, Rate: 10000}
       - {Item: EP20_D_P_Crystal, Rate: 10000}
       - {Item: EP19_N_P_Ore, Rate: 50000}
       - {Item: EP19_D_P_Crystal, Rate: 50000}

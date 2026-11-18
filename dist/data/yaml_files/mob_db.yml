@@ -87851,6 +87851,8 @@ Body:
       - {Item: EP19_Unknown_Cell, Rate: 1315}
       - {Item: Ep20_Fluor_Cell_Sour, Rate: 2301}
       - {Item: Ep20_Fluor_Cell_Sweet, Rate: 328}
+      - {Item: D_Glacier_M_Mace, Rate: 100}
+      - {Item: D_Glacier_Knuckle, Rate: 100}
   - Id: 21971
     AegisName: EP20_ICEBEAR
     Name: Bear
@@ -87917,6 +87919,7 @@ Body:
       - {Item: Shadowdecon_Ore, Rate: 693}
       - {Item: Ep20_Mystic_Spl_Colt, Rate: 2081}
       - {Item: Light_Granule, Rate: 693}
+      - {Item: D_Glacier_Wand, Rate: 100}
   - Id: 21973
     AegisName: EP20_JORMUNGUARD2
     Name: Jormungand Guardian-Y
@@ -88378,6 +88381,7 @@ Body:
       - {Item: Ep20_Coral_Bangle, Rate: 1440}
       - {Item: Ep20_Rgan_Core_F, Rate: 240}
       - {Item: Etel_Dust, Rate: 100}
+      - {Item: D_Glacier_B_Knife, Rate: 100}
   - Id: 21987
     AegisName: EP20_JORGAN_WARLOCK
     Name: Jormungand Church Shaman
@@ -88413,6 +88417,7 @@ Body:
       - {Item: Snow_F_Ore, Rate: 177}
       - {Item: Shadowdecon, Rate: 50}
       - {Item: Snow_F_Stone1, Rate: 177}
+      - {Item: D_Glacier_Whip, Rate: 100}
   - Id: 21988
     AegisName: EP20_JORGAN_HEALER
     Name: Jormungand Church Bishop
@@ -88446,6 +88451,7 @@ Body:
       - {Item: Ep20_Seaweed_Belt, Rate: 1418}
       - {Item: EP19_Unknown_Cell, Rate: 283}
       - {Item: Zelunium_Ore, Rate: 60}
+      - {Item: D_Glacier_Spear, Rate: 100}
   - Id: 21989
     AegisName: EP20_JORGAN_GUARDIAN
     Name: Guardian of Shrine
@@ -88481,6 +88487,7 @@ Body:
       - {Item: Ep20_Rgan_Core_F, Rate: 1100}
       - {Item: Etel_Dust, Rate: 83}
       - {Item: Snow_F_Ore, Rate: 27}
+      - {Item: D_Glacier_Axe, Rate: 100}
   - Id: 21990
     AegisName: EP20_JORGAN_CLEANER
     Name: Jormungand Sanctuary
@@ -88514,6 +88521,7 @@ Body:
       - {Item: EP19_Unknown_Cell, Rate: 910}
       - {Item: Ep20_Fluor_Cell_Salty, Rate: 1040}
       - {Item: Shadowdecon_Ore, Rate: 260}
+      - {Item: D_Glacier_Katar, Rate: 100}
   - Id: 21991
     AegisName: MD_EP20_JOR_G_P
     Name: Jormungand Guardian
