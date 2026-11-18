@@ -60349,6 +60349,14 @@ Body:
     AegisName: Copo_Egg
     Name: Copo Egg
     Type: PetEgg
+  - Id: 9146
+    AegisName: Grey_Icewind_Egg
+    Name: Gray Icewind Egg
+    Type: PetEgg
+  - Id: 9147
+    AegisName: Icewind_Egg
+    Name: Icewind Egg
+    Type: PetEgg
   - Id: 9514
     AegisName: Ein_Ddbox
     Name: Physical Modification Permit
