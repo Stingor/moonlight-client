@@ -86645,6 +86645,7 @@ Body:
       - {Item: Fluorescent_Liquid, Rate: 5000}
       - {Item: EP19_Transparency_Shell, Rate: 2500}
       - {Item: Ice_Piece, Rate: 1500}
+      - {Item: Limacina_Card, Rate: 1, StealProtected: true}
   - Id: 21521
     AegisName: EP19_UNFROST_FLOWER
     Name: Unfrost Flower
@@ -86678,6 +86679,7 @@ Body:
       - {Item: Scales_Shell, Rate: 5000}
       - {Item: EP19_Bell_Flower, Rate: 2700}
       - {Item: Round_Shell, Rate: 2500}
+      - {Item: Unfrost_Flower_card, Rate: 1, StealProtected: true}
   - Id: 21522
     AegisName: EP19_CALMARING
     Name: Calmaring
@@ -86710,6 +86712,7 @@ Body:
       - {Item: Germinating_Sprout, Rate: 4000}
       - {Item: EP19_Calapy, Rate: 2700}
       - {Item: Sticky_Poison, Rate: 5000}
+      - {Item: Calmaring_Card, Rate: 1, StealProtected: true}
   - Id: 21523
     AegisName: EP19_ICE_STRAW
     Name: Ice Straw
@@ -86741,6 +86744,7 @@ Body:
       - {Item: Ice_Heart, Rate: 4000}
       - {Item: Ice_Piece, Rate: 4000}
       - {Item: EP19_Thin_Shell, Rate: 2700}
+      - {Item: Ice_Straw_Card, Rate: 1, StealProtected: true}
   - Id: 21524
     AegisName: EP19_SHINING_SEAWEED
     Name: Shining Seaweed
@@ -86773,6 +86777,7 @@ Body:
       - {Item: Coral_Reef, Rate: 5000}
       - {Item: EP19_Shiny_Seaweed, Rate: 2500}
       - {Item: Stone_Piece, Rate: 4000}
+      - {Item: Shining_Seaweed_Card, Rate: 1, StealProtected: true}
   - Id: 21525
     AegisName: EP19_ICE_GANGU
     Name: Ice Gangu
@@ -86805,6 +86810,7 @@ Body:
       - {Item: Insect_Feeler, Rate: 7000}
       - {Item: Round_Shell, Rate: 4000}
       - {Item: EP19_Frozen_Shell, Rate: 2500}
+      - {Item: Ice_Gangu_Card, Rate: 1, StealProtected: true}
   - Id: 21526
     AegisName: EP19_RGAN_A
     Name: Primitive Rgan
@@ -86834,6 +86840,7 @@ Body:
     Drops:
       - {Item: Ep19_Rgan_Core_F, Rate: 1875}
       - {Item: EP19_Shell_Of_Rgan, Rate: 1125}
+      - {Item: Primitive_Rgan_Card, Rate: 1, StealProtected: true}
   - Id: 21527
     AegisName: EP19_RGAN_B
     Name: Lowest Rgan
@@ -86866,6 +86873,7 @@ Body:
       - {Item: Ep19_Rgan_Core_F, Rate: 1500}
       - {Item: EP19_Shell_Of_Rgan, Rate: 1500}
       - {Item: EP19_Unknown_Cell, Rate: 1500}
+      - {Item: Lowest_Rgan_Card, Rate: 1, StealProtected: true}
   - Id: 21528
     AegisName: EP19_RGAN_C
     Name: Junior Rgan
@@ -86897,6 +86905,7 @@ Body:
       - {Item: Ep19_Rgan_Core_F, Rate: 1500}
       - {Item: EP19_Shell_Of_Rgan, Rate: 1687}
       - {Item: EP19_Unknown_Cell, Rate: 1500}
+      - {Item: Junior_Rgan_Card, Rate: 1, StealProtected: true}
   - Id: 21529
     AegisName: EP19_RGAN_D
     Name: Intermediate Rgan
@@ -86928,6 +86937,7 @@ Body:
       - {Item: Ep19_Rgan_Core_F, Rate: 1125}
       - {Item: EP19_Shell_Of_Rgan, Rate: 1875}
       - {Item: EP19_Unknown_Cell, Rate: 1500}
+      - {Item: Middle_G_Rgan_Card, Rate: 1, StealProtected: true}
   - Id: 21530
     AegisName: EP19_RGAN_E
     Name: Superior Rgan
@@ -87059,6 +87069,7 @@ Body:
       - {Item: Snow_F_Stone1, Rate: 2500}
       - {Item: Snow_F_Ore, Rate: 3500}
       - {Item: Snow_F_Ore, Rate: 1500}
+      - {Item: Simulation_Juncea_Card, Rate: 1, StealProtected: true}
   - Id: 21534
     AegisName: EP19_MD_RGAN_E
     Name: Renovated Superior Rgan
@@ -87174,6 +87185,7 @@ Body:
       - {Item: Snow_F_Stone3, Rate: 1000}
       - {Item: Snow_F_Stone2, Rate: 3000}
       - {Item: Snow_F_Stone1, Rate: 5000}
+      - {Item: Ultra_Limacina_Card, Rate: 1, StealProtected: true}
   - Id: 21538
     AegisName: EP19_WASTED_RGAN_A
     Name: Discarded Primitive Rgan
@@ -87206,6 +87218,7 @@ Body:
       - {Item: EP19_Shell_Of_Rgan, Rate: 2625}
       - {Item: EP19_Unknown_Cell, Rate: 1500}
       - {Item: Ep19_Rgan_Core_F, Rate: 1450}
+      - {Item: Discarded_P_R_Card, Rate: 1, StealProtected: true}
   - Id: 21539
     AegisName: EP19_WASTED_RGAN_C
     Name: Discarded Intermediate Rgan
@@ -87238,6 +87251,7 @@ Body:
       - {Item: EP19_Shell_Of_Rgan, Rate: 1875}
       - {Item: EP19_Unknown_Cell, Rate: 1500}
       - {Item: Ep19_Rgan_Core_F, Rate: 1450}
+      - {Item: Discarded_L_R_Card, Rate: 1, StealProtected: true}
   - Id: 21540
     AegisName: EP19_CAVE_CALMARING
     Name: Cave Calmaring
@@ -87270,6 +87284,7 @@ Body:
       - {Item: EP19_CaCalapy, Rate: 1850}
       - {Item: Fluorescent_Liquid, Rate: 2800}
       - {Item: Sticky_Poison, Rate: 3000}
+      - {Item: Cave_Calmaring_Card, Rate: 1, StealProtected: true}
   - Id: 21541
     AegisName: EP19_CAVE_FLOWER
     Name: Cave Flower
@@ -87303,6 +87318,7 @@ Body:
       - {Item: EP19_Unknown_Cell, Rate: 1850}
       - {Item: EP19_Bell_Flower, Rate: 1550}
       - {Item: Solid_Shell, Rate: 2800}
+      - {Item: Cave_Un_Flower_Card, Rate: 1, StealProtected: true}
   - Id: 21542
     AegisName: EP19_HALLUCIGENIA
     Name: Hallucigenia
@@ -87338,6 +87354,7 @@ Body:
       - {Item: Solid_Shell, Rate: 2800}
       - {Item: Prickly_Fruit_, Rate: 650}
       - {Item: Sticky_Poison, Rate: 2250}
+      - {Item: Hallucigenia_Card, Rate: 1, StealProtected: true}
   - Id: 21543
     AegisName: EP19_HALLUCIGENIA_BABY
     Name: Hallucigenia Baby
@@ -87371,6 +87388,7 @@ Body:
       - {Item: EP19_Prickle_Shell, Rate: 1850}
       - {Item: Prickly_Fruit_, Rate: 650}
       - {Item: Sticky_Poison, Rate: 2500}
+      - {Item: B_Hallucigenia_Card, Rate: 1, StealProtected: true}
   - Id: 21544
     AegisName: EP19_ONE_EYE_DOLLOCARIS
     Name: One Eye Dollocaris
@@ -87404,6 +87422,7 @@ Body:
       - {Item: Scropion's_Nipper, Rate: 2750}
       - {Item: Solid_Shell, Rate: 750}
       - {Item: Nipper, Rate: 2250}
+      - {Item: One_E_Dollocaris_Card, Rate: 1, StealProtected: true}
   - Id: 21545
     AegisName: EP19_DOLLOCARIS
     Name: Two Eyes Dollocaris
@@ -87438,6 +87457,7 @@ Body:
       - {Item: Scropion's_Nipper, Rate: 2750}
       - {Item: Nipper, Rate: 2750}
       - {Item: Solid_Shell, Rate: 1000}
+      - {Item: Eyes_Dollocaris_Card, Rate: 1, StealProtected: true}
   - Id: 21588
     AegisName: EP19_MD_AQUILA_B
     Name: Aquila
@@ -87547,6 +87567,7 @@ Body:
       - {Item: Heart_Hunter_Seal, Rate: 375}
       - {Item: Vroken_Sword, Rate: 3750}
       - {Item: Vroken_Sword, Rate: 2250}
+      - {Item: Heart_Hunter_AT_Card, Rate: 1, StealProtected: true}
   - Id: 21600
     AegisName: EP19_RE_RGAN_E
     Name: Renovated Superior Rgan
@@ -87579,6 +87600,7 @@ Body:
       - {Item: Ep19_Rgan_Core_F, Rate: 750}
       - {Item: EP19_Shell_Of_Rgan, Rate: 2625}
       - {Item: EP19_Unknown_Cell, Rate: 1250}
+      - {Item: R_Superior_Rgan_Card, Rate: 1, StealProtected: true}
   - Id: 21601
     AegisName: EP19_ET_RGAN_D
     Name: Entangled Intermediate Rgan
@@ -87611,6 +87633,7 @@ Body:
       - {Item: Ep19_Rgan_Core_F, Rate: 750}
       - {Item: EP19_Shell_Of_Rgan, Rate: 2625}
       - {Item: EP19_Unknown_Cell, Rate: 1500}
+      - {Item: E_Inter_Rgan_Card, Rate: 1, StealProtected: true}
   - Id: 21853
     AegisName: EP19_MD_BOX1
     Name: Suspicious Storage Stone
@@ -87692,6 +87715,7 @@ Body:
     Drops:
       - {Item: Round_Feather, Rate: 1922}
       - {Item: Ep20_Copo_Head_F, Rate: 961}
+      - {Item: Copo_Card, Rate: 1, StealProtected: true}
   - Id: 21966
     AegisName: EP20_ICEWIND1
     Name: Ashen Icewind
@@ -87725,6 +87749,7 @@ Body:
       - {Item: Soft_Feather, Rate: 2205}
       - {Item: Ep20_Huge_Feather_G, Rate: 1470}
       - {Item: Bill_Of_Birds, Rate: 2205}
+      - {Item: Grey_Icewind_Card, Rate: 1, StealProtected: true}
   - Id: 21967
     AegisName: EP20_ICEWIND2
     Name: Icewind
@@ -87757,6 +87782,7 @@ Body:
       - {Item: Ep20_Huge_Feather_W, Rate: 2343}
       - {Item: Soft_Feather, Rate: 3125}
       - {Item: Bill_Of_Birds, Rate: 2343}
+      - {Item: Icewind_Card, Rate: 1, StealProtected: true}
   - Id: 21968
     AegisName: EP20_EGGCOPO
     Name: Cool Kopo
@@ -87817,6 +87843,7 @@ Body:
       - {Item: Ep20_Fluor_Cell_Sweet, Rate: 1300}
       - {Item: Cool_Liquid, Rate: 520}
       - {Item: EP19_Unknown_Cell, Rate: 260}
+      - {Item: Rabbit_Iceslug_card, Rate: 1, StealProtected: true}
   - Id: 21970
     AegisName: EP20_MELIBE_ICESLUG
     Name: Melibe Snail
@@ -87853,6 +87880,7 @@ Body:
       - {Item: Ep20_Fluor_Cell_Sweet, Rate: 328}
       - {Item: D_Glacier_M_Mace, Rate: 100}
       - {Item: D_Glacier_Knuckle, Rate: 100}
+      - {Item: Melibe_Iceslug_Card, Rate: 1, StealProtected: true}
   - Id: 21971
     AegisName: EP20_ICEBEAR
     Name: Bear
@@ -87886,6 +87914,7 @@ Body:
       - {Item: Sticky_Mucus, Rate: 1418}
       - {Item: Ep20_Ice_Bearskin, Rate: 3121}
       - {Item: Animal's_Skin, Rate: 1986}
+      - {Item: Icebear_Card, Rate: 1, StealProtected: true}
   - Id: 21972
     AegisName: EP20_JORMUNGUARD1
     Name: Jormungand Guardian-P
@@ -87920,6 +87949,7 @@ Body:
       - {Item: Ep20_Mystic_Spl_Colt, Rate: 2081}
       - {Item: Light_Granule, Rate: 693}
       - {Item: D_Glacier_Wand, Rate: 100}
+      - {Item: Jormun_Guardian_Card, Rate: 1, StealProtected: true}
   - Id: 21973
     AegisName: EP20_JORMUNGUARD2
     Name: Jormungand Guardian-Y
@@ -87954,6 +87984,7 @@ Body:
       - {Item: Light_Granule, Rate: 528}
       - {Item: Zelunium_Ore, Rate: 480}
       - {Item: Transparent_Cloth, Rate: 480}
+      - {Item: Jormun_Guardian_Card, Rate: 1, StealProtected: true}
   - Id: 21974
     AegisName: EP20_FAKE_IWIN_SN
     Name: Suspicious Irwin Recruit
@@ -88012,6 +88043,8 @@ Body:
     AttackMotion: 864
     DamageMotion: 864
     Ai: 01
+    Drops:
+      - {Item: Fake_Iwin_S_Card, Rate: 1, StealProtected: true}
   - Id: 21976
     AegisName: EP20_FAKE_IWIN_SB
     Name: Suspicious Private Iwin
@@ -88041,6 +88074,7 @@ Body:
     Ai: 01
     Drops:
       - {Item: Ep20_Iwin_Priva_Co_C, Rate: 1388}
+      - {Item: Fake_Iwin_S_Card, Rate: 1, StealProtected: true}
   - Id: 21977
     AegisName: EP20_FAKE_IWIN_SG
     Name: Corporal Iwin Suspicious
@@ -88072,6 +88106,7 @@ Body:
       - {Item: Ep19_Rgan_Core_F, Rate: 1041}
       - {Item: Ep20_Broken_Trident, Rate: 1041}
       - {Item: Round_Feather, Rate: 2082}
+      - {Item: Fake_Iwin_S_Card, Rate: 1, StealProtected: true}
   - Id: 21978
     AegisName: EP20_FAKE_IWIN_SR
     Name: Suspicious Iwin Mania
@@ -88103,6 +88138,7 @@ Body:
     Drops:
       - {Item: Ep20_Iwin_Sergeant_C, Rate: 2081}
       - {Item: Ep20_Broken_Trident, Rate: 1387}
+      - {Item: Fake_Iwin_S_Card, Rate: 1, StealProtected: true}
   - Id: 21979
     AegisName: EP20_DEMIGOD_LASGAND
     Name: Ultimate Lasgand
@@ -88215,6 +88251,7 @@ Body:
       - {Item: C_White_Serpent_Hair, Rate: 5}
       - {Item: C_Serpent_Crystal, Rate: 5}
       - {Item: C_Serpent_Shadow, Rate: 3}
+      - {Item: Demigod_Lasgand_Card, Rate: 1, StealProtected: true}
   - Id: 21982
     AegisName: MD_EP20_FALLENANGEL
     Name: Fallen Angel Snail
@@ -88257,6 +88294,7 @@ Body:
       - {Item: EP20_D_P_Ore, Rate: 3000}
       - {Item: EP20_D_P_Crystal, Rate: 2000}
       - {Item: EP20_D_P_Extract, Rate: 500}
+      - {Item: F_Angel_Iceslug_Card, Rate: 1, StealProtected: true}
   - Id: 21983
     AegisName: EP20_ANGEL_ICESLUG
     Name: Angel Snail
@@ -88289,6 +88327,7 @@ Body:
       - {Item: Single_Cell, Rate: 1478}
       - {Item: Ep20_Fluor_Cell_Salty, Rate: 1690}
       - {Item: Slicky_Fluid, Rate: 1478}
+      - {Item: Angel_Iceslug_Card, Rate: 1, StealProtected: true}
   - Id: 21984
     AegisName: EP20_ICEEGG
     Name: Icewind Egg
@@ -88316,6 +88355,7 @@ Body:
     Drops:
       - {Item: Piece_Of_Egg_Shell, Rate: 4166}
       - {Item: Ep20_Copo_Egg_Shell, Rate: 8332}
+      - {Item: Icewind_Egg_Card, Rate: 1, StealProtected: true}
   - Id: 21985
     AegisName: EP20_RGAN_WARLOCK
     Name: Great Rgan Shaman
@@ -88348,6 +88388,7 @@ Body:
       - {Item: Ep20_Rgan_Core_F, Rate: 1356}
       - {Item: Ep20_Coral_Bangle, Rate: 1898}
       - {Item: EP19_Unknown_Cell, Rate: 271}
+      - {Item: S_Rgan_Warlock_Card, Rate: 1, StealProtected: true}
   - Id: 21986
     AegisName: EP20_RGAN_HEALER
     Name: Greater Rgan Healer
@@ -88382,6 +88423,7 @@ Body:
       - {Item: Ep20_Rgan_Core_F, Rate: 240}
       - {Item: Etel_Dust, Rate: 100}
       - {Item: D_Glacier_B_Knife, Rate: 100}
+      - {Item: S_Rgan_Healer_Card, Rate: 1, StealProtected: true}
   - Id: 21987
     AegisName: EP20_JORGAN_WARLOCK
     Name: Jormungand Church Shaman
@@ -88418,6 +88460,7 @@ Body:
       - {Item: Shadowdecon, Rate: 50}
       - {Item: Snow_F_Stone1, Rate: 177}
       - {Item: D_Glacier_Whip, Rate: 100}
+      - {Item: E_Rgan_Warlock_Card, Rate: 1, StealProtected: true}
   - Id: 21988
     AegisName: EP20_JORGAN_HEALER
     Name: Jormungand Church Bishop
@@ -88452,6 +88495,7 @@ Body:
       - {Item: EP19_Unknown_Cell, Rate: 283}
       - {Item: Zelunium_Ore, Rate: 60}
       - {Item: D_Glacier_Spear, Rate: 100}
+      - {Item: E_Rgan_Healer_Card, Rate: 1, StealProtected: true}
   - Id: 21989
     AegisName: EP20_JORGAN_GUARDIAN
     Name: Guardian of Shrine
@@ -88488,6 +88532,7 @@ Body:
       - {Item: Etel_Dust, Rate: 83}
       - {Item: Snow_F_Ore, Rate: 27}
       - {Item: D_Glacier_Axe, Rate: 100}
+      - {Item: E_Rgan_Guardian_Card, Rate: 1, StealProtected: true}
   - Id: 21990
     AegisName: EP20_JORGAN_CLEANER
     Name: Jormungand Sanctuary
@@ -88522,6 +88567,7 @@ Body:
       - {Item: Ep20_Fluor_Cell_Salty, Rate: 1040}
       - {Item: Shadowdecon_Ore, Rate: 260}
       - {Item: D_Glacier_Katar, Rate: 100}
+      - {Item: E_Rgan_Cleaner_Card, Rate: 1, StealProtected: true}
   - Id: 21991
     AegisName: MD_EP20_JOR_G_P
     Name: Jormungand Guardian

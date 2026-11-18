@@ -131521,6 +131521,321 @@ Body:
       bonus bMatkRate,10;
       bonus2 bMagicAddRace,RC_Fish,50;
       bonus2 bMagicAddRace,RC_Insect,50;
+  - Id: 300359
+    AegisName: Ice_Gangu_Card
+    Name: Ice Gangu Card
+    Type: Card
+    Weight: 10
+    Locations: {Head_Low: true, Head_Mid: true, Head_Top: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bMatk,10;
+      bonus2 bMagicAddClass,Class_All,1;
+      bonus2 bMagicAtkEle,Ele_Water,4;
+      bonus bUseSPrate,7;
+      .@r = getrefine();
+      if (.@r >= 9) {
+        bonus2 bMagicAtkEle,Ele_Water,3;
+      }
+      if (getallrefine() >= 22) {
+        bonus bVariableCastrate,-5;
+      }
+  - Id: 300360
+    AegisName: Shining_Seaweed_Card
+    Name: Shining Seaweed Card
+    Type: Card
+    Weight: 10
+    Locations: {Head_Low: true, Head_Mid: true, Head_Top: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bBaseAtk,10;
+      bonus2 bAddClass,Class_All,1;
+      bonus bShortAtkRate,3;
+      bonus bUseSPrate,7;
+      .@r = getrefine();
+      if (.@r >= 9) {
+        bonus bShortAtkRate,2;
+      }
+      if (getallrefine() >= 22) {
+        bonus bVariableCastrate,-5;
+      }
+  - Id: 300361
+    AegisName: Ice_Straw_Card
+    Name: Ice Straw Card
+    Type: Card
+    Weight: 10
+    Locations: {Armor: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bMagicAddClass,Class_All,1;
+      bonus bUseSPrate,7;
+      bonus2 bMagicAtkEle,Ele_Water,4*(getrefine()/2);
+  - Id: 300362
+    AegisName: Unfrost_Flower_card
+    Name: Unfrost Flower Card
+    Type: Card
+    Weight: 10
+    Locations: {Armor: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bAddClass,Class_All,1;
+      bonus bUseSPrate,7;
+      bonus bShortAtkRate,4*(getrefine()/3);
+  - Id: 300363
+    AegisName: Limacina_Card
+    Name: Limacina Card
+    Type: Card
+    Weight: 10
+    Locations: {Head_Low: true, Head_Mid: true, Head_Top: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bBaseAtk,10;
+      bonus2 bAddClass,Class_All,1;
+      bonus bLongAtkRate,3;
+      bonus bUseSPrate,7;
+      .@r = getrefine();
+      if (.@r >= 9) {
+        bonus bLongAtkRate,2;
+      }
+      if (getallrefine() >= 22) {
+        bonus bVariableCastrate,-5;
+      }
+  - Id: 300364
+    AegisName: Calmaring_Card
+    Name: Calmaring Card
+    Type: Card
+    Weight: 10
+    Locations: {Left_Accessory: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bMagicAtkEle,Ele_Water,35;
+      bonus bUseSPrate,10;
+  - Id: 300365
+    AegisName: Primitive_Rgan_Card
+    Name: Primitive Rgan Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Accessory: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bShortAtkRate,8;
+  - Id: 300366
+    AegisName: Lowest_Rgan_Card
+    Name: Lowest Rgan Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Accessory: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bCritical,6;
+      bonus bCritAtkRate,1;
+  - Id: 300367
+    AegisName: Junior_Rgan_Card
+    Name: Lesser Rgan Card
+    Type: Card
+    Weight: 10
+    Locations: {Left_Accessory: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bShortAtkRate,8;
+  - Id: 300368
+    AegisName: Middle_G_Rgan_Card
+    Name: Intermediate Rgan Card
+    Type: Card
+    Weight: 10
+    Locations: {Left_Accessory: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bCritical,6;
+      bonus bCritAtkRate,1;
+  - Id: 300369
+    AegisName: Discarded_P_R_Card
+    Name: Wasted Primitive Rgan Card
+    Type: Card
+    Weight: 10
+    Locations: {Left_Accessory: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bMagicAtkEle,Ele_Dark,35;
+      bonus bUseSPrate,10;
+  - Id: 300370
+    AegisName: Discarded_L_R_Card
+    Name: Wasted Intermediate Rgan Card
+    Type: Card
+    Weight: 10
+    Locations: {Left_Accessory: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bMagicAtkEle,Ele_Ghost,35;
+      bonus bUseSPrate,10;
+  - Id: 300371
+    AegisName: Cave_Calmaring_Card
+    Name: Cave Calmaring Card
+    Type: Card
+    Weight: 10
+    Locations: {Left_Accessory: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bMagicAtkEle,Ele_Poison,35;
+      bonus bUseSPrate,10;
+  - Id: 300372
+    AegisName: Cave_Un_Flower_Card
+    Name: Cave Flower Card
+    Type: Card
+    Weight: 10
+    Locations: {Garment: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bSubEle,Ele_Neutral,15;
+      bonus2 bMagicAtkEle,Ele_Ghost,3*getrefine();
+  - Id: 300373
+    AegisName: B_Hallucigenia_Card
+    Name: Hallucigenia Baby Card
+    Type: Card
+    Weight: 10
+    Locations: {Left_Hand: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bDef,-1;
+      bonus bNearAtkDef,3; bonus bLongAtkDef,3;
+      bonus2 bSubEle,Ele_Earth,15;
+      bonus2 bSubRace,RC_Insect,15;
+      bonus2 bSubSize,Size_Small,15;
+  - Id: 300374
+    AegisName: Hallucigenia_Card
+    Name: Hallucigenia Card
+    Type: Card
+    Weight: 10
+    Locations: {Shoes: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bMaxHPrate,-10;
+      bonus bMaxSPrate,10;
+      bonus2 bAddClass,Class_All,1;
+      bonus2 bMagicAddClass,Class_All,1;
+  - Id: 300375
+    AegisName: One_E_Dollocaris_Card
+    Name: One-Eye Dollocaris Card
+    Type: Card
+    Weight: 10
+    Locations: {Garment: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bSubEle,Ele_Neutral,20;
+      .@r = getrefine();
+      .@rate = ((getallrefine() < 24) ? -25 : 25);
+      if (getequipid(EQI_GARMENT) == 480283 || getequipid(EQI_GARMENT) == 480284) {
+        .@rate += 8;
+      }
+      bonus2 bMagicAtkEle,Ele_Dark,.@rate;
+      bonus2 bMagicAtkEle,Ele_Holy,.@rate;
+      bonus2 bMagicAtkEle,Ele_Ghost,.@rate;
+      bonus2 bMagicAtkEle,Ele_Neutral,.@rate;
+  - Id: 300376
+    AegisName: Eyes_Dollocaris_Card
+    Name: Two-Eye Dollocaris Card
+    Type: Card
+    Weight: 10
+    Locations: {Armor: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bDef,2;
+      bonus bNearAtkDef,9; bonus bLongAtkDef,9;
+      if (getallrefine() < 24) {
+        bonus bMaxHPrate,-30;
+        bonus2 bAddClass,Class_All,-10;
+        bonus bMatkRate,-10;
+      }
+      else {
+        bonus bMaxHPrate,30;
+        bonus2 bAddClass,Class_All,10;
+        bonus bMatkRate,10;
+      }
+      if (getequipid(EQI_ARMOR) == 450270 || getequipid(EQI_ARMOR) == 450271) {
+        bonus bNearAtkDef,9; bonus bLongAtkDef,9;
+      }
+  - Id: 300377
+    AegisName: Ultra_Limacina_Card
+    Name: Ultra Limacina Card
+    Type: Card
+    Weight: 10
+    Locations: {Head_Low: true, Head_Mid: true, Head_Top: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bAddClass,Class_All,5;
+      bonus bMatkRate,5;
+      .@r = getrefine();
+      bonus2 bAddClass,Class_All,2*(.@r/3);
+      bonus2 bMagicAddClass,Class_All,2*(.@r/3);
+      if (getallrefine() >= 22) {
+        bonus bFixedCast,-500;
+      }
+  - Id: 300378
+    AegisName: Simulation_Juncea_Card
+    Name: Simulation Juncea Card
+    Type: Card
+    Weight: 10
+    Locations: {Armor: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bAddClass,Class_All,20;
+      bonus2 bMagicAddClass,Class_All,20;
+      bonus bUnbreakableArmor;
+  - Id: 300379
+    AegisName: R_Superior_Rgan_Card
+    Name: Modified Advanced Rgan Card
+    Type: Card
+    Weight: 10
+    Locations: {Left_Hand: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bSubRace,RC_All,15;
+      bonus2 bSubRace,RC_Player_Human,-15;
+      bonus2 bSubRace,RC_Player_Doram,-15;
+      .@rate = (getallrefine() < 24) ? -25 : 25;
+      bonus2 bSubSize,Size_All,.@rate;
+  - Id: 300380
+    AegisName: E_Inter_Rgan_Card
+    Name: Entangled Intermediate Rgan Card
+    Type: Card
+    Weight: 10
+    Locations: {Shoes: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bCritical,5;
+      if (getallrefine() < 24) {
+        bonus bCritical,-15;
+        bonus bCritAtkRate,-10;
+      }
+      else {
+        bonus bCritical,15;
+        bonus bCritAtkRate,10;
+      }
+      if (getequipid(EQI_SHOES) == 470197 || getequipid(EQI_SHOES) == 470198) {
+        bonus bCritAtkRate,5;
+      }
+  - Id: 300381
+    AegisName: Heart_Hunter_AT_Card
+    Name: Hearthunter AT Card
+    Type: Card
+    Weight: 10
+    Locations: {Armor: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bAddClass,Class_All,1;
+      bonus bUseSPrate,7;
+      bonus bLongAtkRate,4*(getrefine()/3);
+  - Id: 300382
+    AegisName: Aquila_Card
+    Name: Aquila Card
+    Type: Card
+    Weight: 10
+    Locations: {Garment: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bMagicAtkEle,Ele_Poison,100;
+      bonus2 bMagicAtkEle,Ele_Undead,100;
+      bonus2 bSubEle,Ele_All,-30;
   - Id: 300454
     AegisName: Ice_C_Orb_Hp
     Name: Glacier Flower Meow Power (Vital)
@@ -131537,6 +131852,326 @@ Body:
                bonus bMaxHPrate,5;
             }
          }
+      }
+  - Id: 300455
+    AegisName: Copo_Card
+    Name: Copo Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Hand: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      .@r = getrefine();
+      bonus2 bAddSize,Size_Small,15+5*(.@r/4);
+      bonus2 bMagicAddSize,Size_Small,15+5*(.@r/4);
+      if (getiteminfo(getequipid(EQI_HAND_R), ITEMINFO_WEAPONLEVEL)==4) {
+         bonus2 bAddSize,Size_Medium,12+4*(.@r/3);
+         bonus2 bMagicAddSize,Size_Medium,12+4*(.@r/3);
+      }
+  - Id: 300456
+    AegisName: Icewind_Egg_Card
+    Name: Icewind's Egg Card
+    Type: Card
+    Weight: 10
+    Locations: {Head_Low: true, Head_Mid: true, Head_Top: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bDelayrate,-3;
+      if (getrefine()>=10) {
+         bonus bDelayrate,-2;
+      }
+  - Id: 300457
+    AegisName: Grey_Icewind_Card
+    Name: Gray Icewind Card
+    Type: Card
+    Weight: 10
+    Locations: {Shoes: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bVariableCastrate,-5;
+      bonus bUseSPrate,7;
+      bonus2 bAddClass,Class_All,5;
+      if (getequipid(EQI_SHOES) == 470197 || getequipid(EQI_SHOES) == 470198) {
+         bonus bVariableCastrate,-3;
+         bonus bStr,3;
+         bonus bDex,3;
+      }
+  - Id: 300458
+    AegisName: Icewind_Card
+    Name: Icewind Card
+    Type: Card
+    Weight: 10
+    Locations: {Shoes: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bVariableCastrate,-5;
+      bonus bUseSPrate,7;
+      bonus bMatkRate,5;
+      if (getequipid(EQI_SHOES) == 470197 || getequipid(EQI_SHOES) == 470198) {
+         bonus bVariableCastrate,-3;
+         bonus bInt,3;
+         bonus bDex,3;
+      }
+  - Id: 300459
+    AegisName: E_Rgan_Healer_Card
+    Name: Jormungandr Church Bishop Card
+    Type: Card
+    Weight: 10
+    Locations: {Head_Low: true, Head_Mid: true, Head_Top: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bAddClass,Class_All,2;
+      bonus2 bMagicAddClass,Class_All,2;
+      bonus bVariableCastrate,-3;
+  - Id: 300460
+    AegisName: Jormun_Guardian_Card
+    Name: Jormungandr Guardian Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Hand: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bMagicAtkEle,Ele_Ghost,5;
+      bonus2 bMagicAtkEle,Ele_Neutral,5;
+      bonus2 bMagicAtkEle,Ele_Dark,5;
+      bonus bMatk,40;
+      if (getrefine()>=10) {
+         bonus2 bMagicAtkEle,Ele_Ghost,5;
+         bonus2 bMagicAtkEle,Ele_Neutral,5;
+         bonus2 bMagicAtkEle,Ele_Dark,5;
+         if (getiteminfo(getequipid(EQI_HAND_R), ITEMINFO_WEAPONLEVEL)==4) {
+            bonus2 bMagicAtkEle,Ele_Ghost,10;
+            bonus2 bMagicAtkEle,Ele_Neutral,10;
+            bonus2 bMagicAtkEle,Ele_Dark,10;
+         }
+      }
+  - Id: 300461
+    AegisName: Fake_Iwin_S_Card
+    Name: Suspicious Iwin Soldier Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Hand: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bShortAtkRate,5;
+      bonus bBaseAtk,40;
+      if (getrefine()>=10) {
+         bonus bShortAtkRate,5;
+         if (getiteminfo(getequipid(EQI_HAND_R), ITEMINFO_WEAPONLEVEL)==4) {
+            bonus bShortAtkRate,10;
+         }
+      }
+  - Id: 300462
+    AegisName: S_Rgan_Warlock_Card
+    Name: Superior Rgan Shaman Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Hand: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bMagicAtkEle,Ele_Earth,5;
+      bonus2 bMagicAtkEle,Ele_Fire,5;
+      bonus2 bMagicAtkEle,Ele_Wind,5;
+      bonus bMatk,40;
+      if (getrefine()>=10) {
+         bonus2 bMagicAtkEle,Ele_Earth,5;
+         bonus2 bMagicAtkEle,Ele_Fire,5;
+         bonus2 bMagicAtkEle,Ele_Wind,5;
+         if (getiteminfo(getequipid(EQI_HAND_R), ITEMINFO_WEAPONLEVEL)==4) {
+            bonus2 bMagicAtkEle,Ele_Earth,10;
+            bonus2 bMagicAtkEle,Ele_Fire,10;
+            bonus2 bMagicAtkEle,Ele_Wind,10;
+         }
+      }
+  - Id: 300463
+    AegisName: S_Rgan_Healer_Card
+    Name: Superior Rgan Healer Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Hand: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bMagicAtkEle,Ele_Poison,5;
+      bonus2 bMagicAtkEle,Ele_Holy,5;
+      bonus2 bMagicAtkEle,Ele_Water,5;
+      bonus bMatk,40;
+      if (getrefine()>=10) {
+         bonus2 bMagicAtkEle,Ele_Poison,5;
+         bonus2 bMagicAtkEle,Ele_Holy,5;
+         bonus2 bMagicAtkEle,Ele_Water,5;
+         if (getiteminfo(getequipid(EQI_HAND_R), ITEMINFO_WEAPONLEVEL)==4) {
+            bonus2 bMagicAtkEle,Ele_Poison,10;
+            bonus2 bMagicAtkEle,Ele_Holy,10;
+            bonus2 bMagicAtkEle,Ele_Water,10;
+         }
+      }
+  - Id: 300464
+    AegisName: E_Rgan_Warlock_Card
+    Name: Jormungandr Church Shaman Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Accessory: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bMagicAtkEle,Ele_Poison,25;
+      bonus2 bMagicAtkEle,Ele_Holy,25;
+      bonus2 bMagicAtkEle,Ele_Water,25;
+      if (readparam(bInt)>=90) {
+         bonus bUseSPrate,7;
+      }
+  - Id: 300465
+    AegisName: E_Rgan_Guardian_Card
+    Name: Jormungandr Sanctuary Guardian Card
+    Type: Card
+    Weight: 10
+    Locations: {Left_Hand: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      .@r = getrefine();
+      bonus bStr,10;
+      bonus bVit,15;
+      bonus bLuk,-25;
+      bonus2 bSubSize,Size_All,20;
+      bonus2 bMagicAddEle,Ele_Poison,-25;
+      bonus2 bMagicAddEle,Ele_Ghost,-25;
+      bonus2 bMagicAddEle,Ele_Holy,-25;
+      bonus2 bMagicAddEle,Ele_Dark,-25;
+      bonus bNearAtkDef,80*(5*.@r)/((5*.@r)+400); bonus bLongAtkDef,80*(5*.@r)/((5*.@r)+400);
+      if (.@r>=7) {
+         bonus2 bAddEle,Ele_Water,25;
+         bonus2 bAddEle,Ele_Wind,25;
+         bonus2 bAddEle,Ele_Earth,25;
+         bonus2 bAddEle,Ele_Fire,25;
+         if (.@r>=10) {
+            bonus bLongAtkRate,10;
+            bonus bShortAtkRate,10;
+         }
+      }
+  - Id: 300466
+    AegisName: E_Rgan_Cleaner_Card
+    Name: Jormungandr Sanctuary Cleaner Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Hand: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bLongAtkRate,5;
+      bonus bBaseAtk,40;
+      if (getrefine()>=10) {
+         bonus bLongAtkRate,5;
+         if (getiteminfo(getequipid(EQI_HAND_R), ITEMINFO_WEAPONLEVEL)==4) {
+            bonus bLongAtkRate,10;
+         }
+      }
+  - Id: 300467
+    AegisName: Angel_Iceslug_Card
+    Name: Angel Slug Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Accessory: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bShortAtkRate,15;
+      if (readparam(bLuk)>=90) {
+         bonus bCritical,-15;
+      }
+  - Id: 300468
+    AegisName: Rabbit_Iceslug_card
+    Name: Snow Rabbit Slug Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Accessory: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bLongAtkRate,15;
+      if (readparam(bLuk)>=90) {
+         bonus bCritical,-15;
+      }
+  - Id: 300469
+    AegisName: Melibe_Iceslug_Card
+    Name: Melibe Slug Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Accessory: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bMagicAtkEle,Ele_Earth,25;
+      bonus2 bMagicAtkEle,Ele_Fire,25;
+      bonus2 bMagicAtkEle,Ele_Wind,25;
+      if (readparam(bInt)>=90) {
+         bonus bUseSPrate,7;
+      }
+  - Id: 300470
+    AegisName: Icebear_Card
+    Name: Bear Bug Card
+    Type: Card
+    Weight: 10
+    Locations: {Right_Accessory: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bMagicAtkEle,Ele_Ghost,25;
+      bonus2 bMagicAtkEle,Ele_Neutral,25;
+      bonus2 bMagicAtkEle,Ele_Dark,25;
+      if (readparam(bInt)>=90) {
+         bonus bUseSPrate,7;
+      }
+  - Id: 300471
+    AegisName: F_Angel_Iceslug_Card
+    Name: Fallen Angel Slug Card
+    Type: Card
+    Weight: 10
+    Locations: {Left_Accessory: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bAddRace,RC_Demon,25;
+      bonus2 bAddRace,RC_Brute,25;
+      bonus2 bAddEle,Ele_Water,25;
+      bonus2 bAddEle,Ele_Dark,25;
+      bonus bMaxHPrate,-20;
+  - Id: 300472
+    AegisName: Demigod_Lasgand_Card
+    Name: Ultimate Rasgandr Card
+    Type: Card
+    Weight: 10
+    Locations: {Armor: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus2 bMagicAddClass,Class_Boss,40;
+      bonus bMaxHPrate,-15;
+      if (getallrefine() >= 24) {
+         bonus2 bMagicAddClass,Class_All,15;
+      }
+      if (BaseLevel>=200) {
+         bonus bInt,15;
+      }
+      if (readparam(bInt)>=90) {
+         bonus bMatkRate,15;
+      }
+  - Id: 300473
+    AegisName: Snow_Angel_Card
+    Name: Snowstorm Angel Card
+    Type: Card
+    Weight: 10
+    Locations: {Garment: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bLongAtkRate,30+5*(getrefine()/3);
+      bonus bCritical,-5*(readparam(bLuk)/20);
+      if (getequipid(EQI_GARMENT) == 480283 || getequipid(EQI_GARMENT) == 480284) {
+         bonus2 bAddClass,Class_Boss,10;
+      }
+  - Id: 300474
+    AegisName: Rgan_Chief_Clean_Card
+    Name: Sanctuary Cleaning Chief Card
+    Type: Card
+    Weight: 10
+    Locations: {Garment: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bShortAtkRate,30+5*(getrefine()/3);
+      bonus bCritical,-5*(readparam(bLuk)/20);
+      if (getequipid(EQI_GARMENT) == 480283 || getequipid(EQI_GARMENT) == 480284) {
+         bonus2 bAddClass,Class_Boss,10;
       }
   - Id: 310076
     AegisName: Cassock_Str
