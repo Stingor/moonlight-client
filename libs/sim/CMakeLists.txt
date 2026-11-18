@@ -52,6 +52,10 @@ add_library(ro_sim STATIC
     src/inventory.cpp
     src/item_facts.cpp
     src/item_news.cpp
+    src/item_use_effect.cpp
+    # La table des effets d'usage, engendrée par
+    # scripts/gen_client_item_use_effects.py.
+    generated/item_use_effect_table.cpp
     src/jump.cpp
     src/broadcast_balloon.cpp
     src/packed_position.cpp

@@ -24783,3 +24783,9 @@ tr: A convenience tool was detected on your computer: {}.\n\nDuring WoE, fair pl
 
 fr: J'ai compris
 tr: Got it
+
+fr: L'expérience de base et de job gagnée sur les monstres augmente de moitié pendant 30 minutes.
+tr: Base and job experience gained from monsters increases by half for 30 minutes.
+
+fr: L'expérience de base et de job gagnée sur les monstres augmente de trois quarts pendant 30 minutes.
+tr: Base and job experience gained from monsters increases by three quarters for 30 minutes.

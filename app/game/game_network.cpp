@@ -47,6 +47,7 @@
 #include "game/gm_outfit_announcer.h"
 #include "game/handshake_pump.h"
 #include "game/interface_sound.h"
+#include "game/item_use_cue.h"
 #include "game/level_up_cue.h"
 #include "game/mail_stage.h"
 #include "game/npc_shop_stage.h"
@@ -159,6 +160,18 @@ ro::core::Result<void> Game::PumpNetwork(std::uint32_t now_ms) {
               PlayInterfaceSound(audio_, *vfs_, client_root_, file);
           !played) {
         ro::core::LogWarning("son de montée de niveau : {}", ro::core::Describe(played.error()));
+      }
+    }
+    // L'USAGE D'UN OBJET, le sien ou celui d'un voisin : ses effets, et son son,
+    // joué à l'oreille. Voir `CueItemUse`.
+    if (const std::optional<std::string_view> sound = CueItemUse(received, world_, now_ms);
+        sound.has_value() && vfs_ != nullptr) {
+      const InterfaceSoundFile file{.place = InterfaceSoundPlace::kSoundArchive,
+                                    .path = std::string(*sound)};
+      if (const ro::core::Result<void> played =
+              PlayInterfaceSound(audio_, *vfs_, client_root_, file);
+          !played) {
+        ro::core::LogWarning("son d'usage d'objet : {}", ro::core::Describe(played.error()));
       }
     }
     // 🔴 LES REPÈRES ET LES POSITIONS DE LA GUILDE SE VIDENT ICI, trame par

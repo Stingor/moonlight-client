@@ -931,6 +931,7 @@ add_executable(ro_tests
     sim/pet_test.cpp
     sim/pet_talk_test.cpp
     sim/level_up_effect_test.cpp
+    sim/item_use_effect_test.cpp
     sim/monster_talk_test.cpp
     sim/homunculus_test.cpp
     sim/mercenary_test.cpp
@@ -1013,6 +1014,7 @@ if(MOONCLIENT_PLATFORM_LAYERS)
         app/ground_item_pick_test.cpp
         app/effect_dark_veil_layer_test.cpp
         app/client_config_test.cpp
+        app/item_use_cue_test.cpp
         app/server_choice_test.cpp
         app/server_probe_test.cpp
         app/lobby_retarget_test.cpp
@@ -1431,7 +1433,7 @@ if(MOONCLIENT_PLATFORM_LAYERS)
         app/webp_picture_test.cpp)
     target_link_libraries(ro_tests
         PRIVATE moonclient_chattabview moonclient_chatlinks moonclient_chatcommands moonclient_skillrefusal moonclient_skillrules moonclient_songmusic moonclient_music moonclient_ranknotices moonclient_chatpreview moonclient_cursor moonclient_targeting moonclient_quickcast moonclient_skillfacts moonclient_calloptions moonclient_spritesounds moonclient_debug moonclient_versus moonclient_damage moonclient_display moonclient_effect_nodes moonclient_effects moonclient_stage moonclient_map_sign moonclient_screenshot moonclient_entitybars moonclient_names moonclient_equip moonclient_camera_rules moonclient_hotkeys moonclient_shortcutwheel moonclient_menuicons moonclient_itemdrop moonclient_items moonclient_itemtoast moonclient_balloons moonclient_monstersheet moonclient_statuses moonclient_titles
-                moonclient_afk moonclient_backdrop moonclient_graphics moonclient_settingtoggles moonclient_cardalbum moonclient_itemsheeteditor moonclient_mvptracker moonclient_battleground moonclient_memorial moonclient_minigames moonclient_survivors moonclient_monstertalk moonclient_battlefield moonclient_craft moonclient_itemfacts moonclient_bugreport moonclient_books moonclient_barter moonclient_laphine moonclient_itemreform moonclient_gradeenchant moonclient_reputation moonclient_buyingstore moonclient_storesearch moonclient_market moonclient_database moonclient_vending moonclient_chatroom moonclient_whispers moonclient_mail moonclient_achievements moonclient_profiles moonclient_entitymenu moonclient_party moonclient_postures moonclient_companionai moonclient_keys moonclient_lobby moonclient_entry moonclient_presets moonclient_styles moonclient_web moonclient_navigation moonclient_quests
+                moonclient_afk moonclient_backdrop moonclient_graphics moonclient_settingtoggles moonclient_cardalbum moonclient_itemsheeteditor moonclient_mvptracker moonclient_battleground moonclient_memorial moonclient_minigames moonclient_survivors moonclient_monstertalk moonclient_itemuse moonclient_battlefield moonclient_craft moonclient_itemfacts moonclient_bugreport moonclient_books moonclient_barter moonclient_laphine moonclient_itemreform moonclient_gradeenchant moonclient_reputation moonclient_buyingstore moonclient_storesearch moonclient_market moonclient_database moonclient_vending moonclient_chatroom moonclient_whispers moonclient_mail moonclient_achievements moonclient_profiles moonclient_entitymenu moonclient_party moonclient_postures moonclient_companionai moonclient_keys moonclient_lobby moonclient_entry moonclient_presets moonclient_styles moonclient_web moonclient_navigation moonclient_quests
                 moonclient_seatlayout moonclient_settings moonclient_settinglinks moonclient_skinlook moonclient_visibility moonclient_voiceoptions
                 moonclient_arena
                 moonclient_chatweboptions

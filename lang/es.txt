@@ -24783,3 +24783,9 @@ tr: Se ha detectado una herramienta de comodidad en tu equipo: {}.\n\nDurante la
 
 fr: J'ai compris
 tr: Entendido
+
+fr: L'expérience de base et de job gagnée sur les monstres augmente de moitié pendant 30 minutes.
+tr: La experiencia base y de job obtenida de los monstruos aumenta en la mitad durante 30 minutos.
+
+fr: L'expérience de base et de job gagnée sur les monstres augmente de trois quarts pendant 30 minutes.
+tr: La experiencia base y de job obtenida de los monstruos aumenta en tres cuartos durante 30 minutos.
