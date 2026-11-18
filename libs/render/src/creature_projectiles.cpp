@@ -4,6 +4,7 @@
 #include <optional>
 #include <string_view>
 
+#include "ro/render/effect_frame.h"
 #include "ro/render/sprite_catalog.h"
 
 namespace ro::render {
@@ -230,6 +231,12 @@ ProjectileFlight ProjectileFlightOf(const SpriteCatalog& catalog, const ActorLoo
                             .turn_degrees = kWandBoltTurnDegrees};
   }
   return ProjectileFlight{.image_rule = ProjectileImageRuleOf(look)};
+}
+
+std::int32_t FlightLifeTicksOf(std::uint32_t flight_ms, const ProjectileFlight& flight) {
+  const auto slowed_tick_ms =
+      static_cast<std::uint32_t>(kEffectTickMs * std::max(flight.clock_slowdown, 1));
+  return static_cast<std::int32_t>(std::max<std::uint32_t>(flight_ms / slowed_tick_ms, 1));
 }
 
 std::optional<CreatureStrikeSprite> StrikeSpriteOf(const ActorLook& look) {

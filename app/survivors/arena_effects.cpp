@@ -616,13 +616,14 @@ void ArenaEffects::ShootFoeShots(const ro::sim::SurvivorsField& field, const Gro
              ground_of, now_ms);
       continue;
     }
-    const std::uint32_t flight_ms = steps * ro::sim::kSurvivorsStepMs;
+    // LE VOL DURE CELUI DU TIR DE LA PARTIE, même d'une horloge ralentie :
+    // sinon le tir touche quand l'image n'a fait qu'une part du chemin.
+    const ro::render::ProjectileFlight flight = ro::render::ProjectileFlightOf(*sprites_, look);
+    const std::int32_t life_ticks =
+        ro::render::FlightLifeTicksOf(steps * ro::sim::kSurvivorsStepMs, flight);
     const glm::vec3 lift{0.0F, ro::render::kArrowFlightHeight, 0.0F};
-    const auto life_ticks = static_cast<std::int32_t>(std::max<std::uint32_t>(
-        flight_ms / static_cast<std::uint32_t>(ro::render::kEffectTickMs), 1));
     static_cast<void>(nodes_.ShootSprite(sprite, ground_of(shot.position) + lift,
-                                         ground_of(lands) + lift, life_ticks,
-                                         ro::render::ProjectileFlightOf(*sprites_, look), tag));
+                                         ground_of(lands) + lift, life_ticks, flight, tag));
     ++launched_total_;
   }
 }
@@ -703,11 +704,10 @@ void ArenaEffects::ShootHeroArrows(const ro::sim::SurvivorsField& field, const G
       continue;
     }
     if (!budget_.Admit(ArenaEffectRank::kLoose)) continue;
-    const std::uint32_t flight_ms = steps * ro::sim::kSurvivorsStepMs;
-    const glm::vec3 lift{0.0F, ro::render::kArrowFlightHeight, 0.0F};
-    const auto life_ticks = static_cast<std::int32_t>(std::max<std::uint32_t>(
-        flight_ms / static_cast<std::uint32_t>(ro::render::kEffectTickMs), 1));
     ro::render::ProjectileFlight flight = ro::render::ProjectileFlightOf(*sprites_, shooter);
+    const std::int32_t life_ticks =
+        ro::render::FlightLifeTicksOf(steps * ro::sim::kSurvivorsStepMs, flight);
+    const glm::vec3 lift{0.0F, ro::render::kArrowFlightHeight, 0.0F};
     // La baguette ne porte pas d'élément : sa boule est de l'arcane.
     if (look->shoots_wand_bolt && switches_.wand_orb) {
       flight.wand_orb_rgb = ro::render::WandOrbRgb(std::nullopt);

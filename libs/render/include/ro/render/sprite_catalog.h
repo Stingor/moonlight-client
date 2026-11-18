@@ -508,6 +508,11 @@ struct ProjectileFlight {
 [[nodiscard]] ProjectileFlight ProjectileFlightOf(const SpriteCatalog& catalog,
                                                   const ActorLook& look);
 
+// La vie à donner à ce vol pour qu'il dure `flight_ms` en tout : son horloge
+// divisée multiplie la vie, qui se divise donc d'avance. Un tic au moins.
+[[nodiscard]] std::int32_t FlightLifeTicksOf(std::uint32_t flight_ms,
+                                             const ProjectileFlight& flight);
+
 // L'IMPACT DE CES COMPÉTENCES LÈVE SUR LEUR LANCEUR UN DRAPEAU que le PROCHAIN
 // tir de flèche dépense sans partir : elles dessinent leurs propres traits.
 // Triangle Shot et deux tirs de l'Abyss Chaser en dur, trois autres par leur

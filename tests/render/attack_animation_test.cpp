@@ -404,6 +404,13 @@ TEST_CASE("Attaque : un joueur à baguette tire un trait, trois fois plus lent q
   CHECK(canon.image_rule == ProjectileImageRule::kSpriteBullet);
   CHECK(canon.clock_slowdown == 1);
   CHECK(canon.turn_degrees == 0);
+  // Un vol qui doit tenir un temps donné en reçoit la vie : le trait, d'une
+  // horloge trois fois plus lente, trois fois moins de tics que la flèche.
+  const ro::render::ProjectileFlight trait =
+      ProjectileFlightOf(catalog, Armed(kWizard, kMale, kRod));
+  CHECK(ro::render::FlightLifeTicksOf(960, bow) == 60);
+  CHECK(ro::render::FlightLifeTicksOf(960, trait) == 20);
+  CHECK(ro::render::FlightLifeTicksOf(0, trait) == 1);
 
   // UN DORAM À BAGUETTE tire le trait, l'arme passant avant l'âme comme pour
   // la flèche ; sous l'état qui donne l'âme, les deux retards s'ajoutent.
