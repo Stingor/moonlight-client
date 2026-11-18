@@ -58,8 +58,7 @@ void SuspectReturn(const proto::ZcItemPickupAck& packet, sim::Deal& deal, sim::I
   }
   const sim::ObtainedItem& last = obtained.back();
   if (last.seq != bag.last_obtained_seq() || last.picked.client_slot != packet.Index ||
-      last.picked.item_id != packet.nameid ||
-      last.picked.amount != static_cast<std::int16_t>(packet.count)) {
+      last.picked.item_id != packet.nameid || last.picked.amount != packet.count) {
     return;
   }
   if (deal.ClaimReturn(last.picked)) {

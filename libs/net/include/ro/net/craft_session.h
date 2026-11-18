@@ -8,6 +8,7 @@
 #include "ro/core/error.h"
 #include "ro/net/connection.h"
 #include "ro/net/world_update.h"
+#include "ro/sim/craft_session.h"
 #include "ro/sim/world_fwd.h"
 
 namespace ro::net {
@@ -38,7 +39,7 @@ void ObserveCraftTrigger(std::span<const std::uint8_t> sent, sim::World& world,
 inline constexpr std::uint32_t kMakeCancelItem = 0xFFFFFFFFU;
 // Les trois matériaux optionnels du chemin `kProduce` ; zéro est un emplacement
 // vide.
-inline constexpr std::size_t kProduceExtraSlots = 3;
+inline constexpr std::size_t kProduceExtraSlots = sim::kForgeExtraSlots;
 
 // « Fabrique ceci » sur la liste des flèches. `kMakeCancelItem` annule.
 [[nodiscard]] core::Result<void> RequestMakeArrow(Connection& link, std::uint32_t item_id);
@@ -51,9 +52,13 @@ inline constexpr std::size_t kProduceExtraSlots = 3;
 // « Fabrique ceci, avec ces matériaux en plus » sur une liste de forge ou de
 // pharmacie. ⚠ L'ANNULATION EST ZÉRO ICI, pas moins un : c'est ainsi que le
 // serveur l'attend sur ce chemin.
-[[nodiscard]] core::Result<void> RequestProduce(
-    Connection& link, std::uint32_t item_id,
-    const std::array<std::uint32_t, kProduceExtraSlots>& extras);
+//
+// 🔴 LES MATÉRIAUX POSÉS SE RETIENNENT DANS `craft` : le serveur les retire sans
+// le dire, et c'est sa réponse qui les fera quitter le sac — voir
+// `CraftSession::NoteForgeSent`.
+[[nodiscard]] core::Result<void> RequestProduce(Connection& link, sim::CraftSession& craft,
+                                                std::uint32_t item_id,
+                                                const sim::ForgeExtras& extras);
 
 // La place qui ANNULE un affinage.
 inline constexpr std::int32_t kWeaponRefineCancel = -1;

@@ -30,9 +30,9 @@ bool SameStack(const InventoryItem& left, const InventoryItem& right) noexcept {
   return true;
 }
 
-std::int16_t SaturatedSum(std::int16_t held, std::int16_t added) noexcept {
-  const int sum = static_cast<int>(held) + static_cast<int>(added);
-  return static_cast<std::int16_t>(std::min(sum, int{std::numeric_limits<std::int16_t>::max()}));
+std::int32_t SaturatedSum(std::int32_t held, std::int32_t added) noexcept {
+  const std::int32_t sum = held + added;
+  return std::min(sum, std::int32_t{std::numeric_limits<std::int16_t>::max()});
 }
 
 }  // namespace

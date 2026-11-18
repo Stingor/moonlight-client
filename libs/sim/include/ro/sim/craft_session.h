@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <cstddef>
 #include <cstdint>
 #include <utility>
 #include <vector>
@@ -99,13 +100,28 @@ struct CraftTrigger {
   std::uint64_t seq = 0;
 };
 
+// Les trois emplacements de forge, où l'on pose des Star Crumb ou une pierre
+// élémentaire ; zéro est un emplacement vide.
+inline constexpr std::size_t kForgeExtraSlots = 3;
+using ForgeExtras = std::array<std::uint32_t, kForgeExtraSlots>;
+
 class CraftSession {
  public:
   // ── LA FABRICATION ────────────────────────────────────────────────────────
   void TellMakeList(MakeList list) {
     make_list_ = std::move(list);
     ++make_list_seq_;
+    // Une liste neuve, c'est une demande qui n'aura plus de réponse.
+    forge_extras_ = {};
   }
+
+  // 🔴 LES EMPLACEMENTS DE FORGE QUITTENT LE SAC SANS QUE LE SERVEUR LE DISE.
+  // Il retire leurs matériaux sans paquet de retrait, et sa réponse ne nomme
+  // ni case ni quantité : c'est au client de retenir ce qu'il a posé, puis de
+  // le retrancher à la réponse.
+  void NoteForgeSent(const ForgeExtras& extras) noexcept { forge_extras_ = extras; }
+  // Rend les emplacements de la demande en attente, et l'oublie.
+  [[nodiscard]] ForgeExtras TakeForgeExtras() noexcept { return std::exchange(forge_extras_, {}); }
   [[nodiscard]] const MakeList& make_list() const noexcept { return make_list_; }
   [[nodiscard]] std::uint64_t make_list_seq() const noexcept { return make_list_seq_; }
 
@@ -171,6 +187,7 @@ class CraftSession {
  private:
   MakeList make_list_;
   std::uint64_t make_list_seq_ = 0;
+  ForgeExtras forge_extras_ = {};
   MakeResult make_result_;
   std::uint64_t make_result_seq_ = 0;
   int cook_mastery_ = -1;

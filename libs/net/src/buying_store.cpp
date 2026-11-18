@@ -147,7 +147,7 @@ FrameOutcome ApplyBuyingStoreSaleToBag(const Frame& frame, sim::Inventory& bag) 
   if (!packet) {
     return FrameOutcome::kUndecodable;
   }
-  bag.Take(packet->client_slot, static_cast<std::int16_t>(packet->amount));
+  bag.Take(packet->client_slot, packet->amount);
   return FrameOutcome::kApplied;
 }
 

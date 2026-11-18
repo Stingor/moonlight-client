@@ -132,7 +132,7 @@ template <typename Added>
   item.client_slot = static_cast<std::uint16_t>(packet.index);
   item.item_id = packet.itemId;
   item.type = packet.itemType;
-  item.amount = static_cast<std::int16_t>(packet.amount);
+  item.amount = packet.amount;
   CopyCards(packet.slot, item);
   CopyOptions(packet.option_data, item);
   item.refine_level = packet.refine;
@@ -150,7 +150,7 @@ template <typename Added>
 void AddToHolder(sim::Inventory& holder, sim::InventoryItem arriving) {
   const sim::InventoryItem* already = holder.Find(arriving.client_slot);
   if (already != nullptr && already->item_id == arriving.item_id) {
-    arriving.amount = static_cast<std::int16_t>(already->amount + arriving.amount);
+    arriving.amount = already->amount + arriving.amount;
     // Une pile portée qu'on complète — des flèches rachetées — reste portée :
     // aucun accusé de pose ne suit.
     arriving.worn_at = already->worn_at;
@@ -295,7 +295,7 @@ FrameOutcome ApplyInventoryFrame(const Frame& frame, sim::World& world, std::uin
         item.client_slot = packet.Index;
         item.item_id = packet.nameid;
         item.type = packet.type;
-        item.amount = static_cast<std::int16_t>(packet.count);
+        item.amount = packet.count;
         item.wearable_at = packet.location;
         CopyCards(packet.slot, item);
         CopyOptions(packet.option_data, item);
@@ -345,10 +345,10 @@ FrameOutcome ApplyInventoryFrame(const Frame& frame, sim::World& world, std::uin
         if (const sim::InventoryItem* held = bag.Find(packet.index);
             held != nullptr && packet.count > 0) {
           sim::InventoryItem dropped = *held;
-          dropped.amount = static_cast<std::int16_t>(packet.count);
+          dropped.amount = packet.count;
           bag.RecordDropped(dropped, now_ms);
         }
-        bag.Take(packet.index, static_cast<std::int16_t>(packet.count));
+        bag.Take(packet.index, packet.count);
         return FrameOutcome::kApplied;
       });
 
@@ -398,7 +398,12 @@ FrameOutcome ApplyInventoryFrame(const Frame& frame, sim::World& world, std::uin
 
     case proto::ZcUseItemAck::kOpcode:
       return Decoded<proto::ZcUseItemAck>(frame, [&world](const auto& packet) {
-        if (packet.result == kUseRefused) {
+        // 🔴 UN USAGE RÉUSSI PART À TOUTE LA ZONE, avec la case et le reste de
+        // la pile de CELUI QUI A UTILISÉ L'OBJET. Seul l'identifiant dit si
+        // c'est nous : sans lui, la potion d'un voisin écrit sa quantité sur
+        // la case de même numéro de notre sac, et l'efface quand il en boit
+        // la dernière.
+        if (packet.AID != world.player_id() || packet.result == kUseRefused) {
           return FrameOutcome::kIgnored;
         }
         // 🔴 LE SERVEUR DONNE CE QUI RESTE, pas ce qui a été consommé. Le
@@ -407,6 +412,16 @@ FrameOutcome ApplyInventoryFrame(const Frame& frame, sim::World& world, std::uin
         return world.inventory().SetAmount(static_cast<std::uint16_t>(packet.index), packet.amount)
                    ? FrameOutcome::kApplied
                    : FrameOutcome::kIgnored;
+      });
+
+    case proto::ZcCashItemDelete::kOpcode:
+      return Decoded<proto::ZcCashItemDelete>(frame, [&world](const auto& packet) {
+        // UNE LOCATION ÉCHUE QUITTE LE SAC, la case entière. ⚠ CE PAQUET EST
+        // PARFOIS LE SEUL : un objet déjà échu à son arrivée n'est suivi
+        // d'aucun retrait ordinaire. Quand l'échéance tombe en jeu, ce retrait
+        // suit et trouve la case vide, ce qui est sans effet.
+        return world.inventory().SetAmount(packet.index, 0) ? FrameOutcome::kApplied
+                                                            : FrameOutcome::kIgnored;
       });
 
     case proto::ZcAckItemidentify::kOpcode:
@@ -467,7 +482,7 @@ FrameOutcome ApplyInventoryFrame(const Frame& frame, sim::World& world, std::uin
 
     case proto::ZcDeleteItemFromCart::kOpcode:
       return Decoded<proto::ZcDeleteItemFromCart>(frame, [&world](const auto& packet) {
-        world.cart().Take(packet.index, static_cast<std::int16_t>(packet.amount));
+        world.cart().Take(packet.index, packet.amount);
         return FrameOutcome::kApplied;
       });
 
@@ -498,7 +513,7 @@ FrameOutcome ApplyInventoryFrame(const Frame& frame, sim::World& world, std::uin
 
     case proto::ZcDeleteItemFromStore::kOpcode:
       return Decoded<proto::ZcDeleteItemFromStore>(frame, [&world](const auto& packet) {
-        world.storage().Take(packet.index, static_cast<std::int16_t>(packet.amount));
+        world.storage().Take(packet.index, static_cast<std::int32_t>(packet.amount));
         return FrameOutcome::kApplied;
       });
 

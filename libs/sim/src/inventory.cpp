@@ -126,7 +126,7 @@ void Inventory::Put(InventoryItem item) {
   ++revision_;
 }
 
-bool Inventory::Take(std::uint16_t client_slot, std::int16_t amount) {
+bool Inventory::Take(std::uint16_t client_slot, std::int32_t amount) {
   const auto at = LowerBoundBySlot(items_, client_slot);
   if (at == items_.end() || at->client_slot != client_slot) {
     return false;
@@ -140,7 +140,7 @@ bool Inventory::Take(std::uint16_t client_slot, std::int16_t amount) {
   if (amount >= at->amount) {
     items_.erase(at);
   } else {
-    at->amount = static_cast<std::int16_t>(at->amount - amount);
+    at->amount -= amount;
   }
   ++revision_;
   return true;
@@ -193,7 +193,7 @@ bool Inventory::TakeOff(std::uint16_t client_slot) {
   return ChangeSlot(items_, client_slot, revision_, [](InventoryItem& item) { item.worn_at = 0; });
 }
 
-bool Inventory::SetAmount(std::uint16_t client_slot, std::int16_t amount) {
+bool Inventory::SetAmount(std::uint16_t client_slot, std::int32_t amount) {
   if (amount <= 0) {
     // Plus rien : la ligne disparait, comme apres un retrait complet.
     const auto found = LowerBoundBySlot(items_, client_slot);

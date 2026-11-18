@@ -124,6 +124,54 @@ TEST_CASE("Atelier : le résultat d'une fabrication, pair pour la réussite", "[
   CHECK(world.craft().make_result_seq() == 1);
 }
 
+TEST_CASE("Atelier : la réponse d'une forge retire ses emplacements du sac", "[net][atelier]") {
+  // 🔴 LE SERVEUR NE LE DIT PAS : il retire un Star Crumb par emplacement et
+  // une seule pierre élémentaire, sans paquet de retrait. Sans ce retrait, le
+  // sac en montre un de trop, et une série repart avec un matériau que le
+  // serveur n'a plus — il le saute sans un mot.
+  constexpr std::uint32_t kStarCrumb = 1000;
+  constexpr std::uint32_t kFlameHeart = 994;
+  constexpr std::uint32_t kGreatNature = 997;
+  constexpr std::uint16_t kFirstStarSlot = 3;
+  constexpr std::uint16_t kSecondStarSlot = 9;
+  constexpr std::uint16_t kFlameSlot = 5;
+  constexpr std::uint16_t kNatureSlot = 6;
+  World world;
+  world.inventory().Put(
+      ro::sim::InventoryItem{.client_slot = kFirstStarSlot, .item_id = kStarCrumb, .amount = 1});
+  world.inventory().Put(
+      ro::sim::InventoryItem{.client_slot = kSecondStarSlot, .item_id = kStarCrumb, .amount = 4});
+  world.inventory().Put(
+      ro::sim::InventoryItem{.client_slot = kFlameSlot, .item_id = kFlameHeart, .amount = 2});
+  world.inventory().Put(
+      ro::sim::InventoryItem{.client_slot = kNatureSlot, .item_id = kGreatNature, .amount = 2});
+
+  // Deux étoiles et deux pierres posées : deux étoiles et UNE pierre partent.
+  world.craft().NoteForgeSent({kStarCrumb, kFlameHeart, kGreatNature});
+  std::vector<std::uint8_t> bytes;
+  PutU16(bytes, ro::proto::ZcAckReqmakingitem::kOpcode);
+  PutU16(bytes, 1);
+  PutU32(bytes, kSword);
+  const Frame answer{.opcode = ro::proto::ZcAckReqmakingitem::kOpcode, .bytes = bytes};
+  REQUIRE(ApplyCraftFrame(answer, world) == FrameOutcome::kApplied);
+
+  // La première pile, celle de la plus petite case, se vide la première.
+  CHECK(world.inventory().Find(kFirstStarSlot) == nullptr);
+  CHECK(world.inventory().Find(kSecondStarSlot)->amount == 4);
+  CHECK(world.inventory().Find(kFlameSlot)->amount == 1);
+  CHECK(world.inventory().Find(kNatureSlot)->amount == 2);
+
+  // La demande est soldée : une seconde réponse ne retire plus rien.
+  REQUIRE(ApplyCraftFrame(answer, world) == FrameOutcome::kApplied);
+  CHECK(world.inventory().Find(kSecondStarSlot)->amount == 4);
+
+  // Une liste neuve oublie une demande restée sans réponse.
+  world.craft().NoteForgeSent({kStarCrumb, 0, 0});
+  world.craft().TellMakeList(ro::sim::MakeList{.kind = ro::sim::MakeListKind::kProduce});
+  REQUIRE(ApplyCraftFrame(answer, world) == FrameOutcome::kApplied);
+  CHECK(world.inventory().Find(kSecondStarSlot)->amount == 4);
+}
+
 TEST_CASE("Atelier : la maîtrise culinaire de ce serveur", "[net][atelier]") {
   World world;
   CHECK(world.craft().cook_mastery() == -1);
@@ -195,7 +243,8 @@ TEST_CASE("Atelier : les quatre réponses, octet par octet", "[net][atelier]") {
   CHECK(ReadU16(making, 2) == ro::sim::kCookingMakeType);
   CHECK(ReadU32(making, 4) == kRedPotion);
 
-  REQUIRE(ro::net::RequestProduce(link, kSword, {1000, 994, 0}).has_value());
+  ro::sim::CraftSession craft;
+  REQUIRE(ro::net::RequestProduce(link, craft, kSword, {1000, 994, 0}).has_value());
   const std::vector<std::uint8_t> produce = server.Receive(ro::proto::CzReqmakingitem::kWireSize);
   REQUIRE(produce.size() == ro::proto::CzReqmakingitem::kWireSize);
   CHECK(ReadU16(produce, 0) == 0x018E);
@@ -203,6 +252,13 @@ TEST_CASE("Atelier : les quatre réponses, octet par octet", "[net][atelier]") {
   CHECK(ReadU32(produce, 6) == 1000);
   CHECK(ReadU32(produce, 10) == 994);
   CHECK(ReadU32(produce, 14) == 0);
+  // Les emplacements partis se retiennent ; l'annulation les oublie.
+  CHECK(craft.TakeForgeExtras() == ro::sim::ForgeExtras{1000, 994, 0});
+  REQUIRE(ro::net::RequestProduce(link, craft, kSword, {1000, 0, 0}).has_value());
+  REQUIRE(ro::net::RequestProduce(link, craft, 0, {1000, 0, 0}).has_value());
+  CHECK(craft.TakeForgeExtras() == ro::sim::ForgeExtras{});
+  static_cast<void>(server.Receive(ro::proto::CzReqmakingitem::kWireSize));
+  static_cast<void>(server.Receive(ro::proto::CzReqmakingitem::kWireSize));
 
   REQUIRE(ro::net::RequestWeaponRefine(link, ro::net::kWeaponRefineCancel).has_value());
   const std::vector<std::uint8_t> refine = server.Receive(6);

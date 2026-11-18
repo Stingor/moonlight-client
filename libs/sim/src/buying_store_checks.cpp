@@ -87,7 +87,7 @@ std::vector<BuyingStoreDraftProblem> CheckBuyingStoreDraft(
     const InventoryItem* owned = FirstStackOf(bag, line.item_id);
     if (owned == nullptr) {
       flag(BuyingStoreDraftFault::kNotInBag, rank);
-    } else if (static_cast<std::int64_t>(std::max<std::int16_t>(owned->amount, 0)) + line.amount >
+    } else if (static_cast<std::int64_t>(std::max<std::int32_t>(owned->amount, 0)) + line.amount >
                kBuyingStoreMostOwned) {
       flag(BuyingStoreDraftFault::kOwnedAboveMost, rank);
     }

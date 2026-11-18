@@ -568,7 +568,7 @@ void MakeItemFlow::Flush(ro::ui::MakeItemWindowState& state, const MakeItemSetti
           sent = ro::net::RequestMakeItem(link, make_type_, pending_id_);
           break;
         case MakeListKind::kProduce:
-          sent = ro::net::RequestProduce(link, pending_id_, forge_slots_);
+          sent = ro::net::RequestProduce(link, world.craft(), pending_id_, forge_slots_);
           break;
       }
       if (!sent) {
@@ -593,7 +593,7 @@ void MakeItemFlow::Flush(ro::ui::MakeItemWindowState& state, const MakeItemSetti
           break;
         case MakeListKind::kProduce:
           // ⚠ ZÉRO SUR CE CHEMIN, pas moins un.
-          sent = ro::net::RequestProduce(link, 0, {});
+          sent = ro::net::RequestProduce(link, world.craft(), 0, {});
           break;
       }
       if (!sent) {

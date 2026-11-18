@@ -97,3 +97,80 @@ TEST_CASE("Jet au sol : noté avant le retrait, et jamais à zéro", "[net][inve
   CHECK(world.inventory().dropped().size() == 1);
   CHECK(world.inventory().Find(kSlot)->amount == 6);
 }
+
+TEST_CASE("Usage : l'accusé d'un VOISIN ne touche pas à notre sac", "[net][inventaire]") {
+  // 🔴 UN USAGE RÉUSSI PART À TOUTE LA ZONE. Un voisin qui ouvre une boîte
+  // d'une pile de 17 775 annonce « case 2, reste 17 774 » ; lu sans regarder
+  // son identifiant, ce reste s'écrivait sur NOTRE case 2 — une coiffe y a
+  // compté 17 774 exemplaires.
+  constexpr std::uint32_t kMe = 2000001;
+  constexpr std::uint32_t kNeighbour = 2000002;
+  constexpr std::uint16_t kSlot = 2;
+  constexpr std::uint32_t kUnicornHorn = 2257;
+  constexpr std::uint32_t kOldBlueBox = 603;
+  constexpr std::int16_t kNeighbourLeft = 17774;
+  World world;
+  world.set_player_id(kMe);
+  world.inventory().Put(InventoryItem{.client_slot = kSlot, .item_id = kUnicornHorn, .amount = 1});
+
+  ro::proto::ZcUseItemAck used;
+  used.index = kSlot;
+  used.itemId = kOldBlueBox;
+  used.AID = kNeighbour;
+  used.amount = kNeighbourLeft;
+  used.result = 1;
+  CHECK(ApplyInventoryFrame(FrameOf(Encode(used)), world, kNowMs) == FrameOutcome::kIgnored);
+  REQUIRE(world.inventory().Find(kSlot) != nullptr);
+  CHECK(world.inventory().Find(kSlot)->amount == 1);
+
+  // Sa DERNIÈRE boîte effaçait la ligne.
+  used.amount = 0;
+  CHECK(ApplyInventoryFrame(FrameOf(Encode(used)), world, kNowMs) == FrameOutcome::kIgnored);
+  CHECK(world.inventory().Find(kSlot) != nullptr);
+
+  // Le nôtre s'applique.
+  used.AID = kMe;
+  CHECK(ApplyInventoryFrame(FrameOf(Encode(used)), world, kNowMs) == FrameOutcome::kApplied);
+  CHECK(world.inventory().Find(kSlot) == nullptr);
+}
+
+TEST_CASE("Sac : une somme passagère au-delà de seize bits ne perd pas la pile",
+          "[net][inventaire]") {
+  // Une mise en charrette refusée revient en « plus N », puis « moins N », sur
+  // la même case. À 20 000 + 20 000, seize bits signés débordaient, et le
+  // retrait effaçait la ligne entière.
+  constexpr std::uint16_t kSlot = 7;
+  constexpr std::int16_t kStack = 20000;
+  constexpr std::uint32_t kStarCrumb = 1000;
+  World world;
+  const auto added = Encode(Picked(kSlot, kStarCrumb, static_cast<std::uint16_t>(kStack)));
+  REQUIRE(ApplyInventoryFrame(FrameOf(added), world, kNowMs) == FrameOutcome::kApplied);
+  REQUIRE(ApplyInventoryFrame(FrameOf(added), world, kNowMs) == FrameOutcome::kApplied);
+  CHECK(world.inventory().Find(kSlot)->amount == 2 * kStack);
+
+  ro::proto::ZcDeleteItemFromBody removed;
+  removed.index = kSlot;
+  removed.count = kStack;
+  REQUIRE(ApplyInventoryFrame(FrameOf(Encode(removed)), world, kNowMs) == FrameOutcome::kApplied);
+  REQUIRE(world.inventory().Find(kSlot) != nullptr);
+  CHECK(world.inventory().Find(kSlot)->amount == kStack);
+}
+
+TEST_CASE("Sac : une location échue quitte le sac, case entière", "[net][inventaire]") {
+  // ⚠ CE PAQUET EST PARFOIS LE SEUL : un objet déjà échu à son arrivée n'est
+  // suivi d'aucun retrait ordinaire, et restait affiché.
+  constexpr std::uint16_t kSlot = 11;
+  constexpr std::uint32_t kRental = 12215;
+  World world;
+  world.inventory().Put(InventoryItem{.client_slot = kSlot, .item_id = kRental, .amount = 3});
+
+  ro::proto::ZcCashItemDelete expired;
+  expired.index = kSlot;
+  expired.itemId = kRental;
+  CHECK(ApplyInventoryFrame(FrameOf(Encode(expired)), world, kNowMs) == FrameOutcome::kApplied);
+  CHECK(world.inventory().Find(kSlot) == nullptr);
+
+  // Quand l'échéance tombe en jeu, un retrait ordinaire suit et trouve la case
+  // vide : sans effet.
+  CHECK(ApplyInventoryFrame(FrameOf(Encode(expired)), world, kNowMs) == FrameOutcome::kIgnored);
+}

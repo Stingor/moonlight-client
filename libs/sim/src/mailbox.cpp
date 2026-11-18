@@ -9,10 +9,9 @@
 namespace ro::sim {
 namespace {
 
-std::int16_t SaturatedSum(std::int16_t held, std::int32_t added) noexcept {
-  const std::int32_t sum = static_cast<std::int32_t>(held) + added;
-  return static_cast<std::int16_t>(
-      std::clamp(sum, std::int32_t{0}, std::int32_t{std::numeric_limits<std::int16_t>::max()}));
+std::int32_t SaturatedSum(std::int32_t held, std::int32_t added) noexcept {
+  const std::int32_t sum = held + added;
+  return std::clamp(sum, std::int32_t{0}, std::int32_t{std::numeric_limits<std::int16_t>::max()});
 }
 
 }  // namespace

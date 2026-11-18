@@ -72,7 +72,11 @@ struct InventoryItem {
 
   // Combien il y en a dans la pile. Une pièce d'équipement ne s'empile pas : sa
   // quantité vaut un, et deux exemplaires sont deux objets.
-  std::int16_t amount = 0;
+  //
+  // ⚠ SUR TRENTE-DEUX BITS, bien que le fil ne la porte que sur seize : le
+  // serveur peut annoncer un ajout puis son retrait, et la somme passagère
+  // dépasse alors ce que seize bits signés tiennent.
+  std::int32_t amount = 0;
 
   // OÙ LA PIÈCE PEUT SE PORTER, en drapeaux d'emplacement (les `EQP_*` du
   // serveur). Zéro pour ce qui ne se porte pas.
@@ -352,7 +356,7 @@ class Inventory {
 
   // Retire `amount` exemplaires de la case. La ligne disparaît quand il n'en
   // reste plus. Faux si la case était vide.
-  bool Take(std::uint16_t client_slot, std::int16_t amount);
+  bool Take(std::uint16_t client_slot, std::int32_t amount);
 
   // Vide le CONTENU. Ce que le contenant peut porter reste : le serveur
   // l'annonce a part, et souvent avant la liste.
@@ -408,7 +412,7 @@ class Inventory {
   // Ce qu'il en reste après usage. ⚠ LE SERVEUR DONNE LE RESTE, pas ce qui a
   // été consommé : retrancher le nombre reçu viderait la pile deux fois trop
   // vite. Zéro fait disparaître la ligne.
-  bool SetAmount(std::uint16_t client_slot, std::int16_t amount);
+  bool SetAmount(std::uint16_t client_slot, std::int32_t amount);
 
   bool Identify(std::uint16_t client_slot);
 

@@ -3,6 +3,7 @@
 
 #include "ro/net/craft_session.h"
 
+#include <algorithm>
 #include <cstddef>
 #include <utility>
 #include <vector>
@@ -50,6 +51,38 @@ template <typename Entries>
   return FrameOutcome::kApplied;
 }
 
+// CE QUE LE SERVEUR RETIRE DES EMPLACEMENTS DE FORGE, sans paquet de retrait.
+//
+// Un Star Crumb par emplacement qui en porte un, et UNE SEULE pierre
+// élémentaire quel que soit leur nombre : les autres restent dans le sac. Chaque
+// exemplaire se prend dans la première pile de l'objet, celle de la plus petite
+// case — c'est celle que le serveur vide. Un emplacement sans exemplaire au sac
+// ne retire rien, et ne compte pas comme la pierre prise.
+constexpr std::uint32_t kStarCrumbId = 1000;
+constexpr std::uint32_t kFirstElementStoneId = 994;  // Flame Heart
+constexpr std::uint32_t kLastElementStoneId = 997;   // Great Nature
+
+void TakeForgeExtras(const sim::ForgeExtras& extras, sim::Inventory& bag) {
+  bool element_taken = false;
+  for (const std::uint32_t item_id : extras) {
+    const bool star = item_id == kStarCrumbId;
+    const bool element =
+        item_id >= kFirstElementStoneId && item_id <= kLastElementStoneId && !element_taken;
+    if (!star && !element) {
+      continue;
+    }
+    const auto items = bag.items();
+    const auto held = std::ranges::find_if(items, [item_id](const sim::InventoryItem& item) {
+      return item.item_id == item_id && item.amount > 0;
+    });
+    if (held == items.end()) {
+      continue;
+    }
+    static_cast<void>(bag.Take(held->client_slot, 1));
+    element_taken = element_taken || element;
+  }
+}
+
 }  // namespace
 
 FrameOutcome ApplyCraftFrame(const Frame& frame, sim::World& world) {
@@ -88,6 +121,8 @@ FrameOutcome ApplyCraftFrame(const Frame& frame, sim::World& world) {
 
     case proto::ZcAckReqmakingitem::kOpcode:
       return Decoded<proto::ZcAckReqmakingitem>(frame, [&world](const auto& packet) {
+        // Réussie ou ratée, la forge a consommé ses emplacements.
+        TakeForgeExtras(world.craft().TakeForgeExtras(), world.inventory());
         world.craft().TellMakeResult(
             sim::MakeResult{.code = packet.result, .item_id = packet.itemId});
         return FrameOutcome::kApplied;
@@ -155,12 +190,14 @@ core::Result<void> RequestMakeItem(Connection& link, std::uint16_t make_type,
   return {};
 }
 
-core::Result<void> RequestProduce(Connection& link, std::uint32_t item_id,
-                                  const std::array<std::uint32_t, kProduceExtraSlots>& extras) {
+core::Result<void> RequestProduce(Connection& link, sim::CraftSession& craft, std::uint32_t item_id,
+                                  const sim::ForgeExtras& extras) {
   proto::CzReqmakingitem request;
   request.itemId = item_id;
   request.material = extras;
   link.Send(proto::Encode(request));
+  // Une annulation ne retire rien.
+  craft.NoteForgeSent(item_id != 0 ? extras : sim::ForgeExtras{});
   return {};
 }
 
