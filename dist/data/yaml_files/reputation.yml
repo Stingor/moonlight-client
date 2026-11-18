@@ -26,10 +26,15 @@ factions:
     least: -3000
     most: 3000
     shown: always
+  - id: 5
+    name: "White Cat Alliance"
+    least: -3000
+    most: 3000
+    shown: always
 groups:
   - id: 2
     name: "Arunafeltz"
     factions: [3]
   - id: 3
     name: "Isgard"
-    factions: [4]
+    factions: [4, 5]

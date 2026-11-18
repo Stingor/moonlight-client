@@ -155,6 +155,61 @@ Body:
       - {Item: Pontifex_Courage, Rate: 10000}
       - {Item: Pontifex_Wisdom, Rate: 10000}
       - {Item: Vila_Basement_Key, Rate: 1000}
+  - Map: "1@slug"
+    Monster: MD_EP20_FALLENANGEL
+    Drops:
+      - {Item: EP20_D_P_Crystal, Rate: 10000}
+      - {Item: EP19_N_P_Ore, Rate: 50000}
+      - {Item: EP19_D_P_Crystal, Rate: 50000}
+      - {Item: EP19_N_P_Crystal, Rate: 10000}
+      - {Item: Ep20_Angels_Tail, Rate: 10000}
+      - {Item: EP19_D_P_Ore, Rate: 10000}
+      - {Item: EP19_D_P_Ore, Rate: 10000}
+      - {Item: EP20_D_P_Extract, Rate: 5000}
+      - {Item: EP20_D_P_Ore, Rate: 90000}
+      - {Item: EP20_D_P_Ore, Rate: 90000}
+      - {Item: EP20_D_P_Crystal, Rate: 10000}
+  - Map: "1@twbs"
+    Monster: EP20_MD_BOX1
+    Drops:
+      - {Item: EP20_D_P_Crystal, Rate: 10000}
+      - {Item: EP19_N_P_Ore, Rate: 50000}
+      - {Item: EP19_D_P_Crystal, Rate: 50000}
+      - {Item: EP19_N_P_Crystal, Rate: 10000}
+      - {Item: Ep20_Angels_Tail, Rate: 10000}
+      - {Item: EP19_D_P_Ore, Rate: 10000}
+      - {Item: EP19_D_P_Ore, Rate: 10000}
+      - {Item: EP20_D_P_Extract, Rate: 5000}
+      - {Item: EP20_D_P_Ore, Rate: 90000}
+      - {Item: EP20_D_P_Ore, Rate: 90000}
+      - {Item: C_Serpent_Shadow, Rate: 10}
+  - Map: "1@twbs"
+    Monster: EP20_MD_BOX2
+    Drops:
+      - {Item: EP20_D_P_Crystal, Rate: 10000}
+      - {Item: EP19_N_P_Ore, Rate: 50000}
+      - {Item: EP19_D_P_Crystal, Rate: 50000}
+      - {Item: EP19_N_P_Crystal, Rate: 10000}
+      - {Item: Ep20_Angels_Tail, Rate: 10000}
+      - {Item: EP19_D_P_Ore, Rate: 10000}
+      - {Item: EP19_D_P_Ore, Rate: 10000}
+      - {Item: EP20_D_P_Extract, Rate: 5000}
+      - {Item: EP20_D_P_Ore, Rate: 90000}
+      - {Item: EP20_D_P_Ore, Rate: 90000}
+      - {Item: C_Serpent_Shadow, Rate: 10}
+  - Map: "1@twbs"
+    Monster: MD_EP20_BOSS_LASGAND
+    Drops:
+      - {Item: EP20_D_P_Crystal, Rate: 10000}
+      - {Item: EP19_N_P_Ore, Rate: 50000}
+      - {Item: EP19_D_P_Crystal, Rate: 50000}
+      - {Item: EP19_N_P_Crystal, Rate: 10000}
+      - {Item: Ep20_Angels_Tail, Rate: 10000}
+      - {Item: EP19_D_P_Ore, Rate: 10000}
+      - {Item: EP19_D_P_Ore, Rate: 10000}
+      - {Item: EP20_D_P_Extract, Rate: 5000}
+      - {Item: EP20_D_P_Ore, Rate: 90000}
+      - {Item: EP20_D_P_Ore, Rate: 90000}
   - Map: "1@xm_d"
     Monster: XM_ANTONIO
     Drops:

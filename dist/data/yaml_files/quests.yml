@@ -14242,6 +14242,147 @@ quests:
   8804:
     title: 3rd Rgan in the Hatchery
     icon: ep
+  8839:
+    title: Reluctantly pretending to help
+    icon: ep
+    summary: Helping Rgan's in trouble
+    description: 'Sacred Roots here and there are in need of "capable messengers" who have just returned from reconnaissance. Without even knowing who they really are.
+
+      * <NAVI>[Gomiagand]<INFO>jor_sanct,215,84,0,101,0</INFO></NAVI>
+
+      * <NAVI>[Halseybygand]<INFO>jor_sanct,190,128,0,101,0</INFO></NAVI>
+
+      * <NAVI>[Pamosugand]<INFO>jor_sanct,257,115,0,101,0</INFO></NAVI>
+
+      * <NAVI>[Nasioramigand]<INFO>jor_sanct,271,156,0,101,0</INFO></NAVI>
+
+      * <NAVI>[Eryligand]<INFO>jor_sanct,101,138,0,101,0</INFO></NAVI>'
+  8840:
+    title: Rgan's Trust
+    icon: ep
+    summary: Talk to Sarekgandh
+    description: Strangely, it became a popular body among top-notch Rgans. There were only those who were stubborn and had strange personalities. I think I can talk to <NAVI>[Sarekgandh]<INFO>jor_sanct,157,171,0,101,0</INFO></NAVI> now.
+  8841:
+    title: But think about it
+    icon: ep
+    summary: Talk to Gomiagand
+    description: Sacred Root's <NAVI>[Gomiagand]<INFO>jor_sanct,215,84,0,101,0</INFO></NAVI> seems to have a lot to say, but it's not easy because his direct subordinate, Gamiravagandha, keeps arguing.
+  8842:
+    title: You are very angry
+    icon: ep
+    summary: Deliver 30 Copo's Feathers
+    description: Sacred Root's <NAVI>[Halseybygand]<INFO>jor_sanct,190,128,0,101,0</INFO></NAVI> asks you to bring 30x <ITEM>[Copo's Feathers]<INFO>1001246</INFO></ITEM>.
+  8843:
+    title: Silent Answer
+    icon: ep
+    summary: After delivering the items, talk to Doririrogand
+    description: 'Pamosugand of the Sacred Root asks you to get 20x <ITEM>[Large Gray Feather]<INFO>1001244</INFO></ITEM>.
+
+      Leaving <NAVI>[Doririrogand]<INFO>jor_sanct,258,117,0,101,0</INFO></NAVI> alone, who was assigned as his direct subordinate... !'
+  8844:
+    title: '[Standby] Example of Silent Answer'
+    icon: dq
+    summary: Reset at 04:00
+    description: This quest is a daily quest, and when the waiting time expires, you can receive it again from <NAVI>[Pamosugand]<INFO>jor_sanct,257,115,0,101,0</INFO></NAVI>.
+    cooldown: true
+  8845:
+    title: Example of Silent Answer
+    icon: dq
+    summary: Deliver 20 Large Gray Feathers
+    description: <NAVI>[Pamosugand]<INFO>jor_sanct,257,115,0,101,0</INFO></NAVI> asks you to get 20x <ITEM>[Large Gray Feather]<INFO>1001244</INFO></ITEM>. ...But whose orders are these? Doririrogand?
+  8846:
+    title: I came all the way here
+    icon: ep
+    summary: Intermediate Rgan Job Search
+    description: 'Work is not assigned to intermediate Rgans who have followed their Sacred Roots. Each should be assigned a task to do.
+
+      * <NAVI>[Puddle]<INFO>jor_sanct,48,159,0,101,0</INFO></NAVI>
+
+      * <NAVI>[Tower]<INFO>jor_sanct,95,152,0,101,0</INFO></NAVI>
+
+      * <NAVI>[Garbage]<INFO>jor_root2,12,172,0,101,0</INFO></NAVI>
+
+      * <NAVI>[A mountain of junk]<INFO>jor_root2,242,124,0,101,0</INFO></NAVI>
+
+      * <NAVI>[Warehouse]<INFO>jor_root2,149,125,0,101,0</INFO></NAVI>'
+  8847:
+    title: Nasioramigand's Work
+    icon: dq
+    summary: Intermediate Rgan Job Search
+    description: I found something to do for Nasioramigand.
+  8848:
+    title: Numkasaigargand's Work
+    icon: dq
+    summary: Intermediate Rgan Job Search
+    description: I found something to do for Numkasaigargand.
+  8849:
+    title: Onnacharamelgand's Work
+    icon: dq
+    summary: Intermediate Rgan Job Search
+    description: I found something to do for Onnacharamelgand.
+  8850:
+    title: Jagdagumigand's Work
+    icon: dq
+    summary: Intermediate Rgan Job Search
+    description: I found something to do for Jagdagumigand.
+  8851:
+    title: Clejainamogand's Work
+    icon: dq
+    summary: Intermediate Rgan Job Search
+    description: I found something to do for Clejainamogand.
+  8852:
+    title: '[Standby] I''ve come this far'
+    icon: dq
+    summary: Reset at 04:00
+    description: This quest is a daily quest, and you can receive it again from <NAVI>[Nasioramigand]<INFO>jor_sanct,271,156,0,101,0</INFO></NAVI> when the waiting time expires.
+    cooldown: true
+  8853:
+    title: I've come this far
+    icon: dq
+    summary: Intermediate Rgan Job Search
+    description: Work is not assigned to intermediate Rgans who have followed their Sacred Roots. You have to give each one a task to do.
+  8854:
+    title: I probably have a lunch box
+    icon: ep
+    summary: Talk to Eryligand
+    description: Did <NAVI>[Eryligand]<INFO>jor_sanct,101,138,0,101,0</INFO></NAVI> really tell this story to everyone?
+  8855:
+    title: Collection of Soft Delicacies
+    icon: ep
+    summary: Gather Materials
+    description: 'Zoryara''s cousin, Toryoryo, joined the daycare center.
+
+      Kill 20 Angel Snails and 20 Snow Rabbit Snails.
+
+      Bring 10x <ITEM>[Soft Fluorescent Cells(Salty)]<INFO>1001232</INFO></ITEM>,
+
+      10x <ITEM>[Soft Fluorescent Cells(Daldal)]<INFO>1001233</INFO></ITEM> to <NAVI>[Toryoryo]<INFO>icas_in,243,66,0,101,0</INFO></NAVI>.'
+  8856:
+    title: '[Standby] Collection of Soft Delicacies'
+    icon: dq
+    summary: Reset at 04:00
+    description: This quest is a daily quest, and you can receive it again from <NAVI>[Toryoryo]<INFO>icas_in,243,66,0,101,0</INFO></NAVI> when the waiting time expires.
+    cooldown: true
+  8857:
+    title: Salty and Sweet Flavors
+    icon: dq
+    summary: Gather Materials
+    description: 'Kill 20 Angel Snails and 20 Snow Rabbit Snails.
+
+      Bring 10x <ITEM>[Soft Fluorescent Cells(Salty)]<INFO>1001232</INFO></ITEM>,
+
+      10x <ITEM>[Soft Fluorescent Cells(Sweet)]<INFO>1001233</INFO></ITEM> to <NAVI>[Toryoryo]<INFO>icas_in,243,66,0,101,0</INFO></NAVI>.'
+  8858:
+    title: Salty, Sweet and Sour
+    icon: dq
+    summary: Gather Materials
+    description: 'Kill 20 Angel Snails, 20 Snow Rabbit Snails and 20 Melive Snails.
+
+      Bring 10x <ITEM>[Soft Fluorescent Cells(Salty)]<INFO>1001232</INFO></ITEM>,
+
+      10x <ITEM>[Soft Fluorescent Cells(Sweet)]<INFO>1001233</INFO></ITEM>,
+
+      10x <ITEM>[Soft Fluorescent Cells(Sour)]<INFO>1001231</INFO></ITEM> to <NAVI>[Toryoryo]<INFO>icas_in,243,66,0,101,0</INFO></NAVI>.'
   9000:
     title: Job Change to Knight
     summary: Talk with other members of Chivalry
@@ -19249,6 +19390,155 @@ quests:
     summary: Reset at 04:00
     description: Helped Tamarin repair a hunting trap in the Ice Castle. Come back tomorrow.
     cooldown: true
+  11928:
+    title: Koko's Secret Base
+    icon: ep
+    summary: To Frederike
+    description: Awin's delivery person asked for a box delivery. Let's deliver it to <NAVI>[Frederike]<INFO>icas_in,35,121,0,101,0</INFO></NAVI> near Icesen.
+  11929:
+    title: Koko's Secret Base
+    icon: ep
+    summary: Talk to Koko
+    description: It's mealtime for Koko near Icesen! Let's send them home to <NAVI>[Koko]<INFO>icas_in,32,116,0,101,0</INFO></NAVI>.
+  11930:
+    title: Koko's Secret Base
+    icon: ep
+    summary: Talk to Koko
+    description: It's mealtime for Koko near Icesen! Let's send them home to <NAVI>[Koko]<INFO>icas_in,30,120,0,101,0</INFO></NAVI>.
+  11931:
+    title: Koko's Secret Base
+    icon: ep
+    summary: Talk to Koko
+    description: It's mealtime for Koko near Icesen! Let's send them home to <NAVI>[Koko]<INFO>icas_in,36,117,0,101,0</INFO></NAVI>.
+  11932:
+    title: Koko's Secret Base
+    icon: ep
+    summary: Talk to Koko
+    description: It's mealtime for Koko near Icesen! Let's send them back home to <NAVI>[Koko]<INFO>icas_in,28,119,0,101,0</INFO></NAVI>.
+  11933:
+    title: Koko's Secret Base
+    icon: ep
+    summary: Outside the House
+    description: It seems Chachako left his little brother Kapopo behind. To take Kapopo back home, let's go to <NAVI>[Outside Frederike's House]<INFO>icecastle,65,213,0,101,0</INFO></NAVI> in Icesen.
+  11934:
+    title: Koko's Secret Base
+    icon: ep
+    summary: To Kapopo's House
+    description: It seems Chachako left his little brother Kapopo behind. To take Kapopo back home, let's go to <NAVI>[Kapopo's House Below Frederike's House]<INFO>icecastle,65,159,0,101,0</INFO></NAVI>.
+  11935:
+    title: Koko's Secret Base
+    icon: ep
+    summary: To Frederike's House
+    description: We safely brought Chachako back home. Let's return to <NAVI>[Frederike's House]<INFO>icecastle,65,213,0,101,0</INFO></NAVI> in Icesen.
+  11936:
+    title: Koko's Secret Base
+    icon: ep
+    summary: Find Rorohyu
+    description: Rorohyu, who was going home, seems to have disappeared. Let's take a walk around <NAVI>[Icesen Surroundings]<INFO>icecastle,109,241,0,101,0</INFO></NAVI> and look for Rorohyu.
+  11937:
+    title: Koko's Secret Base
+    icon: ep
+    summary: To Icesen
+    description: We couldn't find any information about Rorohyu. Let's go inside <NAVI>[Icesen]<INFO>icas_in,113,38,0,101,0</INFO></NAVI> to get information about Rorohyu.
+  11938:
+    title: Koko's Secret Base
+    icon: ep
+    summary: Talk to the Guards
+    description: We couldn't find any information about Rorohyu. Let's go to the entrance of Icesen and meet the guards at <NAVI>[Village Entrance]<INFO>icecastle,24,130,0,101,0</INFO></NAVI>.
+  11939:
+    title: Koko's Secret Base
+    icon: ep
+    summary: Talk to Rorohyu
+    description: The Awin guard says Rorohyu is sightseeing at the entrance of the Icesen village. Let's talk to Rorohyu and take him home.
+  11940:
+    title: Koko's Secret Base
+    icon: ep
+    summary: Outside the Village
+    description: Rorohyu seems to have left the Icesen village entrance and gone outside, leaving behind a fluffy thread at the entrance. Let's go out and look for Rorohyu.
+  11941:
+    title: Koko's Secret Base
+    icon: ep
+    summary: Find Rorohyu
+    description: Let's look for Rorohyu at <NAVI>[Rorohyu]<INFO>jor_back1,310,245,0,101,0</INFO></NAVI> in the Frozen Scale Hill.
+  11942:
+    title: Koko's Secret Base
+    icon: ep
+    summary: Find Rorohyu
+    description: Let's look for Rorohyu at <NAVI>[Rorohyu]<INFO>jor_back2,8,242,0,101,0</INFO></NAVI> in the Frozen Scale Plateau.
+  11943:
+    title: Koko's Secret Base
+    icon: ep
+    summary: Find Rorohyu
+    description: Let's look for Rorohyu at <NAVI>[Rorohyu]<INFO>jor_back3,95,324,0,101,0</INFO></NAVI> in the Frozen Scale Glacier.
+  11944:
+    title: Koko's Secret Base
+    icon: ep
+    summary: Find Rorohyu
+    description: Let's look for Rorohyu at <NAVI>[Rorohyu]<INFO>jor_back4,101,265,0,101,0</INFO></NAVI> in the Frozen Scale Beach.
+  11945:
+    title: Koko's Secret Base
+    icon: ep
+    summary: Find Rorohyu
+    description: We found Koko on the Frozen Scale Beach, and it seems like Rorohyu went into a pit. Let's go in and look for Rorohyu at <NAVI>[Pit]<INFO>jor_back4,101,265,0,101,0</INFO></NAVI>.
+  11946:
+    title: Koko's Secret Base
+    icon: ep
+    summary: Rescue the Kokopos
+    description: We found Rorohyu, but it appears Rorohyu's friend was captured by a monster. Let's defeat the boss monster in the Sticky Sea and rescue Rorohyu's friend.
+  11947:
+    title: Koko's Secret Base
+    icon: ep
+    summary: Talk to Lalaha
+    description: We successfully rescued Rorohyu and Rorohyu's friend. Let's go back to <NAVI>[Lalaha]<INFO>icecastle,67,218,0,101,0</INFO></NAVI> in Icesen, where Rorohyu is waiting.
+  11948:
+    title: Escargo!
+    icon: dq
+    summary: Talk to Koko
+    description: Lalaha says there are Kokopos going into the Sticky Sea. She asks us to get rid of the monsters in the Sticky Sea. Let's talk to the <NAVI>[Koko]<INFO>jor_back4,101,265,0,101,0</INFO></NAVI> at the entrance of the Sticky Sea and go into the Sticky Sea.
+  11949:
+    title: Escargo!
+    icon: dq
+    summary: Defeat the Corrupted Angel Snail
+    description: In the Sticky Sea, defeat the corrupted angel snail that's bothering the Kokopos and rescue them.
+  11950:
+    title: '[Standby] Escargo!'
+    icon: dq
+    summary: Resets at 4 AM
+    description: The Sticky Sea has been cleaned. Let's take a break today.
+    cooldown: true
+  11951:
+    title: It's Dangerous!
+    icon: dq
+    summary: Send Back the Kokopos
+    description: Lalaha still thinks there are Kokopos going into the Sticky Sea. She asks us to scold the lost Kokopos at the Sticky Sea and send them back. Let's talk to <NAVI>[Koko]<INFO>jor_back4,101,265,0,101,0</INFO></NAVI> at the entrance of the Sticky Sea and enter it. After completing the quest, return to <NAVI>[Lalaha]<INFO>icecastle,67,218,0,101,0</INFO></NAVI>.
+  11952:
+    title: '[Standby] It''s Dangerous!'
+    icon: dq
+    summary: Resets at 4 AM
+    description: The Kokopos have been sent back. Let's take a break today.
+    cooldown: true
+  11953:
+    title: I Hope They Reconcile (1)
+    icon: dq
+    summary: Scold the Ashen Icewinds
+    description: Lalaha hopes that Icewinds living in the ancient Ice Canyon will calm down even if it's for the children. Let's go to the <NAVI>[Eastern Part of the Ancient Ice Canyon]<INFO>jor_back5,263,49,0,101,0</INFO></NAVI> and scold about 10 Ashen Icewinds and come back.
+  11954:
+    title: '[Standby] I Hope They Reconcile (1)'
+    icon: dq
+    summary: Resets at 4 AM
+    description: The Ashen Icewinds have been scolded. Let's take a break today.
+    cooldown: true
+  11955:
+    title: I Hope They Reconcile (2)
+    icon: dq
+    summary: Scold the Icewinds
+    description: Lalaha hopes that Icewinds living in the ancient Ice Canyon will calm down even if it's for the children. Let's go to the <NAVI>[Western Part of the Ancient Ice Canyon]<INFO>jor_back6,324,150,0,101,0</INFO></NAVI> and scold about 10 Icewinds and come back.
+  11956:
+    title: '[Standby] I Hope They Reconcile (2)'
+    icon: dq
+    summary: Resets at 4 AM
+    description: The Icewinds have been scolded. Let's take a break today.
+    cooldown: true
   12000:
     title: An old friend
     description: Find Maku's old friend and talk with him.
@@ -21463,6 +21753,28 @@ quests:
     title: Core Disabling
     summary: Core Disabling
     description: There is no measure of how much risk there is to completely blow up the aircraft. First, let's disable the core containing the logic that drives the aircraft.
+  12588:
+    title: '[Standby] The Immortal'
+    icon: ep
+    summary: Resets at 4 AM
+    description: After dawn, you can communicate with <NAVI>The Branch of the World Tree<INFO>prt_elib,60,37,0,101,0</INFO></NAVI> again.
+    cooldown: true
+  12589:
+    title: '[Standby] The Immortal (Advanced)'
+    icon: ep
+    summary: Resets at Dawn after 3 Days
+    description: After 3 days, you can communicate with <NAVI>The Branch of the World Tree<INFO>prt_elib,60,37,0,101,0</INFO></NAVI> again.
+    cooldown: true
+  12590:
+    title: The Story of the Immortal
+    icon: ep
+    summary: EP20 MD
+    description: Is it impossible to kill Lasgand? Then what should we do? Is there no way?
+  12591:
+    title: Neutralizing the Immortal
+    icon: ep
+    summary: Neutralizing Lasgand
+    description: It's said that killing Lasgand is impossible, but it seems like we can somehow make him powerless for a while.
   13000:
     title: RWC 2011Card Gathering
     description: Defeat the Gold Porings that are randomly around Rune Midgard and collect enough Blue Cards to spell out "RWC 2011"
@@ -27100,6 +27412,76 @@ quests:
     icon: dq
     summary: Reset at 04:00
     description: After defeating the Simulation Juncea, take a rest for the day or so. After getting enough rest, you can return to the Snake Nest's <NAVI>[Aroon]<INFO>jor_nest,66,260,0,101,0</INFO></NAVI> waiting in front of Bagot's lab to fight again.
+  16691:
+    title: Expand Exploration Range
+    icon: ep
+    summary: Explore the Ancient Ice Canyon
+    description: Let's go investigate the unexplored area of the <NAVI>[Ancient Ice Canyon]<INFO>jor_back5,350,75,0,101,0</INFO></NAVI>.
+  16692:
+    title: The Natives of the Ancient Ice Canyon
+    icon: ep
+    summary: Take Refuge in a Safe Place
+    description: We were attacked by the ancient Icewinds in the Ancient Ice Canyon. Let's take refuge for now in <NAVI>[a safe place]<INFO>jor_back5,350,75,0,101,0</INFO></NAVI>.
+  16693:
+    title: Exploration of the Ancient Ice Canyon
+    icon: ep
+    summary: Explore the Ancient Ice Canyon
+    description: We found suspicious installations and traces that seem to belong to Le'gan in the Ancient Ice Canyon. Let's further investigate the <NAVI>[surroundings]<INFO>jor_back5,353,357,0,101,0</INFO></NAVI>.
+  16694:
+    title: Evidence and Return
+    icon: ep
+    summary: Return to Icesen
+    description: We acquired a suspicious device. Let's return to <NAVI>[Icesen]<INFO>icas_in,262,202,0,101,0</INFO></NAVI> to examine the device.
+  16695:
+    title: Suspicious Signs
+    icon: ep
+    summary: Talk to Horror
+    description: Horror seems to have something to say to the adventurer. He says he'll be waiting in the <NAVI>[corner]<INFO>icas_in,259,219,0,101,0</INFO></NAVI> of the Icesen adventurer's lodging.
+  16696:
+    title: Military Camp Investigation
+    icon: ep
+    summary: Military Camp Investigation
+    description: Let's conduct an investigation to see if there are any suspicious signs in the <NAVI>[military camp]<INFO>icas_in,113,41,0,101,0</INFO></NAVI> in Icesen.
+  16697:
+    title: Lodge Investigation
+    icon: ep
+    summary: Lodge Investigation
+    description: Let's conduct an investigation to see if there are any suspicious signs in the <NAVI>[lodge]<INFO>icas_in,92,113,0,101,0</INFO></NAVI> in Icesen.
+  16698:
+    title: Back Alley Exploration
+    icon: ep
+    summary: Back Alley Investigation
+    description: Investigate for any suspicious signs in the <NAVI>[Back Alley]<INFO>icecastle,209,243,0,101,0</INFO></NAVI> of Ice Castle.
+  16699:
+    title: Suspicious Signs?
+    icon: ep
+    summary: Talk to Horror
+    description: Were there any suspicious signs? Since the investigation in the designated area is complete, let's return to <NAVI>[Horror]<INFO>icas_in,259,219,0,101,0</INFO></NAVI> at Ice Castle Adventurer's Lodge.
+  16700:
+    title: Identity of the Suspicious Device
+    icon: ep
+    summary: Talk to Velgund
+    description: <NAVI>[Velgund]<INFO>icas_in,260,205,0,101,0</INFO></NAVI> has discovered the identity of the suspicious device. Let's hear the details at the Ice Castle Adventurer's Lodge.
+  16701:
+    title: Canyon Exploration
+    icon: ep
+    summary: Talk to Lehar
+    description: Lehar is preparing for a canyon exploration at <NAVI>[Front of Ice Castle]<INFO>icecastle,201,171,0,101,0</INFO></NAVI>. After the preparations are complete, let's head to the castle front.
+  16702:
+    title: Return to Ice Castle
+    icon: ep
+    summary: Talk to Miriam
+    description: Many things have happened. Return to <NAVI>[Ice Castle]<INFO>icas_in,259,200,0,101,0</INFO></NAVI> to inform Miriam and the adventurer of our safe return.
+  16703:
+    title: Recent Events
+    icon: ep
+    summary: Talk to Rage
+    description: At the <NAVI>[Adventurer's Lodge]<INFO>icas_in,263,200,0,101,0</INFO></NAVI> in Ice Castle, let's talk about the events witnessed during the escape and make plans for the future.
+  16704:
+    title: Era of Cold War and Espionage
+    icon: ep
+    summary: Gather at Front of Snake's Nest Door
+    description: We have decided to transform into high-level Lecans and infiltrate the gaps among the Lecans. Let's start the spy operation from <NAVI>[Front of Snake's Nest]<INFO>jor_nest,36,274,0,101,0</INFO></NAVI>.
   17000:
     title: Meet with Father Bamph
     icon: ep
@@ -27807,6 +28189,168 @@ quests:
     summary: Reset at 04:00
     description: After dawn, the battery will be discharged, so you can come back here to the Ice Castle and replace it. Just rest for today. - <NAVI>[Horr]<INFO>icecastle,27,126,0,101,0</INFO></NAVI>
     cooldown: true
+  17690:
+    title: A New Exploration Site
+    icon: ep
+    summary: To the Ice Castle
+    description: Gather at the inner part of <NAVI>[Ice Castle]<INFO>icas_in,262,202,0,101,0</INFO></NAVI> to discuss a new exploration site.
+  17691:
+    title: Infiltrating the Lair of Lergan
+    icon: ep
+    summary: The Door Is Open
+    description: The previously sealed door of <NAVI>[Lair of the Serpent]<INFO>jor_nest,36,274,0,101,0</INFO></NAVI> has been opened. Now, it's just a matter of entering while transformed into Lergan using a transformation scroll.
+  17692:
+    title: Infiltrating the Lair of Lergan
+    icon: ep
+    summary: To the Roots of the Serpent
+    description: After transforming into Lergan using a transformation scroll, entered the opened Lair of the Serpent's <NAVI>[Beyond]<INFO>jor_root1,32,34,0,101,0</INFO></NAVI>. Let's investigate thoroughly.
+  17693:
+    title: Infiltrating the Lair of Lergan
+    icon: ep
+    summary: Handling Lergan Shamans
+    description: Identified some unusual Lergan who appear human. First, let's deal with these creatures and then search for the <NAVI>[Companions]<INFO>jor_root2,239,243,0,101,0</INFO></NAVI> in the roots of the serpent.
+  17694:
+    title: Infiltrating the Lair of Lergan
+    icon: ep
+    summary: Aiding Leize the Resolver
+    description: Leize went ahead to explore the interior. Let's wait for Leize in the <NAVI>[Sanctuary]<INFO>jor_root2,239,243,0,101,0</INFO></NAVI> within the roots of the serpent.
+  17695:
+    title: Infiltrating the Lair of Lergan
+    icon: ep
+    summary: Leize's Stratagem?
+    description: Leize suggested disguising as Lergan bishops and infiltrating the <NAVI>[Sanctuary]<INFO>jor_root2,239,243,0,101,0</INFO></NAVI> within the roots of the serpent. Is this Leize's plan?
+  17696:
+    title: Sacred and Divine
+    icon: ep
+    summary: To the Sacred Roots
+    description: The party decided to use the appearance of Leize, disguised as a top-tier Lergan, to enter the <NAVI>[Sacred Roots]<INFO>jor_sanct,162,86,0,101,0</INFO></NAVI>.
+  17697:
+    title: Sacred and Divine
+    icon: ep
+    summary: Assisting Lergan's Tasks 1
+    description: When arriving at the Sacred Roots, top-tier <NAVI>[Lergan]<INFO>jor_sanct,162,86,0,101,0</INFO></NAVI> individuals stood in line, seeking assistance. Let's help them wholeheartedly.
+  17698:
+    title: Sacred and Divine
+    icon: ep
+    summary: Collect 3 Snakeberries
+    description: Go out to <NAVI>[Lair of the Serpent]<INFO>jor_root2,26,271,0,101,0</INFO></NAVI> and gather three snakeberries, which our <NAVI>[Bishops]<INFO>jor_sanct,162,86,0,101,0</INFO></NAVI> enjoy.
+  17699:
+    title: Sacred and Divine
+    icon: ep
+    summary: Assisting Lergan's Tasks 2
+    description: We obtained some information about the Sacred Roots from the top-tier Lergan. Let's get more information from other top-tier <NAVI>[Lergan]<INFO>jor_sanct,185,128,0,101,0</INFO></NAVI> individuals in the Sacred Roots.
+  17700:
+    title: Sacred and Divine
+    icon: ep
+    summary: Assisting Lergan's Tasks 3
+    description: We learned about the Magic Absorption Device and the Awin Transformation Device from a top-tier Lergan. Let's seek more information from other top-tier <NAVI>[Lergan]<INFO>jor_sanct,42,105,0,101,0</INFO></NAVI> individuals in the Sacred Roots.
+  17701:
+    title: Earning Lergan's Trust
+    icon: ep
+    summary: Assisting Lergan's Tasks 4
+    description: To acquire more information, we need to gain Lergan's trust. Let's assist Lergan individuals in need, including <NAVI>[Pamoshgand]<INFO>jor_sanct,257,115,0,101,0</INFO></NAVI>, at the Sacred Roots.
+  17702:
+    title: Heading Towards the End of the Maze
+    icon: ep
+    summary: To the Serpent's Maze
+    description: Saergand, known as Lasgand's right hand, will quietly approach adventurers in front of the <NAVI>[Door]<INFO>jor_sanct,22,283,0,101,0</INFO></NAVI> leading to the Serpent's Maze.
+  17703:
+    title: Heading Towards the End of the Maze
+    icon: ep
+    summary: Cleaning the Serpent's Maze
+    description: There are parasites living in the Serpent's Maze beyond this door. It seems like some cleaning is needed. Before that person arrives, deal with three of them and return to <NAVI>[Sacred Roots]<INFO>jor_sanct,22,283,0,101,0</INFO></NAVI>.
+  17704:
+    title: Heading Towards the End of the Maze
+    icon: ep
+    summary: Finding Saergand's Traces 1
+    description: Saregand, known as Lasgand's right hand, said he is going to meet Lasgand. Let's investigate Saergand's <NAVI>[Traces]<INFO>jor_maze,15,47,0,101,0</INFO></NAVI> within the Serpent's Maze.
+  17705:
+    title: Heading Towards the End of the Maze
+    icon: ep
+    summary: Finding Saergand's Traces 2
+    description: Saergand's traces are sporadically present. It seems like a more thorough search of <NAVI>[Serpent's Maze]<INFO>jor_maze,17,153,0,101,0</INFO></NAVI> is necessary.
+  17706:
+    title: Heading Towards the End of the Maze
+    icon: ep
+    summary: Finding Saergand's Traces 3
+    description: After parting ways with the party, you are left alone. Investigate <NAVI>[Serpent's Maze]<INFO>jor_maze,140,71,0,101,0</INFO></NAVI> for Saergand's traces.
+  17707:
+    title: Unexpected Reunion
+    icon: ep
+    summary: Investigating the Suspicious Device
+    description: There is a suspicious <NAVI>[Device]<INFO>jor_maze,140,71,0,101,0</INFO></NAVI> in the Serpent's Maze. The only person who could have created such a device is Bagot. Investigating the device may provide clues.
+  17708:
+    title: Unexpected Reunion
+    icon: ep
+    summary: The Power of the White Cat
+    description: During a confrontation with Lasgand, a white cat suddenly appeared and sent Lasgand's group flying, including the adventurer <NAVI>[Party]<INFO>jor_back1,365,226,0,101,0</INFO></NAVI>, to the frozen Scaled Hill.
+  17709:
+    title: Report on Infiltration
+    icon: ep
+    summary: To the Ice Castle
+    description: Return to <NAVI>[Ice Castle]<INFO>icas_in,226,255,0,101,0</INFO></NAVI> and report the information about 'that place' and Lasgand.
+  17710:
+    title: Cleaning the Serpent's Maze
+    icon: dq
+    summary: Dealing with Yormungand Guardians
+    description: It's all about cleaning today! Eliminate 10 Yormungand Guardians of each color in the Serpent's Maze and then return to <NAVI>[Sacred Roots]<INFO>jor_sanct,22,283,0,101,0</INFO></NAVI>.
+  17711:
+    title: '[Standby] Cleaning the Serpent''s Maze'
+    icon: dq
+    summary: 4 AM Reset
+    description: After the dawn passes, go to the <NAVI>[Supervisor]<INFO>jor_sanct,22,283,0,101,0</INFO></NAVI> in the Sacred Roots to receive new cleaning tasks.
+    cooldown: true
+  17712:
+    title: A New Beginning
+    icon: ep
+    summary: To the Ice Castle
+    description: It's said that the top-tier Lergan we captured earlier is causing trouble. Let's go to the Ice Castle following <NAVI>[Awin Soldier]<INFO>icecastle,46,164,0,101,0</INFO></NAVI> asking for help.
+  17713:
+    title: A New Beginning
+    icon: ep
+    summary: Distinguished Guest
+    description: <NAVI>[Horr]<INFO>icas_in2,31,116,0,101,0</INFO></NAVI> is in a dilemma because of Nadyagand's demands for keeping him imprisoned in the Ice Castle.
+  17714:
+    title: A New Beginning
+    icon: ep
+    summary: Collect 10 Snakeberries
+    description: To make Nadyagand, who is imprisoned in the Ice Castle, talk, we need to bring the snakeberries he demands. Let's go to <NAVI>[Snake God's Roots]<INFO>jor_root2,25,21,0,101,0</INFO></NAVI> and gather 10 snakeberries.
+  17715:
+    title: A New Beginning
+    icon: ep
+    summary: Conversation with Leize
+    description: We've obtained the snakeberries, but the top-tier Lergan knows nothing. Just when he was about to give in to the idea of sitting in the Ice Castle, <NAVI>[Leize]<INFO>icas_in2,32,120,0,101,0</INFO></NAVI> appeared. Let's seek advice from Leize.
+  17716:
+    title: A New Beginning
+    icon: ep
+    summary: Conversation with Leize
+    description: Leize easily persuaded Nadyagand to work without any intentions of playing or eating. How? Let's ask <NAVI>[Leize]<INFO>icas_in2,32,120,0,101,0</INFO></NAVI> for the details when visiting the Ice Castle.
+  17717:
+    title: '[Standby] Taste of Leisure'
+    icon: dq
+    summary: 4 AM Reset
+    description: Unintentionally, we've decided to bring some snacks to <NAVI>[Nadyagand]<INFO>icas_in2,30,121,0,101,0</INFO></NAVI> who is working hard. Let's return to the Ice Castle after dawn.
+    cooldown: true
+  17718:
+    title: Taste of Leisure
+    icon: dq
+    summary: Collect 10 Snakeberries
+    description: Let's gather 10 snakeberries from <NAVI>[Snake God's Roots]<INFO>jor_root2,25,21,0,101,0</INFO></NAVI> for <NAVI>[Nadyagand]<INFO>icas_in2,30,121,0,101,0</INFO></NAVI>, who is working diligently in the Ice Castle.
+  17719:
+    title: Sacred and Divine
+    icon: ep
+    summary: Deliver Snakeberries
+    description: Deliver snakeberries to the Lergan <NAVI>[Bishop]<INFO>jor_sanct,162,86,0,101,0</INFO></NAVI> in the Sacred Roots.
+  17720:
+    title: Taste of Leisure
+    icon: dq
+    summary: To Nadyagand
+    description: We've collected all the snakeberries. Let's deliver them to <NAVI>[Nadyagand]<INFO>icas_in2,30,121,0,101,0</INFO></NAVI> in the Ice Castle.
+  17721:
+    title: Taste of Leisure
+    icon: dq
+    summary: To Nadyagand
+    description: We've collected all the snakeberries. Let's deliver them to <NAVI>[Nadyagand]<INFO>icas_in2,30,121,0,101,0</INFO></NAVI> in the Ice Castle.
   18000:
     title: "Ready to enter"
     icon: lq
@@ -28307,6 +28851,114 @@ quests:
     icon: ep
     summary: Talk to Nyhill in his room
     description: Lehar says you need to get permission to visit from the Guardians of Issgard through the Guardian's Box. At the Royal Palace of Prontera, I decided to use the Guardian's Box stored in <NAVI>[Nyhill]<INFO>prt_cas,331,343,0,101,0</INFO></NAVI>'s room to receive an invitation.
+  18220:
+    title: To the Ice Castle
+    icon: ep
+    summary: Conversation with Leon
+    description: We've received the assistance of Lord Naya. Let's return to the Ice Castle and check in with <NAVI>[Leon]<INFO>icas_in,111,228,0,101,0</INFO></NAVI> and our comrades.
+  18221:
+    title: Finding Lehrar...!
+    icon: ep
+    summary: Investigate the Marker
+    description: We've decided to find Lehrar at the first floor of the Snake's Roots. Let's investigate the <NAVI>[Marker]<INFO>jor_root1,32,75,0,101,0</INFO></NAVI>.
+  18222:
+    title: Investigation, Investigation, Investigation
+    icon: ep
+    summary: Investigate 3 Marks
+    description: After investigating the mark left in the Snake's Roots, Lehrar suggested exchanging information at the Sacred Roots. There are a total of three marked locations.
+  18223:
+    title: Lehrar's Mark 1
+    icon: ep
+    summary: Investigate the Mark
+    description: One of Lehrar's <NAVI>[marks]<INFO>jor_root1,69,128,0,101,0</INFO></NAVI> left in the Snake's Roots 1st floor. There's a long path leading inside. Let's check if there's Bagoth's laboratory inside.
+  18224:
+    title: Lehrar's Mark 2
+    icon: ep
+    summary: Investigate the Mark
+    description: One of Lehrar's <NAVI>[marks]<INFO>jor_root1,35,211,0,101,0</INFO></NAVI> left in the Snake's Roots 1st floor. There's a long path leading inside. Let's check if there's Bagoth's laboratory inside.
+  18225:
+    title: Lehrar's Mark 3
+    icon: ep
+    summary: Investigate the Mark
+    description: One of Lehrar's <NAVI>[marks]<INFO>jor_root1,254,66,0,101,0</INFO></NAVI> left in the Snake's Roots 1st floor. There's a long path leading inside. Let's check if there's Bagoth's laboratory inside.
+  18226:
+    title: It's Just a Hoax. The Next Location.
+    icon: ep
+    summary: Investigate the Marks
+    description: Even after investigating all the marks left in the Snake's Roots 1st floor, we couldn't find the entrance to Bagoth's laboratory. Let's meet Lehrar and Miriam at the <NAVI>[Sacred Roots]<INFO>jor_sanct,133,86,0,101,0</INFO></NAVI>.
+  18227:
+    title: Investigating the Sacred Roots
+    icon: ep
+    summary: Conversation with the Bishop
+    description: Lehrar and Miriam have decided to investigate the interior of the Sacred Roots together. Let's go to the central area and talk to <NAVI>[Bishop Lergan]<INFO>jor_sanct,150,207,0,101,0</INFO></NAVI> to gather information.
+  18228:
+    title: Nyar's Call
+    icon: ep
+    summary: Conversation with the White Cat
+    description: Lured by a massive vibration, we arrived at the Small Twig Nest. The <NAVI>[White Cat]<INFO>jor_twig,187,198,0,101,0</INFO></NAVI> in the Small Twig Nest seems to have something to say. It looks urgent.
+  18229:
+    title: Step on the Cats' Backs and Run!
+    icon: ep
+    summary: Conversation with the White Cat
+    description: Another massive vibration has occurred. It seems something is happening inside the Small Twig Nest <NAVI>[Inner Area]<INFO>jor_twig,180,123,0,101,0</INFO></NAVI>. Let's go and check it out!
+  18230:
+    title: Was Everyone Here?
+    icon: ep
+    summary: Conversation with the White Cat
+    description: Bagoth and Lasgand, who we've been looking for, have somehow infiltrated the Small Twig Nest. We need to help <NAVI>[Nyar]<INFO>jor_twig,142,153,0,101,0</INFO></NAVI> and Leon, who are facing off against Lasgand.
+  18231:
+    title: So, What Happened?
+    icon: ep
+    summary: Conversation with Leon
+    description: Lasgand, who infiltrated the Small Twig Nest, disappeared with <NAVI>[Nyar]<INFO>jor_twig,142,153,0,101,0</INFO></NAVI>'s doppelganger. Let's ask <NAVI>[Leon]<INFO>jor_twig,138,157,0,101,0</INFO></NAVI> about Lasgand's whereabouts.
+  18232:
+    title: Separated Sanctuary
+    icon: ep
+    summary: Neutralize Lasgand
+    description: Before Lasgand could steal the power of the World Tree and the Nest, he was isolated in a different dimension. Nyar, who forcibly separated Lasgand, seems to be struggling to maintain the barrier. Let's go to the 'Separated Sanctuary' through <NAVI>[Orelli]<INFO>jor_twig,138,152,0,101,0</INFO></NAVI> and stop Lasgand.
+  18233:
+    title: The Undying One
+    icon: ep
+    summary: Conversation with Boclinde
+    description: Lasgand, who absorbed the power of Imir's Heart Shard, was an opponent we couldn't defeat. However, now that we have the tainted Imir's Heart Shard, let's return to <NAVI>[Ice Castle]<INFO>icecastle,158,204,0,101,0</INFO></NAVI>. Chichiring knows the location of <NAVI>[Boclinde]<INFO>icecastle,75,126,0,101,0</INFO></NAVI>.
+  18234:
+    title: Awin's Awin Worry
+    icon: dq
+    summary: Defeat Deep Roots Cave Monsters
+    description: A request from Ice Castle's <NAVI>[Chichiring]<INFO>icecastle,75,126,0,101,0</INFO></NAVI>. In order to ensure the safety of the ancient Ice Winds, you must defeat the monsters in the Deep Roots Cave.
+  18235:
+    title: '[Standby] Awin''s Awin Worry'
+    icon: dq
+    summary: 04:00 Reset
+    description: This quest is a daily quest and can be accepted again after the cooldown period expires. You can receive the quest from <NAVI>[Chichiring]<INFO>icecastle,75,126,0,101,0</INFO></NAVI> in Ice Castle.
+    cooldown: true
+  18236:
+    title: Boclinde's Extermination Operation 1
+    icon: dq
+    summary: Defeat 1st Floor Lergan of Snake Roots
+    description: Icegard's <NAVI>[Boclinde]<INFO>icas_in2,253,118,0,101,0</INFO></NAVI> wants to exterminate the monsters coming out of the 1st floor of the Snake's Roots. Let's go wild with them!
+  18237:
+    title: '[Standby] Boclinde''s Extermination Operation 1'
+    icon: dq
+    summary: 04:00 Reset
+    description: This quest is a daily quest and can be accepted again after the cooldown period expires. You can receive the quest from <NAVI>[Boclinde]<INFO>icas_in2,253,118,0,101,0</INFO></NAVI> in Icegard.
+    cooldown: true
+  18238:
+    title: Boclinde's Extermination Operation 2
+    icon: dq
+    summary: Defeat 2nd Floor Lergan of Snake Roots
+    description: Icegard's <NAVI>[Boclinde]<INFO>icas_in2,253,118,0,101,0</INFO></NAVI> wants to exterminate the monsters coming out of the 2nd floor of the Snake's Roots. Let's go wild with them!
+  18239:
+    title: '[Standby] Boclinde''s Extermination Operation 2'
+    icon: dq
+    summary: 04:00 Reset
+    description: This quest is a daily quest and can be accepted again after the cooldown period expires. You can receive the quest from <NAVI>[Boclinde]<INFO>icas_in2,253,118,0,101,0</INFO></NAVI> in Icegard.
+    cooldown: true
+  18240:
+    title: To Ice Castle
+    icon: ep
+    summary: Conversation with Nyar
+    description: Talk to Nyar.
   19101:
     title: The Eye of Hellion
     summary: Clanux Heffron
@@ -28395,6 +29047,171 @@ quests:
   19129:
     title: The Eye of Hellion
     description: You have the Completed Tablet. Bring it to Chilias'Tyus so he knows that the task is complete.
+  19158:
+    title: More Professional Than Any Awin
+    icon: ep
+    summary: Talk to Orlito Joveng
+    description: It seems that the Eagle Patrol has a spy experienced in espionage. Let's go find <NAVI>[Orlito Joveng]<INFO>icas_in,100,62,0,101,0</INFO></NAVI> in the Eagle Patrol's barracks and have a chat.
+    npc:
+      sprite: EP19_NPC_IWIN_SR
+      map: icas_in
+      x: 100
+      y: 62
+  19159:
+    title: Briefing
+    icon: ep
+    summary: Listen to the briefing
+    description: Listen to the briefing given by <NAVI>[Orlito Joveng]<INFO>icas_in,100,62,0,101,0</INFO></NAVI>.
+    npc:
+      sprite: EP19_NPC_IWIN_SR
+      map: icas_in
+      x: 100
+      y: 62
+  19160:
+    title: Spy Countermeasure Meeting
+    icon: ep
+    summary: Attend the meeting
+    description: I suddenly ended up attending the meeting. Let's talk to <NAVI>[Orlito Joveng]<INFO>icas_in,100,62,0,101,0</INFO></NAVI> to participate in the Eagle Patrol's spy countermeasure meeting.
+    npc:
+      sprite: EP19_NPC_IWIN_SR
+      map: icas_in
+      x: 100
+      y: 62
+  19161:
+    title: Mission Explanation
+    icon: ep
+    summary: Listen to the explanation
+    description: Listen to the explanation given by <NAVI>[Orlito Joveng]<INFO>icas_in,100,62,0,101,0</INFO></NAVI>.
+    npc:
+      sprite: EP19_NPC_IWIN_SR
+      map: icas_in
+      x: 100
+      y: 62
+  19162:
+    title: Today's Watchword
+    icon: dq
+    summary: Expiration at 04:00
+    description: 'According to the Eagle Patrol regulations, I received today''s watchword from Orlito Joveng. It seems that verbally received watchwords will expire at 04:00.
+
+      ※ If you forget the watchword, you can listen to it again by talking to <NAVI>[Orlito Joveng]<INFO>icas_in,100,62,0,101,0</INFO></NAVI>.'
+    npc:
+      sprite: EP19_NPC_IWIN_SR
+      map: icas_in
+      x: 100
+      y: 62
+    cooldown: true
+  19163:
+    title: '[Standby] Spy Search'
+    icon: dq
+    summary: Resets at 04:00
+    description: I found the spy hidden in the Ice Castle and received a reward from <NAVI>[Orlito Joveng]<INFO>icas_in,100,62,0,101,0</INFO></NAVI>. Since I'm not the only one searching for spies in the Ice Castle, it's a relief for today.
+    npc:
+      sprite: EP19_NPC_IWIN_SR
+      map: icas_in
+      x: 100
+      y: 62
+    cooldown: true
+  19164:
+    title: Spy Search Success
+    icon: dq
+    summary: Talk to Orlito Joveng
+    description: I found the spy hidden in the Ice Castle with my excellent tracking skills. Let's go to receive the reward from <NAVI>[Orlito Joveng]<INFO>icas_in,100,62,0,101,0</INFO></NAVI>.
+    npc:
+      sprite: EP19_NPC_IWIN_SR
+      map: icas_in
+      x: 100
+      y: 62
+  19165:
+    title: '[Standby] Retrieve Espionage Info'
+    icon: dq
+    summary: Resets at 04:00
+    description: I received intelligence information collected by dispatched members and received a reward from <NAVI>[Orlito Joveng]<INFO>icas_in,100,62,0,101,0</INFO>.
+    npc:
+      sprite: EP19_NPC_IWIN_SR
+      map: icas_in
+      x: 100
+      y: 62
+    cooldown: true
+  19166:
+    title: Completion of Espionage Info Retrieval
+    icon: dq
+    summary: Talk to Orlito Joveng
+    description: I received intelligence information from members dispatched to the Lukan Area. Let's take the received intelligence information to <NAVI>[Orlito Joveng]<INFO>icas_in,100,62,0,101,0</INFO></NAVI>.
+    npc:
+      sprite: EP19_NPC_IWIN_SR
+      map: icas_in
+      x: 100
+      y: 62
+  19167:
+    title: Failure in Retrieving Espionage Info
+    icon: dq
+    summary: Talk to Orlito Joveng
+    description: I failed to receive intelligence information from the members dispatched to the Lukan Area. Let's report it to <NAVI>[Orlito Joveng]<INFO>icas_in,100,62,0,101,0</INFO></NAVI>.
+    npc:
+      sprite: EP19_NPC_IWIN_SR
+      map: icas_in
+      x: 100
+      y: 62
+  19168:
+    title: Meeting Place for Contact
+    icon: dq
+    description: 'You''ve heard about the meeting place for the Awin faction members who were sent to the Lukan area by Orito Jo Battalion.
+
+      Go to <NAVI>[Meeting Place for Contact]<INFO>jor_nest,171,84,0,101,0</INFO></NAVI> and provide the secret code to obtain information.'
+  19169:
+    title: Meeting Place for Contact
+    icon: dq
+    description: 'You''ve heard about the meeting place for the Awin faction members who were sent to the Lukan area by Orito Jo Battalion.
+
+      Go to <NAVI>[Meeting Place for Contact]<INFO>jor_back5,296,149,0,101,0</INFO></NAVI> and provide the secret code to obtain information.'
+  19170:
+    title: Meeting Place for Contact
+    icon: dq
+    description: 'You''ve heard about the meeting place for the Awin faction members who were sent to the Lukan area by Orito Jo Battalion.
+
+      Go to <NAVI>[Meeting Place for Contact]<INFO>jor_twice,76,100,0,101,0</INFO></NAVI> and provide the secret code to obtain information.'
+  19171:
+    title: Meeting Place for Contact
+    icon: dq
+    description: 'You''ve heard about the meeting place for the Awin faction members who were sent to the Lukan area by Orito Jo Battalion.
+
+      Go to <NAVI>[Meeting Place for Contact]<INFO>jor_maze,253,267,0,101,0</INFO></NAVI> and provide the secret code to obtain information.'
+  19172:
+    title: Meeting Place for Contact
+    icon: dq
+    description: 'You''ve heard about the meeting place for the Awin faction members who were sent to the Lukan area by Orito Jo Battalion.
+
+      Go to <NAVI>[Meeting Place for Contact]<INFO>jor_root1,39,93,0,101,0</INFO></NAVI> and provide the secret code to obtain information.'
+  19173:
+    title: Meeting Place for Contact
+    icon: dq
+    description: 'You''ve heard about the meeting place for the Awin faction members who were sent to the Lukan area by Orito Jo Battalion.
+
+      Go to <NAVI>[Meeting Place for Contact]<INFO>jor_root2,19,44,0,101,0</INFO></NAVI> and provide the secret code to obtain information.'
+  19174:
+    title: Meeting Place for Contact
+    icon: dq
+    description: 'You''ve heard about the meeting place for the Awin faction members who were sent to the Lukan area by Orito Jo Battalion.
+
+      Go to <NAVI>[Meeting Place for Contact]<INFO>jor_twig,192,211,0,101,0</INFO></NAVI> and provide the secret code to obtain information.'
+  19175:
+    title: Meeting Place for Contact
+    icon: dq
+    description: 'You''ve heard about the meeting place for the Awin faction members who were sent to the Lukan area by Orito Jo Battalion.
+
+      Go to <NAVI>[Meeting Place for Contact]<INFO>jor_sanct,120,86,0,101,0</INFO></NAVI> and provide the secret code to obtain information.'
+  19176:
+    title: Meeting Place for Contact
+    icon: dq
+    description: 'You''ve heard about the meeting place for the Awin faction members who were sent to the Lukan area by Orito Jo Battalion.
+
+      Go to <NAVI>[Meeting Place for Contact]<INFO>jor_root3,347,147,0,101,0</INFO></NAVI> and provide the secret code to obtain information.'
+  19177:
+    title: Meeting Place for Contact
+    icon: dq
+    description: 'You''ve heard about the meeting place for the Awin faction members who were sent to the Lukan area by Orito Jo Battalion.
+
+      Go to <NAVI>[Meeting Place for Contact]<INFO>jor_back6,353,260,0,101,0</INFO></NAVI> and provide the secret code to obtain information.'
   19200:
     title: RPS with Troy
     description: You can only challenge Troy once the timer has expired.
@@ -31569,6 +32386,142 @@ quests:
     title: 다시 피어날 꽃반지
     summary: 로암 사제와 conversation
     description: 메리크경이 준 '축성의 꽃반지'는 축복을 받을 수 있다. 프론테라 대성당을 방문해 <NAVI>로암 사제<INFO>prt_church,107,99,0,101,0</INFO></NAVI>에게 축성의 꽃반지를 건네자.
+  23100:
+    title: Ancient Deep Sea
+    icon: ep
+    summary: Talk to Diving Awin
+    description: In the confrontation situation with Lasgand, it's possible that Yormungand saved us. To find the place where you met the White Cat, visit <NAVI>[Diving Awin]<INFO>icecastle,141,212,0,101,0</INFO></NAVI>.
+  23101:
+    title: No Matter How Deep, I Can Find It 1
+    icon: ep
+    summary: 3 Frozen Beetle Shells
+    description: Diving Awin from the Ice Castle suggests that he needs a high-calorie meal to swim to the Frozen Zone. Hunt 5 Ice Angoos nearby and bring 3 Frozen Beetle Shells.
+  23102:
+    title: No Matter How Deep, I Can Find It 2
+    icon: ep
+    summary: 3 Luminous Seaweed Stems
+    description: Diving Awin from the Ice Castle suggests that he needs a protective suit made of shining seaweed to swim to the Frozen Zone. Collect 5 Luminous Seaweeds nearby and bring 3 Luminous Seaweed Stems.
+  23103:
+    title: Hidden in the Ice
+    icon: ep
+    summary: Talk to Kokoro
+    description: You've arrived at the Frozen Zone. It's a different place from where you met the White Cat... Check with <NAVI>[Kokoro]<INFO>jor_twice,235,111,0,101,0</INFO></NAVI> what's going on here. If you get lost on your way to the Frozen Zone, find <NAVI>[Diving Awin]<INFO>icecastle,141,212,0,101,0</INFO></NAVI> in the Ice Castle.
+    npc:
+      sprite: 4_EP19_IWIN
+      map: icecastle
+      x: 141
+      y: 212
+  23104:
+    title: Hidden in the Ice
+    icon: ep
+    summary: Find the White Cat
+    description: You've arrived at the Frozen Zone. Now you just need to find the spot where you met the White Cat. There's no plan, but you decided to move anyway. Let's go wherever your feet take you. If you leave the Frozen Zone, <NAVI>[Diving Awin]<INFO>icecastle,141,212,0,101,0</INFO></NAVI> will take you back.
+    npc:
+      sprite: 4_EP19_IWIN
+      map: icecastle
+      x: 141
+      y: 212
+  23105:
+    title: Hidden in the Ice
+    icon: ep
+    summary: Find the White Cat again
+    description: Where on earth is this...? It seems like you're wandering around without a plan, but this is the only way to find the White Cat. Keep exploring the <NAVI>[Frozen Zone]<INFO>jor_twice,158,243,0,101,0</INFO></NAVI>. If you leave the Frozen Zone, <NAVI>[Diving Awin]<INFO>icecastle,141,212,0,101,0</INFO></NAVI> will take you back.
+    npc:
+      sprite: 4_EP19_IWIN
+      map: icecastle
+      x: 141
+      y: 212
+  23106:
+    title: A Nest of Small Branches
+    icon: ep
+    summary: Find Leo and Aureli
+    description: 'You found a spot where you can sense the magic of Yormungand and met a cat. However, the cat led Leo and Aureli away. Let''s follow them with <NAVI>[Lehar]<INFO>jor_twice,235,111,0,101,0</INFO></NAVI> in the Icy Zone.
+
+      If you''ve left the Icy Zone, <NAVI>[Diving Awin]<INFO>icecastle,141,212,0,101,0</INFO></NAVI> in the Ice Castle will take you back.'
+    npc:
+      sprite: 4_EP19_IWIN
+      map: icecastle
+      x: 141
+      y: 212
+  23107:
+    title: A Nest of Small Branches
+    icon: ep
+    summary: Talk to Leo
+    description: Leo seems to have too much on his mind after arriving at the Nest of Small Branches. Let's give him some time to sort his thoughts and then try talking to him.
+  23108:
+    title: Across the Iceberg and the Frozen Sea
+    icon: ep
+    summary: Talk to Aureli
+    description: 'You received an explanation about the Sanctum from Leo and Aureli. Return to the <NAVI>[Icy Zone]<INFO>jor_twice,161,243,0,101,0</INFO></NAVI> and share the information about the Nest of Small Branches with your companions.
+
+      If you''ve left the Icy Zone, <NAVI>[Diving Awin]<INFO>icecastle,141,212,0,101,0</INFO></NAVI> in the Ice Castle will take you back.'
+    npc:
+      sprite: 4_EP19_IWIN
+      map: icecastle
+      x: 141
+      y: 212
+  23109:
+    title: Across the Iceberg and the Frozen Sea
+    icon: ep
+    summary: Defeat 5 Yormungand Cult Ritualists
+    description: 'You received an explanation about the Sanctum from Aureli. It seems like the followers of Yormungand in the Icy Zone are trying to absorb Yormungand''s magic. Defeat 5 Yormungand Cult Ritualists nearby and return to <NAVI>[Aureli]<INFO>jor_twice,161,243,0,101,0</INFO></NAVI> in the Icy Zone.
+
+      If you''ve left the Icy Zone, <NAVI>[Diving Awin]<INFO>icecastle,141,212,0,101,0</INFO></NAVI> in the Ice Castle will take you back.'
+    npc:
+      sprite: 4_EP19_IWIN
+      map: icecastle
+      x: 141
+      y: 212
+  23110:
+    title: '[Standby] Pulling Out Yormungand''s Roots'
+    icon: dq
+    summary: Resets at 04:00
+    description: It seems like you've done enough for today. If the threat is too great, it might backfire, so if you want to clear out the Yormungand Cult Ritualists in the Icy Zone, wait until tomorrow.
+    cooldown: true
+  23111:
+    title: Pulling Out Yormungand's Roots
+    icon: dq
+    summary: Defeat 15 Yormungand Cult Ritualists
+    description: 'You''ve received a request from <NAVI>[Kokoro]<INFO>jor_twice,235,111,0,101,0</INFO></NAVI>. Let''s confront the Yormungand Cult Ritualists wandering in the Icy Zone.
+
+      If you''ve left the Icy Zone, <NAVI>[Diving Awin]<INFO>icecastle,141,212,0,101,0</INFO></NAVI> in the Ice Castle will take you back.'
+    npc:
+      sprite: 4_EP19_IWIN
+      map: icecastle
+      x: 141
+      y: 212
+  23112:
+    title: The Serpent's Maze
+    icon: ep
+    summary: Talk to Lehar
+    description: You've decided to infiltrate the Serpent's Maze. Let's find <NAVI>[Lehar]<INFO>jor_maze,142,73,0,101,0</INFO></NAVI> inside the Maze.
+  23113:
+    title: Gathering Rumors Among Yormungands 1
+    icon: ep
+    description: Listen to the conversations among the Yormungand followers inside the Serpent's Maze at <NAVI>[Yormungand]<INFO>jor_maze,52,238,0,101,0</INFO></NAVI>.
+  23114:
+    title: Gathering Rumors Among Yormungands 2
+    icon: ep
+    description: Listen to the conversations among the Yormungand followers inside the Serpent's Maze at <NAVI>[Yormungand]<INFO>jor_maze,154,244,0,101,0</INFO></NAVI>.
+  23115:
+    title: Gathering Rumors Among Yormungands 3
+    icon: ep
+    description: Listen to the conversations among the Yormungand followers inside the Serpent's Maze at <NAVI>[Yormungand]<INFO>jor_maze,281,191,0,101,0</INFO></NAVI>.
+  23116:
+    title: The Cat at the End of the Maze
+    icon: ep
+    summary: Gather rumors inside the Serpent's Maze
+    description: The Serpent's Maze feels even more mysterious than before. What could have happened in the meantime? Let's gather rumors among the Yormungand followers.
+  23117:
+    title: The Cat at the End of the Maze
+    icon: ep
+    summary: Talk to Miriam
+    description: It seems like you've gathered enough rumors among the Yormungand followers in the Serpent's Maze. Return to the <NAVI>[Meeting Place]<INFO>jor_maze,150,33,0,101,0</INFO></NAVI> within the Maze.
+  23118:
+    title: The Cat at the End of the Maze
+    icon: ep
+    summary: Go further inside the Serpent's Maze
+    description: You've shared the rumors collected by your group inside the Serpent's Maze. Now, let's go further inside the <NAVI>[Inside the Maze]<INFO>jor_maze,197,35,0,101,0</INFO></NAVI>.
   40000:
     title: Lighthalzen Pickpocket
     description: Wait at least 5 minutes before trying to talk with the "Suspicious Guy" again.

@@ -87663,6 +87663,1126 @@ Body:
       - {Item: EP19_N_P_Ore, Rate: 500}
       - {Item: EP19_D_P_Crystal, Rate: 300}
       - {Item: EP19_N_P_Crystal, Rate: 150}
+  - Id: 21965
+    AegisName: EP20_COPO
+    Name: Copo
+    Level: 220
+    Hp: 532862
+    BaseExp: 852579
+    JobExp: 554176
+    Attack: 8300
+    Attack2: 1000
+    Defense: 50
+    MagicDefense: 31
+    Str: 280
+    Agi: 190
+    Vit: 125
+    Int: 120
+    Dex: 180
+    Luk: 150
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Race: Brute
+    WalkSpeed: 130
+    AttackDelay: 866
+    AttackMotion: 864
+    DamageMotion: 864
+    Ai: 01
+    Drops:
+      - {Item: Round_Feather, Rate: 1922}
+      - {Item: Ep20_Copo_Head_F, Rate: 961}
+  - Id: 21966
+    AegisName: EP20_ICEWIND1
+    Name: Ashen Icewind
+    Level: 220
+    Hp: 540535
+    BaseExp: 864856
+    JobExp: 562156
+    Attack: 8300
+    Attack2: 1000
+    Defense: 50
+    MagicDefense: 31
+    Str: 280
+    Agi: 190
+    Vit: 125
+    Int: 120
+    Dex: 180
+    Luk: 150
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    Race: Brute
+    Element: Dark
+    ElementLevel: 3
+    WalkSpeed: 170
+    AttackDelay: 881
+    AttackMotion: 864
+    DamageMotion: 864
+    Ai: 04
+    Drops:
+      - {Item: Soft_Feather, Rate: 2205}
+      - {Item: Ep20_Huge_Feather_G, Rate: 1470}
+      - {Item: Bill_Of_Birds, Rate: 2205}
+  - Id: 21967
+    AegisName: EP20_ICEWIND2
+    Name: Icewind
+    Level: 244
+    Hp: 559156
+    BaseExp: 894650
+    JobExp: 581522
+    Attack: 9000
+    Attack2: 1200
+    Defense: 54
+    MagicDefense: 35
+    Str: 310
+    Agi: 180
+    Vit: 100
+    Int: 150
+    Dex: 200
+    Luk: 180
+    AttackRange: 3
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Brute
+    Element: Wind
+    ElementLevel: 3
+    AttackDelay: 864
+    AttackMotion: 864
+    DamageMotion: 864
+    Ai: 04
+    Drops:
+      - {Item: Ep20_Huge_Feather_W, Rate: 2343}
+      - {Item: Soft_Feather, Rate: 3125}
+      - {Item: Bill_Of_Birds, Rate: 2343}
+  - Id: 21968
+    AegisName: EP20_EGGCOPO
+    Name: Cool Kopo
+    Level: 222
+    Hp: 538071
+    BaseExp: 860914
+    JobExp: 559594
+    Attack: 8300
+    Attack2: 1000
+    Defense: 51
+    MagicDefense: 31
+    Str: 280
+    Agi: 190
+    Vit: 125
+    Int: 120
+    Dex: 180
+    Luk: 150
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Race: Brute
+    Element: Wind
+    WalkSpeed: 140
+    AttackDelay: 865
+    AttackMotion: 864
+    DamageMotion: 864
+    Ai: 01
+    Drops:
+      - {Item: Round_Feather, Rate: 1562}
+  - Id: 21969
+    AegisName: EP20_RABBIT_ICESLUG
+    Name: Snow Hare Snail
+    Level: 220
+    Hp: 541118
+    BaseExp: 865789
+    JobExp: 562763
+    Attack: 8300
+    Attack2: 1000
+    Defense: 50
+    MagicDefense: 31
+    Str: 280
+    Agi: 190
+    Vit: 125
+    Int: 120
+    Dex: 180
+    Luk: 150
+    AttackRange: 3
+    SkillRange: 10
+    ChaseRange: 12
+    Element: Water
+    WalkSpeed: 140
+    AttackDelay: 864
+    AttackMotion: 1152
+    DamageMotion: 864
+    Ai: 04
+    Drops:
+      - {Item: Single_Cell, Rate: 1040}
+      - {Item: Ep20_Fluor_Cell_Sweet, Rate: 1300}
+      - {Item: Cool_Liquid, Rate: 520}
+      - {Item: EP19_Unknown_Cell, Rate: 260}
+  - Id: 21970
+    AegisName: EP20_MELIBE_ICESLUG
+    Name: Melibe Snail
+    Level: 244
+    Hp: 580519
+    BaseExp: 928830
+    JobExp: 603740
+    Attack: 9000
+    Attack2: 1200
+    Defense: 54
+    MagicDefense: 35
+    Str: 310
+    Agi: 180
+    Vit: 100
+    Int: 150
+    Dex: 200
+    Luk: 180
+    AttackRange: 7
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Fish
+    Element: Wind
+    ElementLevel: 2
+    WalkSpeed: 170
+    AttackDelay: 864
+    AttackMotion: 864
+    DamageMotion: 864
+    Ai: 02
+    Drops:
+      - {Item: Single_Cell, Rate: 2958}
+      - {Item: EP19_Unknown_Cell, Rate: 1315}
+      - {Item: Ep20_Fluor_Cell_Sour, Rate: 2301}
+      - {Item: Ep20_Fluor_Cell_Sweet, Rate: 328}
+  - Id: 21971
+    AegisName: EP20_ICEBEAR
+    Name: Bear
+    Level: 243
+    Hp: 553639
+    BaseExp: 885822
+    JobExp: 575784
+    Attack: 9000
+    Attack2: 1200
+    Defense: 54
+    MagicDefense: 35
+    Str: 310
+    Agi: 180
+    Vit: 100
+    Int: 150
+    Dex: 200
+    Luk: 180
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Race: Insect
+    Element: Fire
+    ElementLevel: 2
+    WalkSpeed: 120
+    AttackDelay: 864
+    AttackMotion: 864
+    DamageMotion: 864
+    Ai: 04
+    Modes: {Detector: true}
+    Drops:
+      - {Item: Sticky_Mucus, Rate: 1418}
+      - {Item: Ep20_Ice_Bearskin, Rate: 3121}
+      - {Item: Animal's_Skin, Rate: 1986}
+  - Id: 21972
+    AegisName: EP20_JORMUNGUARD1
+    Name: Jormungand Guardian-P
+    Level: 222
+    Hp: 544528
+    BaseExp: 871245
+    JobExp: 566309
+    Attack: 8300
+    Attack2: 1000
+    Defense: 51
+    MagicDefense: 31
+    Str: 280
+    Agi: 190
+    Vit: 125
+    Int: 120
+    Dex: 180
+    Luk: 150
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Race: Demon
+    Element: Poison
+    ElementLevel: 2
+    AttackDelay: 630
+    AttackMotion: 1344
+    DamageMotion: 864
+    Ai: 04
+    Modes: {Detector: true}
+    Drops:
+      - {Item: Transparent_Cloth, Rate: 2775}
+      - {Item: Shadowdecon_Ore, Rate: 693}
+      - {Item: Ep20_Mystic_Spl_Colt, Rate: 2081}
+      - {Item: Light_Granule, Rate: 693}
+  - Id: 21973
+    AegisName: EP20_JORMUNGUARD2
+    Name: Jormungand Guardian-Y
+    Level: 222
+    Hp: 541253
+    BaseExp: 866005
+    JobExp: 562903
+    Attack: 8300
+    Attack2: 1000
+    Defense: 51
+    MagicDefense: 31
+    Str: 280
+    Agi: 190
+    Vit: 125
+    Int: 120
+    Dex: 180
+    Luk: 150
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Race: Demon
+    Element: Ghost
+    ElementLevel: 2
+    AttackDelay: 773
+    AttackMotion: 768
+    DamageMotion: 864
+    Ai: 04
+    Modes: {Detector: true}
+    Drops:
+      - {Item: Fluorescent_Liquid, Rate: 3360}
+      - {Item: Ep20_Mystic_Spl_Colt, Rate: 1920}
+      - {Item: Light_Granule, Rate: 528}
+      - {Item: Zelunium_Ore, Rate: 480}
+      - {Item: Transparent_Cloth, Rate: 480}
+  - Id: 21974
+    AegisName: EP20_FAKE_IWIN_SN
+    Name: Suspicious Irwin Recruit
+    Level: 220
+    Hp: 536292
+    BaseExp: 858067
+    JobExp: 557744
+    Attack: 8300
+    Attack2: 1000
+    Defense: 50
+    MagicDefense: 31
+    Str: 280
+    Agi: 190
+    Vit: 125
+    Int: 120
+    Dex: 180
+    Luk: 150
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    ElementLevel: 2
+    WalkSpeed: 140
+    AttackDelay: 864
+    AttackMotion: 864
+    DamageMotion: 864
+    Ai: 01
+    Drops:
+      - {Item: Ep19_Rgan_Core_F, Rate: 2082}
+      - {Item: Ep20_Broken_Trident, Rate: 2082}
+  - Id: 21975
+    AegisName: EP20_FAKE_IWIN_SY
+    Name: Suspicious Private Iwin
+    Level: 221
+    Hp: 541882
+    BaseExp: 867011
+    JobExp: 563557
+    Attack: 8300
+    Attack2: 1000
+    Defense: 50
+    MagicDefense: 31
+    Str: 280
+    Agi: 190
+    Vit: 125
+    Int: 120
+    Dex: 180
+    Luk: 150
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Element: Earth
+    ElementLevel: 2
+    WalkSpeed: 140
+    AttackDelay: 864
+    AttackMotion: 864
+    DamageMotion: 864
+    Ai: 01
+  - Id: 21976
+    AegisName: EP20_FAKE_IWIN_SB
+    Name: Suspicious Private Iwin
+    Level: 223
+    Hp: 546298
+    BaseExp: 874077
+    JobExp: 568150
+    Attack: 8300
+    Attack2: 1000
+    Defense: 51
+    MagicDefense: 32
+    Str: 280
+    Agi: 190
+    Vit: 125
+    Int: 120
+    Dex: 180
+    Luk: 150
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Element: Water
+    ElementLevel: 2
+    AttackDelay: 864
+    AttackMotion: 864
+    DamageMotion: 864
+    Ai: 01
+    Drops:
+      - {Item: Ep20_Iwin_Priva_Co_C, Rate: 1388}
+  - Id: 21977
+    AegisName: EP20_FAKE_IWIN_SG
+    Name: Corporal Iwin Suspicious
+    Level: 224
+    Hp: 539883
+    BaseExp: 863813
+    JobExp: 561478
+    Attack: 8300
+    Attack2: 1000
+    Defense: 51
+    MagicDefense: 32
+    Str: 280
+    Agi: 190
+    Vit: 125
+    Int: 120
+    Dex: 180
+    Luk: 150
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Element: Wind
+    ElementLevel: 2
+    AttackDelay: 864
+    AttackMotion: 864
+    DamageMotion: 864
+    Ai: 01
+    Drops:
+      - {Item: Ep19_Rgan_Core_F, Rate: 1041}
+      - {Item: Ep20_Broken_Trident, Rate: 1041}
+      - {Item: Round_Feather, Rate: 2082}
+  - Id: 21978
+    AegisName: EP20_FAKE_IWIN_SR
+    Name: Suspicious Iwin Mania
+    Level: 225
+    Hp: 540797
+    BaseExp: 865275
+    JobExp: 562429
+    Attack: 8300
+    Attack2: 1000
+    Defense: 51
+    MagicDefense: 32
+    Str: 280
+    Agi: 190
+    Vit: 125
+    Int: 120
+    Dex: 180
+    Luk: 150
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Element: Fire
+    ElementLevel: 2
+    WalkSpeed: 180
+    AttackDelay: 864
+    AttackMotion: 864
+    DamageMotion: 864
+    Ai: 01
+    Drops:
+      - {Item: Ep20_Iwin_Sergeant_C, Rate: 2081}
+      - {Item: Ep20_Broken_Trident, Rate: 1387}
+  - Id: 21979
+    AegisName: EP20_DEMIGOD_LASGAND
+    Name: Ultimate Lasgand
+    Level: 225
+    Hp: 4473323
+    Attack: 8300
+    Attack2: 1000
+    Defense: 61
+    MagicDefense: 39
+    Str: 280
+    Agi: 190
+    Vit: 125
+    Int: 120
+    Dex: 180
+    Luk: 150
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    Race: Undead
+    Element: Poison
+    ElementLevel: 4
+    WalkSpeed: 170
+    AttackDelay: 864
+    AttackMotion: 864
+    DamageMotion: 864
+    Ai: 21
+    Class: Boss
+    Modes: {Mvp: true}
+  - Id: 21980
+    AegisName: EP20_BOSS_CLANER
+    Name: Jormund Chief Cleaner
+    Level: 250
+    Hp: 6349247
+    BaseExp: 10158795
+    JobExp: 6603217
+    Attack: 15000
+    Attack2: 3000
+    Defense: 71
+    MagicDefense: 44
+    Str: 400
+    Agi: 240
+    Vit: 220
+    Int: 380
+    Dex: 260
+    Luk: 180
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    Element: Poison
+    ElementLevel: 4
+    WalkSpeed: 170
+    AttackDelay: 864
+    AttackMotion: 864
+    DamageMotion: 864
+    Ai: 21
+    Class: Boss
+    Modes: {Mvp: true}
+    MvpDrops:
+      - {Item: Magic_Card_Album, Rate: 4000}
+      - {Item: Snow_F_Stone3, Rate: 2000}
+    Drops:
+      - {Item: Ep20_Unknown_Canine, Rate: 3500}
+      - {Item: Ep20_Fluor_Cell_Sweet, Rate: 3500}
+      - {Item: Ep20_Fluor_Cell_Salty, Rate: 1700}
+      - {Item: EP20_D_P_Ore, Rate: 4000}
+      - {Item: EP20_D_P_Ore, Rate: 2500}
+      - {Item: EP20_D_P_Crystal, Rate: 1000}
+  - Id: 21981
+    AegisName: MD_EP20_BOSS_LASGAND
+    Name: Ultimate Lasgand
+    Level: 222
+    Hp: 21584526
+    BaseExp: 34535242
+    JobExp: 22447907
+    Attack: 15000
+    Attack2: 3000
+    Defense: 65
+    MagicDefense: 44
+    Str: 400
+    Agi: 240
+    Vit: 220
+    Int: 380
+    Dex: 260
+    Luk: 180
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    Race: Undead
+    Element: Poison
+    ElementLevel: 4
+    WalkSpeed: 170
+    AttackDelay: 864
+    AttackMotion: 1476
+    DamageMotion: 864
+    Ai: 21
+    Class: Boss
+    Modes: {Mvp: true}
+    MvpDrops:
+      - {Item: Magic_Card_Album, Rate: 4000}
+      - {Item: Old_Card_Album, Rate: 4000}
+      - {Item: EP20_D_P_Extract, Rate: 2000}
+    Drops:
+      - {Item: EP20_D_P_Ore, Rate: 4000}
+      - {Item: EP20_D_P_Ore, Rate: 3000}
+      - {Item: EP20_D_P_Crystal, Rate: 2000}
+      - {Item: EP20_D_P_Extract, Rate: 1000}
+      - {Item: C_White_Serpent_Hair, Rate: 5}
+      - {Item: C_Serpent_Crystal, Rate: 5}
+      - {Item: C_Serpent_Shadow, Rate: 3}
+  - Id: 21982
+    AegisName: MD_EP20_FALLENANGEL
+    Name: Fallen Angel Snail
+    Level: 225
+    Hp: 5744198
+    BaseExp: 9190717
+    JobExp: 5973966
+    MvpExp: 404394
+    Attack: 15000
+    Attack2: 3000
+    Defense: 66
+    MagicDefense: 44
+    Str: 400
+    Agi: 240
+    Vit: 220
+    Int: 380
+    Dex: 360
+    Luk: 180
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    Race: Angel
+    Element: Water
+    ElementLevel: 4
+    WalkSpeed: 130
+    AttackDelay: 614
+    AttackMotion: 612
+    DamageMotion: 480
+    Ai: 21
+    Class: Boss
+    Modes: {Mvp: true}
+    MvpDrops:
+      - {Item: Magic_Card_Album, Rate: 4000}
+      - {Item: Old_Card_Album, Rate: 4000}
+      - {Item: EP20_D_P_Extract, Rate: 2000}
+    Drops:
+      - {Item: Ep20_Angels_Tail, Rate: 3500}
+      - {Item: EP20_D_P_Ore, Rate: 4000}
+      - {Item: EP20_D_P_Ore, Rate: 3000}
+      - {Item: EP20_D_P_Crystal, Rate: 2000}
+      - {Item: EP20_D_P_Extract, Rate: 500}
+  - Id: 21983
+    AegisName: EP20_ANGEL_ICESLUG
+    Name: Angel Snail
+    Level: 222
+    Hp: 535184
+    BaseExp: 856294
+    JobExp: 556591
+    Attack: 8300
+    Attack2: 1000
+    Defense: 51
+    MagicDefense: 31
+    Str: 280
+    Agi: 190
+    Vit: 125
+    Int: 120
+    Dex: 180
+    Luk: 150
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Angel
+    Element: Holy
+    AttackDelay: 864
+    AttackMotion: 1476
+    DamageMotion: 864
+    Ai: 04
+    Drops:
+      - {Item: EP19_Unknown_Cell, Rate: 422}
+      - {Item: Single_Cell, Rate: 1478}
+      - {Item: Ep20_Fluor_Cell_Salty, Rate: 1690}
+      - {Item: Slicky_Fluid, Rate: 1478}
+  - Id: 21984
+    AegisName: EP20_ICEEGG
+    Name: Icewind Egg
+    Level: 215
+    Hp: 511014
+    BaseExp: 817622
+    JobExp: 531454
+    Attack: 8300
+    Attack2: 1000
+    Defense: 49
+    MagicDefense: 31
+    Str: 280
+    Agi: 190
+    Vit: 125
+    Int: 120
+    Dex: 180
+    Luk: 150
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    WalkSpeed: 1000
+    AttackDelay: 864
+    AttackMotion: 864
+    DamageMotion: 864
+    Drops:
+      - {Item: Piece_Of_Egg_Shell, Rate: 4166}
+      - {Item: Ep20_Copo_Egg_Shell, Rate: 8332}
+  - Id: 21985
+    AegisName: EP20_RGAN_WARLOCK
+    Name: Great Rgan Shaman
+    Level: 223
+    Hp: 547831
+    BaseExp: 876530
+    JobExp: 569744
+    Attack: 8300
+    Attack2: 1000
+    Defense: 51
+    MagicDefense: 32
+    Str: 280
+    Agi: 190
+    Vit: 125
+    Int: 120
+    Dex: 180
+    Luk: 150
+    AttackRange: 7
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Element: Poison
+    WalkSpeed: 160
+    AttackDelay: 483
+    AttackMotion: 936
+    DamageMotion: 864
+    Ai: 04
+    Drops:
+      - {Item: EP19_Shell_Of_Rgan, Rate: 813}
+      - {Item: Ep20_Rgan_Core_F, Rate: 1356}
+      - {Item: Ep20_Coral_Bangle, Rate: 1898}
+      - {Item: EP19_Unknown_Cell, Rate: 271}
+  - Id: 21986
+    AegisName: EP20_RGAN_HEALER
+    Name: Greater Rgan Healer
+    Level: 223
+    Hp: 547852
+    BaseExp: 876563
+    JobExp: 569766
+    Attack: 8300
+    Attack2: 1000
+    Defense: 51
+    MagicDefense: 32
+    Str: 280
+    Agi: 190
+    Vit: 125
+    Int: 120
+    Dex: 180
+    Luk: 150
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    ElementLevel: 2
+    WalkSpeed: 140
+    AttackDelay: 379
+    AttackMotion: 1248
+    DamageMotion: 864
+    Ai: 01
+    Drops:
+      - {Item: EP19_Shell_Of_Rgan, Rate: 1200}
+      - {Item: EP19_Unknown_Cell, Rate: 720}
+      - {Item: Ep20_Coral_Bangle, Rate: 1440}
+      - {Item: Ep20_Rgan_Core_F, Rate: 240}
+      - {Item: Etel_Dust, Rate: 100}
+  - Id: 21987
+    AegisName: EP20_JORGAN_WARLOCK
+    Name: Jormungand Church Shaman
+    Level: 227
+    Hp: 552233
+    BaseExp: 883573
+    JobExp: 574322
+    Attack: 8300
+    Attack2: 1000
+    Defense: 52
+    MagicDefense: 32
+    Str: 280
+    Agi: 190
+    Vit: 125
+    Int: 120
+    Dex: 180
+    Luk: 150
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Element: Wind
+    ElementLevel: 2
+    WalkSpeed: 160
+    AttackDelay: 693
+    AttackMotion: 864
+    DamageMotion: 864
+    Ai: 04
+    Drops:
+      - {Item: Ep20_Shell_Hairpin, Rate: 1242}
+      - {Item: EP19_Unknown_Cell, Rate: 355}
+      - {Item: Ep20_Rgan_Core_F, Rate: 1065}
+      - {Item: Snow_F_Ore, Rate: 177}
+      - {Item: Shadowdecon, Rate: 50}
+      - {Item: Snow_F_Stone1, Rate: 177}
+  - Id: 21988
+    AegisName: EP20_JORGAN_HEALER
+    Name: Jormungand Church Bishop
+    Level: 230
+    Hp: 555623
+    BaseExp: 888997
+    JobExp: 577848
+    Attack: 8300
+    Attack2: 1000
+    Defense: 52
+    MagicDefense: 32
+    Str: 280
+    Agi: 190
+    Vit: 125
+    Int: 120
+    Dex: 180
+    Luk: 150
+    AttackRange: 3
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Element: Holy
+    ElementLevel: 2
+    WalkSpeed: 160
+    AttackDelay: 3281
+    AttackMotion: 1080
+    DamageMotion: 864
+    Ai: 01
+    Drops:
+      - {Item: Ep20_Rgan_Core_F, Rate: 1702}
+      - {Item: Ep20_Seaweed_Belt, Rate: 1418}
+      - {Item: EP19_Unknown_Cell, Rate: 283}
+      - {Item: Zelunium_Ore, Rate: 60}
+  - Id: 21989
+    AegisName: EP20_JORGAN_GUARDIAN
+    Name: Guardian of Shrine
+    Level: 225
+    Hp: 547638
+    BaseExp: 876221
+    JobExp: 569544
+    Attack: 8300
+    Attack2: 1000
+    Defense: 51
+    MagicDefense: 32
+    Str: 280
+    Agi: 190
+    Vit: 125
+    Int: 120
+    Dex: 180
+    Luk: 150
+    AttackRange: 3
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Element: Dark
+    ElementLevel: 2
+    WalkSpeed: 160
+    AttackDelay: 1004
+    AttackMotion: 1092
+    DamageMotion: 864
+    Ai: 04
+    Drops:
+      - {Item: Shadowdecon_Ore, Rate: 200}
+      - {Item: Ep20_Cataphract_Piece, Rate: 900}
+      - {Item: EP19_Unknown_Cell, Rate: 500}
+      - {Item: Ep20_Rgan_Core_F, Rate: 1100}
+      - {Item: Etel_Dust, Rate: 83}
+      - {Item: Snow_F_Ore, Rate: 27}
+  - Id: 21990
+    AegisName: EP20_JORGAN_CLEANER
+    Name: Jormungand Sanctuary
+    Level: 244
+    Hp: 588638
+    BaseExp: 941821
+    JobExp: 612184
+    Attack: 9000
+    Attack2: 1200
+    Defense: 54
+    MagicDefense: 35
+    Str: 310
+    Agi: 180
+    Vit: 100
+    Int: 150
+    Dex: 200
+    Luk: 180
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    Element: Earth
+    ElementLevel: 2
+    WalkSpeed: 170
+    AttackDelay: 864
+    AttackMotion: 864
+    DamageMotion: 864
+    Ai: 04
+    Drops:
+      - {Item: Ep20_Fluor_Cell_Sweet, Rate: 2340}
+      - {Item: EP19_Unknown_Cell, Rate: 910}
+      - {Item: Ep20_Fluor_Cell_Salty, Rate: 1040}
+      - {Item: Shadowdecon_Ore, Rate: 260}
+  - Id: 21991
+    AegisName: MD_EP20_JOR_G_P
+    Name: Jormungand Guardian
+    Level: 220
+    Hp: 513308
+    Attack: 8300
+    Attack2: 1000
+    Defense: 50
+    MagicDefense: 31
+    Str: 280
+    Agi: 190
+    Vit: 125
+    Int: 120
+    Dex: 180
+    Luk: 150
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Race: Demon
+    Element: Poison
+    ElementLevel: 2
+    AttackDelay: 630
+    AttackMotion: 1344
+    DamageMotion: 478
+    Ai: 04
+  - Id: 21992
+    AegisName: MD_EP20_JOR_G_Y
+    Name: Jormungand Guardian
+    Level: 220
+    Hp: 513308
+    Attack: 8300
+    Attack2: 1000
+    Defense: 50
+    MagicDefense: 31
+    Str: 280
+    Agi: 190
+    Vit: 125
+    Int: 120
+    Dex: 180
+    Luk: 150
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Race: Demon
+    Element: Ghost
+    ElementLevel: 2
+    AttackDelay: 773
+    AttackMotion: 768
+    DamageMotion: 478
+    Ai: 04
+  - Id: 21993
+    AegisName: MD_EP20_JOR_WARLOCK
+    Name: Rgan Shaman
+    Level: 220
+    Hp: 513308
+    Attack: 8300
+    Attack2: 1000
+    Defense: 50
+    MagicDefense: 31
+    Str: 280
+    Agi: 190
+    Vit: 125
+    Int: 120
+    Dex: 180
+    Luk: 150
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Element: Wind
+    ElementLevel: 2
+    WalkSpeed: 160
+    AttackDelay: 693
+    AttackMotion: 864
+    DamageMotion: 478
+    Ai: 04
+  - Id: 21994
+    AegisName: EP20_MD_HEARTHUNTER1
+    Name: Heart hunter
+    Level: 220
+    Hp: 513308
+    Attack: 8300
+    Attack2: 1000
+    Defense: 50
+    MagicDefense: 31
+    Str: 280
+    Agi: 190
+    Vit: 125
+    Int: 120
+    Dex: 180
+    Luk: 150
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Demihuman
+    AttackDelay: 441
+    AttackMotion: 1080
+    DamageMotion: 478
+    Ai: 04
+  - Id: 21995
+    AegisName: EP20_NPC_COCOPO
+    Name: Cocopo
+    Level: 220
+    Attack: 1
+    Attack2: 1
+    Defense: 44
+    MagicDefense: 26
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Brute
+    AttackDelay: 126
+    AttackMotion: 864
+    DamageMotion: 864
+    Ai: 01
+  - Id: 21996
+    AegisName: EP20_SNOW_ANGEL
+    Name: Snowstorm Angel
+    Level: 235
+    Hp: 5509807
+    BaseExp: 8815691
+    JobExp: 5730199
+    Attack: 15000
+    Attack2: 3000
+    Defense: 68
+    MagicDefense: 44
+    Str: 400
+    Agi: 240
+    Vit: 220
+    Int: 380
+    Dex: 260
+    Luk: 180
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    Race: Angel
+    Element: Holy
+    ElementLevel: 4
+    WalkSpeed: 170
+    AttackDelay: 864
+    AttackMotion: 864
+    DamageMotion: 864
+    Ai: 21
+    Class: Boss
+    Modes: {Mvp: true}
+    MvpDrops:
+      - {Item: Old_Card_Album, Rate: 4000}
+      - {Item: Snow_F_Stone3, Rate: 2000}
+    Drops:
+      - {Item: Ep20_Twinkling_Snow, Rate: 3500}
+      - {Item: Ep20_Fluor_Cell_Salty, Rate: 3500}
+      - {Item: Slicky_Fluid, Rate: 1700}
+      - {Item: EP20_D_P_Ore, Rate: 4000}
+      - {Item: EP20_D_P_Ore, Rate: 2500}
+      - {Item: EP20_D_P_Crystal, Rate: 1000}
+  - Id: 21997
+    AegisName: G_EP20_JORMUNGUARD1
+    Name: Jormungand Guardian-P
+    Level: 222
+    Hp: 544528
+    Attack: 8300
+    Attack2: 1000
+    Defense: 51
+    MagicDefense: 31
+    Str: 280
+    Agi: 190
+    Vit: 125
+    Int: 120
+    Dex: 180
+    Luk: 150
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Race: Demon
+    Element: Poison
+    ElementLevel: 2
+    AttackDelay: 630
+    AttackMotion: 1344
+    DamageMotion: 864
+    Ai: 01
+    Modes: {Detector: true}
+  - Id: 21998
+    AegisName: G_EP20_JORMUNGUARD2
+    Name: Jormungand Guardian-Y
+    Level: 222
+    Hp: 541253
+    Attack: 8300
+    Attack2: 1000
+    Defense: 51
+    MagicDefense: 31
+    Str: 280
+    Agi: 190
+    Vit: 125
+    Int: 120
+    Dex: 180
+    Luk: 150
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Race: Demon
+    Element: Ghost
+    ElementLevel: 2
+    AttackDelay: 773
+    AttackMotion: 768
+    DamageMotion: 864
+    Ai: 01
+    Modes: {Detector: true}
+  - Id: 22000
+    AegisName: G_EP20_ANGEL_ICESLUG
+    Name: Delicious Snail
+    Level: 222
+    Hp: 538056
+    Attack: 8300
+    Attack2: 1000
+    Defense: 51
+    MagicDefense: 31
+    Str: 280
+    Agi: 190
+    Vit: 125
+    Int: 120
+    Dex: 180
+    Luk: 150
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Race: Angel
+    Element: Holy
+    AttackDelay: 590
+    AttackMotion: 1476
+    DamageMotion: 864
+    Ai: 04
+  - Id: 22004
+    AegisName: EP20_MD_BOX1
+    Name: Suspicious storage
+    Hp: 10
+    Class: Boss
+    Modes: {IgnoreMagic: true, IgnoreMelee: true, IgnoreMisc: true, IgnoreRanged: true}
+    Drops:
+      - {Item: EP19_D_P_Ore, Rate: 1000}
+      - {Item: EP19_N_P_Ore, Rate: 1000}
+      - {Item: EP20_D_P_Ore, Rate: 1500}
+      - {Item: EP19_D_P_Crystal, Rate: 750}
+      - {Item: EP19_N_P_Crystal, Rate: 750}
+      - {Item: EP20_D_P_Crystal, Rate: 1000}
+  - Id: 22005
+    AegisName: EP20_MD_BOX2
+    Name: Suspicious storage
+    Hp: 10
+    Class: Boss
+    Modes: {IgnoreMagic: true, IgnoreMelee: true, IgnoreMisc: true, IgnoreRanged: true}
+    Drops:
+      - {Item: EP19_D_P_Ore, Rate: 2000}
+      - {Item: EP19_N_P_Ore, Rate: 2000}
+      - {Item: EP20_D_P_Ore, Rate: 3000}
+      - {Item: EP19_D_P_Crystal, Rate: 1500}
+      - {Item: EP19_N_P_Crystal, Rate: 1500}
+      - {Item: EP20_D_P_Crystal, Rate: 2000}
+      - {Item: EP20_D_P_Extract, Rate: 1500}
+      - {Item: EP20_D_Scale, Rate: 100}
+  - Id: 22006
+    AegisName: EP20_NPC_NYAR
+    Name: EP20_NPC_NYAR
+  - Id: 22007
+    AegisName: EP20_NPC_LASGAND
+    Name: EP20_NPC_LASGAND
   - Id: 22378
     AegisName: MD_Airboat_Boss5
     Name: Free Crash Creature
@@ -87692,3 +88812,33 @@ Body:
     Ai: 21
     Class: Boss
     Modes: {CastSensorIdle: true, Detector: true, KnockBackImmune: true, Mvp: true}
+  - Id: 23060
+    AegisName: EP20_ARMOERDCOPO
+    Name: Reliable Copo
+    Level: 243
+    Hp: 576703
+    BaseExp: 922725
+    JobExp: 599771
+    Attack: 9000
+    Attack2: 1200
+    Defense: 54
+    MagicDefense: 35
+    Str: 310
+    Agi: 180
+    Vit: 100
+    Int: 150
+    Dex: 200
+    Luk: 180
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Race: Brute
+    Element: Water
+    WalkSpeed: 170
+    AttackDelay: 864
+    AttackMotion: 864
+    DamageMotion: 864
+    Ai: 01
+    Drops:
+      - {Item: Piece_Of_Egg_Shell, Rate: 1785}
+      - {Item: Bill_Of_Birds, Rate: 3570}

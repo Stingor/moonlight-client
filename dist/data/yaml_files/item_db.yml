@@ -60345,6 +60345,10 @@ Body:
     AegisName: Fire_Golem_Egg
     Name: Fire Golem Egg
     Type: PetEgg
+  - Id: 9145
+    AegisName: Copo_Egg
+    Name: Copo Egg
+    Type: PetEgg
   - Id: 9514
     AegisName: Ein_Ddbox
     Name: Physical Modification Permit
@@ -129652,6 +129656,22 @@ Body:
     Type: DelayConsume
     Script: |
       item_reform();
+  - Id: 102202
+    AegisName: Ep20_Fatty_Icegangu
+    Name: Chubby Ice Gangu
+    Type: Usable
+    Weight: 50
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      pet;
+  - Id: 102227
+    AegisName: Glacier_Armor_9Refine
+    Name: Glacier Armor +9 Refinement Cube
+    Type: DelayConsume
+    Weight: 10
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      laphine_upgrade();
   - Id: 102562
     AegisName: Demi_Freyja_Antiquity
     Name: Antiquity Villa (Twisted God)
@@ -141557,15 +141577,17 @@ Body:
     View: 2348
   - Id: 400414
     AegisName: C_Armored_Copo
-    Name: Costume strong copo
+    Name: Costume Strong Copo
     Type: Armor
-    Locations: {Costume_Head: true}
+    Locations: {Costume_Head: true, Costume_Head_Top: true}
+    ArmorLevel: 1
     View: 2356
   - Id: 400415
     AegisName: C_Egg_Copo
-    Name: Fashionable Copo
+    Name: Costume Dandy Copo
     Type: Armor
-    Locations: {Costume_Head: true}
+    Locations: {Costume_Head: true, Costume_Head_Top: true}
+    ArmorLevel: 1
     View: 2357
   - Id: 400422
     AegisName: C_Diabolus_Helmet_V
@@ -147675,7 +147697,6 @@ Body:
     Script: |
       .@r = getrefine();
       bonus bBaseAtk,120+15*(.@r/2);
-      bonus bDef,15*(.@r/2)/50;
       if (.@r>=7) {
          bonus bLongAtkRate,5;
          bonus bShortAtkRate,5;
@@ -147705,7 +147726,6 @@ Body:
     Script: |
       .@r = getrefine();
       bonus bMatk,120+15*(.@r/2);
-      bonus bDef,15*(.@r/2)/50;
       if (.@r>=7) {
          bonus2 bMagicAtkEle,Ele_All,5;
          bonus bVariableCastrate,-10;
@@ -147787,7 +147807,6 @@ Body:
       .@r = getrefine();
       bonus bMaxHPrate,6;
       bonus bMaxSPrate,6+(.@r/2);
-      bonus bDef,15*(.@r/2)/50;
       if (.@r>=7) {
          bonus2 bMagicAtkEle,Ele_All,7;
          if (.@r>=9) {
@@ -147940,8 +147959,6 @@ Body:
       .@r = getrefine();
       bonus bMagicAtkDef,3;
       bonus bNearAtkDef,3; bonus bLongAtkDef,3;
-      bonus bMdef,2*(.@r/2)/5;
-      bonus bDef,10*(.@r/2)/50;
       if (.@r>=7) {
          bonus bAspdRate,15;
          if (.@r>=9) {
@@ -148337,7 +148354,6 @@ Body:
       .@r = getrefine();
       bonus bMaxHPrate,8;
       bonus bMaxSPrate,4+(.@r/2);
-      bonus bDef,15*(.@r/2)/50;
       if (.@r>=7) {
          bonus bLongAtkRate,7;
          bonus bShortAtkRate,7;
@@ -159245,6 +159261,194 @@ Body:
     Buy: 1680
     Sell: 840
     Weight: 10
+  - Id: 1001154
+    AegisName: Ep20_Jor_Berry
+    Name: Snake Strawberry
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+  - Id: 1001217
+    AegisName: Ep20_Cat_Whiskers
+    Name: Divine Cat Whiskers
+    Flags: {BuyingStore: true}
+  - Id: 1001218
+    AegisName: Ep20_Jor_Device
+    Name: Power Recovery Device
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+  - Id: 1001226
+    AegisName: Ep20_Rgan_Core_F
+    Name: Rgan's Advanced Magic Core
+    Buy: 2600
+    Sell: 1300
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001227
+    AegisName: Ep20_Coral_Bangle
+    Name: Coral Bracelet
+    Buy: 3200
+    Sell: 1600
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001228
+    AegisName: Ep20_Shell_Hairpin
+    Name: Seashell Hairpin
+    Buy: 3200
+    Sell: 1600
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001229
+    AegisName: Ep20_Seaweed_Belt
+    Name: Seaweed Belt
+    Buy: 3200
+    Sell: 1600
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001230
+    AegisName: Ep20_Cataphract_Piece
+    Name: Scale Armor Fragment
+    Buy: 3200
+    Sell: 1600
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001231
+    AegisName: Ep20_Fluor_Cell_Sour
+    Name: Soft Fluorescent Cells(Sour)
+    Buy: 4000
+    Sell: 2000
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001232
+    AegisName: Ep20_Fluor_Cell_Salty
+    Name: Soft Fluorescent Cells(Salty)
+    Buy: 3200
+    Sell: 1600
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001233
+    AegisName: Ep20_Fluor_Cell_Sweet
+    Name: Soft Fluorescent Cells(Sweet)
+    Buy: 3400
+    Sell: 1700
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001234
+    AegisName: Ep20_Ice_Bearskin
+    Name: Bear Skin
+    Buy: 3800
+    Sell: 1900
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001235
+    AegisName: Ep20_Unknown_Canine
+    Name: Monster's Tooth
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001236
+    AegisName: Ep20_Twinkling_Snow
+    Name: Sparkling Snowflakes
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001237
+    AegisName: Ep20_Angels_Tail
+    Name: Angel's Tail
+    Buy: 15000
+    Sell: 7500
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001238
+    AegisName: Ep20_Mystic_Spl_Colt
+    Name: Mysterious Magic Mass
+    Buy: 3400
+    Sell: 1700
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001239
+    AegisName: Ep20_Broken_Trident
+    Name: Broken Trident
+    Buy: 2600
+    Sell: 1300
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001240
+    AegisName: Ep20_Iwin_Private_C
+    Name: Iwin Private Hat
+    Buy: 1260
+    Sell: 630
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001241
+    AegisName: Ep20_Iwin_Priva_Co_C
+    Name: Iwin Private First Class Hat
+    Buy: 1350
+    Sell: 675
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001242
+    AegisName: Ep20_Iwin_Corporal_C
+    Name: Iwin Corporal Hat
+    Buy: 1440
+    Sell: 720
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001243
+    AegisName: Ep20_Iwin_Sergeant_C
+    Name: Iwin Sergeant Hat
+    Buy: 3400
+    Sell: 1700
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001244
+    AegisName: Ep20_Huge_Feather_G
+    Name: Large Gray Feather
+    Buy: 2800
+    Sell: 1400
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001245
+    AegisName: Ep20_Huge_Feather_W
+    Name: Large White Feather
+    Buy: 3800
+    Sell: 1900
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001246
+    AegisName: Ep20_Copo_Head_F
+    Name: Copo's Feathers
+    Buy: 1170
+    Sell: 585
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001247
+    AegisName: Ep20_Copo_Egg_Shell
+    Name: Copo's Eggshell Fragment
+    Buy: 2100
+    Sell: 1050
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001248
+    AegisName: EP20_D_P_Ore
+    Name: Source Stone of Pure Magic
+    Buy: 1000
+    Sell: 500
+    Weight: 30
+    Flags: {BuyingStore: true, DropEffect: client}
+  - Id: 1001249
+    AegisName: EP20_D_P_Crystal
+    Name: Crystal of Pure Magic
+    Weight: 50
+    Flags: {BuyingStore: true, DropEffect: client}
+  - Id: 1001250
+    AegisName: EP20_D_P_Extract
+    Name: Pure Magic Extract
+    Weight: 30
+    Flags: {BuyingStore: true, DropEffect: client}
+  - Id: 1001251
+    AegisName: EP20_D_Scale
+    Name: Snake God's Scales
+    Weight: 50
+    Flags: {BuyingStore: true, DropEffect: client}
+  - Id: 1001254
+    AegisName: Ep20_Ymir_Heart
+    Name: Corrupted Heart Fragment of Ymir
+    Trade: {NoDrop: true, NoTrade: true, NoSell: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
   - Id: 1001478
     AegisName: Cubic_Dia
     Name: Pure Diamond
