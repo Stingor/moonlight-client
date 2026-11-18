@@ -1267,3 +1267,37 @@ triggers:
         cards_allowed: true
         refine_change: 1
         materials: [[1001031, 10], [1001032, 10], [1001217, 40], [1001249, 10]]
+  - item: 102514
+    recipes:
+      - base: 480345
+        result: 480349
+        least_refine: 0
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: 0
+        materials: [[1000442, 50], [1000443, 50], [1000447, 50], [1001456, 30], [1001457, 15], [1001458, 15]]
+      - base: 480346
+        result: 480350
+        least_refine: 0
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: 0
+        materials: [[1000443, 50], [1000444, 50], [1000446, 50], [1001456, 30], [1001457, 15], [1001458, 15]]
+      - base: 480347
+        result: 480351
+        least_refine: 0
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: 0
+        materials: [[1000445, 50], [1000446, 50], [1000447, 50], [1001456, 30], [1001457, 15], [1001458, 15]]
+      - base: 480348
+        result: 480352
+        least_refine: 0
+        most_refine: 10
+        least_options: 0
+        cards_allowed: true
+        refine_change: 0
+        materials: [[1000442, 50], [1000444, 50], [1000445, 50], [1001456, 30], [1001457, 15], [1001458, 15]]

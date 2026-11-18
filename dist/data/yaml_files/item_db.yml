@@ -129715,6 +129715,13 @@ Body:
     Type: Usable
     Weight: 100
     Flags: {BuyingStore: true}
+  - Id: 102514
+    AegisName: Season_H_Upgrade
+    Name: Granting the truth of the Circulation of life
+    Type: DelayConsume
+    Trade: {NoDrop: true, NoTrade: true, NoSell: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      item_reform();
   - Id: 102562
     AegisName: Demi_Freyja_Antiquity
     Name: Antiquity Villa (Twisted God)
@@ -130153,6 +130160,19 @@ Body:
       if (getallrefine() >= 22) {
          bonus bUnbreakableWeapon;
       }
+  - Id: 300087
+    AegisName: Beta_Scissore_Ng_Card
+    Name: Broken Gardener Beta Card
+    Type: Card
+    Weight: 10
+    Locations: {Shoes: true}
+    Flags: {BuyingStore: true, DropEffect: CLIENT}
+    Script: |
+      bonus bLuk,2;
+      bonus bMaxHPrate,10;
+      bonus bMaxSPrate,10;
+      bonus2 bSkillAtk,"SU_SV_STEMSPEAR",10;
+      bonus2 bSkillAtk,"SU_SCAROFTAROU",10;
   - Id: 300088
     AegisName: B_Scissore_Ng_H_Card
     Name: Senior Broken Gardener Card
@@ -142440,6 +142460,1592 @@ Body:
     Name: Constellation's Barrier (1)
     Type: Card
     SubType: Enchant
+  - Id: 312479
+    AegisName: Physical_Seed_1
+    Name: Physical Seed 1Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,1;
+      bonus bDef,1;
+  - Id: 312480
+    AegisName: Physical_Seed_2
+    Name: Physical Seed 2Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,2;
+      bonus bDef,1;
+  - Id: 312481
+    AegisName: Physical_Seed_3
+    Name: Physical Seed 3Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,3;
+      bonus bDef,1;
+  - Id: 312482
+    AegisName: Physical_Seed_4
+    Name: Physical Seed 4Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,4;
+      bonus bDef,1;
+  - Id: 312483
+    AegisName: Physical_Seed_5
+    Name: Physical Seed 5Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,5;
+      bonus bDef,1;
+  - Id: 312484
+    AegisName: Physical_Seed_6
+    Name: Physical Seed 6Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,6;
+      bonus bDef,1;
+  - Id: 312485
+    AegisName: Physical_Seed_7
+    Name: Physical Seed 7Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,7;
+      bonus bDef,1;
+  - Id: 312486
+    AegisName: Physical_Seed_8
+    Name: Physical Seed 8Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,8;
+      bonus bDef,1;
+  - Id: 312487
+    AegisName: Physical_Seed_9
+    Name: Physical Seed 9Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,9;
+      bonus bDef,1;
+  - Id: 312488
+    AegisName: Physical_Seed_10
+    Name: Physical Seed 10Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,10;
+      bonus bDef,1;
+  - Id: 312489
+    AegisName: Magical_Seed_1
+    Name: Magical Seed 1Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,1;
+      bonus bDef,1;
+  - Id: 312490
+    AegisName: Magical_Seed_2
+    Name: Magical Seed 2Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,2;
+      bonus bDef,1;
+  - Id: 312491
+    AegisName: Magical_Seed_3
+    Name: Magical Seed 3Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,3;
+      bonus bDef,1;
+  - Id: 312492
+    AegisName: Magical_Seed_4
+    Name: Magical Seed 4Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,4;
+      bonus bDef,1;
+  - Id: 312493
+    AegisName: Magical_Seed_5
+    Name: Magical Seed 5Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,5;
+      bonus bDef,1;
+  - Id: 312494
+    AegisName: Magical_Seed_6
+    Name: Magical Seed 6Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,6;
+      bonus bDef,1;
+  - Id: 312495
+    AegisName: Magical_Seed_7
+    Name: Magical Seed 7Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,7;
+      bonus bDef,1;
+  - Id: 312496
+    AegisName: Magical_Seed_8
+    Name: Magical Seed 8Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,8;
+      bonus bDef,1;
+  - Id: 312497
+    AegisName: Magical_Seed_9
+    Name: Magical Seed 9Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,9;
+      bonus bDef,1;
+  - Id: 312498
+    AegisName: Magical_Seed_10
+    Name: Magical Seed 10Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,10;
+      bonus bDef,1;
+  - Id: 312499
+    AegisName: Physical_Leaf_1
+    Name: Physical Leaf 1Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,12;
+      bonus bDef,1;
+  - Id: 312500
+    AegisName: Physical_Leaf_2
+    Name: Physical Leaf 2Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,14;
+      bonus bDef,1;
+  - Id: 312501
+    AegisName: Physical_Leaf_3
+    Name: Physical Leaf 3Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,16;
+      bonus bDef,1;
+  - Id: 312502
+    AegisName: Physical_Leaf_4
+    Name: Physical Leaf 4Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,18;
+      bonus bDef,1;
+  - Id: 312503
+    AegisName: Physical_Leaf_5
+    Name: Physical Leaf 5Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,20;
+      bonus bDef,1;
+  - Id: 312504
+    AegisName: Magical_Leaf_1
+    Name: Magical Leaf 1Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,12;
+      bonus bDef,1;
+  - Id: 312505
+    AegisName: Magical_Leaf_2
+    Name: Magical Leaf 2Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,14;
+      bonus bDef,1;
+  - Id: 312506
+    AegisName: Magical_Leaf_3
+    Name: Magical Leaf 3Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,16;
+      bonus bDef,1;
+  - Id: 312507
+    AegisName: Magical_Leaf_4
+    Name: Magical Leaf 4Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,18;
+      bonus bDef,1;
+  - Id: 312508
+    AegisName: Magical_Leaf_5
+    Name: Magical Leaf 5Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,20;
+      bonus bDef,1;
+  - Id: 312509
+    AegisName: Physical_Flower_1
+    Name: Physical Flower 1Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,22;
+      bonus bDef,1;
+      bonus bMagicAtkDef,1;
+      bonus bNearAtkDef,1; bonus bLongAtkDef,1;
+  - Id: 312510
+    AegisName: Physical_Flower_2
+    Name: Physical Flower 2Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,24;
+      bonus bDef,1;
+      bonus bMagicAtkDef,2;
+      bonus bNearAtkDef,2; bonus bLongAtkDef,2;
+  - Id: 312511
+    AegisName: Physical_Flower_3
+    Name: Physical Flower 3Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,26;
+      bonus bDef,1;
+      bonus bMagicAtkDef,3;
+      bonus bNearAtkDef,3; bonus bLongAtkDef,3;
+  - Id: 312512
+    AegisName: Physical_Flower_4
+    Name: Physical Flower 4Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,28;
+      bonus bDef,1;
+      bonus bMagicAtkDef,4;
+      bonus bNearAtkDef,4; bonus bLongAtkDef,4;
+  - Id: 312513
+    AegisName: Physical_Flower_5
+    Name: Physical Flower 5Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,30;
+      bonus bDef,1;
+      bonus bMagicAtkDef,5;
+      bonus bNearAtkDef,5; bonus bLongAtkDef,5;
+  - Id: 312514
+    AegisName: Magical_Flower_1
+    Name: Magical Flower 1Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,22;
+      bonus bDef,1;
+      bonus bMagicAtkDef,1;
+      bonus bNearAtkDef,1; bonus bLongAtkDef,1;
+  - Id: 312515
+    AegisName: Magical_Flower_2
+    Name: Magical Flower 2Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,24;
+      bonus bDef,1;
+      bonus bMagicAtkDef,2;
+      bonus bNearAtkDef,2; bonus bLongAtkDef,2;
+  - Id: 312516
+    AegisName: Magical_Flower_3
+    Name: Magical Flower 3Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,26;
+      bonus bDef,1;
+      bonus bMagicAtkDef,3;
+      bonus bNearAtkDef,3; bonus bLongAtkDef,3;
+  - Id: 312517
+    AegisName: Magical_Flower_4
+    Name: Magical Flower 4Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,28;
+      bonus bDef,1;
+      bonus bMagicAtkDef,4;
+      bonus bNearAtkDef,4; bonus bLongAtkDef,4;
+  - Id: 312518
+    AegisName: Magical_Flower_5
+    Name: Magical Flower 5Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,30;
+      bonus bDef,1;
+      bonus bMagicAtkDef,5;
+      bonus bNearAtkDef,5; bonus bLongAtkDef,5;
+  - Id: 312519
+    AegisName: Physical_Fruit_1
+    Name: Physical Fruit 1Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,3;
+      bonus bDef,1;
+  - Id: 312520
+    AegisName: Physical_Fruit_2
+    Name: Physical Fruit 2Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,6;
+      bonus bDef,1;
+  - Id: 312521
+    AegisName: Physical_Fruit_3
+    Name: Physical Fruit 3Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,9;
+      bonus bDef,1;
+  - Id: 312522
+    AegisName: Physical_Fruit_4
+    Name: Physical Fruit 4Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,12;
+      bonus bDef,1;
+  - Id: 312523
+    AegisName: Physical_Fruit_5
+    Name: Physical Fruit 5Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,15;
+      bonus bDef,1;
+  - Id: 312524
+    AegisName: Physical_Fruit_6
+    Name: Physical Fruit 6Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,18;
+      bonus bDef,1;
+  - Id: 312525
+    AegisName: Physical_Fruit_7
+    Name: Physical Fruit 7Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,21;
+      bonus bDef,1;
+  - Id: 312526
+    AegisName: Physical_Fruit_8
+    Name: Physical Fruit 8Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,24;
+      bonus bDef,1;
+  - Id: 312527
+    AegisName: Physical_Fruit_9
+    Name: Physical Fruit 9Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,27;
+      bonus bDef,1;
+  - Id: 312528
+    AegisName: Physical_Fruit_10
+    Name: Physical Fruit 10Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bBaseAtk,30;
+      bonus bDef,1;
+  - Id: 312529
+    AegisName: Physical_Fruit_11
+    Name: Physical Fruit 11Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,1;
+      bonus bBaseAtk,30;
+      bonus bDef,1;
+  - Id: 312530
+    AegisName: Physical_Fruit_12
+    Name: Physical Fruit 12Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,2;
+      bonus bBaseAtk,30;
+      bonus bDef,1;
+  - Id: 312531
+    AegisName: Physical_Fruit_13
+    Name: Physical Fruit 13Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,3;
+      bonus bBaseAtk,30;
+      bonus bDef,1;
+  - Id: 312532
+    AegisName: Physical_Fruit_14
+    Name: Physical Fruit 14Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,4;
+      bonus bBaseAtk,30;
+      bonus bDef,1;
+  - Id: 312533
+    AegisName: Physical_Fruit_15
+    Name: Physical Fruit 15Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,5;
+      bonus bBaseAtk,30;
+      bonus bDef,1;
+  - Id: 312534
+    AegisName: Physical_Fruit_16
+    Name: Physical Fruit 16Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,6;
+      bonus bBaseAtk,30;
+      bonus bDef,1;
+      bonus2 bAddSize,Size_All,3;
+  - Id: 312535
+    AegisName: Physical_Fruit_17
+    Name: Physical Fruit 17Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,7;
+      bonus bBaseAtk,30;
+      bonus bDef,1;
+      bonus2 bAddSize,Size_All,6;
+  - Id: 312536
+    AegisName: Physical_Fruit_18
+    Name: Physical Fruit 18Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,7;
+      bonus bBaseAtk,30;
+      bonus bDef,1;
+      bonus2 bAddSize,Size_All,9;
+  - Id: 312537
+    AegisName: Physical_Fruit_19
+    Name: Physical Fruit 19Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,7;
+      bonus bBaseAtk,30;
+      bonus bDef,1;
+      bonus2 bAddSize,Size_All,12;
+  - Id: 312538
+    AegisName: Physical_Fruit_20
+    Name: Physical Fruit 20Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,7;
+      bonus bBaseAtk,30;
+      bonus bDef,1;
+      bonus2 bAddSize,Size_All,15;
+  - Id: 312539
+    AegisName: Magical_Fruit_1
+    Name: Magical Fruit 1Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,3;
+      bonus bDef,1;
+  - Id: 312540
+    AegisName: Magical_Fruit_2
+    Name: Magical Fruit 2Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,6;
+      bonus bDef,1;
+  - Id: 312541
+    AegisName: Magical_Fruit_3
+    Name: Magical Fruit 3Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,9;
+      bonus bDef,1;
+  - Id: 312542
+    AegisName: Magical_Fruit_4
+    Name: Magical Fruit 4Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,12;
+      bonus bDef,1;
+  - Id: 312543
+    AegisName: Magical_Fruit_5
+    Name: Magical Fruit 5Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,15;
+      bonus bDef,1;
+  - Id: 312544
+    AegisName: Magical_Fruit_6
+    Name: Magical Fruit 6Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,18;
+      bonus bDef,1;
+  - Id: 312545
+    AegisName: Magical_Fruit_7
+    Name: Magical Fruit 7Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,21;
+      bonus bDef,1;
+  - Id: 312546
+    AegisName: Magical_Fruit_8
+    Name: Magical Fruit 8Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,24;
+      bonus bDef,1;
+  - Id: 312547
+    AegisName: Magical_Fruit_9
+    Name: Magical Fruit 9Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,27;
+      bonus bDef,1;
+  - Id: 312548
+    AegisName: Magical_Fruit_10
+    Name: Magical Fruit 10Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatk,30;
+      bonus bDef,1;
+  - Id: 312549
+    AegisName: Magical_Fruit_11
+    Name: Magical Fruit 11Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatkRate,1;
+      bonus bMatk,30;
+      bonus bDef,1;
+  - Id: 312550
+    AegisName: Magical_Fruit_12
+    Name: Magical Fruit 12Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatkRate,2;
+      bonus bMatk,30;
+      bonus bDef,1;
+  - Id: 312551
+    AegisName: Magical_Fruit_13
+    Name: Magical Fruit 13Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatkRate,3;
+      bonus bMatk,30;
+      bonus bDef,1;
+  - Id: 312552
+    AegisName: Magical_Fruit_14
+    Name: Magical Fruit 14Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatkRate,4;
+      bonus bMatk,30;
+      bonus bDef,1;
+  - Id: 312553
+    AegisName: Magical_Fruit_15
+    Name: Magical Fruit 15Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatkRate,5;
+      bonus bMatk,30;
+      bonus bDef,1;
+  - Id: 312554
+    AegisName: Magical_Fruit_16
+    Name: Magical Fruit 16Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatkRate,6;
+      bonus bMatk,30;
+      bonus bDef,1;
+      bonus2 bMagicAddSize,Size_All,3;
+  - Id: 312555
+    AegisName: Magical_Fruit_17
+    Name: Magical Fruit 17Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatkRate,7;
+      bonus bMatk,30;
+      bonus bDef,1;
+      bonus2 bMagicAddSize,Size_All,6;
+  - Id: 312556
+    AegisName: Magical_Fruit_18
+    Name: Magical Fruit 18Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatkRate,7;
+      bonus bMatk,30;
+      bonus bDef,1;
+      bonus2 bMagicAddSize,Size_All,9;
+  - Id: 312557
+    AegisName: Magical_Fruit_19
+    Name: Magical Fruit 19Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatkRate,7;
+      bonus bMatk,30;
+      bonus bDef,1;
+      bonus2 bMagicAddSize,Size_All,12;
+  - Id: 312558
+    AegisName: Magical_Fruit_20
+    Name: Magical Fruit 20Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMatkRate,7;
+      bonus bMatk,30;
+      bonus bDef,1;
+      bonus2 bMagicAddSize,Size_All,15;
+  - Id: 312559
+    AegisName: Life_of_Spring_1
+    Name: Life of Spring 1Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,1;
+      bonus bShortAtkRate,1;
+  - Id: 312560
+    AegisName: Life_of_Spring_2
+    Name: Life of Spring 2Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,2;
+      bonus bShortAtkRate,2;
+  - Id: 312561
+    AegisName: Life_of_Spring_3
+    Name: Life of Spring 3Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,3;
+      bonus bShortAtkRate,3;
+  - Id: 312562
+    AegisName: Life_of_Spring_4
+    Name: Life of Spring 4Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,4;
+      bonus bShortAtkRate,4;
+  - Id: 312563
+    AegisName: Life_of_Spring_5
+    Name: Life of Spring 5Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,5;
+      bonus bShortAtkRate,5;
+  - Id: 312564
+    AegisName: Life_of_Spring_6
+    Name: Life of Spring 6Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,6;
+      bonus bShortAtkRate,6;
+  - Id: 312565
+    AegisName: Life_of_Spring_7
+    Name: Life of Spring 7Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,7;
+      bonus bShortAtkRate,7;
+  - Id: 312566
+    AegisName: Life_of_Spring_8
+    Name: Life of Spring 8Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,8;
+      bonus bShortAtkRate,8;
+  - Id: 312567
+    AegisName: Life_of_Spring_9
+    Name: Life of Spring 9Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,9;
+      bonus bShortAtkRate,9;
+  - Id: 312568
+    AegisName: Life_of_Spring_10
+    Name: Life of Spring 10Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,10;
+      bonus bShortAtkRate,10;
+  - Id: 312569
+    AegisName: Life_of_Spring_11
+    Name: Life of Spring 11Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,11;
+      bonus bShortAtkRate,10;
+  - Id: 312570
+    AegisName: Life_of_Spring_12
+    Name: Life of Spring 12Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,12;
+      bonus bShortAtkRate,10;
+  - Id: 312571
+    AegisName: Life_of_Spring_13
+    Name: Life of Spring 13Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,13;
+      bonus bShortAtkRate,10;
+  - Id: 312572
+    AegisName: Life_of_Spring_14
+    Name: Life of Spring 14Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,14;
+      bonus bShortAtkRate,10;
+  - Id: 312573
+    AegisName: Life_of_Spring_15
+    Name: Life of Spring 15Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,15;
+      bonus bShortAtkRate,10;
+  - Id: 312574
+    AegisName: Life_of_Spring_16
+    Name: Life of Spring 16Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,16;
+      bonus bShortAtkRate,13;
+  - Id: 312575
+    AegisName: Life_of_Spring_17
+    Name: Life of Spring 17Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,17;
+      bonus bShortAtkRate,16;
+  - Id: 312576
+    AegisName: Life_of_Spring_18
+    Name: Life of Spring 18Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,18;
+      bonus bShortAtkRate,19;
+  - Id: 312577
+    AegisName: Life_of_Spring_19
+    Name: Life of Spring 19Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,19;
+      bonus bShortAtkRate,22;
+  - Id: 312578
+    AegisName: Life_of_Spring_20
+    Name: Life of Spring 20Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,20;
+      bonus bShortAtkRate,25;
+  - Id: 312579
+    AegisName: Life_of_Summer_1
+    Name: Life of Summer 1Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,1;
+      bonus bLongAtkRate,1;
+  - Id: 312580
+    AegisName: Life_of_Summer_2
+    Name: Life of Summer 2Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,2;
+      bonus bLongAtkRate,2;
+  - Id: 312581
+    AegisName: Life_of_Summer_3
+    Name: Life of Summer 3Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,3;
+      bonus bLongAtkRate,3;
+  - Id: 312582
+    AegisName: Life_of_Summer_4
+    Name: Life of Summer 4Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,4;
+      bonus bLongAtkRate,4;
+  - Id: 312583
+    AegisName: Life_of_Summer_5
+    Name: Life of Summer 5Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,5;
+      bonus bLongAtkRate,5;
+  - Id: 312584
+    AegisName: Life_of_Summer_6
+    Name: Life of Summer 6Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,6;
+      bonus bLongAtkRate,6;
+  - Id: 312585
+    AegisName: Life_of_Summer_7
+    Name: Life of Summer 7Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,7;
+      bonus bLongAtkRate,7;
+  - Id: 312586
+    AegisName: Life_of_Summer_8
+    Name: Life of Summer 8Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,8;
+      bonus bLongAtkRate,8;
+  - Id: 312587
+    AegisName: Life_of_Summer_9
+    Name: Life of Summer 9Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,9;
+      bonus bLongAtkRate,9;
+  - Id: 312588
+    AegisName: Life_of_Summer_10
+    Name: Life of Summer 10Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,10;
+      bonus bLongAtkRate,10;
+  - Id: 312589
+    AegisName: Life_of_Summer_11
+    Name: Life of Summer 11Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,11;
+      bonus bLongAtkRate,10;
+  - Id: 312590
+    AegisName: Life_of_Summer_12
+    Name: Life of Summer 12Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,12;
+      bonus bLongAtkRate,10;
+  - Id: 312591
+    AegisName: Life_of_Summer_13
+    Name: Life of Summer 13Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,13;
+      bonus bLongAtkRate,10;
+  - Id: 312592
+    AegisName: Life_of_Summer_14
+    Name: Life of Summer 14Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,14;
+      bonus bLongAtkRate,10;
+  - Id: 312593
+    AegisName: Life_of_Summer_15
+    Name: Life of Summer 15Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,15;
+      bonus bLongAtkRate,10;
+  - Id: 312594
+    AegisName: Life_of_Summer_16
+    Name: Life of Summer 16Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,16;
+      bonus bLongAtkRate,13;
+  - Id: 312595
+    AegisName: Life_of_Summer_17
+    Name: Life of Summer 17Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,17;
+      bonus bLongAtkRate,16;
+  - Id: 312596
+    AegisName: Life_of_Summer_18
+    Name: Life of Summer 18Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,18;
+      bonus bLongAtkRate,19;
+  - Id: 312597
+    AegisName: Life_of_Summer_19
+    Name: Life of Summer 19Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,19;
+      bonus bLongAtkRate,22;
+  - Id: 312598
+    AegisName: Life_of_Summer_20
+    Name: Life of Summer 20Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,20;
+      bonus bLongAtkRate,25;
+  - Id: 312599
+    AegisName: Life_of_Autumn_1
+    Name: Life of Autumn 1Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAddClass,Class_All,1;
+      bonus2 bMagicAtkEle,Ele_All,1;
+  - Id: 312600
+    AegisName: Life_of_Autumn_2
+    Name: Life of Autumn 2Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAddClass,Class_All,2;
+      bonus2 bMagicAtkEle,Ele_All,2;
+  - Id: 312601
+    AegisName: Life_of_Autumn_3
+    Name: Life of Autumn 3Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAddClass,Class_All,3;
+      bonus2 bMagicAtkEle,Ele_All,3;
+  - Id: 312602
+    AegisName: Life_of_Autumn_4
+    Name: Life of Autumn 4Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAddClass,Class_All,4;
+      bonus2 bMagicAtkEle,Ele_All,4;
+  - Id: 312603
+    AegisName: Life_of_Autumn_5
+    Name: Life of Autumn 5Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAddClass,Class_All,5;
+      bonus2 bMagicAtkEle,Ele_All,5;
+  - Id: 312604
+    AegisName: Life_of_Autumn_6
+    Name: Life of Autumn 6Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAddClass,Class_All,6;
+      bonus2 bMagicAtkEle,Ele_All,6;
+  - Id: 312605
+    AegisName: Life_of_Autumn_7
+    Name: Life of Autumn 7Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAddClass,Class_All,7;
+      bonus2 bMagicAtkEle,Ele_All,7;
+  - Id: 312606
+    AegisName: Life_of_Autumn_8
+    Name: Life of Autumn 8Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAddClass,Class_All,8;
+      bonus2 bMagicAtkEle,Ele_All,8;
+  - Id: 312607
+    AegisName: Life_of_Autumn_9
+    Name: Life of Autumn 9Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAddClass,Class_All,9;
+      bonus2 bMagicAtkEle,Ele_All,9;
+  - Id: 312608
+    AegisName: Life_of_Autumn_10
+    Name: Life of Autumn 10Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAddClass,Class_All,10;
+      bonus2 bMagicAtkEle,Ele_All,10;
+  - Id: 312609
+    AegisName: Life_of_Autumn_11
+    Name: Life of Autumn 11Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAddClass,Class_All,11;
+      bonus2 bMagicAtkEle,Ele_All,10;
+  - Id: 312610
+    AegisName: Life_of_Autumn_12
+    Name: Life of Autumn 12Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAddClass,Class_All,12;
+      bonus2 bMagicAtkEle,Ele_All,10;
+  - Id: 312611
+    AegisName: Life_of_Autumn_13
+    Name: Life of Autumn 13Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAddClass,Class_All,13;
+      bonus2 bMagicAtkEle,Ele_All,10;
+  - Id: 312612
+    AegisName: Life_of_Autumn_14
+    Name: Life of Autumn 14Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAddClass,Class_All,14;
+      bonus2 bMagicAtkEle,Ele_All,10;
+  - Id: 312613
+    AegisName: Life_of_Autumn_15
+    Name: Life of Autumn 15Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAddClass,Class_All,15;
+      bonus2 bMagicAtkEle,Ele_All,10;
+  - Id: 312614
+    AegisName: Life_of_Autumn_16
+    Name: Life of Autumn 16Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAddClass,Class_All,16;
+      bonus2 bMagicAtkEle,Ele_All,13;
+  - Id: 312615
+    AegisName: Life_of_Autumn_17
+    Name: Life of Autumn 17Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAddClass,Class_All,17;
+      bonus2 bMagicAtkEle,Ele_All,16;
+  - Id: 312616
+    AegisName: Life_of_Autumn_18
+    Name: Life of Autumn 18Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAddClass,Class_All,18;
+      bonus2 bMagicAtkEle,Ele_All,19;
+  - Id: 312617
+    AegisName: Life_of_Autumn_19
+    Name: Life of Autumn 19Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAddClass,Class_All,19;
+      bonus2 bMagicAtkEle,Ele_All,22;
+  - Id: 312618
+    AegisName: Life_of_Autumn_20
+    Name: Life of Autumn 20Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAddClass,Class_All,20;
+      bonus2 bMagicAtkEle,Ele_All,25;
+  - Id: 312619
+    AegisName: Life_of_Winter_1
+    Name: Life of Winter 1Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,1;
+      bonus bCritAtkRate,1;
+  - Id: 312620
+    AegisName: Life_of_Winter_2
+    Name: Life of Winter 2Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,2;
+      bonus bCritAtkRate,2;
+  - Id: 312621
+    AegisName: Life_of_Winter_3
+    Name: Life of Winter 3Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,3;
+      bonus bCritAtkRate,3;
+  - Id: 312622
+    AegisName: Life_of_Winter_4
+    Name: Life of Winter 4Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,4;
+      bonus bCritAtkRate,4;
+  - Id: 312623
+    AegisName: Life_of_Winter_5
+    Name: Life of Winter 5Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,5;
+      bonus bCritAtkRate,5;
+  - Id: 312624
+    AegisName: Life_of_Winter_6
+    Name: Life of Winter 6Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,6;
+      bonus bCritAtkRate,6;
+  - Id: 312625
+    AegisName: Life_of_Winter_7
+    Name: Life of Winter 7Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,7;
+      bonus bCritAtkRate,7;
+  - Id: 312626
+    AegisName: Life_of_Winter_8
+    Name: Life of Winter 8Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,8;
+      bonus bCritAtkRate,8;
+  - Id: 312627
+    AegisName: Life_of_Winter_9
+    Name: Life of Winter 9Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,9;
+      bonus bCritAtkRate,9;
+  - Id: 312628
+    AegisName: Life_of_Winter_10
+    Name: Life of Winter 10Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,10;
+      bonus bCritAtkRate,10;
+  - Id: 312629
+    AegisName: Life_of_Winter_11
+    Name: Life of Winter 11Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,11;
+      bonus bCritAtkRate,10;
+  - Id: 312630
+    AegisName: Life_of_Winter_12
+    Name: Life of Winter 12Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,12;
+      bonus bCritAtkRate,10;
+  - Id: 312631
+    AegisName: Life_of_Winter_13
+    Name: Life of Winter 13Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,13;
+      bonus bCritAtkRate,10;
+  - Id: 312632
+    AegisName: Life_of_Winter_14
+    Name: Life of Winter 14Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,14;
+      bonus bCritAtkRate,10;
+  - Id: 312633
+    AegisName: Life_of_Winter_15
+    Name: Life of Winter 15Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,15;
+      bonus bCritAtkRate,10;
+  - Id: 312634
+    AegisName: Life_of_Winter_16
+    Name: Life of Winter 16Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,16;
+      bonus bCritAtkRate,13;
+  - Id: 312635
+    AegisName: Life_of_Winter_17
+    Name: Life of Winter 17Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,17;
+      bonus bCritAtkRate,16;
+  - Id: 312636
+    AegisName: Life_of_Winter_18
+    Name: Life of Winter 18Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,18;
+      bonus bCritAtkRate,19;
+  - Id: 312637
+    AegisName: Life_of_Winter_19
+    Name: Life of Winter 19Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,19;
+      bonus bCritAtkRate,22;
+  - Id: 312638
+    AegisName: Life_of_Winter_20
+    Name: Life of Winter 20Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bAddClass,Class_All,20;
+      bonus bCritAtkRate,25;
+  - Id: 312981
+    AegisName: Token_Of_Life
+    Name: Token of Life
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bAllStats,3;
+      bonus bAllStats,5;
+      bonus2 bAddClass,Class_All,3;
+      bonus2 bMagicAddClass,Class_All,3;
+      bonus2 bAddSize,Size_All,5;
+      bonus2 bMagicAddSize,Size_All,5;
+  - Id: 312982
+    AegisName: Signet_Of_Pow1
+    Name: Signet of Power 1Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bShortAtkRate,1;
+      bonus2 bAddClass,Class_All,1;
+  - Id: 312983
+    AegisName: Signet_Of_Pow2
+    Name: Signet of Power 2Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bShortAtkRate,3;
+      bonus2 bAddClass,Class_All,3;
+  - Id: 312984
+    AegisName: Signet_Of_Pow3
+    Name: Signet of Power 3Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bShortAtkRate,6;
+      bonus2 bAddClass,Class_All,6;
+  - Id: 312985
+    AegisName: Signet_Of_Pow4
+    Name: Signet of Power 4Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bShortAtkRate,10;
+      bonus2 bAddClass,Class_All,10;
+  - Id: 312986
+    AegisName: Signet_Of_Pow5
+    Name: Signet of Power 5Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bShortAtkRate,15;
+      bonus2 bAddClass,Class_All,15;
+  - Id: 312987
+    AegisName: Signet_Of_Con1
+    Name: Signet of Concentration 1Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bLongAtkRate,1;
+      bonus2 bAddClass,Class_All,1;
+  - Id: 312988
+    AegisName: Signet_Of_Con2
+    Name: Signet of Concentration 2Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bLongAtkRate,3;
+      bonus2 bAddClass,Class_All,3;
+  - Id: 312989
+    AegisName: Signet_Of_Con3
+    Name: Signet of Concentration 3Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bLongAtkRate,6;
+      bonus2 bAddClass,Class_All,6;
+  - Id: 312990
+    AegisName: Signet_Of_Con4
+    Name: Signet of Concentration 4Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bLongAtkRate,10;
+      bonus2 bAddClass,Class_All,10;
+  - Id: 312991
+    AegisName: Signet_Of_Con5
+    Name: Signet of Concentration 5Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bLongAtkRate,15;
+      bonus2 bAddClass,Class_All,15;
+  - Id: 312992
+    AegisName: Signet_Of_Spl1
+    Name: Signet of Spell 1Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAtkEle,Ele_All,1;
+      bonus bMatkRate,1;
+  - Id: 312993
+    AegisName: Signet_Of_Spl2
+    Name: Signet of Spell 2Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAtkEle,Ele_All,3;
+      bonus bMatkRate,3;
+  - Id: 312994
+    AegisName: Signet_Of_Spl3
+    Name: Signet of Spell 3Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAtkEle,Ele_All,6;
+      bonus bMatkRate,6;
+  - Id: 312995
+    AegisName: Signet_Of_Spl4
+    Name: Signet of Spell 4Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAtkEle,Ele_All,10;
+      bonus bMatkRate,10;
+  - Id: 312996
+    AegisName: Signet_Of_Spl5
+    Name: Signet of Spell 5Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus2 bMagicAtkEle,Ele_All,15;
+      bonus bMatkRate,15;
+  - Id: 312997
+    AegisName: Signet_Of_Sta1
+    Name: Signet of Stamina 1Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDef,1;
+      bonus bMaxHP,1000;
+  - Id: 312998
+    AegisName: Signet_Of_Sta2
+    Name: Signet of Stamina 2Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDef,1;
+      bonus bMaxHP,3000;
+  - Id: 312999
+    AegisName: Signet_Of_Sta3
+    Name: Signet of Stamina 3Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDef,1;
+      bonus bMaxHP,6000;
+  - Id: 313000
+    AegisName: Signet_Of_Sta4
+    Name: Signet of Stamina 4Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDef,2;
+      bonus bMaxHP,10000;
+      bonus bNearAtkDef,5; bonus bLongAtkDef,5;
+  - Id: 313001
+    AegisName: Signet_Of_Sta5
+    Name: Signet of Stamina 5Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bDef,3;
+      bonus bMaxHP,15000;
+      bonus bNearAtkDef,9; bonus bLongAtkDef,9;
+  - Id: 313002
+    AegisName: Signet_Of_Crt1
+    Name: Signet of Creative 1Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bCritAtkRate,1;
+      bonus2 bAddClass,Class_All,1;
+  - Id: 313003
+    AegisName: Signet_Of_Crt2
+    Name: Signet of Creative 2Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bCritAtkRate,3;
+      bonus2 bAddClass,Class_All,3;
+  - Id: 313004
+    AegisName: Signet_Of_Crt3
+    Name: Signet of Creative 3Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bCritAtkRate,6;
+      bonus2 bAddClass,Class_All,6;
+  - Id: 313005
+    AegisName: Signet_Of_Crt4
+    Name: Signet of Creative 4Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bCritAtkRate,10;
+      bonus2 bAddClass,Class_All,10;
+  - Id: 313006
+    AegisName: Signet_Of_Crt5
+    Name: Signet of Creative 5Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bCritAtkRate,15;
+      bonus2 bAddClass,Class_All,15;
+  - Id: 313007
+    AegisName: Signet_Of_Wis1
+    Name: Signed of Wisdom 1Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMdef,1;
+      bonus bMaxSP,100;
+  - Id: 313008
+    AegisName: Signet_Of_Wis2
+    Name: Signed of Wisdom 2Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMdef,3;
+      bonus bMaxSP,250;
+  - Id: 313009
+    AegisName: Signet_Of_Wis3
+    Name: Signed of Wisdom 3Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMdef,6;
+      bonus bMaxSP,450;
+  - Id: 313010
+    AegisName: Signet_Of_Wis4
+    Name: Signed of Wisdom 4Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMdef,10;
+      bonus bMaxSP,700;
+      bonus bMagicAtkDef,5;
+  - Id: 313011
+    AegisName: Signet_Of_Wis5
+    Name: Signed of Wisdom 5Lv
+    Type: Card
+    SubType: Enchant
+    Script: |
+      bonus bMdef,15;
+      bonus bMaxSP,1000;
+      bonus bMagicAtkDef,9;
   - Id: 313024
     AegisName: Star_Cluster_Of_Str1
     Name: Star Cluster of Strength 1Lv
@@ -151549,6 +153155,133 @@ Body:
             if (getallrefine() >= 22) {
                bonus bDelayrate,-10;
                bonus2 bAddClass,Class_All,2;
+            }
+         }
+      }
+  - Id: 480349
+    AegisName: Circul_Of_Life_Spring
+    Name: "Circulation of Life: Spring [1]"
+    Type: Armor
+    Buy: 67000
+    Sell: 16750
+    Weight: 700
+    Defense: 8
+    Slots: 1
+    Locations: {Garment: true}
+    ArmorLevel: 1
+    EquipLevelMin: 250
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bCritical,-20;
+      bonus bStr,4;
+      bonus bDex,4;
+      bonus bBaseAtk,10*(.@r/2);
+      bonus bShortAtkRate,2*(.@r/3);
+      if (.@r>=7) {
+         bonus bVariableCastrate,-10;
+         if (.@r>=9) {
+            bonus bAspdRate,10;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-10;
+               bonus2 bAddClass,Class_All,7;
+            }
+         }
+      }
+  - Id: 480350
+    AegisName: Circul_Of_Life_Summer
+    Name: "Circulation of Life: Summer [1]"
+    Type: Armor
+    Buy: 67000
+    Sell: 16750
+    Weight: 700
+    Defense: 8
+    Slots: 1
+    Locations: {Garment: true}
+    ArmorLevel: 1
+    EquipLevelMin: 250
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bCritical,-20;
+      bonus bStr,4;
+      bonus bDex,4;
+      bonus bBaseAtk,10*(.@r/2);
+      bonus bLongAtkRate,2*(.@r/3);
+      if (.@r>=7) {
+         bonus bVariableCastrate,-10;
+         if (.@r>=9) {
+            bonus bAspdRate,10;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-10;
+               bonus2 bAddClass,Class_All,7;
+            }
+         }
+      }
+  - Id: 480351
+    AegisName: Circul_Of_Life_Autumn
+    Name: "Circulation of Life: Autumn [1]"
+    Type: Armor
+    Buy: 67000
+    Sell: 16750
+    Weight: 700
+    Defense: 8
+    Slots: 1
+    Locations: {Garment: true}
+    ArmorLevel: 1
+    EquipLevelMin: 250
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bInt,4;
+      bonus bDex,4;
+      bonus bUseSPrate,15;
+      bonus bMatk,10*(.@r/2);
+      bonus2 bMagicAtkEle,Ele_All,2*(.@r/3);
+      if (.@r>=7) {
+         bonus bVariableCastrate,-10;
+         if (.@r>=9) {
+            bonus bAspdRate,5;
+            bonus bVariableCastrate,-5;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-10;
+               bonus2 bMagicAddClass,Class_All,7;
+            }
+         }
+      }
+  - Id: 480352
+    AegisName: Circul_Of_Life_Winter
+    Name: "Circulation of Life: Winter [1]"
+    Type: Armor
+    Buy: 67000
+    Sell: 16750
+    Weight: 700
+    Defense: 8
+    Slots: 1
+    Locations: {Garment: true}
+    ArmorLevel: 1
+    EquipLevelMin: 250
+    Refineable: true
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+    Script: |
+      .@r = getrefine();
+      bonus bCritical,4+(.@r/2);
+      bonus bStr,2;
+      bonus bDex,2;
+      bonus bBaseAtk,5*(.@r/2);
+      bonus bCritAtkRate,(.@r/3);
+      bonus bLuk,(.@r/3);
+      if (.@r>=7) {
+         bonus bVariableCastrate,-5;
+         bonus bCritAtkRate,3;
+         if (.@r>=9) {
+            bonus bAspdRate,10;
+            if (getallrefine() >= 22) {
+               bonus bDelayrate,-10;
+               bonus2 bAddClass,Class_All,7;
             }
          }
       }
@@ -162479,6 +164212,11 @@ Body:
     Name: Emblem of Monarch Penguin
     Weight: 10
     Flags: {BuyingStore: true, DropEffect: CLIENT}
+  - Id: 1001456
+    AegisName: Circul_Of_Life
+    Name: Circulation of Life
+    Weight: 10
+    Flags: {BuyingStore: true}
   - Id: 1001457
     AegisName: Fruit_Of_Birth
     Name: Fruit of Birth
@@ -162487,6 +164225,16 @@ Body:
   - Id: 1001458
     AegisName: Fruit_Of_Extinction
     Name: Fruit of Extinction
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001459
+    AegisName: Truth_Of_Life
+    Name: Truth of Life
+    Weight: 10
+    Flags: {BuyingStore: true}
+  - Id: 1001460
+    AegisName: Light_Of_Life
+    Name: Light of Life
     Weight: 10
     Flags: {BuyingStore: true}
   - Id: 1001461
