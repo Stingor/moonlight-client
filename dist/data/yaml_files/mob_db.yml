@@ -38809,6 +38809,8 @@ Body:
     DamageMotion: 360
     Ai: 21
     Class: Boss
+    Drops:
+      - {Item: Bangungot_Card, Rate: 1, StealProtected: true}
   - Id: 2318
     AegisName: BANGUNGOT_2
     Name: Bangungot
@@ -38839,6 +38841,8 @@ Body:
     DamageMotion: 360
     Class: Guardian
     Modes: {IgnoreMagic: true, IgnoreMelee: true, IgnoreMisc: true, IgnoreRanged: true, KnockBackImmune: true}
+    Drops:
+      - {Item: Bangungot_Card, Rate: 1, StealProtected: true}
   - Id: 2319
     AegisName: BUWAYA
     Name: Buwaya
@@ -38910,6 +38914,8 @@ Body:
     DamageMotion: 432
     Ai: 10
     Class: Boss
+    Drops:
+      - {Item: Bakonawa_Card, Rate: 1, StealProtected: true}
   - Id: 2321
     AegisName: BAKONAWA_2
     Name: Bakonawa
@@ -38937,6 +38943,8 @@ Body:
     DamageMotion: 432
     Ai: 10
     Class: Boss
+    Drops:
+      - {Item: Bakonawa_Card, Rate: 1, StealProtected: true}
   - Id: 2322
     AegisName: BAKONAWA_3
     Name: Bakonawa
@@ -38966,6 +38974,8 @@ Body:
     DamageMotion: 432
     Ai: 10
     Class: Boss
+    Drops:
+      - {Item: Bakonawa_Card, Rate: 1, StealProtected: true}
   - Id: 2323
     AegisName: EVENT_BOMB
     Name: Bomb Poring
@@ -40337,7 +40347,7 @@ Body:
       - {Item: Sparkling_Dust, Rate: 2000}
       - {Item: Great_Nature, Rate: 40}
       - {Item: Yggdrasil_Dust, Rate: 10}
-      - {Item: LichternG_Card, Rate: 1, StealProtected: true}
+      - {Item: LichternY_Card, Rate: 1, StealProtected: true}
   - Id: 2369
     AegisName: LICHTERN_R
     Name: Lichtern
@@ -40404,7 +40414,7 @@ Body:
       - {Item: Sparkling_Dust, Rate: 2000}
       - {Item: Rough_Wind, Rate: 40}
       - {Item: Slapping_Herb, Rate: 10}
-      - {Item: LichternY_Card, Rate: 1, StealProtected: true}
+      - {Item: LichternG_Card, Rate: 1, StealProtected: true}
   - Id: 2371
     AegisName: FAITHFUL_MANAGER
     Name: Faithful Manager
@@ -43297,6 +43307,7 @@ Body:
       - {Item: Flame_Heart, Rate: 5000}
       - {Item: FaceWormQueen_Leg, Rate: 100}
       - {Item: Broken_Horn, Rate: 5000, StealProtected: true}
+      - {Item: Faceworm_Queen_Card, Rate: 1, StealProtected: true}
   - Id: 2533
     AegisName: FACEWORM_QUEEN_G
     Name: Green Faceworm Queen
@@ -43336,6 +43347,7 @@ Body:
       - {Item: Broken_Horn, Rate: 5000}
       - {Item: FaceWormQueen_Leg, Rate: 100}
       - {Item: Great_Nature, Rate: 5000}
+      - {Item: Faceworm_Queen_Card, Rate: 1, StealProtected: true}
   - Id: 2534
     AegisName: FACEWORM_QUEEN_B
     Name: Blue Faceworm Queen
@@ -43375,6 +43387,7 @@ Body:
       - {Item: Broken_Horn, Rate: 5000}
       - {Item: FaceWormQueen_Leg, Rate: 100}
       - {Item: Mistic_Frozen, Rate: 5000}
+      - {Item: Faceworm_Queen_Card, Rate: 1, StealProtected: true}
   - Id: 2535
     AegisName: FACEWORM_QUEEN_Y
     Name: Yellow Faceworm Queen
@@ -43414,6 +43427,7 @@ Body:
       - {Item: Broken_Horn, Rate: 5000}
       - {Item: FaceWormQueen_Leg, Rate: 100}
       - {Item: Rough_Wind, Rate: 5000}
+      - {Item: Faceworm_Queen_Card, Rate: 1, StealProtected: true}
   - Id: 2536
     AegisName: HIDDEN_MOB3
     Name: Monster 3
@@ -44267,6 +44281,7 @@ Body:
       - {Item: Fenrir_Card__, Rate: 100}
       - {Item: Fenrir_Card__, Rate: 100}
       - {Item: Fenrir_Card__, Rate: 100}
+      - {Item: Fenrir_Card_, Rate: 500}
       - {Item: Fenrir_Card, Rate: 10, StealProtected: true}
   - Id: 2565
     AegisName: ALPHONSE
@@ -57513,6 +57528,7 @@ Body:
       - {Item: PrizeOfHero, Rate: 5000}
       - {Item: PrizeOfHero, Rate: 5000}
       - {Item: Fruit_Of_Mastela, Rate: 200}
+      - {Item: Morocc's_Minion_Card, Rate: 1, StealProtected: true}
   - Id: 3001
     AegisName: EP14_MORS_MOB1
     Name: Morroc's Ghoul
@@ -57780,6 +57796,7 @@ Body:
       - {Item: Blue_Gemstone, Rate: 20}
       - {Item: Red_Gemstone, Rate: 20}
       - {Item: Fruit_Of_Mastela, Rate: 20}
+      - {Item: Corrupt_Life_Card, Rate: 1, StealProtected: true}
   - Id: 3011
     AegisName: EP14_3_DEATH_A_MOB2
     Name: Corrupt Baby Desert Wol
@@ -57816,6 +57833,7 @@ Body:
       - {Item: Blue_Gemstone, Rate: 20}
       - {Item: Red_Gemstone, Rate: 20}
       - {Item: Fruit_Of_Mastela, Rate: 20}
+      - {Item: Corrupt_Life_Card, Rate: 1, StealProtected: true}
   - Id: 3012
     AegisName: EP14_3_DEATH_A_MOB3
     Name: Corrupt Familiar
@@ -57853,6 +57871,7 @@ Body:
       - {Item: Blue_Gemstone, Rate: 20}
       - {Item: Red_Gemstone, Rate: 20}
       - {Item: Fruit_Of_Mastela, Rate: 20}
+      - {Item: Corrupt_Life_Card, Rate: 1, StealProtected: true}
   - Id: 3013
     AegisName: EP14_3_DEATH_B_MOB1
     Name: Corrupt Orc Warrior
@@ -57890,6 +57909,7 @@ Body:
       - {Item: Blue_Gemstone, Rate: 20}
       - {Item: Red_Gemstone, Rate: 20}
       - {Item: Fruit_Of_Mastela, Rate: 20}
+      - {Item: Corrupt_Life_Card, Rate: 1, StealProtected: true}
   - Id: 3014
     AegisName: EP14_3_DEATH_B_MOB2
     Name: Corrupt Desert Wolf
@@ -57927,6 +57947,7 @@ Body:
       - {Item: Blue_Gemstone, Rate: 20}
       - {Item: Red_Gemstone, Rate: 20}
       - {Item: Fruit_Of_Mastela, Rate: 20}
+      - {Item: Corrupt_Life_Card, Rate: 1, StealProtected: true}
   - Id: 3015
     AegisName: EP14_3_DEATH_B_MOB3
     Name: Corrupt Phen
@@ -57964,6 +57985,7 @@ Body:
       - {Item: Blue_Gemstone, Rate: 20}
       - {Item: Red_Gemstone, Rate: 20}
       - {Item: Fruit_Of_Mastela, Rate: 20}
+      - {Item: Corrupt_Life_Card, Rate: 1, StealProtected: true}
   - Id: 3016
     AegisName: EP14_3_DEATH_C_MOB1
     Name: Corrupt Orc Zombie
@@ -58040,6 +58062,7 @@ Body:
       - {Item: Blue_Gemstone, Rate: 20}
       - {Item: Red_Gemstone, Rate: 20}
       - {Item: Fruit_Of_Mastela, Rate: 20}
+      - {Item: Corrupt_Life_Card, Rate: 1, StealProtected: true}
   - Id: 3018
     AegisName: EP14_3_DEATH_C_MOB3
     Name: Corrupt Megalodon
@@ -58078,6 +58101,7 @@ Body:
       - {Item: Blue_Gemstone, Rate: 20}
       - {Item: Red_Gemstone, Rate: 20}
       - {Item: Fruit_Of_Mastela, Rate: 20}
+      - {Item: Corrupt_Life_Card, Rate: 1, StealProtected: true}
   - Id: 3020
     AegisName: FIRE_CONDOR
     Name: Fire Condor
@@ -58514,6 +58538,7 @@ Body:
       - {Item: Yellow_Live, Rate: 300}
       - {Item: Great_Nature, Rate: 25}
       - {Item: Singing_Pere_Card, Rate: 1, StealProtected: true}
+      - {Item: Playing_Pere_Card, Rate: 1, StealProtected: true}
   - Id: 3070
     AegisName: PERE2
     Name: Ferre
@@ -58550,6 +58575,7 @@ Body:
       - {Item: Crystal_Blue, Rate: 300}
       - {Item: Mistic_Frozen, Rate: 25}
       - {Item: Playing_Pere_Card, Rate: 1, StealProtected: true}
+      - {Item: Singing_Pere_Card, Rate: 1, StealProtected: true}
   - Id: 3071
     AegisName: PERE3
     Name: Ferre
@@ -58585,6 +58611,7 @@ Body:
       - {Item: Yellow_Live, Rate: 300}
       - {Item: Great_Nature, Rate: 25}
       - {Item: Playing_Pere_Card, Rate: 1, StealProtected: true}
+      - {Item: Singing_Pere_Card, Rate: 1, StealProtected: true}
   - Id: 3072
     AegisName: PERE4
     Name: Ferre
@@ -58621,6 +58648,7 @@ Body:
       - {Item: Crystal_Blue, Rate: 300}
       - {Item: Mistic_Frozen, Rate: 25}
       - {Item: Singing_Pere_Card, Rate: 1, StealProtected: true}
+      - {Item: Playing_Pere_Card, Rate: 1, StealProtected: true}
   - Id: 3073
     AegisName: GRAND_PERE
     Name: Awakened Ferre
@@ -60329,6 +60357,7 @@ Body:
       - {Item: Zargon, Rate: 200}
       - {Item: Garlet, Rate: 200, StealProtected: true}
       - {Item: Rotar_Zairo_Card, Rate: 1, StealProtected: true}
+      - {Item: Airship_Raid_Card, Rate: 1, StealProtected: true}
   - Id: 3176
     AegisName: E1_GREMLIN
     Name: Gremlin
@@ -60366,6 +60395,7 @@ Body:
       - {Item: Violet_Jewel, Rate: 50}
       - {Item: Old_Blue_Box, Rate: 1}
       - {Item: Gremlin_Card, Rate: 1, StealProtected: true}
+      - {Item: Airship_Raid_Card, Rate: 1, StealProtected: true}
   - Id: 3177
     AegisName: E1_BEHOLDER
     Name: Beholder
@@ -60404,6 +60434,7 @@ Body:
       - {Item: Elunium, Rate: 1}
       - {Item: Old_Blue_Box, Rate: 1}
       - {Item: Beholder_Card, Rate: 1, StealProtected: true}
+      - {Item: Airship_Raid_Card, Rate: 1, StealProtected: true}
   - Id: 3178
     AegisName: E1_ACIDUS
     Name: Acidus
@@ -60438,6 +60469,7 @@ Body:
       - {Item: Light_Granule, Rate: 100}
       - {Item: Dragon_Canine, Rate: 500}
       - {Item: Dragonball_Yellow, Rate: 200}
+      - {Item: Airship_Raid_Card, Rate: 1, StealProtected: true}
   - Id: 3179
     AegisName: E1_ACIDUS_
     Name: Acidus
@@ -60474,6 +60506,7 @@ Body:
       - {Item: Dragon_Scale, Rate: 500}
       - {Item: Dragonball_Blue, Rate: 200}
       - {Item: Acidus_Card, Rate: 1, StealProtected: true}
+      - {Item: Airship_Raid_Card, Rate: 1, StealProtected: true}
   - Id: 3180
     AegisName: E1_G_S_NYDHOG
     Name: Wywern
@@ -60508,7 +60541,8 @@ Body:
       - {Item: Dark_Red_Scale, Rate: 500}
       - {Item: Treasure_Box, Rate: 1}
       - {Item: Elunium, Rate: 10}
-      - {Item: AirShip_Raid_Card, Rate: 1, StealProtected: true}
+      - {Item: AirShip_Raid_Card, Rate: 1}
+      - {Item: Airship_Raid_Card, Rate: 1, StealProtected: true}
   - Id: 3181
     AegisName: E1_FELOCK
     Name: Captain Ferlock
