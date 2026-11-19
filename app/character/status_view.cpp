@@ -151,6 +151,13 @@ void StatusView::Refresh(const ro::sim::World& world, std::uint32_t now_ms, int 
     ammo_.dressed = true;
     ammo_.item_id = worn != nullptr ? worn->item_id : 0;
     ammo_.element = player->attack_element;
+    // 🔴 LE SERVEUR NE RETIRE JAMAIS CET ÉTAT : il le pose à chaque munition
+    // enfilée, et ni l'ôter ni l'épuiser ne l'efface. C'est le sac qui dit s'il
+    // vaut encore — sans munition portée, la case disparaît.
+    if (ammo_.item_id == 0) {
+      std::erase_if(pending_,
+                    [](const Pending& held) { return held.effect == ro::sim::kEfstEquipArrow; });
+    }
 
     // ⚠ LE MÉTIER AVANT TOUTE LECTURE D'ICÔNE : six états en tirent une autre
     // image, et le chargeur vide son cache quand il change.

@@ -202,4 +202,10 @@ TEST_CASE("Barre d'états : les munitions portées disent leur nom et leur élé
   view.Refresh(world, kNow, /*preview=*/0);
   REQUIRE(view.cells().size() == 1);
   CHECK(view.cells()[0].accent != 0);
+
+  // 🔴 LE SERVEUR NE RETIRE PAS L'ÉTAT quand on ôte les flèches : la case
+  // part quand même, parce que le sac ne porte plus de munition.
+  REQUIRE(world.inventory().TakeOff(kArrowSlot));
+  view.Refresh(world, kNow, /*preview=*/0);
+  CHECK(view.cells().empty());
 }
