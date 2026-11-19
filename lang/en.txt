@@ -19444,6 +19444,9 @@ tr: Shows everything the shop holds
 fr: Munitions
 tr: Ammunition
 
+fr: Munitions portées
+tr: Equipped ammunition
+
 fr: Nom ou ID d'item
 tr: Item name or ID
 

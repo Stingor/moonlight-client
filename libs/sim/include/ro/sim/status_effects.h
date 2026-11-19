@@ -52,6 +52,12 @@ inline constexpr StatusEffectId kEfstDeepSleep = 435;
 // sur les PNJ qui en portent un.
 inline constexpr StatusEffectId kEfstClanInfo = 696;
 
+// LES MUNITIONS PORTÉES (EFST_CLIENT_ONLY_EQUIP_ARROW) : un état sans échéance
+// que le serveur pose sur le joueur seul, à chaque flèche, balle ou kunaï
+// enfilé. Il ne dit ni quelle munition ni son élément : la table de
+// l'installation ne le nomme même pas, et c'est au client de l'habiller.
+inline constexpr StatusEffectId kEfstEquipArrow = 695;
+
 // LES ÉTATS QUI COUPENT LA PAROLE : ceux qui portent `NoChat` dans la table
 // des états de CE serveur — `db/pre-re/status.yml`, surchargée par
 // `db/import/status.yml` —, avec le sommeil profond ci-dessus. Le serveur jette

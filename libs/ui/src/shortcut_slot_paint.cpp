@@ -22,6 +22,9 @@ constexpr float kDropThickness = 2.0F;
 // bleus, pour ne pas se confondre avec la cible d'un glisser.
 constexpr ImU32 kHighlightVeil = IM_COL32(110, 180, 255, 70);
 constexpr ImU32 kHighlightOutline = IM_COL32(120, 190, 255, 240);
+// La case d'un objet porté : un voile et un cadre dorés.
+constexpr ImU32 kWornVeil = IM_COL32(255, 215, 90, 45);
+constexpr ImU32 kWornOutline = IM_COL32(255, 210, 80, 235);
 // L'icône d'une compétence que le serveur ne donne plus.
 constexpr ImU32 kUnknownTint = IM_COL32(105, 105, 115, 150);
 // Le voile du temps d'attente : il MONTE du bas, comme au client.
@@ -104,17 +107,20 @@ void PaintShortcutSlot(ImDrawList* into, const ShortcutBarLayout& look,
   }
   if (slot.highlighted) {
     into->AddRectFilled(top_left, bottom_right, kHighlightVeil, rounding);
+  } else if (slot.worn) {
+    into->AddRectFilled(top_left, bottom_right, kWornVeil, rounding);
   }
   // ⚠ ÉPAISSEUR ZÉRO = PAS DE CADRE, et c'est une valeur que des joueurs
   // choisiront : des cases jointives sans bordure est une disposition qui se
   // défend. La cible d'un glisser garde la sienne — elle doit s'annoncer même
   // sur une barre sans cadre, sinon on lâche à l'aveugle. La case éclairée
-  // aussi, pour la même raison.
-  const bool marked = marks.dropping || slot.highlighted;
+  // aussi, pour la même raison, et celle d'un objet porté.
+  const bool marked = marks.dropping || slot.highlighted || slot.worn;
   const float border = marked ? kDropThickness * scale : look.border_thickness * scale;
   if (border > 0.0F) {
     const ImU32 edge = marks.dropping     ? kDropOutline
                        : slot.highlighted ? kHighlightOutline
+                       : slot.worn        ? kWornOutline
                                           : look.border_color;
     into->AddRect(top_left, bottom_right, edge, rounding, 0, border);
   }

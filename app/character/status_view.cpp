@@ -5,9 +5,14 @@
 #include <cctype>
 #include <span>
 
+#include "ro/core/i18n.h"
+#include "ro/render/element_glow.h"
+#include "ro/sim/equip_location.h"
 #include "ro/sim/world.h"
+#include "ro/ui/database_window.h"
 
 #include "game/skin_image_of.h"
+#include "world/element_glow_of.h"
 
 namespace moonclient {
 namespace {
@@ -28,6 +33,25 @@ constexpr std::array<std::uint32_t, 6> kPreviewDurationsMs = {12'000,  45'000, 1
 
 // En combien de crans la part écoulée de l'aperçu s'étage.
 constexpr std::uint32_t kPreviewSpentSteps = 5;
+
+// L'opacité du cadre d'élément des munitions.
+constexpr std::uint8_t kAmmoAccentAlpha = 235;
+// Le cadre d'une munition neutre : un gris clair. ⚠ IL SE DESSINE QUAND MÊME —
+// son absence se confondrait avec un élément que le serveur n'a pas dit.
+constexpr ImU32 kNeutralAmmoAccent = IM_COL32(205, 205, 205, kAmmoAccentAlpha);
+
+// Le cadre de l'élément des munitions, ou zéro quand le serveur ne l'a pas dit.
+[[nodiscard]] ImU32 AmmoAccentOf(ro::sim::Element element) {
+  if (element == ro::sim::Element::kNone) {
+    return 0;
+  }
+  const std::optional<ro::render::ElementHue> hue = ElementGlowHueOf(element, true);
+  if (!hue.has_value()) {
+    return kNeutralAmmoAccent;
+  }
+  const std::array<std::uint8_t, 3> rgb = ro::render::ElementHueRgb(*hue);
+  return IM_COL32(rgb[0], rgb[1], rgb[2], kAmmoAccentAlpha);
+}
 
 // Cet octet est-il une lettre latine ou un chiffre ?
 //
@@ -89,6 +113,7 @@ void StatusView::ScanDrawable(int want) {
 
 void StatusView::Collect(std::span<const ro::sim::ActiveStatus> statuses, std::uint32_t now_ms) {
   pending_.clear();
+  ammo_ = Ammo();
   abbreviations_.clear();
   description_lines_.clear();
   cells_.clear();
@@ -122,6 +147,11 @@ void StatusView::Refresh(const ro::sim::World& world, std::uint32_t now_ms, int 
   // porte que des bits. Le serveur ne dit pas combien de temps on dort.
   const ro::sim::Actor* player = world.player();
   if (player != nullptr) {
+    const ro::sim::InventoryItem* worn = world.inventory().WornAt(ro::sim::kEquipAmmo);
+    ammo_.dressed = true;
+    ammo_.item_id = worn != nullptr ? worn->item_id : 0;
+    ammo_.element = player->attack_element;
+
     // ⚠ LE MÉTIER AVANT TOUTE LECTURE D'ICÔNE : six états en tirent une autre
     // image, et le chargeur vide son cache quand il change.
     if (icons_ != nullptr) {
@@ -176,7 +206,10 @@ void StatusView::BuildCells() {
   abbreviations_.reserve(pending_.size());
   for (const Pending& held : pending_) {
     const bool drawn = icons_ != nullptr && icons_->Get(held.effect).usable();
-    abbreviations_.push_back(drawn ? std::string() : StatusAbbreviation(NameOf(held.effect)));
+    // ⚠ LES MUNITIONS N'ONT PAS DE NOM DANS LA TABLE DES ÉTATS : leurs lettres
+    // se tirent de celui de l'objet, faute de quoi la case ne se dessinerait pas.
+    const std::string_view named = IsDressedAmmo(held.effect) ? AmmoName() : NameOf(held.effect);
+    abbreviations_.push_back(drawn ? std::string() : StatusAbbreviation(named));
   }
 
   // ── LES LIGNES DE DESCRIPTION, TOUTES AVANT LA PREMIÈRE TRANCHE ───────────
@@ -212,15 +245,18 @@ void StatusView::BuildCells() {
       cell.icon = SizedSkinImageOf(icon);
     }
     cell.abbreviation = abbreviations_[rank];
+    cell.name = NameOf(held.effect);
+    cell.description = std::span<const std::string_view>(description_lines_)
+                           .subspan(mine, DescriptionOf(held.effect).size());
+    cell.time_line = TimeLineOf(held.effect);
+    if (IsDressedAmmo(held.effect)) {
+      DressAmmo(cell);
+    }
     // ⚠ NI IMAGE NI MOT : la case ne se dessinerait pas, et lui garder sa place
     // creuserait un TROU dans la rangée. Voir `DrawStatusCell`, qui rend faux.
     if (!cell.icon.usable() && cell.abbreviation.empty()) {
       continue;
     }
-    cell.name = NameOf(held.effect);
-    cell.description = std::span<const std::string_view>(description_lines_)
-                           .subspan(mine, DescriptionOf(held.effect).size());
-    cell.time_line = TimeLineOf(held.effect);
     cell.remaining_ms = held.remaining_ms;
     cell.total_ms = held.total_ms;
     cells_.push_back(cell);
@@ -228,6 +264,40 @@ void StatusView::BuildCells() {
       genuine_cells_ = cells_.size();
     }
   }
+}
+
+std::string_view StatusView::AmmoName() const {
+  const ro::vfs::ItemEntry* entry =
+      items_ != nullptr && ammo_.item_id != 0 ? items_->Find(ammo_.item_id) : nullptr;
+  return entry != nullptr ? std::string_view(entry->name) : std::string_view();
+}
+
+void StatusView::DressAmmo(ro::ui::StatusCellView& cell) {
+  // L'ICÔNE DE LA MUNITION, quand elle s'ouvre : une flèche de feu se reconnaît
+  // à son dessin, là où l'image de l'état est la même pour toutes.
+  if (item_icons_ != nullptr && ammo_.item_id != 0) {
+    const ro::render::IconTexture& icon = item_icons_->Get(ammo_.item_id);
+    if (icon.usable()) {
+      cell.icon = SizedSkinImageOf(icon);
+    }
+  }
+  const std::string_view name = AmmoName();
+  cell.name = name.empty() ? std::string_view(ro::core::Tr("Munitions portées")) : name;
+  cell.accent = AmmoAccentOf(ammo_.element);
+
+  // ⚠ UNE SEULE LIGNE, ET ELLE REMPLACE CE QUE LA TABLE DIRAIT : l'état ne
+  // décrit rien de la munition, et c'est son élément qu'on vient lire.
+  cell.time_line = 0;
+  if (ammo_.element == ro::sim::Element::kNone) {
+    cell.description = {};
+    return;
+  }
+  // ⚠ RANG PLUS UN : le rang zéro de la liste est « Tous ».
+  const int rank = static_cast<int>(ammo_.element) + 1;
+  ammo_line_ = std::string(ro::core::Tr("Élément :")) + ' ' +
+               ro::ui::DatabaseFilterChoice(rank, ro::ui::kDatabaseElements);
+  ammo_line_view_ = ammo_line_;
+  cell.description = std::span<const std::string_view>(&ammo_line_view_, 1);
 }
 
 const ro::ui::StatusPreviewView& StatusView::Preview(ro::sim::StatusEffectId effect) {

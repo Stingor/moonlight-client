@@ -19444,6 +19444,9 @@ tr: Muestra todo el contenido de la tienda
 fr: Munitions
 tr: Munición
 
+fr: Munitions portées
+tr: Munición equipada
+
 fr: Nom ou ID d'item
 tr: Nombre o ID del item
 

@@ -9,11 +9,14 @@
 #include "character/status_view.h"
 
 #include <cstdint>
+#include <string_view>
 
 #include <catch2/catch_test_macros.hpp>
 
+#include "ro/sim/equip_location.h"
 #include "ro/sim/status_effects.h"
 #include "ro/sim/world.h"
+#include "ro/vfs/item_table.h"
 #include "ro/vfs/status_table.h"
 
 using moonclient::StatusAbbreviation;
@@ -154,4 +157,49 @@ TEST_CASE("Barre d'états : la même altération par les deux voies ne se compte
   view.Refresh(world, kNow, /*preview=*/0);
   REQUIRE(view.cells().size() == 1);
   CHECK(view.cells()[0].remaining_ms == 30'000);
+}
+
+TEST_CASE("Barre d'états : les munitions portées disent leur nom et leur élément", "[app][etats]") {
+  // 🔴 LA TABLE DES ÉTATS NE NOMME PAS CET ÉTAT : sans habillage, l'infobulle
+  // écrit « État sans nom », et la case ne dit rien de la flèche.
+  constexpr std::uint32_t kFireArrow = 1752;
+  constexpr std::uint16_t kArrowSlot = 7;
+  constexpr std::int32_t kArrowCount = 500;
+  World world = WithPlayer();
+  ro::sim::InventoryItem arrows;
+  arrows.client_slot = kArrowSlot;
+  arrows.item_id = kFireArrow;
+  arrows.amount = kArrowCount;
+  arrows.worn_at = ro::sim::kEquipAmmo;
+  world.inventory().Put(arrows);
+  world.NotePlayerStatus(ro::sim::kEfstEquipArrow, true, 0, kNow);
+
+  ro::vfs::ItemTable items;
+  items.Put(kFireArrow, ro::vfs::ItemEntry{.name = "Fire Arrow"});
+  const ro::vfs::StatusTable table = Named();
+  StatusView view(&table, nullptr);
+  view.UseAmmo(&items, nullptr);
+
+  // L'élément pas encore dit : le nom seul, sans ligne ni cadre.
+  view.Refresh(world, kNow, /*preview=*/0);
+  REQUIRE(view.cells().size() == 1);
+  CHECK(view.cells()[0].name == "Fire Arrow");
+  CHECK(view.cells()[0].abbreviation == "FIR");
+  CHECK(view.cells()[0].description.empty());
+  CHECK(view.cells()[0].accent == 0);
+
+  // Le serveur dit le feu : une ligne, et un cadre.
+  REQUIRE(world.TellAttackElement(kPlayer, ro::sim::Element::kFire));
+  view.Refresh(world, kNow, /*preview=*/0);
+  REQUIRE(view.cells().size() == 1);
+  REQUIRE(view.cells()[0].description.size() == 1);
+  CHECK(view.cells()[0].description[0].find("Feu") != std::string_view::npos);
+  CHECK(view.cells()[0].accent != 0);
+
+  // ⚠ NEUTRE A AUSSI SON CADRE : son absence se confondrait avec un élément
+  // que le serveur n'a pas dit.
+  REQUIRE(world.TellAttackElement(kPlayer, ro::sim::Element::kNeutral));
+  view.Refresh(world, kNow, /*preview=*/0);
+  REQUIRE(view.cells().size() == 1);
+  CHECK(view.cells()[0].accent != 0);
 }

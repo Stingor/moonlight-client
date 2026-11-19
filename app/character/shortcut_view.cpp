@@ -1,5 +1,7 @@
 #include "character/shortcut_view.h"
 
+#include <algorithm>
+#include <span>
 #include <utility>
 
 #include <SDL3/SDL_keyboard.h>
@@ -159,6 +161,13 @@ void ShortcutBarView::Refresh(const ro::sim::World& world, const Hotkeys& bindin
       }
       view.amount = world.inventory().AmountOf(slot.item_id);
       view.known = view.amount > 0;
+      // ⚠ UN EXEMPLAIRE PORTÉ SUFFIT : la case retient l'identifiant, pas la
+      // place, et deux piles du même objet ne se distinguent pas ici.
+      const std::span<const ro::sim::InventoryItem> held = world.inventory().items();
+      view.worn =
+          std::any_of(held.begin(), held.end(), [&slot](const ro::sim::InventoryItem& item) {
+            return item.item_id == slot.item_id && item.worn_at != 0;
+          });
       slots_.push_back(view);
       continue;
     }

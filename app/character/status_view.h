@@ -6,11 +6,14 @@
 #include <string_view>
 #include <vector>
 
+#include "ro/render/item_icons.h"
 #include "ro/render/status_icons.h"
+#include "ro/sim/attack_element.h"
 #include "ro/sim/status_effects.h"
 #include "ro/sim/world_fwd.h"
 #include "ro/ui/status_cell.h"
 #include "ro/ui/status_preview.h"
+#include "ro/vfs/item_table.h"
 #include "ro/vfs/status_table.h"
 
 namespace moonclient {
@@ -49,6 +52,14 @@ class StatusView {
   // une installation sans elles garde ses abréviations.
   StatusView(const ro::vfs::StatusTable* table, ro::render::StatusIcons* icons)
       : table_(table), icons_(icons) {}
+
+  // LES MUNITIONS PORTÉES, que l'état du serveur ne décrit pas : leur nom et
+  // leur icône viennent de la table des objets. Nulles, la case garde l'icône
+  // de l'état et ne dit que l'élément.
+  void UseAmmo(const ro::vfs::ItemTable* items, ro::render::ItemIcons* item_icons) {
+    items_ = items;
+    item_icons_ = item_icons;
+  }
 
   // `preview` : combien de FAUX états ajouter, zéro pour aucun.
   //
@@ -111,6 +122,32 @@ class StatusView {
 
   const ro::vfs::StatusTable* table_;
   ro::render::StatusIcons* icons_;
+  const ro::vfs::ItemTable* items_ = nullptr;
+  ro::render::ItemIcons* item_icons_ = nullptr;
+
+  // ── LES MUNITIONS PORTÉES, relevées par `Refresh` ─────────────────────────
+  //
+  // 🔴 L'ÉLÉMENT EST CELUI QUE LE SERVEUR DIT DE L'ATTAQUE
+  // (`Actor::attack_element`), et non celui qu'on lirait sur la flèche : un
+  // endow ou Enchant Arms le remplace, et c'est avec lui que la flèche frappe.
+  struct Ammo {
+    bool dressed = false;
+    std::uint32_t item_id = 0;
+    ro::sim::Element element = ro::sim::Element::kNone;
+  };
+  Ammo ammo_;
+  // La ligne d'élément de l'infobulle, et la tranche d'une ligne qui la désigne.
+  std::string ammo_line_;
+  std::string_view ammo_line_view_;
+
+  // Cet état est-il celui des munitions, et `Refresh` les a-t-il relevées ?
+  [[nodiscard]] bool IsDressedAmmo(ro::sim::StatusEffectId effect) const noexcept {
+    return ammo_.dressed && effect == ro::sim::kEfstEquipArrow;
+  }
+  // Le nom de la munition portée, ou rien.
+  [[nodiscard]] std::string_view AmmoName() const;
+  // Habille la case de l'état des munitions : icône, nom, élément et cadre.
+  void DressAmmo(ro::ui::StatusCellView& cell);
 
   // ── L'APERÇU D'UN LIEN, à part de la barre ────────────────────────────────
   std::vector<std::string_view> preview_lines_;

@@ -161,6 +161,9 @@ struct ShortcutSlotView {
   // ÉCLAIRÉE : elle porte la compétence que le mode clavier du grimoire
   // survole. On voit où elle est déjà avant de la poser ailleurs.
   bool highlighted = false;
+  // PORTÉE : l'objet de la case est sur le corps — la flèche enfilée, l'arme en
+  // main. Un cadre doré, qu'on distingue du bleu du grimoire.
+  bool worn = false;
 };
 
 // HUIT BARRES DE DOUZE CASES.

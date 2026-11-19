@@ -48,6 +48,10 @@ struct StatusCellView {
   // ni voile ni compte à rebours. Voir `sim::ActiveStatus`.
   std::uint32_t remaining_ms = 0;
   std::uint32_t total_ms = 0;
+
+  // UN CADRE DE COULEUR autour de l'icône, transparence comprise ; zéro pour
+  // aucun. C'est ce qui se lit sans survoler : l'élément des munitions portées.
+  ImU32 accent = 0;
 };
 
 // Le voile de la part ÉCOULÉE.

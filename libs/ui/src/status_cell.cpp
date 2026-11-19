@@ -32,6 +32,9 @@ constexpr float kCountdownRounding = 2.0F;
 // Ce dont l'image se retire des bords de la case.
 constexpr float kIconInset = 0.0F;
 
+// L'épaisseur du cadre de couleur, en pixels d'interface.
+constexpr float kAccentThickness = 2.0F;
+
 // Le cerné du texte, en pixels : un compte à rebours se lit sur n'importe quelle
 // icône, claire ou sombre.
 constexpr float kTextShadow = 1.0F;
@@ -280,6 +283,15 @@ bool DrawStatusCell(const StatusCellView& cell, ImVec2 top_left, ImVec2 bottom_r
       // en bas est ce qu'il reste de temps.
       into->AddRectFilled(top_left, ImVec2(bottom_right.x, top_left.y + height * spent), veil);
     }
+  }
+
+  // LE CADRE DE COULEUR, dedans pour ne pas déborder sur la voisine.
+  if ((cell.accent & IM_COL32_A_MASK) != 0) {
+    const float thickness = kAccentThickness * Scale();
+    const float half = thickness * 0.5F;
+    into->AddRect(ImVec2(top_left.x + half, top_left.y + half),
+                  ImVec2(bottom_right.x - half, bottom_right.y - half),
+                  Faded(cell.accent, style.alpha), 0.0F, 0, thickness);
   }
 
   if (style.countdown_pixels > 0.0F && cell.remaining_ms != 0) {
