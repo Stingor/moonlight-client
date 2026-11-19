@@ -75670,7 +75670,7 @@ Body:
       - {Item: Plasma_Spt_Card, Rate: 1, StealProtected: true}
   - Id: 20610
     AegisName: REGINLEIF
-    Name: Valkryie Reginleif
+    Name: Valkyrie Reginleif
     Level: 207
     Hp: 4619955
     BaseExp: 7391928
@@ -75704,7 +75704,7 @@ Body:
       - {Item: Reginleif_Card, Rate: 1, StealProtected: true}
   - Id: 20611
     AegisName: INGRID
-    Name: Valkryie Ingrid
+    Name: Valkyrie Ingrid
     Level: 207
     Hp: 4585892
     BaseExp: 7337427
@@ -80654,6 +80654,8 @@ Body:
     Level: 210
     Hp: 518248
     Sp: 10000
+    BaseExp: 815683
+    JobExp: 530194
     Attack: 6500
     Attack2: 9000
     Defense: 58
@@ -80679,12 +80681,18 @@ Body:
     DamageMotion: 480
     Ai: 21
     Modes: {CastSensorIdle: true, KnockBackImmune: true}
+    Drops:
+      - {Item: MD_Airboat_Card, Rate: 1, StealProtected: true}
+      - {Item: MD_Airboat_Tokken, Rate: 250}
+      - {Item: MD_Airboat_Ore, Rate: 100}
   - Id: 20887
     AegisName: MD_AIRBOAT_PORING
     Name: Melted Poring
     Level: 210
     Hp: 513540
     Sp: 10000
+    BaseExp: 806096
+    JobExp: 523962
     Attack: 5800
     Attack2: 8200
     Defense: 56
@@ -80709,12 +80717,18 @@ Body:
     DamageMotion: 400
     Ai: 21
     Modes: {CastSensorIdle: true, KnockBackImmune: true}
+    Drops:
+      - {Item: MD_Airboat_Card5, Rate: 1, StealProtected: true}
+      - {Item: MD_Airboat_Tokken, Rate: 250}
+      - {Item: MD_Airboat_Ore, Rate: 100}
   - Id: 20888
     AegisName: MD_AIRBOAT_WORM
     Name: Grave Worm
     Level: 210
     Hp: 515737
     Sp: 10000
+    BaseExp: 818963
+    JobExp: 532326
     Attack: 6200
     Attack2: 8700
     Defense: 58
@@ -80740,12 +80754,18 @@ Body:
     DamageMotion: 420
     Ai: 21
     Modes: {CastSensorIdle: true, Detector: true, KnockBackImmune: true}
+    Drops:
+      - {Item: MD_Airboat_Card2, Rate: 1, StealProtected: true}
+      - {Item: MD_Airboat_Tokken, Rate: 250}
+      - {Item: MD_Airboat_Ore, Rate: 100}
   - Id: 20889
     AegisName: MD_AIRBOAT_LEECH
     Name: Brain Sucker
     Level: 210
     Hp: 515110
     Sp: 20000
+    BaseExp: 813986
+    JobExp: 529091
     Attack: 6000
     Attack2: 8500
     Defense: 56
@@ -80771,12 +80791,18 @@ Body:
     DamageMotion: 420
     Ai: 21
     Modes: {CastSensorIdle: true, Detector: true, KnockBackImmune: true}
+    Drops:
+      - {Item: MD_Airboat_Card3, Rate: 1, StealProtected: true}
+      - {Item: MD_Airboat_Tokken, Rate: 250}
+      - {Item: MD_Airboat_Ore, Rate: 100}
   - Id: 20890
     AegisName: MD_AIRBOAT_MOS
     Name: Mosquilo
     Level: 210
     Hp: 511971
     Sp: 15000
+    BaseExp: 813456
+    JobExp: 528746
     Attack: 5600
     Attack2: 8000
     Defense: 54
@@ -80801,12 +80827,19 @@ Body:
     DamageMotion: 360
     Ai: 21
     Modes: {CastSensorIdle: true, Detector: true, KnockBackImmune: true}
+    Drops:
+      - {Item: MD_Airboat_Card4, Rate: 1, StealProtected: true}
+      - {Item: MD_Airboat_Tokken, Rate: 250}
+      - {Item: MD_Airboat_Ore, Rate: 100}
   - Id: 20891
     AegisName: MD_AIRBOAT_BOSS
     Name: Unidentified Creature
     Level: 220
     Hp: 10985810
     Sp: 500000
+    BaseExp: 8315126
+    JobExp: 5404832
+    MvpExp: 6015522
     Attack: 10500
     Attack2: 16000
     Defense: 74
@@ -80830,6 +80863,17 @@ Body:
     Ai: 21
     Class: Boss
     Modes: {CastSensorIdle: true, Detector: true, KnockBackImmune: true, Mvp: true}
+    Drops:
+      - {Item: MD_Airboat_Card6, Rate: 1, StealProtected: true}
+      - {Item: MD_Airboat_Boots5, Rate: 2000}
+      - {Item: MD_Airboat_Boots2, Rate: 2000}
+      - {Item: MD_Airboat_Boots4, Rate: 2000}
+      - {Item: MD_Airboat_Boots6, Rate: 2000}
+      - {Item: MD_Airboat_Boots, Rate: 3000}
+      - {Item: MD_Airboat_Boots3, Rate: 3000}
+      - {Item: MD_Airboat_Tokken, Rate: 10000}
+      - {Item: MD_Airboat_Tokken, Rate: 10000}
+      - {Item: MD_Airboat_Tokken, Rate: 10000}
   - Id: 20892
     AegisName: MD_SAKRAY
     Name: Magic Swordsman Sakray
@@ -83787,6 +83831,9 @@ Body:
     Level: 220
     Hp: 10985810
     Sp: 500000
+    BaseExp: 8315126
+    JobExp: 5404832
+    MvpExp: 6015522
     Attack: 7800
     Attack2: 11500
     Defense: 62
@@ -83810,12 +83857,25 @@ Body:
     Ai: 21
     Class: Boss
     Modes: {CastSensorIdle: true, Detector: true, KnockBackImmune: true, Mvp: true}
+    Drops:
+      - {Item: MD_Airboat_Boots5, Rate: 3000}
+      - {Item: MD_Airboat_Boots2, Rate: 3000}
+      - {Item: MD_Airboat_Boots4, Rate: 2000}
+      - {Item: MD_Airboat_Boots6, Rate: 2500}
+      - {Item: MD_Airboat_Boots, Rate: 2000}
+      - {Item: MD_Airboat_Boots3, Rate: 2000}
+      - {Item: MD_Airboat_Tokken, Rate: 10000}
+      - {Item: MD_Airboat_Tokken, Rate: 10000}
+      - {Item: MD_Airboat_Tokken, Rate: 10000}
   - Id: 21062
     AegisName: MD_AIRBOAT_BOSS3
     Name: Agile Crash Creature
     Level: 220
     Hp: 10985810
     Sp: 500000
+    BaseExp: 8315126
+    JobExp: 5404832
+    MvpExp: 6015522
     Attack: 9200
     Attack2: 13600
     Defense: 66
@@ -83840,12 +83900,27 @@ Body:
     Ai: 21
     Class: Boss
     Modes: {CastSensorIdle: true, Detector: true, KnockBackImmune: true, Mvp: true}
+    MvpDrops:
+      - {Item: MD_Airboat_Random, Rate: 5000}
+    Drops:
+      - {Item: MD_Airboat_Boots5, Rate: 3000}
+      - {Item: MD_Airboat_Boots2, Rate: 2000}
+      - {Item: MD_Airboat_Boots4, Rate: 2000}
+      - {Item: MD_Airboat_Boots6, Rate: 3000}
+      - {Item: MD_Airboat_Boots, Rate: 2000}
+      - {Item: MD_Airboat_Boots3, Rate: 2000}
+      - {Item: MD_Airboat_Tokken, Rate: 10000}
+      - {Item: MD_Airboat_Tokken, Rate: 10000}
+      - {Item: MD_Airboat_Tokken, Rate: 10000}
   - Id: 21063
     AegisName: MD_AIRBOAT_BOSS4
     Name: Extreme Crash Creature
     Level: 220
     Hp: 13635489
     Sp: 500000
+    BaseExp: 9794544
+    JobExp: 6366454
+    MvpExp: 6965522
     Attack: 12400
     Attack2: 18200
     Defense: 75
@@ -83869,6 +83944,16 @@ Body:
     Ai: 21
     Class: Boss
     Modes: {CastSensorIdle: true, Detector: true, KnockBackImmune: true, Mvp: true}
+    Drops:
+      - {Item: MD_Airboat_Boots5, Rate: 3500}
+      - {Item: MD_Airboat_Boots2, Rate: 3500}
+      - {Item: MD_Airboat_Boots4, Rate: 3500}
+      - {Item: MD_Airboat_Boots6, Rate: 3500}
+      - {Item: MD_Airboat_Boots, Rate: 3500}
+      - {Item: MD_Airboat_Boots3, Rate: 3500}
+      - {Item: MD_Airboat_Tokken, Rate: 10000}
+      - {Item: MD_Airboat_Tokken, Rate: 10000}
+      - {Item: MD_Airboat_Tokken, Rate: 10000}
   - Id: 21292
     AegisName: EP18_ARMED_VILLAGER01
     Name: Armed villager

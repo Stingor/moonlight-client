@@ -162890,6 +162890,10 @@ Body:
     Name: Ymir Fragment
     Weight: 1
     Flags: {BuyingStore: true}
+  - Id: 1000364
+    AegisName: MD_Airboat_Ore
+    Name: Ymir Ore
+    Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
   - Id: 1000366
     AegisName: MD_Geffen_Win
     Name: Geffen Arena Championship
