@@ -76,6 +76,9 @@ struct NaviGuideStep {
   std::int32_t exit_x = 0;
   std::int32_t exit_y = 0;
   std::uint16_t link_kind = 0;
+  // Où la liaison dépose le joueur, sur `to_map`.
+  std::int32_t arrival_x = 0;
+  std::int32_t arrival_y = 0;
 };
 
 // À moins de cette marche de la destination, on y est.
@@ -83,6 +86,9 @@ inline constexpr std::uint32_t kNaviArrivalCost = 3 * kMoveCost;
 // Rayon de recherche d'une case praticable autour d'une cible posée sur un
 // décor.
 inline constexpr std::int32_t kNaviTargetRing = 4;
+// D'une image à l'autre, la marche avance d'une case ; au-delà de cet écart, le
+// joueur a été DÉPLACÉ (portail, téléportation), pas marché.
+inline constexpr std::int32_t kNaviJumpCells = 2;
 
 class NaviGuide {
  public:
@@ -124,6 +130,9 @@ class NaviGuide {
   void Plan(formats::NaviMapIndex here, const WalkMap* walk, CellPosition player);
   void AimLocally(formats::NaviMapIndex here, const WalkMap* walk);
   void Trace(CellPosition player);
+  // Le joueur a sauté sur la même carte : vrai si l'itinéraire a été repris
+  // depuis là, auquel cas il n'y a plus rien à faire pour cette image.
+  bool FollowJump(formats::NaviMapIndex here, const WalkMap* walk, CellPosition player);
 
   std::shared_ptr<const formats::NaviData> data_;
   NaviGoalTerrain* goal_terrain_ = nullptr;
@@ -140,6 +149,8 @@ class NaviGuide {
   WalkField field_;
   std::optional<CellPosition> local_target_;
   std::optional<CellPosition> traced_from_;
+  // La case du joueur à l'image précédente, sur `field_map_`.
+  std::optional<CellPosition> last_player_;
   std::vector<CellPosition> path_cells_;
   std::vector<CellPosition> path_corners_;
 };

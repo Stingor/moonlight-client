@@ -152,6 +152,87 @@ TEST_CASE("Guidage : une demande attend les données et une carte connue", "[sim
   CHECK(guide.status() == NaviGuideStatus::kGuiding);
 }
 
+namespace {
+
+// Une carte, deux pièces que sépare un mur, et un portail qui mène de l'ouest à
+// l'est SANS changer de carte — le cas de #ep172_room02_in dans ba_in01.
+std::shared_ptr<const NaviData> TwoRooms() {
+  auto data = std::make_shared<NaviData>();
+  data->maps = {NaviMap{"manor", "Manor", 5003, 20, 3}};
+  NaviLink portal;
+  portal.map = 0;
+  portal.link_id = 200;
+  portal.cell_x = 1;
+  portal.cell_y = 1;
+  portal.dest_map = 0;
+  portal.dest_cell_x = 18;
+  portal.dest_cell_y = 1;
+  data->links.push_back(portal);
+  data->BuildIndexes();
+  return data;
+}
+
+WalkMap Walled() {
+  constexpr std::array<std::string_view, 3> kRows{".....#..............", ".....#..............",
+                                                  ".....#.............."};
+  return WalkMap::FromPicture(kRows);
+}
+
+NaviGuideRequest CellInManor(std::int32_t x, std::int32_t y) {
+  NaviGuideRequest request;
+  request.map_name = "manor";
+  request.kind = NaviGoalKind::kCell;
+  request.cell_x = x;
+  request.cell_y = y;
+  return request;
+}
+
+}  // namespace
+
+TEST_CASE("Guidage : un portail qui reste sur la carte fait passer à l'étape suivante",
+          "[sim][navi_guide]") {
+  const WalkMap manor = Walled();
+  NaviGuide guide;
+  guide.SetData(TwoRooms());
+  guide.Request(CellInManor(7, 1));
+
+  guide.Update("manor", &manor, At(3, 1));
+  REQUIRE(guide.status() == NaviGuideStatus::kGuiding);
+  REQUIRE(guide.steps().size() == 1);
+  REQUIRE(guide.local_target().has_value());
+  CHECK(guide.local_target()->x == 1);
+  guide.Update("manor", &manor, At(2, 1));
+  CHECK(guide.current_step() == 0);
+
+  // Le portail dépose le joueur dans la pièce est : l'étape est franchie, la
+  // trace part de lui jusqu'à la destination, et non plus du segment de repli.
+  guide.Update("manor", &manor, At(18, 1));
+  CHECK(guide.current_step() == 1);
+  REQUIRE(guide.local_target().has_value());
+  CHECK(guide.local_target()->x == 7);
+  REQUIRE(guide.path_cells().size() == 12);
+  CHECK(guide.path_cells().front().x == 18);
+  CHECK(guide.path_cells().back().x == 7);
+  CHECK(guide.status() == NaviGuideStatus::kGuiding);
+}
+
+TEST_CASE("Guidage : téléporté hors de portée de la trace, l'itinéraire repart d'ici",
+          "[sim][navi_guide]") {
+  const WalkMap manor = Walled();
+  NaviGuide guide;
+  guide.SetData(TwoRooms());
+  guide.Request(CellInManor(7, 1));
+  guide.Update("manor", &manor, At(3, 1));
+  REQUIRE(guide.steps().size() == 1);
+
+  // Une aile de mouche le pose dans la pièce est, loin de l'arrivée du portail.
+  guide.Update("manor", &manor, At(12, 1));
+  CHECK(guide.status() == NaviGuideStatus::kGuiding);
+  CHECK(guide.steps().empty());
+  REQUIRE(guide.local_target().has_value());
+  CHECK(guide.local_target()->x == 7);
+}
+
 TEST_CASE("Guidage : entrer ailleurs que prévu relance l'itinéraire", "[sim][navi_guide]") {
   const WalkMap town = Open();
   const WalkMap field = Open();

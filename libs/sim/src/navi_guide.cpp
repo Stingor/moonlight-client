@@ -1,7 +1,9 @@
 #include "ro/sim/navi_guide.h"
 
+#include <algorithm>
 #include <array>
 #include <cstdint>
+#include <cstdlib>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -17,6 +19,13 @@ namespace {
 
 [[nodiscard]] CellPosition Cell(std::int32_t x, std::int32_t y) noexcept {
   return {static_cast<std::uint16_t>(x), static_cast<std::uint16_t>(y), 0};
+}
+
+// L'écart en cases, diagonales comprises, entre deux positions.
+[[nodiscard]] std::int32_t CellsApart(const CellPosition& from, std::int32_t x,
+                                      std::int32_t y) noexcept {
+  return std::max(std::abs(static_cast<std::int32_t>(from.x) - x),
+                  std::abs(static_cast<std::int32_t>(from.y) - y));
 }
 
 // La case que la marche vise vraiment : la cible elle-même si elle se franchit,
@@ -48,6 +57,7 @@ void NaviGuide::Stop() {
   field_ = WalkField{};
   local_target_.reset();
   traced_from_.reset();
+  last_player_.reset();
   path_cells_.clear();
   path_corners_.clear();
 }
@@ -68,6 +78,7 @@ void NaviGuide::Update(std::string_view map_name, const WalkMap* walk, CellPosit
     path_cells_.clear();
     path_corners_.clear();
     local_target_.reset();
+    last_player_.reset();
     field_map_ = here;
     return;
   }
@@ -88,7 +99,10 @@ void NaviGuide::Update(std::string_view map_name, const WalkMap* walk, CellPosit
   } else if (walk != field_walk_) {
     // La grille arrive après le nom de la carte.
     AimLocally(here, walk);
+  } else if (FollowJump(here, walk, player)) {
+    return;
   }
+  last_player_ = player;
   Trace(player);
 
   if (current_step_ < steps_.size()) return;
@@ -174,12 +188,14 @@ void NaviGuide::Plan(formats::NaviMapIndex here, const WalkMap* walk, CellPositi
   for (const std::uint32_t link_id : route->link_ids) {
     const formats::NaviLink* link = data_->FindLink(link_id);
     if (link == nullptr) continue;
-    steps_.push_back({link_id, link->map, link->dest_map, link->cell_x, link->cell_y, link->kind});
+    steps_.push_back({link_id, link->map, link->dest_map, link->cell_x, link->cell_y, link->kind,
+                      link->dest_cell_x, link->dest_cell_y});
   }
   current_step_ = 0;
   estimated_cost_ = route->total_cost;
   status_ = NaviGuideStatus::kGuiding;
   AimLocally(here, walk);
+  last_player_ = player;
   Trace(player);
   if (steps_.empty()) {
     if (const auto left = field_.CostFrom(player.x, player.y); left && *left <= kNaviArrivalCost)
@@ -209,6 +225,33 @@ void NaviGuide::AimLocally(formats::NaviMapIndex here, const WalkMap* walk) {
     const std::array<CellPosition, 1> sources{*source};
     field_ = WalkField::Flood(*walk, sources);
   }
+}
+
+// Franchir une liaison ne change pas toujours de carte : #ep172_room02_in mène
+// d'une pièce de ba_in01 à une autre. Sans changement de nom, rien ne disait
+// que l'étape était passée : la cible restait le portail de la pièce quittée,
+// qu'aucune marche ne rejoint plus, et la trace se réduisait au segment de
+// repli — une flèche sous les pieds du joueur, qui le suivait.
+//
+// Le franchissement se lit donc au SAUT : le joueur ne marche pas plus d'une
+// case par image. Atterri sur l'arrivée de la liaison en cours, il l'a prise.
+// Atterri ailleurs hors de portée de la trace (aile de mouche, téléportation),
+// il n'est plus sur l'itinéraire : on repart d'ici, comme d'une autre carte.
+bool NaviGuide::FollowJump(formats::NaviMapIndex here, const WalkMap* walk, CellPosition player) {
+  if (!last_player_ || CellsApart(*last_player_, player.x, player.y) <= kNaviJumpCells)
+    return false;
+  if (current_step_ < steps_.size()) {
+    const NaviGuideStep& step = steps_[current_step_];
+    if (step.from_map == here && step.to_map == here &&
+        CellsApart(player, step.arrival_x, step.arrival_y) <= kNaviTargetRing) {
+      ++current_step_;
+      AimLocally(here, walk);
+      return false;
+    }
+  }
+  if (walk == nullptr || field_.CostFrom(player.x, player.y)) return false;
+  Plan(here, walk, player);
+  return true;
 }
 
 void NaviGuide::Trace(CellPosition player) {
