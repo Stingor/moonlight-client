@@ -1816,7 +1816,8 @@ add_library(moonclient_patcher STATIC
     patcher/patch_apply.cpp
     patcher/patch_list.cpp
     patcher/patch_run.cpp
-    patcher/patcher_state.cpp)
+    patcher/patcher_state.cpp
+    patcher/update_watch.cpp)
 
 target_link_libraries(moonclient_patcher
     PUBLIC ro_core ro_formats moonclient_config

@@ -41,6 +41,20 @@ TEST_CASE("un serveur test garde sa marque en tête, révision masquée ou non",
         std::string(kTestServerTitleMark) + std::string(kWindowTitle));
 }
 
+TEST_CASE("une mise à jour disponible se dit en queue, pseudo et carte en tête ou non",
+          "[app][window_title]") {
+  const std::string notice =
+      std::string(moonclient::kUpdateTitleSeparator) + "mise à jour disponible";
+  CHECK(WindowTitle(WindowTitleMarks{.revision_shown = false, .update_available = true}) ==
+        std::string(kWindowTitle) + notice);
+  ro::sim::World world;
+  world.set_player_name("Stingor");
+  world.EnterMap("prontera", 0, 0);
+  CHECK(WindowTitle(true, world,
+                    WindowTitleMarks{.revision_shown = false, .update_available = true}) ==
+        "Stingor - prontera - " + std::string(kWindowTitle) + notice);
+}
+
 TEST_CASE("le pseudo et la carte et la révision se masquent séparément", "[app][window_title]") {
   ro::sim::World world;
   world.set_player_name("Stingor");

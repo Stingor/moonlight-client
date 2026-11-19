@@ -7,6 +7,7 @@
 #include <utility>
 
 #include "ro/core/build_stamp.h"
+#include "ro/core/i18n.h"
 #include "ro/core/log.h"
 #include "ro/formats/gat.h"
 #include "ro/mapedit/blocked_cells.h"
@@ -50,6 +51,9 @@ std::string WindowTitle(const WindowTitleMarks& marks) {
       title.append(kModifiedTreeTitleMark);
     }
   }
+  if (marks.update_available) {
+    title.append(kUpdateTitleSeparator).append(ro::core::Tr("mise à jour disponible"));
+  }
   return title;
 }
 
@@ -67,7 +71,8 @@ std::string WindowTitle(bool names_shown, const ro::sim::World& world,
     }
   }
   // La marque est déjà en tête : elle ne se répète pas avant le nom.
-  return title + WindowTitle(WindowTitleMarks{.revision_shown = marks.revision_shown});
+  return title + WindowTitle(WindowTitleMarks{.revision_shown = marks.revision_shown,
+                                              .update_available = marks.update_available});
 }
 
 ro::core::Result<MapStage> LoadMapStage(ro::vfs::Vfs& vfs, std::string_view map_name,

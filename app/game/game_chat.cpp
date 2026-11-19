@@ -55,6 +55,9 @@
 namespace moonclient {
 namespace {
 
+// L'avis de mise à jour, d'un or pâle : il se lit sans crier.
+constexpr std::uint32_t kUpdateNoticeColor = 0xE6CF8A;
+
 // QUI PARLE, ET OÙ : ce qui, hors de la ligne, en fait la place. Le compteur et
 // la retenue le lisent du même endroit.
 [[nodiscard]] ChatWireSpeaker WireSpeakerOf(const ro::sim::World& world,
@@ -96,6 +99,14 @@ void Game::StageChat(std::uint32_t now_ms) {
   // chaque image, pas un évènement — l'ordre de chargement des réglages n'est
   // pas quelque chose sur quoi il faut parier.
   chat_tabs_->KeepLog(settings_->options().chat_look().keep_log);
+  // UNE MISE À JOUR PUBLIÉE PENDANT QUE L'ON JOUE : une ligne, une seule fois
+  // par lancement, et le titre de la fenêtre la rappelle ensuite.
+  if (shell_.TakeUpdateAnnouncement()) {
+    world_.RecordChat(ro::sim::ChatKind::kServer, 0,
+                      ro::core::Tr("Une mise à jour du client est disponible : elle "
+                                   "s'installera au prochain lancement."),
+                      now_ms, kUpdateNoticeColor);
+  }
   // ⚠ POSÉES À CHAQUE IMAGE, et non une fois : la conversation vit dès l'écran de
   // sélection, la table de l'installation n'est lue qu'à l'entrée en jeu. Sans
   // elles, une balise d'objet resterait à l'écran telle quelle.

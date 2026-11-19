@@ -28,36 +28,6 @@ constexpr std::uint64_t kManifestLimitBytes = 16U * 1024U * 1024U;
 constexpr std::string_view kPatcherFilePrefix = "moonclient-patch";
 constexpr std::string_view kMirrorDownloadName = "mirror.download";
 
-[[nodiscard]] Result<std::vector<MirrorFile>> FetchManifest(const PatcherConfig& config,
-                                                            PatchFetcher& fetcher,
-                                                            std::string& chosen_files_url,
-                                                            std::stop_token stop) {
-  std::string failures;
-  for (const PatchMirror& mirror : config.mirrors) {
-    if (mirror.manifest_url.empty()) {
-      continue;
-    }
-    auto text = fetcher.FetchText(mirror.manifest_url, kManifestLimitBytes, stop);
-    if (!text) {
-      ro::core::LogWarning("patcher : manifeste de {} injoignable ({}) — {}", mirror.name,
-                           mirror.manifest_url, ro::core::Describe(text.error()));
-      failures += "\n  " + mirror.name + " : " + ro::core::Describe(text.error());
-      continue;
-    }
-    auto files = ParseMirrorManifest(*text);
-    if (!files) {
-      ro::core::LogWarning("patcher : manifeste de {} illisible — {}", mirror.name,
-                           ro::core::Describe(files.error()));
-      failures += "\n  " + mirror.name + " : " + ro::core::Describe(files.error());
-      continue;
-    }
-    ro::core::LogInfo("patcher : manifeste de {} ({} fichier(s))", mirror.name, files->size());
-    chosen_files_url = mirror.files_url;
-    return files;
-  }
-  return Fail(ErrorCode::kIoFailure, "aucun miroir de fichiers n'a répondu :" + failures);
-}
-
 [[nodiscard]] bool TouchesPatcherFiles(std::string_view relative_path) {
   std::string first_segment(relative_path.substr(0, relative_path.find('/')));
   std::ranges::transform(first_segment, first_segment.begin(), [](char character) {
@@ -160,6 +130,36 @@ constexpr std::string_view kMirrorDownloadName = "mirror.download";
 
 }  // namespace
 
+Result<std::vector<MirrorFile>> FetchMirrorManifest(const PatcherConfig& config,
+                                                    PatchFetcher& fetcher,
+                                                    std::string& chosen_files_url,
+                                                    std::stop_token stop) {
+  std::string failures;
+  for (const PatchMirror& mirror : config.mirrors) {
+    if (mirror.manifest_url.empty()) {
+      continue;
+    }
+    auto text = fetcher.FetchText(mirror.manifest_url, kManifestLimitBytes, stop);
+    if (!text) {
+      ro::core::LogWarning("patcher : manifeste de {} injoignable ({}) — {}", mirror.name,
+                           mirror.manifest_url, ro::core::Describe(text.error()));
+      failures += "\n  " + mirror.name + " : " + ro::core::Describe(text.error());
+      continue;
+    }
+    auto files = ParseMirrorManifest(*text);
+    if (!files) {
+      ro::core::LogWarning("patcher : manifeste de {} illisible — {}", mirror.name,
+                           ro::core::Describe(files.error()));
+      failures += "\n  " + mirror.name + " : " + ro::core::Describe(files.error());
+      continue;
+    }
+    ro::core::LogInfo("patcher : manifeste de {} ({} fichier(s))", mirror.name, files->size());
+    chosen_files_url = mirror.files_url;
+    return files;
+  }
+  return Fail(ErrorCode::kIoFailure, "aucun miroir de fichiers n'a répondu :" + failures);
+}
+
 Result<MirrorSyncOutcome> SyncMirror(const PatchRunSettings& settings,
                                      const std::filesystem::path& running_executable,
                                      PatchFetcher& fetcher, PatchProgressBoard& board,
@@ -174,7 +174,7 @@ Result<MirrorSyncOutcome> SyncMirror(const PatchRunSettings& settings,
   progress.phase = PatchPhase::kListing;
   board.Publish(progress);
   std::string files_url;
-  auto files = FetchManifest(settings.config, fetcher, files_url, stop);
+  auto files = FetchMirrorManifest(settings.config, fetcher, files_url, stop);
   if (!files) {
     return std::unexpected(files.error());
   }

@@ -4,6 +4,7 @@
 #include <atomic>
 #include <cstdio>
 #include <filesystem>
+#include <memory>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -30,6 +31,7 @@
 #include "patcher/install_path.h"
 #include "patcher/patcher_state.h"
 #include "patcher/relaunch.h"
+#include "patcher/update_watch.h"
 #include "shell/skin_folder.h"
 
 namespace moonclient::patcher {
@@ -229,6 +231,13 @@ ro::core::Result<PatchStageEnd> UpdateInstall(ClientShell& shell, const PatcherC
       "patcher : recherche des mises à jour ({} miroir(s), dernier index appliqué {})",
       config.mirrors.size(), last_applied.has_value() ? std::to_string(*last_applied) : "aucun");
   auto ended = RunPatchStage(shell, settings);
+  // 🔴 LE GUET PREND LE RELAIS DE L'ÉTAPE : ce que le serveur publie pendant
+  // que l'on joue, le joueur l'apprend sans quitter. Une partie lancée sur une
+  // installation en retard l'apprend au premier regard, et c'est exact.
+  if (ended && (*ended == PatchStageEnd::kUpToDate || *ended == PatchStageEnd::kPlayOutdated)) {
+    shell.WatchForUpdates(std::make_unique<UpdateWatch>(
+        settings, std::make_unique<HttpPatchFetcher>(), kUpdateCheckPeriod));
+  }
   if (!ended || *ended != PatchStageEnd::kRestart) {
     return ended;
   }

@@ -7,11 +7,13 @@
 #include <optional>
 #include <stop_token>
 #include <string>
+#include <vector>
 
 #include "ro/core/error.h"
 
 #include "game/client_config.h"
 #include "patcher/patch_fetcher.h"
+#include "patcher/patch_list.h"
 
 namespace moonclient::patcher {
 
@@ -78,6 +80,13 @@ struct PatchRunOutcome {
   // client doit se relancer pour être celui que le serveur décrit.
   bool restart_needed = false;
 };
+
+// LA LISTE DES PATCHS DU PREMIER SERVEUR QUI RÉPOND, et dans
+// `chosen_archive_url` le dossier de ses archives. Une erreur quand aucun n'a
+// répondu, qui les nomme tous.
+[[nodiscard]] ro::core::Result<std::vector<PatchEntry>> FetchPatchList(
+    const PatcherConfig& config, PatchFetcher& fetcher, std::string& chosen_archive_url,
+    std::stop_token stop);
 
 // APPLIQUE CE QUI MANQUE DE LA CHAÎNE, dans l'ordre, un patch après l'autre,
 // PUIS SYNCHRONISE LE MIROIR DE FICHIERS (`mirror_sync.h`).

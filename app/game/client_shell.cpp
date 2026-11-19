@@ -32,6 +32,7 @@
 #include "options/skin_look_options.h"
 #include "options/skin_options.h"
 #include "options/window_title_options.h"
+#include "patcher/update_watch.h"
 #include "shell/skin_folder.h"
 #include "world/map_music.h"
 #include "world/map_stage.h"
@@ -68,7 +69,25 @@ ClientShell::~ClientShell() = default;
 WindowTitleMarks ClientShell::TitleMarks() {
   return WindowTitleMarks{
       .revision_shown = settings_->options().pages().window_title->revision_shown(),
-      .test_server = test_server_};
+      .test_server = test_server_,
+      .update_available = update_shown()};
+}
+
+void ClientShell::WatchForUpdates(std::unique_ptr<patcher::UpdateWatch> watch) {
+  update_watch_ = std::move(watch);
+}
+
+bool ClientShell::update_shown() {
+  return update_watch_ != nullptr && update_watch_->update_available() &&
+         settings_->options().pages().window_title->update_notice_shown();
+}
+
+bool ClientShell::TakeUpdateAnnouncement() {
+  if (update_announced_ || !update_shown()) {
+    return false;
+  }
+  update_announced_ = true;
+  return true;
 }
 
 void ClientShell::ReportStage(const char* what) {

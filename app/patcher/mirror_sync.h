@@ -3,10 +3,14 @@
 #include <cstddef>
 #include <filesystem>
 #include <stop_token>
+#include <string>
 #include <string_view>
+#include <vector>
 
 #include "ro/core/error.h"
 
+#include "game/client_config.h"
+#include "patcher/mirror_manifest.h"
 #include "patcher/patch_fetcher.h"
 #include "patcher/patch_run.h"
 
@@ -18,6 +22,13 @@ struct MirrorSyncOutcome {
   // pour employer le nouveau.
   bool restart_needed = false;
 };
+
+// LE MANIFESTE DU PREMIER MIROIR QUI EN DÉCLARE UN ET RÉPOND, et dans
+// `chosen_files_url` le dossier qui sert ses fichiers. Une erreur quand aucun
+// n'a répondu, qui les nomme tous.
+[[nodiscard]] ro::core::Result<std::vector<MirrorFile>> FetchMirrorManifest(
+    const PatcherConfig& config, PatchFetcher& fetcher, std::string& chosen_files_url,
+    std::stop_token stop);
 
 // MET LE DOSSIER DU JEU EN ACCORD AVEC LE MIROIR DE FICHIERS.
 //

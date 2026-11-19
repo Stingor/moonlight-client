@@ -11,12 +11,14 @@ namespace {
 // réglage d'origine, sans que rien ne le dise.
 constexpr const char* kNamesShownKey = "window_title_names";
 constexpr const char* kRevisionShownKey = "window_title_revision";
+constexpr const char* kUpdateNoticeKey = "window_title_update_notice";
 
 }  // namespace
 
 void WindowTitleOptions::Declare(SettingsFile& into) {
   into.Declare(kNamesShownKey, &names_shown_);
   into.Declare(kRevisionShownKey, &revision_shown_);
+  into.Declare(kUpdateNoticeKey, &update_notice_shown_);
 }
 
 void WindowTitleOptions::ComposeInto(std::vector<ro::ui::OptionRowView>& rows) const {
@@ -35,6 +37,14 @@ void WindowTitleOptions::ComposeInto(std::vector<ro::ui::OptionRowView>& rows) c
                            "client a été compilé."),
       .kind = ro::ui::OptionKind::kToggle,
       .on = revision_shown_});
+  rows.push_back(ro::ui::OptionRowView{
+      .id = kWindowTitleRowBase + static_cast<int>(WindowTitleRow::kUpdateNotice),
+      .label = ro::core::Tr("Avertir d'une mise à jour disponible"),
+      .help = ro::core::Tr("Quand le serveur publie une nouvelle version pendant que l'on joue, "
+                           "une ligne le dit dans le chat et le titre de la fenêtre le rappelle. "
+                           "Elle s'installe au lancement suivant."),
+      .kind = ro::ui::OptionKind::kToggle,
+      .on = update_notice_shown_});
 }
 
 bool WindowTitleOptions::Change(const ro::ui::OptionsWindowAction& asked) {
@@ -44,6 +54,10 @@ bool WindowTitleOptions::Change(const ro::ui::OptionsWindowAction& asked) {
   }
   if (asked.changed == kWindowTitleRowBase + static_cast<int>(WindowTitleRow::kRevisionShown)) {
     revision_shown_ = asked.on;
+    return true;
+  }
+  if (asked.changed == kWindowTitleRowBase + static_cast<int>(WindowTitleRow::kUpdateNotice)) {
+    update_notice_shown_ = asked.on;
     return true;
   }
   return false;

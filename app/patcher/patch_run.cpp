@@ -32,33 +32,6 @@ constexpr std::uint64_t kPatchListLimitBytes = 1024U * 1024U;
 // quelques dizaines de mégaoctets ; un gibioctet laisse toute la marge.
 constexpr std::uint64_t kArchiveLimitBytes = 1024U * 1024U * 1024U;
 
-[[nodiscard]] Result<std::vector<PatchEntry>> FetchPatchList(const PatcherConfig& config,
-                                                             PatchFetcher& fetcher,
-                                                             std::string& chosen_archive_url,
-                                                             std::stop_token stop) {
-  std::string failures;
-  for (const PatchMirror& mirror : config.mirrors) {
-    auto text = fetcher.FetchText(mirror.list_url, kPatchListLimitBytes, stop);
-    if (!text) {
-      ro::core::LogWarning("patcher : miroir {} injoignable ({}) — {}", mirror.name,
-                           mirror.list_url, ro::core::Describe(text.error()));
-      failures += "\n  " + mirror.name + " : " + ro::core::Describe(text.error());
-      continue;
-    }
-    auto patches = ParsePatchList(*text);
-    if (!patches) {
-      ro::core::LogWarning("patcher : liste du miroir {} illisible — {}", mirror.name,
-                           ro::core::Describe(patches.error()));
-      failures += "\n  " + mirror.name + " : " + ro::core::Describe(patches.error());
-      continue;
-    }
-    ro::core::LogInfo("patcher : liste de {} ({} patch(s))", mirror.name, patches->size());
-    chosen_archive_url = mirror.archive_url;
-    return patches;
-  }
-  return Fail(ErrorCode::kIoFailure, "aucun serveur de patchs n'a répondu :" + failures);
-}
-
 // Un patch, du téléchargement à l'enregistrement de son index.
 [[nodiscard]] Result<PatchApplied> RunOnePatch(const PatchEntry& patch,
                                                const PatchRunSettings& settings,
@@ -139,6 +112,32 @@ constexpr std::uint64_t kArchiveLimitBytes = 1024U * 1024U * 1024U;
 }
 
 }  // namespace
+
+Result<std::vector<PatchEntry>> FetchPatchList(const PatcherConfig& config, PatchFetcher& fetcher,
+                                               std::string& chosen_archive_url,
+                                               std::stop_token stop) {
+  std::string failures;
+  for (const PatchMirror& mirror : config.mirrors) {
+    auto text = fetcher.FetchText(mirror.list_url, kPatchListLimitBytes, stop);
+    if (!text) {
+      ro::core::LogWarning("patcher : miroir {} injoignable ({}) — {}", mirror.name,
+                           mirror.list_url, ro::core::Describe(text.error()));
+      failures += "\n  " + mirror.name + " : " + ro::core::Describe(text.error());
+      continue;
+    }
+    auto patches = ParsePatchList(*text);
+    if (!patches) {
+      ro::core::LogWarning("patcher : liste du miroir {} illisible — {}", mirror.name,
+                           ro::core::Describe(patches.error()));
+      failures += "\n  " + mirror.name + " : " + ro::core::Describe(patches.error());
+      continue;
+    }
+    ro::core::LogInfo("patcher : liste de {} ({} patch(s))", mirror.name, patches->size());
+    chosen_archive_url = mirror.archive_url;
+    return patches;
+  }
+  return Fail(ErrorCode::kIoFailure, "aucun serveur de patchs n'a répondu :" + failures);
+}
 
 Result<PatchRunOutcome> RunPatches(const PatchRunSettings& settings, PatchFetcher& fetcher,
                                    PatchProgressBoard& board, std::stop_token stop) {

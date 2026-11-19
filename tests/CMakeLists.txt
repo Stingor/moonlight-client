@@ -1316,6 +1316,7 @@ if(MOONCLIENT_PLATFORM_LAYERS)
         app/patch_run_test.cpp
         app/mirror_manifest_test.cpp
         app/mirror_sync_test.cpp
+        app/update_watch_test.cpp
         app/skin_folder_test.cpp
         app/skin_look_code_test.cpp
         app/skin_look_options_test.cpp

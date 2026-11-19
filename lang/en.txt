@@ -24810,3 +24810,15 @@ tr: Base and job experience gained from monsters increases by half for 30 minute
 
 fr: L'expérience de base et de job gagnée sur les monstres augmente de trois quarts pendant 30 minutes.
 tr: Base and job experience gained from monsters increases by three quarters for 30 minutes.
+
+fr: mise à jour disponible
+tr: update available
+
+fr: Une mise à jour du client est disponible : elle s'installera au prochain lancement.
+tr: A client update is available: it will be installed the next time you launch.
+
+fr: Avertir d'une mise à jour disponible
+tr: Notify when an update is available
+
+fr: Quand le serveur publie une nouvelle version pendant que l'on joue, une ligne le dit dans le chat et le titre de la fenêtre le rappelle. Elle s'installe au lancement suivant.
+tr: When the server publishes a new version while you play, a chat line says so and the window title keeps reminding you. It is installed at the next launch.

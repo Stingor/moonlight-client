@@ -11,15 +11,18 @@ namespace moonclient {
 
 // ── LE TITRE DE LA FENÊTRE, dans la section Interface ───────────────────────
 //
-// Deux cases. Le pseudo et la carte en tête du titre — « Stingor - prontera -
+// Trois cases. Le pseudo et la carte en tête du titre — « Stingor - prontera -
 // Moonlight-Destiny a8de56e6c012 » —, lisibles dans la barre des tâches quand
 // deux clients tournent. Le hash du commit bâti après le nom du jeu : il dit
-// d'un coup d'œil de quel binaire vient ce qu'on regarde. Voir `WindowTitle`.
+// d'un coup d'œil de quel binaire vient ce qu'on regarde. L'avis d'une mise à
+// jour publiée pendant que l'on joue, en queue du titre et d'une ligne au
+// chat. Voir `WindowTitle` et `patcher::UpdateWatch`.
 inline constexpr int kWindowTitleRowBase = 8000;
 
 enum class WindowTitleRow : int {
   kNamesShown = 0,
   kRevisionShown,
+  kUpdateNotice,
   kCount,
 };
 
@@ -30,6 +33,7 @@ class WindowTitleOptions {
  public:
   [[nodiscard]] bool names_shown() const noexcept { return names_shown_; }
   [[nodiscard]] bool revision_shown() const noexcept { return revision_shown_; }
+  [[nodiscard]] bool update_notice_shown() const noexcept { return update_notice_shown_; }
 
   // ⚠ AVANT LA LECTURE DU FICHIER : la valeur présente ici est le défaut.
   void Declare(SettingsFile& into);
@@ -43,6 +47,7 @@ class WindowTitleOptions {
  private:
   bool names_shown_ = true;
   bool revision_shown_ = true;
+  bool update_notice_shown_ = true;
 };
 
 }  // namespace moonclient

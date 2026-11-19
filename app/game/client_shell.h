@@ -28,6 +28,10 @@ namespace moonclient {
 
 struct WindowTitleMarks;
 
+namespace patcher {
+class UpdateWatch;
+}  // namespace patcher
+
 // CE QUE LA BOUCLE FAIT TOURNER : un écran, quel qu'il soit.
 //
 // 🔴 DEUX ÉCRANS PARTAGENT LA MÊME BOUCLE, et c'est ce que cette interface
@@ -140,6 +144,14 @@ class ClientShell {
   // Ce que le titre porte sur tous les écrans : le serveur choisi, et le réglage
   // du joueur pour le hash. Voir `WindowTitle`.
   [[nodiscard]] WindowTitleMarks TitleMarks();
+  // LE GUET DES MISES À JOUR, posé par l'étape de patch : le serveur publie-t-il
+  // plus neuf que ce qu'on vient de lancer ? Voir `patcher::UpdateWatch`.
+  void WatchForUpdates(std::unique_ptr<patcher::UpdateWatch> watch);
+  // Vrai si le guet a trouvé plus neuf ET que le joueur veut le savoir.
+  [[nodiscard]] bool update_shown();
+  // VRAI UNE SEULE FOIS par lancement, à la première image où `update_shown` :
+  // la ligne du chat ne se répète pas d'une partie à l'autre.
+  [[nodiscard]] bool TakeUpdateAnnouncement();
   // L'ADRESSE DU SERVEUR DE CONNEXION CHOISI, `hôte:port`, posée par l'écran de
   // connexion : le classement survivors y range ses résultats en attente.
   void SetLoginAddress(std::string address) { login_address_ = std::move(address); }
@@ -257,6 +269,8 @@ class ClientShell {
   std::string web_;
   std::string server_time_zone_ = std::string(kDefaultServerTimeZone);
   bool test_server_ = false;
+  std::unique_ptr<patcher::UpdateWatch> update_watch_;
+  bool update_announced_ = false;
   std::string login_address_;
   std::optional<ZoneStreamCapture> zone_capture_;
   std::optional<ro::vfs::Vfs> vfs_;

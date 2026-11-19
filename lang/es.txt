@@ -24810,3 +24810,15 @@ tr: La experiencia base y de job obtenida de los monstruos aumenta en la mitad d
 
 fr: L'expérience de base et de job gagnée sur les monstres augmente de trois quarts pendant 30 minutes.
 tr: La experiencia base y de job obtenida de los monstruos aumenta en tres cuartos durante 30 minutos.
+
+fr: mise à jour disponible
+tr: actualización disponible
+
+fr: Une mise à jour du client est disponible : elle s'installera au prochain lancement.
+tr: Hay una actualización del cliente disponible: se instalará la próxima vez que lo inicies.
+
+fr: Avertir d'une mise à jour disponible
+tr: Avisar cuando haya una actualización disponible
+
+fr: Quand le serveur publie une nouvelle version pendant que l'on joue, une ligne le dit dans le chat et le titre de la fenêtre le rappelle. Elle s'installe au lancement suivant.
+tr: Cuando el servidor publica una nueva versión mientras juegas, una línea lo indica en el chat y el título de la ventana lo recuerda. Se instala en el siguiente inicio.

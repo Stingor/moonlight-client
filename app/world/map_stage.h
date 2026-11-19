@@ -197,12 +197,18 @@ inline constexpr std::string_view kTestServerTitleMark = "[TEST] ";
 // il ne correspond exactement à aucune révision.
 inline constexpr std::string_view kModifiedTreeTitleMark = "+";
 
+// CE QUI SÉPARE DU RESTE L'AVIS DE MISE À JOUR, en queue du titre.
+inline constexpr std::string_view kUpdateTitleSeparator = " — ";
+
 // Ce que le titre porte autour du nom du jeu, en partie comme hors partie.
 struct WindowTitleMarks {
   // Le hash du commit qui a produit ce binaire, après le nom.
   bool revision_shown = true;
   // `kTestServerTitleMark` en tête.
   bool test_server = false;
+  // Le serveur publie plus neuf que ce qui tourne : le titre le dit en queue,
+  // jusqu'à la relance. Voir `patcher::UpdateWatch`.
+  bool update_available = false;
 };
 
 // LE TITRE DE LA FENÊTRE : le nom, puis le hash du commit bâti —
