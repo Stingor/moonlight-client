@@ -254,6 +254,26 @@ void GameOptions::ComposeShortcutRows(int shown_bar) {
                     .highest = ro::ui::kLargestBorderThickness,
                     .format = "%.0f px"});
   shortcut_rows_.push_back(
+      OptionRowView{.id = ShortcutBarRow(bar, ShortcutBarField::kWornThickness),
+                    .label = Tr("Épaisseur du cadre d'un item porté"),
+                    .help = Tr("La flèche enfilée, l'arme en main : leur case se cerne de ce "
+                               "cadre, tout entier dans la case."),
+                    .kind = OptionKind::kSlider,
+                    .value = look.worn_thickness,
+                    .lowest = ro::ui::kSmallestWornThickness,
+                    .highest = ro::ui::kLargestWornThickness,
+                    .format = "%.0f px"});
+  shortcut_rows_.push_back(
+      OptionRowView{.id = ShortcutBarRow(bar, ShortcutBarField::kWornSoftness),
+                    .label = Tr("Douceur du cadre d'un item porté"),
+                    .help = Tr("Zéro : un trait net. Au-delà, le cadre s'efface vers le centre "
+                               "de la case — d'autant mieux qu'il est épais."),
+                    .kind = OptionKind::kSlider,
+                    .value = look.worn_softness,
+                    .lowest = 0.0F,
+                    .highest = 1.0F,
+                    .format = "%.2f"});
+  shortcut_rows_.push_back(
       OptionRowView{.id = ShortcutBarRow(bar, ShortcutBarField::kCopyLook),
                     .label = Tr("Copier cette apparence sur les autres barres"),
                     .help = Tr("Les couleurs, les tailles et le cadre — pas la position, ni ce "
@@ -280,6 +300,13 @@ void GameOptions::ComposeShortcutRows(int shown_bar) {
                                          .label = Tr("Couleur du cadre"),
                                          .kind = OptionKind::kColor,
                                          .color = look.border_color});
+  shortcut_rows_.push_back(
+      OptionRowView{.id = ShortcutBarRow(bar, ShortcutBarField::kWornColor),
+                    .label = Tr("Couleur du cadre d'un item porté"),
+                    .help = Tr("Sa transparence compte : le voile de la case en garde le "
+                               "cinquième."),
+                    .kind = OptionKind::kColor,
+                    .color = look.worn_color});
   shortcut_rows_.push_back(OptionRowView{.id = ShortcutBarRow(bar, ShortcutBarField::kKeyColor),
                                          .label = Tr("Couleur du texte des touches"),
                                          .kind = OptionKind::kColor,
@@ -394,6 +421,15 @@ bool GameOptions::ChangeShortcutBar(const ro::ui::OptionsWindowAction& asked) {
     case ShortcutBarField::kShadowOffset:
       look.shadow_offset = asked.value;
       break;
+    case ShortcutBarField::kWornColor:
+      look.worn_color = asked.color;
+      break;
+    case ShortcutBarField::kWornThickness:
+      look.worn_thickness = asked.value;
+      break;
+    case ShortcutBarField::kWornSoftness:
+      look.worn_softness = asked.value;
+      break;
     case ShortcutBarField::kCopyLook:
       // 🔴 L'APPARENCE SEULE, ET C'EST CE QUI REND LE GESTE SÛR. Recopier aussi
       // « affichée » et « cases montrées » allumerait huit barres d'un clic, ou
@@ -416,6 +452,9 @@ bool GameOptions::ChangeShortcutBar(const ro::ui::OptionsWindowAction& asked) {
         other.shadow_color = look.shadow_color;
         other.shadow_kind = look.shadow_kind;
         other.shadow_offset = look.shadow_offset;
+        other.worn_color = look.worn_color;
+        other.worn_thickness = look.worn_thickness;
+        other.worn_softness = look.worn_softness;
         // ⚠ LA TAILLE DES CASES ET L'ESPACEMENT EN FONT PARTIE : ce sont des
         // faits d'apparence, et une barre deux fois plus grosse que sa voisine
         // ne se lit pas comme sa sœur. La POSITION, elle, reste à chacune.

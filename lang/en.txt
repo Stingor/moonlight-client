@@ -9832,6 +9832,18 @@ tr: Grid colour
 fr: Couleur du cadre
 tr: Border colour
 
+fr: Couleur du cadre d'un item porté
+tr: Worn item border colour
+
+fr: Sa transparence compte : le voile de la case en garde le cinquième.
+tr: Its transparency counts: the slot's veil keeps a fifth of it.
+
+fr: Douceur du cadre d'un item porté
+tr: Worn item border softness
+
+fr: Zéro : un trait net. Au-delà, le cadre s'efface vers le centre de la case — d'autant mieux qu'il est épais.
+tr: Zero: a crisp line. Above that, the border fades towards the middle of the slot — the thicker it is, the smoother.
+
 fr: Couleur du filet
 tr: Outline colour
 
@@ -13008,6 +13020,12 @@ tr: Ring thickness
 
 fr: Épaisseur du cadre
 tr: Border width
+
+fr: Épaisseur du cadre d'un item porté
+tr: Worn item border width
+
+fr: La flèche enfilée, l'arme en main : leur case se cerne de ce cadre, tout entier dans la case.
+tr: The nocked arrow, the weapon in hand: their slot gets this border, drawn entirely inside the slot.
 
 fr: Épingler : Échap ne ferme plus
 tr: Pin: Escape no longer closes it

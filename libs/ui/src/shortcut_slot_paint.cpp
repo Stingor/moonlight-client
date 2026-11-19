@@ -22,9 +22,8 @@ constexpr float kDropThickness = 2.0F;
 // bleus, pour ne pas se confondre avec la cible d'un glisser.
 constexpr ImU32 kHighlightVeil = IM_COL32(110, 180, 255, 70);
 constexpr ImU32 kHighlightOutline = IM_COL32(120, 190, 255, 240);
-// La case d'un objet porté : un voile et un cadre dorés.
-constexpr ImU32 kWornVeil = IM_COL32(255, 215, 90, 45);
-constexpr ImU32 kWornOutline = IM_COL32(255, 210, 80, 235);
+// La part de l'opacité du cadre d'un objet porté que garde son voile.
+constexpr float kWornVeilShare = 0.2F;
 // L'icône d'une compétence que le serveur ne donne plus.
 constexpr ImU32 kUnknownTint = IM_COL32(105, 105, 115, 150);
 // Le voile du temps d'attente : il MONTE du bas, comme au client.
@@ -74,6 +73,43 @@ void PaintSlotText(ImDrawList* into, const ShortcutBarLayout& look, float size, 
   }
 }
 
+// La couleur à `share` de son opacité.
+[[nodiscard]] ImU32 WithOpacityShare(ImU32 color, float share) {
+  const auto opacity = static_cast<ImU32>(static_cast<float>((color >> IM_COL32_A_SHIFT) & 0xFF) *
+                                          std::clamp(share, 0.0F, 1.0F));
+  return (color & ~IM_COL32_A_MASK) | (opacity << IM_COL32_A_SHIFT);
+}
+
+// LE CADRE D'UN OBJET PORTÉ, tout entier DANS la case : il ne mord pas sur la
+// voisine, quelle que soit son épaisseur.
+//
+// Net, c'est un seul trait. Doux, ce sont des anneaux d'un pixel dont
+// l'opacité décroît vers le centre : le bord garde la couleur choisie, et
+// l'intérieur s'efface d'autant plus que la douceur est grande.
+void PaintWornFrame(ImDrawList* into, ImVec2 top_left, ImVec2 bottom_right,
+                    const ShortcutBarLayout& look, float rounding) {
+  const float scale = Scale();
+  const float thickness =
+      std::clamp(look.worn_thickness, kSmallestWornThickness, kLargestWornThickness) * scale;
+  const float softness = std::clamp(look.worn_softness, 0.0F, 1.0F);
+  if (softness <= 0.0F) {
+    const float half = thickness * 0.5F;
+    into->AddRect(ImVec2(top_left.x + half, top_left.y + half),
+                  ImVec2(bottom_right.x - half, bottom_right.y - half), look.worn_color, rounding,
+                  0, thickness);
+    return;
+  }
+  const int rings = std::max(1, static_cast<int>(thickness + 0.5F));
+  const float ring = thickness / static_cast<float>(rings);
+  for (int rank = 0; rank < rings; ++rank) {
+    const float inset = ring * (static_cast<float>(rank) + 0.5F);
+    const float faded = 1.0F - softness * static_cast<float>(rank) / static_cast<float>(rings);
+    into->AddRect(ImVec2(top_left.x + inset, top_left.y + inset),
+                  ImVec2(bottom_right.x - inset, bottom_right.y - inset),
+                  WithOpacityShare(look.worn_color, faded), rounding, 0, ring);
+  }
+}
+
 }  // namespace
 
 void PaintShortcutSlot(ImDrawList* into, const ShortcutBarLayout& look,
@@ -108,21 +144,26 @@ void PaintShortcutSlot(ImDrawList* into, const ShortcutBarLayout& look,
   if (slot.highlighted) {
     into->AddRectFilled(top_left, bottom_right, kHighlightVeil, rounding);
   } else if (slot.worn) {
-    into->AddRectFilled(top_left, bottom_right, kWornVeil, rounding);
+    into->AddRectFilled(top_left, bottom_right, WithOpacityShare(look.worn_color, kWornVeilShare),
+                        rounding);
   }
   // ⚠ ÉPAISSEUR ZÉRO = PAS DE CADRE, et c'est une valeur que des joueurs
   // choisiront : des cases jointives sans bordure est une disposition qui se
   // défend. La cible d'un glisser garde la sienne — elle doit s'annoncer même
   // sur une barre sans cadre, sinon on lâche à l'aveugle. La case éclairée
-  // aussi, pour la même raison, et celle d'un objet porté.
-  const bool marked = marks.dropping || slot.highlighted || slot.worn;
+  // aussi, pour la même raison.
+  const bool marked = marks.dropping || slot.highlighted;
   const float border = marked ? kDropThickness * scale : look.border_thickness * scale;
   if (border > 0.0F) {
     const ImU32 edge = marks.dropping     ? kDropOutline
                        : slot.highlighted ? kHighlightOutline
-                       : slot.worn        ? kWornOutline
                                           : look.border_color;
     into->AddRect(top_left, bottom_right, edge, rounding, 0, border);
+  }
+  // L'OBJET PORTÉ PAR-DESSUS LE CADRE ORDINAIRE, et sous les deux marques du
+  // geste en cours : un glisser ou le grimoire priment.
+  if (slot.worn && !marked) {
+    PaintWornFrame(into, top_left, bottom_right, look, rounding);
   }
 
   // COMBIEN IL EN RESTE, en bas à droite — la place où la grille du sac écrit

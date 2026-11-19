@@ -223,6 +223,11 @@ inline constexpr float kSmallestLabelScale = 0.5F;
 inline constexpr float kLargestLabelScale = 2.0F;
 inline constexpr float kLargestShadowOffset = 4.0F;
 inline constexpr float kLargestBorderThickness = 5.0F;
+// Le cadre d'un objet porté : doré, et plus épais que celui d'une case.
+inline constexpr ImU32 kDefaultWornColor = IM_COL32(255, 210, 80, 235);
+inline constexpr float kDefaultWornThickness = 2.0F;
+inline constexpr float kSmallestWornThickness = 1.0F;
+inline constexpr float kLargestWornThickness = 8.0F;
 
 // CE QU'UNE BARRE MONTRE, ET COMMENT.
 //
@@ -293,6 +298,13 @@ struct ShortcutBarLayout {
   int shadow_kind = static_cast<int>(SlotTextShadow::kHalo);
   // De combien l'ombre PORTÉE se décale. Sans effet sur le cerne, qui entoure.
   float shadow_offset = kDefaultShadowOffset;
+
+  // LE CADRE D'UN OBJET PORTÉ — la flèche enfilée, l'arme en main. La couleur
+  // porte sa transparence, et le voile de la case s'en tire.
+  ImU32 worn_color = kDefaultWornColor;
+  float worn_thickness = kDefaultWornThickness;
+  // Zéro : un trait net. Un : un dégradé qui s'efface vers le centre de la case.
+  float worn_softness = 0.0F;
 };
 
 // Le plus petit et le plus grand côté de case qu'on laisse choisir. En deçà

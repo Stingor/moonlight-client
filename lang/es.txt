@@ -9832,6 +9832,18 @@ tr: Color de la cuadrícula
 fr: Couleur du cadre
 tr: Color del marco
 
+fr: Couleur du cadre d'un item porté
+tr: Color del marco de un objeto equipado
+
+fr: Sa transparence compte : le voile de la case en garde le cinquième.
+tr: Su transparencia cuenta: el velo de la casilla conserva una quinta parte.
+
+fr: Douceur du cadre d'un item porté
+tr: Suavidad del marco de un objeto equipado
+
+fr: Zéro : un trait net. Au-delà, le cadre s'efface vers le centre de la case — d'autant mieux qu'il est épais.
+tr: Cero: un trazo nítido. Por encima, el marco se desvanece hacia el centro de la casilla, mejor cuanto más grueso sea.
+
 fr: Couleur du filet
 tr: Color del contorno
 
@@ -13008,6 +13020,12 @@ tr: Grosor del anillo
 
 fr: Épaisseur du cadre
 tr: Grosor del marco
+
+fr: Épaisseur du cadre d'un item porté
+tr: Grosor del marco de un objeto equipado
+
+fr: La flèche enfilée, l'arme en main : leur case se cerne de ce cadre, tout entier dans la case.
+tr: La flecha equipada, el arma en mano: su casilla lleva este marco, dibujado por completo dentro de la casilla.
 
 fr: Épingler : Échap ne ferme plus
 tr: Fijar: Esc ya no cierra

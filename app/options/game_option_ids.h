@@ -445,7 +445,7 @@ inline constexpr int kShortcutBarRowBase = 1000;
 // Les réglages d'une barre, dans l'ordre où ils s'encodent. ⚠ PAS DANS L'ORDRE
 // OÙ ILS S'AFFICHENT : la composition met les nuanciers en dernier, leur
 // sélecteur s'ouvrant vers le bas et recouvrant les rangées suivantes.
-inline constexpr int kShortcutFieldsPerBar = 21;
+inline constexpr int kShortcutFieldsPerBar = 24;
 enum class ShortcutBarField : int {
   kShown = 0,
   kClickThrough,
@@ -467,6 +467,9 @@ enum class ShortcutBarField : int {
   kShadowColor,
   kShadowKind,
   kShadowOffset,
+  kWornColor,
+  kWornThickness,
+  kWornSoftness,
   // ⚠ UN GESTE, ET NON UN RÉGLAGE : il recopie l'apparence de cette barre sur
   // les sept autres. Il est DANS l'énumération parce qu'il lui faut un
   // identifiant de ligne comme les autres, et qu'il appartient à une barre —

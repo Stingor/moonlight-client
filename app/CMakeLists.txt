@@ -2170,6 +2170,7 @@ add_executable(moonclient
     options/game_option_items.cpp
     options/game_option_toast.cpp
     options/game_option_keys.cpp
+    options/game_option_bar_keys.cpp
     options/staff_camera_keys.cpp
     options/staff_sky_keys.cpp
     options/game_option_rows.cpp
