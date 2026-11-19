@@ -11372,8 +11372,8 @@ quests:
     summary: Talk with Belle
     description: You have completed everything on the schedule. Ask Chamberlain Bell in your room about the next thing on the schedule.
   7686:
-    title: Nyhill and Skia
-    description: You witnessed the conversation between Nyhill and Skia in the hallway.
+    title: Nihil and Skia
+    description: You witnessed the conversation between Nihil and Skia in the hallway.
   7687:
     title: Participating in the Banquet
     summary: Talk with Spica
@@ -11382,13 +11382,13 @@ quests:
     title: Suspicious Movement
     description: While moving to take part in the banquet, you heard about the conversation between the strangers in the guest room.
   7689:
-    title: Find Nyhill
-    summary: Follow Nyhill
-    description: Skia felt that Nyhill wasn't walking straight. Skia asked you to follow Nyhill who left the banquet early.
+    title: Find Nihil
+    summary: Follow Nihil
+    description: Skia felt that Nihil wasn't walking straight. Skia asked you to follow Nihil who left the banquet early.
   7690:
-    title: Where Is Nyhill?
-    summary: Talk with Nyhill
-    description: When you were looking for Nyhill, you eavesdropped on a suspicious conversation. Where is Nyhill?
+    title: Where Is Nihil?
+    summary: Talk with Nihil
+    description: When you were looking for Nihil, you eavesdropped on a suspicious conversation. Where is Nihil?
   7691:
     title: Waiting for the Ritual
     summary: Talk with Belle
@@ -19098,13 +19098,13 @@ quests:
   11797:
     title: Saint of Purification
     icon: ep
-    summary: Talk to Helock
-    description: You must return to Midgard to find the saint. Let's find <NAVI>[Helock]<INFO>jor_tail,211,63,0,101,0</INFO></NAVI> in the Frozen Tail.
+    summary: Talk to Hellock
+    description: You must return to Midgard to find the saint. Let's find <NAVI>[Hellock]<INFO>jor_tail,211,63,0,101,0</INFO></NAVI> in the Frozen Tail.
   11798:
     title: Saint of Purification
     icon: ep
-    summary: Talk to Helock
-    description: She arrived in Aldebaran on Helock's sleigh. Talk to <NAVI>[Helock]<INFO>aldebaran,102,103,0,101,0</INFO></NAVI> again.
+    summary: Talk to Hellock
+    description: She arrived in Aldebaran on Hellock's sleigh. Talk to <NAVI>[Hellock]<INFO>aldebaran,102,103,0,101,0</INFO></NAVI> again.
   11799:
     title: Saint of Purification
     icon: ep
@@ -19124,73 +19124,73 @@ quests:
     title: Saint of Purification
     icon: ep
     summary: Check the luggage
-    description: Although Elise returned to the Palace of Prontera with her porter, Freiderike's luggage was not organized at all and it seems to be too much. Let's check the <NAVI>[travel bag]<INFO>prt_cas,15,31,0,101,0</INFO></NAVI> to reduce luggage.
+    description: Although Elise returned to the Palace of Prontera with her porter, Friederike's luggage was not organized at all and it seems to be too much. Let's check the <NAVI>[travel bag]<INFO>prt_cas,15,31,0,101,0</INFO></NAVI> to reduce luggage.
   11803:
     title: Saint of Purification
     icon: ep
     summary: Check the luggage
-    description: Inside the Prontera Palace, let's check out another <NAVI>[travel bag]<INFO>prt_cas,16,27,0,101,0</INFO></NAVI> in Freiderike's residence.
+    description: Inside the Prontera Palace, let's check out another <NAVI>[travel bag]<INFO>prt_cas,16,27,0,101,0</INFO></NAVI> in Friederike's residence.
   11804:
     title: Saint of Purification
     icon: ep
     summary: Check the luggage
-    description: Inside the Prontera Palace, let's check out another <NAVI>[travel bag]<INFO>prt_cas,26,27,0,101,0</INFO></NAVI> in Freiderike's residence.
+    description: Inside the Prontera Palace, let's check out another <NAVI>[travel bag]<INFO>prt_cas,26,27,0,101,0</INFO></NAVI> in Friederike's residence.
   11805:
     title: Saint of Purification
     icon: ep
     summary: Check the luggage
-    description: Inside the Prontera Palace, let's check out another <NAVI>[travel bag]<INFO>prt_cas,23,36,0,101,0</INFO></NAVI> in Freiderike's residence.
+    description: Inside the Prontera Palace, let's check out another <NAVI>[travel bag]<INFO>prt_cas,23,36,0,101,0</INFO></NAVI> in Friederike's residence.
   11806:
     title: Saint of Purification
     icon: ep
     summary: Check the luggage
-    description: Inside the Prontera Palace, let's check out another <NAVI>[travel bag]<INFO>prt_cas,22,30,0,101,0</INFO></NAVI> in Freiderike's residence.
+    description: Inside the Prontera Palace, let's check out another <NAVI>[travel bag]<INFO>prt_cas,22,30,0,101,0</INFO></NAVI> in Friederike's residence.
   11807:
     title: Saint of Purification
     icon: ep
     summary: Talk to Ellis
-    description: Packing has been completed. Talk to <NAVI>[Copy Officer Ellis]<INFO>prt_cas,21,31,0,101,0</INFO></NAVI> in Freiderike's residence inside the Prontera Palace.
+    description: Packing has been completed. Talk to <NAVI>[Copy Officer Ellis]<INFO>prt_cas,21,31,0,101,0</INFO></NAVI> in Friederike's residence inside the Prontera Palace.
   11808:
     title: Saint of Purification
     icon: ep
-    summary: Talk to Helock
-    description: Ready to leave for Issgard. Meet <NAVI>[Helock]<INFO>aldebaran,102,103,0,101,0</INFO></NAVI> in Aldebaran and move to Issgard.
+    summary: Talk to Hellock
+    description: Ready to leave for Issgard. Meet <NAVI>[Hellock]<INFO>aldebaran,102,103,0,101,0</INFO></NAVI> in Aldebaran and move to Issgard.
   11809:
     title: Saint of Purification
     icon: ep
     summary: To the Ice Castle
-    description: She arrived again in Issgard. Let her go to <NAVI>[Ice Castle]<INFO>icecastle,23,123,0,101,0</INFO></NAVI> with Freiderike.
+    description: She arrived again in Issgard. Let her go to <NAVI>[Ice Castle]<INFO>icecastle,23,123,0,101,0</INFO></NAVI> with Friederike.
   11810:
     title: Saint of Purification
     icon: ep
-    summary: Talk to Freiderike
-    description: Let's go to <NAVI>[Freiderike]<INFO>icecastle,59,213,0,101,0</INFO></NAVI>'s room in the Ice Castle.
+    summary: Talk to Friederike
+    description: Let's go to <NAVI>[Friederike]<INFO>icecastle,59,213,0,101,0</INFO></NAVI>'s room in the Ice Castle.
   11811:
     title: Saint of Purification
     icon: ep
     summary: Talk to Lehar
-    description: Voglinde visited the Ice Castle and Freiderike's room, and returned after confirming that Freiderike had arrived safely. The next task seems to be left to <NAVI>[Lehar]<INFO>icas_in,35,118,0,101,0</INFO></NAVI>, so let's talk.
+    description: Voglinde visited the Ice Castle and Friederike's room, and returned after confirming that Friederike had arrived safely. The next task seems to be left to <NAVI>[Lehar]<INFO>icas_in,35,118,0,101,0</INFO></NAVI>, so let's talk.
   11812:
-    title: Freiderike's Day
+    title: Friederike's Day
     icon: ep
-    summary: Talk to Freiderike
-    description: <NAVI>[Freiderike]<INFO>icas_in,32,120,0,101,0</INFO></NAVI>, who stayed in Freiderike's room, in the Ice Castle, is said to have been tasked with purifying Rgan's magic core from Voglinde. Let's hear more.
+    summary: Talk to Friederike
+    description: <NAVI>[Friederike]<INFO>icas_in,32,120,0,101,0</INFO></NAVI>, who stayed in Friederike's room, in the Ice Castle, is said to have been tasked with purifying Rgan's magic core from Voglinde. Let's hear more.
   11813:
-    title: Freiderike's Day
+    title: Friederike's Day
     icon: dq
     summary: Gather Rgan's Magic Core
-    description: In the Snake God's Warmth, kill 10 Primitive and Lowest Rgans each, collect 10 Rgan's Magic Cores, and return to <NAVI>[Freiderike]<INFO>icas_in,32,120,0,101,0</INFO></NAVI>.
+    description: In the Snake God's Warmth, kill 10 Primitive and Lowest Rgans each, collect 10 Rgan's Magic Cores, and return to <NAVI>[Friederike]<INFO>icas_in,32,120,0,101,0</INFO></NAVI>.
   11814:
-    title: Freiderike's Day
+    title: Friederike's Day
     icon: dq
     summary: Reset at 04:00
-    description: Helped with Freiderike's work. Let's try again tomorrow.
+    description: Helped with Friederike's work. Let's try again tomorrow.
     cooldown: true
   11815:
     title: Frozen Sea
     icon: ep
     summary: Talk to Tamarin
-    description: Tamarin, which was brought by Surr to Freiderike's room, in the Ice Castle, was healed by Freiderike's power. Let's hear the situation from <NAVI>[Tamarin]<INFO>icas_in,28,119,0,101,0</INFO></NAVI> who has woken up.
+    description: Tamarin, which was brought by Surr to Friederike's room, in the Ice Castle, was healed by Friederike's power. Let's hear the situation from <NAVI>[Tamarin]<INFO>icas_in,28,119,0,101,0</INFO></NAVI> who has woken up.
   11816:
     title: Frozen Sea
     icon: ep
@@ -19214,13 +19214,13 @@ quests:
   11820:
     title: Frozen Sea
     icon: ep
-    summary: Talk to Freiderike
-    description: It is said that the pit where Tamarin fell was so poisonous that it was impossible to enter even wearing a wetsuit. Return to <NAVI>[Freiderike]<INFO>icas_in,32,120,0,101,0</INFO></NAVI> in Freiderike's room in the Ice Castle and ask for help.
+    summary: Talk to Friederike
+    description: It is said that the pit where Tamarin fell was so poisonous that it was impossible to enter even wearing a wetsuit. Return to <NAVI>[Friederike]<INFO>icas_in,32,120,0,101,0</INFO></NAVI> in Friederike's room in the Ice Castle and ask for help.
   11821:
     title: Frozen Sea
     icon: ep
     summary: Back to the Pit
-    description: I persuaded Freiderike. Go back to the <NAVI>[Pit]<INFO>jor_back2,258,314,0,101,0</INFO></NAVI> in the Frozen Scale Plains and purify the poison.
+    description: I persuaded Friederike. Go back to the <NAVI>[Pit]<INFO>jor_back2,258,314,0,101,0</INFO></NAVI> in the Frozen Scale Plains and purify the poison.
   11822:
     title: Frozen Sea
     icon: ep
@@ -19259,8 +19259,8 @@ quests:
   11829:
     title: Frozen Sea
     icon: ep
-    summary: Talk to Freiderike
-    description: Completed the investigation of the Abandoned Pit. Return to the Ice Castle and deliver the collected items to <NAVI>[Freiderike]<INFO>icas_in,32,120,0,101,0</INFO></NAVI>.
+    summary: Talk to Friederike
+    description: Completed the investigation of the Abandoned Pit. Return to the Ice Castle and deliver the collected items to <NAVI>[Friederike]<INFO>icas_in,32,120,0,101,0</INFO></NAVI>.
   11830:
     title: Abandoned Pit
     icon: dq
@@ -27589,8 +27589,8 @@ quests:
   16645:
     title: Share the clues
     icon: ep
-    summary: Talk to Reiji
-    description: I gathered some clues. Let's go back to <NAVI>[Reiji]<INFO>jor_nest,127,207,0,101,0</INFO></NAVI> who has been transformed into a Rgan in the Snake's Nest and share the clues and opinions we have gathered.
+    summary: Talk to Lazy
+    description: I gathered some clues. Let's go back to <NAVI>[Lazy]<INFO>jor_nest,127,207,0,101,0</INFO></NAVI> who has been transformed into a Rgan in the Snake's Nest and share the clues and opinions we have gathered.
   16646:
     title: Whispering Silently
     icon: ep
@@ -27629,13 +27629,13 @@ quests:
   16653:
     title: Accumulating Doubts
     icon: ep
-    summary: Talk to Reiji
-    description: Return to the Ice Castle and exchange achievements with <NAVI>[Reiji]<INFO>icas_in,245,197,0,101,0</INFO></NAVI>.
+    summary: Talk to Lazy
+    description: Return to the Ice Castle and exchange achievements with <NAVI>[Lazy]<INFO>icas_in,245,197,0,101,0</INFO></NAVI>.
   16654:
     title: Accumulating Doubts
     icon: ep
     summary: Talk to Miriam
-    description: Let's keep talking with Reiji and <NAVI>[Miriam]<INFO>icas_in,249,199,0,101,0</INFO></NAVI> at the Ice Castle.
+    description: Let's keep talking with Lazy and <NAVI>[Miriam]<INFO>icas_in,249,199,0,101,0</INFO></NAVI> at the Ice Castle.
   16655:
     title: Intermittent difference
     icon: ep
@@ -27670,7 +27670,7 @@ quests:
     title: Intermittent difference
     icon: ep
     summary: Return to Town
-    description: Take Jung Kea, who has lost her mind by turning into a monster, and go back to the village and talk to <NAVI>[Horr]<INFO>icecastle,27,126,0,101,0</INFO></NAVI>.
+    description: Take Jung Kea, who has lost her mind by turning into a monster, and go back to the village and talk to <NAVI>[Horuru]<INFO>icecastle,27,126,0,101,0</INFO></NAVI>.
   16662:
     title: Simulation Battle
     icon: dq
@@ -28295,7 +28295,7 @@ quests:
     title: "[Cooldown] Sanctuary Purification"
     icon: dq
   17619:
-    title: Reiji's Plan
+    title: Lazy's Plan
     icon: ep
     summary: Go to the home of Rgan
     description: Decided to infiltrate Rgan's <NAVI>[base]<INFO>jor_back3,98,318,0,101,0</INFO></NAVI> using the Rgan Transformation Scroll. Don't forget to bring the Transformation Scroll.
@@ -28363,7 +28363,7 @@ quests:
     title: Infiltration Interim Report
     icon: ep
     summary: Go outside
-    description: Nothing more to hear from Juncea. For now, I'll go <NAVI>[outside]<INFO>jor_nest,87,164,0,101,0</INFO></NAVI> the Snake's Nest and talk with Reiji.
+    description: Nothing more to hear from Juncea. For now, I'll go <NAVI>[outside]<INFO>jor_nest,87,164,0,101,0</INFO></NAVI> the Snake's Nest and talk with Lazy.
   17633:
     title: Infiltration Interim Report
     icon: ep
@@ -28402,7 +28402,7 @@ quests:
   17640:
     title: Confused Snake's Nest
     icon: ep
-    summary: Go to Horr's House
+    summary: Go to Horuru's House
     description: What is the Rgan you are carrying? My <NAVI>[house]<INFO>icas_in,247,116,0,101,0</INFO></NAVI> in the Ice Castle is close here, so let's go there.
   17641:
     title: Confused Snake's Nest
@@ -28413,12 +28413,12 @@ quests:
     title: Confused Snake's Nest
     icon: ep
     summary: Persuade Juncea
-    description: <NAVI>[Juncea]<INFO>icas_in,243,117,0,101,0</INFO></NAVI> wakes up in the Ice Castle, in the house of Horr, and seems to be worried. If this is the case, I think I'm almost convinced.
+    description: <NAVI>[Juncea]<INFO>icas_in,243,117,0,101,0</INFO></NAVI> wakes up in the Ice Castle, in the house of Horuru, and seems to be worried. If this is the case, I think I'm almost convinced.
   17643:
     title: Confused Snake's Nest
     icon: ep
     summary: Talk to Aurelie
-    description: <NAVI>[Aurelie]<INFO>icas_in,249,113,0,101,0</INFO></NAVI> appeared at Horr's house in the Ice Castle to deliver the news himself. Could it be something big?
+    description: <NAVI>[Aurelie]<INFO>icas_in,249,113,0,101,0</INFO></NAVI> appeared at Horuru's house in the Ice Castle to deliver the news himself. Could it be something big?
   17644:
     title: Confused Snake's Nest
     icon: ep
@@ -28507,13 +28507,13 @@ quests:
   17661:
     title: Find a hiding place on the ground
     icon: dq
-    summary: Report to Horr
-    description: Buried all the super strong antennas in the designated places. Let's report back to Mr. <NAVI>[Horr]<INFO>icecastle,27,126,0,101,0</INFO></NAVI> in the Ice Castle.
+    summary: Report to Horuru
+    description: Buried all the super strong antennas in the designated places. Let's report back to Mr. <NAVI>[Horuru]<INFO>icecastle,27,126,0,101,0</INFO></NAVI> in the Ice Castle.
   17662:
     title: '[Standby] Find a hiding place on the ground'
     icon: dq
     summary: Reset at 04:00
-    description: After dawn, the battery will be discharged, so you can come back here to the Ice Castle and replace it. Just rest for today. - <NAVI>[Horr]<INFO>icecastle,27,126,0,101,0</INFO></NAVI>
+    description: After dawn, the battery will be discharged, so you can come back here to the Ice Castle and replace it. Just rest for today. - <NAVI>[Horuru]<INFO>icecastle,27,126,0,101,0</INFO></NAVI>
     cooldown: true
   17690:
     title: A New Exploration Site
@@ -28635,7 +28635,7 @@ quests:
     title: A New Beginning
     icon: ep
     summary: Distinguished Guest
-    description: <NAVI>[Horr]<INFO>icas_in2,31,116,0,101,0</INFO></NAVI> is in a dilemma because of Nadyagand's demands for keeping him imprisoned in the Ice Castle.
+    description: <NAVI>[Horuru]<INFO>icas_in2,31,116,0,101,0</INFO></NAVI> is in a dilemma because of Nadyagand's demands for keeping him imprisoned in the Ice Castle.
   17714:
     title: A New Beginning
     icon: ep
@@ -29202,52 +29202,52 @@ quests:
     title: Guest from the North Wind 2
     icon: ep
     summary: Go to the Prontera Palace
-    description: I decided to get information about Issgard from the Prontera Palace. Let's go to Prontera Royal Palace under the guidance of <NAVI>[Crookes]<INFO>ba_in01,386,110,0,101,0</INFO></NAVI> at the Varmundt's Mansion.
+    description: I decided to get information about Issgard from the Prontera Palace. Let's go to Prontera Royal Palace under the guidance of <NAVI>[Crux]<INFO>ba_in01,386,110,0,101,0</INFO></NAVI> at the Varmundt's Mansion.
   18147:
     title: Guardian's Box and Invitation 1
     icon: ep
-    summary: Talk to Nyhill in his room
-    description: Lehar says you need to get permission to visit from the Guardians of Issgard through the Guardian's Box. At the Royal Palace of Prontera, I decided to use the Guardian's Box stored in <NAVI>[Nyhill]<INFO>prt_cas,331,343,0,101,0</INFO></NAVI>'s room to receive an invitation.
+    summary: Talk to Nihil in his room
+    description: Lehar says you need to get permission to visit from the Guardians of Issgard through the Guardian's Box. At the Royal Palace of Prontera, I decided to use the Guardian's Box stored in <NAVI>[Nihil]<INFO>prt_cas,331,343,0,101,0</INFO></NAVI>'s room to receive an invitation.
   18220:
     title: To the Ice Castle
     icon: ep
     summary: Conversation with Leon
     description: We've received the assistance of Lord Naya. Let's return to the Ice Castle and check in with <NAVI>[Leon]<INFO>icas_in,111,228,0,101,0</INFO></NAVI> and our comrades.
   18221:
-    title: Finding Lehrar...!
+    title: Finding Lehar...!
     icon: ep
     summary: Investigate the Marker
-    description: We've decided to find Lehrar at the first floor of the Snake's Roots. Let's investigate the <NAVI>[Marker]<INFO>jor_root1,32,75,0,101,0</INFO></NAVI>.
+    description: We've decided to find Lehar at the first floor of the Snake's Roots. Let's investigate the <NAVI>[Marker]<INFO>jor_root1,32,75,0,101,0</INFO></NAVI>.
   18222:
     title: Investigation, Investigation, Investigation
     icon: ep
     summary: Investigate 3 Marks
-    description: After investigating the mark left in the Snake's Roots, Lehrar suggested exchanging information at the Sacred Roots. There are a total of three marked locations.
+    description: After investigating the mark left in the Snake's Roots, Lehar suggested exchanging information at the Sacred Roots. There are a total of three marked locations.
   18223:
-    title: Lehrar's Mark 1
+    title: Lehar's Mark 1
     icon: ep
     summary: Investigate the Mark
-    description: One of Lehrar's <NAVI>[marks]<INFO>jor_root1,69,128,0,101,0</INFO></NAVI> left in the Snake's Roots 1st floor. There's a long path leading inside. Let's check if there's Bagoth's laboratory inside.
+    description: One of Lehar's <NAVI>[marks]<INFO>jor_root1,69,128,0,101,0</INFO></NAVI> left in the Snake's Roots 1st floor. There's a long path leading inside. Let's check if there's Bagoth's laboratory inside.
   18224:
-    title: Lehrar's Mark 2
+    title: Lehar's Mark 2
     icon: ep
     summary: Investigate the Mark
-    description: One of Lehrar's <NAVI>[marks]<INFO>jor_root1,35,211,0,101,0</INFO></NAVI> left in the Snake's Roots 1st floor. There's a long path leading inside. Let's check if there's Bagoth's laboratory inside.
+    description: One of Lehar's <NAVI>[marks]<INFO>jor_root1,35,211,0,101,0</INFO></NAVI> left in the Snake's Roots 1st floor. There's a long path leading inside. Let's check if there's Bagoth's laboratory inside.
   18225:
-    title: Lehrar's Mark 3
+    title: Lehar's Mark 3
     icon: ep
     summary: Investigate the Mark
-    description: One of Lehrar's <NAVI>[marks]<INFO>jor_root1,254,66,0,101,0</INFO></NAVI> left in the Snake's Roots 1st floor. There's a long path leading inside. Let's check if there's Bagoth's laboratory inside.
+    description: One of Lehar's <NAVI>[marks]<INFO>jor_root1,254,66,0,101,0</INFO></NAVI> left in the Snake's Roots 1st floor. There's a long path leading inside. Let's check if there's Bagoth's laboratory inside.
   18226:
     title: It's Just a Hoax. The Next Location.
     icon: ep
     summary: Investigate the Marks
-    description: Even after investigating all the marks left in the Snake's Roots 1st floor, we couldn't find the entrance to Bagoth's laboratory. Let's meet Lehrar and Miriam at the <NAVI>[Sacred Roots]<INFO>jor_sanct,133,86,0,101,0</INFO></NAVI>.
+    description: Even after investigating all the marks left in the Snake's Roots 1st floor, we couldn't find the entrance to Bagoth's laboratory. Let's meet Lehar and Miriam at the <NAVI>[Sacred Roots]<INFO>jor_sanct,133,86,0,101,0</INFO></NAVI>.
   18227:
     title: Investigating the Sacred Roots
     icon: ep
     summary: Conversation with the Bishop
-    description: Lehrar and Miriam have decided to investigate the interior of the Sacred Roots together. Let's go to the central area and talk to <NAVI>[Bishop Lergan]<INFO>jor_sanct,150,207,0,101,0</INFO></NAVI> to gather information.
+    description: Lehar and Miriam have decided to investigate the interior of the Sacred Roots together. Let's go to the central area and talk to <NAVI>[Bishop Lergan]<INFO>jor_sanct,150,207,0,101,0</INFO></NAVI> to gather information.
   18228:
     title: Nyar's Call
     icon: ep
