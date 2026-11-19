@@ -73391,6 +73391,32 @@ Body:
       - {Item: Zelunium, Rate: 50}
       - {Item: Yggdrasilberry, Rate: 2500}
       - {Item: Polluted_Dark_L_Card, Rate: 1, StealProtected: true}
+  - Id: 20423
+    AegisName: BACSOJIN2
+    Name: White Lady
+    Level: 72
+    Hp: 56380
+    Attack: 560
+    Attack2: 1446
+    Defense: 10
+    MagicDefense: 15
+    Str: 38
+    Agi: 65
+    Vit: 34
+    Int: 80
+    Dex: 102
+    Luk: 35
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    Race: Demihuman
+    Element: Water
+    ElementLevel: 2
+    WalkSpeed: 160
+    AttackDelay: 576
+    AttackMotion: 960
+    DamageMotion: 480
   - Id: 20426
     AegisName: MD_MANHOLE3
     Name: Cursed Flame
@@ -74527,6 +74553,30 @@ Body:
     DamageMotion: 336
     Ai: 21
     Class: Boss
+  - Id: 20571
+    AegisName: ORK_HERO2
+    Name: Orc Hero
+    Level: 77
+    Hp: 585700
+    Attack: 2257
+    Attack2: 2542
+    Defense: 40
+    MagicDefense: 45
+    Agi: 91
+    Vit: 30
+    Int: 70
+    Dex: 105
+    Luk: 90
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    Race: Demihuman
+    Element: Earth
+    ElementLevel: 2
+    AttackDelay: 1678
+    AttackMotion: 780
+    DamageMotion: 648
   - Id: 20572
     AegisName: MD_C_HEMEL
     Name: Phantom of Himmelmez
@@ -76002,6 +76052,31 @@ Body:
       - {Item: Dragenergy_Red, Rate: 10000}
       - {Item: Dragenergy_Blue, Rate: 10000}
       - {Item: Bone_Detale_Card, Rate: 1, StealProtected: true}
+  - Id: 20619
+    AegisName: GLOOMUNDERNIGHT2
+    Name: Gloom Under Night
+    Level: 89
+    Hp: 1327048
+    Attack: 5880
+    Attack2: 9516
+    Defense: 37
+    MagicDefense: 24
+    Str: 191
+    Agi: 223
+    Vit: 187
+    Int: 155
+    Dex: 362
+    Luk: 163
+    AttackRange: 3
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    Element: Ghost
+    ElementLevel: 3
+    WalkSpeed: 200
+    AttackDelay: 1344
+    AttackMotion: 2880
+    DamageMotion: 576
   - Id: 20620
     AegisName: MD_REDPEPPER
     Name: Red Pepper
@@ -83954,6 +84029,31 @@ Body:
       - {Item: MD_Airboat_Tokken, Rate: 10000}
       - {Item: MD_Airboat_Tokken, Rate: 10000}
       - {Item: MD_Airboat_Tokken, Rate: 10000}
+  - Id: 21290
+    AegisName: KIEL_D_01_2
+    Name: Kiehl
+    Level: 90
+    Hp: 318712
+    Attack: 1682
+    Attack2: 3311
+    Defense: 27
+    MagicDefense: 17
+    Str: 100
+    Agi: 112
+    Vit: 76
+    Int: 89
+    Dex: 187
+    Luk: 102
+    AttackRange: 3
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Medium
+    Element: Dark
+    ElementLevel: 2
+    WalkSpeed: 140
+    AttackDelay: 1152
+    AttackMotion: 576
+    DamageMotion: 432
   - Id: 21292
     AegisName: EP18_ARMED_VILLAGER01
     Name: Armed villager
@@ -86711,6 +86811,31 @@ Body:
       - {Item: Shell_Of_Cognition, Rate: 2000}
       - {Item: Mother's_Nightmare, Rate: 10}
       - {Item: ILL_Maya_Card, Rate: 1, StealProtected: true}
+  - Id: 21502
+    AegisName: BAPHOMET2
+    Name: Baphomet
+    Level: 81
+    Hp: 668000
+    Attack: 3220
+    Attack2: 4040
+    Defense: 35
+    MagicDefense: 45
+    Agi: 152
+    Vit: 30
+    Int: 85
+    Dex: 120
+    Luk: 95
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    Race: Demon
+    Element: Dark
+    ElementLevel: 3
+    WalkSpeed: 100
+    AttackDelay: 768
+    AttackMotion: 768
+    DamageMotion: 576
   - Id: 21513
     AegisName: EP19_NPC_IWIN
     Name: Iwin
@@ -87755,6 +87880,80 @@ Body:
       - {Item: EP19_Shell_Of_Rgan, Rate: 2625}
       - {Item: EP19_Unknown_Cell, Rate: 1500}
       - {Item: E_Inter_Rgan_Card, Rate: 1, StealProtected: true}
+  - Id: 21630
+    AegisName: WILD_ROSE3
+    Name: Wild Rose
+    Level: 38
+    Hp: 2980
+    Attack: 315
+    Attack2: 360
+    MagicDefense: 15
+    Str: 65
+    Agi: 85
+    Vit: 15
+    Int: 35
+    Dex: 65
+    Luk: 80
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Race: Brute
+    Element: Wind
+    WalkSpeed: 100
+    AttackDelay: 964
+    AttackMotion: 864
+    DamageMotion: 288
+  - Id: 21631
+    AegisName: BLUEMOON_LOLI_RURI2
+    Name: Blue Moon Loli Ruri
+    Level: 255
+    Hp: 596605
+    Attack: 14716
+    Attack2: 2795
+    Defense: 60
+    MagicDefense: 36
+    Str: 220
+    Agi: 185
+    Vit: 175
+    Int: 141
+    Dex: 190
+    Luk: 184
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    Race: Demon
+    Element: Water
+    ElementLevel: 3
+    WalkSpeed: 125
+    AttackDelay: 510
+    AttackMotion: 1020
+    DamageMotion: 576
+  - Id: 21653
+    AegisName: EDDGA3
+    Name: Eddga
+    Level: 65
+    Hp: 152000
+    Attack: 1215
+    Attack2: 1565
+    Defense: 15
+    MagicDefense: 15
+    Str: 78
+    Agi: 70
+    Vit: 85
+    Int: 66
+    Dex: 90
+    Luk: 85
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    Race: Brute
+    Element: Fire
+    WalkSpeed: 300
+    AttackDelay: 872
+    AttackMotion: 1344
+    DamageMotion: 432
   - Id: 21853
     AegisName: EP19_MD_BOX1
     Name: Suspicious Storage Stone
@@ -89025,6 +89224,31 @@ Body:
   - Id: 22007
     AegisName: EP20_NPC_LASGAND
     Name: EP20_NPC_LASGAND
+  - Id: 22185
+    AegisName: DARK_LORD2
+    Name: Dark Lord
+    Level: 80
+    Hp: 720000
+    Attack: 2800
+    Attack2: 3320
+    Defense: 30
+    MagicDefense: 70
+    Agi: 120
+    Vit: 30
+    Int: 118
+    Dex: 99
+    Luk: 60
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    Race: Demon
+    Element: Undead
+    ElementLevel: 4
+    WalkSpeed: 100
+    AttackDelay: 868
+    AttackMotion: 768
+    DamageMotion: 480
   - Id: 22192
     AegisName: SPIRIT_G_LAND_S
     Name: L Blue Earth Spirit
@@ -90937,6 +91161,152 @@ Body:
     Ai: 21
     Class: Boss
     Modes: {CastSensorIdle: true, Detector: true, KnockBackImmune: true, Mvp: true}
+  - Id: 22405
+    AegisName: MISTRESS3
+    Name: Mistress
+    Level: 74
+    Hp: 212000
+    Attack: 880
+    Attack2: 1110
+    Defense: 40
+    MagicDefense: 60
+    Str: 50
+    Agi: 165
+    Vit: 60
+    Int: 95
+    Dex: 70
+    Luk: 130
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Race: Insect
+    Element: Wind
+    ElementLevel: 4
+    WalkSpeed: 100
+    AttackDelay: 1148
+    AttackMotion: 648
+    DamageMotion: 300
+  - Id: 22406
+    AegisName: GIANT_HONET2
+    Name: Giant Hornet
+    Level: 56
+    Hp: 13105
+    Attack: 650
+    Attack2: 852
+    Defense: 38
+    MagicDefense: 43
+    Str: 35
+    Agi: 38
+    Vit: 32
+    Int: 10
+    Dex: 71
+    Luk: 64
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Race: Insect
+    Element: Wind
+    WalkSpeed: 155
+    AttackDelay: 1292
+    AttackMotion: 792
+    DamageMotion: 340
+  - Id: 22504
+    AegisName: C_TOWER_MANAGER2
+    Name: Clock Tower Manager
+    Level: 63
+    Hp: 18600
+    Attack: 880
+    Attack2: 1180
+    Defense: 35
+    MagicDefense: 30
+    Agi: 75
+    Vit: 20
+    Int: 64
+    Dex: 75
+    Luk: 60
+    AttackRange: 3
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    ElementLevel: 4
+    WalkSpeed: 200
+    AttackDelay: 1072
+    AttackMotion: 672
+    DamageMotion: 384
+  - Id: 22505
+    AegisName: ANGELGOLT3
+    Name: Angelgolt
+    Level: 196
+    Hp: 461785
+    Attack: 1102
+    Attack2: 1542
+    Defense: 44
+    MagicDefense: 31
+    Str: 143
+    Agi: 117
+    Vit: 102
+    Int: 186
+    Dex: 231
+    Luk: 106
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Race: Angel
+    Element: Holy
+    ElementLevel: 4
+    WalkSpeed: 250
+    AttackDelay: 678
+    AttackMotion: 780
+    DamageMotion: 480
+  - Id: 22506
+    AegisName: TIMEHOLDER3
+    Name: Time Holder
+    Level: 170
+    Hp: 4140807
+    Attack: 5250
+    Attack2: 9100
+    Defense: 57
+    MagicDefense: 38
+    Str: 224
+    Agi: 152
+    Vit: 251
+    Int: 257
+    Dex: 402
+    Luk: 77
+    AttackRange: 1
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    Race: Demon
+    ElementLevel: 4
+    AttackMotion: 576
+    DamageMotion: 480
+  - Id: 23000
+    AegisName: DARK_ILLUSION2
+    Name: Dark Illusion
+    Level: 77
+    Hp: 103631
+    Attack: 1300
+    Attack2: 1983
+    Defense: 64
+    MagicDefense: 70
+    Str: 5
+    Agi: 100
+    Vit: 40
+    Int: 100
+    Dex: 97
+    Luk: 40
+    AttackRange: 2
+    SkillRange: 10
+    ChaseRange: 12
+    Size: Large
+    Race: Demon
+    Element: Undead
+    ElementLevel: 4
+    WalkSpeed: 145
+    AttackDelay: 1024
+    AttackMotion: 768
+    DamageMotion: 480
   - Id: 23060
     AegisName: EP20_ARMOERDCOPO
     Name: Reliable Copo

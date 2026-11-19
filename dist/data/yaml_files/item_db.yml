@@ -60337,14 +60337,68 @@ Body:
     Type: Petegg
     Buy: 20
     Sell: 10
+  - Id: 9126
+    AegisName: Kiel_Egg
+    Name: Kiel Egg
+    Type: PetEgg
+    Buy: 20
+    Sell: 10
+  - Id: 9128
+    AegisName: Dark_Priest_Egg
+    Name: Dark Priest Egg
+    Type: PetEgg
+    Buy: 20
+    Sell: 10
   - Id: 9129
     AegisName: Desert_Wolf_Egg
     Name: Desert Wolf Egg
     Type: PetEgg
+  - Id: 9130
+    AegisName: Chaos_Bapho_Jr_Egg
+    Name: Chaos Baphomet Jr. Egg
+    Type: PetEgg
+    Buy: 20
+    Sell: 10
   - Id: 9131
     AegisName: Fire_Golem_Egg
     Name: Fire Golem Egg
     Type: PetEgg
+  - Id: 9137
+    AegisName: Baphomet_Egg
+    Name: Baphomet Egg
+    Type: PetEgg
+    Buy: 20
+    Sell: 10
+  - Id: 9138
+    AegisName: Farmiliar_Egg
+    Name: Farmiliar Egg
+    Type: PetEgg
+    Buy: 20
+    Sell: 10
+  - Id: 9139
+    AegisName: Dark_Illusion_Egg
+    Name: Dark Illusion Egg
+    Type: PetEgg
+    Buy: 20
+    Sell: 10
+  - Id: 9140
+    AegisName: Blue_Moon_Loli_Ruri_Egg
+    Name: Blue Moon Loli Ruri Egg
+    Type: PetEgg
+    Buy: 20
+    Sell: 10
+  - Id: 9141
+    AegisName: Wild_Rose_Egg2
+    Name: Wild Rose Egg
+    Type: PetEgg
+    Buy: 20
+    Sell: 10
+  - Id: 9142
+    AegisName: Eddga_Egg2
+    Name: Eddga Egg
+    Type: PetEgg
+    Buy: 20
+    Sell: 10
   - Id: 9145
     AegisName: Copo_Egg
     Name: Copo Egg
@@ -60357,6 +60411,60 @@ Body:
     AegisName: Icewind_Egg
     Name: Icewind Egg
     Type: PetEgg
+  - Id: 9148
+    AegisName: Dark_Lord_Egg
+    Name: Dark Lord Egg
+    Type: PetEgg
+    Buy: 20
+    Sell: 10
+  - Id: 9155
+    AegisName: Hornet_Egg
+    Name: Hornet Egg
+    Type: PetEgg
+    Buy: 20
+    Sell: 10
+  - Id: 9169
+    AegisName: C_Tower_Manager_Egg
+    Name: Clock Tower Manager Egg
+    Type: PetEgg
+    Buy: 20
+    Sell: 10
+  - Id: 9170
+    AegisName: Angelgolt_Egg
+    Name: Angelgolt Egg
+    Type: PetEgg
+    Buy: 20
+    Sell: 10
+  - Id: 9171
+    AegisName: Timeholder_Egg
+    Name: Timeholder Egg
+    Type: PetEgg
+    Buy: 20
+    Sell: 10
+  - Id: 9187
+    AegisName: Skeggiold_Egg
+    Name: Skeggiold Egg
+    Type: PetEgg
+    Buy: 20
+    Sell: 10
+  - Id: 9190
+    AegisName: Clock_Egg
+    Name: Clock Egg
+    Type: PetEgg
+    Buy: 20
+    Sell: 10
+  - Id: 9192
+    AegisName: Giant_Hornet_Egg
+    Name: Giant Hornet Egg
+    Type: PetEgg
+    Buy: 20
+    Sell: 10
+  - Id: 9193
+    AegisName: Mistress_Egg
+    Name: Mistress Egg
+    Type: PetEgg
+    Buy: 20
+    Sell: 10
   - Id: 9514
     AegisName: Ein_Ddbox
     Name: Physical Modification Permit
@@ -114259,6 +114367,28 @@ Body:
     Sell: 10000
     Script: |
       pet;
+  - Id: 23257
+    AegisName: Dew_Of_Old_Tree
+    Name: Old Tree's Dew
+    Type: Usable
+    Buy: 20000
+    Sell: 10000
+    Weight: 50
+    Flags: {BuyingStore: true}
+    NoUse: {Sitting: true}
+    Script: |
+      pet;
+  - Id: 23258
+    AegisName: Foul_Rotten_Meat
+    Name: Stinky Rotten Meat
+    Type: Usable
+    Buy: 20000
+    Sell: 10000
+    Weight: 50
+    Flags: {BuyingStore: true}
+    NoUse: {Sitting: true}
+    Script: |
+      pet;
   - Id: 23277
     AegisName: Mado_Box
     Name: Emergency Magic Gear
@@ -129604,6 +129734,17 @@ Body:
     Weight: 10
     Script: |
       laphine_upgrade();
+  - Id: 100796
+    AegisName: Darkness_Bible
+    Name: Dark Bible
+    Type: Usable
+    Buy: 20000
+    Sell: 10000
+    Weight: 50
+    Flags: {BuyingStore: true}
+    NoUse: {Sitting: true}
+    Script: |
+      pet;
   - Id: 100900
     AegisName: Teleport_Ep19_01
     Name: Ice Castle Transport Wing
@@ -129658,6 +129799,17 @@ Body:
     Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
     Script: |
       laphine_upgrade();
+  - Id: 101331
+    AegisName: Fruits_Set_Trap
+    Name: Fruit Set Trap
+    Type: Usable
+    Buy: 20000
+    Sell: 10000
+    Weight: 10
+    Flags: {BuyingStore: true}
+    NoUse: {Sitting: true}
+    Script: |
+      pet;
   - Id: 101355
     AegisName: OS_Weapon_Reform
     Name: OS Weapon Modification Box
@@ -129762,6 +129914,17 @@ Body:
     Flags: {Container: true, DropEffect: CLIENT}
     Script: |
       getgroupitem(IG_AIRBOAT_ANTIQUITY,true);
+  - Id: 102723
+    AegisName: Beehive_Box
+    Name: Beehive
+    Type: Usable
+    Buy: 20000
+    Sell: 10000
+    Weight: 50
+    Flags: {BuyingStore: true}
+    NoUse: {Sitting: true}
+    Script: |
+      pet;
   - Id: 102795
     AegisName: Forgotten_Crystal_1
     Name: Crystal of Forgotten Time (Area 1)
@@ -129788,6 +129951,28 @@ Body:
          specialeffect2 EF_FREEZING;
          showscript "It doesn't seem to have any effect here.", playerattached(), SELF;
       }
+  - Id: 103218
+    AegisName: Angels_Song
+    Name: Angel's Song
+    Type: Usable
+    Buy: 20000
+    Sell: 10000
+    Weight: 50
+    Flags: {BuyingStore: true}
+    NoUse: {Sitting: true}
+    Script: |
+      pet;
+  - Id: 103219
+    AegisName: Clock_Lubricant
+    Name: Clock Lubricant
+    Type: Usable
+    Buy: 20000
+    Sell: 10000
+    Weight: 50
+    Flags: {BuyingStore: true}
+    NoUse: {Sitting: true}
+    Script: |
+      pet;
   - Id: 300001
     AegisName: Poisonous_Card
     Name: Poisonous Card
@@ -163227,6 +163412,13 @@ Body:
     Name: Maya's Crown
     Weight: 10
     Flags: {BuyingStore: true}
+  - Id: 1000552
+    AegisName: Evil_Water
+    Name: Evil Water
+    Buy: 1000
+    Sell: 500
+    Weight: 10
+    Flags: {BuyingStore: true}
   - Id: 1000604
     AegisName: Ep19_Juncea_Tube
     Name: Juncea Test Tube
@@ -163720,6 +163912,13 @@ Body:
     AegisName: Ep19_Ice_Cookie
     Name: Ice Cookie
     Trade: {NoDrop: true, NoTrade: true, NoCart: true, NoStorage: true, NoGuildStorage: true, NoMail: true, NoAuction: true}
+  - Id: 1000889
+    AegisName: Mixed_Fruits_Juice
+    Name: Complex Fruit Juice
+    Buy: 1000
+    Sell: 500
+    Weight: 10
+    Flags: {BuyingStore: true}
   - Id: 1001029
     AegisName: EP19_D_P_Ore
     Name: Encroached Magical Ore

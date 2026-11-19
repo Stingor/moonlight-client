@@ -5707,6 +5707,794 @@ achievements:
       minor: 0
       objectives:
         - {text: "Pochettes ouvertes"}
+  900100:
+    name: "Enfants de la nuit"
+    score: 50
+    targets: []
+    reward: {item: 25377, title: 0, script: false}
+    dependents: [900101, 900102, 900103, 900104, 900105, 900106, 900107, 900108]
+    window:
+      summary: "Réussir tous les défis de la série"
+      details: "Démons et créatures des ténèbres : il faut du cran pour en faire des compagnons."
+      gauge: bullets
+      group: "GOAL_LEVEL"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Réussir le défi « Deviruchi - taming »", shortcut: 900101}
+        - {text: "Réussir le défi « Baphomet Jr. - taming »", shortcut: 900102}
+        - {text: "Réussir le défi « Deleter - taming »", shortcut: 900103}
+        - {text: "Réussir le défi « Diabolic - taming »", shortcut: 900104}
+        - {text: "Réussir le défi « Imp - taming »", shortcut: 900105}
+        - {text: "Réussir le défi « Incubus - taming »", shortcut: 900106}
+        - {text: "Réussir le défi « Nightmare Terror - taming »", shortcut: 900107}
+        - {text: "Réussir le défi « Dark Priest - taming »", shortcut: 900108}
+  900101:
+    name: "Deviruchi - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Deviruchi"
+      details: "Capturez un Deviruchi pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Deviruchi"}
+  900102:
+    name: "Baphomet Jr. - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Baphomet Jr."
+      details: "Capturez un Baphomet Jr. pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Baphomet Jr."}
+  900103:
+    name: "Deleter - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Deleter"
+      details: "Capturez un Deleter pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Deleter"}
+  900104:
+    name: "Diabolic - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Diabolic"
+      details: "Capturez un Diabolic pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Diabolic"}
+  900105:
+    name: "Imp - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Imp"
+      details: "Capturez un Imp pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Imp"}
+  900106:
+    name: "Incubus - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Incubus"
+      details: "Capturez un Incubus pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Incubus"}
+  900107:
+    name: "Nightmare Terror - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Nightmare Terror"
+      details: "Capturez un Nightmare Terror pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Nightmare Terror"}
+  900108:
+    name: "Dark Priest - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Dark Priest"
+      details: "Capturez un Dark Priest pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Dark Priest"}
+  900120:
+    name: "La horde verte"
+    score: 50
+    targets: []
+    reward: {item: 25377, title: 0, script: false}
+    dependents: [900121, 900122, 900123, 900124, 900125]
+    window:
+      summary: "Réussir tous les défis de la série"
+      details: "Orcs et gobelins se laissent apprivoiser, pour peu qu'on parle leur langue."
+      gauge: bullets
+      group: "GOAL_LEVEL"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Réussir le défi « Orc Warrior - taming »", shortcut: 900121}
+        - {text: "Réussir le défi « Goblin (couteau) - taming »", shortcut: 900122}
+        - {text: "Réussir le défi « Goblin (fleau) - taming »", shortcut: 900123}
+        - {text: "Réussir le défi « Goblin (marteau) - taming »", shortcut: 900124}
+        - {text: "Réussir le défi « Goblin Leader - taming »", shortcut: 900125}
+  900121:
+    name: "Orc Warrior - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Orc Warrior"
+      details: "Capturez un Orc Warrior pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Orc Warrior"}
+  900122:
+    name: "Goblin (couteau) - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Goblin (couteau)"
+      details: "Capturez un Goblin (couteau) pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Goblin (couteau)"}
+  900123:
+    name: "Goblin (fleau) - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Goblin (fleau)"
+      details: "Capturez un Goblin (fleau) pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Goblin (fleau)"}
+  900124:
+    name: "Goblin (marteau) - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Goblin (marteau)"
+      details: "Capturez un Goblin (marteau) pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Goblin (marteau)"}
+  900125:
+    name: "Goblin Leader - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Goblin Leader"
+      details: "Capturez un Goblin Leader pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Goblin Leader"}
+  900140:
+    name: "Contes d'Orient"
+    score: 50
+    targets: []
+    reward: {item: 25377, title: 0, script: false}
+    dependents: [900141, 900142, 900143, 900144, 900145, 900146, 900147, 900148, 900149, 900150]
+    window:
+      summary: "Réussir tous les défis de la série"
+      details: "Les esprits et les héros des légendes de l'Est ne suivent que les plus patients."
+      gauge: bullets
+      group: "GOAL_LEVEL"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Réussir le défi « Dokebi - taming »", shortcut: 900141}
+        - {text: "Réussir le défi « Bongun - taming »", shortcut: 900142}
+        - {text: "Réussir le défi « Shinobi - taming »", shortcut: 900143}
+        - {text: "Réussir le défi « Miyabi Doll - taming »", shortcut: 900144}
+        - {text: "Réussir le défi « Evil Nymph - taming »", shortcut: 900145}
+        - {text: "Réussir le défi « Mao Guai - taming »", shortcut: 900146}
+        - {text: "Réussir le défi « White Lady - taming »", shortcut: 900147}
+        - {text: "Réussir le défi « Nine Tail - taming »", shortcut: 900148}
+        - {text: "Réussir le défi « Chung E - taming »", shortcut: 900149}
+        - {text: "Réussir le défi « Tikbalang - taming »", shortcut: 900150}
+  900141:
+    name: "Dokebi - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Dokebi"
+      details: "Capturez un Dokebi pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Dokebi"}
+  900142:
+    name: "Bongun - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Bongun"
+      details: "Capturez un Bongun pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Bongun"}
+  900143:
+    name: "Shinobi - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Shinobi"
+      details: "Capturez un Shinobi pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Shinobi"}
+  900144:
+    name: "Miyabi Doll - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Miyabi Doll"
+      details: "Capturez un Miyabi Doll pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Miyabi Doll"}
+  900145:
+    name: "Evil Nymph - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Evil Nymph"
+      details: "Capturez un Evil Nymph pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Evil Nymph"}
+  900146:
+    name: "Mao Guai - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Mao Guai"
+      details: "Capturez un Mao Guai pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Mao Guai"}
+  900147:
+    name: "White Lady - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un White Lady"
+      details: "Capturez un White Lady pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un White Lady"}
+  900148:
+    name: "Nine Tail - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Nine Tail"
+      details: "Capturez un Nine Tail pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Nine Tail"}
+  900149:
+    name: "Chung E - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Chung E"
+      details: "Capturez un Chung E pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Chung E"}
+  900150:
+    name: "Tikbalang - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Tikbalang"
+      details: "Capturez un Tikbalang pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Tikbalang"}
+  900160:
+    name: "Âmes sans repos"
+    score: 50
+    targets: []
+    reward: {item: 25377, title: 0, script: false}
+    dependents: [900161, 900162, 900163, 900164, 900165, 900166]
+    window:
+      summary: "Réussir tous les défis de la série"
+      details: "Fantômes, momies et poupées : ils ont déjà vécu, ils peuvent bien vous suivre."
+      gauge: bullets
+      group: "GOAL_LEVEL"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Réussir le défi « Wanderer - taming »", shortcut: 900161}
+        - {text: "Réussir le défi « Whisper - taming »", shortcut: 900162}
+        - {text: "Réussir le défi « Dullahan - taming »", shortcut: 900163}
+        - {text: "Réussir le défi « Mummy - taming »", shortcut: 900164}
+        - {text: "Réussir le défi « Marionette - taming »", shortcut: 900165}
+        - {text: "Réussir le défi « Medusa - taming »", shortcut: 900166}
+  900161:
+    name: "Wanderer - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Wanderer"
+      details: "Capturez un Wanderer pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Wanderer"}
+  900162:
+    name: "Whisper - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Whisper"
+      details: "Capturez un Whisper pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Whisper"}
+  900163:
+    name: "Dullahan - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Dullahan"
+      details: "Capturez un Dullahan pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Dullahan"}
+  900164:
+    name: "Mummy - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Mummy"
+      details: "Capturez un Mummy pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Mummy"}
+  900165:
+    name: "Marionette - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Marionette"
+      details: "Capturez un Marionette pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Marionette"}
+  900166:
+    name: "Medusa - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Medusa"
+      details: "Capturez un Medusa pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Medusa"}
+  900180:
+    name: "Bêtes curieuses"
+    score: 50
+    targets: []
+    reward: {item: 25377, title: 0, script: false}
+    dependents: [900181, 900182, 900183, 900184, 900185, 900186, 900187, 900188, 900189]
+    window:
+      summary: "Réussir tous les défis de la série"
+      details: "Golems, chats, coquillages et oursons : une ménagerie bien étrange."
+      gauge: bullets
+      group: "GOAL_LEVEL"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Réussir le défi « Golem - taming »", shortcut: 900181}
+        - {text: "Réussir le défi « Stone Shooter - taming »", shortcut: 900182}
+        - {text: "Réussir le défi « Leaf Cat - taming »", shortcut: 900183}
+        - {text: "Réussir le défi « Cramp - taming »", shortcut: 900184}
+        - {text: "Réussir le défi « Hydra - taming »", shortcut: 900185}
+        - {text: "Réussir le défi « Marin - taming »", shortcut: 900186}
+        - {text: "Réussir le défi « Gremlin - taming »", shortcut: 900187}
+        - {text: "Réussir le défi « Teddy Bear - taming »", shortcut: 900188}
+        - {text: "Réussir le défi « Copo - taming »", shortcut: 900189}
+  900181:
+    name: "Golem - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Golem"
+      details: "Capturez un Golem pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Golem"}
+  900182:
+    name: "Stone Shooter - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Stone Shooter"
+      details: "Capturez un Stone Shooter pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Stone Shooter"}
+  900183:
+    name: "Leaf Cat - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Leaf Cat"
+      details: "Capturez un Leaf Cat pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Leaf Cat"}
+  900184:
+    name: "Cramp - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Cramp"
+      details: "Capturez un Cramp pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Cramp"}
+  900185:
+    name: "Hydra - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Hydra"
+      details: "Capturez un Hydra pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Hydra"}
+  900186:
+    name: "Marin - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Marin"
+      details: "Capturez un Marin pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Marin"}
+  900187:
+    name: "Gremlin - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Gremlin"
+      details: "Capturez un Gremlin pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Gremlin"}
+  900188:
+    name: "Teddy Bear - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Teddy Bear"
+      details: "Capturez un Teddy Bear pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Teddy Bear"}
+  900189:
+    name: "Copo - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Copo"
+      details: "Capturez un Copo pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Copo"}
+  900200:
+    name: "Nouveaux compagnons"
+    score: 50
+    targets: []
+    reward: {item: 25377, title: 0, script: false}
+    dependents: [900201, 900202, 900203, 900204, 900205, 900206]
+    window:
+      summary: "Réussir tous les défis de la série"
+      details: "Les familiers arrivés à Moonlight en dernier attendent leur dresseur."
+      gauge: bullets
+      group: "GOAL_LEVEL"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Réussir le défi « Willow - taming »", shortcut: 900201}
+        - {text: "Réussir le défi « Roween - taming »", shortcut: 900202}
+        - {text: "Réussir le défi « Familiar - taming »", shortcut: 900203}
+        - {text: "Réussir le défi « Hornet - taming »", shortcut: 900204}
+        - {text: "Réussir le défi « Skeggiold - taming »", shortcut: 900205}
+        - {text: "Réussir le défi « Clock - taming »", shortcut: 900206}
+  900201:
+    name: "Willow - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Willow"
+      details: "Capturez un Willow pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Willow"}
+  900202:
+    name: "Roween - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Roween"
+      details: "Capturez un Roween pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Roween"}
+  900203:
+    name: "Familiar - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Familiar"
+      details: "Capturez un Familiar pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Familiar"}
+  900204:
+    name: "Hornet - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Hornet"
+      details: "Capturez un Hornet pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Hornet"}
+  900205:
+    name: "Skeggiold - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Skeggiold"
+      details: "Capturez un Skeggiold pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Skeggiold"}
+  900206:
+    name: "Clock - taming"
+    score: 10
+    targets: [[0, 1]]
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "Apprivoiser un Clock"
+      details: "Capturez un Clock pour en faire votre familier."
+      gauge: bullets
+      group: "TAMING"
+      major: 3
+      minor: 1
+      objectives:
+        - {text: "Apprivoiser un Clock"}
   910001:
     name: "Jusqu'au bout"
     score: 10
