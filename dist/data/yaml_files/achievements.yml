@@ -39,6 +39,21 @@
 version: 1
 mode: Prerenewal
 achievements:
+  110000:
+    name: "At this time I live to eat"
+    score: 10
+    targets: []
+    reward: {item: 0, title: 0, script: false}
+    dependents: []
+    window:
+      summary: "1 a.m. - Time for an midnight snack."
+      details: "Bring the food Bigfoot demands to an ambitious perspective"
+      gauge: bullets
+      group: "EAT"
+      major: 4
+      minor: 0
+      objectives:
+        - {text: "Bring the food Bigfoot demands to an ambitious perspective"}
   110001:
     name: "A fan of this polarity"
     score: 10
@@ -3009,9 +3024,18 @@ achievements:
   128039:
     name: "Show Jailbreak to the weak captain"
     score: 10
-    targets: []
+    targets: [[0, 1]]
     reward: {item: 0, title: 0, script: false}
     dependents: []
+    window:
+      summary: "Eliminate Ferlock"
+      details: "Proceed until the end of the Dungeon"
+      gauge: counts
+      group: "BATTLE"
+      major: 5
+      minor: 0
+      objectives:
+        - {text: "Eliminate 1 Ferlock"}
   128040:
     name: "Riot on board"
     score: 20
@@ -3033,6 +3057,15 @@ achievements:
     targets: [[0, 10]]
     reward: {item: 0, title: 0, script: false}
     dependents: []
+    window:
+      summary: "Eliminate Ferlock"
+      details: "Proceed until the end of the Dungeon"
+      gauge: counts
+      group: "BATTLE"
+      major: 5
+      minor: 0
+      objectives:
+        - {text: "Eliminate 10 Ferlock"}
   128042:
     name: "Rebellion on board"
     score: 50
@@ -3051,9 +3084,18 @@ achievements:
   128043:
     name: "Revolt of Riot"
     score: 50
-    targets: []
+    targets: [[0, 50]]
     reward: {item: 0, title: 0, script: false}
     dependents: []
+    window:
+      summary: "Eliminate Ferlock"
+      details: "Proceed until the end of the Dungeon"
+      gauge: counts
+      group: "BATTLE"
+      major: 5
+      minor: 0
+      objectives:
+        - {text: "Eliminate 50 Ferlock"}
   128044:
     name: "Magic tournament champion"
     score: 10
