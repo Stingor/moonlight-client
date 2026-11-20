@@ -3629,6 +3629,21 @@ achievements:
         - {text: "Visit Richard Royal Family and start conversation"}
         - {text: "Visit Gaebolg Royal Family and start conversation"}
         - {text: "Visit Lugenburg Royal Family and start conversation"}
+  130005:
+    name: "The One Who Made Kings"
+    score: 10
+    targets: []
+    reward: {item: 0, title: 1046, script: false}
+    dependents: []
+    window:
+      summary: "The king I created"
+      details: "Restore the glory of Terra Gloria and crown its protagonists."
+      gauge: bullets
+      group: "CHATTING"
+      major: 4
+      minor: 0
+      objectives:
+        - {text: "Attend the coronation ceremony of the new king of Rune-Midgards"}
   170000:
     name: "Song chamber is not an accident"
     score: 10
