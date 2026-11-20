@@ -191,7 +191,7 @@ class Painter {
   [[nodiscard]] float TextWidth(std::string_view text, float size, bool bold = false) const {
     const ImVec2 extent = ImGui::GetFont()->CalcTextSizeA(size * scale_, FLT_MAX, 0.0F, text.data(),
                                                           text.data() + text.size());
-    return extent.x / scale_ + (bold ? kFakeBoldPixels : 0.0F);
+    return (extent.x + (bold ? Offset(kFakeBoldPixels) : 0.0F)) / scale_;
   }
   [[nodiscard]] float TextHeight(float size) const {
     return ImGui::GetFont()->CalcTextSizeA(size * scale_, FLT_MAX, 0.0F, "A").y / scale_;
@@ -204,13 +204,7 @@ class Painter {
     if (text.empty()) {
       return;
     }
-    ImFont* const font = ImGui::GetFont();
-    const char* const begin = text.data();
-    const char* const end = begin + text.size();
-    into_->AddText(font, size * scale_, At(x, y), color, begin, end);
-    if (bold) {
-      into_->AddText(font, size * scale_, At(x + kFakeBoldPixels, y), color, begin, end);
-    }
+    TextShifted(x, y, 0.0F, 0.0F, text, size, color, bold);
   }
 
   void TextRight(float right, float y, std::string_view text, float size, ImU32 color,
@@ -227,17 +221,19 @@ class Painter {
   // Le contour : quatre passes en croix, puis le texte.
   void TextOutlined(float x, float y, std::string_view text, float size, ImU32 color, ImU32 outline,
                     bool bold = false) const {
-    Text(x - kOutlinePixels, y, text, size, outline, bold);
-    Text(x + kOutlinePixels, y, text, size, outline, bold);
-    Text(x, y - kOutlinePixels, text, size, outline, bold);
-    Text(x, y + kOutlinePixels, text, size, outline, bold);
+    const float step = Offset(kOutlinePixels);
+    TextShifted(x, y, -step, 0.0F, text, size, outline, bold);
+    TextShifted(x, y, step, 0.0F, text, size, outline, bold);
+    TextShifted(x, y, 0.0F, -step, text, size, outline, bold);
+    TextShifted(x, y, 0.0F, step, text, size, outline, bold);
     Text(x, y, text, size, color, bold);
   }
 
   // L'ombre portée, un pixel en bas à droite, puis le texte.
   void TextShadowed(float x, float y, std::string_view text, float size, ImU32 color, ImU32 shadow,
                     bool bold = false) const {
-    Text(x + kShadowPixels, y + kShadowPixels, text, size, shadow, bold);
+    const float step = Offset(kShadowPixels);
+    TextShifted(x, y, step, step, text, size, shadow, bold);
     Text(x, y, text, size, color, bold);
   }
 
@@ -300,6 +296,32 @@ class Painter {
   }
 
  private:
+  // Un décalage d'art en pixels d'écran entiers : voir `ScreenOffsetPixels`.
+  [[nodiscard]] float Offset(float art_pixels) const {
+    return ScreenOffsetPixels(art_pixels, scale_);
+  }
+
+  // Le texte en (x, y), déplacé de (`shift_x`, `shift_y`) pixels D'ÉCRAN, et
+  // son faux gras. ⚠ LES DÉCALAGES S'AJOUTENT APRÈS `At` : ajoutés aux
+  // coordonnées d'art, ils grandiraient avec l'échelle et tomberaient, arrondis
+  // avec la position, à un ou deux pixels selon l'endroit.
+  void TextShifted(float x, float y, float shift_x, float shift_y, std::string_view text,
+                   float size, ImU32 color, bool bold) const {
+    if (text.empty()) {
+      return;
+    }
+    ImFont* const font = ImGui::GetFont();
+    const char* const begin = text.data();
+    const char* const end = begin + text.size();
+    const ImVec2 corner = At(x, y);
+    const ImVec2 at(corner.x + shift_x, corner.y + shift_y);
+    into_->AddText(font, size * scale_, at, color, begin, end);
+    if (bold) {
+      into_->AddText(font, size * scale_, ImVec2(at.x + Offset(kFakeBoldPixels), at.y), color,
+                     begin, end);
+    }
+  }
+
   ImDrawList* into_;
   ImVec2 origin_;
   float scale_;

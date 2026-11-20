@@ -1,6 +1,8 @@
 #pragma once
 
+#include <algorithm>
 #include <array>
+#include <cmath>
 #include <cstdint>
 #include <span>
 
@@ -33,6 +35,18 @@ inline constexpr float kButtonSinkPixels = 1.0F;
 // Le décalage du FAUX GRAS : le même texte, repassé un pixel plus loin. La
 // police n'a qu'une graisse chargée.
 inline constexpr float kFakeBoldPixels = 1.0F;
+
+// UN DÉCALAGE DE PIXELS D'ART, porté à l'écran à l'échelle `scale` : un nombre
+// ENTIER de pixels, jamais moins d'un. C'est celui du faux gras, d'un contour,
+// d'une ombre : une seconde passe du même texte.
+//
+// ⚠ ARRONDI VERS LE BAS, ET UNE FOIS POUR TOUTES. Produit puis arrondi avec la
+// position du texte, 1,25 pixel donne un ou deux pixels selon l'endroit ; deux
+// pixels, sur une police d'une quinzaine de pixels dont les creux en font un ou
+// deux, bouchent les lettres.
+[[nodiscard]] inline float ScreenOffsetPixels(float art_pixels, float scale) {
+  return std::max(1.0F, std::floor(art_pixels * scale));
+}
 
 // La largeur qu'occuperait un bouton en taille automatique, DANS LA LANGUE
 // COURANTE. De quoi dimensionner un conteneur sur ses libellés traduits — le

@@ -64,9 +64,9 @@ void BoldText(std::string_view text, ImU32 color) {
   const ImVec2 at = ImGui::GetCursorScreenPos();
   const float wrap = ImGui::CalcWrapWidthForPos(at, ImGui::GetCurrentWindow()->DC.TextWrapPos);
   ColoredText(color, text);
-  ImGui::GetWindowDrawList()->AddText(ImGui::GetFont(), ImGui::GetFontSize(),
-                                      ImVec2(at.x + kFakeBoldPixels * Scale(), at.y), color, begin,
-                                      end, wrap);
+  ImGui::GetWindowDrawList()->AddText(
+      ImGui::GetFont(), ImGui::GetFontSize(),
+      ImVec2(at.x + ScreenOffsetPixels(kFakeBoldPixels, Scale()), at.y), color, begin, end, wrap);
 }
 
 // UNE LIGNE D'AVERTISSEMENT : le signe peint, puis la phrase repliée à sa

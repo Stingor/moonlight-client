@@ -341,6 +341,20 @@ TEST_CASE("Alignement : un texte se centre sur la RANGÉE, pas sur la pièce", "
   CHECK(ro::ui::RowTextTop(0.0F, 15.0F, 10.0F) == 2.0F);
 }
 
+// 🔴 LE FAUX GRAS RESTE À UN PIXEL ENTRE DEUX ÉCHELLES ENTIÈRES. À 125 %, la
+// seconde passe d'un texte d'une quinzaine de pixels tombée deux pixels plus
+// loin bouche les creux des lettres : « Aventure » ne se lit plus.
+TEST_CASE("Faux gras : un nombre entier de pixels d'écran, jamais moins d'un", "[ui][widgets]") {
+  using ro::ui::kFakeBoldPixels;
+  using ro::ui::ScreenOffsetPixels;
+  CHECK(ScreenOffsetPixels(kFakeBoldPixels, 1.0F) == 1.0F);
+  CHECK(ScreenOffsetPixels(kFakeBoldPixels, 1.25F) == 1.0F);
+  CHECK(ScreenOffsetPixels(kFakeBoldPixels, 1.5F) == 1.0F);
+  CHECK(ScreenOffsetPixels(kFakeBoldPixels, 2.0F) == 2.0F);
+  // Réduite, l'interface garde un gras visible.
+  CHECK(ScreenOffsetPixels(kFakeBoldPixels, 0.75F) == 1.0F);
+}
+
 // 🔴 LA DENSITÉ DE L'INTERFACE : un cadre vaut la barre de titre.
 //
 // Un champ de saisie, une jauge ou une liste déroulante valent la police plus

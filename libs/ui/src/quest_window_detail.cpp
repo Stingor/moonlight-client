@@ -64,7 +64,7 @@ void BoldText(std::string_view text, ImU32 color, float wrap) {
   const ImVec2 at = ImGui::GetCursorScreenPos();
   const char* const begin = text.data();
   const char* const end = begin + text.size();
-  const float bold = Px(kFakeBoldPixels);
+  const float bold = ScreenOffsetPixels(kFakeBoldPixels, Scale());
   const ImVec2 extent = font->CalcTextSizeA(size, FLT_MAX, wrap, begin, end);
   ImDrawList* const into = ImGui::GetWindowDrawList();
   into->AddText(font, size, at, color, begin, end, wrap);
