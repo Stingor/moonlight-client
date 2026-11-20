@@ -128,6 +128,9 @@ struct GreyWorldLook {
 [[nodiscard]] bool GreyWorldHidesModels(const GreyWorldLook& look) noexcept;
 [[nodiscard]] bool GreyWorldHidesLightmap(const GreyWorldLook& look) noexcept;
 [[nodiscard]] bool GreyWorldHidesMapEffects(const GreyWorldLook& look) noexcept;
+// 🔴 L'EAU PART AVEC L'INTERRUPTEUR, sans levier à elle : sa nappe garde la
+// hauteur de la carte, et sur un sol aplati ou uni elle noie tout le terrain.
+[[nodiscard]] bool GreyWorldHidesWater(const GreyWorldLook& look) noexcept;
 [[nodiscard]] bool GreyWorldShowsGrid(const GreyWorldLook& look) noexcept;
 [[nodiscard]] bool GreyWorldPaintsGround(const GreyWorldLook& look) noexcept;
 [[nodiscard]] bool GreyWorldFlattens(const GreyWorldLook& look) noexcept;

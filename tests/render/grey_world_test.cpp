@@ -38,6 +38,7 @@ using ro::render::GreyWorldGroundColor;
 using ro::render::GreyWorldHidesLightmap;
 using ro::render::GreyWorldHidesMapEffects;
 using ro::render::GreyWorldHidesModels;
+using ro::render::GreyWorldHidesWater;
 using ro::render::GreyWorldIsPainted;
 using ro::render::GreyWorldLook;
 using ro::render::GreyWorldPaintsGround;
@@ -218,6 +219,21 @@ TEST_CASE("GreyWorld : les effets de la carte ont leur propre levier", "[render]
   look.hide_models = true;
   CHECK_FALSE(GreyWorldHidesMapEffects(look));
   CHECK(GreyWorldHidesModels(look));
+}
+
+TEST_CASE("GreyWorld : l'eau part avec l'interrupteur, quels que soient les leviers",
+          "[render][greyworld]") {
+  GreyWorldLook look;
+  CHECK_FALSE(GreyWorldHidesWater(look));
+  look.enabled = true;
+  CHECK(GreyWorldHidesWater(look));
+  look.hide_models = false;
+  look.hide_lightmap = false;
+  look.hide_map_effects = false;
+  look.grid = false;
+  look.flat_ground = false;
+  look.flatten = false;
+  CHECK(GreyWorldHidesWater(look));
 }
 
 TEST_CASE("GreyWorld : le sol uni par défaut est une ardoise", "[render][greyworld]") {

@@ -85,6 +85,8 @@ bool GreyWorldHidesMapEffects(const GreyWorldLook& look) noexcept {
   return look.enabled && look.hide_map_effects;
 }
 
+bool GreyWorldHidesWater(const GreyWorldLook& look) noexcept { return look.enabled; }
+
 bool GreyWorldShowsGrid(const GreyWorldLook& look) noexcept { return look.enabled && look.grid; }
 
 bool GreyWorldPaintsGround(const GreyWorldLook& look) noexcept {
